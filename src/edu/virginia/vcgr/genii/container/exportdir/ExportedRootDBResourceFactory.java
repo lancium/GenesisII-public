@@ -9,21 +9,16 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public class ExportedRootDBResourceFactory extends ExportedDirDBResourceFactory
 {
-	public ExportedRootDBResourceFactory(
-			DatabaseConnectionPool pool)
-		throws SQLException
+	public ExportedRootDBResourceFactory(DatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}
-	
+
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
-		try
-		{
+		try {
 			return new ExportedRootDBResource(parentKey, _pool);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 	}

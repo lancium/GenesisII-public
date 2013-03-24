@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD})
-public @interface Option 
-{
+@Target({ ElementType.METHOD, ElementType.FIELD })
+public @interface Option {
 	String[] value();
+
 	String maxOccurances() default "1";
 }

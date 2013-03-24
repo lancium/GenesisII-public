@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface PipelineProcessor
-{
+public @interface PipelineProcessor {
 	Class<?> portType();
+
 	String methodName() default "";
 }

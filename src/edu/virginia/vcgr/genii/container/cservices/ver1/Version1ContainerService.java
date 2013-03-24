@@ -15,36 +15,34 @@ class Version1ContainerService
 {
 	@XmlAttribute(name = "class", required = true)
 	private String _className = null;
-	
+
 	@XmlElement(name = "property", nillable = true, required = false)
-	private Collection<Version1Property> _properties =
-		new LinkedList<Version1Property>();
-	
+	private Collection<Version1Property> _properties = new LinkedList<Version1Property>();
+
 	@SuppressWarnings("unchecked")
 	final Class<? extends ContainerService> serviceClass(Properties macros) throws ClassNotFoundException
 	{
 		String className = MacroUtils.replaceMacros(macros, _className);
-		
+
 		if (className.endsWith(".GridLoggerContainerService"))
 			return null;
-		
-		Class<? extends ContainerService> serviceClass =
-			(Class<? extends ContainerService>)Version1Upgrader.class.getClassLoader().loadClass(className);
-		
+
+		Class<? extends ContainerService> serviceClass = (Class<? extends ContainerService>) Version1Upgrader.class
+			.getClassLoader().loadClass(className);
+
 		return serviceClass;
 	}
-	
+
 	final Properties properties(Properties macros)
 	{
 		Properties ret = new Properties();
 		for (Version1Property property : _properties)
-			ret.setProperty(
-				MacroUtils.replaceMacros(macros, property.name()),
+			ret.setProperty(MacroUtils.replaceMacros(macros, property.name()),
 				MacroUtils.replaceMacros(macros, property.value()));
-		
+
 		return ret;
 	}
-	
+
 	@Override
 	final public String toString()
 	{

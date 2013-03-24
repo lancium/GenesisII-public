@@ -17,49 +17,32 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 
-public class ApplicationDeployerAttributeHandler extends
-		AbstractAttributeHandler
+public class ApplicationDeployerAttributeHandler extends AbstractAttributeHandler
 {
-	public ApplicationDeployerAttributeHandler(AttributePackage pkg)
-		throws NoSuchMethodException
+	public ApplicationDeployerAttributeHandler(AttributePackage pkg) throws NoSuchMethodException
 	{
 		super(pkg);
 	}
-	
-	public Collection<MessageElement> getSupportDocumentAttributes()
-		throws ResourceException, ResourceUnknownFaultType
+
+	public Collection<MessageElement> getSupportDocumentAttributes() throws ResourceException, ResourceUnknownFaultType
 	{
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
-		
-		PlatformDescriptionType []platform =
-			new PlatformDescriptionType[] {
-				new PlatformDescriptionType(
-					new CPUArchitecture_Type[] {
-						JSDLUtils.getLocalCPUArchitecture()
-				},
-				new OperatingSystem_Type[] {
-					JSDLUtils.getLocalOperatingSystem()
-				},
-				null)
-			};
-		
-		ret.add(new MessageElement(
-			AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME,
-				new SupportDocumentType(platform, null,
-					ApplicationDescriptionUtils.DEPLOYMENT_TYPE_BINARY)));
-		ret.add(new MessageElement(
-			AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME,
-				new SupportDocumentType(platform, null,
-					ApplicationDescriptionUtils.DEPLOYMENT_TYPE_ZIPJAR)));
-		
+
+		PlatformDescriptionType[] platform = new PlatformDescriptionType[] { new PlatformDescriptionType(
+			new CPUArchitecture_Type[] { JSDLUtils.getLocalCPUArchitecture() },
+			new OperatingSystem_Type[] { JSDLUtils.getLocalOperatingSystem() }, null) };
+
+		ret.add(new MessageElement(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME, new SupportDocumentType(platform,
+			null, ApplicationDescriptionUtils.DEPLOYMENT_TYPE_BINARY)));
+		ret.add(new MessageElement(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME, new SupportDocumentType(platform,
+			null, ApplicationDescriptionUtils.DEPLOYMENT_TYPE_ZIPJAR)));
+
 		return ret;
 	}
-	
+
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException
 	{
-		addHandler(
-			AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME, 
-			"getSupportDocumentAttributes");
+		addHandler(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME, "getSupportDocumentAttributes");
 	}
 }

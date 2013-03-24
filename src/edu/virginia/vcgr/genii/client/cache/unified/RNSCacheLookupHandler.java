@@ -41,30 +41,39 @@ import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
  * are always valid so we can safely increase the cache lifetime of the component RNS entries.
  * */
 
-public class RNSCacheLookupHandler {
-	
+public class RNSCacheLookupHandler
+{
+
 	static private Log _logger = LogFactory.getLog(RNSCacheLookupHandler.class);
 
 	@SuppressWarnings("unchecked")
-	public static LookupResponseType getCachedLookupResponse(EndpointReferenceType target, String filteredNames[]) {
+	public static LookupResponseType getCachedLookupResponse(EndpointReferenceType target, String filteredNames[])
+	{
 		try {
-			
-			WSName wsName = new WSName(target);
-			if (!wsName.isValidWSName()) return null;
 
-			// Opportunistically store root and current path's resource config in the cache to improve the
-			// chance of cache hit for looked up contents. This is useful sometimes as it can happen that
-			// the resources under a directory are already in the cache but we fail to use them as the parent's
-			// resource configuration is not there (either never saved or evicted). This opportunistic caching
-			// can only be applied when the concerned parent is on the path to current working directory.
-			// For all other directories, we don't have the path information saved anywhere beforehand.
+			WSName wsName = new WSName(target);
+			if (!wsName.isValidWSName())
+				return null;
+
+			// Opportunistically store root and current path's resource config in the cache to
+			// improve the
+			// chance of cache hit for looked up contents. This is useful sometimes as it can happen
+			// that
+			// the resources under a directory are already in the cache but we fail to use them as
+			// the parent's
+			// resource configuration is not there (either never saved or evicted). This
+			// opportunistic caching
+			// can only be applied when the concerned parent is on the path to current working
+			// directory.
+			// For all other directories, we don't have the path information saved anywhere
+			// beforehand.
 			storeRootAndCurrentPathsInTheCache();
-			
-			WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager
-					.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
+
+			WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(),
+				WSResourceConfig.class);
 			if (resourceConfig == null) {
-				// handling the current RNS path separately. 
-				RNSPath currentPath = ContextManager.getCurrentContext().getCurrentPath();
+				// handling the current RNS path separately.
+				RNSPath currentPath = ContextManager.getExistingContext().getCurrentPath();
 				EndpointReferenceType currentPathEpr = currentPath.getEndpoint();
 				WSName currentPathWsName = new WSName(currentPathEpr);
 				if (currentPathWsName.equals(wsName)) {
@@ -73,34 +82,42 @@ public class RNSCacheLookupHandler {
 					CacheManager.putItemInCache(wsEndpointIdentifier, currentPathConfig);
 					resourceConfig = currentPathConfig;
 				} else {
-					_logger.trace("Lookup failed: no resource configuration in the cache.");
+					if (_logger.isTraceEnabled())
+						_logger.trace("Lookup failed: no resource configuration in the cache.");
 					return null;
 				}
 			}
-			
-			// if there is no RNSPath mapping for the resource then it is not possible to construct a lookup
-			// response from cached contents.
-			if (!resourceConfig.isMappedToRNSPaths()) return null;
-			
-			// this is a safety checking as cache access may be blocked and we got the original null 
-			// return for the resource configuration object because of that, instead of absence of the 
-			// object in the cache.
-			resourceConfig = (WSResourceConfig) CacheManager
-					.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
-			if (resourceConfig == null) return null;
-			 
-			if (resourceConfig.isCacheAccessBlocked()) return null;
 
-			MessageElement element = (MessageElement) CacheManager
-					.getItemFromCache(wsName, RNSConstants.ELEMENT_COUNT_QNAME, MessageElement.class);
+			// if there is no RNSPath mapping for the resource then it is not possible to construct
+			// a lookup
+			// response from cached contents.
+			if (!resourceConfig.isMappedToRNSPaths())
+				return null;
+
+			// this is a safety checking as cache access may be blocked and we got the original null
+			// return for the resource configuration object because of that, instead of absence of
+			// the
+			// object in the cache.
+			resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(),
+				WSResourceConfig.class);
+			if (resourceConfig == null)
+				return null;
+
+			if (resourceConfig.isCacheAccessBlocked())
+				return null;
+
+			MessageElement element = (MessageElement) CacheManager.getItemFromCache(wsName, RNSConstants.ELEMENT_COUNT_QNAME,
+				MessageElement.class);
 			if (element == null) {
 				processHotspot(resourceConfig, target);
-				_logger.trace("Lookup failed: element count property missing: " + resourceConfig.getRnsPath());
+				if (_logger.isTraceEnabled())
+					_logger.trace("Lookup failed: element count property missing: " + resourceConfig.getRnsPath());
 				return null;
 			}
 
 			int elementCount = Integer.parseInt(element.getValue());
-			if (elementCount == 0) return new LookupResponseType();
+			if (elementCount == 0)
+				return new LookupResponseType();
 
 			Map<String, EndpointReferenceType> matchings = null;
 			List<RNSEntryResponseType> entries = new ArrayList<RNSEntryResponseType>();
@@ -111,57 +128,72 @@ public class RNSCacheLookupHandler {
 					addMatchingEntriesInMap(entries, matchings);
 				}
 			}
-			
+
 			if (filteredNames == null || filteredNames.length == 0) {
 				if (entries.size() != elementCount) {
-					// There is a mismatch between cached element count and actual number of child entries in cache. This
-					// can happen during concurrent update in same RNS directory and if no element listing has been done on
-					// target previously. Regardless of the cause, if the target has been subscribed for notifications we 
+					// There is a mismatch between cached element count and actual number of child
+					// entries in cache. This
+					// can happen during concurrent update in same RNS directory and if no element
+					// listing has been done on
+					// target previously. Regardless of the cause, if the target has been subscribed
+					// for notifications we
 					// should keep the element count property up-to-date.
 					processHotspot(resourceConfig, target);
-					
-					// In case there are stale entries in the cache that are not updated/removed because of some notification
-					// blockage, we are removing all entry EPRS from the cache too. 
+
+					// In case there are stale entries in the cache that are not updated/removed
+					// because of some notification
+					// blockage, we are removing all entry EPRS from the cache too.
 					removePossiblyStaleEntries(matchings);
-					
-					_logger.trace("Lookup failed: element count does not match total cached contents: " + resourceConfig.getRnsPath());
+
+					if (_logger.isTraceEnabled())
+						_logger.trace("Lookup failed: element count does not match total cached contents: "
+							+ resourceConfig.getRnsPath());
 					return null;
 				}
-				// When the call is initiated from FUSE, most of the time it will be succeeded by a bunch o get-attributes
-				// call for the entries. If those attributes are not in cache then an RPC will be issued for each entry
-				// missing attributes. As when looking up entries from the container we can prefetch attributes for entries
-				// that are in the same container as the target, sometimes it is better to let the lookup RPC to pass than
-				// satisfying request from the cache. The following IF condition does that assessment.
-				if (isCallMadeFromFuse() && !isCacheContainsAllEntryAttributes(resourceConfig, entries)) return null;
+				// When the call is initiated from FUSE, most of the time it will be succeeded by a
+				// bunch o get-attributes
+				// call for the entries. If those attributes are not in cache then an RPC will be
+				// issued for each entry
+				// missing attributes. As when looking up entries from the container we can prefetch
+				// attributes for entries
+				// that are in the same container as the target, sometimes it is better to let the
+				// lookup RPC to pass than
+				// satisfying request from the cache. The following IF condition does that
+				// assessment.
+				if (isCallMadeFromFuse() && !isCacheContainsAllEntryAttributes(resourceConfig, entries))
+					return null;
 			} else {
 				int totalCachedEntries = entries.size();
 				filterEntries(entries, filteredNames);
 				// This is not always right as the caller can pass an entry name that does not
 				// exists in the RNS directory. We can't cover all the cases where such scenarios
-				// can spur. However the checking of total-cached-entry counts will save us in 
-				// cases where the client has made a directory listing for all elements in the 
+				// can spur. However the checking of total-cached-entry counts will save us in
+				// cases where the client has made a directory listing for all elements in the
 				// RNS directory before making the vein lookup call.
 				if ((filteredNames.length != entries.size()) && (totalCachedEntries < elementCount)) {
-					_logger.trace("Lookup failed: filtered search count mismatch: " + resourceConfig.getRnsPath());
+					if (_logger.isTraceEnabled())
+						_logger.trace("Lookup failed: filtered search count mismatch: " + resourceConfig.getRnsPath());
 					return null;
 				}
 			}
-			
-			LookupResponseType lookupResponseType = new LookupResponseType(
-					entries.toArray(new RNSEntryResponseType[entries.size()]), null);
+
+			LookupResponseType lookupResponseType = new LookupResponseType(entries.toArray(new RNSEntryResponseType[entries
+				.size()]), null);
 			return lookupResponseType;
 
 		} catch (Exception ex) {
-			_logger.debug("Exception occurred while looking up the cache", ex);
+			if (_logger.isDebugEnabled())
+				_logger.debug("Exception occurred while looking up the cache", ex);
 		}
 		return null;
 	}
 
-	private static void storeRootAndCurrentPathsInTheCache() throws FileNotFoundException, IOException {
-		
-		RNSPath currentPath = ContextManager.getCurrentContext().getCurrentPath();
+	private static void storeRootAndCurrentPathsInTheCache() throws FileNotFoundException, IOException
+	{
+
+		RNSPath currentPath = ContextManager.getExistingContext().getCurrentPath();
 		RNSPath rootPath = currentPath.getRoot();
-		
+
 		// save the root resource configuration if possible
 		EndpointReferenceType rootEpr = rootPath.getCachedEPR();
 		if (rootEpr != null) {
@@ -169,7 +201,7 @@ public class RNSCacheLookupHandler {
 			WSResourceConfig rootConfig = new WSResourceConfig(rootPathWsName, rootPath.pwd());
 			CacheManager.putItemInCache(rootPathWsName.getEndpointIdentifier(), rootConfig);
 		}
-		
+
 		// retrace steps towards the root and store as many resource configurations as possible
 		while (!currentPath.pwd().equals(rootPath.pwd())) {
 			EndpointReferenceType currentPathEpr = currentPath.getCachedEPR();
@@ -183,19 +215,19 @@ public class RNSCacheLookupHandler {
 	}
 
 	private static void addMatchingEntriesInMap(List<RNSEntryResponseType> entries,
-			Map<String, EndpointReferenceType> matchingEntries) {
-		for (Map.Entry<String, EndpointReferenceType> entry : matchingEntries
-				.entrySet()) {
+		Map<String, EndpointReferenceType> matchingEntries)
+	{
+		for (Map.Entry<String, EndpointReferenceType> entry : matchingEntries.entrySet()) {
 			String entryRNSPath = entry.getKey();
 			int indexOfLastSeperator = entryRNSPath.lastIndexOf('/');
 			String entryName = entryRNSPath.substring(indexOfLastSeperator + 1);
-			RNSEntryResponseType response = new RNSEntryResponseType(
-					entry.getValue(), null, null, entryName);
+			RNSEntryResponseType response = new RNSEntryResponseType(entry.getValue(), null, null, entryName);
 			entries.add(response);
 		}
 	}
 
-	private static void filterEntries(List<RNSEntryResponseType> entries, String[] filteredNames) {
+	private static void filterEntries(List<RNSEntryResponseType> entries, String[] filteredNames)
+	{
 
 		if (filteredNames == null || filteredNames.length == 0)
 			return;
@@ -209,113 +241,125 @@ public class RNSCacheLookupHandler {
 			}
 		}
 	}
-	
+
 	/*
-	 * Some RNS resource has been subscribed means the client is interested in its contents, that in turn of the time
-	 * should be available in the client-cache, therefore we are fetching the element-count property to later on to 
-	 * be able to satisfy lookup requests from the cache.
-	 * */
-	private static void processHotspot(WSResourceConfig config, EndpointReferenceType target) {
-		if (!config.isHasRegisteredCallback()) return;
+	 * Some RNS resource has been subscribed means the client is interested in its contents, that in
+	 * turn of the time should be available in the client-cache, therefore we are fetching the
+	 * element-count property to later on to be able to satisfy lookup requests from the cache.
+	 */
+	private static void processHotspot(WSResourceConfig config, EndpointReferenceType target)
+	{
+		if (!config.isHasRegisteredCallback())
+			return;
 		ICallingContext currentContext;
 		try {
-			currentContext = ContextManager.getCurrentContext();
+			currentContext = ContextManager.getExistingContext();
 			ElementCountPropertyRetriever retriever = new ElementCountPropertyRetriever(target, currentContext);
 			retriever.start();
 		} catch (Exception e) {
 			_logger.info("could not retrieve calling context information", e);
-		} 
+		}
 	}
-	
+
 	/*
-	 * If a target RNS directory was blocked because of rapid updates by some other user, there is a 
-	 * chance that current user's cache has already removed entries. The existence of deleted entries
-	 * in the cache will cause continuous cache failure as the element-count of the target will 
-	 * always have a smaller value than the number of entries in the cache. To avoid this problem,
-	 * this method is used to remove the cached EPRs of contents of the target RNS directory.
-	 * */
-	private static void removePossiblyStaleEntries(Map<String, EndpointReferenceType> matchedEntries) {
-		
-		if (matchedEntries == null || matchedEntries.isEmpty()) return;
-		
+	 * If a target RNS directory was blocked because of rapid updates by some other user, there is a
+	 * chance that current user's cache has already removed entries. The existence of deleted
+	 * entries in the cache will cause continuous cache failure as the element-count of the target
+	 * will always have a smaller value than the number of entries in the cache. To avoid this
+	 * problem, this method is used to remove the cached EPRs of contents of the target RNS
+	 * directory.
+	 */
+	private static void removePossiblyStaleEntries(Map<String, EndpointReferenceType> matchedEntries)
+	{
+
+		if (matchedEntries == null || matchedEntries.isEmpty())
+			return;
+
 		for (String entryPath : matchedEntries.keySet()) {
 			CacheManager.removeItemFromCache(entryPath, EndpointReferenceType.class);
 		}
 	}
-	
+
 	/*
-	 * This is the thread for asynchronously retrieving elementCount property from
-	 * RNS directories that are hot-spots of lookup operation.
-	 * */
-	private static class ElementCountPropertyRetriever extends Thread {
-		
+	 * This is the thread for asynchronously retrieving elementCount property from RNS directories
+	 * that are hot-spots of lookup operation.
+	 */
+	private static class ElementCountPropertyRetriever extends Thread
+	{
+
 		private EndpointReferenceType endpoint;
 		private ICallingContext callingContext;
 
-		public ElementCountPropertyRetriever(EndpointReferenceType endpoint, 
-				ICallingContext callingContext) {
+		public ElementCountPropertyRetriever(EndpointReferenceType endpoint, ICallingContext callingContext)
+		{
 			this.endpoint = endpoint;
 			this.callingContext = callingContext;
 		}
 
 		@Override
-		public void run() {
-			
-			// Every cache management related thread that load or store information from the Cache should have 
-			// unaccounted access to both CachedManager and RPCs to avoid getting mingled with Cache access and 
-			// RPCs initiated by some user action. This is important to provide accurate statistics on per container
+		public void run()
+		{
+
+			// Every cache management related thread that load or store information from the Cache
+			// should have
+			// unaccounted access to both CachedManager and RPCs to avoid getting mingled with Cache
+			// access and
+			// RPCs initiated by some user action. This is important to provide accurate statistics
+			// on per container
 			// resource usage.
 			ResourceAccessMonitor.getUnaccountedAccessRight();
-			
+
 			try {
-				Closeable assumedContext = 
-					ContextManager.temporarilyAssumeContext(callingContext);
-				EnhancedRNSPortType portType = 
-					ClientUtils.createProxy(EnhancedRNSPortType.class, endpoint);
+				Closeable assumedContext = ContextManager.temporarilyAssumeContext(callingContext);
+				EnhancedRNSPortType portType = ClientUtils.createProxy(EnhancedRNSPortType.class, endpoint);
 				portType.getResourceProperty(RNSConstants.ELEMENT_COUNT_QNAME);
 				assumedContext.close();
 			} catch (Exception ex) {
-				//ignore
+				// ignore
 			}
 		}
 	}
-	
+
 	/*
 	 * Determine whether or not a lookup request is initiated from FUSE by examining the call-stack.
-	 * This information is subsequently used to assess the effectiveness returning a lookup result from 
-	 * client-cache.
-	 * */
-	private static boolean isCallMadeFromFuse() {
+	 * This information is subsequently used to assess the effectiveness returning a lookup result
+	 * from client-cache.
+	 */
+	private static boolean isCallMadeFromFuse()
+	{
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		for (StackTraceElement traceElement : stackTrace) {
 			String className = traceElement.getClassName();
-			if (GenesisIIFilesystem.class.getName().equals(className) 
-					|| GeniiFuseMount.class.getName().equals(className)) {
+			if (GenesisIIFilesystem.class.getName().equals(className) || GeniiFuseMount.class.getName().equals(className)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-	private static boolean isCacheContainsAllEntryAttributes(WSResourceConfig targetConfig, List<RNSEntryResponseType> entries) {
+
+	private static boolean isCacheContainsAllEntryAttributes(WSResourceConfig targetConfig, List<RNSEntryResponseType> entries)
+	{
 
 		String targetContainerId = targetConfig.getContainerId();
-		if (targetContainerId == null) return true;
+		if (targetContainerId == null)
+			return true;
 
 		boolean attributesMissingFromResourcesOfSameContainer = false;
 
 		for (RNSEntryResponseType entry : entries) {
 			URI entryWSIndentifier = CacheUtils.getEPI(entry.getEndpoint());
-			WSResourceConfig entryConfig = 
-				(WSResourceConfig) CacheManager.getItemFromCache(entryWSIndentifier, WSResourceConfig.class);
-			if (entryConfig == null) continue;
-			
+			WSResourceConfig entryConfig = (WSResourceConfig) CacheManager.getItemFromCache(entryWSIndentifier,
+				WSResourceConfig.class);
+			if (entryConfig == null)
+				continue;
+
 			String entryContainerId = entryConfig.getContainerId();
 			if (targetContainerId.equals(entryContainerId)) {
-				// A checking on permissions-string attribute has been made because it is applicable for both RNS and ByteIO.
+				// A checking on permissions-string attribute has been made because it is applicable
+				// for both RNS and ByteIO.
 				// A thorough testing on all attributes will be an overkill.
-				Object permissionProperty = CacheManager.getItemFromCache(entryConfig.getWsIdentifier(), 
-						GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, MessageElement.class);
+				Object permissionProperty = CacheManager.getItemFromCache(entryConfig.getWsIdentifier(),
+					GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, MessageElement.class);
 				if (permissionProperty == null) {
 					attributesMissingFromResourcesOfSameContainer = true;
 					break;

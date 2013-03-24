@@ -9,19 +9,16 @@ class ForkExecHPCApplicationFacet extends CommonPosixLikeHPCApplicationFacet
 {
 	private FilesystemManager _fsManager;
 	private BESWorkingDirectory _workingDirectory;
-	
-	public ForkExecHPCApplicationFacet(FilesystemManager fsManager,
-		BESWorkingDirectory workingDirectory)
+
+	public ForkExecHPCApplicationFacet(FilesystemManager fsManager, BESWorkingDirectory workingDirectory)
 	{
 		_fsManager = fsManager;
 		_workingDirectory = workingDirectory;
 	}
-	
+
 	@Override
-	public Object createFacetUnderstanding(Object parentUnderstanding)
-		throws JSDLException
+	public Object createFacetUnderstanding(Object parentUnderstanding) throws JSDLException
 	{
-		return new ForkExecApplicationUnderstanding(
-			_fsManager, _workingDirectory);
+		return new ForkExecApplicationUnderstanding(_fsManager, _workingDirectory);
 	}
 }

@@ -9,10 +9,9 @@ import javax.swing.JComboBox;
 public class EnumComboBox<Type extends Enum<Type>> extends JComboBox
 {
 	static final long serialVersionUID = 0L;
-	
+
 	@SuppressWarnings("unchecked")
-    public EnumComboBox(Class<Type> enumerationClass,
-		EnumComboSort sort, boolean includeNull, Map<Type, Icon> iconMap)
+	public EnumComboBox(Class<Type> enumerationClass, EnumComboSort sort, boolean includeNull, Map<Type, Icon> iconMap)
 	{
 		super(new EnumComboModel<Type>(enumerationClass, sort, includeNull));
 		setRenderer(new EnumComboBoxRenderer<Type>(iconMap));

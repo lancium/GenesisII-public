@@ -18,21 +18,16 @@ class StreamableByteIOFactoryOpenFile extends GeniiOpenFile
 {
 	private StreamableByteIOPortType _target;
 	private StreamableByteIOOpenFile _file;
-	
-	StreamableByteIOFactoryOpenFile(String[] path, EndpointReferenceType target,
-		boolean canRead, boolean canWrite, boolean isAppend)
-			throws ResourceException, GenesisIISecurityException, 
-				RemoteException, IOException
+
+	StreamableByteIOFactoryOpenFile(String[] path, EndpointReferenceType target, boolean canRead, boolean canWrite,
+		boolean isAppend) throws ResourceException, GenesisIISecurityException, RemoteException, IOException
 	{
 		super(path, canRead, canWrite, isAppend);
-		
-		StreamableByteIOFactory factory = ClientUtils.createProxy(
-			StreamableByteIOFactory.class, target);
+
+		StreamableByteIOFactory factory = ClientUtils.createProxy(StreamableByteIOFactory.class, target);
 		target = factory.openStream(null).getEndpoint();
-		_target = ClientUtils.createProxy(
-			StreamableByteIOPortType.class, target);
-		_file = new StreamableByteIOOpenFile(path, false, _target, 
-			canRead, canWrite, isAppend);
+		_target = ClientUtils.createProxy(StreamableByteIOPortType.class, target);
+		_file = new StreamableByteIOOpenFile(path, false, _target, canRead, canWrite, isAppend);
 	}
 
 	@Override
@@ -40,14 +35,14 @@ class StreamableByteIOFactoryOpenFile extends GeniiOpenFile
 	{
 		_file.flush();
 	}
-	
+
 	@Override
 	protected void closeImpl() throws IOException
 	{
 		_file.closeImpl();
 		_target.destroy(new Destroy());
 	}
-	
+
 	@Override
 	protected void appendImpl(ByteBuffer source) throws FSException
 	{

@@ -21,51 +21,48 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 public class RNSException extends Exception
 {
 	static final long serialVersionUID = 0;
-	
+
 	private RNSException(Throwable cause, boolean isUnwrapped)
 	{
 		super(cause.toString(), cause);
 	}
-	
+
 	public RNSException(String msg)
 	{
 		super(msg);
 	}
-	
+
 	public RNSException(String msg, Throwable cause)
 	{
 		super(msg, unwrap(cause));
 	}
-	
+
 	public RNSException(Throwable cause)
 	{
 		this(unwrap(cause), true);
 	}
-	
+
 	public RNSException(BaseFaultType bft)
 	{
 		super(convertDescription(bft.getDescription()), bft);
 	}
-	
-	static private String convertDescription(
-		BaseFaultTypeDescription []desc)
+
+	static private String convertDescription(BaseFaultTypeDescription[] desc)
 	{
 		StringBuilder builder = new StringBuilder();
-		
-		for (BaseFaultTypeDescription d : desc)
-		{
+
+		for (BaseFaultTypeDescription d : desc) {
 			builder.append(d.get_value() + "\n");
 		}
-		
+
 		return builder.toString();
 	}
-	
+
 	static private Throwable unwrap(Throwable t)
 	{
 		Throwable tmp;
-		
-		while (true)
-		{
+
+		while (true) {
 			tmp = t.getCause();
 			if (tmp == null)
 				return t;

@@ -17,37 +17,40 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 
 @XmlRootElement(namespace = GenesisIIConstants.GENESISII_NS, name = "AuthZConfigUpdateNotification")
-public class AuthZConfigUpdateNotification extends NotificationMessageContents {
+public class AuthZConfigUpdateNotification extends NotificationMessageContents
+{
 
 	private static final long serialVersionUID = 0L;
 
-	public AuthZConfigUpdateNotification() {}
-	
-	public AuthZConfigUpdateNotification(AuthZConfig authZConfig) 
-			throws ResourceUnknownFaultType, ResourceException {
+	public AuthZConfigUpdateNotification()
+	{
+	}
+
+	public AuthZConfigUpdateNotification(AuthZConfig authZConfig) throws ResourceUnknownFaultType, ResourceException
+	{
 		useIndirectPublishers = true;
 		indirectPublishersRetrieveQuery = "SELECT DISTINCT(resourceid) FROM entries WHERE endpoint_id = ?";
 		MessageElement element = new MessageElement(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME, authZConfig);
-		setAdditionalAttributes(new MessageElement[] {element}); 
+		setAdditionalAttributes(new MessageElement[] { element });
 	}
-	
+
 	@XmlTransient
-	public AuthZConfig getNewConfig() throws ResourcePropertyException {
+	public AuthZConfig getNewConfig() throws ResourcePropertyException
+	{
 		MessageElement[] additionalAttributes = getAdditionalAttributes();
 		for (MessageElement attribute : additionalAttributes) {
 			QName qName = attribute.getQName();
 			if (qName.equals(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME)) {
-				SingleResourcePropertyTranslator authZTranslator = 
-					new DefaultSingleResourcePropertyTranslator();
+				SingleResourcePropertyTranslator authZTranslator = new DefaultSingleResourcePropertyTranslator();
 				return authZTranslator.deserialize(AuthZConfig.class, attribute);
 			}
 		}
-		throw new RuntimeException("Could not find authZConfig " +
-				"attribute in notification message.");
+		throw new RuntimeException("Could not find authZConfig " + "attribute in notification message.");
 	}
-	
+
 	@Override
-	public boolean isIgnoreBlockedIndirectPublisher(long blockingTime) {
+	public boolean isIgnoreBlockedIndirectPublisher(long blockingTime)
+	{
 		return false;
 	}
 }

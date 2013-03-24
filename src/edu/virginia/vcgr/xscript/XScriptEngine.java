@@ -23,14 +23,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.xml.sax.SAXException;
 
-public class XScriptEngine 
-	implements ScriptEngine, Compilable, Invocable
+public class XScriptEngine implements ScriptEngine, Compilable, Invocable
 {
 	static private Log _logger = LogFactory.getLog(XScriptEngine.class);
-	
+
 	private XScriptEngineFactory _factory;
 	private XScriptContext _context;
-	
+
 	XScriptEngine(XScriptEngineFactory factory)
 	{
 		_factory = factory;
@@ -56,16 +55,14 @@ public class XScriptEngine
 	}
 
 	@Override
-	public Object eval(String script, ScriptContext context)
-			throws ScriptException
+	public Object eval(String script, ScriptContext context) throws ScriptException
 	{
 		CompiledScript cScript = compile(script);
 		return cScript.eval(context);
 	}
 
 	@Override
-	public Object eval(Reader reader, ScriptContext context)
-			throws ScriptException
+	public Object eval(Reader reader, ScriptContext context) throws ScriptException
 	{
 		CompiledScript cScript = compile(reader);
 		return cScript.eval(context);
@@ -124,25 +121,19 @@ public class XScriptEngine
 	@Override
 	public void setContext(ScriptContext context)
 	{
-		_context = (XScriptContext)context;
+		_context = (XScriptContext) context;
 	}
 
 	@Override
 	public CompiledScript compile(String script) throws ScriptException
 	{
-		try
-		{
+		try {
 			return XScriptParser.parse(this, script);
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new ScriptException(ioe);
-		} 
-		catch (ParserConfigurationException e)
-		{
+		} catch (ParserConfigurationException e) {
 			throw new ScriptException(e);
-		} catch (SAXException e)
-		{
+		} catch (SAXException e) {
 			throw new ScriptException(e);
 		}
 	}
@@ -150,68 +141,51 @@ public class XScriptEngine
 	@Override
 	public CompiledScript compile(Reader script) throws ScriptException
 	{
-		try
-		{
+		try {
 			return XScriptParser.parse(this, script);
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new ScriptException(ioe);
-		} 
-		catch (ParserConfigurationException e)
-		{
+		} catch (ParserConfigurationException e) {
 			throw new ScriptException(e);
-		} catch (SAXException e)
-		{
+		} catch (SAXException e) {
 			throw new ScriptException(e);
 		}
 	}
-	
-	protected XScriptContext getScriptContext(Bindings nn) 
+
+	protected XScriptContext getScriptContext(Bindings nn)
 	{
 		XScriptContext ctxt = new XScriptContext();
 		Bindings gs = getBindings(ScriptContext.GLOBAL_SCOPE);
-		
-		if (gs != null) 
+
+		if (gs != null)
 			ctxt.setBindings(gs, ScriptContext.GLOBAL_SCOPE);
-		
-		if (nn != null) 
-		{
-			ctxt.setBindings(nn,
-			ScriptContext.ENGINE_SCOPE);
+
+		if (nn != null) {
+			ctxt.setBindings(nn, ScriptContext.ENGINE_SCOPE);
 		} else
 			throw new NullPointerException("Engine scope Bindings may not be null.");
-		
+
 		ctxt.setReader(_context.getReader());
 		ctxt.setWriter(_context.getWriter());
 		ctxt.setErrorWriter(_context.getErrorWriter());
-		
+
 		return ctxt;
 	}
 
 	@Override
 	public <T> T getInterface(Class<T> clasz)
 	{
-		try
-		{
+		try {
 			if (!clasz.isInterface())
 				return null;
-			
-			return clasz.cast(Proxy.newProxyInstance(
-				Thread.currentThread().getContextClassLoader(), 
-				new Class<?>[] { clasz }, 
+
+			return clasz.cast(Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[] { clasz },
 				new ScriptFunctionInvoker(clasz)));
-		} 
-		catch (IllegalArgumentException e)
-		{
-			_logger.warn("Error trying to match interface to script function.",
-				e);
+		} catch (IllegalArgumentException e) {
+			_logger.warn("Error trying to match interface to script function.", e);
 			return null;
-		}
-		catch (NoSuchMethodException e)
-		{
-			_logger.warn("Error trying to match interface to script function.",
-				e);
+		} catch (NoSuchMethodException e) {
+			_logger.warn("Error trying to match interface to script function.", e);
 			return null;
 		}
 	}
@@ -223,81 +197,60 @@ public class XScriptEngine
 	}
 
 	@Override
-	public Object invokeFunction(String name, Object... args)
-			throws ScriptException, NoSuchMethodException
+	public Object invokeFunction(String name, Object... args) throws ScriptException, NoSuchMethodException
 	{
 		return invokeFunction(findFunction(name), args);
 	}
 
 	@Override
-	public Object invokeMethod(Object thiz, String name, Object... args)
-			throws ScriptException, NoSuchMethodException
+	public Object invokeMethod(Object thiz, String name, Object... args) throws ScriptException, NoSuchMethodException
 	{
-		throw new NoSuchMethodException(String.format(
-			"Method \"%s\" not available.", name));
+		throw new NoSuchMethodException(String.format("Method \"%s\" not available.", name));
 	}
-	
-	private ParseStatement findFunction(String functionName)
-		throws NoSuchMethodException
+
+	private ParseStatement findFunction(String functionName) throws NoSuchMethodException
 	{
-		Object functionObj = _context.getAttribute(functionName, 
-			ScriptContext.GLOBAL_SCOPE);
-		
-		if ( (functionObj != null) && (functionObj instanceof ParseStatement) )
-		{
-			return (ParseStatement)functionObj;
-		} else
-		{
-			throw new NoSuchMethodException(String.format(
-				"Method \"%s\" is not available.", functionName));
+		Object functionObj = _context.getAttribute(functionName, ScriptContext.GLOBAL_SCOPE);
+
+		if ((functionObj != null) && (functionObj instanceof ParseStatement)) {
+			return (ParseStatement) functionObj;
+		} else {
+			throw new NoSuchMethodException(String.format("Method \"%s\" is not available.", functionName));
 		}
 	}
-	
-	private Object invokeFunction(ParseStatement function, Object []args)
-		throws ScriptException
+
+	private Object invokeFunction(ParseStatement function, Object[] args) throws ScriptException
 	{
 		_context.push();
-		try
-		{
+		try {
 			_context.setAttribute("ARGV", args);
 			return function.evaluate(_context);
-		}
-		catch (ReturnFromFunctionException rffe)
-		{
+		} catch (ReturnFromFunctionException rffe) {
 			return rffe.getResult();
-		}
-		catch (EarlyExitException eee)
-		{
+		} catch (EarlyExitException eee) {
 			return eee.getExitCode();
-		}
-		finally
-		{
+		} finally {
 			_context.pop();
 		}
 	}
-	
+
 	private class ScriptFunctionInvoker implements InvocationHandler
 	{
-		private Map<String, ParseStatement> _functions =
-			new HashMap<String, ParseStatement>();
-		
-		public ScriptFunctionInvoker(Class<?> iface)
-			throws NoSuchMethodException
+		private Map<String, ParseStatement> _functions = new HashMap<String, ParseStatement>();
+
+		public ScriptFunctionInvoker(Class<?> iface) throws NoSuchMethodException
 		{
-			for (Method m : iface.getMethods())
-			{
+			for (Method m : iface.getMethods()) {
 				String mName = m.getName();
 				ParseStatement stmt = _functions.get(m);
 				if (stmt != null)
-					throw new NoSuchMethodException(String.format(
-						"Unable to find unique function \"%s\".", mName));
+					throw new NoSuchMethodException(String.format("Unable to find unique function \"%s\".", mName));
 				_functions.put(mName, findFunction(mName));
 			}
 		}
-		
+
 		@Override
-		public Object invoke(Object proxy, Method method, Object[] args)
-				throws Throwable
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
 			ParseStatement stmt = _functions.get(method.getName());
 			return invokeFunction(stmt, args);

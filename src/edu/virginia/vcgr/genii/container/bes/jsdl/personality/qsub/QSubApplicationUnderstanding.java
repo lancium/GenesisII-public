@@ -24,61 +24,46 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.JobUndersta
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.PosixLikeApplicationUnderstanding;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.StringOrPath;
 
-class QSubApplicationUnderstanding 
-	extends PosixLikeApplicationUnderstanding
+class QSubApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 {
-    static private Log _logger = LogFactory.getLog(QSubApplicationUnderstanding.class);
+	static private Log _logger = LogFactory.getLog(QSubApplicationUnderstanding.class);
 
-	public QSubApplicationUnderstanding(FilesystemManager fsManager,
-		BESWorkingDirectory workingDirectory)
+	public QSubApplicationUnderstanding(FilesystemManager fsManager, BESWorkingDirectory workingDirectory)
 	{
 		super(fsManager, workingDirectory);
 	}
-	
+
 	@Override
-	public void addExecutionPhases(BESConstructionParameters creationProperties,
-		Vector<ExecutionPhase> executionPlan,
-		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext)
-		throws JSDLException
+	public void addExecutionPhases(BESConstructionParameters creationProperties, Vector<ExecutionPhase> executionPlan,
+		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext) throws JSDLException
 	{
 		File fuseMountPoint = jobContext.getFuseMountPoint();
-		
-		Deployment deployment = Installation.getDeployment(
-			new DeploymentName());
+
+		Deployment deployment = Installation.getDeployment(new DeploymentName());
 		DeploymentName depName = deployment.getName();
-		
+
 		FilesystemManager fsManager = getFilesystemManager();
-		executionPlan.add(new PrepareApplicationPhase(
-			fsManager, getExecutable()));
-		
+		executionPlan.add(new PrepareApplicationPhase(fsManager, getExecutable()));
+
 		Map<String, StringOrPath> env = getEnvironment();
 		env.put("GENII_DEPLOYMENT_NAME", new StringOrPath(depName.toString()));
 		env.put("GENII_USER_DIR", new StringOrPath(".genesisII-bes-state"));
 		_logger.info("rewrote GENII_USER_DIR to be: " + env.get("GENII_USER_DIR"));
-		
+
 		Map<String, String> stringEnv = new HashMap<String, String>();
-		for (String key : env.keySet())
-		{
+		for (String key : env.keySet()) {
 			StringOrPath sop = env.get(key);
 			stringEnv.put(key, sop.toString(fsManager));
 		}
-		
+
 		Collection<String> stringArgs = new LinkedList<String>();
-		for (StringOrPath sop : getArguments())
-		{
+		for (StringOrPath sop : getArguments()) {
 			stringArgs.add(sop.toString(fsManager));
 		}
-		
-		executionPlan.add(new QueueProcessPhase(
-			fuseMountPoint,
-			getSPMDVariation(), getNumProcesses(), 
-			getNumProcessesPerHost(),
-			fsManager.lookup(getExecutable()),
-			stringArgs, stringEnv,
-			fsManager.lookup(getStdinRedirect()),
-			fsManager.lookup(getStdoutRedirect()),
-			fsManager.lookup(getStderrRedirect()),
-			creationProperties,
-			jobContext.getResourceConstraints()));
+
+		executionPlan.add(new QueueProcessPhase(fuseMountPoint, getSPMDVariation(), getNumProcesses(),
+			getNumProcessesPerHost(), fsManager.lookup(getExecutable()), stringArgs, stringEnv, fsManager
+				.lookup(getStdinRedirect()), fsManager.lookup(getStdoutRedirect()), fsManager.lookup(getStderrRedirect()),
+			creationProperties, jobContext.getResourceConstraints()));
 	}
 }

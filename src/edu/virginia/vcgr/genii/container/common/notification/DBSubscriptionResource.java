@@ -16,58 +16,41 @@ public class DBSubscriptionResource extends BasicDBResource
 	{
 		super(key, connection);
 	}
-	
-	public DBSubscriptionResource(ResourceKey parentKey,
-		DatabaseConnectionPool connectionPool) throws SQLException
+
+	public DBSubscriptionResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}
-	
-	void createSubscription(EndpointReferenceType subscriptionReference,
-		SubscriptionConstructionParameters cons)
-			throws ResourceException
+
+	void createSubscription(EndpointReferenceType subscriptionReference, SubscriptionConstructionParameters cons)
+		throws ResourceException
 	{
-		try
-		{
-			SubscriptionsDatabase.createSubscription(_connection, _resourceKey,
-				cons.publisherResourceKey(), subscriptionReference,
-				cons.consumerReference(), 
-				cons.topicQuery(), cons.policies(), cons.additionalUserData());
-		} 
-		catch (SQLException e)
-		{
-			throw new ResourceException(
-				"Unable to create subscription entry in table.", e);
+		try {
+			SubscriptionsDatabase.createSubscription(_connection, _resourceKey, cons.publisherResourceKey(),
+				subscriptionReference, cons.consumerReference(), cons.topicQuery(), cons.policies(), cons.additionalUserData());
+		} catch (SQLException e) {
+			throw new ResourceException("Unable to create subscription entry in table.", e);
 		}
 	}
-	
+
 	void toggleSubscriptionPause(boolean markPaused) throws ResourceException
 	{
-		try
-		{
-			SubscriptionsDatabase.toggleSubscriptionPause(
-				_connection, _resourceKey, markPaused);
-		}
-		catch (SQLException e)
-		{
-			throw new ResourceException(
-				"Unable to toggle pause status on subscription.", e);
+		try {
+			SubscriptionsDatabase.toggleSubscriptionPause(_connection, _resourceKey, markPaused);
+		} catch (SQLException e) {
+			throw new ResourceException("Unable to toggle pause status on subscription.", e);
 		}
 	}
 
 	@Override
 	public void destroy() throws ResourceException
 	{
-		try
-		{
+		try {
 			SubscriptionsDatabase.deleteSubscription(_connection, _resourceKey);
+		} catch (SQLException e) {
+			throw new ResourceException("Unable to clean up subscription entry in table.", e);
 		}
-		catch (SQLException e)
-		{
-			throw new ResourceException(
-				"Unable to clean up subscription entry in table.", e);
-		}
-		
+
 		super.destroy();
 	}
 }

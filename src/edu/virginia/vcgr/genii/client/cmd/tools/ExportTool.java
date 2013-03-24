@@ -40,13 +40,10 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 
 public class ExportTool extends BaseGridTool
 {
-	static final private String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dexport";
-	static final private String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uexport";
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/export";
-	
+	static final private String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dexport";
+	static final private String _USAGE_RESOURCE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uexport";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/export";
+
 	private boolean _create = false;
 	private boolean _quit = false;
 	private boolean _url = false;
@@ -54,162 +51,141 @@ public class ExportTool extends BaseGridTool
 	private String _svnUser = null;
 	private String _svnPass = null;
 	private Long _svnRevision = null;
-	
+
 	public ExportTool()
 	{
-		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE),
-				false, ToolCategory.DATA);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE), false, ToolCategory.DATA);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
-	@Option({"create"})
+
+	@Option({ "create" })
 	public void setCreate()
 	{
 		_create = true;
 	}
-	
-	@Option({"quit"})
+
+	@Option({ "quit" })
 	public void setQuit()
 	{
 		_quit = true;
 	}
-	
-	@Option({"url"})
+
+	@Option({ "url" })
 	public void setUrl()
 	{
 		_url = true;
 	}
-	
-	@Option({"replicate"})
+
+	@Option({ "replicate" })
 	public void setReplicate()
 	{
 		_replicate = true;
 	}
-	
+
 	@Option("svn-user")
 	public void setSVNUser(String user)
 	{
 		_svnUser = user;
 	}
-	
+
 	@Option("svn-pass")
 	public void setSVNPass(String pass)
 	{
 		_svnPass = pass;
 	}
-	
+
 	@Option("svn-revision")
 	public void setSVNRevision(String revision)
 	{
 		_svnRevision = Long.valueOf(revision);
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		int numArgs = numArguments();
-		if (_create)
-		{
-			/* get rns path for exported root and ensure dne*/			
+		if (_create) {
+			/* get rns path for exported root and ensure dne */
 			String targetRNSName = null;
-			if (numArgs == 3){
+			if (numArgs == 3) {
 				GeniiPath gPath = new GeniiPath(getArgument(2));
 				if (gPath.pathType() != GeniiPathType.Grid)
 					throw new InvalidToolUsageException("[new-rns-path] must be a grid path. ");
 				targetRNSName = gPath.path();
-				
-				//ensure location does not already exist
+
+				// ensure location does not already exist
 				ensureTargetDNE(targetRNSName);
 			}
-			
+
 			EndpointReferenceType exportServiceEPR;
 			String serviceLocation = getArgument(0);
 			/* get EPR for target exported root service */
 			if (_url)
 				exportServiceEPR = EPRUtils.makeEPR(serviceLocation);
-			else
-			{
-				exportServiceEPR = RNSUtilities.findService(
-					"/containers/BootstrapContainer", "ExportedRootPortType", 
-					new PortType[] {
-							WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE
-					}, serviceLocation).getEndpoint();
+			else {
+				exportServiceEPR = RNSUtilities.findService("/containers/BootstrapContainer", "ExportedRootPortType",
+					new PortType[] { WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE }, serviceLocation).getEndpoint();
 			}
 
 			/* get local directory path to be exported */
 			String localPath = getArgument(1);
-			
-			EndpointReferenceType epr = createExportedRoot(targetRNSName,
-				exportServiceEPR, localPath, _svnUser, _svnPass, _svnRevision,
-				targetRNSName, _replicate);
 
-			if (targetRNSName == null)
-			{
-				stdout.println(ObjectSerializer.toString(epr,
-					new QName(GenesisIIConstants.GENESISII_NS, "endpoint")));
+			EndpointReferenceType epr = createExportedRoot(targetRNSName, exportServiceEPR, localPath, _svnUser, _svnPass,
+				_svnRevision, targetRNSName, _replicate);
+
+			if (targetRNSName == null) {
+				stdout.println(ObjectSerializer.toString(epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint")));
 			}
-			
+
 			return 0;
-		} else if (_replicate)
-		{
-			/* get rns path for exported root and ensure dne*/			
+		} else if (_replicate) {
+			/* get rns path for exported root and ensure dne */
 			String targetRNSName = null;
-			if (numArgs == 4){
+			if (numArgs == 4) {
 				GeniiPath gPath = new GeniiPath(getArgument(3));
-				if ( gPath.pathType() != GeniiPathType.Grid)
+				if (gPath.pathType() != GeniiPathType.Grid)
 					throw new InvalidToolUsageException("[new-rns-path] must be a grid path. ");
 				targetRNSName = gPath.path();
-				
-				//ensure location does not already exist
+
+				// ensure location does not already exist
 				ensureTargetDNE(targetRNSName);
 			}
-			
+
 			EndpointReferenceType exportServiceEPR = null;
 			EndpointReferenceType replicationServiceEPR = null;
-			
+
 			String primaryLocation = getArgument(0);
 			String replicationLocation = getArgument(1);
-			
-			/* get EPRs for needed services*/
-			if (_url){
+
+			/* get EPRs for needed services */
+			if (_url) {
 				exportServiceEPR = EPRUtils.makeEPR(primaryLocation);
 				replicationServiceEPR = EPRUtils.makeEPR(replicationLocation);
+			} else {
+				exportServiceEPR = RNSUtilities.findService("/containers/BootstrapContainer", "ExportedRootPortType",
+					new PortType[] { WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE }, primaryLocation).getEndpoint();
+
+				replicationServiceEPR = RNSUtilities.findService("/containers/BootstrapContainer", "RExportResolverPortType",
+					new PortType[] { WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE }, replicationLocation).getEndpoint();
 			}
-			else{
-				exportServiceEPR = RNSUtilities.findService(
-					"/containers/BootstrapContainer", "ExportedRootPortType", 
-					new PortType[] {
-							WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE
-					}, primaryLocation).getEndpoint();
-				
-				replicationServiceEPR = RNSUtilities.findService(
-					"/containers/BootstrapContainer", "RExportResolverPortType", 
-					new PortType[] {
-							WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE
-					}, replicationLocation).getEndpoint();
-			}
-			
+
 			/* get local directory path to be exported */
 			GeniiPath gPath = new GeniiPath(getArgument(2));
-			if(gPath.pathType() != GeniiPathType.Local)
+			if (gPath.pathType() != GeniiPathType.Local)
 				throw new InvalidToolUsageException("<primary-local-path> must be a local path beginning with 'local:' ");
 			String localPath = gPath.path();
-			
-			EndpointReferenceType epr = createReplicatedExportedRoot(
-				exportServiceEPR, localPath, targetRNSName, 
-				_replicate, replicationServiceEPR );
 
-			if (targetRNSName == null)
-			{
-				stdout.println(ObjectSerializer.toString(epr,
-					new QName(GenesisIIConstants.GENESISII_NS, "endpoint")));
+			EndpointReferenceType epr = createReplicatedExportedRoot(exportServiceEPR, localPath, targetRNSName, _replicate,
+				replicationServiceEPR);
+
+			if (targetRNSName == null) {
+				stdout.println(ObjectSerializer.toString(epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint")));
 			}
-			
+
 			return 0;
-		}else if (_quit)
-		{
+		} else if (_quit) {
 			GeniiPath gPath = new GeniiPath(getArgument(0));
-			if ( gPath.pathType() != GeniiPathType.Grid)
+			if (gPath.pathType() != GeniiPathType.Grid)
 				throw new InvalidToolUsageException("export-root must be a grid path. ");
 			String exportedRootLocation = gPath.path();
 			/* get EPR for target export service that will create exported root */
@@ -219,8 +195,7 @@ public class ExportTool extends BaseGridTool
 				quitExportedRootFromRNS(exportedRootLocation);
 			stdout.println("Exported root stopped successfully");
 			return 0;
-		} else
-		{
+		} else {
 			ExportDirDialog dialog = new ExportDirDialog();
 			dialog.pack();
 			GuiUtils.centerComponent(dialog);
@@ -233,76 +208,59 @@ public class ExportTool extends BaseGridTool
 	protected void verify() throws ToolException
 	{
 		int numArgs = numArguments();
-		
-		if (_create)
-		{
+
+		if (_create) {
 			if (_quit)
-				throw new InvalidToolUsageException(
-					"Only one of the options create or " +
-					"quit can be specified.");
-			
+				throw new InvalidToolUsageException("Only one of the options create or " + "quit can be specified.");
+
 			if (numArgs < 2 || numArgs > 3)
-				throw new InvalidToolUsageException(
-					"Invalid number of arguments.");
-		} else if (_replicate){
+				throw new InvalidToolUsageException("Invalid number of arguments.");
+		} else if (_replicate) {
 			if (numArgs < 3 || numArgs > 4)
-				throw new InvalidToolUsageException(
-					"Invalid number of arguments.");
-		}
-		else if (_quit)
-		{
+				throw new InvalidToolUsageException("Invalid number of arguments.");
+		} else if (_quit) {
 			if (_create)
-				throw new InvalidToolUsageException(
-					"Only one of the options create or " +
-					"quit can be specified.");
-			
+				throw new InvalidToolUsageException("Only one of the options create or " + "quit can be specified.");
+
 			if (numArgs != 1)
-				throw new InvalidToolUsageException(
-					"Invalid number of arguments.");
-		}else{
+				throw new InvalidToolUsageException("Invalid number of arguments.");
+		} else {
 			if (numArgs != 0)
-				throw new InvalidToolUsageException(
-					"Invalid arguments.");
+				throw new InvalidToolUsageException("Invalid arguments.");
 		}
 	}
-	
-	static public EndpointReferenceType createExportedRoot(
-		String humanName, EndpointReferenceType exportServiceEPR, 
-		String localPath, String svnUser, String svnPass, Long svnRevision,
-		String RNSPath, boolean isReplicated) 
-		throws ResourceException,
-			ResourceCreationFaultType, RemoteException, RNSException,
-			CreationException, IOException, InvalidToolUsageException
+
+	static public EndpointReferenceType createExportedRoot(String humanName, EndpointReferenceType exportServiceEPR,
+		String localPath, String svnUser, String svnPass, Long svnRevision, String RNSPath, boolean isReplicated)
+		throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException,
+		InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
-		
+
 		String replicationIndicator = "false";
 		if (isReplicated)
 			replicationIndicator = "true";
-		
+
 		if (localPath.startsWith("local:"))
 			localPath = localPath.substring(6);
 		else if (localPath.startsWith("file:"))
 			localPath = localPath.substring(5);
-		
-		MessageElement[] createProps = ExportedDirUtils.createCreationProperties(
-			humanName, localPath, svnUser, svnPass, svnRevision,
-			"", replicationIndicator);
-		
-		ICallingContext origContext = ContextManager.getCurrentContext();
+
+		MessageElement[] createProps = ExportedDirUtils.createCreationProperties(humanName, localPath, svnUser, svnPass,
+			svnRevision, "", replicationIndicator);
+
+		ICallingContext origContext = ContextManager.getExistingContext();
 		ICallingContext createContext = origContext.deriveNewContext();
-		createContext.setSingleValueProperty(
-				RNSConstants.RESOLVED_ENTRY_UNBOUND_PROPERTY, "FALSE");
-		try{
+		createContext.setSingleValueProperty(RNSConstants.RESOLVED_ENTRY_UNBOUND_PROPERTY, "FALSE");
+		try {
 			ContextManager.storeCurrentContext(createContext);
 			newEPR = createInstance(exportServiceEPR, RNSPath, createProps);
-		}
-		finally	{
+		} finally {
 			ContextManager.storeCurrentContext(origContext);
 		}
 		return newEPR;
 	}
-	
+
 	/**
 	 * local linking tool that on error uses quit export instead of resource delete
 	 * 
@@ -317,84 +275,68 @@ public class ExportTool extends BaseGridTool
 	 * @throws RNSException
 	 * @throws CreationException
 	 * @throws IOException
-	 * @throws InvalidToolUsageException 
+	 * @throws InvalidToolUsageException
 	 */
-	static public EndpointReferenceType createInstance(
-			EndpointReferenceType service,
-			String optTargetName,
-			MessageElement [] createProperties) 
-		throws ResourceException,
-			ResourceCreationFaultType, RemoteException, RNSException, 
-			CreationException, IOException, InvalidToolUsageException
+	static public EndpointReferenceType createInstance(EndpointReferenceType service, String optTargetName,
+		MessageElement[] createProperties) throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException,
+		CreationException, IOException, InvalidToolUsageException
 	{
-		EndpointReferenceType epr = ResourceCreator.createNewResource(
-			service, createProperties, null);
-		
-		if (optTargetName != null)
-		{
-			try{
+		EndpointReferenceType epr = ResourceCreator.createNewResource(service, createProperties, null);
+
+		if (optTargetName != null) {
+			try {
 				LnTool.link(epr, new GeniiPath(optTargetName));
-			}
-			catch (RNSException re){
+			} catch (RNSException re) {
 				quitExportedRoot(epr, false);
 				throw re;
 			}
 		}
-		
+
 		return epr;
 	}
-	
-	static public EndpointReferenceType createReplicatedExportedRoot(
-			EndpointReferenceType exportServiceEPR, String localPath, 
-			String RNSPath, boolean isReplicated, 
-			EndpointReferenceType replicationService) 
-		throws ResourceException,
-			ResourceCreationFaultType, RemoteException, RNSException,
-			CreationException, IOException, InvalidToolUsageException
+
+	static public EndpointReferenceType createReplicatedExportedRoot(EndpointReferenceType exportServiceEPR, String localPath,
+		String RNSPath, boolean isReplicated, EndpointReferenceType replicationService) throws ResourceException,
+		ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
 		String replicationIndicator = "false";
 		if (isReplicated)
 			replicationIndicator = "true";
-		
-		MessageElement[] createProps = ExportedDirUtils.createReplicationCreationProperties(
-			localPath, "", replicationIndicator, replicationService);
-		
-		ICallingContext origContext = ContextManager.getCurrentContext();
+
+		MessageElement[] createProps = ExportedDirUtils.createReplicationCreationProperties(localPath, "",
+			replicationIndicator, replicationService);
+
+		ICallingContext origContext = ContextManager.getExistingContext();
 		ICallingContext createContext = origContext.deriveNewContext();
-		createContext.setSingleValueProperty(
-				RNSConstants.RESOLVED_ENTRY_UNBOUND_PROPERTY, "FALSE");
-		try{
+		createContext.setSingleValueProperty(RNSConstants.RESOLVED_ENTRY_UNBOUND_PROPERTY, "FALSE");
+		try {
 			ContextManager.storeCurrentContext(createContext);
 			newEPR = createInstance(exportServiceEPR, RNSPath, createProps);
-		}
-		finally{
+		} finally {
 			ContextManager.storeCurrentContext(origContext);
 		}
 		return newEPR;
 	}
-	
-	static public boolean quitExportedRootFromRNS(String exportedRootRNSPath) 
-		throws IOException, RNSException
+
+	static public boolean quitExportedRootFromRNS(String exportedRootRNSPath) throws IOException, RNSException
 	{
 		RNSPath path = RNSPath.getCurrent();
 		path = path.lookup(exportedRootRNSPath, RNSPathQueryFlags.MUST_EXIST);
 		boolean ret = quitExportedRoot(path.getEndpoint(), false);
-		
+
 		/* remove from RNS */
 		path.unlink();
-		
+
 		return ret;
 	}
-	
-	static public boolean quitExportedRootFromURL(String exportedRootURL) 
-		throws IOException, RNSException
+
+	static public boolean quitExportedRootFromURL(String exportedRootURL) throws IOException, RNSException
 	{
 		return quitExportedRoot(EPRUtils.makeEPR(exportedRootURL), false);
 	}
-	
-	static public boolean quitExportedRoot(EndpointReferenceType epr, boolean deleteDirectory)
-		throws IOException, RNSException
+
+	static public boolean quitExportedRoot(EndpointReferenceType epr, boolean deleteDirectory) throws IOException, RNSException
 	{
 		ExportedRootPortType exportedRoot = ClientUtils.createProxy(ExportedRootPortType.class, epr);
 		QuitExport request = new QuitExport();
@@ -402,19 +344,16 @@ public class ExportTool extends BaseGridTool
 		QuitExportResponse response = exportedRoot.quitExport(request);
 		return response.isSuccess();
 	}
-	
-	static public void ensureTargetDNE(String targetPath)
-		throws ResourceException
+
+	static public void ensureTargetDNE(String targetPath) throws ResourceException
 	{
-		try{
+		try {
 			RNSPath currentPath = RNSPath.getCurrent();
 			currentPath.lookup(targetPath, RNSPathQueryFlags.MUST_NOT_EXIST);
-		}
-		catch(RNSPathAlreadyExistsException e){
-			throw new ResourceException ("Target RNS path already exists.");
-		}
-		catch(Exception e){
-			throw new ResourceException ("Problem with ensuring target RNS path does not already exist.");
+		} catch (RNSPathAlreadyExistsException e) {
+			throw new ResourceException("Target RNS path already exists.");
+		} catch (Exception e) {
+			throw new ResourceException("Problem with ensuring target RNS path does not already exist.");
 		}
 	}
 }

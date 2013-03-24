@@ -6,7 +6,7 @@ class FilesystemAliasConfiguration extends FilesystemSandboxContainerConfigurati
 {
 	@XmlAttribute(name = "alias-for", required = true)
 	private String _aliasFor = null;
-	
+
 	final String aliasFor()
 	{
 		return _aliasFor;

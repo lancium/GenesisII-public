@@ -12,7 +12,7 @@ public class JobsRNSFork extends StaticRNSResourceFork
 	{
 		super(service, forkPath);
 	}
-	
+
 	@Override
 	protected void addEntries(Map<String, ResourceForkInformation> entries)
 	{

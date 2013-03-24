@@ -18,12 +18,12 @@ package edu.virginia.vcgr.genii.client.jsdl;
 public class InvalidJSDLException extends JSDLException
 {
 	static final long serialVersionUID = 0;
-	
+
 	public InvalidJSDLException(String msg)
 	{
 		super(msg);
 	}
-	
+
 	public InvalidJSDLException(String msg, Throwable cause)
 	{
 		super(msg, cause);

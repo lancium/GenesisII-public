@@ -21,41 +21,47 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
  * lightweight class and has multiple use cases the cache holding instances of this class
  * should have both a larger lifetime and capacity.
  * */
-public class WSResourceConfig {
+public class WSResourceConfig
+{
 
-	public enum IdentifierType {WS_ENDPOINT_IDENTIFIER, RNS_PATH_IDENTIFIER, INODE_NUMBER_IDENTIFIER}
-	
-	private enum ResourceType {FILE, DIRECTORY}
-	
+	public enum IdentifierType {
+		WS_ENDPOINT_IDENTIFIER, RNS_PATH_IDENTIFIER, INODE_NUMBER_IDENTIFIER
+	}
+
+	private enum ResourceType {
+		FILE, DIRECTORY
+	}
+
 	private URI wsIdentifier;
 	private Set<String> rnsPaths;
 	private Integer inodeNumber;
 	private ResourceType type;
-	
+
 	/*
-	 * These two properties indicate that the concerned resource will remain synchronized 
-	 * -- using container to client update notifications or by polling status -- with the 
-	 * container holding it for the specified period of time. This information is used to
-	 * increase the lifetime of the related items in different caches. 
-	 * */
+	 * These two properties indicate that the concerned resource will remain synchronized -- using
+	 * container to client update notifications or by polling status -- with the container holding
+	 * it for the specified period of time. This information is used to increase the lifetime of the
+	 * related items in different caches.
+	 */
 	private boolean hasRegisteredCallback;
 	private Date callbackExpiryTime;
-	
+
 	/*
-	 * This two fields are used to check whether the container has notified the client not to 
-	 * rely on cache for a specific period of time. The container does that when it receive too
-	 * many notification to be delivered on behave of the concerned resource.
-	 * */
+	 * This two fields are used to check whether the container has notified the client not to rely
+	 * on cache for a specific period of time. The container does that when it receive too many
+	 * notification to be delivered on behave of the concerned resource.
+	 */
 	private boolean cacheAccessBlocked;
 	private Date cacheBlockageExpiryTime;
-	
+
 	/*
 	 * Represents in which GenesisII container the resource is located. For non-GenesisII resources
 	 * this should be NULL.
-	 * */
+	 */
 	private String containerId;
-	
-	public WSResourceConfig(WSName wsName) {
+
+	public WSResourceConfig(WSName wsName)
+	{
 		this.wsIdentifier = wsName.getEndpointIdentifier();
 		TypeInformation typeInfo = new TypeInformation(wsName.getEndpoint());
 		if (typeInfo.isRNS()) {
@@ -63,99 +69,117 @@ public class WSResourceConfig {
 		} else {
 			type = ResourceType.FILE;
 		}
-		if (wsName.isValidWSName())  {
+		if (wsName.isValidWSName()) {
 			inodeNumber = wsIdentifier.toString().hashCode();
-			
-			// It can happen that a subscribed resource's resource configuration got evicted from the
-			// cache due to overload. In future, if we create another configuration for the resource 
-			// as we start reusing it (coming back to a previously visited directory, etc.) then we 
-			// should retrieve the subscription related information to ensure that cache contents related
+
+			// It can happen that a subscribed resource's resource configuration got evicted from
+			// the
+			// cache due to overload. In future, if we create another configuration for the resource
+			// as we start reusing it (coming back to a previously visited directory, etc.) then we
+			// should retrieve the subscription related information to ensure that cache contents
+			// related
 			// to this resource are given appropriate lifetimes.
 			String EPI = wsName.getEndpointIdentifier().toString();
 			Date subscriptionTimeoutTime = SubscriptionDirectory.getSubscriptionTimeoutTime(EPI);
-			if (subscriptionTimeoutTime != null 
-					&& subscriptionTimeoutTime.getTime() > System.currentTimeMillis()) {
+			if (subscriptionTimeoutTime != null && subscriptionTimeoutTime.getTime() > System.currentTimeMillis()) {
 				hasRegisteredCallback = true;
 				callbackExpiryTime = subscriptionTimeoutTime;
 			}
 		}
 		rnsPaths = new HashSet<String>(3);
-		containerId = CacheUtils.getContainerId(wsName); 
+		containerId = CacheUtils.getContainerId(wsName);
 	}
-	
-	public WSResourceConfig(WSName wsName, String rnsPath) {
+
+	public WSResourceConfig(WSName wsName, String rnsPath)
+	{
 		this(wsName);
 		rnsPaths.add(rnsPath);
 	}
-	
-	public boolean isMappedToMultiplePath() {
+
+	public boolean isMappedToMultiplePath()
+	{
 		return (rnsPaths.size() > 1);
 	}
 
-	public URI getWsIdentifier() {
+	public URI getWsIdentifier()
+	{
 		return wsIdentifier;
 	}
 
-	public void setWsIdentifier(URI wsIdentifier) {
+	public void setWsIdentifier(URI wsIdentifier)
+	{
 		this.wsIdentifier = wsIdentifier;
 	}
 
-	public String getRnsPath() {
-		if (rnsPaths == null || rnsPaths.isEmpty()) return null;
+	public String getRnsPath()
+	{
+		if (rnsPaths == null || rnsPaths.isEmpty())
+			return null;
 		return rnsPaths.toArray(new String[rnsPaths.size()])[0];
 	}
 
-	public Collection<String> getRnsPaths() {
+	public Collection<String> getRnsPaths()
+	{
 		return rnsPaths;
 	}
-	
-	public void addRNSPath(String rnsPath) {
+
+	public void addRNSPath(String rnsPath)
+	{
 		rnsPaths.add(rnsPath);
 	}
-	
-	public void addRNSPaths(Collection<String> rnsPaths) {
+
+	public void addRNSPaths(Collection<String> rnsPaths)
+	{
 		if (rnsPaths != null) {
 			this.rnsPaths.addAll(rnsPaths);
 		}
 	}
-	
-	public void removeRNSPath(String rnsPath) {
+
+	public void removeRNSPath(String rnsPath)
+	{
 		rnsPaths.remove(rnsPath);
 	}
 
-	public Integer getInodeNumber() {
+	public Integer getInodeNumber()
+	{
 		return inodeNumber;
 	}
 
-	public void setInodeNumber(Integer inodeNumber) {
+	public void setInodeNumber(Integer inodeNumber)
+	{
 		this.inodeNumber = inodeNumber;
 	}
-	
-	public boolean isHasRegisteredCallback() {
-		
+
+	public boolean isHasRegisteredCallback()
+	{
+
 		// A posterior update on the flag when a query about callback is made.
 		// This is done to ensure correctness as otherwise we would need something
 		// like a cronjob to reset the flags of cached configurations.
 		if ((callbackExpiryTime != null) && callbackExpiryTime.before(new Date())) {
 			hasRegisteredCallback = false;
 		}
-		
+
 		return hasRegisteredCallback;
 	}
 
-	public void setHasRegisteredCallback(boolean hasRegisteredCallback) {
+	public void setHasRegisteredCallback(boolean hasRegisteredCallback)
+	{
 		this.hasRegisteredCallback = hasRegisteredCallback;
 	}
 
-	public Date getCallbackExpiryTime() {
+	public Date getCallbackExpiryTime()
+	{
 		return callbackExpiryTime;
 	}
 
-	public void setCallbackExpiryTime(Date callbackExpiryTime) {
+	public void setCallbackExpiryTime(Date callbackExpiryTime)
+	{
 		this.callbackExpiryTime = callbackExpiryTime;
 	}
-	
-	public boolean isCacheAccessBlocked() {
+
+	public boolean isCacheAccessBlocked()
+	{
 		if (cacheAccessBlocked) {
 			if (cacheBlockageExpiryTime.before(new Date())) {
 				cacheAccessBlocked = false;
@@ -165,55 +189,72 @@ public class WSResourceConfig {
 		return cacheAccessBlocked;
 	}
 
-	public void blockCacheAccess() {
+	public void blockCacheAccess()
+	{
 		this.cacheAccessBlocked = true;
 	}
 
-	public void setCacheBlockageExpiryTime(Date cacheBlockageExpiryTime) {
+	public void setCacheBlockageExpiryTime(Date cacheBlockageExpiryTime)
+	{
 		this.cacheBlockageExpiryTime = cacheBlockageExpiryTime;
 	}
-	
-	public String getContainerId() {
+
+	public String getContainerId()
+	{
 		return containerId;
 	}
 
-	public void setContainerId(String containerId) {
+	public void setContainerId(String containerId)
+	{
 		this.containerId = containerId;
 	}
 
-	public boolean identifierMatches(Object identifier) {
-		if (identifier == null) return false;
-		if (identifier instanceof URI) return wsIdentifier.equals(identifier);
-		if (identifier instanceof String) return rnsPaths.contains(identifier);
-		if (identifier instanceof Integer) return (identifier.equals(inodeNumber));
+	public boolean identifierMatches(Object identifier)
+	{
+		if (identifier == null)
+			return false;
+		if (identifier instanceof URI)
+			return wsIdentifier.equals(identifier);
+		if (identifier instanceof String)
+			return rnsPaths.contains(identifier);
+		if (identifier instanceof Integer)
+			return (identifier.equals(inodeNumber));
 		return false;
 	}
-	
-	public boolean isMappedToRNSPaths() {
+
+	public boolean isMappedToRNSPaths()
+	{
 		return (rnsPaths != null && rnsPaths.size() > 0);
 	}
-	
-	public boolean isDirectory() {
+
+	public boolean isDirectory()
+	{
 		return (type == ResourceType.DIRECTORY);
 	}
-	
-	public long getMillisecondTimeLeftToCallbackExpiry() {
-		if (!hasRegisteredCallback) return 0;
+
+	public long getMillisecondTimeLeftToCallbackExpiry()
+	{
+		if (!hasRegisteredCallback)
+			return 0;
 		long expiryTimeInMillis = callbackExpiryTime.getTime();
 		long currentTimeMillis = System.currentTimeMillis();
-		if (expiryTimeInMillis <= currentTimeMillis) return 0;
+		if (expiryTimeInMillis <= currentTimeMillis)
+			return 0;
 		return (expiryTimeInMillis - currentTimeMillis);
 	}
-	
-	public boolean isRoot() {
+
+	public boolean isRoot()
+	{
 		return rnsPaths.contains("/");
 	}
-	
-	public boolean isMatchingPath(String path) {
+
+	public boolean isMatchingPath(String path)
+	{
 		return (getMatchingPath(path) != null);
 	}
-	
-	public String getMatchingPath(String path) {
+
+	public String getMatchingPath(String path)
+	{
 		for (String rnsPath : rnsPaths) {
 			if (rnsPath.matches(path)) {
 				return rnsPath;

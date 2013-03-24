@@ -5,19 +5,17 @@ import java.util.Calendar;
 import edu.virginia.vcgr.genii.container.byteio.StreamableByteIOAttributePreFetcher;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
-public class StreamableByteIOForkAttributePreFetcher
-	extends StreamableByteIOAttributePreFetcher<IResource>
+public class StreamableByteIOForkAttributePreFetcher extends StreamableByteIOAttributePreFetcher<IResource>
 {
 	private StreamableByteIOResourceFork _fork;
-	
-	public StreamableByteIOForkAttributePreFetcher(
-		IResource resource, StreamableByteIOResourceFork fork)
+
+	public StreamableByteIOForkAttributePreFetcher(IResource resource, StreamableByteIOResourceFork fork)
 	{
 		super(resource);
-		
+
 		_fork = fork;
 	}
-	
+
 	@Override
 	protected Calendar getAccessTime() throws Throwable
 	{

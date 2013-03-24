@@ -6,23 +6,24 @@ import java.io.PrintStream;
 public class DefaultXMLFormatHandler implements XMLFormatHandler
 {
 	private PrintStream _out;
-	
+
 	public DefaultXMLFormatHandler(PrintStream out)
 	{
 		_out = out;
 	}
-	
+
 	@Override
 	public void appendText(String text) throws IOException
 	{
 		_out.print(text);
 	}
-	
+
 	@Override
 	public void startElement() throws IOException
 	{
 		// Do nothing
 	}
+
 	@Override
 	public void startAttribute() throws IOException
 	{

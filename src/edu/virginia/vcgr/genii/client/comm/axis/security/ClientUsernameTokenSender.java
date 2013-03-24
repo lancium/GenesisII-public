@@ -15,6 +15,14 @@
  */
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.ws.axis.security.WSDoAllSender;
@@ -25,26 +33,16 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.security.credentials.*;
-import edu.virginia.vcgr.genii.security.credentials.identity.*;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
-import java.security.GeneralSecurityException;
+import edu.virginia.vcgr.genii.security.TransientCredentials;
+import edu.virginia.vcgr.genii.security.credentials.NuCredential;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 /**
- * Client-side UsernameToken message-level security handler for outgoing 
- * (request) messages. 
- *  
+ * Client-side UsernameToken message-level security handler for outgoing (request) messages.
+ * 
  * @author dgm4d
  */
-public class ClientUsernameTokenSender extends WSDoAllSender implements
-		ISecuritySendHandler
+public class ClientUsernameTokenSender extends WSDoAllSender implements ISecuritySendHandler
 {
 	static final long serialVersionUID = 0L;
 
@@ -60,8 +58,7 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements
 	}
 
 	/**
-	 * Indicates that this handler is the final handler and should serialize the
-	 * message context
+	 * Indicates that this handler is the final handler and should serialize the message context
 	 */
 	public void setToSerialize()
 	{
@@ -69,40 +66,30 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements
 	}
 
 	/**
-	 * Configures the Send handler. Returns whether or not this handler is to
-	 * perform any actions
+	 * Configures the Send handler. Returns whether or not this handler is to perform any actions
 	 */
-	public boolean configure(ICallingContext callContext,
-			MessageSecurity msgSecData) throws GeneralSecurityException
+	public boolean configure(ICallingContext callContext, MessageSecurity msgSecData) throws GeneralSecurityException
 	{
 		_utIdentity = null;
 
 		// get credentials from calling context
-		ArrayList<GIICredential> credentials =
-				TransientCredentials.getTransientCredentials(callContext)._credentials;
+		ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
 
-		for (GIICredential cred : credentials)
-		{
-			if (cred instanceof UsernamePasswordIdentity)
-			{
-				if (_utIdentity != null)
-				{
-					throw new GeneralSecurityException(
-							"Cannot have more than one username-token credential");
+		for (NuCredential cred : credentials) {
+			if (cred instanceof UsernamePasswordIdentity) {
+				if (_utIdentity != null) {
+					throw new GeneralSecurityException("Cannot have more than one username-token credential");
 				}
 				_utIdentity = (UsernamePasswordIdentity) cred;
 			}
 		}
 
-		if (_utIdentity == null)
-		{
-			_securityActions =
-					_securityActions + " " + WSHandlerConstants.NO_SECURITY;
+		if (_utIdentity == null) {
+			_securityActions = _securityActions + " " + WSHandlerConstants.NO_SECURITY;
 			return false;
 		}
 
-		_securityActions =
-				_securityActions + " " + WSHandlerConstants.USERNAME_TOKEN;
+		_securityActions = _securityActions + " " + WSHandlerConstants.USERNAME_TOKEN;
 		// _securityActions = _securityActions + " " +
 		// WSHandlerConstants.TIMESTAMP;
 
@@ -114,32 +101,24 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements
 	public void invoke(MessageContext msgContext) throws AxisFault
 	{
 
-		if (!_serialize)
-		{
+		if (!_serialize) {
 			// don't let this handler serialize just yet: there may be more
-			_securityActions =
-					_securityActions + " "
-							+ WSHandlerConstants.NO_SERIALIZATION;
+			_securityActions = _securityActions + " " + WSHandlerConstants.NO_SERIALIZATION;
 		}
 
 		_securityActions = _securityActions.trim();
 		setOption(WSHandlerConstants.ACTION, _securityActions);
-		setOption(WSHandlerConstants.PW_CALLBACK_CLASS,
-				ClientUsernameTokenSender.ClientPWCallback.class.getName());
+		setOption(WSHandlerConstants.PW_CALLBACK_CLASS, ClientUsernameTokenSender.ClientPWCallback.class.getName());
 
 		super.invoke(msgContext);
 	}
 
-	public WSPasswordCallback getPassword(String username, int doAction,
-			String clsProp, String refProp, RequestData reqData)
-			throws WSSecurityException
+	public WSPasswordCallback getPassword(String username, int doAction, String clsProp, String refProp, RequestData reqData)
+		throws WSSecurityException
 	{
 
-		if ((doAction == WSConstants.UT) && (_utIdentity != null))
-		{
-			WSPasswordCallback pwCb =
-					new WSPasswordCallback(username,
-							WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
+		if ((doAction == WSConstants.UT) && (_utIdentity != null)) {
+			WSPasswordCallback pwCb = new WSPasswordCallback(username, WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
 			pwCb.setPassword(_utIdentity.getPassword());
 
 			return pwCb;
@@ -157,30 +136,22 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements
 		 * 
 		 */
 
-		public void handle(Callback[] callbacks) throws IOException,
-				UnsupportedCallbackException
+		public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
 		{
-			for (int i = 0; i < callbacks.length; i++)
-			{
-				if (callbacks[i] instanceof WSPasswordCallback)
-				{
+			for (int i = 0; i < callbacks.length; i++) {
+				if (callbacks[i] instanceof WSPasswordCallback) {
 					WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-					switch (pc.getUsage())
-					{
-					case WSPasswordCallback.DECRYPT:
-					case WSPasswordCallback.SIGNATURE:
-						pc.setPassword(CRYTO_PASS);
-						break;
-					default:
-						throw new UnsupportedCallbackException(callbacks[i],
-								"Unrecognized Callback");
+					switch (pc.getUsage()) {
+						case WSPasswordCallback.DECRYPT:
+						case WSPasswordCallback.SIGNATURE:
+							pc.setPassword(CRYTO_PASS);
+							break;
+						default:
+							throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
 					}
 
-				}
-				else
-				{
-					throw new UnsupportedCallbackException(callbacks[i],
-							"Unrecognized Callback");
+				} else {
+					throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
 				}
 
 			}

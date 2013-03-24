@@ -6,10 +6,9 @@ import org.morgan.util.gui.table.AbstractRowTableColumnDefinition;
 
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 
-class CredentialsColumn 
-	extends AbstractRowTableColumnDefinition<JobInformation, CredentialBundle>
+class CredentialsColumn extends AbstractRowTableColumnDefinition<JobInformation, CredentialBundle>
 {
-	
+
 	CredentialsColumn()
 	{
 		super("Credentials", CredentialBundle.class, 250);
@@ -19,7 +18,7 @@ class CredentialsColumn
 	final public void prepareTableColumn(TableColumn column)
 	{
 		super.prepareTableColumn(column);
-		
+
 		column.setCellRenderer(new CredentialsCellRenderer());
 	}
 

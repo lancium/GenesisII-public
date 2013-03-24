@@ -31,75 +31,66 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 	}
 
 	@Override
-	public boolean isEnabled(
-			Collection<EndpointDescription> selectedDescriptions)
+	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
 	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-		
+
 		return selectedDescriptions.iterator().next().typeInformation().isByteIO();
 	}
-	
+
 	static private class TextLoadHandler implements LazyLoadTabHandler
 	{
 		private UIPluginContext _context;
 		private FileDisplayWidget _widget;
-		
-		private TextLoadHandler(UIPluginContext context,
-			FileDisplayWidget widget)
+
+		private TextLoadHandler(UIPluginContext context, FileDisplayWidget widget)
 		{
 			_widget = widget;
 			_context = context;
 		}
-		
+
 		@Override
 		public void load()
 		{
-			Collection<RNSPath> paths = 
-				_context.endpointRetriever().getTargetEndpoints();
-			
-			_context.uiContext().executor().submit(new DocumentRetriever(
-				_widget, paths.iterator().next()));
+			Collection<RNSPath> paths = _context.endpointRetriever().getTargetEndpoints();
+
+			_context.uiContext().executor().submit(new DocumentRetriever(_widget, paths.iterator().next()));
 		}
 	}
-	
+
 	static private class DocumentRetriever implements Runnable
 	{
 		// large buffer size to help us jump ahead of all possible writes and arrive
 		// at the end before log4j can add more lines.
 		static final private int BUFFER_SIZE = 1024 * 1024 * 1;
-		
+
 		private RNSPath _path;
 		private FileDisplayWidget _widget;
-		
+
 		private DocumentRetriever(FileDisplayWidget widget, RNSPath path)
 		{
 			_path = path;
 			_widget = widget;
 		}
-		
+
 		@Override
 		public void run()
 		{
-			SwingUtilities.invokeLater(new DocumentUpdater(false,
-				_widget.UPDATING_STYLE,
-				"Reading file contents...", _widget));
-			
+			SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.UPDATING_STYLE, "Reading file contents...", _widget));
+
 			StringBuilder builder = new StringBuilder();
-			char []data = new char[BUFFER_SIZE];
+			char[] data = new char[BUFFER_SIZE];
 			int read;
-			
+
 			InputStream in = null;
-			try
-			{
+			try {
 				in = ByteIOStreamFactory.createInputStream(_path);
 				Reader reader = new InputStreamReader(in);
-				while ((read = reader.read(data, 0, BUFFER_SIZE)) > 0)
-				{
+				while ((read = reader.read(data, 0, BUFFER_SIZE)) > 0) {
 					builder.append(data, 0, read);
 					if (builder.length() > 0) {
-						SwingUtilities.invokeLater(new DocumentUpdater(true,
-							_widget.PLAIN_STYLE, builder.toString(), _widget));
+						SwingUtilities.invokeLater(new DocumentUpdater(true, _widget.PLAIN_STYLE, builder.toString(), _widget));
 						builder.delete(0, builder.length());
 					}
 					if (!reader.ready()) {
@@ -111,42 +102,37 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 					// yield the thread to the gui updater.
 					Thread.sleep(200);
 				}
-				
-			}
-			catch (Throwable e)
-			{
-				SwingUtilities.invokeLater(new DocumentUpdater(false,
-					_widget.ERROR_STYLE,
-					"Unable to read file contents:  " + e, _widget));
-			}
-			finally
-			{
+
+			} catch (Throwable e) {
+				SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.ERROR_STYLE, "Unable to read file contents:  "
+					+ e, _widget));
+			} finally {
 				StreamUtils.close(in);
 			}
 		}
 	}
-	
+
 	static private class DocumentUpdater implements Runnable
 	{
 		private String _content;
 		private Style _style;
 		private FileDisplayWidget _widget;
 		private boolean _append;
-		
-		private DocumentUpdater(boolean append, Style style,
-			String content, FileDisplayWidget widget)
+
+		private DocumentUpdater(boolean append, Style style, String content, FileDisplayWidget widget)
 		{
 			_style = style;
 			_content = content;
 			_widget = widget;
 			_append = append;
 		}
-		
+
 		@Override
 		public void run()
 		{
-			if (!_append) _widget.clear();
-			
+			if (!_append)
+				_widget.clear();
+
 			_widget.append(_style, _content);
 			if (!_append)
 				_widget.setCaretPosition(0);

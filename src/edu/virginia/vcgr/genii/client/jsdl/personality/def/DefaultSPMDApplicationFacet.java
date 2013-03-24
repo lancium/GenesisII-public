@@ -10,109 +10,81 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.SPMDApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.posix.JSDLPosixConstants;
 import edu.virginia.vcgr.genii.client.jsdl.spmd.SPMDConstants;
 
-public class DefaultSPMDApplicationFacet extends DefaultPersonalityFacet
-		implements SPMDApplicationFacet
+public class DefaultSPMDApplicationFacet extends DefaultPersonalityFacet implements SPMDApplicationFacet
 {
 	@Override
-	public void consumeArgument(Object currentUnderstanding,
-			String filesystemName, String argument)
-			throws JSDLException
+	public void consumeArgument(Object currentUnderstanding, String filesystemName, String argument) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Argument"));
+		throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Argument"));
 	}
 
 	@Override
-	public void consumeEnvironment(Object currentUnderstanding,
-			String name, String filesystemName,
-			String environment) throws JSDLException
+	public void consumeEnvironment(Object currentUnderstanding, String name, String filesystemName, String environment)
+		throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Environment"));
+		throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Environment"));
 	}
 
 	@Override
-	public void consumeError(Object currentUnderstanding,
-			String filesystemName, String error) throws JSDLException
+	public void consumeError(Object currentUnderstanding, String filesystemName, String error) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Error"));
+		throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Error"));
 	}
 
 	@Override
-	public void consumeExecutable(Object currentUnderstanding,
-			String filesystemName, String executable)
-			throws JSDLException
+	public void consumeExecutable(Object currentUnderstanding, String filesystemName, String executable) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Executable"));
+		throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Executable"));
 	}
 
 	@Override
-	public void consumeInput(Object currentUnderstanding,
-			String filesystemName, String input) throws JSDLException
+	public void consumeInput(Object currentUnderstanding, String filesystemName, String input) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Input"));
+		throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Input"));
 	}
 
 	@Override
-	public void consumeOutput(Object currentUnderstanding,
-			String filesystemName, String output)
-			throws JSDLException
+	public void consumeOutput(Object currentUnderstanding, String filesystemName, String output) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Output"));
+		throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Output"));
 	}
 
 	@Override
-	public void consumeUserName(Object currentUnderstanding,
-			String userName) throws JSDLException
+	public void consumeUserName(Object currentUnderstanding, String userName) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLPosixConstants.JSDL_POSIX_NS, "UserName"));
+		throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "UserName"));
 	}
 
 	@Override
-	public void consumeWorkingDirectory(Object currentUnderstanding,
-			String filesystemName, String workingDirectory)
-			throws JSDLException
+	public void consumeWorkingDirectory(Object currentUnderstanding, String filesystemName, String workingDirectory)
+		throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLPosixConstants.JSDL_POSIX_NS, "WorkingDirectory"));
+		throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "WorkingDirectory"));
 	}
 
 	@Override
-	public void consumeNumberOfProcesses(Object currentUnderstanding,
-			Integer numberOfProcesses, boolean useActualCPUCount)
-			throws JSDLException
+	public void consumeNumberOfProcesses(Object currentUnderstanding, Integer numberOfProcesses, boolean useActualCPUCount)
+		throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(SPMDConstants.JSDL_SPMD_NS, "NumberOfProcesses"));
+		throw new UnsupportedJSDLElement(new QName(SPMDConstants.JSDL_SPMD_NS, "NumberOfProcesses"));
 	}
 
 	@Override
-	public void consumeProcessesPerHost(Object currentUnderstanding,
-			Integer processesPerHost) throws JSDLException
+	public void consumeProcessesPerHost(Object currentUnderstanding, Integer processesPerHost) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(SPMDConstants.JSDL_SPMD_NS, "ProcessesPerHost"));
+		throw new UnsupportedJSDLElement(new QName(SPMDConstants.JSDL_SPMD_NS, "ProcessesPerHost"));
 	}
 
 	@Override
-	public void consumeSPMDVariation(Object currentUnderstanding,
-			URI spmdVariation) throws JSDLException
+	public void consumeSPMDVariation(Object currentUnderstanding, URI spmdVariation) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(SPMDConstants.JSDL_SPMD_NS, "SPMDVariation"));
+		throw new UnsupportedJSDLElement(new QName(SPMDConstants.JSDL_SPMD_NS, "SPMDVariation"));
 	}
 
 	@Override
-	public void consumeThreadsPerProcess(Object currentUnderstanding,
-			Integer threadsPerProcess, boolean useActualIndividualCPUCount)
-			throws JSDLException
+	public void consumeThreadsPerProcess(Object currentUnderstanding, Integer threadsPerProcess,
+		boolean useActualIndividualCPUCount) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(SPMDConstants.JSDL_SPMD_NS, "ThreadsPerProcess"));
+		throw new UnsupportedJSDLElement(new QName(SPMDConstants.JSDL_SPMD_NS, "ThreadsPerProcess"));
 	}
 }

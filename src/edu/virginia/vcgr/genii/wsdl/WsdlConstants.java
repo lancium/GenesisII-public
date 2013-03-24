@@ -6,13 +6,10 @@ public class WsdlConstants
 {
 	/* Namespaces */
 	static public final String WSDL_NS = "http://schemas.xmlsoap.org/wsdl/";
-	static public final String GENII_EXT_NS = 
-		"http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions";
-	static public final String WS_ADDRESSING_NS =
-		"http://www.w3.org/2005/08/addressing";
-	static public final String SOAP_NS =
-		"http://schemas.xmlsoap.org/wsdl/soap/";
-	
+	static public final String GENII_EXT_NS = "http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions";
+	static public final String WS_ADDRESSING_NS = "http://www.w3.org/2005/08/addressing";
+	static public final String SOAP_NS = "http://schemas.xmlsoap.org/wsdl/soap/";
+
 	/* Element Names */
 	static public final String DEFINITIONS = "definitions";
 	static public final String IMPORT = "import";
@@ -23,7 +20,7 @@ public class WsdlConstants
 	static public final String FAULT = "fault";
 	static public final String EXTEND = "extend";
 	static public final String ACTION = "Action";
-	
+
 	/* Element QNames */
 	static public QName DEFINITIONS_QNAME = new QName(WSDL_NS, DEFINITIONS);
 	static public QName IMPORT_QNAME = new QName(WSDL_NS, IMPORT);
@@ -34,7 +31,7 @@ public class WsdlConstants
 	static public QName FAULT_QNAME = new QName(WSDL_NS, FAULT);
 	static public QName EXTEND_QNAME = new QName(GENII_EXT_NS, EXTEND);
 	static public QName ACTION_QNAME = new QName(WS_ADDRESSING_NS, ACTION);
-	
+
 	/* Attribute Names */
 	static public final String NAME_ATTR = "name";
 	static public final String TARGET_NAMESPACE_ATTR = "targetNamespace";

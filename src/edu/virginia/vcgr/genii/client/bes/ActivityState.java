@@ -33,58 +33,50 @@ public class ActivityState implements Serializable, Cloneable
 {
 	static final long serialVersionUID = 0L;
 
-	static final public String _GENII_NS = 
-		"http://vcgr.cs.virginia.edu/genesisII/bes/activity-states";
-	
-	static final private String _GENII_SUS_NS =
-		"http://vcgr.cs.virginia.edu/genesisII/bes/activity-states/suspend";
+	static final public String _GENII_NS = "http://vcgr.cs.virginia.edu/genesisII/bes/activity-states";
+
+	static final private String _GENII_SUS_NS = "http://vcgr.cs.virginia.edu/genesisII/bes/activity-states/suspend";
 	static final private String _SUSPEND_STATE_ELEMENT_NAME = "suspended";
-	static final private QName _SUSPEND_STATE_ELEMENT_QNAME = new QName(
-		_GENII_SUS_NS, _SUSPEND_STATE_ELEMENT_NAME);
-	
+	static final private QName _SUSPEND_STATE_ELEMENT_QNAME = new QName(_GENII_SUS_NS, _SUSPEND_STATE_ELEMENT_NAME);
+
 	@XmlAttribute(name = "bes-state", required = true)
 	private String _besState;
-	
+
 	@XmlAttribute(name = "genii-state", required = false)
 	private String _geniiState;
-	
+
 	@XmlAttribute(name = "is-suspended", required = false)
 	private boolean _isSuspended;
-	
+
 	@SuppressWarnings("unused")
 	private ActivityState()
-	{	
+	{
 		_besState = null;
 		_geniiState = null;
 		_isSuspended = false;
 	}
-	
-	public ActivityState(ActivityStateEnumeration besState, 
-		String geniiState, boolean isSuspended)
+
+	public ActivityState(ActivityStateEnumeration besState, String geniiState, boolean isSuspended)
 	{
 		if (besState == null)
 			throw new IllegalArgumentException("BESState cannot be null.");
-		
+
 		_besState = besState.getValue();
 		_geniiState = geniiState;
 		_isSuspended = isSuspended;
 	}
-	
+
 	public ActivityState(ActivityStatusType wireState)
 	{
 		_geniiState = null;
 		_isSuspended = false;
-		
-		if (wireState == null)
-		{
+
+		if (wireState == null) {
 			_besState = ActivityStateEnumeration._Failed;
-		} else
-		{
-			MessageElement []any = wireState.get_any();
-			if (any != null)
-			{
-				for (MessageElement me : any)
-				{
+		} else {
+			MessageElement[] any = wireState.get_any();
+			if (any != null) {
+				for (MessageElement me : any) {
 					QName eName = me.getQName();
 					if (eName.getNamespaceURI().equals(_GENII_NS))
 						_geniiState = eName.getLocalPart();
@@ -92,65 +84,59 @@ public class ActivityState implements Serializable, Cloneable
 						_isSuspended = true;
 				}
 			}
-			
+
 			ActivityStateEnumeration stateE = wireState.getState();
-			if (stateE == null)
-			{
+			if (stateE == null) {
 				_besState = ActivityStateEnumeration._Failed;
-			} else
-			{
+			} else {
 				_besState = wireState.getState().getValue();
 			}
 		}
 	}
-	
-	public ActivityState(MessageElement element)
-		throws ResourceException
+
+	public ActivityState(MessageElement element) throws ResourceException
 	{
 		this(ObjectDeserializer.toObject(element, ActivityStatusType.class));
 	}
-	
+
 	static private boolean equals(String one, String two)
 	{
-		if (one == null)
-		{
+		if (one == null) {
 			if (two == null)
 				return true;
 			else
 				return false;
-		} else
-		{
+		} else {
 			if (two == null)
 				return false;
 		}
-		
+
 		return one.equals(two);
 	}
-	
+
 	public boolean equals(ActivityState other)
 	{
-		return equals(_besState, other._besState) &&
-			equals(_geniiState, other._geniiState) &&
-			(_isSuspended == other._isSuspended);
+		return equals(_besState, other._besState) && equals(_geniiState, other._geniiState)
+			&& (_isSuspended == other._isSuspended);
 	}
-	
+
 	public boolean equals(Object other)
 	{
 		if (other instanceof ActivityState)
-			return equals((ActivityState)other);
+			return equals((ActivityState) other);
 		return false;
 	}
-	
+
 	public boolean isSuspended()
 	{
 		return _isSuspended;
 	}
-	
+
 	public void suspend(boolean setSuspended)
 	{
 		_isSuspended = setSuspended;
 	}
-	
+
 	public boolean isFinalState()
 	{
 		if (_besState.equals(ActivityStateEnumeration._Cancelled))
@@ -159,30 +145,30 @@ public class ActivityState implements Serializable, Cloneable
 			return true;
 		else if (_besState.equals(ActivityStateEnumeration._Finished))
 			return true;
-		
+
 		return false;
 	}
-	
+
 	public boolean isFailedState()
 	{
-		return _besState.equals(ActivityStateEnumeration._Failed);	
+		return _besState.equals(ActivityStateEnumeration._Failed);
 	}
-	
+
 	public boolean isCancelledState()
 	{
-		return _besState.equals(ActivityStateEnumeration._Cancelled);	
+		return _besState.equals(ActivityStateEnumeration._Cancelled);
 	}
-	
+
 	public boolean isFinishedState()
 	{
-		return _besState.equals(ActivityStateEnumeration._Finished);	
+		return _besState.equals(ActivityStateEnumeration._Finished);
 	}
-	
+
 	public boolean isIgnoreable()
 	{
 		return _geniiState != null && _geniiState.equals("Ignoreable");
 	}
-	
+
 	public ActivityStatusType toActivityStatusType()
 	{
 		Collection<MessageElement> anyC = new Vector<MessageElement>(2);
@@ -190,9 +176,8 @@ public class ActivityState implements Serializable, Cloneable
 			anyC.add(new MessageElement(new QName(_GENII_NS, _geniiState)));
 		if (_isSuspended)
 			anyC.add(new MessageElement(_SUSPEND_STATE_ELEMENT_QNAME));
-		
-		return new ActivityStatusType(
-			(anyC.size() > 0) ? anyC.toArray(new MessageElement[0]) : null,
+
+		return new ActivityStatusType((anyC.size() > 0) ? anyC.toArray(new MessageElement[0]) : null,
 			ActivityStateEnumeration.fromValue(_besState));
 	}
 
@@ -204,14 +189,12 @@ public class ActivityState implements Serializable, Cloneable
 			builder.append(":" + _geniiState);
 		if (_isSuspended)
 			builder.append("[suspended]");
-		
+
 		return builder.toString();
 	}
-	
+
 	public Object clone()
 	{
-		return new ActivityState(
-			ActivityStateEnumeration.fromValue(_besState),
-			_geniiState, _isSuspended);
+		return new ActivityState(ActivityStateEnumeration.fromValue(_besState), _geniiState, _isSuspended);
 	}
 }

@@ -12,9 +12,9 @@ import javax.swing.JPanel;
 public class LazilyLoadedTab extends JPanel
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private LazyLoadTabHandler _loadHandler;
-	
+
 	private class ComponentListenerImpl extends ComponentAdapter
 	{
 		@Override
@@ -25,23 +25,21 @@ public class LazilyLoadedTab extends JPanel
 				load();
 		}
 	}
-	
+
 	public LazilyLoadedTab(LazyLoadTabHandler handler, JComponent component)
 	{
 		super(new GridBagLayout());
-		
+
 		_loadHandler = handler;
-		add(component, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+		add(component, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5), 5, 5));
-		
+
 		addComponentListener(new ComponentListenerImpl());
 	}
-	
+
 	public void load()
 	{
-		if (_loadHandler != null)
-		{
+		if (_loadHandler != null) {
 			_loadHandler.load();
 			_loadHandler = null;
 		}

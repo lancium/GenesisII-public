@@ -14,60 +14,54 @@ import org.apache.commons.logging.LogFactory;
 public class FileDisplayWidget extends JTextPane
 {
 	static final long serialVersionUID = 0L;
-	
+
 	static private Log _logger = LogFactory.getLog(FileDisplayWidget.class);
-	
+
 	public Style PLAIN_STYLE = null;
 	public Style UPDATING_STYLE = null;
 	public Style ERROR_STYLE = null;
-	
+
 	private void createStyles(StyledDocument exemplar)
 	{
 		PLAIN_STYLE = exemplar.addStyle("Plain", null);
-		
+
 		UPDATING_STYLE = exemplar.addStyle("Updating", PLAIN_STYLE);
 		StyleConstants.setItalic(UPDATING_STYLE, true);
 		StyleConstants.setForeground(UPDATING_STYLE, Color.darkGray);
-		
+
 		ERROR_STYLE = exemplar.addStyle("Error", PLAIN_STYLE);
 		StyleConstants.setItalic(ERROR_STYLE, true);
 		StyleConstants.setForeground(ERROR_STYLE, Color.red);
 	}
-	
+
 	public FileDisplayWidget()
 	{
 		createStyles(getStyledDocument());
-		
+
 		setFocusable(true);
 		setEditable(false);
 	}
-	
+
 	public void clear()
 	{
-		try
-		{
+		try {
 			StyledDocument doc = getStyledDocument();
 			doc.remove(0, doc.getLength());
-		}
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			_logger.warn("Unable to clear Text area.", cause);
 		}
 	}
-	
+
 	public void append(Style style, String text)
 	{
-		try
-		{
+		try {
 			StyledDocument doc = getStyledDocument();
 			doc.insertString(doc.getLength(), text, style);
-		}
-		catch (BadLocationException ble)
-		{
+		} catch (BadLocationException ble) {
 			_logger.warn("Unable to append content to text document.", ble);
 		}
 	}
-	
+
 	@Override
 	public boolean getScrollableTracksViewportWidth()
 	{

@@ -10,21 +10,16 @@ public class BaseFaultFixer implements IAroundInvoker
 	@Override
 	public Object invoke(InvocationContext invocationContext) throws Exception
 	{
-		try
-		{
+		try {
 			return invocationContext.proceed();
-		}
-		catch (BaseFaultType bft)
-		{
+		} catch (BaseFaultType bft) {
 			if (bft.getTimestamp() == null)
 				bft.setTimestamp(Calendar.getInstance());
 			throw bft;
-		}
-		catch (InvocationTargetException ite)
-		{
+		} catch (InvocationTargetException ite) {
 			Throwable cause = ite.getCause();
 			if (cause instanceof Exception)
-				throw (Exception)cause;
+				throw (Exception) cause;
 			else
 				throw ite;
 		}

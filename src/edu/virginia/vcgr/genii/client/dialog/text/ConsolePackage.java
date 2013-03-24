@@ -12,44 +12,37 @@ class ConsolePackage
 	private PrintWriter _stdout;
 	private PrintWriter _stderr;
 	private BufferedReader _stdin;
-	
-	public ConsolePackage(
-		PrintWriter stdout, PrintWriter stderr, BufferedReader stdin)
+
+	public ConsolePackage(PrintWriter stdout, PrintWriter stderr, BufferedReader stdin)
 	{
 		_stdout = stdout;
 		_stderr = stderr;
 		_stdin = stdin;
 	}
-	
-	public String readLine()
-		throws DialogException
+
+	public String readLine() throws DialogException
 	{
 		return readLine(false);
 	}
-	
-	public String readLine(boolean hiddenInput)
-		throws DialogException
+
+	public String readLine(boolean hiddenInput) throws DialogException
 	{
-		try
-		{
-			if (hiddenInput)
-			{
+		try {
+			if (hiddenInput) {
 				return GetPassword2.getPassword("");
 			}
-			
+
 			return _stdin.readLine();
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new DialogException("Unable to read from standard in.", ioe);
 		}
 	}
-	
+
 	public PrintWriter stdout()
 	{
 		return _stdout;
 	}
-	
+
 	public PrintWriter stderr()
 	{
 		return _stderr;

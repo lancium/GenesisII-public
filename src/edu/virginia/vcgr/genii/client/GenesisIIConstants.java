@@ -12,15 +12,6 @@ public class GenesisIIConstants
 
 	static public final String OGSA_BP_NS = "http://schemas.ggc.org/ogsa/2006/05/wsrf-bp";
 
-	// credentials are valid 10 years by default.
-	static public final long CredentialExpirationMillis = 1000L * 60L * 60L * 24L * 365L * 10L;
-
-	static public final long CredentialGoodFromOffset = 1000L * 60L * 15L; // 15 minutes ago
-
-	static public final long CredentialCacheTimeout = 1000L * 60L * 60L; // 1 hour lifetime in cache
-
-	static public final int MaxDelegationDepth = 10;
-
 	static public final String NAMING_CLIENT_CONFORMANCE_PROPERTY = "IsWSNamingClient";
 
 	static public final String REGISTERED_TOPICS_ATTR = "registered-topic";
@@ -77,6 +68,22 @@ public class GenesisIIConstants
 
 	static public final QName CLIENT_ID_QNAME = new QName(GENESISII_NS, CLIENT_ID_ATTRIBUTE_NAME);
 
+	static public final String DELEGATED_SAML_ASSERTIONS_NAME = "delegated-saml-credentials";
+	static public final QName DELEGATED_SAML_ASSERTIONS_QNAME = new QName(GENESISII_NS, DELEGATED_SAML_ASSERTIONS_NAME);
+
 	static public final QName MYPROXY_QNAME = new QName(UNICORE_NS, MYPROXY_ATTRIBUTE_NAME);
 	static public final String myproxyFilenameSuffix = "teragrid_x509.pem";
+
+	// constant object for the security token ref qname.
+	static public final QName WSSE11_NS_SECURITY_QNAME = new QName(org.apache.ws.security.WSConstants.WSSE11_NS,
+		"SecurityTokenReference");
+
+	// our old namespace for wss, which has been outdated by using newer wss4j library.
+	static public final String INTERMEDIATE_WSE_NS = "http://docs.oasis-open.org/wss/2005/xx/oasis-2005xx-wss-wssecurity-secext-1.1.xsd";
+
+	// constant object for the older version of the security token ref qname.
+	static public final QName INTERMEDIATE_WSE_NS_SECURITY_QNAME = new QName(INTERMEDIATE_WSE_NS, "SecurityTokenReference");
+
+	// default time for snoozes while waiting for a lock on a file.
+	static public final int DEFAULT_FILE_LOCK = 40;
 }

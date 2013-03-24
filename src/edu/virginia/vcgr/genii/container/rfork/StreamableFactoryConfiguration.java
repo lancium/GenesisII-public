@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface StreamableFactoryConfiguration
-{
+public @interface StreamableFactoryConfiguration {
 	boolean destroyOnClose() default true;
+
 	boolean notifyOnDestroy() default true;
 }

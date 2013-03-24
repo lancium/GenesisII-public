@@ -10,14 +10,13 @@ public class RNSTreeOperatorSource implements OperatorSource
 {
 	private RNSTree _sourceTree;
 	private Collection<Pair<RNSTreeNode, RNSPath>> _sourcePaths;
-	
-	public RNSTreeOperatorSource(RNSTree sourceTree,
-		Collection<Pair<RNSTreeNode, RNSPath>> sourcePaths)
+
+	public RNSTreeOperatorSource(RNSTree sourceTree, Collection<Pair<RNSTreeNode, RNSPath>> sourcePaths)
 	{
 		_sourceTree = sourceTree;
 		_sourcePaths = sourcePaths;
 	}
-	
+
 	@Override
 	public boolean isFilesystemSource()
 	{
@@ -29,12 +28,12 @@ public class RNSTreeOperatorSource implements OperatorSource
 	{
 		return true;
 	}
-	
+
 	public RNSTree sourceTree()
 	{
 		return _sourceTree;
 	}
-	
+
 	public Collection<Pair<RNSTreeNode, RNSPath>> sourcePaths()
 	{
 		return _sourcePaths;

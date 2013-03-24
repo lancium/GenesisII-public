@@ -23,52 +23,45 @@ import edu.virginia.vcgr.genii.ui.plugins.queue.resources.ResourcesPanel;
 public class QueueManagerPlugin extends AbstractCombinedUIMenusPlugin
 {
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType)
-			throws UIPluginException
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
-		try
-		{
+		try {
 			JFrame frame = new JFrame("Queue Manager");
-			
+
 			QueueManagerPanel qPanel = new QueueManagerPanel(context);
 			ResourcesPanel rPanel = new ResourcesPanel(context);
-			
+
 			JTabbedPane tabbed = new JTabbedPane();
 			tabbed.addTab("Job Manager", new LazilyLoadedTab(qPanel, qPanel));
 			tabbed.addTab("Resource Manager", new LazilyLoadedTab(rPanel, rPanel));
-			
+
 			Container container = frame.getContentPane();
 			container.setLayout(new GridBagLayout());
-			
-			container.add(tabbed, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(5, 5, 5, 5), 5, 5));
-			
+
+			container.add(tabbed, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.pack();
 			GUIUtils.centerWindow(frame);
 			frame.setVisible(true);
 			frame.toFront();
-		}
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			if (cause instanceof UIPluginException)
-				throw (UIPluginException)cause;
+				throw (UIPluginException) cause;
 			else if (cause instanceof RuntimeException)
-				throw (RuntimeException)cause;
+				throw (RuntimeException) cause;
 			else
-				throw new UIPluginException("Unable to create QueueManager.",
-					cause);
+				throw new UIPluginException("Unable to create QueueManager.", cause);
 		}
 	}
 
 	@Override
-	final public boolean isEnabled(
-		Collection<EndpointDescription> selectedDescriptions)
+	final public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
 	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-		
+
 		return selectedDescriptions.iterator().next().typeInformation().isQueue();
 	}
 }

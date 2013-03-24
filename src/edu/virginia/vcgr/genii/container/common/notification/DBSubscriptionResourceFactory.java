@@ -16,34 +16,27 @@ public class DBSubscriptionResourceFactory extends BasicDBResourceFactory
 	{
 		Connection conn = null;
 		super.createTables();
-		
-		try
-		{
+
+		try {
 			conn = _pool.acquire(false);
 			SubscriptionsDatabase.createTables(conn);
 			conn.commit();
-		}
-		finally
-		{
+		} finally {
 			_pool.release(conn);
 		}
 	}
 
-	public DBSubscriptionResourceFactory(DatabaseConnectionPool pool)
-			throws SQLException
+	public DBSubscriptionResourceFactory(DatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}
-	
+
 	@Override
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
-		try
-		{
+		try {
 			return new DBSubscriptionResource(parentKey, _pool);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 	}

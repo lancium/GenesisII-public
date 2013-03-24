@@ -34,94 +34,94 @@ import edu.virginia.vcgr.genii.ui.utils.LoggingTarget;
  */
 public class SaveToDialog extends AbstractCombinedUIMenusPlugin
 {
-    static private Log _logger = LogFactory.getLog(SaveToDialog.class);
-    JFileChooser _fileDialog = new JFileChooser();
+	static private Log _logger = LogFactory.getLog(SaveToDialog.class);
+	JFileChooser _fileDialog = new JFileChooser();
 
-    /**
-     * We support both RNS directories and ByteIO files with this plugin.
-     */
-    @Override
-    public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
-    {
-        if (selectedDescriptions == null || selectedDescriptions.size() != 1)
-            return false;
+	/**
+	 * We support both RNS directories and ByteIO files with this plugin.
+	 */
+	@Override
+	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
+	{
+		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
+			return false;
 
-        return selectedDescriptions.iterator().next().typeInformation().isRNS()
-                || selectedDescriptions.iterator().next().typeInformation().isByteIO();
-    }
+		return selectedDescriptions.iterator().next().typeInformation().isRNS()
+			|| selectedDescriptions.iterator().next().typeInformation().isByteIO();
+	}
 
-    @Override
-    protected void performMenuAction(UIPluginContext context, MenuType menuType)
-            throws UIPluginException
-    {
-        if (context == null) return;
-        _logger.debug("SaveToDialog performMenuAction called.");
-        Closeable contextToken = null;
-        contextToken = null;
-        try {
-            contextToken = ContextManager.temporarilyAssumeContext(context.uiContext()
-                    .callingContext());
+	@Override
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
+	{
+		if (context == null)
+			return;
+		if (_logger.isDebugEnabled())
+			_logger.debug("SaveToDialog performMenuAction called.");
+		Closeable contextToken = null;
+		contextToken = null;
+		try {
+			contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 
-            _fileDialog.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-            int retPick = _fileDialog.showOpenDialog(context.ownerComponent());
-            if (retPick == JFileChooser.APPROVE_OPTION) {
-                Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
-                RNSPath path = paths.iterator().next();
-                context.uiContext()
-                        .progressMonitorFactory()
-                        .createMonitor(context.ownerComponent(), "Saving to local filesystem...",
-                                "", 1000L,
-                                new SaveToTask(path, _fileDialog.getSelectedFile().toString()),
-                                null).start();
-            }
-        } catch (Throwable cause) {
-            ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
-        } finally {
-            StreamUtils.close(contextToken);
-        }
-    }
+			_fileDialog.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			int retPick = _fileDialog.showOpenDialog(context.ownerComponent());
+			if (retPick == JFileChooser.APPROVE_OPTION) {
+				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
+				RNSPath path = paths.iterator().next();
+				context
+					.uiContext()
+					.progressMonitorFactory()
+					.createMonitor(context.ownerComponent(), "Saving to local filesystem...", "", 1000L,
+						new SaveToTask(path, _fileDialog.getSelectedFile().toString()), null).start();
+			}
+		} catch (Throwable cause) {
+			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
+		} finally {
+			StreamUtils.close(contextToken);
+		}
+	}
 
-    private class SaveToTask extends AbstractTask<Integer>
-    {
-        RNSPath path;
-        String target;
+	private class SaveToTask extends AbstractTask<Integer>
+	{
+		RNSPath path;
+		String target;
 
-        SaveToTask(RNSPath pathIn, String targetIn)
-        {
-            path = pathIn;
-            target = targetIn;
-        }
+		SaveToTask(RNSPath pathIn, String targetIn)
+		{
+			path = pathIn;
+			target = targetIn;
+		}
 
-        private PathOutcome performSave(RNSPath source, TaskProgressListener progressListener)
-        {
-            if ( (source == null) || (progressListener == null) ) return null;
-            File file = _fileDialog.getSelectedFile();
-            String target = "local:" + file.toString();
-            // we assume they don't want to overwrite files without knowing it.
-            CopyMachine cm = new CopyMachine(source.pwd(), target, progressListener, false, null);
-            return cm.copyTree();
-        }
+		private PathOutcome performSave(RNSPath source, TaskProgressListener progressListener)
+		{
+			if ((source == null) || (progressListener == null))
+				return null;
+			File file = _fileDialog.getSelectedFile();
+			String target = "local:" + file.toString();
+			// we assume they don't want to overwrite files without knowing it.
+			CopyMachine cm = new CopyMachine(source.pwd(), target, progressListener, false, null);
+			return cm.copyTree();
+		}
 
-        @Override
-        public Integer execute(TaskProgressListener progressListener) throws Exception
-        {
-            if (progressListener == null) return 1;
-            PathOutcome ret = performSave(path, progressListener);
-            if (PathOutcome.OUTCOME_SUCCESS.differs(ret)) {
-                String msg = "failed to save to the chosen path: " + target + " because "
-                        + PathOutcome.outcomeText(ret);
-                LoggingTarget.logInfo(msg, null);
-                _logger.error(msg);
-                return 1;
-            }
-            return 0;
-        }
+		@Override
+		public Integer execute(TaskProgressListener progressListener) throws Exception
+		{
+			if (progressListener == null)
+				return 1;
+			PathOutcome ret = performSave(path, progressListener);
+			if (PathOutcome.OUTCOME_SUCCESS.differs(ret)) {
+				String msg = "failed to save to the chosen path: " + target + " because " + PathOutcome.outcomeText(ret);
+				LoggingTarget.logInfo(msg, null);
+				_logger.error(msg);
+				return 1;
+			}
+			return 0;
+		}
 
-        @Override
-        public boolean showProgressDialog()
-        {
-            return true;
-        }
+		@Override
+		public boolean showProgressDialog()
+		{
+			return true;
+		}
 
-    }
+	}
 }

@@ -24,147 +24,120 @@ import fuse.FuseMount;
 public class GeniiFuse
 {
 	static private Log _logger = LogFactory.getLog(GeniiFuse.class);
-	
-	static public GeniiFuseConnection mountGenesisII(
-		File mountPoint, String []additionalArguments, 
-		ICallingContext callingContext, String sandbox, int uid,
-		boolean daemon) 
-		throws IOException, RemoteException, RNSException, 
-			GeneralSecurityException
+
+	static public GeniiFuseConnection mountGenesisII(File mountPoint, String[] additionalArguments,
+		ICallingContext callingContext, String sandbox, int uid, boolean daemon) throws IOException, RemoteException,
+		RNSException, GeneralSecurityException
 	{
 		if (!mountPoint.exists())
-			throw new FileNotFoundException(String.format(
-				"Unable to locate mount point \"%s\".",
-				mountPoint.getAbsolutePath()));
-		
+			throw new FileNotFoundException(String.format("Unable to locate mount point \"%s\".", mountPoint.getAbsolutePath()));
+
 		String msg = FuseUtils.supportsFuse();
 		if (msg != null)
 			throw new IOException(msg);
-			
+
 		if (callingContext == null)
-			callingContext = ContextManager.getCurrentContext();
-		
-		GenesisIIFilesystem fs = new GenesisIIFilesystem(
-			RNSPath.getCurrent(), sandbox);
-		
-		GeniiFuseMount mount = new GeniiFuseMount(
-			fs, uid);
-		String []args = new String[additionalArguments.length + 1];
+			callingContext = ContextManager.getExistingContext();
+
+		GenesisIIFilesystem fs = new GenesisIIFilesystem(RNSPath.getCurrent(), sandbox);
+
+		GeniiFuseMount mount = new GeniiFuseMount(fs, uid);
+		String[] args = new String[additionalArguments.length + 1];
 		args[0] = mountPoint.getAbsolutePath();
 		System.arraycopy(additionalArguments, 0, args, 1, additionalArguments.length);
-		
-		GeniiMountRunner runner = new GeniiMountRunner(mount, args, 
-			callingContext);
-		if (daemon)
-		{
+
+		GeniiMountRunner runner = new GeniiMountRunner(mount, args, callingContext);
+		if (daemon) {
 			Thread th = new Thread(runner);
 			th.setName("Genesis II FUSE Mount Runner");
 			th.setDaemon(false);
 			th.start();
 		} else
 			runner.run();
-		
-		return new GeniiFuseConnectionImpl(mountPoint);	
+
+		return new GeniiFuseConnectionImpl(mountPoint);
 	}
-	
-	static public GeniiFuseConnection mountGenesisII(
-		File mountpoint, String []additionalArguments, int uid, boolean daemon)
-		throws IOException, RemoteException, RNSException, 
-			GeneralSecurityException
+
+	static public GeniiFuseConnection mountGenesisII(File mountpoint, String[] additionalArguments, int uid, boolean daemon)
+		throws IOException, RemoteException, RNSException, GeneralSecurityException
 	{
-		return mountGenesisII(mountpoint, additionalArguments,
-			null, null, uid, daemon);
+		return mountGenesisII(mountpoint, additionalArguments, null, null, uid, daemon);
 	}
-	
-	static public void unmountGenesisII(File mountPoint)
-		throws FuseException
+
+	static public void unmountGenesisII(File mountPoint) throws FuseException
 	{
 		new GeniiFuseConnectionImpl(mountPoint).unmount();
 	}
-	
-	static public void unmountGenesisII(
-		File mountPoint, boolean lazy) throws FuseException
+
+	static public void unmountGenesisII(File mountPoint, boolean lazy) throws FuseException
 	{
 		new GeniiFuseConnectionImpl(mountPoint).unmount(lazy);
 	}
-	
+
 	static private class GeniiFuseConnectionImpl implements GeniiFuseConnection
 	{
 		private File _mountPoint;
-		
+
 		public GeniiFuseConnectionImpl(File mountPoint)
 		{
 			_mountPoint = mountPoint;
 		}
-		
+
 		@Override
 		public void unmount() throws FuseException
 		{
 			unmount(false);
 		}
-		
+
 		@Override
 		public void unmount(boolean lazy) throws FuseException
 		{
-			try
-			{
+			try {
 				SimpleExecutionResults results;
-				
+
 				if (lazy)
-					results = ExecutionEngine.execute(
-						"fusermount", "-u", "-z", _mountPoint.getAbsolutePath());
+					results = ExecutionEngine.execute("fusermount", "-u", "-z", _mountPoint.getAbsolutePath());
 				else
-					results = ExecutionEngine.execute(
-						"fusermount", "-u", _mountPoint.getAbsolutePath());
-				
+					results = ExecutionEngine.execute("fusermount", "-u", _mountPoint.getAbsolutePath());
+
 				if (results.getExitCode() == 0)
-					_logger.debug(String.format(
-						"Fuse unmount succeeded:\n" +
-						"Output:\n%s\nError:\n%s",
-						ExecutionEngine.formatOutput(results.getOutput()),
-						ExecutionEngine.formatOutput(results.getError())));
-				else
-				{
-					_logger.error(String.format(
-						"Unable to unmount fuse filesystem:\n" +
-						"Output:\n%s\nError:\n%s",
-						ExecutionEngine.formatOutput(results.getOutput()),
-						ExecutionEngine.formatOutput(results.getError())));
-					throw new FuseException(
-						"Unable to unmount fuse file system.");
-				}
-			}
-			catch (IOException ioe)
-			{
+					if (_logger.isDebugEnabled())
+						_logger
+							.debug(String.format("Fuse unmount succeeded:\n" + "Output:\n%s\nError:\n%s",
+								ExecutionEngine.formatOutput(results.getOutput()),
+								ExecutionEngine.formatOutput(results.getError())));
+					else {
+						_logger
+							.error(String.format("Unable to unmount fuse filesystem:\n" + "Output:\n%s\nError:\n%s",
+								ExecutionEngine.formatOutput(results.getOutput()),
+								ExecutionEngine.formatOutput(results.getError())));
+						throw new FuseException("Unable to unmount fuse file system.");
+					}
+			} catch (IOException ioe) {
 				throw new FuseException("Unable to unmount file system.", ioe);
 			}
 		}
 	}
-	
+
 	static private class GeniiMountRunner implements Runnable
 	{
-		private String []_arguments;
+		private String[] _arguments;
 		private Filesystem _fs;
 		private ICallingContext _callingContext;
-		
-		public GeniiMountRunner(Filesystem fs, String []arguments,
-			ICallingContext callingContext)
+
+		public GeniiMountRunner(Filesystem fs, String[] arguments, ICallingContext callingContext)
 		{
 			_fs = fs;
 			_arguments = arguments;
-			_callingContext  = callingContext;
+			_callingContext = callingContext;
 		}
-		
+
 		public void run()
 		{
-			try
-			{
-				ContextManager.setResolver(
-					new MemoryBasedContextResolver(_callingContext));
+			try {
+				ContextManager.setResolver(new MemoryBasedContextResolver(_callingContext));
 				FuseMount.mount(_arguments, _fs);
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				_logger.error("Error occurred in fuse mount.", e);
 			}
 

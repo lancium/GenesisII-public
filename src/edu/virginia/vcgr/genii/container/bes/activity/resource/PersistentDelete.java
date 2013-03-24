@@ -18,37 +18,33 @@ public class PersistentDelete
 	static private class PersistentDeleteActor implements OutcallActor
 	{
 		static final long serialVersionUID = 0L;
-		
+
 		private File _path;
-		
+
 		private PersistentDeleteActor(File path)
 		{
 			_path = path;
 		}
-		
+
 		@Override
-		final public boolean enactOutcall(ICallingContext callingContext,
-			EndpointReferenceType target, GeniiAttachment attachment) throws Throwable
+		final public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target,
+			GeniiAttachment attachment) throws Throwable
 		{
 			if (!FileSystemUtils.recursiveDelete(_path, false))
 				return false;
-			
+
 			File path = new File(_path.getAbsolutePath());
 			if (path.exists())
 				return false;
-			
+
 			return true;
 		}
 	}
-	
+
 	static public void persistentDelete(File dir)
 	{
-		PersistentOutcallContainerService service = 
-			ContainerServices.findService(
-				PersistentOutcallContainerService.class);
-		service.schedule(new PersistentDeleteActor(dir), 
-			new ExponentialBackoffScheduler(
-				30L, TimeUnit.DAYS, null, 8, 1L, TimeUnit.MINUTES,
-				15L, TimeUnit.SECONDS), null, null, null);
+		PersistentOutcallContainerService service = ContainerServices.findService(PersistentOutcallContainerService.class);
+		service.schedule(new PersistentDeleteActor(dir), new ExponentialBackoffScheduler(30L, TimeUnit.DAYS, null, 8, 1L,
+			TimeUnit.MINUTES, 15L, TimeUnit.SECONDS), null, null, null);
 	}
 }

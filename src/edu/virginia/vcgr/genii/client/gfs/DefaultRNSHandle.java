@@ -13,14 +13,13 @@ public class DefaultRNSHandle implements DirectoryHandle
 {
 	private GenesisIIFilesystem _fs;
 	private Collection<RNSPath> _entries;
-	
-	public DefaultRNSHandle(GenesisIIFilesystem fs, 
-		Collection<RNSPath> entries)
+
+	public DefaultRNSHandle(GenesisIIFilesystem fs, Collection<RNSPath> entries)
 	{
 		_fs = fs;
 		_entries = entries;
 	}
-	
+
 	@Override
 	public Iterator<FilesystemStatStructure> iterator()
 	{
@@ -32,17 +31,16 @@ public class DefaultRNSHandle implements DirectoryHandle
 	{
 		// do nothing
 	}
-	
-	private class DefaultRNSIterator 
-		implements Iterator<FilesystemStatStructure>
+
+	private class DefaultRNSIterator implements Iterator<FilesystemStatStructure>
 	{
 		private Iterator<RNSPath> _entries;
-		
+
 		public DefaultRNSIterator(Iterator<RNSPath> entries)
 		{
 			_entries = entries;
 		}
-		
+
 		@Override
 		public boolean hasNext()
 		{
@@ -55,15 +53,11 @@ public class DefaultRNSHandle implements DirectoryHandle
 			RNSPath next = _entries.next();
 			if (next == null)
 				return null;
-			
-			try
-			{
+
+			try {
 				return _fs.stat(next);
-			}
-			catch (Exception e)
-			{
-				throw new FSRuntimeException(FSExceptions.translate(
-					"Unable to stat directory entry.", e));
+			} catch (Exception e) {
+				throw new FSRuntimeException(FSExceptions.translate("Unable to stat directory entry.", e));
 			}
 		}
 

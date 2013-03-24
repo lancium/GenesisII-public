@@ -36,7 +36,6 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.NotificationMessageHolder;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscription;
@@ -64,37 +63,40 @@ import edu.virginia.vcgr.genii.notification.broker.TestNotificationResponse;
 import edu.virginia.vcgr.genii.notification.broker.UpdateForwardingPortResponse;
 import edu.virginia.vcgr.genii.notification.broker.UpdateModeResponse;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = NotificationBrokerDBResourceProvider.class)
 @ConstructionParametersType(NotificationBrokerConstructionParams.class)
-public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase 
-		implements EnhancedNotificationBrokerPortType, NotificationBrokerTopics {
+public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase implements EnhancedNotificationBrokerPortType,
+	NotificationBrokerTopics
+{
 
 	public static final String PORT_NAME = "EnhancedNotificationBrokerPortType";
-	
+
 	private static final long LIFETIME_TERMINATION_SAFETY_INTERVAL = 60 * 1000; // one minute
-	private static final long SUBSCRIPTION_TERMINATION_SAFETY_INTERVAL = 30 * 1000; // thirty seconds
-	
+	private static final long SUBSCRIPTION_TERMINATION_SAFETY_INTERVAL = 30 * 1000; // thirty
+																					// seconds
+
 	private static Log _logger = LogFactory.getLog(EnhancedNotificationBrokerServiceImpl.class);
 
-	public EnhancedNotificationBrokerServiceImpl() throws RemoteException {
+	public EnhancedNotificationBrokerServiceImpl() throws RemoteException
+	{
 		super(PORT_NAME);
 	}
-	
-	public EnhancedNotificationBrokerServiceImpl(String serviceName) throws RemoteException {
+
+	public EnhancedNotificationBrokerServiceImpl(String serviceName) throws RemoteException
+	{
 		super(PORT_NAME);
 	}
-	
+
 	@Override
-	protected void postCreate(ResourceKey rKey, 
-			EndpointReferenceType newEPR,
-			ConstructionParameters cParams,
-			HashMap<QName, Object> constructionParameters,
-			Collection<MessageElement> resolverCreationParameters)
-			throws ResourceException, BaseFaultType, RemoteException {
-		
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
+		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParameters)
+		throws ResourceException, BaseFaultType, RemoteException
+	{
+
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
-		
+
 		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) rKey.dereference();
 		NotificationBrokerConstructionParams brokerConstructionParams = (NotificationBrokerConstructionParams) cParams;
 		boolean activeMode = Boolean.TRUE.equals(brokerConstructionParams.getMode());
@@ -110,37 +112,38 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase
 
 	@RWXMapping(RWXCategory.WRITE)
 	@Override
-	public UpdateModeResponse updateMode(boolean updateModeRequest) throws RemoteException {
-		NotificationBrokerDBResource resource = 
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
+	public UpdateModeResponse updateMode(boolean updateModeRequest) throws RemoteException
+	{
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
+			.dereference();
 		resource.updateModeInDB(updateModeRequest);
 		return null;
 	}
 
 	/*
-	 * The purpose of test notifications is to verify whether or not the client can directly receive 
-	 * notification messages from the broker through its forwarding port. That is why the Notify message
-	 * is created directly, instead of going through subscriptions and usual publication oriented  
-	 * notification mechanism. If you have used that process than it will both increase the number of 
-	 * verification related RPCs, and create the chance of race condition where the client will poll 
-	 * an test notification message and change its mode to direct notification.
-	 * */
+	 * The purpose of test notifications is to verify whether or not the client can directly receive
+	 * notification messages from the broker through its forwarding port. That is why the Notify
+	 * message is created directly, instead of going through subscriptions and usual publication
+	 * oriented notification mechanism. If you have used that process than it will both increase the
+	 * number of verification related RPCs, and create the chance of race condition where the client
+	 * will poll an test notification message and change its mode to direct notification.
+	 */
 	@RWXMapping(RWXCategory.EXECUTE)
 	@Override
-	public TestNotificationResponse testNotification(TestNotificationRequest testNotificationRequest)
-			throws RemoteException {
-		
-		NotificationBrokerDBResource resource = 
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
-		
+	public TestNotificationResponse testNotification(TestNotificationRequest testNotificationRequest) throws RemoteException
+	{
+
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
+			.dereference();
+
 		resource.initializeResourceFromDB();
 		EndpointReferenceType forwardingPort = resource.getForwardingPort();
 		if (forwardingPort != null) {
-			NotificationMessageHolder holder = new NotificationMessageHolder(forwardingPort, 
-					getMyEPR(false), TEST_NOTIFICAION_TOPIC, new TestNotificationMessageContents());
+			NotificationMessageHolder holder = new NotificationMessageHolder(forwardingPort, getMyEPR(false),
+				TEST_NOTIFICAION_TOPIC, new TestNotificationMessageContents());
 			try {
-				ICallingContext callingContext = ContextManager.getCurrentContext();
-				Notify notification = new Notify(new NotificationMessageHolderType[] {holder.toAxisType()}, null);
+				ICallingContext callingContext = ContextManager.getExistingContext();
+				Notify notification = new Notify(new NotificationMessageHolderType[] { holder.toAxisType() }, null);
 				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, forwardingPort, callingContext);
 				common.notify(notification);
 			} catch (Exception ex) {
@@ -155,66 +158,71 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase
 	@RWXMapping(RWXCategory.WRITE)
 	@Override
 	public IndirectSubscriptionEntryType[] createIndirectSubscriptions(IndirectSubscriptionType indirectSubscribeRequest)
-			throws RemoteException, SubscriptionFailedFaultType {
-		
+		throws RemoteException, SubscriptionFailedFaultType
+	{
+
 		EndpointReferenceType publisher = indirectSubscribeRequest.getPublisher();
 		long subscriptionLifeTime = indirectSubscribeRequest.getDuration();
 		Duration duration = new Duration(subscriptionLifeTime);
 		TerminationTimeType terminationTime = TerminationTimeType.newInstance(duration);
 		final EndpointReferenceType myEPR = getMyEPR(true);
 		IndirectSubscriptionEntryType[] response = new IndirectSubscriptionEntryType[3];
-		
+
 		try {
 			// Subscribe to change in directory content represented by the RNS resource
 			TopicQueryExpression topicFilter = RNSTopics.RNS_CONTENT_CHANGE_TOPIC.asConcreteQueryExpression();
 			Subscription subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			EndpointReferenceType subscriptionReference = subscription.subscriptionReference();
-			response[0] = new IndirectSubscriptionEntryType(new MessageElement[] {
-					new MessageElement(NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE, 
-							NotificationBrokerConstants.RNS_CONTENT_CHANGE_SUBSCRIPTION)}, subscriptionReference);
+			response[0] = new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
+				NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
+				NotificationBrokerConstants.RNS_CONTENT_CHANGE_SUBSCRIPTION) }, subscriptionReference);
 
-			// Subscribe to attributes update on byteIOs that are children of the directory represented by the
-			// RNS resource. This subscription works for only those byteIOs that are in the same container.
+			// Subscribe to attributes update on byteIOs that are children of the directory
+			// represented by the
+			// RNS resource. This subscription works for only those byteIOs that are in the same
+			// container.
 			topicFilter = ByteIOTopics.BYTEIO_ATTRIBUTES_UPDATE_TOPIC.asConcreteQueryExpression();
 			subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			subscriptionReference = subscription.subscriptionReference();
-			response[1] = new IndirectSubscriptionEntryType(new MessageElement[] {
-					new MessageElement(NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE, 
-							NotificationBrokerConstants.BYTEIO_ATTRIBUTE_CHANGE_SUBSCRIPTION)}, subscriptionReference);
+			response[1] = new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
+				NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
+				NotificationBrokerConstants.BYTEIO_ATTRIBUTE_CHANGE_SUBSCRIPTION) }, subscriptionReference);
 
-			// Subscribe to authorization parameter update on the RNS resources and byteIOs that are children of 
-			// the directory represented by the RNS resource. For byteIOs this subscription works for only those  
+			// Subscribe to authorization parameter update on the RNS resources and byteIOs that are
+			// children of
+			// the directory represented by the RNS resource. For byteIOs this subscription works
+			// for only those
 			// that are in the same container as this RNS resource.
 			topicFilter = GenesisIIBaseTopics.AUTHZ_CONFIG_UPDATE_TOPIC.asConcreteQueryExpression();
 			subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			subscriptionReference = subscription.subscriptionReference();
-			response[2] = new IndirectSubscriptionEntryType(new MessageElement[] {
-					new MessageElement(NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE, 
-							NotificationBrokerConstants.RESOURCE_AUTHORIZATION_CHANGE_SUBSCRIPTION)}, subscriptionReference);
+			response[2] = new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
+				NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
+				NotificationBrokerConstants.RESOURCE_AUTHORIZATION_CHANGE_SUBSCRIPTION) }, subscriptionReference);
 		} catch (Exception ex) {
 			_logger.info("Subscription request has been failed: " + ex.getMessage());
-			final SubscriptionFailedFaultType subscriptionFault = 
-				new SubscriptionFailedFaultType(null, Calendar.getInstance(), publisher, null, 
-						new BaseFaultTypeDescription[] {new BaseFaultTypeDescription("Unable to create subscriptions.")}, null);
+			final SubscriptionFailedFaultType subscriptionFault = new SubscriptionFailedFaultType(null, Calendar.getInstance(),
+				publisher, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+					"Unable to create subscriptions.") }, null);
 			throw subscriptionFault;
 		}
-		
-		NotificationBrokerDBResource resource = 
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
-		
-		long subscriptionEndTime = System.currentTimeMillis() + subscriptionLifeTime + 
-				SUBSCRIPTION_TERMINATION_SAFETY_INTERVAL;
+
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
+			.dereference();
+
+		long subscriptionEndTime = System.currentTimeMillis() + subscriptionLifeTime + SUBSCRIPTION_TERMINATION_SAFETY_INTERVAL;
 		resource.storeSubscriptionTracesInDB(extractSubscriptionEPIs(response), publisher, subscriptionEndTime);
-		
+
 		return response;
 	}
 
 	@RWXMapping(RWXCategory.READ)
 	@Override
-	public GetMessagesResponse getUnreadMessages(BigInteger getUnreadMessagesRequest) 
-			throws RemoteException, MessageMissedFaultType {
-		NotificationBrokerDBResource resource = 
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
+	public GetMessagesResponse getUnreadMessages(BigInteger getUnreadMessagesRequest) throws RemoteException,
+		MessageMissedFaultType
+	{
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
+			.dereference();
 		resource.loadMessageIndexFromDB();
 		int messageIndex = resource.getMessageIndex();
 		int clientsMessageIndex = getUnreadMessagesRequest.intValue();
@@ -225,35 +233,34 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase
 			countDifference -= unsentMessages.size();
 		}
 		if (countDifference > 0) {
-			// replenish the message queue so that the client can retrieve the messages using 
+			// replenish the message queue so that the client can retrieve the messages using
 			// the getMessages() method of the pull point interface, if it wants to.
 			if (unsentMessages != null) {
 				manager.setMessageQueueOfBroker(resource.getKey(), unsentMessages);
 			}
-			final MessageMissedFaultType messageMissedFault = 
-				new MessageMissedFaultType(null, Calendar.getInstance(), null, null, 
-						new BaseFaultTypeDescription[] {new BaseFaultTypeDescription("Messages are missing")}, null);
+			final MessageMissedFaultType messageMissedFault = new MessageMissedFaultType(null, Calendar.getInstance(), null,
+				null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Messages are missing") }, null);
 			throw messageMissedFault;
 		}
-		GetMessagesResponse response = 
-			manager.getMessagesResponseFromHeldMessages(unsentMessages, messageIndex);
+		GetMessagesResponse response = manager.getMessagesResponseFromHeldMessages(unsentMessages, messageIndex);
 		return response;
 	}
 
 	@Override
-	public DestroyPullPointResponse destroyPullPoint(DestroyPullPoint destroyPullPointRequest) 
-			throws RemoteException, UnableToDestroyPullPointFaultType, ResourceUnknownFaultType {
-		// TODO Auto-generated method stub
+	public DestroyPullPointResponse destroyPullPoint(DestroyPullPoint destroyPullPointRequest) throws RemoteException,
+		UnableToDestroyPullPointFaultType, ResourceUnknownFaultType
+	{
 		return null;
 	}
 
 	@RWXMapping(RWXCategory.READ)
 	@Override
-	public GetMessagesResponse getMessages(GetMessages getMessagesRequest)
-			throws RemoteException, UnableToGetMessagesFaultType, ResourceUnknownFaultType {
-		
-		NotificationBrokerDBResource resource = 
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
+	public GetMessagesResponse getMessages(GetMessages getMessagesRequest) throws RemoteException,
+		UnableToGetMessagesFaultType, ResourceUnknownFaultType
+	{
+
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
+			.dereference();
 		NotificationBrokerMessageManager manager = NotificationBrokerMessageManager.getManager();
 		List<OnHoldNotificationMessage> unsentMessages = manager.getMessageQueueOfBroker(resource.getKey());
 		resource.loadMessageIndexFromDB();
@@ -263,31 +270,32 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase
 	}
 
 	@Override
-	public PortType getFinalWSResourceInterface() {
+	public PortType getFinalWSResourceInterface()
+	{
 		return WellKnownPortTypes.ENHANCED_NOTIFICATION_BROKER_PORT;
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
 	@Override
-	public UpdateForwardingPortResponse updateForwardingPort(EndpointReferenceType forwardingPort)
-			throws RemoteException {
-		// TODO Auto-generated method stub
+	public UpdateForwardingPortResponse updateForwardingPort(EndpointReferenceType forwardingPort) throws RemoteException
+	{
 		return null;
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
 	@Override
-	public void notify(Notify msg) throws RemoteException {
-		
-		NotificationBrokerDBResource resource = 
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
+	public void notify(Notify msg) throws RemoteException
+	{
+
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
+			.dereference();
 		resource.initializeResourceFromDB();
 
 		EndpointReferenceType forwardingPort = resource.getForwardingPort();
-		
+
 		if (resource.isActiveMode() && forwardingPort != null) {
 			try {
-				ICallingContext callingContext = ContextManager.getCurrentContext();
+				ICallingContext callingContext = ContextManager.getExistingContext();
 				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, forwardingPort, callingContext);
 				common.notify(msg);
 			} catch (Exception ex) {
@@ -295,8 +303,9 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase
 			}
 		}
 	}
-	
-	private List<String> extractSubscriptionEPIs(IndirectSubscriptionEntryType[] subscriptionEntries) {
+
+	private List<String> extractSubscriptionEPIs(IndirectSubscriptionEntryType[] subscriptionEntries)
+	{
 		List<String> subscriptionEPIs = new ArrayList<String>();
 		for (IndirectSubscriptionEntryType entry : subscriptionEntries) {
 			EndpointReferenceType subscriptionReference = entry.getSubscriptionReference();
@@ -305,12 +314,11 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase
 		}
 		return subscriptionEPIs;
 	}
-	
-	private Subscription createSubscription(EndpointReferenceType publisherEPR, 
-			EndpointReferenceType brokerEPR, 
-			TopicQueryExpression topicFilter, 
-			TerminationTimeType terminationTime) throws Exception {
-		
+
+	private Subscription createSubscription(EndpointReferenceType publisherEPR, EndpointReferenceType brokerEPR,
+		TopicQueryExpression topicFilter, TerminationTimeType terminationTime) throws Exception
+	{
+
 		boolean assumedNewContext = false;
 		try {
 			WorkingContext.temporarilyAssumeNewIdentity(publisherEPR);
@@ -324,13 +332,13 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase
 			}
 		}
 	}
-	
+
 	// A small time period is added with the lifetime suggested by the client to accommodate
 	// any timing difference between the client and the container.
-	private Calendar getTerminationTime(long suggestedLifeTime) {
+	private Calendar getTerminationTime(long suggestedLifeTime)
+	{
 		Calendar timeToDeath = Calendar.getInstance();
-		timeToDeath.setTimeInMillis(System.currentTimeMillis() + 
-				suggestedLifeTime + LIFETIME_TERMINATION_SAFETY_INTERVAL);
+		timeToDeath.setTimeInMillis(System.currentTimeMillis() + suggestedLifeTime + LIFETIME_TERMINATION_SAFETY_INTERVAL);
 		return timeToDeath;
 	}
 }

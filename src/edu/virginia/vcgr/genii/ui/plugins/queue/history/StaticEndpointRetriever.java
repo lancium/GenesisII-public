@@ -11,18 +11,18 @@ import edu.virginia.vcgr.genii.ui.plugins.EndpointRetriever;
 class StaticEndpointRetriever implements EndpointRetriever
 {
 	private EndpointReferenceType _endpoint;
-	
+
 	StaticEndpointRetriever(EndpointReferenceType endpoint)
 	{
 		_endpoint = endpoint;
 	}
-	
+
 	@Override
 	final public Collection<RNSPath> getTargetEndpoints()
 	{
 		ArrayList<RNSPath> ret = new ArrayList<RNSPath>(1);
 		ret.add(new RNSPath(_endpoint));
-		
+
 		return ret;
 	}
 

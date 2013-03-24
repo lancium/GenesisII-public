@@ -14,49 +14,43 @@ import edu.virginia.vcgr.genii.client.cmd.tools.Option;
 
 public class QCompleteTool extends BaseGridTool
 {
-	static final private String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dqcomplete";
-	static final private String _USAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uqcomplete";
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/qcomplete";
+	static final private String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dqcomplete";
+	static final private String _USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uqcomplete";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/qcomplete";
 	private boolean _all = false;
-	
+
 	public QCompleteTool()
 	{
 		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.EXECUTION);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
-	@Option({"all"})
+
+	@Option({ "all" })
 	public void setAll()
 	{
 		_all = true;
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
-		if(gPath.pathType() != GeniiPathType.Grid)
+		if (gPath.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException("<queue-path must be a grid path. ");
 		QueueManipulator manipulator = new QueueManipulator(gPath.path());
-		
-		if (_all)
-		{
+
+		if (_all) {
 			manipulator.completeAll();
-		} else
-		{
+		} else {
 			ArrayList<JobTicket> tickets = new ArrayList<JobTicket>(numArguments() - 1);
-		
-			for (String arg : getArguments().subList(1, numArguments()))
-			{
+
+			for (String arg : getArguments().subList(1, numArguments())) {
 				tickets.add(new JobTicket(arg));
 			}
-			
+
 			manipulator.complete(tickets);
 		}
-		
+
 		return 0;
 	}
 

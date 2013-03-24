@@ -24,111 +24,92 @@ final public class RNSLegacyProxy
 {
 	private EnhancedRNSPortType _newClient;
 	private ICallingContext _callContext;
-	
-	public RNSLegacyProxy(EnhancedRNSPortType newClient, 
-		ICallingContext callContext)
+
+	public RNSLegacyProxy(EnhancedRNSPortType newClient, ICallingContext callContext)
 	{
-		try
-		{
+		try {
 			_newClient = newClient;
-			_callContext = callContext == null ? 
-				ContextManager.getCurrentContext() : callContext;
-		}
-		catch (IOException ioe)
-		{
-			throw new IllegalArgumentException(
-				"Calling context invalid!", ioe);
+			_callContext = callContext == null ? ContextManager.getExistingContext() : callContext;
+		} catch (IOException ioe) {
+			throw new IllegalArgumentException("Calling context invalid!", ioe);
 		}
 	}
-	
+
 	public RNSLegacyProxy(EnhancedRNSPortType newClient)
 	{
 		this(newClient, null);
 	}
-	
-	final public RNSEntryResponseType[] lookup(String...names)
-		throws ReadNotPermittedFaultType, RemoteException
+
+	final public RNSEntryResponseType[] lookup(String... names) throws ReadNotPermittedFaultType, RemoteException
 	{
 		return iterateList(names).toArray();
 	}
-	
-	final public RNSIterable iterateList(String...names)
-		throws ReadNotPermittedFaultType, RemoteException
+
+	final public RNSIterable iterateList(String... names) throws ReadNotPermittedFaultType, RemoteException
 	{
 		LookupResponseType resp;
-		
+
 		if (names == null || names.length == 0)
 			resp = _newClient.lookup(null);
 		else
 			resp = _newClient.lookup(names);
-		
+
 		return new RNSIterable(resp, _callContext, RNSConstants.PREFERRED_BATCH_SIZE);
 	}
-	
-	final public EndpointReferenceType add(
-		String name, EndpointReferenceType epr, MessageElement []any) 
-			throws WriteNotPermittedFaultType, RemoteException
+
+	final public EndpointReferenceType add(String name, EndpointReferenceType epr, MessageElement[] any)
+		throws WriteNotPermittedFaultType, RemoteException
 	{
 		RNSMetadataType mdt = null;
 		if (any != null && any.length > 0)
 			mdt = RNSUtilities.createMetadata(epr, any);
-		
-		RNSEntryResponseType rpt = _newClient.add(new RNSEntryType[] { 
-			new RNSEntryType(epr, mdt, name) })[0];
+
+		RNSEntryResponseType rpt = _newClient.add(new RNSEntryType[] { new RNSEntryType(epr, mdt, name) })[0];
 		BaseFaultType fault = rpt.getFault();
 		if (fault != null)
-			throw new RemoteException(String.format(
-				"Unable to add %s!", name), fault);
-		
+			throw new RemoteException(String.format("Unable to add %s!", name), fault);
+
 		return rpt.getEndpoint();
 	}
-	
-	final public EndpointReferenceType add(String name, EndpointReferenceType epr) 
-		throws WriteNotPermittedFaultType, RemoteException
+
+	final public EndpointReferenceType add(String name, EndpointReferenceType epr) throws WriteNotPermittedFaultType,
+		RemoteException
 	{
 		return add(name, epr, null);
 	}
-	
-	final public EndpointReferenceType add(String name)
-		throws WriteNotPermittedFaultType, RemoteException
+
+	final public EndpointReferenceType add(String name) throws WriteNotPermittedFaultType, RemoteException
 	{
 		return add(name, null);
 	}
-	
-	final public EndpointReferenceType createRoot()
-		throws WriteNotPermittedFaultType, RemoteException
+
+	final public EndpointReferenceType createRoot() throws WriteNotPermittedFaultType, RemoteException
 	{
 		return add(null);
 	}
-	
-	final public Set<String> remove(String...names)
-		throws WriteNotPermittedFaultType, RemoteException
+
+	final public Set<String> remove(String... names) throws WriteNotPermittedFaultType, RemoteException
 	{
-		RNSEntryResponseType []rpt;
-		
+		RNSEntryResponseType[] rpt;
+
 		if (names == null || names.length == 0)
 			rpt = _newClient.remove(null);
 		else
 			rpt = _newClient.remove(names);
-		
+
 		Set<String> ret = new HashSet<String>();
-		for (RNSEntryResponseType resp : rpt)
-		{
+		for (RNSEntryResponseType resp : rpt) {
 			if (resp.getFault() != null)
-				throw new RemoteException(String.format(
-					"Unable to remove entry %s!", resp.getEntryName()), 
-					resp.getFault());
-			
+				throw new RemoteException(String.format("Unable to remove entry %s!", resp.getEntryName()), resp.getFault());
+
 			ret.add(resp.getEntryName());
 		}
-		
+
 		return ret;
 	}
-	
-	final public EndpointReferenceType createFile(String fileName) 
-		throws RemoteException
+
+	final public EndpointReferenceType createFile(String fileName) throws RemoteException
 	{
-		return _newClient.createFile(
-			new CreateFileRequestType(fileName)).getEndpoint();
+		return _newClient.createFile(new CreateFileRequestType(fileName)).getEndpoint();
 	}
 }

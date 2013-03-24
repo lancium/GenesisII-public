@@ -25,73 +25,84 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSTopics;
  * This mechanism of blocking notification is intended for prohibiting notification outcalls when a resource is undergoing 
  * rapid changes -- it does not stop notifications when these are simultaneously issued from many resources. 
  * */
-public class NotificationRateController {
-	
+public class NotificationRateController
+{
+
 	static private Log _logger = LogFactory.getLog(NotificationRateController.class);
-	
+
 	private static final List<TopicPath> CONSTRICTED_NOTIFICATION_TYPES;
 	static {
 		CONSTRICTED_NOTIFICATION_TYPES = new ArrayList<TopicPath>();
 		CONSTRICTED_NOTIFICATION_TYPES.add(RNSTopics.RNS_CONTENT_CHANGE_TOPIC);
 		CONSTRICTED_NOTIFICATION_TYPES.add(ByteIOTopics.BYTEIO_ATTRIBUTES_UPDATE_TOPIC);
 	}
-	
+
 	private static final long BLOCKAGE_PERIOD_TIME_SPAN = 2 * 60 * 1000L; // two minutes
 	private static final long BURST_PERIOD_TIME_SPAN = 30 * 1000L; // thirty seconds
 
 	// This should be around five to ten.
 	private static final int ALLOWED_BURSTINESS_THRESHOLD = 10;
-	
+
 	private Map<String, List<Long>> publisherToRecentNotificationTimeMappings;
 	private Map<String, Long> blockedPublisherToBlockageExpiryTimeMappings;
-	
-	public NotificationRateController() {
+
+	public NotificationRateController()
+	{
 		publisherToRecentNotificationTimeMappings = Collections.synchronizedMap(new HashMap<String, List<Long>>());
 		blockedPublisherToBlockageExpiryTimeMappings = Collections.synchronizedMap(new HashMap<String, Long>());
 		new RecentNotificationTraceCleaner().start();
 		new BlockedResourceCleaner().start();
 	}
-	
-	public boolean notificationCanPass(String publisherKey, TopicPath topic, 
-			NotificationMessageContents message) {
-		if (!isRestrictedTopic(topic)) return true;
-		if (isBlockedPublisher(publisherKey)) return false;
+
+	public boolean notificationCanPass(String publisherKey, TopicPath topic, NotificationMessageContents message)
+	{
+		if (!isRestrictedTopic(topic))
+			return true;
+		if (isBlockedPublisher(publisherKey))
+			return false;
 		submitNotificationForRateControl(publisherKey, message);
 		return true;
 	}
-	
-	public boolean isPublisherBlocked(String publisherKey) {
+
+	public boolean isPublisherBlocked(String publisherKey)
+	{
 		return blockedPublisherToBlockageExpiryTimeMappings.containsKey(publisherKey);
 	}
-	
-	public Long getBlockadeCreationTime(String publisherKey) {
+
+	public Long getBlockadeCreationTime(String publisherKey)
+	{
 		Long blockExpiryTime = blockedPublisherToBlockageExpiryTimeMappings.get(publisherKey);
-		if (blockExpiryTime == null) return null;
+		if (blockExpiryTime == null)
+			return null;
 		return blockExpiryTime - BLOCKAGE_PERIOD_TIME_SPAN;
 	}
-	
-	private boolean isRestrictedTopic(TopicPath topic) {
+
+	private boolean isRestrictedTopic(TopicPath topic)
+	{
 		for (TopicPath restrictedTopic : CONSTRICTED_NOTIFICATION_TYPES) {
-			if (restrictedTopic.equals(topic)) return true;
+			if (restrictedTopic.equals(topic))
+				return true;
 		}
 		return false;
 	}
-	
-	private boolean isBlockedPublisher(String publisherKey) {
+
+	private boolean isBlockedPublisher(String publisherKey)
+	{
 		if (blockedPublisherToBlockageExpiryTimeMappings.containsKey(publisherKey)) {
 			Long blockageExpiryTime = blockedPublisherToBlockageExpiryTimeMappings.get(publisherKey);
-			if (blockageExpiryTime == null) return false;
+			if (blockageExpiryTime == null)
+				return false;
 			long currentTime = System.currentTimeMillis();
 			return (blockageExpiryTime >= currentTime);
 		}
 		return false;
 	}
-	
-	private void submitNotificationForRateControl(String publisherKey, NotificationMessageContents message) {
+
+	private void submitNotificationForRateControl(String publisherKey, NotificationMessageContents message)
+	{
 		List<Long> publishersRecentNotificationTimes = publisherToRecentNotificationTimeMappings.get(publisherKey);
 		if (publishersRecentNotificationTimes == null) {
-			publishersRecentNotificationTimes = 
-				Collections.synchronizedList(new ArrayList<Long>(ALLOWED_BURSTINESS_THRESHOLD));
+			publishersRecentNotificationTimes = Collections.synchronizedList(new ArrayList<Long>(ALLOWED_BURSTINESS_THRESHOLD));
 			publisherToRecentNotificationTimeMappings.put(publisherKey, publishersRecentNotificationTimes);
 		}
 		long currentTime = System.currentTimeMillis();
@@ -100,28 +111,30 @@ public class NotificationRateController {
 			blockPublisherAndUpdateMessage(publisherKey, message);
 		} else if (publishersRecentNotificationTimes.size() > ALLOWED_BURSTINESS_THRESHOLD) {
 			// rate controlling is not working properly.
-			_logger.warn("notification rate controller may not be working properly. Letting notification " +
-					"to pass without any rate control marker.");
+			_logger.warn("notification rate controller may not be working properly. Letting notification "
+				+ "to pass without any rate control marker.");
 			return;
 		}
 	}
-	
-	private void blockPublisherAndUpdateMessage(String publisherKey, NotificationMessageContents message) {
+
+	private void blockPublisherAndUpdateMessage(String publisherKey, NotificationMessageContents message)
+	{
 		message.setPublisherBlockedFromFurtherNotifications(true);
 		message.setBlockageTime(BLOCKAGE_PERIOD_TIME_SPAN);
 		long blockageExpiryTime = System.currentTimeMillis() + BLOCKAGE_PERIOD_TIME_SPAN;
 		blockedPublisherToBlockageExpiryTimeMappings.put(publisherKey, blockageExpiryTime);
-		_logger.info("Publisher " + publisherKey + 
-				" has been blocked from sending further notifications for some time");
+		_logger.info("Publisher " + publisherKey + " has been blocked from sending further notifications for some time");
 	}
-	
-	private class RecentNotificationTraceCleaner extends Thread {
+
+	private class RecentNotificationTraceCleaner extends Thread
+	{
 		@Override
-		public void run() {
+		public void run()
+		{
 			while (true) {
 				try {
 					sleep(1000); // iterate in every second interval
-					long tooOldNotificationThreshold = System.currentTimeMillis() - BURST_PERIOD_TIME_SPAN; 
+					long tooOldNotificationThreshold = System.currentTimeMillis() - BURST_PERIOD_TIME_SPAN;
 					List<String> publishersWithEmptyLists = new ArrayList<String>();
 					for (Map.Entry<String, List<Long>> entry : publisherToRecentNotificationTimeMappings.entrySet()) {
 						String publisherKey = entry.getKey();
@@ -135,7 +148,8 @@ public class NotificationRateController {
 								}
 							}
 						}
-						if (recentNotificationTimes.isEmpty()) publishersWithEmptyLists.add(publisherKey);
+						if (recentNotificationTimes.isEmpty())
+							publishersWithEmptyLists.add(publisherKey);
 					}
 					for (String publisherKey : publishersWithEmptyLists) {
 						publisherToRecentNotificationTimeMappings.remove(publisherKey);
@@ -146,10 +160,12 @@ public class NotificationRateController {
 			}
 		}
 	}
-	
-	private class BlockedResourceCleaner extends Thread {
+
+	private class BlockedResourceCleaner extends Thread
+	{
 		@Override
-		public void run() {
+		public void run()
+		{
 			while (true) {
 				try {
 					sleep(5000); // iterate in every five seconds

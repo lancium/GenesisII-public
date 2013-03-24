@@ -3,16 +3,17 @@ package edu.virginia.vcgr.genii.client.invoke;
 class MethodDescription
 {
 	private String _methodName;
-	private Class<?> []_parameterTypes;
+	private Class<?>[] _parameterTypes;
 	private int _hashCode;
-	
+
 	/**
-	 * The method name and parameter types passed in here are assumed to be from the port type interface
+	 * The method name and parameter types passed in here are assumed to be from the port type
+	 * interface
 	 * 
 	 * @param methodName
 	 * @param parameterTypes
 	 */
-	MethodDescription(String methodName, Class<?> []parameterTypes)
+	MethodDescription(String methodName, Class<?>[] parameterTypes)
 	{
 		_methodName = methodName;
 		_parameterTypes = parameterTypes;
@@ -20,12 +21,12 @@ class MethodDescription
 		for (Class<?> pType : parameterTypes)
 			_hashCode ^= pType.hashCode();
 	}
-	
+
 	public int hashCode()
 	{
 		return _hashCode;
 	}
-	
+
 	public boolean equals(MethodDescription other)
 	{
 		if (_hashCode != other._hashCode)
@@ -40,12 +41,12 @@ class MethodDescription
 
 		return true;
 	}
-	
+
 	public boolean equals(Object other)
 	{
 		if (other instanceof MethodDescription)
-			return equals((MethodDescription)other);
-		
+			return equals((MethodDescription) other);
+
 		return false;
 	}
 }

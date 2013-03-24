@@ -10,16 +10,16 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 public class GuiErrorDialog implements InformationDialog
 {
 	private TextContent _help = null;
-	
+
 	private String _title;
 	private TextContent _content;
-	
+
 	public GuiErrorDialog(String title, TextContent content)
 	{
 		_title = title;
 		_content = content;
 	}
-	
+
 	@Override
 	public TextContent getHelp()
 	{

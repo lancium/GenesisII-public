@@ -23,20 +23,17 @@ import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 public class JNIContainerBaseClass
 {
 	static private Log _logger = LogFactory.getLog(JNIContainerBaseClass.class);
-	
+
 	static public final String VCGR_CONTAINER_LIB_NAME = "VcgrContainerLib";
-	
-	static 
-	{
-		try 
-		{
+
+	static {
+		try {
 			System.loadLibrary(VCGR_CONTAINER_LIB_NAME);
-		}
-		catch (UnsatisfiedLinkError e)
-		{
+		} catch (UnsatisfiedLinkError e) {
 			OperatingSystemType os = OperatingSystemType.getCurrent();
 			if (os == OperatingSystemType.LINUX) {
-				_logger.trace("saw expected failure to load library " + VCGR_CONTAINER_LIB_NAME + " on linux OS.");
+				if (_logger.isTraceEnabled())
+					_logger.trace("saw expected failure to load library " + VCGR_CONTAINER_LIB_NAME + " on linux OS.");
 			} else {
 				_logger.warn("Problem loading shared library " + VCGR_CONTAINER_LIB_NAME, e);
 			}

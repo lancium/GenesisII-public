@@ -9,27 +9,23 @@ import edu.virginia.vcgr.genii.client.byteio.buffer.BasicFileOperator;
 class OperatorBasedOpenFile extends GeniiOpenFile
 {
 	private BasicFileOperator _operator;
-	
-	protected OperatorBasedOpenFile(String[] path, BasicFileOperator operator,
-		boolean canRead, boolean canWrite, boolean isAppend)
+
+	protected OperatorBasedOpenFile(String[] path, BasicFileOperator operator, boolean canRead, boolean canWrite,
+		boolean isAppend)
 	{
 		super(path, canRead, canWrite, isAppend);
-		
+
 		_operator = operator;
 	}
-	
+
 	@Override
 	protected void appendImpl(ByteBuffer source) throws FSException
 	{
-		try
-		{
-			synchronized(_operator)
-			{
+		try {
+			synchronized (_operator) {
 				_operator.append(source);
 			}
-		}
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			throw FSExceptions.translate("Unable to append to file.", cause);
 		}
 	}
@@ -37,24 +33,19 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	@Override
 	protected void flush() throws FSException
 	{
-		try
-		{
-			synchronized(_operator)
-			{
+		try {
+			synchronized (_operator) {
 				_operator.flush();
 			}
-		}
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			throw FSExceptions.translate("Unable to flush file.", cause);
 		}
 	}
-	
+
 	@Override
 	protected void closeImpl() throws IOException
 	{
-		synchronized(_operator)
-		{
+		synchronized (_operator) {
 			_operator.flush();
 			_operator.close();
 		}
@@ -63,13 +54,10 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	@Override
 	protected void readImpl(long offset, ByteBuffer target) throws FSException
 	{
-		try
-		{
-			while (target.hasRemaining())
-			{
+		try {
+			while (target.hasRemaining()) {
 				int start = target.position();
-				synchronized(_operator)
-				{
+				synchronized (_operator) {
 					_operator.read(offset, target);
 				}
 				int read = target.position() - start;
@@ -77,9 +65,7 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 					return;
 				offset += read;
 			}
-		}
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			throw FSExceptions.translate("Unable to read from file.", cause);
 		}
 	}
@@ -87,15 +73,11 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	@Override
 	protected void writeImpl(long offset, ByteBuffer source) throws FSException
 	{
-		try
-		{
-			synchronized(_operator)
-			{
+		try {
+			synchronized (_operator) {
 				_operator.write(offset, source);
 			}
-		}
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			throw FSExceptions.translate("Unable to write to file.", cause);
 		}
 	}

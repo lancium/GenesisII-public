@@ -10,10 +10,10 @@ public class ClientConstructionParameters
 	{
 		MessageElement ret = new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
 		ret.setValue(epiURI.toString());
-		
+
 		return ret;
 	}
-	
+
 	static public org.apache.axis.types.URI getEndpointIdentifierProperty(MessageElement m)
 		throws org.apache.axis.types.URI.MalformedURIException
 	{

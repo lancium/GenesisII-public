@@ -26,22 +26,19 @@ import edu.virginia.vcgr.genii.client.configuration.Hostname;
 public class AttributedURITypeSmart extends AttributedURIType
 {
 	static private Log _logger = LogFactory.getLog(AttributedURITypeSmart.class);
-	
+
 	static final long serialVersionUID = 0;
-	
+
 	public AttributedURITypeSmart(String url)
 	{
 		super(smartifyURL(url));
 	}
-	
+
 	static private String smartifyURL(String url)
 	{
-		try
-		{
+		try {
 			return Hostname.normalizeURL(url);
-		}
-		catch (UnknownHostException uhe)
-		{
+		} catch (UnknownHostException uhe) {
 			_logger.warn(uhe);
 			return url;
 		}

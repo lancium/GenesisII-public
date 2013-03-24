@@ -9,21 +9,24 @@ import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-public class RNSAttributesHandler extends AbstractAttributeHandler {
+public class RNSAttributesHandler extends AbstractAttributeHandler
+{
 
-	public RNSAttributesHandler(AttributePackage pkg) throws NoSuchMethodException {
+	public RNSAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
+	{
 		super(pkg);
 	}
 
 	@Override
-	protected void registerHandlers() throws NoSuchMethodException {
+	protected void registerHandlers() throws NoSuchMethodException
+	{
 		addHandler(RNSConstants.ELEMENT_COUNT_QNAME, "getElementCount");
 	}
-	
-	public MessageElement getElementCount() throws ResourceUnknownFaultType, 
-			ResourceException {
+
+	public MessageElement getElementCount() throws ResourceUnknownFaultType, ResourceException
+	{
 		IRNSResource resource = null;
-		resource = (IRNSResource)(ResourceManager.getCurrentResource().dereference());
+		resource = (IRNSResource) (ResourceManager.getCurrentResource().dereference());
 		Object elementCount = null;
 		if (!resource.isServiceResource()) {
 			elementCount = resource.getProperty(IRNSResource.ELEMENT_COUNT_PROPERTY);

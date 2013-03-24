@@ -15,43 +15,35 @@ import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 
 public class RNSContainerUtilities
 {
-	static public LookupResponseType translate(
-		Iterable<RNSEntryResponseType> entries,
-		IteratorBuilder<Object> builder) throws RemoteException
+	static public LookupResponseType translate(Iterable<RNSEntryResponseType> entries, IteratorBuilder<Object> builder)
+		throws RemoteException
 	{
-		
+
 		return indexedTranslate(entries, builder, null);
 	}
 
-	
-	public static LookupResponseType indexedTranslate(
-			Iterable<RNSEntryResponseType> entries,
-			IteratorBuilder<Object> builder,
-			InMemoryIteratorWrapper imiw) throws RemoteException
+	public static LookupResponseType indexedTranslate(Iterable<RNSEntryResponseType> entries, IteratorBuilder<Object> builder,
+		InMemoryIteratorWrapper imiw) throws RemoteException
 	{
-		
-			
+
 		builder.preferredBatchSize(RNSConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(entries);
 
 		IteratorInitializationType iit = builder.create(imiw);
 		Collection<RNSEntryResponseType> batch = null;
-		IterableElementType []iet = iit.getBatchElement();
-		if (iet != null && iet.length > 0)
-		{
+		IterableElementType[] iet = iit.getBatchElement();
+		if (iet != null && iet.length > 0) {
 			batch = new ArrayList<RNSEntryResponseType>(iet.length);
 			int lcv = 0;
-			for (RNSEntryResponseType t : entries)
-			{
+			for (RNSEntryResponseType t : entries) {
 				if (lcv >= iet.length)
 					break;
 				batch.add(t);
 				lcv++;
 			}
 		}
-		
-		return new LookupResponseType(
-			batch == null ? null : batch.toArray(new RNSEntryResponseType[batch.size()]),
+
+		return new LookupResponseType(batch == null ? null : batch.toArray(new RNSEntryResponseType[batch.size()]),
 			iit.getIteratorEndpoint());
 	}
 }

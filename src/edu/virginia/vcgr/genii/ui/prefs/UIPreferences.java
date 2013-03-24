@@ -16,66 +16,53 @@ import edu.virginia.vcgr.genii.ui.prefs.xml.XMLUIPreferenceSet;
 
 public class UIPreferences
 {
-	private
-		Map<Class<? extends UIPreferenceSet>, UIPreferenceSet> _preferenceSets
-			= new LinkedHashMap<Class<? extends UIPreferenceSet>, UIPreferenceSet>();
-	
+	private Map<Class<? extends UIPreferenceSet>, UIPreferenceSet> _preferenceSets = new LinkedHashMap<Class<? extends UIPreferenceSet>, UIPreferenceSet>();
+
 	static private Preferences uiPreferencesRoot()
 	{
 		return Preferences.userNodeForPackage(UIPreferences.class);
 	}
-	
+
 	public UIPreferences()
 	{
 		Preferences uiPreferencesRoot = uiPreferencesRoot();
-		
-		_preferenceSets.put(GeneralUIPreferenceSet.class, 
-			new GeneralUIPreferenceSet());
-		_preferenceSets.put(ShellUIPreferenceSet.class,
-			new ShellUIPreferenceSet());
-		_preferenceSets.put(SecurityUIPreferenceSet.class, 
-			new SecurityUIPreferenceSet());
-		_preferenceSets.put(HistoryUIPreferenceSet.class,
-			new HistoryUIPreferenceSet());
-		_preferenceSets.put(XMLUIPreferenceSet.class,
-			new XMLUIPreferenceSet());
-		
+
+		_preferenceSets.put(GeneralUIPreferenceSet.class, new GeneralUIPreferenceSet());
+		_preferenceSets.put(ShellUIPreferenceSet.class, new ShellUIPreferenceSet());
+		_preferenceSets.put(SecurityUIPreferenceSet.class, new SecurityUIPreferenceSet());
+		_preferenceSets.put(HistoryUIPreferenceSet.class, new HistoryUIPreferenceSet());
+		_preferenceSets.put(XMLUIPreferenceSet.class, new XMLUIPreferenceSet());
+
 		for (UIPreferenceSet pSet : _preferenceSets.values())
 			pSet.load(uiPreferencesRoot);
 	}
-	
+
 	Collection<UIPreferenceSet> preferenceSets()
 	{
-		synchronized(_preferenceSets)
-		{
-			return Collections.unmodifiableCollection(
-				_preferenceSets.values());
+		synchronized (_preferenceSets) {
+			return Collections.unmodifiableCollection(_preferenceSets.values());
 		}
 	}
-	
+
 	public void store() throws BackingStoreException
 	{
 		Preferences uiPreferencesRoot = uiPreferencesRoot();
-		
-		synchronized(_preferenceSets)
-		{
+
+		synchronized (_preferenceSets) {
 			for (UIPreferenceSet pSet : _preferenceSets.values())
 				pSet.store(uiPreferencesRoot);
 		}
-		
+
 		uiPreferencesRoot.flush();
 	}
-	
-	public <Type extends UIPreferenceSet> Type preferenceSet(
-		Class<Type> preferenceSetType)
+
+	public <Type extends UIPreferenceSet> Type preferenceSet(Class<Type> preferenceSetType)
 	{
-		synchronized(_preferenceSets)
-		{
-			return preferenceSetType.cast(
-				_preferenceSets.get(preferenceSetType));
+		synchronized (_preferenceSets) {
+			return preferenceSetType.cast(_preferenceSets.get(preferenceSetType));
 		}
 	}
-	
+
 	public void launchEditor(Window owner) throws BackingStoreException
 	{
 		UIPreferencesDialog.launchEditor(owner, this);

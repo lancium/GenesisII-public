@@ -30,127 +30,109 @@ public class DefaultPersonalityProvider implements PersonalityProvider
 	}
 
 	@Override
-	public ApplicationFacet getApplicationFacet(
-			Object currentUnderstanding) throws JSDLException
+	public ApplicationFacet getApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultApplicationFacet();
 	}
 
 	@Override
-	public CPUArchitectureFacet getCPUArchitectureFacet(
-			Object currentUnderstanding) throws JSDLException
+	public CPUArchitectureFacet getCPUArchitectureFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultCPUArchitectureFacet();
 	}
 
 	@Override
-	public CandidateHostsFacet getCandidateHostsFacet(
-			Object currentUnderstanding) throws JSDLException
+	public CandidateHostsFacet getCandidateHostsFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultCandidateHostsFacet();
 	}
 
 	@Override
-	public DataStagingFacet getDataStagingFacet(
-			Object currentUnderstanding) throws JSDLException
+	public DataStagingFacet getDataStagingFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultDataStagingFacet();
 	}
 
 	@Override
-	public FileSystemFacet getFileSystemFacet(Object currentUnderstanding)
-			throws JSDLException
+	public FileSystemFacet getFileSystemFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultFileSystemFacet();
 	}
 
 	@Override
-	public HPCApplicationFacet getHPCApplicationFacet(
-			Object currentUnderstanding) throws JSDLException
+	public HPCApplicationFacet getHPCApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultHPCApplicationFacet();
 	}
-	
+
 	@Override
-	public SPMDApplicationFacet getSPMDApplicationFacet(
-		Object currentUnderstanding) throws JSDLException
+	public SPMDApplicationFacet getSPMDApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultSPMDApplicationFacet();
 	}
 
 	@Override
-	public JobDefinitionFacet getJobDefinitionFacet(
-			Object currentUnderstanding) throws JSDLException
+	public JobDefinitionFacet getJobDefinitionFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultJobDefinitionFacet();
 	}
 
 	@Override
-	public JobDescriptionFacet getJobDescriptionFacet(
-			Object currentUnderstanding) throws JSDLException
+	public JobDescriptionFacet getJobDescriptionFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultJobDescriptionFacet();
 	}
 
 	@Override
-	public JobIdentificationFacet getJobIdentificationFacet(
-			Object currentUnderstanding) throws JSDLException
+	public JobIdentificationFacet getJobIdentificationFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultJobIdentificationFacet();
 	}
 
 	@Override
-	public OperatingSystemFacet getOperatingSystemFacet(
-			Object currentUnderstanding) throws JSDLException
+	public OperatingSystemFacet getOperatingSystemFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultOperatingSystemFacet();
 	}
 
 	@Override
-	public OperatingSystemTypeFacet getOperatingSystemTypeFacet(
-			Object currentUnderstanding) throws JSDLException
+	public OperatingSystemTypeFacet getOperatingSystemTypeFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultOperatingSystemTypeFacet();
 	}
 
 	@Override
-	public POSIXApplicationFacet getPOSIXApplicationFacet(
-			Object currentUnderstanding) throws JSDLException
+	public POSIXApplicationFacet getPOSIXApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultPOSIXApplicationFacet();
 	}
 
 	@Override
-	public ResourcesFacet getResourcesFacet(Object currentUnderstanding)
-			throws JSDLException
+	public ResourcesFacet getResourcesFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultResourcesFacet();
 	}
 
 	@Override
-	public SourceURIFacet getSourceURIFacet(Object currentUnderstanding)
-			throws JSDLException
+	public SourceURIFacet getSourceURIFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultSourceURIFacet();
 	}
 
 	@Override
-	public TargetURIFacet getTargetURIFacet(Object currentUnderstanding)
-			throws JSDLException
+	public TargetURIFacet getTargetURIFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultTargetURIFacet();
 	}
 
 	@Override
-	public GeniiOrFacet getGeniiOrFacet(Object currentUnderstanding)
-			throws JSDLException
+	public GeniiOrFacet getGeniiOrFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultGeniiOrFacet();
 	}
 
 	@Override
-	public GeniiPropertyFacet getGeniiPropertyFacet(Object currentUnderstanding)
-			throws JSDLException
+	public GeniiPropertyFacet getGeniiPropertyFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultGeniiPropertyFacet();
 	}

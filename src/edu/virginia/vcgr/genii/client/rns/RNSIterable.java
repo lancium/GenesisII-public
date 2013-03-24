@@ -20,71 +20,62 @@ final public class RNSIterable implements Iterable<RNSEntryResponseType>
 {
 	private String _path;
 	private WSIterable<RNSEntryResponseType> _iterable;
-	
-	
-	public RNSIterable(LookupResponseType lookupResponse,
-			ICallingContext callContext, int blockSize)
-				throws ResourceException, GenesisIISecurityException
+
+	public RNSIterable(LookupResponseType lookupResponse, ICallingContext callContext, int blockSize) throws ResourceException,
+		GenesisIISecurityException
 	{
 		this(null, lookupResponse, callContext, blockSize);
 	}
-	
-	public RNSIterable(String path, LookupResponseType lookupResponse,
-		ICallingContext callContext, int blockSize)
-			throws ResourceException, GenesisIISecurityException
+
+	public RNSIterable(String path, LookupResponseType lookupResponse, ICallingContext callContext, int blockSize)
+		throws ResourceException, GenesisIISecurityException
 	{
 		_path = path;
-		
-		RNSEntryResponseType []tmp = lookupResponse.getEntryResponse();
-		
-		_iterable = WSIterable.axisIterable(
-			RNSEntryResponseType.class,
-			tmp,
-			new IteratorInitializationType(
-				lookupResponse.getIterator(),
-				null), callContext, blockSize);
+
+		RNSEntryResponseType[] tmp = lookupResponse.getEntryResponse();
+
+		_iterable = WSIterable.axisIterable(RNSEntryResponseType.class, tmp,
+			new IteratorInitializationType(lookupResponse.getIterator(), null), callContext, blockSize);
 	}
-	
+
 	final public RNSEntryResponseType[] toArray()
 	{
-		Collection<RNSEntryResponseType> tmp = 
-			new LinkedList<RNSEntryResponseType>();
-		
+		Collection<RNSEntryResponseType> tmp = new LinkedList<RNSEntryResponseType>();
+
 		for (RNSEntryResponseType resp : this)
 			tmp.add(resp);
-		
+
 		RNSEntryResponseType[] respArray = tmp.toArray(new RNSEntryResponseType[tmp.size()]);
 		StreamUtils.close(_iterable);
 		return respArray;
 	}
-	
+
 	final public WSIterable<RNSEntryResponseType> getIterable()
 	{
 		return _iterable;
 	}
-	
+
 	final public Map<String, RNSEntryResponseType> toMap()
 	{
-		Map<String, RNSEntryResponseType> ret = 
-			new HashMap<String, RNSEntryResponseType>();
-		
+		Map<String, RNSEntryResponseType> ret = new HashMap<String, RNSEntryResponseType>();
+
 		for (RNSEntryResponseType resp : this)
 			ret.put(resp.getEntryName(), resp);
-		
+
 		return ret;
 	}
-	
+
 	@Override
 	final public Iterator<RNSEntryResponseType> iterator()
 	{
 		return new RNSIterator(_path, _iterable.iterator());
 	}
-	
+
 	static private class RNSIterator implements Iterator<RNSEntryResponseType>
 	{
 		private String _path;
 		private Iterator<RNSEntryResponseType> _iter;
-		
+
 		private RNSIterator(String path, Iterator<RNSEntryResponseType> iter)
 		{
 			_path = path;
@@ -101,12 +92,11 @@ final public class RNSIterable implements Iterable<RNSEntryResponseType>
 		final public RNSEntryResponseType next()
 		{
 			RNSEntryResponseType resp = _iter.next();
-		/*	if (resp.getFault() != null)
-				throw new RuntimeException(
-					"Fault encountered with RNS entry!", resp.getFault());
-		*/	
-			if (_path != null && resp.getFault()==null)
-			{
+			/*
+			 * if (resp.getFault() != null) throw new RuntimeException(
+			 * "Fault encountered with RNS entry!", resp.getFault());
+			 */
+			if (_path != null && resp.getFault() == null) {
 				RNSLookupCache.put(_path, resp.getEntryName(), resp.getEndpoint());
 			}
 			return resp;

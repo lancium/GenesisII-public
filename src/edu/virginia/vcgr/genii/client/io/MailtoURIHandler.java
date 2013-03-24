@@ -23,12 +23,11 @@ import java.util.Properties;
 
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
-public class MailtoURIHandler extends AbstractURIHandler
-	implements IURIHandler
+public class MailtoURIHandler extends AbstractURIHandler implements IURIHandler
 {
 	public String[] getHandledProtocols()
 	{
-		return new String[] {"mailto"};
+		return new String[] { "mailto" };
 	}
 
 	public boolean canRead(String uriScheme)
@@ -41,43 +40,35 @@ public class MailtoURIHandler extends AbstractURIHandler
 		return (uriScheme != null && uriScheme.equals("mailto"));
 	}
 
-	public InputStream openInputStream(URI uri,
-		UsernamePasswordIdentity credential) throws IOException
+	public InputStream openInputStream(URI uri, UsernamePasswordIdentity credential) throws IOException
 	{
 		throw new IOException("Cannot read from mailto URIs.");
 	}
 
-	public OutputStream openOutputStream(URI uri, 
-		UsernamePasswordIdentity credential) throws IOException
+	public OutputStream openOutputStream(URI uri, UsernamePasswordIdentity credential) throws IOException
 	{
 		if (credential != null)
-			throw new IOException(
-				"Don't know how to perform mailto with a credential.");
-		
+			throw new IOException("Don't know how to perform mailto with a credential.");
+
 		String address;
 		Properties headers = new Properties();
-		
+
 		String schemeSpecific = uri.getSchemeSpecificPart();
 		int index = schemeSpecific.indexOf('?');
-		if (index < 0)
-		{
+		if (index < 0) {
 			address = schemeSpecific;
-		} else
-		{
+		} else {
 			address = schemeSpecific.substring(0, index);
 			schemeSpecific = schemeSpecific.substring((index + 1));
-			String []headerStrings = schemeSpecific.split("&");
-			for (String header : headerStrings)
-			{
+			String[] headerStrings = schemeSpecific.split("&");
+			for (String header : headerStrings) {
 				index = header.indexOf('=');
-				if (index > 0)
-				{
-					headers.put(
-						header.substring(0, index), header.substring(index + 1));
+				if (index > 0) {
+					headers.put(header.substring(0, index), header.substring(index + 1));
 				}
 			}
 		}
-		
+
 		return new MailOutputStream(address, headers);
 	}
 }

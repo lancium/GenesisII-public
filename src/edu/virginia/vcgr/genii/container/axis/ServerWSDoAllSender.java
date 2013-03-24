@@ -60,11 +60,9 @@ public class ServerWSDoAllSender extends WSDoAllSender
 	{
 		_serverPrivateKey = serverPrivateKey;
 
-		setOption(WSHandlerConstants.PW_CALLBACK_CLASS,
-				ServerWSDoAllReceiver.ServerPWCallback.class.getName());
+		setOption(WSHandlerConstants.PW_CALLBACK_CLASS, ServerWSDoAllReceiver.ServerPWCallback.class.getName());
 		setOption(WSHandlerConstants.USER, ServerWSDoAllSender.CRYPTO_ALIAS);
-		setOption(WSHandlerConstants.ENCRYPTION_USER,
-				WSHandlerConstants.USE_REQ_SIG_CERT);
+		setOption(WSHandlerConstants.ENCRYPTION_USER, WSHandlerConstants.USE_REQ_SIG_CERT);
 		setOption(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
 	}
 
@@ -72,11 +70,8 @@ public class ServerWSDoAllSender extends WSDoAllSender
 	{
 
 		// get the incoming security actions
-		Vector<?> results =
-				(Vector<?>) msgContext
-						.getProperty(WSHandlerConstants.RECV_RESULTS);
-		if (results == null)
-		{
+		Vector<?> results = (Vector<?>) msgContext.getProperty(WSHandlerConstants.RECV_RESULTS);
+		if (results == null) {
 			// no security results
 			return;
 		}
@@ -87,27 +82,22 @@ public class ServerWSDoAllSender extends WSDoAllSender
 		// security actions
 		String action = "";
 		Iterator<?> itr = securityResults.iterator();
-		while (itr.hasNext())
-		{
+		while (itr.hasNext()) {
 			WSSecurityEngineResult r = (WSSecurityEngineResult) itr.next();
-			switch (r.getAction())
-			{
-			case WSConstants.SIGN:
-				action = action + " " + WSHandlerConstants.SIGNATURE;
-				break;
-			case WSConstants.ENCR:
-				action = action + " " + WSHandlerConstants.ENCRYPT;
-				break;
-			default:
-				break;
+			switch (r.getAction()) {
+				case WSConstants.SIGN:
+					action = action + " " + WSHandlerConstants.SIGNATURE;
+					break;
+				case WSConstants.ENCR:
+					action = action + " " + WSHandlerConstants.ENCRYPT;
+					break;
+				default:
+					break;
 			}
 		}
-		if (action.length() == 0)
-		{
+		if (action.length() == 0) {
 			action = WSHandlerConstants.NO_SECURITY;
-		}
-		else
-		{
+		} else {
 			// trim the leading space
 			action = action.substring(1);
 		}
@@ -119,16 +109,13 @@ public class ServerWSDoAllSender extends WSDoAllSender
 	}
 
 	/**
-	 * Hook to allow subclasses to load their Signature Crypto however they see
-	 * fit.
+	 * Hook to allow subclasses to load their Signature Crypto however they see fit.
 	 */
-	public Crypto loadSignatureCrypto(RequestData reqData)
-			throws WSSecurityException
+	public Crypto loadSignatureCrypto(RequestData reqData) throws WSSecurityException
 	{
 
 		AbstractCrypto crypto = null;
-		try
-		{
+		try {
 			// create an in-memory keystore for the client's key material
 			KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(null, null);
@@ -137,43 +124,31 @@ public class ServerWSDoAllSender extends WSDoAllSender
 			// initially placed it in the working context when the incoming
 			// message arrived
 			WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
-			Certificate[] targetCertChain =
-					(Certificate[]) ctxt
-							.getProperty(WorkingContext.CERT_CHAIN_KEY);
+			Certificate[] targetCertChain = (Certificate[]) ctxt.getProperty(WorkingContext.CERT_CHAIN_KEY);
 
-			keyStore.setKeyEntry(CRYPTO_ALIAS, _serverPrivateKey, CRYTO_PASS
-					.toCharArray(), targetCertChain);
+			keyStore.setKeyEntry(CRYPTO_ALIAS, _serverPrivateKey, CRYTO_PASS.toCharArray(), targetCertChain);
 
 			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
 
 			return crypto;
 
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			throw new WSSecurityException(e.getMessage(), e);
-		}
-		catch (java.security.GeneralSecurityException e)
-		{
+		} catch (java.security.GeneralSecurityException e) {
 			throw new WSSecurityException(e.getMessage(), e);
-		}
-		catch (org.apache.ws.security.components.crypto.CredentialException e)
-		{
+		} catch (org.apache.ws.security.components.crypto.CredentialException e) {
 			throw new WSSecurityException(e.getMessage(), e);
 		}
 	}
 
 	/**
-	 * Hook to allow subclasses to load their Encryption Crypto however they see
-	 * fit.
+	 * Hook to allow subclasses to load their Encryption Crypto however they see fit.
 	 */
-	protected Crypto loadEncryptionCrypto(RequestData reqData)
-			throws WSSecurityException
+	protected Crypto loadEncryptionCrypto(RequestData reqData) throws WSSecurityException
 	{
 		AbstractCrypto crypto = null;
-		try
-		{
+		try {
 			// create an in-memory keystore for the server's key material
 			KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(null, null);
@@ -183,17 +158,11 @@ public class ServerWSDoAllSender extends WSDoAllSender
 
 			return crypto;
 
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			throw new WSSecurityException(e.getMessage(), e);
-		}
-		catch (java.security.GeneralSecurityException e)
-		{
+		} catch (java.security.GeneralSecurityException e) {
 			throw new WSSecurityException(e.getMessage(), e);
-		}
-		catch (org.apache.ws.security.components.crypto.CredentialException e)
-		{
+		} catch (org.apache.ws.security.components.crypto.CredentialException e) {
 			throw new WSSecurityException(e.getMessage(), e);
 		}
 	}
@@ -207,25 +176,18 @@ public class ServerWSDoAllSender extends WSDoAllSender
 		 * 
 		 */
 
-		public void handle(Callback[] callbacks) throws IOException,
-				UnsupportedCallbackException
+		public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
 		{
-			for (int i = 0; i < callbacks.length; i++)
-			{
-				if (callbacks[i] instanceof WSPasswordCallback)
-				{
+			for (int i = 0; i < callbacks.length; i++) {
+				if (callbacks[i] instanceof WSPasswordCallback) {
 					WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
 					// set the password given a username
-					if (CRYPTO_ALIAS.compareToIgnoreCase(pc.getIdentifer()) == 0)
-					{
+					if (CRYPTO_ALIAS.compareToIgnoreCase(pc.getIdentifer()) == 0) {
 						pc.setPassword(CRYTO_PASS);
 					}
 
-				}
-				else
-				{
-					throw new UnsupportedCallbackException(callbacks[i],
-							"Unrecognized Callback");
+				} else {
+					throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
 				}
 
 			}

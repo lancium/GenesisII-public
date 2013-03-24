@@ -15,54 +15,49 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 public class PingTool extends BaseGridTool
 {
 	static final private String _DEFAULT_MESSAGE = "Hello, World!";
-	
-	static final private String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dping";
-	static final private String _USAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uping";
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/ping";
-	
-	public PingTool() {
-		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
-				false, ToolCategory.GENERAL);
+
+	static final private String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dping";
+	static final private String _USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uping";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/ping";
+
+	public PingTool()
+	{
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.GENERAL);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
+
 	private int _attempts = 1;
-	
-	@Option({"attempts"})
-	public void setAttempts(String attempts) {
+
+	@Option({ "attempts" })
+	public void setAttempts(String attempts)
+	{
 		_attempts = Integer.parseInt(attempts);
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
-		if(gPath.pathType() != GeniiPathType.Grid)
+		if (gPath.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException("<target> must be a grid path. ");
 		RNSPath path = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
-		
+
 		EndpointReferenceType target = path.getEndpoint();
 		/*
-		target.getAddress().get_value().setQueryString("genii-container-id=" + new GUID());
-		*/
-		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-			target);
+		 * target.getAddress().get_value().setQueryString("genii-container-id=" + new GUID());
+		 */
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, target);
 
 		String msg = _DEFAULT_MESSAGE;
 		if (numArguments() == 2)
 			msg = getArgument(1);
-		
-		for (int i = 0; i < _attempts; i++) 
-		{
+
+		for (int i = 0; i < _attempts; i++) {
 			String response = common.ping(msg);
 			stdout.format("Response %d:  %s\n", i, response);
-			stdout.format("Endpoint Information:  %s\n", 
-				ClientUtils.getLastEndpointInformation(common));
+			stdout.format("Endpoint Information:  %s\n", ClientUtils.getLastEndpointInformation(common));
 		}
-		
+
 		return 0;
 	}
 
@@ -70,7 +65,7 @@ public class PingTool extends BaseGridTool
 	protected void verify() throws ToolException
 	{
 		int numArgs = numArguments();
-		if ( (numArgs < 1) || (numArgs > 2) )
+		if ((numArgs < 1) || (numArgs > 2))
 			throw new InvalidToolUsageException();
 	}
 }

@@ -4,16 +4,15 @@ public class SimpleCheckBoxItem extends SimpleMenuItem implements CheckBoxItem
 {
 	private boolean _isEditable;
 	private boolean _isChecked;
-	
-	public SimpleCheckBoxItem(String tag, Object content, 
-		boolean isChecked, boolean isEditable)
+
+	public SimpleCheckBoxItem(String tag, Object content, boolean isChecked, boolean isEditable)
 	{
 		super(tag, content);
-		
+
 		_isChecked = isChecked;
 		_isEditable = isEditable;
 	}
-	
+
 	@Override
 	public boolean isChecked()
 	{

@@ -28,24 +28,20 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IBESResource extends IResource
 {
-	static public final String STORED_ACCEPTING_NEW_ACTIVITIES = 
-		"edu.virginia.bes.resource.stored-accepting-new-activities";
-	static public final String THRESHOLD_DB_PROPERTY_NAME =
-		"edu.virginia.bes.resource.threshold";
-	
+	static public final String STORED_ACCEPTING_NEW_ACTIVITIES = "edu.virginia.bes.resource.stored-accepting-new-activities";
+	static public final String THRESHOLD_DB_PROPERTY_NAME = "edu.virginia.bes.resource.threshold";
+
 	public BESPolicy getPolicy() throws RemoteException;
+
 	public void setPolicy(BESPolicy policy) throws RemoteException;
-	
+
 	public BES getBES() throws RemoteException;
-	
-	public Collection<BESActivity> getContainedActivities() 
-		throws RemoteException;
-	
-	public BESActivity getActivity(String activityid)
-		throws RemoteException, UnknownActivityIdentifierFaultType;
-	public BESActivity getActivity(EndpointReferenceType activity)
-		throws RemoteException, UnknownActivityIdentifierFaultType;
-	
-	public boolean isAcceptingNewActivities()
-		throws RemoteException;
+
+	public Collection<BESActivity> getContainedActivities() throws RemoteException;
+
+	public BESActivity getActivity(String activityid) throws RemoteException, UnknownActivityIdentifierFaultType;
+
+	public BESActivity getActivity(EndpointReferenceType activity) throws RemoteException, UnknownActivityIdentifierFaultType;
+
+	public boolean isAcceptingNewActivities() throws RemoteException;
 }

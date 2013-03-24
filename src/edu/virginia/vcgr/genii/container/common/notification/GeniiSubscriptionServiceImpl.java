@@ -33,7 +33,6 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.TerminationTimeType;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPolicy;
@@ -45,60 +44,48 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @ConstructionParametersType(SubscriptionConstructionParameters.class)
-@GeniiServiceConfiguration(
-	resourceProvider=DBSubscriptionResourceProvider.class)
-public class GeniiSubscriptionServiceImpl extends GenesisIIBase
-	implements GeniiSubscriptionPortType
+@GeniiServiceConfiguration(resourceProvider = DBSubscriptionResourceProvider.class)
+public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements GeniiSubscriptionPortType
 {
 	@Override
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-		ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters,
-		Collection<MessageElement> resolverCreationParameters)
-			throws ResourceException, BaseFaultType, RemoteException
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
+		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParameters)
+		throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(rKey, newEPR, cParams, constructionParameters,
-			resolverCreationParameters);
-		
-		SubscriptionConstructionParameters sCons =
-			(SubscriptionConstructionParameters)cParams;
-		
-		DBSubscriptionResource resource =
-			(DBSubscriptionResource)rKey.dereference();
-		
-		Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies =
-			sCons.policies();
-		
-		if (policies != null)
-		{
+		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
+
+		SubscriptionConstructionParameters sCons = (SubscriptionConstructionParameters) cParams;
+
+		DBSubscriptionResource resource = (DBSubscriptionResource) rKey.dereference();
+
+		Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies = sCons.policies();
+
+		if (policies != null) {
 			if (policies.containsKey(SubscriptionPolicyTypes.UseRawPolicy))
-				throw FaultManipulator.fillInFault(
-					new UnsupportedPolicyRequestFaultType());
+				throw FaultManipulator.fillInFault(new UnsupportedPolicyRequestFaultType());
 			if (policies.containsKey(SubscriptionPolicyTypes.BatchEvents))
-				throw FaultManipulator.fillInFault(
-					new UnsupportedPolicyRequestFaultType());
+				throw FaultManipulator.fillInFault(new UnsupportedPolicyRequestFaultType());
 			if (policies.containsKey(SubscriptionPolicyTypes.CollapseEvents))
-				throw FaultManipulator.fillInFault(
-					new UnsupportedPolicyRequestFaultType());
+				throw FaultManipulator.fillInFault(new UnsupportedPolicyRequestFaultType());
 			if (policies.containsKey(SubscriptionPolicyTypes.IgnoreDuplicateEvents))
-				throw FaultManipulator.fillInFault(
-					new UnsupportedPolicyRequestFaultType());
+				throw FaultManipulator.fillInFault(new UnsupportedPolicyRequestFaultType());
 		}
-		
+
 		resource.createSubscription(newEPR, sCons);
 	}
 
 	public GeniiSubscriptionServiceImpl() throws RemoteException
 	{
 		super("GeniiSubscriptionPortType");
-		
+
 		addImplementedPortType(WSRFConstants.WSN_CREATE_PULL_POINT_PORT);
 		addImplementedPortType(WSRFConstants.WSN_SUBSCRIPTION_MANAGER_PORT);
 		addImplementedPortType(WSRFConstants.WSN_PAUSABLE_SUBSCRIPTION_MANAGER_PORT);
 	}
-	
+
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
@@ -107,27 +94,23 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public PauseSubscriptionResponse pauseSubscription(PauseSubscription arg0)
-			throws RemoteException, PauseFailedFaultType,
-			ResourceUnknownFaultType
+	public PauseSubscriptionResponse pauseSubscription(PauseSubscription arg0) throws RemoteException, PauseFailedFaultType,
+		ResourceUnknownFaultType
 	{
-		DBSubscriptionResource resource = 
-			(DBSubscriptionResource)ResourceManager.getCurrentResource(
-				).dereference();
+		DBSubscriptionResource resource = (DBSubscriptionResource) ResourceManager.getCurrentResource().dereference();
 		resource.toggleSubscriptionPause(true);
 		return new PauseSubscriptionResponse();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RenewResponse renew(Renew renew) throws RemoteException,
-			ResourceUnknownFaultType, UnacceptableTerminationTimeFaultType
+	public RenewResponse renew(Renew renew) throws RemoteException, ResourceUnknownFaultType,
+		UnacceptableTerminationTimeFaultType
 	{
 		AbsoluteOrRelativeTimeType termTime = renew.getTerminationTime();
 		if (termTime == null)
-			throw FaultManipulator.fillInFault(
-				new UnacceptableTerminationTimeFaultType());
-		
+			throw FaultManipulator.fillInFault(new UnacceptableTerminationTimeFaultType());
+
 		TerminationTimeType ttt = TerminationTimeType.newInstance(termTime);
 		Calendar currentTime = Calendar.getInstance();
 		Calendar terminationTime = ttt.terminationTime();
@@ -137,25 +120,21 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public ResumeSubscriptionResponse resumeSubscription(ResumeSubscription arg0)
-			throws RemoteException, ResourceUnknownFaultType,
-			ResumeFailedFaultType
+	public ResumeSubscriptionResponse resumeSubscription(ResumeSubscription arg0) throws RemoteException,
+		ResourceUnknownFaultType, ResumeFailedFaultType
 	{
-		DBSubscriptionResource resource = 
-			(DBSubscriptionResource)ResourceManager.getCurrentResource(
-				).dereference();
+		DBSubscriptionResource resource = (DBSubscriptionResource) ResourceManager.getCurrentResource().dereference();
 		resource.toggleSubscriptionPause(false);
 		return new ResumeSubscriptionResponse();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public UnsubscribeResponse unsubscribe(Unsubscribe arg0)
-			throws RemoteException, UnableToDestroySubscriptionFaultType,
-			ResourceUnknownFaultType
+	public UnsubscribeResponse unsubscribe(Unsubscribe arg0) throws RemoteException, UnableToDestroySubscriptionFaultType,
+		ResourceUnknownFaultType
 	{
 		super.destroy(new Destroy());
-		
+
 		return new UnsubscribeResponse();
 	}
 }

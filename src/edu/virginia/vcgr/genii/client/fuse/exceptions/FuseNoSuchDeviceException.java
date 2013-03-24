@@ -5,7 +5,7 @@ import fuse.FuseException;
 public class FuseNoSuchDeviceException extends FuseException
 {
 	static final long serialVersionUID = 0L;
-	
+
 	public FuseNoSuchDeviceException(String msg)
 	{
 		this(msg, null);

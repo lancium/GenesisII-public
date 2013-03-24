@@ -32,31 +32,25 @@ import edu.virginia.vcgr.genii.ui.plugins.queue.history.JobHistoryFrame;
 
 public class JobHistoryPlugin extends AbstractCombinedUIMenusPlugin
 {
-	private Collection<HistoryEvent> readHistoryEvents(UIPluginContext context,
-		MenuType menuType) throws IOException, RNSPathDoesNotExistException,
-			ClassNotFoundException
+	private Collection<HistoryEvent> readHistoryEvents(UIPluginContext context, MenuType menuType) throws IOException,
+		RNSPathDoesNotExistException, ClassNotFoundException
 	{
 		Collection<HistoryEvent> events = null;
 		InputStream in = null;
 		Closeable token = null;
-		
-		try
-		{
-			token = ContextManager.temporarilyAssumeContext(
-				context.uiContext().callingContext());
-			
-			Collection<RNSPath> paths =
-				context.endpointRetriever().getTargetEndpoints();
-			if (paths != null && paths.size() == 1)
-			{
+
+		try {
+			token = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+
+			Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
+			if (paths != null && paths.size() == 1) {
 				EndpointReferenceType target = paths.iterator().next().getEndpoint();
 				TypeInformation typeInfo = new TypeInformation(target);
 				if (typeInfo.isByteIO())
 					in = ByteIOStreamFactory.createInputStream(target);
 			}
-			
-			if (in == null)
-			{
+
+			if (in == null) {
 				JFileChooser chooser = new JFileChooser();
 				chooser.setMultiSelectionEnabled(false);
 				int answer = chooser.showOpenDialog(null);
@@ -65,49 +59,40 @@ public class JobHistoryPlugin extends AbstractCombinedUIMenusPlugin
 				File file = chooser.getSelectedFile();
 				in = new FileInputStream(file);
 			}
-			
+
 			ObjectInputStream ois = new ObjectInputStream(in);
 			int count = ois.readInt();
 			events = new ArrayList<HistoryEvent>(count);
 			while (count-- > 0)
-				events.add((HistoryEvent)ois.readObject());
+				events.add((HistoryEvent) ois.readObject());
 			ois.close();
-			
+
 			return events;
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(in);
 			StreamUtils.close(token);
 		}
 	}
-	
+
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType)
-		throws UIPluginException
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
-		try
-		{
+		try {
 			Collection<HistoryEvent> events = readHistoryEvents(context, menuType);
 			if (events == null)
 				return;
-			
-			JobHistoryFrame frame = new JobHistoryFrame(
-				(UIContext)context.uiContext().clone(), null, null, events);
+
+			JobHistoryFrame frame = new JobHistoryFrame((UIContext) context.uiContext().clone(), null, null, events);
 			frame.pack();
 			GUIUtils.centerWindow(frame);
 			frame.setVisible(true);
-		}
-		catch (Throwable cause)
-		{
-			ErrorHandler.handleError(context.uiContext(),
-				context.ownerComponent(), cause);
+		} catch (Throwable cause) {
+			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
 		}
 	}
 
 	@Override
-	public boolean isEnabled(
-		Collection<EndpointDescription> selectedDescriptions)
+	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
 	{
 		return true;
 	}

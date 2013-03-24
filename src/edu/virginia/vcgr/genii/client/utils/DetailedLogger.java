@@ -20,8 +20,13 @@ import org.apache.log4j.Logger;
 public class DetailedLogger
 {
 	private static final Logger _logger = Logger.getLogger(DetailedLogger.class);
-	
-	DetailedLogger() {}
-	
-	public Logger detailed() { return _logger; }
+
+	DetailedLogger()
+	{
+	}
+
+	public Logger detailed()
+	{
+		return _logger;
+	}
 }

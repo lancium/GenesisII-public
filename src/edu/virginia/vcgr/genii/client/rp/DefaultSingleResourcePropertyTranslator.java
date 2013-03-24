@@ -8,30 +8,22 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
 /**
- * This is the default resource property translator used for
- * single-valued resource properties.
+ * This is the default resource property translator used for single-valued resource properties.
  * 
  * @author mmm2a
  */
-public class DefaultSingleResourcePropertyTranslator implements
-		SingleResourcePropertyTranslator
+public class DefaultSingleResourcePropertyTranslator implements SingleResourcePropertyTranslator
 {
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <Type> Type deserialize(Class<Type> clazz, MessageElement element)
-			throws ResourcePropertyException
+	public <Type> Type deserialize(Class<Type> clazz, MessageElement element) throws ResourcePropertyException
 	{
-		try
-		{
+		try {
 			return clazz.cast(ObjectDeserializer.toObject(element, clazz));
-		}
-		catch (ResourceException re)
-		{
-			throw new ResourcePropertyException(
-				"Unable to deserialize resource property " +
-				element.getQName(), re);
+		} catch (ResourceException re) {
+			throw new ResourcePropertyException("Unable to deserialize resource property " + element.getQName(), re);
 		}
 	}
 
@@ -39,8 +31,7 @@ public class DefaultSingleResourcePropertyTranslator implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public MessageElement serialize(QName name, Object obj)
-			throws ResourcePropertyException
+	public MessageElement serialize(QName name, Object obj) throws ResourcePropertyException
 	{
 		return new MessageElement(name, obj);
 	}

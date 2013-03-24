@@ -5,7 +5,7 @@ import fuse.FuseException;
 public class FuseIllegalAccessException extends FuseException
 {
 	static final long serialVersionUID = 0L;
-	
+
 	public FuseIllegalAccessException(String msg)
 	{
 		this(msg, null);

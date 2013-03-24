@@ -11,7 +11,7 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 public class DefaultSubscriptionFactory extends AbstractSubscriptionFactory
 {
 	private EndpointReferenceType _consumerReference;
-	
+
 	@Override
 	final protected EndpointReferenceType getConsumerReference()
 	{
@@ -22,27 +22,18 @@ public class DefaultSubscriptionFactory extends AbstractSubscriptionFactory
 	{
 		_consumerReference = consumerReference;
 	}
-	
+
 	@Override
-	final public Subscription subscribe(EndpointReferenceType publisher,
-		TopicQueryExpression topicFilter,
-		TerminationTimeType terminationTime,
-		AdditionalUserData additionalUserData,
-		SubscriptionPolicy... policies) throws SubscribeException
+	final public Subscription subscribe(EndpointReferenceType publisher, TopicQueryExpression topicFilter,
+		TerminationTimeType terminationTime, AdditionalUserData additionalUserData, SubscriptionPolicy... policies)
+		throws SubscribeException
 	{
-		try
-		{
-			GeniiCommon common = ClientUtils.createProxy(
-				GeniiCommon.class, publisher);
-			return new DefaultSubscription(common.subscribe(
-				new SubscribeRequest(
-					_consumerReference, topicFilter, terminationTime,
-					additionalUserData, policies).asRequestType()));
-		}
-		catch (Throwable cause)
-		{
-			throw new SubscribeException(
-				"Unable to subscribe consumer.", cause);
+		try {
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, publisher);
+			return new DefaultSubscription(common.subscribe(new SubscribeRequest(_consumerReference, topicFilter,
+				terminationTime, additionalUserData, policies).asRequestType()));
+		} catch (Throwable cause) {
+			throw new SubscribeException("Unable to subscribe consumer.", cause);
 		}
 	}
 }

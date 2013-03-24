@@ -13,42 +13,40 @@ import java.util.regex.Pattern;
  */
 public class URLUtilities
 {
-	static private Pattern _WINDOWS_DRIVE_PATTERN = Pattern.compile(
-		"^\\p{Alpha}:(\\\\|/).*$");
-	static private Pattern _SIMPLE_URL_PATTERN = Pattern.compile(
-		"^\\w+:.*");
-	
+	static private Pattern _WINDOWS_DRIVE_PATTERN = Pattern.compile("^\\p{Alpha}:(\\\\|/).*$");
+	static private Pattern _SIMPLE_URL_PATTERN = Pattern.compile("^\\w+:.*");
+
 	/**
-	 * Take a string which may represent a URL, or may represent a file path
-	 * and convert it into a URL.
+	 * Take a string which may represent a URL, or may represent a file path and convert it into a
+	 * URL.
 	 * 
-	 * @param urlOrPath The string URL or Path.
-	 * @param includeWindows Indicates whether or not the method should take
-	 * into account Windows file paths which start with drive letters.  These
-	 * paths can easily be mistaken for URLs if one isn't careful.
+	 * @param urlOrPath
+	 *            The string URL or Path.
+	 * @param includeWindows
+	 *            Indicates whether or not the method should take into account Windows file paths
+	 *            which start with drive letters. These paths can easily be mistaken for URLs if one
+	 *            isn't careful.
 	 * @return The URL from the path.
 	 * 
 	 * @throws MalformedURLException
 	 */
-	static public URL formURL(String urlOrPath, boolean includeWindows)
-		throws MalformedURLException
+	static public URL formURL(String urlOrPath, boolean includeWindows) throws MalformedURLException
 	{
 		Matcher matcher;
-		
+
 		if (urlOrPath == null)
 			return null;
-		
-		if (includeWindows)
-		{
+
+		if (includeWindows) {
 			matcher = _WINDOWS_DRIVE_PATTERN.matcher(urlOrPath);
 			if (matcher.matches())
 				return (new File(urlOrPath)).toURI().toURL();
 		}
-		
+
 		matcher = _SIMPLE_URL_PATTERN.matcher(urlOrPath);
 		if (matcher.matches())
 			return new URL(urlOrPath);
-		
+
 		return (new File(urlOrPath)).toURI().toURL();
 	}
 }

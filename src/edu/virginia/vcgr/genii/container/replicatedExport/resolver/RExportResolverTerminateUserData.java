@@ -14,29 +14,25 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 public class RExportResolverTerminateUserData extends AdditionalUserData
 {
 	static final long serialVersionUID = 0L;
-	
+
 	@XmlAttribute(name = "epi", required = true)
 	private URI _epi = null;
-	
+
 	protected RExportResolverTerminateUserData()
-	{	
+	{
 	}
-	
+
 	public RExportResolverTerminateUserData(URI epi)
 	{
 		_epi = epi;
 	}
-	
+
 	final public org.apache.axis.types.URI getEPI()
 	{
-		try
-		{
+		try {
 			return new org.apache.axis.types.URI(_epi.toString());
-		} 
-		catch (MalformedURIException e)
-		{
-			throw new RuntimeException(
-				"This shouldn't have happend.", e);
+		} catch (MalformedURIException e) {
+			throw new RuntimeException("This shouldn't have happend.", e);
 		}
 	}
 }

@@ -17,58 +17,49 @@ public class CallStatement implements ParseStatement
 	private String _functionName;
 	private String _property;
 	private Collection<ParseStatement> _parameters;
-	
+
 	public CallStatement(String functionName, String property)
 	{
 		_functionName = functionName;
 		_property = property;
 		_parameters = new ArrayList<ParseStatement>();
 	}
-	
+
 	public void addParameter(ParseStatement stmt)
 	{
 		_parameters.add(stmt);
 	}
-	
+
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
 	{
-		Object functionObj = context.getAttribute(
-			MacroReplacer.replaceMacros(context, _functionName),
+		Object functionObj = context.getAttribute(MacroReplacer.replaceMacros(context, _functionName),
 			ScriptContext.GLOBAL_SCOPE);
-		
+
 		if ((functionObj == null) || !(functionObj instanceof ParseStatement))
-			throw new ScriptException(String.format(
-				"Unable to find function %s.", _functionName));
-		
-		Object []parameters = new Object[_parameters.size()];
+			throw new ScriptException(String.format("Unable to find function %s.", _functionName));
+
+		Object[] parameters = new Object[_parameters.size()];
 		int lcv = 0;
 		for (ParseStatement stmt : _parameters)
 			parameters[lcv++] = stmt.evaluate(context);
-		
+
 		Object ret;
-		
-		try
-		{
-			context.push();		
+
+		try {
+			context.push();
 			context.setAttribute("ARGV", parameters);
-			
-			ret = ((ParseStatement)functionObj).evaluate(context);
-		}
-		catch (ReturnFromFunctionException rffe)
-		{
+
+			ret = ((ParseStatement) functionObj).evaluate(context);
+		} catch (ReturnFromFunctionException rffe) {
 			ret = rffe.getResult();
-		}
-		finally
-		{
+		} finally {
 			context.pop();
 		}
-		
+
 		if (_property != null)
-			context.setAttribute(MacroReplacer.replaceMacros(
-				context, _property), ret);
-		
+			context.setAttribute(MacroReplacer.replaceMacros(context, _property), ret);
+
 		return ret;
 	}
 }

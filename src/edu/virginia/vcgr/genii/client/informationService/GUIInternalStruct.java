@@ -1,29 +1,29 @@
 package edu.virginia.vcgr.genii.client.informationService;
 
-
-
-public class GUIInternalStruct {
+public class GUIInternalStruct
+{
 	private String OSTypeValue = "";
 	private String OSVersionValue = "";
 	private String CPUArchitectureNameValue = "";
 	private String CPUCountValue = "";
-	private String CPUSpeedValue ="";
-	private String physicalMemoryValue= "";
-	private String virtualMemoryValue= "";
-	private String commonNameValue= "";
-	private String totalNumberOfActivitiesValue= "";
-	private String localResourceManagerValue= "";
-	private String namingProfileValue= "";
-	private boolean isAcceptingNewActivitiesValue =false;
-	
-	public GUIInternalStruct(){
+	private String CPUSpeedValue = "";
+	private String physicalMemoryValue = "";
+	private String virtualMemoryValue = "";
+	private String commonNameValue = "";
+	private String totalNumberOfActivitiesValue = "";
+	private String localResourceManagerValue = "";
+	private String namingProfileValue = "";
+	private boolean isAcceptingNewActivitiesValue = false;
+
+	public GUIInternalStruct()
+	{
 	}
-	
-	public GUIInternalStruct (String OSTypeValue, String OSVersionValue,
-			String CPUArchitectureNameValue, String CPUCountValue, String CPUSpeedValue,
-			String physicalMemoryValue, String virtualMemoryValue, String commonNameValue,
-			String totalNumberOfActivitiesValue, String localResourceManagerValue,
-			String namingProfileValue, boolean isAcceptingNewActivitiesvalue){
+
+	public GUIInternalStruct(String OSTypeValue, String OSVersionValue, String CPUArchitectureNameValue, String CPUCountValue,
+		String CPUSpeedValue, String physicalMemoryValue, String virtualMemoryValue, String commonNameValue,
+		String totalNumberOfActivitiesValue, String localResourceManagerValue, String namingProfileValue,
+		boolean isAcceptingNewActivitiesvalue)
+	{
 		this.OSTypeValue = OSTypeValue;
 		this.OSVersionValue = OSVersionValue;
 		this.CPUArchitectureNameValue = CPUArchitectureNameValue;
@@ -35,102 +35,126 @@ public class GUIInternalStruct {
 		this.totalNumberOfActivitiesValue = totalNumberOfActivitiesValue;
 		this.localResourceManagerValue = localResourceManagerValue;
 		this.namingProfileValue = namingProfileValue;
-		this.isAcceptingNewActivitiesValue = isAcceptingNewActivitiesvalue;	
+		this.isAcceptingNewActivitiesValue = isAcceptingNewActivitiesvalue;
 	}
-	
-	public String getOSTypeValue (){
+
+	public String getOSTypeValue()
+	{
 		return OSTypeValue;
 	}
-	
-	public String getOSVersionValue (){
+
+	public String getOSVersionValue()
+	{
 		return OSVersionValue;
 	}
-	
-	public String getCPUArchitectureNameValue(){
+
+	public String getCPUArchitectureNameValue()
+	{
 		return CPUArchitectureNameValue;
 	}
-	
-	public String getCPUCountValue(){
+
+	public String getCPUCountValue()
+	{
 		return CPUCountValue;
 	}
-	
-	public String getCPUSpeedValue() {
+
+	public String getCPUSpeedValue()
+	{
 		return CPUSpeedValue;
 	}
-	
-	public String getPhysicalMemoryValue() {
+
+	public String getPhysicalMemoryValue()
+	{
 		return physicalMemoryValue;
 	}
-	
-	public String getVirtualMemoryValue(){
+
+	public String getVirtualMemoryValue()
+	{
 		return virtualMemoryValue;
 	}
 
-	public String getCommonNameValue(){
+	public String getCommonNameValue()
+	{
 		return commonNameValue;
 	}
-	
-	public String getTotalNumberOfActivitiesValue(){
+
+	public String getTotalNumberOfActivitiesValue()
+	{
 		return totalNumberOfActivitiesValue;
 	}
-	
-	public String getLocalResourcemanagerValue(){
+
+	public String getLocalResourcemanagerValue()
+	{
 		return localResourceManagerValue;
 	}
 
-	public String getNamingProfilevalue(){
+	public String getNamingProfilevalue()
+	{
 		return namingProfileValue;
 	}
-	
-	public boolean getIsAcceptingNewActivitiesValue(){
+
+	public boolean getIsAcceptingNewActivitiesValue()
+	{
 		return this.isAcceptingNewActivitiesValue;
 	}
-	
-	public void setOSTypevalue (String OSTypeValue){
+
+	public void setOSTypevalue(String OSTypeValue)
+	{
 		this.OSTypeValue = OSTypeValue;
 	}
-	
-	public void setOSVersionValue (String OSVersionValue){
+
+	public void setOSVersionValue(String OSVersionValue)
+	{
 		this.OSVersionValue = OSVersionValue;
 	}
-	
-	public void setCPUArchitectureNameValue (String CPUArchitectureNameValue){
+
+	public void setCPUArchitectureNameValue(String CPUArchitectureNameValue)
+	{
 		this.CPUArchitectureNameValue = CPUArchitectureNameValue;
 	}
-	
-	public void setCPUCountValue (String CPUCountValue){
+
+	public void setCPUCountValue(String CPUCountValue)
+	{
 		this.CPUCountValue = CPUCountValue;
 	}
-	
-	public void setCPUSpeedValue (String CPUSpeedvalue){
+
+	public void setCPUSpeedValue(String CPUSpeedvalue)
+	{
 		this.CPUSpeedValue = CPUSpeedvalue;
 	}
-	
-	public void setPhysicalMemoryValue (String physicalMemoryValue){
+
+	public void setPhysicalMemoryValue(String physicalMemoryValue)
+	{
 		this.physicalMemoryValue = physicalMemoryValue;
 	}
-	
-	public void setVirtualMemoryValue (String virtualMemoryValue){
+
+	public void setVirtualMemoryValue(String virtualMemoryValue)
+	{
 		this.virtualMemoryValue = virtualMemoryValue;
 	}
-	
-	public void setCommonNameValue (String commonNameValue){
+
+	public void setCommonNameValue(String commonNameValue)
+	{
 		this.commonNameValue = commonNameValue;
 	}
-	
-	public void setTotalNumberOfActivitiesValue (String totalNumberOfActivities){
+
+	public void setTotalNumberOfActivitiesValue(String totalNumberOfActivities)
+	{
 		this.totalNumberOfActivitiesValue = totalNumberOfActivities;
 	}
-	
-	public void setLocalResourceManagervalue (String localResourceManager){
+
+	public void setLocalResourceManagervalue(String localResourceManager)
+	{
 		this.localResourceManagerValue = localResourceManager;
 	}
-	
-	public void setNamingProfileValue (String namingProfileValue){
+
+	public void setNamingProfileValue(String namingProfileValue)
+	{
 		this.namingProfileValue = namingProfileValue;
 	}
-	
-	public void setIsAcceptingNewActivitiesValue (boolean isAcceptingNewActivities){
+
+	public void setIsAcceptingNewActivitiesValue(boolean isAcceptingNewActivities)
+	{
 		this.isAcceptingNewActivitiesValue = isAcceptingNewActivities;
 	}
 }

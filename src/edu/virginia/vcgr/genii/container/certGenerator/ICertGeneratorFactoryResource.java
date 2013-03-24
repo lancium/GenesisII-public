@@ -15,8 +15,6 @@
  */
 package edu.virginia.vcgr.genii.container.certGenerator;
 
-
-
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface ICertGeneratorFactoryResource extends IResource

@@ -25,75 +25,69 @@ import edu.virginia.vcgr.genii.gjt.gui.util.ButtonPanel;
 class HistoryCategoryFilterDialog extends JDialog
 {
 	static final long serialVersionUID = 0L;
-	
+
 	static final private int SELECTION_COLUMN_WIDTH = 64;
-	
+
 	private HistoryCategoryFilterModel _model;
 	private Set<HistoryEventCategory> _selectionSet = null;
-	
+
 	private void prepareColumns(TableColumnModel columnModel)
 	{
 		TableColumn selectionColumn = columnModel.getColumn(0);
 		TableColumn categoryColumn = columnModel.getColumn(1);
-		
+
 		selectionColumn.setMaxWidth(SELECTION_COLUMN_WIDTH);
 		selectionColumn.setPreferredWidth(SELECTION_COLUMN_WIDTH);
 		selectionColumn.setResizable(false);
-		
+
 		categoryColumn.setCellRenderer(new DefaultTableCellRenderer()
 		{
 			private static final long serialVersionUID = 0L;
 
 			@Override
-			public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus,
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column)
 			{
-				super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
-					row, column);
-				
-				HistoryEventCategory category = (HistoryEventCategory)value;
+				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+				HistoryEventCategory category = (HistoryEventCategory) value;
 				if (category != null)
 					setIcon(category.information().categoryIcon());
-				
+
 				return this;
 			}
 		});
 	}
-	
-	private HistoryCategoryFilterDialog(Window owner,
-		HistoryEventFilter filter)
+
+	private HistoryCategoryFilterDialog(Window owner, HistoryEventFilter filter)
 	{
 		super(owner);
-		
+
 		setTitle("History Event Category Filter");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
+
 		_model = new HistoryCategoryFilterModel(filter);
 		JTable table = new JTable(_model);
 		prepareColumns(table.getColumnModel());
-		
+
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
-		
-		content.add(new JScrollPane(table), new GridBagConstraints(
-			0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+
+		content.add(new JScrollPane(table), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(ButtonPanel.createHorizontalPanel(
-			new OKAction(), new CancelAction()), new GridBagConstraints(
-				0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-				GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalPanel(new OKAction(), new CancelAction()), new GridBagConstraints(0, 1, 1, 1,
+			1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 	}
-	
+
 	private class OKAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
-		
+
 		private OKAction()
 		{
 			super("OK");
 		}
-		
+
 		@Override
 		final public void actionPerformed(ActionEvent e)
 		{
@@ -101,16 +95,16 @@ class HistoryCategoryFilterDialog extends JDialog
 			dispose();
 		}
 	}
-	
+
 	private class CancelAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
-		
+
 		private CancelAction()
 		{
 			super("Cancel");
 		}
-		
+
 		@Override
 		final public void actionPerformed(ActionEvent e)
 		{
@@ -118,16 +112,15 @@ class HistoryCategoryFilterDialog extends JDialog
 			dispose();
 		}
 	}
-	
+
 	static void modifyFilter(Window owner, HistoryEventFilter filter)
 	{
-		HistoryCategoryFilterDialog dialog = 
-			new HistoryCategoryFilterDialog(owner, filter);
+		HistoryCategoryFilterDialog dialog = new HistoryCategoryFilterDialog(owner, filter);
 		dialog.setModalityType(ModalityType.DOCUMENT_MODAL);
 		dialog.pack();
 		GUIUtils.centerWindow(dialog);
 		dialog.setVisible(true);
-		
+
 		Set<HistoryEventCategory> selectionSet = dialog._selectionSet;
 		if (selectionSet != null)
 			filter.categoryFilter(selectionSet);

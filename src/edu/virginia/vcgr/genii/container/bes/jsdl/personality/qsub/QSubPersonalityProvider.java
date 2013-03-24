@@ -12,37 +12,30 @@ public class QSubPersonalityProvider extends CommonPersonalityProvider
 {
 	private FilesystemManager _fsManager;
 	private BESWorkingDirectory _workingDirectory;
-	
-	public QSubPersonalityProvider(FilesystemManager fsManager,
-		BESWorkingDirectory workingDirectory)
+
+	public QSubPersonalityProvider(FilesystemManager fsManager, BESWorkingDirectory workingDirectory)
 	{
 		super(fsManager);
-		
+
 		_fsManager = fsManager;
 		_workingDirectory = workingDirectory;
 	}
-	
+
 	@Override
-	public POSIXApplicationFacet getPOSIXApplicationFacet(
-		Object currentUnderstanding) throws JSDLException
+	public POSIXApplicationFacet getPOSIXApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{
-		return new QSubPOSIXApplicationFacet(
-			_fsManager, _workingDirectory);
+		return new QSubPOSIXApplicationFacet(_fsManager, _workingDirectory);
 	}
-	
+
 	@Override
-	public HPCApplicationFacet getHPCApplicationFacet(
-		Object currentUnderstanding) throws JSDLException
+	public HPCApplicationFacet getHPCApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{
-		return new QSubHPCApplicationFacet(
-			_fsManager, _workingDirectory);
+		return new QSubHPCApplicationFacet(_fsManager, _workingDirectory);
 	}
-	
+
 	@Override
-	public SPMDApplicationFacet getSPMDApplicationFacet(
-		Object currentUnderstanding) throws JSDLException
+	public SPMDApplicationFacet getSPMDApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{
-		return new QSubSPMDApplicationFacet(
-			_fsManager, _workingDirectory);
+		return new QSubSPMDApplicationFacet(_fsManager, _workingDirectory);
 	}
 }

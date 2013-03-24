@@ -33,95 +33,70 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
-public class DBBESActivityResource extends BasicDBResource implements
-		IBESActivityResource
+public class DBBESActivityResource extends BasicDBResource implements IBESActivityResource
 {
 	@Override
 	public void destroy() throws ResourceException
 	{
-		FilesystemManager fsManager = 
-			(FilesystemManager)getProperty(FILESYSTEM_MANAGER);
+		FilesystemManager fsManager = (FilesystemManager) getProperty(FILESYSTEM_MANAGER);
 		fsManager.releaseAll();
-	
-		String fuseMountDirString = (String)getProperty(FUSE_MOUNT_PROPERTY);
+
+		String fuseMountDirString = (String) getProperty(FUSE_MOUNT_PROPERTY);
 		super.destroy();
-		
+
 		BES bes = BES.findBESForActivity(_resourceKey);
 		if (bes == null)
-			throw new ResourceException(
-				"Unable to find bes for activity " + _resourceKey);
+			throw new ResourceException("Unable to find bes for activity " + _resourceKey);
 		BESActivity activity = bes.findActivity(_resourceKey);
-		
+
 		BESWorkingDirectory dir = activity.getActivityCWD();
-		
-		if (fuseMountDirString != null)
-		{
+
+		if (fuseMountDirString != null) {
 			File f;
 			if (fuseMountDirString.startsWith("/"))
 				f = new File(fuseMountDirString);
 			else
-				f = new File(dir.getWorkingDirectory(),
-					fuseMountDirString);
-			
+				f = new File(dir.getWorkingDirectory(), fuseMountDirString);
+
 			File[] entries = f.listFiles();
-			if (entries == null || entries.length == 0)
-			{
-				if (BESUtilities.isDeletable(dir.getWorkingDirectory())
-					|| dir.mustDelete())
-						PersistentDelete.persistentDelete(
-							dir.getWorkingDirectory());				
+			if (entries == null || entries.length == 0) {
+				if (BESUtilities.isDeletable(dir.getWorkingDirectory()) || dir.mustDelete())
+					PersistentDelete.persistentDelete(dir.getWorkingDirectory());
 			}
-		} else
-		{
-			if (BESUtilities.isDeletable(dir.getWorkingDirectory()) 
-				|| dir.mustDelete())
-					PersistentDelete.persistentDelete(
-						dir.getWorkingDirectory());			
+		} else {
+			if (BESUtilities.isDeletable(dir.getWorkingDirectory()) || dir.mustDelete())
+				PersistentDelete.persistentDelete(dir.getWorkingDirectory());
 		}
-		
-		try
-		{
+
+		try {
 			bes.deleteActivity(getConnection(), _resourceKey);
-		}
-		catch (UnknownActivityIdentifierFaultType uaift)
-		{
+		} catch (UnknownActivityIdentifierFaultType uaift) {
 			throw new ResourceException("Unable to delete activity.", uaift);
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException(
-				"Unable to remove activity from database.", sqe);
+		} catch (SQLException sqe) {
+			throw new ResourceException("Unable to remove activity from database.", sqe);
 		}
 	}
 
-	public DBBESActivityResource(
-			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool)
-		throws SQLException
+	public DBBESActivityResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}
-	
-	public BESActivity findActivity()
-		throws ResourceUnknownFaultType
+
+	public BESActivity findActivity() throws ResourceUnknownFaultType
 	{
 		BES bes = BES.findBESForActivity(_resourceKey);
 		if (bes == null)
-			throw FaultManipulator.fillInFault(
-				new ResourceUnknownFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription("Unknown BES \"" +
-							_resourceKey + "\".")
-				}, null));
+			throw FaultManipulator
+				.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + _resourceKey + "\".") },
+					null));
 		BESActivity activity = bes.findActivity(_resourceKey);
 		if (activity == null)
-			throw FaultManipulator.fillInFault(
-				new ResourceUnknownFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription("Unknown BES \"" +
-							_resourceKey + "\".")
-				}, null));
-		
+			throw FaultManipulator
+				.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + _resourceKey + "\".") },
+					null));
+
 		return activity;
 	}
 }

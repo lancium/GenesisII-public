@@ -5,6 +5,5 @@ import org.w3c.dom.Element;
 
 public interface TopicQueryExpressionFactory
 {
-	public TopicQueryExpression createFromElement(Element e) 
-		throws TopicNotSupportedFaultType;
+	public TopicQueryExpression createFromElement(Element e) throws TopicNotSupportedFaultType;
 }

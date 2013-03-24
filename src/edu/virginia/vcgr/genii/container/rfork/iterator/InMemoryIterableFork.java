@@ -10,11 +10,10 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 public interface InMemoryIterableFork
 {
 
-	public IterableSnapshot splitAndList(EndpointReferenceType 
-			endpointReferenceType, ResourceKey resourceKey) throws IOException;
-	
-	public IterableSnapshot splitAndList(String[] lookupRequest,
-			EndpointReferenceType exemplarEPR, 
-			ResourceKey resourceKey) throws IOException;
+	public IterableSnapshot splitAndList(EndpointReferenceType endpointReferenceType, ResourceKey resourceKey)
+		throws IOException;
+
+	public IterableSnapshot splitAndList(String[] lookupRequest, EndpointReferenceType exemplarEPR, ResourceKey resourceKey)
+		throws IOException;
 
 }

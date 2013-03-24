@@ -24,155 +24,137 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
 class RandomByteIOOpenFile extends OperatorBasedOpenFile
 {
-	static private BasicFileOperator createOperator(EndpointReferenceType target) 
-		throws ResourceException, GenesisIISecurityException, RemoteException, 
-			IOException
+	static private BasicFileOperator createOperator(EndpointReferenceType target) throws ResourceException,
+		GenesisIISecurityException, RemoteException, IOException
 	{
-		
-		//ak3ka's additions for parallel fuse IO
+
+		// ak3ka's additions for parallel fuse IO
 		int numThreads = ByteIOConstants.numThreads;
 		RandomByteIOTransferer rbit[] = new RandomByteIOTransferer[numThreads];
-        for(int i=0; i<numThreads; ++i)
-        	rbit[i] = RandomByteIOTransfererFactory.createRandomByteIOTransferer(
-                      ClientUtils.createProxy(RandomByteIOPortType.class, target));
+		for (int i = 0; i < numThreads; ++i)
+			rbit[i] = RandomByteIOTransfererFactory.createRandomByteIOTransferer(ClientUtils.createProxy(
+				RandomByteIOPortType.class, target));
 
-        return new BasicFileOperator(
-                        ByteIOBufferLeaser.leaser(rbit[0].getTransferProtocol()),
-                        new ReadResolverImpl(rbit),
-                        new WriteResolverImpl(rbit[0]),
-                        new AppendResolverImpl(rbit[0]), false);		
+		return new BasicFileOperator(ByteIOBufferLeaser.leaser(rbit[0].getTransferProtocol()), new ReadResolverImpl(rbit),
+			new WriteResolverImpl(rbit[0]), new AppendResolverImpl(rbit[0]), false);
 	}
-	
-	RandomByteIOOpenFile(String[] path, EndpointReferenceType target,
-		boolean canRead, boolean canWrite, boolean isAppend)
-			throws ResourceException, GenesisIISecurityException, 
-				RemoteException, IOException
+
+	RandomByteIOOpenFile(String[] path, EndpointReferenceType target, boolean canRead, boolean canWrite, boolean isAppend)
+		throws ResourceException, GenesisIISecurityException, RemoteException, IOException
 	{
-		super(path, createOperator(target),
-			canRead, canWrite, isAppend);
+		super(path, createOperator(target), canRead, canWrite, isAppend);
 	}
-	
+
 	static private class ReadResolverImpl implements ReadResolver
 	{
 
-		//ak3ka's additions for parallel fuse-read !
-		
-		 private RandomByteIOTransferer[] _transferer;
+		// ak3ka's additions for parallel fuse-read !
 
-		 private ReadResolverImpl(RandomByteIOTransferer transferer[])
-         {
-                 _transferer = transferer;
-         }
+		private RandomByteIOTransferer[] _transferer;
 
-		
-		@Override
-		public void read(long fileOffset, ByteBuffer destination)
-			throws IOException
+		private ReadResolverImpl(RandomByteIOTransferer transferer[])
 		{
-		
+			_transferer = transferer;
+		}
+
+		@Override
+		public void read(long fileOffset, ByteBuffer destination) throws IOException
+		{
+
 			int length = destination.remaining();
-            int numThreads = ByteIOConstants.numThreads;
-            int threadBlkReadSize=(length/numThreads);
-			
-            Thread[] thread = new Thread[numThreads];
-            FastRead[] fr = new FastRead[numThreads];
+			int numThreads = ByteIOConstants.numThreads;
+			int threadBlkReadSize = (length / numThreads);
 
-            CountDownLatch cdl = new CountDownLatch(numThreads);
+			Thread[] thread = new Thread[numThreads];
+			FastRead[] fr = new FastRead[numThreads];
 
-            FillerAndChecker fac = new FillerAndChecker(cdl, length);
+			CountDownLatch cdl = new CountDownLatch(numThreads);
 
-            int subLength = 0;
+			FillerAndChecker fac = new FillerAndChecker(cdl, length);
 
-            for(int i=0;i<numThreads-1; ++i)
-            {
-            	fr[i] = new FastRead(_transferer[i], fileOffset + subLength,
-                                threadBlkReadSize, fac, i, threadBlkReadSize);
-            	subLength += threadBlkReadSize;
-                thread[i]= new Thread(fr[i]);
-            }
+			int subLength = 0;
 
-            fr[numThreads-1] = new FastRead(_transferer[numThreads-1], fileOffset + subLength,
-                                        threadBlkReadSize + (length % numThreads), fac, numThreads-1,
-                                        threadBlkReadSize);
+			for (int i = 0; i < numThreads - 1; ++i) {
+				fr[i] = new FastRead(_transferer[i], fileOffset + subLength, threadBlkReadSize, fac, i, threadBlkReadSize);
+				subLength += threadBlkReadSize;
+				thread[i] = new Thread(fr[i]);
+			}
 
-            thread[numThreads - 1] = new Thread(fr[numThreads - 1] );
+			fr[numThreads - 1] = new FastRead(_transferer[numThreads - 1], fileOffset + subLength, threadBlkReadSize
+				+ (length % numThreads), fac, numThreads - 1, threadBlkReadSize);
 
-            for(int i=0; i<numThreads; ++i)
-                thread[i].start();
-            
-            try
-            {
-            	fac.await();
-            }
-            
-            catch (InterruptedException ie)
-            {
-            	throw new IOException(ie);
-            }
+			thread[numThreads - 1] = new Thread(fr[numThreads - 1]);
 
+			for (int i = 0; i < numThreads; ++i)
+				thread[i].start();
 
-            if(fac.isErrorFlag())
-                throw new IOException(fac.getThreadFailCause());
+			try {
+				fac.await();
+			}
 
-            int lastFilledBufferIndex = fac.getLastFilledBufferIndex();
+			catch (InterruptedException ie) {
+				throw new IOException(ie);
+			}
 
-            if( lastFilledBufferIndex != -1)
-            {
+			if (fac.isErrorFlag())
+				throw new IOException(fac.getThreadFailCause());
 
-                
-                if(lastFilledBufferIndex != (length -1 ))
-                        //I have fetched only a subset of the requested amount!
-                {
-                	byte[] temp_data = new byte[lastFilledBufferIndex+1];
-                    System.arraycopy(fac.getData() , 0, temp_data, 0, lastFilledBufferIndex+1);
-                    destination.put(temp_data);                                           
-                }
-                
-                else
-                	destination.put(fac.getData());                       
-                
-              }
+			int lastFilledBufferIndex = fac.getLastFilledBufferIndex();
 
-              else  // Attempt to read 0 bytes
-              {
-                   return;
-              }
-			
+			if (lastFilledBufferIndex != -1) {
+
+				if (lastFilledBufferIndex != (length - 1))
+				// I have fetched only a subset of the requested amount!
+				{
+					byte[] temp_data = new byte[lastFilledBufferIndex + 1];
+					System.arraycopy(fac.getData(), 0, temp_data, 0, lastFilledBufferIndex + 1);
+					destination.put(temp_data);
+				}
+
+				else
+					destination.put(fac.getData());
+
+			}
+
+			else // Attempt to read 0 bytes
+			{
+				return;
+			}
+
 		}
 	}
-	
+
 	static private class WriteResolverImpl implements WriteResolver
 	{
 		private RandomByteIOTransferer _transferer;
-		
+
 		private WriteResolverImpl(RandomByteIOTransferer transferer)
 		{
 			_transferer = transferer;
 		}
-		
-		@Override 
+
+		@Override
 		public void truncate(long offset) throws IOException
 		{
 			_transferer.truncAppend(offset, new byte[0]);
 		}
-		
+
 		@Override
-		public void write(long fileOffset, ByteBuffer source)
-			throws IOException
+		public void write(long fileOffset, ByteBuffer source) throws IOException
 		{
 			_transferer.write(fileOffset, source);
 		}
 	}
-	
+
 	static private class AppendResolverImpl implements AppendResolver
 	{
 		private RandomByteIOTransferer _transferer;
-		
+
 		private AppendResolverImpl(RandomByteIOTransferer transferer)
 		{
 			_transferer = transferer;
 		}
-		
+
 		@Override
 		public void append(ByteBuffer source) throws IOException
 		{

@@ -30,25 +30,23 @@ import edu.virginia.vcgr.genii.ui.shell.tokenizer.Token;
 public class CommandField extends JTextField
 {
 	static final private int DEFAULT_COLUMNS = 75;
-	
+
 	static final long serialVersionUID = 0L;
-	
+
 	private LineBasedReader _reader = null;
-	
+
 	private ExecutionContext _executionContext;
 	private UIContext _uiContext;
 	private Display _display;
 	private JLabel _label;
 	private boolean _executing = false;
-	
+
 	private String stripEscapesAndQuotes(String word)
 	{
 		StringBuilder builder = new StringBuilder();
-		for (int lcv = 0; lcv < word.length(); lcv++)
-		{
+		for (int lcv = 0; lcv < word.length(); lcv++) {
 			char c = word.charAt(lcv);
-			if (c == '\\')
-			{
+			if (c == '\\') {
 				lcv++;
 				if (lcv >= word.length())
 					continue;
@@ -59,77 +57,70 @@ public class CommandField extends JTextField
 			else
 				builder.append(c);
 		}
-		
+
 		return builder.toString();
 	}
-	
-	private String insertEscapesOrQuotes(boolean preferQuotes,
-		String word)
+
+	private String insertEscapesOrQuotes(boolean preferQuotes, String word)
 	{
 		StringBuilder builder = new StringBuilder();
 		boolean needQuotes = false;
-		
-		for (int lcv = 0; lcv < word.length(); lcv++)
-		{
+
+		for (int lcv = 0; lcv < word.length(); lcv++) {
 			char c = word.charAt(lcv);
 			if (c == '\\')
 				builder.append("\\\\");
 			else if (c == '"')
 				builder.append("\\\"");
-			else if (Character.isSpaceChar(c))
-			{
+			else if (Character.isSpaceChar(c)) {
 				if (preferQuotes)
 					needQuotes = true;
 				else
 					builder.append("\\");
-				
+
 				builder.append(c);
 			} else
 				builder.append(c);
 		}
-		
+
 		if (needQuotes || preferQuotes)
 			return String.format("\"%s\"", builder.toString());
-		
+
 		return builder.toString();
 	}
-			
-	private String findCommonStart(String []words)
+
+	private String findCommonStart(String[] words)
 	{
 		String ret = words[0];
-		
-		for (int lcv = 1; lcv < words.length; lcv++)
-		{
+
+		for (int lcv = 1; lcv < words.length; lcv++) {
 			String test = words[lcv];
-			for (int i = 0; (i < test.length()) && (i < ret.length()); i++)
-			{
+			for (int i = 0; (i < test.length()) && (i < ret.length()); i++) {
 				if (ret.charAt(i) != test.charAt(i))
 					ret = ret.substring(0, i);
 			}
 		}
-		
+
 		return ret;
 	}
-	
-	public CommandField(UIContext uiContext, JLabel label, Display display,
-		ExecutionContext executionContext, int columns)
+
+	public CommandField(UIContext uiContext, JLabel label, Display display, ExecutionContext executionContext, int columns)
 	{
 		super(columns);
-		
+
 		_label = label;
 		_display = display;
 		_uiContext = uiContext;
 		_executionContext = executionContext;
-		
-		InputBindings inputBindings = uiContext.preferences().preferenceSet(
-			ShellUIPreferenceSet.class).createBindings();
-		
+
+		InputBindings inputBindings = uiContext.preferences().preferenceSet(ShellUIPreferenceSet.class).createBindings();
+
 		setDragEnabled(true);
-		
+
 		setFocusTraversalKeysEnabled(false);
 		addKeyListener(inputBindings);
 		inputBindings.addBindingActionListener(new FieldActioner());
-		
+
 		addFocusListener(new FocusListener()
 		{
 			@Override
@@ -137,7 +128,7 @@ public class CommandField extends JTextField
 			{
 				// Nothing to do
 			}
-			
+
 			@Override
 			public void focusGained(FocusEvent e)
 			{
@@ -146,42 +137,37 @@ public class CommandField extends JTextField
 			}
 		});
 	}
-	
-	public CommandField(UIContext uiContext, JLabel label,
-		Display display, ExecutionContext executionContext)
+
+	public CommandField(UIContext uiContext, JLabel label, Display display, ExecutionContext executionContext)
 	{
 		this(uiContext, label, display, executionContext, DEFAULT_COLUMNS);
 	}
-	
+
 	private class FieldActioner extends BindingActionAdapter
 	{
 		private History _history = new History();
 		private HistoryIterator _historyIterator = null;
 		private HistorySearch _historySearch = null;
-		
+
 		@Override
 		public void addCharacter(char c)
 		{
 			Caret caret = getCaret();
-			
-			if (_historySearch != null)
-			{
+
+			if (_historySearch != null) {
 				Pair<String, String> pair = _historySearch.addCharacter(c);
 				if (pair == null)
 					beep();
-				else
-				{
+				else {
 					setText(pair.first() + pair.second());
 					caret.setDot(pair.first().length());
 				}
-			} else
-			{	
+			} else {
 				String text = getText();
 				int position = caret.getDot();
-				setText(text.substring(0, position) + c +
-					text.substring(position));
+				setText(text.substring(0, position) + c + text.substring(position));
 				getCaret().setDot(position + 1);
-				
+
 				_historyIterator = null;
 			}
 		}
@@ -189,45 +175,40 @@ public class CommandField extends JTextField
 		@Override
 		public void backspace()
 		{
-			if (_historySearch != null)
-			{
+			if (_historySearch != null) {
 				beep();
 				return;
 			}
-			
+
 			Caret caret = getCaret();
 			String text = getText();
 			int position = caret.getDot();
 			if (position == 0)
 				beep();
-			else
-			{
+			else {
 				position--;
-				setText(text.substring(0, position) +
-					text.substring(position + 1));
+				setText(text.substring(0, position) + text.substring(position + 1));
 				caret.setDot(position);
 			}
-			
+
 			_historyIterator = null;
 		}
 
 		@Override
 		public void backwardHistory()
 		{
-			if (_historySearch != null)
-			{
+			if (_historySearch != null) {
 				beep();
 				return;
 			}
-			
+
 			if (_historyIterator == null)
 				_historyIterator = _history.startIteration();
-			
+
 			String newLine = _historyIterator.searchBackword();
 			if (newLine == null)
 				beep();
-			else
-			{
+			else {
 				setText(newLine);
 				getCaret().setDot(newLine.length());
 			}
@@ -243,55 +224,50 @@ public class CommandField extends JTextField
 		public void clear()
 		{
 			LineBasedReader reader = _reader;
-			
-			if (reader != null)
-			{
+
+			if (reader != null) {
 				_reader = null;
 				StreamUtils.close(reader);
 			}
-			
+
 			if (_historySearch != null)
 				_historySearch = null;
-			
+
 			setText("");
 			getCaret().setDot(0);
-			
+
 			_historyIterator = null;
 		}
 
 		@Override
 		public void delete()
 		{
-			if (_historySearch != null)
-			{
+			if (_historySearch != null) {
 				beep();
 				return;
 			}
-			
+
 			Caret caret = getCaret();
 			String text = getText();
 			int position = caret.getDot();
 			if (position >= text.length())
 				beep();
-			else
-			{
-				setText(text.substring(0, position) + 
-					text.substring(position + 1));
+			else {
+				setText(text.substring(0, position) + text.substring(position + 1));
 				caret.setDot(position);
 			}
-			
+
 			_historyIterator = null;
 		}
 
 		@Override
 		public void end()
 		{
-			if (_historySearch != null)
-			{
+			if (_historySearch != null) {
 				beep();
 				return;
 			}
-			
+
 			Caret caret = getCaret();
 			caret.setDot(getText().length());
 		}
@@ -300,11 +276,9 @@ public class CommandField extends JTextField
 		public void enter()
 		{
 
-
 			setEditable(false);
-			
-			if (_historySearch != null)
-			{
+
+			if (_historySearch != null) {
 				setText(_historySearch.getActualLine());
 				getCaret().setDot(0);
 				_historySearch = null;
@@ -314,18 +288,15 @@ public class CommandField extends JTextField
 			clear();
 
 			LineBasedReader reader = _reader;
-			if (reader == null)
-			{
+			if (reader == null) {
 				line = line.trim();
-				if (line.length() == 0){
+				if (line.length() == 0) {
 					if (!_executing)
 						setEditable(true);
 					return;
 				}
-					
 
-				if (line.equals("quit") || line.equals("exit"))
-				{
+				if (line.equals("quit") || line.equals("exit")) {
 					SwingUtilities.windowForComponent(CommandField.this).dispose();
 					return;
 				}
@@ -338,12 +309,11 @@ public class CommandField extends JTextField
 				_display.start();
 				_display.header().format("Command:  ");
 				_display.command().println(line);
-				_uiContext.progressMonitorFactory().createMonitor(CommandField.this, 
-						"Executing Command", "Executing command.", 1000L,
-						new CommandExecutionTask(line, reader),
-						new CommandCompletionListener()).start();
-			} else
-			{
+				_uiContext
+					.progressMonitorFactory()
+					.createMonitor(CommandField.this, "Executing Command", "Executing command.", 1000L,
+						new CommandExecutionTask(line, reader), new CommandCompletionListener()).start();
+			} else {
 				reader.addLine(line);
 			}
 
@@ -353,20 +323,18 @@ public class CommandField extends JTextField
 		@Override
 		public void forwardHistory()
 		{
-			if (_historySearch != null)
-			{
+			if (_historySearch != null) {
 				beep();
 				return;
 			}
-			
+
 			if (_historyIterator == null)
 				_historyIterator = _history.startIteration();
-			
+
 			String newLine = _historyIterator.searchForward();
 			if (newLine == null)
 				beep();
-			else
-			{
+			else {
 				setText(newLine);
 				getCaret().setDot(newLine.length());
 			}
@@ -375,12 +343,11 @@ public class CommandField extends JTextField
 		@Override
 		public void home()
 		{
-			if (_historySearch != null)
-			{
+			if (_historySearch != null) {
 				beep();
 				return;
 			}
-			
+
 			Caret caret = getCaret();
 			caret.setDot(0);
 		}
@@ -388,12 +355,11 @@ public class CommandField extends JTextField
 		@Override
 		public void left()
 		{
-			if (_historySearch != null)
-			{
+			if (_historySearch != null) {
 				beep();
 				return;
 			}
-			
+
 			Caret caret = getCaret();
 			int position = caret.getDot();
 			if (position == 0)
@@ -405,12 +371,11 @@ public class CommandField extends JTextField
 		@Override
 		public void right()
 		{
-			if (_historySearch != null)
-			{
+			if (_historySearch != null) {
 				beep();
 				return;
 			}
-			
+
 			Caret caret = getCaret();
 			int position = caret.getDot();
 			if (position >= getText().length())
@@ -418,112 +383,101 @@ public class CommandField extends JTextField
 			else
 				caret.setDot(position + 1);
 		}
-		
+
 		@Override
 		public void complete()
 		{
-			if (_historySearch != null)
-			{
+			if (_historySearch != null) {
 				beep();
 				return;
 			}
-			
+
 			Caret caret = getCaret();
 			int position = caret.getDot();
 			String left = getText();
 			String right = left.substring(position);
 			left = left.substring(0, position);
-			Token []words = LineTokenizer.tokenize(left);
-			
+			Token[] words = LineTokenizer.tokenize(left);
+
 			int wordCount = 0;
 			WordCompleter completer = null;
-			for (Token word : words)
-			{
+			for (Token word : words) {
 				if (!word.isSpaceToken())
 					wordCount++;
 			}
-			
+
 			String lastWord = "";
 			String partial = "";
 			if (words.length > 0)
 				lastWord = words[words.length - 1].token();
-			if(lastWord.startsWith("-"))
-			{
+			if (lastWord.startsWith("-")) {
 				completer = _executionContext.optionCompleter();
 				partial = stripEscapesAndQuotes(left);
-			}
-			else 
-			{
+			} else {
 				partial = stripEscapesAndQuotes(lastWord);
 				if (wordCount <= 1)
 					completer = _executionContext.commandCompleter();
 				else
 					completer = _executionContext.pathCompleter();
 			}
-			
+
 			if (completer == null)
 				beep();
-			else
-			{
+			else {
 				setText("forming completions...");
 				setEnabled(false);
-				_uiContext.progressMonitorFactory().createMonitor(
-					CommandField.this, "Forming Completions",
-					"Forming completions.", 1000L,
-					new CompleterTask(completer, partial),
-					new CompletionFinisher(lastWord, right, words, left)).start();
+				_uiContext
+					.progressMonitorFactory()
+					.createMonitor(CommandField.this, "Forming Completions", "Forming completions.", 1000L,
+						new CompleterTask(completer, partial), new CompletionFinisher(lastWord, right, words, left)).start();
 			}
-			
+
 			_historyIterator = null;
 		}
-		
+
 		@Override
 		public void search()
 		{
 			Pair<String, String> pair;
-			
+
 			if (_historySearch == null)
 				_historySearch = _history.startSearch();
-			
+
 			pair = _historySearch.search();
-			if (pair == null)
-			{
+			if (pair == null) {
 				beep();
-			} else
-			{
+			} else {
 				setText(pair.first() + pair.second());
 				getCaret().setDot(pair.first().length());
 			}
-			
+
 			_historyIterator = null;
 		}
-		
+
 		@Override
 		public void stopSearch()
 		{
-			if (_historySearch != null)
-			{
+			if (_historySearch != null) {
 				setText(_historySearch.getActualLine());
 				getCaret().setDot(0);
 				_historySearch = null;
 			}
 		}
 	}
-	
+
 	private class CompleterTask extends AbstractTask<String[]>
 	{
 		private WordCompleter _completer;
 		private String _partial;
-		
+
 		private CompleterTask(WordCompleter completer, String partial)
 		{
 			_completer = completer;
 			_partial = partial;
 		}
-		
+
 		@Override
-		public String[] execute(TaskProgressListener progressListener)
-				throws Exception
+		public String[] execute(TaskProgressListener progressListener) throws Exception
 		{
 			return _completer.completions(_partial);
 		}
@@ -534,24 +488,22 @@ public class CommandField extends JTextField
 			return true;
 		}
 	}
-	
-	private class CompletionFinisher
-		implements TaskCompletionListener<String[]>
+
+	private class CompletionFinisher implements TaskCompletionListener<String[]>
 	{
 		private String _lastWord;
 		private String _right;
-		private Token []_words;
+		private Token[] _words;
 		private String _originalLeft;
-		
-		private CompletionFinisher(String lastWord, String right,
-			Token []words, String originalLeft)
+
+		private CompletionFinisher(String lastWord, String right, Token[] words, String originalLeft)
 		{
 			_lastWord = lastWord;
 			_right = right;
 			_words = words;
 			_originalLeft = originalLeft;
 		}
-		
+
 		@Override
 		public void taskCancelled(Task<String[]> task)
 		{
@@ -566,32 +518,25 @@ public class CommandField extends JTextField
 		public void taskCompleted(Task<String[]> task, String[] completions)
 		{
 			String newWord;
-			
-			try
-			{
-				if (completions == null || completions.length == 0)
-				{
+
+			try {
+				if (completions == null || completions.length == 0) {
 					setText(_originalLeft + _right);
 					getCaret().setDot(_originalLeft.length());
 					Toolkit.getDefaultToolkit().beep();
-				} else
-				{
+				} else {
 					if (completions.length == 1)
-						newWord = insertEscapesOrQuotes(
-							_lastWord.startsWith("\""), completions[0]);
-					else
-					{
+						newWord = insertEscapesOrQuotes(_lastWord.startsWith("\""), completions[0]);
+					else {
 						_display.start();
 						_display.header().println("Completions:\n");
-						
+
 						for (String completion : completions)
 							_display.output().format("\t%s\n", completion);
-						
-						newWord = insertEscapesOrQuotes(
-							_lastWord.startsWith("\""),
-							findCommonStart(completions));
+
+						newWord = insertEscapesOrQuotes(_lastWord.startsWith("\""), findCommonStart(completions));
 					}
-					
+
 					StringBuilder builder = new StringBuilder();
 					for (int lcv = 0; lcv < _words.length - 1; lcv++)
 						builder.append(_words[lcv].token());
@@ -605,9 +550,7 @@ public class CommandField extends JTextField
 					setText(builder.toString());
 					getCaret().setDot(position);
 				}
-			}
-			finally
-			{
+			} finally {
 				setEnabled(true);
 				requestFocusInWindow();
 			}
@@ -618,27 +561,25 @@ public class CommandField extends JTextField
 		{
 			setEnabled(true);
 			requestFocusInWindow();
-			_display.error().println(
-				"Unable to generate completions.");
+			_display.error().println("Unable to generate completions.");
 			setText(_originalLeft + _right);
 			getCaret().setDot(_originalLeft.length());
 		}
 	}
-	
+
 	private class CommandExecutionTask extends AbstractTask<Integer>
 	{
 		private String _line;
 		private LineBasedReader _reader;
-		
+
 		private CommandExecutionTask(String line, LineBasedReader reader)
 		{
 			_line = line;
 			_reader = reader;
 		}
-		
+
 		@Override
-		public Integer execute(TaskProgressListener progressListener)
-				throws Exception
+		public Integer execute(TaskProgressListener progressListener) throws Exception
 		{
 			_executionContext.executeCommand(_line, _display, _reader);
 			return null;
@@ -650,32 +591,26 @@ public class CommandField extends JTextField
 			return false;
 		}
 	}
-	
-	private class CommandCompletionListener
-		implements TaskCompletionListener<Integer>
+
+	private class CommandCompletionListener implements TaskCompletionListener<Integer>
 	{
 		private void finishCommand()
 		{
 			Closeable token = null;
-			
-			try
-			{
-				token = ContextManager.temporarilyAssumeContext(
-					_uiContext.callingContext());
-				_label.setText(
-					UserPreferences.preferences().shellPrompt().toString());
+
+			try {
+				token = ContextManager.temporarilyAssumeContext(_uiContext.callingContext());
+				_label.setText(UserPreferences.preferences().shellPrompt().toString());
 				_reader = null;
 				CommandField.this.requestFocusInWindow();
 				CommandField.this.setEditable(true);
 				_executing = false;
-				
-			}
-			finally
-			{
+
+			} finally {
 				StreamUtils.close(token);
 			}
 		}
-		
+
 		@Override
 		public void taskCancelled(Task<Integer> task)
 		{

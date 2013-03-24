@@ -7,7 +7,8 @@ import java.io.Serializable;
 public interface JSDLFileSystem extends Serializable
 {
 	public File relativeTo(String relativePath) throws IOException;
+
 	public void release();
-	
+
 	public File getMountPoint();
 }

@@ -10,58 +10,46 @@ import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.FileSystemFacet;
 import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
 
-public class DefaultFileSystemFacet extends DefaultPersonalityFacet implements
-		FileSystemFacet
+public class DefaultFileSystemFacet extends DefaultPersonalityFacet implements FileSystemFacet
 {
 	@Override
-	public void consumeDescription(Object currentUnderstanding,
-			String description) throws JSDLException
+	public void consumeDescription(Object currentUnderstanding, String description) throws JSDLException
 	{
 	}
 
 	@Override
-	public void consumeDiskSpace(Object currentUnderstanding,
-			RangeExpression diskSpace) throws JSDLException
+	public void consumeDiskSpace(Object currentUnderstanding, RangeExpression diskSpace) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLConstants.JSDL_NS, "DiskSpace"));
+		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "DiskSpace"));
 	}
 
 	@Override
-	public void consumeFileSystemType(Object currentUnderstanding,
-			FileSystemTypeEnumeration fileSystemType) throws JSDLException
+	public void consumeFileSystemType(Object currentUnderstanding, FileSystemTypeEnumeration fileSystemType)
+		throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLConstants.JSDL_NS, "FileSystemType"));
+		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "FileSystemType"));
 	}
 
 	@Override
-	public void consumeMountPoint(Object currentUnderstanding,
-			String mountPoint) throws JSDLException
+	public void consumeMountPoint(Object currentUnderstanding, String mountPoint) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLConstants.JSDL_NS, "MountPoint"));
+		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "MountPoint"));
 	}
 
 	@Override
-	public void consumeMountSource(Object currentUnderstanding,
-			String mountSource) throws JSDLException
+	public void consumeMountSource(Object currentUnderstanding, String mountSource) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLConstants.JSDL_NS, "MountSource"));
+		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "MountSource"));
 	}
 
 	@Override
-	public void consumeName(Object currentUnderstanding,
-			String name) throws JSDLException
+	public void consumeName(Object currentUnderstanding, String name) throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(
-			new QName(JSDLConstants.JSDL_NS, "Name"));
+		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "Name"));
 	}
-	
+
 	@Override
-	public void consumeUniqueID(Object currentUnderstanding,
-		String uniqueID) throws JSDLException
+	public void consumeUniqueID(Object currentUnderstanding, String uniqueID) throws JSDLException
 	{
 		// Ignore
 	}

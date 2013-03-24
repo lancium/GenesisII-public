@@ -31,76 +31,69 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 
 final public class AttributePackage
 {
-	private HashMap<QName, IAttributeManipulator> _manipulators =
-		new HashMap<QName, IAttributeManipulator>();
-	
+	private HashMap<QName, IAttributeManipulator> _manipulators = new HashMap<QName, IAttributeManipulator>();
+
 	final public void addManipulator(IAttributeManipulator manipulator)
 	{
-		synchronized(_manipulators)
-		{
+		synchronized (_manipulators) {
 			_manipulators.put(manipulator.getAttributeQName(), manipulator);
 		}
 	}
-	
+
 	final public ArrayList<IAttributeManipulator> getManipulators()
 	{
 		ArrayList<IAttributeManipulator> manipulators;
-		
-		synchronized(_manipulators)
-		{
-			manipulators = new ArrayList<IAttributeManipulator>(
-				_manipulators.values());
+
+		synchronized (_manipulators) {
+			manipulators = new ArrayList<IAttributeManipulator>(_manipulators.values());
 		}
-		
+
 		return manipulators;
 	}
-	
+
 	final public IAttributeManipulator getManipulator(QName attrName)
 	{
-		synchronized(_manipulators)
-		{
-			return _manipulators.get(attrName); 
+		synchronized (_manipulators) {
+			return _manipulators.get(attrName);
 		}
 	}
-	
-	final public Map<QName, Collection<MessageElement>> getUnknownAttributes(
-		IResource resource) throws ResourceException
+
+	final public Map<QName, Collection<MessageElement>> getUnknownAttributes(IResource resource) throws ResourceException
 	{
 		Map<QName, Collection<MessageElement>> map = new HashMap<QName, Collection<MessageElement>>();
 		Collection<MessageElement> attrs = resource.getUnknownAttributes();
 
-		for (MessageElement e : attrs)
-		{
+		for (MessageElement e : attrs) {
 			QName name = e.getQName();
 			Collection<MessageElement> subList = map.get(name);
 			if (subList == null)
 				map.put(name, subList = new ArrayList<MessageElement>());
 			subList.add(e);
 		}
-		
+
 		return map;
 	}
-	
-	final public void setUnknownAttributes(IResource resource, Collection<MessageElement> newAttributes) throws ResourceException
+
+	final public void setUnknownAttributes(IResource resource, Collection<MessageElement> newAttributes)
+		throws ResourceException
 	{
 		Map<QName, Collection<MessageElement>> map = new HashMap<QName, Collection<MessageElement>>();
-		for (MessageElement e : newAttributes)
-		{
+		for (MessageElement e : newAttributes) {
 			QName name = e.getQName();
 			Collection<MessageElement> subList = map.get(name);
 			if (subList == null)
 				map.put(name, subList = new ArrayList<MessageElement>());
 			subList.add(e);
 		}
-		
+
 		resource.setUnknownAttributes(map);
 	}
-	
+
 	final public void deleteUnknownAttributes(IResource resource, QName attrs) throws ResourceException
 	{
 		Set<QName> set = new HashSet<QName>();
 		set.add(attrs);
-		
+
 		resource.deleteUnknownAttributes(set);
 	}
 }

@@ -5,16 +5,14 @@ import java.util.Calendar;
 import edu.virginia.vcgr.genii.container.byteio.StreamableByteIOAttributePreFetcher;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
-public class StreamableByteIOFactoryForkAttributePreFetcher 
-	extends StreamableByteIOAttributePreFetcher<IResource>
+public class StreamableByteIOFactoryForkAttributePreFetcher extends StreamableByteIOAttributePreFetcher<IResource>
 {
 	private StreamableByteIOFactoryResourceFork _fork;
-	
-	public StreamableByteIOFactoryForkAttributePreFetcher(IResource resource,
-		StreamableByteIOFactoryResourceFork fork)
+
+	public StreamableByteIOFactoryForkAttributePreFetcher(IResource resource, StreamableByteIOFactoryResourceFork fork)
 	{
 		super(resource);
-		
+
 		_fork = fork;
 	}
 

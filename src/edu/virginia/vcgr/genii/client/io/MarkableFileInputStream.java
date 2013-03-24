@@ -11,25 +11,22 @@ public class MarkableFileInputStream extends InputStream
 	private long _markPos = -1L;
 	private File _source;
 	private RandomAccessFile _raf;
-	
+
 	private void reopen() throws FileNotFoundException
 	{
-		if (_raf == null)
-		{
+		if (_raf == null) {
 			_markPos = 0L;
 			_raf = new RandomAccessFile(_source, "r");
 		}
 	}
-	
-	public MarkableFileInputStream(File source)
-		throws FileNotFoundException
+
+	public MarkableFileInputStream(File source) throws FileNotFoundException
 	{
 		_source = source;
 		_raf = new RandomAccessFile(source, "r");
 	}
-	
-	public MarkableFileInputStream(String filename) 
-		throws FileNotFoundException
+
+	public MarkableFileInputStream(String filename) throws FileNotFoundException
 	{
 		this(new File(filename));
 	}
@@ -40,14 +37,14 @@ public class MarkableFileInputStream extends InputStream
 		_raf.close();
 		_raf = null;
 	}
-	
+
 	@Override
 	synchronized public int read() throws IOException
 	{
 		reopen();
 		return _raf.read();
 	}
-	
+
 	@Override
 	synchronized public int read(byte[] b) throws IOException
 	{
@@ -73,15 +70,12 @@ public class MarkableFileInputStream extends InputStream
 	@Override
 	synchronized public void mark(int readlimit)
 	{
-		try
-		{
+		try {
 			if (_raf == null)
 				throw new RuntimeException("Stream is closed.");
-			
+
 			_markPos = _raf.getFilePointer();
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new RuntimeException("Unable to mark position.", ioe);
 		}
 	}
@@ -98,7 +92,7 @@ public class MarkableFileInputStream extends InputStream
 		reopen();
 		if (_markPos < 0)
 			throw new IOException("Mark not set.");
-		
+
 		_raf.seek(_markPos);
 		_markPos = -1L;
 	}

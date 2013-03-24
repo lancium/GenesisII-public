@@ -15,58 +15,56 @@ import edu.virginia.vcgr.genii.context.ContextType;
  * IDPLogin
  * logout (username-password token)
  */
-public class XSEDELoginTool extends BaseLoginTool{
+public class XSEDELoginTool extends BaseLoginTool
+{
 
 	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dlogin";
-	static private final String _USAGE_RESOURCE = 
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ulogin";
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/login";
-	
-	protected XSEDELoginTool(String description, String usage, boolean isHidden) {
+	static private final String _USAGE_RESOURCE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/ulogin";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/login";
+
+	protected XSEDELoginTool(String description, String usage, boolean isHidden)
+	{
 		super(description, usage, isHidden);
 		overrideCategory(ToolCategory.SECURITY);
 	}
 
-	public XSEDELoginTool() {
+	public XSEDELoginTool()
+	{
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		overrideCategory(ToolCategory.SECURITY);
 		addManPage(new FileResource(_MANPAGE));
 	}
 
 	@Override
-	protected void verify() throws ToolException {
-		// TODO Auto-generated method stub
-		
+	protected void verify() throws ToolException
+	{
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 
 		// get the local identity's key material (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext(false);
+		ICallingContext callContext = ContextManager.getCurrentContext();
 		if (callContext == null) {
 			callContext = new CallingContextImpl(new ContextType());
 		}
 
-	
-		//Make sure we have username/password set if they were not passed in
+		// Make sure we have username/password set if they were not passed in
 		aquireUsername();
 		aquirePassword();
-		
-		//Do a myproxy login (will replace tool identity)
+
+		// Do a myproxy login (will replace tool identity)
 		MyProxyLoginTool mpTool = new MyProxyLoginTool();
 		BaseLoginTool.copyCreds(this, mpTool);
 		mpTool.run(stdout, stderr, stdin);
-		
-		//Do a normal login
+
+		// Do a normal login
 		LoginTool lTool = new LoginTool();
 		BaseLoginTool.copyCreds(this, lTool);
 		lTool.run(stdout, stderr, stdin);
-		
-		
+
 		return 0;
 	}
-	
-	
+
 }

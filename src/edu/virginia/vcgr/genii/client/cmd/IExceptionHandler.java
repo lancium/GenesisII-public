@@ -4,6 +4,5 @@ import java.io.Writer;
 
 public interface IExceptionHandler
 {
-	public int handleException(Throwable cause,
-		Writer errorStream);
+	public int handleException(Throwable cause, Writer errorStream);
 }

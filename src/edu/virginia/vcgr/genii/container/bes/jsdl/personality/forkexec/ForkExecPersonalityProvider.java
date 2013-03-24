@@ -11,29 +11,24 @@ public class ForkExecPersonalityProvider extends CommonPersonalityProvider
 {
 	private FilesystemManager _fsManager;
 	private BESWorkingDirectory _workingDirectory;
-	
-	public ForkExecPersonalityProvider(FilesystemManager fsManager,
-		BESWorkingDirectory workingDirectory)
+
+	public ForkExecPersonalityProvider(FilesystemManager fsManager, BESWorkingDirectory workingDirectory)
 	{
 		super(fsManager);
-		
+
 		_fsManager = fsManager;
 		_workingDirectory = workingDirectory;
 	}
-	
+
 	@Override
-	public POSIXApplicationFacet getPOSIXApplicationFacet(
-		Object currentUnderstanding) throws JSDLException
+	public POSIXApplicationFacet getPOSIXApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{
-		return new ForkExecPOSIXApplicationFacet(
-			_fsManager, _workingDirectory);
+		return new ForkExecPOSIXApplicationFacet(_fsManager, _workingDirectory);
 	}
-	
+
 	@Override
-	public HPCApplicationFacet getHPCApplicationFacet(
-		Object currentUnderstanding) throws JSDLException
+	public HPCApplicationFacet getHPCApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{
-		return new ForkExecHPCApplicationFacet(
-			_fsManager, _workingDirectory);
+		return new ForkExecHPCApplicationFacet(_fsManager, _workingDirectory);
 	}
 }

@@ -12,25 +12,22 @@ import edu.virginia.vcgr.xscript.XScriptContext;
 
 public class BlockStatement implements ParseStatement
 {
-	private Collection<ParseStatement> _statements = 
-		new LinkedList<ParseStatement>();
-	
+	private Collection<ParseStatement> _statements = new LinkedList<ParseStatement>();
+
 	public void addStatement(ParseStatement stmt)
 	{
 		_statements.add(stmt);
 	}
-	
+
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
 	{
 		Object result = null;
-		
-		for (ParseStatement stmt : _statements)
-		{
+
+		for (ParseStatement stmt : _statements) {
 			result = stmt.evaluate(context);
 		}
-		
+
 		return result;
 	}
 }

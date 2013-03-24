@@ -4,6 +4,5 @@ import javax.script.ScriptException;
 
 public interface ParseContext
 {
-	public ParseHandler findHandler(String namespace)
-		throws ScriptException;
+	public ParseHandler findHandler(String namespace) throws ScriptException;
 }

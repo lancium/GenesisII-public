@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface CommandParameter
-{
+public @interface CommandParameter {
 	String value();
+
 	String description() default "";
 }

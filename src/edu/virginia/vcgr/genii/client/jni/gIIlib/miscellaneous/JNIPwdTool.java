@@ -10,13 +10,10 @@ public class JNIPwdTool extends JNILibraryBase
 	public static String getCurrentDirectory()
 	{
 		tryToInitialize();
-		
-		try 
-		{
+
+		try {
 			return RNSPath.getCurrent().getName();
-		}
-		catch (ConfigurationException e) 
-		{			
+		} catch (ConfigurationException e) {
 			return "no context";
 		}
 	}

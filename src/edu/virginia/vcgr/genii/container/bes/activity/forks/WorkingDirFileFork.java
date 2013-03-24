@@ -9,13 +9,13 @@ import java.util.Calendar;
 
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 {
@@ -24,34 +24,29 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 		File ret;
 		String relativePath = getForkPath();
 		if (!relativePath.startsWith(WorkingDirectoryFork.FORK_BASE_PATH))
-			throw new FileNotFoundException(String.format(
-				"Invalid fork path specified (%s).", relativePath));
-		relativePath = relativePath.substring(
-			WorkingDirectoryFork.FORK_BASE_PATH.length());
-		
+			throw new FileNotFoundException(String.format("Invalid fork path specified (%s).", relativePath));
+		relativePath = relativePath.substring(WorkingDirectoryFork.FORK_BASE_PATH.length());
+
 		if (relativePath.length() > 0 && relativePath.startsWith("/"))
 			relativePath = relativePath.substring(1);
-		
-		IBESActivityResource resource = 
-			(IBESActivityResource)getService().getResourceKey().dereference();
-		
+
+		IBESActivityResource resource = (IBESActivityResource) getService().getResourceKey().dereference();
+
 		BESActivity activity = resource.findActivity();
 		BESWorkingDirectory workingDir = activity.getActivityCWD();
 		if (relativePath.length() == 0)
 			ret = workingDir.getWorkingDirectory();
 		else
 			ret = new File(workingDir.getWorkingDirectory(), relativePath);
-		
+
 		if (!ret.exists())
-			throw new FileNotFoundException(String.format(
-				"Couldn't find path \"%s\".", getForkPath()));
+			throw new FileNotFoundException(String.format("Couldn't find path \"%s\".", getForkPath()));
 		if (!ret.isFile())
-			throw new IOException(String.format(
-				"Target \"%s\" is not a file.", getForkPath()));
-		
+			throw new IOException(String.format("Target \"%s\" is not a file.", getForkPath()));
+
 		return ret;
 	}
-	
+
 	public WorkingDirFileFork(ResourceForkService service, String forkPath)
 	{
 		super(service, forkPath);
@@ -62,15 +57,12 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 	public void read(long offset, ByteBuffer dest) throws IOException
 	{
 		RandomAccessFile raf = null;
-		
-		try
-		{
+
+		try {
 			raf = new RandomAccessFile(getTargetFile(), "r");
 			raf.seek(offset);
 			raf.getChannel().read(dest);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(raf);
 		}
 	}
@@ -80,16 +72,13 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 	public void truncAppend(long offset, ByteBuffer source) throws IOException
 	{
 		RandomAccessFile raf = null;
-		
-		try
-		{
+
+		try {
 			raf = new RandomAccessFile(getTargetFile(), "rw");
 			raf.setLength(offset);
 			raf.seek(offset);
 			raf.getChannel().write(source);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(raf);
 		}
 	}
@@ -99,15 +88,12 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 	public void write(long offset, ByteBuffer source) throws IOException
 	{
 		RandomAccessFile raf = null;
-		
-		try
-		{
+
+		try {
 			raf = new RandomAccessFile(getTargetFile(), "rw");
 			raf.seek(offset);
 			raf.getChannel().write(source);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(raf);
 		}
 	}
@@ -141,16 +127,13 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 	public Calendar modificationTime()
 	{
 		Calendar c = Calendar.getInstance();
-		try
-		{
+		try {
 			File file = getTargetFile();
 			c.setTimeInMillis(file.lastModified());
-		}
-		catch (IOException cause)
-		{
+		} catch (IOException cause) {
 			return c;
 		}
-		
+
 		return c;
 	}
 
@@ -165,12 +148,9 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 	@RWXMapping(RWXCategory.READ)
 	public boolean readable()
 	{
-		try
-		{
+		try {
 			return getTargetFile().canRead();
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			return false;
 		}
 	}
@@ -179,12 +159,9 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 	@RWXMapping(RWXCategory.READ)
 	public long size()
 	{
-		try
-		{
+		try {
 			return getTargetFile().length();
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			return 0L;
 		}
 	}
@@ -193,12 +170,9 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 	@RWXMapping(RWXCategory.READ)
 	public boolean writable()
 	{
-		try
-		{
+		try {
 			return getTargetFile().canWrite();
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			return false;
 		}
 	}

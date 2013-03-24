@@ -13,22 +13,20 @@ public class GetServerPort
 	{
 		System.out.print(_USAGE + "\n");
 	}
-	
+
 	static public int getServerPort(String deployName)
 	{
 		System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deployName);
 		String userDir = GetUserDir.getUserDir();
-		ConfigurationManager configurationManager = 
-			ConfigurationManager.initializeConfiguration(userDir);
+		ConfigurationManager configurationManager = ConfigurationManager.initializeConfiguration(userDir);
 		ContainerConfiguration serverConf = new ContainerConfiguration(configurationManager);
-		
+
 		return serverConf.getListenPort();
 	}
-	
-	static public void main(String [] args)
+
+	static public void main(String[] args)
 	{
-		if (args.length != 1)
-		{
+		if (args.length != 1) {
 			printUsage();
 			return;
 		}

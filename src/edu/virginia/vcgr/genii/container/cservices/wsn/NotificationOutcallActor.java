@@ -28,89 +28,73 @@ import edu.virginia.vcgr.genii.container.cservices.percall.OutcallActor;
 public class NotificationOutcallActor implements OutcallActor
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private ICallingContext _callingContext;
-	private Collection<NotificationMessageOutcallContent> _contents =
-		new LinkedList<NotificationMessageOutcallContent>();
+	private Collection<NotificationMessageOutcallContent> _contents = new LinkedList<NotificationMessageOutcallContent>();
 	private boolean _persistent;
-	
-	public NotificationOutcallActor(
-		NotificationMessageOutcallContent...contents) 
-			throws FileNotFoundException, IOException
+
+	public NotificationOutcallActor(NotificationMessageOutcallContent... contents) throws FileNotFoundException, IOException
 	{
-		_callingContext = ContextManager.getCurrentContext().deriveNewContext();
-		
+		_callingContext = ContextManager.getExistingContext().deriveNewContext();
+
 		for (NotificationMessageOutcallContent content : contents)
 			_contents.add(content);
 	}
-	
+
 	final public void add(NotificationMessageOutcallContent content)
 	{
 		_contents.add(content);
 	}
-	
+
 	public void setPersistent(boolean persistent)
 	{
 		_persistent = persistent;
 	}
-	
+
 	@Override
-	public boolean enactOutcall(ICallingContext callingContext,
-		EndpointReferenceType target, GeniiAttachment attachment) throws Throwable
+	public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target, GeniiAttachment attachment)
+		throws Throwable
 	{
-		Collection<NotificationMessageHolderType> holders =
-			new ArrayList<NotificationMessageHolderType>(
-				_contents.size());
-		
+		Collection<NotificationMessageHolderType> holders = new ArrayList<NotificationMessageHolderType>(_contents.size());
+
 		List<MessageElement> messageElements = new ArrayList<MessageElement>();
 		int messageIndex = 0;
 		MessageElement[] additionalAttributes = null;
-		
-		for (NotificationMessageOutcallContent content : _contents)
-		{
-			NotificationMessageHolder holder = new NotificationMessageHolder(
-				content.subscriptionReference(), content.publisher(),
-				content.topic(), content.contents());
+
+		for (NotificationMessageOutcallContent content : _contents) {
+			NotificationMessageHolder holder = new NotificationMessageHolder(content.subscriptionReference(),
+				content.publisher(), content.topic(), content.contents());
 			holders.add(holder.toAxisType());
 			additionalAttributes = content.contents().getAdditionalAttributes();
 
-			// If there are additional attributes in the notification message then 
-			// retrieve those, add the attributes separator element, and finally 
+			// If there are additional attributes in the notification message then
+			// retrieve those, add the attributes separator element, and finally
 			// add all the attributes in the collections. The separator is subsequently
 			// used to determine which attribute belongs to what message.
 			if (additionalAttributes != null && additionalAttributes.length > 0) {
-				messageElements.add(new MessageElement(
-						GenesisIIConstants.NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR, 
-						messageIndex));
+				messageElements.add(new MessageElement(GenesisIIConstants.NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR,
+					messageIndex));
 				messageElements.addAll(Arrays.asList(additionalAttributes));
 			}
 			messageIndex++;
 		}
-		
-		Notify notify = new Notify(
-			holders.toArray(new NotificationMessageHolderType[holders.size()]),
-			null);
-		notify.set_any(messageElements.toArray(
-				new MessageElement[messageElements.size()]));
-		
-		GeniiCommon common = ClientUtils.createProxy(
-			GeniiCommon.class, target,
-			(callingContext == null) ? _callingContext : callingContext);
-		if (attachment != null)
-		{
+
+		Notify notify = new Notify(holders.toArray(new NotificationMessageHolderType[holders.size()]), null);
+		notify.set_any(messageElements.toArray(new MessageElement[messageElements.size()]));
+
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, target, (callingContext == null) ? _callingContext
+			: callingContext);
+		if (attachment != null) {
 			Collection<GeniiAttachment> attachments = new LinkedList<GeniiAttachment>();
 			attachments.add(attachment);
 			ClientUtils.setAttachments(common, attachments, AttachmentType.MTOM);
 		}
-		if (_persistent)
-		{
+		if (_persistent) {
 			NotifyResponseType response = common.notifyWithResponse(notify);
-			if ((response != null) && (response.getStatus() != null) &&
-				(response.getStatus().toString().equals(NotificationConstants.TRYAGAIN)))
+			if ((response != null) && (response.getStatus() != null)
+				&& (response.getStatus().toString().equals(NotificationConstants.TRYAGAIN)))
 				return false;
-		}
-		else
-		{
+		} else {
 			common.notify(notify);
 		}
 		return true;

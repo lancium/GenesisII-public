@@ -60,7 +60,7 @@ import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
-import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.AbstractSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
@@ -76,8 +76,8 @@ import edu.virginia.vcgr.genii.container.q2.iterator.QueueInMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
-import edu.virginia.vcgr.genii.security.credentials.GIICredential;
-import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.security.credentials.NuCredential;
+import edu.virginia.vcgr.genii.security.identity.Identity;
 
 /**
  * The Job Manager class is the main class to handle adding/removing/managing jobs in the queue. It
@@ -198,7 +198,8 @@ public class JobManager implements Closeable
 	 */
 	synchronized private void loadFromDatabase(Connection connection) throws SQLException, ResourceException
 	{
-		_logger.debug("Starting to reload jobs from the database.");
+		if (_logger.isDebugEnabled())
+			_logger.debug("Starting to reload jobs from the database.");
 
 		/*
 		 * Ask the database for a list of all jobs stored in the database for this queue.
@@ -254,7 +255,8 @@ public class JobManager implements Closeable
 
 				} else if (jobState.equals(QueueStates.RUNNING) || job.getBESID() != null) {
 					if (!jobState.equals(QueueStates.RUNNING)) {
-						_logger.debug("Found a job not marked as running in the database, but with a bes id.");
+						if (_logger.isDebugEnabled())
+							_logger.debug("Found a job not marked as running in the database, but with a bes id.");
 						job.setJobState(QueueStates.RUNNING);
 					}
 					/*
@@ -274,7 +276,8 @@ public class JobManager implements Closeable
 			}
 		}
 
-		_logger.debug("Finished reloading jobs from the database.");
+		if (_logger.isDebugEnabled())
+			_logger.debug("Finished reloading jobs from the database.");
 
 		/*
 		 * Finally, we have to actually fail all of the jobs that were marked as starting.
@@ -312,9 +315,11 @@ public class JobManager implements Closeable
 			return ret;
 		}
 
-		_logger.debug(String.format("Failing job %s(%s, %s, %s)", job, countAsAnAttempt ? "This failure counts against the job"
-			: "This failure does NOT count against the job", isPermanent ? "Failure is permanent" : "Failure is NOT permanent",
-			attemptKill ? "Attempting to kill the job" : "NOT attempting to kill the job"));
+		if (_logger.isDebugEnabled())
+			_logger.debug(String.format("Failing job %s(%s, %s, %s)", job,
+				countAsAnAttempt ? "This failure counts against the job" : "This failure does NOT count against the job",
+				isPermanent ? "Failure is permanent" : "Failure is NOT permanent", attemptKill ? "Attempting to kill the job"
+					: "NOT attempting to kill the job"));
 
 		/* Increment his attempt count if this counts against him. */
 		if (countAsAnAttempt) {
@@ -347,7 +352,9 @@ public class JobManager implements Closeable
 			job.history(HistoryEventCategory.Terminating).error("Maximum Attempts Reached");
 
 			// We can't run this job any more.
-			_logger.debug(String.format("Moving job %s to ERROR state because we exceeded the maximum retry attempts.", job));
+			if (_logger.isDebugEnabled())
+				_logger.debug(String
+					.format("Moving job %s to ERROR state because we exceeded the maximum retry attempts.", job));
 			newState = QueueStates.ERROR;
 		} else {
 			job.history(HistoryEventCategory.ReQueing).createTraceWriter("Re-queuing Job")
@@ -355,12 +362,14 @@ public class JobManager implements Closeable
 				.close();
 
 			/* Otherwise, we'll just requeue him */
-			_logger.debug(String.format("Requeueing job %s because we has more attempts left.", job));
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Requeueing job %s because we has more attempts left.", job));
 			newState = QueueStates.REQUEUED;
 			ret = true;
 		}
 
-		_logger.debug(String.format("Job %s's new states is %s", job, newState));
+		if (_logger.isDebugEnabled())
+			_logger.debug(String.format("Job %s's new states is %s", job, newState));
 
 		// This is one of the few times we are going to break our pattern and
 		// modify the in memory state before the database. The reason for this
@@ -416,11 +425,13 @@ public class JobManager implements Closeable
 		JobData job = _jobsByID.get(new Long(jobID));
 		if (job == null) {
 			// don't know where it went, but it's no longer our responsibility.
-			_logger.debug(String.format("Couldn't find job for id %d, so I can't finish it.", jobID));
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Couldn't find job for id %d, so I can't finish it.", jobID));
 			return;
 		}
 
-		_logger.debug("Finished job " + job);
+		if (_logger.isDebugEnabled())
+			_logger.debug("Finished job " + job);
 
 		Connection connection = null;
 
@@ -452,7 +463,8 @@ public class JobManager implements Closeable
 		 * See failJob for a complete discussion of why we enqueue an outcall worker at this point
 		 * -- the reasons are the same.
 		 */
-		_logger.debug(String.format("Creating a JobKiller for finished job %s.", job));
+		if (_logger.isDebugEnabled())
+			_logger.debug(String.format("Creating a JobKiller for finished job %s.", job));
 
 		String besName = null;
 		Long besID = job.getBESID();
@@ -469,11 +481,13 @@ public class JobManager implements Closeable
 		JobData job = _jobsByID.get(new Long(jobID));
 		if (job == null) {
 			// don't know where it went, but it's no longer our responsibility.
-			_logger.debug(String.format("Couldn't find job for id %d, so I can't kill it.", jobID));
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Couldn't find job for id %d, so I can't kill it.", jobID));
 			return;
 		}
 
-		_logger.debug("Killing a running job:" + jobID);
+		if (_logger.isDebugEnabled())
+			_logger.debug("Killing a running job:" + jobID);
 
 		// This is one of the few times we are going to break our pattern and
 		// modify the in memory state before the database. The reason for this
@@ -505,7 +519,8 @@ public class JobManager implements Closeable
 		/*
 		 * Otherwise, we assume that he's already in the right list
 		 */
-		_logger.debug("Moving job \"" + job.getJobTicket() + "\" to the " + QueueStates.FINISHED + " state.");
+		if (_logger.isDebugEnabled())
+			_logger.debug("Moving job \"" + job.getJobTicket() + "\" to the " + QueueStates.FINISHED + " state.");
 
 		String besName = null;
 		if (besID != null)
@@ -552,7 +567,7 @@ public class JobManager implements Closeable
 			 * Go ahead and get the current caller's calling context. We store this so that we can
 			 * make outcalls in the future on his/her behalf.
 			 */
-			ICallingContext callingContext = ContextManager.getCurrentContext(false);
+			ICallingContext callingContext = ContextManager.getExistingContext();
 
 			/*
 			 * Similarly, get the current caller's security identity so that we can store that. This
@@ -594,7 +609,8 @@ public class JobManager implements Closeable
 			 * here on out.
 			 */
 
-			_logger.debug("Submitted job \"" + ticket + "\" as job number " + jobID);
+			if (_logger.isDebugEnabled())
+				_logger.debug("Submitted job \"" + ticket + "\" as job number " + jobID);
 
 			/*
 			 * Create a new data structure for the job's in memory information and put it into the
@@ -631,7 +647,8 @@ public class JobManager implements Closeable
 
 			return ticket;
 		} catch (IOException ioe) {
-			_logger.debug("Failed to submit job from jsdl: " + jsdl.toString());
+			if (_logger.isDebugEnabled())
+				_logger.debug("Failed to submit job from jsdl: " + jsdl.toString());
 			throw new ResourceException("Unable to submit job.", ioe);
 		}
 	}
@@ -1058,8 +1075,7 @@ public class JobManager implements Closeable
 			HashMap<Long, PartialJobInfo> ownerMap;
 
 			// iterator has to be built
-			if (jobIDs.size() > QueueConstants.PREFERRED_BATCH_SIZE)
-			{
+			if (jobIDs.size() > QueueConstants.PREFERRED_BATCH_SIZE) {
 				for (int lcv = 0; lcv < QueueConstants.PREFERRED_BATCH_SIZE; lcv++) {
 					batchSubset.add(it.next());
 				}
@@ -1169,8 +1185,7 @@ public class JobManager implements Closeable
 				PartialJobInfo pji = ownerMap.get(jobID);
 
 				// is the caller the owner of this job?
-				if (QueueSecurity.isOwner(pji.getOwners(), callers))
-				{
+				if (QueueSecurity.isOwner(pji.getOwners(), callers)) {
 					toIterate.add(jobID.toString());
 				}
 
@@ -1210,8 +1225,7 @@ public class JobManager implements Closeable
 			Collection<Long> batchSubset = new LinkedList<Long>();
 
 			// iterator will be built
-			if (_jobsByID.size() > QueueConstants.PREFERRED_BATCH_SIZE)
-			{
+			if (_jobsByID.size() > QueueConstants.PREFERRED_BATCH_SIZE) {
 				for (int lcv = 0; lcv < QueueConstants.PREFERRED_BATCH_SIZE; lcv++) {
 					// grabs the first batch-size amount of jobs
 					batchSubset.add(it.next());
@@ -1298,8 +1312,7 @@ public class JobManager implements Closeable
 						PartialJobInfo pji = ownerMap.get(jobID);
 
 						// is the caller the owner of this job?
-						if (QueueSecurity.isOwner(pji.getOwners(), callers)) 
-						{
+						if (QueueSecurity.isOwner(pji.getOwners(), callers)) {
 							ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
 								JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
 								QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils
@@ -1328,8 +1341,7 @@ public class JobManager implements Closeable
 				PartialJobInfo pji = ownerMap.get(jobID);
 
 				// is the caller the owner of this job?
-				if (QueueSecurity.isOwner(pji.getOwners(), callers))
-				{
+				if (QueueSecurity.isOwner(pji.getOwners(), callers)) {
 					toIterate.add(jobID.toString());
 				}
 
@@ -1412,7 +1424,8 @@ public class JobManager implements Closeable
 		 * remove the job from all of those.
 		 */
 		for (Long jobID : jobsToComplete) {
-			_logger.debug(String.format("Completing job %d.", jobID));
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Completing job %d.", jobID));
 
 			/*
 			 * Get and remove the job information (which has the ticket needed to remove the job
@@ -1439,7 +1452,8 @@ public class JobManager implements Closeable
 	{
 		for (Long jobID : jobs) {
 			try {
-				_logger.debug(String.format("Rescheduling job %d.", jobID));
+				if (_logger.isDebugEnabled())
+					_logger.debug(String.format("Rescheduling job %d.", jobID));
 				failJob(connection, jobID, false, false, true);
 			} catch (Throwable cause) {
 				_logger.warn(String.format("Unable to \"reschedule\" job %d.", jobID), cause);
@@ -1609,7 +1623,8 @@ public class JobManager implements Closeable
 
 	synchronized public void checkJobStatus(long jobID)
 	{
-		_logger.debug("adding record to check on job status for: " + jobID);
+		if (_logger.isDebugEnabled())
+			_logger.debug("adding record to check on job status for: " + jobID);
 		_pendingChecks.add(jobID);
 	}
 
@@ -1621,7 +1636,8 @@ public class JobManager implements Closeable
 		while (_pendingChecks.size() > 0) {
 			long jobId = _pendingChecks.get(0);
 			_pendingChecks.remove(0);
-			_logger.debug("JobManager: scheduling job status check on: " + jobId);
+			if (_logger.isDebugEnabled())
+				_logger.debug("JobManager: scheduling job status check on: " + jobId);
 			scheduleAJobStatusCheck(jobId);
 		}
 		// reset for the next time to check notified statuses.
@@ -1663,8 +1679,9 @@ public class JobManager implements Closeable
 
 		int newCount = _outcallThreadPool.size();
 
-		_logger.debug(String.format("Just finished enqueing a bunch of jobs into the thread pool "
-			+ "and the thread pool size grew from %d jobs to %d jobs.", originalCount, newCount));
+		if (_logger.isDebugEnabled())
+			_logger.debug(String.format("Just finished enqueing a bunch of jobs into the thread pool "
+				+ "and the thread pool size grew from %d jobs to %d jobs.", originalCount, newCount));
 	}
 
 	synchronized public Map<String, Long> summarizeToMap()
@@ -1735,14 +1752,18 @@ public class JobManager implements Closeable
 		 */
 		for (JobData job : _runningJobs.values()) {
 			if (job == null || job.getBESID() == null) {
-				if (job == null)
-					_logger.debug(String.format("Can't check a job that is NULL."));
-				else
-					_logger.debug(String.format("Last minute decision not to check on job %s "
-						+ "status because it doesn't have a BES associated.", job));
+				if (job == null) {
+					if (_logger.isDebugEnabled())
+						_logger.debug(String.format("Can't check a job that is NULL."));
+				} else {
+					if (_logger.isDebugEnabled())
+						_logger.debug(String.format("Last minute decision not to check on job %s "
+							+ "status because it doesn't have a BES associated.", job));
+				}
 				continue;
 			} else {
-				_logger.debug(String.format("Starting process of checking status of running job %s", job));
+				if (_logger.isDebugEnabled())
+					_logger.debug(String.format("Starting process of checking status of running job %s", job));
 			}
 
 			HistoryContext history = job.history(HistoryEventCategory.Checking);
@@ -1771,8 +1792,9 @@ public class JobManager implements Closeable
 
 		int newCount = _outcallThreadPool.size();
 
-		_logger.debug(String.format("Just finished enqueing a bunch of jobs into the thread pool "
-			+ "and the thread pool size grew from %d jobs to %d jobs.", originalCount, newCount));
+		if (_logger.isDebugEnabled())
+			_logger.debug(String.format("Just finished enqueing a bunch of jobs into the thread pool "
+				+ "and the thread pool size grew from %d jobs to %d jobs.", originalCount, newCount));
 	}
 
 	/**
@@ -2203,7 +2225,7 @@ public class JobManager implements Closeable
 				if (checkResults.removedCredentials().size() > 0) {
 					PrintWriter hWriter = history.createErrorWriter("Job Credentials Expired");
 					hWriter.println("The following credentials expired:");
-					for (GIICredential cred : checkResults.removedCredentials())
+					for (NuCredential cred : checkResults.removedCredentials())
 						hWriter.format("\t%s\n", cred.describe(VerbosityLevel.OFF));
 					hWriter.close();
 
@@ -2456,7 +2478,8 @@ public class JobManager implements Closeable
 		{
 			HistoryContext history = _jobData.history(HistoryEventCategory.Terminating);
 
-			_logger.debug(String.format("JobKiller in \"terminateActivity\" for %s.", _jobData));
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("JobKiller in \"terminateActivity\" for %s.", _jobData));
 
 			/*
 			 * Ask the database for all information needed to terminate the activity at the BES
@@ -2483,8 +2506,9 @@ public class JobManager implements Closeable
 				ICallingContext ctxt = killInfo.getCallingContext();
 
 				if (_attemptKill) {
-					_logger.debug(String.format(
-						"JobKiller::terminateActivity making the kill request for %s a persistent outcall.", _jobData));
+					if (_logger.isDebugEnabled())
+						_logger.debug(String.format(
+							"JobKiller::terminateActivity making the kill request for %s a persistent outcall.", _jobData));
 
 					PersistentOutcallJobKiller.killJob(_besName, killInfo.getBESEndpoint(),
 						_database.historyKey(_jobData.getJobTicket()), _jobData.historyToken(), killInfo.getJobEndpoint(),
@@ -2508,7 +2532,8 @@ public class JobManager implements Closeable
 		{
 			HistoryContext history = _jobData.history(HistoryEventCategory.Terminating);
 
-			_logger.debug(String.format("JobKiller running for job %s", _jobData));
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("JobKiller running for job %s", _jobData));
 
 			Connection connection = null;
 
@@ -2517,8 +2542,9 @@ public class JobManager implements Closeable
 				connection = _connectionPool.acquire(false);
 
 				if (_outcallOnly) {
-					_logger.debug(String.format("JobKiller using terminate on %s because we are flagged as \"outcallOnly\".",
-						_jobData));
+					if (_logger.isDebugEnabled())
+						_logger.debug(String.format(
+							"JobKiller using terminate on %s because we are flagged as \"outcallOnly\".", _jobData));
 					terminateActivity(connection);
 
 					/* Ask the database to update the job state */
@@ -2528,14 +2554,16 @@ public class JobManager implements Closeable
 
 					return;
 				} else {
-					_logger.debug(String.format("JobKiller not using terminate because we are not flagged as \"outcallOnly\".",
-						_jobData));
+					if (_logger.isDebugEnabled())
+						_logger.debug(String.format(
+							"JobKiller not using terminate because we are not flagged as \"outcallOnly\".", _jobData));
 				}
 
 				/* If the job is running, then we have to terminate it */
 				if (_jobData.getJobState().equals(QueueStates.RUNNING)) {
-					_logger.debug(String
-						.format("JobKiller has to terminate %s because the job is marked as running.", _jobData));
+					if (_logger.isDebugEnabled())
+						_logger.debug(String.format("JobKiller has to terminate %s because the job is marked as running.",
+							_jobData));
 					terminateActivity(connection);
 				}
 
@@ -2558,9 +2586,11 @@ public class JobManager implements Closeable
 					history.createInfoWriter("Re-queing Job")
 						.format("Next available run time is %tc.", _jobData.getNextCanRun()).close();
 
-					_logger.debug("Re-queing job " + _jobData.getJobTicket());
+					if (_logger.isDebugEnabled())
+						_logger.debug("Re-queing job " + _jobData.getJobTicket());
 					synchronized (JobManager.this) {
-						_logger.debug(String.format("Re-queuing job %s in the JobKiller.", _jobData));
+						if (_logger.isDebugEnabled())
+							_logger.debug(String.format("Re-queuing job %s in the JobKiller.", _jobData));
 
 						// Retrieve owner identities and extract primary username
 						Collection<Long> jobID = new ArrayList<Long>();
@@ -2581,7 +2611,8 @@ public class JobManager implements Closeable
 					/*
 					 * Otherwise, we assume that he's already in the right list
 					 */
-					_logger.debug("Moving job \"" + _jobData + "\" to the " + _newState + " state.");
+					if (_logger.isDebugEnabled())
+						_logger.debug("Moving job \"" + _jobData + "\" to the " + _newState + " state.");
 				}
 
 				/*

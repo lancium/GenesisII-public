@@ -7,6 +7,5 @@ import edu.virginia.vcgr.xscript.XScriptContext;
 
 public interface ConditionExpression extends ParseStatement
 {
-	public boolean evaluateCondition(XScriptContext context)
-		throws ScriptException;
+	public boolean evaluateCondition(XScriptContext context) throws ScriptException;
 }

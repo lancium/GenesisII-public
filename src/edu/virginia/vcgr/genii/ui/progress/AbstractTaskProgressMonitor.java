@@ -6,42 +6,36 @@ import java.util.LinkedList;
 
 abstract class AbstractTaskProgressMonitor implements ProgressMonitor
 {
-	private Collection<ProgressMonitorListener> _listeners =
-		new LinkedList<ProgressMonitorListener>();
-	
+	private Collection<ProgressMonitorListener> _listeners = new LinkedList<ProgressMonitorListener>();
+
 	final protected void fireTaskStarted()
 	{
 		Collection<ProgressMonitorListener> listeners;
-		
-		synchronized(_listeners)
-		{
-			listeners = new ArrayList<ProgressMonitorListener>(
-				_listeners);
+
+		synchronized (_listeners) {
+			listeners = new ArrayList<ProgressMonitorListener>(_listeners);
 		}
-		
+
 		for (ProgressMonitorListener listener : listeners)
 			listener.taskStarted();
 	}
-	
+
 	final protected void fireTaskCompleted()
 	{
 		Collection<ProgressMonitorListener> listeners;
-		
-		synchronized(_listeners)
-		{
-			listeners = new ArrayList<ProgressMonitorListener>(
-				_listeners);
+
+		synchronized (_listeners) {
+			listeners = new ArrayList<ProgressMonitorListener>(_listeners);
 		}
-		
+
 		for (ProgressMonitorListener listener : listeners)
 			listener.taskCompleted();
 	}
-	
+
 	@Override
 	final public void addProgressMonitorListener(ProgressMonitorListener listener)
 	{
-		synchronized (_listeners)
-		{
+		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
@@ -49,8 +43,7 @@ abstract class AbstractTaskProgressMonitor implements ProgressMonitor
 	@Override
 	final public void removeProgressMonitorListener(ProgressMonitorListener listener)
 	{
-		synchronized (_listeners)
-		{
+		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}

@@ -45,9 +45,9 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.BlobLimits;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
-import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
-import edu.virginia.vcgr.genii.security.WSSecurityUtils;
+import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.axis.WSSecurityUtils;
 
 import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.*;
 import org.w3.www.ns.ws_policy.*;
@@ -56,74 +56,57 @@ public class EPRUtils
 {
 	static private Log _logger = LogFactory.getLog(EPRUtils.class);
 
-	static public final String GENII_CONTAINER_ID_PARAMETER =
-		"genii-container-id";
-	static private final Pattern GENII_CONTAINER_ID_PATTERN = 
-		Pattern.compile(String.format("%s=([-a-fA-F0-9]+)",
-			Pattern.quote(GENII_CONTAINER_ID_PARAMETER)));
-	
-	static public final String GENII_SHORT_PARAMETER_NAME =
-		"genii-short-parameter";
-	static private final Pattern GENII_SHORT_PARAMTER_PATTERN =
-		Pattern.compile(String.format("%s=([-a-fA-F0-9:]+)",
-			Pattern.quote(GENII_SHORT_PARAMETER_NAME)));
-	
+	static public final String GENII_CONTAINER_ID_PARAMETER = "genii-container-id";
+	static private final Pattern GENII_CONTAINER_ID_PATTERN = Pattern.compile(String.format("%s=([-a-fA-F0-9]+)",
+		Pattern.quote(GENII_CONTAINER_ID_PARAMETER)));
+
+	static public final String GENII_SHORT_PARAMETER_NAME = "genii-short-parameter";
+	static private final Pattern GENII_SHORT_PARAMETER_PATTERN = Pattern.compile(String.format("%s=([-a-fA-F0-9:]+)",
+		Pattern.quote(GENII_SHORT_PARAMETER_NAME)));
+
 	/**
-	 * Generates a temporary EPR to (hopefully) obtain the full (incl.
-	 * porttypes, certs, etc.) EPR from the service's attributes. The full one
-	 * is returned if available, otherwise the temporary one is returned.
+	 * Generates a temporary EPR to (hopefully) obtain the full (incl. porttypes, certs, etc.) EPR
+	 * from the service's attributes. The full one is returned if available, otherwise the temporary
+	 * one is returned.
 	 * 
-	 * Some checking of URIs may be required to ensure that a man-in-the-middle
-	 * attack has not occured
+	 * Some checking of URIs may be required to ensure that a man-in-the-middle attack has not
+	 * occured
 	 * 
 	 * @param serviceURL
 	 * @return The EPR for the service indicated.
 	 */
-	static public EndpointReferenceType makeEPR(String serviceURL,
-			boolean retrieveFromObject)
+	static public EndpointReferenceType makeEPR(String serviceURL, boolean retrieveFromObject)
 	{
 
-		EndpointReferenceType epr =
-				new EndpointReferenceType(
-						new AttributedURITypeSmart(serviceURL), null, null,
-						null);
+		EndpointReferenceType epr = new EndpointReferenceType(new AttributedURITypeSmart(serviceURL), null, null, null);
 
-		try
-		{
+		try {
 			new URL(serviceURL);
-		}
-		catch (MalformedURLException mue)
-		{
+		} catch (MalformedURLException mue) {
 			// Not a URL
 			retrieveFromObject = false;
 		}
 
-		if (!retrieveFromObject)
-		{
+		if (!retrieveFromObject) {
 			return epr;
 		}
 
-		try
-		{
-			OGSARP rp =
-					(OGSARP) ResourcePropertyManager.createRPInterface(epr,
-							OGSARP.class);
+		try {
+			OGSARP rp = (OGSARP) ResourcePropertyManager.createRPInterface(epr, OGSARP.class);
 			return rp.getResourceEndpoint();
-		}
-		catch (Throwable t)
-		{
+		} catch (Throwable t) {
 			_logger.info("exception occurred in makeEPR", t);
 			return epr;
 		}
 	}
 
 	/**
-	 * Generates a temporary EPR to (hopefully) obtain the full (incl.
-	 * porttypes, certs, etc.) EPR from the service's attributes. The full one
-	 * is returned if available, otherwise the temporary one is returned.
+	 * Generates a temporary EPR to (hopefully) obtain the full (incl. porttypes, certs, etc.) EPR
+	 * from the service's attributes. The full one is returned if available, otherwise the temporary
+	 * one is returned.
 	 * 
-	 * Some checking of URIs may be required to ensure that a man-in-the-middle
-	 * attack has not occured
+	 * Some checking of URIs may be required to ensure that a man-in-the-middle attack has not
+	 * occured
 	 * 
 	 * @param serviceURL
 	 * @return The EPR for the service indicated.
@@ -143,19 +126,13 @@ public class EPRUtils
 		if (any == null || any.length == 0)
 			return null;
 
-		for (MessageElement element : any)
-		{
-			if (element.getQName().equals(WSName.ENDPOINT_IDENTIFIER_QNAME))
-			{
+		for (MessageElement element : any) {
+			if (element.getQName().equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
 				String s = element.getValue().toString();
-				try
-				{
+				try {
 					return new URI(s);
-				}
-				catch (URI.MalformedURIException e)
-				{
-					_logger.warn("Found EPR with WSName \"" + s
-							+ "\" which isn't a URI.");
+				} catch (URI.MalformedURIException e) {
+					_logger.warn("Found EPR with WSName \"" + s + "\" which isn't a URI.");
 					return null;
 				}
 			}
@@ -164,8 +141,7 @@ public class EPRUtils
 		return null;
 	}
 
-	static public X509Certificate[] extractCertChain(EndpointReferenceType epr)
-			throws GeneralSecurityException
+	static public X509Certificate[] extractCertChain(EndpointReferenceType epr) throws GeneralSecurityException
 	{
 
 		MetadataType mdt = epr.getMetadata();
@@ -175,32 +151,18 @@ public class EPRUtils
 		if (elements == null || elements.length == 0)
 			return null;
 
-		for (MessageElement element : elements)
-		{
-			if (element.getQName()
-					.equals(
-							new QName(GenesisIIConstants.OGSA_BSP_NS,
-									"EndpointKeyInfo")))
-			{
-
+		for (MessageElement element : elements) {
+			if (_logger.isTraceEnabled())
+				if (_logger.isTraceEnabled())
+					_logger.trace("seeing element named: " + element.getQName().toString());
+			if (element.getQName().equals(new QName(GenesisIIConstants.OGSA_BSP_NS, "EndpointKeyInfo"))) {
 				// original style
-				element =
-						element.getChildElement(new QName(
-								org.apache.ws.security.WSConstants.WSSE11_NS,
-								"SecurityTokenReference"));
-				if (element != null)
-				{
-					return WSSecurityUtils
-							.getChainFromPkiPathSecTokenRef(element);
+				element = element.getChildElement(GenesisIIConstants.INTERMEDIATE_WSE_NS_SECURITY_QNAME);
+				if (element != null) {
+					return WSSecurityUtils.getChainFromPkiPathSecTokenRef(element);
 				}
-
-			}
-			else if (element.getQName().equals(
-					new QName(org.apache.ws.security.WSConstants.WSSE11_NS,
-							"SecurityTokenReference")))
-			{
-
-				// Secure Addressing style
+			} else if (WSSecurityUtils.matchesSecurityToken(element)) {
+				// Secure Addressing style with default namespace from wss4j or our old namespace.
 				return WSSecurityUtils.getChainFromPkiPathSecTokenRef(element);
 			}
 		}
@@ -208,8 +170,8 @@ public class EPRUtils
 		return null;
 	}
 
-	static public MessageLevelSecurityRequirements extractMinMessageSecurity(
-			EndpointReferenceType epr) throws GeneralSecurityException
+	static public MessageLevelSecurityRequirements extractMinMessageSecurity(EndpointReferenceType epr)
+		throws GeneralSecurityException
 	{
 
 		MetadataType mdt = epr.getMetadata();
@@ -219,21 +181,15 @@ public class EPRUtils
 		if (elements == null || elements.length == 0)
 			return null;
 
-		for (MessageElement element : elements)
-		{
+		for (MessageElement element : elements) {
 
 			if (element.getQName().equals(
-					new QName(PolicyAttachment.getTypeDesc().getXmlType()
-							.getNamespaceURI(), "PolicyAttachment")))
-			{
+				new QName(PolicyAttachment.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyAttachment"))) {
 
 				// OGSA Secure Addressing compliant security requirements
-				try
-				{
+				try {
 
-					PolicyAttachment policyAttachment =
-							(PolicyAttachment) element
-									.getObjectValue(PolicyAttachment.class);
+					PolicyAttachment policyAttachment = (PolicyAttachment) element.getObjectValue(PolicyAttachment.class);
 
 					MessageLevelSecurityRequirements retval = new MessageLevelSecurityRequirements();
 
@@ -241,193 +197,142 @@ public class EPRUtils
 					// get
 					// more specific at some point of SecAddr takes off
 					Policy metaPolicy = policyAttachment.getPolicy();
-					
-					//Added by ak3ka: Confirmed with Duane to be correct.
+
+					// Added by ak3ka: Confirmed with Duane to be correct.
 					if (metaPolicy == null)
 						return null;
-					
+
 					MessageElement[] policyElements = metaPolicy.get_any();
-					if (policyElements == null || policyElements.length == 0)
-					{
+					if (policyElements == null || policyElements.length == 0) {
 						return null;
 					}
-			
-					for (MessageElement attachmentElement : policyElements)
-					{
+
+					for (MessageElement attachmentElement : policyElements) {
 						if (attachmentElement.getQName().equals(
-								new QName(PolicyReference.getTypeDesc()
-										.getXmlType().getNamespaceURI(),
-										"PolicyReference")))
-						{
-							
-							PolicyReference policyReference =
-									(PolicyReference) attachmentElement
-											.getObjectValue(PolicyReference.class);
+							new QName(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference"))) {
+
+							PolicyReference policyReference = (PolicyReference) attachmentElement
+								.getObjectValue(PolicyReference.class);
 							if (policyReference.getURI().equals(
-									new org.apache.axis.types.URI(
-											SecurityConstants.MUTUAL_X509_URI)))
-							{
-								retval =
-										retval
-												.computeUnion(new MessageLevelSecurityRequirements(
-														MessageLevelSecurityRequirements.SIGN));
+								new org.apache.axis.types.URI(SecurityConstants.MUTUAL_X509_URI))) {
+								retval = retval.computeUnion(new MessageLevelSecurityRequirements(
+									MessageLevelSecurityRequirements.SIGN));
 							}
 
-						}
-						else if (attachmentElement.getQName().equals(
-								new QName(SePartsType.getTypeDesc()
-										.getXmlType().getNamespaceURI(),
-										"EncryptedParts")))
-						{
+						} else if (attachmentElement.getQName().equals(
+							new QName(SePartsType.getTypeDesc().getXmlType().getNamespaceURI(), "EncryptedParts"))) {
 
 							retval = retval.computeUnion(new MessageLevelSecurityRequirements(
-									MessageLevelSecurityRequirements.ENCRYPT));
+								MessageLevelSecurityRequirements.ENCRYPT));
 						}
 					}
 
 					return retval;
 
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					_logger.info("exception occurred in extractMinMessageSecurity", e);
 					return null;
 				}
 			}
 		}
 
-		return null;  // simplifying by removing dead code.
-/* dead code, saved for analysis...
-        RequiredMessageSecurityType minSec = null;  // was at top of function.
-        
-        //current implementation was at this point.
-        
-        //then these checks, which made the rest of the function dead code, since
-        // minSec was never set anywhere in the rest of the function...
-        if (minSec == null)
-        {
-            return null;
-        }
-		RequiredMessageSecurityTypeMin minType = minSec.getMin();
-		if (minType == null)
-		{
-			return null;
-		}
-
-		return new MessageLevelSecurityRequirements(minType.getValue());
-*/
+		return null; // simplifying by removing dead code.
+		/*
+		 * dead code, saved for analysis... RequiredMessageSecurityType minSec = null; // was at top
+		 * of function.
+		 * 
+		 * //current implementation was at this point.
+		 * 
+		 * //then these checks, which made the rest of the function dead code, since // minSec was
+		 * never set anywhere in the rest of the function... if (minSec == null) { return null; }
+		 * RequiredMessageSecurityTypeMin minType = minSec.getMin(); if (minType == null) { return
+		 * null; }
+		 * 
+		 * return new MessageLevelSecurityRequirements(minType.getValue());
+		 */
 	}
 
-	static private Pattern _SERVICE_NAME_PATTERN =
-			Pattern.compile("^.*/axis/services/([^/]+)$");
+	static private Pattern _SERVICE_NAME_PATTERN = Pattern.compile("^.*/axis/services/([^/]+)$");
 
-	static public String extractServiceName(URI uri)
-		throws AxisFault
+	static public String extractServiceName(URI uri) throws AxisFault
 	{
-		Matcher matcher = _SERVICE_NAME_PATTERN.matcher(
-			uri.getPath());
+		Matcher matcher = _SERVICE_NAME_PATTERN.matcher(uri.getPath());
 		if (!matcher.matches())
-			throw new AxisFault(String.format(
-				"Can't locate target service \"%s\".", uri));
+			throw new AxisFault(String.format("Can't locate target service \"%s\".", uri));
 		return matcher.group(1);
 	}
-	
-	static public String extractServiceName(EndpointReferenceType epr)
-			throws AxisFault
+
+	static public String extractServiceName(EndpointReferenceType epr) throws AxisFault
 	{
 		return extractServiceName(epr.getAddress().get_value());
 	}
 
-	static public String extractServiceName(String url)
-		throws AxisFault, MalformedURIException
+	static public String extractServiceName(String url) throws AxisFault, MalformedURIException
 	{
 		return extractServiceName(new URI(url));
 	}
 
-	static public byte[] toBytes(EndpointReferenceType epr)
-			throws ResourceException
+	static public byte[] toBytes(EndpointReferenceType epr) throws ResourceException
 	{
 		ByteArrayOutputStream baos = null;
 
-		try
-		{
+		try {
 			baos = new ByteArrayOutputStream();
 			OutputStreamWriter writer = new OutputStreamWriter(baos);
-			ObjectSerializer.serialize(writer, epr, new QName(
-					GenesisIIConstants.GENESISII_NS, "endpoint"));
+			ObjectSerializer.serialize(writer, epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint"));
 			writer.flush();
 			writer.close();
 
 			return baos.toByteArray();
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new ResourceException(ioe.toString(), ioe);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(baos);
 		}
 
 	}
 
-	static public EndpointReferenceType fromBytes(byte[] data)
-			throws ResourceException
+	static public EndpointReferenceType fromBytes(byte[] data) throws ResourceException
 	{
 		ByteArrayInputStream bais = null;
 
-		try
-		{
+		try {
 			bais = new ByteArrayInputStream(data);
 			return fromInputStream(bais);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(bais);
 		}
 	}
 
-	static public EndpointReferenceType fromInputStream(InputStream in)
-			throws ResourceException
+	static public EndpointReferenceType fromInputStream(InputStream in) throws ResourceException
 	{
-		return (EndpointReferenceType) ObjectDeserializer.deserialize(
-				new InputSource(in), EndpointReferenceType.class);
+		return (EndpointReferenceType) ObjectDeserializer.deserialize(new InputSource(in), EndpointReferenceType.class);
 	}
 
-	static public Blob toBlob(
-		EndpointReferenceType epr, String tableName, String columnName)
-			throws ResourceException
+	static public Blob toBlob(EndpointReferenceType epr, String tableName, String columnName) throws ResourceException
 	{
 		long maxLength = BlobLimits.limits().getLimit(tableName, columnName);
-		
+
 		if (epr == null)
 			return null;
 
-		try
-		{
+		try {
 			Blob blob = new SerialBlob(toBytes(epr));
-			_logger.debug(String.format(
-				"Created a blob of length %d bytes for %s.%s which has a " +
-				"max length of %d bytes.",
-				blob.length(), tableName, columnName, maxLength));
-			if (blob.length() > maxLength)
-			{
-				_logger.error(String.format(
-					"Error:  Blob was created with %d bytes for %s.%s, " +
-					"but the maximum length for that column is %d bytes.", 
-					blob.length(), tableName, columnName, maxLength));
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Created a blob of length %d bytes for %s.%s which has a "
+					+ "max length of %d bytes.", blob.length(), tableName, columnName, maxLength));
+			if (blob.length() > maxLength) {
+				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "
+					+ "but the maximum length for that column is %d bytes.", blob.length(), tableName, columnName, maxLength));
 			}
-			
+
 			return blob;
-		}
-		catch (Throwable t)
-		{
+		} catch (Throwable t) {
 			throw new ResourceException("Could not serialze epr to BLOB", t);
 		}
 	}
 
-	static public EndpointReferenceType fromBlob(Blob blob)
-			throws ResourceException
+	static public EndpointReferenceType fromBlob(Blob blob) throws ResourceException
 
 	{
 		InputStream in = null;
@@ -435,18 +340,12 @@ public class EPRUtils
 		if (blob == null)
 			return null;
 
-		try
-		{
+		try {
 			in = blob.getBinaryStream();
 			return fromInputStream(in);
-		}
-		catch (Throwable t)
-		{
-			throw new ResourceException("Could not deserialize EPR from BLOB",
-					t);
-		}
-		finally
-		{
+		} catch (Throwable t) {
+			throw new ResourceException("Could not deserialize EPR from BLOB", t);
+		} finally {
 			StreamUtils.close(in);
 		}
 	}
@@ -460,11 +359,8 @@ public class EPRUtils
 		if (any == null || any.length == 0)
 			return null;
 
-		for (MessageElement element : any)
-		{
-			if (element.getQName().equals(
-					OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME))
-			{
+		for (MessageElement element : any) {
+			if (element.getQName().equals(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME)) {
 				String s = element.getValue().toString();
 				return PortType.translate(s).toArray(new PortType[0]);
 			}
@@ -472,80 +368,65 @@ public class EPRUtils
 
 		return null;
 	}
-	
+
 	static public GUID getGeniiContainerID(EndpointReferenceType epr)
 	{
 		AttributedURIType uriType = epr.getAddress();
-		if (uriType != null)
-		{
+		if (uriType != null) {
 			URI uri = uriType.get_value();
-			if (uri != null)
-			{
+			if (uri != null) {
 				String query = uri.getQueryString();
-				if (query != null)
-				{
-					Matcher matcher = GENII_CONTAINER_ID_PATTERN.matcher(
-						query);
+				if (query != null) {
+					Matcher matcher = GENII_CONTAINER_ID_PATTERN.matcher(query);
 					if (matcher.matches())
 						return GUID.fromString(matcher.group(1));
 				}
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	static public String getEPIShortParameter(EndpointReferenceType epr)
 	{
 		AttributedURIType uriType = epr.getAddress();
-		if (uriType != null)
-		{
+		if (uriType != null) {
 			URI uri = uriType.get_value();
-			if (uri != null)
-			{
+			if (uri != null) {
 				String query = uri.getQueryString();
-				if (query != null)
-				{
-					Matcher matcher = GENII_SHORT_PARAMTER_PATTERN.matcher(
-						query);
+				if (query != null) {
+					Matcher matcher = GENII_SHORT_PARAMETER_PATTERN.matcher(query);
 					if (matcher.matches())
 						return matcher.group(1);
 				}
 			}
 		}
-		
+
 		return null;
 	}
 
-	static public EndpointReferenceType readEPR(String filename)
-			throws IOException
+	static public EndpointReferenceType readEPR(String filename) throws IOException
 	{
 		FileInputStream fin = null;
 
-		try
-		{
+		try {
 			fin = new FileInputStream(filename);
-			return (EndpointReferenceType) ObjectDeserializer.deserialize(
-					new InputSource(fin), EndpointReferenceType.class);
-		}
-		finally
-		{
+			return (EndpointReferenceType) ObjectDeserializer.deserialize(new InputSource(fin), EndpointReferenceType.class);
+		} finally {
 			StreamUtils.close(fin);
 		}
 	}
 
 	static public boolean isUnboundEPR(EndpointReferenceType epr)
 	{
-		return ((epr.getAddress() == null)
-				|| (epr.getAddress().get_value() == null) || (epr.getAddress()
-				.get_value().toString().equals(WSName.UNBOUND_ADDRESS)));
+		return ((epr.getAddress() == null) || (epr.getAddress().get_value() == null) || (epr.getAddress().get_value()
+			.toString().equals(WSName.UNBOUND_ADDRESS)));
 	}
 
 	static public EndpointReferenceType makeUnboundEPR(EndpointReferenceType epr)
 	{
-		return new EndpointReferenceType(
-				new org.ws.addressing.AttributedURIType(WSName.UNBOUND_ADDRESS),
-				epr.getReferenceParameters(), epr.getMetadata(), epr.get_any());
+		return new EndpointReferenceType(new org.ws.addressing.AttributedURIType(WSName.UNBOUND_ADDRESS),
+			epr.getReferenceParameters(), epr.getMetadata(), epr.get_any());
 	}
 
 	static public boolean isCommunicable(EndpointReferenceType epr)
@@ -553,105 +434,89 @@ public class EPRUtils
 		AttributedURIType auri = epr.getAddress();
 		org.apache.axis.types.URI uri = auri.get_value();
 
-		try
-		{
+		try {
 			new URL(uri.toString());
 			return true;
-		}
-		catch (MalformedURLException mue)
-		{
+		} catch (MalformedURLException mue) {
 			return false;
 		}
 	}
 
-	final static public void serializeEPR(ObjectOutputStream oos,
-			EndpointReferenceType epr) throws IOException
+	final static public void serializeEPR(ObjectOutputStream oos, EndpointReferenceType epr) throws IOException
 	{
-		if (epr == null)
-		{
+		if (epr == null) {
 			oos.writeInt(-1);
-		}
-		else
-		{
+		} else {
 			byte[] data = toBytes(epr);
 			oos.writeInt(data.length);
 			oos.write(data);
 		}
 	}
 
-	final static public EndpointReferenceType deserializeEPR(
-			ObjectInputStream ois) throws IOException
+	final static public EndpointReferenceType deserializeEPR(ObjectInputStream ois) throws IOException
 	{
 		int length = ois.readInt();
-		if (length < 0)
-		{
+		if (length < 0) {
 			return null;
-		}
-		else
-		{
+		} else {
 			byte[] data = new byte[length];
 			ois.readFully(data);
 			return fromBytes(data);
 		}
 	}
-	
-	static public EndpointReferenceType packEPR(EndpointReferenceType epr) 
-		throws ResourceException
+
+	static public EndpointReferenceType packEPR(EndpointReferenceType epr) throws ResourceException
 	{
 		return fromBytes(toBytes(epr));
 	}
-	
+
 	static public GUID extractContainerID(EndpointReferenceType epr)
 	{
 		if (epr == null)
 			return null;
-		
+
 		MetadataType md = epr.getMetadata();
 		if (md == null)
 			return null;
-		
-		MessageElement []any = md.get_any();
+
+		MessageElement[] any = md.get_any();
 		if (any == null)
 			return null;
-		
-		for (MessageElement element : any)
-		{
+
+		for (MessageElement element : any) {
 			QName name = element.getQName();
-			if (name.equals(ContainerConstants.CONTAINER_ID_METADATA_ELEMENT))
-			{
+			if (name.equals(ContainerConstants.CONTAINER_ID_METADATA_ELEMENT)) {
 				return GUID.fromString(element.getValue());
 			}
 		}
-		
+
 		return null;
 	}
 
-	public static String getMasterPortType(EndpointReferenceType epr) 
+	public static String getMasterPortType(EndpointReferenceType epr)
 	{
-		
+
 		if (epr == null)
 			return null;
-		
+
 		MetadataType md = epr.getMetadata();
-		
+
 		if (md == null)
 			return null;
-		
-		MessageElement []any = md.get_any();
+
+		MessageElement[] any = md.get_any();
 		if (any == null)
 			return null;
-		
-		for (MessageElement element : any)
-		{
+
+		for (MessageElement element : any) {
 			QName name = element.getQName();
-			if (name.equals(new QName(WSAddressingConstants.WSA_NS,"PortType")))
-			{
+			if (name.equals(new QName(WSAddressingConstants.WSA_NS, "PortType"))) {
 				String portTypeWithNameSpace = element.getValue();
 				int separator = portTypeWithNameSpace.lastIndexOf(':') + 1;
 				return portTypeWithNameSpace.substring(separator);
 			}
 		}
-		
+
 		return null;
 	}
 }

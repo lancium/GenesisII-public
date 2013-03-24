@@ -12,51 +12,48 @@ public class BESEndpoint implements InformationEndpoint
 	private String _besName;
 	private String _queueID;
 	private IBESPortTypeResolver _portTypeResolver;
-	
-	GeniiBESPortType getClientStub(Connection connection)
-		throws Throwable
+
+	GeniiBESPortType getClientStub(Connection connection) throws Throwable
 	{
 		return _portTypeResolver.createClientStub(connection, _besID);
 	}
-	
-	public BESEndpoint(String queueID, long besID, String besName,
-		IBESPortTypeResolver portTypeResolver)
+
+	public BESEndpoint(String queueID, long besID, String besName, IBESPortTypeResolver portTypeResolver)
 	{
 		_queueID = queueID;
 		_besID = besID;
 		_besName = besName;
 		_portTypeResolver = portTypeResolver;
 	}
-	
+
 	public long getBESID()
 	{
 		return _besID;
 	}
-	
+
 	public boolean equals(BESEndpoint other)
 	{
 		return _besID == other._besID;
 	}
-	
-	@Override 
+
+	@Override
 	public boolean equals(Object other)
 	{
 		if (other instanceof BESEndpoint)
-			return equals((BESEndpoint)other);
-		
+			return equals((BESEndpoint) other);
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
-		return (int)_besID;
+		return (int) _besID;
 	}
-	
+
 	@Override
 	public String toString()
 	{
-		return String.format("[%d] %s@%s",
-			_besID, _besName, _queueID);
+		return String.format("[%d] %s@%s", _besID, _besName, _queueID);
 	}
 }

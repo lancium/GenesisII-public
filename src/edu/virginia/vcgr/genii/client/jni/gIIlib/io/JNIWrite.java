@@ -12,54 +12,44 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 public class JNIWrite extends JNILibraryBase
 {
 	static private Log _logger = LogFactory.getLog(JNIWrite.class);
-	
+
 	public static Integer write(Integer fileHandle, byte[] data, Long offset)
 	{
-		_logger.trace(String.format(
-			"JNIWrite::write(%d, byte[%d], %d)", fileHandle, data.length, 
-			offset));
-		
+		if (_logger.isTraceEnabled())
+			_logger.trace(String.format("JNIWrite::write(%d, byte[%d], %d)", fileHandle, data.length, offset));
+
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
-		
+
 		FilesystemHandle fsHandle = openHandles.get(fileHandle);
-		if(fsHandle == null || fsHandle.isDirectoryHandle())
-		{
-			_logger.error("G-ICING:  Invalid handle received for file write");			
+		if (fsHandle == null || fsHandle.isDirectoryHandle()) {
+			_logger.error("G-ICING:  Invalid handle received for file write");
 			return null;
 		}
-			
-		try
-		{
-			return ((FileHandle)fsHandle).write(offset, data);
-		}
-		catch (FSException fse)
-		{
+
+		try {
+			return ((FileHandle) fsHandle).write(offset, data);
+		} catch (FSException fse) {
 			_logger.error("Unable to write to file.", fse);
 			return null;
 		}
 	}
-	
+
 	public static Integer truncateAppend(Integer fileHandle, byte[] data, Long offset)
 	{
-		_logger.trace(String.format(
-			"JNIWrite::truncateAppend(%d, byte[%d], %d)", fileHandle, data,
-			offset));
-		
+		if (_logger.isTraceEnabled())
+			_logger.trace(String.format("JNIWrite::truncateAppend(%d, byte[%d], %d)", fileHandle, data, offset));
+
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
-		
+
 		FilesystemHandle fsHandle = openHandles.get(fileHandle);
-		if(fsHandle == null || fsHandle.isDirectoryHandle())
-		{
-			_logger.error("G-ICING:  Invalid handle received for file truncAppend");			
+		if (fsHandle == null || fsHandle.isDirectoryHandle()) {
+			_logger.error("G-ICING:  Invalid handle received for file truncAppend");
 			return null;
 		}
-			
-		try
-		{
-			return ((FileHandle)fsHandle).truncAppend(offset, data);
-		}
-		catch (FSException fse)
-		{
+
+		try {
+			return ((FileHandle) fsHandle).truncAppend(offset, data);
+		} catch (FSException fse) {
 			_logger.error("Unable to write to file.", fse);
 			return null;
 		}

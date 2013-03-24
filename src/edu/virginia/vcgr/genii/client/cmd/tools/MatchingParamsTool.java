@@ -17,79 +17,66 @@ import edu.virginia.vcgr.genii.container.q2.matching.MatchingParamEnum;
 
 public class MatchingParamsTool extends BaseGridTool
 {
-	static final private String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dmatching-params";
-	static final private FileResource _USAGE =
-		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/umatching-params");
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/matching-params";
-	
-	static private final Pattern ADD_REMOVE_PATTERN = Pattern.compile(
-		"^\\s*((?:add)|(?:remove))\\s*\\(([^),]+),([^)]+)\\)\\s*$");
-	
+	static final private String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dmatching-params";
+	static final private FileResource _USAGE = new FileResource(
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/umatching-params");
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/matching-params";
+
+	static private final Pattern ADD_REMOVE_PATTERN = Pattern
+		.compile("^\\s*((?:add)|(?:remove))\\s*\\(([^),]+),([^)]+)\\)\\s*$");
+
 	private Collection<String> _targets = new LinkedList<String>();
-	private Collection<MatchingParameter> _adds =
-		new LinkedList<MatchingParameter>();
-	private Collection<MatchingParameter> _removes =
-		new LinkedList<MatchingParameter>();
-	
+	private Collection<MatchingParameter> _adds = new LinkedList<MatchingParameter>();
+	private Collection<MatchingParameter> _removes = new LinkedList<MatchingParameter>();
+
 	private void verifyParameterName(String name) throws InvalidToolUsageException
 	{
-		try
-		{
+		try {
 			int index = name.indexOf(':');
 			if (index > 0)
 				MatchingParamEnum.valueOf(name.substring(0, index));
-		}
-		catch (IllegalArgumentException e)
-		{
+		} catch (IllegalArgumentException e) {
 			throw new InvalidToolUsageException(String.format(
-				"Matching parameter name %s is not valid (requirment indicator must be %s, or %s).",
-				name, MatchingParamEnum.requires, MatchingParamEnum.supports));
+				"Matching parameter name %s is not valid (requirment indicator must be %s, or %s).", name,
+				MatchingParamEnum.requires, MatchingParamEnum.supports));
 		}
 	}
-	
+
 	public MatchingParamsTool()
 	{
-		super(new FileResource(_DESCRIPTION), _USAGE, false,
-				ToolCategory.ADMINISTRATION);
+		super(new FileResource(_DESCRIPTION), _USAGE, false, ToolCategory.ADMINISTRATION);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		RNSPath current = RNSPath.getCurrent();
-		MatchingParameter []addParameters;
-		MatchingParameter []removeParameters;
-		
+		MatchingParameter[] addParameters;
+		MatchingParameter[] removeParameters;
+
 		addParameters = new MatchingParameter[_adds.size()];
 		removeParameters = new MatchingParameter[_removes.size()];
-		
+
 		addParameters = _adds.toArray(addParameters);
 		removeParameters = _removes.toArray(removeParameters);
-		
-		for (String target : _targets)
-		{
-			for (RNSPath t : current.expand(target))
-			{
-				GeniiCommon stub = ClientUtils.createProxy(
-					GeniiCommon.class, t.getEndpoint());
-				
-				if (addParameters.length > 0)
-				{
+
+		for (String target : _targets) {
+			for (RNSPath t : current.expand(target)) {
+				GeniiCommon stub = ClientUtils.createProxy(GeniiCommon.class, t.getEndpoint());
+
+				if (addParameters.length > 0) {
 					stdout.format("Adding values to %s\n", t.pwd());
 					stub.addMatchingParameter(addParameters);
 				}
-				
-				if (removeParameters.length > 0)
-				{
+
+				if (removeParameters.length > 0) {
 					stdout.format("Removing values from %s\n", t.pwd());
 					stub.removeMatchingParameter(removeParameters);
 				}
 			}
 		}
-		
+
 		return 0;
 	}
 
@@ -99,30 +86,27 @@ public class MatchingParamsTool extends BaseGridTool
 		if (_targets.size() < 1)
 			throw new InvalidToolUsageException();
 	}
-	
+
 	@Override
 	public void addArgument(String argument) throws ToolException
 	{
 		Matcher matcher = ADD_REMOVE_PATTERN.matcher(argument);
-		if (matcher.matches())
-		{
+		if (matcher.matches()) {
 			String addRemove = matcher.group(1).trim();
 			String name = matcher.group(2).trim();
 			String value = matcher.group(3).trim();
-			
+
 			verifyParameterName(name);
-			
+
 			if (addRemove.equals("add"))
 				_adds.add(new MatchingParameter(name, value));
 			else if (addRemove.equals("remove"))
 				_removes.add(new MatchingParameter(name, value));
 			else
-				throw new InvalidToolUsageException(
-					"Unknown error occurred in tool.");
-		} else
-		{
+				throw new InvalidToolUsageException("Unknown error occurred in tool.");
+		} else {
 			GeniiPath gPath = new GeniiPath(argument);
-			if(gPath.pathType() != GeniiPathType.Grid)
+			if (gPath.pathType() != GeniiPathType.Grid)
 				throw new InvalidToolUsageException("<target> must be a grid path. ");
 			_targets.add(argument);
 		}

@@ -10,35 +10,25 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.rfork.iterator.InMemoryIterableFork;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 
-public abstract class AbstractRNSResourceFork extends AbstractResourceFork
-	implements RNSResourceFork
+public abstract class AbstractRNSResourceFork extends AbstractResourceFork implements RNSResourceFork
 {
-	protected AbstractRNSResourceFork(ResourceForkService service, 
-		String forkPath)
+	protected AbstractRNSResourceFork(ResourceForkService service, String forkPath)
 	{
 		super(service, forkPath);
 	}
-	
-	protected InternalEntry createInternalEntry(
-		EndpointReferenceType exemplarEPR, String entryName,
-		ResourceForkInformation rif, boolean isExistent) 
-			throws ResourceUnknownFaultType, ResourceException
+
+	protected InternalEntry createInternalEntry(EndpointReferenceType exemplarEPR, String entryName,
+		ResourceForkInformation rif, boolean isExistent) throws ResourceUnknownFaultType, ResourceException
 	{
-		return new InternalEntry(entryName,
-			getService().createForkEPR(formForkPath(entryName), rif),
-			null, isExistent);
+		return new InternalEntry(entryName, getService().createForkEPR(formForkPath(entryName), rif), null, isExistent);
 	}
-	
-	protected InternalEntry createInternalEntry(
-			EndpointReferenceType exemplarEPR, String entryName,
-			ResourceForkInformation rif) 
-				throws ResourceUnknownFaultType, ResourceException
-		{
-			return new InternalEntry(entryName,
-				getService().createForkEPR(formForkPath(entryName), rif),
-				null);
-		}
-	
+
+	protected InternalEntry createInternalEntry(EndpointReferenceType exemplarEPR, String entryName, ResourceForkInformation rif)
+		throws ResourceUnknownFaultType, ResourceException
+	{
+		return new InternalEntry(entryName, getService().createForkEPR(formForkPath(entryName), rif), null);
+	}
+
 	protected String formForkPath(String entryName)
 	{
 		String path = getForkPath();
@@ -46,18 +36,17 @@ public abstract class AbstractRNSResourceFork extends AbstractResourceFork
 			return path + entryName;
 		return path + "/" + entryName;
 	}
-		
-	
+
 	@Override
-	public boolean isInMemoryIterable() throws IOException 
-	{		
+	public boolean isInMemoryIterable() throws IOException
+	{
 		return false;
 	}
-	
+
 	@Override
-	public InMemoryIterableFork getInMemoryIterableFork() throws IOException 
+	public InMemoryIterableFork getInMemoryIterableFork() throws IOException
 	{
 		return null;
 	}
-	
+
 }

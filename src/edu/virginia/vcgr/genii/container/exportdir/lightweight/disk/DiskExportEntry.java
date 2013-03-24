@@ -18,23 +18,20 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportDir;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportEntry;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportFile;
 
-public class DiskExportEntry extends AbstractVExportEntry
-	implements VExportDir, VExportFile
+public class DiskExportEntry extends AbstractVExportEntry implements VExportDir, VExportFile
 {
 	static private FSLockManager _lockManager = new FSLockManager();
-	
+
 	private File _target;
-	
+
 	public DiskExportEntry(File target) throws IOException
 	{
 		super(target.getName(), target.isDirectory());
 
 		_target = target;
-		
+
 		if (!_target.exists())
-			throw new FileNotFoundException(String.format(
-				"Unable to locate file system entry \"%s\".",
-				_target));
+			throw new FileNotFoundException(String.format("Unable to locate file system entry \"%s\".", _target));
 	}
 
 	@Override
@@ -48,8 +45,7 @@ public class DiskExportEntry extends AbstractVExportEntry
 	{
 		Collection<VExportEntry> entries = new LinkedList<VExportEntry>();
 
-		for (File entry : _target.listFiles())
-		{
+		for (File entry : _target.listFiles()) {
 			if (name == null || name.equals(entry.getName()))
 				if (!isLink(_target))
 					entries.add(new DiskExportEntry(entry));
@@ -107,17 +103,14 @@ public class DiskExportEntry extends AbstractVExportEntry
 	{
 		RandomAccessFile raf = null;
 		FSLock lock = null;
-		
-		try
-		{
+
+		try {
 			lock = _lockManager.acquire(_target);
-			
+
 			raf = new RandomAccessFile(_target, "r");
 			raf.seek(offset);
 			raf.getChannel().read(target);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(raf);
 			if (lock != null)
 				lock.release();
@@ -134,14 +127,11 @@ public class DiskExportEntry extends AbstractVExportEntry
 	public long size() throws IOException
 	{
 		FSLock lock = null;
-		
-		try
-		{
+
+		try {
 			lock = _lockManager.acquire(_target);
 			return _target.length();
-		}
-		finally
-		{
+		} finally {
 			if (lock != null)
 				lock.release();
 		}
@@ -152,18 +142,15 @@ public class DiskExportEntry extends AbstractVExportEntry
 	{
 		FSLock lock = null;
 		RandomAccessFile raf = null;
-		
-		try
-		{
+
+		try {
 			lock = _lockManager.acquire(_target);
-			
+
 			raf = new RandomAccessFile(_target, "rw");
 			raf.setLength(offset);
 			raf.seek(offset);
 			raf.getChannel().write(source);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(raf);
 			if (lock != null)
 				lock.release();
@@ -181,41 +168,38 @@ public class DiskExportEntry extends AbstractVExportEntry
 	{
 		FSLock lock = null;
 		RandomAccessFile raf = null;
-		
-		try
-		{
+
+		try {
 			lock = _lockManager.acquire(_target);
 			raf = new RandomAccessFile(_target, "rw");
 			raf.seek(offset);
 			raf.getChannel().write(source);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(raf);
 			if (lock != null)
 				lock.release();
 		}
 	}
-	
-	public static boolean isLink(File target) throws IOException{
+
+	public static boolean isLink(File target) throws IOException
+	{
 		if (target == null)
-		    throw new NullPointerException("File must not be null");
-		  File canon;
-		  if (target.getParent() == null) {
-		    canon = target;
-		  } else {
-		    File canonDir = target.getParentFile().getCanonicalFile();
-		    canon = new File(canonDir, target.getName());
-		  }
-		  return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
+			throw new NullPointerException("File must not be null");
+		File canon;
+		if (target.getParent() == null) {
+			canon = target;
+		} else {
+			File canonDir = target.getParentFile().getCanonicalFile();
+			canon = new File(canonDir, target.getName());
+		}
+		return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
 	}
 
-	
-	public int getTotalSize(String name) throws IOException {
-		
+	public int getTotalSize(String name) throws IOException
+	{
+
 		int numEntries = 0;
-		for (File entry : _target.listFiles())
-		{
+		for (File entry : _target.listFiles()) {
 			if (name == null || name.equals(entry.getName()))
 				if (!isLink(_target))
 					numEntries++;
@@ -223,27 +207,23 @@ public class DiskExportEntry extends AbstractVExportEntry
 		return numEntries;
 	}
 
-	
-	public Collection<String> getListing() throws IOException 
+	public Collection<String> getListing() throws IOException
 	{
 		return null;
 	}
 
 	@Override
-	public Collection<VExportEntry> list() throws IOException 
+	public Collection<VExportEntry> list() throws IOException
 	{
 		Collection<VExportEntry> entries = new LinkedList<VExportEntry>();
 
-		for (File entry : _target.listFiles())
-		{
+		for (File entry : _target.listFiles()) {
 			if (!isLink(_target))
 				entries.add(new DiskExportEntry(entry));
 		}
 
 		return entries;
-		
+
 	}
 
-	
-	
 }

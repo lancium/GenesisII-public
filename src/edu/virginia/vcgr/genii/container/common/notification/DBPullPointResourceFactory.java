@@ -15,21 +15,17 @@ public class DBPullPointResourceFactory extends BasicDBResourceFactory
 	{
 	}
 
-	public DBPullPointResourceFactory(DatabaseConnectionPool pool)
-		throws SQLException
+	public DBPullPointResourceFactory(DatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}
-	
+
 	@Override
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
-		try
-		{
+		try {
 			return new DBPullPointResource(parentKey, _pool);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 	}

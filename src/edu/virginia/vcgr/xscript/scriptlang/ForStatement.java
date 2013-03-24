@@ -16,10 +16,9 @@ public class ForStatement implements ParseStatement
 	private String _exclusiveLimit;
 	private String _incrementValue;
 	private ParseStatement _innerStatement;
-	
-	public ForStatement(String paramName, String initialValue,
-		String inclusiveLimit, String exclusiveLimit, String incrementValue,
-		ParseStatement innerStatement)
+
+	public ForStatement(String paramName, String initialValue, String inclusiveLimit, String exclusiveLimit,
+		String incrementValue, ParseStatement innerStatement)
 	{
 		_paramName = paramName;
 		_initialValue = initialValue;
@@ -28,31 +27,25 @@ public class ForStatement implements ParseStatement
 		_incrementValue = incrementValue;
 		_innerStatement = innerStatement;
 	}
-	
+
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
 	{
 		String paramName = MacroReplacer.replaceMacros(context, _paramName);
-		int initialValue= Integer.parseInt(
-			MacroReplacer.replaceMacros(context, _initialValue));
-		int incrementValue = Integer.parseInt(
-			MacroReplacer.replaceMacros(context, _incrementValue));
+		int initialValue = Integer.parseInt(MacroReplacer.replaceMacros(context, _initialValue));
+		int incrementValue = Integer.parseInt(MacroReplacer.replaceMacros(context, _incrementValue));
 		int limit;
 		if (_inclusiveLimit != null)
-			limit = Integer.parseInt(
-				MacroReplacer.replaceMacros(context, _inclusiveLimit)) + 1;
+			limit = Integer.parseInt(MacroReplacer.replaceMacros(context, _inclusiveLimit)) + 1;
 		else
-			limit = Integer.parseInt(
-				MacroReplacer.replaceMacros(context, _exclusiveLimit));
-		
+			limit = Integer.parseInt(MacroReplacer.replaceMacros(context, _exclusiveLimit));
+
 		Object result = null;
-		for (int lcv = initialValue; lcv < limit; lcv += incrementValue)
-		{
+		for (int lcv = initialValue; lcv < limit; lcv += incrementValue) {
 			context.setAttribute(paramName, lcv);
 			result = _innerStatement.evaluate(context);
 		}
-		
+
 		return result;
 	}
 }

@@ -19,10 +19,9 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
 public class PipeAttributesHandler extends AbstractAttributeHandler
 {
-	static private final String SBYTEIO_NAMESPACE = 
-		ByteIOConstants.STREAMABLE_BYTEIO_NS;
+	static private final String SBYTEIO_NAMESPACE = ByteIOConstants.STREAMABLE_BYTEIO_NS;
 	static private final String PIPE_NS = PipeConstants.PIPE_NS;
-	
+
 	static final private QName SIZE_QNAME = new QName(SBYTEIO_NAMESPACE, "Size");
 	static final private QName READABLE_QNAME = new QName(SBYTEIO_NAMESPACE, "Readable");
 	static final private QName WRITEABLE_QNAME = new QName(SBYTEIO_NAMESPACE, "Writeable");
@@ -30,11 +29,10 @@ public class PipeAttributesHandler extends AbstractAttributeHandler
 	static final private QName END_OF_STREAM_QNAME = new QName(SBYTEIO_NAMESPACE, "EndOfStream");
 	static final private QName TRANSFER_MECH_QNAME = new QName(SBYTEIO_NAMESPACE, "TransferMechanism");
 	static final private QName DESTROY_ON_CLOSE_QNAME = new QName(SBYTEIO_NAMESPACE, "DestroyOnClose");
-	
+
 	static final private QName PIPE_SIZE_QNAME = new QName(PIPE_NS, "PipeSize");
-	
-	public PipeAttributesHandler(AttributePackage pkg)
-			throws NoSuchMethodException
+
+	public PipeAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
 	{
 		super(pkg);
 	}
@@ -49,64 +47,58 @@ public class PipeAttributesHandler extends AbstractAttributeHandler
 		addHandler(END_OF_STREAM_QNAME, "getEndOfStreamAttr");
 		addHandler(TRANSFER_MECH_QNAME, "getTransferMechsAttr");
 		addHandler(DESTROY_ON_CLOSE_QNAME, "getDestroyOnCloseAttr");
-		
+
 		addHandler(PIPE_SIZE_QNAME, "getPipeSizeAttr");
 	}
-	
+
 	public MessageElement getSizeAttr()
 	{
 		return new MessageElement(SIZE_QNAME, 0L);
 	}
-	
+
 	public MessageElement getReadableAttr()
 	{
 		return new MessageElement(READABLE_QNAME, Boolean.TRUE);
 	}
-	
+
 	public MessageElement getWriteableAttr()
 	{
 		return new MessageElement(WRITEABLE_QNAME, Boolean.TRUE);
 	}
-	
+
 	public MessageElement getSeekableAttr()
 	{
 		return new MessageElement(SEEKABLE_QNAME, Boolean.FALSE);
 	}
-	
+
 	public MessageElement getEndOfStreamAttr()
 	{
 		return new MessageElement(END_OF_STREAM_QNAME, Boolean.FALSE);
 	}
-	
+
 	public MessageElement getDestroyOnCloseAttr()
 	{
 		return new MessageElement(DESTROY_ON_CLOSE_QNAME, Boolean.FALSE);
 	}
-	
+
 	public Collection<MessageElement> getTransferMechsAttr()
 	{
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
 		QName name = TRANSFER_MECH_QNAME;
-		
-		ret.add(new MessageElement(name,
-			ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
-		ret.add(new MessageElement(name,
-			ByteIOConstants.TRANSFER_TYPE_DIME_URI));
-		ret.add(new MessageElement(name,
-			ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
-		
+
+		ret.add(new MessageElement(name, ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
+		ret.add(new MessageElement(name, ByteIOConstants.TRANSFER_TYPE_DIME_URI));
+		ret.add(new MessageElement(name, ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+
 		return ret;
 	}
-	
-	public MessageElement getPipeSizeAttr()
-		throws ResourceUnknownFaultType, ResourceException
+
+	public MessageElement getPipeSizeAttr() throws ResourceUnknownFaultType, ResourceException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		PipeConstructionParameters consParms = 
-			(PipeConstructionParameters)resource.constructionParameters(
-				PipeServiceImpl.class);
-		
-		return new MessageElement(PIPE_SIZE_QNAME,
-			consParms.pipeSize());
+		PipeConstructionParameters consParms = (PipeConstructionParameters) resource
+			.constructionParameters(PipeServiceImpl.class);
+
+		return new MessageElement(PIPE_SIZE_QNAME, consParms.pipeSize());
 	}
 }

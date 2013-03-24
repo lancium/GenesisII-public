@@ -8,34 +8,28 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
-public class StatUtils 
+public class StatUtils
 {
 	static private Log _logger = LogFactory.getLog(StatUtils.class);
-	
+
 	static public long generateInodeNumber(EndpointReferenceType target)
 	{
 		WSName name = new WSName(target);
-		if (name.isValidWSName())
-		{
+		if (name.isValidWSName()) {
 			return name.getEndpointIdentifier().toString().hashCode();
-		} else
-		{
+		} else {
 			_logger.warn("Trying to generate an INode number of a target which"
 				+ "does not implement the WS-Naming specification.");
-			
-			try
-			{
-				byte []array = EPRUtils.toBytes(target);
+
+			try {
+				byte[] array = EPRUtils.toBytes(target);
 				long result = 0;
-				for (byte d : array)
-				{
+				for (byte d : array) {
 					result ^= d;
 				}
-				
+
 				return result;
-			}
-			catch (ResourceException re)
-			{
+			} catch (ResourceException re) {
 				_logger.fatal("Unexpected error while trying to serialize EPR.", re);
 				throw new RuntimeException(re);
 			}

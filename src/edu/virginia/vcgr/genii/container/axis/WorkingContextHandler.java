@@ -40,37 +40,28 @@ public class WorkingContextHandler extends BasicHandler
 
 	private Boolean _isRequest = null;
 
-	public void init() { super.init(); }
-	
+	public void init()
+	{
+		super.init();
+	}
+
 	private boolean isRequest() throws AxisFault
 	{
-		synchronized (this)
-		{
-			if (_isRequest == null)
-			{
+		synchronized (this) {
+			if (_isRequest == null) {
 				AxisFault fault = null;
 
 				String value = (String) getOption(_FLOW_SIDE_KEY);
-				if (value != null)
-				{
+				if (value != null) {
 					if (value.equals(_FLOW_SIDE_REQUEST_VALUE))
 						_isRequest = Boolean.TRUE;
 					else if (value.equals(_FLOW_SIDE_RESPONSE_VALUE))
 						_isRequest = Boolean.FALSE;
 					else
-						fault =
-								new AxisFault(
-										_FLOW_SIDE_KEY
-												+ " property not recognized.  Expected "
-												+ _FLOW_SIDE_REQUEST_VALUE
-												+ " or "
-												+ _FLOW_SIDE_RESPONSE_VALUE);
-				}
-				else
-				{
-					fault =
-							new AxisFault("Couldn't find " + _FLOW_SIDE_KEY
-									+ " parameter.");
+						fault = new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected "
+							+ _FLOW_SIDE_REQUEST_VALUE + " or " + _FLOW_SIDE_RESPONSE_VALUE);
+				} else {
+					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY + " parameter.");
 				}
 
 				if (fault != null)
@@ -91,24 +82,21 @@ public class WorkingContextHandler extends BasicHandler
 
 	protected void handleRequest(MessageContext ctxt) throws AxisFault
 	{
-		_logger.trace("Setting the working context for an incoming message.");
+		if (_logger.isTraceEnabled())
+			_logger.trace("Setting the working context for an incoming message.");
 
 		WorkingContext newContext = new WorkingContext();
 		WorkingContext.setCurrentWorkingContext(newContext);
 
-		EndpointReferenceType epr =
-				(EndpointReferenceType) ctxt
-						.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
-		if (epr == null)
-		{
-			throw new AxisFault("Couldn't find \""
-					+ WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY
-					+ "\" property in message context.");
+		EndpointReferenceType epr = (EndpointReferenceType) ctxt
+			.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
+		if (epr == null) {
+			throw new AxisFault("Couldn't find \"" + WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY
+				+ "\" property in message context.");
 		}
 		newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
 
-		newContext.setProperty(WorkingContext.TARGETED_SERVICE_NAME,
-			EPRUtils.extractServiceName(epr));
+		newContext.setProperty(WorkingContext.TARGETED_SERVICE_NAME, EPRUtils.extractServiceName(epr));
 
 		newContext.setProperty(WorkingContext.MESSAGE_CONTEXT_KEY, ctxt);
 
@@ -122,24 +110,20 @@ public class WorkingContextHandler extends BasicHandler
 		// been created. We may have to investigate a delegate/wrapper
 		// pattern to know this information (the service class is known
 		// from the message context's operation).
-		try
-		{
+		try {
 			ResourceKey rKey = ResourceManager.getCurrentResource();
-			epr =
-					ResourceManager.createEPR(rKey, epr.getAddress()
-							.get_value().toString(), EPRUtils
-							.getImplementedPortTypes(epr), EPRUtils.getMasterPortType(epr));
+			epr = ResourceManager.createEPR(rKey, epr.getAddress().get_value().toString(),
+				EPRUtils.getImplementedPortTypes(epr), EPRUtils.getMasterPortType(epr));
 			newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
-		}
-		catch (Throwable t)
-		{
+		} catch (Throwable t) {
 		}
 
 	}
 
 	protected void handleResponse(MessageContext ctxt)
 	{
-		_logger.trace("Clearing the working context for a message.");
+		if (_logger.isTraceEnabled())
+			_logger.trace("Clearing the working context for a message.");
 
 		cleanupWorkingContext(ctxt);
 	}
@@ -151,7 +135,8 @@ public class WorkingContextHandler extends BasicHandler
 
 	public void onFault(MessageContext ctxt)
 	{
-		_logger.debug("On fault called.");
+		if (_logger.isDebugEnabled())
+			_logger.debug("On fault called.");
 
 		cleanupWorkingContext(ctxt);
 	}

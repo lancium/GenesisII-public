@@ -15,59 +15,55 @@ abstract class GeniiOpenFile implements Closeable
 	private boolean _append;
 	private boolean _closed = false;
 	private String[] _path;
-	
+
 	protected abstract void closeImpl() throws IOException;
-	protected abstract void readImpl(long offset, ByteBuffer target)
-		throws FSException;
-	protected abstract void writeImpl(long offset, ByteBuffer source)
-		throws FSException;
-	protected abstract void appendImpl(ByteBuffer source)
-		throws FSException;
-	
-	protected GeniiOpenFile(String[] path, boolean canRead, boolean canWrite, 
-		boolean isAppend)
+
+	protected abstract void readImpl(long offset, ByteBuffer target) throws FSException;
+
+	protected abstract void writeImpl(long offset, ByteBuffer source) throws FSException;
+
+	protected abstract void appendImpl(ByteBuffer source) throws FSException;
+
+	protected GeniiOpenFile(String[] path, boolean canRead, boolean canWrite, boolean isAppend)
 	{
 		_read = canRead;
 		_write = canWrite;
 		_append = isAppend;
 		_path = path;
 	}
-	
+
 	@Override
 	synchronized final public void close() throws IOException
 	{
-		try
-		{
+		try {
 			if (!_closed)
 				closeImpl();
-		}
-		finally
-		{
+		} finally {
 			_closed = true;
 		}
 	}
-	
+
 	void flush() throws FSException
 	{
 		// Nothing to do.
 	}
-	
+
 	final public void read(long offset, ByteBuffer target) throws FSException
 	{
 		if (_closed)
 			throw new FSBadFileHandleException("The file is closed.");
-		
+
 		if (!_read)
 			throw new FSFileHandleBadStateException("Cannot read from file.");
-		
+
 		readImpl(offset, target);
 	}
-	
+
 	final public void write(long offset, ByteBuffer source) throws FSException
 	{
 		if (_closed)
 			throw new FSBadFileHandleException("The file is closed.");
-		
+
 		if (_append)
 			appendImpl(source);
 		else if (_write)
@@ -75,8 +71,9 @@ abstract class GeniiOpenFile implements Closeable
 		else
 			throw new FSFileHandleBadStateException("Cannot write to file.");
 	}
-	
-	public String[] getPath(){
+
+	public String[] getPath()
+	{
 		return _path;
 	}
 }

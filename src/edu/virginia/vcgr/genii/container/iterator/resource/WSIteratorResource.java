@@ -10,10 +10,9 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface WSIteratorResource extends IResource
 {
-	static final public String PREFERRED_BATCH_SIZE_PROPERTY =
-		"ws-iterator-preferred-batch-size";
-	
+	static final public String PREFERRED_BATCH_SIZE_PROPERTY = "ws-iterator-preferred-batch-size";
+
 	public long iteratorSize() throws ResourceException;
-	public Collection<Pair<Long, MessageElement>> retrieveEntries(
-		int firstElement, int numElements) throws ResourceException;
+
+	public Collection<Pair<Long, MessageElement>> retrieveEntries(int firstElement, int numElements) throws ResourceException;
 }

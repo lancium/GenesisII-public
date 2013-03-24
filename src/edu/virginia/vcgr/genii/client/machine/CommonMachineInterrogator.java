@@ -17,14 +17,12 @@ public class CommonMachineInterrogator implements MachineInterrogator
 	@Override
 	public boolean isScreenSaverActive()
 	{
-		throw new IllegalStateException(
-			"Cannot determine screen saver state on this plaform.");
+		throw new IllegalStateException("Cannot determine screen saver state on this plaform.");
 	}
 
 	@Override
 	public boolean isUserLoggedIn()
 	{
-		throw new IllegalStateException(
-			"Cannot determine user log in status on this platform.");
+		throw new IllegalStateException("Cannot determine user log in status on this platform.");
 	}
 }

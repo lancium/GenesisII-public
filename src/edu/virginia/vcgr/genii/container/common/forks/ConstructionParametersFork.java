@@ -7,16 +7,15 @@ import java.io.OutputStream;
 import javax.xml.bind.JAXBException;
 
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 public class ConstructionParametersFork extends AbstractStreamableByteIOFactoryResourceFork
 {
-	public ConstructionParametersFork(ResourceForkService service,
-		String forkPath)
+	public ConstructionParametersFork(ResourceForkService service, String forkPath)
 	{
 		super(service, forkPath);
 	}
@@ -25,18 +24,12 @@ public class ConstructionParametersFork extends AbstractStreamableByteIOFactoryR
 	@RWXMapping(RWXCategory.WRITE)
 	public void modifyState(InputStream source) throws IOException
 	{
-		try
-		{
-			ConstructionParameters cParams =
-				ConstructionParameters.deserializeConstructionParameters(
-					getService().getClass(), source);
-			ResourceManager.getCurrentResource().dereference(
-				).constructionParameters(cParams);
-		}
-		catch (JAXBException e)
-		{
-			throw new IOException(
-				"Unable to unmarshall new construction parameters.", e);
+		try {
+			ConstructionParameters cParams = ConstructionParameters.deserializeConstructionParameters(getService().getClass(),
+				source);
+			ResourceManager.getCurrentResource().dereference().constructionParameters(cParams);
+		} catch (JAXBException e) {
+			throw new IOException("Unable to unmarshall new construction parameters.", e);
 		}
 	}
 
@@ -44,17 +37,12 @@ public class ConstructionParametersFork extends AbstractStreamableByteIOFactoryR
 	@RWXMapping(RWXCategory.WRITE)
 	public void snapshotState(OutputStream sink) throws IOException
 	{
-		try
-		{
-			ConstructionParameters cParams = 
-				ResourceManager.getCurrentResource().dereference(
-					).constructionParameters(getService().getClass());
+		try {
+			ConstructionParameters cParams = ResourceManager.getCurrentResource().dereference()
+				.constructionParameters(getService().getClass());
 			cParams.serialize(sink);
-		}
-		catch (JAXBException e)
-		{
-			throw new IOException(
-				"Unable to marshall construction parameters.", e);
+		} catch (JAXBException e) {
+			throw new IOException("Unable to marshall construction parameters.", e);
 		}
 	}
 }

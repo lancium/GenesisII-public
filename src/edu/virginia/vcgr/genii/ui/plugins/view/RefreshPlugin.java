@@ -21,32 +21,30 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
  */
 public class RefreshPlugin extends AbstractCombinedUIMenusPlugin
 {
-    @Override
-    protected void performMenuAction(UIPluginContext context, MenuType menuType)
-            throws UIPluginException
-    {
-        Closeable contextToken = null;
+	@Override
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
+	{
+		Closeable contextToken = null;
 
-        while (true) {
-            contextToken = null;
-            try {
-                contextToken = ContextManager.temporarilyAssumeContext(context.uiContext()
-                        .callingContext());
-                context.endpointRetriever().refresh();
-                return;
-            } catch (Throwable cause) {
-                ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
-            } finally {
-                StreamUtils.close(contextToken);
-            }
-        }
-    }
+		while (true) {
+			contextToken = null;
+			try {
+				contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+				context.endpointRetriever().refresh();
+				return;
+			} catch (Throwable cause) {
+				ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
+			} finally {
+				StreamUtils.close(contextToken);
+			}
+		}
+	}
 
-    @Override
-    public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
-    {
-        if (selectedDescriptions == null || selectedDescriptions.size() != 1)
-            return false;
-        return selectedDescriptions.iterator().next().typeInformation().isRNS();
-    }
+	@Override
+	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
+	{
+		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
+			return false;
+		return selectedDescriptions.iterator().next().typeInformation().isRNS();
+	}
 }

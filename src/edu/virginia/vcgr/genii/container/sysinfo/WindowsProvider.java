@@ -17,15 +17,19 @@ package edu.virginia.vcgr.genii.container.sysinfo;
 
 import edu.virginia.vcgr.genii.client.jni.JNIContainerBaseClass;
 
-public class WindowsProvider extends JNIContainerBaseClass implements
-		ISystemInfoProvider
+public class WindowsProvider extends JNIContainerBaseClass implements ISystemInfoProvider
 {
 	public native long getIndividualCPUSpeed();
+
 	public native long getPhysicalMemory();
+
 	public native long getPhysicalMemoryAvailable();
+
 	public native long getVirtualMemory();
+
 	public native long getVirtualMemoryAvailable();
-	
+
 	public native boolean getUserLoggedIn();
+
 	public native boolean getScreenSaverActive();
 }

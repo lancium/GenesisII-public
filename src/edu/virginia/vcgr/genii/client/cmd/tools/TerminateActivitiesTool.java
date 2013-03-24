@@ -22,90 +22,81 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 public class TerminateActivitiesTool extends BaseGridTool
 {
 
-
-	static private final String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dterminateActivities";
-	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uterminateActivities";
-
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dterminateActivities";
+	static private final String _USAGE_RESOURCE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uterminateActivities";
 
 	private String besFactory = null;
 
 	private String activities = null;
 
 	private String activityFolders = null;
-	
+
 	private int batchSize = 250;
 
 	public TerminateActivitiesTool()
 	{
-		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE),
-				false,ToolCategory.EXECUTION);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE), false, ToolCategory.EXECUTION);
 
 	}
 
-	@Option({"bes"})
+	@Option({ "bes" })
 	public void setBESFactory(String besFactory)
 	{
 		this.besFactory = besFactory;
 	}
 
-	@Option({"activities"})
-	public void setActivities(String activities) {
+	@Option({ "activities" })
+	public void setActivities(String activities)
+	{
 		this.activities = activities;
 	}
 
-	@Option({"activityFolders"})
-	public void setActivityFolders(String activityFolders) {
+	@Option({ "activityFolders" })
+	public void setActivityFolders(String activityFolders)
+	{
 		this.activityFolders = activityFolders;
 	}
-	
-	
-	@Option({"batchSize"})
-	public void setBatchSize(int batchSize) {
+
+	@Option({ "batchSize" })
+	public void setBatchSize(int batchSize)
+	{
 		this.batchSize = batchSize;
 	}
-
 
 	@Override
 	protected int runCommand() throws Throwable
 	{
 
 		GeniiPath factoryPath = new GeniiPath(besFactory);
-		if(factoryPath.pathType() != GeniiPathType.Grid)
+		if (factoryPath.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException("<bes> must be a grid path. ");
-
 
 		RNSPath path = lookup(factoryPath, RNSPathQueryFlags.MUST_EXIST);
 
-		GeniiBESPortType bes = ClientUtils.createProxy(
-				GeniiBESPortType.class, path.getEndpoint());
+		GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, path.getEndpoint());
 
 		List<EndpointReferenceType> activityEprs = new ArrayList<EndpointReferenceType>();
 		List<String> activityPaths = new ArrayList<String>();
-		if(activities != null)
-		{
+		if (activities != null) {
 			String[] split = activities.split(",");
-			if(split.length==0) throw new InvalidToolUsageException("<activities> must not be empty. ");
-			for(String s : split)
-			{
+			if (split.length == 0)
+				throw new InvalidToolUsageException("<activities> must not be empty. ");
+			for (String s : split) {
 				GeniiPath actPath = new GeniiPath(s);
 				path = lookup(actPath, RNSPathQueryFlags.DONT_CARE);
 				activityPaths.add(s);
 				activityEprs.add(path.getEndpoint());
 			}
 		}
-		if(activityFolders != null)
-		{
+		if (activityFolders != null) {
 			String[] activityFolderPaths = activityFolders.split(",");
-			if(activityFolderPaths.length==0) throw new InvalidToolUsageException("<activity-folders> must not be empty. ");
-			for(String s : activityFolderPaths)
-			{
+			if (activityFolderPaths.length == 0)
+				throw new InvalidToolUsageException("<activity-folders> must not be empty. ");
+			for (String s : activityFolderPaths) {
 				GeniiPath actFolderPath = new GeniiPath(s);
 				path = lookup(actFolderPath, RNSPathQueryFlags.MUST_EXIST);
 				Collection<RNSPath> children = path.listContents();
-				for(RNSPath child : children)
-				{
+				for (RNSPath child : children) {
 					// TypeInformation type = new TypeInformation(path.getEndpoint());
 					// if(type.isBESActivity())
 					{
@@ -117,41 +108,34 @@ public class TerminateActivitiesTool extends BaseGridTool
 		}
 
 		int exitCode = 0;
-		if(activityPaths.size() == 0) 
-		{
+		if (activityPaths.size() == 0) {
 			stderr.println("No activities to terminate...");
 			return 1;
 		}
 		// terminate activities in batches
-		for(int h = 0; h < Math.ceil(activityPaths.size()/((double)batchSize));h++)
-		{
+		for (int h = 0; h < Math.ceil(activityPaths.size() / ((double) batchSize)); h++) {
 			int start = h;
-			int end = Math.min(activityEprs.size(),batchSize*(1+h));
-			
+			int end = Math.min(activityEprs.size(), batchSize * (1 + h));
+
 			List<EndpointReferenceType> currActivityEprs = activityEprs.subList(start, end);
 
-			TerminateActivitiesResponseType resp = 
-				bes.terminateActivities(new TerminateActivitiesType(
-						currActivityEprs.toArray(new EndpointReferenceType[currActivityEprs.size()]), null));
+			TerminateActivitiesResponseType resp = bes.terminateActivities(new TerminateActivitiesType(currActivityEprs
+				.toArray(new EndpointReferenceType[currActivityEprs.size()]), null));
 
-			if (resp != null)
-			{
-				TerminateActivityResponseType []resps = resp.getResponse();
-				if (resps != null)
-				{
+			if (resp != null) {
+				TerminateActivityResponseType[] resps = resp.getResponse();
+				if (resps != null) {
 					int i = 0;
-					for(TerminateActivityResponseType r : resps)
-					{
-						if (!r.isTerminated())
-						{
-							stderr.println("Failed to terminate the activity "+activityPaths.get(start+i)+": "+ 
-									r.getFault().getFaultstring());
+					for (TerminateActivityResponseType r : resps) {
+						if (!r.isTerminated()) {
+							stderr.println("Failed to terminate the activity " + activityPaths.get(start + i) + ": "
+								+ r.getFault().getFaultstring());
 							exitCode = 1;
 						}
 						i++;
 					}
-				}
-				else exitCode = 1;
+				} else
+					exitCode = 1;
 			}
 		}
 
@@ -159,21 +143,16 @@ public class TerminateActivitiesTool extends BaseGridTool
 
 	}
 
-
 	@Override
 	protected void verify() throws ToolException
 	{
 
-		if(besFactory == null || besFactory.trim().length() == 0)
-		{
+		if (besFactory == null || besFactory.trim().length() == 0) {
 			throw new InvalidToolUsageException("No BES container specified.");
 		}
-		if((activities == null || activities.trim().length() == 0) 
-				&& (activityFolders == null || activityFolders.trim().length() == 0))
-		{
+		if ((activities == null || activities.trim().length() == 0)
+			&& (activityFolders == null || activityFolders.trim().length() == 0)) {
 			throw new InvalidToolUsageException("No activities specified.");
 		}
 	}
 }
-
-			

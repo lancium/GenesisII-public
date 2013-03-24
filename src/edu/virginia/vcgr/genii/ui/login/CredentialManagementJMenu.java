@@ -9,14 +9,12 @@ import edu.virginia.vcgr.genii.ui.UIContext;
 public class CredentialManagementJMenu extends JMenu
 {
 	static final long serialVersionUID = 0L;
-	
-	static private class CredentialManagementActionImpl 
-		extends CredentialManagementAction
+
+	static private class CredentialManagementActionImpl extends CredentialManagementAction
 	{
 		static final long serialVersionUID = 0L;
-		
-		private CredentialManagementActionImpl(
-			CredentialManagementContext context)
+
+		private CredentialManagementActionImpl(CredentialManagementContext context)
 		{
 			super(context);
 		}
@@ -27,16 +25,16 @@ public class CredentialManagementJMenu extends JMenu
 			// Nothing to do.
 		}
 	}
-	
+
 	CredentialManagementJMenu(CredentialManagementContext context)
 	{
 		super(new CredentialManagementActionImpl(context));
-		
+
 		add(context.loginAction());
 		add(context.logoutAction());
 		add(context.logoutAllAction());
 	}
-	
+
 	public CredentialManagementJMenu(UIContext context)
 	{
 		this(new CredentialManagementContext(context));

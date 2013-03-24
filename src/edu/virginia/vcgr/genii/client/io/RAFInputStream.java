@@ -22,7 +22,7 @@ import java.io.RandomAccessFile;
 public class RAFInputStream extends InputStream
 {
 	private RandomAccessFile _raf;
-	
+
 	public RAFInputStream(RandomAccessFile raf)
 	{
 		_raf = raf;
@@ -32,24 +32,24 @@ public class RAFInputStream extends InputStream
 	{
 		_raf.close();
 	}
-	
+
 	public int read() throws IOException
 	{
 		return _raf.read();
 	}
-	
-    public int read(byte[] b) throws IOException
-    {
-    	return _raf.read(b);
-    }
+
+	public int read(byte[] b) throws IOException
+	{
+		return _raf.read(b);
+	}
 
 	public int read(byte[] b, int off, int len) throws IOException
 	{
 		return _raf.read(b, off, len);
 	}
-	
-    public long skip(long n) throws IOException
-    {
-    	return _raf.skipBytes((int)n);
-    }
+
+	public long skip(long n) throws IOException
+	{
+		return _raf.skipBytes((int) n);
+	}
 }

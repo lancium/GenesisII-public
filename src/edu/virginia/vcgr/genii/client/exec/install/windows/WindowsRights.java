@@ -13,44 +13,36 @@ public class WindowsRights
 		private File _rightsExe;
 		private String _rightToken;
 		private String _account;
-		
-		private GrantRightsTask(File rightsExe, String rightToken, 
-			String account) throws IOException
+
+		private GrantRightsTask(File rightsExe, String rightToken, String account) throws IOException
 		{
-			CommonFunctions.checkPath(
-				rightsExe, true);
-			
+			CommonFunctions.checkPath(rightsExe, true);
+
 			_rightsExe = rightsExe;
 			_rightToken = rightToken;
 			_account = account;
 		}
-		
+
 		@Override
 		public String[] getCommandLine()
 		{
-			return new String[] {
-				_rightsExe.getAbsolutePath(),
-				"+r", _rightToken, "-u", _account
-			};
+			return new String[] { _rightsExe.getAbsolutePath(), "+r", _rightToken, "-u", _account };
 		}
-		
+
 		@Override
 		public String toString()
 		{
-			return String.format("Grant right %s to %s",
-				_rightToken, _account);
+			return String.format("Grant right %s to %s", _rightToken, _account);
 		}
 	}
-	
-	static public ExecutionTask grantLogonAsService(String account)
-		throws IOException
+
+	static public ExecutionTask grantLogonAsService(String account) throws IOException
 	{
 		account = CommonFunctions.getAccount(account);
 		File geniiInstallDir = CommonFunctions.getGeniiInstallDir();
-		File rightsExe = new File(geniiInstallDir, 
-			"ext\\WindowsResourceKits\\Tools\\ntrights.exe");
+		File rightsExe = new File(geniiInstallDir, "ext\\WindowsResourceKits\\Tools\\ntrights.exe");
 		CommonFunctions.checkPath(rightsExe, true);
-		
+
 		return new GrantRightsTask(rightsExe, "SeServiceLogonRight", account);
 	}
 }

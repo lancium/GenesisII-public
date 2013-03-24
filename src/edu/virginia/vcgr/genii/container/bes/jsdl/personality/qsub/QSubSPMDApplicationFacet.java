@@ -9,19 +9,16 @@ public class QSubSPMDApplicationFacet extends CommonPosixLikeSPMDApplicationFace
 {
 	private FilesystemManager _fsManager;
 	private BESWorkingDirectory _workingDirectory;
-	
-	public QSubSPMDApplicationFacet(FilesystemManager fsManager,
-		BESWorkingDirectory workingDirectory)
+
+	public QSubSPMDApplicationFacet(FilesystemManager fsManager, BESWorkingDirectory workingDirectory)
 	{
 		_fsManager = fsManager;
 		_workingDirectory = workingDirectory;
 	}
-	
+
 	@Override
-	public Object createFacetUnderstanding(Object partentUnderstanding)
-		throws JSDLException
+	public Object createFacetUnderstanding(Object partentUnderstanding) throws JSDLException
 	{
-		return new QSubApplicationUnderstanding(
-			_fsManager, _workingDirectory);
+		return new QSubApplicationUnderstanding(_fsManager, _workingDirectory);
 	}
 }

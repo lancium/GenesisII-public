@@ -1,8 +1,0 @@
-#
-# This is an example version list
-#
-#
-
-foo/bar/com.1[1.0.0]		# Let's just make sure that the comments work
-foo/bar/com.2[1.2.0]
-foo/bar/com.3[1.2.3]

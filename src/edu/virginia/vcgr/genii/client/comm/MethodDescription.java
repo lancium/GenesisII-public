@@ -25,39 +25,36 @@ public class MethodDescription
 	{
 		_method = m;
 	}
-	
+
 	public int hashCode()
 	{
 		return _method.getName().hashCode();
 	}
-	
+
 	public boolean equals(MethodDescription other)
 	{
-		if (other._method.getName().equals(_method.getName()))
-		{
-			Class<?> []otherParameterTypes = other._method.getParameterTypes();
-			Class<?> []myParameterTypes = _method.getParameterTypes();
-			
-			if (otherParameterTypes.length == myParameterTypes.length)
-			{
-				for (int lcv = 0; lcv < myParameterTypes.length; lcv++)
-				{
+		if (other._method.getName().equals(_method.getName())) {
+			Class<?>[] otherParameterTypes = other._method.getParameterTypes();
+			Class<?>[] myParameterTypes = _method.getParameterTypes();
+
+			if (otherParameterTypes.length == myParameterTypes.length) {
+				for (int lcv = 0; lcv < myParameterTypes.length; lcv++) {
 					if (!otherParameterTypes[lcv].equals(myParameterTypes[lcv]))
 						return false;
 				}
-				
+
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public boolean equals(Object other)
 	{
-		return equals((MethodDescription)other);
+		return equals((MethodDescription) other);
 	}
-	
+
 	public Method getMethod()
 	{
 		return _method;

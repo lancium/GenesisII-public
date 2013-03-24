@@ -6,10 +6,10 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 public interface ResourceFork
 {
 	public String getForkPath();
-	
-	public void registerNotificationHandlers(
-		NotificationMultiplexer multiplexer);
-	
+
+	public void registerNotificationHandlers(NotificationMultiplexer multiplexer);
+
 	public void destroy() throws ResourceException;
+
 	public ResourceForkInformation describe();
 }

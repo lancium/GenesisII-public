@@ -14,114 +14,85 @@ import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 
 public class HPCApplicationReifier
 {
-	static public HPCProfileApplication_Type reifyApplication(
-		File deployDirectory,
-		AbstractReifier reifier,
+	static public HPCProfileApplication_Type reifyApplication(File deployDirectory, AbstractReifier reifier,
 		HPCProfileApplication_Type application)
 	{
-		application.setEnvironment(
-			reifyEnvironment(deployDirectory, reifier, application.getEnvironment()));
-		
+		application.setEnvironment(reifyEnvironment(deployDirectory, reifier, application.getEnvironment()));
+
 		FileName_Type binary = application.getExecutable();
-		if (binary == null)
-		{
+		if (binary == null) {
 			binary = new FileName_Type(reifier.getBinaryName(deployDirectory));
 			application.setExecutable(binary);
 		}
-		
-		DirectoryName_Type directory = new DirectoryName_Type(
-			reifier.getCWD(deployDirectory));
+
+		DirectoryName_Type directory = new DirectoryName_Type(reifier.getCWD(deployDirectory));
 		application.setWorkingDirectory(directory);
-		
+
 		return application;
 	}
-	
-	static private Environment_Type[] reifyEnvironment(
-		File deployDirectory,
-		AbstractReifier reifier, Environment_Type []original)
+
+	static private Environment_Type[] reifyEnvironment(File deployDirectory, AbstractReifier reifier,
+		Environment_Type[] original)
 	{
 		boolean isWindows = isWindows();
 		boolean handledPath = false;
 		boolean handledLibraryPath = false;
-		
-		Collection<Environment_Type> ret =
-			new ArrayList<Environment_Type>();
-		
+
+		Collection<Environment_Type> ret = new ArrayList<Environment_Type>();
+
 		if (original == null)
 			original = new Environment_Type[0];
-		for (Environment_Type env : original)
-		{
+		for (Environment_Type env : original) {
 			String name = env.getName().toString();
-			
-			if (isWindows && name.equalsIgnoreCase("path"))
-			{
-				env.set_value(
-					modifyPath(env.get_value(), 
-						reifier.getAdditionalPaths(deployDirectory)));
-				env.set_value(
-					modifyPath(env.get_value(), 
-						reifier.getAdditionalLibraryPaths(deployDirectory)));
+
+			if (isWindows && name.equalsIgnoreCase("path")) {
+				env.set_value(modifyPath(env.get_value(), reifier.getAdditionalPaths(deployDirectory)));
+				env.set_value(modifyPath(env.get_value(), reifier.getAdditionalLibraryPaths(deployDirectory)));
 				handledPath = true;
 				handledLibraryPath = true;
-			} else if (!isWindows && name.equals("PATH"))
-			{
-				env.set_value(
-					modifyPath(env.get_value(),
-						reifier.getAdditionalPaths(deployDirectory)));
+			} else if (!isWindows && name.equals("PATH")) {
+				env.set_value(modifyPath(env.get_value(), reifier.getAdditionalPaths(deployDirectory)));
 				handledPath = true;
-			} else if (!isWindows && name.equals("LD_LIBRARY_PATH"))
-			{
-				env.set_value(
-					modifyPath(env.get_value(),
-						reifier.getAdditionalLibraryPaths(deployDirectory)));
+			} else if (!isWindows && name.equals("LD_LIBRARY_PATH")) {
+				env.set_value(modifyPath(env.get_value(), reifier.getAdditionalLibraryPaths(deployDirectory)));
 				handledLibraryPath = true;
 			}
 		}
-		
-		if (!handledPath)
-		{
-			Environment_Type env = new Environment_Type(
-				modifyPath(null, reifier.getAdditionalPaths(deployDirectory)));
+
+		if (!handledPath) {
+			Environment_Type env = new Environment_Type(modifyPath(null, reifier.getAdditionalPaths(deployDirectory)));
 			env.setName(new NCName("PATH"));
-			
-			if (isWindows)
-			{
-				env.set_value(
-					modifyPath(env.get_value(),
-						reifier.getAdditionalLibraryPaths(deployDirectory)));
+
+			if (isWindows) {
+				env.set_value(modifyPath(env.get_value(), reifier.getAdditionalLibraryPaths(deployDirectory)));
 				handledLibraryPath = true;
 			}
-			
+
 			ret.add(env);
 		}
-		
-		if (!handledLibraryPath)
-		{
-			Environment_Type env = new Environment_Type(
-				modifyPath(null, reifier.getAdditionalLibraryPaths(deployDirectory)));
+
+		if (!handledLibraryPath) {
+			Environment_Type env = new Environment_Type(modifyPath(null, reifier.getAdditionalLibraryPaths(deployDirectory)));
 			env.setName(new NCName("LD_LIBRARY_PATH"));
 		}
-			
+
 		return ret.toArray(new Environment_Type[0]);
 	}
-	
+
 	static private boolean isWindows()
 	{
-		return OperatingSystemType.getCurrent() == 
-			OperatingSystemType.Windows_XP;
+		return OperatingSystemType.getCurrent() == OperatingSystemType.Windows_XP;
 	}
-	
-	static private String modifyPath(String original,
-		String[] newPaths)
+
+	static private String modifyPath(String original, String[] newPaths)
 	{
-		for (String newPath : newPaths)
-		{
+		for (String newPath : newPaths) {
 			if (original == null)
 				original = newPath;
 			else
 				original = original + File.pathSeparatorChar + newPath;
 		}
-		
+
 		return original;
 	}
 }

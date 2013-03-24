@@ -35,5 +35,4 @@ Code:
 
 Implementing Classes 
 
-    * edu.virginia.vcgr.genii.client.cmd.tools.GamlChmodTool
-    * edu.virginia.vcgr.genii.client.security.gamlauthz.GamlClientTool 
+    * edu.virginia.vcgr.genii.client.cmd.tools.ChmodTool

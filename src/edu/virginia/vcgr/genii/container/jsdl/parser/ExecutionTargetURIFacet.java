@@ -9,9 +9,8 @@ public class ExecutionTargetURIFacet extends DefaultTargetURIFacet
 	@Override
 	public void consumeURI(Object currentUnderstanding, URI uri)
 	{
-		ExecutionDataStagingFacet ds = 
-			(ExecutionDataStagingFacet)currentUnderstanding;
-		
+		ExecutionDataStagingFacet ds = (ExecutionDataStagingFacet) currentUnderstanding;
+
 		ds.setTargetURI(uri.toString());
 	}
 }

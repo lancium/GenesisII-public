@@ -6,12 +6,12 @@ import javax.swing.JTextField;
 public class GuiPasswordDialog extends GuiInputDialog
 {
 	static final long serialVersionUID = 0L;
-	public GuiPasswordDialog(String title, 
-			String prompt)
+
+	public GuiPasswordDialog(String title, String prompt)
 	{
 		super(title, prompt);
 	}
-	
+
 	@Override
 	protected JTextField createTextField()
 	{

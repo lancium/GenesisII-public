@@ -10,21 +10,17 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class DBBrokerResourceFactory extends BasicDBResourceFactory
 {
-	public DBBrokerResourceFactory(DatabaseConnectionPool pool)
-		throws SQLException
+	public DBBrokerResourceFactory(DatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}
-	
+
 	@Override
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
-		try
-		{
+		try {
 			return new DBBrokerResource(parentKey, _pool);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 	}

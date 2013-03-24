@@ -5,18 +5,15 @@ import java.util.Collection;
 
 import org.apache.axis.message.MessageElement;
 
-public abstract class AbstractAttributePreFetcher 
-	implements AttributePreFetcher
+public abstract class AbstractAttributePreFetcher implements AttributePreFetcher
 {
-	protected abstract void fillInAttributes(
-		Collection<MessageElement> attributes);
-	
+	protected abstract void fillInAttributes(Collection<MessageElement> attributes);
+
 	@Override
 	public Collection<MessageElement> preFetch()
 	{
-		Collection<MessageElement> attributes =
-			new ArrayList<MessageElement>();
-		
+		Collection<MessageElement> attributes = new ArrayList<MessageElement>();
+
 		fillInAttributes(attributes);
 		return attributes;
 	}

@@ -4,7 +4,6 @@ import java.io.File;
 
 public interface ExternalApplication
 {
-	public ExternalApplicationToken launch(
-		File content, ExternalApplicationCallback...callbacks)
-			throws ExternalApplicationException;
+	public ExternalApplicationToken launch(File content, ExternalApplicationCallback... callbacks)
+		throws ExternalApplicationException;
 }

@@ -8,6 +8,5 @@ import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
 
 public interface IJSDLReifier
 {
-	public JobDefinition_Type reifyJSDL(File deployDirectory,
-		JobDefinition_Type jobDef) throws DeploymentException;
+	public JobDefinition_Type reifyJSDL(File deployDirectory, JobDefinition_Type jobDef) throws DeploymentException;
 }

@@ -10,44 +10,39 @@ import java.util.Arrays;
 
 public class InMemorySerializedContextResolver implements IContextResolver
 {
-	private byte []_storedContext;
-	
+	private byte[] _storedContext;
+
 	public InMemorySerializedContextResolver()
 	{
 		this(null);
 	}
-	
-	private InMemorySerializedContextResolver(byte []newData)
+
+	private InMemorySerializedContextResolver(byte[] newData)
 	{
 		_storedContext = newData;
 	}
-	
+
 	@Override
 	public ICallingContext load() throws IOException, FileNotFoundException
 	{
 		if (_storedContext == null)
 			return null;
-		
-		try
-		{
+
+		try {
 			ByteArrayInputStream bais = new ByteArrayInputStream(_storedContext);
 			ObjectInputStream ois = new ObjectInputStream(bais);
-			return (ICallingContext)ois.readObject();
-		}
-		catch (ClassNotFoundException cnfe)
-		{
+			return (ICallingContext) ois.readObject();
+		} catch (ClassNotFoundException cnfe) {
 			throw new IOException("Couldn't find class for deserialization.", cnfe);
 		}
 	}
 
 	@Override
-	public void store(ICallingContext ctxt) throws FileNotFoundException,
-			IOException
+	public void store(ICallingContext ctxt) throws FileNotFoundException, IOException
 	{
 		if (ctxt == null)
 			_storedContext = null;
-		else
-		{
+		else {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
 			oos.writeObject(ctxt);
@@ -55,13 +50,12 @@ public class InMemorySerializedContextResolver implements IContextResolver
 			_storedContext = baos.toByteArray();
 		}
 	}
-	
+
 	public Object clone()
 	{
 		if (_storedContext == null)
 			return new InMemorySerializedContextResolver(null);
-		
-		return new InMemorySerializedContextResolver(
-			Arrays.copyOf(_storedContext, _storedContext.length));
+
+		return new InMemorySerializedContextResolver(Arrays.copyOf(_storedContext, _storedContext.length));
 	}
 }

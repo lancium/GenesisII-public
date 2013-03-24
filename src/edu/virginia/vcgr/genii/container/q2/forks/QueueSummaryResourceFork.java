@@ -7,29 +7,27 @@ import java.io.PrintStream;
 import java.sql.SQLException;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.q2.QueueManager;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class QueueSummaryResourceFork extends
-		AbstractStreamableByteIOFactoryResourceFork
+public class QueueSummaryResourceFork extends AbstractStreamableByteIOFactoryResourceFork
 {
-	public QueueSummaryResourceFork(ResourceForkService service,
-		String forkPath)
+	public QueueSummaryResourceFork(ResourceForkService service, String forkPath)
 	{
 		super(service, forkPath);
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
 	public void destroy() throws ResourceException
 	{
 		super.destroy();
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
 	public void modifyState(InputStream source) throws IOException
@@ -43,15 +41,12 @@ public class QueueSummaryResourceFork extends
 	{
 		ResourceKey rKey = getService().getResourceKey();
 		PrintStream ps = new PrintStream(sink);
-		
-		try
-		{
+
+		try {
 			QueueManager qMgr = QueueManager.getManager(rKey.getResourceKey());
 			qMgr.summarize(ps);
 			ps.flush();
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new IOException("Unable to get queue summary.", sqe);
 		}
 	}

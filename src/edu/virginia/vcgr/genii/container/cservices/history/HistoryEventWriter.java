@@ -9,6 +9,6 @@ public abstract class HistoryEventWriter extends PrintWriter
 	{
 		super(writer);
 	}
-	
+
 	public abstract HistoryEventToken getToken();
 }

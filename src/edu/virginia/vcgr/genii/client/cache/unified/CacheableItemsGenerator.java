@@ -13,9 +13,10 @@ import java.util.Collection;
  * back from a container. The cache manager will ensure that the 
  * items are propagated to appropriate caches if the relevant method 
  * in manager interface is invoked.*/
-public interface CacheableItemsGenerator {
- 
+public interface CacheableItemsGenerator
+{
+
 	boolean isSupported(Class<?>... argumentTypes);
-	
+
 	Collection<CacheableItem> generateItems(Object... originalItems);
 }

@@ -13,53 +13,48 @@ public class GeniiAttachment
 {
 	private String _name;
 	private byte[] _data;
-	
-	public GeniiAttachment(String name, byte []data)
+
+	public GeniiAttachment(String name, byte[] data)
 	{
 		_name = name;
 		_data = data;
 	}
-	
-	public GeniiAttachment(byte []data)
+
+	public GeniiAttachment(byte[] data)
 	{
 		this(null, data);
 	}
-	
+
 	public byte[] getData()
 	{
 		return _data;
 	}
-	
+
 	public String getName()
 	{
 		return _name;
 	}
-	
-	static public byte[] extractData(AttachmentPart part)
-		throws SOAPException, IOException
+
+	static public byte[] extractData(AttachmentPart part) throws SOAPException, IOException
 	{
 		InputStream in = null;
-		
-		try
-		{
+
+		try {
 			DataHandler handler = part.getDataHandler();
 			in = handler.getInputStream();
-			byte []data = new byte[in.available()];
+			byte[] data = new byte[in.available()];
 			int offset = 0;
 			int length = data.length;
-			while (length > 0)
-			{
+			while (length > 0) {
 				int read = in.read(data, offset, length);
 				if (read <= 0)
 					break;
 				offset += read;
 				length -= read;
 			}
-			
+
 			return data;
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(in);
 		}
 	}

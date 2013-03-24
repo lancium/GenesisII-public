@@ -24,8 +24,8 @@ import java.security.KeyStoreException;
 import java.security.KeyStore;
 
 /**
- * This class defines the Service Provider Interface (SPI) for the WinX509TM
- * TrustManagerFactory class.
+ * This class defines the Service Provider Interface (SPI) for the WinX509TM TrustManagerFactory
+ * class.
  * 
  * @author Duane Merrill
  * 
@@ -45,14 +45,11 @@ public final class WinX509TrustManagerFactorySpi extends TrustManagerFactorySpi
 	}
 
 	/**
-	 * Initializes this factory with a source of certificate authorities and
-	 * related trust material.
+	 * Initializes this factory with a source of certificate authorities and related trust material.
 	 */
-	synchronized protected void engineInit(KeyStore ks)
-			throws KeyStoreException
+	synchronized protected void engineInit(KeyStore ks) throws KeyStoreException
 	{
-		if (_trustManager == null)
-		{
+		if (_trustManager == null) {
 			_trustManager = new WinX509TrustManager();
 		}
 	}
@@ -62,8 +59,7 @@ public final class WinX509TrustManagerFactorySpi extends TrustManagerFactorySpi
 	 */
 	synchronized protected void engineInit(ManagerFactoryParameters spec)
 	{
-		if (_trustManager == null)
-		{
+		if (_trustManager == null) {
 			_trustManager = new WinX509TrustManager();
 		}
 	}

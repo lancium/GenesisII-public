@@ -9,12 +9,12 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 public class BatchEventsSubscriptionPolicy extends DurationBasedSubscriptionPolicy
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private BatchEventsSubscriptionPolicy()
 	{
 		super(SubscriptionPolicyTypes.BatchEvents, null);
 	}
-	
+
 	public BatchEventsSubscriptionPolicy(Duration batchDuration)
 	{
 		super(SubscriptionPolicyTypes.BatchEvents, batchDuration);

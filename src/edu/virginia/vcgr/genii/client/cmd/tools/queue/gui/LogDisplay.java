@@ -35,23 +35,23 @@ public class LogDisplay extends JDialog
 	private EndpointReferenceType _queue;
 	private JobTicket _job;
 	private JTextPane _text;
-	
+
 	private class TextSetter implements Runnable
 	{
 		private String _text;
-		
+
 		public TextSetter(String text)
 		{
 			_text = text;
 		}
-		
+
 		@Override
 		public void run()
 		{
 			setLogText(_text);
 		}
 	}
-	
+
 	private class UpdateWorker implements Runnable
 	{
 		@Override
@@ -61,74 +61,65 @@ public class LogDisplay extends JDialog
 			InputStreamReader reader = null;
 			StringWriter writer = new StringWriter();
 			PrintWriter printer = new PrintWriter(writer);
-			
-			try
-			{
+
+			try {
 				QueueManipulator manip = new QueueManipulator(_queue);
 				EndpointReferenceType epr = manip.getJobLog(_job);
 				in = ByteIOStreamFactory.createInputStream(epr);
 				reader = new InputStreamReader(in);
 				StreamUtils.copyStream(reader, printer);
-			}
-			catch (Throwable cause)
-			{
+			} catch (Throwable cause) {
 				printer.println("Unable to acquire job's log!\n\n");
 				cause.printStackTrace(printer);
 			}
-			
+
 			printer.close();
 			SwingUtilities.invokeLater(new TextSetter(writer.toString()));
 		}
 	}
-	
-	public LogDisplay(JFrame owner, EndpointReferenceType queue,
-		JobTicket job)
+
+	public LogDisplay(JFrame owner, EndpointReferenceType queue, JobTicket job)
 	{
 		super(owner);
 		setTitle("Job Log");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
+
 		_queue = queue;
 		_job = job;
-		
+
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
-		
+
 		_text = new JTextPane();
 		_text.setEditable(false);
 		_text.setText("Querying grid queue for job log.");
-		
+
 		Dimension d = new Dimension(800, 400);
 		_text.setMinimumSize(d);
 		_text.setPreferredSize(d);
 		JScrollPane scroller = new JScrollPane(_text);
-		scroller.setBorder(BorderFactory.createTitledBorder(
-			BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-			"Job Log"));
-		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+		scroller.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Job Log"));
+		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new OKAction()),
-			new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
-		
+		content.add(new JButton(new OKAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+
 		Thread th = new Thread(new UpdateWorker());
 		th.setName("Job Log Updater Thread");
 		th.setDaemon(true);
 		th.start();
 	}
-	
+
 	private void setLogText(String text)
 	{
 		_text.setText(text);
 		_text.setCaretPosition(0);
 	}
-	
+
 	private class OKAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
-		
+
 		public OKAction()
 		{
 			super("OK");

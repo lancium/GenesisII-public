@@ -10,7 +10,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JNICdTool extends JNILibraryBase 
+public class JNICdTool extends JNILibraryBase
 {
 	static private Log _logger = LogFactory.getLog(JNICdTool.class);
 
@@ -18,22 +18,19 @@ public class JNICdTool extends JNILibraryBase
 	{
 		tryToInitialize();
 
-		try
-		{
-			ICallingContext ctxt = ContextManager.getCurrentContext();
-			RNSPath path = ctxt.getCurrentPath().lookup(targetDirectory, RNSPathQueryFlags.MUST_EXIST);			
+		try {
+			ICallingContext ctxt = ContextManager.getExistingContext();
+			RNSPath path = ctxt.getCurrentPath().lookup(targetDirectory, RNSPathQueryFlags.MUST_EXIST);
 			if (!(new TypeInformation(path.getEndpoint()).isRNS()))
 				return false;
-			
+
 			ctxt.setCurrentPath(path);
 			ContextManager.storeCurrentContext(ctxt);
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_logger.info("exception occurred in changeDirectory", e);
 			return false;
 		}
-		
+
 		return true;
 	}
 }

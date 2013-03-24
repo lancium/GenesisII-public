@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>GenesisII-gaml</name>
+	<name>GenesisII-fred</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -14,4 +14,15 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<filteredResources>
+		<filter>
+			<id>0</id>
+			<name></name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-.svn</arguments>
+			</matcher>
+		</filter>
+	</filteredResources>
 </projectDescription>

@@ -21,7 +21,6 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
@@ -36,17 +35,15 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-@GeniiServiceConfiguration(
-	resourceProvider=DBBrokerResourceProvider.class)
-public class GeniiWSNBrokerServiceImpl extends GenesisIIBase
-	implements GeniiWSNBrokerPortType
+@GeniiServiceConfiguration(resourceProvider = DBBrokerResourceProvider.class)
+public class GeniiWSNBrokerServiceImpl extends GenesisIIBase implements GeniiWSNBrokerPortType
 {
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(GeniiWSNBrokerServiceImpl.class);
-	
-	private class BrokeredNotificationHandler 
-		extends AbstractNotificationHandler<NotificationMessageContents>
+
+	private class BrokeredNotificationHandler extends AbstractNotificationHandler<NotificationMessageContents>
 	{
 		private BrokeredNotificationHandler()
 		{
@@ -54,38 +51,32 @@ public class GeniiWSNBrokerServiceImpl extends GenesisIIBase
 		}
 
 		@Override
-		final public String handleNotification(TopicPath topic,
-			EndpointReferenceType producerReference,
-			EndpointReferenceType subscriptionReference,
-			NotificationMessageContents contents) throws Exception
+		final public String handleNotification(TopicPath topic, EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference, NotificationMessageContents contents) throws Exception
 		{
 			// Should we broker attachments?
 			GeniiAttachment attachment = null;
-			
+
 			ResourceKey rKey = ResourceManager.getCurrentResource();
-			WSNotificationContainerService wsnService = ContainerServices.findService(
-				WSNotificationContainerService.class);
-			
-			wsnService.publishNotification(rKey.getResourceKey(),
-				producerReference, topic, contents, attachment);
+			WSNotificationContainerService wsnService = ContainerServices.findService(WSNotificationContainerService.class);
+
+			wsnService.publishNotification(rKey.getResourceKey(), producerReference, topic, contents, attachment);
 			return NotificationConstants.OK;
 		}
 	}
-	
+
 	@Override
-	protected void registerNotificationHandlers(
-		NotificationMultiplexer multiplexer)
+	protected void registerNotificationHandlers(NotificationMultiplexer multiplexer)
 	{
 		super.registerNotificationHandlers(multiplexer);
-		
+
 		multiplexer.registerNotificationHandler(null, new BrokeredNotificationHandler());
 	}
 
-	public GeniiWSNBrokerServiceImpl()
-		throws RemoteException
+	public GeniiWSNBrokerServiceImpl() throws RemoteException
 	{
 		super("GeniiWSNBrokerPortType");
-		
+
 		addImplementedPortType(WSRFConstants.WSN_CREATE_PULL_POINT_PORT);
 		addImplementedPortType(WSRFConstants.WSN_BROKERED_NOTIFICATION_PORT);
 		addImplementedPortType(WSRFConstants.WSN_REGISTER_PUBLISHER_PORT);
@@ -99,23 +90,18 @@ public class GeniiWSNBrokerServiceImpl extends GenesisIIBase
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreatePullPointResponse createPullPoint(CreatePullPoint_Element arg0)
-			throws RemoteException, UnableToCreatePullPointFaultType
+	public CreatePullPointResponse createPullPoint(CreatePullPoint_Element arg0) throws RemoteException,
+		UnableToCreatePullPointFaultType
 	{
-		throw FaultManipulator.fillInFault(
-			new UnableToCreatePullPointFaultType());
+		throw FaultManipulator.fillInFault(new UnableToCreatePullPointFaultType());
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public RegisterPublisherResponse registerPublisher(RegisterPublisher arg0)
-		throws RemoteException, PublisherRegistrationRejectedFaultType,
-			TopicNotSupportedFaultType,
-			UnacceptableInitialTerminationTimeFaultType,
-			InvalidTopicExpressionFaultType, ResourceUnknownFaultType,
-			PublisherRegistrationFailedFaultType
+	public RegisterPublisherResponse registerPublisher(RegisterPublisher arg0) throws RemoteException,
+		PublisherRegistrationRejectedFaultType, TopicNotSupportedFaultType, UnacceptableInitialTerminationTimeFaultType,
+		InvalidTopicExpressionFaultType, ResourceUnknownFaultType, PublisherRegistrationFailedFaultType
 	{
-		throw FaultManipulator.fillInFault(
-			new PublisherRegistrationRejectedFaultType());
+		throw FaultManipulator.fillInFault(new PublisherRegistrationRejectedFaultType());
 	}
 }

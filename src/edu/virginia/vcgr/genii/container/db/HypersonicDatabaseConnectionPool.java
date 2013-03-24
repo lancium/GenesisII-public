@@ -7,29 +7,29 @@ import java.util.Properties;
 
 public class HypersonicDatabaseConnectionPool extends DatabaseConnectionPool
 {
-	public HypersonicDatabaseConnectionPool(Properties connectionProperties)
-		throws IllegalAccessException, ClassNotFoundException, InstantiationException
+	public HypersonicDatabaseConnectionPool(Properties connectionProperties) throws IllegalAccessException,
+		ClassNotFoundException, InstantiationException
 	{
 		super(connectionProperties);
 	}
-	
+
 	protected Connection createConnection() throws SQLException
 	{
 		Connection conn = super.createConnection();
-		
+
 		Statement stmt = null;
-		try
-		{
+		try {
 			stmt = conn.createStatement();
 			stmt.execute("SET WRITE_DELAY FALSE");
 			conn.commit();
-			
+
 			return conn;
-		}
-		finally
-		{
+		} finally {
 			if (stmt != null)
-				try { stmt.close(); } catch (Throwable t) {}
+				try {
+					stmt.close();
+				} catch (Throwable t) {
+				}
 		}
 	}
 }

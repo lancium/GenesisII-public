@@ -29,7 +29,6 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
@@ -45,32 +44,29 @@ import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @ForkRoot(RootRNSFork.class)
-public class VCGRContainerServiceImpl extends ResourceForkBaseService
-	implements VCGRContainerPortType
+public class VCGRContainerServiceImpl extends ResourceForkBaseService implements VCGRContainerPortType
 {
 	@SuppressWarnings("unused")
-	static private Log _logger = LogFactory.getLog(
-		VCGRContainerServiceImpl.class);
+	static private Log _logger = LogFactory.getLog(VCGRContainerServiceImpl.class);
 
 	static final private String SERVICE_NAME = "VCGRContainerPortType";
-	
+
 	@Override
-	protected void setAttributeHandlers() throws ResourceException, 
-		ResourceUnknownFaultType, NoSuchMethodException
+	protected void setAttributeHandlers() throws ResourceException, ResourceUnknownFaultType, NoSuchMethodException
 	{
 		super.setAttributeHandlers();
-		
+
 		new VCGRContainerAttributeHandlers(getAttributePackage());
 	}
-	
+
 	public VCGRContainerServiceImpl() throws RemoteException
 	{
 		super(SERVICE_NAME);
-		
-		addImplementedPortType(
-			WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE);
+
+		addImplementedPortType(WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE);
 	}
 
 	@Override
@@ -81,24 +77,15 @@ public class VCGRContainerServiceImpl extends ResourceForkBaseService
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public ContainerStatisticsResultType containerStatistics(Object arg0)
-			throws RemoteException
+	public ContainerStatisticsResultType containerStatistics(Object arg0) throws RemoteException
 	{
 		ContainerStatistics stats = ContainerStatistics.instance();
-		
-		try
-		{
-			return new ContainerStatisticsResultType(stats.getStartTime(),
-				DBSerializer.serialize(stats.getDatabaseStatistics().report(),
-					Long.MAX_VALUE),
-				DBSerializer.serialize(stats.getMethodStatistics().report(),
-					Long.MAX_VALUE));
-		}
-		catch (IOException ioe)
-		{
-			throw new RemoteException(
-				"An IO Exception occurred trying to serialize statistics.",
-				ioe);
+
+		try {
+			return new ContainerStatisticsResultType(stats.getStartTime(), DBSerializer.serialize(stats.getDatabaseStatistics()
+				.report(), Long.MAX_VALUE), DBSerializer.serialize(stats.getMethodStatistics().report(), Long.MAX_VALUE));
+		} catch (IOException ioe) {
+			throw new RemoteException("An IO Exception occurred trying to serialize statistics.", ioe);
 		}
 	}
 
@@ -106,64 +93,45 @@ public class VCGRContainerServiceImpl extends ResourceForkBaseService
 	@RWXMapping(RWXCategory.WRITE)
 	public Object shutdown(Object arg0) throws RemoteException
 	{
-		throw new RemoteException(
-			"Not allowed to shut down the container this way.");
+		throw new RemoteException("Not allowed to shut down the container this way.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public IterateAccountingRecordsResponseType iterateAccountingRecords(
-		Object arg0) throws RemoteException
+	public IterateAccountingRecordsResponseType iterateAccountingRecords(Object arg0) throws RemoteException
 	{
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
-		
-		AccountingService acctService = 
-			ContainerServices.findService(
-				AccountingService.class);
-		
-		try
-		{
-			if (acctService != null)
-			{
+
+		AccountingService acctService = ContainerServices.findService(AccountingService.class);
+
+		try {
+			if (acctService != null) {
 				for (AccountingRecordType art : acctService.getAccountingRecords())
 					col.add(AnyHelper.toAny(art));
 			}
-			
+
 			IteratorBuilder<MessageElement> builder = iteratorBuilder();
 			builder.preferredBatchSize(100);
 			builder.addElements(col);
-			return new IterateAccountingRecordsResponseType(
-				builder.create());
-		}
-		catch (IOException ioe)
-		{
+			return new IterateAccountingRecordsResponseType(builder.create());
+		} catch (IOException ioe) {
 			throw new RemoteException("Unable to create iterator.", ioe);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to create iterator.", sqe);
 		}
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void commitAccountingRecords(CommitAccountingRecordsRequestType arg0)
-			throws RemoteException
+	public void commitAccountingRecords(CommitAccountingRecordsRequestType arg0) throws RemoteException
 	{
-		AccountingService acctService = 
-			ContainerServices.findService(
-				AccountingService.class);
-		
-		try
-		{
+		AccountingService acctService = ContainerServices.findService(AccountingService.class);
+
+		try {
 			if (acctService != null)
-				acctService.deleteAccountingRecords(
-					arg0.getLastRecordIdToCommit());
-		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException(
-				"Unable to commit accounting records.", sqe);
+				acctService.deleteAccountingRecords(arg0.getLastRecordIdToCommit());
+		} catch (SQLException sqe) {
+			throw new RemoteException("Unable to commit accounting records.", sqe);
 		}
 	}
 }

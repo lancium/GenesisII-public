@@ -31,26 +31,24 @@ import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.container.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.context.ContextType;
 
-public class RunJSDL extends BaseGridTool{
+public class RunJSDL extends BaseGridTool
+{
 
 	private String _type = "jsdl";
-	
-	static private final String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/drunJSDL";
-	static private final String _USAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/urunJSDL";
-	static private final String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/runJSDL";
-	
-	@Option({"type"})
-	public void setType(String type) {
+
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/drunJSDL";
+	static private final String _USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/urunJSDL";
+	static private final String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/runJSDL";
+
+	@Option({ "type" })
+	public void setType(String type)
+	{
 		_type = type;
 	}
-	
+
 	public RunJSDL()
 	{
-		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE),
-				false,ToolCategory.EXECUTION);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.EXECUTION);
 		addManPage(new FileResource(_MANPAGE));
 	}
 
@@ -58,97 +56,82 @@ public class RunJSDL extends BaseGridTool{
 	protected int runCommand() throws Throwable
 	{
 		// get the local identity's key material (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext(false);
+		ICallingContext callContext = ContextManager.getCurrentContext();
 		if (callContext == null) {
 			callContext = new CallingContextImpl(new ContextType());
 		}
 
-	
 		InputStream in = null;
 
 		File wDir = new File(getArgument(0));
 		GeniiPath source = new GeniiPath(getArgument(1));
 
 		if (!source.exists())
-			throw new FileNotFoundException(String.format(
-					"Unable to find source file %s!", source));
+			throw new FileNotFoundException(String.format("Unable to find source file %s!", source));
 		if (!source.isFile())
-			throw new IOException(String.format(
-					"Source path %s is not a file!", source));
+			throw new IOException(String.format("Source path %s is not a file!", source));
 
 		in = source.openInputStream();
 
 		JobRequest tJob = null;
 
-		if(_type.equals("jsdl")){
-			JobDefinition_Type jsdl =
-				(JobDefinition_Type)ObjectDeserializer.deserialize(
-						new InputSource(in), JobDefinition_Type.class);
+		if (_type.equals("jsdl")) {
+			JobDefinition_Type jsdl = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in),
+				JobDefinition_Type.class);
 			PersonalityProvider provider = new ExecutionProvider();
-			tJob = (JobRequest)JSDLInterpreter.interpretJSDL(provider, jsdl);
+			tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
 			in.close();
-		}
-		else if(_type.equals("binary")){
+		} else if (_type.equals("binary")) {
 			ObjectInputStream oIn = new ObjectInputStream(in);
-			tJob = (JobRequest)oIn.readObject();
+			tJob = (JobRequest) oIn.readObject();
 			in.close();
-		}
-		else{
+		} else {
 			stdout.println("Invalid input type");
 			return 0;
 		}
-		
-		
-		StageDataTool stageTool;
-		//Create Working directory, 
-		//will only run if working directory does not exist
-		if(wDir.mkdir()){
 
-			//Generate bash script
+		StageDataTool stageTool;
+		// Create Working directory,
+		// will only run if working directory does not exist
+		if (wDir.mkdir()) {
+
+			// Generate bash script
 			stdout.println("Generating Pwrapper Script");
-			File resourceUsage = 
-				new File(getArgument(0) + "/resourceusage.xml");
-			
-			File submitScript = 
-				File.createTempFile("exec", ".sh", wDir);
+			File resourceUsage = new File(getArgument(0) + "/resourceusage.xml");
+
+			File submitScript = File.createTempFile("exec", ".sh", wDir);
 			OutputStream ps = new FileOutputStream(submitScript);
-			
-			generateWrapperScript(
-					ps, wDir, resourceUsage, tJob, wDir);
+
+			generateWrapperScript(ps, wDir, resourceUsage, tJob, wDir);
 			ps.close();
 
-			//Stage in
+			// Stage in
 			stdout.println("Staging in");
 			stageTool = new StageDataTool();
 			stageTool.addArgument(getArgument(0));
 			stageTool.addArgument(getArgument(1));
 			stageTool.setDirection("in");
 			stageTool.run(stdout, stderr, stdin);
-			
-			//Execute
+
+			// Execute
 			stdout.println("Executing");
 			submitScript.setExecutable(true, true);
-			new File(wDir.getAbsolutePath() + "/" + 
-					tJob.getExecutable().getTarget()).setExecutable(true, true);
+			new File(wDir.getAbsolutePath() + "/" + tJob.getExecutable().getTarget()).setExecutable(true, true);
 			Runtime.getRuntime().exec(submitScript.getAbsolutePath()).waitFor();
 
-			//Stage Out
+			// Stage Out
 			stdout.println("Staging Out");
 			stageTool.setDirection("out");
 			stageTool.run(stdout, stderr, stdin);
-			
-			
-			//Complete
+
+			// Complete
 			stdout.println("Job Executed");
-			
-		}
-		else
+
+		} else
 			stdout.println("Working directory must not already exist");
-		
+
 		return 0;
 	}
-
-
 
 	@Override
 	protected void verify() throws ToolException
@@ -156,77 +139,68 @@ public class RunJSDL extends BaseGridTool{
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException();
 	}
-	
-	private static void generateWrapperScript(OutputStream tStream,
-			File workingDir, File resourceUsage, JobRequest job, File tmpDir) throws Exception{
-		try
-		{
+
+	private static void generateWrapperScript(OutputStream tStream, File workingDir, File resourceUsage, JobRequest job,
+		File tmpDir) throws Exception
+	{
+		try {
 
 			PrintStream ps = new PrintStream(tStream);
 
-			//Generate Header
+			// Generate Header
 			ps.format("#!%s\n\n", "/bin/bash");
 
-			//Generate App Body
+			// Generate App Body
 			ps.format("cd \"%s\"\n", workingDir.getAbsolutePath());
-
 
 			ResourceOverrides overrides = new ResourceOverrides();
 
-			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(
-					tmpDir, overrides.operatingSystemName(),
-					overrides.cpuArchitecture());
+			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(tmpDir, overrides.operatingSystemName(),
+				overrides.cpuArchitecture());
 
 			boolean first = true;
 
 			String execName = job.getExecutable().getTarget();
 			if (!execName.contains("/"))
 				execName = String.format("./%s", execName);
-			
-			for (String element : wrapper.formCommandLine(null,
-					null, //app.getEnvironment()
-					workingDir,
-					getRedirect(job.getStdinRedirect(), workingDir), 
-					getRedirect(job.getStdoutRedirect(), workingDir),
-					getRedirect(job.getStderrRedirect(), workingDir),
-					resourceUsage,
-					execName,
-					getArguments(new String[job.getArguments().size()],
-							job.getArguments())))
-					
+
+			for (String element : wrapper.formCommandLine(
+				null,
+				null, // app.getEnvironment()
+				workingDir, getRedirect(job.getStdinRedirect(), workingDir), getRedirect(job.getStdoutRedirect(), workingDir),
+				getRedirect(job.getStderrRedirect(), workingDir), resourceUsage, execName,
+				getArguments(new String[job.getArguments().size()], job.getArguments())))
+
 			{
 				if (!first)
 					ps.format(" ");
 				first = false;
-				if (element.contains(tmpDir.getAbsolutePath())){
-					element = workingDir.getAbsolutePath() +
-					element.substring(element.lastIndexOf("/"));
+				if (element.contains(tmpDir.getAbsolutePath())) {
+					element = workingDir.getAbsolutePath() + element.substring(element.lastIndexOf("/"));
 				}
 				ps.format("\"%s\"", element);
 			}
 			ps.println();
-			//Generate complete file
+			// Generate complete file
 			ps.println("touch executePhase.complete");
 			ps.flush();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			throw e;
 		}
 	}
-	
-	private static File getRedirect(FilesystemRelative<String> tPath,
-			File workingDir){
+
+	private static File getRedirect(FilesystemRelative<String> tPath, File workingDir)
+	{
 		if (tPath == null)
 			return null;
-		return new File(workingDir.toString() +
-				"/" + tPath.getTarget());
+		return new File(workingDir.toString() + "/" + tPath.getTarget());
 	}
 
-	private static String[] getArguments(String[] args,  List<FilesystemRelative<String>> tArgs){
+	private static String[] getArguments(String[] args, List<FilesystemRelative<String>> tArgs)
+	{
 		int i = 0;
-		for (FilesystemRelative<String> tArg : tArgs){
-			args[i] =  tArg.getTarget();
+		for (FilesystemRelative<String> tArg : tArgs) {
+			args[i] = tArg.getTarget();
 			i++;
 		}
 		return args;

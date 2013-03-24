@@ -7,6 +7,6 @@ import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
 public interface IDeployerProvider
 {
 	public IJSDLReifier getReifier();
-	public void deployApplication(File targetDirectory) 
-		throws DeploymentException;
+
+	public void deployApplication(File targetDirectory) throws DeploymentException;
 }

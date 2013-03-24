@@ -23,19 +23,18 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 public class HelpButton extends JButton
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private Icon _helpIcon;
 	private Icon _grayedIcon;
-	
+
 	public HelpButton()
 	{
 		setContentAreaFilled(false);
-		
+
 		prepareIcons();
-		
-		Dimension dim = new Dimension(
-			_helpIcon.getIconWidth(), _helpIcon.getIconHeight());
-		
+
+		Dimension dim = new Dimension(_helpIcon.getIconWidth(), _helpIcon.getIconHeight());
+
 		setPreferredSize(dim);
 		setMaximumSize(dim);
 		setMinimumSize(dim);
@@ -43,75 +42,67 @@ public class HelpButton extends JButton
 	}
 
 	// Paint the round background and label.
-	protected void paintComponent(Graphics g) 
+	protected void paintComponent(Graphics g)
 	{
-		if (getModel().isArmed()) 
-		{
+		if (getModel().isArmed()) {
 			// You might want to make the highlight color
 			// a property of the RoundButton class.
 			g.setColor(Color.lightGray);
-		} else 
-		{
+		} else {
 			g.setColor(getBackground());
 		}
-		
-		g.fillOval(0, 0, getSize().width-1, getSize().height-1);
-		
+
+		g.fillOval(0, 0, getSize().width - 1, getSize().height - 1);
+
 		if (isEnabled())
 			_helpIcon.paintIcon(this, g, 0, 0);
 		else
 			_grayedIcon.paintIcon(this, g, 0, 0);
 	}
-	
+
 	// Paint the border of the button using a simple stroke.
-	protected void paintBorder(Graphics g) 
+	protected void paintBorder(Graphics g)
 	{
 	}
 
 	// Hit detection.
 	private Shape shape;
-	public boolean contains(int x, int y) 
+
+	public boolean contains(int x, int y)
 	{
 		// If the button has changed size, make a new shape object.
-		if (shape == null || !shape.getBounds().equals(getBounds())) 
-		{
+		if (shape == null || !shape.getBounds().equals(getBounds())) {
 			shape = new Ellipse2D.Float(0, 0, getWidth(), getHeight());
 		}
-		
+
 		return shape.contains(x, y);
 	}
 
 	private void prepareIcons()
 	{
-		ColorConvertOp converter =
-			new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-		
+		ColorConvertOp converter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+
 		BufferedImage original = getHelpImage();
 		BufferedImage greyed = converter.filter(original, null);
-		
+
 		_helpIcon = new ImageIcon(original);
 		_grayedIcon = new ImageIcon(greyed);
 	}
-	
+
 	static public BufferedImage getHelpImage()
 	{
 		InputStream in = null;
-		
-		try
-		{
+
+		try {
 			in = new FileResource("edu/virginia/vcgr/genii/client/dialog/gui/help-icon.png").open();
 			return ImageIO.read(in);
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new RuntimeException("Unable to load help icon.", ioe);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(in);
 		}
 	}
-	
+
 	static public Icon getHelpIcon()
 	{
 		return new ImageIcon(getHelpImage());

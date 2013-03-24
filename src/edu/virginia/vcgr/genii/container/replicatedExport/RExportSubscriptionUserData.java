@@ -11,21 +11,20 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 class RExportSubscriptionUserData extends AdditionalUserData
 {
 	static final long serialVersionUID = 0L;
-	
-	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
-		name = "primary-local-path", nillable = false, required = true)
+
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "primary-local-path", nillable = false, required = true)
 	private String _primaryLocalPath = null;
-	
+
 	@SuppressWarnings("unused")
 	private RExportSubscriptionUserData()
-	{	
+	{
 	}
-	
+
 	public RExportSubscriptionUserData(String localFilename)
 	{
 		_primaryLocalPath = localFilename;
 	}
-	
+
 	final public String getPrimaryLocalPath()
 	{
 		return _primaryLocalPath;

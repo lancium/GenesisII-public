@@ -19,63 +19,53 @@ public class OGRSHServer extends ApplicationBase
 {
 	static private Log _logger = LogFactory.getLog(OGRSHServer.class);
 
-	static public void main(String []args)
+	static public void main(String[] args)
 	{
 		String deploymentName = System.getenv("GENII_DEPLOYMENT_NAME");
-		if (deploymentName != null)
-		{
-			_logger.debug("Using Deployment \"" + deploymentName + "\".");
+		if (deploymentName != null) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Using Deployment \"" + deploymentName + "\".");
 			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deploymentName);
-		} else
-		{
-			_logger.debug("Using Deployment \"default\".");
+		} else {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Using Deployment \"default\".");
 		}
 		prepareClientApplication();
-		
+
 		boolean _done = false;
 		ServerSocketChannel serverChannel = null;
 		GUID serverSecret = null;
-		
+
 		ContextManager.setResolver(new OGRSHContextResolver());
 		SessionManager sessionManager = new SessionManager();
-		
-		if (args.length > 1)
-		{
+
+		if (args.length > 1) {
 			System.err.println("USAGE:  OGRSHServer [port]");
 			System.exit(1);
 		}
-		
-		try
-		{
+
+		try {
 			serverChannel = ServerSocketChannel.open();
 			ServerSocket serverSocket = serverChannel.socket();
 			serverSocket.bind(null);
-		
+
 			serverSecret = new GUID();
-			System.out.println("Server[" + serverSecret + "] listening on port "
-				+ serverSocket.getLocalPort());
+			System.out.println("Server[" + serverSecret + "] listening on port " + serverSocket.getLocalPort());
 			serverChannel.configureBlocking(true);
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			_logger.fatal("Unable to open server socket.", ioe);
 			System.exit(1);
 		}
-		
-		while (!_done)
-		{
-			try
-			{
+
+		while (!_done) {
+			try {
 				SocketChannel socketChannel = serverChannel.accept();
 				socketChannel.configureBlocking(true);
-				OGRSHConnection connection = new OGRSHConnection(
-					sessionManager, socketChannel, serverSecret);
+				OGRSHConnection connection = new OGRSHConnection(sessionManager, socketChannel, serverSecret);
 				Thread th = new Thread(connection);
 				th.setDaemon(true);
 				th.start();
-			}
-			catch (IOException ioe)
-			{
+			} catch (IOException ioe) {
 				_logger.error("Error accepting connection.", ioe);
 			}
 		}

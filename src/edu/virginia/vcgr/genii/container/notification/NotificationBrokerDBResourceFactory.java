@@ -10,14 +10,17 @@ import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class NotificationBrokerDBResourceFactory extends BasicDBResourceFactory implements IResourceFactory {
+public class NotificationBrokerDBResourceFactory extends BasicDBResourceFactory implements IResourceFactory
+{
 
-	public NotificationBrokerDBResourceFactory(DatabaseConnectionPool pool) throws SQLException {
+	public NotificationBrokerDBResourceFactory(DatabaseConnectionPool pool) throws SQLException
+	{
 		super(pool);
 	}
 
 	@Override
-	protected void createTables() throws SQLException {
+	protected void createTables() throws SQLException
+	{
 		Connection conn = null;
 		super.createTables();
 		try {
@@ -30,7 +33,8 @@ public class NotificationBrokerDBResourceFactory extends BasicDBResourceFactory 
 	}
 
 	@Override
-	public IResource instantiate(ResourceKey parentKey) throws ResourceException {
+	public IResource instantiate(ResourceKey parentKey) throws ResourceException
+	{
 		try {
 			return new NotificationBrokerDBResource(parentKey, _pool);
 		} catch (SQLException ex) {

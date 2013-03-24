@@ -28,11 +28,8 @@ public class GeniiFileSyncRunner implements ResourceSyncRunner
 	static private Log _logger = LogFactory.getLog(GeniiFileSyncRunner.class);
 	static private final int _DEFAULT_BUFFER_SIZE = 1024 * 8;
 
-	public void doSync(IResource vResource,
-			EndpointReferenceType primaryEPR,
-			EndpointReferenceType myEPR,
-			ReplicationThread replicator)
-		throws Throwable
+	public void doSync(IResource vResource, EndpointReferenceType primaryEPR, EndpointReferenceType myEPR,
+		ReplicationThread replicator) throws Throwable
 	{
 		IRByteIOResource resource = (IRByteIOResource) vResource;
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, primaryEPR);
@@ -41,64 +38,48 @@ public class GeniiFileSyncRunner implements ResourceSyncRunner
 		MessageElement[] valueArr = resp.get_any();
 		long fileSize = 0;
 		boolean isRecordFile = false;
-		for (MessageElement messageElement : valueArr)
-		{
-			try
-			{
+		for (MessageElement messageElement : valueArr) {
+			try {
 				// Attribute names: See ByteIOAttributeHandlers.get*Namespace().
 				String name = messageElement.getQName().getLocalPart();
-				if (name.equals("CreateTime"))
-				{
+				if (name.equals("CreateTime")) {
 					resource.setCreateTime((Calendar) messageElement.getObjectValue(Calendar.class));
-				}
-				else if (name.equals("ModificationTime"))
-				{
+				} else if (name.equals("ModificationTime")) {
 					resource.setModTime((Calendar) messageElement.getObjectValue(Calendar.class));
-				}
-				else if (name.equals("Size"))
-				{
+				} else if (name.equals("Size")) {
 					fileSize = (Long) messageElement.getObjectValue(Long.class);
 				}
-			}
-			catch (Exception exception)
-			{
+			} catch (Exception exception) {
 				// Some properties may be null, unexpected types, etc.
 				// Report the exception and continue processing resource properties.
-				_logger.debug("GeniiFileSyncRunner: error processing property",  exception);
+				if (_logger.isDebugEnabled())
+					_logger.debug("GeniiFileSyncRunner: error processing property", exception);
 			}
 		}
-		if (isRecordFile)
-		{
+		if (isRecordFile) {
 			setBitmapFilename(resource);
 		}
 		RandomAccessFile raf = null;
 		InputStream inputStream = null;
-		try
-		{
+		try {
 			raf = new RandomAccessFile(resource.getCurrentFile(), "rw");
-			if (isRecordFile)
-			{
+			if (isRecordFile) {
 				raf.setLength(fileSize);
-			}
-			else
-			{
+			} else {
 				inputStream = ByteIOStreamFactory.createInputStream(primaryEPR);
 				raf.setLength(0);
 				byte[] data = new byte[_DEFAULT_BUFFER_SIZE];
 				int len;
-				while ((len = inputStream.read(data)) >= 0)
-				{
+				while ((len = inputStream.read(data)) >= 0) {
 					raf.write(data, 0, len);
 				}
 			}
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(inputStream);
 			StreamUtils.close(raf);
 		}
 	}
-	
+
 	@Override
 	public TopicPath getSyncTopic()
 	{
@@ -108,11 +89,9 @@ public class GeniiFileSyncRunner implements ResourceSyncRunner
 	/**
 	 * Setup this replica as a record file (a/k/a local cache) as opposed to a document file.
 	 */
-	private void setBitmapFilename(IRByteIOResource resource)
-		throws IOException
+	private void setBitmapFilename(IRByteIOResource resource) throws IOException
 	{
-		if (resource.getBitmapFile() == null)
-		{
+		if (resource.getBitmapFile() == null) {
 			String filename = resource.getFilePath();
 			int idx = filename.lastIndexOf('.');
 			if (idx > 0)

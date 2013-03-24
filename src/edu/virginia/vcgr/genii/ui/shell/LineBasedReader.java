@@ -8,14 +8,12 @@ import java.util.LinkedList;
 public class LineBasedReader extends Reader
 {
 	private boolean _closed = false;
-	private LinkedList<String> _lines =
-		new LinkedList<String>();
-	
+	private LinkedList<String> _lines = new LinkedList<String>();
+
 	@Override
 	public void close() throws IOException
 	{
-		synchronized(_lines)
-		{
+		synchronized (_lines) {
 			_closed = true;
 			_lines.notifyAll();
 		}
@@ -25,22 +23,17 @@ public class LineBasedReader extends Reader
 	public int read(char[] cbuf, int off, int len) throws IOException
 	{
 		int ret = 0;
-		
-		try
-		{
-			synchronized(_lines)
-			{
-				while (true)
-				{
+
+		try {
+			synchronized (_lines) {
+				while (true) {
 					if (_closed)
 						return -1;
-					
+
 					if (_lines.isEmpty())
 						_lines.wait();
-					else
-					{
-						while (!_lines.isEmpty())
-						{
+					else {
+						while (!_lines.isEmpty()) {
 							String line = _lines.removeFirst();
 							int toCopy = Math.min(len, line.length());
 							line.getChars(0, toCopy, cbuf, off);
@@ -52,22 +45,19 @@ public class LineBasedReader extends Reader
 							if (len <= 0)
 								return ret;
 						}
-						
+
 						return ret;
 					}
 				}
 			}
-		}
-		catch (InterruptedException ie)
-		{
+		} catch (InterruptedException ie) {
 			throw new InterruptedIOException();
 		}
 	}
-	
+
 	public void addLine(String line)
 	{
-		synchronized(_lines)
-		{
+		synchronized (_lines) {
 			_lines.addLast(line + "\n");
 			_lines.notifyAll();
 		}

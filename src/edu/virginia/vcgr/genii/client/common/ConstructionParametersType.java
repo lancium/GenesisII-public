@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface ConstructionParametersType
-{
+public @interface ConstructionParametersType {
 	Class<? extends ConstructionParameters> value();
 }

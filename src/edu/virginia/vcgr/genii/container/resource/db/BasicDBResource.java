@@ -45,69 +45,53 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class BasicDBResource implements IResource
 {
-	static protected final String _SPECIAL_SERVICE_KEY_TEMPLATE =
-		"edu.virginia.vcgr.genii.container.resource.db.special-service-key.";
-	
-	static private final String _VERIFY_STMT =
-		"SELECT createtime FROM resources WHERE resourceid = ?";
-	static private final String _CREATE_STMT =
-		"INSERT INTO resources VALUES(?, ?)";
-	static private final String _REMOVE_PROPERTY_STMT =
-		"DELETE FROM properties WHERE resourceid = ? AND propname = ?";
-	static private final String _INSERT_PROPERTY_STMT =
-		"INSERT INTO properties VALUES (?, ?, ?)";
-	static private final String _GET_PROPERTY_STMT =
-		"SELECT propvalue FROM properties WHERE resourceid = ? AND propname = ?";
-	static private final String _DESTROY_KEYS_STMT =
-		"DELETE FROM resources WHERE resourceid = ?";
-	static private final String _DESTROY_PROPERTIES_STMT =
-		"DELETE FROM properties WHERE resourceid = ?";
-	static private final String _DESTROY_MATCHING_PARAMS_STMT =
-		"DELETE FROM matchingparams WHERE resourceid = ?";
-	
+	static protected final String _SPECIAL_SERVICE_KEY_TEMPLATE = "edu.virginia.vcgr.genii.container.resource.db.special-service-key.";
+
+	static private final String _VERIFY_STMT = "SELECT createtime FROM resources WHERE resourceid = ?";
+	static private final String _CREATE_STMT = "INSERT INTO resources VALUES(?, ?)";
+	static private final String _REMOVE_PROPERTY_STMT = "DELETE FROM properties WHERE resourceid = ? AND propname = ?";
+	static private final String _INSERT_PROPERTY_STMT = "INSERT INTO properties VALUES (?, ?, ?)";
+	static private final String _GET_PROPERTY_STMT = "SELECT propvalue FROM properties WHERE resourceid = ? AND propname = ?";
+	static private final String _DESTROY_KEYS_STMT = "DELETE FROM resources WHERE resourceid = ?";
+	static private final String _DESTROY_PROPERTIES_STMT = "DELETE FROM properties WHERE resourceid = ?";
+	static private final String _DESTROY_MATCHING_PARAMS_STMT = "DELETE FROM matchingparams WHERE resourceid = ?";
+
 	static private Log _logger = LogFactory.getLog(BasicDBResource.class);
-	
+
 	protected DatabaseConnectionPool _connectionPool;
 	protected Connection _connection;
 	protected String _resourceKey;
 	protected ResourceKey _parentKey;
 
-	protected BasicDBResource(String parentKey,
-		Connection connection)
+	protected BasicDBResource(String parentKey, Connection connection)
 	{
 		_parentKey = null;
 		_resourceKey = parentKey;
 		_connection = connection;
 		_connectionPool = null;
 	}
-	
-	public BasicDBResource(
-			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool)
-		throws SQLException
+
+	public BasicDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
 	{
 		_parentKey = parentKey;
 		_connectionPool = connectionPool;
 		_connection = _connectionPool.acquire(false);
 	}
-	
+
 	public Connection getConnection()
 	{
 		return _connection;
 	}
-	
+
 	protected void finalize() throws Throwable
 	{
-		try
-		{
+		try {
 			StreamUtils.close(this);
-		}
-		finally
-		{
+		} finally {
 			super.finalize();
 		}
 	}
-	
+
 	public String getKey()
 	{
 		if (_resourceKey.startsWith(_SPECIAL_SERVICE_KEY_TEMPLATE))
@@ -115,87 +99,70 @@ public class BasicDBResource implements IResource
 
 		return _resourceKey;
 	}
-	
+
 	public Object getLockKey()
 	{
 		return _resourceKey;
 	}
 
-	public void initialize(HashMap<QName, Object> constructionParams)
-		throws ResourceException
+	public void initialize(HashMap<QName, Object> constructionParams) throws ResourceException
 	{
-		_logger.debug("Initializing resource with construction parameters.");
-		Boolean b = (Boolean)constructionParams.get(
-			IResource.IS_SERVICE_CONSTRUCTION_PARAM);
+		if (_logger.isDebugEnabled())
+			_logger.debug("Initializing resource with construction parameters.");
+		Boolean b = (Boolean) constructionParams.get(IResource.IS_SERVICE_CONSTRUCTION_PARAM);
 		if (b != null && b.booleanValue())
 			_resourceKey = _SPECIAL_SERVICE_KEY_TEMPLATE + _parentKey.getServiceName();
 		else
 			_resourceKey = new GUID().toString();
-		
+
 		PreparedStatement stmt = null;
-		
-		try
-		{
+
+		try {
 			stmt = _connection.prepareStatement(_CREATE_STMT);
 			stmt.setString(1, _resourceKey);
-			stmt.setTimestamp(2, new Timestamp(
-				new Date().getTime()));
+			stmt.setTimestamp(2, new Timestamp(new Date().getTime()));
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Couldn't create resource.");
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
-	
-	public void load(String resourceKey) 
-		throws ResourceUnknownFaultType, ResourceException
+
+	public void load(String resourceKey) throws ResourceUnknownFaultType, ResourceException
 	{
 		_resourceKey = resourceKey;
 
 		if (_resourceKey == null)
 			_resourceKey = _SPECIAL_SERVICE_KEY_TEMPLATE + _parentKey.getServiceName();
-		
+
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
-		
-		try
-		{
+
+		try {
 			stmt = _connection.prepareStatement(_VERIFY_STMT);
 			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
-			if (!rs.next())
-			{
-				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(
-					null, null, null, null, new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription("Resource \"" + _resourceKey + "\" is unknown.")
-					}, null));
+			if (!rs.next()) {
+				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Resource \"" + _resourceKey
+						+ "\" is unknown.") }, null));
 			}
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}
 
-	static public void setProperty(Connection connection,
-		String resourceKey, String propertyName, Object value)
-			throws SQLException
+	static public void setProperty(Connection connection, String resourceKey, String propertyName, Object value)
+		throws SQLException
 	{
 		PreparedStatement stmt = null;
-		
-		try
-		{
+
+		try {
 			stmt = connection.prepareStatement(_REMOVE_PROPERTY_STMT);
 			stmt.setString(1, resourceKey);
 			stmt.setString(2, propertyName);
@@ -207,102 +174,80 @@ public class BasicDBResource implements IResource
 			stmt = connection.prepareStatement(_INSERT_PROPERTY_STMT);
 			stmt.setString(1, resourceKey);
 			stmt.setString(2, propertyName);
-			
-			Blob b = DBSerializer.toBlob(value,
-				"properties", "propvalue");
-			if (b != null)
-			{
-				_logger.debug("Serializing " + b.length() + 
-					" bytes into property database.");
-				if (b.length() <= 0)
-				{
-					_logger.error(
-						"Attempt to serialize property \"" + propertyName + 
-						"\" with 0 bytes into the property database.");
-				} else if (b.length() >= 128 * 1024)
-				{
-					_logger.error("Attempt to serialize property \"" + propertyName +
-						"\" of length " + b.length() + " bytes into a "
-						+ "128K space.");
+
+			Blob b = DBSerializer.toBlob(value, "properties", "propvalue");
+			if (b != null) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("Serializing " + b.length() + " bytes into property database.");
+				if (b.length() <= 0) {
+					_logger.error("Attempt to serialize property \"" + propertyName
+						+ "\" with 0 bytes into the property database.");
+				} else if (b.length() >= 128 * 1024) {
+					_logger.error("Attempt to serialize property \"" + propertyName + "\" of length " + b.length()
+						+ " bytes into a " + "128K space.");
 				}
 			}
-			
+
 			stmt.setBlob(3, b);
 			if (stmt.executeUpdate() != 1)
-				throw new SQLException("Unable to update property \"" +
-					propertyName + "\".");
-		}
-		finally
-		{
+				throw new SQLException("Unable to update property \"" + propertyName + "\".");
+		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
-	
-	public void setProperty(String propertyName, Object value)
-		throws ResourceException
+
+	public void setProperty(String propertyName, Object value) throws ResourceException
 	{
-		try
-		{
+		try {
 			setProperty(_connection, _resourceKey, propertyName, value);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 	}
-	
-	static public Object getProperty(Connection connection, String resourceKey,
-		String propertyName) throws SQLException
+
+	static public Object getProperty(Connection connection, String resourceKey, String propertyName) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		
-		try
-		{
+
+		try {
 			stmt = connection.prepareStatement(_GET_PROPERTY_STMT);
 			stmt.setString(1, resourceKey);
 			stmt.setString(2, propertyName);
 			rs = stmt.executeQuery();
 			if (!rs.next())
 				return null;
-			
+
 			Blob blob = rs.getBlob(1);
 			if (blob == null)
 				return null;
-			
+
 			return DBSerializer.fromBlob(blob);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}
-	
+
 	public Object getProperty(String propertyName) throws ResourceException
 	{
 		boolean exceptionOccurred = true;
-		
-		try
-		{
-			if(_connection == null)
-			{
+
+		try {
+			if (_connection == null) {
 				_connection = _connectionPool.acquire(false);
 				exceptionOccurred = false;
 			}
-			
+
 			return getProperty(_connection, _resourceKey, propertyName);
 		}
-		
-		catch (SQLException sqe)
-		{
+
+		catch (SQLException sqe) {
 			throw new ResourceException("Unable to get property.", sqe);
 		}
-		
-		finally
-		{
-			if(exceptionOccurred == false)
-			{
+
+		finally {
+			if (exceptionOccurred == false) {
 				_connectionPool.release(_connection);
 				_connection = null;
 			}
@@ -312,9 +257,8 @@ public class BasicDBResource implements IResource
 	public void destroy() throws ResourceException
 	{
 		PreparedStatement stmt = null;
-		
-		try
-		{
+
+		try {
 			stmt = _connection.prepareStatement(_DESTROY_PROPERTIES_STMT);
 			stmt.setString(1, _resourceKey);
 			stmt.executeUpdate();
@@ -327,44 +271,32 @@ public class BasicDBResource implements IResource
 			stmt.setString(1, _resourceKey);
 			stmt.executeUpdate();
 			stmt.close();
-			stmt = _connection.prepareStatement(
-				"DELETE FROM persistedproperties WHERE resourceid = ?");
+			stmt = _connection.prepareStatement("DELETE FROM persistedproperties WHERE resourceid = ?");
 			stmt.setString(1, _resourceKey);
 			stmt.executeUpdate();
 			ResourceSummary.removeResources(_connection, _resourceKey);
 
-			SubscriptionsDatabase.destroyMySubscriptions(
-				_connection, _resourceKey);
-			
-			HistoryContainerService service =
-				ContainerServices.findService(HistoryContainerService.class);
+			SubscriptionsDatabase.destroyMySubscriptions(_connection, _resourceKey);
+
+			HistoryContainerService service = ContainerServices.findService(HistoryContainerService.class);
 			service.deleteRecords(_resourceKey);
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException(
-				"Error while trying to destroy resource.", sqe);
-		}
-		finally
-		{
+		} catch (SQLException sqe) {
+			throw new ResourceException("Error while trying to destroy resource.", sqe);
+		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
 
 	synchronized public void commit() throws ResourceException
 	{
-		if (_connection == null)
-		{
+		if (_connection == null) {
 			// It's already been closed
 			return;
 		}
-		
-		try
-		{
+
+		try {
 			_connection.commit();
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			_logger.warn(sqe);
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
@@ -372,26 +304,21 @@ public class BasicDBResource implements IResource
 
 	public void rollback()
 	{
-		if (_connection == null)
-		{
+		if (_connection == null) {
 			// It's already been closed.
 			return;
 		}
-		
-		try
-		{
+
+		try {
 			_connection.rollback();
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			_logger.error(sqe);
 		}
 	}
 
 	synchronized public void close() throws IOException
 	{
-		if (_connection != null && _connectionPool != null)
-		{
+		if (_connection != null && _connectionPool != null) {
 			_connectionPool.release(_connection);
 			_connection = null;
 		}
@@ -401,33 +328,26 @@ public class BasicDBResource implements IResource
 	{
 		return _parentKey;
 	}
-	
-	static protected void destroyAll(Connection connection, Collection<String> keys)
-		throws ResourceException
+
+	static protected void destroyAll(Connection connection, Collection<String> keys) throws ResourceException
 	{
 		PreparedStatement destroyKeyStmt = null;
 		PreparedStatement destroyPropertiesStmt = null;
-		
-		try
-		{
+
+		try {
 			destroyKeyStmt = connection.prepareStatement(_DESTROY_KEYS_STMT);
 			destroyPropertiesStmt = connection.prepareStatement(_DESTROY_PROPERTIES_STMT);
-			
-			for (String key : keys)
-			{
+
+			for (String key : keys) {
 				destroyKeyStmt.setString(1, key);
 				destroyKeyStmt.executeUpdate();
-					
+
 				destroyPropertiesStmt.setString(1, key);
 				destroyPropertiesStmt.executeUpdate();
 			}
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(destroyKeyStmt);
 			StreamUtils.close(destroyPropertiesStmt);
 		}
@@ -436,157 +356,119 @@ public class BasicDBResource implements IResource
 	/**
 	 * Return whether or not the resource is a service resource
 	 */
-	public boolean isServiceResource() {
+	public boolean isServiceResource()
+	{
 		if (_resourceKey.startsWith(_SPECIAL_SERVICE_KEY_TEMPLATE)) {
 			return true;
-		} 
+		}
 		return false;
 	}
-	
+
 	@Override
 	public Collection<MatchingParameter> getMatchingParameters() throws ResourceException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		Collection<MatchingParameter> ret = new LinkedList<MatchingParameter>();
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"SELECT paramname, paramvalue FROM matchingparams " +
-					"WHERE resourceid = ?");
+
+		try {
+			stmt = _connection.prepareStatement("SELECT paramname, paramvalue FROM matchingparams " + "WHERE resourceid = ?");
 			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
-			while (rs.next())
-			{
-				ret.add(new MatchingParameter(
-					rs.getString(1), rs.getString(2)));
+			while (rs.next()) {
+				ret.add(new MatchingParameter(rs.getString(1), rs.getString(2)));
 			}
-			
+
 			return ret;
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to get matching parameters.",
-				sqe);
-		}
-		finally
-		{
+		} catch (SQLException sqe) {
+			throw new ResourceException("Unable to get matching parameters.", sqe);
+		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}
 
 	@Override
-	public void addMatchingParameter(MatchingParameter... parameters)
-			throws ResourceException
+	public void addMatchingParameter(MatchingParameter... parameters) throws ResourceException
 	{
 		PreparedStatement stmt = null;
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"INSERT INTO matchingparams" +
-					"(resourceid, paramname, paramvalue) " +
-				"VALUES (?, ?, ?)");
-			
-			for (MatchingParameter param : parameters)
-			{
+
+		try {
+			stmt = _connection.prepareStatement("INSERT INTO matchingparams" + "(resourceid, paramname, paramvalue) "
+				+ "VALUES (?, ?, ?)");
+
+			for (MatchingParameter param : parameters) {
 				stmt.setString(1, _resourceKey);
 				stmt.setString(2, param.getName());
 				stmt.setString(3, param.getValue());
 				stmt.addBatch();
 			}
-			
+
 			stmt.executeBatch();
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to add matching parameters.",
-				sqe);
-		}
-		finally
-		{
+		} catch (SQLException sqe) {
+			throw new ResourceException("Unable to add matching parameters.", sqe);
+		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
 
 	@Override
-	public void removeMatchingParameter(MatchingParameter... parameters)
-			throws ResourceException
+	public void removeMatchingParameter(MatchingParameter... parameters) throws ResourceException
 	{
 		PreparedStatement stmt = null;
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"DELETE FROM matchingparams " +
-					"WHERE resourceid = ? AND paramname = ? " +
-						"AND paramvalue = ?");
-			
-			for (MatchingParameter param : parameters)
-			{
+
+		try {
+			stmt = _connection.prepareStatement("DELETE FROM matchingparams " + "WHERE resourceid = ? AND paramname = ? "
+				+ "AND paramvalue = ?");
+
+			for (MatchingParameter param : parameters) {
 				stmt.setString(1, _resourceKey);
 				stmt.setString(2, param.getName());
 				stmt.setString(3, param.getValue());
 				stmt.addBatch();
 			}
-			
+
 			stmt.executeBatch();
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to delete matching parameters.",
-				sqe);
-		}
-		finally
-		{
+		} catch (SQLException sqe) {
+			throw new ResourceException("Unable to delete matching parameters.", sqe);
+		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
-	
-	static public String getEPI(Connection connection, String resourceID)
-		throws SQLException
+
+	static public String getEPI(Connection connection, String resourceID) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		
-		try
-		{
-			stmt = connection.prepareStatement(
-				"SELECT epi FROM resources2 WHERE resourceid = ?");
+
+		try {
+			stmt = connection.prepareStatement("SELECT epi FROM resources2 WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
 			rs = stmt.executeQuery();
 			if (rs.next())
 				return rs.getString(1);
-			
+
 			rs.close();
 			rs = null;
-			
+
 			stmt.close();
 			stmt = null;
-			
-			stmt = connection.prepareStatement(
-				"SELECT propvalue FROM properties " +
-				"WHERE resourceid = ? AND propname = ?");
+
+			stmt = connection.prepareStatement("SELECT propvalue FROM properties " + "WHERE resourceid = ? AND propname = ?");
 			stmt.setString(1, resourceID);
 			stmt.setString(2, IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME);
-			
+
 			rs = stmt.executeQuery();
-			if (rs.next())
-			{
+			if (rs.next()) {
 				Object obj = DBSerializer.fromBlob(rs.getBlob(1));
 				if (obj != null)
 					return obj.toString();
-				
+
 				return null;
 			}
-			
-			throw new SQLException(String.format(
-				"Unable to find EPI for resource \"%s\".", resourceID));
-		}
-		finally
-		{
+
+			throw new SQLException(String.format("Unable to find EPI for resource \"%s\".", resourceID));
+		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
@@ -595,22 +477,17 @@ public class BasicDBResource implements IResource
 	/**
 	 * The inverse of getEPI().
 	 */
-	static public String getResourceID(Connection connection, String epi)
-		throws SQLException
+	static public String getResourceID(Connection connection, String epi) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		try
-		{
-			stmt = connection.prepareStatement(
-				"SELECT resourceid FROM resources2 WHERE epi = ?");
+		try {
+			stmt = connection.prepareStatement("SELECT resourceid FROM resources2 WHERE epi = ?");
 			stmt.setString(1, epi);
 			rs = stmt.executeQuery();
 			if (rs.next())
 				return rs.getString(1);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
@@ -622,11 +499,9 @@ public class BasicDBResource implements IResource
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"SELECT createtime FROM resources WHERE resourceid = ?");
+
+		try {
+			stmt = _connection.prepareStatement("SELECT createtime FROM resources WHERE resourceid = ?");
 			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
 			if (!rs.next())
@@ -635,169 +510,125 @@ public class BasicDBResource implements IResource
 			Calendar c = Calendar.getInstance();
 			c.setTime(ts);
 			return c;
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to get create time.",
-				sqe);
-		}
-		finally
-		{
+		} catch (SQLException sqe) {
+			throw new ResourceException("Unable to get create time.", sqe);
+		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}
 
-	static public ConstructionParameters constructionParameters(
-		Connection connection,
-		Class<?> serviceClass, String resourceid) throws SQLException
+	static public ConstructionParameters constructionParameters(Connection connection, Class<?> serviceClass, String resourceid)
+		throws SQLException
 	{
-		ConstructionParameters cParams =
-			(ConstructionParameters)getProperty(connection, resourceid,
-				ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME.toString());
-		
+		ConstructionParameters cParams = (ConstructionParameters) getProperty(connection, resourceid,
+			ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString());
+
 		if (cParams == null)
 			cParams = ConstructionParameters.instantiateDefault(serviceClass);
-		
-		return cParams;
-	}
-	
-	@Override
-	public ConstructionParameters constructionParameters(Class<?> serviceClass)
-			throws ResourceException
-	{
-		ConstructionParameters cParams = (ConstructionParameters)getProperty(
-			ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME.toString());
-		
-		if (cParams == null)
-			cParams = ConstructionParameters.instantiateDefault(serviceClass);
-		
+
 		return cParams;
 	}
 
-	static public void constructionParameters(Connection connection,
-		String resourceid, ConstructionParameters parameters) throws SQLException
-	{
-		setProperty(connection, resourceid,
-			ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME.toString(),
-			parameters);
-	}
-	
 	@Override
-	public void constructionParameters(ConstructionParameters parameters)
-			throws ResourceException
+	public ConstructionParameters constructionParameters(Class<?> serviceClass) throws ResourceException
 	{
-		setProperty(
-			ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME.toString(),
-			parameters);
+		ConstructionParameters cParams = (ConstructionParameters) getProperty(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME
+			.toString());
+
+		if (cParams == null)
+			cParams = ConstructionParameters.instantiateDefault(serviceClass);
+
+		return cParams;
+	}
+
+	static public void constructionParameters(Connection connection, String resourceid, ConstructionParameters parameters)
+		throws SQLException
+	{
+		setProperty(connection, resourceid, ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString(), parameters);
 	}
 
 	@Override
-	public Collection<MessageElement> getUnknownAttributes()
-			throws ResourceException
+	public void constructionParameters(ConstructionParameters parameters) throws ResourceException
+	{
+		setProperty(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString(), parameters);
+	}
+
+	@Override
+	public Collection<MessageElement> getUnknownAttributes() throws ResourceException
 	{
 		Collection<MessageElement> ret = new LinkedList<MessageElement>();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"SELECT attrvalues FROM unknownattrs WHERE resourceid = ?");
+
+		try {
+			stmt = _connection.prepareStatement("SELECT attrvalues FROM unknownattrs WHERE resourceid = ?");
 			stmt.setString(1, getKey());
 			rs = stmt.executeQuery();
-			while (rs.next())
-			{
+			while (rs.next()) {
 				Blob blob = rs.getBlob(1);
 				long blobLength = blob.length();
-				MessageElement []any = ObjectDeserializer.anyFromBytes(
-					blob.getBytes(1L, (int)blobLength));
-				if (any != null)
-				{
+				MessageElement[] any = ObjectDeserializer.anyFromBytes(blob.getBytes(1L, (int) blobLength));
+				if (any != null) {
 					for (MessageElement value : any)
 						ret.add(value);
 				}
 			}
-			
+
 			return ret;
-		}
-		catch (SQLException e)
-		{
+		} catch (SQLException e) {
 			throw new ResourceException("Unable to retrieve unknown attributes!", e);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}
 
 	@Override
-	public void setUnknownAttributes(
-		Map<QName, Collection<MessageElement>> newAttrs)
-			throws ResourceException
+	public void setUnknownAttributes(Map<QName, Collection<MessageElement>> newAttrs) throws ResourceException
 	{
 		PreparedStatement stmt = null;
 		deleteUnknownAttributes(newAttrs.keySet());
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"INSERT INTO unknownattrs(resourceid, attrname, attrvalues) VALUES (?, ?, ?)");
-			
-			for (Map.Entry<QName, Collection<MessageElement>> entry :
-				newAttrs.entrySet())
-			{
+
+		try {
+			stmt = _connection.prepareStatement("INSERT INTO unknownattrs(resourceid, attrname, attrvalues) VALUES (?, ?, ?)");
+
+			for (Map.Entry<QName, Collection<MessageElement>> entry : newAttrs.entrySet()) {
 				stmt.setString(1, _resourceKey);
 				stmt.setString(2, entry.getKey().toString());
-				
+
 				Collection<MessageElement> any = entry.getValue();
-				stmt.setBlob(3, new SerialBlob(ObjectSerializer.anyToBytes(
-					any.toArray(new MessageElement[any.size()]))));
-				
+				stmt.setBlob(3, new SerialBlob(ObjectSerializer.anyToBytes(any.toArray(new MessageElement[any.size()]))));
+
 				stmt.addBatch();
 			}
-			
+
 			stmt.executeBatch();
-		}
-		catch (SQLException e)
-		{
-			throw new ResourceException(
-				"Unable to serialize unknown attributes into database!", e);
-		}
-		finally
-		{
+		} catch (SQLException e) {
+			throw new ResourceException("Unable to serialize unknown attributes into database!", e);
+		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
 
 	@Override
-	public void deleteUnknownAttributes(Set<QName> names)
-		throws ResourceException
+	public void deleteUnknownAttributes(Set<QName> names) throws ResourceException
 	{
 		PreparedStatement stmt = null;
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"DELETE FROM unknownattrs WHERE resourceid = ? AND attrname = ?");
-			
-			for (QName name : names)
-			{
+
+		try {
+			stmt = _connection.prepareStatement("DELETE FROM unknownattrs WHERE resourceid = ? AND attrname = ?");
+
+			for (QName name : names) {
 				stmt.setString(1, _resourceKey);
 				stmt.setString(2, name.toString());
 				stmt.addBatch();
 			}
-			
+
 			stmt.executeBatch();
-		}
-		catch (SQLException e)
-		{
-			throw new ResourceException(
-				"Unable to delete unknown attributes into database!", e);
-		}
-		finally
-		{
+		} catch (SQLException e) {
+			throw new ResourceException("Unable to delete unknown attributes into database!", e);
+		} finally {
 			StreamUtils.close(stmt);
 		}
 	}

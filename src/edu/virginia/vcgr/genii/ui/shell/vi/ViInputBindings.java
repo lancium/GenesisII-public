@@ -7,72 +7,56 @@ import edu.virginia.vcgr.genii.ui.shell.KeySet;
 
 public class ViInputBindings extends BaseInputBindings
 {
-	static final private KeySet SYMBOLS = new KeySet(
-		" \t`~!@#$%^&*()_-+={}|[]\\:\";'<>?,./");
+	static final private KeySet SYMBOLS = new KeySet(" \t`~!@#$%^&*()_-+={}|[]\\:\";'<>?,./");
 
 	private ViMode _mode = ViMode.INPUT_MODE;
-	
+
 	@Override
 	protected void keyPressed(int keyCode, KeyEvent e)
 	{
 		boolean toConsume = false;
-		if (e.isControlDown() || e.isMetaDown())
-		{
-			if(keyCode == 72)
+		if (e.isControlDown() || e.isMetaDown()) {
+			if (keyCode == 72)
 				toConsume = true;
-			if (keyCode == KeyEvent.VK_BACK_SPACE)
-			{
+			if (keyCode == KeyEvent.VK_BACK_SPACE) {
 				fireClear();
 				_mode = ViMode.INPUT_MODE;
 				toConsume = true;
-			} else if (keyCode == KeyEvent.VK_R)
-			{
+			} else if (keyCode == KeyEvent.VK_R) {
 				fireSearch();
 				_mode = ViMode.INPUT_MODE;
 				toConsume = true;
 			}
-		} else
-		{
-			if (_mode == ViMode.INPUT_MODE)
-			{
-				if (keyCode == KeyEvent.VK_ESCAPE)
-				{
+		} else {
+			if (_mode == ViMode.INPUT_MODE) {
+				if (keyCode == KeyEvent.VK_ESCAPE) {
 					fireStopSearch();
 					_mode = ViMode.COMMAND_MODE;
 					toConsume = true;
 				}
-			} else if (_mode == ViMode.COMMAND_MODE)
-			{
-				if (keyCode == KeyEvent.VK_ESCAPE)
-				{
+			} else if (_mode == ViMode.COMMAND_MODE) {
+				if (keyCode == KeyEvent.VK_ESCAPE) {
 					fireBeep();
 					toConsume = true;
 				}
 			}
-			
-			if (keyCode == KeyEvent.VK_LEFT)
-			{
+
+			if (keyCode == KeyEvent.VK_LEFT) {
 				fireLeft();
 				toConsume = true;
-			}
-			else if (keyCode == KeyEvent.VK_RIGHT)
-			{
+			} else if (keyCode == KeyEvent.VK_RIGHT) {
 				fireRight();
 				toConsume = true;
-			}
-			else if (keyCode == KeyEvent.VK_UP)
-			{
+			} else if (keyCode == KeyEvent.VK_UP) {
 				toConsume = true;
 				fireBackwardHistory();
-			}
-			else if (keyCode == KeyEvent.VK_DOWN)
-			{
+			} else if (keyCode == KeyEvent.VK_DOWN) {
 				fireForwardHistory();
 				toConsume = true;
 			}
 		}
-		
-		if(toConsume)
+
+		if (toConsume)
 			e.consume();
 	}
 
@@ -80,69 +64,62 @@ public class ViInputBindings extends BaseInputBindings
 	protected void keyTyped(char keyChar, KeyEvent e)
 	{
 		boolean toConsume = true;
-		if(!e.isControlDown() || e.isMetaDown())
-			if (_mode == ViMode.INPUT_MODE)
-			{
+		if (!e.isControlDown() || e.isMetaDown())
+			if (_mode == ViMode.INPUT_MODE) {
 				if (keyChar == KeyEvent.VK_TAB)
 					fireComplete();
 				else if (Character.isLetterOrDigit(keyChar) || SYMBOLS.inSet(keyChar))
 					toConsume = false;
-				else if (keyChar == KeyEvent.VK_ENTER)
-				{
+				else if (keyChar == KeyEvent.VK_ENTER) {
 					fireEnter();
 					_mode = ViMode.INPUT_MODE;
-				}
-				else
+				} else
 					toConsume = false;
-			} else if (_mode == ViMode.COMMAND_MODE)
-			{ 
+			} else if (_mode == ViMode.COMMAND_MODE) {
 				if (keyChar == KeyEvent.VK_ENTER)
 					fireEnter();
-				else
-				{
-					switch (keyChar)
-					{
-						case 'x' :
+				else {
+					switch (keyChar) {
+						case 'x':
 							fireDelete();
 							break;
-						case 'X' :
+						case 'X':
 							fireBackspace();
 							break;
-						case 'h' :
+						case 'h':
 							fireLeft();
 							break;
-						case 'l' :
+						case 'l':
 							fireRight();
 							break;
-						case 'A' :
+						case 'A':
 							fireEnd();
 							_mode = ViMode.INPUT_MODE;
 							break;
-						case 'a' :
+						case 'a':
 							fireRight();
 							_mode = ViMode.INPUT_MODE;
 							break;
-						case 'I' :
+						case 'I':
 							fireHome();
 							_mode = ViMode.INPUT_MODE;
 							break;
-						case 'i' :
+						case 'i':
 							_mode = ViMode.INPUT_MODE;
 							break;
-						case 'k' :
+						case 'k':
 							fireBackwardHistory();
 							break;
-						case 'j' :
+						case 'j':
 							fireForwardHistory();
 							break;
-						default :
+						default:
 							toConsume = true;
 					}
 				}
-			}
-			else 
+			} else
 				toConsume = false;
-		if(toConsume)
+		if (toConsume)
 			e.consume();
 	}
 }

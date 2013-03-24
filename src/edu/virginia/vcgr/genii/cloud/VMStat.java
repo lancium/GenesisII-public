@@ -10,7 +10,8 @@ import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class VMStat {
+public class VMStat
+{
 
 	private String _id;
 	private String _besid;
@@ -20,24 +21,27 @@ public class VMStat {
 	private int _load = 0;
 	private boolean _prepared = false;
 	private boolean _preparing = false;
-	
-	public void setPreparing(){
+
+	public void setPreparing()
+	{
 		_preparing = true;
 	}
-	
-	public boolean preparing(){
+
+	public boolean preparing()
+	{
 		return _preparing;
 	}
 
 	static private Log _logger = LogFactory.getLog(VMStat.class);
-	
-	public VMStat(){
+
+	public VMStat()
+	{
 
 	}
 
-	public VMStat(String id, String host, int port,
-			int load, int setup, String besid) {
-	
+	public VMStat(String id, String host, int port, int load, int setup, String besid)
+	{
+
 		_id = id;
 		_host = host;
 		_port = port;
@@ -47,9 +51,9 @@ public class VMStat {
 			_prepared = true;
 
 	}
-	
-	private VMStat(String id, String besid, VMState state,
-			String host, int load, boolean prepared){
+
+	private VMStat(String id, String besid, VMState state, String host, int load, boolean prepared)
+	{
 		_id = id;
 		_besid = besid;
 		_state = state;
@@ -59,68 +63,85 @@ public class VMStat {
 		_port = -1;
 	}
 
-	public void setPrepared(){
+	public void setPrepared()
+	{
 		_prepared = true;
 		updateResource();
 	}
 
-	
-	public void setHost(String host){
+	public void setHost(String host)
+	{
 		_host = host;
 	}
-	
-	public void setID(String id){
+
+	public void setID(String id)
+	{
 		_id = id;
 	}
-	
-	public void setBESID(String besid){
+
+	public void setBESID(String besid)
+	{
 		_besid = besid;
 	}
-	
-	public String getID() {
+
+	public String getID()
+	{
 		return _id;
 	}
 
-	public VMState getState() {
+	public VMState getState()
+	{
 		return _state;
 	}
-	public void setState(VMState state) {
+
+	public void setState(VMState state)
+	{
 		_state = state;
 	}
-	public String getHost() {
+
+	public String getHost()
+	{
 		return _host;
 	}
-	public int getPort() {
+
+	public int getPort()
+	{
 		return _port;
 	}
 
-	public int getLoad() {
+	public int getLoad()
+	{
 		return _load;
 	}
-	public void setLoad(int load) {
+
+	public void setLoad(int load)
+	{
 		_load = load;
 		updateResource();
 	}
 
-	public void addWork(){
+	public void addWork()
+	{
 		_load += 1;
 		updateResource();
 	}
 
-	public void removeWork(){
+	public void removeWork()
+	{
 		_load -= 1;
 		updateResource();
 	}
 
-	public boolean isReady(){
+	public boolean isReady()
+	{
 		return ((_state == VMState.RUNNING) && _prepared);
 	}
 
-
-	public void updateResource(){
+	public void updateResource()
+	{
 		int prepared = 0;
 		if (_prepared)
-			prepared=1;
+			prepared = 1;
 		try {
 			CloudMonitor.updateResource(_besid, _id, _load, prepared);
 		} catch (SQLException e) {
@@ -128,39 +149,24 @@ public class VMStat {
 		}
 
 	}
-	
-	
+
 	public MessageElement toMessageElement(QName elementName)
 	{
 		String tState = "";
-		if (_state != null){
+		if (_state != null) {
 			tState = _state.toString();
 		}
-		
+
 		MessageElement ret = new MessageElement(elementName);
 
-		MessageElement id = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"id"), _id);
-		MessageElement besid = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"besid"), _besid);
-		MessageElement state = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"state"), tState);
-		MessageElement host = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"host"), _host);
-		MessageElement load = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"load"), _load);
-		MessageElement prepared = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"prepared"), _prepared);
-		
+		MessageElement id = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "id"), _id);
+		MessageElement besid = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "besid"), _besid);
+		MessageElement state = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "state"), tState);
+		MessageElement host = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "host"), _host);
+		MessageElement load = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "load"), _load);
+		MessageElement prepared = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "prepared"), _prepared);
 
-		try
-		{
+		try {
 			ret.addChild(id);
 			ret.addChild(besid);
 			ret.addChild(state);
@@ -168,11 +174,8 @@ public class VMStat {
 			ret.addChild(load);
 			ret.addChild(prepared);
 
-		}
-		catch (SOAPException se)
-		{
-			throw new RuntimeException(
-			"Unexpected exception thrown while packageing policy.");
+		} catch (SOAPException se) {
+			throw new RuntimeException("Unexpected exception thrown while packageing policy.");
 		}
 
 		return ret;
@@ -189,37 +192,28 @@ public class VMStat {
 		boolean prepared = false;
 
 		Iterator<?> iter = element.getChildElements();
-		while (iter.hasNext())
-		{
-			MessageElement child = (MessageElement)iter.next();
+		while (iter.hasNext()) {
+			MessageElement child = (MessageElement) iter.next();
 			QName childName = child.getQName();
-	
-			if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "id")))
+
+			if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "id")))
 				id = child.getValue();
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "besid")))
+			else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "besid")))
 				besid = child.getValue();
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "state"))){
+			else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "state"))) {
 				if (child.getValue() != null)
 					state = VMState.valueOf(child.getValue());
-			}
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "host")))
+			} else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "host")))
 				host = child.getValue();
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "load")))
+			else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "load")))
 				load = Integer.parseInt(child.getValue());
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "prepared")))
+			else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "prepared")))
 				prepared = Boolean.getBoolean(child.getValue());
-	
 
 		}
 
 		return new VMStat(id, besid, state, host, load, prepared);
-		
+
 	}
 
 }

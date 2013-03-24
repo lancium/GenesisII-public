@@ -24,21 +24,21 @@ public class ReducedCommandLine implements ICommandLine
 {
 	private ICommandLine _parentCommandLine;
 	private int _firstArgument;
-	
+
 	public ReducedCommandLine(ICommandLine parentCommandLine, int firstArgument)
 	{
 		_parentCommandLine = parentCommandLine;
 		_firstArgument = firstArgument;
 	}
-	
+
 	/**
 	 * Returns true if the command line has no arguments, options, or flags
 	 */
-	public boolean isEmpty() 
+	public boolean isEmpty()
 	{
 		return _parentCommandLine.isEmpty();
 	}
-	
+
 	public int numArguments()
 	{
 		return _parentCommandLine.numArguments() - _firstArgument;
@@ -51,10 +51,10 @@ public class ReducedCommandLine implements ICommandLine
 
 	public String[] getArguments()
 	{
-		String []ret = new String[numArguments()];
-		String []tmp = _parentCommandLine.getArguments();
+		String[] ret = new String[numArguments()];
+		String[] tmp = _parentCommandLine.getArguments();
 		System.arraycopy(tmp, _firstArgument, ret, 0, ret.length);
-		
+
 		return ret;
 	}
 

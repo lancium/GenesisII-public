@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface AdvertisedSize
-{
+public @interface AdvertisedSize {
 	long value() default 0L;
 }

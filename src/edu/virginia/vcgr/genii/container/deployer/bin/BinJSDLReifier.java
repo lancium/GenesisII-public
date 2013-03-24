@@ -6,14 +6,13 @@ import java.io.Serializable;
 import edu.virginia.vcgr.genii.container.deployer.AbstractReifier;
 import edu.virginia.vcgr.genii.container.deployer.IJSDLReifier;
 
-public class BinJSDLReifier 
-	extends AbstractReifier implements IJSDLReifier, Serializable
+public class BinJSDLReifier extends AbstractReifier implements IJSDLReifier, Serializable
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private String _binaryName;
 	private String _relativeCWD;
-	
+
 	public BinJSDLReifier(String binaryName, String relativeCWD)
 	{
 		_binaryName = binaryName;
@@ -23,17 +22,13 @@ public class BinJSDLReifier
 	@Override
 	public String[] getAdditionalLibraryPaths(File deployDirectory)
 	{
-		return new String [] {
-			new File(deployDirectory, "lib").getAbsolutePath()
-		};
+		return new String[] { new File(deployDirectory, "lib").getAbsolutePath() };
 	}
 
 	@Override
 	public String[] getAdditionalPaths(File deployDirectory)
 	{
-		return new String[] {
-			new File(deployDirectory, "bin").getAbsolutePath()
-		};
+		return new String[] { new File(deployDirectory, "bin").getAbsolutePath() };
 	}
 
 	@Override
@@ -48,7 +43,7 @@ public class BinJSDLReifier
 		File dir = deployDirectory;
 		if (_relativeCWD != null)
 			dir = new File(dir, _relativeCWD);
-		
+
 		return dir.getAbsolutePath();
 	}
 }

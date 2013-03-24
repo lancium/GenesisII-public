@@ -11,10 +11,10 @@ public class FuseUtils
 		File f = SystemExec.findExecutableInPath("fusermount");
 		if (f == null)
 			return "Unable to locate fusermount binary.";
-		
+
 		return null;
 	}
-	
+
 	static private String checkForFuseDevice()
 	{
 		File f = new File("/dev/fuse");
@@ -24,24 +24,24 @@ public class FuseUtils
 			return "Can't read /dev/fuse.";
 		if (!f.canWrite())
 			return "Can't write /dev/fuse.";
-		
+
 		return null;
 	}
-	
+
 	static public String supportsFuse()
 	{
 		String msg = checkForFuserMount();
 		if (msg != null)
 			return msg;
-		
+
 		msg = checkForFuseDevice();
 		if (msg != null)
 			return msg;
-		
+
 		return null;
 	}
-	
-	static public void main(String []args)
+
+	static public void main(String[] args)
 	{
 		System.err.println(supportsFuse());
 	}

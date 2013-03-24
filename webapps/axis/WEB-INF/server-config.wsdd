@@ -18,6 +18,7 @@
 		<handler type="java:edu.virginia.vcgr.genii.container.axis.WorkingContextHandler">
 			<parameter name="flow-side" value="request"/>
 		</handler>
+		<handler type="java:edu.virginia.vcgr.genii.security.axis.CredentialsWalletRetriever"/>
 		<handler type="java:edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver">
 			<parameter name="user" value="CRYPTO_ALIAS"/>
 			<parameter name="passwordCallbackClass" value="edu.virginia.vcgr.htc.client.security.axis.ServerWSDoAllReceiver$ServerPWCallback"/>

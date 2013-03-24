@@ -8,16 +8,13 @@ import java.util.List;
 
 import org.apache.axis.message.MessageElement;
 
-public abstract class AbstractIteratorBuilder<SourceType> 
-	implements IteratorBuilder<SourceType>, Iterable<MessageElement>
+public abstract class AbstractIteratorBuilder<SourceType> implements IteratorBuilder<SourceType>, Iterable<MessageElement>
 {
 	private int _preferredBatchSize = DEFAULT_PREFERRED_BATCH_SIZE;
-	private List<Iterator<?>> _iterators = 
-		new LinkedList<Iterator<?>>();
-	
-	abstract protected MessageElement serialize(SourceType item)
-		throws IOException;
-	
+	private List<Iterator<?>> _iterators = new LinkedList<Iterator<?>>();
+
+	abstract protected MessageElement serialize(SourceType item) throws IOException;
+
 	@Override
 	final public int preferredBatchSize()
 	{
@@ -47,18 +44,17 @@ public abstract class AbstractIteratorBuilder<SourceType>
 	{
 		return new InternalIterator();
 	}
-	
+
 	final private class InternalIterator implements Iterator<MessageElement>
 	{
 		private Iterator<Iterator<?>> _iterators;
 		private Iterator<?> _current = null;
-		
+
 		private InternalIterator()
 		{
 			_iterators = AbstractIteratorBuilder.this._iterators.iterator();
-			
-			while(_iterators.hasNext())
-			{
+
+			while (_iterators.hasNext()) {
 				_current = _iterators.next();
 				if (_current.hasNext())
 					break;
@@ -75,23 +71,18 @@ public abstract class AbstractIteratorBuilder<SourceType>
 		@Override
 		final public MessageElement next()
 		{
-			SourceType next = (SourceType)_current.next();
-			if (!_current.hasNext())
-			{
-				while(_iterators.hasNext())
-				{
+			SourceType next = (SourceType) _current.next();
+			if (!_current.hasNext()) {
+				while (_iterators.hasNext()) {
 					_current = _iterators.next();
 					if (_current.hasNext())
 						break;
 				}
 			}
-			
-			try
-			{
+
+			try {
 				return serialize(next);
-			}
-			catch (IOException ioe)
-			{
+			} catch (IOException ioe) {
 				throw new UndeclaredThrowableException(ioe);
 			}
 		}
@@ -99,8 +90,7 @@ public abstract class AbstractIteratorBuilder<SourceType>
 		@Override
 		final public void remove()
 		{
-			throw new UnsupportedOperationException(
-				"Remove not supported on this iterator type!");
+			throw new UnsupportedOperationException("Remove not supported on this iterator type!");
 		}
 	}
 }

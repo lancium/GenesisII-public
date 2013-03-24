@@ -13,64 +13,51 @@ import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIde
 public class CommonDataStagingFacet extends DefaultDataStagingFacet
 {
 	@Override
-	public Object createFacetUnderstanding(Object parentUnderstanding)
-			throws JSDLException
+	public Object createFacetUnderstanding(Object parentUnderstanding) throws JSDLException
 	{
 		return new DataStagingUnderstanding();
 	}
 
 	@Override
-	public void consumeCreationFlag(Object currentUnderstanding,
-		CreationFlagEnumeration creationFlag) throws JSDLException
+	public void consumeCreationFlag(Object currentUnderstanding, CreationFlagEnumeration creationFlag) throws JSDLException
 	{
 		if (creationFlag.equals(CreationFlagEnumeration.append))
-			throw new UnsupportedJSDLElement(
-				"Creation flag \"append\" is not supported.", 
-				new QName(JSDLConstants.JSDL_NS, "CreationFlag"));
-				
-		((DataStagingUnderstanding)currentUnderstanding).setCreationFlag(
-			creationFlag);
+			throw new UnsupportedJSDLElement("Creation flag \"append\" is not supported.", new QName(JSDLConstants.JSDL_NS,
+				"CreationFlag"));
+
+		((DataStagingUnderstanding) currentUnderstanding).setCreationFlag(creationFlag);
 	}
 
 	@Override
-	public void consumeDeleteOnTerminateFlag(Object currentUnderstanding,
-			boolean deleteOnTerminate) throws JSDLException
+	public void consumeDeleteOnTerminateFlag(Object currentUnderstanding, boolean deleteOnTerminate) throws JSDLException
 	{
-		((DataStagingUnderstanding)currentUnderstanding).setDeleteOnTerminate(
-			deleteOnTerminate);
+		((DataStagingUnderstanding) currentUnderstanding).setDeleteOnTerminate(deleteOnTerminate);
 	}
 
 	@Override
-	public void consumeFileSystemName(Object currentUnderstanding,
-			String fileSystemName) throws JSDLException
+	public void consumeFileSystemName(Object currentUnderstanding, String fileSystemName) throws JSDLException
 	{
-		((DataStagingUnderstanding)currentUnderstanding).setFileSystemName(
-			fileSystemName);
+		((DataStagingUnderstanding) currentUnderstanding).setFileSystemName(fileSystemName);
 	}
 
 	@Override
-	public void consumeFileName(Object currentUnderstanding, String fileName)
-			throws JSDLException
+	public void consumeFileName(Object currentUnderstanding, String fileName) throws JSDLException
 	{
-		((DataStagingUnderstanding)currentUnderstanding).setFilename(fileName);
+		((DataStagingUnderstanding) currentUnderstanding).setFilename(fileName);
 	}
 
 	@Override
-	public void consumeCredential(Object currentUnderstanding,
-			UsernamePasswordIdentity upi) throws JSDLException
+	public void consumeCredential(Object currentUnderstanding, UsernamePasswordIdentity upi) throws JSDLException
 	{
-		((DataStagingUnderstanding)currentUnderstanding).setCredential(upi);
-	}	
-	
+		((DataStagingUnderstanding) currentUnderstanding).setCredential(upi);
+	}
+
 	@Override
-	public void completeFacet(Object parentUnderstanding,
-			Object currentUnderstanding) throws JSDLException
+	public void completeFacet(Object parentUnderstanding, Object currentUnderstanding) throws JSDLException
 	{
-		CommonExecutionUnderstanding parent = 
-			(CommonExecutionUnderstanding)parentUnderstanding;
-		DataStagingUnderstanding child = 
-			(DataStagingUnderstanding)currentUnderstanding;
-		
+		CommonExecutionUnderstanding parent = (CommonExecutionUnderstanding) parentUnderstanding;
+		DataStagingUnderstanding child = (DataStagingUnderstanding) currentUnderstanding;
+
 		parent.addDataStaging(child);
 	}
 }

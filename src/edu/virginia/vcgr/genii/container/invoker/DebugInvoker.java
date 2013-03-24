@@ -8,36 +8,32 @@ import edu.virginia.vcgr.genii.container.naming.NamingUtils;
 public class DebugInvoker implements IAroundInvoker
 {
 	static private Log _logger = LogFactory.getLog(DebugInvoker.class);
-	
+
 	public Object invoke(InvocationContext invocationContext) throws Exception
 	{
-		String description = "method " + 
-			invocationContext.getMethod().getName() +
-			" on class " + 
-			invocationContext.getTarget().getClass().getName() + ".";
-		
-		_logger.trace("Calling " + description + " from a "
-			+ (NamingUtils.isWSNamingAwareClient() ? "" : "non-") + "WS-Naming aware client.");
-		
+		String description = "method " + invocationContext.getMethod().getName() + " on class "
+			+ invocationContext.getTarget().getClass().getName() + ".";
+
+		if (_logger.isTraceEnabled())
+			_logger.trace("Calling " + description + " from a " + (NamingUtils.isWSNamingAwareClient() ? "" : "non-")
+				+ "WS-Naming aware client.");
+
 		long start = System.currentTimeMillis();
-		
-		try
-		{
+
+		try {
 			Object obj = invocationContext.proceed();
 			long stop = System.currentTimeMillis();
-			
-			_logger.debug(String.format("Successfully called %s in %d ms.",
-				description, (stop - start)));
-			
+
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Successfully called %s in %d ms.", description, (stop - start)));
+
 			return obj;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			long stop = System.currentTimeMillis();
-			
-			_logger.debug(String.format("Failed to call %s in %d ms.",
-				description, (stop - start)), e);
-			
+
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Failed to call %s in %d ms.", description, (stop - start)), e);
+
 			throw e;
 		}
 	}

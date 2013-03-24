@@ -28,15 +28,17 @@ public interface IRNSResource extends IResource
 
 	static public final String ELEMENT_COUNT_PROPERTY = "edu.virginia.vcgr.genii.rns.elementCount";
 
-	public void addEntry(InternalEntry entry) 
-		throws ResourceException, RNSEntryExistsFaultType;
+	public void addEntry(InternalEntry entry) throws ResourceException, RNSEntryExistsFaultType;
+
 	public Collection<String> listEntries(String name) throws ResourceException;
-	public Collection<InternalEntry> retrieveEntries(String entryName)
-		throws ResourceException;
-	public Collection<String> removeEntries(String entryName)
-		throws ResourceException;
+
+	public Collection<InternalEntry> retrieveEntries(String entryName) throws ResourceException;
+
+	public Collection<String> removeEntries(String entryName) throws ResourceException;
+
 	public int retrieveOccurrenceCount() throws ResourceException;
-	public Collection<InMemoryIteratorEntry> retrieveIdOfEntry(
-			String request) throws ResourceException;
+
+	public Collection<InMemoryIteratorEntry> retrieveIdOfEntry(String request) throws ResourceException;
+
 	public InternalEntry retrieveInternalEntryFromID(String id) throws ResourceException;
 }

@@ -6,33 +6,40 @@ package edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement;
  * doing all subscriptions through a notification broker, we can just hold onto the EPIs
  * of the subscriptions and ask the broker delete them using the EPIs.
  * */
-public class SubscriptionReferenceList {
+public class SubscriptionReferenceList
+{
 
 	private String rnsContentChangeReference;
 	private String byteIOAttributesUpdateReference;
 	private String permissionsBitsChangeReference;
-	
-	public String getRnsContentChangeReference() {
+
+	public String getRnsContentChangeReference()
+	{
 		return rnsContentChangeReference;
 	}
-	
-	public void setRnsContentChangeReference(String rnsContentChangeReference) {
+
+	public void setRnsContentChangeReference(String rnsContentChangeReference)
+	{
 		this.rnsContentChangeReference = rnsContentChangeReference;
 	}
-	
-	public String getByteIOAttributesUpdateReference() {
+
+	public String getByteIOAttributesUpdateReference()
+	{
 		return byteIOAttributesUpdateReference;
 	}
-	
-	public void setByteIOAttributesUpdateReference(String byteIOAttributesUpdateReference) {
+
+	public void setByteIOAttributesUpdateReference(String byteIOAttributesUpdateReference)
+	{
 		this.byteIOAttributesUpdateReference = byteIOAttributesUpdateReference;
 	}
-	
-	public String getPermissionsBitsChangeReference() {
+
+	public String getPermissionsBitsChangeReference()
+	{
 		return permissionsBitsChangeReference;
 	}
 
-	public void setPermissionsBitsChangeReference(String permissionsBitsChangeReference) {
+	public void setPermissionsBitsChangeReference(String permissionsBitsChangeReference)
+	{
 		this.permissionsBitsChangeReference = permissionsBitsChangeReference;
 	}
 }

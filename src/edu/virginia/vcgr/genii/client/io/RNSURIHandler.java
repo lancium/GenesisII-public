@@ -29,14 +29,12 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
-public class RNSURIHandler extends AbstractURIHandler
-	implements IURIHandler
+public class RNSURIHandler extends AbstractURIHandler implements IURIHandler
 {
 	static private Log _logger = LogFactory.getLog(RNSURIHandler.class);
-	
-	static private final String []_HANDLED_PROTOCOLS =
-		new String[] { "rns" };
-	
+
+	static private final String[] _HANDLED_PROTOCOLS = new String[] { "rns" };
+
 	public boolean canRead(String uriScheme)
 	{
 		return uriScheme != null && uriScheme.equals(_HANDLED_PROTOCOLS[0]);
@@ -52,50 +50,38 @@ public class RNSURIHandler extends AbstractURIHandler
 		return _HANDLED_PROTOCOLS;
 	}
 
-	public InputStream openInputStream(URI uri, 
-		UsernamePasswordIdentity credential) throws IOException
+	public InputStream openInputStream(URI uri, UsernamePasswordIdentity credential) throws IOException
 	{
 		if (credential != null)
-			throw new IOException(
-				"Don't know how to perform rns: with a credential.");
-						
-		try
-		{
+			throw new IOException("Don't know how to perform rns: with a credential.");
+
+		try {
 			RNSPath path = RNSPath.getCurrent();
-			path = path.lookup(uri.getSchemeSpecificPart(), 
-				RNSPathQueryFlags.MUST_EXIST);
-			
-			_logger.debug(String.format("Staging a file in from \"%s\".",
-				path.pwd()));
-			
+			path = path.lookup(uri.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
+
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Staging a file in from \"%s\".", path.pwd()));
+
 			return ByteIOStreamFactory.createInputStream(path);
-		}
-		catch (RNSException re)
-		{
+		} catch (RNSException re) {
 			throw new IOException(re.getMessage());
 		}
 	}
 
-	public OutputStream openOutputStream(URI uri,
-		UsernamePasswordIdentity credential) throws IOException
+	public OutputStream openOutputStream(URI uri, UsernamePasswordIdentity credential) throws IOException
 	{
 		if (credential != null)
-			throw new IOException(
-				"Don't know how to perform rns: with a credential.");
-						
-		try
-		{
+			throw new IOException("Don't know how to perform rns: with a credential.");
+
+		try {
 			RNSPath path = RNSPath.getCurrent();
-			path = path.lookup(uri.getSchemeSpecificPart(), 
-				RNSPathQueryFlags.DONT_CARE);
-			
-			_logger.debug(String.format("Staging a file out to \"%s\".",
-				path.pwd()));
-			
+			path = path.lookup(uri.getSchemeSpecificPart(), RNSPathQueryFlags.DONT_CARE);
+
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Staging a file out to \"%s\".", path.pwd()));
+
 			return ByteIOStreamFactory.createOutputStream(path);
-		}
-		catch (RNSException re)
-		{
+		} catch (RNSException re) {
 			throw new IOException(re.getMessage());
 		}
 	}

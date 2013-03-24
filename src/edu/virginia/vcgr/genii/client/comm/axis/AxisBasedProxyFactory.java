@@ -43,92 +43,75 @@ public class AxisBasedProxyFactory implements IProxyFactory
 {
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(AxisBasedProxyFactory.class);
-	
-	static public QName LOCATOR_REGISTRY_QNAME =
-		new QName(GenesisIIConstants.GENESISII_NS, "locator-registry");
-	
+
+	static public QName LOCATOR_REGISTRY_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "locator-registry");
+
 	@SuppressWarnings("unchecked")
-	public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, 
-		EndpointReferenceType epr, ICallingContext callContext) 
-		throws ResourceException, GenesisIISecurityException
-	{
-		XMLConfiguration conf = 
-			ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
-		HashMap<String, Class<?>> _locators;
-		
-		synchronized(conf)
-		{
-			_locators = (HashMap<String, Class<?>>)conf.retrieveSection(
-				LOCATOR_REGISTRY_QNAME);
-		}
-		
-		Class<?> []locators = new Class[1];
-		
-		locators[0] = _locators.get(iface.getName());
-		if (locators[0] == null)
-		{
-			throw new ConfigurationException(
-				"Unable to find a locator for \"" + iface.getName() +
-				"\".");
-		}
-		
-		return (IFace)createClientProxy(loader, locators, epr, callContext);
-	}
-	
-	private Object createClientProxy(ClassLoader loader, 
-		Class<?> []locatorClasses, EndpointReferenceType targetEPR, 
+	public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr,
 		ICallingContext callContext) throws ResourceException, GenesisIISecurityException
 	{
-		Class<?> []portTypes = ClientUtils.getLocatorPortTypes(locatorClasses);
-		AxisClientInvocationHandler handler = new AxisClientInvocationHandler(
-			locatorClasses, targetEPR, callContext);
-		
+		XMLConfiguration conf = ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
+		HashMap<String, Class<?>> _locators;
+
+		synchronized (conf) {
+			_locators = (HashMap<String, Class<?>>) conf.retrieveSection(LOCATOR_REGISTRY_QNAME);
+		}
+
+		Class<?>[] locators = new Class[1];
+
+		locators[0] = _locators.get(iface.getName());
+		if (locators[0] == null) {
+			throw new ConfigurationException("Unable to find a locator for \"" + iface.getName() + "\".");
+		}
+
+		return (IFace) createClientProxy(loader, locators, epr, callContext);
+	}
+
+	private Object createClientProxy(ClassLoader loader, Class<?>[] locatorClasses, EndpointReferenceType targetEPR,
+		ICallingContext callContext) throws ResourceException, GenesisIISecurityException
+	{
+		Class<?>[] portTypes = ClientUtils.getLocatorPortTypes(locatorClasses);
+		AxisClientInvocationHandler handler = new AxisClientInvocationHandler(locatorClasses, targetEPR, callContext);
+
 		return Proxy.newProxyInstance(loader, portTypes, handler);
 	}
-	
-	private AxisClientInvocationHandler 
-		getInvocationHandler(Object clientProxy)
-		throws ResourceException
+
+	private AxisClientInvocationHandler getInvocationHandler(Object clientProxy) throws ResourceException
 	{
 		InvocationHandler handler = Proxy.getInvocationHandler(clientProxy);
 		if (handler == null)
 			throw new ResourceException("Invalid client proxy.");
 		if (!(handler instanceof AxisClientInvocationHandler))
 			throw new ResourceException("Invalid client proxy.");
-		return (AxisClientInvocationHandler)handler;
+		return (AxisClientInvocationHandler) handler;
 	}
-	
-	public EndpointReferenceType extractTargetEPR(Object proxy)
-		throws ResourceException
+
+	public EndpointReferenceType extractTargetEPR(Object proxy) throws ResourceException
 	{
 		AxisClientInvocationHandler handler = getInvocationHandler(proxy);
 		return handler.getTargetEPR();
 	}
 
-	public Collection<GeniiAttachment> getAttachments(Object clientProxy)
-		throws ResourceException
+	public Collection<GeniiAttachment> getAttachments(Object clientProxy) throws ResourceException
 	{
 		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);
 		return handler.getInAttachments();
 	}
-	
-	public GenesisIIEndpointInformation getLastEndpointInformation(
-		Object clientProxy) throws ResourceException
+
+	public GenesisIIEndpointInformation getLastEndpointInformation(Object clientProxy) throws ResourceException
 	{
 		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);
 		return handler.getLastEndpointInformation();
 	}
 
-	public void setAttachments(Object clientProxy, 
-		Collection<GeniiAttachment> attachments, 
-		AttachmentType attachmentType) throws ResourceException
+	public void setAttachments(Object clientProxy, Collection<GeniiAttachment> attachments, AttachmentType attachmentType)
+		throws ResourceException
 	{
 		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);
 		handler.setOutAttachments(attachments, attachmentType);
 	}
-	
-	public void setTimeout(Object clientProxy,
-		int timeoutMillis) throws ResourceException
+
+	public void setTimeout(Object clientProxy, int timeoutMillis) throws ResourceException
 	{
 		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);
 		handler.setTimeout(timeoutMillis);

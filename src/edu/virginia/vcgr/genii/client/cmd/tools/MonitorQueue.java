@@ -11,47 +11,41 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class MonitorQueue extends BaseGridTool
 {
-	static private final String DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dmonitor-queue";
-	static private final String USAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/umonitor-queue";
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/monitor-queue";
-	
+	static private final String DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dmonitor-queue";
+	static private final String USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/umonitor-queue";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/monitor-queue";
+
 	public MonitorQueue()
 	{
-		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true,
-				ToolCategory.INTERNAL);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true, ToolCategory.INTERNAL);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
-		if(gPath.pathType() != GeniiPathType.Grid)
+		if (gPath.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException("queue-path must be a grid path. ");
 		QueueManipulator manipulator = new QueueManipulator(gPath.path());
 		int finished;
 		int total;
 		long sleepInterval = Long.parseLong(getArgument(1)) * 1000L;
-		
-		while (true)
-		{
+
+		while (true) {
 			finished = total = 0;
 			Iterator<JobInformation> info = manipulator.status(null);
-			while (info.hasNext())
-			{
+			while (info.hasNext()) {
 				JobInformation jobInfo = info.next();
 				total++;
 				if (jobInfo.getJobState().isFinalState())
 					finished++;
 			}
-			
+
 			stdout.format("%d/%d completed.\n", finished, total);
 			if (finished >= total)
 				return 0;
-			
+
 			Thread.sleep(sleepInterval);
 		}
 	}

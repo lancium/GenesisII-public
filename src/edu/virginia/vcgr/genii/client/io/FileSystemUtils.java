@@ -30,7 +30,7 @@ import edu.virginia.vcgr.genii.client.jni.JNIClientBaseClass;
 public class FileSystemUtils extends JNIClientBaseClass
 {
 	static private Log _logger = LogFactory.getLog(FileSystemUtils.class);
-	
+
 	static public final int MODE_SET_UID = 04000;
 	static public final int MODE_SET_GID = 02000;
 	static public final int MODE_STICKY = 01000;
@@ -44,140 +44,110 @@ public class FileSystemUtils extends JNIClientBaseClass
 	static public final int MODE_WORLD_WRITE = 00002;
 	static public final int MODE_WORLD_EXECUTE = 00001;
 
-	static private Pattern _EXTENSION_PATTERN = Pattern.compile(
-		"\\.\\w{3}(?=\\.)");
-	
-	static public native void chmod(String filePath, int mode)
-		throws IOException;
-	
-	static private File makeWindowsExecutable(File file)
-		throws FileNotFoundException, IOException
+	static private Pattern _EXTENSION_PATTERN = Pattern.compile("\\.\\w{3}(?=\\.)");
+
+	static public native void chmod(String filePath, int mode) throws IOException;
+
+	static private File makeWindowsExecutable(File file) throws FileNotFoundException, IOException
 	{
 		String filepath = file.getAbsolutePath();
-		
+
 		int index = filepath.lastIndexOf('.');
-		if (index > 0)
-		{
+		if (index > 0) {
 			String subString = filepath.substring(index + 1);
-			if (	subString.equalsIgnoreCase("exe")		||
-					subString.equalsIgnoreCase("com")		||
-					subString.equalsIgnoreCase("cmd")		||
-					subString.equalsIgnoreCase("bat")	)
+			if (subString.equalsIgnoreCase("exe") || subString.equalsIgnoreCase("com") || subString.equalsIgnoreCase("cmd")
+				|| subString.equalsIgnoreCase("bat"))
 				return file;
 		}
-		
+
 		String guess = guessMostLikelyExtension(filepath);
 		File ret = new File(file.getAbsolutePath() + "." + guess);
 		if (!file.renameTo(ret))
-			throw new IOException("Unable to rename file from \"" + file
-				+ "\" to \"" + ret + "\".");
+			throw new IOException("Unable to rename file from \"" + file + "\" to \"" + ret + "\".");
 		return ret;
 	}
-	
+
 	static private String guessMostLikelyExtension(String filepath)
 	{
 		Matcher matcher = _EXTENSION_PATTERN.matcher(filepath);
-		while (matcher.find())
-		{
+		while (matcher.find()) {
 			String possibleMatch = matcher.group().substring(1, 4);
-			if (	possibleMatch.equalsIgnoreCase("exe")	||
-					possibleMatch.equalsIgnoreCase("com")	||
-					possibleMatch.equalsIgnoreCase("cmd")	||
-					possibleMatch.equalsIgnoreCase("bat")	)
+			if (possibleMatch.equalsIgnoreCase("exe") || possibleMatch.equalsIgnoreCase("com")
+				|| possibleMatch.equalsIgnoreCase("cmd") || possibleMatch.equalsIgnoreCase("bat"))
 				return possibleMatch;
 		}
-		
+
 		return "exe";
 	}
-	
-	static public File makeExecutable(File filepath)
-		throws FileNotFoundException, IOException
+
+	static public File makeExecutable(File filepath) throws FileNotFoundException, IOException
 	{
 		if (!filepath.exists())
-			throw new FileNotFoundException("Couldn't find file \"" +
-				filepath.getAbsolutePath() + "\".");
+			throw new FileNotFoundException("Couldn't find file \"" + filepath.getAbsolutePath() + "\".");
 
 		if (OperatingSystemType.getCurrent().isWindows())
 			return makeWindowsExecutable(filepath);
-		else
-		{
-			if (!filepath.canExecute())
-			{
-				chmod(filepath.getAbsolutePath(),
-					MODE_USER_READ | MODE_USER_WRITE | MODE_USER_EXECUTE | 
-					MODE_GROUP_READ | MODE_GROUP_EXECUTE
-					);
+		else {
+			if (!filepath.canExecute()) {
+				chmod(filepath.getAbsolutePath(), MODE_USER_READ | MODE_USER_WRITE | MODE_USER_EXECUTE | MODE_GROUP_READ
+					| MODE_GROUP_EXECUTE);
 			}
-			
+
 			return filepath;
 		}
 	}
-	
+
 	static public boolean isSoftLink(File file) throws IOException
 	{
 		if (OperatingSystemType.getCurrent().isWindows())
 			return false;
-		
+
 		if (file == null)
 			throw new NullPointerException("File must not be null");
-		
+
 		File canon;
-		
+
 		if (file.getParent() == null)
 			canon = file;
-		else 
-		{
+		else {
 			File canonDir = file.getParentFile().getCanonicalFile();
 			canon = new File(canonDir, file.getName());
 		}
-		
+
 		return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
 	}
-	
+
 	static public boolean recursiveDelete(File target, boolean followSoftLinks)
 	{
 		boolean succeed = true;
-		
+
 		if (target == null)
 			return succeed;
-		
-		if (target.isFile())
-		{
-			if (!target.delete())
-			{
+
+		if (target.isFile()) {
+			if (!target.delete()) {
 				succeed = false;
-				_logger.warn(String.format(
-					"Unable to remove file system entry %s", target));
+				_logger.warn(String.format("Unable to remove file system entry %s", target));
 			}
-		} else if (target.isDirectory())
-		{
-			try
-			{
-				if (followSoftLinks || !isSoftLink(target))
-				{
-					for (File entry : target.listFiles())
-					{
+		} else if (target.isDirectory()) {
+			try {
+				if (followSoftLinks || !isSoftLink(target)) {
+					for (File entry : target.listFiles()) {
 						if (!recursiveDelete(entry, followSoftLinks))
 							succeed = false;
 					}
 				}
-				
-				if (!target.delete())
-				{
+
+				if (!target.delete()) {
 					succeed = false;
-					_logger.warn(String.format(
-						"Unable to remove file system entry %s.", target));
+					_logger.warn(String.format("Unable to remove file system entry %s.", target));
 				}
-			}
-			catch (IOException ioe)
-			{
+			} catch (IOException ioe) {
 				succeed = false;
-				_logger.error(String.format(
-					"Error trying to determine whether or not %s is a soft-link.", 
-					target), ioe);
+				_logger.error(String.format("Error trying to determine whether or not %s is a soft-link.", target), ioe);
 			}
 		}
-		
+
 		return succeed;
 	}
 }

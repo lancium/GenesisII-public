@@ -33,12 +33,31 @@
 		</condition>
 	</fail>
 
+<!--	<fail message="log4j.home variable not set.">
+		<condition>
+			<not>
+				<isset property="log4j.home"/>
+			</not>
+		</condition>
+	</fail>
+-->
+
+	<fail message="bundles.home variable not set.">
+		<condition>
+			<not>
+				<isset property="bundles.home"/>
+			</not>
+		</condition>
+	</fail>
+
 	<path id="axis.classpath">
 		<fileset dir="${axis.home}" includes="**/*.jar"/>
+		<fileset dir="${ext.dir}" includes="slf-log4j*.jar"/>
+		<fileset dir="${bundles.home}" includes="**/*.jar" excludes="bundle-axis*"/>
 	</path>
 
 	<taskdef resource="axis-tasks.properties"
-		classpathref="axis.classpath"/>
+		classpathref="axis.classpath" />
 
 	<target name="wsdl-build.echo">
 		<echo message="This is the build file common to all service builds."/>

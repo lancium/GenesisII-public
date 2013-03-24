@@ -19,34 +19,35 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+import org.morgan.util.io.DataTransferStatistics;
+
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 public interface IURIHandler
 {
 	public String[] getHandledProtocols();
-	
+
 	/**
-	 * Determines whether or not this protocol allows for reading.  This does not
-	 * guarantee that the URI provided can be read from, only that the protocol
-	 * in general allows it.
+	 * Determines whether or not this protocol allows for reading. This does not guarantee that the
+	 * URI provided can be read from, only that the protocol in general allows it.
 	 * 
-	 * @param uriScheme The uri scheme to test.
+	 * @param uriScheme
+	 *            The uri scheme to test.
 	 * @return True if the scheme given can be read from.
 	 */
 	public boolean canRead(String uriScheme);
-	
+
 	/**
-	 * Determines whether or not this protocol allows for writing.  This does not
-	 * guarantee that the URI provided can be written to, only that the protocol
-	 * in general allows it.
+	 * Determines whether or not this protocol allows for writing. This does not guarantee that the
+	 * URI provided can be written to, only that the protocol in general allows it.
 	 * 
-	 * @param uriScheme The uri scheme to test.
+	 * @param uriScheme
+	 *            The uri scheme to test.
 	 * @return True if the scheme given can be written to.
 	 */
 	public boolean canWrite(String uriScheme);
-	
-	public DataTransferStatistics get(URI source, File target,
-		UsernamePasswordIdentity credential) throws IOException;
-	public DataTransferStatistics put(File source, URI target,
-		UsernamePasswordIdentity credential) throws IOException;
+
+	public DataTransferStatistics get(URI source, File target, UsernamePasswordIdentity credential) throws IOException;
+
+	public DataTransferStatistics put(File source, URI target, UsernamePasswordIdentity credential) throws IOException;
 }

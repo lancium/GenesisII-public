@@ -4,53 +4,48 @@ import java.awt.event.KeyEvent;
 
 public class DefaultInputBindings extends BaseInputBindings
 {
-	static final private KeySet SYMBOLS = new KeySet(
-	" \t`~!@#$%^&*()_-+={}|[]\\:\";'<>?,./");
-	
+	static final private KeySet SYMBOLS = new KeySet(" \t`~!@#$%^&*()_-+={}|[]\\:\";'<>?,./");
+
 	@Override
 	protected void keyPressed(int keyCode, KeyEvent e)
 	{
 		boolean toConsume = true;
-		if (e.isControlDown() || e.isMetaDown())
-		{
-			switch (keyCode)
-			{
-				case KeyEvent.VK_BACK_SPACE :
+		if (e.isControlDown() || e.isMetaDown()) {
+			switch (keyCode) {
+				case KeyEvent.VK_BACK_SPACE:
 					fireClear();
-					break;	
+					break;
 				case 72:
 					break;
-				default :
+				default:
 					toConsume = false;
 					break;
 			}
-		}
-		else
-			switch (keyCode)
-			{
-				case KeyEvent.VK_ESCAPE :
+		} else
+			switch (keyCode) {
+				case KeyEvent.VK_ESCAPE:
 					fireBeep();
 					break;
-				case KeyEvent.VK_LEFT :
+				case KeyEvent.VK_LEFT:
 					fireLeft();
 					break;
-				case KeyEvent.VK_RIGHT :
+				case KeyEvent.VK_RIGHT:
 					fireRight();
 					break;
-				case KeyEvent.VK_UP :
+				case KeyEvent.VK_UP:
 					fireBackwardHistory();
 					break;
-				case KeyEvent.VK_DOWN :
+				case KeyEvent.VK_DOWN:
 					fireForwardHistory();
-					break;	
-				default : 
+					break;
+				default:
 					toConsume = false;
 					break;
 			}
-		if(toConsume)
+		if (toConsume)
 			e.consume();
 	}
-	
+
 	@Override
 	protected void keyTyped(char keyChar, KeyEvent e)
 	{
@@ -72,7 +67,7 @@ public class DefaultInputBindings extends BaseInputBindings
 				fireEnter();
 			else
 				toConsume = false;
-		if(toConsume)
+		if (toConsume)
 			e.consume();
 	}
 }

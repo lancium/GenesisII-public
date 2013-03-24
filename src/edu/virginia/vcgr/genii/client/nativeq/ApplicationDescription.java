@@ -23,35 +23,31 @@ public class ApplicationDescription
 	private String _stderrRedirect;
 	private ResourceConstraints _resourceConstraints;
 	private File _resourceUsagePath;
-	
-	public ApplicationDescription(File fuseMountPoint,
-		URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
-		String executableName, Collection<String> arguments,
-		Map<String, String> environment,
-		String stdinRedirect, String stdoutRedirect, String stderrRedirect,
-		ResourceConstraints resourceConstraints, File resourceUsagePath)
+
+	public ApplicationDescription(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
+		String executableName, Collection<String> arguments, Map<String, String> environment, String stdinRedirect,
+		String stdoutRedirect, String stderrRedirect, ResourceConstraints resourceConstraints, File resourceUsagePath)
 	{
 		_fuseMountPoint = fuseMountPoint;
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
 		_numProcessesPerHost = numProcessesPerHost;
-		
+
 		if (executableName == null)
-			throw new IllegalArgumentException(
-				"Executable name cannot be null.");
-		
+			throw new IllegalArgumentException("Executable name cannot be null.");
+
 		if (arguments == null)
 			arguments = new ArrayList<String>();
 		if (environment == null)
 			environment = new HashMap<String, String>();
-		
+
 		_executableName = executableName;
 		_arguments = arguments;
 		_environment = environment;
 		_stdinRedirect = stdinRedirect;
 		_stdoutRedirect = stdoutRedirect;
 		_stderrRedirect = stderrRedirect;
-		
+
 		_resourceConstraints = resourceConstraints;
 		_resourceUsagePath = resourceUsagePath;
 	}
@@ -60,22 +56,22 @@ public class ApplicationDescription
 	{
 		return _spmdVariation;
 	}
-	
+
 	public Integer getNumProcesses()
 	{
 		return _numProcesses;
 	}
-	
+
 	public Integer getNumProcessesPerHost()
 	{
 		return _numProcessesPerHost;
 	}
-	
+
 	public String getExecutableName()
 	{
 		return _executableName;
 	}
-	
+
 	public File getFuseMountPoint()
 	{
 		return _fuseMountPoint;
@@ -95,26 +91,25 @@ public class ApplicationDescription
 	{
 		if (_stdinRedirect == null)
 			return null;
-		
+
 		File stdin = new File(_stdinRedirect);
 		if (stdin.isAbsolute())
 			return stdin;
-		
+
 		return new File(workingDirectory, _stdinRedirect);
 	}
-	
+
 	public File getStdoutRedirect(File workingDirectory)
 	{
 		if (_stdoutRedirect == null)
 			return null;
-		
+
 		File stdout = new File(_stdoutRedirect);
 		if (stdout.isAbsolute())
 			return stdout;
-		
+
 		return new File(workingDirectory, _stdoutRedirect);
 	}
-	
 
 	public void setStdoutRedirect(String stdoutRedirect)
 	{
@@ -125,24 +120,24 @@ public class ApplicationDescription
 	{
 		if (_stderrRedirect == null)
 			return null;
-		
+
 		File stderr = new File(_stderrRedirect);
 		if (stderr.isAbsolute())
 			return stderr;
-		
+
 		return new File(workingDirectory, _stderrRedirect);
 	}
-	
+
 	public void setStderrRedirect(String stderrRedirect)
 	{
 		_stderrRedirect = stderrRedirect;
 	}
-	
+
 	public ResourceConstraints getResourceConstraints()
 	{
 		return _resourceConstraints;
 	}
-	
+
 	public File getResourceUsagePath()
 	{
 		return _resourceUsagePath;

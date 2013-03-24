@@ -19,32 +19,30 @@ public class GenericEPRBuilder implements EPRBuilder
 		int lcv = 0;
 		if (list == null || list.size() == 0)
 			return null;
-		
-		MessageElement []array = new MessageElement[list.size()];
-		for (Element e : list)
-		{
+
+		MessageElement[] array = new MessageElement[list.size()];
+		for (Element e : list) {
 			MessageElement me;
 			if (e instanceof MessageElement)
-				me = (MessageElement)e;
+				me = (MessageElement) e;
 			else
 				me = new MessageElement(e);
-			
+
 			array[lcv++] = me;
 		}
-		
+
 		return array;
 	}
-	
+
 	private URI _address;
-	private Collection<Element> _referenceParameters =
-		new LinkedList<Element>();
+	private Collection<Element> _referenceParameters = new LinkedList<Element>();
 	private Collection<Element> _metadata = new LinkedList<Element>();
-	
+
 	public GenericEPRBuilder(URI address)
 	{
 		address(address);
 	}
-	
+
 	@Override
 	final public URI address()
 	{
@@ -55,9 +53,8 @@ public class GenericEPRBuilder implements EPRBuilder
 	final public void address(URI address)
 	{
 		if (address == null)
-			throw new IllegalArgumentException(
-				"Address cannot be null!");
-		
+			throw new IllegalArgumentException("Address cannot be null!");
+
 		_address = address;
 	}
 
@@ -80,7 +77,7 @@ public class GenericEPRBuilder implements EPRBuilder
 		for (Element m : metadata)
 			_metadata.add(m);
 	}
-	
+
 	@Override
 	public Collection<Element> metadata()
 	{
@@ -90,13 +87,10 @@ public class GenericEPRBuilder implements EPRBuilder
 	@Override
 	final public EndpointReferenceType mint()
 	{
-		MessageElement []rp = convert(referenceParameters());
-		MessageElement []m = convert(metadata());
-		
-		return new EndpointReferenceType(
-			new AttributedURIType(_address.toString()),
-			(rp == null) ? null : new ReferenceParametersType(rp),
-			(m == null) ? null : new MetadataType(m),
-			null);
+		MessageElement[] rp = convert(referenceParameters());
+		MessageElement[] m = convert(metadata());
+
+		return new EndpointReferenceType(new AttributedURIType(_address.toString()), (rp == null) ? null
+			: new ReferenceParametersType(rp), (m == null) ? null : new MetadataType(m), null);
 	}
 }

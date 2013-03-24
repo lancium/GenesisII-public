@@ -9,13 +9,13 @@ import edu.virginia.vcgr.genii.ui.prefs.AbstractUIPreferenceSet;
 public class XMLUIPreferenceSet extends AbstractUIPreferenceSet
 {
 	static final private String PREFERENCE_SET_TITLE = "XML Displays";
-	
+
 	static final private String PREFERENCE_NODE_NAME = "xml displays";
-	
+
 	static final private String PREFER_TEXT_KEY = "prefer-text";
-	
+
 	private boolean _preferTextPane = true;
-	
+
 	public XMLUIPreferenceSet()
 	{
 		super(PREFERENCE_SET_TITLE);
@@ -48,9 +48,9 @@ public class XMLUIPreferenceSet extends AbstractUIPreferenceSet
 	@Override
 	public void load(JPanel editor)
 	{
-		_preferTextPane = ((XMLUIPreferenceSetEditor)editor).preferText();
+		_preferTextPane = ((XMLUIPreferenceSetEditor) editor).preferText();
 	}
-	
+
 	final public boolean preferText()
 	{
 		return _preferTextPane;

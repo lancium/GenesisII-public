@@ -14,29 +14,21 @@ import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 public class EPRMapperService extends AbstractContainerService
 {
 	static final public String SERVICE_NAME = "EPI-to-EPR Mapping Service";
-	
-	private EndpointReferenceType internalLookup(String epi) 
-		throws ResourceException
+
+	private EndpointReferenceType internalLookup(String epi) throws ResourceException
 	{
 		Connection connection = null;
 
-		try
-		{
+		try {
 			connection = getConnectionPool().acquire(true);
 			return ResourceSummary.getEPRFromEPI(connection, epi);
-		}
-		catch (SQLException e)
-		{
-			throw new ResourceException(String.format(
-				"Unable to lookup resource \"%s\".", epi),
-				e);
-		}
-		finally
-		{
+		} catch (SQLException e) {
+			throw new ResourceException(String.format("Unable to lookup resource \"%s\".", epi), e);
+		} finally {
 			StreamUtils.close(connection);
 		}
 	}
-	
+
 	@Override
 	protected void loadService() throws Throwable
 	{
@@ -48,22 +40,19 @@ public class EPRMapperService extends AbstractContainerService
 	{
 		// Nothing to do
 	}
-	
+
 	public EPRMapperService()
 	{
 		super(SERVICE_NAME);
 	}
-	
-	static public EndpointReferenceType lookup(String epi) 
-		throws ResourceException
+
+	static public EndpointReferenceType lookup(String epi) throws ResourceException
 	{
-		EPRMapperService service =
-			ContainerServices.findService(EPRMapperService.class);
-		
+		EPRMapperService service = ContainerServices.findService(EPRMapperService.class);
+
 		if (service == null)
-			throw new RuntimeException(String.format(
-				"Couldn't find service \"%s\".", SERVICE_NAME));
-		
+			throw new RuntimeException(String.format("Couldn't find service \"%s\".", SERVICE_NAME));
+
 		return service.internalLookup(epi);
 	}
 }

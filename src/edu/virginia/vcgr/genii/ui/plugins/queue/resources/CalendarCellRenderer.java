@@ -14,9 +14,8 @@ class CalendarCellRenderer extends DefaultTableCellRenderer
 	{
 		if (value == null)
 			super.setValue("");
-		else
-		{
-			Calendar displayable = (Calendar)((Calendar)value).clone();
+		else {
+			Calendar displayable = (Calendar) ((Calendar) value).clone();
 			displayable.setTimeZone(TimeZone.getDefault());
 			super.setValue(String.format("%tc", displayable));
 		}

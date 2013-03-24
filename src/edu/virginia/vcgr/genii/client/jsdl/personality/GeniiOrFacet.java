@@ -4,6 +4,5 @@ import javax.xml.namespace.QName;
 
 public interface GeniiOrFacet extends GeniiRestrictionFacet
 {
-	static final public QName OR_ELEMENT = new QName(
-		GENII_RESTRICTION_NS, "or");
+	static final public QName OR_ELEMENT = new QName(GENII_RESTRICTION_NS, "or");
 }

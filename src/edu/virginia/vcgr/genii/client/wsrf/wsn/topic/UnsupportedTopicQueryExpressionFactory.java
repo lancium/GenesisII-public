@@ -5,12 +5,10 @@ import org.w3c.dom.Element;
 
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
-public class UnsupportedTopicQueryExpressionFactory implements
-		TopicQueryExpressionFactory
+public class UnsupportedTopicQueryExpressionFactory implements TopicQueryExpressionFactory
 {
 	@Override
-	public TopicQueryExpression createFromElement(Element e) 
-		throws TopicNotSupportedFaultType
+	public TopicQueryExpression createFromElement(Element e) throws TopicNotSupportedFaultType
 	{
 		throw FaultManipulator.fillInFault(new TopicNotSupportedFaultType());
 	}

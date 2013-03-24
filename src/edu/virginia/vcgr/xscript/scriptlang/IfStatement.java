@@ -14,39 +14,36 @@ public class IfStatement implements ParseStatement
 	private String _test;
 	private ParseStatement _thenStmt;
 	private ParseStatement _elseStmt;
-	
-	public IfStatement(String test, ParseStatement thenStmt, 
-		ParseStatement elseStmt)
+
+	public IfStatement(String test, ParseStatement thenStmt, ParseStatement elseStmt)
 	{
 		_test = test;
 		_thenStmt = thenStmt;
 		_elseStmt = elseStmt;
 	}
-	
+
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
 	{
 		boolean test;
-		
+
 		String property = MacroReplacer.replaceMacros(context, _test);
 		Object value = context.getAttribute(property);
 		if (value == null)
 			test = false;
-		else
-		{
+		else {
 			if (value instanceof Boolean)
-				test = ((Boolean)value).booleanValue();
+				test = ((Boolean) value).booleanValue();
 			else
 				test = XScriptParser.getBoolean(context, value.toString());
 		}
-		
+
 		if (test)
 			return _thenStmt.evaluate(context);
-		
+
 		if (_elseStmt != null)
 			return _elseStmt.evaluate(context);
-		
+
 		return null;
 	}
 }

@@ -18,11 +18,16 @@ package edu.virginia.vcgr.genii.container.sysinfo;
 public interface ISystemInfoProvider
 {
 	public long getIndividualCPUSpeed();
+
 	public long getPhysicalMemory();
+
 	public long getPhysicalMemoryAvailable();
+
 	public long getVirtualMemory();
+
 	public long getVirtualMemoryAvailable();
-	
+
 	public boolean getUserLoggedIn();
+
 	public boolean getScreenSaverActive();
 }

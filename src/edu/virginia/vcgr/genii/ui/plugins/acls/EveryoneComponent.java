@@ -9,7 +9,7 @@ class EveryoneComponent extends DraggableImageComponent
 	public EveryoneComponent(UIContext context)
 	{
 		super(ACLImages.everyone());
-	
+
 		setTransferHandler(new EveryoneTransferHandler(context));
 	}
 }

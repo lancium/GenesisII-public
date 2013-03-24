@@ -15,22 +15,21 @@
  */
 package edu.virginia.vcgr.genii.client.rns;
 
-public class RNSPathAlreadyExistsException extends RNSException 
+public class RNSPathAlreadyExistsException extends RNSException
 {
 	static final long serialVersionUID = 0;
-	
-	static private final String _MESSAGE_FORMAT =
-		"Path \"%1$s\" already exists.";
-	
+
+	static private final String _MESSAGE_FORMAT = "Path \"%1$s\" already exists.";
+
 	private String _path;
-	
+
 	public RNSPathAlreadyExistsException(String pathExpression)
 	{
 		super(String.format(_MESSAGE_FORMAT, pathExpression));
-		
+
 		_path = pathExpression;
 	}
-	
+
 	public String getPath()
 	{
 		return _path;

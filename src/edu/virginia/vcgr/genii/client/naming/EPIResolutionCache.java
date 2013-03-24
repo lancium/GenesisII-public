@@ -15,41 +15,38 @@
  */
 package edu.virginia.vcgr.genii.client.naming;
 
-
 import org.apache.axis.types.URI;
 
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
+import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 
 /**
- * The EPIResolutionCache class to maintain a cache of resolved EPRs for EPIs.  The methods
- * are currently all static and this class manages synchronization isssues, etc. 
+ * The EPIResolutionCache class to maintain a cache of resolved EPRs for EPIs. The methods are
+ * currently all static and this class manages synchronization isssues, etc.
  * 
  * @author John Karpovich
  */
 public class EPIResolutionCache
 {
-	static private TimedOutLRUCache<URI, EndpointReferenceType>
-		_cache = new TimedOutLRUCache<URI, EndpointReferenceType>(
-			1024, 1000*60*60*24);
-		
-	
+	static private TimedOutLRUCache<URI, EndpointReferenceType> _cache = new TimedOutLRUCache<URI, EndpointReferenceType>(1024,
+		1000 * 60 * 60 * 24);
+
 	static public synchronized EndpointReferenceType get(URI epi)
 	{
 		return _cache.get(epi);
 	}
-	
+
 	static public synchronized void put(URI epi, EndpointReferenceType epr)
 	{
 		_cache.put(epi, epr);
 	}
-	
+
 	static public synchronized void remove(URI epi)
 	{
 		_cache.remove(epi);
 	}
-	
+
 	static public synchronized void badEPR(URI epi, EndpointReferenceType epr)
 	{
 		if (epi == null)

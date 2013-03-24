@@ -13,23 +13,21 @@ import org.oasis_open.wsn.base.UnableToGetMessagesFaultType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.resource.PortType;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.common.notification.GeniiPullPointPortType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-@GeniiServiceConfiguration(
-	resourceProvider=DBPullPointResourceProvider.class)
-public class GeniiPullPointServiceImpl extends GenesisIIBase
-	implements GeniiPullPointPortType
+@GeniiServiceConfiguration(resourceProvider = DBPullPointResourceProvider.class)
+public class GeniiPullPointServiceImpl extends GenesisIIBase implements GeniiPullPointPortType
 {
 	public GeniiPullPointServiceImpl() throws RemoteException
 	{
 		super("GeniiPullPointPortType");
-		
+
 		addImplementedPortType(WSRFConstants.WSN_PULL_POINT_PORT);
 	}
 
@@ -41,9 +39,8 @@ public class GeniiPullPointServiceImpl extends GenesisIIBase
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public DestroyPullPointResponse destroyPullPoint(DestroyPullPoint arg0)
-			throws RemoteException, UnableToDestroyPullPointFaultType,
-			ResourceUnknownFaultType
+	public DestroyPullPointResponse destroyPullPoint(DestroyPullPoint arg0) throws RemoteException,
+		UnableToDestroyPullPointFaultType, ResourceUnknownFaultType
 	{
 		super.destroy(new Destroy());
 		return new DestroyPullPointResponse();
@@ -51,9 +48,8 @@ public class GeniiPullPointServiceImpl extends GenesisIIBase
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetMessagesResponse getMessages(GetMessages arg0)
-			throws RemoteException, UnableToGetMessagesFaultType,
-			ResourceUnknownFaultType
+	public GetMessagesResponse getMessages(GetMessages arg0) throws RemoteException, UnableToGetMessagesFaultType,
+		ResourceUnknownFaultType
 	{
 		throw FaultManipulator.fillInFault(new UnableToGetMessagesFaultType());
 	}

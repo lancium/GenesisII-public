@@ -10,55 +10,48 @@ import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 public class Restrictions implements Serializable
 {
 	static final long serialVersionUID = 0L;
-	
+
 	static private Log _logger = LogFactory.getLog(Restrictions.class);
-	
+
 	private ProcessorArchitectureEnumeration _arch = null;
 	private OperatingSystemTypeEnumeration _osType = null;
 	private String _osVersion = null;
-	
-	public void setProcessorArchitectureRestriction(
-		ProcessorArchitectureEnumeration arch)
+
+	public void setProcessorArchitectureRestriction(ProcessorArchitectureEnumeration arch)
 	{
-		_logger.trace(String.format(
-			"Setting Processor Arch restriction to %s.",
-			arch));
-		
+		if (_logger.isTraceEnabled())
+			_logger.trace(String.format("Setting Processor Arch restriction to %s.", arch));
+
 		_arch = arch;
 	}
-	
-	public ProcessorArchitectureEnumeration 
-		getProcessorArchitectureRestriction()
+
+	public ProcessorArchitectureEnumeration getProcessorArchitectureRestriction()
 	{
 		return _arch;
 	}
-	
-	public void setOperatingSystemTypeRestriction(
-		OperatingSystemTypeEnumeration osType)
+
+	public void setOperatingSystemTypeRestriction(OperatingSystemTypeEnumeration osType)
 	{
-		_logger.trace(String.format(
-			"Setting OS Type restriction to %s.",
-			osType));
-			
+		if (_logger.isTraceEnabled())
+			_logger.trace(String.format("Setting OS Type restriction to %s.", osType));
+
 		_osType = osType;
 	}
-	
-	public OperatingSystemTypeEnumeration
-		getOperatingSystemTypeRestriction()
+
+	public OperatingSystemTypeEnumeration getOperatingSystemTypeRestriction()
 	{
 		return _osType;
 	}
-	
+
 	public void setOperatingSystemVersionRestriction(String osVersion)
 	{
-		_logger.trace(String.format(
-			"Setting OS Version restriction to %s.",
-			osVersion));
-			
+		if (_logger.isTraceEnabled())
+			_logger.trace(String.format("Setting OS Version restriction to %s.", osVersion));
+
 		_osVersion = osVersion;
 	}
-	
-	public String getOperatingSystemVersionRestriction() 
+
+	public String getOperatingSystemVersionRestriction()
 	{
 		return _osVersion;
 	}

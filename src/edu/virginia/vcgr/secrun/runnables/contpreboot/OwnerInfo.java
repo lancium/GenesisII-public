@@ -13,57 +13,53 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 public class OwnerInfo
 {
 	private File _ownerInfoFile;
-	
+
 	private String _userPath;
 	private String _userName;
 	private String _userPassword;
-	
+
 	public OwnerInfo() throws IOException
 	{
-		_ownerInfoFile = Installation.getDeployment(
-			new DeploymentName()).security().getSecurityFile("owner.info");
-		
+		_ownerInfoFile = Installation.getDeployment(new DeploymentName()).security().getSecurityFile("owner.info");
+
 		FileReader reader = null;
 		BufferedReader bReader = null;
-		
-		try
-		{
+
+		try {
 			reader = new FileReader(_ownerInfoFile);
 			bReader = new BufferedReader(reader);
 			_userPath = bReader.readLine();
 			_userName = bReader.readLine();
 			_userPassword = bReader.readLine();
-			
+
 			if (_userPassword == null)
 				throw new IOException("User info file is not correct.");
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(bReader);
 			StreamUtils.close(reader);
 		}
 	}
-	
+
 	public String getUserPath()
 	{
 		return _userPath;
 	}
-	
+
 	public String getUserName()
 	{
 		return _userName;
 	}
-	
+
 	public String getUserPassword()
 	{
 		return _userPassword;
 	}
-	
+
 	public void deleteFile()
 	{
 		_ownerInfoFile.delete();
 	}
-	
+
 	public boolean exists()
 	{
 		return _ownerInfoFile.exists();

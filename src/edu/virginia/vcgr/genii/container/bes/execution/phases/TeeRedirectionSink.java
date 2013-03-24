@@ -16,51 +16,44 @@ public class TeeRedirectionSink implements StreamRedirectionSink
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(TeeRedirectionSink.class);
-	
-	private StreamRedirectionSink []_sinks;
-	
-	public TeeRedirectionSink(StreamRedirectionSink...sinks)
+
+	private StreamRedirectionSink[] _sinks;
+
+	public TeeRedirectionSink(StreamRedirectionSink... sinks)
 	{
 		_sinks = sinks;
 	}
-	
+
 	@Override
 	public OutputStream openSink(ExecutionContext context) throws IOException
 	{
 		TeeOutputStream ret = new TeeOutputStream();
-		for (StreamRedirectionSink sink : _sinks)
-		{
+		for (StreamRedirectionSink sink : _sinks) {
 			ret.addTarget(sink.openSink(context));
 		}
-		
+
 		return ret;
 	}
-	
+
 	static private class TeeOutputStream extends OutputStream
 	{
-		private Collection<OutputStream> _targets = 
-			new LinkedList<OutputStream>();
-		
+		private Collection<OutputStream> _targets = new LinkedList<OutputStream>();
+
 		public void addTarget(OutputStream target)
 		{
 			_targets.add(target);
 		}
-		
+
 		@Override
 		public void close() throws IOException
 		{
 			Iterator<OutputStream> streamIter = _targets.iterator();
-			while (streamIter.hasNext())
-			{
+			while (streamIter.hasNext()) {
 				OutputStream out = streamIter.next();
-				try
-				{
+				try {
 					out.close();
-				}
-				catch (IOException ioe)
-				{
-					_logger.warn("Removing tee'd redirection stream " +
-						"because it threw an exception.", ioe);
+				} catch (IOException ioe) {
+					_logger.warn("Removing tee'd redirection stream " + "because it threw an exception.", ioe);
 					streamIter.remove();
 				}
 			}
@@ -70,17 +63,12 @@ public class TeeRedirectionSink implements StreamRedirectionSink
 		public void flush() throws IOException
 		{
 			Iterator<OutputStream> streamIter = _targets.iterator();
-			while (streamIter.hasNext())
-			{
+			while (streamIter.hasNext()) {
 				OutputStream out = streamIter.next();
-				try
-				{
+				try {
 					out.flush();
-				}
-				catch (IOException ioe)
-				{
-					_logger.warn("Removing tee'd redirection stream " +
-							"because it threw an exception.", ioe);
+				} catch (IOException ioe) {
+					_logger.warn("Removing tee'd redirection stream " + "because it threw an exception.", ioe);
 					streamIter.remove();
 				}
 			}
@@ -90,17 +78,12 @@ public class TeeRedirectionSink implements StreamRedirectionSink
 		public void write(byte[] b, int off, int len) throws IOException
 		{
 			Iterator<OutputStream> streamIter = _targets.iterator();
-			while (streamIter.hasNext())
-			{
+			while (streamIter.hasNext()) {
 				OutputStream out = streamIter.next();
-				try
-				{
+				try {
 					out.write(b, off, len);
-				}
-				catch (IOException ioe)
-				{
-					_logger.warn("Removing tee'd redirection stream " +
-							"because it threw an exception.", ioe);
+				} catch (IOException ioe) {
+					_logger.warn("Removing tee'd redirection stream " + "because it threw an exception.", ioe);
 					streamIter.remove();
 				}
 			}
@@ -110,17 +93,12 @@ public class TeeRedirectionSink implements StreamRedirectionSink
 		public void write(byte[] b) throws IOException
 		{
 			Iterator<OutputStream> streamIter = _targets.iterator();
-			while (streamIter.hasNext())
-			{
+			while (streamIter.hasNext()) {
 				OutputStream out = streamIter.next();
-				try
-				{
+				try {
 					out.write(b);
-				}
-				catch (IOException ioe)
-				{
-					_logger.warn("Removing tee'd redirection stream " +
-							"because it threw an exception.", ioe);
+				} catch (IOException ioe) {
+					_logger.warn("Removing tee'd redirection stream " + "because it threw an exception.", ioe);
 					streamIter.remove();
 				}
 			}
@@ -130,17 +108,12 @@ public class TeeRedirectionSink implements StreamRedirectionSink
 		public void write(int b) throws IOException
 		{
 			Iterator<OutputStream> streamIter = _targets.iterator();
-			while (streamIter.hasNext())
-			{
+			while (streamIter.hasNext()) {
 				OutputStream out = streamIter.next();
-				try
-				{
+				try {
 					out.write(b);
-				}
-				catch (IOException ioe)
-				{
-					_logger.warn("Removing tee'd redirection stream " +
-							"because it threw an exception.", ioe);
+				} catch (IOException ioe) {
+					_logger.warn("Removing tee'd redirection stream " + "because it threw an exception.", ioe);
 					streamIter.remove();
 				}
 			}

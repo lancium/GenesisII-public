@@ -7,70 +7,65 @@ import edu.virginia.vcgr.genii.ui.shell.KeySet;
 
 public class EmacsInputBindings extends BaseInputBindings
 {
-	static final private KeySet SYMBOLS = new KeySet(
-		" \t`~!@#$%^&*()_-+={}|[]\\:\";'<>?,./");
-	
+	static final private KeySet SYMBOLS = new KeySet(" \t`~!@#$%^&*()_-+={}|[]\\:\";'<>?,./");
+
 	@Override
 	protected void keyPressed(int keyCode, KeyEvent e)
 	{
 		boolean toConsume = true;
-		if (e.isControlDown() || e.isMetaDown())
-		{
-			switch (keyCode)
-			{
-				case KeyEvent.VK_B :
+		if (e.isControlDown() || e.isMetaDown()) {
+			switch (keyCode) {
+				case KeyEvent.VK_B:
 					fireLeft();
 					break;
-				case KeyEvent.VK_F :
+				case KeyEvent.VK_F:
 					fireRight();
 					break;
-				case KeyEvent.VK_D :
+				case KeyEvent.VK_D:
 					fireDelete();
 					break;
-				case KeyEvent.VK_BACK_SPACE :
+				case KeyEvent.VK_BACK_SPACE:
 					fireClear();
 					break;
-				case KeyEvent.VK_P :
+				case KeyEvent.VK_P:
 					fireBackwardHistory();
 					break;
-				case KeyEvent.VK_N :
+				case KeyEvent.VK_N:
 					fireForwardHistory();
 					break;
-				case KeyEvent.VK_R :
+				case KeyEvent.VK_R:
 					fireSearch();
 					break;
-				case KeyEvent.VK_H :
+				case KeyEvent.VK_H:
 					break;
-				default :
+				default:
 					toConsume = false;
 					break;
 			}
-		}
-		else
-			switch (keyCode)
-			{
-				case KeyEvent.VK_ESCAPE :
+		} else
+			switch (keyCode) {
+				case KeyEvent.VK_ESCAPE:
 					fireBeep();
 					break;
-				case KeyEvent.VK_LEFT :
+				case KeyEvent.VK_LEFT:
 					fireLeft();
 					break;
-				case KeyEvent.VK_RIGHT :
+				case KeyEvent.VK_RIGHT:
 					fireRight();
 					break;
-				case KeyEvent.VK_UP :
+				case KeyEvent.VK_UP:
 					fireBackwardHistory();
 					break;
-				case KeyEvent.VK_DOWN :
+				case KeyEvent.VK_DOWN:
 					fireForwardHistory();
-					break;	
-				default :
+					break;
+				default:
 					toConsume = false;
 			}
-		if(toConsume)
+		if (toConsume)
 			e.consume();
 	}
-	
+
 	@Override
 	protected void keyTyped(char keyChar, KeyEvent e)
 	{
@@ -92,7 +87,7 @@ public class EmacsInputBindings extends BaseInputBindings
 				fireEnter();
 			else
 				toConsume = false;
-		if(toConsume)
+		if (toConsume)
 			e.consume();
 	}
 }

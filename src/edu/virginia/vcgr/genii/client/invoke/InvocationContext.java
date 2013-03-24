@@ -15,10 +15,10 @@ public class InvocationContext
 	private IFinalInvoker _finalInvoker;
 	private Method _finalMethod;
 	private int _myStage;
-	private Object []_params;
-	
-	InvocationContext(Vector<OperationHandler> handlers, EndpointReferenceType target,
-		ICallingContext callingContext, Object []params, IFinalInvoker finalInvoker, Method finalMethod)
+	private Object[] _params;
+
+	InvocationContext(Vector<OperationHandler> handlers, EndpointReferenceType target, ICallingContext callingContext,
+		Object[] params, IFinalInvoker finalInvoker, Method finalMethod)
 	{
 		_target = target;
 		_callingContext = callingContext;
@@ -28,7 +28,7 @@ public class InvocationContext
 		_finalInvoker = finalInvoker;
 		_finalMethod = finalMethod;
 	}
-	
+
 	private InvocationContext(InvocationContext old)
 	{
 		_target = old._target;
@@ -39,31 +39,33 @@ public class InvocationContext
 		_finalInvoker = old._finalInvoker;
 		_finalMethod = old._finalMethod;
 	}
-	
+
 	public EndpointReferenceType getTarget()
 	{
 		return _target;
 	}
-	
+
 	public ICallingContext getCallingContext()
 	{
 		return _callingContext;
 	}
-	
-	public Object[] getParams() {
+
+	public Object[] getParams()
+	{
 		return _params;
 	}
 
-	public void updateParams(Object[] newParams) {
+	public void updateParams(Object[] newParams)
+	{
 		_params = newParams;
 	}
-	
+
 	public Object proceed() throws Throwable
 	{
 		InvocationContext nextStage = new InvocationContext(this);
 		if (nextStage._myStage >= nextStage._handlers.size())
 			return _finalInvoker.finalInvoke(_finalInvoker, _finalMethod, _params);
-		
+
 		return nextStage._handlers.get(nextStage._myStage).handle(nextStage, _params);
 	}
 }

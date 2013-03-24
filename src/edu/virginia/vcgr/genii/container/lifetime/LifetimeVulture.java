@@ -38,61 +38,54 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 public class LifetimeVulture implements IEventHandler
 {
 	static private Log _logger = LogFactory.getLog(LifetimeVulture.class);
-	
+
 	static private final String _EVENT_NAME_BASE = "LifetimeVultureEvent";
 	static private final long _DEFAULT_CHECK_INTERVAL = 1000 * 30;
-	
+
 	private HashMap<URI, Date> _nameDateMap = new HashMap<URI, Date>();
 	private TreeSet<LifetimePrey> _preySet;
-	
-	public LifetimeVulture(EventManager eManager, AlarmManager aManager)
-		throws EventException
+
+	public LifetimeVulture(EventManager eManager, AlarmManager aManager) throws EventException
 	{
 		_logger.info("Lifetime Watcher Initializing.");
-		
-		_preySet = new TreeSet<LifetimePrey>(
-			LifetimePrey.createComparor());
-		
-		EventDescription ed = eManager.registerEventDescription(
-			_EVENT_NAME_BASE + "." + (new GUID()).toString());
+
+		_preySet = new TreeSet<LifetimePrey>(LifetimePrey.createComparor());
+
+		EventDescription ed = eManager.registerEventDescription(_EVENT_NAME_BASE + "." + (new GUID()).toString());
 		IEvent event = new DefaultEvent(ed);
 		eManager.registerHandler(ed, this, 0);
 		aManager.addAlarm(_DEFAULT_CHECK_INTERVAL, event);
 	}
-	
-	public void setLifetimeWatch(URI epi, EndpointReferenceType target,
-		Date terminationDate)
-	{
-		_logger.debug("Adding resource for \"" + epi
-			+ "\" to lifetime watcher.");
 
-		synchronized(this)
-		{
+	public void setLifetimeWatch(URI epi, EndpointReferenceType target, Date terminationDate)
+	{
+		if (_logger.isDebugEnabled())
+			_logger.debug("Adding resource for \"" + epi + "\" to lifetime watcher.");
+
+		synchronized (this) {
 			removePrey(epi);
 			if (terminationDate == null)
 				return;
-			
+
 			_nameDateMap.put(epi, terminationDate);
 			_preySet.add(new LifetimePrey(epi, target, terminationDate));
 		}
 	}
-	
+
 	public void checkTermintationStatuses()
 	{
-		_logger.debug("Checking termintation statuses from lifetime watcher.");
+		if (_logger.isDebugEnabled())
+			_logger.debug("Checking termintation statuses from lifetime watcher.");
 		ArrayList<LifetimePrey> bodies = new ArrayList<LifetimePrey>();
 		Date now = new Date();
-		
-		synchronized(this)
-		{
-			while (true)
-			{
+
+		synchronized (this) {
+			while (true) {
 				if (_preySet.isEmpty())
 					break;
 				LifetimePrey prey = _preySet.first();
-				
-				if (prey.getTermintationTime().before(now))
-				{
+
+				if (prey.getTermintationTime().before(now)) {
 					_nameDateMap.remove(prey.getName());
 					_preySet.remove(prey);
 					bodies.add(prey);
@@ -100,27 +93,20 @@ public class LifetimeVulture implements IEventHandler
 					break;
 			}
 		}
-		
-		try
-		{
+
+		try {
 			WorkingContext.setCurrentWorkingContext(new WorkingContext());
-			for (LifetimePrey prey : bodies)
-			{
-				_logger.debug("Auto-Termintating scheduled resource \""
-					+ prey.getName() + "\".");
-				
-				try
-				{
+			for (LifetimePrey prey : bodies) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("Auto-Termintating scheduled resource \"" + prey.getName() + "\".");
+
+				try {
 					prey.destroy();
-				}
-				catch (Throwable t)
-				{
+				} catch (Throwable t) {
 					_logger.warn(t.getMessage());
 				}
 			}
-		}
-		finally
-		{
+		} finally {
 			WorkingContext.setCurrentWorkingContext(null);
 		}
 	}
@@ -130,14 +116,14 @@ public class LifetimeVulture implements IEventHandler
 		checkTermintationStatuses();
 		return true;
 	}
-	
+
 	private void removePrey(URI name)
 	{
 		Date termDate;
 		termDate = _nameDateMap.get(name);
 		if (termDate == null)
 			return;
-		
+
 		LifetimePrey prey = new LifetimePrey(name, null, termDate);
 		_preySet.remove(prey);
 	}

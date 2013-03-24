@@ -75,7 +75,6 @@ import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
@@ -108,6 +107,7 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.graph.GridDependency;
 import edu.virginia.vcgr.genii.queue.QueuePortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.sweep.SweepException;
 import edu.virginia.vcgr.jsdl.sweep.SweepListener;
@@ -120,46 +120,42 @@ import edu.virginia.vcgr.jsdl.sweep.SweepUtility;
  * @author mmm2a
  */
 @ForkRoot(RootRNSFork.class)
-@GeniiServiceConfiguration(
-	resourceProvider=QueueDBResourceProvider.class)
+@GeniiServiceConfiguration(resourceProvider = QueueDBResourceProvider.class)
 @ConstructionParametersType(QueueConstructionParameters.class)
 @GridDependency(GeniiBESServiceImpl.class)
-public class QueueServiceImpl extends ResourceForkBaseService
-	implements QueuePortType
+public class QueueServiceImpl extends ResourceForkBaseService implements QueuePortType
 {
 	static private Log _logger = LogFactory.getLog(QueueServiceImpl.class);
-	
-	//static private final long _DEFAULT_TIME_TO_LIVE = 1000L * 60 * 60;
-	static public QName _JOBID_QNAME =
-		new QName(GenesisIIConstants.GENESISII_NS, "job-id");
-	
+
+	// static private final long _DEFAULT_TIME_TO_LIVE = 1000L * 60 * 60;
+	static public QName _JOBID_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "job-id");
+
 	@MInject(lazy = true)
 	private IQueueResource _resource;
-	
+
 	@MInject(injectionFactory = QueueManagerInjectionFactory.class)
 	private QueueManager _queueMgr;
-	
+
 	public QueueServiceImpl() throws RemoteException
 	{
 		/* Indicate the port type name to the base class */
 		super("QueuePortType");
-		
-		/* Now we have to add our own port types to the list of port types
-		 * implemented by this service.
+
+		/*
+		 * Now we have to add our own port types to the list of port types implemented by this
+		 * service.
 		 */
 		addImplementedPortType(QueueConstants.QUEUE_PORT_TYPE);
 	}
-	
+
 	@Override
-	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
-		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters,
-		Collection<MessageElement> resolverCreationParameters)
-			throws ResourceException, BaseFaultType, RemoteException
+	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR, ConstructionParameters cParams,
+		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParameters)
+		throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(key, newEPR, cParams, constructionParameters,
-			resolverCreationParameters);
-		
-		IQueueResource resource = (IQueueResource)key.dereference();
+		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParameters);
+
+		IQueueResource resource = (IQueueResource) key.dereference();
 		resource.setEPR(newEPR);
 	}
 
@@ -167,18 +163,15 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	{
 		return QueueConstants.QUEUE_PORT_TYPE;
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
 	public Object completeJobs(String[] completeRequest) throws RemoteException
 	{
-		try
-		{
+		try {
 			_queueMgr.completeJobs(completeRequest);
 			return null;
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to complete jobs in queue.", sqe);
 		}
 	}
@@ -187,105 +180,82 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	@RWXMapping(RWXCategory.OPEN)
 	public Object rescheduleJobs(String[] jobs) throws RemoteException
 	{
-		try
-		{
+		try {
 			_queueMgr.rescheduleJobs(jobs);
 			return null;
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to reschedule jobs in queue.", sqe);
 		}
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public Object configureResource(ConfigureRequestType configureRequest)
-			throws RemoteException
+	public Object configureResource(ConfigureRequestType configureRequest) throws RemoteException
 	{
-		try
-		{
-			_queueMgr.configureBES(configureRequest.getQueueResource(), 
-				configureRequest.getNumSlots().intValue());
+		try {
+			_queueMgr.configureBES(configureRequest.getQueueResource(), configureRequest.getNumSlots().intValue());
 			return null;
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to add bes container.", sqe);
 		}
 	}
 
-	private QueueInMemoryIteratorEntry getIterableStatus(String[] getStatusRequest)
-	throws RemoteException
-{
+	private QueueInMemoryIteratorEntry getIterableStatus(String[] getStatusRequest) throws RemoteException
+	{
 
-	try
-	{
-		QueueInMemoryIteratorEntry qmie = _queueMgr.getIterableJobStatus(getStatusRequest);
-		return qmie;
+		try {
+			QueueInMemoryIteratorEntry qmie = _queueMgr.getIterableJobStatus(getStatusRequest);
+			return qmie;
+		}
+
+		catch (SQLException sqe) {
+			throw new RemoteException("Unable to list jobs in queue.", sqe);
+		}
 	}
-	
-	catch (SQLException sqe)
-	{
-		throw new RemoteException("Unable to list jobs in queue.", sqe);
-	}
-}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	public IterateStatusResponseType iterateStatus(String[] iterateStatusRequest)
-			throws RemoteException
+	public IterateStatusResponseType iterateStatus(String[] iterateStatusRequest) throws RemoteException
 	{
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
 		QueueInMemoryIteratorEntry qmie = getIterableStatus(iterateStatusRequest);
 		List<InMemoryIteratorEntry> indices = new LinkedList<InMemoryIteratorEntry>();
-		
-		for(JobInformationType jit : qmie.getReturnables())
+
+		for (JobInformationType jit : qmie.getReturnables())
 			col.add(AnyHelper.toAny(jit));
-		
-		if(qmie.isIterable())
-		{
-			for(String jobID: qmie.getIterableIDs())
-			{
-				indices.add(new InMemoryIteratorEntry(null, jobID, true,
-						FileOrDir.UNKNOWN));
+
+		if (qmie.isIterable()) {
+			for (String jobID : qmie.getIterableIDs()) {
+				indices.add(new InMemoryIteratorEntry(null, jobID, true, FileOrDir.UNKNOWN));
 			}
 		}
-		
-		InMemoryIteratorWrapper imiw = new InMemoryIteratorWrapper(this.getClass().getName(), indices, 
-				new Object[]{_queueMgr});
+
+		InMemoryIteratorWrapper imiw = new InMemoryIteratorWrapper(this.getClass().getName(), indices,
+			new Object[] { _queueMgr });
 		IteratorBuilder<MessageElement> builder = iteratorBuilder();
 		builder.preferredBatchSize(QueueConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(col);
 		return new IterateStatusResponseType(builder.create(imiw));
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	public JobErrorPacket[] queryErrorInformation(QueryErrorRequest arg0)
-			throws RemoteException
+	public JobErrorPacket[] queryErrorInformation(QueryErrorRequest arg0) throws RemoteException
 	{
-		try
-		{
+		try {
 			return _queueMgr.queryErrorInformation(arg0.getJobTicket());
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to complete jobs in queue.", sqe);
 		}
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetJobLogResponse getJobLog(GetJobLogRequest arg0)
-			throws RemoteException
+	public GetJobLogResponse getJobLog(GetJobLogRequest arg0) throws RemoteException
 	{
-		try
-		{
+		try {
 			return _queueMgr.getJobLog(arg0.getJobTicket());
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to get job log endpoint.", sqe);
 		}
 	}
@@ -294,43 +264,35 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	@RWXMapping(RWXCategory.OPEN)
 	public Object killJobs(String[] killRequest) throws RemoteException
 	{
-		try
-		{
+		try {
 			_queueMgr.killJobs(killRequest);
 			return null;
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to list jobs in queue.", sqe);
 		}
 	}
 
-	private ReducedJobInformationType[] listJobs(Object listRequest)
-			throws RemoteException
+	private ReducedJobInformationType[] listJobs(Object listRequest) throws RemoteException
 	{
 		Collection<ReducedJobInformationType> jobs;
-		
-		try
-		{
+
+		try {
 			jobs = _queueMgr.listJobs(null);
 			return jobs.toArray(new ReducedJobInformationType[0]);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to list jobs in queue.", sqe);
 		}
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public IterateListResponseType iterateListJobs(Object iterateListRequest)
-			throws RemoteException
+	public IterateListResponseType iterateListJobs(Object iterateListRequest) throws RemoteException
 	{
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
-		
+
 		for (ReducedJobInformationType rjit : listJobs(iterateListRequest))
 			col.add(AnyHelper.toAny(rjit));
-		
+
 		IteratorBuilder<MessageElement> builder = iteratorBuilder();
 		builder.preferredBatchSize(100);
 		builder.addElements(col);
@@ -339,123 +301,92 @@ public class QueueServiceImpl extends ResourceForkBaseService
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public IterateHistoryEventsResponseType iterateHistoryEvents(
-		IterateHistoryEventsRequestType arg0) throws RemoteException
+	public IterateHistoryEventsResponseType iterateHistoryEvents(IterateHistoryEventsRequestType arg0) throws RemoteException
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		
-		if (arg0 != null && arg0.getResourceHint() != null)
-		{
-			try
-			{
+
+		if (arg0 != null && arg0.getResourceHint() != null) {
+			try {
 				_queueMgr.getJobStatus(new String[] { arg0.getResourceHint() });
+			} catch (SQLException sqe) {
+				throw new RemoteException("Unable to check that job exists.", sqe);
 			}
-			catch (SQLException sqe)
-			{
-				throw new RemoteException(
-					"Unable to check that job exists.", sqe);
-			}
-			
-			arg0.setResourceHint(new QueueDatabase(
-				rKey.getResourceKey()).historyKey(
-					arg0.getResourceHint()));
+
+			arg0.setResourceHint(new QueueDatabase(rKey.getResourceKey()).historyKey(arg0.getResourceHint()));
 		}
-		
+
 		return super.iterateHistoryEvents(arg0);
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest)
-			throws RemoteException
+	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest) throws RemoteException
 	{
 		String ticket;
 		SweepListenerImpl listener;
-		
-		try
-		{
+
+		try {
 			if (!_resource.isAcceptingNewActivites())
-				throw new RemoteException(
-					"Queue is not accepting activities at the moment!");
-			
-			JobDefinition jobDefinition = JSDLUtils.convert(
-				submitJobRequest.getJobDefinition());
-			if (jobDefinition.parameterSweeps().size() > 0)
-			{
+				throw new RemoteException("Queue is not accepting activities at the moment!");
+
+			JobDefinition jobDefinition = JSDLUtils.convert(submitJobRequest.getJobDefinition());
+			if (jobDefinition.parameterSweeps().size() > 0) {
 				SweepToken token;
-				token = SweepUtility.performSweep(jobDefinition, 
-					listener = new SweepListenerImpl(
-						_queueMgr, submitJobRequest.getPriority()));
+				token = SweepUtility.performSweep(jobDefinition,
+					listener = new SweepListenerImpl(_queueMgr, submitJobRequest.getPriority()));
 				token.join();
 				ticket = listener.firstTicket();
-			} else
-			{
-				ticket = _queueMgr.submitJob(submitJobRequest.getPriority(), 
-					submitJobRequest.getJobDefinition());
+			} else {
+				ticket = _queueMgr.submitJob(submitJobRequest.getPriority(), submitJobRequest.getJobDefinition());
 			}
-			
+
 			return new SubmitJobResponseType(ticket);
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new RemoteException("Unable to submit job to queue.", ioe);
-		}
-		catch (InterruptedException ie)
-		{
-			throw new RemoteException(
-				"Unable to wait for first ticket to get generated.", ie);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (InterruptedException ie) {
+			throw new RemoteException("Unable to wait for first ticket to get generated.", ie);
+		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to submit job to queue.", sqe);
-		}
-		catch (JAXBException e)
-		{
+		} catch (JAXBException e) {
 			throw new RemoteException("Unable to submit job to queue.", e);
-		}
-		catch (SweepException e)
-		{
+		} catch (SweepException e) {
 			throw new RemoteException("Unable to submit job to queue.", e);
 		}
 	}
 
 	/*
-	 * This method is called automatically when the Web server first comes up.
-	 * We use it to restart the queue from where it left off.
+	 * This method is called automatically when the Web server first comes up. We use it to restart
+	 * the queue from where it left off.
 	 */
 	@Override
 	public boolean startup()
 	{
 		boolean serviceCreated = super.startup();
-		
+
 		return serviceCreated;
 	}
-	
+
 	@Override
 	public void postStartup()
 	{
-		try
-		{
-			/* In order to make out calls, we have to have a working context
-			 * so we go ahead and create an empty one.
+		try {
+			/*
+			 * In order to make out calls, we have to have a working context so we go ahead and
+			 * create an empty one.
 			 */
 			WorkingContext.setCurrentWorkingContext(new WorkingContext());
-			
-			/* Now we get the database connection pool configured 
-			 * with this service */
-			DatabaseConnectionPool connectionPool = (
-				(QueueDBResourceFactory)ResourceManager.getServiceResource(_serviceName
-					).getProvider().getFactory()).getConnectionPool();
-			
+
+			/*
+			 * Now we get the database connection pool configured with this service
+			 */
+			DatabaseConnectionPool connectionPool = ((QueueDBResourceFactory) ResourceManager.getServiceResource(_serviceName)
+				.getProvider().getFactory()).getConnectionPool();
+
 			_logger.info("Restarting all BES Managers.");
 			QueueManager.startAllManagers(connectionPool);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_logger.error("Unable to start resource info managers.", e);
-		}
-		finally
-		{
+		} finally {
 			WorkingContext.setCurrentWorkingContext(null);
 			_logger.info("Done restarting all BES Managers.");
 		}
@@ -465,30 +396,26 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	protected void preDestroy() throws RemoteException, ResourceException
 	{
 		super.preDestroy();
-		
-		try
-		{
+
+		try {
 			_queueMgr.close();
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new ResourceException("Unable to pre-destroy queue.", ioe);
 		}
 	}
-	
+
 	@Override
-	protected void registerNotificationHandlers(
-			NotificationMultiplexer multiplexer)
+	protected void registerNotificationHandlers(NotificationMultiplexer multiplexer)
 	{
 		super.registerNotificationHandlers(multiplexer);
-		
+
 		multiplexer.registerNotificationHandler(
 			BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(),
 			new LegacyBESActivityStateChangeFinalNotificationHandler());
 	}
 
-	private class LegacyBESActivityStateChangeFinalNotificationHandler
-		extends AbstractNotificationHandler<BESActivityStateChangedContents>
+	private class LegacyBESActivityStateChangeFinalNotificationHandler extends
+		AbstractNotificationHandler<BESActivityStateChangedContents>
 	{
 		private LegacyBESActivityStateChangeFinalNotificationHandler()
 		{
@@ -496,19 +423,14 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		}
 
 		@Override
-		public String handleNotification(TopicPath topic,
-				EndpointReferenceType producerReference,
-				EndpointReferenceType subscriptionReference,
-				BESActivityStateChangedContents contents) throws Exception
+		public String handleNotification(TopicPath topic, EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference, BESActivityStateChangedContents contents) throws Exception
 		{
-			JobCompletedAdditionUserData userData = 
-				contents.additionalUserData(
-					JobCompletedAdditionUserData.class);
-			
+			JobCompletedAdditionUserData userData = contents.additionalUserData(JobCompletedAdditionUserData.class);
+
 			if (userData == null)
-				throw new RemoteException(
-					"Missing required user data for notification");
-			
+				throw new RemoteException("Missing required user data for notification");
+
 			long jobid = userData.jobID();
 			ActivityState state = contents.activityState();
 			if (state.isFinalState())
@@ -516,51 +438,44 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			return NotificationConstants.OK;
 		}
 	}
-	
-	public void submitJobStream(InputStream in)
-		throws IOException
+
+	public void submitJobStream(InputStream in) throws IOException
 	{
 		if (!in.markSupported())
-			throw new IOException(
-				"Can only submit jobs from streams that support marking.");
-		
+			throw new IOException("Can only submit jobs from streams that support marking.");
+
 		in.mark(Integer.MAX_VALUE);
-		
-		if (!submitJobTrySingle(in))
-		{
+
+		if (!submitJobTrySingle(in)) {
 			in.reset();
 			submitJobTryMulti(in);
 		}
 	}
-	
-	private boolean submitJobTryMulti(InputStream in)
-		throws IOException
+
+	private boolean submitJobTryMulti(InputStream in) throws IOException
 	{
-		JobDefinition_Type []jobDefs = 
-			((JobMultiDefinition_Type)ObjectDeserializer.deserialize(
-				new InputSource(in), JobMultiDefinition_Type.class)).getJobDefinition();
+		JobDefinition_Type[] jobDefs = ((JobMultiDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in),
+			JobMultiDefinition_Type.class)).getJobDefinition();
 		if (jobDefs == null)
 			return false;
-		
+
 		for (JobDefinition_Type jobDef : jobDefs)
-			submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
-		
+			submitJob(new SubmitJobRequestType(jobDef, (byte) 0x0));
+
 		return true;
 	}
-	
-	private boolean submitJobTrySingle(InputStream in)
-		throws IOException
+
+	private boolean submitJobTrySingle(InputStream in) throws IOException
 	{
-		JobDefinition_Type jobDef = 
-			(JobDefinition_Type)ObjectDeserializer.deserialize(
-				new InputSource(in), JobDefinition_Type.class);
+		JobDefinition_Type jobDef = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in),
+			JobDefinition_Type.class);
 		if (jobDef == null || jobDef.getJobDescription() == null)
 			return false;
-		
-		submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
+
+		submitJob(new SubmitJobRequestType(jobDef, (byte) 0x0));
 		return true;
 	}
-	
+
 	private class SweepListenerImpl implements SweepListener
 	{
 		private WorkingContext _workingContext;
@@ -569,67 +484,49 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		private Collection<String> _tickets;
 		private short _prioroity;
 		private int _count = 0;
-		
+
 		private String firstTicket() throws InterruptedException
 		{
-			synchronized(_tickets)
-			{
+			synchronized (_tickets) {
 				while (_tickets.isEmpty())
 					_tickets.wait();
-				
+
 				return _tickets.iterator().next();
 			}
 		}
-		
-		private SweepListenerImpl(QueueManager queueManager,
-			short priority) throws FileNotFoundException, IOException
+
+		private SweepListenerImpl(QueueManager queueManager, short priority) throws FileNotFoundException, IOException
 		{
 			_queueManager = queueManager;
 			_tickets = new LinkedList<String>();
 			_prioroity = priority;
-			_callingContext = ContextManager.getCurrentContext();
-			_workingContext = 
-				(WorkingContext)WorkingContext.getCurrentWorkingContext().clone();
+			_callingContext = ContextManager.getExistingContext();
+			_workingContext = (WorkingContext) WorkingContext.getCurrentWorkingContext().clone();
 		}
-		
+
 		@Override
-		public void emitSweepInstance(JobDefinition jobDefinition) 
-			throws SweepException
+		public void emitSweepInstance(JobDefinition jobDefinition) throws SweepException
 		{
 			Closeable token = null;
-			
-			try
-			{
+
+			try {
 				WorkingContext.setCurrentWorkingContext(_workingContext);
 				token = ContextManager.temporarilyAssumeContext(_callingContext);
-				synchronized(_tickets)
-				{
-					_tickets.add(_queueManager.submitJob(_prioroity,
-						JSDLUtils.convert(jobDefinition)));
+				synchronized (_tickets) {
+					_tickets.add(_queueManager.submitJob(_prioroity, JSDLUtils.convert(jobDefinition)));
 					_tickets.notifyAll();
 				}
-				_logger.debug(String.format(
-					"Submitted job %d from a parameter sweep.", ++_count));
-			}
-			catch (JAXBException je)
-			{
-				throw new SweepException(
-					"Unable to convert JAXB type to Axis type.", je);
-			}
-			catch (ResourceException e)
-			{
+				if (_logger.isDebugEnabled())
+					_logger.debug(String.format("Submitted job %d from a parameter sweep.", ++_count));
+			} catch (JAXBException je) {
+				throw new SweepException("Unable to convert JAXB type to Axis type.", je);
+			} catch (ResourceException e) {
 				throw new SweepException("Unable to submit job.", e);
-			}
-			catch (SQLException e)
-			{
+			} catch (SQLException e) {
 				throw new SweepException("Unable to submit job.", e);
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				throw new SweepException("Unable to submit job.", e);
-			}
-			finally
-			{
+			} finally {
 				StreamUtils.close(token);
 				WorkingContext.setCurrentWorkingContext(null);
 			}
@@ -640,199 +537,160 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	@RWXMapping(RWXCategory.WRITE)
 	public Object forceUpdate(String[] arg0) throws RemoteException
 	{
-		for (String arg : arg0)
-		{
-			try
-			{
+		for (String arg : arg0) {
+			try {
 				_queueMgr.forceBESUpdate(arg);
-			} catch (SQLException e)
-			{
-				_logger.error(String.format(
-					"Unable to force update for resource %s.", arg), e);
+			} catch (SQLException e) {
+				_logger.error(String.format("Unable to force update for resource %s.", arg), e);
 			}
 		}
-		
+
 		return null;
 	}
 
-	static private String getJobTicketFromActivityEPR(
-		EndpointReferenceType activityEPR) throws RemoteException
+	static private String getJobTicketFromActivityEPR(EndpointReferenceType activityEPR) throws RemoteException
 	{
-		AddressingParameters addressingParameters = new AddressingParameters(
-			activityEPR.getReferenceParameters());
-		ResourceForkInformation rForkInfo = 
-			(ResourceForkInformation)addressingParameters.getResourceForkInformation();
-		if (rForkInfo != null)
-		{
+		AddressingParameters addressingParameters = new AddressingParameters(activityEPR.getReferenceParameters());
+		ResourceForkInformation rForkInfo = (ResourceForkInformation) addressingParameters.getResourceForkInformation();
+		if (rForkInfo != null) {
 			String forkPath = rForkInfo.forkPath();
-			String jobTicket = 
-				JobInformationFork.determineJobTicketFromForkPath(forkPath);
+			String jobTicket = JobInformationFork.determineJobTicketFromForkPath(forkPath);
 			return jobTicket;
 		}
-		
+
 		throw new RemoteException("Unable to find job ticket in activity EPR!");
 	}
-	
-	private GetActivityStatusResponseType getActivityStatus(
-		EndpointReferenceType activity)
+
+	private GetActivityStatusResponseType getActivityStatus(EndpointReferenceType activity)
 	{
 		ActivityStatusType activityStatus = null;
 		Fault fault = null;
-		
-		try
-		{
+
+		try {
 			String jobTicket = getJobTicketFromActivityEPR(activity);
 			activityStatus = _queueMgr.getBESActivityStatus(jobTicket);
+		} catch (Throwable cause) {
+			fault = new Fault(new QName("http://tempuri.org", "fault"), cause.getLocalizedMessage(), null, null);
 		}
-		catch (Throwable cause)
-		{
-			fault = new Fault(new QName("http://tempuri.org", "fault"), 
-				cause.getLocalizedMessage(), null, null);
-		}
-		
-		return new GetActivityStatusResponseType(
-			activity, activityStatus, fault, null);
+
+		return new GetActivityStatusResponseType(activity, activityStatus, fault, null);
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetActivityStatusesResponseType getActivityStatuses(
-		GetActivityStatusesType parameters) throws RemoteException,
-			UnknownActivityIdentifierFaultType
+	public GetActivityStatusesResponseType getActivityStatuses(GetActivityStatusesType parameters) throws RemoteException,
+		UnknownActivityIdentifierFaultType
 	{
-		GetActivityStatusResponseType []responses;
-		EndpointReferenceType []activities = parameters.getActivityIdentifier();
+		GetActivityStatusResponseType[] responses;
+		EndpointReferenceType[] activities = parameters.getActivityIdentifier();
 		responses = new GetActivityStatusResponseType[activities.length];
-		
+
 		for (int lcv = 0; lcv < activities.length; lcv++)
 			responses[lcv] = getActivityStatus(activities[lcv]);
 
 		return new GetActivityStatusesResponseType(responses, null);
 	}
-	
-	private TerminateActivityResponseType terminateActivity(
-		EndpointReferenceType activity)
+
+	private TerminateActivityResponseType terminateActivity(EndpointReferenceType activity)
 	{
 		boolean terminated = false;
 		Fault fault = null;
-		
-		try
-		{
+
+		try {
 			String jobTicket = getJobTicketFromActivityEPR(activity);
-			killJobs(new String[] { jobTicket} );
+			killJobs(new String[] { jobTicket });
 			completeJobs(new String[] { jobTicket });
 			terminated = true;
+		} catch (Throwable cause) {
+			fault = new Fault(new QName("http://tempuri.org", "fault"), cause.getLocalizedMessage(), null, null);
 		}
-		catch (Throwable cause)
-		{
-			fault = new Fault(new QName("http://tempuri.org", "fault"), 
-				cause.getLocalizedMessage(), null, null);
-		}
-		
-		return new TerminateActivityResponseType(
-			activity, terminated, fault, null);
+
+		return new TerminateActivityResponseType(activity, terminated, fault, null);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public TerminateActivitiesResponseType terminateActivities(
-		TerminateActivitiesType parameters) throws RemoteException,
-			UnknownActivityIdentifierFaultType
+	public TerminateActivitiesResponseType terminateActivities(TerminateActivitiesType parameters) throws RemoteException,
+		UnknownActivityIdentifierFaultType
 	{
-		TerminateActivityResponseType []responses;
-		EndpointReferenceType []activities = parameters.getActivityIdentifier();
+		TerminateActivityResponseType[] responses;
+		EndpointReferenceType[] activities = parameters.getActivityIdentifier();
 		responses = new TerminateActivityResponseType[activities.length];
-		
+
 		for (int lcv = 0; lcv < activities.length; lcv++)
 			responses[lcv] = terminateActivity(activities[lcv]);
-		
+
 		return new TerminateActivitiesResponseType(responses, null);
 	}
 
-	private GetActivityDocumentResponseType getActivityDocument(
-		EndpointReferenceType activity)
+	private GetActivityDocumentResponseType getActivityDocument(EndpointReferenceType activity)
 	{
 		JobDefinition_Type jobDef = null;
 		Fault fault = null;
-		
-		try
-		{
+
+		try {
 			String jobTicket = getJobTicketFromActivityEPR(activity);
 			jobDef = _queueMgr.getJobDefinition(jobTicket);
+		} catch (Throwable cause) {
+			fault = new Fault(new QName("http://tempuri.org", "fault"), cause.getLocalizedMessage(), null, null);
 		}
-		catch (Throwable cause)
-		{
-			fault = new Fault(new QName("http://tempuri.org", "fault"), 
-				cause.getLocalizedMessage(), null, null);
-		}
-		
-		return new GetActivityDocumentResponseType(
-			activity, jobDef, fault, null);
+
+		return new GetActivityDocumentResponseType(activity, jobDef, fault, null);
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetActivityDocumentsResponseType getActivityDocuments(
-		GetActivityDocumentsType parameters) throws RemoteException,
-			UnknownActivityIdentifierFaultType
+	public GetActivityDocumentsResponseType getActivityDocuments(GetActivityDocumentsType parameters) throws RemoteException,
+		UnknownActivityIdentifierFaultType
 	{
-		GetActivityDocumentResponseType []responses;
-		EndpointReferenceType []activities = parameters.getActivityIdentifier();
+		GetActivityDocumentResponseType[] responses;
+		EndpointReferenceType[] activities = parameters.getActivityIdentifier();
 		responses = new GetActivityDocumentResponseType[activities.length];
-		
+
 		for (int lcv = 0; lcv < activities.length; lcv++)
 			responses[lcv] = getActivityDocument(activities[lcv]);
-		
+
 		return new GetActivityDocumentsResponseType(responses, null);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetFactoryAttributesDocumentResponseType getFactoryAttributesDocument(
-		GetFactoryAttributesDocumentType parameters) throws RemoteException
+	public GetFactoryAttributesDocumentResponseType getFactoryAttributesDocument(GetFactoryAttributesDocumentType parameters)
+		throws RemoteException
 	{
-		ConstructionParameters baseCP =
-			_resource.constructionParameters(QueueConstructionParameters.class);
-		
-		if (baseCP == null || !(baseCP instanceof QueueConstructionParameters))
-		{
+		ConstructionParameters baseCP = _resource.constructionParameters(QueueConstructionParameters.class);
+
+		if (baseCP == null || !(baseCP instanceof QueueConstructionParameters)) {
 			// Default
-			throw new RemoteException("The construction parameters for " +
-				"this Queue have not been overridden.  It therefor " +
-				"cannot currently be used as a BES!");
+			throw new RemoteException("The construction parameters for " + "this Queue have not been overridden.  It therefor "
+				+ "cannot currently be used as a BES!");
 		}
-		
-		QueueAsBESFactoryAttributesUtilities utils = new QueueAsBESFactoryAttributesUtilities(
-			_queueMgr.getBESManager().allBESInformation(),
-			(QueueConstructionParameters)baseCP);
+
+		QueueAsBESFactoryAttributesUtilities utils = new QueueAsBESFactoryAttributesUtilities(_queueMgr.getBESManager()
+			.allBESInformation(), (QueueConstructionParameters) baseCP);
 		boolean isAcceptingNewActivities = _resource.isAcceptingNewActivites();
 		long totalNumberOfActivities = _queueMgr.getJobCount();
-		return new GetFactoryAttributesDocumentResponseType(
-			utils.factoryResourceAttributes(
-				isAcceptingNewActivities, totalNumberOfActivities), null);
+		return new GetFactoryAttributesDocumentResponseType(utils.factoryResourceAttributes(isAcceptingNewActivities,
+			totalNumberOfActivities), null);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateActivityResponseType createActivity(
-		CreateActivityType parameters) throws RemoteException,
-			NotAcceptingNewActivitiesFaultType, InvalidRequestMessageFaultType,
-			UnsupportedFeatureFaultType, NotAuthorizedFaultType
+	public CreateActivityResponseType createActivity(CreateActivityType parameters) throws RemoteException,
+		NotAcceptingNewActivitiesFaultType, InvalidRequestMessageFaultType, UnsupportedFeatureFaultType, NotAuthorizedFaultType
 	{
-		SubmitJobResponseType resp = submitJob(new SubmitJobRequestType(
-			parameters.getActivityDocument().getJobDefinition(), (byte)0));
+		SubmitJobResponseType resp = submitJob(new SubmitJobRequestType(parameters.getActivityDocument().getJobDefinition(),
+			(byte) 0));
 		String jobTicket = resp.getJobTicket();
 		String forkPath = String.format("/jobs/mine/all/%s", jobTicket);
-		EndpointReferenceType target =
-			createForkEPR(forkPath, new JobFork(this, forkPath).describe());
-		return new CreateActivityResponseType(target,
-			parameters.getActivityDocument(), null);
+		EndpointReferenceType target = createForkEPR(forkPath, new JobFork(this, forkPath).describe());
+		return new CreateActivityResponseType(target, parameters.getActivityDocument(), null);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public StopAcceptingNewActivitiesResponseType stopAcceptingNewActivities(
-		StopAcceptingNewActivitiesType parameters) throws RemoteException
+	public StopAcceptingNewActivitiesResponseType stopAcceptingNewActivities(StopAcceptingNewActivitiesType parameters)
+		throws RemoteException
 	{
 		_resource.isAcceptingNewActivites(false);
 		return new StopAcceptingNewActivitiesResponseType();
@@ -840,46 +698,41 @@ public class QueueServiceImpl extends ResourceForkBaseService
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public StartAcceptingNewActivitiesResponseType startAcceptingNewActivities(
-			StartAcceptingNewActivitiesType parameters) throws RemoteException
+	public StartAcceptingNewActivitiesResponseType startAcceptingNewActivities(StartAcceptingNewActivitiesType parameters)
+		throws RemoteException
 	{
 		_resource.isAcceptingNewActivites(true);
 		return new StartAcceptingNewActivitiesResponseType();
 	}
-	
-	/*Do not change the name or signature of the below method.
-	 *  It is used in WSIteratorDBResource using java-reflection.
+
+	/*
+	 * Do not change the name or signature of the below method. It is used in WSIteratorDBResource
+	 * using java-reflection.
 	 * 
-	 * If modifying: edit in WSIteratorDBResource.java and EnhancedRNSServiceImpl.java
-	 * and LightWeightExportDirFork.java .
-	 * */
-	
-	public static MessageElement getIndexedContent(Connection connection,
-			InMemoryIteratorEntry entry, Object[] queueManager) throws ResourceException
+	 * If modifying: edit in WSIteratorDBResource.java and EnhancedRNSServiceImpl.java and
+	 * LightWeightExportDirFork.java .
+	 */
+
+	public static MessageElement getIndexedContent(Connection connection, InMemoryIteratorEntry entry, Object[] queueManager)
+		throws ResourceException
 	{
-		if(queueManager == null || entry == null || connection == null)
+		if (queueManager == null || entry == null || connection == null)
 			throw new ResourceException("Unable to stat jobs in queue");
-		
-		if(queueManager[0] == null)
+
+		if (queueManager[0] == null)
 			throw new ResourceException("Unable to stat jobs in queue");
-			
-		QueueManager qMgr = (QueueManager)queueManager[0];
+
+		QueueManager qMgr = (QueueManager) queueManager[0];
 		JobInformationType jit;
-		
-		try
-		{
+
+		try {
 			jit = qMgr.getStatusFromID(Long.parseLong(entry.getId()), connection);
-		}		
-		catch(GenesisIISecurityException gse)
-		{
+		} catch (GenesisIISecurityException gse) {
 			throw new ResourceException("Unable to stat jobs in queue.", gse);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException("Unable to stat jobs in queue.", sqe);
 		}
 		return AnyHelper.toAny(jit);
-		
-		
+
 	}
 }

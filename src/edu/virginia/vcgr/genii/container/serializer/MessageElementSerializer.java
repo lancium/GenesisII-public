@@ -4,9 +4,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 
-public class MessageElementSerializer 
+public class MessageElementSerializer
 {
-	public static MessageElement serialize(QName name, Object item) 
+	public static MessageElement serialize(QName name, Object item)
 	{
 		return new MessageElement(name, item);
 	}

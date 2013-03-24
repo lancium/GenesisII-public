@@ -32,33 +32,27 @@ import edu.virginia.vcgr.genii.resolver.GeniiResolverPortType;
 import edu.virginia.vcgr.genii.resolver.InvalidWSNameFaultType;
 
 public class GeniiResolverFactoryProxy implements IResolverFactoryProxy
-{	
+{
 	/**
-	 * Register the given EPR with a resolver.
-	 * Return an EPR with targetEPR's address and resource-key,
-	 * and with a resolver element.
-	 *
-	 * @param confProperties The properties from server-config.xml.
-	 * @param resolverProperties The properties from postCreate().
+	 * Register the given EPR with a resolver. Return an EPR with targetEPR's address and
+	 * resource-key, and with a resolver element.
+	 * 
+	 * @param confProperties
+	 *            The properties from server-config.xml.
+	 * @param resolverProperties
+	 *            The properties from postCreate().
 	 */
-	public EndpointReferenceType createResolver(
-			EndpointReferenceType targetEPR,
-			Properties confProperties,
-			MessageElement[] resolverProperties)
-		throws RemoteException,	ResourceException, InvalidWSNameFaultType
+	public EndpointReferenceType createResolver(EndpointReferenceType targetEPR, Properties confProperties,
+		MessageElement[] resolverProperties) throws RemoteException, ResourceException, InvalidWSNameFaultType
 	{
 		MessageElement[] params = new MessageElement[1];
-		params[0] = new MessageElement(
-				GeniiResolverServiceImpl.TARGET_EPR_PARAMETER,
-				targetEPR);
+		params[0] = new MessageElement(GeniiResolverServiceImpl.TARGET_EPR_PARAMETER, targetEPR);
 		String resolverServiceURL = Container.getServiceURL("GeniiResolverPortType");
 		EndpointReferenceType resolverServiceEPR = EPRUtils.makeEPR(resolverServiceURL);
-		GeniiResolverPortType resolverService = ClientUtils.createProxy(
-					GeniiResolverPortType.class, resolverServiceEPR);
+		GeniiResolverPortType resolverService = ClientUtils.createProxy(GeniiResolverPortType.class, resolverServiceEPR);
 		VcgrCreateResponse response = resolverService.vcgrCreate(new VcgrCreate(params));
 		EndpointReferenceType resolutionEPR = response.getEndpoint();
-		GeniiResolverPortType resolutionService = ClientUtils.createProxy(
-					GeniiResolverPortType.class, resolutionEPR);
+		GeniiResolverPortType resolutionService = ClientUtils.createProxy(GeniiResolverPortType.class, resolutionEPR);
 		return resolutionService.resolve(null);
 	}
 }

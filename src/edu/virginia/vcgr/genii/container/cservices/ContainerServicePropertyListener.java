@@ -4,6 +4,5 @@ import java.io.Serializable;
 
 public interface ContainerServicePropertyListener
 {
-	public void propertyChanged(String propertyName, 
-		Serializable newValue);
+	public void propertyChanged(String propertyName, Serializable newValue);
 }

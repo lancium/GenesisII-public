@@ -11,28 +11,25 @@ class InMemoryHistoryContext extends AbstractHistoryContext
 {
 	private HistoryEventSource _source;
 	private InMemoryHistoryEventSink _sink;
-	
-	InMemoryHistoryContext(InMemoryHistoryEventSink sink,
-		HistoryEventSource source, Map<String, String> properties,
+
+	InMemoryHistoryContext(InMemoryHistoryEventSink sink, HistoryEventSource source, Map<String, String> properties,
 		HistoryEventCategory category)
 	{
 		super(properties, category);
-		
+
 		_source = source;
 		_sink = sink;
 	}
-	
+
 	@Override
-	final public HistoryEventToken logEvent(HistoryEventLevel level,
-		HistoryEventData data)
+	final public HistoryEventToken logEvent(HistoryEventLevel level, HistoryEventData data)
 	{
-		return _sink.add(category(), level, properties(), _source, data); 
+		return _sink.add(category(), level, properties(), _source, data);
 	}
-	
+
 	@Override
 	final public Object clone()
 	{
-		return new InMemoryHistoryContext(
-			_sink, _source, properties(), category());
+		return new InMemoryHistoryContext(_sink, _source, properties(), category());
 	}
 }

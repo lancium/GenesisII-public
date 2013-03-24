@@ -67,8 +67,8 @@
 		
 		<!-- ============= AuthZ Provider Instances ============= -->
 
-		<mconf:instance name="gamlacl-authz-provider"
-			type="edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclAuthZProvider">
+		<mconf:instance name="acl-authz-provider"
+			type="edu.virginia.vcgr.genii.container.security.authz.providers.AclAuthZProvider">
 			
 			<!-- Denotes the X.509 identity to be used for *new* resources are created 
 			     without the presence of a caller credential (e.g., service resources
@@ -81,7 +81,7 @@
 		</mconf:instance>
 
 <!-- Swap in instead of above for no security
-		<mconf:instance name="gamlacl-authz-provider"
+		<mconf:instance name="acl-authz-provider"
 			type="edu.virginia.vcgr.genii.container.security.authz.providers.OpenAuthZProvider">
 		</mconf:instance>
 -->		

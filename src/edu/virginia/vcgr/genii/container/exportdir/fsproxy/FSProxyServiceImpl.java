@@ -8,7 +8,6 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.exportdir.FSProxyConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
@@ -17,14 +16,14 @@ import edu.virginia.vcgr.genii.exportdir.QuitExport;
 import edu.virginia.vcgr.genii.exportdir.QuitExportResponse;
 import edu.virginia.vcgr.genii.exportdir.fsproxy.FSProxyPortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @ForkRoot(FSProxyDirFork.class)
 @ConstructionParametersType(FSProxyConstructionParameters.class)
-public class FSProxyServiceImpl extends ResourceForkBaseService
-	implements FSProxyPortType
+public class FSProxyServiceImpl extends ResourceForkBaseService implements FSProxyPortType
 {
 	static final public String SERVICE_NAME = "FSProxyPortType";
-	
+
 	public FSProxyServiceImpl() throws RemoteException
 	{
 		super(SERVICE_NAME);
@@ -40,13 +39,11 @@ public class FSProxyServiceImpl extends ResourceForkBaseService
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public QuitExportResponse quitExport(QuitExport arg0)
-			throws RemoteException, ResourceUnknownFaultType
+	public QuitExportResponse quitExport(QuitExport arg0) throws RemoteException, ResourceUnknownFaultType
 	{
-		IResource resource = 
-			ResourceManager.getCurrentResource().dereference();
+		IResource resource = ResourceManager.getCurrentResource().dereference();
 		resource.destroy();
-		
+
 		return new QuitExportResponse(true);
 	}
 }

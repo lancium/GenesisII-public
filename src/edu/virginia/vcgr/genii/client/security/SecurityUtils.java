@@ -8,7 +8,10 @@ import java.io.ObjectOutputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PublicKey;
-import java.security.cert.*;
+import java.security.cert.CertificateFactory;
+import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.X509CertSelector;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -20,10 +23,14 @@ import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.morgan.util.configuration.ConfigurationException;
+import org.morgan.util.io.StreamUtils;
+
 import edu.virginia.vcgr.genii.certGenerator.CertificateChainType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
-import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -32,176 +39,150 @@ import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.authz.*;
-import edu.virginia.vcgr.genii.client.security.x509.CertTool;
-import edu.virginia.vcgr.genii.security.credentials.*;
-import edu.virginia.vcgr.genii.security.credentials.assertions.*;
-import edu.virginia.vcgr.genii.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
+import edu.virginia.vcgr.genii.security.CertificateValidator;
+import edu.virginia.vcgr.genii.security.TransientCredentials;
+import edu.virginia.vcgr.genii.security.credentials.NuCredential;
+import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
+import edu.virginia.vcgr.genii.security.credentials.X509Identity;
+import edu.virginia.vcgr.genii.security.identity.Identity;
+import edu.virginia.vcgr.genii.security.x509.CertTool;
 
-import org.morgan.util.configuration.ConfigurationException;
-import org.morgan.util.io.StreamUtils;
-
-public class SecurityUtils
+public class SecurityUtils implements CertificateValidator
 {
-	static
-	{
+	static private Log _logger = LogFactory.getLog(SecurityUtils.class);
+
+	static {
 		CertTool.loadBCProvider();
 	}
 
 	static private KeyStore __trustStore = null;
 
 	/**
-	 * Class to wipe our loaded config stuff in the event the config manager
-	 * reloads.
+	 * Class to wipe our loaded config stuff in the event the config manager reloads.
 	 */
-	static
-	{
-		ConfigurationManager
-				.addConfigurationUnloadListener(new ConfigUnloadListener());
+	static {
+		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
 	}
 
-	public static class ConfigUnloadListener implements
-			ConfigurationUnloadedListener
+	public static class ConfigUnloadListener implements ConfigurationUnloadedListener
 	{
 		public void notifyUnloaded()
 		{
-			synchronized (AxisClientInvocationHandler.class)
-			{
+			synchronized (ConfigurationManager.class) {
 				__trustStore = null;
 			}
 		}
 	}
 
+	public SecurityUtils()
+	{
+	}
+
 	/**
 	 * Establishes the trust manager for use in verifying resource identities
 	 */
-	static public synchronized KeyStore getTrustStore()
-			throws GeneralSecurityException
+	static public synchronized KeyStore getTrustStore() throws GeneralSecurityException
 	{
 
-		if (__trustStore != null)
-		{
+		if (__trustStore != null) {
 			return __trustStore;
 		}
 
-		try
-		{
-			Security security = Installation.getDeployment(
-				new DeploymentName()).security();
-			String trustStoreLoc = security.getProperty(
-				SecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_LOCATION_PROP);
-			String trustStoreType = security.getProperty(
-				SecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_TYPE_PROP,
+		try {
+			Security security = Installation.getDeployment(new DeploymentName()).security();
+			String trustStoreLoc = security.getProperty(SecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_LOCATION_PROP);
+			String trustStoreType = security.getProperty(SecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_TYPE_PROP,
 				SecurityConstants.TRUST_STORE_TYPE_DEFAULT);
-			String trustStorePass = security.getProperty(
-				SecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_PASSWORD_PROP);
+			String trustStorePass = security.getProperty(SecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_PASSWORD_PROP);
 
 			// open the trust store
-			if (trustStoreLoc == null)
-			{
-				throw new GenesisIISecurityException(
-						"Could not load TrustManager: no identity trust store location specified");
+			if (trustStoreLoc == null) {
+				throw new GenesisIISecurityException("Could not load TrustManager: no identity trust store location specified");
 			}
 			char[] trustStorePassChars = null;
-			if (trustStorePass != null)
-			{
+			if (trustStorePass != null) {
 				trustStorePassChars = trustStorePass.toCharArray();
 			}
-			__trustStore =CertTool.openStoreDirectPath(
-				Installation.getDeployment(
-					new DeploymentName()).security().getSecurityFile(trustStoreLoc),
-				trustStoreType, trustStorePassChars);
+			__trustStore = CertTool.openStoreDirectPath(Installation.getDeployment(new DeploymentName()).security()
+				.getSecurityFile(trustStoreLoc), trustStoreType, trustStorePassChars);
 			return __trustStore;
 
-		}
-		catch (ConfigurationException e)
-		{
-			throw new GeneralSecurityException("Could not load TrustManager: "
-					+ e.getMessage(), e);
-		}
-		catch (IOException e)
-		{
-			throw new GeneralSecurityException("Could not load TrustManager: "
-					+ e.getMessage(), e);
+		} catch (ConfigurationException e) {
+			throw new GeneralSecurityException("Could not load TrustManager: " + e.getMessage(), e);
+		} catch (IOException e) {
+			throw new GeneralSecurityException("Could not load TrustManager: " + e.getMessage(), e);
 		}
 	}
 
 	/**
-	 * Verify the certificate path.  If useLocalTrustStore, then also 
-	 * ensure correctly chaining to a trusted root in the local trust 
-	 * store; otherwise just validate the signature chain (no trust).
+	 * Verify the certificate path. If useLocalTrustStore, then also ensure correctly chaining to a
+	 * trusted root in the local trust store; otherwise just validate the signature chain (no
+	 * trust).
 	 */
-	static public void validateCertPath(
-			X509Certificate[] certChain, 
-			boolean useLocalTrustStore)
-		throws GeneralSecurityException
+	@Override
+	public boolean validateCertPath(X509Certificate[] certChain, boolean useLocalTrustStore)
 	{
-		if (!useLocalTrustStore) 
-		{
+		if (!useLocalTrustStore) {
 			// simply verify each certificate with its predecessor
-			for (int i = 0; i < certChain.length - 2; i++)
-			{
-				certChain[i].verify(certChain[i + 1].getPublicKey());
+			for (int i = 0; i < certChain.length - 2; i++) {
+				try {
+					certChain[i].verify(certChain[i + 1].getPublicKey());
+				} catch (Throwable e) {
+					_logger.error(
+						"failure to validate this cert " + certChain[i].getIssuerDN() + " error is: " + e.getMessage(), e);
+					return false;
+				}
 			}
 
-			// we're through no problemo
-			return;
+			// we're through no problemo.
+			return true;
 		}
-		
 
-		// create a trust manager from the trust store
-		KeyStore ks = SecurityUtils.getTrustStore();
-		PKIXBuilderParameters pkixParams =
-				new PKIXBuilderParameters(ks,
-						new X509CertSelector());
-		pkixParams.setRevocationEnabled(false);
-		ManagerFactoryParameters trustParams =
-				new CertPathTrustManagerParameters(pkixParams);
-		TrustManagerFactory tmf =
-				TrustManagerFactory.getInstance("PKIX");
-		tmf.init(trustParams);
-		X509TrustManager trustManager = (X509TrustManager) tmf.getTrustManagers()[0];
-
-		trustManager.checkClientTrusted(
-				certChain,
-				certChain[0].getPublicKey().getAlgorithm());
+		try {
+			// create a trust manager from the trust store
+			KeyStore ks = SecurityUtils.getTrustStore();
+			PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(ks, new X509CertSelector());
+			pkixParams.setRevocationEnabled(false);
+			ManagerFactoryParameters trustParams = new CertPathTrustManagerParameters(pkixParams);
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+			tmf.init(trustParams);
+			X509TrustManager trustManager = (X509TrustManager) tmf.getTrustManagers()[0];
+			trustManager.checkClientTrusted(certChain, certChain[0].getPublicKey().getAlgorithm());
+		} catch (Throwable e) {
+			if (_logger.isTraceEnabled())
+				_logger.trace("failure to validate this cert " + certChain[0].getIssuerDN() + " error is: " + e.getMessage());
+			return false;
+		}
+		return true;
 	}
 
-
-	static public final byte[] serializePublicKey(PublicKey pk)
-			throws IOException
+	static public final byte[] serializePublicKey(PublicKey pk) throws IOException
 	{
 		ByteArrayOutputStream baos = null;
 		ObjectOutputStream oos = null;
 
-		try
-		{
+		try {
 			baos = new ByteArrayOutputStream();
 			oos = new ObjectOutputStream(baos);
 			oos.writeObject(pk);
 			oos.flush();
 			return baos.toByteArray();
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(oos);
 		}
 	}
 
-	static public final PublicKey deserializePublicKey(byte[] data)
-			throws IOException, ClassNotFoundException
+	static public final PublicKey deserializePublicKey(byte[] data) throws IOException, ClassNotFoundException
 	{
 		ByteArrayInputStream bais = null;
 		ObjectInputStream ois = null;
 
-		try
-		{
+		try {
 			bais = new ByteArrayInputStream(data);
 			ois = new ObjectInputStream(bais);
 			return (PublicKey) ois.readObject();
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(ois);
 		}
 	}
@@ -214,40 +195,32 @@ public class SecurityUtils
 	 * @return
 	 * @throws IOException
 	 */
-	static public final byte[] serializeX509Certificate(X509Certificate cert)
-			throws IOException
+	static public final byte[] serializeX509Certificate(X509Certificate cert) throws IOException
 	{
 		ByteArrayOutputStream baos = null;
 		ObjectOutputStream oos = null;
 
-		try
-		{
+		try {
 			baos = new ByteArrayOutputStream();
 			oos = new ObjectOutputStream(baos);
 			oos.writeObject(cert);
 			oos.flush();
 			return baos.toByteArray();
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(oos);
 		}
 	}
 
-	static public final X509Certificate deserializeX509Certificate(byte[] data)
-			throws IOException, ClassNotFoundException
+	static public final X509Certificate deserializeX509Certificate(byte[] data) throws IOException, ClassNotFoundException
 	{
 		ByteArrayInputStream bais = null;
 		ObjectInputStream ois = null;
 
-		try
-		{
+		try {
 			bais = new ByteArrayInputStream(data);
 			ois = new ObjectInputStream(bais);
 			return (X509Certificate) ois.readObject();
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(ois);
 		}
 	}
@@ -260,138 +233,114 @@ public class SecurityUtils
 	 * @return
 	 * @throws IOException
 	 */
-	static public final byte[][] serializeX509CertificateChain(
-			X509Certificate[] certs) throws IOException
+	static public final byte[][] serializeX509CertificateChain(X509Certificate[] certs) throws IOException
 	{
 		byte[][] ret = new byte[certs.length][];
 		int lcv = 0;
-		for (X509Certificate cert : certs)
-		{
+		for (X509Certificate cert : certs) {
 			ret[lcv++] = serializeX509Certificate(cert);
 		}
 
 		return ret;
 	}
 
-	static public final X509Certificate[] deserializeX509CertificateChain(
-			byte[][] data) throws IOException, ClassNotFoundException
+	static public final X509Certificate[] deserializeX509CertificateChain(byte[][] data) throws IOException,
+		ClassNotFoundException
 	{
 		X509Certificate[] ret = new X509Certificate[data.length];
 
-		for (int i = 0; i < data.length; i++)
-		{
+		for (int i = 0; i < data.length; i++) {
 			ret[i] = deserializeX509Certificate(data[i]);
 		}
 
 		return ret;
 	}
 
-	static public final X509Certificate[] decodeCertificateChain(
-			CertificateChainType certChain) throws GeneralSecurityException
+	static public final X509Certificate[] decodeCertificateChain(CertificateChainType certChain)
+		throws GeneralSecurityException
 	{
 		int numCerts = certChain.getCount();
 		X509Certificate[] certs = new X509Certificate[numCerts];
 
 		CertificateFactory cf = CertificateFactory.getInstance("X.509");
-		for (int i = 0; i < numCerts; i++)
-		{
+		for (int i = 0; i < numCerts; i++) {
 			byte[] encoded = certChain.getCertificate(i);
-			certs[i] =
-					(X509Certificate) cf
-							.generateCertificate(new ByteArrayInputStream(
-									encoded));
+			certs[i] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encoded));
 		}
 		return certs;
 	}
-	
-	static public Collection<Identity> getCallerIdentities(
-		ICallingContext callingContext) 
-			throws AuthZSecurityException, GeneralSecurityException
-	{
-		try
-		{
-			
-			Collection<Identity> ret = new ArrayList<Identity>();
-			
-			if (callingContext == null)
-				throw new AuthZSecurityException(
-					"Error processing GAML credential: No calling context");
-			
-			// remove/renew stale creds/attributes
-			ClientUtils.checkAndRenewCredentials(callingContext, new Date(),
-				new SecurityUpdateResults());
 
-			TransientCredentials transientCredentials = 
-				TransientCredentials.getTransientCredentials(callingContext);
-			
-			for (GIICredential cred : transientCredentials._credentials) 
-			{
-				/* If the cred is an Identity, then we simply add that idendity
-				 * to our identity list.
+	static public Collection<Identity> getCallerIdentities(ICallingContext callingContext) throws AuthZSecurityException,
+		GeneralSecurityException
+	{
+		try {
+
+			Collection<Identity> ret = new ArrayList<Identity>();
+
+			if (callingContext == null)
+				throw new AuthZSecurityException("Error processing credential: No calling context");
+
+			// remove/renew stale creds/attributes
+			ClientUtils.checkAndRenewCredentials(callingContext, new Date(), new SecurityUpdateResults());
+
+			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callingContext);
+
+			for (NuCredential cred : transientCredentials.getCredentials()) {
+				/*
+				 * If the cred is an Identity, then we simply add that identity to our identity
+				 * list.
 				 */
-				if (cred instanceof Identity) 
-				{
-					ret.add((Identity)cred);
-				} else if (cred instanceof SignedAssertion) 
-				{
-					/* If the cred is a signed identity assertion, then we have to
-					 * get the identity out of the assertion.
+				if (cred instanceof Identity) {
+					ret.add((Identity) cred);
+				} else if (cred instanceof TrustCredential) {
+					/*
+					 * If the cred is a signed identity assertion, then we have to get the identity
+					 * out of the assertion.
 					 */
-					SignedAssertion signedAssertion = (SignedAssertion)cred;
-					if (signedAssertion.getAttribute() 
-						instanceof IdentityAttribute) 
-					{
-						IdentityAttribute identityAttr = 
-							(IdentityAttribute) signedAssertion.getAttribute();
-	
-						ret.add(identityAttr.getIdentity());
-					}
+					TrustCredential tc = (TrustCredential) cred;
+					X509Identity identityAttr = (X509Identity) tc.getRootIdentity();
+
+					ret.add(identityAttr);
 				}
 			}
-			
+
 			return ret;
-		}
-		catch (IOException ioe)
-		{
-			throw new AuthZSecurityException("Unable to load current context.", 
-				ioe);
+		} catch (IOException ioe) {
+			throw new AuthZSecurityException("Unable to load current context.", ioe);
 		}
 	}
-	
-	static public Collection<Identity> getCallerIdentities()
-		throws AuthZSecurityException, IOException, GeneralSecurityException
+
+	static public Collection<Identity> getCallerIdentities() throws AuthZSecurityException, IOException,
+		GeneralSecurityException
 	{
-		return getCallerIdentities(ContextManager.getCurrentContext());
+		return getCallerIdentities(ContextManager.getExistingContext());
 	}
-	
-	static final public Pattern GROUP_TOKEN_PATTERN =
-		Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
-	static final public Pattern CLIENT_IDENTITY_PATTERN =
-		Pattern.compile("^.*(?<![a-z])cn=[^,]*Client.*$", Pattern.CASE_INSENSITIVE);
-	
-	static private boolean matches(Identity identity, Pattern []patterns)
+
+	static final public Pattern GROUP_TOKEN_PATTERN = Pattern
+		.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
+	static final public Pattern CLIENT_IDENTITY_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*Client.*$",
+		Pattern.CASE_INSENSITIVE);
+
+	static private boolean matches(Identity identity, Pattern[] patterns)
 	{
-		for (Pattern pattern : patterns)
-		{
+		for (Pattern pattern : patterns) {
 			Matcher matcher = pattern.matcher(identity.toString());
 			if (matcher.matches())
 				return true;
 		}
-		
+
 		return false;
 	}
-	
-	static public Collection<Identity> filterCredentials(
-		Collection<Identity> in, Pattern...patterns)
+
+	static public Collection<Identity> filterCredentials(Collection<Identity> in, Pattern... patterns)
 	{
 		Collection<Identity> ret = new ArrayList<Identity>(in.size());
-		
-		for (Identity test : in)
-		{
+
+		for (Identity test : in) {
 			if (!matches(test, patterns))
 				ret.add(test);
 		}
-		
+
 		return ret;
 	}
 }

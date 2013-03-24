@@ -9,25 +9,21 @@ public class XScript extends CompiledScript
 {
 	private XScriptEngine _engine;
 	private ParseStatement _program;
-	
+
 	XScript(XScriptEngine engine, ParseStatement program)
 	{
 		_engine = engine;
 		_program = program;
 	}
-	
+
 	@Override
 	public Object eval(ScriptContext context) throws ScriptException
 	{
-		try
-		{
-			return _program.evaluate(
-				(XScriptContext)context);
-		} catch (EarlyExitException e)
-		{
+		try {
+			return _program.evaluate((XScriptContext) context);
+		} catch (EarlyExitException e) {
 			return e.getExitCode();
-		} catch (ReturnFromFunctionException e)
-		{
+		} catch (ReturnFromFunctionException e) {
 			return e.getResult();
 		}
 	}

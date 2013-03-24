@@ -77,13 +77,16 @@ import edu.virginia.vcgr.genii.iterator.WSIteratorPortType;
  * call and requests for additional attributes that we hope the client will look for 
  * immediately or that may come useful for managing the cache.   
  * */
-public class AttributeCacheHandler2 {
+public class AttributeCacheHandler2
+{
 
 	private static Log _logger = LogFactory.getLog(AttributeCacheHandler2.class);
 
-	private class FlushListener implements AttributeCacheFlushListener {
+	private class FlushListener implements AttributeCacheFlushListener
+	{
 		@Override
-		public void flush(WSName endpoint, QName... attributes) {
+		public void flush(WSName endpoint, QName... attributes)
+		{
 			if (endpoint == null) {
 				CacheManager.clearCache(MessageElement.class);
 			} else {
@@ -97,133 +100,130 @@ public class AttributeCacheHandler2 {
 			}
 		}
 	}
-	
-	public AttributeCacheHandler2() {
+
+	public AttributeCacheHandler2()
+	{
 		AttributeCache.addFlushListener(new FlushListener());
 	}
-	
+
 	/*
-	 * In new implementation this is the only method that lost the ability 
-	 * to retrieve the response from the cache. However, we don't think it
-	 * is not a likely scenario that this method will be called multiple 
-	 * times from anywhere within our code base. So the loss of caching 
-	 * should not have any significant impact. 
-	 * */
+	 * In new implementation this is the only method that lost the ability to retrieve the response
+	 * from the cache. However, we don't think it is not a likely scenario that this method will be
+	 * called multiple times from anywhere within our code base. So the loss of caching should not
+	 * have any significant impact.
+	 */
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(
-			InvocationContext ctxt,
-			GetResourcePropertyDocument request) throws Throwable {
+	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(InvocationContext ctxt,
+		GetResourcePropertyDocument request) throws Throwable
+	{
 		EndpointReferenceType target = ctxt.getTarget();
-		GetResourcePropertyDocumentResponse resp =
-			(GetResourcePropertyDocumentResponse)ctxt.proceed();
+		GetResourcePropertyDocumentResponse resp = (GetResourcePropertyDocumentResponse) ctxt.proceed();
 		MessageElement[] attributes = resp.get_any();
 		storeAttributesInCache(target, attributes);
 		return resp;
 	}
-	
+
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public UpdateResourcePropertiesResponse updateResourceProperties(InvocationContext ctxt, 
-			UpdateResourceProperties updateRequest) throws Throwable {
+	public UpdateResourcePropertiesResponse updateResourceProperties(InvocationContext ctxt,
+		UpdateResourceProperties updateRequest) throws Throwable
+	{
 		EndpointReferenceType target = ctxt.getTarget();
-		UpdateResourcePropertiesResponse response = 
-			(UpdateResourcePropertiesResponse)ctxt.proceed();
+		UpdateResourcePropertiesResponse response = (UpdateResourcePropertiesResponse) ctxt.proceed();
 		storeAttributesInCache(target, updateRequest.getUpdate().get_any());
 		return response;
 	}
-	
+
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public DeleteResourcePropertiesResponse deleteResourceProperties(InvocationContext ctxt, 
-			DeleteResourceProperties deleteRequest) throws Throwable {
+	public DeleteResourcePropertiesResponse deleteResourceProperties(InvocationContext ctxt,
+		DeleteResourceProperties deleteRequest) throws Throwable
+	{
 		EndpointReferenceType target = ctxt.getTarget();
-		DeleteResourcePropertiesResponse response = 
-			(DeleteResourcePropertiesResponse)ctxt.proceed();
-		CacheManager.removeItemFromCache(target, 
-				deleteRequest.getDelete().getResourceProperty(), MessageElement.class);
+		DeleteResourcePropertiesResponse response = (DeleteResourcePropertiesResponse) ctxt.proceed();
+		CacheManager.removeItemFromCache(target, deleteRequest.getDelete().getResourceProperty(), MessageElement.class);
 		return response;
 	}
-	
+
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public InsertResourcePropertiesResponse insertResourceProperties(InvocationContext ctxt, 
-			InsertResourceProperties insertRequest) throws Throwable {
+	public InsertResourcePropertiesResponse insertResourceProperties(InvocationContext ctxt,
+		InsertResourceProperties insertRequest) throws Throwable
+	{
 		EndpointReferenceType target = ctxt.getTarget();
-		InsertResourcePropertiesResponse response = 
-			(InsertResourcePropertiesResponse)ctxt.proceed();
+		InsertResourcePropertiesResponse response = (InsertResourcePropertiesResponse) ctxt.proceed();
 		storeAttributesInCache(target, insertRequest.getInsert().get_any());
 		return response;
 	}
-	
+
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public SetResourcePropertiesResponse setResourceProperties(InvocationContext ctxt, 
-			SetResourceProperties setRequest) throws Throwable {
+	public SetResourcePropertiesResponse setResourceProperties(InvocationContext ctxt, SetResourceProperties setRequest)
+		throws Throwable
+	{
 		EndpointReferenceType target = ctxt.getTarget();
-		SetResourcePropertiesResponse response = 
-			(SetResourcePropertiesResponse)ctxt.proceed();
+		SetResourcePropertiesResponse response = (SetResourcePropertiesResponse) ctxt.proceed();
 		storeAttributesInCache(target, setRequest.getInsert().get_any());
 		storeAttributesInCache(target, setRequest.getUpdate().get_any());
-		CacheManager.removeItemFromCache(target, 
-				setRequest.getDelete().getResourceProperty(), MessageElement.class);
+		CacheManager.removeItemFromCache(target, setRequest.getDelete().getResourceProperty(), MessageElement.class);
 		return response;
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
 	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(InvocationContext ctxt,
-			QName[] getMultipleResourcePropertiesRequest) throws Throwable {
+		QName[] getMultipleResourcePropertiesRequest) throws Throwable
+	{
 		EndpointReferenceType target = ctxt.getTarget();
 
-		Collection<MessageElement> result = 
-			findAttributes(target, getMultipleResourcePropertiesRequest);
+		Collection<MessageElement> result = findAttributes(target, getMultipleResourcePropertiesRequest);
 		if (result != null) {
 			return new GetMultipleResourcePropertiesResponse(result.toArray(new MessageElement[0]));
 		}
 
 		Object[] originalParameters = ctxt.getParams();
-		
+
 		for (QName orig : getMultipleResourcePropertiesRequest) {
-			_logger.debug("Reqested parameter: " + orig);
+			if (_logger.isDebugEnabled())
+				_logger.debug("Reqested parameter: " + orig);
 		}
-		
-		List<QName> addedAttributeNames = 
-			reconfigureToPrefetchAdditionalAttributes(ctxt, getMultipleResourcePropertiesRequest);
-		GetMultipleResourcePropertiesResponse response = 
-				(GetMultipleResourcePropertiesResponse)ctxt.proceed();
+
+		List<QName> addedAttributeNames = reconfigureToPrefetchAdditionalAttributes(ctxt, getMultipleResourcePropertiesRequest);
+		GetMultipleResourcePropertiesResponse response = (GetMultipleResourcePropertiesResponse) ctxt.proceed();
 		storeAttributesInCache(target, response.get_any());
 		filterAddedAttributesFromTheResponse(response, addedAttributeNames);
-		
+
 		ctxt.updateParams(originalParameters);
 		return response;
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetResourcePropertyResponse getResourceProperty(InvocationContext ctxt,
-			QName getResourcePropertyRequest) throws Throwable {
+	public GetResourcePropertyResponse getResourceProperty(InvocationContext ctxt, QName getResourcePropertyRequest)
+		throws Throwable
+	{
 		EndpointReferenceType target = ctxt.getTarget();
-		Collection<MessageElement> result = 
-			findAttribute(target, getResourcePropertyRequest);
+		Collection<MessageElement> result = findAttribute(target, getResourcePropertyRequest);
 		if (result != null) {
 			return new GetResourcePropertyResponse(result.toArray(new MessageElement[0]));
 		}
-		_logger.trace("Reqested resource property: " + getResourcePropertyRequest);
-		
-		GetResourcePropertyResponse response = 
-			(GetResourcePropertyResponse)ctxt.proceed();
+		if (_logger.isTraceEnabled())
+			_logger.trace("Reqested resource property: " + getResourcePropertyRequest);
+
+		GetResourcePropertyResponse response = (GetResourcePropertyResponse) ctxt.proceed();
 		storeAttributesInCache(target, response.get_any());
 		return response;
 	}
 
 	@PipelineProcessor(portType = EnhancedRNSPortType.class)
-	public LookupResponseType lookup(InvocationContext ctxt, String []names) throws Throwable {
+	public LookupResponseType lookup(InvocationContext ctxt, String[] names) throws Throwable
+	{
 
-		LookupResponseType resp = (LookupResponseType)ctxt.proceed();
-		RNSEntryResponseType []initMembers = resp.getEntryResponse();
-		
+		LookupResponseType resp = (LookupResponseType) ctxt.proceed();
+		RNSEntryResponseType[] initMembers = resp.getEntryResponse();
+
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName wsName = new WSName(target);
 		WSResourceConfig targetConfig = null;
 		if (wsName.isValidWSName()) {
-			targetConfig = (WSResourceConfig) CacheManager.getItemFromCache(
-					wsName.getEndpointIdentifier(), WSResourceConfig.class);
+			targetConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(),
+				WSResourceConfig.class);
 		}
-		
+
 		if (initMembers != null) {
 			// let the cache manager to inspect the returned entries and store any important
 			// information, if found.
@@ -237,28 +237,28 @@ public class AttributeCacheHandler2 {
 		}
 		return resp;
 	}
-	
+
 	@PipelineProcessor(portType = WSIteratorPortType.class)
-	public IterateResponseType iterate(InvocationContext ctxt, IterateRequestType iterateRequest) throws Throwable {
-		
-		IterateResponseType resp = (IterateResponseType)ctxt.proceed();
+	public IterateResponseType iterate(InvocationContext ctxt, IterateRequestType iterateRequest) throws Throwable
+	{
+
+		IterateResponseType resp = (IterateResponseType) ctxt.proceed();
 
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName wsName = new WSName(target);
 		WSResourceConfig targetConfig = null;
 		if (wsName.isValidWSName()) {
-			targetConfig = (WSResourceConfig) CacheManager.getItemFromCache(
-					wsName.getEndpointIdentifier(), WSResourceConfig.class);
+			targetConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(),
+				WSResourceConfig.class);
 		}
-		
+
 		if (resp.getIterableElement() != null) {
 			for (IterableElementType member : resp.getIterableElement()) {
-				MessageElement []any = member.get_any();
+				MessageElement[] any = member.get_any();
 				if (any != null && any.length == 1) {
 					QName type = any[0].getQName();
 					if (type != null && type.equals(RNSEntryResponseType.getTypeDesc().getXmlType())) {
-						RNSEntryResponseType entry = ObjectDeserializer.toObject(any[0], 
-								RNSEntryResponseType.class);
+						RNSEntryResponseType entry = ObjectDeserializer.toObject(any[0], RNSEntryResponseType.class);
 						if (targetConfig == null) {
 							CacheManager.cacheReleventInformation(entry);
 						} else {
@@ -270,9 +270,10 @@ public class AttributeCacheHandler2 {
 		}
 		return resp;
 	}
-	
+
 	@PipelineProcessor(portType = EnhancedRNSPortType.class)
-	public RNSEntryResponseType[] add(InvocationContext ctxt, RNSEntryType[] addRequest) throws Throwable {
+	public RNSEntryResponseType[] add(InvocationContext ctxt, RNSEntryType[] addRequest) throws Throwable
+	{
 		RNSEntryResponseType[] resp = (RNSEntryResponseType[]) ctxt.proceed();
 		if (resp != null) {
 			for (RNSEntryResponseType entry : resp) {
@@ -284,9 +285,10 @@ public class AttributeCacheHandler2 {
 		}
 		return resp;
 	}
-	
+
 	@PipelineProcessor(portType = EnhancedRNSPortType.class)
-	public CreateFileResponseType createFile(InvocationContext ctxt, CreateFileRequestType createFile) throws Throwable {
+	public CreateFileResponseType createFile(InvocationContext ctxt, CreateFileRequestType createFile) throws Throwable
+	{
 		EndpointReferenceType target = ctxt.getTarget();
 		CreateFileResponseType resp = (CreateFileResponseType) ctxt.proceed();
 		if (resp != null) {
@@ -294,9 +296,10 @@ public class AttributeCacheHandler2 {
 		}
 		return resp;
 	}
-	
+
 	@PipelineProcessor(portType = EnhancedRNSPortType.class)
-	public RNSEntryResponseType[] remove(InvocationContext ctxt, String[] removeRequest) throws Throwable {
+	public RNSEntryResponseType[] remove(InvocationContext ctxt, String[] removeRequest) throws Throwable
+	{
 		RNSEntryResponseType[] resp = (RNSEntryResponseType[]) ctxt.proceed();
 		if (resp != null) {
 			int numberOfRemovedEntries = resp.length;
@@ -305,102 +308,115 @@ public class AttributeCacheHandler2 {
 		}
 		return resp;
 	}
-	
+
 	@PipelineProcessor(portType = RandomByteIOPortType.class)
-	public WriteResponse write(InvocationContext ctxt, Write write) throws Throwable {
+	public WriteResponse write(InvocationContext ctxt, Write write) throws Throwable
+	{
 		removeByteIOAttributesBeforeWrite(ctxt);
 		WriteResponse resp = (WriteResponse) ctxt.proceed();
-		if (resp != null) storePiggyBackedByteIOAttributes(ctxt, resp.getTransferInformation());
-		return resp;
-	}
-	
-	@PipelineProcessor(portType = RandomByteIOPortType.class)
-	public AppendResponse append(InvocationContext ctxt, Append append) throws Throwable {
-		removeByteIOAttributesBeforeWrite(ctxt);
-		AppendResponse resp = (AppendResponse) ctxt.proceed();
-		if (resp != null) storePiggyBackedByteIOAttributes(ctxt, resp.getTransferInformation());
-		return resp;
-	}
-	
-	@PipelineProcessor(portType = RandomByteIOPortType.class)
-	public TruncAppendResponse truncAppend(InvocationContext ctxt, TruncAppend truncAppend) throws Throwable {
-		removeByteIOAttributesBeforeWrite(ctxt);
-		TruncAppendResponse resp = (TruncAppendResponse) ctxt.proceed();
-		if (resp != null) storePiggyBackedByteIOAttributes(ctxt, resp.getTransferInformation());
-		return resp;
-	}
-	
-	@PipelineProcessor(portType = StreamableByteIOPortType.class)
-	public SeekWriteResponse seekWrite(InvocationContext ctxt, SeekWrite seekWriteRequest) throws Throwable {
-		removeByteIOAttributesBeforeWrite(ctxt);
-		SeekWriteResponse resp = (SeekWriteResponse) ctxt.proceed();
-		if (resp != null) storePiggyBackedByteIOAttributes(ctxt, resp.getTransferInformation());
+		if (resp != null)
+			storePiggyBackedByteIOAttributes(ctxt, resp.getTransferInformation());
 		return resp;
 	}
 
-	private void storePiggyBackedByteIOAttributes(InvocationContext ctxt,
-			TransferInformationType transferInformation) {
+	@PipelineProcessor(portType = RandomByteIOPortType.class)
+	public AppendResponse append(InvocationContext ctxt, Append append) throws Throwable
+	{
+		removeByteIOAttributesBeforeWrite(ctxt);
+		AppendResponse resp = (AppendResponse) ctxt.proceed();
+		if (resp != null)
+			storePiggyBackedByteIOAttributes(ctxt, resp.getTransferInformation());
+		return resp;
+	}
+
+	@PipelineProcessor(portType = RandomByteIOPortType.class)
+	public TruncAppendResponse truncAppend(InvocationContext ctxt, TruncAppend truncAppend) throws Throwable
+	{
+		removeByteIOAttributesBeforeWrite(ctxt);
+		TruncAppendResponse resp = (TruncAppendResponse) ctxt.proceed();
+		if (resp != null)
+			storePiggyBackedByteIOAttributes(ctxt, resp.getTransferInformation());
+		return resp;
+	}
+
+	@PipelineProcessor(portType = StreamableByteIOPortType.class)
+	public SeekWriteResponse seekWrite(InvocationContext ctxt, SeekWrite seekWriteRequest) throws Throwable
+	{
+		removeByteIOAttributesBeforeWrite(ctxt);
+		SeekWriteResponse resp = (SeekWriteResponse) ctxt.proceed();
+		if (resp != null)
+			storePiggyBackedByteIOAttributes(ctxt, resp.getTransferInformation());
+		return resp;
+	}
+
+	private void storePiggyBackedByteIOAttributes(InvocationContext ctxt, TransferInformationType transferInformation)
+	{
 		EndpointReferenceType target = ctxt.getTarget();
 		if (transferInformation != null) {
 			MessageElement[] piggyBackedAttributes = transferInformation.get_any();
 			storeAttributesInCache(target, piggyBackedAttributes);
-		} 
+		}
 	}
-	
-	private void removeByteIOAttributesBeforeWrite(InvocationContext ctxt) {
+
+	private void removeByteIOAttributesBeforeWrite(InvocationContext ctxt)
+	{
 		EndpointReferenceType target = ctxt.getTarget();
 		MetadataManager.updateAttributesAfterWrite(target);
 	}
-	
-	private void storeAttributesInCache(EndpointReferenceType target, MessageElement[] attributes) {
+
+	private void storeAttributesInCache(EndpointReferenceType target, MessageElement[] attributes)
+	{
 		if (attributes != null) {
 			for (MessageElement element : attributes) {
 				CacheManager.putItemInCache(target, element.getQName(), element);
 			}
 		}
 	}
-	
-	private Collection<MessageElement> findAttribute(EndpointReferenceType target, QName attr) {
-		QName[] attrArray = new QName[] {attr};
+
+	private Collection<MessageElement> findAttribute(EndpointReferenceType target, QName attr)
+	{
+		QName[] attrArray = new QName[] { attr };
 		return findAttributes(target, attrArray);
 	}
-	
-	private Collection<MessageElement> findAttributes(EndpointReferenceType target, 
-			QName []attrs) {
+
+	private Collection<MessageElement> findAttributes(EndpointReferenceType target, QName[] attrs)
+	{
 		Collection<MessageElement> result = new ArrayList<MessageElement>();
 		for (QName attr : attrs) {
-			Object cachedValue = 
-				CacheManager.getItemFromCache(target, attr, MessageElement.class);
-			if (cachedValue == null) return null;
+			Object cachedValue = CacheManager.getItemFromCache(target, attr, MessageElement.class);
+			if (cachedValue == null)
+				return null;
 			if (cachedValue instanceof MessageElement) {
 				result.add((MessageElement) cachedValue);
 			} else {
 				@SuppressWarnings("unchecked")
-				Collection<MessageElement> collection = 
-					(Collection<MessageElement>) cachedValue;
+				Collection<MessageElement> collection = (Collection<MessageElement>) cachedValue;
 				result.addAll(collection);
 			}
 		}
 		return result;
 	}
-	
+
 	/*
-	 * reconfigureToPrefetchAdditionalAttributes and filterAddedAttributesFromTheResponse are the two methods that 
-	 * deal with prefetching additional attributes with a getMultipleAttributes request and remove those extra attributes 
-	 * from the response to keep the process transparent to the caller. Note that, we are relying on the fact that
-	 * retrieving these additional attributes will not increase the cost on the container significantly and most often
-	 * the client will need to access the added attributes subsequently.
+	 * reconfigureToPrefetchAdditionalAttributes and filterAddedAttributesFromTheResponse are the
+	 * two methods that deal with prefetching additional attributes with a getMultipleAttributes
+	 * request and remove those extra attributes from the response to keep the process transparent
+	 * to the caller. Note that, we are relying on the fact that retrieving these additional
+	 * attributes will not increase the cost on the container significantly and most often the
+	 * client will need to access the added attributes subsequently.
 	 * 
-	 * Note that we are not checking whether or not the requested attributes are already in the cache. This is done to
-	 * improve the freshness of the cached attributes.  
-	 * */
-	private List<QName> reconfigureToPrefetchAdditionalAttributes(InvocationContext ctxt, QName[] originallyRequestedAttributes) {
+	 * Note that we are not checking whether or not the requested attributes are already in the
+	 * cache. This is done to improve the freshness of the cached attributes.
+	 */
+	private List<QName> reconfigureToPrefetchAdditionalAttributes(InvocationContext ctxt, QName[] originallyRequestedAttributes)
+	{
 
 		EndpointReferenceType target = ctxt.getTarget();
 		TypeInformation typeInformation = new TypeInformation(target);
-	
-		if (!isSafePortTypeForCallAggregation(typeInformation, target)) return null;
-		
+
+		if (!isSafePortTypeForCallAggregation(typeInformation, target))
+			return null;
+
 		List<QName> potentialToBeAddedAttributes = new ArrayList<QName>();
 		potentialToBeAddedAttributes.add(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME);
 		if (typeInformation.isEnhancedRNS()) {
@@ -430,7 +446,8 @@ public class AttributeCacheHandler2 {
 					break;
 				}
 			}
-			if (attributeAlreadyRequested) iterator.remove();
+			if (attributeAlreadyRequested)
+				iterator.remove();
 		}
 		if (!potentialToBeAddedAttributes.isEmpty()) {
 			int totalAttributes = originallyRequestedAttributes.length + potentialToBeAddedAttributes.size();
@@ -444,18 +461,21 @@ public class AttributeCacheHandler2 {
 				modifiedRequest[index] = newAttribute;
 				index++;
 			}
-			ctxt.updateParams(new Object[] {modifiedRequest});
+			ctxt.updateParams(new Object[] { modifiedRequest });
 			return potentialToBeAddedAttributes;
 		}
 		return null;
 	}
-	
-	private void filterAddedAttributesFromTheResponse(GetMultipleResourcePropertiesResponse response, 
-			List<QName> addedAttributeList) {
+
+	private void filterAddedAttributesFromTheResponse(GetMultipleResourcePropertiesResponse response,
+		List<QName> addedAttributeList)
+	{
 		MessageElement[] elements = response.get_any();
-		if (elements == null) return;
-		if (addedAttributeList == null || addedAttributeList.isEmpty()) return;
-		Set<QName> addedAttributes = new HashSet<QName>(addedAttributeList); 
+		if (elements == null)
+			return;
+		if (addedAttributeList == null || addedAttributeList.isEmpty())
+			return;
+		Set<QName> addedAttributes = new HashSet<QName>(addedAttributeList);
 		List<MessageElement> baseResponse = new ArrayList<MessageElement>();
 		for (MessageElement element : elements) {
 			QName qName = element.getQName();
@@ -465,24 +485,28 @@ public class AttributeCacheHandler2 {
 		}
 		response.set_any(baseResponse.toArray(new MessageElement[baseResponse.size()]));
 	}
-	
+
 	/*
-	 * Ideally any port-type that extends byteIO or enhanced-RNS port-types should have the additional attributes
-	 * that we chunk with a request for retrieving resource properties. Unfortunately, this is not the case. For 
-	 * many port-types in our system we don't have the required attributes of byteIOs or enhanced-RNSes, depending 
-	 * on which one is applicable. Therefore, this method is used to explicitly validate that the target is a ByteIO 
-	 * or Enhanced-RNS, where our property aggregation operation is safe to do.
-	 * */
-	private boolean isSafePortTypeForCallAggregation(TypeInformation typeInfo, EndpointReferenceType target) {
-		
-		if (typeInfo.isResourceFork()) return false;
-		if (!typeInfo.isRNS() && !typeInfo.isByteIO()) return false;
-	
+	 * Ideally any port-type that extends byteIO or enhanced-RNS port-types should have the
+	 * additional attributes that we chunk with a request for retrieving resource properties.
+	 * Unfortunately, this is not the case. For many port-types in our system we don't have the
+	 * required attributes of byteIOs or enhanced-RNSes, depending on which one is applicable.
+	 * Therefore, this method is used to explicitly validate that the target is a ByteIO or
+	 * Enhanced-RNS, where our property aggregation operation is safe to do.
+	 */
+	private boolean isSafePortTypeForCallAggregation(TypeInformation typeInfo, EndpointReferenceType target)
+	{
+
+		if (typeInfo.isResourceFork())
+			return false;
+		if (!typeInfo.isRNS() && !typeInfo.isByteIO())
+			return false;
+
 		try {
 			MetadataType metaData = target.getMetadata();
 			if (metaData != null && metaData.get_any() != null) {
 
-				QName portTypeAttributeName = new QName(WSAddressingConstants.WSA_NS,"PortType");
+				QName portTypeAttributeName = new QName(WSAddressingConstants.WSA_NS, "PortType");
 				String portTypeValue = null;
 				for (MessageElement element : metaData.get_any()) {
 					if (element.getQName().equals(portTypeAttributeName)) {
@@ -491,18 +515,20 @@ public class AttributeCacheHandler2 {
 					}
 				}
 				if (portTypeValue != null) {
-					if (portTypeValue.endsWith("RandomByteIOPortType") 
-							|| portTypeValue.endsWith("StreamableByteIOPortType")) {
-						_logger.debug("matching ByteIO port-type has been found");
+					if (portTypeValue.endsWith("RandomByteIOPortType") || portTypeValue.endsWith("StreamableByteIOPortType")) {
+						if (_logger.isDebugEnabled())
+							_logger.debug("matching ByteIO port-type has been found");
 						return true;
 					} else if (portTypeValue.endsWith("EnhancedRNSPortType")) {
-						_logger.debug("matching RNS port-type has been found");
+						if (_logger.isDebugEnabled())
+							_logger.debug("matching RNS port-type has been found");
 						return true;
 					}
 				}
 			}
 		} catch (Exception ex) {
-			_logger.debug("Failed to parse EPR to retrieve port-type information" + ex.getMessage());
+			if (_logger.isDebugEnabled())
+				_logger.debug("Failed to parse EPR to retrieve port-type information" + ex.getMessage());
 		}
 		return false;
 	}

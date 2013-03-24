@@ -19,21 +19,16 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 public class CdTool extends BaseGridTool
 {
-	static final private String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcd";
-	static final private String _USAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucd";
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/cd";
-		
-	
+	static final private String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dcd";
+	static final private String _USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/ucd";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/cd";
+
 	public CdTool()
 	{
-		super(new FileResource(_DESCRIPTION), 
-				new FileResource(_USAGE), false, ToolCategory.DATA);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.DATA);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
@@ -44,35 +39,28 @@ public class CdTool extends BaseGridTool
 	@Override
 	protected void verify() throws ToolException
 	{
-		if (numArguments() == 0)
-		{
-			Map<String, String> env = 
-				GridUserEnvironment.getGridUserEnvironment();
+		if (numArguments() == 0) {
+			Map<String, String> env = GridUserEnvironment.getGridUserEnvironment();
 			String value = env.get("HOME");
 			if (value == null)
-				throw new InvalidToolUsageException(
-					"\"HOME\" variable undefined.");
-			
+				throw new InvalidToolUsageException("\"HOME\" variable undefined.");
+
 			addArgument(value);
 		}
-		
+
 		if (numArguments() != 1)
 			throw new InvalidToolUsageException();
 	}
-	
 
-	static public void chdir(String target)
-		throws ResourceException, RNSException, RemoteException,
-			IOException, InvalidToolUsageException
+	static public void chdir(String target) throws ResourceException, RNSException, RemoteException, IOException,
+		InvalidToolUsageException
 	{
-		RNSPath path = lookup(
-			new GeniiPath(target), RNSPathQueryFlags.MUST_EXIST);
+		RNSPath path = lookup(new GeniiPath(target), RNSPathQueryFlags.MUST_EXIST);
 		TypeInformation typeInfo = new TypeInformation(path.getEndpoint());
 		if (!typeInfo.isRNS())
-			throw new RNSException("Path \"" + path.pwd() + 
-				"\" is not an RNS directory.");
-		
-		ICallingContext ctxt = ContextManager.getCurrentContext();
+			throw new RNSException("Path \"" + path.pwd() + "\" is not an RNS directory.");
+
+		ICallingContext ctxt = ContextManager.getExistingContext();
 		ctxt.setCurrentPath(path);
 		ContextManager.storeCurrentContext(ctxt);
 	}

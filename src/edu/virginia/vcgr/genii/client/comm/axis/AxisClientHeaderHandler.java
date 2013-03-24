@@ -18,9 +18,11 @@ package edu.virginia.vcgr.genii.client.comm.axis;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.EnumSet;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -54,6 +56,16 @@ import edu.virginia.vcgr.genii.client.invoke.handlers.MyProxyCertificate;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.context.ContextType;
+import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.SecurityConstants;
+import edu.virginia.vcgr.genii.security.TransientCredentials;
+import edu.virginia.vcgr.genii.security.axis.AxisSAMLCredentials;
+import edu.virginia.vcgr.genii.security.credentials.BasicConstraints;
+import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
+import edu.virginia.vcgr.genii.security.credentials.NuCredential;
+import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
+import edu.virginia.vcgr.genii.security.identity.IdentityType;
+import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 public class AxisClientHeaderHandler extends BasicHandler
 {
@@ -184,6 +196,49 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 	}
 
+	public static void delegateCredentials(CredentialWallet wallet, ICallingContext callingContext,
+		MessageContext messageContext, MessageSecurity msgSecData) throws Exception
+	{
+		if (wallet == null || wallet.getCredentials().isEmpty())
+			return;
+		if (msgSecData == null)
+			return;
+
+		X509Certificate[] resourceCertChain = msgSecData._resourceCertChain;
+		KeyAndCertMaterial clientKeyAndCertificate = callingContext.getActiveKeyAndCertMaterial();
+
+		long beginTime = System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset;
+		long endTime = System.currentTimeMillis() + SecurityConstants.CredentialExpirationMillis;
+
+		BasicConstraints restrictions = new BasicConstraints(beginTime, endTime, SecurityConstants.MaxDelegationDepth);
+
+		EnumSet<RWXCategory> accessCategories = EnumSet.of(RWXCategory.READ, RWXCategory.WRITE, RWXCategory.EXECUTE);
+
+		/*
+		 * A new credentials wallet is needed for the resource. Otherwise, the operation of
+		 * delegation will corrupt client's own credentials wallet.
+		 */
+		AxisSAMLCredentials walletForResource = new AxisSAMLCredentials();
+
+		boolean foundAny = false;
+		for (TrustCredential trustDelegation : wallet.getCredentials()) {
+			walletForResource.getRealCreds().addCredential(trustDelegation);
+			foundAny = true;
+			if (resourceCertChain == null) {
+				_logger.info("this is odd, resource cert chain is null.  just using bare credentials.");
+			} else {
+				walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
+					clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
+					accessCategories, trustDelegation);
+			}
+		}
+
+		if (!foundAny)
+			_logger.error("Found no credentials to delegate for soap header!");
+		final javax.xml.soap.SOAPHeader soapHeader = messageContext.getMessage().getSOAPHeader();
+		soapHeader.addChildElement(walletForResource.convertToSOAPElement());
+	}
+
 	@SuppressWarnings("unchecked")
 	private void setCallingContextHeaders(MessageContext msgContext) throws AxisFault
 	{
@@ -211,6 +266,16 @@ public class AxisClientHeaderHandler extends BasicHandler
 			callContext = callContext.deriveNewContext();
 		}
 
+		// load the credentials up that we will be sending out.
+		CredentialWallet wallet = new CredentialWallet();
+		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
+		if (transientCredentials != null) {
+			for (NuCredential cred : transientCredentials.getCredentials()) {
+				if (cred instanceof TrustCredential)
+					wallet.addCredential((TrustCredential) cred);
+			}
+		}
+
 		// process the transient credentials to prepare
 		// the serializable portion of the calling context for them
 		MessageSecurity msgSecData = (MessageSecurity) msgContext.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
@@ -218,7 +283,13 @@ public class AxisClientHeaderHandler extends BasicHandler
 		// Prepare outgoing credentials contained within the
 		// calling-context's TransientCredentials, performing pre-delegation
 		// and serialization steps.
-		MessageSecurity.messageSendPrepareHandler(callContext, msgContext.getOperation().getMethod(), msgSecData);
+		MessageSecurity.messageSendPrepareHandler(callContext, msgContext, msgSecData);
+
+		try {
+			delegateCredentials(wallet, callContext, msgContext, msgSecData);
+		} catch (Exception ex) {
+			_logger.warn("ERROR: Failed to delegate SAML credentials.", ex);
+		}
 
 		try {
 			if (_logger.isTraceEnabled()) {
@@ -264,7 +335,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 	private void setMyProxyCertificateHeaders(MessageContext msgContext) throws AxisFault
 	{
-		_logger.debug("THE HEADER IS SET TO " + MyProxyCertificate.getPEMString());
+		if (_logger.isDebugEnabled())
+			_logger.debug("THE HEADER IS SET TO " + MyProxyCertificate.getPEMString());
 		SOAPHeaderElement pemKey = new SOAPHeaderElement(GenesisIIConstants.MYPROXY_QNAME, MyProxyCertificate.getPEMString());
 		try {
 			msgContext.getMessage().getSOAPHeader().addChildElement(pemKey);

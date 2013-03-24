@@ -10,30 +10,25 @@ import java.util.ServiceLoader;
 public class PostProtocols
 {
 	static private Map<String, PostProtocol> _postProtocols = null;
-	
+
 	synchronized static public OutputStream openPostProtocol(URI target)
 	{
 		PostProtocol poster;
-		
-		if (_postProtocols == null)
-		{
+
+		if (_postProtocols == null) {
 			_postProtocols = new HashMap<String, PostProtocol>();
-			ServiceLoader<PostProtocol> loader = ServiceLoader.load(
-				PostProtocol.class);
-			for (PostProtocol pp : loader)
-			{
+			ServiceLoader<PostProtocol> loader = ServiceLoader.load(PostProtocol.class);
+			for (PostProtocol pp : loader) {
 				for (String protocol : pp.handledProtocols())
 					_postProtocols.put(protocol, pp);
 			}
 		}
-		
-		synchronized(_postProtocols)
-		{
+
+		synchronized (_postProtocols) {
 			poster = _postProtocols.get(target.getScheme());
 		}
-		
-		if (poster == null)
-		{
+
+		if (poster == null) {
 			return new OutputStream()
 			{
 				@Override
@@ -43,7 +38,7 @@ public class PostProtocols
 				}
 			};
 		}
-		
+
 		return poster.postStream(target);
 	}
 }

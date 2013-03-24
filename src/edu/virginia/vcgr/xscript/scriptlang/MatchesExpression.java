@@ -11,20 +11,17 @@ public class MatchesExpression extends AbstractConditionExpression
 {
 	private String _string;
 	private String _pattern;
-	
+
 	public MatchesExpression(String string, String pattern)
 	{
 		_string = string;
 		_pattern = pattern;
 	}
-	
+
 	@Override
-	public boolean evaluateCondition(XScriptContext context)
-			throws ScriptException
+	public boolean evaluateCondition(XScriptContext context) throws ScriptException
 	{
-		Pattern pattern = Pattern.compile(
-			MacroReplacer.replaceMacros(context, _pattern));
-		return pattern.matcher(MacroReplacer.replaceMacros(
-			context, _string)).matches();
+		Pattern pattern = Pattern.compile(MacroReplacer.replaceMacros(context, _pattern));
+		return pattern.matcher(MacroReplacer.replaceMacros(context, _string)).matches();
 	}
 }

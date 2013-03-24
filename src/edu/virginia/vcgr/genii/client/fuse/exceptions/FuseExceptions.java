@@ -22,7 +22,7 @@ public class FuseExceptions
 	static public FuseException translate(String message, Throwable cause)
 	{
 		if (cause instanceof FuseException)
-			return (FuseException)cause;
+			return (FuseException) cause;
 		else if (cause instanceof RNSPathAlreadyExistsException)
 			return new FuseEntryAlreadyExistsException(message, cause);
 		else if (cause instanceof RNSPathDoesNotExistException)
@@ -53,7 +53,7 @@ public class FuseExceptions
 			return translate(message, cause.getCause());
 		else if (cause instanceof FSSecurityException)
 			return new FusePermissionDeniedException(message, cause);
-		else				
+		else
 			return new FuseUnknownException(message, cause);
 	}
 }

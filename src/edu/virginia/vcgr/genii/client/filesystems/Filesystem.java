@@ -7,19 +7,16 @@ import java.util.concurrent.TimeUnit;
 
 public interface Filesystem
 {
-	void addSandbox(String sandboxName, String relativePath,
-		boolean doCreate) throws FileNotFoundException;
-	
+	void addSandbox(String sandboxName, String relativePath, boolean doCreate) throws FileNotFoundException;
+
 	public Set<FilesystemProperties> properties();
-	
+
 	public File filesystemRoot();
-	
-	public FilesystemSandbox openSandbox(String sandboxName)
-		throws FileNotFoundException;
-	
-	public FilesystemWatchRegistration addWatch(Integer callLimit, 
-		long checkPeriod, TimeUnit checkPeriodUnits, 
+
+	public FilesystemSandbox openSandbox(String sandboxName) throws FileNotFoundException;
+
+	public FilesystemWatchRegistration addWatch(Integer callLimit, long checkPeriod, TimeUnit checkPeriodUnits,
 		FilesystemWatchFilter filter, FilesystemWatchHandler handler);
-	
+
 	public FilesystemUsageInformation currentUsage();
 }

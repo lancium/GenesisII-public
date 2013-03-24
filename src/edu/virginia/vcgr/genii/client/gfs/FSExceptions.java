@@ -15,7 +15,7 @@ public class FSExceptions
 	static public FSException translate(String message, Throwable cause)
 	{
 		if (cause instanceof FSException)
-			return (FSException)cause;
+			return (FSException) cause;
 		else if (cause instanceof RNSPathAlreadyExistsException)
 			return new FSEntryAlreadyExistsException(message, cause);
 		else if (cause instanceof RNSPathDoesNotExistException)

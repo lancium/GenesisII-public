@@ -9,13 +9,12 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfi
 public interface NativeQueue
 {
 	public String getProviderName();
+
 	public Class<?> providerConfigurationType();
+
 	public ResourceManagerType resourceManagerType();
-	
-	public NativeQueueConnection connect(
-		ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorCon,
-		File workingDirectory,
-		NativeQueueConfiguration nativeQueueConfiguration,
-		Object providerConfiguration) throws NativeQueueException;
+
+	public NativeQueueConnection connect(ResourceOverrides resourceOverrides,
+		CmdLineManipulatorConfiguration cmdLineManipulatorCon, File workingDirectory,
+		NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException;
 }

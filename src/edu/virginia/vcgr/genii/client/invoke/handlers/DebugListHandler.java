@@ -5,7 +5,7 @@ import org.ggf.rns.RNSPortType;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
 
-public class DebugListHandler 
+public class DebugListHandler
 {
 	@PipelineProcessor(portType = RNSPortType.class)
 	public int list(InvocationContext ctxt, int listRequest) throws Throwable

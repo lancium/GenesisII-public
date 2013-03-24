@@ -14,42 +14,29 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 public class BESManagementPlugin implements ITabPlugin
 {
 	@Override
-	public Component getComponent(RNSPath[] selectedPaths)
-			throws PluginException
+	public Component getComponent(RNSPath[] selectedPaths) throws PluginException
 	{
-		try
-		{
-			return new BESManagerPanel(ContextManager.getCurrentContext(),
-				selectedPaths[0].getEndpoint());
-		}
-		catch (Throwable cause)
-		{
-			throw new PluginException(
-				"Unable to communicate with BES container.", cause);
+		try {
+			return new BESManagerPanel(ContextManager.getExistingContext(), selectedPaths[0].getEndpoint());
+		} catch (Throwable cause) {
+			throw new PluginException("Unable to communicate with BES container.", cause);
 		}
 	}
 
 	@Override
-	public PluginStatus getStatus(RNSPath[] selectedResources)
-			throws PluginException
+	public PluginStatus getStatus(RNSPath[] selectedResources) throws PluginException
 	{
-		try
-		{
-			if (selectedResources != null && selectedResources.length == 1)
-			{
-				TypeInformation info = new TypeInformation(
-					selectedResources[0].getEndpoint());
+		try {
+			if (selectedResources != null && selectedResources.length == 1) {
+				TypeInformation info = new TypeInformation(selectedResources[0].getEndpoint());
 				if (info.isBESContainer())
 					return PluginStatus.ACTIVTE;
 			}
+		} catch (RNSPathDoesNotExistException e) {
+			throw new PluginException("Unexpected RNSPath referring to non-existant directory \"" + selectedResources[0].pwd()
+				+ "\".", e);
 		}
-		catch (RNSPathDoesNotExistException e)
-		{
-			throw new PluginException(
-				"Unexpected RNSPath referring to non-existant directory \"" 
-				+ selectedResources[0].pwd() + "\".", e);
-		}
-		
+
 		return PluginStatus.INACTIVE;
 	}
 }

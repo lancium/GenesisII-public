@@ -12,7 +12,7 @@ public class GridJobToolApplication extends AbstractExternalApplication
 	public GridJobToolApplication()
 	{
 	}
-	
+
 	@Override
 	protected void doRun(File content) throws Throwable
 	{
@@ -22,7 +22,7 @@ public class GridJobToolApplication extends AbstractExternalApplication
 		JobTool.launch(initialFiles, null, waiter);
 		waiter.join();
 	}
-	
+
 	@Override
 	public String toString()
 	{

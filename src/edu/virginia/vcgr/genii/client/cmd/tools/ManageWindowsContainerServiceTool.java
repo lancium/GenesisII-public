@@ -20,123 +20,100 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class ManageWindowsContainerServiceTool extends BaseGridTool
 {
-	static private Log _logger = LogFactory.getLog(
-		ManageWindowsContainerServiceTool.class);
-	
-	static final private String USAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/umanage-windows-container-service";
-	static final private String DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dmanage-windows-container-service";
-	
+	static private Log _logger = LogFactory.getLog(ManageWindowsContainerServiceTool.class);
+
+	static final private String USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/umanage-windows-container-service";
+	static final private String DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dmanage-windows-container-service";
+
 	private boolean _install = false;
 	private boolean _uninstall = false;
 	private String _serviceName = "Genesis II Container";
 	private String _account = null;
 	private String _password = null;
-	
+
 	public ManageWindowsContainerServiceTool()
 	{
-		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true,
-				ToolCategory.ADMINISTRATION);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true, ToolCategory.ADMINISTRATION);
 	}
-	
-	@Option({"service-name"})
+
+	@Option({ "service-name" })
 	public void setService_name(String serviceName)
 	{
 		_serviceName = serviceName;
 	}
-	
-	@Option({"account"})
+
+	@Option({ "account" })
 	public void setAccount(String account)
 	{
 		_account = account;
 	}
-	
-	@Option({"password"})
+
+	@Option({ "password" })
 	public void setPassword(String password)
 	{
 		_password = password;
 	}
-	
-	@Option({"i"})
+
+	@Option({ "i" })
 	public void setI()
 	{
 		_install = true;
 	}
-	
-	@Option({"u"})
+
+	@Option({ "u" })
 	public void setU()
 	{
 		_uninstall = true;
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		int result = 0;
-		
-		Properties webContainerProperties = Installation.getDeployment(
-			new DeploymentName()).webContainerProperties();
-		int port = Integer.parseInt(webContainerProperties.getProperty(
-			WebContainerConstants.LISTEN_PORT_PROP, "18080"));
-		
+
+		Properties webContainerProperties = Installation.getDeployment(new DeploymentName()).webContainerProperties();
+		int port = Integer.parseInt(webContainerProperties.getProperty(WebContainerConstants.LISTEN_PORT_PROP, "18080"));
+
 		ExecutionTask tasks[];
-		
+
 		if (_install)
-			tasks = new ExecutionTask[] {
-				GenesisIIContainerService.installGenesisIIContainer(
-					_account, _password),
+			tasks = new ExecutionTask[] { GenesisIIContainerService.installGenesisIIContainer(_account, _password),
 				WindowsRights.grantLogonAsService(_account),
-				WindowsFirewall.createOpenPortTask(_serviceName, port, 
-					WindowsFirewall.FirewallPortTypes.TCP),
-				WindowsServices.createStartServiceTask("Genesis II Container"),
-			};
+				WindowsFirewall.createOpenPortTask(_serviceName, port, WindowsFirewall.FirewallPortTypes.TCP),
+				WindowsServices.createStartServiceTask("Genesis II Container"), };
 		else
-			tasks = new ExecutionTask[] {
-				WindowsServices.createStopServiceTask("Genesis II Container"),
-				WindowsFirewall.createClosePortTask(port,
-					WindowsFirewall.FirewallPortTypes.TCP),
-				GenesisIIContainerService.uninstallGenesisIIContainer()
-			};
-		
-		for (ExecutionTask eTask : tasks)
-		{
+			tasks = new ExecutionTask[] { WindowsServices.createStopServiceTask("Genesis II Container"),
+				WindowsFirewall.createClosePortTask(port, WindowsFirewall.FirewallPortTypes.TCP),
+				GenesisIIContainerService.uninstallGenesisIIContainer() };
+
+		for (ExecutionTask eTask : tasks) {
 			boolean success = false;
-			for (int lcv = 0; lcv < 5; lcv++)
-			{
-				try
-				{
-					ExecutionEngine.execute(null, System.out, System.err,
-						eTask);
+			for (int lcv = 0; lcv < 5; lcv++) {
+				try {
+					ExecutionEngine.execute(null, System.out, System.err, eTask);
 					success = true;
 					break;
-				}
-				catch (Throwable cause)
-				{
-					_logger.error(String.format(
-						"Unable to execute task(%s).", eTask), cause);
-					try { Thread.sleep(1000L * 5); } catch (InterruptedException ie) {}
+				} catch (Throwable cause) {
+					_logger.error(String.format("Unable to execute task(%s).", eTask), cause);
+					try {
+						Thread.sleep(1000L * 5);
+					} catch (InterruptedException ie) {
+					}
 				}
 			}
-			
-			if (!success)
-			{
-				if (_install)
-				{
-					_logger.error(String.format(
-						"Failed to execute task(%s) with all retries -- " +
-						"giving up.", eTask));
+
+			if (!success) {
+				if (_install) {
+					_logger.error(String.format("Failed to execute task(%s) with all retries -- " + "giving up.", eTask));
 					return 1;
-				} else
-				{
-					_logger.error(String.format(
-						"Failed to execute task(%s) with all retries -- " +
-						"we'll keep going just in case.", eTask));
+				} else {
+					_logger.error(String.format("Failed to execute task(%s) with all retries -- "
+						+ "we'll keep going just in case.", eTask));
 					result = 1;
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -144,7 +121,6 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 	protected void verify() throws ToolException
 	{
 		if (_uninstall == _install)
-			throw new InvalidToolUsageException(
-				"Must specify either install or uninstall flag.");
+			throw new InvalidToolUsageException("Must specify either install or uninstall flag.");
 	}
 }

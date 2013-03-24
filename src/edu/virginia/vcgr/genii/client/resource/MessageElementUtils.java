@@ -30,49 +30,37 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
 public class MessageElementUtils
 {
-	static public byte[] toBytes(MessageElement me)
-		throws ResourceException
+	static public byte[] toBytes(MessageElement me) throws ResourceException
 	{
 		ByteArrayOutputStream baos = null;
-		
-		try
-		{
+
+		try {
 			baos = new ByteArrayOutputStream();
-			OutputStreamWriter writer =  new OutputStreamWriter(baos);
-	        try {
-	            AnyHelper.write(writer, me);
-	        } catch (Exception e) {
-	            throw new ResourceException("Generic Serialization Error.", e);
-	        }
+			OutputStreamWriter writer = new OutputStreamWriter(baos);
+			try {
+				AnyHelper.write(writer, me);
+			} catch (Exception e) {
+				throw new ResourceException("Generic Serialization Error.", e);
+			}
 			writer.flush();
 			writer.close();
 			return baos.toByteArray();
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new ResourceException(ioe.toString(), ioe);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(baos);
 		}
-			
+
 	}
-	
-	static public MessageElement fromBytes(byte []data)
-		throws ResourceException
+
+	static public MessageElement fromBytes(byte[] data) throws ResourceException
 	{
 		ByteArrayInputStream bais = null;
-		
-		try
-		{
+
+		try {
 			bais = new ByteArrayInputStream(data);
-			return (MessageElement)ObjectDeserializer.deserialize(
-				new InputSource(bais),
-				MessageElement.class);
-		}
-		finally
-		{
+			return (MessageElement) ObjectDeserializer.deserialize(new InputSource(bais), MessageElement.class);
+		} finally {
 			StreamUtils.close(bais);
 		}
 	}

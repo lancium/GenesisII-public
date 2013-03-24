@@ -7,6 +7,5 @@ package edu.virginia.vcgr.genii.ui.utils;
  */
 public interface ILoggingRecipient
 {
-  public boolean consumeLogging(String message, Throwable cause);
+	public boolean consumeLogging(String message, Throwable cause);
 }
-

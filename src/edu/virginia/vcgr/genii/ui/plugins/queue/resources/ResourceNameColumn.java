@@ -2,8 +2,7 @@ package edu.virginia.vcgr.genii.ui.plugins.queue.resources;
 
 import org.morgan.util.gui.table.AbstractRowTableColumnDefinition;
 
-class ResourceNameColumn
-	extends AbstractRowTableColumnDefinition<QueueResourceInformation, String>
+class ResourceNameColumn extends AbstractRowTableColumnDefinition<QueueResourceInformation, String>
 {
 	ResourceNameColumn()
 	{

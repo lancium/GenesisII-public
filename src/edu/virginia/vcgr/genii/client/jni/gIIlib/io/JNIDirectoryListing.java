@@ -20,63 +20,51 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 public class JNIDirectoryListing extends JNILibraryBase
 {
 	static private Log _logger = LogFactory.getLog(JNIDirectoryListing.class);
-	
-	public static ArrayList<String> getDirectoryListing(Integer handle, 
-		String target) 
+
+	public static ArrayList<String> getDirectoryListing(Integer handle, String target)
 	{
-		_logger.trace(String.format(
-			"JNIDirectoryListing::getDirectoryListing(%d, %s)",
-			handle, target));
-		
+		if (_logger.isTraceEnabled())
+			_logger.trace(String.format("JNIDirectoryListing::getDirectoryListing(%d, %s)", handle, target));
+
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 		FilesystemHandle fsHandle;
 		DirectoryHandle dirHandle;
-		
+
 		fsHandle = openHandles.get(handle);
-		if(fsHandle == null || !fsHandle.isDirectoryHandle())
-		{
-			_logger.error(
-				"G-ICING:  Invalid handle received for directory listing");			
+		if (fsHandle == null || !fsHandle.isDirectoryHandle()) {
+			_logger.error("G-ICING:  Invalid handle received for directory listing");
 			return null;
 		}
-		
-		dirHandle = (DirectoryHandle)fsHandle;
-		
+
+		dirHandle = (DirectoryHandle) fsHandle;
+
 		Pattern pat = null;
 		if (target != null)
 			pat = FilePattern.compile(target);
-		
+
 		Iterable<FilesystemStatStructure> entries = null;
-		
-		try
-		{
+
+		try {
 			entries = dirHandle.listEntries();
-		
+
 			ArrayList<String> ret = new ArrayList<String>();
-			for (FilesystemStatStructure stat : entries)
-			{
+			for (FilesystemStatStructure stat : entries) {
 				if (pat != null && !(pat.matcher(stat.getName()).matches()))
 					continue;
-				
+
 				ret.add(Integer.toString(FilesystemHandle.INVALID_HANDLE));
-				ret.add( 
-					(stat.getEntryType() == FilesystemEntryType.DIRECTORY) ?
-						"D" : "F");
+				ret.add((stat.getEntryType() == FilesystemEntryType.DIRECTORY) ? "D" : "F");
 				ret.add(Long.toString(stat.getSize()));
 				ret.add(stat.getName());
 			}
-			
+
 			return ret;
-		}
-		catch (FSException fse)
-		{
+		} catch (FSException fse) {
 			_logger.error("Unable to get directory listing.", fse);
 			return null;
-		}
-		finally
-		{
+		} finally {
 			if (entries != null && entries instanceof Closeable)
-				StreamUtils.close((Closeable)entries);
+				StreamUtils.close((Closeable) entries);
 		}
 	}
 }

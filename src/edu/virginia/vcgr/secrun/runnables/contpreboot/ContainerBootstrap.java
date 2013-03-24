@@ -42,72 +42,59 @@ import edu.virginia.vcgr.secrun.SecureRunnable;
 public class ContainerBootstrap implements SecureRunnable
 {
 	static private Log _logger = LogFactory.getLog(ContainerBootstrap.class);
-	
+
 	private Writer out = null;
 	private Writer err = null;
 	private Reader in = null;
-	
+
 	@Override
 	public boolean run(Properties runProperties) throws Throwable
 	{
 		BootstrapProperties bProperties = new BootstrapProperties();
 
-		try
-		{
+		try {
 			out = new OutputStreamWriter(System.out);
 			err = new OutputStreamWriter(System.err);
 			in = new InputStreamReader(System.in);
-			
+
 			String connectURL = bProperties.getConnectURL();
 			if (connectURL == null)
-				throw new ConfigurationException(
-					"The container.properties file did not contain " +
-					"a connect url.");
-			
+				throw new ConfigurationException("The container.properties file did not contain " + "a connect url.");
+
 			String hostname = getHostName(false, true);
-			
+
 			/*
-			ICallingContext callingContext = ContextManager.getCurrentContext(false);
-			*/
+			 * ICallingContext callingContext = ContextManager.getCurrentContext(false);
+			 */
 			ICallingContext callingContext = null;
 			if (callingContext == null)
 				callingContext = connect(connectURL);
-			
-			try
-			{
-				ContextManager.setResolver(new MemoryBasedContextResolver(
-					callingContext));
+
+			try {
+				ContextManager.setResolver(new MemoryBasedContextResolver(callingContext));
 				loginAsInstaller(bProperties);
 				generateContainerCertificate(bProperties, hostname);
 				generateContainerPublicCertificate(bProperties);
 				generateOwnerFile(new OwnerInfo());
-			}
-			finally
-			{
+			} finally {
 				ContextManager.setResolver(null);
 			}
-			
+
 			return true;
-		}
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			_logger.error("Unable to bootstrap container.", cause);
 			throw cause;
 		}
 	}
-	
-	static private String getHostName(boolean getIP, boolean fullyQualified)
-		throws ConfigurationException
+
+	static private String getHostName(boolean getIP, boolean fullyQualified) throws ConfigurationException
 	{
-		try
-		{
+		try {
 			if (getIP)
 				return GetHostName.getHostNameIP();
-			else
-			{
+			else {
 				String hostname = GetHostName.getHostName();
-				if (!fullyQualified)
-				{
+				if (!fullyQualified) {
 					int index = hostname.indexOf('.');
 					if (index > 0)
 						hostname = hostname.substring(0, index);
@@ -115,96 +102,77 @@ public class ContainerBootstrap implements SecureRunnable
 
 				return hostname;
 			}
-		}
-		catch (SocketException se)
-		{
+		} catch (SocketException se) {
 			throw new ConfigurationException("Unable to get host name.", se);
 		}
 	}
-	
-	static private ICallingContext connect(String connectURL)
-		throws ResourceException, MalformedURLException, IOException
+
+	static private ICallingContext connect(String connectURL) throws ResourceException, MalformedURLException, IOException
 	{
 		return ContextStreamUtils.load(new URL(connectURL));
 	}
-	
-	private void generateOwnerFile(OwnerInfo info) 
-		throws Throwable
+
+	private void generateOwnerFile(OwnerInfo info) throws Throwable
 	{
-		File ownerCer = Installation.getDeployment(
-			new DeploymentName()).security().getSecurityFile("owner.cer");
-		
-		if (!ownerCer.exists())
-		{
+		File ownerCer = Installation.getDeployment(new DeploymentName()).security().getSecurityFile("owner.cer");
+
+		if (!ownerCer.exists()) {
 			DownloadCertificateTool dTool = new DownloadCertificateTool();
 			dTool.addArgument(info.getUserPath());
-			dTool.addArgument(
-				Installation.getDeployment(
-					new DeploymentName()).security().getSecurityFile(
-						"owner.cer").getAbsolutePath());
+			dTool.addArgument(Installation.getDeployment(new DeploymentName()).security().getSecurityFile("owner.cer")
+				.getAbsolutePath());
 			dTool.run(out, err, in);
 		}
 	}
-	
-	private void loginAsInstaller(
-		BootstrapProperties cProperties) throws Throwable
+
+	private void loginAsInstaller(BootstrapProperties cProperties) throws Throwable
 	{
 		String certStore = cProperties.getInstallerCertStorePath();
 		if (certStore == null)
-			throw new ConfigurationException(
-				"Unable to find installer certificate store path property.");
-		
+			throw new ConfigurationException("Unable to find installer certificate store path property.");
+
 		String certStoreType = cProperties.getInstallerCertStoreType();
 		if (certStoreType == null)
 			certStoreType = "PKCS12";
-		
+
 		String certPattern = cProperties.getInstallerCertPattern();
 		if (certPattern == null)
-			throw new ConfigurationException(
-				"Unable to find installer certificate pattern property.");
-		
+			throw new ConfigurationException("Unable to find installer certificate pattern property.");
+
 		String certPassword = cProperties.getInstallerCertStorePassword();
-		
-		ConfigurationManager mgr =
-			ConfigurationManager.getCurrentConfiguration();
-		try
-		{
+
+		ConfigurationManager mgr = ConfigurationManager.getCurrentConfiguration();
+		try {
 			mgr.setRoleClient();
 			LogoutTool outTool = new LogoutTool();
 			outTool.setAll();
 			outTool.setNo_gui();
 			outTool.run(out, err, in);
-			
-			//Assume Certificate Login
+
+			// Assume Certificate Login
 			KeystoreLoginTool tool = new KeystoreLoginTool();
 			tool.setNo_gui();
-			tool.addArgument("local:" + Installation.getDeployment(
-				new DeploymentName()).security().getSecurityFile(
-					certStore).getAbsolutePath());
+			tool.addArgument("local:"
+				+ Installation.getDeployment(new DeploymentName()).security().getSecurityFile(certStore).getAbsolutePath());
 			tool.setStoretype(certStoreType);
 			tool.setPattern(certPattern);
 			if (certPassword != null)
 				tool.setPassword(certPassword);
 			if (tool.run(out, err, in) != 0)
 				throw new ToolException("Unable to log in as installer.");
-		}
-		finally
-		{
+		} finally {
 			mgr.setRoleServer();
 		}
 	}
-	
-	private void generateContainerCertificate(BootstrapProperties bProperties,
-		String hostname) throws Throwable
+
+	private void generateContainerCertificate(BootstrapProperties bProperties, String hostname) throws Throwable
 	{
 		CertGeneratorTool tool = new CertGeneratorTool();
 		tool.setGen_cert();
 		tool.addArgument(bProperties.getCertGeneratorRNSPath());
 		tool.setKeysize(bProperties.getCertGeneratorKeysize());
-		tool.setKs_path(
-			Installation.getDeployment(
-				new DeploymentName()).security().getSecurityFile(
-					bProperties.getCertGeneratorOutputStoreName()).getAbsolutePath());
+		tool.setKs_path(Installation.getDeployment(new DeploymentName()).security()
+			.getSecurityFile(bProperties.getCertGeneratorOutputStoreName()).getAbsolutePath());
 		tool.setKs_pword(bProperties.getCertGeneratorPassword());
 		tool.setKs_alias(bProperties.getCertGeneratorAlias());
 		tool.setCn(hostname);
@@ -216,33 +184,26 @@ public class ContainerBootstrap implements SecureRunnable
 		if (tool.run(out, err, in) != 0)
 			throw new ToolException("Unable to generate container certificate.");
 	}
-	 
-	static private void generateContainerPublicCertificate(
-		BootstrapProperties bProperties) throws Throwable
+
+	static private void generateContainerPublicCertificate(BootstrapProperties bProperties) throws Throwable
 	{
 		KeyStore kStore = KeyStore.getInstance("PKCS12", "BC");
 
 		InputStream stream = null;
 		OutputStream out = null;
-		try
-		{
-			stream = new FileInputStream(
-				Installation.getDeployment(new DeploymentName()).security().getSecurityFile(
-				bProperties.getCertGeneratorOutputStoreName()));
-			kStore.load(stream, 
-				bProperties.getCertGeneratorPassword().toCharArray());
+		try {
+			stream = new FileInputStream(Installation.getDeployment(new DeploymentName()).security()
+				.getSecurityFile(bProperties.getCertGeneratorOutputStoreName()));
+			kStore.load(stream, bProperties.getCertGeneratorPassword().toCharArray());
 			Certificate cert = kStore.getCertificate(bProperties.getCertGeneratorAlias());
-			X509Certificate xCert = (X509Certificate)cert;
-			
-			out = new FileOutputStream(Installation.getDeployment(
-				new DeploymentName()).security().getSecurityFile(
-					bProperties.getContainerPublicCertFilename()));
+			X509Certificate xCert = (X509Certificate) cert;
+
+			out = new FileOutputStream(Installation.getDeployment(new DeploymentName()).security()
+				.getSecurityFile(bProperties.getContainerPublicCertFilename()));
 			out.write(xCert.getEncoded());
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(out);
-			 StreamUtils.close(stream);
+			StreamUtils.close(stream);
 		}
-	 }
+	}
 }

@@ -12,12 +12,12 @@ public class BESRootRNSFork extends CommonRootRNSFork
 	{
 		super(service, forkPath);
 	}
-	
+
 	@Override
 	protected void addEntries(Map<String, ResourceForkInformation> entries)
 	{
 		super.addEntries(entries);
-		
+
 		addDefaultEntry("activities", ActivityListRNSResourceFork.class);
 	}
 }

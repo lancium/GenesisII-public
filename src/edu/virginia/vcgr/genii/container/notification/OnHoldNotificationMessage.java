@@ -5,33 +5,40 @@ import java.util.Date;
 import org.apache.axis.message.MessageElement;
 import org.oasis_open.wsn.base.NotificationMessageHolderType;
 
-public class OnHoldNotificationMessage {
-	
+public class OnHoldNotificationMessage
+{
+
 	private Date messagePublicationTime;
 	private NotificationMessageHolderType holderType;
 	private MessageElement[] additionalAttributes;
-	
-	public Date getMessagePublicationTime() {
+
+	public Date getMessagePublicationTime()
+	{
 		return messagePublicationTime;
 	}
 
-	public void setMessagePublicationTime(Date messagePublicationTime) {
+	public void setMessagePublicationTime(Date messagePublicationTime)
+	{
 		this.messagePublicationTime = messagePublicationTime;
 	}
 
-	public NotificationMessageHolderType getHolderType() {
+	public NotificationMessageHolderType getHolderType()
+	{
 		return holderType;
 	}
-	
-	public void setHolderType(NotificationMessageHolderType holderType) {
+
+	public void setHolderType(NotificationMessageHolderType holderType)
+	{
 		this.holderType = holderType;
 	}
-	
-	public MessageElement[] getAdditionalAttributes() {
+
+	public MessageElement[] getAdditionalAttributes()
+	{
 		return additionalAttributes;
 	}
-	
-	public void setAdditionalAttributes(MessageElement[] additionalAttributes) {
+
+	public void setAdditionalAttributes(MessageElement[] additionalAttributes)
+	{
 		this.additionalAttributes = additionalAttributes;
 	}
 }

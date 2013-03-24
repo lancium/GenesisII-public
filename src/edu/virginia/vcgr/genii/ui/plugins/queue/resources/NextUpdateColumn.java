@@ -6,14 +6,13 @@ import javax.swing.table.TableColumn;
 
 import org.morgan.util.gui.table.AbstractRowTableColumnDefinition;
 
-class NextUpdateColumn
-	extends AbstractRowTableColumnDefinition<QueueResourceInformation, Calendar>
+class NextUpdateColumn extends AbstractRowTableColumnDefinition<QueueResourceInformation, Calendar>
 {
 	NextUpdateColumn()
 	{
 		super("Next Update", Calendar.class, 128);
 	}
-	
+
 	@Override
 	final public Calendar extract(QueueResourceInformation row)
 	{
@@ -24,7 +23,7 @@ class NextUpdateColumn
 	final public void prepareTableColumn(TableColumn column)
 	{
 		super.prepareTableColumn(column);
-		
+
 		column.setCellRenderer(new CalendarCellRenderer());
 	}
 }

@@ -20,21 +20,20 @@ import javax.xml.namespace.QName;
 public class UnsupportedJSDLElement extends JSDLException
 {
 	static final long serialVersionUID = 0;
-	
+
 	private QName _jsdlElementName;
-	
+
 	public UnsupportedJSDLElement(String msg, QName jsdlElement)
 	{
 		super(msg);
 		_jsdlElementName = jsdlElement;
 	}
-	
+
 	public UnsupportedJSDLElement(QName jsdlElement)
 	{
-		this("The jsdl element \"" + jsdlElement.toString() 
-			+ "\" is unsupported.", jsdlElement);
+		this("The jsdl element \"" + jsdlElement.toString() + "\" is unsupported.", jsdlElement);
 	}
-	
+
 	public QName getJSDLElementName()
 	{
 		return _jsdlElementName;

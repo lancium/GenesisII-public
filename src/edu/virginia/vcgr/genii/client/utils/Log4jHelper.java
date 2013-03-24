@@ -38,7 +38,7 @@ public class Log4jHelper
 	// this only works if the appenderName exists, and if it is derived from FileAppender.
 	static public String queryLog4jFile(String appenderName)
 	{
-		// re-use the answer from last time, if there was an answer.  the log file will
+		// re-use the answer from last time, if there was an answer. the log file will
 		// currently not change during runtime.
 		if (log4jFileStatic == null) {
 			Appender appender = Logger.getRootLogger().getAppender(appenderName);

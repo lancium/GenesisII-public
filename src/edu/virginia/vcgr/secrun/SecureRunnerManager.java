@@ -25,215 +25,161 @@ import edu.virginia.vcgr.genii.client.configuration.Security;
 public class SecureRunnerManager implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(SecureRunnerManager.class);
-	
+
 	static public final int DEFAULT_DESCRIPTORS_SIZE = 4;
-	
-	static public final String SECURE_RUNNER_PROPERTIES_FILE =
-		"secure-runner.properties";
-	static public final String TRUSTED_CERT_FILE_PROPERTY_PATTERN =
-		"edu.virginia.vcgr.secrun.trusted-cert-file.%d";
-	
-	private Map<String, Collection<SecureRunnableDescriptor>> _descriptors =
-		new HashMap<String, Collection<SecureRunnableDescriptor>>(
-			DEFAULT_DESCRIPTORS_SIZE);
-	
-	public SecureRunnerManager(ClassLoader loader,
-		Certificate[] allowedCertificates, File directory)
+
+	static public final String SECURE_RUNNER_PROPERTIES_FILE = "secure-runner.properties";
+	static public final String TRUSTED_CERT_FILE_PROPERTY_PATTERN = "edu.virginia.vcgr.secrun.trusted-cert-file.%d";
+
+	private Map<String, Collection<SecureRunnableDescriptor>> _descriptors = new HashMap<String, Collection<SecureRunnableDescriptor>>(
+		DEFAULT_DESCRIPTORS_SIZE);
+
+	public SecureRunnerManager(ClassLoader loader, Certificate[] allowedCertificates, File directory)
 	{
 		if (!directory.exists() || !directory.isDirectory())
 			return;
-		
-		for (File entry : directory.listFiles(_deleteMeFilter))
-		{
+
+		for (File entry : directory.listFiles(_deleteMeFilter)) {
 			entry.delete();
 		}
-		
-		for (File entry : directory.listFiles(_jarFilter))
-		{
+
+		for (File entry : directory.listFiles(_jarFilter)) {
 			addEntry(loader, allowedCertificates, entry);
 		}
 	}
-	
+
 	@Override
 	protected void finalize() throws Throwable
 	{
 		close();
 	}
-	
+
 	@Override
 	synchronized public void close() throws IOException
 	{
-		for (String hook : _descriptors.keySet())
-		{
-			Collection<SecureRunnableDescriptor> descriptors =
-				_descriptors.get(hook);
-			if (descriptors != null)
-			{
-				for (SecureRunnableDescriptor descriptor : descriptors)
-				{
+		for (String hook : _descriptors.keySet()) {
+			Collection<SecureRunnableDescriptor> descriptors = _descriptors.get(hook);
+			if (descriptors != null) {
+				for (SecureRunnableDescriptor descriptor : descriptors) {
 					StreamUtils.close(descriptor);
 				}
 			}
 		}
-		
+
 		_descriptors.clear();
 	}
-	
+
 	public void run(String hook, Properties runProperties)
 	{
-		try
-		{
+		try {
 			Collection<SecureRunnableDescriptor> list = _descriptors.get(hook);
-			if (list != null)
-			{
-				for (SecureRunnableDescriptor desc : list)
-				{
+			if (list != null) {
+				for (SecureRunnableDescriptor desc : list) {
 					desc.run(runProperties);
 				}
 			}
-		}
-		finally
-		{
+		} finally {
 			Runtime.getRuntime().gc();
 		}
 	}
-	
-	private void addEntry(ClassLoader parentLoader,
-		Certificate []allowedCerts, File entry)
+
+	private void addEntry(ClassLoader parentLoader, Certificate[] allowedCerts, File entry)
 	{
-		try
-		{
-			SecureRunnableDescriptor descriptor = 
-				new SecureRunnableDescriptor(
-					parentLoader, allowedCerts, entry);
+		try {
+			SecureRunnableDescriptor descriptor = new SecureRunnableDescriptor(parentLoader, allowedCerts, entry);
 			String hook = descriptor.getHook();
-			Collection<SecureRunnableDescriptor> descList =
-				_descriptors.get(hook);
+			Collection<SecureRunnableDescriptor> descList = _descriptors.get(hook);
 			if (descList == null)
-				_descriptors.put(hook, 
-					descList = new LinkedList<SecureRunnableDescriptor>());
-			
+				_descriptors.put(hook, descList = new LinkedList<SecureRunnableDescriptor>());
+
 			descList.add(descriptor);
-		}
-		catch (Throwable cause)
-		{
-			_logger.error(String.format(
-				"Unable to load securely downloaded library \"%s\" -- " +
-				"removing it.", entry.getAbsolutePath()), cause);
-			
-			try
-			{
-				if (!entry.delete())
-				{
-					_logger.error(String.format(
-						"Unable to delete securely downloaded library \"%s\".",
-						entry.getAbsolutePath()));
+		} catch (Throwable cause) {
+			_logger.error(String.format("Unable to load securely downloaded library \"%s\" -- " + "removing it.",
+				entry.getAbsolutePath()), cause);
+
+			try {
+				if (!entry.delete()) {
+					_logger
+						.error(String.format("Unable to delete securely downloaded library \"%s\".", entry.getAbsolutePath()));
 				}
-			}
-			catch (Throwable cause2)
-			{
-				_logger.error(String.format(
-					"Unable to delete securely downloaded library \"%s\".",
-					entry.getAbsolutePath()), cause2);
+			} catch (Throwable cause2) {
+				_logger.error(String.format("Unable to delete securely downloaded library \"%s\".", entry.getAbsolutePath()),
+					cause2);
 			}
 		}
 	}
-	
-	static private final FilenameFilter _deleteMeFilter = 
-		new FilenameFilterImpl(".deleteme");
-	static private final FilenameFilter _jarFilter = 
-		new FilenameFilterImpl(".jar");
+
+	static private final FilenameFilter _deleteMeFilter = new FilenameFilterImpl(".deleteme");
+	static private final FilenameFilter _jarFilter = new FilenameFilterImpl(".jar");
+
 	static private class FilenameFilterImpl implements FilenameFilter
 	{
 		private String _endsWithString;
-		
+
 		public FilenameFilterImpl(String endsWithString)
 		{
 			_endsWithString = endsWithString;
 		}
-		
+
 		@Override
 		public boolean accept(File dir, String name)
 		{
 			return (name.endsWith(_endsWithString));
-		}	
+		}
 	}
-	
-	static private Certificate loadCertificate(File certFile)
-		throws IOException, CertificateException
+
+	static private Certificate loadCertificate(File certFile) throws IOException, CertificateException
 	{
 		InputStream in = null;
-		
-		try
-		{
+
+		try {
 			in = new FileInputStream(certFile);
 			CertificateFactory cf = CertificateFactory.getInstance("X.509");
 			return (cf.generateCertificate(in));
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(in);
 		}
 	}
-	
-	static private Properties loadProperties(File inputFile)
-		throws IOException
+
+	static private Properties loadProperties(File inputFile) throws IOException
 	{
 		InputStream in = null;
-		
-		try
-		{
+
+		try {
 			in = new FileInputStream(inputFile);
 			Properties props = new Properties();
 			props.load(in);
 			return props;
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(in);
 		}
 	}
-	
-	static public SecureRunnerManager createSecureRunnerManager(
-		ClassLoader loader, Deployment deployment)
+
+	static public SecureRunnerManager createSecureRunnerManager(ClassLoader loader, Deployment deployment)
 	{
 		Security sec = deployment.security();
 		Collection<Certificate> certs = new LinkedList<Certificate>();
-		File config = deployment.getConfigurationFile(
-			SECURE_RUNNER_PROPERTIES_FILE);
-		try
-		{
+		File config = deployment.getConfigurationFile(SECURE_RUNNER_PROPERTIES_FILE);
+		try {
 			Properties configProperties = loadProperties(config);
 			int lcv = 0;
-			while (true)
-			{
-				String property = String.format(TRUSTED_CERT_FILE_PROPERTY_PATTERN,
-					lcv++);
+			while (true) {
+				String property = String.format(TRUSTED_CERT_FILE_PROPERTY_PATTERN, lcv++);
 				String value = configProperties.getProperty(property);
-				if (value != null)
-				{
-					try
-					{
+				if (value != null) {
+					try {
 						certs.add(loadCertificate(sec.getSecurityFile(value)));
-					}
-					catch (Throwable cause)
-					{
-						_logger.warn(String.format(
-							"Unable to load a certificate specified by " +
-							"\"%s\" -- continuing with degraded functionallity.", 
-							value), cause);
+					} catch (Throwable cause) {
+						_logger.warn(String.format("Unable to load a certificate specified by "
+							+ "\"%s\" -- continuing with degraded functionallity.", value), cause);
 					}
 				} else
 					break;
 			}
-		}
-		catch (Throwable cause2)
-		{
+		} catch (Throwable cause2) {
 			_logger.error("Unable to load secure runner manager.", cause2);
 		}
-		
-		return new SecureRunnerManager(loader, 
-			certs.toArray(new Certificate[0]),
-			deployment.secureRunnableDirectory());
+
+		return new SecureRunnerManager(loader, certs.toArray(new Certificate[0]), deployment.secureRunnableDirectory());
 	}
 }

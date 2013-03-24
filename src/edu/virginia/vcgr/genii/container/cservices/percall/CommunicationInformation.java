@@ -10,5 +10,5 @@ public class CommunicationInformation
 	public EndpointReferenceType targetEPR;
 	public ICallingContext callingContext;
 	public OutcallActor outcallActor;
-	public GeniiAttachment attachment;	
+	public GeniiAttachment attachment;
 }

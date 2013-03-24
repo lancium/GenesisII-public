@@ -26,11 +26,9 @@ import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 public interface IJNDIResource extends IRNSResource
 {
 
-	static public QName IS_IDP_RESOURCE_CONSTRUCTION_PARAM =
-			new QName(GenesisIIConstants.GENESISII_NS, "is-idp-resource");
+	static public QName IS_IDP_RESOURCE_CONSTRUCTION_PARAM = new QName(GenesisIIConstants.GENESISII_NS, "is-idp-resource");
 
-	static public enum StsType
-	{
+	static public enum StsType {
 		NIS, LDAP
 	};
 
@@ -40,6 +38,5 @@ public interface IJNDIResource extends IRNSResource
 
 	public StsType getStsType() throws ResourceException;
 
-	public URI createChildIdpEpi(String childName)
-			throws URI.MalformedURIException, ResourceException;
+	public URI createChildIdpEpi(String childName) throws URI.MalformedURIException, ResourceException;
 }

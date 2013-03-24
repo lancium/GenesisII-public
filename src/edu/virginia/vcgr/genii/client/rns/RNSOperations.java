@@ -1,9 +1,5 @@
 package edu.virginia.vcgr.genii.client.rns;
 
-public enum RNSOperations
-{
-	Add(),
-	Remove(),
-	Destroy(),
-	Unlink();
+public enum RNSOperations {
+	Add(), Remove(), Destroy(), Unlink();
 }

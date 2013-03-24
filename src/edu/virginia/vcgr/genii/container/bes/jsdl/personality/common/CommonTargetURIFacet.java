@@ -8,9 +8,8 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultTargetURIFacet
 public class CommonTargetURIFacet extends DefaultTargetURIFacet
 {
 	@Override
-	public void consumeURI(Object currentUnderstanding, URI uri)
-			throws JSDLException
+	public void consumeURI(Object currentUnderstanding, URI uri) throws JSDLException
 	{
-		((DataStagingUnderstanding)currentUnderstanding).setTargetURI(uri);
+		((DataStagingUnderstanding) currentUnderstanding).setTargetURI(uri);
 	}
 }

@@ -15,43 +15,39 @@ import fuse.FuseException;
 public class TeardownFUSEPhase extends AbstractFUSEPhases
 {
 	static private Log _logger = LogFactory.getLog(TeardownFUSEPhase.class);
-	
+
 	static final long serialVersionUID = 0L;
-	
+
 	public TeardownFUSEPhase(String mountPoint)
 	{
-		super(mountPoint, new ActivityState(
-			ActivityStateEnumeration.Running, "fuse-teardown", false));
+		super(mountPoint, new ActivityState(ActivityStateEnumeration.Running, "fuse-teardown", false));
 	}
-	
+
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
 		long sleepTime = 250L;
-		
-		try { Thread.sleep(250L); } catch (InterruptedException ie) {}
-		
-		for (int lcv = 0; lcv < 5; lcv++)
-		{
-			try
-			{
+
+		try {
+			Thread.sleep(250L);
+		} catch (InterruptedException ie) {
+		}
+
+		for (int lcv = 0; lcv < 5; lcv++) {
+			try {
 				File f = getMountPoint(context);
 				GeniiFuse.unmountGenesisII(f, true);
 				Thread.sleep(250L);
 				if (!f.delete())
-					throw new IOException(
-						"Unable to delete old fuse directory.");
+					throw new IOException("Unable to delete old fuse directory.");
 				return;
-			}
-			catch (Throwable exception)
-			{
-				_logger.warn(
-					"Exception thrown while trying to unmount FUSE.", exception);
+			} catch (Throwable exception) {
+				_logger.warn("Exception thrown while trying to unmount FUSE.", exception);
 				Thread.sleep(sleepTime);
 				sleepTime <<= 2;
 			}
 		}
-		
+
 		throw new FuseException("Unable to unmount FUSE file system.");
 	}
 }

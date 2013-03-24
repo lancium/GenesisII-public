@@ -35,4 +35,4 @@ Credentials are given a "Not Valid Before" timestamp of 15 minutes prior. This i
 Code:
 
 Implementing Class 
-    edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool 
+    edu.virginia.vcgr.genii.client.cmd.tools.LoginTool 

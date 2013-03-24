@@ -16,40 +16,33 @@
 
 package edu.virginia.vcgr.genii.container.security.authz.providers;
 
+import java.lang.reflect.Method;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
-
-import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.client.context.*;
-import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
-import edu.virginia.vcgr.genii.client.security.authz.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
-import edu.virginia.vcgr.genii.common.security.*;
-import edu.virginia.vcgr.genii.container.resource.*;
-import edu.virginia.vcgr.genii.client.resource.*;
-import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.common.security.AuthZConfig;
+import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.security.RWXCategory;
-import edu.virginia.vcgr.genii.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 
 /**
- * AuthZ provider implementation that returns true for all 
- * access-control decisions
+ * AuthZ provider implementation that returns true for all access-control decisions
  * 
  * @author dmerrill
  * 
  */
 public class OpenAuthZProvider implements IAuthZProvider
 {
-
-	static public final String GAML_ACL_PROPERTY_NAME =
-			"genii.container.security.authz.gaml-acl";
-
-	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec =
-			new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
+	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec = new MessageLevelSecurityRequirements(
+		MessageLevelSecurityRequirements.NONE);
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(OpenAuthZProvider.class);
@@ -59,66 +52,54 @@ public class OpenAuthZProvider implements IAuthZProvider
 	}
 
 	/**
-	 * Presently configures the specified resource to have default access
-	 * allowed for every GAML credential in the bag of credentials. We may want
-	 * to look at restricting this in the future to special credentials.
+	 * Presently configures the specified resource to have default access allowed for every
+	 * credential in the bag of credentials. We may want to look at restricting this in the future
+	 * to special credentials.
 	 */
-	public void setDefaultAccess(ICallingContext callingContext,
-			IResource resource, X509Certificate[] serviceCertChain)
-			throws AuthZSecurityException, ResourceException
+	public void setDefaultAccess(ICallingContext callingContext, IResource resource, X509Certificate[] serviceCertChain)
+		throws AuthZSecurityException, ResourceException
 	{
 	}
-	
-	public boolean checkAccess(
-			Collection<GIICredential> authenticatedCallerCredentials,
-			IResource resource, RWXCategory category)
-		throws AuthZSecurityException, ResourceException
+
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
 	{
 		return true;
 	}
 
-	public void checkAccess(
-			Collection<GIICredential> authenticatedCallerCredentials,
-			IResource resource, 
-			Class<?> serviceClass, 
-			Method operation)
-			throws PermissionDeniedException, AuthZSecurityException, ResourceException
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
+		Class<?> serviceClass, Method operation)
 	{
+		return true; // all is allowed.
 	}
 
-	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(
-			IResource resource) throws AuthZSecurityException,
-			ResourceException
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource) throws AuthZSecurityException,
+		ResourceException
 	{
 		return _defaultMinMsgSec;
 	}
 
-	public AuthZConfig getAuthZConfig(IResource resource)
-			throws AuthZSecurityException, ResourceException
+	public AuthZConfig getAuthZConfig(IResource resource) throws AuthZSecurityException, ResourceException
 	{
 
 		return new AuthZConfig(null);
 	}
-	
-	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize)
-			throws AuthZSecurityException, ResourceException
+
+	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize) throws AuthZSecurityException, ResourceException
 	{
 		return getAuthZConfig(resource);
 	}
 
-	public void setAuthZConfig(AuthZConfig config, IResource resource)
-			throws AuthZSecurityException, ResourceException
+	public void setAuthZConfig(AuthZConfig config, IResource resource) throws AuthZSecurityException, ResourceException
 	{
 	}
-	
-	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig,
-			IResource resource)
+
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource)
 		throws AuthZSecurityException, ResourceException
 	{
 	}
-	
-	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource)
-		throws ResourceException, AuthZSecurityException
+
+	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource) throws ResourceException,
+		AuthZSecurityException
 	{
 	}
 }

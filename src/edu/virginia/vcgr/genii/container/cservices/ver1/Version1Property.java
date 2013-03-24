@@ -6,20 +6,20 @@ class Version1Property
 {
 	@XmlAttribute(name = "name", required = true)
 	private String _name = null;
-	
+
 	@XmlAttribute(name = "value", required = true)
 	private String _value = null;
-	
+
 	final String name()
 	{
 		return _name;
 	}
-	
+
 	final String value()
 	{
 		return _value;
 	}
-	
+
 	@Override
 	final public String toString()
 	{

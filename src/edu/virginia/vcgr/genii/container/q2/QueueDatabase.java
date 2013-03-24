@@ -33,7 +33,7 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
-import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.security.identity.Identity;
 
 /**
  * This class is a conduit for accessing all information from the database. It SHOULD be the only

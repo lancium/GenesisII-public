@@ -15,22 +15,21 @@
  */
 package edu.virginia.vcgr.genii.client.rns;
 
-public class RNSPathDoesNotExistException extends RNSException 
+public class RNSPathDoesNotExistException extends RNSException
 {
 	static final long serialVersionUID = 0;
-	
-	static private final String _MESSAGE_FORMAT =
-		"Path \"%1$s\" does not exist.";
-	
+
+	static private final String _MESSAGE_FORMAT = "Path \"%1$s\" does not exist.";
+
 	private String _path;
-	
+
 	public RNSPathDoesNotExistException(String pathExpression)
 	{
 		super(String.format(_MESSAGE_FORMAT, pathExpression));
-		
+
 		_path = pathExpression;
 	}
-	
+
 	public String getPath()
 	{
 		return _path;

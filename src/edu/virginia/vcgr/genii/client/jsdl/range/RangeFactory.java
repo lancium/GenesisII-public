@@ -12,23 +12,21 @@ import edu.virginia.vcgr.genii.client.jsdl.range.RangeDescription;
 
 abstract class CompositeRangeExpression implements RangeExpression
 {
-	protected Collection<RangeExpression> _expressions =
-		new LinkedList<RangeExpression>();
-	
+	protected Collection<RangeExpression> _expressions = new LinkedList<RangeExpression>();
+
 	public void addExpression(RangeExpression expr)
 	{
 		_expressions.add(expr);
 	}
-	
+
 	public RangeDescription describe()
 	{
 		RangeDescription description = new RangeDescription();
-		
-		for (RangeExpression expr : _expressions)
-		{
+
+		for (RangeExpression expr : _expressions) {
 			description.addDescription(expr.describe());
 		}
-		
+
 		return description;
 	}
 }
@@ -37,54 +35,52 @@ class CompositeAndRangeExpression extends CompositeRangeExpression
 {
 	public boolean matches(double testValue)
 	{
-		for (RangeExpression expr : _expressions)
-		{
+		for (RangeExpression expr : _expressions) {
 			if (!expr.matches(testValue))
 				return false;
 		}
-		
+
 		return true;
 	}
-	
+
 }
 
 class CompositeOrRangeExpression extends CompositeRangeExpression
 {
 	public boolean matches(double testValue)
 	{
-		for (RangeExpression expr : _expressions)
-		{
+		for (RangeExpression expr : _expressions) {
 			if (expr.matches(testValue))
 				return true;
 		}
-		
+
 		return false;
 	}
-		
+
 }
 
 class ExactValueRangeExpression implements RangeExpression
 {
 	private double _value;
 	private Double _epsilon;
-	
+
 	public ExactValueRangeExpression(Exact_Type exact)
 	{
 		_value = exact.get_value();
 		_epsilon = exact.getEpsilon();
 	}
-	
+
 	public boolean matches(double testValue)
 	{
 		if (_epsilon != null)
 			return Math.abs(testValue - _value) <= _epsilon;
-		
+
 		return testValue == _value;
 	}
-	
+
 	public RangeDescription describe()
-	{		
-		return new RangeDescription((_value-_epsilon), (_value+_epsilon));
+	{
+		return new RangeDescription((_value - _epsilon), (_value + _epsilon));
 	}
 }
 
@@ -92,14 +88,14 @@ abstract class BoundRangeExpression implements RangeExpression
 {
 	protected double _bound;
 	protected boolean _exclusive;
-	
+
 	public BoundRangeExpression(Boundary_Type boundary)
 	{
 		_bound = boundary.get_value();
 		Boolean exclusive = boundary.getExclusiveBound();
 		_exclusive = (exclusive == null) ? false : true;
 	}
-	
+
 }
 
 class LowerBoundRangeExpression extends BoundRangeExpression
@@ -108,18 +104,18 @@ class LowerBoundRangeExpression extends BoundRangeExpression
 	{
 		super(boundary);
 	}
-	
+
 	public boolean matches(double testValue)
 	{
 		if (_exclusive)
 			return testValue > _bound;
-			
+
 		return testValue >= _bound;
 	}
-	
+
 	public RangeDescription describe()
 	{
-		return new RangeDescription(_bound, Double.NaN); 
+		return new RangeDescription(_bound, Double.NaN);
 	}
 }
 
@@ -129,18 +125,18 @@ class UpperBoundRangeExpression extends BoundRangeExpression
 	{
 		super(boundary);
 	}
-	
+
 	public boolean matches(double testValue)
 	{
 		if (_exclusive)
 			return testValue < _bound;
-			
+
 		return testValue <= _bound;
 	}
-	
+
 	public RangeDescription describe()
 	{
-		return new RangeDescription(Double.NaN, _bound); 
+		return new RangeDescription(Double.NaN, _bound);
 	}
 }
 
@@ -159,33 +155,30 @@ public class RangeFactory
 	{
 		if (rvt == null)
 			return null;
-		
+
 		CompositeOrRangeExpression ret = new CompositeOrRangeExpression();
-		
-		Exact_Type []etArray = rvt.getExact();
+
+		Exact_Type[] etArray = rvt.getExact();
 		Boundary_Type lower = rvt.getLowerBoundedRange();
 		Boundary_Type upper = rvt.getUpperBoundedRange();
-		Range_Type []rangeArray = rvt.getRange();
-		
-		if (etArray != null)
-		{
+		Range_Type[] rangeArray = rvt.getRange();
+
+		if (etArray != null) {
 			for (Exact_Type et : etArray)
 				ret.addExpression(new ExactValueRangeExpression(et));
 		}
-		
+
 		if (lower != null)
 			ret.addExpression(new LowerBoundRangeExpression(lower));
 		if (upper != null)
 			ret.addExpression(new UpperBoundRangeExpression(upper));
-		
-		if (rangeArray != null)
-		{
-			for (Range_Type rt : rangeArray)
-			{
+
+		if (rangeArray != null) {
+			for (Range_Type rt : rangeArray) {
 				ret.addExpression(new FullyBoundedRangeExpression(rt));
 			}
 		}
-		
+
 		return ret;
 	}
 }

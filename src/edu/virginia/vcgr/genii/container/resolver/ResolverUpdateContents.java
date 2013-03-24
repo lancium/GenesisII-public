@@ -11,37 +11,30 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.container.sync.VersionVector;
 
-@XmlRootElement(namespace = ResolverUpdateContents.RESOLVER_NAMESPACE,
-		name = "ResolverUpdateContents")
+@XmlRootElement(namespace = ResolverUpdateContents.RESOLVER_NAMESPACE, name = "ResolverUpdateContents")
 public class ResolverUpdateContents extends NotificationMessageContents
 {
 	static final long serialVersionUID = 0L;
-	
-	static public final String RESOLVER_NAMESPACE =
-		"http://vcgr.cs.virginia.edu/genii/genii-resolver";
-	
-	@XmlElement(namespace = RESOLVER_NAMESPACE,
-			name = "targetEPI", nillable = true, required = true)
+
+	static public final String RESOLVER_NAMESPACE = "http://vcgr.cs.virginia.edu/genii/genii-resolver";
+
+	@XmlElement(namespace = RESOLVER_NAMESPACE, name = "targetEPI", nillable = true, required = true)
 	private URI _targetEPI;
-	
-	@XmlElement(namespace = RESOLVER_NAMESPACE,
-			name = "targetID", nillable = false, required = true)
+
+	@XmlElement(namespace = RESOLVER_NAMESPACE, name = "targetID", nillable = false, required = true)
 	private int _targetID;
-	
-	@XmlElement(namespace = RESOLVER_NAMESPACE,
-			name = "entryReference", nillable = true, required = true)
+
+	@XmlElement(namespace = RESOLVER_NAMESPACE, name = "entryReference", nillable = true, required = true)
 	private byte[] _entryReference;
-	
-	@XmlElement(namespace = RESOLVER_NAMESPACE,
-			name = "version")
+
+	@XmlElement(namespace = RESOLVER_NAMESPACE, name = "version")
 	private VersionVector _versionVector;
-	
+
 	protected ResolverUpdateContents()
 	{
 	}
-	
-	public ResolverUpdateContents(int targetID, EndpointReferenceType entryReference,
-			VersionVector versionVector)
+
+	public ResolverUpdateContents(int targetID, EndpointReferenceType entryReference, VersionVector versionVector)
 		throws ResourceException
 	{
 		_targetID = targetID;
@@ -49,10 +42,8 @@ public class ResolverUpdateContents extends NotificationMessageContents
 			_entryReference = EPRUtils.toBytes(entryReference);
 		_versionVector = versionVector;
 	}
-	
-	public ResolverUpdateContents(URI targetEPI, int targetID,
-			VersionVector versionVector)
-		throws ResourceException
+
+	public ResolverUpdateContents(URI targetEPI, int targetID, VersionVector versionVector) throws ResourceException
 	{
 		_targetEPI = targetEPI;
 		_targetID = targetID;
@@ -63,20 +54,19 @@ public class ResolverUpdateContents extends NotificationMessageContents
 	{
 		return _targetEPI;
 	}
-	
+
 	final public int targetID()
 	{
 		return _targetID;
 	}
 
-	final public EndpointReferenceType entryReference()
-		throws ResourceException
+	final public EndpointReferenceType entryReference() throws ResourceException
 	{
 		if (_entryReference == null)
 			return null;
 		return EPRUtils.fromBytes(_entryReference);
 	}
-	
+
 	final public VersionVector versionVector()
 	{
 		return _versionVector;

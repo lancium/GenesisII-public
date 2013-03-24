@@ -28,113 +28,111 @@ import org.xml.sax.Locator;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
-public class ObjectDeserializationContext extends DeserializationContext {
+public class ObjectDeserializationContext extends DeserializationContext
+{
 
-    private Deserializer topDeserializer = null;
+	private Deserializer topDeserializer = null;
 
-    public ObjectDeserializationContext(MessageElement element)
-        throws ResourceException {
-        this(element, null);
-    }
+	public ObjectDeserializationContext(MessageElement element) throws ResourceException
+	{
+		this(element, null);
+	}
 
-    public ObjectDeserializationContext(MessageElement element,
-                                        Class<?> javaClass)
-        throws ResourceException {
-        super(Config.mooch(), new SOAPHandler());
+	public ObjectDeserializationContext(MessageElement element, Class<?> javaClass) throws ResourceException
+	{
+		super(Config.mooch(), new SOAPHandler());
 
-        init(element.getType(), javaClass);
+		init(element.getType(), javaClass);
 
-        String inputString = element.toString();
-        inputSource = new InputSource(new StringReader(inputString));
-    }
+		String inputString = element.toString();
+		inputSource = new InputSource(new StringReader(inputString));
+	}
 
-    public ObjectDeserializationContext(Element element)
-        throws ResourceException {
-        this(element, null);
-    }
+	public ObjectDeserializationContext(Element element) throws ResourceException
+	{
+		this(element, null);
+	}
 
-    public ObjectDeserializationContext(Element element, Class<?> javaClass)
-        throws ResourceException {
-        super(Config.mooch(), new SOAPHandler());
+	public ObjectDeserializationContext(Element element, Class<?> javaClass) throws ResourceException
+	{
+		super(Config.mooch(), new SOAPHandler());
 
-        String typeAttr =
-            element.getAttributeNS(Constants.URI_DEFAULT_SCHEMA_XSI, "type");
+		String typeAttr = element.getAttributeNS(Constants.URI_DEFAULT_SCHEMA_XSI, "type");
 
-        QName type = null;
+		QName type = null;
 
-        if (typeAttr != null && typeAttr.length() > 0) {
-            type = XMLUtils.getQNameFromString(typeAttr,
-                                               element);
-        }
+		if (typeAttr != null && typeAttr.length() > 0) {
+			type = XMLUtils.getQNameFromString(typeAttr, element);
+		}
 
-        init(type, javaClass);
+		init(type, javaClass);
 
-        String inputString = XMLUtils.ElementToString(element);
-        inputSource = new InputSource(new StringReader(inputString));
-    }
+		String inputString = XMLUtils.ElementToString(element);
+		inputSource = new InputSource(new StringReader(inputString));
+	}
 
-    public ObjectDeserializationContext(InputSource input, Class<?> javaClass)
-        throws ResourceException {
-        super(Config.mooch(), new SOAPHandler());
-        init(null, javaClass);
-        this.inputSource = input;
-    }
+	public ObjectDeserializationContext(InputSource input, Class<?> javaClass) throws ResourceException
+	{
+		super(Config.mooch(), new SOAPHandler());
+		init(null, javaClass);
+		this.inputSource = input;
+	}
 
-    private void setDeserializer(QName type, Class<?> javaClass) 
-        throws ResourceException {
-        if (type == null && javaClass == null) {
-            throw new ResourceException("Type or class required.");
-        }
+	private void setDeserializer(QName type, Class<?> javaClass) throws ResourceException
+	{
+		if (type == null && javaClass == null) {
+			throw new ResourceException("Type or class required.");
+		}
 
-        if (type != null) {
-            // Use the xmlType to get the deserializer.
-            this.topDeserializer = getDeserializerForType(type);
-        } else {
-            QName defaultXMLType = getTypeMapping().getTypeQName(javaClass);
-            this.topDeserializer = getDeserializer(javaClass, defaultXMLType);
-        }
-        
-        if (this.topDeserializer == null) {
-            this.topDeserializer = getDeserializerForClass(javaClass);
-        }
-    }
+		if (type != null) {
+			// Use the xmlType to get the deserializer.
+			this.topDeserializer = getDeserializerForType(type);
+		} else {
+			QName defaultXMLType = getTypeMapping().getTypeQName(javaClass);
+			this.topDeserializer = getDeserializer(javaClass, defaultXMLType);
+		}
 
-    private void init(QName type, Class<?> javaClass)
-        throws ResourceException {
-        msgContext.setEncodingStyle("");
-        popElementHandler();
+		if (this.topDeserializer == null) {
+			this.topDeserializer = getDeserializerForClass(javaClass);
+		}
+	}
 
-        setDeserializer(type, javaClass);
+	private void init(QName type, Class<?> javaClass) throws ResourceException
+	{
+		msgContext.setEncodingStyle("");
+		popElementHandler();
 
-        if (topDeserializer == null) {
-            throw new ResourceException("No Deserializer.");
-        }
+		setDeserializer(type, javaClass);
 
-        pushElementHandler(
-              new EnvelopeHandler((SOAPHandler) this.topDeserializer)
-        );
-    }
+		if (topDeserializer == null) {
+			throw new ResourceException("No Deserializer.");
+		}
 
-    // overwrites the superclass method
-    public void setDocumentLocator(Locator locator) {}
+		pushElementHandler(new EnvelopeHandler((SOAPHandler) this.topDeserializer));
+	}
 
-    public Object getValue() {
-        return (this.topDeserializer == null) ?
-            null :
-            this.topDeserializer.getValue();
-    }
+	// overwrites the superclass method
+	public void setDocumentLocator(Locator locator)
+	{
+	}
 
-    public MessageElement getMessageElement() {
-        if (this.topDeserializer == null ||
-            !(this.topDeserializer instanceof SOAPHandler)) {
-            return null;
-        }
-        return ((SOAPHandler)this.topDeserializer).myElement;
-    }
+	public Object getValue()
+	{
+		return (this.topDeserializer == null) ? null : this.topDeserializer.getValue();
+	}
 
-    public QName getQName() {
-        MessageElement element = getMessageElement();
-        return (element == null) ? null : element.getQName();
-    }
+	public MessageElement getMessageElement()
+	{
+		if (this.topDeserializer == null || !(this.topDeserializer instanceof SOAPHandler)) {
+			return null;
+		}
+		return ((SOAPHandler) this.topDeserializer).myElement;
+	}
+
+	public QName getQName()
+	{
+		MessageElement element = getMessageElement();
+		return (element == null) ? null : element.getQName();
+	}
 
 }

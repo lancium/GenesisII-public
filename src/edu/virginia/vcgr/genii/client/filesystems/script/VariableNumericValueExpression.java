@@ -5,43 +5,37 @@ import edu.virginia.vcgr.genii.client.filesystems.FilesystemUsageInformation;
 class VariableNumericValueExpression implements NumericValueExpression
 {
 	private Variables _variable;
-	
-	VariableNumericValueExpression(String variableName)
-		throws FilterScriptException
+
+	VariableNumericValueExpression(String variableName) throws FilterScriptException
 	{
-		try
-		{
+		try {
 			_variable = Variables.valueOf(variableName);
-		}
-		catch (IllegalArgumentException iae)
-		{
-			throw new FilterScriptException(String.format(
-				"Variable \"%s\" not recognized!", variableName), iae);
+		} catch (IllegalArgumentException iae) {
+			throw new FilterScriptException(String.format("Variable \"%s\" not recognized!", variableName), iae);
 		}
 	}
-	
+
 	@Override
 	final public double evaluate(FilesystemUsageInformation usageInformation)
 	{
-		switch (_variable)
-		{
-			case filesystemSize :
+		switch (_variable) {
+			case filesystemSize:
 				return usageInformation.filesystemSize();
-			case percentAvailable :
+			case percentAvailable:
 				return usageInformation.percentAvailable();
-			case percentUsed :
+			case percentUsed:
 				return usageInformation.percentUsed();
-			case spaceAvailable :
+			case spaceAvailable:
 				return usageInformation.spaceAvailable();
-			case spaceUsable :
+			case spaceUsable:
 				return usageInformation.spaceUsable();
-			case spaceUsed :
+			case spaceUsed:
 				return usageInformation.spaceUsed();
 		}
-		
+
 		return 0.0;
 	}
-	
+
 	@Override
 	final public String toString()
 	{

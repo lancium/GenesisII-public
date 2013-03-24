@@ -13,18 +13,16 @@ import edu.virginia.vcgr.xscript.macros.MacroReplacer;
 public class EchoStatement implements ParseStatement
 {
 	private String _message;
-	
+
 	EchoStatement(String message)
 	{
 		_message = message;
 	}
-	
+
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
 	{
-		try
-		{
+		try {
 			StringBuilder builder = new StringBuilder();
 			builder.append(MacroReplacer.replaceMacros(context, _message));
 			builder.append("\n");
@@ -32,9 +30,7 @@ public class EchoStatement implements ParseStatement
 			context.getWriter().append(ret);
 			context.getWriter().flush();
 			return ret;
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new ScriptException(ioe);
 		}
 	}

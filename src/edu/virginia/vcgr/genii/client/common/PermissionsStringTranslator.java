@@ -8,43 +8,34 @@ import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 
-public class PermissionsStringTranslator implements
-		SingleResourcePropertyTranslator
+public class PermissionsStringTranslator implements SingleResourcePropertyTranslator
 {
 	@Override
-	public <Type> Type deserialize(Class<Type> clazz, MessageElement element)
-			throws ResourcePropertyException
+	public <Type> Type deserialize(Class<Type> clazz, MessageElement element) throws ResourcePropertyException
 	{
 		if (!clazz.equals(Permissions.class))
-			throw new ResourcePropertyException(
-				"The PermissionsStringTranslator can ONLY be used to translate " +
-				"Permission string resource properties.");
-		
+			throw new ResourcePropertyException("The PermissionsStringTranslator can ONLY be used to translate "
+				+ "Permission string resource properties.");
+
 		if (element == null)
 			return null;
-		
-		try
-		{
+
+		try {
 			String pString = element.getValue();
 			return clazz.cast(new Permissions(pString));
-		}
-		catch (Exception e)
-		{
-			throw new ResourcePropertyException(
-				"Unable to extract permissions from property.", e);
+		} catch (Exception e) {
+			throw new ResourcePropertyException("Unable to extract permissions from property.", e);
 		}
 	}
 
 	@Override
-	public MessageElement serialize(QName name, Object obj)
-			throws ResourcePropertyException
+	public MessageElement serialize(QName name, Object obj) throws ResourcePropertyException
 	{
 		if (!(obj instanceof Permissions))
-			throw new ResourcePropertyException(
-				"The PermissionsStringTranslator can ONLY be used to translate " +
-				"Permissions resource properties.");
-		
-		Permissions perms = (Permissions)obj;
+			throw new ResourcePropertyException("The PermissionsStringTranslator can ONLY be used to translate "
+				+ "Permissions resource properties.");
+
+		Permissions perms = (Permissions) obj;
 		return new MessageElement(name, perms.toString());
 	}
 }

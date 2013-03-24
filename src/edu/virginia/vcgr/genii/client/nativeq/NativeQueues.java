@@ -4,19 +4,15 @@ import java.util.ServiceLoader;
 
 public class NativeQueues
 {
-	static private ServiceLoader<NativeQueue> _queues =
-		ServiceLoader.load(NativeQueue.class);
-	
-	synchronized static public NativeQueue getNativeQueue(String providerName)
-		throws NativeQueueException
+	static private ServiceLoader<NativeQueue> _queues = ServiceLoader.load(NativeQueue.class);
+
+	synchronized static public NativeQueue getNativeQueue(String providerName) throws NativeQueueException
 	{
-		for (NativeQueue queue : _queues)
-		{
+		for (NativeQueue queue : _queues) {
 			if (queue.getProviderName().equals(providerName))
 				return queue;
 		}
-		
-		throw new NativeQueueException("Unable to find queue provider \"" 
-			+ providerName + "\".");
+
+		throw new NativeQueueException("Unable to find queue provider \"" + providerName + "\".");
 	}
 }

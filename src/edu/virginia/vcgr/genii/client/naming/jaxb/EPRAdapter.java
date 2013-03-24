@@ -6,8 +6,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 
-public class EPRAdapter 
-	extends XmlAdapter<byte[], EndpointReferenceType>
+public class EPRAdapter extends XmlAdapter<byte[], EndpointReferenceType>
 {
 	@Override
 	public byte[] marshal(EndpointReferenceType arg0) throws Exception

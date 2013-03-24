@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -20,9 +19,9 @@ import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummaryInform
 import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class ResourcesSummaryFork extends
-		AbstractStreamableByteIOFactoryResourceFork
+public class ResourcesSummaryFork extends AbstractStreamableByteIOFactoryResourceFork
 {
 	public ResourcesSummaryFork(ResourceForkService service, String forkPath)
 	{
@@ -35,50 +34,40 @@ public class ResourcesSummaryFork extends
 	{
 		throw new IOException("Not allowed to modify the the resources summary.");
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public void snapshotState(OutputStream sink) throws IOException
 	{
 		PrintStream ps = new PrintStream(sink);
 		long total = 0;
-		
-		try
-		{
+
+		try {
 			ResourceKey key = getService().getResourceKey();
 			IResource resource = key.dereference();
-			if (resource instanceof BasicDBResource)
-			{
-				Connection connection = 
-					((BasicDBResource)resource).getConnection();
-				Map<String, Collection<ResourceSummaryInformation>> map =
-					ResourceSummary.resources(connection);
-				
+			if (resource instanceof BasicDBResource) {
+				Connection connection = ((BasicDBResource) resource).getConnection();
+				Map<String, Collection<ResourceSummaryInformation>> map = ResourceSummary.resources(connection);
+
 				List<String> keys = new Vector<String>(map.keySet());
 				Collections.sort(keys);
-				for (String className : keys)
-				{
-					Collection<ResourceSummaryInformation> summaryInfo =
-						map.get(className);
-					if (summaryInfo != null)
-					{
+				for (String className : keys) {
+					Collection<ResourceSummaryInformation> summaryInfo = map.get(className);
+					if (summaryInfo != null) {
 						total += summaryInfo.size();
-						
-						ps.format("Number of resource for \"%s\":  %d\n", className, 
-							summaryInfo.size());
+
+						ps.format("Number of resource for \"%s\":  %d\n", className, summaryInfo.size());
 					}
 				}
-				
+
 				ps.println();
 				ps.format("Total number of resources contained:  %d\n", total);
 			}
-		}
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			ps.println("Unable to get resources summary.");
 			cause.printStackTrace(ps);
 		}
-		
+
 		ps.flush();
 		ps.close();
 	}

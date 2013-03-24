@@ -40,253 +40,218 @@ class QueueAsBESFactoryAttributesUtilities
 	private QueueConstructionParameters _consParms;
 	private ResourceOverrides _resO;
 	private Collection<BESInformation> _allBESInformation;
-	
+
 	private OperatingSystem_Type operatingSystem()
 	{
 		OperatingSystemNames osName = _resO.operatingSystemName();
 		if (osName == null)
-			throw new IllegalArgumentException(
-				"Operating System name cannot be null!");
-		
+			throw new IllegalArgumentException("Operating System name cannot be null!");
+
 		String osVersion = _resO.operatingSystemVersion();
 		if (osVersion == null)
 			osVersion = "";
-		
-		return new OperatingSystem_Type(
-			new OperatingSystemType_Type(
-				OperatingSystemTypeEnumeration.fromString(osName.name()),
-					null),
-				osVersion, null, null);
+
+		return new OperatingSystem_Type(new OperatingSystemType_Type(OperatingSystemTypeEnumeration.fromString(osName.name()),
+			null), osVersion, null, null);
 	}
-	
+
 	private CPUArchitecture_Type cpuArchitecture()
 	{
 		ProcessorArchitecture arch = _resO.cpuArchitecture();
 		if (arch == null)
-			throw new IllegalArgumentException(
-				"Processor Architecture cannot be null!");
-		
-		return new CPUArchitecture_Type(
-			ProcessorArchitectureEnumeration.fromString(arch.name()), null);
+			throw new IllegalArgumentException("Processor Architecture cannot be null!");
+
+		return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.fromString(arch.name()), null);
 	}
-	
+
 	private Collection<MessageElement> supportedFilesystems()
 	{
 		Set<String> supportedFilesystems = new HashSet<String>();
-		
+
 		for (BESInformation info : _allBESInformation)
 			supportedFilesystems.addAll(info.supportedFilesystems());
-		
-		Collection<MessageElement> ret = new ArrayList<MessageElement>(
-			supportedFilesystems.size());
+
+		Collection<MessageElement> ret = new ArrayList<MessageElement>(supportedFilesystems.size());
 		for (String fs : supportedFilesystems)
 			ret.add(new MessageElement(BESConstants.FILESYSTEM_SUPPORT_ATTR, fs));
-		
+
 		return ret;
 	}
-	
+
 	private int totalCPUCount()
 	{
 		int total = 0;
-		for (BESInformation info : _allBESInformation)
-		{
+		for (BESInformation info : _allBESInformation) {
 			Double count = info.getCPUCount();
 			if (count != null)
 				total += count.intValue();
 		}
-		
+
 		return total;
 	}
-	
+
 	private ClockSpeed highestCPUSpeed()
 	{
 		double highest = 0.0;
-		
-		for (BESInformation info : _allBESInformation)
-		{
+
+		for (BESInformation info : _allBESInformation) {
 			Double speed = info.getCPUSpeed();
 			if (speed != null)
 				highest = Math.max(highest, speed.doubleValue());
 		}
-		
+
 		return new ClockSpeed(highest);
 	}
-	
+
 	private Size largestPhysicalMemory()
 	{
 		double largest = 0.0;
-		
-		for (BESInformation info : _allBESInformation)
-		{
+
+		for (BESInformation info : _allBESInformation) {
 			Double mem = info.getPhysicalMemory();
 			if (mem != null)
 				largest = Math.max(mem, largest);
 		}
-		
+
 		return new Size(largest);
 	}
-	
+
 	private Size largestVirtualMemory()
 	{
 		double largest = 0.0;
-		
-		for (BESInformation info : _allBESInformation)
-		{
+
+		for (BESInformation info : _allBESInformation) {
 			Double mem = info.getVirtualMemory();
 			if (mem != null)
 				largest = Math.max(mem, largest);
 		}
-		
+
 		return new Size(largest);
 	}
-	
+
 	private Duration getLargestWallclockTimeLimit()
 	{
 		Double largest = null;
-		
-		for (BESInformation info : _allBESInformation)
-		{
+
+		for (BESInformation info : _allBESInformation) {
 			Double value = info.getWallclockTimeLimit();
-			if (value != null)
-			{
+			if (value != null) {
 				if (largest == null)
 					largest = value;
 				else
 					largest = Math.max(largest, value);
 			}
 		}
-		
+
 		return (largest == null) ? null : new Duration(largest);
 	}
-	
+
 	private double cpuCount()
 	{
 		Integer i = _resO.cpuCount();
 		if (i == null)
 			i = totalCPUCount();
-		
+
 		return i.doubleValue();
 	}
-	
+
 	private double cpuSpeed()
 	{
 		ClockSpeed speed = _resO.cpuSpeed();
 		if (speed == null)
 			speed = highestCPUSpeed();
-		
+
 		return speed.as(ClockSpeedUnits.Hertz);
 	}
-	
+
 	private double physicalMemory()
 	{
 		Size size = _resO.physicalMemory();
 		if (size == null)
 			size = largestPhysicalMemory();
-		
+
 		return size.as(SizeUnits.Bytes);
 	}
-	
+
 	private double virtualMemory()
 	{
 		Size size = _resO.virtualMemory();
 		if (size == null)
 			size = largestVirtualMemory();
-		
+
 		return size.as(SizeUnits.Bytes);
 	}
-	
+
 	private Long wallclockTimeLimit()
 	{
 		Duration d = _resO.wallclockTimeLimit();
 		if (d == null)
 			d = getLargestWallclockTimeLimit();
-		
+
 		if (d != null)
 			return new Double(d.as(DurationUnits.Milliseconds)).longValue();
-		
+
 		return null;
 	}
-	
+
 	private Set<MatchingParameter> allMatchingParameters()
 	{
 		Set<MatchingParameter> ret = new HashSet<MatchingParameter>();
-		
-		for (BESInformation info : _allBESInformation)
-		{
+
+		for (BESInformation info : _allBESInformation) {
 			MatchingParameters parameters = info.getMatchingParameters();
 			ret.addAll(parameters.getParameters());
 		}
-		
+
 		return ret;
 	}
-	
-	QueueAsBESFactoryAttributesUtilities(
-		Collection<BESInformation> allBESInformation,
-		QueueConstructionParameters consParms)
+
+	QueueAsBESFactoryAttributesUtilities(Collection<BESInformation> allBESInformation, QueueConstructionParameters consParms)
 	{
 		_allBESInformation = allBESInformation;
-		
+
 		if (_allBESInformation == null)
-			throw new IllegalArgumentException(
-				"Must have bes information!");
-		
+			throw new IllegalArgumentException("Must have bes information!");
+
 		_consParms = consParms;
 		_resO = _consParms.getResourceOverrides();
 		if (_resO == null)
-			throw new IllegalArgumentException(
-				"Resource overrides cannot be null!");
+			throw new IllegalArgumentException("Resource overrides cannot be null!");
 	}
-	
-	
-	
-	FactoryResourceAttributesDocumentType factoryResourceAttributes(
-		boolean isAcceptingNewActivities, long totalNumberOfActivities)
+
+	FactoryResourceAttributesDocumentType factoryResourceAttributes(boolean isAcceptingNewActivities,
+		long totalNumberOfActivities)
 	{
-		URI []namingProfiles = null;
-		URI []besExtensions = null;
-		URI localResourceManagerType = 
-			ResourceManagerType.GridQueue.toApacheAxisURI();
-		
-		try
-		{
-			namingProfiles = new URI[] {
-					new URI(BESConstants.NAMING_PROFILE_WS_ADDRESSING),
-					new URI(BESConstants.NAMING_PROFILE_WS_NAMING)
-				};
-		}
-		catch (MalformedURIException e)
-		{
+		URI[] namingProfiles = null;
+		URI[] besExtensions = null;
+		URI localResourceManagerType = ResourceManagerType.GridQueue.toApacheAxisURI();
+
+		try {
+			namingProfiles = new URI[] { new URI(BESConstants.NAMING_PROFILE_WS_ADDRESSING),
+				new URI(BESConstants.NAMING_PROFILE_WS_NAMING) };
+		} catch (MalformedURIException e) {
 			namingProfiles = new URI[0];
 		}
-		
+
 		besExtensions = new URI[0];
-		
+
 		String machineName = Hostname.getLocalHostname().toString();
-		
+
 		Collection<MessageElement> any = new LinkedList<MessageElement>();
 		any.addAll(supportedFilesystems());
-		
+
 		Long wallclockTimeLimit = wallclockTimeLimit();
 		if (wallclockTimeLimit != null)
-			any.add(new MessageElement(
-				BESConstants.BES_WALLCLOCK_TIMELIMIT_ATTR,
-				wallclockTimeLimit));
+			any.add(new MessageElement(BESConstants.BES_WALLCLOCK_TIMELIMIT_ATTR, wallclockTimeLimit));
 		for (MatchingParameter parameter : allMatchingParameters())
-			any.add(new MessageElement(
-				GenesisIIBaseRP.MATCHING_PARAMTER_ATTR_QNAME,
-				parameter.toAxisType()));
-		
-		BasicResourceAttributesDocumentType basicResourceAttributesDocument =
-			new BasicResourceAttributesDocumentType(
-				machineName, operatingSystem(), cpuArchitecture(), cpuCount(), 
-				cpuSpeed(), physicalMemory(), virtualMemory(),
-				any.toArray(new MessageElement[any.size()]));
-		
-		return new FactoryResourceAttributesDocumentType(
-			basicResourceAttributesDocument, isAcceptingNewActivities, 
-			machineName, machineName, totalNumberOfActivities, 
-			null, _allBESInformation.size(), 
-			null, namingProfiles, besExtensions, 
-			localResourceManagerType, any.toArray(new MessageElement[any.size()]));
+			any.add(new MessageElement(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, parameter.toAxisType()));
+
+		BasicResourceAttributesDocumentType basicResourceAttributesDocument = new BasicResourceAttributesDocumentType(
+			machineName, operatingSystem(), cpuArchitecture(), cpuCount(), cpuSpeed(), physicalMemory(), virtualMemory(),
+			any.toArray(new MessageElement[any.size()]));
+
+		return new FactoryResourceAttributesDocumentType(basicResourceAttributesDocument, isAcceptingNewActivities,
+			machineName, machineName, totalNumberOfActivities, null, _allBESInformation.size(), null, namingProfiles,
+			besExtensions, localResourceManagerType, any.toArray(new MessageElement[any.size()]));
 	}
 }

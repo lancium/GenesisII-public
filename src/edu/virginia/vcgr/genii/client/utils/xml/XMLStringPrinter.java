@@ -28,7 +28,7 @@ public class XMLStringPrinter
 	static private Log _logger = LogFactory.getLog(XMLStringPrinter.class);
 
 	// formats the chunk of XML in xmlString with reasonably nice indentation, i.e. it pretty prints
-	// the XML code.  if there's a failure during parsing/formatting, then null is returned.
+	// the XML code. if there's a failure during parsing/formatting, then null is returned.
 	public static String format(String xmlString)
 	{
 		try {
@@ -42,9 +42,9 @@ public class XMLStringPrinter
 			s.serialize(doc);
 			return w.toString();
 		} catch (Throwable e) {
-			// hmmm: example of naive catch-all, without consideration for memory exceptions, etc...
-			_logger.info("failed to parse and print XML", e);
-			return null;
+			String msg = "failed to parse and print XML" + e.getMessage();
+			_logger.info(msg);
+			return msg;
 		}
 	}
 

@@ -14,47 +14,40 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 public class BESManager extends BaseGridTool
 {
-	static final private String DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dbes-manager";		
-	static final private String USAGE = 
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ubes-manager";		
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/bes-manager";
-	
+	static final private String DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dbes-manager";
+	static final private String USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/ubes-manager";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/bes-manager";
+
 	private EndpointReferenceType getLocalBESContainer()
 	{
 		return BESSelectorDialog.selectBESContainer(null);
 	}
-	
+
 	public BESManager()
 	{
-		super(new FileResource(DESCRIPTION), new FileResource(USAGE), false,
-				ToolCategory.ADMINISTRATION);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), false, ToolCategory.ADMINISTRATION);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		EndpointReferenceType target = null;
-		
-		if (numArguments() == 1)
-		{
-			RNSPath targetPath = lookup(new GeniiPath(getArgument(0)), 
-				RNSPathQueryFlags.MUST_EXIST);
+
+		if (numArguments() == 1) {
+			RNSPath targetPath = lookup(new GeniiPath(getArgument(0)), RNSPathQueryFlags.MUST_EXIST);
 			target = targetPath.getEndpoint();
-		} else
-		{
+		} else {
 			target = getLocalBESContainer();
 			if (target == null)
 				return 0;
 		}
-		
+
 		BESManagerDialog dialog = new BESManagerDialog(null, target);
 		dialog.pack();
 		GuiUtils.centerComponent(dialog);
 		dialog.setVisible(true);
-		
+
 		return 0;
 	}
 

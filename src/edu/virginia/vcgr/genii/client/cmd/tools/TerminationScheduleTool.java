@@ -22,61 +22,50 @@ import edu.virginia.vcgr.genii.client.gpath.*;
 
 public class TerminationScheduleTool extends BaseGridTool
 {
-	static final private String _DESCRIPTION_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dschedule-termination";
-	static final private String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uschedule-termination";
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/schedule-termination";
-	
+	static final private String _DESCRIPTION_RESOURCE = "edu/virginia/vcgr/genii/client/cmd/tools/description/dschedule-termination";
+	static final private String _USAGE_RESOURCE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uschedule-termination";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/schedule-termination";
+
 	public TerminationScheduleTool()
 	{
-		super(new FileResource(_DESCRIPTION_RESOURCE),
-			new FileResource(_USAGE_RESOURCE), false, ToolCategory.GENERAL);
+		super(new FileResource(_DESCRIPTION_RESOURCE), new FileResource(_USAGE_RESOURCE), false, ToolCategory.GENERAL);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		int numArgs = numArguments();
 		Date targetTime = null;
-		
-		targetTime = parseTargetTime(getArgument(numArgs -1));
-		
-		for (int lcv = 0; lcv < (numArgs - 1); lcv++)
-		{
-			RNSPath target = lookup(new GeniiPath(getArgument(lcv)),
-				RNSPathQueryFlags.MUST_EXIST);
+
+		targetTime = parseTargetTime(getArgument(numArgs - 1));
+
+		for (int lcv = 0; lcv < (numArgs - 1); lcv++) {
+			RNSPath target = lookup(new GeniiPath(getArgument(lcv)), RNSPathQueryFlags.MUST_EXIST);
 			schedTerm(target, targetTime);
 		}
-		
+
 		return 0;
 	}
-	
-	static private Date parseTargetTime(String targetTime)
-		throws ParseException
+
+	static private Date parseTargetTime(String targetTime) throws ParseException
 	{
-		if (targetTime.startsWith("+"))
-		{
+		if (targetTime.startsWith("+")) {
 			Duration d = new Duration(targetTime.substring(1));
-			return new Date(new Date().getTime() + (long)d.as(DurationUnits.Milliseconds));
-		} else
-		{
+			return new Date(new Date().getTime() + (long) d.as(DurationUnits.Milliseconds));
+		} else {
 			DateFormat format = DateFormat.getDateTimeInstance();
 			return format.parse(targetTime);
 		}
 	}
-	
-	static public void schedTerm(RNSPath target, Date targetTime)
-		throws RemoteException, RNSPathDoesNotExistException
+
+	static public void schedTerm(RNSPath target, Date targetTime) throws RemoteException, RNSPathDoesNotExistException
 	{
-		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-			target.getEndpoint());
-		
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, target.getEndpoint());
+
 		Calendar c = Calendar.getInstance();
 		c.setTime(targetTime);
-		
+
 		common.setTerminationTime(new SetTerminationTime(c, null));
 	}
 
@@ -85,9 +74,9 @@ public class TerminationScheduleTool extends BaseGridTool
 	{
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException();
-		int numArgs=numArguments();
-		for (int lcv = 0; lcv < numArgs-1; lcv ++)
-			if(new GeniiPath(getArgument(lcv)).pathType() != GeniiPathType.Grid)
+		int numArgs = numArguments();
+		for (int lcv = 0; lcv < numArgs - 1; lcv++)
+			if (new GeniiPath(getArgument(lcv)).pathType() != GeniiPathType.Grid)
 				throw new InvalidToolUsageException("<target> must be a grid path. ");
 	}
 }

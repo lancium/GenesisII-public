@@ -15,61 +15,47 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportEntry;
 
 public class SVNExportRoot extends AbstractVExportRoot
 {
-	static
-	{
+	static {
 		SVNRepositoryFactoryImpl.setup();
 		DAVRepositoryFactory.setup();
 		FSRepositoryFactory.setup();
 	}
-	
+
 	static final private int SVN_CACHE_SIZE = 256;
 
-	static private SVNExportEntryCache _entryCache = new SVNExportEntryCache(
-		SVN_CACHE_SIZE);
-	
+	static private SVNExportEntryCache _entryCache = new SVNExportEntryCache(SVN_CACHE_SIZE);
+
 	private SVNRepository _repository;
 	private String _svnURL;
 	private long _revision;
-	
-	public SVNExportRoot(
-		String svnURL, String svnUser, String svnPass, Long svnRevision)
-			throws IOException
+
+	public SVNExportRoot(String svnURL, String svnUser, String svnPass, Long svnRevision) throws IOException
 	{
 		_svnURL = svnURL;
-		try
-		{
+		try {
 			if (svnUser != null && svnPass == null)
 				svnPass = "";
-			
-			SVNClientManager mgr = SVNClientManager.newInstance(
-				null, svnUser, svnPass);
+
+			SVNClientManager mgr = SVNClientManager.newInstance(null, svnUser, svnPass);
 			SVNURL url = SVNURL.parseURIEncoded(svnURL);
 			_repository = mgr.createRepository(url, true);
-			
+
 			if (svnRevision == null)
 				_revision = _repository.getLatestRevision();
 			else
 				_revision = svnRevision;
-		}
-		catch (SVNException e)
-		{
+		} catch (SVNException e) {
 			throw new IOException("Unable to connect to SVN repository.", e);
 		}
 	}
-	
+
 	@Override
-	protected VExportEntry internalLookup(String normalizedPath)
-		throws IOException
+	protected VExportEntry internalLookup(String normalizedPath) throws IOException
 	{
-		try
-		{
-			return _entryCache.lookup(new SVNPathIdentifier(
-				_repository, _svnURL, normalizedPath, _revision));
-		}
-		catch (SVNException e)
-		{
-			throw new IOException(String.format(
-				"Unable to locate svn path \"%s\".", normalizedPath), e);
+		try {
+			return _entryCache.lookup(new SVNPathIdentifier(_repository, _svnURL, normalizedPath, _revision));
+		} catch (SVNException e) {
+			throw new IOException(String.format("Unable to locate svn path \"%s\".", normalizedPath), e);
 		}
 	}
 }

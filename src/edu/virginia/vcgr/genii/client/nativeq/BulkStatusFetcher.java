@@ -4,6 +4,5 @@ import java.util.Map;
 
 public interface BulkStatusFetcher
 {
-	public Map<JobToken, NativeQueueState> getStateMap()
-		throws NativeQueueException;
+	public Map<JobToken, NativeQueueState> getStateMap() throws NativeQueueException;
 }

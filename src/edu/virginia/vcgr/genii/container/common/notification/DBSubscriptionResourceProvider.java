@@ -9,8 +9,7 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider;
 public class DBSubscriptionResourceProvider extends BasicDBResourceProvider
 {
 	@Override
-	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
-		throws SQLException
+	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool) throws SQLException
 	{
 		return new DBSubscriptionResourceFactory(pool);
 	}

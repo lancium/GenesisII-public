@@ -14,35 +14,30 @@ import edu.virginia.vcgr.genii.container.q2.QueueManager;
 public class QueueInformation extends GenesisIIStyledPage
 {
 	static final private String PAGE_TITLE = "Grid Queue Information";
-	
+
 	@InjectParameter("queueID")
 	private String _queueID;
-	
+
 	private void generateAllQueuesPage(PrintStream ps) throws IOException
 	{
 		ps.println("<H2>Grid Queues Available</H2>");
 		ps.println("<UL>");
-		for (String queueID : QueueManager.listAllQueues())
-		{
-			ps.format("<LI><A HREF=\"queue-info.html?queueID=%s\">Grid Queue %s</A></LI>",
-				queueID, queueID);
+		for (String queueID : QueueManager.listAllQueues()) {
+			ps.format("<LI><A HREF=\"queue-info.html?queueID=%s\">Grid Queue %s</A></LI>", queueID, queueID);
 		}
 		ps.println("</UL>");
 	}
-	
-	private void generateResourcesAvailable(PrintStream ps, QueueManager queue)
-		throws IOException
+
+	private void generateResourcesAvailable(PrintStream ps, QueueManager queue) throws IOException
 	{
 		ps.format("<H2>Total Resources Available:  %d</H2><BR/>", queue.totalSlots());
-		ps.format("<H2>Total Jobs Finished Since 14 August 2009:  %d</H2><BR/>",
-			(669378L + queue.totalFinishedAllTime()));
+		ps.format("<H2>Total Jobs Finished Since 14 August 2009:  %d</H2><BR/>", (669378L + queue.totalFinishedAllTime()));
 		ps.println("<TABLE border=\"0\" cellpadding=\"50\">");
 		ps.println("<TR>");
 		ps.println("<TD>");
 		ps.println("<UL>");
 		Map<String, Long> jobMap = queue.summarizeJobs();
-		for (String category : jobMap.keySet())
-		{
+		for (String category : jobMap.keySet()) {
 			if (category.equals("Error"))
 				ps.format("<LI>%d Jobs Currently in Error</LI>", jobMap.get(category));
 			else if (category.equals("Finished"))
@@ -53,34 +48,28 @@ public class QueueInformation extends GenesisIIStyledPage
 		ps.println("</UL>");
 		ps.println("</TD>");
 		ps.println("<TD>");
-		ps.format("<IMG SRC=\"queue-resources.png?queueID=%1$s&width=%2$d&height=%3$d\" " +
-			"ALT=\"*\" width=\"%2$d\" height=\"%3$d\"/>",
-			_queueID, QueueResources.WIDTH, QueueResources.HEIGHT);
+		ps.format("<IMG SRC=\"queue-resources.png?queueID=%1$s&width=%2$d&height=%3$d\" "
+			+ "ALT=\"*\" width=\"%2$d\" height=\"%3$d\"/>", _queueID, QueueResources.WIDTH, QueueResources.HEIGHT);
 		ps.println("</TD>");
 		ps.println("</TR>");
 		ps.println("</TABLE>");
 	}
-	
-	private void generateQueuePage(PrintStream ps, String queueID)
-		throws IOException
+
+	private void generateQueuePage(PrintStream ps, String queueID) throws IOException
 	{
-		try
-		{
+		try {
 			QueueManager queue = QueueManager.getManager(queueID);
 			if (queue == null)
 				throw new FileNotFoundException("Couldn't find target Queue.");
-			else
-			{
+			else {
 				generateResourcesAvailable(ps, queue);
 			}
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			ps.println("<BOLD>Unable to find queue</BOLD>");
 			return;
 		}
 	}
-	
+
 	@Override
 	protected void generateContent(PrintStream ps) throws IOException
 	{
@@ -89,7 +78,7 @@ public class QueueInformation extends GenesisIIStyledPage
 		else
 			generateQueuePage(ps, _queueID);
 	}
-	
+
 	public QueueInformation()
 	{
 		super("images/grid_logo_medium.jpg", PAGE_TITLE);

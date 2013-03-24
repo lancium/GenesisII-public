@@ -30,56 +30,40 @@ import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 public class QueueManagerTableModel extends RowTableModel<JobInformation>
 {
 	static final long serialVersionUID = 0L;
-	
-	static private RowTableColumnDefinition<?, ?>[] COLUMNS = {
-		new JobTicketColumn(),
-		new JobNameColumn(),
-		new SubmitTimeColumn(),
-		new CredentialsColumn(),
-		new AttemptNumberColumn(),
-		new JobStateColumn()
-	};
-	
-	private class QueueJobListFetcherTask 
-		extends AbstractTask<Collection<JobInformation>>
+
+	static private RowTableColumnDefinition<?, ?>[] COLUMNS = { new JobTicketColumn(), new JobNameColumn(),
+		new SubmitTimeColumn(), new CredentialsColumn(), new AttemptNumberColumn(), new JobStateColumn() };
+
+	private class QueueJobListFetcherTask extends AbstractTask<Collection<JobInformation>>
 	{
 		@Override
-		final public Collection<JobInformation> execute(
-			TaskProgressListener progressListener)
-				throws Exception
+		final public Collection<JobInformation> execute(TaskProgressListener progressListener) throws Exception
 		{
 			Collection<JobInformation> jobInfo = new LinkedList<JobInformation>();
-			
+
 			WSIterable<JobInformationType> iterable = null;
-			try
-			{
-				iterable = WSIterable.axisIterable(
-					JobInformationType.class, 
-					_queue.iterateStatus(null).getResult(), 200);
-				JobInformationIterator iter = new JobInformationIterator(
-					iterable.iterator());
+			try {
+				iterable = WSIterable.axisIterable(JobInformationType.class, _queue.iterateStatus(null).getResult(), 200);
+				JobInformationIterator iter = new JobInformationIterator(iterable.iterator());
 				while (iter.hasNext())
 					jobInfo.add(iter.next());
-				
+
 				return jobInfo;
-			}
-			finally
-			{
+			} finally {
 				StreamUtils.close(iterable);
 			}
-		}	
+		}
 	}
-	
-	private class QueueJobListCompletionListener
-		implements TaskCompletionListener<Collection<JobInformation>>
+
+	private class QueueJobListCompletionListener implements TaskCompletionListener<Collection<JobInformation>>
 	{
 		private Component _parentComponent;
-		
+
 		private QueueJobListCompletionListener(Component parentComponent)
 		{
 			_parentComponent = parentComponent;
 		}
-		
+
 		@Override
 		public void taskCancelled(Task<Collection<JobInformation>> task)
 		{
@@ -87,53 +71,47 @@ public class QueueManagerTableModel extends RowTableModel<JobInformation>
 		}
 
 		@Override
-		public void taskCompleted(Task<Collection<JobInformation>> task,
-			Collection<JobInformation> result)
+		public void taskCompleted(Task<Collection<JobInformation>> task, Collection<JobInformation> result)
 		{
 			_contents.clear();
 			_contents.addAll(result);
-			
+
 			fireTableDataChanged();
 		}
 
 		@Override
-		public void taskExcepted(Task<Collection<JobInformation>> task,
-				Throwable cause)
+		public void taskExcepted(Task<Collection<JobInformation>> task, Throwable cause)
 		{
-			ErrorHandler.handleError(_uiContext.uiContext(),
-				(JComponent)_parentComponent, cause);
+			ErrorHandler.handleError(_uiContext.uiContext(), (JComponent) _parentComponent, cause);
 		}
 	}
-	
+
 	private UIPluginContext _uiContext;
 	private QueuePortType _queue;
-	private ArrayList<JobInformation> _contents = 
-		new ArrayList<JobInformation>();
-	
+	private ArrayList<JobInformation> _contents = new ArrayList<JobInformation>();
+
 	void refresh(Component parentComponent)
 	{
-		_uiContext.uiContext().progressMonitorFactory().createMonitor(
-			parentComponent,
-			"Loading Queue Jobs", "Fetching job list from queue", 1000L,
-			new QueueJobListFetcherTask(), 
-			new QueueJobListCompletionListener(parentComponent)).start();
+		_uiContext
+			.uiContext()
+			.progressMonitorFactory()
+			.createMonitor(parentComponent, "Loading Queue Jobs", "Fetching job list from queue", 1000L,
+				new QueueJobListFetcherTask(), new QueueJobListCompletionListener(parentComponent)).start();
 	}
-	
-	QueueManagerTableModel(UIPluginContext uiContext)
-		throws ResourceException, GenesisIISecurityException, 
-			RNSPathDoesNotExistException
+
+	QueueManagerTableModel(UIPluginContext uiContext) throws ResourceException, GenesisIISecurityException,
+		RNSPathDoesNotExistException
 	{
 		_uiContext = uiContext;
-		_queue = ClientUtils.createProxy(QueuePortType.class,
-			uiContext.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint(),
-			uiContext.uiContext().callingContext());
+		_queue = ClientUtils.createProxy(QueuePortType.class, uiContext.endpointRetriever().getTargetEndpoints().iterator()
+			.next().getEndpoint(), uiContext.uiContext().callingContext());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	final protected RowTableColumnDefinition<JobInformation, ?>[] columnDefinitions()
 	{
-		return (RowTableColumnDefinition<JobInformation, ?>[])COLUMNS;
+		return (RowTableColumnDefinition<JobInformation, ?>[]) COLUMNS;
 	}
 
 	@Override

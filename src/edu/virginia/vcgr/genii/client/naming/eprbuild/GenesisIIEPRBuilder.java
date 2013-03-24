@@ -19,28 +19,28 @@ public class GenesisIIEPRBuilder extends OGSAEPRBuilder
 {
 	private Set<PortType> _portTypes = new HashSet<PortType>();
 	private GUID _containerID = null;
-	
+
 	public GenesisIIEPRBuilder(URI address)
 	{
 		super(address);
 	}
-	
+
 	final public GUID containerID()
 	{
 		return _containerID;
 	}
-	
+
 	final public void containerID(GUID containerID)
 	{
 		_containerID = containerID;
 	}
-	
-	final public void addPortTypes(PortType...pt)
+
+	final public void addPortTypes(PortType... pt)
 	{
 		for (PortType p : pt)
 			_portTypes.add(p);
 	}
-	
+
 	final public Set<PortType> portTypes()
 	{
 		return Collections.unmodifiableSet(_portTypes);
@@ -50,23 +50,19 @@ public class GenesisIIEPRBuilder extends OGSAEPRBuilder
 	public Collection<Element> metadata()
 	{
 		Collection<Element> ret = super.metadata();
-		
+
 		if (ret != null)
 			ret = new LinkedList<Element>(ret);
 		else
 			ret = new LinkedList<Element>();
-		
+
 		/* Add port types */
-		ret.add(new MessageElement(
-			OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME,
-			PortType.translate(_portTypes)));
-		
+		ret.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.translate(_portTypes)));
+
 		/* Add container ID */
 		if (_containerID != null)
-			ret.add(new MessageElement(
-				ContainerConstants.CONTAINER_ID_METADATA_ELEMENT,
-				_containerID.toString()));
-		
+			ret.add(new MessageElement(ContainerConstants.CONTAINER_ID_METADATA_ELEMENT, _containerID.toString()));
+
 		return Collections.unmodifiableCollection(ret);
 	}
 }

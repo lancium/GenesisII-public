@@ -4,30 +4,32 @@ import java.util.Collection;
 
 import edu.virginia.cs.vcgr.genii.job_management.JobInformationType;
 
-public class QueueInMemoryIteratorEntry 
+public class QueueInMemoryIteratorEntry
 {
 
 	private boolean _isIterable;
 	private Collection<JobInformationType> _toReturn;
 	private Collection<String> _iterableIDs;
 
-	public QueueInMemoryIteratorEntry(boolean isIterable,
-			Collection<JobInformationType> ret, Collection<String> toIterate) 
+	public QueueInMemoryIteratorEntry(boolean isIterable, Collection<JobInformationType> ret, Collection<String> toIterate)
 	{
 		_isIterable = isIterable;
 		_toReturn = ret;
 		_iterableIDs = toIterate;
 	}
 
-	public boolean isIterable() {
+	public boolean isIterable()
+	{
 		return _isIterable;
 	}
 
-	public Collection<JobInformationType> getReturnables() {
+	public Collection<JobInformationType> getReturnables()
+	{
 		return _toReturn;
 	}
 
-	public Collection<String> getIterableIDs() {
+	public Collection<String> getIterableIDs()
+	{
 		return _iterableIDs;
 	}
 

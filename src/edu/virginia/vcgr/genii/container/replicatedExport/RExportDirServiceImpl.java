@@ -27,7 +27,6 @@ import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
@@ -47,52 +46,44 @@ import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType;
 import edu.virginia.vcgr.genii.replicatedExport.PopulateDirRequestType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-@GeniiServiceConfiguration(
-	resourceProvider=RExportDBResourceProvider.class)
-public class RExportDirServiceImpl extends GenesisIIBase 
-	implements RExportDirPortType
+@GeniiServiceConfiguration(resourceProvider = RExportDBResourceProvider.class)
+public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPortType
 {
 	static private Log _logger = LogFactory.getLog(RExportDirServiceImpl.class);
-	
-	protected void setAttributeHandlers()
-		throws NoSuchMethodException, ResourceException, 
-			ResourceUnknownFaultType
+
+	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
-		
+
 		new RandomByteIOAttributeHandlers(getAttributePackage());
 	}
-	
+
 	public RExportDirServiceImpl() throws RemoteException
 	{
 		this("RExportDirPortType");
-		
-		addImplementedPortType(
-				WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
 
-		addImplementedPortType(
-				WellKnownPortTypes.RNS_PORT_TYPE);
-		
+		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
+
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
+
 	}
-	
+
 	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.REXPORT_DIR_PORT_TYPE;
 	}
-	
+
 	protected RExportDirServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
-		
-		addImplementedPortType(
-				WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
-		addImplementedPortType(
-				WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
+
+		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 	}
-	
-	private class LegacyResourceTerminatedNotificationHandler
-		extends AbstractNotificationHandler<ResourceTerminationContents>
+
+	private class LegacyResourceTerminatedNotificationHandler extends AbstractNotificationHandler<ResourceTerminationContents>
 	{
 		private LegacyResourceTerminatedNotificationHandler()
 		{
@@ -100,59 +91,49 @@ public class RExportDirServiceImpl extends GenesisIIBase
 		}
 
 		@Override
-		public String handleNotification(TopicPath topic,
-			EndpointReferenceType producerReference,
-			EndpointReferenceType subscriptionReference,
-			ResourceTerminationContents contents) throws Exception
+		public String handleNotification(TopicPath topic, EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference, ResourceTerminationContents contents) throws Exception
 		{
-			/*ensure this notification is for matching resource*/
+			/* ensure this notification is for matching resource */
 			ResourceKey rKey = ResourceManager.getCurrentResource();
 			IRExportResource resource = (IRExportResource) rKey.dereference();
-			String resourcePrimaryLocalPath= resource.getLocalPath();
-			
-			RExportSubscriptionUserData notifyData = 
-				contents.additionalUserData(
-					RExportSubscriptionUserData.class);
-			
+			String resourcePrimaryLocalPath = resource.getLocalPath();
+
+			RExportSubscriptionUserData notifyData = contents.additionalUserData(RExportSubscriptionUserData.class);
+
 			String exportPath = notifyData.getPrimaryLocalPath();
-			if(resourcePrimaryLocalPath.equals(exportPath)){
-				//destroy resource DB info
-				//this will not send termination notification
+			if (resourcePrimaryLocalPath.equals(exportPath)) {
+				// destroy resource DB info
+				// this will not send termination notification
 				resource.destroy(false);
-				
+
 				_logger.info("RExportDir replica " + exportPath + " terminated.");
-			}
-			else{
-				_logger.error("Termination notification user" +
-						" data does not match RExportDir resource.");
+			} else {
+				_logger.error("Termination notification user" + " data does not match RExportDir resource.");
 			}
 			return NotificationConstants.OK;
 		}
 	}
-	
+
 	@Override
-	protected void registerNotificationHandlers(
-		NotificationMultiplexer multiplexer)
+	protected void registerNotificationHandlers(NotificationMultiplexer multiplexer)
 	{
 		super.registerNotificationHandlers(multiplexer);
-		
-		multiplexer.registerNotificationHandler(
-			GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
+
+		multiplexer.registerNotificationHandler(GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
 			new LegacyResourceTerminatedNotificationHandler());
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
-			throws RemoteException, WriteNotPermittedFaultType
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("add operation not supported in RExportDir.");
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest) 
-		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType
+	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest) throws RemoteException,
+		RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 		throw new RemoteException("createFile operation not supported in RExportDir.");
 	}
@@ -162,94 +143,83 @@ public class RExportDirServiceImpl extends GenesisIIBase
 	 */
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public LookupResponseType lookup(String []lookupRequest) 
-		throws RemoteException, ResourceUnknownFaultType
+	public LookupResponseType lookup(String[] lookupRequest) throws RemoteException, ResourceUnknownFaultType
 	{
 		Collection<RExportEntry> entries = new LinkedList<RExportEntry>();
-		
-		//get current resource
-		IRExportResource resource = 
-			(IRExportResource)ResourceManager.getCurrentResource().dereference();
-		
-		//retrieve entries associated with resource
+
+		// get current resource
+		IRExportResource resource = (IRExportResource) ResourceManager.getCurrentResource().dereference();
+
+		// retrieve entries associated with resource
 		if (lookupRequest == null || lookupRequest.length == 0)
 			lookupRequest = new String[] { null };
-		
+
 		for (String entryName : lookupRequest)
 			entries.addAll(resource.retrieveEntries(entryName));
-		
+
 		if (entries.size() == 0)
 			_logger.info("empty RExportDir lookup results");
-		
-		//create EntryType list of found entries for response
-		Collection<RNSEntryResponseType> result = 
-			new ArrayList<RNSEntryResponseType>(entries.size());
-		for (RExportEntry entry : entries)
-		{
-			result.add(new RNSEntryResponseType(
-				entry.getEntryReference(), 
-				RNSUtilities.createMetadata(entry.getEntryReference(), entry.getAttributes()), null, 
-				entry.getName()));
+
+		// create EntryType list of found entries for response
+		Collection<RNSEntryResponseType> result = new ArrayList<RNSEntryResponseType>(entries.size());
+		for (RExportEntry entry : entries) {
+			result.add(new RNSEntryResponseType(entry.getEntryReference(), RNSUtilities.createMetadata(
+				entry.getEntryReference(), entry.getAttributes()), null, entry.getName()));
 		}
-		
-		return RNSContainerUtilities.translate(
-    		result, iteratorBuilder(
-    			RNSEntryResponseType.getTypeDesc().getXmlType()));
+
+		return RNSContainerUtilities.translate(result, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()));
 	}
-	
+
 	/*
-	 * creates entry for new replica of new export entry in rexportentry table 
-	 * called on RExportDir containing replica resource
+	 * creates entry for new replica of new export entry in rexportentry table called on RExportDir
+	 * containing replica resource
 	 */
 	@RWXMapping(RWXCategory.WRITE)
-	public void populateDir(PopulateDirRequestType request) 
-		throws ResourceException, ResourceUnknownFaultType, RNSEntryExistsFaultType
+	public void populateDir(PopulateDirRequestType request) throws ResourceException, ResourceUnknownFaultType,
+		RNSEntryExistsFaultType
 	{
-		//extract replica epr from request
+		// extract replica epr from request
 		EndpointReferenceType replicaEPR = request.getReplica_EPR();
-		
-		//extract replica name from request 
+
+		// extract replica name from request
 		String replicaName = request.getReplica_name();
-		
-		//extract replica type from request
+
+		// extract replica type from request
 		String replicaType = request.getReplica_type();
-		
-		//get db entry associated with current resource
+
+		// get db entry associated with current resource
 		IRExportResource dirResource = null;
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		dirResource = (IRExportResource)rKey.dereference();
-		
-		//store new entry and commit changes
-		RExportEntry newReplicaEntry = new RExportEntry(
-				dirResource.getId(),   	//resourceKey of current dir 
-				replicaName, 			//passed in name of replica
-				replicaEPR, 			//passed in epr of replica
-				(new GUID()).toString(),//newly created GUID as entryID
-				replicaType, 			//passed in type of replica
-				null);					//null attrs
-		
+		dirResource = (IRExportResource) rKey.dereference();
+
+		// store new entry and commit changes
+		RExportEntry newReplicaEntry = new RExportEntry(dirResource.getId(), // resourceKey of
+																				// current dir
+			replicaName, // passed in name of replica
+			replicaEPR, // passed in epr of replica
+			(new GUID()).toString(),// newly created GUID as entryID
+			replicaType, // passed in type of replica
+			null); // null attrs
+
 		dirResource.addEntry(newReplicaEntry, false);
 		dirResource.commit();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
-		throws RemoteException, WriteNotPermittedFaultType
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("Rename operation not supported in RExportDir.");
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] remove(String[] removeRequest)
-		throws RemoteException, WriteNotPermittedFaultType
+	public RNSEntryResponseType[] remove(String[] removeRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("Remove operation not supported in RExportDir.");
 	}
-	
-	protected Object translateConstructionParameter(MessageElement parameter)
-	throws Exception
+
+	protected Object translateConstructionParameter(MessageElement parameter) throws Exception
 	{
 		QName messageName = parameter.getQName();
 		if (messageName.equals(IRExportResource.LOCALPATH_CONSTRUCTION_PARAM))
@@ -257,22 +227,19 @@ public class RExportDirServiceImpl extends GenesisIIBase
 		else
 			return super.translateConstructionParameter(parameter);
 	}
-	
-	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters)
-		throws ResourceException, BaseFaultType
+
+	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters) throws ResourceException, BaseFaultType
 	{
 		_logger.info("Creating new RExportDir instance.");
-		
+
 		return super.createResource(constructionParameters);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] setMetadata(
-		MetadataMappingType[] setMetadataRequest) throws RemoteException,
-			WriteNotPermittedFaultType
+	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
+		WriteNotPermittedFaultType
 	{
-		throw new RemoteException(
-			"SetMetadata operation not supported in RExportDir!");
+		throw new RemoteException("SetMetadata operation not supported in RExportDir!");
 	}
 }

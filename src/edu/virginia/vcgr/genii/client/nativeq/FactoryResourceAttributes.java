@@ -8,20 +8,18 @@ public class FactoryResourceAttributes extends ResourceAttributes
 {
 	private BasicResourceAttributes _basicResourceAttributes;
 	private Collection<ResourceAttributes> _containedResources;
-    private URI _localResourceManagerType;
-    
-    public FactoryResourceAttributes(
-    	BasicResourceAttributes basicResourceAttributes, 
-    	Collection<ResourceAttributes> containedResources, 
-    	URI localResourceManagerType)
-    {
-    	if (containedResources == null)
-    		containedResources = new ArrayList<ResourceAttributes>();
-    	
-    	_basicResourceAttributes = basicResourceAttributes;
-    	_containedResources = containedResources;
-    	_localResourceManagerType = localResourceManagerType;
-    }
+	private URI _localResourceManagerType;
+
+	public FactoryResourceAttributes(BasicResourceAttributes basicResourceAttributes,
+		Collection<ResourceAttributes> containedResources, URI localResourceManagerType)
+	{
+		if (containedResources == null)
+			containedResources = new ArrayList<ResourceAttributes>();
+
+		_basicResourceAttributes = basicResourceAttributes;
+		_containedResources = containedResources;
+		_localResourceManagerType = localResourceManagerType;
+	}
 
 	public BasicResourceAttributes getBasicResourceAttributes()
 	{
@@ -37,26 +35,20 @@ public class FactoryResourceAttributes extends ResourceAttributes
 	{
 		return _localResourceManagerType;
 	}
-	
+
 	protected void describe(StringBuilder builder, String tabPrefix)
 	{
-		if (_basicResourceAttributes != null)
-		{
-			builder.append(String.format(
-				"%sBasic Resource Attrs:\n", tabPrefix));
+		if (_basicResourceAttributes != null) {
+			builder.append(String.format("%sBasic Resource Attrs:\n", tabPrefix));
 			_basicResourceAttributes.describe(builder, tabPrefix + "\t");
 		}
-		
-		for (ResourceAttributes attr : _containedResources)
-		{
-			builder.append(String.format(
-				"%sContained Resource:\n", tabPrefix));
+
+		for (ResourceAttributes attr : _containedResources) {
+			builder.append(String.format("%sContained Resource:\n", tabPrefix));
 			attr.describe(builder, tabPrefix + "\t");
 		}
-		
+
 		if (_localResourceManagerType != null)
-			builder.append(String.format(
-				"%sLocal Resource Manager Type:  %s\n", tabPrefix, 
-				_localResourceManagerType));
+			builder.append(String.format("%sLocal Resource Manager Type:  %s\n", tabPrefix, _localResourceManagerType));
 	}
 }

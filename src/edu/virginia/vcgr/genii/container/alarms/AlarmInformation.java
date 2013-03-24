@@ -13,8 +13,7 @@ class AlarmInformation
 	private String _methodName;
 	private Object _userData;
 
-	AlarmInformation(long alarmID, long repeatInterval,
-		ICallingContext callingContext, EndpointReferenceType target,
+	AlarmInformation(long alarmID, long repeatInterval, ICallingContext callingContext, EndpointReferenceType target,
 		String methodName, Object userData)
 	{
 		_alarmID = alarmID;
@@ -24,32 +23,32 @@ class AlarmInformation
 		_methodName = methodName;
 		_userData = userData;
 	}
-	
+
 	final long alarmID()
 	{
 		return _alarmID;
 	}
-	
+
 	final long repeatInterval()
 	{
 		return _repeatInterval;
 	}
-	
+
 	final ICallingContext callingContext()
 	{
 		return _callingContext;
 	}
-	
+
 	final EndpointReferenceType target()
 	{
 		return _target;
 	}
-	
+
 	final String methodName()
 	{
 		return _methodName;
 	}
-	
+
 	final Object userData()
 	{
 		return _userData;

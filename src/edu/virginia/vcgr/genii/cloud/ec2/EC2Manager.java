@@ -22,15 +22,13 @@ import edu.virginia.vcgr.genii.cloud.VMStat;
 import edu.virginia.vcgr.genii.cloud.VMState;
 import edu.virginia.vcgr.genii.cloud.ssh.SSHSession;
 
-
 //This class must be thread safe!!
-public class EC2Manager implements CloudManager{
-
+public class EC2Manager implements CloudManager
+{
 
 	private HashMap<String, VMStat> _vms;
 	private final Lock vmLock = new ReentrantLock();
-	
-	
+
 	private String _user;
 	private String _pass;
 	private String _authFile;
@@ -47,30 +45,29 @@ public class EC2Manager implements CloudManager{
 	private String _desc = "";
 	private int _prepThreads = 0;
 	private int _maxPrepThreads = 10;
-	
+
 	static private Log _logger = LogFactory.getLog(EC2Manager.class);
-	
-	public void addVMS(List<VMStat> vms) throws Exception{
-		for (VMStat tStat : vms){
+
+	public void addVMS(List<VMStat> vms) throws Exception
+	{
+		for (VMStat tStat : vms) {
 			_vms.put(tStat.getID(), tStat);
 		}
-		//Update their the state of vms
-		if (_controller != null){
-			try{
+		// Update their the state of vms
+		if (_controller != null) {
+			try {
 				vmLock.lock();
 				_controller.updateState(_vms.values());
-			}
-			finally{
+			} finally {
 				vmLock.unlock();
 			}
 		}
 
 	}
 
+	public EC2Manager(CloudConfiguration config, int pollInterval, String besid)
+	{
 
-	public EC2Manager(
-			CloudConfiguration config, int pollInterval, String besid){
-		
 		_vms = new HashMap<String, VMStat>();
 		_user = config.getUsername();
 		_pass = config.getPassword();
@@ -84,21 +81,19 @@ public class EC2Manager implements CloudManager{
 		_pollInterval = pollInterval;
 		_type = config.getType();
 		_desc = config.getDescription();
-		
+
 		_poller = new StatusPoller(pollInterval, this);
 		Thread thread = new Thread(_poller, "Cloud Poller Thread");
 		thread.setDaemon(true);
 		thread.start();
 	}
 
+	private ResourceController getVMController(VMStat tStat)
+	{
+		if (tStat != null) {
+			SSHSession tSession = new SSHSession(_user, tStat.getPort(), tStat.getHost(), _pass);
 
-	private ResourceController getVMController(VMStat tStat){
-		if (tStat != null){
-			SSHSession tSession =
-				new SSHSession(_user, tStat.getPort(), tStat.getHost(), _pass);
-	
-			
-			if (_authFile != null || !(_authFile.equals(""))){
+			if (_authFile != null || !(_authFile.equals(""))) {
 				tSession.setPrivateKeyAuth(_authFile);
 			}
 			return tSession;
@@ -108,33 +103,31 @@ public class EC2Manager implements CloudManager{
 	}
 
 	@Override
-	public boolean spawnResources(int count) throws Exception {
+	public boolean spawnResources(int count) throws Exception
+	{
 
-		try{
+		try {
 			vmLock.lock();
 
-			if ((this.count() + count) > _maxResources){
+			if ((this.count() + count) > _maxResources) {
 				return false;
 			}
 
-			if (_controller != null){
-				_logger.info("(" + _desc + ") Spawning " + count +
-						" VMS at " + System.currentTimeMillis());
+			if (_controller != null) {
+				_logger.info("(" + _desc + ") Spawning " + count + " VMS at " + System.currentTimeMillis());
 				Collection<VMStat> vms = _controller.spawnResources(count);
-				if (vms != null){
-					for (VMStat tStat : vms){
-						//Set besid in each vm
+				if (vms != null) {
+					for (VMStat tStat : vms) {
+						// Set besid in each vm
 						tStat.setBESID(_besid);
 						_vms.put(tStat.getID(), tStat);
-						CloudMonitor.createResource(_besid, tStat.getID(),
-								tStat.getHost(), tStat.getPort(), 0, 0);	
+						CloudMonitor.createResource(_besid, tStat.getID(), tStat.getHost(), tStat.getPort(), 0, 0);
 
 					}
 					return true;
 				}
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 
@@ -142,133 +135,132 @@ public class EC2Manager implements CloudManager{
 	}
 
 	@Override
-	public boolean setResources(int count) throws Exception {
+	public boolean setResources(int count) throws Exception
+	{
 		boolean result = false;
-		
-		try{	
+
+		try {
 			vmLock.lock();
-			//Determine shrink or set;
-			if (count > this.count()){
-				//Grow
-				result = this.spawnResources(count - this.count());	
-			}
-			else if(count < this.count()){
-				//Shrink
+			// Determine shrink or set;
+			if (count > this.count()) {
+				// Grow
+				result = this.spawnResources(count - this.count());
+			} else if (count < this.count()) {
+				// Shrink
 				result = this.killResources(this.count() - count);
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return result;
 	}
 
 	@Override
-	public boolean shrink() throws Exception {
-		//Tries to kill all idle resources
+	public boolean shrink() throws Exception
+	{
+		// Tries to kill all idle resources
 		boolean result = false;
-		try{
+		try {
 			vmLock.lock();
 			result = this.killResources(this.idle());
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return result;
 	}
 
 	@Override
-	public void setMaxResources(int count) {
+	public void setMaxResources(int count)
+	{
 		_maxResources = count;
 	}
 
-	private Collection<VMStat> getIdleVMS(){
-		
+	private Collection<VMStat> getIdleVMS()
+	{
+
 		ArrayList<VMStat> tList = new ArrayList<VMStat>();
 		ArrayList<VMStat> idleList = new ArrayList<VMStat>();
-		try{
+		try {
 			vmLock.lock();
 			tList.addAll(_vms.values());
-			for (VMStat tStat : tList){
-				if ((tStat.getLoad() == 0) && tStat.isReady()){
-					idleList.add(tStat);		
+			for (VMStat tStat : tList) {
+				if ((tStat.getLoad() == 0) && tStat.isReady()) {
+					idleList.add(tStat);
 				}
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return idleList;
 	}
 
-
 	@Override
-	public boolean killResources(int count) throws Exception {
+	public boolean killResources(int count) throws Exception
+	{
 
 		boolean result = false;
-		
-		try{
+
+		try {
 			vmLock.lock();
 			ArrayList<VMStat> killList = new ArrayList<VMStat>();
 			killList.addAll(this.getIdleVMS());
 
-			if (killList.size() >= count){
+			if (killList.size() >= count) {
 				result = _controller.killResources(killList.subList(0, count));
 			}
 
-			for (VMStat tStat : killList.subList(0, count)){
+			for (VMStat tStat : killList.subList(0, count)) {
 				CloudMonitor.deleteResource(tStat.getID(), _besid);
 				_vms.remove(tStat.getID());
 
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return result;
 	}
 
 	@Override
-	public int count() {
+	public int count()
+	{
 		return _vms.size();
 	}
 
 	@Override
-	public int idle() {
+	public int idle()
+	{
 		return getIdleVMS().size();
 	}
 
 	@Override
-	public CloudStat getStatus() throws Exception {
-		//Get status of resources
-		try{
-			if (_controller != null){
+	public CloudStat getStatus() throws Exception
+	{
+		// Get status of resources
+		try {
+			if (_controller != null) {
 				vmLock.lock();
 				_controller.updateState(_vms.values());
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 
-		return new CloudStat(this.available(), this.count(), this.busy(),
-				this.pending(), this.preparing(), _type, _desc);
+		return new CloudStat(this.available(), this.count(), this.busy(), this.pending(), this.preparing(), _type, _desc);
 	}
 
-	private VMStat getResource(String id){
+	private VMStat getResource(String id)
+	{
 		return _vms.get(id);
 	}
 
-
 	@Override
-	public boolean sendFileTo(String resourceID, String localPath,
-			String remotePath) throws Exception {
-		
-		
+	public boolean sendFileTo(String resourceID, String localPath, String remotePath) throws Exception
+	{
+
 		VMStat tStat = this.getResource(resourceID);
 
-		if (tStat != null){
-			synchronized(tStat){
+		if (tStat != null) {
+			synchronized (tStat) {
 				ResourceController tCont = this.getVMController(tStat);
 				if (tCont != null)
 					return tCont.sendFileTo(localPath, remotePath);
@@ -276,15 +268,15 @@ public class EC2Manager implements CloudManager{
 		}
 		return false;
 	}
-	
+
 	@Override
-	public boolean checkFile(String resourceID, String path) throws Exception {
-		
-		
+	public boolean checkFile(String resourceID, String path) throws Exception
+	{
+
 		VMStat tStat = this.getResource(resourceID);
 
-		if (tStat != null){
-			synchronized(tStat){
+		if (tStat != null) {
+			synchronized (tStat) {
 				ResourceController tCont = this.getVMController(tStat);
 				if (tCont != null)
 					return tCont.fileExists(path);
@@ -294,13 +286,13 @@ public class EC2Manager implements CloudManager{
 	}
 
 	@Override
-	public boolean recieveFileFrom(String resourceID, String localPath,
-			String remotePath) throws Exception {
-		
+	public boolean recieveFileFrom(String resourceID, String localPath, String remotePath) throws Exception
+	{
+
 		VMStat tStat = this.getResource(resourceID);
 
-		if (tStat != null){
-			synchronized(tStat){
+		if (tStat != null) {
+			synchronized (tStat) {
 				ResourceController tCont = this.getVMController(tStat);
 				if (tCont != null)
 					return tCont.recieveFileFrom(localPath, remotePath);
@@ -310,15 +302,14 @@ public class EC2Manager implements CloudManager{
 	}
 
 	@Override
-	public int sendCommand(String resourceID, String command,
-			OutputStream out, OutputStream err) throws Exception {
-		
-		
+	public int sendCommand(String resourceID, String command, OutputStream out, OutputStream err) throws Exception
+	{
+
 		VMStat tStat = this.getResource(resourceID);
 
-		if (tStat != null){
+		if (tStat != null) {
 
-			synchronized(tStat){
+			synchronized (tStat) {
 				ResourceController tCont = this.getVMController(tStat);
 				if (tCont != null)
 					return tCont.sendCommand(command, out, err);
@@ -327,171 +318,167 @@ public class EC2Manager implements CloudManager{
 		return -1;
 	}
 
+	private boolean freeResource(String resourceID)
+	{
 
-
-
-	private boolean freeResource(String resourceID) {
-
-		try{
+		try {
 			vmLock.lock();
 			VMStat tStat = getResource(resourceID);
-			if (tStat != null){
+			if (tStat != null) {
 				tStat.removeWork();
-				//Must persist to database;
+				// Must persist to database;
 				return true;
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return false;
 	}
 
-
-	private Collection<VMStat> getAvailableVMS(){
+	private Collection<VMStat> getAvailableVMS()
+	{
 
 		ArrayList<VMStat> tList = new ArrayList<VMStat>();
 		ArrayList<VMStat> aList = new ArrayList<VMStat>();
 
-		try{
+		try {
 			vmLock.lock();
 
 			tList.addAll(_vms.values());
-			for (VMStat tStat : tList){
-				if ((tStat.getLoad() < _workPerVM) && tStat.isReady()){
+			for (VMStat tStat : tList) {
+				if ((tStat.getLoad() < _workPerVM) && tStat.isReady()) {
 					aList.add(tStat);
 				}
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return aList;
 	}
 
-	private Collection<VMStat> getBusyVMS(){
+	private Collection<VMStat> getBusyVMS()
+	{
 		ArrayList<VMStat> tList = new ArrayList<VMStat>();
 		ArrayList<VMStat> bList = new ArrayList<VMStat>();
 
-		try{
+		try {
 			vmLock.lock();
 
 			tList.addAll(_vms.values());
 
-			for (VMStat tStat : tList){
-				if ((tStat.getLoad() > 0) && tStat.isReady()){
+			for (VMStat tStat : tList) {
+				if ((tStat.getLoad() > 0) && tStat.isReady()) {
 					bList.add(tStat);
 				}
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return bList;
 	}
 
-	private Collection<VMStat> getPendingVMS(){
-		
+	private Collection<VMStat> getPendingVMS()
+	{
+
 		ArrayList<VMStat> tList = new ArrayList<VMStat>();
 		ArrayList<VMStat> pList = new ArrayList<VMStat>();
 
-		try{
+		try {
 			vmLock.lock();
 			tList.addAll(_vms.values());
 
-			for (VMStat tStat : tList){
-				if (!(tStat.getState() == VMState.RUNNING)){
+			for (VMStat tStat : tList) {
+				if (!(tStat.getState() == VMState.RUNNING)) {
 					pList.add(tStat);
 				}
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return pList;
 	}
 
-	private String aquireResource() {
+	private String aquireResource()
+	{
 
-		try{
+		try {
 			vmLock.lock();
 			ArrayList<VMStat> tList = new ArrayList<VMStat>();
 			tList.addAll(_vms.values());
 			String result;
 
-			for (VMStat tStat : tList){
-				if ((tStat.getLoad() < _workPerVM) && tStat.isReady()){
+			for (VMStat tStat : tList) {
+				if ((tStat.getLoad() < _workPerVM) && tStat.isReady()) {
 					result = tStat.getID();
 					tStat.addWork();
 					return result;
 				}
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return null;
 	}
 
 	@Override
-	public void setController(CloudController controller) {
+	public void setController(CloudController controller)
+	{
 		_controller = controller;
 
 	}
 
 	@Override
-	public int available() {
+	public int available()
+	{
 		return this.getAvailableVMS().size();
 	}
 
-	public int preparing(){
-		
+	public int preparing()
+	{
+
 		int count = 0;
-		try{
+		try {
 			vmLock.lock();
 			ArrayList<VMStat> tList = new ArrayList<VMStat>();
 			tList.addAll(_vms.values());
-			for (VMStat tStat : tList){
-				if ((tStat.getState() == VMState.RUNNING) && !tStat.isReady()){
+			for (VMStat tStat : tList) {
+				if ((tStat.getState() == VMState.RUNNING) && !tStat.isReady()) {
 					count++;
 				}
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return count;
 	}
-	
+
 	@Override
-	public int pending() {
+	public int pending()
+	{
 		return this.getPendingVMS().size();
 	}
 
-
-
 	@Override
-	public int busy() {
+	public int busy()
+	{
 		return this.getBusyVMS().size();
 	}
 
 	@Override
-	public void setWorkPerResource(int count) {
+	public void setWorkPerResource(int count)
+	{
 		_workPerVM = count;
 	}
 
 	@Override
-	public int getMaxResources() {
+	public int getMaxResources()
+	{
 		return _maxResources;
 	}
 
-
-
-
-
 	private class StatusPoller implements Runnable
 	{
-		//Poll interval in seconds
+		// Poll interval in seconds
 		private int _poll;
 		private CloudManager _tManage;
 
@@ -503,40 +490,34 @@ public class EC2Manager implements CloudManager{
 
 		public void run()
 		{
-			
-			while (true)
-			{
+
+			while (true) {
 				try {
-					if (_controller != null){
-						try{
+					if (_controller != null) {
+						try {
 							vmLock.lock();
 							_controller.updateState(_vms.values());
-						}
-						finally{
+						} finally {
 							vmLock.unlock();
 						}
 					}
 
-					//Prepare VM if necessary
-					if ((_script != null) || (_archive != null)){
-						for (VMStat tStat : _vms.values()){
-							if ((tStat.getState() == VMState.RUNNING) && !tStat.isReady()){
-								if (_prepThreads < _maxPrepThreads){
-									
-									if(!tStat.preparing()){
-									//Spawn new vm preparer
-									_prepThreads++;
-									tStat.setPreparing();
-									_logger.info("(" + _desc +
-											") Spawning prep thread for " +
-											tStat.getID() + " at " +
-											System.currentTimeMillis());
-									VMPreparer preparer = 
-										new VMPreparer(_tManage, tStat);
-									Thread thread = new Thread(preparer,
-											"VMPreparer " + tStat.getID());
-									thread.setDaemon(true);
-									thread.start();
+					// Prepare VM if necessary
+					if ((_script != null) || (_archive != null)) {
+						for (VMStat tStat : _vms.values()) {
+							if ((tStat.getState() == VMState.RUNNING) && !tStat.isReady()) {
+								if (_prepThreads < _maxPrepThreads) {
+
+									if (!tStat.preparing()) {
+										// Spawn new vm preparer
+										_prepThreads++;
+										tStat.setPreparing();
+										_logger.info("(" + _desc + ") Spawning prep thread for " + tStat.getID() + " at "
+											+ System.currentTimeMillis());
+										VMPreparer preparer = new VMPreparer(_tManage, tStat);
+										Thread thread = new Thread(preparer, "VMPreparer " + tStat.getID());
+										thread.setDaemon(true);
+										thread.start();
 									}
 								}
 							}
@@ -549,10 +530,8 @@ public class EC2Manager implements CloudManager{
 			}
 		}
 
-
 	}
-	
-	
+
 	private class VMPreparer implements Runnable
 	{
 
@@ -570,34 +549,26 @@ public class EC2Manager implements CloudManager{
 
 		public void run()
 		{
-			
-			while (true)
-			{
-					
+
+			while (true) {
+
 				try {
 
-					//Exponential Backoff
-					if (_failed){
-						long sleep = (long) ((_backoff * 1000) *
-								Math.exp(.5 * _attempts));
-						_logger.info("VM Preparer for " + _tVM.getID() + 
-								" sleeping for " + sleep/1000 + " seconds");
+					// Exponential Backoff
+					if (_failed) {
+						long sleep = (long) ((_backoff * 1000) * Math.exp(.5 * _attempts));
+						_logger.info("VM Preparer for " + _tVM.getID() + " sleeping for " + sleep / 1000 + " seconds");
 						Thread.sleep(sleep);
 						_failed = false;
 					}
 
-					//Prepare VM 
+					// Prepare VM
 					_attempts++;
-					if ((_tVM.getState() == VMState.RUNNING) && !_tVM.isReady()){
-						_logger.info("(" + _desc + ") Preparing VM " +
-								_tVM.getID() + " at " +
-								System.currentTimeMillis());
-						VMSetup.setupVM(_script, _archive,
-								_remoteSetupDir, _tVM.getID(), _tManage);
+					if ((_tVM.getState() == VMState.RUNNING) && !_tVM.isReady()) {
+						_logger.info("(" + _desc + ") Preparing VM " + _tVM.getID() + " at " + System.currentTimeMillis());
+						VMSetup.setupVM(_script, _archive, _remoteSetupDir, _tVM.getID(), _tManage);
 						_tVM.setPrepared();
-						_logger.info("(" + _desc + ") Prepared VM " +
-								_tVM.getID() + " at " +
-								System.currentTimeMillis());
+						_logger.info("(" + _desc + ") Prepared VM " + _tVM.getID() + " at " + System.currentTimeMillis());
 						_prepThreads--;
 						break;
 					}
@@ -609,55 +580,50 @@ public class EC2Manager implements CloudManager{
 			}
 		}
 
-
 	}
-	
-	
-
 
 	@Override
-	public boolean releaseResource(String activityID) throws SQLException {
-		//Add vm cleanup code (terminate processes, wipe working directories)
-		
+	public boolean releaseResource(String activityID) throws SQLException
+	{
+		// Add vm cleanup code (terminate processes, wipe working directories)
+
 		String resourceID = CloudMonitor.getResourceID(activityID);
-		if (resourceID != null){
+		if (resourceID != null) {
 			this.freeResource(resourceID);
 			sendKillCommands(activityID);
 			CloudMonitor.removeActivity(activityID);
 		}
 		return false;
 	}
-	
-	private void sendKillCommands(String activityID){
+
+	private void sendKillCommands(String activityID)
+	{
 		try {
 			String resourceID = aquireResource(activityID);
-			//Kill Job processes, (modify once no longer running as root to killall -9 -1	
-			//Change to make persistent in future?
-			sendCommand(resourceID,
-					"killall -9 -g runScript.sh", System.out, System.err);
-			sendCommand(resourceID,
-					"killall -9 -g grid", System.out, System.err);
+			// Kill Job processes, (modify once no longer running as root to killall -9 -1
+			// Change to make persistent in future?
+			sendCommand(resourceID, "killall -9 -g runScript.sh", System.out, System.err);
+			sendCommand(resourceID, "killall -9 -g grid", System.out, System.err);
 		} catch (Exception e) {
-			_logger.debug(e);
-		}	
-		
+			if (_logger.isDebugEnabled())
+				_logger.debug(e);
+		}
 
 	}
-	
 
 	@Override
-	public String aquireResource(
-			String activityID) throws InterruptedException {
-		//Puts thread to sleep if resource unavailable
+	public String aquireResource(String activityID) throws InterruptedException
+	{
+		// Puts thread to sleep if resource unavailable
 		String resourceID = CloudMonitor.getResourceID(activityID);
-		if (resourceID != null){
-			//_logger.debug("CloudBES: Activity " + activityID + 
-			//		" aquired resource " + resourceID);
+		if (resourceID != null) {
+			// if (_logger.isDebugEnabled()) _logger.debug("CloudBES: Activity " + activityID +
+			// " aquired resource " + resourceID);
 			return resourceID;
 		}
-		while (resourceID == null){
+		while (resourceID == null) {
 			resourceID = this.aquireResource();
-			if (resourceID != null){
+			if (resourceID != null) {
 				try {
 					CloudMonitor.addActivity(activityID, resourceID);
 					return resourceID;
@@ -665,67 +631,66 @@ public class EC2Manager implements CloudManager{
 					_logger.error(e);
 				}
 			}
-			Thread.sleep(_pollInterval * 1000); 
+			Thread.sleep(_pollInterval * 1000);
 		}
 
 		return null;
 
 	}
 
-
 	@Override
-	public boolean freeResources() throws Exception {
+	public boolean freeResources() throws Exception
+	{
 
 		boolean result = false;
 
-		try{
+		try {
 			vmLock.lock();
 			ArrayList<VMStat> killList = new ArrayList<VMStat>();
 			killList.addAll(_vms.values());
 			result = _controller.killResources(killList);
 
-			for (VMStat tStat : killList){
+			for (VMStat tStat : killList) {
 				CloudMonitor.deleteResource(tStat.getID(), _besid);
 				_vms.remove(tStat.getID());
 			}
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 		return result;
 	}
 
-
 	@Override
-	public Collection<VMStat> getResourceStatus() throws Exception {
+	public Collection<VMStat> getResourceStatus() throws Exception
+	{
 		return _vms.values();
 	}
 
-
 	@Override
-	public boolean killResource(String id) throws Exception {
+	public boolean killResource(String id) throws Exception
+	{
 
 		boolean result = false;
 
-		try{
+		try {
 			vmLock.lock();
 
 			VMStat tStat = _vms.get(id);
-			_logger.debug("CloudBES: Attempting to force kill " + id);
+			if (_logger.isDebugEnabled())
+				_logger.debug("CloudBES: Attempting to force kill " + id);
 
-			if (tStat != null){
+			if (tStat != null) {
 				ArrayList<VMStat> killList = new ArrayList<VMStat>();
 				killList.add(tStat);
 				result = _controller.killResources(killList);
 			}
-			if (result = true){
+			if (result = true) {
 				CloudMonitor.deleteResource(tStat.getID(), _besid);
 				_vms.remove(tStat.getID());
 				_logger.info("CloudBES: Killed " + id);
 			}
 
-		}
-		finally{
+		} finally {
 			vmLock.unlock();
 		}
 
@@ -733,4 +698,3 @@ public class EC2Manager implements CloudManager{
 	}
 
 }
-

@@ -48,5 +48,3 @@ A separate commandline tool that allows users to create or import certificates a
 
 Code:
 
-Implementing Class 
-    edu.virginia.vcgr.genii.client.security.x509.CertTool 

@@ -9,23 +9,20 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 public class ClearEnvTool extends BaseGridTool
 {
 	static public final String USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uclearenv";
-	static public final String DESCRIPTION = 
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dclearenv";
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/clearenv";
-	
+	static public final String DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dclearenv";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/clearenv";
+
 	public ClearEnvTool()
 	{
-		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true,
-				ToolCategory.INTERNAL);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true, ToolCategory.INTERNAL);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		GridUserEnvironment.clearGridUserEnvironment();
-		ContextManager.storeCurrentContext(ContextManager.getCurrentContext());
+		ContextManager.storeCurrentContext(ContextManager.getExistingContext());
 		return 0;
 	}
 
@@ -33,7 +30,6 @@ public class ClearEnvTool extends BaseGridTool
 	protected void verify() throws ToolException
 	{
 		if (numArguments() != 0)
-			throw new InvalidToolUsageException(
-				"Too many arguments.");
+			throw new InvalidToolUsageException("Too many arguments.");
 	}
 }

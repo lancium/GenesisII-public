@@ -12,28 +12,31 @@ import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.wsn.WSNotificationContainerService;
 import edu.virginia.vcgr.genii.container.notification.NotificationBrokerConstants;
 
-public class NotificationMessageIndexPropagator extends BasicHandler {
+public class NotificationMessageIndexPropagator extends BasicHandler
+{
 
 	private static final long serialVersionUID = 0L;
 
 	@Override
-	public void invoke(MessageContext msgContext) throws AxisFault {
+	public void invoke(MessageContext msgContext) throws AxisFault
+	{
 
 		ClientConfig clientConfig = ClientConfig.getCurrentClientConfig();
 		if (clientConfig != null) {
 			String clientId = clientConfig.getClientId();
-			WSNotificationContainerService notificationService = ContainerServices.findService(
-					WSNotificationContainerService.class);
+			WSNotificationContainerService notificationService = ContainerServices
+				.findService(WSNotificationContainerService.class);
 			Integer messageIndex = notificationService.getMessageIndexOfBroker(clientId);
 			if (messageIndex != null) {
 				setNotificationMessageIndex(messageIndex, msgContext);
 			}
 		}
 	}
-	
-	private void setNotificationMessageIndex(int messageIndex, MessageContext msgContext) throws AxisFault {
-		SOAPHeaderElement messageIndexHeader = new SOAPHeaderElement(
-				NotificationBrokerConstants.MESSAGE_INDEX_QNAME, messageIndex);
+
+	private void setNotificationMessageIndex(int messageIndex, MessageContext msgContext) throws AxisFault
+	{
+		SOAPHeaderElement messageIndexHeader = new SOAPHeaderElement(NotificationBrokerConstants.MESSAGE_INDEX_QNAME,
+			messageIndex);
 		messageIndexHeader.setActor(null);
 		messageIndexHeader.setMustUnderstand(false);
 		try {

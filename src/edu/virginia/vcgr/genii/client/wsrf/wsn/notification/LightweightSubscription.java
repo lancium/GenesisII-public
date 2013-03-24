@@ -8,5 +8,5 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.Subscription;
 public interface LightweightSubscription extends Subscription
 {
 	public <ContentsType extends NotificationMessageContents> NotificationRegistration registerNotificationHandler(
-			NotificationHandler<ContentsType> handler);
+		NotificationHandler<ContentsType> handler);
 }

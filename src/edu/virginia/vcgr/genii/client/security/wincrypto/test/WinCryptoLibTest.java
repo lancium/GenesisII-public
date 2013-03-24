@@ -29,21 +29,21 @@ import javax.crypto.spec.*;
 
 import edu.virginia.vcgr.genii.client.security.wincrypto.*;
 
-
-public class WinCryptoLibTest {
+public class WinCryptoLibTest
+{
 
 	/**
-	 * Initializes an object output stream that encrypts using a freshly
-	 * generated 3DES session key. This session key is wrapped using the
-	 * supplied asymmetric key and placed at the beginning of the output
+	 * Initializes an object output stream that encrypts using a freshly generated 3DES session key.
+	 * This session key is wrapped using the supplied asymmetric key and placed at the beginning of
+	 * the output
 	 * 
 	 * @param asymmetricKey
 	 * @param baseOutput
 	 * @return
 	 * @throws Exception
 	 */
-	public static OutputStream initCipherOutputStream(Key asymmetricKey,
-			OutputStream baseOutput) throws Exception {
+	public static OutputStream initCipherOutputStream(Key asymmetricKey, OutputStream baseOutput) throws Exception
+	{
 		// Generate a triple-DES key
 		KeyGenerator keygen = KeyGenerator.getInstance("DESede");
 		keygen.init(new SecureRandom());
@@ -77,30 +77,28 @@ public class WinCryptoLibTest {
 	}
 
 	/**
-	 * Initializes an object input stream that decrypts input from the base
-	 * input. Decryption is done with a session key that is unwrapped from the
-	 * beginning of the stream with the supplied assymetric key
+	 * Initializes an object input stream that decrypts input from the base input. Decryption is
+	 * done with a session key that is unwrapped from the beginning of the stream with the supplied
+	 * assymetric key
 	 * 
 	 * @param asymmetricKey
 	 * @param baseInput
 	 * @return
 	 * @throws Exception
 	 */
-	public static InputStream initCipherInputStream(Key asymmetricKey,
-			InputStream baseInput) throws Exception {
+	public static InputStream initCipherInputStream(Key asymmetricKey, InputStream baseInput) throws Exception
+	{
 		// read the wrapped session key
 		int amt = baseInput.read();
 		byte[] recvWrappedSessionKey = new byte[amt];
 		while (amt > 0) {
-			amt -= baseInput.read(recvWrappedSessionKey,
-					recvWrappedSessionKey.length - amt, amt);
+			amt -= baseInput.read(recvWrappedSessionKey, recvWrappedSessionKey.length - amt, amt);
 		}
 
 		// create RSA unswrap cipher and decrypt session key
 		Cipher unwrapCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		unwrapCipher.init(Cipher.UNWRAP_MODE, asymmetricKey);
-		Key desSessionKey = unwrapCipher.unwrap(recvWrappedSessionKey,
-				"DESede", Cipher.SECRET_KEY);
+		Key desSessionKey = unwrapCipher.unwrap(recvWrappedSessionKey, "DESede", Cipher.SECRET_KEY);
 
 		// read the initialization vector (iv)
 		amt = baseInput.read();
@@ -111,8 +109,7 @@ public class WinCryptoLibTest {
 
 		// create the DESede decription cipher
 		Cipher desDecryptCipher = Cipher.getInstance("DESede/CFB8/NoPadding");
-		desDecryptCipher.init(Cipher.DECRYPT_MODE, desSessionKey,
-				new IvParameterSpec(iv));
+		desDecryptCipher.init(Cipher.DECRYPT_MODE, desSessionKey, new IvParameterSpec(iv));
 
 		// Create the DESede deciphering inputstream
 		return new CipherInputStream(baseInput, desDecryptCipher);
@@ -121,21 +118,19 @@ public class WinCryptoLibTest {
 	/**
 	 * @param args
 	 */
-	public static void test(PrivateKey privKey, PublicKey pubKey)
-			throws Exception {
+	public static void test(PrivateKey privKey, PublicKey pubKey) throws Exception
+	{
 
 		final String MESSAGETEXT = "The quick brown dog jumps over the lazy fox.";
-		
+
 		// create a dummy output stream
 		ByteArrayOutputStream dummyOutput = new ByteArrayOutputStream();
-		
+
 		// create an encryption stream that encrypts with the
 		// recipient's public key, wrap it with a stream that signs
 		// it with our private key
-		ObjectOutputStream cipherOutput = new ObjectOutputStream(
-				initCipherOutputStream(
-						privKey,
-						initCipherOutputStream(pubKey, dummyOutput)));
+		ObjectOutputStream cipherOutput = new ObjectOutputStream(initCipherOutputStream(privKey,
+			initCipherOutputStream(pubKey, dummyOutput)));
 
 		// write a message to the stream
 		System.out.println("Writing message...");
@@ -151,57 +146,56 @@ public class WinCryptoLibTest {
 
 		// create a decryption stream, wrap it with a stream that
 		// verifies the sender's identity
-		ObjectInputStream cipherIn = new ObjectInputStream(
-				initCipherInputStream(pubKey,
-						initCipherInputStream(privKey, dummyInput)));
+		ObjectInputStream cipherIn = new ObjectInputStream(initCipherInputStream(pubKey,
+			initCipherInputStream(privKey, dummyInput)));
 
 		// read the message from the stream
 		String receivedMessage = cipherIn.readUTF();
 		System.out.println("Got: " + receivedMessage);
-		
+
 		if (!receivedMessage.equals(MESSAGETEXT)) {
 			System.out.println("DECRYPTION FAILED!");
 		}
 	}
 
 	/**
-	 * Iterates through the personal certificates, looking for a 
-	 * public/private keypair to test encryption with
+	 * Iterates through the personal certificates, looking for a public/private keypair to test
+	 * encryption with
 	 * 
 	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception
+	{
 
 		WinCryptoLib cryptoLib = new WinCryptoLib();
 
-		String stores[] = {"My"};
-//		String stores[] = {"CA", "Root", "My"};
-		
+		String stores[] = { "My" };
+		// String stores[] = {"CA", "Root", "My"};
+
 		for (int s = 0; s < stores.length; s++) {
-		
+
 			ArrayList<String> aliases = cryptoLib.getAliases(stores[s]);
 			Iterator<String> itr = aliases.iterator();
 			while (itr.hasNext()) {
 				String alias = itr.next();
-	
+
 				X509Certificate cert = cryptoLib.getCertificate(stores[s], alias);
-				
+
 				System.out.println(cert.getClass().getName());
-				
+
 				if (cert != null) {
-					System.out.println("CERT:\n"
-						+ cert.getSubjectX500Principal().getName());
+					System.out.println("CERT:\n" + cert.getSubjectX500Principal().getName());
 				}
-	
+
 				PublicKey publicKey = cert.getPublicKey();
 				System.out.println("Public key: " + publicKey);
-	
+
 				RSAPrivateCrtKey privateKey = cryptoLib.getPrivateKey(stores[s], alias);
 				if (privateKey != null) {
 					System.out.println("Private key: " + privateKey);
 					test(privateKey, publicKey);
 				}
-	
+
 				try {
 					X509Certificate[] chain = cryptoLib.getCertificateChain(stores[s], alias);
 					if (chain != null) {
@@ -212,7 +206,7 @@ public class WinCryptoLibTest {
 					}
 				} catch (WinCryptoChainInvalidException e) {
 					System.err.println("Cert chain invalid: " + e.getMessage());
-					
+
 					// double check failure
 					try {
 						cryptoLib.isCertTrusted(cert);
@@ -220,19 +214,20 @@ public class WinCryptoLibTest {
 					} catch (Exception ex) {
 						System.err.println("CONFIRM: " + e.getMessage());
 					}
-					
+
 				}
-				
+
 				System.out.println();
 			}
 		}
-		
+
 		System.out.println("Key Manager output:");
-		
+
 		WinX509KeyManager km = new WinX509KeyManager();
 		String[] a = km.getClientAliases(null, null);
 		for (int i = 0; i < a.length; i++) {
-			System.out.println("km alias: " + ((X509Certificate) km.getCertificateChain(a[i])[0]).getSubjectX500Principal().getName());
+			System.out.println("km alias: "
+				+ ((X509Certificate) km.getCertificateChain(a[i])[0]).getSubjectX500Principal().getName());
 			if (km.getPrivateKey(a[i]) != null) {
 				System.out.println("Contains exportable private key");
 			}

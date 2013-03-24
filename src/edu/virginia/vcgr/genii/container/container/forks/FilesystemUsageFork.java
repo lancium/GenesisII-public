@@ -9,15 +9,14 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.filesystems.Filesystem;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemUsageInformation;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class FilesystemUsageFork
-	extends AbstractStreamableByteIOFactoryResourceFork
+public class FilesystemUsageFork extends AbstractStreamableByteIOFactoryResourceFork
 {
 	public FilesystemUsageFork(ResourceForkService service, String forkPath)
 	{
@@ -35,23 +34,19 @@ public class FilesystemUsageFork
 	@RWXMapping(RWXCategory.READ)
 	public void snapshotState(OutputStream sink) throws IOException
 	{
-		FilesystemManager mgr = 
-			ConfigurationManager.getCurrentConfiguration().filesystemManager();
-		
+		FilesystemManager mgr = ConfigurationManager.getCurrentConfiguration().filesystemManager();
+
 		PrintStream ps = new PrintStream(sink);
-		
+
 		ps.print("Filesystem Summary\n\n");
-		
-		for (String fsName : mgr.filesystems())
-		{
+
+		for (String fsName : mgr.filesystems()) {
 			Filesystem fs = mgr.lookup(fsName);
 			FilesystemUsageInformation usageInfo = fs.currentUsage();
-			ps.format("Filesystem \"%s\" at %s:  %s (%.2f%%) space free.\n", 
-				fsName, fs.filesystemRoot(),
-				new Size(usageInfo.spaceUsable(), SizeUnits.Megabytes).toString(2),
-				usageInfo.percentAvailable());
+			ps.format("Filesystem \"%s\" at %s:  %s (%.2f%%) space free.\n", fsName, fs.filesystemRoot(),
+				new Size(usageInfo.spaceUsable(), SizeUnits.Megabytes).toString(2), usageInfo.percentAvailable());
 		}
-		
+
 		ps.close();
 	}
 }

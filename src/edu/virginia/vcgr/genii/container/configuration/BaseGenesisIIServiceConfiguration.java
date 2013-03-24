@@ -4,8 +4,7 @@ import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 
-class BaseGenesisIIServiceConfiguration 
-	implements GenesisIIServiceConfiguration
+class BaseGenesisIIServiceConfiguration implements GenesisIIServiceConfiguration
 {
 	@Override
 	public IResourceProvider resourceProvider()

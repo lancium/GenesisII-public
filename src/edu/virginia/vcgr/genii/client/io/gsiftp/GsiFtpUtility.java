@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.client.io.gsiftp;
 import java.io.File;
 import java.io.IOException;
 
-import edu.virginia.vcgr.genii.client.io.DataTransferStatistics;
+import org.morgan.util.io.DataTransferStatistics;
 
 public class GsiFtpUtility
 {

@@ -26,10 +26,11 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface ICertGeneratorResource extends IResource
 {
-	public void setCertificateIssuerInfo(HashMap<QName, Object> creationParameters) 
-		throws ResourceException;
-	
+	public void setCertificateIssuerInfo(HashMap<QName, Object> creationParameters) throws ResourceException;
+
 	public Long getDefaultValidity() throws ResourceException;
+
 	public X509Certificate[] getIssuerChain() throws ResourceException;
+
 	public PrivateKey getIssuerPrivateKey() throws ResourceException;
 }

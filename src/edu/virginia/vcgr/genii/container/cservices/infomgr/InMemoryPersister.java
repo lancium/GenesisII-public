@@ -7,15 +7,13 @@ import java.util.Map;
  * A simple persister which stores things in memory.
  * 
  * @author mmm2a
- *
+ * 
  * @param <InformationType>
  */
-public class InMemoryPersister<InformationType>
-	implements InformationPersister<InformationType>
+public class InMemoryPersister<InformationType> implements InformationPersister<InformationType>
 {
-	private Map<InformationEndpoint, InformationResult<InformationType>> 
-		_storage = new HashMap<InformationEndpoint, InformationResult<InformationType>>();
-	
+	private Map<InformationEndpoint, InformationResult<InformationType>> _storage = new HashMap<InformationEndpoint, InformationResult<InformationType>>();
+
 	/** {@inheritDoc} */
 	@Override
 	public InformationResult<InformationType> get(InformationEndpoint endpoint)
@@ -25,8 +23,7 @@ public class InMemoryPersister<InformationType>
 
 	/** {@inheritDoc} */
 	@Override
-	public void persist(InformationEndpoint endpoint,
-			InformationResult<InformationType> information)
+	public void persist(InformationEndpoint endpoint, InformationResult<InformationType> information)
 	{
 		if (information == null)
 			_storage.remove(endpoint);

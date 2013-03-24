@@ -21,7 +21,6 @@ import org.ggf.rns.WriteNotPermittedFaultType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
@@ -36,52 +35,44 @@ import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
 import edu.virginia.vcgr.genii.replicatedExport.RExportFilePortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class RExportFileServiceImpl extends RandomByteIOServiceImpl 
-	implements RExportFilePortType
+public class RExportFileServiceImpl extends RandomByteIOServiceImpl implements RExportFilePortType
 {
 	static private Log _logger = LogFactory.getLog(RExportFileServiceImpl.class);
-	
-	protected void setAttributeHandlers()
-		throws NoSuchMethodException, ResourceException, 
-			ResourceUnknownFaultType
+
+	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
-		
+
 		new RandomByteIOAttributeHandlers(getAttributePackage());
 	}
-	
+
 	public RExportFileServiceImpl() throws RemoteException
 	{
 		this("RExportFilePortType");
-		
-		addImplementedPortType(
-				WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
-		
+
+		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
+
 	}
-	
+
 	protected RExportFileServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
-		
-		addImplementedPortType(
-				WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
-		addImplementedPortType(
-				WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
+
+		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 	}
-	
-	public WriteResponse write(Write write)
-		throws RemoteException, CustomFaultType, 
-			ReadNotPermittedFaultType, UnsupportedTransferFaultType, 
-			ResourceUnknownFaultType
+
+	public WriteResponse write(Write write) throws RemoteException, CustomFaultType, ReadNotPermittedFaultType,
+		UnsupportedTransferFaultType, ResourceUnknownFaultType
 	{
 		WriteResponse writeResp = super.write(write);
-		
-		return writeResp; 
+
+		return writeResp;
 	}
-	
-	private class LegacyResourceTerminatedNotificationHandler
-		extends AbstractNotificationHandler<ResourceTerminationContents>
+
+	private class LegacyResourceTerminatedNotificationHandler extends AbstractNotificationHandler<ResourceTerminationContents>
 	{
 		private LegacyResourceTerminatedNotificationHandler()
 		{
@@ -89,13 +80,10 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl
 		}
 
 		@Override
-		public String handleNotification(TopicPath topic,
-			EndpointReferenceType producerReference,
-			EndpointReferenceType subscriptionReference,
-			ResourceTerminationContents contents) throws Exception
+		public String handleNotification(TopicPath topic, EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference, ResourceTerminationContents contents) throws Exception
 		{
-			RExportSubscriptionUserData notifyData = 
-				contents.additionalUserData(RExportSubscriptionUserData.class);
+			RExportSubscriptionUserData notifyData = contents.additionalUserData(RExportSubscriptionUserData.class);
 			String exportPath = notifyData.getPrimaryLocalPath();
 			destroy(new Destroy());
 			_logger.info("RExport replica " + exportPath + " terminated.");
@@ -104,58 +92,50 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl
 	}
 
 	@Override
-	protected void registerNotificationHandlers(
-		NotificationMultiplexer multiplexer)
+	protected void registerNotificationHandlers(NotificationMultiplexer multiplexer)
 	{
 		super.registerNotificationHandlers(multiplexer);
-		
-		multiplexer.registerNotificationHandler(
-			GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
+
+		multiplexer.registerNotificationHandler(GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
 			new LegacyResourceTerminatedNotificationHandler());
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] remove(String[] removeRequest)
-			throws RemoteException, WriteNotPermittedFaultType
+	public RNSEntryResponseType[] remove(String[] removeRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("remove operation not supported in replicated export");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
-			throws RemoteException, WriteNotPermittedFaultType
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("rename operation not supported in replicated export");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] setMetadata(
-			MetadataMappingType[] setMetadataRequest) throws RemoteException,
-			WriteNotPermittedFaultType
+	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
+		WriteNotPermittedFaultType
 	{
 		throw new RemoteException("setMetadata operation not supported in replicated export");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
-			throws RemoteException, WriteNotPermittedFaultType
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("add operation not supported in replicated export");
 	}
 
 	@Override
-	public LookupResponseType lookup(String[] lookupRequest)
-			throws RemoteException, org.ggf.rns.ReadNotPermittedFaultType
+	public LookupResponseType lookup(String[] lookupRequest) throws RemoteException, org.ggf.rns.ReadNotPermittedFaultType
 	{
 		throw new RemoteException("lookup operation not supported in replicated export");
 	}
-	
-	protected Object translateConstructionParameter(MessageElement parameter)
-	throws Exception
+
+	protected Object translateConstructionParameter(MessageElement parameter) throws Exception
 	{
 		QName messageName = parameter.getQName();
 		if (messageName.equals(IRExportResource.LOCALPATH_CONSTRUCTION_PARAM))
@@ -163,5 +143,5 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl
 		else
 			return super.translateConstructionParameter(parameter);
 	}
-	
+
 }

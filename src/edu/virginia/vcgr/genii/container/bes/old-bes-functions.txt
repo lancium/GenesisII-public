@@ -104,7 +104,7 @@
 					}
 					catch (NoSuchActivityFault nsaf)
 					{
-						_logger.debug("We lost an activity between the " +
+						if (_logger.isDebugEnabled()) _logger.debug("We lost an activity between the " +
 							"time we looked it up and the time we got " +
 							"it's EPR.", nsaf);
 					}
@@ -341,7 +341,7 @@
 					}
 					catch (NoSuchActivityFault nsaf)
 					{
-						_logger.debug("We lost an activity between the time " +
+						if (_logger.isDebugEnabled()) _logger.debug("We lost an activity between the time " +
 							"we looked it up and when we asked for it's EPR.", 
 							nsaf);
 					}

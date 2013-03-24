@@ -15,54 +15,42 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 public class WSIteratorDBResourceFactory extends BasicDBResourceFactory
 {
 	@SuppressWarnings("unused")
-	static private Log _logger = LogFactory.getLog(
-		WSIteratorDBResourceFactory.class);
-	
-	static private final String []_CREATE_STMTS = new String[] {
-		"CREATE TABLE iterators (" +
-			"entryid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
-			"iteratorid VARCHAR(256) NOT NULL, " +
-			"elementindex BIGINT NOT NULL, " +
-			"contents BLOB(2G) NOT NULL, " +
-			"CONSTRAINT iteratorsuniqueconstraint UNIQUE (iteratorid, elementindex))"
-	};
-	
-	public WSIteratorDBResourceFactory(DatabaseConnectionPool pool)
-			throws SQLException
+	static private Log _logger = LogFactory.getLog(WSIteratorDBResourceFactory.class);
+
+	static private final String[] _CREATE_STMTS = new String[] { "CREATE TABLE iterators ("
+		+ "entryid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " + "iteratorid VARCHAR(256) NOT NULL, "
+		+ "elementindex BIGINT NOT NULL, " + "contents BLOB(2G) NOT NULL, "
+		+ "CONSTRAINT iteratorsuniqueconstraint UNIQUE (iteratorid, elementindex))" };
+
+	public WSIteratorDBResourceFactory(DatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}
-	
+
 	@Override
 	public WSIteratorResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
-		try
-		{
+		try {
 			return new WSIteratorDBResource(parentKey, _pool);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 	}
-	
+
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
 		super.createTables();
-		
-		try
-		{
+
+		try {
 			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, _CREATE_STMTS);
 			conn.commit();
-		}
-		finally
-		{
+		} finally {
 			_pool.release(conn);
 		}
 	}
-	
+
 	public DatabaseConnectionPool getConnectionPool()
 	{
 		return _pool;

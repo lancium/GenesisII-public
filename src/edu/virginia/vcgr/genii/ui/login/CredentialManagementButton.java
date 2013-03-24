@@ -7,7 +7,7 @@ import edu.virginia.vcgr.genii.ui.UIContext;
 public class CredentialManagementButton extends JButton
 {
 	static final long serialVersionUID = 0L;
-	
+
 	public CredentialManagementButton(UIContext context)
 	{
 		super(new PopupTriggerCredentialManagementAction(context));

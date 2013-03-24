@@ -3,11 +3,10 @@ package edu.virginia.vcgr.genii.ui.xml;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.namespace.QName;
 
-class QNameBasedTreeNode extends DefaultMutableTreeNode
-	implements XMLTreeNode
+class QNameBasedTreeNode extends DefaultMutableTreeNode implements XMLTreeNode
 {
 	static final long serialVersionUID = 0L;
-	
+
 	static private String formName(QName name)
 	{
 		String uri = name.getNamespaceURI();
@@ -16,7 +15,7 @@ class QNameBasedTreeNode extends DefaultMutableTreeNode
 		else
 			return String.format("{%s}%s", uri, name.getLocalPart());
 	}
-	
+
 	protected QNameBasedTreeNode(QName name)
 	{
 		super(formName(name), true);

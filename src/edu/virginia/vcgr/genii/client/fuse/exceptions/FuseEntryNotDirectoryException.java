@@ -5,7 +5,7 @@ import fuse.FuseException;
 public class FuseEntryNotDirectoryException extends FuseException
 {
 	static final long serialVersionUID = 0L;
-	
+
 	public FuseEntryNotDirectoryException(String msg)
 	{
 		this(msg, null);

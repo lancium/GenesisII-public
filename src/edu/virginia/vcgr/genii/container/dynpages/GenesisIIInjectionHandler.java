@@ -17,50 +17,38 @@ class GenesisIIInjectionHandler implements ObjectInjectionHandler, Closeable
 {
 	private DatabaseConnectionPool _connectionPool;
 	private Connection _connection = null;
-	
-	private Object getInjectionValue(Class<?> type, InjectObject annotation)
-		throws InjectionException
+
+	private Object getInjectionValue(Class<?> type, InjectObject annotation) throws InjectionException
 	{
 		if (type.equals(DatabaseConnectionPool.class))
 			return _connectionPool;
-		else if (type.equals(Connection.class))
-		{
-			if (_connection == null)
-			{
-				try
-				{
+		else if (type.equals(Connection.class)) {
+			if (_connection == null) {
+				try {
 					_connection = _connectionPool.acquire(false);
-				}
-				catch (SQLException sqe)
-				{
-					throw new InjectionException(
-						"Error while trying to create conneciton.", sqe);
+				} catch (SQLException sqe) {
+					throw new InjectionException("Error while trying to create conneciton.", sqe);
 				}
 			}
-			
+
 			return _connection;
 		} else
-			throw new InjectionException(String.format(
-				"Don't know how to inject into type \"%s\".",
-				type.getName()));
+			throw new InjectionException(String.format("Don't know how to inject into type \"%s\".", type.getName()));
 	}
-	
+
 	GenesisIIInjectionHandler(DatabaseConnectionPool connectionPool)
 	{
 		_connectionPool = connectionPool;
 	}
-	
+
 	@Override
-	public Object getFieldInjectionValue(Field field, InjectObject annotation)
-		throws InjectionException
+	public Object getFieldInjectionValue(Field field, InjectObject annotation) throws InjectionException
 	{
 		return getInjectionValue(field.getType(), annotation);
 	}
 
 	@Override
-	public Object getMethodInjectionValue(Method method,
-		InjectObject annotation)
-			throws InjectionException
+	public Object getMethodInjectionValue(Method method, InjectObject annotation) throws InjectionException
 	{
 		return getInjectionValue(method.getParameterTypes()[0], annotation);
 	}

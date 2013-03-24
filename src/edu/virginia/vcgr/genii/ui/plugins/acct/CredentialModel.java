@@ -17,44 +17,34 @@ import edu.virginia.vcgr.genii.client.acct.AccountingCredentialTypes;
 class CredentialModel extends AbstractTableModel
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private Vector<CredentialBundle> _bundles;
-	
+
 	CredentialModel(Connection connection) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		
-		try
-		{
-			stmt = connection.prepareStatement(
-				"SELECT cid, credentialtype, credentialdesc " +
-				"FROM xcgcredentials");
+
+		try {
+			stmt = connection.prepareStatement("SELECT cid, credentialtype, credentialdesc " + "FROM xcgcredentials");
 			rs = stmt.executeQuery();
-			
+
 			_bundles = new Vector<CredentialBundle>();
-			while (rs.next())
-			{
+			while (rs.next()) {
 				AccountingCredentialTypes type = null;
-				try
-				{
+				try {
 					type = AccountingCredentialTypes.valueOf(rs.getString(2));
+				} catch (Throwable cause) {
 				}
-				catch (Throwable cause)
-				{
-				}
-				
-				_bundles.add(new CredentialBundle(
-					rs.getLong(1), type, rs.getString(3)));
+
+				_bundles.add(new CredentialBundle(rs.getLong(1), type, rs.getString(3)));
 			}
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}
-	
+
 	@Override
 	public int getColumnCount()
 	{
@@ -71,42 +61,39 @@ class CredentialModel extends AbstractTableModel
 	public Object getValueAt(int rowIndex, int columnIndex)
 	{
 		CredentialBundle bundle = _bundles.get(rowIndex);
-		switch (columnIndex)
-		{
-			case 0 :
+		switch (columnIndex) {
+			case 0:
 				return bundle.credentialType();
-			case 1 :
+			case 1:
 				return bundle;
 		}
-		
+
 		return null;
 	}
 
 	@Override
 	public Class<?> getColumnClass(int columnIndex)
 	{
-		switch (columnIndex)
-		{
-			case 0 :
+		switch (columnIndex) {
+			case 0:
 				return AccountingCredentialTypes.class;
-			case 1 :
+			case 1:
 				return CredentialBundle.class;
 		}
-		
+
 		return null;
 	}
 
 	@Override
 	public String getColumnName(int column)
 	{
-		switch (column)
-		{
-			case 0 :
+		switch (column) {
+			case 0:
 				return "Credential Type";
-			case 1 :
+			case 1:
 				return "Credential Description";
 		}
-		
+
 		return null;
 	}
 
@@ -119,22 +106,20 @@ class CredentialModel extends AbstractTableModel
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex)
 	{
-		if (columnIndex == 0)
-		{
-			_bundles.get(rowIndex).credentialType(
-				(AccountingCredentialTypes)aValue);
-			
+		if (columnIndex == 0) {
+			_bundles.get(rowIndex).credentialType((AccountingCredentialTypes) aValue);
+
 			fireTableCellUpdated(rowIndex, columnIndex);
 		}
 	}
-	
+
 	final Collection<CredentialBundle> dirtyBundles()
 	{
 		Collection<CredentialBundle> ret = new LinkedList<CredentialBundle>();
 		for (CredentialBundle bundle : _bundles)
 			if (bundle.isDirty())
 				ret.add(bundle);
-		
+
 		return ret;
 	}
 }

@@ -13,27 +13,25 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 public class TopicForest
 {
 	private Map<QName, TopicTree> _forest = new HashMap<QName, TopicTree>();
-	
+
 	final public void addTopic(TopicPath topic)
 	{
 		QName root = topic.root();
 		TopicTree tree = _forest.get(root);
 		if (tree == null)
 			_forest.put(root, tree = new TopicTree());
-		
+
 		tree.addTopic(topic);
 	}
-	
+
 	final public void describe(Element rootDocument)
 	{
 		Document ownerDocument = rootDocument.getOwnerDocument();
-		
-		for (Map.Entry<QName, TopicTree> tree : _forest.entrySet())
-		{
+
+		for (Map.Entry<QName, TopicTree> tree : _forest.entrySet()) {
 			QName treeName = tree.getKey();
-			
-			Element treeDoc = (Element)rootDocument.appendChild(
-				ElementBuilderUtils.createElement(ownerDocument, treeName));
+
+			Element treeDoc = (Element) rootDocument.appendChild(ElementBuilderUtils.createElement(ownerDocument, treeName));
 			tree.getValue().describe(treeDoc);
 		}
 	}

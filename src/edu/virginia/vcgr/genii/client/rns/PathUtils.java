@@ -22,68 +22,62 @@ class PathUtils
 	static public String[] normalizePath(String currentPath, String path)
 	{
 		String fullPath;
-		
+
 		if (path.startsWith("/"))
 			fullPath = path;
 		else
 			fullPath = currentPath + "/" + path;
-		
+
 		return normalizePath(fullPath);
-		
+
 	}
-	
+
 	static public String[] normalizePath(String path)
 	{
 		Stack<String> nPath = new Stack<String>();
-		String []ret = path.split("/");
-		for (String s : ret)
-		{
+		String[] ret = path.split("/");
+		for (String s : ret) {
 			if (s == null || s.length() == 0)
 				continue;
-			
-			if (s.equals(".."))
-			{
+
+			if (s.equals("..")) {
 				if (!nPath.empty())
 					nPath.pop();
-			} else if (!s.equals("."))
-			{
+			} else if (!s.equals(".")) {
 				nPath.push(s);
 			}
 		}
-		
+
 		ret = new String[nPath.size()];
 		nPath.toArray(ret);
 		return ret;
 	}
-	
-	static public String formPath(String []pathElements)
+
+	static public String formPath(String[] pathElements)
 	{
 		StringBuilder builder = new StringBuilder();
-		for (String element : pathElements)
-		{
+		for (String element : pathElements) {
 			builder.append('/');
 			builder.append(element);
 		}
-		if (builder.length() == 0)
-		{
+		if (builder.length() == 0) {
 			builder.append('/');
 		}
 		return builder.toString();
 	}
-	
-	static private void print(String []path)
+
+	static private void print(String[] path)
 	{
 		System.out.print("{");
-		for (int lcv = 0; lcv < path.length; lcv++)
-		{
+		for (int lcv = 0; lcv < path.length; lcv++) {
 			if (lcv != 0)
 				System.out.print(", ");
 			System.out.print(path[lcv]);
 		}
 		System.out.println("}");
 	}
-	
-	static public void main(String []args)
+
+	static public void main(String[] args)
 	{
 		print(normalizePath("/one/two/three", "../../../../../mark"));
 		print(normalizePath("/", "home/foobar"));

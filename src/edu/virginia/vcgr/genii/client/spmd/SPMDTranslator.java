@@ -4,6 +4,5 @@ import java.util.List;
 
 public interface SPMDTranslator
 {
-	public List<String> translateCommandLine(List<String> commandLine)
-		throws SPMDException;
+	public List<String> translateCommandLine(List<String> commandLine) throws SPMDException;
 }

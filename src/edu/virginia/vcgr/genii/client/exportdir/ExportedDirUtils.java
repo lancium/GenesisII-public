@@ -45,10 +45,10 @@ public class ExportedDirUtils
 	static final public String _SVN_USERNAME = "svn-user";
 	static final public String _SVN_PASSWORD = "svn-pass";
 	static final public String _SVN_REVISION = "svn-revision";
-	
+
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(ExportedDirUtils.class);
-	
+
 	static public class ExportedDirInitInfo
 	{
 		private String _path = null;
@@ -59,17 +59,13 @@ public class ExportedDirUtils
 		private String _svnUser = null;
 		private String _svnPass = null;
 		private Long _svnRevision = null;
-	
-		/*public ExportedDirInitInfo(String path, String parentIds, String isReplicated)
-		{
-			_path = path;
-			_parentIds = parentIds;
-			_isReplicated = isReplicated;
-		}
-		*/
-		public ExportedDirInitInfo(String path, String parentIds, String isReplicated,
-			Long lastModified, EndpointReferenceType resolverServiceEPR,
-			String svnUser, String svnPass, Long svnRevision)
+
+		/*
+		 * public ExportedDirInitInfo(String path, String parentIds, String isReplicated) { _path =
+		 * path; _parentIds = parentIds; _isReplicated = isReplicated; }
+		 */
+		public ExportedDirInitInfo(String path, String parentIds, String isReplicated, Long lastModified,
+			EndpointReferenceType resolverServiceEPR, String svnUser, String svnPass, Long svnRevision)
 		{
 			_path = path;
 			_parentIds = parentIds;
@@ -80,126 +76,102 @@ public class ExportedDirUtils
 			_svnPass = svnPass;
 			_svnRevision = svnRevision;
 		}
-		
+
 		public String getPath()
 		{
 			return _path;
 		}
-		
+
 		public String getParentIds()
 		{
 			return _parentIds;
 		}
-		
+
 		public String getReplicationState()
 		{
 			return _isReplicated;
 		}
-		
-		public Long getLastModifiedTime(){
+
+		public Long getLastModifiedTime()
+		{
 			return _lastModified;
 		}
-		
+
 		public EndpointReferenceType getResolverFactoryEPR()
 		{
 			return _resolverServiceEPR;
 		}
-		
+
 		public String svnUser()
 		{
 			return _svnUser;
 		}
-		
+
 		public String svnPass()
 		{
 			return _svnPass;
 		}
-		
+
 		public Long svnRevision()
 		{
 			return _svnRevision;
 		}
 	}
-	
-	static public MessageElement[] createCreationProperties(String humanName,
-		String path, String svnUser, String svnPass, Long svnRevision,
-		String parentIds, String isReplicated) throws RemoteException
+
+	static public MessageElement[] createCreationProperties(String humanName, String path, String svnUser, String svnPass,
+		Long svnRevision, String parentIds, String isReplicated) throws RemoteException
 	{
 		Collection<MessageElement> any = new Vector<MessageElement>(6);
-		any.add(new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path));
-		any.add(new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME), parentIds));
-		any.add(new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR), isReplicated));
-		any.add(new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _LAST_MODIFIED_TIME), 
-			getLastModifiedTime(path)));
-		any.add(new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
-			null));
-		any.add(new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _SVN_USERNAME),
-			svnUser));
-		any.add(new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _SVN_PASSWORD),
-			svnPass));
-		any.add(new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _SVN_REVISION),
-			svnRevision));
-		
-		if (humanName != null)
-		{
+		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path));
+		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME), parentIds));
+		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR), isReplicated));
+		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _LAST_MODIFIED_TIME), getLastModifiedTime(path)));
+		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR), null));
+		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_USERNAME), svnUser));
+		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_PASSWORD), svnPass));
+		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_REVISION), svnRevision));
+
+		if (humanName != null) {
 			ConstructionParameters cParams = new ConstructionParameters();
 			cParams.humanName(humanName);
 			any.add(cParams.serializeToMessageElement());
 		}
-		
+
 		return any.toArray(new MessageElement[any.size()]);
 	}
-	
-	static public MessageElement[] createReplicationCreationProperties(
-			String path, String parentIds, String isReplicated,
-			EndpointReferenceType replicationServiceEPR)
-		{
-			MessageElement []any = new MessageElement[5];
-			any[0] = new MessageElement(new QName(
-				GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path);
-			any[1] = new MessageElement(new QName(
-				GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME), parentIds);
-			any[2] = new MessageElement(new QName(
-				GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR), isReplicated);
-			any[3] = new MessageElement(new QName(
-				GenesisIIConstants.GENESISII_NS, _LAST_MODIFIED_TIME), 
-				getLastModifiedTime(path));
-			any[4] = new MessageElement(new QName(
-				GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
-				replicationServiceEPR);
-			
-			return any;
-		}
-	
-	/**
-	 * Add creation parameters for the resolver from the passed in creation params 
-	 * for export root creation.
-	 * Localpath of export on primary and the epr of the resolver service are added.
-	 * 
-	 * @param resolverCreationParams: collection to which resolver creation params are added.
-	 * @param initInfo: Contains the processed creation parameters for export creation.
-	 */
-	static public void createResolverCreationProperties(
-			Collection<MessageElement> resolverCreationParams,
-			ExportedDirInitInfo initInfo)
+
+	static public MessageElement[] createReplicationCreationProperties(String path, String parentIds, String isReplicated,
+		EndpointReferenceType replicationServiceEPR)
 	{
-		resolverCreationParams.add(new MessageElement(new QName(
-				GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), initInfo.getPath()));
-		resolverCreationParams.add(new MessageElement(new QName(
-				GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR), 
-				initInfo.getResolverFactoryEPR()));
+		MessageElement[] any = new MessageElement[5];
+		any[0] = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path);
+		any[1] = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME), parentIds);
+		any[2] = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR), isReplicated);
+		any[3] = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _LAST_MODIFIED_TIME), getLastModifiedTime(path));
+		any[4] = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR), replicationServiceEPR);
+
+		return any;
 	}
-	
-	static public ExportedDirInitInfo extractCreationProperties(
-		HashMap<QName, Object> properties) throws ResourceException
+
+	/**
+	 * Add creation parameters for the resolver from the passed in creation params for export root
+	 * creation. Localpath of export on primary and the epr of the resolver service are added.
+	 * 
+	 * @param resolverCreationParams
+	 *            : collection to which resolver creation params are added.
+	 * @param initInfo
+	 *            : Contains the processed creation parameters for export creation.
+	 */
+	static public void createResolverCreationProperties(Collection<MessageElement> resolverCreationParams,
+		ExportedDirInitInfo initInfo)
+	{
+		resolverCreationParams.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), initInfo
+			.getPath()));
+		resolverCreationParams.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
+			initInfo.getResolverFactoryEPR()));
+	}
+
+	static public ExportedDirInitInfo extractCreationProperties(HashMap<QName, Object> properties) throws ResourceException
 	{
 		String path = null;
 		String parentIds = null;
@@ -209,124 +181,103 @@ public class ExportedDirUtils
 		String svnUser = null;
 		String svnPass = null;
 		Long svnRevision = null;
-		
-		if (properties == null)
-			throw new IllegalArgumentException(
-				"Can't have a null export creation properites parameter.");
 
-		//get path
-		MessageElement pathElement = 
-			(MessageElement)properties.get(new QName(
-				GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME));
+		if (properties == null)
+			throw new IllegalArgumentException("Can't have a null export creation properites parameter.");
+
+		// get path
+		MessageElement pathElement = (MessageElement) properties
+			.get(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME));
 		if (pathElement == null)
-			throw new IllegalArgumentException(
-				"Couldn't find path in export creation properties.");
+			throw new IllegalArgumentException("Couldn't find path in export creation properties.");
 		path = pathElement.getValue();
-		
-		//get parentIds
-		MessageElement parentIDSElement = 
-			(MessageElement)properties.get(new QName(
-				GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
+
+		// get parentIds
+		MessageElement parentIDSElement = (MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS,
+			_PARENT_IDS_ELEM_NAME));
 		if (parentIDSElement == null)
-			throw new IllegalArgumentException(
-				"Couldn't find parentIds in export creation properties.");
+			throw new IllegalArgumentException("Couldn't find parentIds in export creation properties.");
 		parentIds = parentIDSElement.getValue();
 		if (parentIds == null)
 			parentIds = "";
-		
+
 		// get svn user
-		MessageElement svnUserElement =
-			(MessageElement)properties.get(new QName(
-				GenesisIIConstants.GENESISII_NS, _SVN_USERNAME));
+		MessageElement svnUserElement = (MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS,
+			_SVN_USERNAME));
 		if (svnUserElement != null)
 			svnUser = svnUserElement.getValue();
 
 		// get svn pass
-		MessageElement svnPassElement =
-			(MessageElement)properties.get(new QName(
-				GenesisIIConstants.GENESISII_NS, _SVN_PASSWORD));
+		MessageElement svnPassElement = (MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS,
+			_SVN_PASSWORD));
 		if (svnPassElement != null)
 			svnPass = svnPassElement.getValue();
-		
+
 		// get svn revision
-		MessageElement svnRevisionElement =
-			(MessageElement)properties.get(new QName(
-				GenesisIIConstants.GENESISII_NS, _SVN_REVISION));
-		try
-		{
+		MessageElement svnRevisionElement = (MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS,
+			_SVN_REVISION));
+		try {
 			if (svnRevisionElement != null && svnRevisionElement.getValue() != null)
-				svnRevision = (Long)svnRevisionElement.getObjectValue(Long.class);
-		}
-		catch (Exception e)
-		{
+				svnRevision = (Long) svnRevisionElement.getObjectValue(Long.class);
+		} catch (Exception e) {
 			throw new ResourceException("Unable to extract svn revision.", e);
 		}
-		
-		//get replication state
-		MessageElement replicationElement = 
-			(MessageElement)properties.get(new QName(
-				GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR));
+
+		// get replication state
+		MessageElement replicationElement = (MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS,
+			_REPLICATION_INDICATOR));
 		if (replicationElement == null)
-			throw new IllegalArgumentException(
-				"Couldn't find replication indicator in export creation properties.");
+			throw new IllegalArgumentException("Couldn't find replication indicator in export creation properties.");
 		isReplicated = replicationElement.getValue();
-		
-		//get resolver service epr
-		MessageElement resolverServiceElement = 
-			(MessageElement)properties.get(new QName(
-				GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR));
+
+		// get resolver service epr
+		MessageElement resolverServiceElement = (MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS,
+			_REXPORT_RESOLVER_EPR));
 		if (resolverServiceElement == null)
-			throw new IllegalArgumentException(
-				"Couldn't find resolver service epr in export creation properties.");
-		try{
-			if (resolverServiceElement.getObjectValue()!= null)
-				resolverServiceEPR = (EndpointReferenceType) resolverServiceElement.getObjectValue(
-						EndpointReferenceType.class);
+			throw new IllegalArgumentException("Couldn't find resolver service epr in export creation properties.");
+		try {
+			if (resolverServiceElement.getObjectValue() != null)
+				resolverServiceEPR = (EndpointReferenceType) resolverServiceElement.getObjectValue(EndpointReferenceType.class);
+		} catch (Exception e) {
+			throw new ResourceException("Uable to extract resolver factory epr: " + e.getMessage());
 		}
-		catch(Exception e){
-			throw new ResourceException("Uable to extract resolver factory epr: " 
-					+ e.getMessage());
-		}
-		
-		//ensure all properties filled in
+
+		// ensure all properties filled in
 		if (path == null)
-			throw new IllegalArgumentException(
-				"Couldn't find path in export creation properties.");
+			throw new IllegalArgumentException("Couldn't find path in export creation properties.");
 		if (isReplicated == null)
-			throw new IllegalArgumentException(
-				"Couldn't find replication indicator in export creation properties.");
-		
-		//get last modified time
+			throw new IllegalArgumentException("Couldn't find replication indicator in export creation properties.");
+
+		// get last modified time
 		lastModified = getLastModifiedTime(path);
-		
-		return new ExportedDirInitInfo(path, parentIds, 
-				isReplicated, lastModified, resolverServiceEPR,
-				svnUser, svnPass, svnRevision);
+
+		return new ExportedDirInitInfo(path, parentIds, isReplicated, lastModified, resolverServiceEPR, svnUser, svnPass,
+			svnRevision);
 	}
-	
+
 	static public String createParentIdsString(String ancestorIdString, String parentId)
 	{
-		if (ancestorIdString == null)
-		{
+		if (ancestorIdString == null) {
 			ancestorIdString = "";
 		}
 		if (parentId == null)
 			return null;
-		
+
 		return ancestorIdString + _PARENT_ID_BEGIN_DELIMITER + parentId + _PARENT_ID_END_DELIMITER;
 	}
-	
+
 	/*
 	 * createLocalDir - Create new directory in local file system
 	 * 
 	 * @param path Path to new directory
-	 * @return boolean Return true if dir does not exist and could be created.  
-	 *         False if dir exists.  Pass through IOExceptions from create.
+	 * 
+	 * @return boolean Return true if dir does not exist and could be created. False if dir exists.
+	 * Pass through IOExceptions from create.
 	 */
 	static public boolean createLocalDir(String path)
 	{
 		File newFile = new File(path);
-		
+
 		return newFile.mkdir();
 	}
 
@@ -334,28 +285,29 @@ public class ExportedDirUtils
 	 * dirReadable - Return whether path points to a readable directory or not.
 	 * 
 	 * @param path Path to directory
-	 * @return boolean true if path exists, is a directory and is readable.  Otherwise false.  
+	 * 
+	 * @return boolean true if path exists, is a directory and is readable. Otherwise false.
 	 */
-	static public boolean dirReadable(String path)
-		throws IOException
+	static public boolean dirReadable(String path) throws IOException
 	{
 		File testFile = new File(path);
-		
+
 		if (testFile.exists() && testFile.isDirectory() && testFile.canRead())
 			return true;
 		return false;
 	}
-	
+
 	/**
 	 * 
 	 */
-	static public long getLastModifiedTime(String path){
+	static public long getLastModifiedTime(String path)
+	{
 		long lastModifiedTime = 0;
 		File testFile = new File(path);
-		
+
 		if ((testFile.exists()) && testFile.isDirectory())
 			lastModifiedTime = testFile.lastModified();
-		
+
 		return lastModifiedTime;
 	}
 }

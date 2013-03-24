@@ -19,19 +19,16 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class ConnectTool extends BaseGridTool
 {
-	static private final String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dconnect";
-	static private final String _USAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uconnect";
-	static private final String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/connect";
-	
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dconnect";
+	static private final String _USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uconnect";
+	static private final String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/connect";
+
 	public ConnectTool()
 	{
 		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
@@ -42,7 +39,7 @@ public class ConnectTool extends BaseGridTool
 			deploymentName = getArgument(1);
 
 		connect(connectURL, deploymentName == null ? null : new DeploymentName(deploymentName));
-		
+
 		throw new ReloadShellException();
 	}
 
@@ -52,32 +49,27 @@ public class ConnectTool extends BaseGridTool
 		if (numArguments() != 1 && numArguments() != 2)
 			throw new InvalidToolUsageException();
 	}
-	
 
-	static public void connect(ICallingContext ctxt)
-		throws ResourceException, IOException
+	static public void connect(ICallingContext ctxt) throws ResourceException, IOException
 	{
 		ContextManager.storeCurrentContext(ctxt);
 	}
 
-	static public void connect(String connectURL)
-		throws ResourceException, MalformedURLException, IOException
+	static public void connect(String connectURL) throws ResourceException, MalformedURLException, IOException
 	{
 		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
-		
+
 		URL url = URLUtilities.formURL(connectURL, isWindows);
 		connect(ContextStreamUtils.load(url), null);
 	}
 
-	static public void connect(ICallingContext ctxt, DeploymentName deploymentName)
-		throws ResourceException, IOException
+	static public void connect(ICallingContext ctxt, DeploymentName deploymentName) throws ResourceException, IOException
 	{
 		ContextManager.storeCurrentContext(ctxt);
-		if (deploymentName != null)
-		{
+		if (deploymentName != null) {
 			UserConfig userConfig = new UserConfig(deploymentName);
 			UserConfigUtils.setCurrentUserConfig(userConfig);
-			
+
 			/*
 			 * reload the configuration manager so that all config options are loaded from the
 			 * specified deployment dir (instead of likely the "default" deployment).
@@ -85,12 +77,12 @@ public class ConnectTool extends BaseGridTool
 			UserConfigUtils.reloadConfiguration();
 		}
 	}
-	
-	static public void connect(String connectURL, DeploymentName deploymentName)
-		throws ResourceException, MalformedURLException, IOException
+
+	static public void connect(String connectURL, DeploymentName deploymentName) throws ResourceException,
+		MalformedURLException, IOException
 	{
 		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
-		
+
 		URL url = URLUtilities.formURL(connectURL, isWindows);
 		connect(ContextStreamUtils.load(url), deploymentName);
 	}

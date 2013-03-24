@@ -5,9 +5,9 @@ import java.io.File;
 public class GridFileSystem extends DirectoryBasedFileSystem
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private String _sandbox;
-	
+
 	public GridFileSystem(File directory, String sandbox)
 	{
 		super(directory);
@@ -19,8 +19,8 @@ public class GridFileSystem extends DirectoryBasedFileSystem
 	{
 		return false;
 	}
-	
-	public String getSandbox() 
+
+	public String getSandbox()
 	{
 		return _sandbox;
 	}

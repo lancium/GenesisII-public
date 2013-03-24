@@ -11,15 +11,14 @@ import edu.virginia.vcgr.xscript.macros.MacroReplacer;
 public class ParamStatement implements ParseStatement
 {
 	private String _contents;
-	
+
 	public ParamStatement(String contents)
 	{
 		_contents = contents;
 	}
-	
+
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
 	{
 		return MacroReplacer.replaceMacros(context, _contents);
 	}

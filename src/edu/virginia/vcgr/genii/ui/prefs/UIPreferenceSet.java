@@ -7,10 +7,12 @@ import javax.swing.JPanel;
 public interface UIPreferenceSet
 {
 	public String preferenceSetName();
-	
+
 	public void load(Preferences uiPreferencesRoot);
+
 	public void store(Preferences uiPreferencesRoot);
-	
+
 	public JPanel createEditor();
+
 	public void load(JPanel editor);
 }

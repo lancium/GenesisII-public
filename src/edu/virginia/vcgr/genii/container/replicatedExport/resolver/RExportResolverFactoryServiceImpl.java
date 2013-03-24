@@ -26,7 +26,6 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
@@ -39,128 +38,95 @@ import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverPortType
 import edu.virginia.vcgr.genii.replicatedExport.resolver.UpdateRequestType;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateRootReplicaRequest;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-@GeniiServiceConfiguration(
-	resourceProvider=RExportResolverFactoryDBResourceProvider.class)
-public class RExportResolverFactoryServiceImpl
-	extends GenesisIIBase implements RExportResolverFactoryPortType
+@GeniiServiceConfiguration(resourceProvider = RExportResolverFactoryDBResourceProvider.class)
+public class RExportResolverFactoryServiceImpl extends GenesisIIBase implements RExportResolverFactoryPortType
 {
 	static private Log _logger = LogFactory.getLog(RExportResolverFactoryServiceImpl.class);
-	
-	public RExportResolverFactoryServiceImpl() 
-		throws RemoteException
+
+	public RExportResolverFactoryServiceImpl() throws RemoteException
 	{
 		this("RExportResolverFactoryPortType");
 	}
-	
+
 	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.REXPORT_RESOLVER_FACTORY_PORT_TYPE;
 	}
-	
-	protected RExportResolverFactoryServiceImpl(String serviceName) 
-		throws RemoteException
+
+	protected RExportResolverFactoryServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
 
-		addImplementedPortType(
-				WellKnownPortTypes.REXPORT_RESOLVER_FACTORY_PORT_TYPE);
-		addImplementedPortType(
-				WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.REXPORT_RESOLVER_FACTORY_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 	}
-	
+
 	/**
 	 * Creates resolver resource for export resource specified by targetEPR in request
 	 * 
-	 * @param targetEPR:	export resource for which a resolver is to be created
-	 * @param any():		resolverCreationProperties
-	 *  					primary localpath
-	 *  					resolver factory epr
-	 *  
-	 *  
-	 * @return resolutionEPR: 	target EPR augmented with resolver EPR
-	 * @return resolverEPR:	resolver EPR
+	 * @param targetEPR
+	 *            : export resource for which a resolver is to be created
+	 * @param any
+	 *            (): resolverCreationProperties primary localpath resolver factory epr
+	 * 
+	 * 
+	 * @return resolutionEPR: target EPR augmented with resolver EPR
+	 * @return resolverEPR: resolver EPR
 	 * 
 	 */
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateResolverResponseType createResolver(CreateResolverRequestType createResolver)
-		throws RemoteException,
-			ResourceException,
-			InvalidWSNameFaultType
+	public CreateResolverResponseType createResolver(CreateResolverRequestType createResolver) throws RemoteException,
+		ResourceException, InvalidWSNameFaultType
 	{
-		//if no creation params for resolver, do not create resolver
-		if (createResolver.get_any() == null){
+		// if no creation params for resolver, do not create resolver
+		if (createResolver.get_any() == null) {
 			return null;
-		}	
-		
-		_logger.debug("createRExportResolver called");
-	
+		}
+
+		if (_logger.isDebugEnabled())
+			_logger.debug("createRExportResolver called");
+
 		EndpointReferenceType resolverReference = null;
 		EndpointReferenceType resolutionEPR = null;
-		
-		//get primaryEPR - epr to which resolver is to be added
+
+		// get primaryEPR - epr to which resolver is to be added
 		EndpointReferenceType primaryEPR = createResolver.getTarget_EPR();
-		
-		//collect creation params for resolver
-		MessageElement []resolverCreationProperties = RExportResolverUtils.
-			createResolverCreationParams(createResolver.get_any(), primaryEPR);
-		
-		try
-		{ 
-			//create proxy to resolver specifed by creation param
-			RExportResolverPortType resolverService = ClientUtils.createProxy(
-					RExportResolverPortType.class,
-					RExportResolverUtils.extractResolverServiceEPR(createResolver.get_any()));
-			//previously: EPRUtils.makeEPR(getResolverServiceURL()
-			
-			//create resolver instance with params
-			VcgrCreateResponse resp = resolverService.vcgrCreate(
-				new VcgrCreate(resolverCreationProperties));
-			
-			//get resolver epr
+
+		// collect creation params for resolver
+		MessageElement[] resolverCreationProperties = RExportResolverUtils.createResolverCreationParams(
+			createResolver.get_any(), primaryEPR);
+
+		try {
+			// create proxy to resolver specifed by creation param
+			RExportResolverPortType resolverService = ClientUtils.createProxy(RExportResolverPortType.class,
+				RExportResolverUtils.extractResolverServiceEPR(createResolver.get_any()));
+			// previously: EPRUtils.makeEPR(getResolverServiceURL()
+
+			// create resolver instance with params
+			VcgrCreateResponse resp = resolverService.vcgrCreate(new VcgrCreate(resolverCreationProperties));
+
+			// get resolver epr
 			resolverReference = resp.getEndpoint();
-			
-			//store resource-resolver mapping in table
-			RExportResolverUtils.updateResolverResourceInfo(
-					resolverReference,
-					primaryEPR);
-			
-			//create proxy to resolver
-			RExportResolverPortType resolverProxy = ClientUtils.createProxy(
-					RExportResolverPortType.class, 
-					resolverReference);
-			
-			//get resolution epr returned from resolver
+
+			// store resource-resolver mapping in table
+			RExportResolverUtils.updateResolverResourceInfo(resolverReference, primaryEPR);
+
+			// create proxy to resolver
+			RExportResolverPortType resolverProxy = ClientUtils.createProxy(RExportResolverPortType.class, resolverReference);
+
+			// get resolution epr returned from resolver
 			resolutionEPR = resolverProxy.update(new UpdateRequestType(primaryEPR)).getResolution_EPR();
-			
-			
-			//create rexportdir replica if default resolver
-			if (RExportResolverUtils.isRootResolver(createResolver.get_any())){
+
+			// create rexportdir replica if default resolver
+			if (RExportResolverUtils.isRootResolver(createResolver.get_any())) {
 				resolverProxy.createRootReplica(new CreateRootReplicaRequest(primaryEPR));
 			}
+		} catch (Throwable t) {
+			throw new ResourceException("Could not create new RExportResolver", t);
 		}
-		catch(Throwable t){
-			throw new ResourceException(
-					"Could not create new RExportResolver", t);
-		}
-		
+
 		return new CreateResolverResponseType(resolutionEPR, resolverReference);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

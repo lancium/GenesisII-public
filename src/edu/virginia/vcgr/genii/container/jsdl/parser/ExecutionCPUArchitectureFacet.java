@@ -9,11 +9,10 @@ import edu.virginia.vcgr.genii.container.jsdl.Restrictions;
 public class ExecutionCPUArchitectureFacet extends DefaultCPUArchitectureFacet
 {
 	@Override
-	public void consumeCPUArchitectureName(Object currentUnderstanding,
-		ProcessorArchitectureEnumeration cpuArchitectureName)
-			throws JSDLException
+	public void consumeCPUArchitectureName(Object currentUnderstanding, ProcessorArchitectureEnumeration cpuArchitectureName)
+		throws JSDLException
 	{
-		Restrictions restrictions = (Restrictions)currentUnderstanding;
+		Restrictions restrictions = (Restrictions) currentUnderstanding;
 		restrictions.setProcessorArchitectureRestriction(cpuArchitectureName);
 	}
 }

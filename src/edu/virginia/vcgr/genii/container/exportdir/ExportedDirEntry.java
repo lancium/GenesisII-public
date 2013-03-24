@@ -25,87 +25,85 @@ class ExportedDirEntry
 	private EndpointReferenceType _entryReference;
 	private String _id;
 	private String _type;
-	private MessageElement []_attributes;
-	
+	private MessageElement[] _attributes;
+
 	/* must fit within size of type field in database */
 	static public String _FILE_TYPE = "F";
 	static public String _DIR_TYPE = "D";
-	
-	ExportedDirEntry(String dirId, String name, EndpointReferenceType entryReference, 
-			String id, String type, MessageElement[] attributes)
+
+	ExportedDirEntry(String dirId, String name, EndpointReferenceType entryReference, String id, String type,
+		MessageElement[] attributes)
 	{
 		_dirId = dirId;
 		_name = name;
-		
+
 		_entryReference = entryReference;
-		
+
 		_id = id;
 		_type = type;
 		_attributes = attributes;
 	}
-	
-	ExportedDirEntry(String dirId, String name, EndpointReferenceType entryReference, 
-			String id, String type)
+
+	ExportedDirEntry(String dirId, String name, EndpointReferenceType entryReference, String id, String type)
 	{
 		this(dirId, name, entryReference, id, type, null);
 	}
-	
+
 	public String getDirId()
 	{
 		return _dirId;
 	}
-	
+
 	public String getName()
 	{
 		return _name;
 	}
-	
+
 	public EndpointReferenceType getEntryReference()
 	{
 		return _entryReference;
 	}
-	
+
 	public String getId()
 	{
 		return _id;
 	}
-	
+
 	public String getType()
 	{
 		return _type;
 	}
-	
+
 	public MessageElement[] getAttributes()
 	{
 		return _attributes;
 	}
-	
-	public void setAttributes(MessageElement [] attributes)
+
+	public void setAttributes(MessageElement[] attributes)
 	{
 		_attributes = attributes;
 	}
-	
+
 	public void addAttribute(MessageElement attribute)
 	{
 		int origSize = 0;
 		if (_attributes != null)
 			origSize = _attributes.length;
-		MessageElement [] newAttributes = new MessageElement[origSize + 1];
-		for (int i = 0; i < origSize; i++)
-		{
+		MessageElement[] newAttributes = new MessageElement[origSize + 1];
+		for (int i = 0; i < origSize; i++) {
 			newAttributes[i] = _attributes[i];
 		}
 		newAttributes[origSize] = attribute;
 		_attributes = newAttributes;
 	}
-	
+
 	public boolean isDirectory()
 	{
 		if (_type != null && _type.equals(_DIR_TYPE))
 			return true;
 		return false;
 	}
-	
+
 	public boolean isFile()
 	{
 		if (_type != null && _type.equals(_FILE_TYPE))

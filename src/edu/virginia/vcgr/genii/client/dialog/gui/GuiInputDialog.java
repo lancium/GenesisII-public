@@ -21,35 +21,35 @@ import edu.virginia.vcgr.genii.client.dialog.InputValidator;
 
 public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, ActionListener
 {
-	
+
 	static private final String _OK_ACTION = "OK";
+
 	@Override
 	protected void okCalled()
 	{
 		_answer = _field.getText();
-		
+
 		super.okCalled();
 	}
 
 	static final long serialVersionUID = 0L;
-	
+
 	private String _defaultAnswer;
 	private JLabel _label;
 	private JTextField _field;
 	private String _answer;
 	private InputValidator _validator;
-	
-	public GuiInputDialog(String title, 
-		String prompt)
+
+	public GuiInputDialog(String title, String prompt)
 	{
 		super(title, prompt);
-	
+
 		_validator = null;
 		_answer = null;
 		_defaultAnswer = null;
-		
+
 	}
-	
+
 	protected JTextField createTextField()
 	{
 		JTextField field = new JTextField();
@@ -59,32 +59,28 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, Ac
 		dim = field.getPreferredSize();
 		dim.width = 100;
 		field.setPreferredSize(dim);
-		
+
 		field.setActionCommand(_OK_ACTION);
-		field.addActionListener(this);	
-		
+		field.addActionListener(this);
+
 		return field;
 	}
-	
+
 	@Override
-	protected JComponent createBody(Object []bodyParameters)
+	protected JComponent createBody(Object[] bodyParameters)
 	{
-		_label = new JLabel((String)bodyParameters[0]);
+		_label = new JLabel((String) bodyParameters[0]);
 		_field = createTextField();
-		
+
 		_field.setInputVerifier(new InternalInputVerifier());
-		
+
 		JPanel panel = new JPanel(new GridBagLayout());
-		
-		panel.add(_label,
-			new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(_field,
-			new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5), 5, 5));
-		
+
+		panel.add(_label, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(_field, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
+
 		return panel;
 	}
 
@@ -112,30 +108,24 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, Ac
 		_defaultAnswer = defaultAnswer;
 		setDefaultValue();
 	}
-	
+
 	private void setDefaultValue()
 	{
-		try
-		{
-			if (!SwingUtilities.isEventDispatchThread())
-			{
-				SwingUtilities.invokeAndWait(new Runnable() {
+		try {
+			if (!SwingUtilities.isEventDispatchThread()) {
+				SwingUtilities.invokeAndWait(new Runnable()
+				{
 					public void run()
 					{
 						setDefaultValue();
 					}
 				});
 			}
-			
+
 			_field.setText(_defaultAnswer);
-		}
-		catch (InvocationTargetException ite)
-		{
-			throw new RuntimeException("Unexpected exception.", 
-				ite.getCause());
-		}
-		catch (InterruptedException ie)
-		{
+		} catch (InvocationTargetException ite) {
+			throw new RuntimeException("Unexpected exception.", ite.getCause());
+		} catch (InterruptedException ie) {
 			throw new RuntimeException("Unexpectedly interrupted.", ie);
 		}
 	}
@@ -145,31 +135,26 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, Ac
 	{
 		_validator = validator;
 	}
-	
-	
+
 	public void actionPerformed(ActionEvent arg0)
 	{
-				super._okAction.actionPerformed(arg0);	
+		super._okAction.actionPerformed(arg0);
 	}
-	
-	
+
 	private class InternalInputVerifier extends InputVerifier
 	{
 		@Override
 		public boolean verify(JComponent input)
 		{
 			String text = _field.getText();
-			if (_validator != null)
-			{
+			if (_validator != null) {
 				String msg = _validator.validateInput(text);
-				if (msg != null)
-				{
-					JOptionPane.showMessageDialog(_field, msg,
-						"Input Validation Failed", JOptionPane.ERROR_MESSAGE);
+				if (msg != null) {
+					JOptionPane.showMessageDialog(_field, msg, "Input Validation Failed", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 			}
-			
+
 			return true;
 		}
 	}

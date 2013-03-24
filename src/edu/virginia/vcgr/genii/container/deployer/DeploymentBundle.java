@@ -10,21 +10,19 @@ import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
 public class DeploymentBundle implements IDeployment, Serializable
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private IJSDLReifier _reifier;
 	private File _targetDirectory;
 	private String _deploymentInstance;
-	
-	DeploymentBundle(String deploymentInstance,
-		File targetDirectory, IJSDLReifier reifier)
+
+	DeploymentBundle(String deploymentInstance, File targetDirectory, IJSDLReifier reifier)
 	{
 		_reifier = reifier;
 		_targetDirectory = targetDirectory;
 		_deploymentInstance = deploymentInstance;
 	}
-	
-	public JobDefinition_Type reifyJSDL(JobDefinition_Type jsdl)
-			throws DeploymentException
+
+	public JobDefinition_Type reifyJSDL(JobDefinition_Type jsdl) throws DeploymentException
 	{
 		return _reifier.reifyJSDL(_targetDirectory, jsdl);
 	}

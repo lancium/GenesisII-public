@@ -10,8 +10,7 @@ import org.morgan.util.gui.table.AbstractRowTableColumnDefinition;
 
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 
-class SubmitTimeColumn 
-	extends AbstractRowTableColumnDefinition<JobInformation, Calendar>
+class SubmitTimeColumn extends AbstractRowTableColumnDefinition<JobInformation, Calendar>
 {
 	static private class StateRenderer extends DefaultTableCellRenderer
 	{
@@ -20,17 +19,17 @@ class SubmitTimeColumn
 		@Override
 		protected void setValue(Object value)
 		{
-			Calendar displayable = (Calendar)((Calendar)value).clone();
+			Calendar displayable = (Calendar) ((Calendar) value).clone();
 			displayable.setTimeZone(TimeZone.getDefault());
 			super.setValue(String.format("%tc", displayable));
 		}
 	}
-	
+
 	@Override
 	public void prepareTableColumn(TableColumn column)
 	{
 		super.prepareTableColumn(column);
-		
+
 		column.setCellRenderer(new StateRenderer());
 	}
 

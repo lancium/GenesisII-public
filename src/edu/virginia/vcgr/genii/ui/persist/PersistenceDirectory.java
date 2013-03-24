@@ -18,88 +18,73 @@ import org.morgan.util.io.StreamUtils;
 public class PersistenceDirectory
 {
 	static private Log _logger = LogFactory.getLog(PersistenceDirectory.class);
-	
-	static private final String FILENAME_FORMAT =
-		"file-%d.dat";
-	static private final Pattern FILENAME_PATTERN = Pattern.compile(
-		"^file-(\\d+)\\.dat$");
-	
+
+	static private final String FILENAME_FORMAT = "file-%d.dat";
+	static private final Pattern FILENAME_PATTERN = Pattern.compile("^file-(\\d+)\\.dat$");
+
 	private Set<PersistenceKey> _keys = new HashSet<PersistenceKey>();
-	
+
 	private File _directory;
 	private long _nextNumber;
-	
-	PersistenceDirectory(File directory)
-		throws IOException
+
+	PersistenceDirectory(File directory) throws IOException
 	{
 		if (!directory.exists())
 			directory.mkdirs();
-		
+
 		if (!directory.exists())
-			throw new FileNotFoundException(String.format(
-				"Unable to find directory \"%s\".", directory));
-		
+			throw new FileNotFoundException(String.format("Unable to find directory \"%s\".", directory));
+
 		if (!directory.isDirectory())
-			throw new IOException(String.format(
-				"Path \"%s\" does not appear to be a directory."));
-		
+			throw new IOException(String.format("Path \"%s\" does not appear to be a directory."));
+
 		_directory = directory;
 		_nextNumber = 0;
-		
-		for (File target : _directory.listFiles())
-		{
-			try
-			{
+
+		for (File target : _directory.listFiles()) {
+			try {
 				Matcher matcher = FILENAME_PATTERN.matcher(target.getName());
 				if (!matcher.matches())
 					target.delete();
-				else
-				{
+				else {
 					long number = Long.parseLong(matcher.group(1));
 					if (number >= _nextNumber)
 						_nextNumber = number + 1;
 					_keys.add(new PersistenceKey(target));
 				}
-			}
-			catch (Throwable cause)
-			{
-				_logger.warn(String.format(
-					"Unable to load persistence directory entry:  %s", target), 
-					cause);
+			} catch (Throwable cause) {
+				_logger.warn(String.format("Unable to load persistence directory entry:  %s", target), cause);
 			}
 		}
 	}
-	
+
 	public void removeEntry(PersistenceKey key)
 	{
 		key.persistenceFile().delete();
-		synchronized(_keys)
-		{
+		synchronized (_keys) {
 			_keys.remove(key);
 		}
 	}
-	
+
 	public Set<PersistenceKey> keys()
 	{
 		Set<PersistenceKey> ret;
-		
-		synchronized(_keys)
-		{
+
+		synchronized (_keys) {
 			ret = new HashSet<PersistenceKey>(_keys);
 		}
-		
+
 		return ret;
 	}
-	
+
 	public PersistenceKey addEntry(Persistable persistable) throws IOException
 	{
 		OutputStream out = null;
 		File realTarget;
 		File tmpTarget = File.createTempFile("tmp", ".tmp", _directory);
 		boolean ret;
-		
-		try
-		{
+
+		try {
 			out = new FileOutputStream(tmpTarget);
 			ObjectOutputStream oos = new ObjectOutputStream(out);
 			ret = persistable.persist(oos);
@@ -108,19 +93,15 @@ public class PersistenceDirectory
 			out = null;
 			if (!ret)
 				return null;
-			
-			synchronized(this)
-			{
-				realTarget = new File(_directory, String.format(
-					FILENAME_FORMAT, _nextNumber++));
+
+			synchronized (this) {
+				realTarget = new File(_directory, String.format(FILENAME_FORMAT, _nextNumber++));
 				if (!tmpTarget.renameTo(realTarget))
 					throw new IOException("Unable to persist persistable.");
 				tmpTarget = null;
 			}
 			return new PersistenceKey(realTarget);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(out);
 			if (tmpTarget != null)
 				tmpTarget.delete();

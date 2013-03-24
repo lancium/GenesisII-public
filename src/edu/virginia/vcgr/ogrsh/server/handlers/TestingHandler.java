@@ -10,15 +10,13 @@ public class TestingHandler
 	{
 		return a + b;
 	}
-	
+
 	@OGRSHOperation
-	public float OGRSHDivide(int a, int b)
-		throws OGRSHException
+	public float OGRSHDivide(int a, int b) throws OGRSHException
 	{
 		if (b == 0)
-			throw new OGRSHException("Divide by zero exception.", 
-				OGRSHException.EXCEPTION_DIVIDE_BY_ZERO);
-		
-		return (float)a / b;
+			throw new OGRSHException("Divide by zero exception.", OGRSHException.EXCEPTION_DIVIDE_BY_ZERO);
+
+		return (float) a / b;
 	}
 }

@@ -14,37 +14,32 @@ public class SimpleResolverTerminateUserData extends AdditionalUserData
 {
 	static final long serialVersionUID = 0L;
 
-	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
-			name = "targetEPI", required = true, nillable = false)
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "targetEPI", required = true, nillable = false)
 	private String _targetEPI = null;
-	
-	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
-			name = "targetID", required = true, nillable = false)
+
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "targetID", required = true, nillable = false)
 	private int _targetID = -1;
-	
+
 	@SuppressWarnings("unused")
 	private SimpleResolverTerminateUserData()
 	{
 	}
-	
+
 	public SimpleResolverTerminateUserData(URI targetEPI, int targetID)
 	{
 		_targetEPI = targetEPI.toString();
 		_targetID = targetID;
 	}
-	
+
 	public URI getTargetEPI()
 	{
-		try
-		{
+		try {
 			return new URI(_targetEPI);
-		}
-		catch (Exception exception)
-		{
+		} catch (Exception exception) {
 			return null;
 		}
 	}
-	
+
 	public int getTargetID()
 	{
 		return _targetID;

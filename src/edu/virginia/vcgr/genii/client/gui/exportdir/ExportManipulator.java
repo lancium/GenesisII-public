@@ -20,49 +20,41 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 
 public class ExportManipulator
 {
-	static public RNSPath createExport(
-		URL containerURL, File localPath, String rnsPath,
-		boolean isLightweight)
-			throws FileNotFoundException, ExportException,
-				RNSException, CreationException,
-				ResourceCreationFaultType, RemoteException, IOException, InvalidToolUsageException
+	static public RNSPath createExport(URL containerURL, File localPath, String rnsPath, boolean isLightweight)
+		throws FileNotFoundException, ExportException, RNSException, CreationException, ResourceCreationFaultType,
+		RemoteException, IOException, InvalidToolUsageException
 	{
 		validate(localPath);
-			
+
 		RNSPath target = RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 		validate(target);
-		
-		ExportTool.createExportedRoot(rnsPath, EPRUtils.makeEPR(containerURL.toString() 
-			+ "/axis/services/" + 
-				(isLightweight ? "LightWeightExportPortType" : "ExportedRootPortType")),
-			localPath.getAbsolutePath(), null, null, null, rnsPath, false);
+
+		ExportTool.createExportedRoot(
+			rnsPath,
+			EPRUtils.makeEPR(containerURL.toString() + "/axis/services/"
+				+ (isLightweight ? "LightWeightExportPortType" : "ExportedRootPortType")), localPath.getAbsolutePath(), null,
+			null, null, rnsPath, false);
 		return RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST);
 	}
-	
-	static public void validate(File localPath)
-		throws FileNotFoundException, ExportException
+
+	static public void validate(File localPath) throws FileNotFoundException, ExportException
 	{
 		if (!localPath.exists())
-			throw new FileNotFoundException("Couldn't find source directory \"" + 
-				localPath.getAbsolutePath() + "\".");
+			throw new FileNotFoundException("Couldn't find source directory \"" + localPath.getAbsolutePath() + "\".");
 		if (!localPath.isDirectory())
-			throw new ExportException("Cannot export \"" + localPath.getAbsolutePath() 
-				+ "\" because it is not a directory.");
+			throw new ExportException("Cannot export \"" + localPath.getAbsolutePath() + "\" because it is not a directory.");
 	}
-	
-	static public void validate(RNSPath rnsPath)
-		throws ExportException, RNSPathDoesNotExistException
+
+	static public void validate(RNSPath rnsPath) throws ExportException, RNSPathDoesNotExistException
 	{
 		RNSPath parent = rnsPath.getParent();
 		if (!parent.exists())
-			throw new ExportException("Cannot create export because target RNS path \"" +
-				parent.pwd() + "\" does not exist.");
+			throw new ExportException("Cannot create export because target RNS path \"" + parent.pwd() + "\" does not exist.");
 		if (!(new TypeInformation(parent.getEndpoint())).isRNS())
 			throw new ExportException("RNS path \"" + parent.pwd() + "\" is not an RNS capable endpoint.");
 	}
-	
-	static public void quitExport(
-		RNSPath exportRoot) throws RNSException, IOException
+
+	static public void quitExport(RNSPath exportRoot) throws RNSException, IOException
 	{
 		ExportTool.quitExportedRoot(exportRoot.getEndpoint(), false);
 		exportRoot.unlink();

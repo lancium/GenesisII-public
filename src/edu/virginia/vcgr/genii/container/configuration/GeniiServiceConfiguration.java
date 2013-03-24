@@ -11,19 +11,16 @@ import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface GeniiServiceConfiguration
-{
-	Class<? extends IResourceProvider> resourceProvider() 
-		default IResourceProvider.class;
-	Class<? extends IAuthZProvider> defaultAuthZProvider()
-		default IAuthZProvider.class;
-	Class<? extends IResolverFactoryProxy> defaultResolverFactoryProxy()
-		default IResolverFactoryProxy.class;
-	
+public @interface GeniiServiceConfiguration {
+	Class<? extends IResourceProvider> resourceProvider() default IResourceProvider.class;
+
+	Class<? extends IAuthZProvider> defaultAuthZProvider() default IAuthZProvider.class;
+
+	Class<? extends IResolverFactoryProxy> defaultResolverFactoryProxy() default IResolverFactoryProxy.class;
+
 	long defaultServiceCertificateLifetime() default -1L;
+
 	long defaultResourceCertificateLifetime() default -1L;
-	
-	Class<? extends JAXBGenesisIIServiceConfiguration> 
-		jaxbServiceConfigurationClass() 
-		default JAXBGenesisIIServiceConfiguration.class;
+
+	Class<? extends JAXBGenesisIIServiceConfiguration> jaxbServiceConfigurationClass() default JAXBGenesisIIServiceConfiguration.class;
 }

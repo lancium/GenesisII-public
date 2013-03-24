@@ -9,12 +9,10 @@ class PersistentOutcallEntry
 	private int _numAttempts;
 	private Calendar _nextAttempt;
 	private Calendar _createTime;
-	
+
 	private AttemptScheduler _scheduler;
-	
-	PersistentOutcallEntry(long id,
-		int numAttempts, Calendar nextAttempt, Calendar createTime,
-		AttemptScheduler scheduler)
+
+	PersistentOutcallEntry(long id, int numAttempts, Calendar nextAttempt, Calendar createTime, AttemptScheduler scheduler)
 	{
 		_entryID = id;
 		_numAttempts = numAttempts;
@@ -23,51 +21,49 @@ class PersistentOutcallEntry
 
 		_scheduler = scheduler;
 	}
-	
+
 	final long entryID()
 	{
 		return _entryID;
 	}
-	
+
 	final int numAttempts()
 	{
 		return _numAttempts;
 	}
-	
+
 	final void numAttempts(int numAttempts)
 	{
 		_numAttempts = numAttempts;
 	}
-	
+
 	final Calendar nextAttempt()
 	{
 		return _nextAttempt;
 	}
-	
+
 	final void nextAttempt(Calendar nextAttempt)
 	{
 		_nextAttempt = nextAttempt;
 	}
-	
+
 	final Calendar createTime()
 	{
 		return _createTime;
 	}
-	
+
 	final AttemptScheduler scheduler()
 	{
 		return _scheduler;
 	}
-	
-	static private class NextAttemptComparator
-		implements Comparator<PersistentOutcallEntry>
+
+	static private class NextAttemptComparator implements Comparator<PersistentOutcallEntry>
 	{
 		@Override
 		public int compare(PersistentOutcallEntry o1, PersistentOutcallEntry o2)
 		{
 			int ret = o1._nextAttempt.compareTo(o2._nextAttempt);
-			if (ret == 0)
-			{
+			if (ret == 0) {
 				long val = o1.entryID() - o2.entryID();
 				if (val == 0L)
 					return 0;
@@ -76,11 +72,10 @@ class PersistentOutcallEntry
 				else
 					return 1;
 			}
-			
+
 			return ret;
 		}
 	}
-	
-	static final Comparator<PersistentOutcallEntry> NEXT_ATTEMPT_COMPARATOR =
-		new NextAttemptComparator();
+
+	static final Comparator<PersistentOutcallEntry> NEXT_ATTEMPT_COMPARATOR = new NextAttemptComparator();
 }

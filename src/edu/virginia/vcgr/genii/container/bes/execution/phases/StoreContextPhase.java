@@ -13,43 +13,35 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 
-public class StoreContextPhase extends AbstractExecutionPhase implements
-		ExecutionPhase, Serializable
+public class StoreContextPhase extends AbstractExecutionPhase implements ExecutionPhase, Serializable
 {
 	static final long serialVersionUID = 0L;
-	
+
 	static public final String STORING_CONTEXT_PHASE = "storing-context";
-	
+
 	private String _filename;
-	
+
 	public StoreContextPhase(String filename)
 	{
-		super(new ActivityState(
-			ActivityStateEnumeration.Running,
-			STORING_CONTEXT_PHASE, false));
-		
+		super(new ActivityState(ActivityStateEnumeration.Running, STORING_CONTEXT_PHASE, false));
+
 		_filename = filename;
 	}
-	
+
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
-		File callingContextFile = new File(
-			context.getCurrentWorkingDirectory().getWorkingDirectory(), 
-			_filename);
+		File callingContextFile = new File(context.getCurrentWorkingDirectory().getWorkingDirectory(), _filename);
 		FileOutputStream fos = null;
-		
-		try
-		{
+
+		try {
 			ICallingContext cc = context.getCallingContext();
 			fos = new FileOutputStream(callingContextFile);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(cc);
 			oos.flush();
 			oos.close();
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(fos);
 		}
 	}

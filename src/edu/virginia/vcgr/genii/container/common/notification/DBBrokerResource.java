@@ -13,9 +13,8 @@ public class DBBrokerResource extends BasicDBResource
 	{
 		super(key, connection);
 	}
-	
-	public DBBrokerResource(ResourceKey parentKey,
-		DatabaseConnectionPool connectionPool) throws SQLException
+
+	public DBBrokerResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

@@ -22,34 +22,34 @@ import java.io.RandomAccessFile;
 public class RAFOutputStream extends OutputStream
 {
 	private RandomAccessFile _raf;
-	
+
 	public RAFOutputStream(RandomAccessFile raf)
 	{
 		_raf = raf;
 	}
-	
+
 	public void close() throws IOException
 	{
 		_raf.close();
 	}
-	
-    public void flush() throws IOException
-    {
-    	_raf.getChannel().force(false);
-    }
 
-    public void write(byte[] b) throws IOException
-    {
-    	_raf.write(b);
-    }
-    
-    public void write(byte[] b, int off, int len) throws IOException
-    {
-    	_raf.write(b, off, len);
-    }
-    
-    public void write(int b) throws IOException
-    {
-    	_raf.write(b);
-    }
+	public void flush() throws IOException
+	{
+		_raf.getChannel().force(false);
+	}
+
+	public void write(byte[] b) throws IOException
+	{
+		_raf.write(b);
+	}
+
+	public void write(byte[] b, int off, int len) throws IOException
+	{
+		_raf.write(b, off, len);
+	}
+
+	public void write(int b) throws IOException
+	{
+		_raf.write(b);
+	}
 }

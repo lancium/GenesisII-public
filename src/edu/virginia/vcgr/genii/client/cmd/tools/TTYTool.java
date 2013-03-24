@@ -21,23 +21,19 @@ import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
 public class TTYTool extends BaseGridTool
 {
-	static private final String _DESCRIPTION = 
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dtty";
-	static private final FileResource _USAGE_RESOURCE =	new FileResource(
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/utty");
-	static private final String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/tty";
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dtty";
+	static private final FileResource _USAGE_RESOURCE = new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/utty");
+	static private final String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/tty";
 
 	static public final String WATCH_TOKEN = "watch";
 	static public final String UNWATCH_TOKEN = "unwatch";
-	
+
 	public TTYTool()
 	{
-		super(new FileResource(_DESCRIPTION), _USAGE_RESOURCE, 
-				false, ToolCategory.MISC);
+		super(new FileResource(_DESCRIPTION), _USAGE_RESOURCE, false, ToolCategory.MISC);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
@@ -53,41 +49,35 @@ public class TTYTool extends BaseGridTool
 	protected void verify() throws ToolException
 	{
 		int numArgs = numArguments();
-		if (numArgs == 1)
-		{
+		if (numArgs == 1) {
 			if (getArgument(0).equals(UNWATCH_TOKEN))
 				return;
-		} else if (numArgs == 2)
-		{
+		} else if (numArgs == 2) {
 			if (new GeniiPath(getArgument(1)).pathType() != GeniiPathType.Grid)
 				throw new InvalidToolUsageException("<tty-object-path> must be a grid path. ");
 			if (getArgument(0).equals(WATCH_TOKEN))
 				return;
 		}
-		
+
 		throw new InvalidToolUsageException();
 	}
-	
-	public void watch(String path) 
-		throws RNSException,
-			ToolException, TTYException, FileNotFoundException,
-			RemoteException, IOException
+
+	public void watch(String path) throws RNSException, ToolException, TTYException, FileNotFoundException, RemoteException,
+		IOException
 	{
 		RNSPath rPath = lookup(new GeniiPath(path), RNSPathQueryFlags.MUST_EXIST);
 		TypeInformation tInfo = new TypeInformation(rPath.getEndpoint());
 		if (!tInfo.isTTY())
-			throw new ToolException("Target path \"" + path + 
-				"\" is not a grid tty object.");
-		
+			throw new ToolException("Target path \"" + path + "\" is not a grid tty object.");
+
 		TTYWatcher.watch(stdout, stderr, rPath.getEndpoint());
-		ContextManager.getCurrentContext().setSingleValueProperty(
-			TTYConstants.TTY_CALLING_CONTEXT_PROPERTY, EPRUtils.toBytes(rPath.getEndpoint()));
+		ContextManager.getExistingContext().setSingleValueProperty(TTYConstants.TTY_CALLING_CONTEXT_PROPERTY,
+			EPRUtils.toBytes(rPath.getEndpoint()));
 	}
-	
+
 	public void unwatch() throws TTYException, IOException
 	{
 		TTYWatcher.unwatch();
-		ContextManager.getCurrentContext().removeProperty(
-			TTYConstants.TTY_CALLING_CONTEXT_PROPERTY);
+		ContextManager.getExistingContext().removeProperty(TTYConstants.TTY_CALLING_CONTEXT_PROPERTY);
 	}
 }

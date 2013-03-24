@@ -23,64 +23,65 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.context.ContextType;
+import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 public interface ICallingContext
 {
-	// Properties are intended to be serialized within outgoing 
+	// Properties are intended to be serialized within outgoing
 	// messages
-	
+
 	/**
-	 * Gets a multi-value property.  Null if does not exist, otherwise 
-	 * a non-empty ArrayList
+	 * Gets a multi-value property. Null if does not exist, otherwise a non-empty ArrayList
 	 */
 	public Collection<Serializable> getProperty(String name);
 
 	/**
-	 * Sets a multi-value property.  Overwrites any prevous properties
-	 * at this level (Overloads, but does not overwrite a same-named 
-	 * parent property.) 
+	 * Sets a multi-value property. Overwrites any prevous properties at this level (Overloads, but
+	 * does not overwrite a same-named parent property.)
 	 */
 	public void setProperty(String name, Collection<Serializable> values);
-	
+
 	/**
-	 * Removes a multi-value property from all levels (including parent). 
+	 * Removes a multi-value property from all levels (including parent).
 	 */
 	public void removeProperty(String name);
-	
+
 	/**
-	 * Gets a single-value property.  If the name refers to a mulit-value 
-	 * property, the first value is returened.  Returns null if does not 
-	 * exist
+	 * Gets a single-value property. If the name refers to a mulit-value property, the first value
+	 * is returened. Returns null if does not exist
 	 */
 	public Serializable getSingleValueProperty(String name);
 
 	/**
-	 * Sets a single-value property.  Overwrites any prevous properties
-	 * at this level (Overloads, but does not overwrite a same-named 
-	 * parent property.) 
+	 * Sets a single-value property. Overwrites any prevous properties at this level (Overloads, but
+	 * does not overwrite a same-named parent property.)
 	 */
 	public void setSingleValueProperty(String name, Serializable value);
 
 	public void setActiveKeyAndCertMaterial(KeyAndCertMaterial clientKeyMaterial) throws GeneralSecurityException;
+
 	public KeyAndCertMaterial getActiveKeyAndCertMaterial() throws GeneralSecurityException;
-	
-	
+
 	public Serializable getTransientProperty(String name);
+
 	public void setTransientProperty(String name, Serializable value);
+
 	public void removeTransientProperty(String name);
-	
+
 	public RNSPath getCurrentPath();
+
 	public void setCurrentPath(RNSPath newPath);
-	
-	public ContextType getSerialized() throws IOException ;
-	
+
+	public ContextType getSerialized() throws IOException;
+
 	public ICallingContext deriveNewContext();
+
 	public ICallingContext deriveNewContext(ContextType serializedInformation) throws IOException;
-	
+
 	public void serializeTransientProperties(ObjectOutput out) throws IOException;
+
 	public void deserializeTransientProperties(ObjectInput in) throws IOException;
-	
+
 	public ContextDescription describe();
 }

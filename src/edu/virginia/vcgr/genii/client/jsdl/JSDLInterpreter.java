@@ -74,82 +74,57 @@ import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIde
 
 public class JSDLInterpreter
 {
-	static public Object interpretJSDL(
-		PersonalityProvider provider, JobDefinition_Type jsdl) 
-			throws JSDLException
+	static public Object interpretJSDL(PersonalityProvider provider, JobDefinition_Type jsdl) throws JSDLException
 	{
 		Object understanding = provider.createNewUnderstanding();
-		
+
 		understand(provider, understanding, jsdl);
 		return understanding;
 	}
-	
-	static private void understandAny(
-		PersonalityFacet facet, Object understanding, 
-		MessageElement []any) throws JSDLException
+
+	static private void understandAny(PersonalityFacet facet, Object understanding, MessageElement[] any) throws JSDLException
 	{
-		if (any != null)
-		{
-			for (MessageElement a : any)
-			{
+		if (any != null) {
+			for (MessageElement a : any) {
 				if (a != null)
 					facet.consumeAny(understanding, a);
 			}
 		}
 	}
-	
-	static private void understandResourcesAny(PersonalityProvider provider,
-		PersonalityFacet facet, Object understanding, MessageElement []any)
-			throws JSDLException
+
+	static private void understandResourcesAny(PersonalityProvider provider, PersonalityFacet facet, Object understanding,
+		MessageElement[] any) throws JSDLException
 	{
-		if (any != null)
-		{
-			for (MessageElement a : any)
-			{
-				if (a != null)
-				{
+		if (any != null) {
+			for (MessageElement a : any) {
+				if (a != null) {
 					QName name = a.getQName();
-					if (name.equals(GeniiPropertyFacet.PROPERTY_ELEMENT))
-					{
-						String propertyName = a.getAttribute(
-							GeniiPropertyFacet.PROPERTY_NAME_ATTRIBUTE);
-						String propertyValue = a.getAttribute(
-							GeniiPropertyFacet.PROPERTY_VALUE_ATTRIBUTE);
-						
-						GeniiPropertyFacet f2 = provider.getGeniiPropertyFacet(
-							understanding);
-						Object newUnderstanding = f2.createFacetUnderstanding(
-							understanding);
-						f2.consumeProperty(newUnderstanding, propertyName, 
-							propertyValue);
+					if (name.equals(GeniiPropertyFacet.PROPERTY_ELEMENT)) {
+						String propertyName = a.getAttribute(GeniiPropertyFacet.PROPERTY_NAME_ATTRIBUTE);
+						String propertyValue = a.getAttribute(GeniiPropertyFacet.PROPERTY_VALUE_ATTRIBUTE);
+
+						GeniiPropertyFacet f2 = provider.getGeniiPropertyFacet(understanding);
+						Object newUnderstanding = f2.createFacetUnderstanding(understanding);
+						f2.consumeProperty(newUnderstanding, propertyName, propertyValue);
 						f2.completeFacet(understanding, newUnderstanding);
-					} else if (name.equals(GeniiOrFacet.OR_ELEMENT))
-					{
-						GeniiOrFacet f2 = provider.getGeniiOrFacet(
-							understanding);
-						Object newUnderstanding = f2.createFacetUnderstanding(
-							understanding);
-						
-						Collection<MessageElement> children = 
-							new ArrayList<MessageElement>();
+					} else if (name.equals(GeniiOrFacet.OR_ELEMENT)) {
+						GeniiOrFacet f2 = provider.getGeniiOrFacet(understanding);
+						Object newUnderstanding = f2.createFacetUnderstanding(understanding);
+
+						Collection<MessageElement> children = new ArrayList<MessageElement>();
 						Iterator<?> iter = a.getChildElements();
 						while (iter.hasNext())
-							children.add((MessageElement)iter.next());
+							children.add((MessageElement) iter.next());
 						understandResourcesAny(provider, f2, newUnderstanding,
 							children.toArray(new MessageElement[children.size()]));
 						f2.completeFacet(understanding, newUnderstanding);
-					} else if (name.equals(new QName("http://vcgr.cs.virginia.edu/jsdl/genii", "WallclockTime")))
-					{
-						try
-						{
+					} else if (name.equals(new QName("http://vcgr.cs.virginia.edu/jsdl/genii", "WallclockTime"))) {
+						try {
 							RangeValue_Type rType = ObjectDeserializer.toObject(a, RangeValue_Type.class);
 							RangeExpression range = RangeFactory.parse(rType);
 							if (range != null)
-								((ResourcesFacet)facet).consumeWallclockTimeLimit(
-									understanding, range);
-						}
-						catch (Throwable cause)
-						{
+								((ResourcesFacet) facet).consumeWallclockTimeLimit(understanding, range);
+						} catch (Throwable cause) {
 							throw new JSDLException("Unable to parse wallclock time.", cause);
 						}
 					} else
@@ -159,245 +134,200 @@ public class JSDLInterpreter
 		}
 	}
 
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, JobDefinition_Type def)
-			throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, JobDefinition_Type def)
+		throws JSDLException
 	{
 		if (def == null)
 			return;
-		
-		JobDefinitionFacet facet = provider.getJobDefinitionFacet(
-			parentUnderstanding);
-		Object understanding = 
-			facet.createFacetUnderstanding(parentUnderstanding);
-		
+
+		JobDefinitionFacet facet = provider.getJobDefinitionFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		NormalizedString id = def.getId();
 		if (id != null)
 			facet.consumeID(understanding, id.toString());
-		
+
 		understandAny(facet, understanding, def.get_any());
-		
+
 		understand(provider, understanding, def.getJobDescription());
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
-	
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, JobDescription_Type desc) 
-			throws JSDLException
+
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, JobDescription_Type desc)
+		throws JSDLException
 	{
 		if (desc == null)
 			return;
-		
-		JobDescriptionFacet facet = provider.getJobDescriptionFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		JobDescriptionFacet facet = provider.getJobDescriptionFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		understandAny(facet, understanding, desc.get_any());
-		
+
 		understand(provider, understanding, desc.getJobIdentification());
 		understand(provider, understanding, desc.getApplication());
 		understand(provider, understanding, desc.getResources());
 		understand(provider, understanding, desc.getDataStaging());
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
-	
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, JobIdentification_Type ident)
-			throws JSDLException
+
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, JobIdentification_Type ident)
+		throws JSDLException
 	{
 		if (ident == null)
 			return;
-		
-		JobIdentificationFacet facet = provider.getJobIdentificationFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		JobIdentificationFacet facet = provider.getJobIdentificationFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		understandAny(facet, understanding, ident.get_any());
-		
+
 		String str = ident.getJobName();
 		if (str != null)
 			facet.consumeJobName(understanding, str);
-		
+
 		str = ident.getDescription();
 		if (str != null)
 			facet.consumeDescription(understanding, str);
-		
-		String []annotArray = ident.getJobAnnotation();
-		if (annotArray != null)
-		{
-			for (String annot : annotArray)
-			{
+
+		String[] annotArray = ident.getJobAnnotation();
+		if (annotArray != null) {
+			for (String annot : annotArray) {
 				if (annot != null)
 					facet.consumeJobAnnotation(understanding, annot);
 			}
 		}
-		
-		String []projectArray = ident.getJobProject();
-		if (projectArray != null)
-		{
-			for (String project : projectArray)
-			{
+
+		String[] projectArray = ident.getJobProject();
+		if (projectArray != null) {
+			for (String project : projectArray) {
 				if (project != null)
 					facet.consumeJobProject(understanding, project);
 			}
 		}
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, Application_Type app)
-			throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, Application_Type app)
+		throws JSDLException
 	{
 		Collection<MessageElement> any = new LinkedList<MessageElement>();
-		
+
 		if (app == null)
 			return;
-		
-		ApplicationFacet facet = provider.getApplicationFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		ApplicationFacet facet = provider.getApplicationFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		String str = app.getApplicationName();
 		if (str != null)
 			facet.consumeApplicationName(understanding, str);
-		
+
 		str = app.getApplicationVersion();
 		if (str != null)
 			facet.consumeApplicationVersion(understanding, str);
-		
+
 		str = app.getDescription();
 		if (str != null)
 			facet.consumeDescription(understanding, str);
-		
-		MessageElement []anyArray = app.get_any();
-		if (anyArray != null)
-		{
-			for (MessageElement a : anyArray)
-			{
+
+		MessageElement[] anyArray = app.get_any();
+		if (anyArray != null) {
+			for (MessageElement a : anyArray) {
 				QName elementName = a.getQName();
-				if (elementName.equals(
-					JSDLPosixConstants.JSDL_POSIX_APPLICATION_QNAME))
-				{
-					try
-					{
-						POSIXApplication_Type pat = ObjectDeserializer.toObject(
-							a, POSIXApplication_Type.class);
+				if (elementName.equals(JSDLPosixConstants.JSDL_POSIX_APPLICATION_QNAME)) {
+					try {
+						POSIXApplication_Type pat = ObjectDeserializer.toObject(a, POSIXApplication_Type.class);
 						understand(provider, understanding, pat);
+					} catch (ResourceException re) {
+						throw new InvalidJSDLException("Unable to parse JSDL Application element "
+							+ "into POSIXApplication element.", re);
 					}
-					catch (ResourceException re)
-					{
-						throw new InvalidJSDLException(
-							"Unable to parse JSDL Application element " +
-								"into POSIXApplication element.", re);
-					}
-				} else if (elementName.equals(
-					HPCConstants.HPC_APPLICATION_QNAME))
-				{
-					try
-					{
-						HPCProfileApplication_Type hat = ObjectDeserializer.toObject(
-							a, HPCProfileApplication_Type.class);
+				} else if (elementName.equals(HPCConstants.HPC_APPLICATION_QNAME)) {
+					try {
+						HPCProfileApplication_Type hat = ObjectDeserializer.toObject(a, HPCProfileApplication_Type.class);
 						understand(provider, understanding, hat);
+					} catch (ResourceException re) {
+						throw new InvalidJSDLException("Unable to parse JSDL Application element "
+							+ "into HPCProfileApplication element.", re);
 					}
-					catch (ResourceException re)
-					{
-						throw new InvalidJSDLException(
-							"Unable to parse JSDL Application element " +
-								"into HPCProfileApplication element.", re);
-					}
-				} else if (elementName.equals(
-					SPMDConstants.JSDL_SPMD_APPLICATION_QNAME))
-				{
-					try
-					{
-						SPMDApplication_Type spmd = ObjectDeserializer.toObject(
-							a, SPMDApplication_Type.class);
+				} else if (elementName.equals(SPMDConstants.JSDL_SPMD_APPLICATION_QNAME)) {
+					try {
+						SPMDApplication_Type spmd = ObjectDeserializer.toObject(a, SPMDApplication_Type.class);
 						understand(provider, understanding, spmd);
+					} catch (ResourceException re) {
+						throw new InvalidJSDLException("Unable to parse JSDL Application element "
+							+ "into SPMDApplication element.", re);
 					}
-					catch (ResourceException re)
-					{
-						throw new InvalidJSDLException(
-							"Unable to parse JSDL Application element " +
-								"into SPMDApplication element.", re);
-					}
-				} else
-				{
+				} else {
 					any.add(a);
 				}
 			}
 		}
 		understandAny(facet, understanding, any.toArray(new MessageElement[0]));
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, Resources_Type resources)
-			throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, Resources_Type resources)
+		throws JSDLException
 	{
 		if (resources == null)
 			return;
-		
-		ResourcesFacet facet = provider.getResourcesFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-				
+
+		ResourcesFacet facet = provider.getResourcesFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		understandResourcesAny(provider, facet, understanding, resources.get_any());
-		
-		understandCandidateHosts(provider, understanding, 
-			resources.getCandidateHosts());
+
+		understandCandidateHosts(provider, understanding, resources.getCandidateHosts());
 		understand(provider, understanding, resources.getFileSystem());
-		
+
 		Boolean b = resources.getExclusiveExecution();
 		if (b != null)
-		facet.consumeExclusiveExecution(understanding, b.booleanValue());
-		
+			facet.consumeExclusiveExecution(understanding, b.booleanValue());
+
 		understand(provider, understanding, resources.getOperatingSystem());
 		understand(provider, understanding, resources.getCPUArchitecture());
-		
-		RangeExpression range = RangeFactory.parse(
-			resources.getIndividualCPUSpeed());
+
+		RangeExpression range = RangeFactory.parse(resources.getIndividualCPUSpeed());
 		if (range != null)
 			facet.consumeIndividualCPUSpeed(understanding, range);
-		
+
 		range = RangeFactory.parse(resources.getIndividualCPUTime());
 		if (range != null)
 			facet.consumeIndividualCPUTime(understanding, range);
-		
+
 		range = RangeFactory.parse(resources.getIndividualCPUCount());
 		if (range != null)
 			facet.consumeIndividualCPUCount(understanding, range);
-		
+
 		range = RangeFactory.parse(resources.getIndividualNetworkBandwidth());
 		if (range != null)
 			facet.consumeIndividualNetworkBandwidth(understanding, range);
-		
+
 		range = RangeFactory.parse(resources.getIndividualPhysicalMemory());
 		if (range != null)
 			facet.consumeIndividualPhysicalMemory(understanding, range);
-		
+
 		range = RangeFactory.parse(resources.getIndividualVirtualMemory());
 		if (range != null)
 			facet.consumeIndividualVirtualMemory(understanding, range);
-		
+
 		range = RangeFactory.parse(resources.getIndividualDiskSpace());
 		if (range != null)
 			facet.consumeIndividualDiskSpace(understanding, range);
-		
+
 		range = RangeFactory.parse(resources.getTotalCPUTime());
 		if (range != null)
 			facet.consumeTotalCPUTime(understanding, range);
-		
+
 		range = RangeFactory.parse(resources.getTotalCPUCount());
 		if (range != null)
 			facet.consumeTotalCPUCount(understanding, range);
-		
+
 		range = RangeFactory.parse(resources.getTotalPhysicalMemory());
 		if (range != null)
 			facet.consumeTotalPhysicalMemory(understanding, range);
@@ -409,328 +339,266 @@ public class JSDLInterpreter
 		range = RangeFactory.parse(resources.getTotalDiskSpace());
 		if (range != null)
 			facet.consumeTotalDiskSpace(understanding, range);
-		
+
 		range = RangeFactory.parse(resources.getTotalResourceCount());
 		if (range != null)
 			facet.consumeTotalResourceCount(understanding, range);
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, DataStaging_Type []staging)
-			throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, DataStaging_Type[] staging)
+		throws JSDLException
 	{
 		if (staging == null)
 			return;
-		
-		for (DataStaging_Type stage : staging)
-		{
+
+		for (DataStaging_Type stage : staging) {
 			understand(provider, parentUnderstanding, stage);
 		}
 	}
-	
-	static private void understand(PersonalityProvider provider,
-		Object parentUnderstanding, SPMDApplication_Type spmd)
+
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, SPMDApplication_Type spmd)
 		throws JSDLException
 	{
 		if (spmd == null)
 			return;
-		
-		SPMDApplicationFacet facet = provider.getSPMDApplicationFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		SPMDApplicationFacet facet = provider.getSPMDApplicationFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		NormalizedString nStr;
-		
+
 		FileName_Type file = spmd.getExecutable();
-		if (file != null)
-		{
+		if (file != null) {
 			nStr = file.getFilesystemName();
-			facet.consumeExecutable(understanding, 
-				nStr != null ? nStr.toString() : null, file.get_value());
+			facet.consumeExecutable(understanding, nStr != null ? nStr.toString() : null, file.get_value());
 		}
-		
-		Argument_Type []args = spmd.getArgument();
-		if (args != null)
-		{
-			for (Argument_Type arg : args)
-			{
+
+		Argument_Type[] args = spmd.getArgument();
+		if (args != null) {
+			for (Argument_Type arg : args) {
 				nStr = arg.getFilesystemName();
 				NormalizedString nStr2 = arg.get_value();
-				facet.consumeArgument(understanding, 
-					nStr != null ? nStr.toString() : null,
-					nStr2 != null ? nStr2.toString() : null);
+				facet.consumeArgument(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString()
+					: null);
 			}
 		}
-		
+
 		file = spmd.getInput();
-		if (file != null)
-		{
+		if (file != null) {
 			nStr = file.getFilesystemName();
-			facet.consumeInput(understanding, nStr != null ? nStr.toString() : null, 
-				file.get_value());
+			facet.consumeInput(understanding, nStr != null ? nStr.toString() : null, file.get_value());
 		}
-		
+
 		file = spmd.getOutput();
-		if (file != null)
-		{
+		if (file != null) {
 			nStr = file.getFilesystemName();
-			facet.consumeOutput(understanding, nStr != null ? nStr.toString() : null, 
-				file.get_value());
+			facet.consumeOutput(understanding, nStr != null ? nStr.toString() : null, file.get_value());
 		}
 		file = spmd.getError();
-		if (file != null)
-		{
+		if (file != null) {
 			nStr = file.getFilesystemName();
-			facet.consumeError(understanding, nStr != null ? nStr.toString() : null, 
-				file.get_value());
+			facet.consumeError(understanding, nStr != null ? nStr.toString() : null, file.get_value());
 		}
-		
+
 		DirectoryName_Type dir = spmd.getWorkingDirectory();
-		if (dir != null)
-		{
+		if (dir != null) {
 			nStr = dir.getFilesystemName();
-			facet.consumeWorkingDirectory(understanding, 
-				nStr != null ? nStr.toString() : null, dir.get_value());
+			facet.consumeWorkingDirectory(understanding, nStr != null ? nStr.toString() : null, dir.get_value());
 		}
-		
-		Environment_Type []env = spmd.getEnvironment();
-		if (env != null)
-		{
-			for (Environment_Type e : env)
-			{
+
+		Environment_Type[] env = spmd.getEnvironment();
+		if (env != null) {
+			for (Environment_Type e : env) {
 				nStr = e.getName();
 				NormalizedString nStr2 = e.getFilesystemName();
-				facet.consumeEnvironment(understanding, nStr != null ? nStr.toString() : null, 
-					nStr2 != null ? nStr2.toString() : null, e.get_value());
+				facet.consumeEnvironment(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString()
+					: null, e.get_value());
 			}
 		}
-		
+
 		UserName_Type user = spmd.getUserName();
 		if (user != null)
 			facet.consumeUserName(understanding, user.get_value());
-		
+
 		NumberOfProcesses_Type nProcs = spmd.getNumberOfProcesses();
-		if (nProcs != null)
-		{
+		if (nProcs != null) {
 			PositiveInteger pi = nProcs.get_value();
 			Boolean b = nProcs.getActualtotalcpucount();
-			
-			facet.consumeNumberOfProcesses(understanding, 
-				pi != null ? pi.intValue() : null,
-				b != null ? b.booleanValue() : false);
+
+			facet.consumeNumberOfProcesses(understanding, pi != null ? pi.intValue() : null, b != null ? b.booleanValue()
+				: false);
 		}
-		
+
 		ProcessesPerHost_Type pph = spmd.getProcessesPerHost();
-		if (pph != null)
-		{
+		if (pph != null) {
 			PositiveInteger pi = pph.get_value();
 			if (pi != null)
 				facet.consumeProcessesPerHost(understanding, pi.intValue());
 		}
-		
+
 		ThreadsPerProcess_Type tpp = spmd.getThreadsPerProcess();
-		if (tpp != null)
-		{
+		if (tpp != null) {
 			PositiveInteger pi = tpp.get_value();
 			Boolean b = tpp.getActualindividualcpucount();
-			facet.consumeThreadsPerProcess(understanding, 
-				pi != null ? pi.intValue() : null,
-				b != null ? b.booleanValue() : false);
+			facet.consumeThreadsPerProcess(understanding, pi != null ? pi.intValue() : null, b != null ? b.booleanValue()
+				: false);
 		}
-		
+
 		org.apache.axis.types.URI variation = spmd.getSPMDVariation();
-		facet.consumeSPMDVariation(understanding, URI.create(
-			variation.toString()));
-		
+		facet.consumeSPMDVariation(understanding, URI.create(variation.toString()));
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
-	
-	static private void understand(PersonalityProvider provider,
-		Object parentUnderstanding, POSIXApplication_Type pat)
-			throws JSDLException
+
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, POSIXApplication_Type pat)
+		throws JSDLException
 	{
 		if (pat == null)
 			return;
-		
-		POSIXApplicationFacet facet = provider.getPOSIXApplicationFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		POSIXApplicationFacet facet = provider.getPOSIXApplicationFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		NormalizedString nStr;
-		
+
 		FileName_Type file = pat.getExecutable();
-		if (file != null)
-		{
+		if (file != null) {
 			nStr = file.getFilesystemName();
-			facet.consumeExecutable(understanding, 
-				nStr != null ? nStr.toString() : null, file.get_value());
+			facet.consumeExecutable(understanding, nStr != null ? nStr.toString() : null, file.get_value());
 		}
-		
-		Argument_Type []args = pat.getArgument();
-		if (args != null)
-		{
-			for (Argument_Type arg : args)
-			{
+
+		Argument_Type[] args = pat.getArgument();
+		if (args != null) {
+			for (Argument_Type arg : args) {
 				nStr = arg.getFilesystemName();
 				NormalizedString nStr2 = arg.get_value();
-				facet.consumeArgument(understanding, 
-					nStr != null ? nStr.toString() : null, 
-					nStr2 != null ? nStr2.toString() : null);
+				facet.consumeArgument(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString()
+					: null);
 			}
 		}
-		
+
 		file = pat.getInput();
-		if (file != null)
-		{
+		if (file != null) {
 			nStr = file.getFilesystemName();
-			facet.consumeInput(understanding, nStr != null ? nStr.toString() : null, 
-				file.get_value());
+			facet.consumeInput(understanding, nStr != null ? nStr.toString() : null, file.get_value());
 		}
-		
+
 		file = pat.getOutput();
-		if (file != null)
-		{
+		if (file != null) {
 			nStr = file.getFilesystemName();
-			facet.consumeOutput(understanding, nStr != null ? nStr.toString() : null, 
-				file.get_value());
+			facet.consumeOutput(understanding, nStr != null ? nStr.toString() : null, file.get_value());
 		}
 		file = pat.getError();
-		if (file != null)
-		{
+		if (file != null) {
 			nStr = file.getFilesystemName();
-			facet.consumeError(understanding, nStr != null ? nStr.toString() : null, 
-				file.get_value());
+			facet.consumeError(understanding, nStr != null ? nStr.toString() : null, file.get_value());
 		}
-		
+
 		DirectoryName_Type dir = pat.getWorkingDirectory();
-		if (dir != null)
-		{
+		if (dir != null) {
 			nStr = dir.getFilesystemName();
-			facet.consumeWorkingDirectory(understanding, 
-				nStr != null ? nStr.toString() : null, dir.get_value());
+			facet.consumeWorkingDirectory(understanding, nStr != null ? nStr.toString() : null, dir.get_value());
 		}
-		
-		Environment_Type []env = pat.getEnvironment();
-		if (env != null)
-		{
-			for (Environment_Type e : env)
-			{
+
+		Environment_Type[] env = pat.getEnvironment();
+		if (env != null) {
+			for (Environment_Type e : env) {
 				nStr = e.getName();
 				NormalizedString nStr2 = e.getFilesystemName();
-				facet.consumeEnvironment(understanding, nStr != null ? nStr.toString() : null, 
-					nStr2 != null ? nStr2.toString() : null, e.get_value());
+				facet.consumeEnvironment(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString()
+					: null, e.get_value());
 			}
 		}
-		
+
 		Limits_Type limit = pat.getWallTimeLimit();
 		if (limit != null)
-			facet.consumeWallTimeLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeWallTimeLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getFileSizeLimit();
 		if (limit != null)
-			facet.consumeFileSizeLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeFileSizeLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getCoreDumpLimit();
 		if (limit != null)
-			facet.consumeCoreDumpLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeCoreDumpLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getDataSegmentLimit();
 		if (limit != null)
-			facet.consumeDataSegmentLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeDataSegmentLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getLockedMemoryLimit();
 		if (limit != null)
-			facet.consumeLockedMemoryLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeLockedMemoryLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getMemoryLimit();
 		if (limit != null)
-			facet.consumeMemoryLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeMemoryLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getOpenDescriptorsLimit();
 		if (limit != null)
-			facet.consumeOpenDescriptorsLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeOpenDescriptorsLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getPipeSizeLimit();
 		if (limit != null)
-			facet.consumePipeSizeLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumePipeSizeLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getStackSizeLimit();
 		if (limit != null)
-			facet.consumeStackSizeLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeStackSizeLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getCPUTimeLimit();
 		if (limit != null)
-			facet.consumeCPUTimeLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeCPUTimeLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getProcessCountLimit();
 		if (limit != null)
-			facet.consumeProcessCountLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeProcessCountLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getVirtualMemoryLimit();
 		if (limit != null)
-			facet.consumeVirtualMemoryLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeVirtualMemoryLimit(understanding, limit.get_value().longValue());
+
 		limit = pat.getThreadCountLimit();
 		if (limit != null)
-			facet.consumeThreadCountLimit(understanding, 
-				limit.get_value().longValue());
-		
+			facet.consumeThreadCountLimit(understanding, limit.get_value().longValue());
+
 		UserName_Type user = pat.getUserName();
 		if (user != null)
 			facet.consumeUserName(understanding, user.get_value());
-		
+
 		GroupName_Type group = pat.getGroupName();
 		if (group != null)
 			facet.consumeGroupName(understanding, group.get_value());
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
-	
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, 
-		HPCProfileApplication_Type hat) throws JSDLException
+
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, HPCProfileApplication_Type hat)
+		throws JSDLException
 	{
 		if (hat == null)
 			return;
-		
-		HPCApplicationFacet facet = provider.getHPCApplicationFacet(
-			parentUnderstanding);	
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		HPCApplicationFacet facet = provider.getHPCApplicationFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		NormalizedString ns = hat.getName();
 		if (ns != null)
 			facet.consumeName(understanding, ns.toString());
-		
+
 		org.ggf.jsdl.hpcp.FileName_Type ft = hat.getExecutable();
 		if (ft != null)
 			facet.consumeExecutable(understanding, ft.get_value());
-		
-		org.ggf.jsdl.hpcp.Argument_Type []args = hat.getArgument();
-		if (args != null)
-		{
-			for (org.ggf.jsdl.hpcp.Argument_Type arg : args)
-			{
+
+		org.ggf.jsdl.hpcp.Argument_Type[] args = hat.getArgument();
+		if (args != null) {
+			for (org.ggf.jsdl.hpcp.Argument_Type arg : args) {
 				facet.consumeArgument(understanding, arg.get_value());
 			}
 		}
-		
+
 		ft = hat.getInput();
 		if (ft != null)
 			facet.consumeInput(understanding, ft.get_value());
@@ -740,308 +608,253 @@ public class JSDLInterpreter
 		ft = hat.getError();
 		if (ft != null)
 			facet.consumeError(understanding, ft.get_value());
-		
+
 		org.ggf.jsdl.hpcp.DirectoryName_Type dt = hat.getWorkingDirectory();
 		if (dt != null)
 			facet.consumeWorkingDirectory(understanding, dt.get_value());
-		
-		org.ggf.jsdl.hpcp.Environment_Type []env = hat.getEnvironment();
-		if (env != null)
-		{
-			for (org.ggf.jsdl.hpcp.Environment_Type e : env)
-			{
-				facet.consumeEnvironment(understanding, 
-					e.getName().toString(), e.get_value());
+
+		org.ggf.jsdl.hpcp.Environment_Type[] env = hat.getEnvironment();
+		if (env != null) {
+			for (org.ggf.jsdl.hpcp.Environment_Type e : env) {
+				facet.consumeEnvironment(understanding, e.getName().toString(), e.get_value());
 			}
 		}
-		
+
 		org.ggf.jsdl.hpcp.UserName_Type uName = hat.getUserName();
 		if (uName != null)
 			facet.consumeUserName(understanding, uName.get_value());
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
-	
-	static private void understandCandidateHosts(PersonalityProvider provider, 
-		Object parentUnderstanding, String []candidateHosts) 
-			throws JSDLException
+
+	static private void understandCandidateHosts(PersonalityProvider provider, Object parentUnderstanding,
+		String[] candidateHosts) throws JSDLException
 	{
 		if (candidateHosts == null)
 			return;
-		
-		CandidateHostsFacet facet = provider.getCandidateHostsFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
-		for (String host : candidateHosts)
-		{
+
+		CandidateHostsFacet facet = provider.getCandidateHostsFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
+		for (String host : candidateHosts) {
 			if (host != null)
 				facet.consumeHostName(understanding, host);
 		}
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, 
-		Object understanding, FileSystem_Type []fs) throws JSDLException
+	static private void understand(PersonalityProvider provider, Object understanding, FileSystem_Type[] fs)
+		throws JSDLException
 	{
 		if (fs == null)
 			return;
-		
-		for (FileSystem_Type fst : fs)
-		{
+
+		for (FileSystem_Type fst : fs) {
 			understand(provider, understanding, fst);
 		}
 	}
-	
-	static private void understand(PersonalityProvider provider,
-		Object parentUnderstanding, FileSystem_Type fst) throws JSDLException
+
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, FileSystem_Type fst)
+		throws JSDLException
 	{
 		if (fst == null)
 			return;
-		
-		FileSystemFacet facet = provider.getFileSystemFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		FileSystemFacet facet = provider.getFileSystemFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		understandAny(facet, understanding, fst.get_any());
-		
+
 		NormalizedString nString = fst.getName();
 		if (nString != null)
 			facet.consumeName(understanding, nString.toString());
-		
+
 		String uniqueID = fst.getUniqueId();
 		if (uniqueID != null)
 			facet.consumeUniqueID(understanding, uniqueID);
-		
+
 		String str = fst.getDescription();
 		if (str != null)
 			facet.consumeDescription(understanding, str);
-		
+
 		str = fst.getMountPoint();
 		if (str != null)
 			facet.consumeMountPoint(understanding, str);
-		
+
 		str = fst.getMountSource();
 		if (str != null)
 			facet.consumeMountSource(understanding, str);
-		
+
 		RangeExpression range = RangeFactory.parse(fst.getDiskSpace());
 		if (range != null)
 			facet.consumeDiskSpace(understanding, range);
-		
+
 		FileSystemTypeEnumeration fste = fst.getFileSystemType();
 		if (fste != null)
 			facet.consumeFileSystemType(understanding, fste);
-		
-		facet.completeFacet(parentUnderstanding, understanding);
-	}
-	
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, OperatingSystem_Type osType)
-			throws JSDLException
-	{
-		if (osType == null)
-			return;
-		
-		OperatingSystemFacet facet = provider.getOperatingSystemFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
-		understandAny(facet, understanding, osType.get_any());
-		
-		String str = osType.getDescription();
-		if (str != null)
-			facet.consumeDescription(understanding, str);
-		
-		str = osType.getOperatingSystemVersion();
-		if (str != null)
-			facet.consumeOperatingSystemVersion(understanding, str);
-		
-		understand(provider, understanding, osType.getOperatingSystemType());
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, OperatingSystemType_Type osType)
-			throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, OperatingSystem_Type osType)
+		throws JSDLException
 	{
 		if (osType == null)
 			return;
-		
-		OperatingSystemTypeFacet facet = provider.getOperatingSystemTypeFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		OperatingSystemFacet facet = provider.getOperatingSystemFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		understandAny(facet, understanding, osType.get_any());
-		
+
+		String str = osType.getDescription();
+		if (str != null)
+			facet.consumeDescription(understanding, str);
+
+		str = osType.getOperatingSystemVersion();
+		if (str != null)
+			facet.consumeOperatingSystemVersion(understanding, str);
+
+		understand(provider, understanding, osType.getOperatingSystemType());
+
+		facet.completeFacet(parentUnderstanding, understanding);
+	}
+
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, OperatingSystemType_Type osType)
+		throws JSDLException
+	{
+		if (osType == null)
+			return;
+
+		OperatingSystemTypeFacet facet = provider.getOperatingSystemTypeFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
+		understandAny(facet, understanding, osType.get_any());
+
 		OperatingSystemTypeEnumeration e = osType.getOperatingSystemName();
 		if (e != null)
 			facet.consumeOperatingSystemName(understanding, e);
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
-	
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, CPUArchitecture_Type arch)
-			throws JSDLException
+
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, CPUArchitecture_Type arch)
+		throws JSDLException
 	{
 		if (arch == null)
 			return;
-		
-		CPUArchitectureFacet facet = provider.getCPUArchitectureFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		CPUArchitectureFacet facet = provider.getCPUArchitectureFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		understandAny(facet, understanding, arch.get_any());
-		
+
 		ProcessorArchitectureEnumeration e = arch.getCPUArchitectureName();
 		if (e != null)
 			facet.consumeCPUArchitectureName(understanding, e);
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
-	
-	static private void understand(PersonalityProvider provider, 
-		Object parentUnderstanding, DataStaging_Type stage)
-			throws JSDLException
+
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, DataStaging_Type stage)
+		throws JSDLException
 	{
 		Collection<MessageElement> any = new LinkedList<MessageElement>();
 
 		if (stage == null)
 			return;
-		
-		DataStagingFacet facet = provider.getDataStagingFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		DataStagingFacet facet = provider.getDataStagingFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		String str = stage.getFileName();
 		if (str != null)
 			facet.consumeFileName(understanding, str);
-		
+
 		NormalizedString nStr = stage.getFilesystemName();
 		if (nStr != null)
 			facet.consumeFileSystemName(understanding, nStr.toString());
-		
+
 		CreationFlagEnumeration e = stage.getCreationFlag();
 		if (e != null)
 			facet.consumeCreationFlag(understanding, e);
-		
+
 		Boolean b = stage.getDeleteOnTermination();
 		if (b != null)
 			facet.consumeDeleteOnTerminateFlag(understanding, b.booleanValue());
-		
+
 		understandSource(provider, understanding, stage.getSource());
 		understandTarget(provider, understanding, stage.getTarget());
-		
-		MessageElement []anyArray = stage.get_any();
-		if (anyArray != null)
-		{
-			for (MessageElement a : anyArray)
-			{
+
+		MessageElement[] anyArray = stage.get_any();
+		if (anyArray != null) {
+			for (MessageElement a : anyArray) {
 				QName elementName = a.getQName();
-				if (elementName.equals(
-					HPCConstants.HPCP_CREDENTIAL_QNAME))
-				{
+				if (elementName.equals(HPCConstants.HPCP_CREDENTIAL_QNAME)) {
 					Iterator<?> iter = a.getChildElements();
-					if (iter != null)
-					{
-						while (iter.hasNext())
-						{
-							MessageElement elem = (MessageElement)iter.next();
+					if (iter != null) {
+						while (iter.hasNext()) {
+							MessageElement elem = (MessageElement) iter.next();
 							QName childName = elem.getQName();
-							if (childName.equals(
-								HPCConstants.USERNAME_TOKEN_QNAME))
-							{
-								try
-								{
-									facet.consumeCredential(understanding,
-										new UsernamePasswordIdentity(elem));
+							if (childName.equals(HPCConstants.USERNAME_TOKEN_QNAME)) {
+								try {
+									facet.consumeCredential(understanding, new UsernamePasswordIdentity(elem));
+								} catch (GeneralSecurityException cause) {
+									throw new InvalidJSDLException("Unable to understand credential element.", cause);
 								}
-								catch (GeneralSecurityException cause)
-								{
-									throw new InvalidJSDLException(
-										"Unable to understand credential element.",
-										cause);
-								}
-							} else
-							{
-								throw new InvalidJSDLException(
-									"Unable to understand credential element.");
+							} else {
+								throw new InvalidJSDLException("Unable to understand credential element.");
 							}
 						}
 					}
-				} else
-				{
+				} else {
 					any.add(a);
 				}
 			}
 		}
 		understandAny(facet, understanding, any.toArray(new MessageElement[0]));
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
-	
-	static private void understandSource(PersonalityProvider provider,
-		Object parentUnderstanding, SourceTarget_Type source) 
-			throws JSDLException
+
+	static private void understandSource(PersonalityProvider provider, Object parentUnderstanding, SourceTarget_Type source)
+		throws JSDLException
 	{
 		if (source == null)
 			return;
-		
-		SourceURIFacet facet = provider.getSourceURIFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		SourceURIFacet facet = provider.getSourceURIFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		understandAny(facet, understanding, source.get_any());
-		
-		try
-		{
-			facet.consumeURI(understanding, 
-				new URI(source.getURI().toString()));
+
+		try {
+			facet.consumeURI(understanding, new URI(source.getURI().toString()));
+		} catch (URISyntaxException use) {
+			throw new InvalidJSDLException("Unable to parse URI in data staging element.");
 		}
-		catch (URISyntaxException use)
-		{
-			throw new InvalidJSDLException(
-				"Unable to parse URI in data staging element.");
-		}
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
-	
-	static private void understandTarget(PersonalityProvider provider,
-		Object parentUnderstanding, SourceTarget_Type target) 
-			throws JSDLException
+
+	static private void understandTarget(PersonalityProvider provider, Object parentUnderstanding, SourceTarget_Type target)
+		throws JSDLException
 	{
 		if (target == null)
 			return;
-		
-		TargetURIFacet facet = provider.getTargetURIFacet(
-			parentUnderstanding);
-		Object understanding = facet.createFacetUnderstanding(
-			parentUnderstanding);
-		
+
+		TargetURIFacet facet = provider.getTargetURIFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
 		understandAny(facet, understanding, target.get_any());
-		
-		try
-		{
-			facet.consumeURI(understanding, 
-				new URI(target.getURI().toString()));
+
+		try {
+			facet.consumeURI(understanding, new URI(target.getURI().toString()));
+		} catch (URISyntaxException use) {
+			throw new InvalidJSDLException("Unable to parse URI in data staging element.");
 		}
-		catch (URISyntaxException use)
-		{
-			throw new InvalidJSDLException(
-				"Unable to parse URI in data staging element.");
-		}
-		
+
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 }

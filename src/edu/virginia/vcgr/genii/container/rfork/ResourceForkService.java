@@ -8,10 +8,8 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public interface ResourceForkService
 {
-	public ResourceKey getResourceKey()
-		throws ResourceUnknownFaultType, ResourceException;
-	
-	public EndpointReferenceType createForkEPR(
-		String forkPath, ResourceForkInformation rif)
-			throws ResourceUnknownFaultType, ResourceException;
+	public ResourceKey getResourceKey() throws ResourceUnknownFaultType, ResourceException;
+
+	public EndpointReferenceType createForkEPR(String forkPath, ResourceForkInformation rif) throws ResourceUnknownFaultType,
+		ResourceException;
 }

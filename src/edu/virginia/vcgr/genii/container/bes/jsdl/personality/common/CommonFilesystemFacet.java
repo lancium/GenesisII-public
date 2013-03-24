@@ -8,55 +8,45 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultFileSystemFace
 public class CommonFilesystemFacet extends DefaultFileSystemFacet
 {
 	@Override
-	public Object createFacetUnderstanding(Object parentUnderstanding)
-			throws JSDLException
+	public Object createFacetUnderstanding(Object parentUnderstanding) throws JSDLException
 	{
 		return new FilesystemUnderstanding();
 	}
-	
+
 	@Override
-	public void consumeDescription(Object currentUnderstanding,
-			String description) throws JSDLException
+	public void consumeDescription(Object currentUnderstanding, String description) throws JSDLException
 	{
 		// No need to do anything with this...just let it go.
 	}
 
 	@Override
-	public void consumeFileSystemType(Object currentUnderstanding,
-			FileSystemTypeEnumeration fileSystemType) throws JSDLException
-	{
-		((FilesystemUnderstanding)currentUnderstanding).setFileSystemType(
-			fileSystemType);
-	}
-
-	@Override
-	public void consumeName(Object currentUnderstanding, String name)
-			throws JSDLException
-	{
-		((FilesystemUnderstanding)currentUnderstanding).setFileSystemName(
-			name);
-	}
-	
-	@Override
-	public void consumeUniqueID(Object currentUnderstanding, String uniqueID)
+	public void consumeFileSystemType(Object currentUnderstanding, FileSystemTypeEnumeration fileSystemType)
 		throws JSDLException
 	{
-		((FilesystemUnderstanding)currentUnderstanding).setUniqueID(uniqueID);
+		((FilesystemUnderstanding) currentUnderstanding).setFileSystemType(fileSystemType);
 	}
 
 	@Override
-	public void consumeMountSource(Object currentUnderstanding,
-			String mountSource) throws JSDLException
+	public void consumeName(Object currentUnderstanding, String name) throws JSDLException
 	{
-		((FilesystemUnderstanding)currentUnderstanding).setFileSystemSource(
-			mountSource);
+		((FilesystemUnderstanding) currentUnderstanding).setFileSystemName(name);
 	}
 
 	@Override
-	public void completeFacet(Object parentUnderstanding,
-			Object currentUnderstanding) throws JSDLException
+	public void consumeUniqueID(Object currentUnderstanding, String uniqueID) throws JSDLException
 	{
-		((CommonExecutionUnderstanding)parentUnderstanding).addFilesystem(
-			(FilesystemUnderstanding)currentUnderstanding);
+		((FilesystemUnderstanding) currentUnderstanding).setUniqueID(uniqueID);
+	}
+
+	@Override
+	public void consumeMountSource(Object currentUnderstanding, String mountSource) throws JSDLException
+	{
+		((FilesystemUnderstanding) currentUnderstanding).setFileSystemSource(mountSource);
+	}
+
+	@Override
+	public void completeFacet(Object parentUnderstanding, Object currentUnderstanding) throws JSDLException
+	{
+		((CommonExecutionUnderstanding) parentUnderstanding).addFilesystem((FilesystemUnderstanding) currentUnderstanding);
 	}
 }

@@ -7,7 +7,6 @@ import java.util.Collection;
 
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.q2.QueueManager;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRNSResourceFork;
@@ -15,6 +14,7 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 public class ResourcesRNSFork extends AbstractRNSResourceFork
 {
@@ -25,65 +25,52 @@ public class ResourcesRNSFork extends AbstractRNSResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType add(EndpointReferenceType exemplarEPR,
-			String entryName, EndpointReferenceType entry) throws IOException
+	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry)
+		throws IOException
 	{
 		ResourceKey rKey = getService().getResourceKey();
-		
-		try
-		{
+
+		try {
 			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			mgr.addNewBES(entryName, entry);
 			return entry;
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new IOException("Unable to add bes container.", sqe);
 		}
 	}
 
 	@Override
-	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR,
-			String newFileName) throws IOException
+	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR, String newFileName) throws IOException
 	{
-		throw new IOException(
-			"This RNS directory only permits BES containers to be linked in.");
+		throw new IOException("This RNS directory only permits BES containers to be linked in.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR,
-			String entryName) throws IOException
+	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR, String entryName) throws IOException
 	{
 		ResourceKey rKey = getService().getResourceKey();
 		Collection<LegacyEntryType> entries;
 		Collection<InternalEntry> ret;
-		
-		try
-		{
+
+		try {
 			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			entries = mgr.listBESs(entryName);
 			ret = new ArrayList<InternalEntry>(entries.size());
-			for (LegacyEntryType entry : entries)
-			{
-				ret.add(new InternalEntry(entry.getEntry_name(), 
-					entry.getEntry_reference(), entry.get_any()));
+			for (LegacyEntryType entry : entries) {
+				ret.add(new InternalEntry(entry.getEntry_name(), entry.getEntry_reference(), entry.get_any()));
 			}
-			
+
 			return ret;
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new IOException("Unable to add bes container.", sqe);
 		}
 	}
 
 	@Override
-	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR,
-			String newDirectoryName) throws IOException
+	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR, String newDirectoryName) throws IOException
 	{
-		throw new IOException(
-			"This RNS directory only permits BES containers to be linked in.");
+		throw new IOException("This RNS directory only permits BES containers to be linked in.");
 	}
 
 	@Override
@@ -92,16 +79,13 @@ public class ResourcesRNSFork extends AbstractRNSResourceFork
 	{
 		ResourceKey rKey = getService().getResourceKey();
 		Collection<String> entries = new ArrayList<String>();
-		
-		try
-		{
+
+		try {
 			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			entries = mgr.removeBESs(entryName);
-			
+
 			return entries.size() > 0;
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new IOException("Unable to add bes container.", sqe);
 		}
 	}

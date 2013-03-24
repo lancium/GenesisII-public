@@ -5,9 +5,7 @@ import java.util.Properties;
 
 public interface UIPlugin
 {
-	public boolean isEnabled(
-		Collection<EndpointDescription> selectedDescriptions);
-	
-	public void configurePlugin(Properties properties)
-		throws UIPluginException;
+	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions);
+
+	public void configurePlugin(Properties properties) throws UIPluginException;
 }

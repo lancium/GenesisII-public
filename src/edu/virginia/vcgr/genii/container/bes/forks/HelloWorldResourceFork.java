@@ -5,16 +5,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class HelloWorldResourceFork
-	extends AbstractStreamableByteIOFactoryResourceFork
+public class HelloWorldResourceFork extends AbstractStreamableByteIOFactoryResourceFork
 {
-	public HelloWorldResourceFork(ResourceForkService service,
-		String forkPath)
+	public HelloWorldResourceFork(ResourceForkService service, String forkPath)
 	{
 		super(service, forkPath);
 	}

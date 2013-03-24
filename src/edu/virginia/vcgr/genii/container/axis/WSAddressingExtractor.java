@@ -60,7 +60,8 @@ public class WSAddressingExtractor extends BasicHandler
 	public void invoke(MessageContext ctxt) throws AxisFault
 	{
 		Vector<MessageElement> refParams = new Vector<MessageElement>();
-		_logger.trace("WSAddressingExtractor extracting EPR from header.");
+		if (_logger.isTraceEnabled())
+			_logger.trace("WSAddressingExtractor extracting EPR from header.");
 
 		EndpointReferenceType epr = new EndpointReferenceType();
 
@@ -80,7 +81,8 @@ public class WSAddressingExtractor extends BasicHandler
 				;
 			} else if (heName.equals(_WSA_TO_QNAME)) {
 				epr.setAddress(new AttributedURIType(he.getFirstChild().getNodeValue()));
-				_logger.debug("WSAddressingExtractor found target: \"" + epr.getAddress().get_value() + "\".");
+				if (_logger.isDebugEnabled())
+					_logger.debug("WSAddressingExtractor found target: \"" + epr.getAddress().get_value() + "\".");
 			} else if (heName.equals(GenesisIIConstants.MYPROXY_QNAME)) {
 				MyProxyCertificate.setPEMFormattedCertificate(he.getFirstChild().getNodeValue());
 			} else {
@@ -103,12 +105,14 @@ public class WSAddressingExtractor extends BasicHandler
 
 		if (epr.getAddress() == null) {
 			epr.setAddress(new AttributedURIType(Container.getCurrentServiceURL(ctxt)));
-			_logger.trace("WSAddressingExtractor setting target address to \"" + epr.getAddress().get_value() + "\".");
+			if (_logger.isTraceEnabled())
+				_logger.trace("WSAddressingExtractor setting target address to \"" + epr.getAddress().get_value() + "\".");
 		}
 
 		String shortParameterName = EPRUtils.getEPIShortParameter(epr);
 		if (shortParameterName != null) {
-			_logger.trace(String.format("Found a shorthand epi of %s.  Looking it up.", shortParameterName));
+			if (_logger.isTraceEnabled())
+				_logger.trace(String.format("Found a shorthand epi of %s.  Looking it up.", shortParameterName));
 			epr = EPRMapperService.lookup(shortParameterName);
 		}
 

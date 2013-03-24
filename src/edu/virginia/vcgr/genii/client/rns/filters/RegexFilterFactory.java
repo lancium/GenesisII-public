@@ -9,26 +9,26 @@ public class RegexFilterFactory implements FilterFactory
 	{
 		return new RegexFilter(Pattern.compile(pattern));
 	}
-	
+
 	@Override
-	public boolean isFilterNeeded(String pattern) {
+	public boolean isFilterNeeded(String pattern)
+	{
 		return true;
 	}
-	
+
 	static protected class RegexFilter implements Filter
 	{
 		private Pattern _regex;
-		
+
 		public RegexFilter(Pattern regex)
 		{
 			_regex = regex;
 		}
-		
+
 		public boolean matches(String text)
 		{
 			return _regex.matcher(text).matches();
 		}
 	}
 
-	
 }

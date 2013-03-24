@@ -8,6 +8,5 @@ import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 
 public interface StreamRedirectionSource extends Serializable
 {
-	public InputStream openSource(ExecutionContext context) 
-		throws IOException;
+	public InputStream openSource(ExecutionContext context) throws IOException;
 }

@@ -9,15 +9,12 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.CPUArchitectureFacet;
 
-public class DefaultCPUArchitectureFacet extends DefaultPersonalityFacet
-		implements CPUArchitectureFacet
+public class DefaultCPUArchitectureFacet extends DefaultPersonalityFacet implements CPUArchitectureFacet
 {
 	@Override
-	public void consumeCPUArchitectureName(Object currentUnderstanding,
-			ProcessorArchitectureEnumeration cpuArchitectureName)
-			throws JSDLException
+	public void consumeCPUArchitectureName(Object currentUnderstanding, ProcessorArchitectureEnumeration cpuArchitectureName)
+		throws JSDLException
 	{
-		throw new UnsupportedJSDLElement(new QName(
-			JSDLConstants.JSDL_NS, "CPUArchitectureName"));
+		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "CPUArchitectureName"));
 	}
 }

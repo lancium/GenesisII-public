@@ -9,14 +9,13 @@ public class NullHistoryContext extends AbstractHistoryContext
 	{
 		super(null, null);
 	}
-	
+
 	@Override
-	final public HistoryEventToken logEvent(HistoryEventLevel level,
-		HistoryEventData data)
+	final public HistoryEventToken logEvent(HistoryEventLevel level, HistoryEventData data)
 	{
 		return new VerbatimHistoryEventToken(null);
 	}
-	
+
 	@Override
 	final public Object clone()
 	{

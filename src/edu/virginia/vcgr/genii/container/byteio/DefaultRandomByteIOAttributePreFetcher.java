@@ -8,21 +8,19 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-public class DefaultRandomByteIOAttributePreFetcher
-	extends RandomByteIOAttributePreFetcher<IRByteIOResource>
+public class DefaultRandomByteIOAttributePreFetcher extends RandomByteIOAttributePreFetcher<IRByteIOResource>
 {
 	public DefaultRandomByteIOAttributePreFetcher(IRByteIOResource resource)
 	{
 		super(resource);
 	}
-	
-	public DefaultRandomByteIOAttributePreFetcher(EndpointReferenceType target) 
-		throws ResourceException, ResourceUnknownFaultType
+
+	public DefaultRandomByteIOAttributePreFetcher(EndpointReferenceType target) throws ResourceException,
+		ResourceUnknownFaultType
 	{
-		this((IRByteIOResource)ResourceManager.getTargetResource(
-			target).dereference());
+		this((IRByteIOResource) ResourceManager.getTargetResource(target).dereference());
 	}
-	
+
 	@Override
 	protected Calendar getAccessTime() throws Throwable
 	{

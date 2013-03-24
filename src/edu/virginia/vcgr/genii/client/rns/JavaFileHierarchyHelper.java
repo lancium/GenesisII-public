@@ -17,68 +17,73 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JavaFileHierarchyHelper implements TreeTraversalPathQuery<File>
 {
-    static private Log _logger = LogFactory.getLog(JavaFileHierarchyHelper.class);
+	static private Log _logger = LogFactory.getLog(JavaFileHierarchyHelper.class);
 
-    public JavaFileHierarchyHelper()
-    {
-    }
+	public JavaFileHierarchyHelper()
+	{
+	}
 
-    @Override
-    public PathOutcome checkPathSanity(File path, TreeTraversalActionAlert<File> bounce)
-    {
-        if (path == null) return PathOutcome.OUTCOME_NOTHING;
-        // now check some characteristics of this node.
-        if (!path.exists()) {
-            _logger.warn("path no longer exists: " + path.toString());
-            return PathOutcome.OUTCOME_NONEXISTENT;
-        }
+	@Override
+	public PathOutcome checkPathSanity(File path, TreeTraversalActionAlert<File> bounce)
+	{
+		if (path == null)
+			return PathOutcome.OUTCOME_NOTHING;
+		// now check some characteristics of this node.
+		if (!path.exists()) {
+			_logger.warn("path no longer exists: " + path.toString());
+			return PathOutcome.OUTCOME_NONEXISTENT;
+		}
 
-        // for cycle detection, we rely on the tree traverser's depth limit. currently there is
-        // no good way in java6 to tell if a file is a link.
+		// for cycle detection, we rely on the tree traverser's depth limit. currently there is
+		// no good way in java6 to tell if a file is a link.
 
-        return PathOutcome.OUTCOME_SUCCESS;
-    }
+		return PathOutcome.OUTCOME_SUCCESS;
+	}
 
-    @Override
-    public boolean exists(File path)
-    {
-        if (path == null) return false;
-        return path.exists();
-    }
+	@Override
+	public boolean exists(File path)
+	{
+		if (path == null)
+			return false;
+		return path.exists();
+	}
 
-    @Override
-    public boolean isDirectory(File path)
-    {
-        if (path == null) return false;
-        return path.isDirectory();
-    }
+	@Override
+	public boolean isDirectory(File path)
+	{
+		if (path == null)
+			return false;
+		return path.isDirectory();
+	}
 
-    @Override
-    public boolean isFile(File path)
-    {
-        if (path == null) return false;
-        return path.isFile();
-    }
+	@Override
+	public boolean isFile(File path)
+	{
+		if (path == null)
+			return false;
+		return path.isFile();
+	}
 
-    @Override
-    public Collection<File> getContents(File path)
-    {
-        if (path == null) return null;
-        ArrayList<File> arr = new ArrayList<File>(0);
-        try {
-            File[] filesFound = path.listFiles();
-            for (int i = 0; i < filesFound.length; i++) {
-                arr.add(new File(filesFound[i].getAbsolutePath().replace('\\', '/')));
-            }
-        } catch (Throwable cause) {
-            _logger.error("failed to list path contents for " + path.toString(), cause);
-        }
-        if (_logger.isDebugEnabled()) {
-            _logger.debug("returning an array with " + arr.size() + " elems:");
-            for (int i = 0; i < arr.size(); i++) {
-                _logger.debug("index " + i + ": " + arr.get(i).toString());
-            }
-        }
-        return arr;
-    }
+	@Override
+	public Collection<File> getContents(File path)
+	{
+		if (path == null)
+			return null;
+		ArrayList<File> arr = new ArrayList<File>(0);
+		try {
+			File[] filesFound = path.listFiles();
+			for (int i = 0; i < filesFound.length; i++) {
+				arr.add(new File(filesFound[i].getAbsolutePath().replace('\\', '/')));
+			}
+		} catch (Throwable cause) {
+			_logger.error("failed to list path contents for " + path.toString(), cause);
+		}
+		if (_logger.isDebugEnabled()) {
+			_logger.debug("returning an array with " + arr.size() + " elems:");
+			for (int i = 0; i < arr.size(); i++) {
+				_logger.debug("index " + i + ": " + arr.get(i).toString());
+			}
+		}
+		return arr;
+	}
 }

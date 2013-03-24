@@ -38,19 +38,17 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 	private Method _getMethod;
 	private Method _setMethod;
 	private boolean _isSingleSet;
-	
-	private DefaultAttributeManipulator(
-		Object target,
-		QName attrQName, Method getterMethod,
-		Method setterMethod, boolean isSingleSet)
+
+	private DefaultAttributeManipulator(Object target, QName attrQName, Method getterMethod, Method setterMethod,
+		boolean isSingleSet)
 	{
 		_target = target;
 		_attrQName = attrQName;
 		_getMethod = getterMethod;
 		_setMethod = setterMethod;
-		_isSingleSet = isSingleSet ;
+		_isSingleSet = isSingleSet;
 	}
-	
+
 	public QName getAttributeQName()
 	{
 		return _attrQName;
@@ -62,157 +60,121 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<MessageElement> getAttributeValues()
-		throws ResourceUnknownFaultType, RemoteException
+	public Collection<MessageElement> getAttributeValues() throws ResourceUnknownFaultType, RemoteException
 	{
 		Object ret;
-		
-		try
-		{
-			ret = _getMethod.invoke(
-				_target, new Object[0]);
-			
+
+		try {
+			ret = _getMethod.invoke(_target, new Object[0]);
+
 			if (ret == null)
 				return new ArrayList<MessageElement>();
-			
-			if (ret instanceof MessageElement)
-			{
-				ArrayList<MessageElement> tmp =
-					new ArrayList<MessageElement>(1);
-				tmp.add((MessageElement)ret);
+
+			if (ret instanceof MessageElement) {
+				ArrayList<MessageElement> tmp = new ArrayList<MessageElement>(1);
+				tmp.add((MessageElement) ret);
 				return tmp;
 			} else
-				return (Collection<MessageElement>)ret;
-		}
-		catch (InvocationTargetException ite)
-		{
+				return (Collection<MessageElement>) ret;
+		} catch (InvocationTargetException ite) {
 			Throwable t = ite.getCause();
 			if (t == null)
 				t = ite;
-			
+
 			if (t instanceof RemoteException)
-				throw (RemoteException)t;
-			
+				throw (RemoteException) t;
+
 			throw new RemoteException(t.getMessage(), t);
-		}
-		catch (IllegalAccessException iae)
-		{
+		} catch (IllegalAccessException iae) {
 			throw new RemoteException(iae.getMessage(), iae);
 		}
 	}
 
-	public void setAttributeValues(Collection<MessageElement> values) 
-		throws ResourceUnknownFaultType, RemoteException,
-			UnableToModifyResourcePropertyFaultType
+	public void setAttributeValues(Collection<MessageElement> values) throws ResourceUnknownFaultType, RemoteException,
+		UnableToModifyResourcePropertyFaultType
 	{
-		Object []params = null;
-		
+		Object[] params = null;
+
 		if (_setMethod == null)
-			throw FaultManipulator.fillInFault(
-				new UnableToModifyResourcePropertyFaultType());
-		
-		if (_isSingleSet)
-		{
+			throw FaultManipulator.fillInFault(new UnableToModifyResourcePropertyFaultType());
+
+		if (_isSingleSet) {
 			if (values.size() == 0)
 				params = new Object[] { null };
 			else if (values.size() == 1)
 				params = new Object[] { values.iterator().next() };
 			else
-				throw FaultManipulator.fillInFault(
-					new UpdateResourcePropertiesRequestFailedFaultType());
-		} else
-		{
+				throw FaultManipulator.fillInFault(new UpdateResourcePropertiesRequestFailedFaultType());
+		} else {
 			params = new Object[] { values };
 		}
-		
-		try
-		{
+
+		try {
 			_setMethod.invoke(_target, params);
-		}
-		catch (InvocationTargetException ite)
-		{
+		} catch (InvocationTargetException ite) {
 			Throwable t = ite.getCause();
 			if (t == null)
 				t = ite;
-			
+
 			if (t instanceof RemoteException)
-				throw (RemoteException)t;
-			
+				throw (RemoteException) t;
+
 			throw new RemoteException(t.getMessage(), t);
-		}
-		catch (IllegalAccessException iae)
-		{
+		} catch (IllegalAccessException iae) {
 			throw new RemoteException(iae.getMessage(), iae);
 		}
 	}
-	
-	static public IAttributeManipulator createManipulator(
-		Object target, QName attributeName, 
-		String getMethodName) throws NoSuchMethodException
+
+	static public IAttributeManipulator createManipulator(Object target, QName attributeName, String getMethodName)
+		throws NoSuchMethodException
 	{
 		return createManipulator(target, attributeName, getMethodName, null);
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	static public IAttributeManipulator createManipulator(
-		Object target, QName attributeName, 
-		String getMethodName, String setMethodName) throws NoSuchMethodException
+	static public IAttributeManipulator createManipulator(Object target, QName attributeName, String getMethodName,
+		String setMethodName) throws NoSuchMethodException
 	{
 		Class<? extends Object> clazz;
-		
+
 		if (target == null)
-			throw new IllegalArgumentException(
-				"Parameter \"target\" cannot be null.");
-		
-		if (target instanceof Class)
-		{
-			clazz = (Class<? extends Object>)target;
+			throw new IllegalArgumentException("Parameter \"target\" cannot be null.");
+
+		if (target instanceof Class) {
+			clazz = (Class<? extends Object>) target;
 			target = null;
 		} else
 			clazz = target.getClass();
-		
-		if (attributeName == null)
-			throw new IllegalArgumentException(
-				"Parameter \"attributeName\" cannot be null.");
-		if (getMethodName == null)
-			throw new IllegalArgumentException(
-				"Parameter \"getMethodName\" cannot be null.");
 
-		Method getter = clazz.getMethod(getMethodName, new Class[0]); 
+		if (attributeName == null)
+			throw new IllegalArgumentException("Parameter \"attributeName\" cannot be null.");
+		if (getMethodName == null)
+			throw new IllegalArgumentException("Parameter \"getMethodName\" cannot be null.");
+
+		Method getter = clazz.getMethod(getMethodName, new Class[0]);
 		Class<? extends Object> returnType = getter.getReturnType();
-		if (!(
-			(MessageElement.class.isAssignableFrom(returnType)) ||
-			(Collection.class.isAssignableFrom(returnType))) )
-			throw new IllegalArgumentException("Method \"" +
-				getMethodName + "\" does not appear to return the correct type.");
-		
+		if (!((MessageElement.class.isAssignableFrom(returnType)) || (Collection.class.isAssignableFrom(returnType))))
+			throw new IllegalArgumentException("Method \"" + getMethodName + "\" does not appear to return the correct type.");
+
 		Method setter;
 		boolean isSingleSet = true;
 		if (setMethodName == null)
 			setter = null;
-		else
-		{
-			try
-			{
-				setter = clazz.getMethod(setMethodName,
-					new Class[] { Collection.class });
+		else {
+			try {
+				setter = clazz.getMethod(setMethodName, new Class[] { Collection.class });
 				isSingleSet = false;
-			}
-			catch (NoSuchMethodException nsme)
-			{
-				setter = clazz.getMethod(setMethodName,
-					new Class[] { MessageElement.class });
+			} catch (NoSuchMethodException nsme) {
+				setter = clazz.getMethod(setMethodName, new Class[] { MessageElement.class });
 			}
 		}
-		
-		return new DefaultAttributeManipulator(target,
-			attributeName, getter, setter, isSingleSet);
+
+		return new DefaultAttributeManipulator(target, attributeName, getter, setter, isSingleSet);
 	}
-	
+
 	@Override
 	final public String toString()
 	{
-		return String.format("[%s] %s/%s",
-			_attrQName, _getMethod, _setMethod);
+		return String.format("[%s] %s/%s", _attrQName, _getMethod, _setMethod);
 	}
 }

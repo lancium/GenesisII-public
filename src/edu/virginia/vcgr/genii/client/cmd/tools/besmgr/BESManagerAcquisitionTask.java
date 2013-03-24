@@ -12,27 +12,22 @@ public class BESManagerAcquisitionTask implements ProgressTask<ManagementData>
 {
 	private ICallingContext _callingContext;
 	private EndpointReferenceType _target;
-	
-	BESManagerAcquisitionTask(ICallingContext callingContext,
-		EndpointReferenceType target)
+
+	BESManagerAcquisitionTask(ICallingContext callingContext, EndpointReferenceType target)
 	{
 		_callingContext = callingContext;
 		_target = target;
 	}
-	
+
 	@Override
 	public ManagementData compute(ProgressNotifier notifier) throws Exception
 	{
 		notifier.updateNote("Communicating with target BES container.");
-		
-		BESRP rp = (BESRP)ResourcePropertyManager.createRPInterface(
-			_callingContext, _target,
-			new Class<?> [] { BESRP.class}, 
-			BESRP.IS_ACCEPTING_NEW_ACTIVITIES_ATTR,
-			BESRP.POLICY_RP, BESRP.THRESHOLD_RP);
-		
-		return new ManagementData(rp.getPolicy(), rp.getThreshold(),
-			rp.isAcceptingNewActivities());
+
+		BESRP rp = (BESRP) ResourcePropertyManager.createRPInterface(_callingContext, _target, new Class<?>[] { BESRP.class },
+			BESRP.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, BESRP.POLICY_RP, BESRP.THRESHOLD_RP);
+
+		return new ManagementData(rp.getPolicy(), rp.getThreshold(), rp.isAcceptingNewActivities());
 	}
 
 	@Override

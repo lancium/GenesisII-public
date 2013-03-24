@@ -14,7 +14,6 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -24,50 +23,40 @@ import edu.virginia.vcgr.genii.exportdir.QuitExport;
 import edu.virginia.vcgr.genii.exportdir.QuitExportResponse;
 import edu.virginia.vcgr.genii.exportdir.lightweight.LightWeightExportPortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @ForkRoot(LightWeightExportDirFork.class)
-public class LightWeightExportServiceImpl extends ResourceForkBaseService
-	implements LightWeightExportPortType
+public class LightWeightExportServiceImpl extends ResourceForkBaseService implements LightWeightExportPortType
 {
-	static private Log _logger = LogFactory.getLog(
-		LightWeightExportServiceImpl.class);
-	
+	static private Log _logger = LogFactory.getLog(LightWeightExportServiceImpl.class);
+
 	@Override
-	protected ResourceKey createResource(HashMap<QName, Object> creationParameters)
-		throws ResourceException, BaseFaultType
+	protected ResourceKey createResource(HashMap<QName, Object> creationParameters) throws ResourceException, BaseFaultType
 	{
-		_logger.debug("Creating new LightWeightExport Resource.");
-		
-		ExportedDirUtils.ExportedDirInitInfo initInfo = 
-			ExportedDirUtils.extractCreationProperties(creationParameters);
-		
+		if (_logger.isDebugEnabled())
+			_logger.debug("Creating new LightWeightExport Resource.");
+
+		ExportedDirUtils.ExportedDirInitInfo initInfo = ExportedDirUtils.extractCreationProperties(creationParameters);
+
 		ResourceKey key = super.createResource(creationParameters);
-		key.dereference().setProperty(
-			LightWeightExportConstants.ROOT_DIRECTORY_PROPERTY_NAME,
-			initInfo.getPath());
-		
+		key.dereference().setProperty(LightWeightExportConstants.ROOT_DIRECTORY_PROPERTY_NAME, initInfo.getPath());
+
 		String svnUser = initInfo.svnUser();
 		String svnPass = initInfo.svnPass();
 		Long svnRevision = initInfo.svnRevision();
-		
+
 		if (svnUser != null)
-			key.dereference().setProperty(
-				LightWeightExportConstants.SVN_USER_PROPERTY_NAME,
-				svnUser);
-		
+			key.dereference().setProperty(LightWeightExportConstants.SVN_USER_PROPERTY_NAME, svnUser);
+
 		if (svnPass != null)
-			key.dereference().setProperty(
-				LightWeightExportConstants.SVN_PASS_PROPERTY_NAME,
-				svnPass);
-		
+			key.dereference().setProperty(LightWeightExportConstants.SVN_PASS_PROPERTY_NAME, svnPass);
+
 		if (svnRevision != null)
-			key.dereference().setProperty(
-				LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME,
-				svnRevision);
-		
+			key.dereference().setProperty(LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME, svnRevision);
+
 		return key;
 	}
-	
+
 	public LightWeightExportServiceImpl() throws RemoteException
 	{
 		super("LightWeightExportPortType");
@@ -75,7 +64,7 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService
 		addImplementedPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.EXPORTED_LIGHTWEIGHT_ROOT_SERVICE_PORT_TYPE);
 	}
-	
+
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
@@ -84,13 +73,11 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public QuitExportResponse quitExport(QuitExport arg0)
-			throws RemoteException, ResourceUnknownFaultType
+	public QuitExportResponse quitExport(QuitExport arg0) throws RemoteException, ResourceUnknownFaultType
 	{
-		IResource resource = 
-			ResourceManager.getCurrentResource().dereference();
+		IResource resource = ResourceManager.getCurrentResource().dereference();
 		resource.destroy();
-		
+
 		return new QuitExportResponse(true);
 	}
 }

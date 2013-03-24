@@ -10,14 +10,14 @@ import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 public class FileRedirectionSink implements StreamRedirectionSink
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private File _file;
-	
+
 	public FileRedirectionSink(File file)
 	{
 		_file = file;
 	}
-	
+
 	@Override
 	public OutputStream openSink(ExecutionContext context) throws IOException
 	{

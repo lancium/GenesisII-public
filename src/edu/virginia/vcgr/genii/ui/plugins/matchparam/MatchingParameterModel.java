@@ -13,51 +13,45 @@ import edu.virginia.vcgr.genii.container.q2.matching.MatchingParamEnum;
 class MatchingParameterModel extends AbstractTableModel
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private Vector<Pair<String, String>> _originalParameters;
 	private Vector<Pair<String, String>> _parameters;
-	
+
 	MatchingParameterModel(Collection<Pair<String, String>> parameters)
 	{
-		_originalParameters = new Vector<Pair<String,String>>(parameters);
-		_parameters = new Vector<Pair<String,String>>(parameters);
+		_originalParameters = new Vector<Pair<String, String>>(parameters);
+		_parameters = new Vector<Pair<String, String>>(parameters);
 	}
-	
+
 	final void addParameter(String name, String value)
 	{
 		_parameters.add(new Pair<String, String>(name, value));
 		fireTableRowsInserted(_parameters.size() - 1, _parameters.size() - 1);
 	}
-	
+
 	final void removeParameter(int row)
 	{
 		_parameters.remove(row);
 		fireTableRowsDeleted(row, row);
 	}
-	
-	final Collection<Pair<Pair<String, String>, MatchingParameterOperation>>
-		generateOperations()
+
+	final Collection<Pair<Pair<String, String>, MatchingParameterOperation>> generateOperations()
 	{
-		Collection<Pair<Pair<String, String>, MatchingParameterOperation>> ret =
-			new LinkedList<Pair<Pair<String,String>,MatchingParameterOperation>>();
-		
-		for (Pair<String, String> original : _originalParameters)
-		{
+		Collection<Pair<Pair<String, String>, MatchingParameterOperation>> ret = new LinkedList<Pair<Pair<String, String>, MatchingParameterOperation>>();
+
+		for (Pair<String, String> original : _originalParameters) {
 			if (!_parameters.contains(original))
-				ret.add(new Pair<Pair<String,String>, MatchingParameterOperation>(
-					original, MatchingParameterOperation.Delete));
+				ret.add(new Pair<Pair<String, String>, MatchingParameterOperation>(original, MatchingParameterOperation.Delete));
 		}
-		
-		for (Pair<String, String> newP : _parameters)
-		{
+
+		for (Pair<String, String> newP : _parameters) {
 			if (!_originalParameters.contains(newP))
-				ret.add(new Pair<Pair<String,String>, MatchingParameterOperation>(
-					newP, MatchingParameterOperation.Add));
+				ret.add(new Pair<Pair<String, String>, MatchingParameterOperation>(newP, MatchingParameterOperation.Add));
 		}
-		
+
 		return ret;
 	}
-	
+
 	@Override
 	public int getColumnCount()
 	{
@@ -76,19 +70,17 @@ class MatchingParameterModel extends AbstractTableModel
 		MatchingParamEnum matchType;
 		String name;
 		Pair<String, String> parameter = _parameters.get(rowIndex);
-		
+
 		String first = parameter.first();
 		int index = first.indexOf(':');
-		if (index > 0)
-		{
+		if (index > 0) {
 			name = first.substring(index + 1);
 			matchType = MatchingParamEnum.valueOf(first.substring(0, index));
-		} else
-		{
+		} else {
 			matchType = MatchingParamEnum.supports;
 			name = parameter.first();
 		}
-				
+
 		if (columnIndex == 0)
 			return name;
 		else if (columnIndex == 1)
@@ -96,7 +88,7 @@ class MatchingParameterModel extends AbstractTableModel
 		else
 			return matchType;
 	}
-	
+
 	@Override
 	public String getColumnName(int column)
 	{
@@ -118,16 +110,16 @@ class MatchingParameterModel extends AbstractTableModel
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex)
 	{
 		Pair<String, String> parm = _parameters.get(rowIndex);
-		
+
 		if (columnIndex == 0)
 			parm = new Pair<String, String>(this.getValueAt(rowIndex, 2) + ":" + aValue.toString(), parm.second());
 		else if (columnIndex == 1)
 			parm = new Pair<String, String>(parm.first(), aValue.toString());
 		else
-			parm = new Pair<String, String>(aValue.toString() + ":" + this.getValueAt(rowIndex,0), parm.second());
-		
+			parm = new Pair<String, String>(aValue.toString() + ":" + this.getValueAt(rowIndex, 0), parm.second());
+
 		_parameters.set(rowIndex, parm);
-		
+
 		fireTableRowsUpdated(rowIndex, rowIndex);
 	}
 }

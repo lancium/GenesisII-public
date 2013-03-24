@@ -19,9 +19,8 @@ public class DefineStatement implements ParseStatement
 	private Pattern _pattern;
 	private String _replacement;
 	private String _isGlobal;
-	
-	DefineStatement(String variable, String source,
-		Pattern pattern, String replacement, String isGlobal)
+
+	DefineStatement(String variable, String source, Pattern pattern, String replacement, String isGlobal)
 	{
 		_variable = variable;
 		_source = source;
@@ -29,17 +28,15 @@ public class DefineStatement implements ParseStatement
 		_replacement = replacement;
 		_isGlobal = isGlobal;
 	}
-	
+
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
 	{
 		String variable = MacroReplacer.replaceMacros(context, _variable);
 		String source = MacroReplacer.replaceMacros(context, _source);
 		String result;
-		
-		if (_pattern != null)
-		{
+
+		if (_pattern != null) {
 			Matcher matcher = _pattern.matcher(source);
 			if (XScriptParser.getBoolean(context, _isGlobal))
 				result = matcher.replaceAll(_replacement);
@@ -47,7 +44,7 @@ public class DefineStatement implements ParseStatement
 				result = matcher.replaceFirst(_replacement);
 		} else
 			result = source;
-		
+
 		context.setAttribute(variable, result);
 		return result;
 	}

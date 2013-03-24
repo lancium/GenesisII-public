@@ -26,17 +26,27 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IRByteIOResource extends IResource
 {
-	public File chooseFile(HashMap<QName, Object> creationProperties)
-		throws ResourceException;
+	public File chooseFile(HashMap<QName, Object> creationProperties) throws ResourceException;
+
 	public File getCurrentFile() throws ResourceException;
+
 	public void destroy() throws ResourceException;
-	public String getFilePath()	throws ResourceException;
+
+	public String getFilePath() throws ResourceException;
+
 	public void setCreateTime(Calendar tm) throws ResourceException;
-	public Calendar getCreateTime()	throws ResourceException;
-	public void setModTime(Calendar tm)	throws ResourceException;
+
+	public Calendar getCreateTime() throws ResourceException;
+
+	public void setModTime(Calendar tm) throws ResourceException;
+
 	public Calendar getModTime() throws ResourceException;
+
 	public void setAccessTime(Calendar tm) throws ResourceException;
-	public Calendar getAccessTime()	throws ResourceException;
+
+	public Calendar getAccessTime() throws ResourceException;
+
 	public void setBitmapFilePath(String path) throws ResourceException;
+
 	public File getBitmapFile() throws ResourceException;
 }

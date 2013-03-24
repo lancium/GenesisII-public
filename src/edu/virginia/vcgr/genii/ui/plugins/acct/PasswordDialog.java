@@ -21,47 +21,39 @@ import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 class PasswordDialog extends JDialog
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private JPasswordField _passwordField = new JPasswordField(16);
 	private String _password = null;
-	
+
 	private PasswordDialog(Component ownerComponent)
 	{
-		super(SwingUtilities.getWindowAncestor(ownerComponent),
-			"Accounting DB Password");
-		
+		super(SwingUtilities.getWindowAncestor(ownerComponent), "Accounting DB Password");
+
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
-		
-		content.add(
-			new JLabel("Please enter password for accounting database."), 
-			new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, 
-				GridBagConstraints.WEST, GridBagConstraints.NONE, 
-				new Insets(5, 5, 5, 5), 5, 5));
-		content.add(_passwordField, 
-			new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5), 5, 5));
-		
+
+		content.add(new JLabel("Please enter password for accounting database."), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(_passwordField, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+
 		JButton okButton = new JButton(new OKAction());
-		content.add(ButtonPanel.createHorizontalButtonPanel(okButton,
-			new CancelAction()), new GridBagConstraints(
-				0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.SOUTH,
-				GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		
+		content.add(ButtonPanel.createHorizontalButtonPanel(okButton, new CancelAction()), new GridBagConstraints(0, 2, 1, 1,
+			1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+
 		getRootPane().setDefaultButton(okButton);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
-	
+
 	private class OKAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
-		
+
 		private OKAction()
 		{
 			super("OK");
 		}
-		
+
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
@@ -69,16 +61,16 @@ class PasswordDialog extends JDialog
 			dispose();
 		}
 	}
-	
+
 	private class CancelAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
-		
+
 		private CancelAction()
 		{
 			super("Cancel");
 		}
-		
+
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
@@ -86,7 +78,7 @@ class PasswordDialog extends JDialog
 			dispose();
 		}
 	}
-	
+
 	static String getPassword(Component ownerComponent)
 	{
 		PasswordDialog dialog = new PasswordDialog(ownerComponent);

@@ -8,11 +8,11 @@ import java.util.Calendar;
 
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.utils.Log4jHelper;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 public class ContainerLogFork extends AbstractRandomByteIOResourceFork
 {
@@ -22,7 +22,7 @@ public class ContainerLogFork extends AbstractRandomByteIOResourceFork
 		// and must be kept in synch for this to continue working.
 		return new File(Log4jHelper.queryLog4jFile("LOGFILE"));
 	}
-	
+
 	public ContainerLogFork(ResourceForkService service, String forkPath)
 	{
 		super(service, forkPath);
@@ -34,16 +34,13 @@ public class ContainerLogFork extends AbstractRandomByteIOResourceFork
 	{
 		RandomAccessFile raf = null;
 		File containerLog = null;
-		
-		try
-		{
+
+		try {
 			containerLog = getContainerLogFile();
 			raf = new RandomAccessFile(containerLog, "r");
 			raf.seek(offset);
 			raf.getChannel().read(dest);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(raf);
 			containerLog = null;
 		}

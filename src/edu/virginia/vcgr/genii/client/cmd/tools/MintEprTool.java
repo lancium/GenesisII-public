@@ -41,47 +41,35 @@ import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
 final public class MintEprTool extends BaseGridTool
 {
-	static final private String DESCRIPTION = 
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dmint-epr";
-	static final private FileResource USAGE =
-		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/umint-epr");
-	
-	static private EndpointReferenceType readEPRFromFile(GeniiPath path)
-		throws IOException
+	static final private String DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dmint-epr";
+	static final private FileResource USAGE = new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/umint-epr");
+
+	static private EndpointReferenceType readEPRFromFile(GeniiPath path) throws IOException
 	{
 		InputStream in = null;
-		
-		try
-		{
+
+		try {
 			in = path.openInputStream();
-			return (EndpointReferenceType)ObjectDeserializer.deserialize(
-				new InputSource(in), EndpointReferenceType.class);
-		}
-		finally
-		{
+			return (EndpointReferenceType) ObjectDeserializer.deserialize(new InputSource(in), EndpointReferenceType.class);
+		} finally {
 			StreamUtils.close(in);
 		}
 	}
-	
-	static private X509Certificate[] readCertChainFromFile(GeniiPath path)
-		throws CertificateException, IOException
+
+	static private X509Certificate[] readCertChainFromFile(GeniiPath path) throws CertificateException, IOException
 	{
 		InputStream in = null;
-		
-		try
-		{
+
+		try {
 			in = path.openInputStream();
 			CertificateFactory factory = CertificateFactory.getInstance("X.509");
-			X509Certificate cert = 
-				(X509Certificate)factory.generateCertificate(in);
+			X509Certificate cert = (X509Certificate) factory.generateCertificate(in);
 			return new X509Certificate[] { cert };
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(in);
 		}
 	}
-	
+
 	private GeniiPath _outputFile = null;
 	private GeniiPath _linkPath = null;
 	private Set<GeniiPath> _referenceParameterFiles = new HashSet<GeniiPath>();
@@ -95,47 +83,39 @@ final public class MintEprTool extends BaseGridTool
 	private boolean _requireEncryption = false;
 	private boolean _includeServerTls = false;
 	private boolean _requireMessageSigning = false;
-	
-	private Collection<Element> getReferenceParameters()
-		throws IOException, ParserConfigurationException, SAXException
+
+	private Collection<Element> getReferenceParameters() throws IOException, ParserConfigurationException, SAXException
 	{
 		Collection<Element> refParams = new LinkedList<Element>();
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		
-		for (GeniiPath path : _referenceParameterFiles)
-		{
+
+		for (GeniiPath path : _referenceParameterFiles) {
 			InputStream in = null;
-			
-			try
-			{
+
+			try {
 				in = path.openInputStream();
 				Document doc = builder.parse(in);
 				refParams.add(doc.getDocumentElement());
-			}
-			finally
-			{
+			} finally {
 				StreamUtils.close(in);
 			}
 		}
 
 		return refParams;
 	}
-	
+
 	@Override
 	protected void verify() throws ToolException
 	{
-		if (_linkPath != null)
-		{
+		if (_linkPath != null) {
 			if (_linkPath.pathType() != GeniiPathType.Grid)
-				throw new InvalidToolUsageException(
-					"Link Path is not a grid path!");
+				throw new InvalidToolUsageException("Link Path is not a grid path!");
 			if (_outputFile != null)
-				throw new InvalidToolUsageException(
-					"Cannot have both a link path and an output file specified!");
+				throw new InvalidToolUsageException("Cannot have both a link path and an output file specified!");
 		}
-		
+
 		if (numArguments() != 1)
 			throw new InvalidToolUsageException();
 	}
@@ -143,167 +123,147 @@ final public class MintEprTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		GenesisIIEPRBuilder eprFactory = new GenesisIIEPRBuilder(
-			new URI(getArgument(0)));
-		
+		GenesisIIEPRBuilder eprFactory = new GenesisIIEPRBuilder(new URI(getArgument(0)));
+
 		for (Element e : getReferenceParameters())
 			eprFactory.addReferenceParameters(e);
-		
-		eprFactory.addPortTypes(_portTypes.toArray(
-			new PortType[_portTypes.size()]));
-		
+
+		eprFactory.addPortTypes(_portTypes.toArray(new PortType[_portTypes.size()]));
+
 		if (_epi != null)
 			eprFactory.epi(new URI(_epi));
-		
-		if (!_epiResolvers.isEmpty())
-		{
+
+		if (!_epiResolvers.isEmpty()) {
 			for (GeniiPath path : _epiResolvers)
-				eprFactory.addEndpointIdentifierResolvers(
-					readEPRFromFile(path));
+				eprFactory.addEndpointIdentifierResolvers(readEPRFromFile(path));
 		}
-		
-		if (!_refResolvers.isEmpty())
-		{
+
+		if (!_refResolvers.isEmpty()) {
 			for (GeniiPath path : _refResolvers)
-				eprFactory.addReferenceResolvers(
-					readEPRFromFile(path));
+				eprFactory.addReferenceResolvers(readEPRFromFile(path));
 		}
-		
+
 		if (_containerID != null)
 			eprFactory.containerID(_containerID);
-		
-		if (_certificateChain != null)
-		{
-			X509Certificate []certChain = readCertChainFromFile(
-				_certificateChain);
+
+		if (_certificateChain != null) {
+			X509Certificate[] certChain = readCertChainFromFile(_certificateChain);
 			eprFactory.certificateChain(certChain);
 		}
-		
+
 		if (_usernamePasswordPolicy != null)
 			eprFactory.addUsernamePasswordTokenPolicy(_usernamePasswordPolicy);
-		
+
 		if (_requireEncryption)
 			eprFactory.requireEncryption(true);
-		
+
 		if (_includeServerTls)
 			eprFactory.includeServerTls(true);
-		
+
 		if (_requireMessageSigning)
 			eprFactory.requireMessageSigning(true);
-		
+
 		OutputStream out = null;
 		PrintWriter writer;
-		try
-		{
-			if (_outputFile != null)
-			{
+		try {
+			if (_outputFile != null) {
 				out = _outputFile.openOutputStream();
 				writer = new PrintWriter(out);
-			} else if (_linkPath != null)
-			{
-				RNSPath path = RNSPath.getCurrent().lookup(_linkPath.path(), 
-					RNSPathQueryFlags.MUST_NOT_EXIST);
+			} else if (_linkPath != null) {
+				RNSPath path = RNSPath.getCurrent().lookup(_linkPath.path(), RNSPathQueryFlags.MUST_NOT_EXIST);
 				path.link(eprFactory.mint());
 				return 0;
 			} else
 				writer = stdout;
-			
-			ObjectSerializer.serialize(writer, eprFactory.mint(),
-				new QName(WSAddressingConstants.WSA_NS, "epr", "wsa"));
+
+			ObjectSerializer.serialize(writer, eprFactory.mint(), new QName(WSAddressingConstants.WSA_NS, "epr", "wsa"));
 			writer.flush();
-			
+
 			return 0;
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(out);
 		}
 	}
-	
+
 	public MintEprTool()
 	{
-		super(new FileResource(DESCRIPTION), USAGE, false,
-				ToolCategory.ADMINISTRATION);
+		super(new FileResource(DESCRIPTION), USAGE, false, ToolCategory.ADMINISTRATION);
 	}
-	
+
 	@Option("output")
 	final public void setOutputFile(String path)
 	{
 		_outputFile = new GeniiPath(path);
 	}
-	
-	@Option(maxOccurances = "unbounded",
-		value = "reference-parameters")
+
+	@Option(maxOccurances = "unbounded", value = "reference-parameters")
 	final public void setReferenceParameterFile(String path)
 	{
 		_referenceParameterFiles.add(new GeniiPath(path));
 	}
-	
-	@Option(maxOccurances = "unbounded",
-		value = "port-type")
+
+	@Option(maxOccurances = "unbounded", value = "port-type")
 	final public void setPortType(String portType)
 	{
 		QName portTypeName = QName.valueOf(portType);
 		if (PortType.isKnown(portTypeName))
 			_portTypes.add(PortType.get(portTypeName));
 	}
-	
+
 	@Option("epi")
 	final public void setEPI(String epi)
 	{
 		_epi = epi;
 	}
-	
-	@Option(maxOccurances = "unbounded",
-		value = "epi-resolver")
+
+	@Option(maxOccurances = "unbounded", value = "epi-resolver")
 	final public void setEPIResolver(String path)
 	{
 		_epiResolvers.add(new GeniiPath(path));
 	}
-	
-	@Option(maxOccurances = "unbounded",
-		value = "reference-resolver")
+
+	@Option(maxOccurances = "unbounded", value = "reference-resolver")
 	final public void setReferenceResolver(String path)
 	{
 		_refResolvers.add(new GeniiPath(path));
 	}
-	
+
 	@Option("container-id")
 	final public void setContainerID(String containerID)
 	{
 		_containerID = GUID.fromString(containerID);
 	}
-	
+
 	@Option("certificate-chain")
 	final public void setCertificateChain(String path)
 	{
 		_certificateChain = new GeniiPath(path);
 	}
-	
+
 	@Option("add-username-password-policy")
 	final public void setUsernamePasswordPolicy(String isOptional)
 	{
 		_usernamePasswordPolicy = Boolean.valueOf(isOptional);
 	}
-	
+
 	@Option("require-encryption")
 	final public void setRequireEncryption()
 	{
 		_requireEncryption = true;
 	}
-	
+
 	@Option("include-server-tls")
 	final public void setIncludeServerTls()
 	{
 		_includeServerTls = true;
 	}
-	
+
 	@Option("require-message-signing")
 	final public void setRequireMessageSigning()
 	{
 		_requireMessageSigning = true;
 	}
-	
+
 	@Option("link")
 	final public void setLink(String path)
 	{

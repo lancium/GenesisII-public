@@ -24,8 +24,7 @@ public class Config
 
 	static public AxisClient getClientEngine()
 	{
-		if (_client == null)
-		{
+		if (_client == null) {
 			_client = new AxisClient();
 		}
 
@@ -33,12 +32,11 @@ public class Config
 	}
 
 	static private MessageContext _cached = null;
+
 	static public MessageContext mooch()
 	{
-		synchronized(Config.class)
-		{
-			if (_cached == null)
-			{
+		synchronized (Config.class) {
+			if (_cached == null) {
 				_cached = new MessageContext(getClientEngine());
 				_cached.setEncodingStyle("");
 				_cached.setProperty(AxisClient.PROP_DOMULTIREFS, Boolean.FALSE);

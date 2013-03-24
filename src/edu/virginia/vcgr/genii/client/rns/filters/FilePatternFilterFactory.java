@@ -9,10 +9,11 @@ public class FilePatternFilterFactory extends RegexFilterFactory
 	{
 		return new RegexFilter(FilePattern.compile(pattern));
 	}
-	
+
 	@Override
-	public boolean isFilterNeeded(String pattern) {
+	public boolean isFilterNeeded(String pattern)
+	{
 		return FilePattern.isFilterNeeded(pattern);
 	}
-	
+
 }

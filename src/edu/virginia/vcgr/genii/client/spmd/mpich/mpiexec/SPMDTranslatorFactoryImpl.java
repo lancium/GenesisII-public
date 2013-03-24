@@ -9,18 +9,15 @@ import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
 public class SPMDTranslatorFactoryImpl extends AbstractSPMDTranslatorFactory
 {
 	static final public String PROVIDER_NAME = "mpich.mpiexec";
-	
+
 	public SPMDTranslatorFactoryImpl()
 	{
 		super(PROVIDER_NAME);
 	}
-	
+
 	@Override
-	public SPMDTranslator newTranslator(Properties constructionProperties)
-			throws SPMDException
+	public SPMDTranslator newTranslator(Properties constructionProperties) throws SPMDException
 	{
-		return new SPMDTranslatorImpl(
-			constructionProperties.getProperty(
-				ADDITIONAL_CMDLINE_ARGS_PROPERTY));
+		return new SPMDTranslatorImpl(constructionProperties.getProperty(ADDITIONAL_CMDLINE_ARGS_PROPERTY));
 	}
 }

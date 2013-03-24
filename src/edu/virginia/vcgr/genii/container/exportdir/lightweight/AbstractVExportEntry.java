@@ -4,13 +4,13 @@ public class AbstractVExportEntry implements VExportEntry
 {
 	private String _name;
 	private boolean _isDirectory;
-	
+
 	protected AbstractVExportEntry(String name, boolean isDirectory)
 	{
 		_name = name;
 		_isDirectory = isDirectory;
 	}
-	
+
 	@Override
 	final public String getName()
 	{

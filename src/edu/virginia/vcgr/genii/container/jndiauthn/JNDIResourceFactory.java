@@ -9,24 +9,18 @@ import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class JNDIResourceFactory extends BasicDBResourceFactory implements
-		IResourceFactory
+public class JNDIResourceFactory extends BasicDBResourceFactory implements IResourceFactory
 {
-	public JNDIResourceFactory(DatabaseConnectionPool pool)
-		throws SQLException
+	public JNDIResourceFactory(DatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}
 
-	public IResource instantiate(ResourceKey parentKey)
-			throws ResourceException
+	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
-		try
-		{
+		try {
 			return new JNDIResource(parentKey, _pool);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 	}

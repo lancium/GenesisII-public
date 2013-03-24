@@ -55,188 +55,160 @@ public class RNSTree extends JTree implements Autoscroll
 	static final long serialVersionUID = 0L;
 
 	static Log _logger = LogFactory.getLog(RNSTree.class);
-	
+
 	// These insets and ints are for the autoscroll feature for drag and drop.
 	private Insets _insets = null;
 	private int _top = 0, _bottom = 0, _topRow = 0, _bottomRow = 0;
-	
+
 	public RNSTree(RNSPath root) throws RNSException
 	{
 		super(new RNSTreeModel(root.createSandbox()));
-		
+
 		DragSource dragSource = DragSource.getDefaultDragSource();
-		dragSource.createDefaultDragGestureRecognizer(this,
-			DnDConstants.ACTION_COPY | DnDConstants.ACTION_LINK,
+		dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY | DnDConstants.ACTION_LINK,
 			new RNSTreeDragGestureListener());
 		new DropTarget(this, new RNSTreeDropTargetListener());
-		
+
 		setShowsRootHandles(true);
-		
-		RNSTreeModel model = (RNSTreeModel)getModel();
+
+		RNSTreeModel model = (RNSTreeModel) getModel();
 		model.setTree(this);
-		model.prepareExpansion((RNSTreeNode)model.getRoot());
+		model.prepareExpansion((RNSTreeNode) model.getRoot());
 		addTreeWillExpandListener(model);
 		addTreeExpansionListener(model);
 	}
-	
+
 	public RNSTree() throws RNSException
 	{
 		this(RNSPath.getCurrent().getRoot());
 	}
-	
+
 	public Insets getAutoscrollInsets()
 	{
 		return _insets;
 	}
-	
+
 	public void autoscroll(Point p)
 	{
 		// Only support up/down scrolling
 		_top = Math.abs(getLocation().y) + 10;
 		_bottom = _top + getParent().getHeight() - 20;
 		int next;
-		if (p.y < _top)
-		{
+		if (p.y < _top) {
 			next = _topRow--;
 			_bottomRow++;
 			scrollRowToVisible(next);
-		} else if (p.y > _bottom)
-		{
+		} else if (p.y > _bottom) {
 			next = _bottomRow++;
 			_topRow--;
 			scrollRowToVisible(next);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public boolean reloadSubtree(RNSPath path)
 	{
-		RNSTreeModel model = (RNSTreeModel)getModel();
-		TreeNode root = (TreeNode)model.getRoot();
+		RNSTreeModel model = (RNSTreeModel) getModel();
+		TreeNode root = (TreeNode) model.getRoot();
 		String sPath = path.pwd();
-		
-		String []components = sPath.substring(1).split("/");
-		outer:
-		for (String component : components)
-		{
+
+		String[] components = sPath.substring(1).split("/");
+		outer: for (String component : components) {
 			Enumeration<TreeNode> children = root.children();
-			while (children.hasMoreElements())
-			{
+			while (children.hasMoreElements()) {
 				TreeNode child = children.nextElement();
-				if (child.toString().equals(component))
-				{
+				if (child.toString().equals(component)) {
 					root = child;
 					continue outer;
 				}
 			}
-			
+
 			return false;
 		}
-		
+
 		if (root instanceof RNSTreeNode)
-			((RNSTreeNode)root).refresh(model);
-		
+			((RNSTreeNode) root).refresh(model);
+
 		model.reload(root);
 		return true;
 	}
-	
-	private static class RNSTreeDragGestureListener 
-		implements DragGestureListener
+
+	private static class RNSTreeDragGestureListener implements DragGestureListener
 	{
 		public void dragGestureRecognized(DragGestureEvent event)
 		{
-			try
-			{
+			try {
 				Collection<RNSPath> rPaths = new ArrayList<RNSPath>();
-				
-				JTree tree = (JTree)event.getComponent();
-				TreePath []paths = tree.getSelectionPaths();
-				if (paths == null || paths.length == 0)
-				{
+
+				JTree tree = (JTree) event.getComponent();
+				TreePath[] paths = tree.getSelectionPaths();
+				if (paths == null || paths.length == 0) {
 					// Nothing selected, nothing to drag
-				} else
-				{
+				} else {
 					Cursor cursor = null;
-					
+
 					int action = event.getDragAction();
-					if ((action & DnDConstants.ACTION_COPY) != 0)
-					{
+					if ((action & DnDConstants.ACTION_COPY) != 0) {
 						cursor = DragSource.DefaultCopyDrop;
-						
+
 						// Only files.
-						for (TreePath path : paths)
-						{
-							DefaultMutableTreeNode node = 
-								(DefaultMutableTreeNode)path.getLastPathComponent();
-							if (!(node instanceof RNSTreeNode))
-							{
+						for (TreePath path : paths) {
+							DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+							if (!(node instanceof RNSTreeNode)) {
 								_logger.fatal("Cannot drag-and-drop un-resolved nodes.");
 								tree.getToolkit().beep();
-							} else
-							{
-								RNSTreeNode rNode = (RNSTreeNode)node;
+							} else {
+								RNSTreeNode rNode = (RNSTreeNode) node;
 								RNSPath rnsPath = rNode.getRNSPath();
-								if (!rnsPath.exists())
-								{
+								if (!rnsPath.exists()) {
 									_logger.fatal("Cannot drag-and-drop un-resolved nodes.");
 									tree.getToolkit().beep();
 								}
-								
+
 								TypeInformation typeInfo = new TypeInformation(rnsPath.getEndpoint());
-								if (!typeInfo.isByteIO())
-								{
+								if (!typeInfo.isByteIO()) {
 									_logger.fatal("Can only copy ByteIO instances.");
 									tree.getToolkit().beep();
 								}
-								
+
 								rPaths.add(rnsPath);
 							}
 						}
-					} else if ((action & DnDConstants.ACTION_LINK) != 0)
-					{
+					} else if ((action & DnDConstants.ACTION_LINK) != 0) {
 						cursor = DragSource.DefaultLinkDrop;
-						
+
 						// Anything.
-						for (TreePath path : paths)
-						{
-							DefaultMutableTreeNode node = 
-								(DefaultMutableTreeNode)path.getLastPathComponent();
-							if (!(node instanceof RNSTreeNode))
-							{
+						for (TreePath path : paths) {
+							DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+							if (!(node instanceof RNSTreeNode)) {
 								_logger.fatal("Cannot drag-and-drop un-resolved nodes.");
 								tree.getToolkit().beep();
-							} else
-							{
-								RNSTreeNode rNode = (RNSTreeNode)node;
+							} else {
+								RNSTreeNode rNode = (RNSTreeNode) node;
 								RNSPath rnsPath = rNode.getRNSPath();
-								if (!rnsPath.exists())
-								{
+								if (!rnsPath.exists()) {
 									_logger.fatal("Cannot drag-and-drop un-resolved nodes.");
 									tree.getToolkit().beep();
 								}
-								
+
 								rPaths.add(rnsPath);
 							}
 						}
-					} else
-					{
+					} else {
 						// Unknown action
 						_logger.error("Unknown drag-and-drop action.");
 						tree.getToolkit().beep();
 					}
-					
-					RNSTransferableTreeNode tNode =
-						new RNSTransferableTreeNode(rPaths);
+
+					RNSTransferableTreeNode tNode = new RNSTransferableTreeNode(rPaths);
 					event.startDrag(cursor, tNode, new MyDragSourceListener());
 				}
-			}
-			catch (RNSPathDoesNotExistException dne)
-			{
+			} catch (RNSPathDoesNotExistException dne) {
 				_logger.fatal("Unexpected exception -- path does not exist in tree.", dne);
 			}
 		}
 	}
-	
+
 	private class RNSTreeDropTargetListener implements DropTargetListener
 	{
 		public void dragEnter(DropTargetDragEvent dropTargetDragEvent)
@@ -248,251 +220,201 @@ public class RNSTree extends JTree implements Autoscroll
 			_bottomRow = getClosestRowForLocation(0, _bottom);
 			_insets = new Insets(_top + 10, 0, _bottom - 10, getWidth());
 		}
-		
+
 		public void dragExit(DropTargetEvent event)
 		{
 		}
-		
+
 		public void dragOver(DropTargetDragEvent event)
 		{
 		}
-		
+
 		public void dropActionChanged(DropTargetDragEvent event)
 		{
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		synchronized public void drop(DropTargetDropEvent event)
 		{
 			Point location = event.getLocation();
 			TreePath path = getPathForLocation(location.x, location.y);
 			Object node = path.getLastPathComponent();
-			if (node == null || !(node instanceof TreeNode))
-			{
+			if (node == null || !(node instanceof TreeNode)) {
 				_logger.fatal("Couldn't find drop target.");
 				event.rejectDrop();
 			}
-			
-			try
-			{
+
+			try {
 				Transferable tr = event.getTransferable();
-				if (tr.isDataFlavorSupported(RNSTransferableTreeNode.DEFAULT_RNS_PATHS_FLAVOR))
-				{
+				if (tr.isDataFlavorSupported(RNSTransferableTreeNode.DEFAULT_RNS_PATHS_FLAVOR)) {
 					event.acceptDrop(DnDConstants.ACTION_COPY | DnDConstants.ACTION_LINK);
-					Object userObject = tr.getTransferData(
-						RNSTransferableTreeNode.DEFAULT_RNS_PATHS_FLAVOR);
+					Object userObject = tr.getTransferData(RNSTransferableTreeNode.DEFAULT_RNS_PATHS_FLAVOR);
 					if ((event.getDropAction() & DnDConstants.ACTION_COPY) != 0)
-						copy(path, (Collection<RNSPath>)userObject);
+						copy(path, (Collection<RNSPath>) userObject);
 					else
-						link(path, (Collection<RNSPath>)userObject);
+						link(path, (Collection<RNSPath>) userObject);
 					event.dropComplete(true);
-				} else if (tr.isDataFlavorSupported(DataFlavor.stringFlavor))
-				{
+				} else if (tr.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 					event.acceptDrop(DnDConstants.ACTION_COPY);
-					String stringFlavor = (String)tr.getTransferData(DataFlavor.stringFlavor);
-					
+					String stringFlavor = (String) tr.getTransferData(DataFlavor.stringFlavor);
+
 					BufferedReader reader = new BufferedReader(new StringReader(stringFlavor));
 					String line;
 					List<File> fileList = new ArrayList<File>();
-					while ( (line = reader.readLine()) != null)
-					{
+					while ((line = reader.readLine()) != null) {
 						line = line.trim();
-						if (line.length() > 0)
-						{
+						if (line.length() > 0) {
 							URI uri = URI.create(line);
 							fileList.add(new File(uri));
 						}
 					}
 					copy(path, fileList);
 					event.dropComplete(true);
-				} else if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-				{
+				} else if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 					event.acceptDrop(DnDConstants.ACTION_COPY);
-					List<File> fileList = (List<File>)tr.getTransferData(
-						DataFlavor.javaFileListFlavor);
+					List<File> fileList = (List<File>) tr.getTransferData(DataFlavor.javaFileListFlavor);
 					copy(path, fileList);
 					event.dropComplete(true);
-				} else
-				{
+				} else {
 					_logger.error("Unable to accept drop.");
 					event.rejectDrop();
 				}
-			}
-			catch (IOException ioe)
-			{
+			} catch (IOException ioe) {
 				_logger.error("IOException during drag-and-drop operation.", ioe);
 				event.rejectDrop();
-			}
-			catch (UnsupportedFlavorException ufe)
-			{
+			} catch (UnsupportedFlavorException ufe) {
 				_logger.error("Unsupported drag and drop flavor.", ufe);
 				event.rejectDrop();
 			}
 		}
-		
-		private RNSPath getNewPath(RNSPath parent, String origName)
-			throws IOException
+
+		private RNSPath getNewPath(RNSPath parent, String origName) throws IOException
 		{
 			int lcv = 0;
-			
-			for (lcv = 0; lcv < 10; lcv++)
-			{
+
+			for (lcv = 0; lcv < 10; lcv++) {
 				String newName = null;
-				
-				newName = (lcv == 0) ? 
-					origName : String.format("%s (%d)", origName, lcv);
+
+				newName = (lcv == 0) ? origName : String.format("%s (%d)", origName, lcv);
 				RNSPath ret = parent.lookup(newName);
 				if (!ret.exists())
 					return ret;
 			}
-			
-			throw new IOException("Unable to create new name for \"" 
-				+ origName + "\".");
-		}
-		
 
-		public void copy(InputStream in, OutputStream out)
-			throws IOException
+			throw new IOException("Unable to create new name for \"" + origName + "\".");
+		}
+
+		public void copy(InputStream in, OutputStream out) throws IOException
 		{
-			byte []data = new byte[ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE];
-			
-			while (true)
-			{
+			byte[] data = new byte[ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE];
+
+			while (true) {
 				int read = in.read(data);
 				if (read <= 0)
 					break;
 				out.write(data, 0, read);
 			}
 		}
-		
-		private void copy(TreePath path, Collection<RNSPath> rnsPaths)
-			throws IOException
+
+		private void copy(TreePath path, Collection<RNSPath> rnsPaths) throws IOException
 		{
-			DefaultMutableTreeNode parent =
-				(DefaultMutableTreeNode)path.getLastPathComponent();
-			if (!(parent instanceof RNSTreeNode))
-			{
+			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getLastPathComponent();
+			if (!(parent instanceof RNSTreeNode)) {
 				_logger.fatal("Cannot drop onto an un-resolved RNS path.");
 				throw new IOException("Unable to drop onto un-resolved RNS path.");
 			}
-			
-			RNSTreeNode rNode = (RNSTreeNode)parent;
-			
-			for (RNSPath rPath : rnsPaths)
-			{
-				RNSPath newPath = getNewPath(rNode.getRNSPath(),
-					rPath.getName());
+
+			RNSTreeNode rNode = (RNSTreeNode) parent;
+
+			for (RNSPath rPath : rnsPaths) {
+				RNSPath newPath = getNewPath(rNode.getRNSPath(), rPath.getName());
 				InputStream in = null;
 				OutputStream out = null;
-				
-				try
-				{
+
+				try {
 					in = ByteIOStreamFactory.createInputStream(rPath);
 					out = ByteIOStreamFactory.createOutputStream(newPath);
 					copy(in, out);
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					_logger.error("Unable to copy files.", e);
 					if (e instanceof IOException)
-						throw (IOException)e;
+						throw (IOException) e;
 					throw new IOException("Unable to copy files.", e);
-				}
-				finally
-				{
+				} finally {
 					StreamUtils.close(in);
 					StreamUtils.close(out);
 				}
 			}
-			
-			rNode.refresh((RNSTreeModel)getModel());
+
+			rNode.refresh((RNSTreeModel) getModel());
 		}
-		
-		private void link(TreePath path, Collection<RNSPath> rnsPaths)
-			throws IOException
+
+		private void link(TreePath path, Collection<RNSPath> rnsPaths) throws IOException
 		{
-			DefaultMutableTreeNode parent =
-				(DefaultMutableTreeNode)path.getLastPathComponent();
-			if (!(parent instanceof RNSTreeNode))
-			{
+			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getLastPathComponent();
+			if (!(parent instanceof RNSTreeNode)) {
 				_logger.fatal("Cannot drop onto an un-resolved RNS path.");
 				throw new IOException("Unable to drop onto un-resolved RNS path.");
 			}
-			
-			RNSTreeNode rNode = (RNSTreeNode)parent;
-		
-			for (RNSPath rPath : rnsPaths)
-			{
-				RNSPath newPath = getNewPath(
-					rNode.getRNSPath(), rPath.getName());
-				
-				try
-				{
+
+			RNSTreeNode rNode = (RNSTreeNode) parent;
+
+			for (RNSPath rPath : rnsPaths) {
+				RNSPath newPath = getNewPath(rNode.getRNSPath(), rPath.getName());
+
+				try {
 					newPath.link(rPath.getEndpoint());
-				}
-				catch (RNSException re)
-				{
+				} catch (RNSException re) {
 					_logger.warn("Unable to link in new path.", re);
 				}
 			}
-			
-			rNode.refresh((RNSTreeModel)getModel());
+
+			rNode.refresh((RNSTreeModel) getModel());
 		}
-		
-		private void copy(TreePath path, List<File> fileList)
-			throws IOException
+
+		private void copy(TreePath path, List<File> fileList) throws IOException
 		{
-			DefaultMutableTreeNode parent =
-				(DefaultMutableTreeNode)path.getLastPathComponent();
-			if (!(parent instanceof RNSTreeNode))
-			{
+			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getLastPathComponent();
+			if (!(parent instanceof RNSTreeNode)) {
 				_logger.fatal("Cannot drop onto an un-resolved RNS path.");
 				throw new IOException("Unable to drop onto un-resolved RNS path.");
 			}
-			
-			RNSTreeNode rNode = (RNSTreeNode)parent;
-			
-			for (File file : fileList)
-			{
-				RNSPath newPath = getNewPath(rNode.getRNSPath(),
-					file.getName());
+
+			RNSTreeNode rNode = (RNSTreeNode) parent;
+
+			for (File file : fileList) {
+				RNSPath newPath = getNewPath(rNode.getRNSPath(), file.getName());
 				InputStream in = null;
 				OutputStream out = null;
-				
-				try
-				{
+
+				try {
 					in = new FileInputStream(file);
 					out = ByteIOStreamFactory.createOutputStream(newPath);
 					copy(in, out);
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					_logger.error("Unable to copy files.", e);
 					if (e instanceof IOException)
-						throw (IOException)e;
+						throw (IOException) e;
 					throw new IOException("Unable to copy files.", e);
-				}
-				finally
-				{
+				} finally {
 					StreamUtils.close(in);
 					StreamUtils.close(out);
 				}
 			}
-			
-			rNode.refresh((RNSTreeModel)getModel());
+
+			rNode.refresh((RNSTreeModel) getModel());
 		}
 	}
-	
+
 	static private class MyDragSourceListener implements DragSourceListener
 	{
 		public void dragDropEnd(DragSourceDropEvent event)
 		{
 		}
-		
+
 		public void dragEnter(DragSourceDragEvent event)
 		{
-			DragSourceContext context =
-				event.getDragSourceContext();
+			DragSourceContext context = event.getDragSourceContext();
 			int dropAction = event.getDropAction();
 			if ((dropAction & DnDConstants.ACTION_COPY) != 0)
 				context.setCursor(DragSource.DefaultCopyDrop);
@@ -501,51 +423,47 @@ public class RNSTree extends JTree implements Autoscroll
 			else
 				context.setCursor(DragSource.DefaultCopyNoDrop);
 		}
-		
+
 		public void dragExit(DragSourceEvent event)
 		{
 		}
-		
+
 		public void dragOver(DragSourceDragEvent event)
 		{
 		}
-		
+
 		public void dropActionChanged(DragSourceDragEvent event)
 		{
 		}
 	}
 }
 
-class RNSTransferableTreeNode
-	extends DefaultMutableTreeNode implements Transferable
+class RNSTransferableTreeNode extends DefaultMutableTreeNode implements Transferable
 {
 	static final long serialVersionUID = 0L;
-		
-	final public static DataFlavor DEFAULT_RNS_PATHS_FLAVOR =
-		new DataFlavor(DefaultMutableTreeNode.class,
-			"RNS Paths");
-	
+
+	final public static DataFlavor DEFAULT_RNS_PATHS_FLAVOR = new DataFlavor(DefaultMutableTreeNode.class, "RNS Paths");
+
 	private Collection<RNSPath> _data;
-	
+
 	public RNSTransferableTreeNode(Collection<RNSPath> data)
 	{
 		_data = data;
 	}
-	
+
 	public DataFlavor[] getTransferDataFlavors()
 	{
 		return new DataFlavor[] { DEFAULT_RNS_PATHS_FLAVOR };
 	}
-	
-	public Object getTransferData(DataFlavor flavor)
-		throws UnsupportedFlavorException, IOException
+
+	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
 		if (flavor.equals(DEFAULT_RNS_PATHS_FLAVOR))
 			return _data;
 		else
 			throw new UnsupportedFlavorException(flavor);
 	}
-	
+
 	public boolean isDataFlavorSupported(DataFlavor flavor)
 	{
 		return flavor.equals(DEFAULT_RNS_PATHS_FLAVOR);

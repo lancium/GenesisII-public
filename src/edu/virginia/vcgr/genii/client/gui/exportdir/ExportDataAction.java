@@ -22,71 +22,64 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 class ExportDataAction extends AbstractAction
 {
 	static final long serialVersionUID = 0L;
-	
+
 	static final private String _EXPORT_DATA_BUTTON = "Export Data";
-	
+
 	private ExportDirDialog _owner;
 	private Collection<IExportChangeListener> _listeners = new ArrayList<IExportChangeListener>();
-	
+
 	public ExportDataAction(ExportDirDialog owner)
 	{
 		super(_EXPORT_DATA_BUTTON);
-		
+
 		_owner = owner;
 	}
-	
+
 	public void addExportChangeListener(IExportChangeListener listener)
 	{
 		_listeners.add(listener);
 	}
-	
+
 	public void removeExportChangeListener(IExportChangeListener listener)
 	{
 		_listeners.remove(listener);
 	}
-	
+
 	protected void fireExportChanged()
 	{
-		for (IExportChangeListener listener : _listeners)
-		{
+		for (IExportChangeListener listener : _listeners) {
 			listener.exportsUpdated();
 		}
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		try
-		{
+		try {
 			ExportCreationDialog creation = new ExportCreationDialog(_owner);
 			creation.setModalityType(ModalityType.APPLICATION_MODAL);
 			creation.pack();
 			GuiUtils.centerComponent(creation);
-			
+
 			creation.setVisible(true);
 			ExportCreationInformation creationInfo = creation.getExportCreationInformation();
-			if (creationInfo != null)
-			{
+			if (creationInfo != null) {
 				createExport(creationInfo);
 			}
-		}
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			GuiUtils.displayError(_owner, "Export Error", cause);
 		}
 	}
-	
-	private void createExport(ExportCreationInformation creationInfo)
-		throws FileLockException, IOException, ExportException, RNSException,
-		CreationException, ResourceCreationFaultType, RemoteException, InvalidToolUsageException
+
+	private void createExport(ExportCreationInformation creationInfo) throws FileLockException, IOException, ExportException,
+		RNSException, CreationException, ResourceCreationFaultType, RemoteException, InvalidToolUsageException
 	{
 		String rnsPath = creationInfo.getRNSPath();
 		File localPath = new File(creationInfo.getLocalPath());
-		RNSPath rPath = ExportManipulator.createExport(
-			creationInfo.getContainerInformation().getContainerURL(), localPath, rnsPath,
-			creationInfo.isLightWeight());
-		ExportDirState.addExport(creationInfo.getContainerInformation().getDeploymentName(),
-			new ExportDirInformation(rPath, localPath));
+		RNSPath rPath = ExportManipulator.createExport(creationInfo.getContainerInformation().getContainerURL(), localPath,
+			rnsPath, creationInfo.isLightWeight());
+		ExportDirState.addExport(creationInfo.getContainerInformation().getDeploymentName(), new ExportDirInformation(rPath,
+			localPath));
 		fireExportChanged();
 	}
 }

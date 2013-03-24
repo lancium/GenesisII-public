@@ -9,14 +9,14 @@ public class DebugExceptionHandler implements IExceptionHandler
 	{
 		PrintWriter pw = null;
 		if (errorStream instanceof PrintWriter)
-			pw = (PrintWriter)errorStream;
+			pw = (PrintWriter) errorStream;
 		else
 			pw = new PrintWriter(errorStream);
-		
+
 		pw.println(cause.getLocalizedMessage());
 		cause.printStackTrace(pw);
 		pw.flush();
-		
+
 		return 1;
 	}
 }

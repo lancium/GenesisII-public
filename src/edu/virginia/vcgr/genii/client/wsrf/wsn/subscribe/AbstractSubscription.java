@@ -14,24 +14,24 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 public abstract class AbstractSubscription implements Subscription
 {
 	static private Log _logger = LogFactory.getLog(AbstractSubscription.class);
-	
+
 	private EndpointReferenceType _subscriptionReference;
 	private Calendar _publisherCurrentTime;
 	private Calendar _publisherTerminationTime;
-	
+
 	protected AbstractSubscription(SubscribeResponse response)
 	{
 		_subscriptionReference = response.getSubscriptionReference();
 		_publisherCurrentTime = response.getCurrentTime();
 		_publisherTerminationTime = response.getTerminationTime();
 	}
-	
+
 	@Override
 	final public EndpointReferenceType subscriptionReference()
 	{
 		return _subscriptionReference;
 	}
-	
+
 	@Override
 	final public Calendar publisherCurrentTime()
 	{
@@ -43,20 +43,15 @@ public abstract class AbstractSubscription implements Subscription
 	{
 		return _publisherTerminationTime;
 	}
-	
+
 	@Override
 	public void cancel()
 	{
-		try
-		{
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-				subscriptionReference());
+		try {
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, subscriptionReference());
 			common.destroy(new Destroy());
-		}
-		catch (Throwable cause)
-		{
-			_logger.warn("Unable to cancel subscription with publisher."
-				, cause);
+		} catch (Throwable cause) {
+			_logger.warn("Unable to cancel subscription with publisher.", cause);
 		}
 	}
 }

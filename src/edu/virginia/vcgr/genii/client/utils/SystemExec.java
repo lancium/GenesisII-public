@@ -10,18 +10,15 @@ public class SystemExec
 		String path = System.getenv("PATH");
 		if (path == null)
 			return null;
-		
-		for (String pathElement : path.split(
-			Pattern.quote(File.pathSeparator)))
-		{
-			if (pathElement != null && pathElement.length() > 0)
-			{
+
+		for (String pathElement : path.split(Pattern.quote(File.pathSeparator))) {
+			if (pathElement != null && pathElement.length() > 0) {
 				File f = new File(pathElement, executableName);
 				if (f.exists() && f.canExecute())
 					return f;
 			}
 		}
-		
+
 		return null;
 	}
 }

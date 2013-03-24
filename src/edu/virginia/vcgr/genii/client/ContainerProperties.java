@@ -14,75 +14,63 @@ public class ContainerProperties extends Properties
 {
 	static final long serialVersionUID = 0L;
 
-	static final private String CONTAINER_PROPERTIES_FILENAME =
-		"container.properties";
-	
-	static final private String GENII_USER_DIR_PROPERTY_NAME =
-		"edu.virginia.vcgr.genii.container.user-dir";
-	static final private String GENII_DEPLOYMENT_NAME_PROPERTY_NAME =
-		"edu.virginia.vcgr.genii.container.deployment-name";
-	static final private String GRID_CONNECTION_COMMAND =
-		"edu.virginia.vcgr.genii.gridInitCommand";
-	
-	static public ContainerProperties containerProperties = 
-		new ContainerProperties();
-	
+	static final private String CONTAINER_PROPERTIES_FILENAME = "container.properties";
+
+	static final private String GENII_USER_DIR_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.user-dir";
+	static final private String GENII_DEPLOYMENT_NAME_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.deployment-name";
+	static final private String GRID_CONNECTION_COMMAND = "edu.virginia.vcgr.genii.gridInitCommand";
+
+	static public ContainerProperties containerProperties = new ContainerProperties();
+
 	static private File getContainerPropertiesFile()
 	{
-		File ret = new File(Installation.getInstallDirectory(), 
-			CONTAINER_PROPERTIES_FILENAME);
+		File ret = new File(Installation.getInstallDirectory(), CONTAINER_PROPERTIES_FILENAME);
 		if (ret.exists() && ret.isFile() && ret.canRead())
 			return ret;
-		
+
 		return null;
 	}
-	
+
 	private boolean _existed = false;
-	
+
 	private ContainerProperties()
 	{
 		File file = getContainerPropertiesFile();
-		if (file != null)
-		{
+		if (file != null) {
 			InputStream in = null;
-			try
-			{
+			try {
 				in = new FileInputStream(file);
 				load(in);
 				_existed = true;
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				return;
-			}
-			finally
-			{
+			} finally {
 				StreamUtils.close(in);
 			}
 		}
 	}
-	
+
 	public boolean existed()
 	{
 		return _existed;
 	}
-	
+
 	public String getUserDirectory()
 	{
 		String val = getProperty(GENII_USER_DIR_PROPERTY_NAME);
-		if ( (val == null) || val.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE))
+		if ((val == null) || val.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE))
 			val = ApplicationBase.getUserDirFromEnvironment();
 		return val;
 	}
-	
+
 	public String getDeploymentName()
 	{
 		return getProperty(GENII_DEPLOYMENT_NAME_PROPERTY_NAME);
 	}
-	
+
 	/**
-	 * returns the command line for a grid connect command (minus 'grid' and 'connect').  if this property
-	 * has not been set, then this returns null.
+	 * returns the command line for a grid connect command (minus 'grid' and 'connect'). if this
+	 * property has not been set, then this returns null.
 	 */
 	public String getConnectionCommand()
 	{

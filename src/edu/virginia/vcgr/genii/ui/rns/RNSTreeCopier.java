@@ -37,116 +37,87 @@ import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 public class RNSTreeCopier extends RNSTreeOperator
 {
 	static private Log _logger = LogFactory.getLog(RNSTreeCopier.class);
-	
-	static public RNSTreeOperator copy(RNSTree sourceTree,
-		RNSTree targetTree, TreePath targetPath,
-		UIContext sourceContext,
+
+	static public RNSTreeOperator copy(RNSTree sourceTree, RNSTree targetTree, TreePath targetPath, UIContext sourceContext,
 		Collection<Pair<RNSTreeNode, RNSPath>> paths)
 	{
-		return new RNSTreeCopier(sourceContext, targetTree, targetPath,
-			new RNSTreeOperatorSource(sourceTree, paths));
+		return new RNSTreeCopier(sourceContext, targetTree, targetPath, new RNSTreeOperatorSource(sourceTree, paths));
 	}
-	
-	static public RNSTreeOperator copy(RNSTree targetTree, TreePath targetPath,
-		UIContext targetContext, List<?> files)
+
+	static public RNSTreeOperator copy(RNSTree targetTree, TreePath targetPath, UIContext targetContext, List<?> files)
 	{
 		List<File> fileSources = new Vector<File>(files.size());
 		for (Object obj : files)
-			fileSources.add((File)obj);
+			fileSources.add((File) obj);
 
-		return new RNSTreeCopier(targetContext, targetTree, targetPath,
-			new FilesystemOperatorSource(fileSources));
+		return new RNSTreeCopier(targetContext, targetTree, targetPath, new FilesystemOperatorSource(fileSources));
 	}
-	
-	private void doCopy(InputStream in, EndpointReferenceType fileEPR) 
-		throws FileNotFoundException, RemoteException, IOException
+
+	private void doCopy(InputStream in, EndpointReferenceType fileEPR) throws FileNotFoundException, RemoteException,
+		IOException
 	{
 		OutputStream out = null;
-		
-		try
-		{
+
+		try {
 			out = ByteIOStreamFactory.createOutputStream(fileEPR);
 			StreamUtils.copyStream(in, out);
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(out);
 		}
 	}
-	
-	private void doCopy(TaskProgressListener progressListener,
-		File source, RNSPath target)
-		throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException,
-		RNSException, RemoteException, IOException
+
+	private void doCopy(TaskProgressListener progressListener, File source, RNSPath target)
+		throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException, RNSException, RemoteException, IOException
 	{
-		if (source.isDirectory())
-		{
+		if (source.isDirectory()) {
 			target.mkdir();
-			
-			for (File entry : source.listFiles())
-			{
-				doCopy(progressListener, entry, target.lookup(
-					entry.getName(), RNSPathQueryFlags.MUST_NOT_EXIST));
+
+			for (File entry : source.listFiles()) {
+				doCopy(progressListener, entry, target.lookup(entry.getName(), RNSPathQueryFlags.MUST_NOT_EXIST));
 			}
-		} else
-		{
-			progressListener.updateSubTitle(String.format(
-				"Copying %s", source.getName()));
+		} else {
+			progressListener.updateSubTitle(String.format("Copying %s", source.getName()));
 			EndpointReferenceType fileEPR = target.createNewFile();
 			InputStream in = null;
-			
-			try
-			{
+
+			try {
 				in = new FileInputStream(source);
 				doCopy(in, fileEPR);
-			}
-			finally
-			{
+			} finally {
 				StreamUtils.close(in);
 			}
 		}
 	}
-	
-	private void doCopy(TaskProgressListener progressListener,
-		RNSPath source, RNSPath target)
-		throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException, RNSException,
-			FileNotFoundException, RemoteException, IOException
+
+	private void doCopy(TaskProgressListener progressListener, RNSPath source, RNSPath target)
+		throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException, RNSException, FileNotFoundException,
+		RemoteException, IOException
 	{
 		TypeInformation tInfo = new TypeInformation(source.getEndpoint());
-		
-		if (tInfo.isRNS())
-		{
+
+		if (tInfo.isRNS()) {
 			target.mkdir();
-			
-			for (RNSPath entry : source.listContents())
-			{
-				doCopy(progressListener, entry, target.lookup(
-					entry.getName(), RNSPathQueryFlags.MUST_NOT_EXIST));
+
+			for (RNSPath entry : source.listContents()) {
+				doCopy(progressListener, entry, target.lookup(entry.getName(), RNSPathQueryFlags.MUST_NOT_EXIST));
 			}
-		} else if (tInfo.isByteIO())
-		{
-			progressListener.updateSubTitle(String.format(
-				"Copying %s", source.getName()));
+		} else if (tInfo.isByteIO()) {
+			progressListener.updateSubTitle(String.format("Copying %s", source.getName()));
 			EndpointReferenceType fileEPR = target.createNewFile();
 			InputStream in = null;
-			
-			try
-			{
+
+			try {
 				in = ByteIOStreamFactory.createInputStream(source);
 				doCopy(in, fileEPR);
-			}
-			finally
-			{
+			} finally {
 				StreamUtils.close(in);
 			}
-		} else
-		{
+		} else {
 			target.link(source.getEndpoint());
 		}
 	}
-	
-	private RNSTreeCopier(UIContext uiContext, RNSTree targetTree,
-			TreePath targetPath, OperatorSource sourceInformation)
+
+	private RNSTreeCopier(UIContext uiContext, RNSTree targetTree, TreePath targetPath, OperatorSource sourceInformation)
 	{
 		super(uiContext, targetTree, targetPath, sourceInformation);
 	}
@@ -154,104 +125,72 @@ public class RNSTreeCopier extends RNSTreeOperator
 	@Override
 	public boolean performOperation()
 	{
-		_logger.debug("RNSTreeCopier called.");
-		_uiContext.progressMonitorFactory().createMonitor(
-			_targetTree, "Copying Endpoints", "Copying endpoints.",
-			1000L, new CopierTask(), null).start();
+		if (_logger.isDebugEnabled())
+			_logger.debug("RNSTreeCopier called.");
+		_uiContext.progressMonitorFactory()
+			.createMonitor(_targetTree, "Copying Endpoints", "Copying endpoints.", 1000L, new CopierTask(), null).start();
 		return true;
 	}
-	
+
 	private class CopierTask extends AbstractTask<Integer>
 	{
 		@Override
-		public Integer execute(TaskProgressListener progressListener)
-				throws Exception
+		public Integer execute(TaskProgressListener progressListener) throws Exception
 		{
-			RNSTreeNode targetParentNode = (RNSTreeNode)_targetPath.getLastPathComponent();
-			RNSFilledInTreeObject targetParentObject = 
-				(RNSFilledInTreeObject)targetParentNode.getUserObject();
-			
-			if (_sourceInformation.isRNSSource())
-			{
-				RNSTreeOperatorSource source = (RNSTreeOperatorSource)_sourceInformation;
-				
-				for (Pair<RNSTreeNode, RNSPath> path : source.sourcePaths())
-				{
-					progressListener.updateSubTitle(String.format("Copying %s", 
-						path.second().getName()));
-					RNSPath target = getTargetPath(
-						targetParentObject.path(), path.second().getName());
-					if (target != null)
-					{
+			RNSTreeNode targetParentNode = (RNSTreeNode) _targetPath.getLastPathComponent();
+			RNSFilledInTreeObject targetParentObject = (RNSFilledInTreeObject) targetParentNode.getUserObject();
+
+			if (_sourceInformation.isRNSSource()) {
+				RNSTreeOperatorSource source = (RNSTreeOperatorSource) _sourceInformation;
+
+				for (Pair<RNSTreeNode, RNSPath> path : source.sourcePaths()) {
+					progressListener.updateSubTitle(String.format("Copying %s", path.second().getName()));
+					RNSPath target = getTargetPath(targetParentObject.path(), path.second().getName());
+					if (target != null) {
 						IContextResolver resolver = ContextManager.getResolver();
-						
-						try
-						{
-							ContextManager.setResolver(
-								new MemoryBasedContextResolver(
-									_uiContext.callingContext()));
+
+						try {
+							ContextManager.setResolver(new MemoryBasedContextResolver(_uiContext.callingContext()));
 							doCopy(progressListener, path.second(), target);
 							new RefreshWorker(_targetTree, targetParentNode).run();
-						}
-						catch (Throwable cause)
-						{
+						} catch (Throwable cause) {
 							if (wasCancelled())
 								return null;
-							
-							_logger.warn(String.format(
-								"Unable to copy source \"%s\".", 
-								path.second().pwd()), cause);
-							ErrorHandler.handleError(
-								_uiContext, _targetTree, cause);
-						}
-						finally
-						{
+
+							_logger.warn(String.format("Unable to copy source \"%s\".", path.second().pwd()), cause);
+							ErrorHandler.handleError(_uiContext, _targetTree, cause);
+						} finally {
 							ContextManager.setResolver(resolver);
 						}
 					}
 				}
-			} else
-			{
-				FilesystemOperatorSource source = (FilesystemOperatorSource)_sourceInformation;
-				
-				for (File sourceFile : source.sources())
-				{
-					progressListener.updateSubTitle(String.format("Copying %s", 
-						sourceFile.getName()));
-					RNSPath target = getTargetPath(
-						targetParentObject.path(), sourceFile.getName());
-					
-					if (target != null)
-					{
+			} else {
+				FilesystemOperatorSource source = (FilesystemOperatorSource) _sourceInformation;
+
+				for (File sourceFile : source.sources()) {
+					progressListener.updateSubTitle(String.format("Copying %s", sourceFile.getName()));
+					RNSPath target = getTargetPath(targetParentObject.path(), sourceFile.getName());
+
+					if (target != null) {
 						IContextResolver resolver = ContextManager.getResolver();
-						
-						try
-						{
-							ContextManager.setResolver(
-								new MemoryBasedContextResolver(
-									_uiContext.callingContext()));
+
+						try {
+							ContextManager.setResolver(new MemoryBasedContextResolver(_uiContext.callingContext()));
 							doCopy(progressListener, sourceFile, target);
 							new RefreshWorker(_targetTree, targetParentNode).run();
-						}
-						catch (Throwable cause)
-						{
+						} catch (Throwable cause) {
 							if (wasCancelled())
 								return null;
-							
-							_logger.warn(String.format(
-								"Unable to copy source \"%s\".", 
-								sourceFile), cause);
-							ErrorHandler.handleError(
-								_uiContext, _targetTree, cause);
-						}
-						finally
-						{
+
+							_logger.warn(String.format("Unable to copy source \"%s\".", sourceFile), cause);
+							ErrorHandler.handleError(_uiContext, _targetTree, cause);
+						} finally {
 							ContextManager.setResolver(resolver);
 						}
 					}
 				}
 			}
-			
+
 			return null;
 		}
 

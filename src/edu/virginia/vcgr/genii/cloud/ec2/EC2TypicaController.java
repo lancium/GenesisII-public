@@ -16,8 +16,8 @@ import edu.virginia.vcgr.genii.cloud.CloudController;
 import edu.virginia.vcgr.genii.cloud.VMStat;
 import edu.virginia.vcgr.genii.cloud.VMState;
 
-public class EC2TypicaController implements CloudController{
-
+public class EC2TypicaController implements CloudController
+{
 
 	private String _publicKey;
 	private String _secretKey;
@@ -31,12 +31,10 @@ public class EC2TypicaController implements CloudController{
 	private String _keyPair;
 	private int _backoff = 20;
 
+	public EC2TypicaController(String publicKey, String secretKey, String endpoint, int port, boolean https, boolean euca,
+		String keyPair)
+	{
 
-
-	public EC2TypicaController(
-			String publicKey, String secretKey,String endpoint, int port,
-			boolean https, boolean euca, String keyPair){
-		
 		_publicKey = publicKey;
 		_secretKey = secretKey;
 		_endpoint = endpoint;
@@ -45,47 +43,43 @@ public class EC2TypicaController implements CloudController{
 		_eucalyptus = euca;
 		_keyPair = keyPair;
 
-		
-		//Security (SSL) for api calls to cloud temporarily disabled
-		//Possible for replay attacks but secret key not compromised
-		//Issue with Socket factory to be resolved in the future (mts5x - 1/2011)
+		// Security (SSL) for api calls to cloud temporarily disabled
+		// Possible for replay attacks but secret key not compromised
+		// Issue with Socket factory to be resolved in the future (mts5x - 1/2011)
 		_secure = false;
-		
-		if(_eucalyptus){
+
+		if (_eucalyptus) {
 			_ec2 = new Jec2(_publicKey, _secretKey, _secure, _endpoint, _port);
 			_ec2.setResourcePrefix("/services/Eucalyptus");
-		}
-		else{
+		} else {
 			_ec2 = new Jec2(_publicKey, _secretKey, _secure, _endpoint);
 		}
 	}
 
 	@Override
-	public Collection<VMStat> spawnResources(int count) throws Exception {
-		LaunchConfiguration tConfig =
-			new LaunchConfiguration(_imageID, count, count);
-		
+	public Collection<VMStat> spawnResources(int count) throws Exception
+	{
+		LaunchConfiguration tConfig = new LaunchConfiguration(_imageID, count, count);
+
 		tConfig.setInstanceType(_type);
 		tConfig.setKeyName(_keyPair);
 		ReservationDescription tDesc;
 		tDesc = _ec2.runInstances(tConfig);
-	
+
 		int retries = 0;
-		
-		//Ensure can update state, if api call is lagging try several times
-		//then send terminate instances command to ensure no orphans
-		while (true){
-			try{
-			return this.updateState(tDesc);
-			}catch(EC2Exception e){
-				if (retries < 3){
+
+		// Ensure can update state, if api call is lagging try several times
+		// then send terminate instances command to ensure no orphans
+		while (true) {
+			try {
+				return this.updateState(tDesc);
+			} catch (EC2Exception e) {
+				if (retries < 3) {
 					retries++;
-					long sleep = (long) ((_backoff * 1000) *
-							Math.exp(.5 * retries));
+					long sleep = (long) ((_backoff * 1000) * Math.exp(.5 * retries));
 					Thread.sleep(sleep);
-				}
-				else{
-					//Need to ensure this succeeds
+				} else {
+					// Need to ensure this succeeds
 					this.killResources(tDesc);
 					throw e;
 				}
@@ -93,13 +87,13 @@ public class EC2TypicaController implements CloudController{
 		}
 	}
 
-	private Collection<VMStat> updateState(
-			ReservationDescription tDesc) throws EC2Exception{
+	private Collection<VMStat> updateState(ReservationDescription tDesc) throws EC2Exception
+	{
 
 		List<VMStat> vmList = new ArrayList<VMStat>();
 		List<String> idList = new ArrayList<String>();
 
-		for (Instance tInstance : tDesc.getInstances()){
+		for (Instance tInstance : tDesc.getInstances()) {
 			idList.add(tInstance.getInstanceId());
 		}
 
@@ -108,13 +102,13 @@ public class EC2TypicaController implements CloudController{
 
 		List<Instance> instList = new ArrayList<Instance>();
 
-		for (ReservationDescription desc : rList){
-			for (Instance tInstance : desc.getInstances()){
-				instList.add(tInstance);	
+		for (ReservationDescription desc : rList) {
+			for (Instance tInstance : desc.getInstances()) {
+				instList.add(tInstance);
 			}
 		}
 
-		for (Instance tInstance : instList){
+		for (Instance tInstance : instList) {
 			VMStat tStat = new VMStat();
 			this.getVMData(tInstance, tStat);
 			vmList.add(tStat);
@@ -123,54 +117,56 @@ public class EC2TypicaController implements CloudController{
 		return vmList;
 	}
 
-	private void getVMData(Instance inst, VMStat vm){
+	private void getVMData(Instance inst, VMStat vm)
+	{
 		vm.setHost(inst.getDnsName());
 		vm.setID(inst.getInstanceId());
 		vm.setState(parseState(inst.getState()));
 	}
 
-
-	//Add more states later
-	private VMState parseState(String state){
+	// Add more states later
+	private VMState parseState(String state)
+	{
 
 		if (state.equals("pending"))
-			return VMState.PENDING;			
+			return VMState.PENDING;
 		else if (state.equals("shutting-down"))
 			return VMState.TERMINATING;
 		else if (state.equals("running"))
 			return VMState.RUNNING;
 
-
 		return VMState.PENDING;
 	}
 
 	@Override
-	//Work on this make sure reliable? (persistent with exponential backoff?
-	public boolean killResources(Collection<VMStat> vms) throws Exception {
+	// Work on this make sure reliable? (persistent with exponential backoff?
+	public boolean killResources(Collection<VMStat> vms) throws Exception
+	{
 		List<String> idList = new ArrayList<String>();
-		for (VMStat tStat : vms){
+		for (VMStat tStat : vms) {
 			idList.add(tStat.getID());
 		}
 
-		try{
+		try {
 			_ec2.terminateInstances(idList);
-		}catch(Exception ex){
-			//More fine tuned catching of exceptions
+		} catch (Exception ex) {
+			// More fine tuned catching of exceptions
 			return true;
 		}
 
 		return false;
 	}
-	
-	private boolean killResources(ReservationDescription tDesc) throws Exception{
+
+	private boolean killResources(ReservationDescription tDesc) throws Exception
+	{
 		List<String> idList = new ArrayList<String>();
-		for (Instance t : tDesc.getInstances()){
+		for (Instance t : tDesc.getInstances()) {
 			idList.add(t.getInstanceId());
 		}
 
-		try{
+		try {
 			_ec2.terminateInstances(idList);
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			return true;
 		}
 
@@ -178,85 +174,96 @@ public class EC2TypicaController implements CloudController{
 	}
 
 	@Override
-	public boolean updateState(VMStat vm) throws Exception {
+	public boolean updateState(VMStat vm) throws Exception
+	{
 		String[] idArray = new String[1];
 		idArray[0] = vm.getID();
 
 		List<ReservationDescription> rList;
 		rList = _ec2.describeInstances(idArray);
 
-		if (rList.size() > 0){
-			if (rList.get(0).getInstances().size() > 0){
+		if (rList.size() > 0) {
+			if (rList.get(0).getInstances().size() > 0) {
 				this.getVMData(rList.get(0).getInstances().get(0), vm);
 				return true;
 			}
 		}
 		return false;
 
-
 	}
 
 	@Override
-	public boolean updateState(Collection<VMStat> vms) throws Exception {
+	public boolean updateState(Collection<VMStat> vms) throws Exception
+	{
 		List<String> idList = new ArrayList<String>();
 
-		for (VMStat vm : vms){
+		for (VMStat vm : vms) {
 			idList.add(vm.getID());
 		}
 
 		List<ReservationDescription> rList;
 
-		if (idList.size() > 0){
+		if (idList.size() > 0) {
 			rList = _ec2.describeInstances(idList);
 
 			List<Instance> instList = new ArrayList<Instance>();
 
-			for (ReservationDescription desc : rList){
-				for (Instance tInstance : desc.getInstances()){
-					instList.add(tInstance);	
+			for (ReservationDescription desc : rList) {
+				for (Instance tInstance : desc.getInstances()) {
+					instList.add(tInstance);
 				}
 			}
 
 			VMStat tStat;
 			HashMap<String, VMStat> vmMap = this.buildMap(vms);
 
-			for (Instance tInstance : instList){
+			for (Instance tInstance : instList) {
 				tStat = vmMap.get(tInstance.getInstanceId());
-				if (tStat != null){
+				if (tStat != null) {
 					this.getVMData(tInstance, tStat);
 				}
 			}
 		}
 
-		//Add checks to ensure success
+		// Add checks to ensure success
 		return true;
 	}
 
-	private HashMap<String, VMStat> buildMap(Collection<VMStat> vms){
+	private HashMap<String, VMStat> buildMap(Collection<VMStat> vms)
+	{
 		HashMap<String, VMStat> vmMap = new HashMap<String, VMStat>();
 
-		for (VMStat vm : vms){
+		for (VMStat vm : vms) {
 			vmMap.put(vm.getID(), vm);
 		}
 
 		return vmMap;
 	}
 
-
-	public String get_imageID() {
+	public String get_imageID()
+	{
 		return _imageID;
 	}
 
-	public void set_imageID(String _imageID) {
+	public void set_imageID(String _imageID)
+	{
 		this._imageID = _imageID;
 	}
 
-	public void chooseInstanceType(int size){
-		switch(size){
-		case 1: _type = InstanceType.MEDIUM_HCPU;break;
-		case 2: _type = InstanceType.LARGE;break;
-		case 3: _type = InstanceType.XLARGE;break;
-		default: break;
+	public void chooseInstanceType(int size)
+	{
+		switch (size) {
+			case 1:
+				_type = InstanceType.MEDIUM_HCPU;
+				break;
+			case 2:
+				_type = InstanceType.LARGE;
+				break;
+			case 3:
+				_type = InstanceType.XLARGE;
+				break;
+			default:
+				break;
 		}
 	}
 

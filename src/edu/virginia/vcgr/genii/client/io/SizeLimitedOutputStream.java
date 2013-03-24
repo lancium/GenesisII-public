@@ -5,20 +5,20 @@ import java.io.OutputStream;
 
 public class SizeLimitedOutputStream extends OutputStream
 {
-	private byte []_storage;
+	private byte[] _storage;
 	private int _next;
-	
+
 	public SizeLimitedOutputStream(int size)
 	{
 		_storage = new byte[size];
 		_next = 0;
 	}
-	
+
 	@Override
 	public void write(int b) throws IOException
 	{
-		byte []data = new byte[1];
-		data[0] = (byte)b;
+		byte[] data = new byte[1];
+		data[0] = (byte) b;
 		write(data);
 	}
 
@@ -36,14 +36,14 @@ public class SizeLimitedOutputStream extends OutputStream
 	{
 		write(b, 0, b.length);
 	}
-	
+
 	final public byte[] toArray()
 	{
-		byte []ret = new byte[_next];
+		byte[] ret = new byte[_next];
 		System.arraycopy(_storage, 0, ret, 0, _next);
 		return ret;
 	}
-	
+
 	final public boolean isFull()
 	{
 		return _next >= _storage.length;

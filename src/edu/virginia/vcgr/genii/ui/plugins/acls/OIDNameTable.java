@@ -9,12 +9,13 @@ import javax.swing.table.TableCellEditor;
 class OIDNameTable extends JTable
 {
 	static final long serialVersionUID = 0L;
-	
+
 	OIDNameTable()
 	{
 		super(new OIDNameTableModel());
 
-		addFocusListener(new FocusAdapter() {
+		addFocusListener(new FocusAdapter()
+		{
 
 			@Override
 			public void focusLost(FocusEvent e)

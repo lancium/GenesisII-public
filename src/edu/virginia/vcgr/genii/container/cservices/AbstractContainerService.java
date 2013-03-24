@@ -14,37 +14,37 @@ public abstract class AbstractContainerService implements ContainerService
 	private ExecutorService _executor = null;
 	private DatabaseConnectionPool _connectionPool = null;
 	private ContainerServicesProperties _cservicesProperties = null;
-	
+
 	protected AbstractContainerService(String serviceName)
 	{
 		_serviceName = serviceName;
 	}
-	
+
 	protected ExecutorService getExecutor()
 	{
 		return _executor;
 	}
-	
+
 	protected DatabaseConnectionPool getConnectionPool()
 	{
 		return _connectionPool;
 	}
-	
+
 	protected abstract void startService() throws Throwable;
+
 	protected abstract void loadService() throws Throwable;
-	
+
 	@Override
-	final synchronized public void load(ExecutorService executor,
-		DatabaseConnectionPool connectionPool,
+	final synchronized public void load(ExecutorService executor, DatabaseConnectionPool connectionPool,
 		ContainerServicesProperties cservicesProperties) throws Throwable
 	{
 		_executor = executor;
 		_connectionPool = connectionPool;
 		_cservicesProperties = cservicesProperties;
-		
+
 		loadService();
 	}
-	
+
 	@Override
 	public void setProperties(Properties properties)
 	{
@@ -61,12 +61,11 @@ public abstract class AbstractContainerService implements ContainerService
 	final synchronized public void start() throws Throwable
 	{
 		if (_connectionPool == null)
-			throw new ConfigurationException("Attempt to start service \"" +
-				_serviceName + "\" without datbase connection pool.");
+			throw new ConfigurationException("Attempt to start service \"" + _serviceName
+				+ "\" without datbase connection pool.");
 		if (_started)
-			throw new ConfigurationException("Service \"" + _serviceName +
-				"\" has already been started.");
-		
+			throw new ConfigurationException("Service \"" + _serviceName + "\" has already been started.");
+
 		startService();
 	}
 
@@ -75,7 +74,7 @@ public abstract class AbstractContainerService implements ContainerService
 	{
 		return _started;
 	}
-	
+
 	@Override
 	public ContainerServicesProperties getContainerServicesProperties()
 	{

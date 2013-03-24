@@ -12,19 +12,18 @@ public class GuiYesNoDialog implements YesNoDialog
 	private boolean _isYes;
 
 	private TextContent _help;
-	
+
 	private String _prompt;
 	private String _title;
-	
-	public GuiYesNoDialog(
-		String title, String prompt)
+
+	public GuiYesNoDialog(String title, String prompt)
 	{
 		_title = title;
 		_prompt = prompt;
-		
+
 		_help = null;
 	}
-	
+
 	@Override
 	public boolean isNo()
 	{
@@ -52,11 +51,10 @@ public class GuiYesNoDialog implements YesNoDialog
 	@Override
 	public void showDialog() throws DialogException, UserCancelException
 	{
-		int result = JOptionPane.showConfirmDialog(null, _prompt, _title,
-			JOptionPane.YES_NO_CANCEL_OPTION);
+		int result = JOptionPane.showConfirmDialog(null, _prompt, _title, JOptionPane.YES_NO_CANCEL_OPTION);
 		if (result == JOptionPane.CANCEL_OPTION)
 			throw new UserCancelException();
-		
+
 		_isYes = (result == JOptionPane.YES_OPTION);
 	}
 }

@@ -11,13 +11,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 class Version1Configuration
 {
 	@XmlElement(name = "variable", nillable = true, required = false)
-	private Collection<Version1Variable> _variables =
-		new LinkedList<Version1Variable>();
-	
+	private Collection<Version1Variable> _variables = new LinkedList<Version1Variable>();
+
 	@XmlElement(name = "container-service", nillable = true, required = false)
-	private Collection<Version1ContainerService> _services =
-		new LinkedList<Version1ContainerService>();
-	
+	private Collection<Version1ContainerService> _services = new LinkedList<Version1ContainerService>();
+
 	final Properties variables()
 	{
 		Properties ret = new Properties();
@@ -26,7 +24,7 @@ class Version1Configuration
 
 		return ret;
 	}
-	
+
 	final Collection<Version1ContainerService> services()
 	{
 		return _services;

@@ -11,17 +11,15 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.common.HistoryEventBundleType;
 import edu.virginia.vcgr.genii.container.cservices.history.CloseableIterator;
 
-class CloseableIteratorHistoryEventWrapper
-	implements CloseableIterator<MessageElement>
+class CloseableIteratorHistoryEventWrapper implements CloseableIterator<MessageElement>
 {
 	private CloseableIterator<HistoryEvent> _rootIter;
-	
-	CloseableIteratorHistoryEventWrapper(
-		CloseableIterator<HistoryEvent> rootIter)
+
+	CloseableIteratorHistoryEventWrapper(CloseableIterator<HistoryEvent> rootIter)
 	{
 		_rootIter = rootIter;
 	}
-	
+
 	@Override
 	final public void close() throws IOException
 	{
@@ -37,18 +35,12 @@ class CloseableIteratorHistoryEventWrapper
 	@Override
 	final public MessageElement next()
 	{
-		try
-		{
+		try {
 			HistoryEvent event = _rootIter.next();
-			byte []data = DBSerializer.serialize(event, -1L);
-			return new MessageElement(
-				new QName("http://tempuri.org", "data"),
-				new HistoryEventBundleType(data));
-		}
-		catch (IOException ioe)
-		{
-			throw new RuntimeException(
-				"Unable to serialize history event.", ioe);
+			byte[] data = DBSerializer.serialize(event, -1L);
+			return new MessageElement(new QName("http://tempuri.org", "data"), new HistoryEventBundleType(data));
+		} catch (IOException ioe) {
+			throw new RuntimeException("Unable to serialize history event.", ioe);
 		}
 	}
 

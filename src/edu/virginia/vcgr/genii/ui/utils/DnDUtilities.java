@@ -10,18 +10,18 @@ public class DnDUtilities
 			builder.append("|");
 		builder.append(str);
 	}
-	
-	static public String printActions(int actions) 
+
+	static public String printActions(int actions)
 	{
 		StringBuilder builder = new StringBuilder();
-		
+
 		if ((actions & TransferHandler.COPY) > 0x0)
 			addActionString(builder, "COPY");
 		if ((actions & TransferHandler.MOVE) > 0x0)
 			addActionString(builder, "MOVE");
 		if ((actions & TransferHandler.LINK) > 0x0)
 			addActionString(builder, "LINK");
-		
+
 		return builder.toString();
 	}
 }

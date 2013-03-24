@@ -4,6 +4,5 @@ import org.w3c.dom.Element;
 
 public interface ExternalApplicationFactory
 {
-	public ExternalApplication createApplication(
-		Element configuration);
+	public ExternalApplication createApplication(Element configuration);
 }

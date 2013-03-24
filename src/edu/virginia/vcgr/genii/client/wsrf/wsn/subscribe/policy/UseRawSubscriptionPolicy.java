@@ -8,7 +8,7 @@ import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 public class UseRawSubscriptionPolicy extends AbstractSubscriptionPolicy
 {
 	static final long serialVersionUID = 0L;
-	
+
 	public UseRawSubscriptionPolicy()
 	{
 		super(SubscriptionPolicyTypes.UseRawPolicy);

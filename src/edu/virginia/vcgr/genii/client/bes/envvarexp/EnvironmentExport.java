@@ -21,41 +21,36 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(namespace = EnvironmentVariableExportConstants.NAMESPACE,
-	name = "environment-export")
+@XmlRootElement(namespace = EnvironmentVariableExportConstants.NAMESPACE, name = "environment-export")
 public class EnvironmentExport
 {
 	static private EnvironmentExport CONTAINER_EXPORT = null;
-	
+
 	private EnvironmentExport _parent = null;
-	
-	private Map<String, EnvironmentVariableExport> _variables =
-		new HashMap<String, EnvironmentVariableExport>();
-	
-	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE,
-		name = "environment-variable", required = false, nillable = false)
-	private void setEnvironmentVariables(
-		EnvironmentVariableExport []variables)
+
+	private Map<String, EnvironmentVariableExport> _variables = new HashMap<String, EnvironmentVariableExport>();
+
+	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE, name = "environment-variable", required = false, nillable = false)
+	private void setEnvironmentVariables(EnvironmentVariableExport[] variables)
 	{
 		_variables.clear();
-		
-		if (variables != null)
-		{
+
+		if (variables != null) {
 			for (EnvironmentVariableExport variable : variables)
 				_variables.put(variable.variableName(), variable);
 		}
 	}
-	
+
 	private EnvironmentExport()
 	{
 		// For JAXB Only.
 	}
-	
+
 	private void setParent(EnvironmentExport parent)
 	{
 		_parent = parent;
 	}
-	
+
 	final public Set<String> keySet()
 	{
 		Set<String> ret = new HashSet<String>();
@@ -64,54 +59,46 @@ public class EnvironmentExport
 		ret.addAll(_variables.keySet());
 		return ret;
 	}
-	
+
 	final public String value(String variableName)
 	{
 		EnvironmentVariableExport variable = _variables.get(variableName);
 		if (variable != null)
 			return variable.value();
-		
+
 		if (_parent != null)
 			return _parent.value(variableName);
-		
+
 		return null;
 	}
-	
+
 	synchronized static private EnvironmentExport containerExport()
 	{
-		try
-		{
-			if (CONTAINER_EXPORT == null)
-			{
-				File file = Installation.getDeployment(
-					new DeploymentName()).getConfigurationFile(
-						EnvironmentVariableExportConstants.GLOBAL_CONFIG_FILE_NAME);
-				if (file.exists())
-				{
-					JAXBContext context = JAXBContext.newInstance(
-						EnvironmentExport.class);
+		try {
+			if (CONTAINER_EXPORT == null) {
+				File file = Installation.getDeployment(new DeploymentName()).getConfigurationFile(
+					EnvironmentVariableExportConstants.GLOBAL_CONFIG_FILE_NAME);
+				if (file.exists()) {
+					JAXBContext context = JAXBContext.newInstance(EnvironmentExport.class);
 					Unmarshaller u = context.createUnmarshaller();
-					
-					CONTAINER_EXPORT = (EnvironmentExport)(u.unmarshal(file));
+
+					CONTAINER_EXPORT = (EnvironmentExport) (u.unmarshal(file));
 				} else
 					CONTAINER_EXPORT = new EnvironmentExport();
 			}
-			
+
 			return CONTAINER_EXPORT;
-		}
-		catch (JAXBException e)
-		{
-			throw new ConfigurationException(
-				"Unable to deserialize environment export.", e);
+		} catch (JAXBException e) {
+			throw new ConfigurationException("Unable to deserialize environment export.", e);
 		}
 	}
-	
+
 	static public EnvironmentExport besExport(BESConstructionParameters besConsParms)
 	{
 		EnvironmentExport besExport = besConsParms.environmentExport();
 		if (besExport == null)
 			return containerExport();
-		
+
 		EnvironmentExport ret = new EnvironmentExport();
 		ret._variables.putAll(besExport._variables);
 		ret.setParent(containerExport());

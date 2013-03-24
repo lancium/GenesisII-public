@@ -12,12 +12,12 @@ public class RootRNSFork extends CommonRootRNSFork
 	{
 		super(service, forkPath);
 	}
-	
+
 	@Override
 	protected void addEntries(Map<String, ResourceForkInformation> entries)
 	{
 		super.addEntries(entries);
-		
+
 		addDefaultEntry("resources", ResourcesRNSFork.class);
 		addDefaultEntry("resource-management", ResourceManagementRNSFork.class);
 		addDefaultEntry("jobs", JobsRNSFork.class);

@@ -8,7 +8,8 @@ public interface AppendResolver
 	/**
 	 * Append a bunch of bytes to the end of a ByteIO.
 	 * 
-	 * @param source The source of the bytes to append.
+	 * @param source
+	 *            The source of the bytes to append.
 	 * 
 	 * @throws IOException
 	 */

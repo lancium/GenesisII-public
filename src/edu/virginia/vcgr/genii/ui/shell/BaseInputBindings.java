@@ -6,22 +6,19 @@ import java.util.LinkedList;
 
 public class BaseInputBindings implements InputBindings
 {
-	private Collection<BindingActionListener> _listeners =
-		new LinkedList<BindingActionListener>();
+	private Collection<BindingActionListener> _listeners = new LinkedList<BindingActionListener>();
 
 	final private BindingActionListener[] getListeners()
 	{
-		BindingActionListener []listeners;
-		
-		synchronized(_listeners)
-		{
-			listeners = _listeners.toArray(
-				new BindingActionListener[_listeners.size()]);
+		BindingActionListener[] listeners;
+
+		synchronized (_listeners) {
+			listeners = _listeners.toArray(new BindingActionListener[_listeners.size()]);
 		}
-		
+
 		return listeners;
 	}
-	
+
 	final protected void fireBeep()
 	{
 		for (BindingActionListener listener : getListeners())
@@ -93,13 +90,13 @@ public class BaseInputBindings implements InputBindings
 		for (BindingActionListener listener : getListeners())
 			listener.enter();
 	}
-	
+
 	final protected void fireSearch()
 	{
 		for (BindingActionListener listener : getListeners())
 			listener.search();
 	}
-	
+
 	final protected void fireStopSearch()
 	{
 		for (BindingActionListener listener : getListeners())
@@ -108,24 +105,23 @@ public class BaseInputBindings implements InputBindings
 
 	protected void keyPressed(int keyCode, KeyEvent e)
 	{
-		
+
 	}
-	
+
 	protected void keyReleased(int keyCode, KeyEvent e)
 	{
-		
+
 	}
-	
+
 	protected void keyTyped(char keyChar, KeyEvent e)
 	{
-		
+
 	}
-	
+
 	@Override
 	final public void addBindingActionListener(BindingActionListener listener)
 	{
-		synchronized(_listeners)
-		{
+		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
@@ -133,8 +129,7 @@ public class BaseInputBindings implements InputBindings
 	@Override
 	final public void removeBindingActionListener(BindingActionListener listener)
 	{
-		synchronized(_listeners)
-		{
+		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}

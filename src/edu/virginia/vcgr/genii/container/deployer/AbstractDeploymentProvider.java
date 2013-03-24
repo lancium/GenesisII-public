@@ -32,147 +32,109 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 public abstract class AbstractDeploymentProvider implements IDeployerProvider
 {
 	protected EndpointReferenceType _deploymentDescriptionEPR;
-	
+
 	private DeploySnapshot _snapshot = null;
 
 	protected AbstractDeploymentProvider(EndpointReferenceType depDescEPR)
 	{
 		_deploymentDescriptionEPR = depDescEPR;
 	}
-	
-	public DeploySnapshot getSnapshot()
-		throws DeploymentException
+
+	public DeploySnapshot getSnapshot() throws DeploymentException
 	{
-		synchronized(this)
-		{
+		synchronized (this) {
 			if (_snapshot == null)
 				_snapshot = figureOutSnapshot();
 		}
-		
+
 		return _snapshot;
 	}
-	
-	static private EndpointReferenceType getSourceEndpoint(
-		SourceElementType source) throws DeploymentException
+
+	static private EndpointReferenceType getSourceEndpoint(SourceElementType source) throws DeploymentException
 	{
-		MessageElement []sourceElements = source.get_any();
+		MessageElement[] sourceElements = source.get_any();
 		if (sourceElements == null || sourceElements.length != 1)
 			throw new DeploymentException("Invalid source element found.");
-		
+
 		QName name = sourceElements[0].getQName();
 		if (name.equals(ApplicationDescriptionUtils.RNS_FILE_SOURCE_NAME))
 			return getSourceEndpoint(sourceElements[0].getValue());
-		else if (name.equals(ApplicationDescriptionUtils.REMOTE_ENDPOINT_NAME))
-		{
-			try
-			{
-				return ObjectDeserializer.toObject(
-					sourceElements[0], EndpointReferenceType.class);
-			}
-			catch (ResourceException re)
-			{
+		else if (name.equals(ApplicationDescriptionUtils.REMOTE_ENDPOINT_NAME)) {
+			try {
+				return ObjectDeserializer.toObject(sourceElements[0], EndpointReferenceType.class);
+			} catch (ResourceException re) {
 				throw new DeploymentException("Unable to get source.", re);
 			}
-		}
-		else
+		} else
 			throw new DeploymentException("Invalid source element found.");
 	}
-	
-	static private EndpointReferenceType getSourceEndpoint(String rnsPath)
-		throws DeploymentException
+
+	static private EndpointReferenceType getSourceEndpoint(String rnsPath) throws DeploymentException
 	{
-		try
-		{
-			RNSPath path = RNSPath.getCurrent().lookup(
-				rnsPath, RNSPathQueryFlags.MUST_EXIST);
+		try {
+			RNSPath path = RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST);
 			return path.getEndpoint();
-		}
-		catch (RNSException rne)
-		{
-			throw new DeploymentException(
-				"Unable to lookup deployment path.", rne);
+		} catch (RNSException rne) {
+			throw new DeploymentException("Unable to lookup deployment path.", rne);
 		}
 	}
-	
-	static protected DeployFacet getDeployFacet(SourceElementType source)
-		throws DeploymentException
+
+	static protected DeployFacet getDeployFacet(SourceElementType source) throws DeploymentException
 	{
 		EndpointReferenceType endpoint = getSourceEndpoint(source);
-		return new DeployFacet(
-			new WSName(endpoint).getEndpointIdentifier().toString(),
-			getModificationTime(endpoint));
+		return new DeployFacet(new WSName(endpoint).getEndpointIdentifier().toString(), getModificationTime(endpoint));
 	}
-	
-	static protected InputStream openSource(SourceElementType source)
-		throws DeploymentException, IOException
+
+	static protected InputStream openSource(SourceElementType source) throws DeploymentException, IOException
 	{
 		EndpointReferenceType epr = getSourceEndpoint(source);
 		return ByteIOStreamFactory.createInputStream(epr);
 	}
-	
-	static protected void downloadFile(SourceElementType source, File target,
-		boolean makeReadOnly, boolean makeExecutable)
+
+	static protected void downloadFile(SourceElementType source, File target, boolean makeReadOnly, boolean makeExecutable)
 		throws DeploymentException
 	{
 		InputStream in = null;
 		OutputStream out = null;
-		
-		try
-		{
-			try
-			{
+
+		try {
+			try {
 				in = openSource(source);
 				out = new FileOutputStream(target);
 				StreamUtils.copyStream(in, out);
 				out.flush();
-			}
-			finally
-			{
+			} finally {
 				StreamUtils.close(in);
 				StreamUtils.close(out);
 			}
-			
+
 			if (makeReadOnly)
 				target.setReadOnly();
 			if (makeExecutable)
 				FileSystemUtils.makeExecutable(target);
-		}
-		catch (IOException ioe)
-		{
-			throw new DeploymentException("Unable to deploy component to "
-				+ target, ioe);
+		} catch (IOException ioe) {
+			throw new DeploymentException("Unable to deploy component to " + target, ioe);
 		}
 	}
-	
-	static protected DeployFacet getDeploymentDescriptionFacet(
-		EndpointReferenceType depDescEPR)
-		throws DeploymentException
+
+	static protected DeployFacet getDeploymentDescriptionFacet(EndpointReferenceType depDescEPR) throws DeploymentException
 	{
-		String deployID = new WSName(
-			depDescEPR).getEndpointIdentifier().toString();
-		return new DeployFacet(
-			deployID, getModificationTime(depDescEPR));
+		String deployID = new WSName(depDescEPR).getEndpointIdentifier().toString();
+		return new DeployFacet(deployID, getModificationTime(depDescEPR));
 	}
-	
-	static private Timestamp getModificationTime(
-		EndpointReferenceType target) throws DeploymentException
+
+	static private Timestamp getModificationTime(EndpointReferenceType target) throws DeploymentException
 	{
-		try
-		{
-			RandomByteIORP rp = 
-				(RandomByteIORP)ResourcePropertyManager.createRPInterface(
-					target, RandomByteIORP.class);
-			
+		try {
+			RandomByteIORP rp = (RandomByteIORP) ResourcePropertyManager.createRPInterface(target, RandomByteIORP.class);
+
 			Calendar modTime = rp.getModificationTime();
-			
+
 			return new Timestamp(modTime.getTime().getTime());
-		}
-		catch (ResourcePropertyException re)
-		{
+		} catch (ResourcePropertyException re) {
 			throw new DeploymentException("Can't get source attributes.", re);
 		}
 	}
-	
-	protected abstract DeploySnapshot figureOutSnapshot()
-		throws DeploymentException;
+
+	protected abstract DeploySnapshot figureOutSnapshot() throws DeploymentException;
 }

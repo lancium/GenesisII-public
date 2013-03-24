@@ -8,11 +8,10 @@ class XMLEventFilter
 {
 	private XMLEventReader _reader;
 	private XMLEvent _nextEvent = null;
-	
+
 	static private boolean isGoodEvent(XMLEvent event)
 	{
-		if (event.isCharacters())
-		{
+		if (event.isCharacters()) {
 			String data = event.asCharacters().getData().trim();
 			if (data.length() != 0)
 				return true;
@@ -20,40 +19,37 @@ class XMLEventFilter
 			return true;
 		else if (event.isEndElement())
 			return true;
-		
+
 		return false;
 	}
-	
-	XMLEventFilter(XMLEventReader reader)
-		throws XMLStreamException
+
+	XMLEventFilter(XMLEventReader reader) throws XMLStreamException
 	{
 		_reader = reader;
-		
-		while (_reader.hasNext())
-		{
+
+		while (_reader.hasNext()) {
 			_nextEvent = _reader.nextEvent();
 			if (isGoodEvent(_nextEvent))
 				return;
 		}
-		
+
 		_nextEvent = null;
 	}
-	
+
 	public XMLEvent next() throws XMLStreamException
 	{
 		XMLEvent ret = _nextEvent;
-		
-		while(_reader.hasNext())
-		{
+
+		while (_reader.hasNext()) {
 			_nextEvent = _reader.nextEvent();
 			if (isGoodEvent(_nextEvent))
 				return ret;
 		}
-		
+
 		_nextEvent = null;
 		return ret;
 	}
-	
+
 	public XMLEvent peek()
 	{
 		return _nextEvent;

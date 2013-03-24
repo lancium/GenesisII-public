@@ -19,19 +19,26 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
-import java.text.*;
-import java.util.*;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
-import org.apache.axis.types.URI;
-
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.InitialDirContext;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 
+import org.apache.axis.AxisFault;
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
@@ -39,19 +46,38 @@ import org.apache.ws.security.components.crypto.CredentialException;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
-
-import org.ggf.rns.*;
+import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.ggf.rns.LookupResponseType;
+import org.ggf.rns.MetadataMappingType;
+import org.ggf.rns.NameMappingType;
+import org.ggf.rns.RNSEntryExistsFaultType;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
+import org.ggf.rns.ReadNotPermittedFaultType;
+import org.ggf.rns.WriteNotPermittedFaultType;
+import org.morgan.util.configuration.ConfigurationException;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.DelegateToType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.LifetimeType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestSecurityTokenResponseType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestSecurityTokenType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestTypeEnum;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestTypeOpenEnum;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestedProofTokenType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestedSecurityTokenType;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultType;
+import org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
-import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
-import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
@@ -60,46 +86,33 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
-import edu.virginia.vcgr.genii.client.security.*;
-import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
-import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
-import edu.virginia.vcgr.genii.client.context.ContextManager;
-import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
-import edu.virginia.vcgr.genii.client.security.x509.CertTool;
-import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
-import edu.virginia.vcgr.genii.container.Container;
-
-import edu.virginia.vcgr.genii.jndiauthn.*;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
+import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
+import edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnPortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
-import edu.virginia.vcgr.genii.security.WSSecurityUtils;
-import edu.virginia.vcgr.genii.security.credentials.assertions.*;
-import edu.virginia.vcgr.genii.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.security.XMLCompatible;
+import edu.virginia.vcgr.genii.security.axis.AxisSAMLCredentials;
+import edu.virginia.vcgr.genii.security.axis.WSSecurityUtils;
+import edu.virginia.vcgr.genii.security.axis.XMLConverter;
+import edu.virginia.vcgr.genii.security.credentials.BasicConstraints;
+import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
+import edu.virginia.vcgr.genii.security.identity.IdentityType;
+import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.security.x509.CertCreationSpec;
+import edu.virginia.vcgr.genii.security.x509.CertTool;
+import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
-import org.oasis_open.docs.ws_sx.ws_trust._200512.*;
-import org.oasis_open.wsrf.basefaults.BaseFaultType;
-import org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType;
-import org.ws.addressing.EndpointReferenceType;
-
-import org.apache.axis.AxisFault;
-import org.bouncycastle.asn1.DERObjectIdentifier;
-
-import org.morgan.util.configuration.ConfigurationException;
-
-@GeniiServiceConfiguration(
-	resourceProvider=JNDIResourceProvider.class,
-	defaultAuthZProvider=JNDIAuthZProvider.class)
-public class JNDIAuthnServiceImpl extends GenesisIIBase implements
-		JNDIAuthnPortType, EnhancedRNSPortType
+@GeniiServiceConfiguration(resourceProvider = JNDIResourceProvider.class, defaultAuthZProvider = JNDIAuthZProvider.class)
+public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPortType, EnhancedRNSPortType
 {
 
 	static private Log _logger = LogFactory.getLog(JNDIAuthnServiceImpl.class);
 
 	public JNDIAuthnServiceImpl() throws RemoteException
 	{
-		this(WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE.getQName()
-				.getLocalPart());
+		this(WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE.getQName().getLocalPart());
 	}
 
 	protected JNDIAuthnServiceImpl(String serviceName) throws RemoteException
@@ -108,65 +121,50 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 
 	}
 
-	
-	public String getMasterType(ResourceKey rKey)
-	throws ResourceException, ResourceUnknownFaultType
+	public String getMasterType(ResourceKey rKey) throws ResourceException, ResourceUnknownFaultType
 	{
-		
-		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource)))
-		{
+
+		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource))) {
 			// JNDIAuthnPortType
 			return new String("JNDIAuthnPortType");
 		}
 
 		IJNDIResource serviceResource = (IJNDIResource) rKey.dereference();
 
-		if (serviceResource.isServiceResource())
-		{
+		if (serviceResource.isServiceResource()) {
 			// JNDIAuthnPortType
 			return new String("JNDIAuthnPortType");
-		}
-		else if (serviceResource.isIdpResource())
-		{
+		} else if (serviceResource.isIdpResource()) {
 			// individual IDP resource
 			return new String("IndividualIDPResource");
 		}
 
 		// STS for a JNDI directory resource
 		return new String("STSForJNDIAuthnPortType");
-				
+
 	}
-	
+
 	/**
 	 * Return different implemented port types depending on who we are
 	 */
-	public PortType[] getImplementedPortTypes(ResourceKey rKey)
-			throws ResourceException, ResourceUnknownFaultType
+	public PortType[] getImplementedPortTypes(ResourceKey rKey) throws ResourceException, ResourceUnknownFaultType
 	{
 
-		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource)))
-		{
+		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource))) {
 			// JNDIAuthnPortType
-			PortType[] response = {
-					WellKnownPortTypes.RNS_PORT_TYPE,
-					WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE };
+			PortType[] response = { WellKnownPortTypes.RNS_PORT_TYPE, WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE };
 
 			return response;
 		}
 
 		IJNDIResource serviceResource = (IJNDIResource) rKey.dereference();
 
-		if (serviceResource.isServiceResource())
-		{
+		if (serviceResource.isServiceResource()) {
 			// JNDIAuthnPortType
-			PortType[] response = {
-					WellKnownPortTypes.RNS_PORT_TYPE,
-					WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE };
+			PortType[] response = { WellKnownPortTypes.RNS_PORT_TYPE, WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE };
 
 			return response;
-		}
-		else if (serviceResource.isIdpResource())
-		{
+		} else if (serviceResource.isIdpResource()) {
 			// individual IDP resource
 			PortType[] response = { WellKnownPortTypes.STS_SERVICE_PORT_TYPE, };
 
@@ -174,10 +172,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		}
 
 		// STS for a JNDI directory resource
-		PortType[] response = {
-				WellKnownPortTypes.STS_SERVICE_PORT_TYPE,
-				WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE,
-				WellKnownPortTypes.RNS_PORT_TYPE, };
+		PortType[] response = { WellKnownPortTypes.STS_SERVICE_PORT_TYPE, WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE,
+			WellKnownPortTypes.RNS_PORT_TYPE, };
 
 		return response;
 	}
@@ -188,104 +184,79 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	}
 
 	/**
-	 * Quick test for overriding classes to implement should they desire to
-	 * disable resource creation on this endpoint
+	 * Quick test for overriding classes to implement should they desire to disable resource
+	 * creation on this endpoint
 	 * 
 	 * @return false.
 	 */
-	protected boolean allowVcgrCreate() throws ResourceException,
-			ResourceUnknownFaultType
+	protected boolean allowVcgrCreate() throws ResourceException, ResourceUnknownFaultType
 	{
 		ResourceKey serviceKey = ResourceManager.getCurrentResource();
-		IJNDIResource serviceResource =
-				(IJNDIResource) serviceKey.dereference();
+		IJNDIResource serviceResource = (IJNDIResource) serviceKey.dereference();
 
 		// only allow remote creation on the JNDIAuthnPortType endpoint resource
-		if (!serviceResource.isServiceResource())
-		{
+		if (!serviceResource.isServiceResource()) {
 			return false;
 		}
 
 		return true;
 	}
 
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters,
-		Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
+		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParams)
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 
 		ResourceKey myKey = ResourceManager.getCurrentResource();
 		IJNDIResource myResource = (IJNDIResource) myKey.dereference();
-		if (!myResource.isServiceResource())
-		{
+		if (!myResource.isServiceResource()) {
 			// we're an STS resource creating directory entries
-			super.postCreate(rKey, newEPR, cParams, constructionParameters,
-					resolverCreationParams);
+			super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 			return;
 		}
 
 		// we're the service resource creating STS entries
 
 		// make sure the specific STS doesn't yet exist
-		String newStsName =
-				(String) constructionParameters
-						.get(SecurityConstants.NEW_JNDI_STS_NAME_QNAME);
+		String newStsName = (String) constructionParameters.get(SecurityConstants.NEW_JNDI_STS_NAME_QNAME);
 		Collection<String> entries = myResource.listEntries(null);
-		if (entries.contains(newStsName))
-		{
-			throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(
-					null, null, null, null, null, null, newStsName));
+		if (entries.contains(newStsName)) {
+			throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(null, null, null, null, null, null, newStsName));
 		}
 
 		// add the entry to the service's list of STSs
 		myResource.addEntry(new InternalEntry(newStsName, newEPR, null));
 		myResource.commit();
 
-		super.postCreate(rKey, newEPR, cParams, constructionParameters,
-				resolverCreationParams);
+		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 	}
 
-	protected Object translateConstructionParameter(MessageElement property)
-			throws Exception
+	protected Object translateConstructionParameter(MessageElement property) throws Exception
 	{
 
 		// decodes the base64-encoded delegated assertion construction param
 		QName name = property.getQName();
-		if (name.equals(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME))
-		{
+		if (name.equals(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME)) {
 			return property.getValue();
-		}
-		else if (name.equals(SecurityConstants.NEW_JNDI_STS_HOST_QNAME))
-		{
+		} else if (name.equals(SecurityConstants.NEW_JNDI_STS_HOST_QNAME)) {
 			return property.getValue();
-		}
-		else if (name.equals(SecurityConstants.NEW_JNDI_STS_NAME_QNAME))
-		{
+		} else if (name.equals(SecurityConstants.NEW_JNDI_STS_NAME_QNAME)) {
 			return property.getValue();
-		}
-		else if (name.equals(SecurityConstants.NEW_JNDI_STS_SEARCHBASE_QNAME))
-		{
+		} else if (name.equals(SecurityConstants.NEW_JNDI_STS_SEARCHBASE_QNAME)) {
 			return property.getValue();
-		}
-		else if (name.equals(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME))
-		{
+		} else if (name.equals(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME)) {
 			return property.getValue();
-		}
-		else
-		{
+		} else {
 			return super.translateConstructionParameter(property);
 		}
 	}
 
-	protected CertCreationSpec getChildCertSpec() throws ResourceException,
-			ResourceUnknownFaultType, ConfigurationException
+	protected CertCreationSpec getChildCertSpec() throws ResourceException, ResourceUnknownFaultType, ConfigurationException
 	{
 
 		ResourceKey myKey = ResourceManager.getCurrentResource();
 		IJNDIResource myResource = (IJNDIResource) myKey.dereference();
-		if (!myResource.isServiceResource())
-		{
+		if (!myResource.isServiceResource()) {
 			// Returns null because we return unbound eprs for
 			// new IDP resources
 			return null;
@@ -293,130 +264,111 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		return super.getChildCertSpec();
 	}
 
-	protected RequestSecurityTokenResponseType formatResponse(
-			X509Certificate[] delegateToChain, Date created, Date expiry)
-			throws GeneralSecurityException, SOAPException,
-			ConfigurationException, RemoteException
+	protected RequestSecurityTokenResponseType formatResponse(X509Certificate[] delegateToChain, Date created, Date expiry)
+		throws GeneralSecurityException, SOAPException, ConfigurationException, RemoteException
 	{
 
-		if (delegateToChain != null)
-		{
+		if (delegateToChain != null) {
 			// do delegation if necessary
 			return formatDelegateToken(delegateToChain, created, expiry);
 		}
 		return formatIdentity();
 	}
 
-	protected RequestSecurityTokenResponseType formatIdentity()
-			throws GeneralSecurityException, SOAPException,
-			ConfigurationException, RemoteException
+	protected RequestSecurityTokenResponseType formatIdentity() throws GeneralSecurityException, SOAPException,
+		ConfigurationException, RemoteException
 	{
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		IResource resource = rKey.dereference();
 
-		X509Certificate[] identity =
-				(X509Certificate[]) resource
-						.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+		X509Certificate[] identity = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 
 		// ----- assemble the response document
 		// -----------------------------------------
 
-		RequestSecurityTokenResponseType response =
-				new RequestSecurityTokenResponseType();
+		RequestSecurityTokenResponseType response = new RequestSecurityTokenResponseType();
 		MessageElement[] elements = new MessageElement[2];
 		response.set_any(elements);
 
 		// Add TokenType element
-		elements[0] =
-				new MessageElement(new QName(
-						"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-						"TokenType"), PKIPathSecurity.getType());
-		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema",
-				"anyURI"));
+		elements[0] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"),
+			PKIPathSecurity.getType());
+		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
 
-		MessageElement wseTokenRef =
-				WSSecurityUtils.makePkiPathSecTokenRef(identity);
+		MessageElement wseTokenRef = WSSecurityUtils.makePkiPathSecTokenRef(identity);
 
-		elements[1] =
-				new MessageElement(new QName(
-						"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-						"RequestedSecurityToken"),
-						new RequestedSecurityTokenType(
-								new MessageElement[] { wseTokenRef }));
+		elements[1] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+			"RequestedSecurityToken"), new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		return response;
 	}
 
-	protected RequestSecurityTokenResponseType formatDelegateToken(
-			X509Certificate[] delegateToChain, Date created, Date expiry)
-			throws GeneralSecurityException, SOAPException,
-			ConfigurationException, RemoteException
+	protected RequestSecurityTokenResponseType formatDelegateToken(X509Certificate[] delegateToChain, Date created, Date expiry)
+		throws GeneralSecurityException, SOAPException, ConfigurationException, RemoteException
 	{
-
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		IResource resource = rKey.dereference();
-
-		X509Certificate[] identity =
-				(X509Certificate[]) resource
-						.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-		SignedAssertion signedAssertion = new X509Identity(identity);
+		if (_logger.isDebugEnabled())
+			_logger.debug("hitting the formatDelegateToken in jndi authn");
+		/*
+		 * ResourceKey rKey = ResourceManager.getCurrentResource(); IResource resource =
+		 * rKey.dereference();
+		 * 
+		 * X509Certificate[] identity = (X509Certificate[]) resource
+		 * .getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+		 */
 
 		// Get this resource's key and cert material
 		ICallingContext callingContext = null;
 		KeyAndCertMaterial resourceKeyMaterial = null;
-		try
-		{
-			callingContext = ContextManager.getCurrentContext();
+		try {
+			callingContext = ContextManager.getExistingContext();
 			resourceKeyMaterial = callingContext.getActiveKeyAndCertMaterial();
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
 
+		AxisSAMLCredentials creds = new AxisSAMLCredentials();
+
 		// Delegate the assertion to delegateTo
-		DelegatedAttribute delegatedAttribute =
-				new DelegatedAttribute(new BasicConstraints(created.getTime(),
-						expiry.getTime() - created.getTime(), 10),
-						signedAssertion, delegateToChain);
-		signedAssertion =
-				new DelegatedAssertion(delegatedAttribute,
-						resourceKeyMaterial._clientPrivateKey);
+		TrustCredential tc = new TrustCredential(delegateToChain, IdentityType.CONNECTION,
+			resourceKeyMaterial._clientCertChain, IdentityType.USER, new BasicConstraints(created.getTime(), expiry.getTime()
+				- created.getTime(), SecurityConstants.MaxDelegationDepth), TrustCredential.FULL_ACCESS);
+		tc.signAssertion(resourceKeyMaterial._clientPrivateKey);
+
+		creds.getRealCreds().addCredential(tc);
 
 		// ----- assemble the response document
 		// -----------------------------------------
 
-		RequestSecurityTokenResponseType response =
-				new RequestSecurityTokenResponseType();
+		RequestSecurityTokenResponseType response = new RequestSecurityTokenResponseType();
 		MessageElement[] elements = new MessageElement[2];
 		response.set_any(elements);
 
+		XMLCompatible xup = XMLConverter.upscaleCredential(tc);
+		if (xup == null) {
+			String msg = "unknown type of credential; cannot upscale to XMLCompatible: " + tc.toString();
+			_logger.error(msg);
+			throw new GeneralSecurityException(msg);
+		}
+
 		// Add TokenType element
-		elements[0] =
-				new MessageElement(new QName(
-						"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-						"TokenType"), signedAssertion.getTokenType());
-		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema",
-				"anyURI"));
+		elements[0] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"),
+			xup.getTokenType());
+		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
 
-		MessageElement wseTokenRef = signedAssertion.toMessageElement();
+		MessageElement wseTokenRef = creds.convertToSOAPElement();
 
-		elements[1] =
-				new MessageElement(new QName(
-						"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-						"RequestedSecurityToken"),
-						new RequestedSecurityTokenType(
-								new MessageElement[] { wseTokenRef }));
+		elements[1] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+			"RequestedSecurityToken"), new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		return response;
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
-	public RequestSecurityTokenResponseType[] requestSecurityToken2(
-			RequestSecurityTokenType request) throws java.rmi.RemoteException
+	public RequestSecurityTokenResponseType[] requestSecurityToken2(RequestSecurityTokenType request)
+		throws java.rmi.RemoteException
 	{
 
 		// ------ Parse and perform syntactic checks (has correct form) --------
@@ -425,140 +377,60 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		LifetimeType lifetime = null;
 		X509Certificate[] delegateToChain = null;
 
-		for (MessageElement element : request.get_any())
-		{
-			if (element.getName().equals("TokenType"))
-			{
+		for (MessageElement element : request.get_any()) {
+			if (element.getName().equals("TokenType")) {
 				// process TokenType element
 				// String tokenType = element.getValue();
 
-			}
-			else if (element.getName().equals("RequestType"))
-			{
+			} else if (element.getName().equals("RequestType")) {
 				// process RequestType element
-				try
-				{
-					requestType =
-							(RequestTypeOpenEnum) element
-									.getObjectValue(RequestTypeOpenEnum.class);
-				}
-				catch (Exception e)
-				{
+				try {
+					requestType = (RequestTypeOpenEnum) element.getObjectValue(RequestTypeOpenEnum.class);
+				} catch (Exception e) {
 				}
 
-			}
-			else if (element.getName().equals("Lifetime"))
-			{
+			} else if (element.getName().equals("Lifetime")) {
 				// process LifeTime element
-				try
-				{
-					lifetime =
-							(LifetimeType) element
-									.getObjectValue(LifetimeType.class);
-				}
-				catch (Exception e)
-				{
+				try {
+					lifetime = (LifetimeType) element.getObjectValue(LifetimeType.class);
+				} catch (Exception e) {
 				}
 
-			}
-			else if (element.getName().equals("DelegateTo"))
-			{
+			} else if (element.getName().equals("DelegateTo")) {
 				// process DelegateTo element
 				DelegateToType dt = null;
-				try
-				{
-					dt =
-							(DelegateToType) element
-									.getObjectValue(DelegateToType.class);
+				try {
+					dt = (DelegateToType) element.getObjectValue(DelegateToType.class);
+				} catch (Exception e) {
 				}
-				catch (Exception e)
-				{
-				}
-				if (dt != null)
-				{
-					for (MessageElement subElement : dt.get_any())
-					{
-						if (subElement
-								.getQName()
-								.equals(
-										new QName(
-												org.apache.ws.security.WSConstants.WSSE11_NS,
-												"SecurityTokenReference")))
-						{
-							subElement =
-									subElement
-											.getChildElement(new QName(
-													org.apache.ws.security.WSConstants.WSSE11_NS,
-													"Embedded"));
-							if (subElement != null)
-							{
-								subElement =
-										subElement
-												.getChildElement(BinarySecurity.TOKEN_BST);
-								if (subElement != null)
-								{
-									try
-									{
-										if (subElement.getAttributeValue(
-												"ValueType").equals(
-												edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE))
-										{
-											X509Security bstToken =
-													new X509Security(subElement);
-											X509Certificate delegateTo =
-													bstToken
-															.getX509Certificate(new GIIBouncyCrypto());
-											delegateToChain =
-													new X509Certificate[] { delegateTo };
-										}
-										//hmmm: this appears to be wrong code; the condition is identical, even in the version
-										// still calling getType on X509Security class.
-										/*
-										else if (subElement.getAttributeValue(
-												"ValueType").equals(
-												edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE))
-										{
-											PKIPathSecurity bstToken =
-													new PKIPathSecurity(element);
-											delegateToChain =
-													bstToken
-															.getX509Certificates(
-																	false,
-																	new edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto());
-										}
-										*/
-										else
-										{
-											if (delegateToChain == null)
-											{
-												throw new AxisFault(
-														new QName(
-																"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-																"BadRequest"),
-														"Missing or unsupported DelegateTo security ValueType",
-														null, null);
+				if (dt != null) {
+					for (MessageElement subElement : dt.get_any()) {
+						if (WSSecurityUtils.matchesSecurityToken(subElement)) {
+							subElement = WSSecurityUtils.acquireChildSecurityElement(subElement, "Embedded");
+							if (subElement != null) {
+								subElement = subElement.getChildElement(BinarySecurity.TOKEN_BST);
+								if (subElement != null) {
+									try {
+										if (subElement.getAttributeValue("ValueType").equals(
+											edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE)) {
+											X509Security bstToken = new X509Security(subElement);
+											X509Certificate delegateTo = bstToken.getX509Certificate(new GIIBouncyCrypto());
+											delegateToChain = new X509Certificate[] { delegateTo };
+										} else {
+											if (delegateToChain == null) {
+												throw new AxisFault(new QName(
+													"http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"),
+													"Missing or unsupported DelegateTo security ValueType", null, null);
 											}
 										}
-									}
-									catch (GenesisIISecurityException e)
-									{
-										throw new WSSecurityException(e
-												.getMessage(), e);
-									}
-									catch (WSSecurityException e)
-									{
-										throw new WSSecurityException(e
-												.getMessage(), e);
-									}
-									catch (IOException e)
-									{
-										throw new WSSecurityException(e
-												.getMessage(), e);
-									}
-									catch (CredentialException e)
-									{
-										throw new WSSecurityException(e
-												.getMessage(), e);
+									} catch (GenesisIISecurityException e) {
+										throw new WSSecurityException(e.getMessage(), e);
+									} catch (WSSecurityException e) {
+										throw new WSSecurityException(e.getMessage(), e);
+									} catch (IOException e) {
+										throw new WSSecurityException(e.getMessage(), e);
+									} catch (CredentialException e) {
+										throw new WSSecurityException(e.getMessage(), e);
 									}
 								}
 							}
@@ -568,621 +440,167 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 			}
 		}
 
-		/*
-		 * Don't care at the moment: they get what they get // check requested
-		 * token type if ((tokenType == null) ||
-		 * !tokenType.equals(WSSecurityUtils.GAML_TOKEN_TYPE)) { throw new
-		 * AxisFault( new
-		 * QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-		 * "BadRequest"), "IDP cannot provide tokens of type " + tokenType,
-		 * null, null); }
-		 */
-
 		// check request type
 		if ((requestType == null)
-				|| !requestType.getRequestTypeEnumValue().toString().equals(
-						RequestTypeEnum._value1.toString()))
-		{
-			throw new AxisFault(new QName(
-					"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-					"BadRequest"), "IDP cannot service a request of type "
-					+ requestType.getRequestTypeEnumValue(), null, null);
+			|| !requestType.getRequestTypeEnumValue().toString().equals(RequestTypeEnum._value1.toString())) {
+			throw new AxisFault(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"),
+				"IDP cannot service a request of type " + requestType.getRequestTypeEnumValue(), null, null);
 		}
 
 		// check lifetime element
-		if (lifetime == null)
-		{
-			throw new AxisFault(new QName(
-					"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-					"InvalidRequest"), "Missing Lifetime parameter", null, null);
+		if (lifetime == null) {
+			throw new AxisFault(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "InvalidRequest"),
+				"Missing Lifetime parameter", null, null);
 		}
 
-		SimpleDateFormat zulu =
-				new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-		Date created =
-				zulu.parse(lifetime.getCreated().get_value(),
-						new ParsePosition(0));
-		Date expiry =
-				zulu.parse(lifetime.getExpires().get_value(),
-						new ParsePosition(0));
+		SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		Date created = zulu.parse(lifetime.getCreated().get_value(), new ParsePosition(0));
+		Date expiry = zulu.parse(lifetime.getExpires().get_value(), new ParsePosition(0));
 
-		if ((created == null) || (expiry == null))
-		{
-			throw new AxisFault(new QName(
-					"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-					"InvalidRequest"), "Could not parse lifetime dates", null,
-					null);
+		if ((created == null) || (expiry == null)) {
+			throw new AxisFault(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "InvalidRequest"),
+				"Could not parse lifetime dates", null, null);
 		}
 
 		// ------ Assemble response ------------------------------------------
 
-		ArrayList<RequestSecurityTokenResponseType> responseArray =
-				new ArrayList<RequestSecurityTokenResponseType>();
+		ArrayList<RequestSecurityTokenResponseType> responseArray = new ArrayList<RequestSecurityTokenResponseType>();
 
-		try
-		{
+		try {
 			// add the local token
 			responseArray.add(formatResponse(delegateToChain, created, expiry));
-		}
-		catch (GeneralSecurityException e)
-		{
+		} catch (GeneralSecurityException e) {
 			throw new WSSecurityException(e.getMessage(), e);
-		}
-		catch (SOAPException se)
-		{
+		} catch (SOAPException se) {
 			throw new AxisFault(se.getLocalizedMessage(), se);
-		}
-		catch (ConfigurationException ce)
-		{
+		} catch (ConfigurationException ce) {
 			throw new RemoteException(ce.getMessage(), ce);
 		}
 
-		return responseArray
-				.toArray(new RequestSecurityTokenResponseType[responseArray
-						.size()]);
+		return responseArray.toArray(new RequestSecurityTokenResponseType[responseArray.size()]);
 	}
 
-	/* Deprecated by Mark Morgan during transition to RNS 1.1 */
-	/*
-	@RWXMapping(RWXCategory.READ)
-	public ListResponse list(List list) throws RemoteException,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-			RNSFaultType
-	{
-		_logger.debug("Entered list method.");
-
-		ResourceKey myResourceKey = ResourceManager.getCurrentResource();
-		IJNDIResource myResource = (IJNDIResource) myResourceKey.dereference();
-		if (myResource.isIdpResource())
-		{
-			throw new RemoteException("\"list\" not applicable.");
-		}
-
-		if (myResource.isServiceResource())
-		{
-			// list the directory contents from state
-
-			IRNSResource resource = null;
-			Collection<InternalEntry> entries;
-
-			ResourceKey rKey = ResourceManager.getCurrentResource();
-			resource = (IRNSResource) rKey.dereference();
-			entries = resource.retrieveEntries(list.getEntryName());
-
-			EntryType[] ret = new EntryType[entries.size()];
-			int lcv = 0;
-			for (InternalEntry entry : entries)
-			{
-				ret[lcv++] =
-						new EntryType(entry.getName(), entry.getAttributes(),
-								entry.getEntryReference());
-			}
-
-			return new ListResponse(ret);
-		}
-
-		// STS for a JNDI directory resource
-
-		// Note: May rethink about keeping this check... It does prevent us from
-		// going OOM accidently, but it's not complete...
-		if (list.getEntryName() == null)
-		{
-			throw new RemoteException("\"unconstrained list\" not applicable.");
-		}
-
-		EntryIterator iterator =
-				new EntryIterator(myResource, list.getEntryName());
-
-		ArrayList<EntryType> accumulator = new ArrayList<EntryType>();
-		while (iterator.hasNext())
-		{
-			MessageElement wrappedEntryType = iterator.next();
-			EntryType entry =
-					ObjectDeserializer.toObject(wrappedEntryType,
-							EntryType.class);
-			accumulator.add(entry);
-		}
-
-		return new ListResponse(accumulator.toArray(new EntryType[0]));
-
-	}
-
-	@RWXMapping(RWXCategory.READ)
-	public IterateListResponseType iterateList(IterateListRequestType list)
-			throws RemoteException, ResourceUnknownFaultType,
-			RNSEntryNotDirectoryFaultType, RNSFaultType
-	{
-		_logger.debug("Entered iterateList method.");
-
-		ResourceKey myResourceKey = ResourceManager.getCurrentResource();
-		IJNDIResource myResource = (IJNDIResource) myResourceKey.dereference();
-		if (myResource.isIdpResource())
-		{
-			throw new RemoteException("\"list\" not applicable.");
-		}
-
-		if (myResource.isServiceResource())
-		{
-			// list the directory contents from state
-
-			Collection<InternalEntry> entries;
-			entries = myResource.retrieveEntries(null);
-
-			Collection<MessageElement> col = new LinkedList<MessageElement>();
-			for (InternalEntry internalEntry : entries)
-			{
-				EntryType entry =
-						new EntryType(internalEntry.getName(), internalEntry
-								.getAttributes(), internalEntry
-								.getEntryReference());
-
-				col.add(AnyHelper.toAny(entry));
-			}
-
-			try
-			{
-				IteratorBuilder<MessageElement> builder = iteratorBuilder();
-				builder.preferredBatchSize(100);
-				builder.addElements(col);
-				return new IterateListResponseType(builder.create());
-			}
-			catch (ConfigurationException ce)
-			{
-				throw new RemoteException("Unable to create iterator.", ce);
-			}
-		}
-
-		// STS for a JNDI directory resource
-
-		try
-		{
-			EntryIterator iterator = new EntryIterator(myResource, null);
-			IteratorBuilder<MessageElement> builder = iteratorBuilder();
-			builder.preferredBatchSize(100);
-			builder.addElements(iterator);
-			return new IterateListResponseType(builder.create());
-
-		}
-		catch (java.io.IOException e)
-		{
-			throw new RemoteException("Unable to create iterator.", e);
-		}
-		catch (ConfigurationException e)
-		{
-			throw new RemoteException("Unable to create iterator.", e);
-		}
-	}
-	
-	@RWXMapping(RWXCategory.WRITE)
-	public String[] remove(Remove remove) throws RemoteException,
-			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType,
-			RNSFaultType
+	protected X509Certificate[] createCertChainForListing(IJNDIResource idpResource, IJNDIResource stsResource)
+		throws RemoteException, GeneralSecurityException
 	{
 
-		ResourceKey serviceKey = ResourceManager.getCurrentResource();
-		IJNDIResource serviceResource =
-				(IJNDIResource) serviceKey.dereference();
-
-		if (!serviceResource.isServiceResource())
-		{
-			throw new RemoteException("\"remove\" not applicable.");
-		}
-
-		String[] ret;
-		IRNSResource resource = null;
-
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRNSResource) rKey.dereference();
-		Collection<String> removed =
-				resource.removeEntries(remove.getEntryName());
-		ret = new String[removed.size()];
-		removed.toArray(ret);
-		resource.commit();
-
-		return ret;
-	}
-
-	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateFileResponse createFile(CreateFile createFile)
-			throws RemoteException, RNSEntryExistsFaultType,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-			RNSFaultType
-	{
-		throw new RemoteException("\"createFile\" not applicable.");
-	}
-
-	@RWXMapping(RWXCategory.WRITE)
-	public AddResponse add(Add addRequest) throws RemoteException,
-			RNSEntryExistsFaultType, ResourceUnknownFaultType,
-			RNSEntryNotDirectoryFaultType, RNSFaultType
-	{
-
-		throw new RemoteException("\"add\" not applicable.");
-
-	}
-
-	@RWXMapping(RWXCategory.WRITE)
-	public MoveResponse move(Move move) throws RemoteException,
-			ResourceUnknownFaultType, RNSFaultType
-	{
-		throw new RemoteException("\"move\" not applicable.");
-	}
-
-	@RWXMapping(RWXCategory.READ)
-	public QueryResponse query(Query q) throws RemoteException,
-			ResourceUnknownFaultType, RNSFaultType
-	{
-		throw new RemoteException("\"query\" not applicable.");
-	}
-	
-	public class EntryIterator implements Iterator<MessageElement>
-	{
-
-		protected NamingEnumeration<NameClassPair> _namingEnumerator = null;
-		protected String _stsEPI = null;
-		protected EndpointReferenceType _stsEPR = null;
-		protected Pattern _pattern = null;
-		protected IJNDIResource _stsResource = null;
-
-		protected NameClassPair _next = null;
-
-		public EntryIterator(IJNDIResource stsResource, String entryName)
-				throws ResourceException, RemoteException
-		{
-
-			_stsResource = stsResource;
-
-			try
-			{
-
-				// get service EPI and EPR
-				_stsEPI = (String) stsResource.getKey();
-
-				_stsEPR =
-						(EndpointReferenceType) WorkingContext
-								.getCurrentWorkingContext().getProperty(
-										WorkingContext.EPR_PROPERTY_NAME);
-
-				if (entryName != null)
-					_pattern = Pattern.compile("^\\Q" + entryName + "\\E$");
-				else
-					_pattern = Pattern.compile("^.*$");
-
-				Properties jndiEnv = new Properties();
-				String providerUrl = null;
-				String queryUri = null;
-
-				switch (stsResource.getStsType())
-				{
-				case NIS:
-
-					jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-							"com.sun.jndi.nis.NISCtxFactory");
-					providerUrl =
-							"nis://"
-									+ stsResource
-											.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME
-													.getLocalPart())
-									+ "/"
-									+ stsResource
-											.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME
-													.getLocalPart());
-					queryUri = providerUrl + "/system/passwd";
-
-					jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
-					InitialDirContext initialContext =
-							new InitialDirContext(jndiEnv);
-					_namingEnumerator = initialContext.list(queryUri);
-					initialContext.close();
-
-					break;
-
-				case LDAP:
-					jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-							"com.sun.jndi.ldap.LdapCtxFactory");
-
-					throw new RemoteException(
-							"\"LDAP not implemented\" not applicable.");
-				}
-
-			}
-			catch (NamingException e)
-			{
-				throw new ResourceException(e.getMessage(), e);
-			}
-			catch (ContextException e)
-			{
-				throw new ResourceException(e.getMessage(), e);
-			}
-		}
-
-		public MessageElement next()
-		{
-
-			if (!hasNext())
-			{
-				throw new NoSuchElementException("No more name elements");
-			}
-
-			try
-			{
-
-				HashMap<QName, Object> creationParameters =
-						new HashMap<QName, Object>();
-				creationParameters.put(
-						IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM,
-						_stsResource.createChildIdpEpi(_next.getName()));
-				creationParameters.put(
-						IJNDIResource.IS_IDP_RESOURCE_CONSTRUCTION_PARAM,
-						Boolean.TRUE);
-				ResourceKey listingKey = createResource(creationParameters);
-
-				PortType[] implementedPortTypes =
-						{ WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE,
-								WellKnownPortTypes.STS_SERVICE_PORT_TYPE };
-				WSName wsName =
-						new WSName(ResourceManager.createEPR(listingKey,
-								(new AttributedURIType(WSName.UNBOUND_ADDRESS))
-										.toString(), implementedPortTypes));
-
-				// add resolver info
-				wsName.addEndpointIdentifierReferenceResolver(_stsEPR);
-
-				EntryType newEntry =
-						new EntryType(_next.getName(), null, wsName
-								.getEndpoint());
-
-				return AnyHelper.toAny(newEntry);
-
-			}
-			catch (ResourceException e)
-			{
-				NoSuchElementException nee =
-						new NoSuchElementException(e.getMessage());
-				nee.initCause(e);
-				throw nee;
-			}
-			catch (URI.MalformedURIException e)
-			{
-				NoSuchElementException nee =
-						new NoSuchElementException(e.getMessage());
-				nee.initCause(e);
-				throw nee;
-			}
-			catch (BaseFaultType e)
-			{
-				NoSuchElementException nee =
-						new NoSuchElementException(e.getMessage());
-				nee.initCause(e);
-				throw nee;
-			}
-			finally
-			{
-				_next = null;
-			}
-		}
-
-		public void remove()
-		{
-		}
-
-		public boolean hasNext()
-		{
-
-			if (_next != null)
-			{
-				return true;
-			}
-
-			try
-			{
-				do
-				{
-					if (!_namingEnumerator.hasMoreElements())
-					{
-						return false;
-					}
-					_next = _namingEnumerator.next();
-				} while (!_pattern.matcher(_next.getName()).matches());
-			}
-			catch (NamingException e)
-			{
-				return false;
-			}
-
-			return true;
-		}
-	}
-
-	*/
-
-	protected X509Certificate[] createCertChainForListing(
-			IJNDIResource idpResource, IJNDIResource stsResource)
-			throws RemoteException, GeneralSecurityException
-	{
-
-		try
-		{
+		try {
 
 			// the expensive part: we finally generate a certificate for this
 			// guy
-			X509Certificate[] containerChain =
-					Container.getContainerCertChain();
+			X509Certificate[] containerChain = Container.getContainerCertChain();
 
-			if (containerChain == null)
-			{
+			if (containerChain == null) {
 				return null;
 			}
 
 			String epiString = (String) idpResource.getKey();
 			String userName = idpResource.getIdpName();
 
-			CertCreationSpec certSpec =
-					new CertCreationSpec(containerChain[0].getPublicKey(),
-							containerChain, Container.getContainerPrivateKey(),
-							getResourceCertificateLifetime());
+			CertCreationSpec certSpec = new CertCreationSpec(containerChain[0].getPublicKey(), containerChain,
+				Container.getContainerPrivateKey(), getResourceCertificateLifetime());
 
 			Properties jndiEnv = new Properties();
 			String providerUrl = null;
 			String queryUri = null;
 
-			switch (stsResource.getStsType())
-			{
-			case NIS:
+			switch (stsResource.getStsType()) {
+				case NIS:
 
-				jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-						"com.sun.jndi.nis.NISCtxFactory");
-				providerUrl =
-						"nis://"
-								+ stsResource
-										.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME
-												.getLocalPart())
-								+ "/"
-								+ stsResource
-										.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME
-												.getLocalPart());
-				jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
+					jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.nis.NISCtxFactory");
+					providerUrl = "nis://" + stsResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart())
+						+ "/" + stsResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());
+					jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
 
-				InitialDirContext initialContext =
-						new InitialDirContext(jndiEnv);
-				queryUri = providerUrl + "/system/passwd/" + userName;
-				String[] attrIDs = { "gecos", "uidnumber" };
-				Attributes attrs =
-						initialContext.getAttributes(queryUri, attrIDs);
-				initialContext.close();
+					InitialDirContext initialContext = new InitialDirContext(jndiEnv);
+					queryUri = providerUrl + "/system/passwd/" + userName;
+					String[] attrIDs = { "gecos", "uidnumber" };
+					Attributes attrs = initialContext.getAttributes(queryUri, attrIDs);
+					initialContext.close();
 
-				// get CNs for cert (gecos common string)
-				ArrayList<String> cnList = new ArrayList<String>();
-				cnList.add(idpResource.getParentResourceKey().getServiceName());
-				if (attrs.get("gecos") != null)
-				{
-					cnList.add((String) attrs.get("gecos").get());
-				}
+					// get CNs for cert (gecos common string)
+					ArrayList<String> cnList = new ArrayList<String>();
+					cnList.add(idpResource.getParentResourceKey().getServiceName());
+					if (attrs.get("gecos") != null) {
+						cnList.add((String) attrs.get("gecos").get());
+					}
 
-				// get UID for cert
-				String uid =
-						(attrs.get("uidnumber") == null) ? null
-								: (String) attrs.get("uidnumber").get();
+					// get UID for cert
+					String uid = (attrs.get("uidnumber") == null) ? null : (String) attrs.get("uidnumber").get();
 
-				Map.Entry<List<DERObjectIdentifier>, List<String> > additionalFields = 
-					CertTool.constructCommonDnFields(epiString, null, cnList, uid); 							
-				
-				return CertTool.createResourceCertChain(certSpec, additionalFields);
+					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields = CertTool.constructCommonDnFields(
+						epiString, null, cnList, uid);
 
-			case LDAP:
-				jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-						"com.sun.jndi.ldap.LdapCtxFactory");
+					return CertTool.createResourceCertChain(certSpec, additionalFields);
 
-				throw new RemoteException(
-						"\"LDAP not implemented\" not applicable.");
+				case LDAP:
+					jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 
-			default:
+					throw new RemoteException("\"LDAP not implemented\" not applicable.");
 
-				throw new RemoteException("Unknown STS type.");
+				default:
+
+					throw new RemoteException("Unknown STS type.");
 			}
 
-		}
-		catch (ResourceException e)
-		{
+		} catch (ResourceException e) {
 			throw new GeneralSecurityException(e.getMessage(), e);
-		}
-		catch (NamingException e)
-		{
+		} catch (NamingException e) {
 			throw new GeneralSecurityException(e.getMessage(), e);
-		}
-		catch (ConfigurationException e)
-		{
+		} catch (ConfigurationException e) {
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
 	}
 
 	/* EndpointIdentifierResolver port type. */
 	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType resolveEPI(org.apache.axis.types.URI resolveEPI)
-			throws RemoteException, ResourceUnknownFaultType,
-			ResolveFailedFaultType
+	public EndpointReferenceType resolveEPI(org.apache.axis.types.URI resolveEPI) throws RemoteException,
+		ResourceUnknownFaultType, ResolveFailedFaultType
 	{
-		_logger.debug("Entered resolveEPI method.");
+		if (_logger.isDebugEnabled())
+			_logger.debug("Entered resolveEPI method.");
 
-		EndpointReferenceType myEPR =
-				(EndpointReferenceType) WorkingContext
-						.getCurrentWorkingContext().getProperty(
-								WorkingContext.EPR_PROPERTY_NAME);
+		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
+			WorkingContext.EPR_PROPERTY_NAME);
 
 		ResourceKey stsKey = ResourceManager.getCurrentResource();
 		IJNDIResource stsResource = (IJNDIResource) stsKey.dereference();
-		if (stsResource.isServiceResource() || stsResource.isIdpResource())
-		{
+		if (stsResource.isServiceResource() || stsResource.isIdpResource()) {
 			throw new RemoteException("\"resolveEPI\" not applicable.");
 		}
 
-		HashMap<QName, Object> creationParameters =
-				new HashMap<QName, Object>();
-		try
-		{
-			creationParameters.put(
-					IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, new URI(
-							resolveEPI.toString()));
+		HashMap<QName, Object> creationParameters = new HashMap<QName, Object>();
+		try {
+			creationParameters.put(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, new URI(resolveEPI.toString()));
 
-			creationParameters.put(
-					IJNDIResource.IS_IDP_RESOURCE_CONSTRUCTION_PARAM,
-					Boolean.TRUE);
+			creationParameters.put(IJNDIResource.IS_IDP_RESOURCE_CONSTRUCTION_PARAM, Boolean.TRUE);
 
 			ResourceKey idpKey = createResource(creationParameters);
 			IJNDIResource idpResource = (IJNDIResource) idpKey.dereference();
 
-			X509Certificate[] resourceCertChain =
-					createCertChainForListing(idpResource, stsResource);
-			idpResource.setProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME,
-					resourceCertChain);
+			X509Certificate[] resourceCertChain = createCertChainForListing(idpResource, stsResource);
+			idpResource.setProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME, resourceCertChain);
 
-			PortType[] implementedPortTypes =
-					{ WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE,
-							WellKnownPortTypes.STS_SERVICE_PORT_TYPE };
-			EndpointReferenceType retval =
-					ResourceManager.createEPR(idpKey, myEPR.getAddress()
-							.toString(), implementedPortTypes, new String("JNDIWithSTSPortType"));
+			PortType[] implementedPortTypes = { WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE,
+				WellKnownPortTypes.STS_SERVICE_PORT_TYPE };
+			EndpointReferenceType retval = ResourceManager.createEPR(idpKey, myEPR.getAddress().toString(),
+				implementedPortTypes, new String("JNDIWithSTSPortType"));
 
 			return retval;
 
-		}
-		catch (GeneralSecurityException e)
-		{
+		} catch (GeneralSecurityException e) {
 			throw new ResourceException(e.getMessage(), e);
-		}
-		catch (URI.MalformedURIException e)
-		{
+		} catch (URI.MalformedURIException e) {
 			throw new ResourceException(e.getMessage(), e);
 		}
 
 	}
 
 	@Override
-	public RNSEntryResponseType[] remove(String[] removeRequest)
-			throws RemoteException, WriteNotPermittedFaultType
+	public RNSEntryResponseType[] remove(String[] removeRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		// In reality, this service is deprecated and needs to be re-written
-		// using resource forks.  In the meantime, merely to have the system
+		// using resource forks. In the meantime, merely to have the system
 		// compile, I have included the correct function interfaces for
 		// RNS 1.1, but am not upgrading this service to work with it.
 		//
@@ -1191,11 +609,10 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	}
 
 	@Override
-	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
-			throws RemoteException, WriteNotPermittedFaultType
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		// In reality, this service is deprecated and needs to be re-written
-		// using resource forks.  In the meantime, merely to have the system
+		// using resource forks. In the meantime, merely to have the system
 		// compile, I have included the correct function interfaces for
 		// RNS 1.1, but am not upgrading this service to work with it.
 		//
@@ -1204,11 +621,10 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	}
 
 	@Override
-	public CreateFileResponseType createFile(
-			CreateFileRequestType createFileRequest) throws RemoteException
+	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest) throws RemoteException
 	{
 		// In reality, this service is deprecated and needs to be re-written
-		// using resource forks.  In the meantime, merely to have the system
+		// using resource forks. In the meantime, merely to have the system
 		// compile, I have included the correct function interfaces for
 		// RNS 1.1, but am not upgrading this service to work with it.
 		//
@@ -1217,12 +633,11 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	}
 
 	@Override
-	public RNSEntryResponseType[] setMetadata(
-			MetadataMappingType[] setMetadataRequest) throws RemoteException,
-			WriteNotPermittedFaultType
+	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
+		WriteNotPermittedFaultType
 	{
 		// In reality, this service is deprecated and needs to be re-written
-		// using resource forks.  In the meantime, merely to have the system
+		// using resource forks. In the meantime, merely to have the system
 		// compile, I have included the correct function interfaces for
 		// RNS 1.1, but am not upgrading this service to work with it.
 		//
@@ -1231,11 +646,10 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	}
 
 	@Override
-	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
-			throws RemoteException, WriteNotPermittedFaultType
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		// In reality, this service is deprecated and needs to be re-written
-		// using resource forks.  In the meantime, merely to have the system
+		// using resource forks. In the meantime, merely to have the system
 		// compile, I have included the correct function interfaces for
 		// RNS 1.1, but am not upgrading this service to work with it.
 		//
@@ -1244,11 +658,10 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	}
 
 	@Override
-	public LookupResponseType lookup(String[] lookupRequest)
-			throws RemoteException, ReadNotPermittedFaultType
+	public LookupResponseType lookup(String[] lookupRequest) throws RemoteException, ReadNotPermittedFaultType
 	{
 		// In reality, this service is deprecated and needs to be re-written
-		// using resource forks.  In the meantime, merely to have the system
+		// using resource forks. In the meantime, merely to have the system
 		// compile, I have included the correct function interfaces for
 		// RNS 1.1, but am not upgrading this service to work with it.
 		//

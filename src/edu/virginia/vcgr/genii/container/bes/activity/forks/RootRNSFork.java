@@ -12,12 +12,11 @@ public class RootRNSFork extends StaticRNSResourceFork
 	{
 		super(service, forkPath);
 	}
-	
+
 	@Override
 	protected void addEntries(Map<String, ResourceForkInformation> entries)
 	{
 		addDefaultEntry("status", ActivitySummaryResourceFork.class);
-		addDefaultEntry(WorkingDirectoryFork.FORK_BASE_PATH_NAME,
-			WorkingDirectoryFork.class);
+		addDefaultEntry(WorkingDirectoryFork.FORK_BASE_PATH_NAME, WorkingDirectoryFork.class);
 	}
 }

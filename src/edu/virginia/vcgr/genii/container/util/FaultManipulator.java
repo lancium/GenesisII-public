@@ -25,36 +25,27 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 
 public class FaultManipulator
 {
-	static public <FaultType extends BaseFaultType>
-		FaultType fillInFault(FaultType bft)
+	static public <FaultType extends BaseFaultType> FaultType fillInFault(FaultType bft)
 	{
 		return fillInFault(bft, null);
 	}
-	
-	static public <FaultType extends BaseFaultType>
-		FaultType fillInFault(FaultType bft, String error)
+
+	static public <FaultType extends BaseFaultType> FaultType fillInFault(FaultType bft, String error)
 	{
 		if (bft.getTimestamp() == null)
 			bft.setTimestamp(Calendar.getInstance());
-		if (bft.getOriginator() == null)
-		{
-			try
-			{
-				EndpointReferenceType originator =
-					(EndpointReferenceType)WorkingContext.getCurrentWorkingContext(
-						).getProperty(WorkingContext.EPR_PROPERTY_NAME);
+		if (bft.getOriginator() == null) {
+			try {
+				EndpointReferenceType originator = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext()
+					.getProperty(WorkingContext.EPR_PROPERTY_NAME);
 				bft.setOriginator(originator);
-			}
-			catch (Throwable t)
-			{
+			} catch (Throwable t) {
 			}
 		}
-		if ((error == null) && (bft.getDescription() == null))
-		{
+		if ((error == null) && (bft.getDescription() == null)) {
 			error = bft.getClass().getName() + ":  " + bft.toString();
 		}
-		if (error != null)
-		{
+		if (error != null) {
 			BaseFaultTypeDescription description = new BaseFaultTypeDescription(error);
 			bft.setDescription(new BaseFaultTypeDescription[] { description });
 		}

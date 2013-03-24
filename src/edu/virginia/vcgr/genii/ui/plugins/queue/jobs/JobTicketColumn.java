@@ -5,8 +5,7 @@ import org.morgan.util.gui.table.AbstractRowTableColumnDefinition;
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 
-class JobTicketColumn 
-	extends AbstractRowTableColumnDefinition<JobInformation, JobTicket>
+class JobTicketColumn extends AbstractRowTableColumnDefinition<JobInformation, JobTicket>
 {
 	JobTicketColumn()
 	{

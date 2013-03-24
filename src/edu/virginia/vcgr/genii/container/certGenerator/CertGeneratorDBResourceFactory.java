@@ -9,24 +9,18 @@ import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class CertGeneratorDBResourceFactory extends BasicDBResourceFactory implements
-		IResourceFactory
+public class CertGeneratorDBResourceFactory extends BasicDBResourceFactory implements IResourceFactory
 {
-	public CertGeneratorDBResourceFactory(
-			DatabaseConnectionPool pool)
-		throws SQLException
+	public CertGeneratorDBResourceFactory(DatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}
-	
+
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
-		try
-		{
+		try {
 			return new CertGeneratorDBResource(parentKey, _pool);
-		}
-		catch (SQLException sqe)
-		{
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 	}

@@ -8,10 +8,7 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IRExportEntryResource extends IResource
 {
-	public void destroy(Connection connection, boolean hardDestroy) 
-		throws ResourceException, ResourceUnknownFaultType;
-	
-	public void destroy(boolean hardDestroy)
-		throws ResourceException, ResourceUnknownFaultType;
-}
+	public void destroy(Connection connection, boolean hardDestroy) throws ResourceException, ResourceUnknownFaultType;
 
+	public void destroy(boolean hardDestroy) throws ResourceException, ResourceUnknownFaultType;
+}

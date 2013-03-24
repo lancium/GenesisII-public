@@ -6,32 +6,28 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
  * mts5x
  */
 public enum ToolCategory {
-	
-	DATA (false, "Data"),
-	HELP (false, "Help"),
-	SECURITY (false, "Security"),
-	MISC (false, "Misc"),
-	INTERNAL (false, "Internal Use"),
-	EXECUTION(false, "Job/Execution"),
-	ANTIQUATED(false, "Antiquated"),
-	GENERAL(false, "General"),
-	ADMINISTRATION(false, "Administration");
-	
-	
+
+	DATA(false, "Data"), HELP(false, "Help"), SECURITY(false, "Security"), MISC(false, "Misc"), INTERNAL(false, "Internal Use"), EXECUTION(
+		false, "Job/Execution"), ANTIQUATED(false, "Antiquated"), GENERAL(false, "General"), ADMINISTRATION(false,
+		"Administration");
+
 	private boolean _hidden;
 	private String _desc;
-	
-	ToolCategory(boolean hiddenGroup, String description){
+
+	ToolCategory(boolean hiddenGroup, String description)
+	{
 		_hidden = hiddenGroup;
 		_desc = description;
 	}
-	
-	public boolean isHidden(){
+
+	public boolean isHidden()
+	{
 		return _hidden;
 	}
-	
-	public String getDescription(){
+
+	public String getDescription()
+	{
 		return _desc;
 	}
-	
+
 }

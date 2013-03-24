@@ -31,40 +31,39 @@ public class LifetimePrey
 	private URI _epi;
 	private EndpointReferenceType _target;
 	private Date _termintationTime;
-	
+
 	LifetimePrey(URI epi, EndpointReferenceType target, Date termintationTime)
 	{
 		_epi = epi;
 		_target = target;
 		_termintationTime = termintationTime;
 	}
-	
+
 	void destroy() throws ResourceUnknownFaultType, ResourceException
 	{
 		ResourceManager.getTargetResource(_target).destroy();
 	}
-	
+
 	URI getName()
 	{
 		return _epi;
 	}
-	
+
 	Date getTermintationTime()
 	{
 		return _termintationTime;
 	}
-	
+
 	static Comparator<LifetimePrey> createComparor()
 	{
 		return new Comparator<LifetimePrey>()
 		{
 			public int compare(LifetimePrey arg0, LifetimePrey arg1)
 			{
-				int value = arg0._termintationTime.compareTo(
-					arg1._termintationTime);
+				int value = arg0._termintationTime.compareTo(arg1._termintationTime);
 				if (value == 0)
 					value = arg0._epi.toString().compareTo(arg1._epi.toString());
-				
+
 				return value;
 			}
 		};

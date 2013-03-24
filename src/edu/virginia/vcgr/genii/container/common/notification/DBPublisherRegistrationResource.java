@@ -13,9 +13,8 @@ public class DBPublisherRegistrationResource extends BasicDBResource
 	{
 		super(key, connection);
 	}
-	
-	public DBPublisherRegistrationResource(ResourceKey parentKey,
-		DatabaseConnectionPool connectionPool) throws SQLException
+
+	public DBPublisherRegistrationResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

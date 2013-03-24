@@ -16,41 +16,26 @@ public class ResourceMInjectResolver implements MInjectResolver
 	@Override
 	public boolean handles(MInject arg, Class<?> targetType)
 	{
-		return (arg.name().isEmpty() && (
-			IResource.class.isAssignableFrom(targetType) ||
-			ResourceLock.class.isAssignableFrom(targetType) ||
-			StringResourceIdentifier.class.isAssignableFrom(targetType)
-			));
+		return (arg.name().isEmpty() && (IResource.class.isAssignableFrom(targetType)
+			|| ResourceLock.class.isAssignableFrom(targetType) || StringResourceIdentifier.class.isAssignableFrom(targetType)));
 	}
 
 	@Override
-	public <Type> Type resolve(MInject arg, Class<Type> targetType)
-		throws InjectionException
+	public <Type> Type resolve(MInject arg, Class<Type> targetType) throws InjectionException
 	{
-		try
-		{
+		try {
 			if (IResource.class.isAssignableFrom(targetType))
-				return targetType.cast(
-					ResourceManager.getCurrentResource().dereference());
+				return targetType.cast(ResourceManager.getCurrentResource().dereference());
 			else if (ResourceLock.class.isAssignableFrom(targetType))
-				return targetType.cast(
-					ResourceManager.getCurrentResource().getResourceLock());
+				return targetType.cast(ResourceManager.getCurrentResource().getResourceLock());
 			else if (StringResourceIdentifier.class.isAssignableFrom(targetType))
-				return targetType.cast(new StringResourceIdentifier(
-					ResourceManager.getCurrentResource().getResourceKey()));
+				return targetType.cast(new StringResourceIdentifier(ResourceManager.getCurrentResource().getResourceKey()));
+		} catch (ResourceException e) {
+			throw new InjectionException("Unable to resolve injection value.", e);
+		} catch (ResourceUnknownFaultType e) {
+			throw new InjectionException("Unable to resolve injection value.", e);
 		}
-		catch (ResourceException e)
-		{
-			throw new InjectionException(
-				"Unable to resolve injection value.", e);
-		}
-		catch (ResourceUnknownFaultType e)
-		{
-			throw new InjectionException(
-				"Unable to resolve injection value.", e);
-		}
-		
-		throw new InjectionException(String.format(
-			"Don't know how to inject into type %s.", targetType));
+
+		throw new InjectionException(String.format("Don't know how to inject into type %s.", targetType));
 	}
 }

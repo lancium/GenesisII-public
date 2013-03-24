@@ -14,10 +14,8 @@ public class PictureViewerApplication extends AbstractExternalApplication
 	{
 		Image image = ImageIO.read(content);
 		if (image == null)
-			throw new IllegalArgumentException(String.format(
-				"Don't know how to read image format from %s.", 
-				content.getName()));
-		
+			throw new IllegalArgumentException(String.format("Don't know how to read image format from %s.", content.getName()));
+
 		PictureViewer.displayPicture(image, content.getName());
 	}
 }

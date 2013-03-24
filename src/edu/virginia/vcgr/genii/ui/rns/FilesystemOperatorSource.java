@@ -6,12 +6,12 @@ import java.util.List;
 public class FilesystemOperatorSource implements OperatorSource
 {
 	private List<File> _sources;
-	
+
 	public FilesystemOperatorSource(List<File> sources)
 	{
 		_sources = sources;
 	}
-	
+
 	@Override
 	public boolean isFilesystemSource()
 	{
@@ -23,7 +23,7 @@ public class FilesystemOperatorSource implements OperatorSource
 	{
 		return false;
 	}
-	
+
 	public List<File> sources()
 	{
 		return _sources;

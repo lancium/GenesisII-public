@@ -18,38 +18,32 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class GetBESFactoryAttributesTool extends BaseGridTool
 {
-	static final private String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dgetbesattributes";
-	static final private String _USAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uget-bes-attributes";
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/get-bes-attributes";
-	
+	static final private String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dgetbesattributes";
+	static final private String _USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uget-bes-attributes";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/get-bes-attributes";
+
 	public GetBESFactoryAttributesTool()
 	{
-		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
-				false, ToolCategory.ADMINISTRATION);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.ADMINISTRATION);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
-		if(gPath.pathType() != GeniiPathType.Grid)
+		if (gPath.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException("<target> must be a grid path. ");
 		RNSPath path = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
-		
-		GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class,
-			path.getEndpoint());
 
-		GetFactoryAttributesDocumentResponseType resp =
-			bes.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
-		
-		ObjectSerializer.serialize(stdout, resp, 
-			new QName("http://tempuri.org", "bes-factory-attributes"));
+		GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, path.getEndpoint());
+
+		GetFactoryAttributesDocumentResponseType resp = bes
+			.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
+
+		ObjectSerializer.serialize(stdout, resp, new QName("http://tempuri.org", "bes-factory-attributes"));
 		stdout.flush();
-		
+
 		return 0;
 	}
 

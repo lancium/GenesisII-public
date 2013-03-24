@@ -26,13 +26,10 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 
 public class WSNSubscribeTool extends BaseGridTool
 {
-	static private final String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dwsn-subscribe";
-	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uwsn-subscribe";
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dwsn-subscribe";
+	static private final String _USAGE_RESOURCE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uwsn-subscribe";
 
-	private class NotificationHandlerImpl
-		extends AbstractNotificationHandler<NotificationMessageContents>
+	private class NotificationHandlerImpl extends AbstractNotificationHandler<NotificationMessageContents>
 	{
 		private NotificationHandlerImpl()
 		{
@@ -40,117 +37,97 @@ public class WSNSubscribeTool extends BaseGridTool
 		}
 
 		@Override
-		public String handleNotification(TopicPath topic,
-			EndpointReferenceType producerReference,
-			EndpointReferenceType subscriptionReference,
-			NotificationMessageContents contents) throws Exception
+		public String handleNotification(TopicPath topic, EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference, NotificationMessageContents contents) throws Exception
 		{
-			stdout.format(
-				"Received notification [%s]:  %s\n",
-				topic, contents);
+			stdout.format("Received notification [%s]:  %s\n", topic, contents);
 			return NotificationConstants.OK;
 		}
 	}
-	
+
 	private GeniiPath _subscriptionPath = null;
 	private SimpleNamespaceContext _context = new SimpleNamespaceContext();
 	private TopicQueryExpression _filter = null;
-	
-	private void subscribe(GeniiPath publisher, GeniiPath subscriber)
-		throws SubscribeException, RNSPathAlreadyExistsException, RNSException
+
+	private void subscribe(GeniiPath publisher, GeniiPath subscriber) throws SubscribeException, RNSPathAlreadyExistsException,
+		RNSException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath publisherPath = current.lookup(publisher.path());
 		RNSPath subscriberPath = current.lookup(subscriber.path());
-		SubscriptionFactory factory = new DefaultSubscriptionFactory(
-			subscriberPath.getEndpoint());
-		Subscription result = factory.subscribe(publisherPath.getEndpoint(),
-			_filter, null, null);
-		
-		if (_subscriptionPath != null)
-		{
-			RNSPath subscription = current.lookup(
-				_subscriptionPath.path(), RNSPathQueryFlags.MUST_NOT_EXIST);
+		SubscriptionFactory factory = new DefaultSubscriptionFactory(subscriberPath.getEndpoint());
+		Subscription result = factory.subscribe(publisherPath.getEndpoint(), _filter, null, null);
+
+		if (_subscriptionPath != null) {
+			RNSPath subscription = current.lookup(_subscriptionPath.path(), RNSPathQueryFlags.MUST_NOT_EXIST);
 			subscription.link(result.subscriptionReference());
 		}
 	}
-	
+
 	private void subscribe(GeniiPath publisher) throws Exception
 	{
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath publisherPath = current.lookup(publisher.path());
-		
-		LightweightNotificationServer server =
-			LightweightNotificationServer.createStandardServer();
+
+		LightweightNotificationServer server = LightweightNotificationServer.createStandardServer();
 		server.start();
-		LightweightSubscription result = server.subscribe(
-			publisherPath.getEndpoint(), _filter, null, null);
+		LightweightSubscription result = server.subscribe(publisherPath.getEndpoint(), _filter, null, null);
 		result.registerNotificationHandler(new NotificationHandlerImpl());
-		
-		if (_subscriptionPath != null)
-		{
-			RNSPath subscription = current.lookup(
-				_subscriptionPath.path(), RNSPathQueryFlags.MUST_NOT_EXIST);
+
+		if (_subscriptionPath != null) {
+			RNSPath subscription = current.lookup(_subscriptionPath.path(), RNSPathQueryFlags.MUST_NOT_EXIST);
 			subscription.link(result.subscriptionReference());
 		}
-		
-		while (true)
-		{
+
+		while (true) {
 			Thread.sleep(1000L * 1000);
 		}
 	}
-	
+
 	@Option("subscription-path")
 	protected void subscriptionPath(String path) throws ToolException
 	{
 		_subscriptionPath = new GeniiPath(path);
-		
+
 		if (_subscriptionPath.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException(
-				"Subscription path is not a grid path.");
+			throw new InvalidToolUsageException("Subscription path is not a grid path.");
 	}
-	
+
 	protected void topicFilter(String topicFilter) throws ToolException
 	{
-		_filter = TopicPath.createTopicPath(
-			_context, topicFilter).asConcreteQueryExpression();
+		_filter = TopicPath.createTopicPath(_context, topicFilter).asConcreteQueryExpression();
 	}
-	
+
 	protected void addPrefix(String prefix, String uri)
 	{
 		_context.associate(prefix, uri);
 	}
-	
+
 	protected void addPrefix(String prefixString) throws ToolException
 	{
 		int index = prefixString.indexOf('=');
 		if (index <= 0)
-			throw new InvalidToolUsageException(String.format(
-				"xmlns:%s is not a valid prefix instruction.", prefixString));
-		
-		addPrefix(prefixString.substring(0, index),
-			prefixString.substring(index + 1));
+			throw new InvalidToolUsageException(String.format("xmlns:%s is not a valid prefix instruction.", prefixString));
+
+		addPrefix(prefixString.substring(0, index), prefixString.substring(index + 1));
 	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		GeniiPath publisher = new GeniiPath(getArgument(0));
 		if (publisher.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException(
-				"Publisher path must be a grid path.");
-		
-		if (numArguments() == 2)
-		{
+			throw new InvalidToolUsageException("Publisher path must be a grid path.");
+
+		if (numArguments() == 2) {
 			GeniiPath subscriber = new GeniiPath(getArgument(1));
 			if (subscriber.pathType() != GeniiPathType.Grid)
-				throw new InvalidToolUsageException(
-					"Subscriber path must be a grid path.");
-			
+				throw new InvalidToolUsageException("Subscriber path must be a grid path.");
+
 			subscribe(publisher, subscriber);
 		} else
 			subscribe(publisher);
-		
+
 		return 0;
 	}
 
@@ -160,19 +137,18 @@ public class WSNSubscribeTool extends BaseGridTool
 		if (numArguments() < 1 || numArguments() > 2)
 			throw new InvalidToolUsageException();
 	}
-	
+
 	public WSNSubscribeTool()
 	{
-		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE),
-				true, ToolCategory.INTERNAL);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE), true, ToolCategory.INTERNAL);
 	}
-	
+
 	@Override
 	public void addArgument(String argument) throws ToolException
 	{
 		if (argument.startsWith("xmlns:"))
 			addPrefix(argument.substring(6));
-		
+
 		super.addArgument(argument);
 	}
 }

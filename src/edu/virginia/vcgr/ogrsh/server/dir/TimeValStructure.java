@@ -10,48 +10,48 @@ public class TimeValStructure implements IPackable
 {
 	private long _seconds;
 	private long _microseconds;
-	
+
 	public TimeValStructure()
 	{
 		this(0L, 0L);
 	}
-	
+
 	public TimeValStructure(long seconds)
 	{
 		this(seconds, 0L);
 	}
-	
+
 	public TimeValStructure(long seconds, long microseconds)
 	{
 		_seconds = seconds;
 		_microseconds = microseconds;
 	}
-	
+
 	public TimeValStructure(IOGRSHReadBuffer buffer) throws IOException
 	{
 		unpack(buffer);
 	}
-	
+
 	public long getSeconcds()
 	{
 		return _seconds;
 	}
-	
+
 	public void setSeconds(long seconds)
 	{
 		_seconds = seconds;
 	}
-	
+
 	public long getMicroSeconds()
 	{
 		return _microseconds;
 	}
-	
+
 	public void setMicroSeconds(long microSeconds)
 	{
 		_microseconds = microSeconds;
 	}
-	
+
 	@Override
 	public void pack(IOGRSHWriteBuffer buffer) throws IOException
 	{
@@ -62,7 +62,7 @@ public class TimeValStructure implements IPackable
 	@Override
 	public void unpack(IOGRSHReadBuffer buffer) throws IOException
 	{
-		_seconds = (Long)buffer.readObject();
-		_microseconds = (Long)buffer.readObject();
+		_seconds = (Long) buffer.readObject();
+		_microseconds = (Long) buffer.readObject();
 	}
 }

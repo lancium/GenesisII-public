@@ -8,44 +8,54 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 
-public class CacheUtils {
-	
-	public static String getContainerId(WSName wsName) {
-		if (!wsName.isValidWSName()) return null;
+public class CacheUtils
+{
+
+	public static String getContainerId(WSName wsName)
+	{
+		if (!wsName.isValidWSName())
+			return null;
 		return getContainerId(wsName.getEndpoint());
 	}
 
-	public static String getContainerId(EndpointReferenceType epr) {
+	public static String getContainerId(EndpointReferenceType epr)
+	{
 		try {
 			return EPRUtils.getGeniiContainerID(epr).toString();
 		} catch (Exception ex) {
-			//not a GenesisII resource
+			// not a GenesisII resource
 			return null;
 		}
 	}
-	
-	public static String getNamespaceForByteIOAttributes(EndpointReferenceType byteIO) {
+
+	public static String getNamespaceForByteIOAttributes(EndpointReferenceType byteIO)
+	{
 		TypeInformation info = new TypeInformation(byteIO);
 		if (info.isRByteIO()) {
-			 return ByteIOConstants.RANDOM_BYTEIO_NS;
+			return ByteIOConstants.RANDOM_BYTEIO_NS;
 		} else {
 			return ByteIOConstants.STREAMABLE_BYTEIO_NS;
 		}
 	}
-	
-	public static URI getEPI(EndpointReferenceType endPoint) {
+
+	public static URI getEPI(EndpointReferenceType endPoint)
+	{
 		WSName wsName = new WSName(endPoint);
-		if (!wsName.isValidWSName()) return null;
-		return wsName.getEndpointIdentifier(); 
+		if (!wsName.isValidWSName())
+			return null;
+		return wsName.getEndpointIdentifier();
 	}
-	
-	public static String getEPIString(EndpointReferenceType endPoint) {
+
+	public static String getEPIString(EndpointReferenceType endPoint)
+	{
 		WSName wsName = new WSName(endPoint);
-		if (!wsName.isValidWSName()) return null;
-		return wsName.getEndpointIdentifier().toString(); 
+		if (!wsName.isValidWSName())
+			return null;
+		return wsName.getEndpointIdentifier().toString();
 	}
-	
-	public static String getStackTraceString() {
+
+	public static String getStackTraceString()
+	{
 		StringBuilder buffer = new StringBuilder();
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		for (StackTraceElement traceElement : stackTrace) {

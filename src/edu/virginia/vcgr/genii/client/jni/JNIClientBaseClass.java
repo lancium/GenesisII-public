@@ -22,17 +22,12 @@ public class JNIClientBaseClass
 {
 	static public final String VCGR_CLIENT_LIB_NAME = "VcgrClientLib";
 	static private Log _logger = LogFactory.getLog(JNIClientBaseClass.class);
-	
-	static 
-	{
-		try 
-		{
+
+	static {
+		try {
 			System.loadLibrary(VCGR_CLIENT_LIB_NAME);
-		}
-		catch (UnsatisfiedLinkError e)
-		{
+		} catch (UnsatisfiedLinkError e) {
 			_logger.warn("linking in library " + VCGR_CLIENT_LIB_NAME + " failed", e);
 		}
 	}
 }
-

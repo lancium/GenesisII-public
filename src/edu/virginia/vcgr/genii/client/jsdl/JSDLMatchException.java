@@ -20,12 +20,12 @@ import javax.xml.namespace.QName;
 public class JSDLMatchException extends JSDLException
 {
 	static final long serialVersionUID = 0;
-	
+
 	public JSDLMatchException(String reason)
 	{
 		super(reason);
 	}
-	
+
 	public JSDLMatchException(QName unsatisfiedElement)
 	{
 		super("Unable to satisfy \"" + unsatisfiedElement + "\" requirement.");

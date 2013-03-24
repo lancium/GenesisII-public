@@ -40,7 +40,7 @@ public class ResolutionContext
 	{
 		return _origEPR;
 	}
-	
+
 	public boolean rebindAllowed()
 	{
 		return _rebindAllowed;
@@ -50,30 +50,26 @@ public class ResolutionContext
 	{
 		return _triedOriginalEPR;
 	}
-	
+
 	public void setTriedOriginalEPR()
 	{
 		_triedOriginalEPR = true;
 	}
 
-	public EndpointReferenceType resolve()
-		throws RemoteException
+	public EndpointReferenceType resolve() throws RemoteException
 	{
 		// If this is the first call to resolve(), then resolve the original EPR.
-		if (_resolvedEPR == null)
-		{
+		if (_resolvedEPR == null) {
 			_resolvedEPR = ResolverUtils.resolve(_origEPR);
 			_knownEndpoints++;
 			return _resolvedEPR;
 		}
 		// The client has already tried origEPR and resolvedEPR, and neither worked.
 		// Are there more endpoints to resolve?
-		if (_endpointCount == 0)
-		{
+		if (_endpointCount == 0) {
 			_endpointCount = ResolverUtils.getEndpointCount(_origEPR);
 		}
-		if (_knownEndpoints < _endpointCount)
-		{
+		if (_knownEndpoints < _endpointCount) {
 			_resolvedEPR = ResolverUtils.resolve(_resolvedEPR);
 			_knownEndpoints++;
 			return _resolvedEPR;

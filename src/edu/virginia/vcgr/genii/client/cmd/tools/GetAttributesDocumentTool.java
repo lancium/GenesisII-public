@@ -24,30 +24,26 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class GetAttributesDocumentTool extends BaseGridTool
 {
-	static final private String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dgetattributes";
-	static final private String _USAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uget-attributes";
-	static final private String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/get-attributes";
-	
+	static final private String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dgetattributes";
+	static final private String _USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uget-attributes";
+	static final private String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/get-attributes";
+
 	private boolean _human = false;
 	private boolean _local = false;
-	
+
 	public GetAttributesDocumentTool()
 	{
-		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE),
-				false, ToolCategory.ADMINISTRATION);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.ADMINISTRATION);
 		addManPage(new FileResource(_MANPAGE));
 	}
-	
-	@Option({"human", "h"})
+
+	@Option({ "human", "h" })
 	public void setHuman()
 	{
 		_human = true;
 	}
-	
-	@Option({"local", "l"})
+
+	@Option({ "local", "l" })
 	public void setLocal()
 	{
 		_human = true;
@@ -58,40 +54,30 @@ public class GetAttributesDocumentTool extends BaseGridTool
 	protected int runCommand() throws Throwable
 	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
-		if ( gPath.pathType() != GeniiPathType.Grid)
+		if (gPath.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException("<target> must be a grid path. ");
 		RNSPath path = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
-		
-		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-			path.getEndpoint());
-		GetResourcePropertyDocumentResponse resp = common.getResourcePropertyDocument(
-			new GetResourcePropertyDocument());
-		if (_human)
-		{
+
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, path.getEndpoint());
+		GetResourcePropertyDocumentResponse resp = common.getResourcePropertyDocument(new GetResourcePropertyDocument());
+		if (_human) {
 			SortedMap<String, String> sortMap = new TreeMap<String, String>();
-			for (MessageElement child : resp.get_any())
-			{
+			for (MessageElement child : resp.get_any()) {
 				String name = (_local ? child.getName() : child.getQName().toString());
 				String value = child.getValue();
-				if (value == null)
-				{
+				if (value == null) {
 					NodeList nodeList = child.getChildNodes();
 					if (nodeList != null)
 						value = "<" + nodeList.getLength() + ">";
 				}
 				sortMap.put(name, value);
 			}
-			for (Map.Entry<String, String> entry : sortMap.entrySet())
-			{
+			for (Map.Entry<String, String> entry : sortMap.entrySet()) {
 				stdout.println(entry.getKey() + "=" + entry.getValue());
 			}
-		}
-		else
-		{
-			MessageElement document = new MessageElement(
-					new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
-			for (MessageElement child : resp.get_any())
-			{
+		} else {
+			MessageElement document = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
+			for (MessageElement child : resp.get_any()) {
 				document.addChild(child);
 			}
 			stdout.println(document);

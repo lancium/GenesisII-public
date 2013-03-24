@@ -14,46 +14,39 @@ import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
 public class BasicDBResourceProvider implements IResourceProvider, Initializable
 {
 	private IResourceFactory _factory = null;
-	
+
 	public BasicDBResourceProvider()
-	{	
+	{
 	}
-	
+
 	private DatabaseConnectionPool createConnectionPool()
 
 	{
 		DatabaseConnectionPool pool = null;
-		
+
 		Object obj = NamedInstances.getServerInstances().lookup("connection-pool");
-		if (obj != null)
-		{
-			pool = (DatabaseConnectionPool)obj;
+		if (obj != null) {
+			pool = (DatabaseConnectionPool) obj;
 			return pool;
 		}
-		
-		throw new ConfigurationException(
-			"Couldn't find connection pool.");
+
+		throw new ConfigurationException("Couldn't find connection pool.");
 	}
-	
+
 	synchronized public IResourceFactory getFactory()
 	{
-		if (_factory == null)
-		{
-			try
-			{
+		if (_factory == null) {
+			try {
 				_factory = instantiateResourceFactory(createConnectionPool());
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				throw new RuntimeException(e.getLocalizedMessage(), e);
 			}
 		}
-		
+
 		return _factory;
 	}
 
-	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
-		throws SQLException, ResourceException
+	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool) throws SQLException, ResourceException
 	{
 		return new BasicDBResourceFactory(pool);
 	}

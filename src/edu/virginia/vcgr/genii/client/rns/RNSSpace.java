@@ -25,17 +25,14 @@ import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 
 public class RNSSpace
 {
-	static public RNSPath createNewSpace(String serviceURL)
-		throws RemoteException
+	static public RNSPath createNewSpace(String serviceURL) throws RemoteException
 	{
 		return RNSSpace.createNewSpace(EPRUtils.makeEPR(serviceURL));
 	}
-	
-	static public RNSPath createNewSpace(EndpointReferenceType serviceEPR)
-		throws RemoteException
+
+	static public RNSPath createNewSpace(EndpointReferenceType serviceEPR) throws RemoteException
 	{
-		EnhancedRNSPortType factory = ClientUtils.createProxy(
-			EnhancedRNSPortType.class, serviceEPR);
+		EnhancedRNSPortType factory = ClientUtils.createProxy(EnhancedRNSPortType.class, serviceEPR);
 		RNSLegacyProxy proxy = new RNSLegacyProxy(factory);
 		EndpointReferenceType rootEPR = proxy.createRoot();
 		return new RNSPath(rootEPR);

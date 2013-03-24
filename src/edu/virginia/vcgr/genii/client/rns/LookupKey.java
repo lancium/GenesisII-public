@@ -21,29 +21,28 @@ public class LookupKey
 {
 	private WSName _name;
 	private String _entryExpression;
-	
+
 	public LookupKey(WSName name, String entryExpression)
 	{
 		_name = name;
 		_entryExpression = entryExpression;
 	}
-	
+
 	public int hashCode()
 	{
 		return _name.hashCode() ^ _entryExpression.hashCode();
 	}
-	
+
 	public boolean equals(LookupKey other)
 	{
-		return (_name.equals(other._name) 
-			&& _entryExpression.equals(other._entryExpression));
+		return (_name.equals(other._name) && _entryExpression.equals(other._entryExpression));
 	}
-	
+
 	public boolean equals(Object other)
 	{
 		if (!(other instanceof LookupKey))
 			return false;
-		
-		return equals((LookupKey)other);
+
+		return equals((LookupKey) other);
 	}
 }

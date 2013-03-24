@@ -1,11 +1,9 @@
 package edu.virginia.vcgr.fsii.path;
 
-public class UnixFilesystemPathRepresentation 
-	extends	AbstractFilesystemPathRepresentation
+public class UnixFilesystemPathRepresentation extends AbstractFilesystemPathRepresentation
 {
-	static public UnixFilesystemPathRepresentation INSTANCE =
-		new UnixFilesystemPathRepresentation();
-	
+	static public UnixFilesystemPathRepresentation INSTANCE = new UnixFilesystemPathRepresentation();
+
 	@Override
 	/** {@inheritDoc} */
 	protected String getRootString()
@@ -33,14 +31,13 @@ public class UnixFilesystemPathRepresentation
 	{
 		if (path.length == 0)
 			return getRootString();
-		
+
 		StringBuilder builder = new StringBuilder();
-		for (String element : path)
-		{
+		for (String element : path) {
 			builder.append('/');
 			builder.append(element);
 		}
-		
+
 		return builder.toString();
 	}
 }

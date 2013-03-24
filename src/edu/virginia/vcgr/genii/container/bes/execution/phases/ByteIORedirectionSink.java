@@ -16,51 +16,46 @@ import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 public class ByteIORedirectionSink implements StreamRedirectionSink
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private EndpointReferenceType _target;
-	
+
 	public ByteIORedirectionSink(EndpointReferenceType target)
 	{
 		_target = target;
 	}
-	
+
 	@Override
 	public OutputStream openSink(ExecutionContext context) throws IOException
 	{
 		return ByteIOStreamFactory.createOutputStream(_target);
 	}
-	
-	private void writeObject(ObjectOutputStream out)
-    	throws IOException
+
+	private void writeObject(ObjectOutputStream out) throws IOException
 	{
-		byte []data = EPRUtils.toBytes(_target);
+		byte[] data = EPRUtils.toBytes(_target);
 		out.writeInt(data.length);
 		out.write(data);
 	}
-	
-	private void readObject(ObjectInputStream in)
-    	throws IOException, ClassNotFoundException
+
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		int offset = 0;
 		int length = in.readInt();
-		byte []data = new byte[length];
-		
-		while (length > 0)
-		{
+		byte[] data = new byte[length];
+
+		while (length > 0) {
 			int read = in.read(data, offset, length);
 			if (read <= 0)
-				throw new IOException(
-					"Unable to read bytes from serialized stream.");
+				throw new IOException("Unable to read bytes from serialized stream.");
 			length -= read;
 			offset += read;
 		}
-		
+
 		_target = EPRUtils.fromBytes(data);
 	}
 
 	@SuppressWarnings("unused")
-	private void readObjectNoData() 
-    	throws ObjectStreamException
+	private void readObjectNoData() throws ObjectStreamException
 	{
 		throw new StreamCorruptedException("Unable to deserialize object.");
 	}

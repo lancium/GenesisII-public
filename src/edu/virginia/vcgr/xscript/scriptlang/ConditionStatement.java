@@ -12,23 +12,18 @@ public class ConditionStatement implements ParseStatement
 {
 	private String _propertyname;
 	private ConditionExpression _expression;
-	
-	public ConditionStatement(String propertyName, 
-		ConditionExpression expression)
+
+	public ConditionStatement(String propertyName, ConditionExpression expression)
 	{
 		_propertyname = propertyName;
 		_expression = expression;
 	}
-	
+
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
 	{
-		Boolean value = new Boolean(
-			_expression.evaluateCondition(context));
-		context.setAttribute(
-			MacroReplacer.replaceMacros(context, _propertyname),
-			value);
+		Boolean value = new Boolean(_expression.evaluateCondition(context));
+		context.setAttribute(MacroReplacer.replaceMacros(context, _propertyname), value);
 		return value;
 	}
 }

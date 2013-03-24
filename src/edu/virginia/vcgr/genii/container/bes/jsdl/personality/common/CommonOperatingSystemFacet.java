@@ -8,12 +8,10 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultOperatingSyste
 public class CommonOperatingSystemFacet extends DefaultOperatingSystemFacet
 {
 	@Override
-	public void consumeOperatingSystemVersion(Object currentUnderstanding,
-			String operatingSystemVersion) throws JSDLException
+	public void consumeOperatingSystemVersion(Object currentUnderstanding, String operatingSystemVersion) throws JSDLException
 	{
-		if (operatingSystemVersion != null && !operatingSystemVersion.equals(
-			JSDLUtils.getLocalOperatingSystem().getOperatingSystemVersion()))
-			throw new JSDLMatchException(
-				"Operating system versions don't match.");
+		if (operatingSystemVersion != null
+			&& !operatingSystemVersion.equals(JSDLUtils.getLocalOperatingSystem().getOperatingSystemVersion()))
+			throw new JSDLMatchException("Operating system versions don't match.");
 	}
 }

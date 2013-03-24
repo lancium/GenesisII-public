@@ -6,7 +6,8 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 
 @XmlRootElement(namespace = GenesisIIConstants.ENHANCED_NOTIFICATION_BROKER_NS, name = "TestNotification")
-public class TestNotificationMessageContents extends NotificationMessageContents {
+public class TestNotificationMessageContents extends NotificationMessageContents
+{
 
 	private static final long serialVersionUID = 0L;
 }

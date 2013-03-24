@@ -5,18 +5,17 @@ import java.io.OutputStream;
 
 public class TeeOutputStream extends OutputStream
 {
-	private OutputStream []_streams;
-	
-	public TeeOutputStream(OutputStream...streams)
+	private OutputStream[] _streams;
+
+	public TeeOutputStream(OutputStream... streams)
 	{
 		_streams = streams;
 	}
-	
+
 	@Override
 	public void write(int b) throws IOException
 	{
-		for (OutputStream stream : _streams)
-		{
+		for (OutputStream stream : _streams) {
 			stream.write(b);
 		}
 	}
@@ -24,8 +23,7 @@ public class TeeOutputStream extends OutputStream
 	@Override
 	public void close() throws IOException
 	{
-		for (OutputStream stream : _streams)
-		{
+		for (OutputStream stream : _streams) {
 			stream.close();
 		}
 	}
@@ -33,8 +31,7 @@ public class TeeOutputStream extends OutputStream
 	@Override
 	public void flush() throws IOException
 	{
-		for (OutputStream stream : _streams)
-		{
+		for (OutputStream stream : _streams) {
 			stream.flush();
 		}
 	}
@@ -42,8 +39,7 @@ public class TeeOutputStream extends OutputStream
 	@Override
 	public void write(byte[] b, int off, int len) throws IOException
 	{
-		for (OutputStream stream : _streams)
-		{
+		for (OutputStream stream : _streams) {
 			stream.write(b, off, len);
 		}
 	}
@@ -51,8 +47,7 @@ public class TeeOutputStream extends OutputStream
 	@Override
 	public void write(byte[] b) throws IOException
 	{
-		for (OutputStream stream : _streams)
-		{
+		for (OutputStream stream : _streams) {
 			stream.write(b);
 		}
 	}

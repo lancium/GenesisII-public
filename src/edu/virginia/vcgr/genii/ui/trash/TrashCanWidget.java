@@ -15,59 +15,45 @@ import edu.virginia.vcgr.genii.ui.UIContext;
 public class TrashCanWidget extends JComponent
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private ApplicationContext _appContext;
 	private UIContext _context;
-        
-	public TrashCanWidget(ApplicationContext appContext,
-		UIContext context)
+
+	public TrashCanWidget(ApplicationContext appContext, UIContext context)
 	{
 		_appContext = appContext;
 		_context = context;
-		
-		Dimension size = new Dimension(
-			Math.max(
-				Images.emptyTrashcan().getWidth(),
-				Images.fullTrashcan().getWidth()),
-			Math.max(
-				Images.emptyTrashcan().getHeight(),
-				Images.fullTrashcan().getHeight()));
-		
+
+		Dimension size = new Dimension(Math.max(Images.emptyTrashcan().getWidth(), Images.fullTrashcan().getWidth()), Math.max(
+			Images.emptyTrashcan().getHeight(), Images.fullTrashcan().getHeight()));
+
 		setMinimumSize(size);
 		setPreferredSize(size);
 		setMaximumSize(size);
-		
-		_context.trashCan().addTrashCanStateListener(
-			new TrashCanStateListenerImpl());
-		
+
+		_context.trashCan().addTrashCanStateListener(new TrashCanStateListenerImpl());
+
 		setTransferHandler(new TrashCanTransferHandler(context));
-		
+
 		addMouseListener(new MouseClickListener());
 	}
-	
+
 	@Override
 	protected void paintComponent(Graphics _g)
 	{
-		Graphics2D g = (Graphics2D)_g.create();
-		
-		try
-		{
+		Graphics2D g = (Graphics2D) _g.create();
+
+		try {
 			int width = getWidth();
 			int height = getHeight();
-			BufferedImage image =
-				_context.trashCan().isEmpty() ?
-					Images.emptyTrashcan() : Images.fullTrashcan();
-					
-			g.drawImage(image, 
-				(width - image.getWidth()) / 2, 
-				(height - image.getHeight()) / 2, null);
-		}
-		finally
-		{
+			BufferedImage image = _context.trashCan().isEmpty() ? Images.emptyTrashcan() : Images.fullTrashcan();
+
+			g.drawImage(image, (width - image.getWidth()) / 2, (height - image.getHeight()) / 2, null);
+		} finally {
 			g.dispose();
 		}
 	}
-	
+
 	private class TrashCanStateListenerImpl implements TrashCanStateListener
 	{
 		@Override

@@ -11,22 +11,17 @@ import org.morgan.util.io.StreamUtils;
 
 public class Images
 {
-	static protected BufferedImage loadImage(String resourcePath)
-		throws IOException
+	static protected BufferedImage loadImage(String resourcePath) throws IOException
 	{
 		InputStream in = null;
-		
-		try
-		{
+
+		try {
 			in = ClassLoader.getSystemResourceAsStream(resourcePath);
 			if (in == null)
-				throw new FileNotFoundException(String.format(
-					"Couldn't find resource %s.", resourcePath));
+				throw new FileNotFoundException(String.format("Couldn't find resource %s.", resourcePath));
 			BufferedImage image = ImageIO.read(in);
 			return image;
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(in);
 		}
 	}

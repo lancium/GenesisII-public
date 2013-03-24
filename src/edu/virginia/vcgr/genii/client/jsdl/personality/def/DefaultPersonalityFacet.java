@@ -9,22 +9,18 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityFacet;
 public class DefaultPersonalityFacet implements PersonalityFacet
 {
 	@Override
-	public void completeFacet(
-		Object parentUnderstanding, Object currentUnderstanding)
-			throws JSDLException
+	public void completeFacet(Object parentUnderstanding, Object currentUnderstanding) throws JSDLException
 	{
 	}
 
 	@Override
-	public void consumeAny(Object currentUnderstanding,
-			MessageElement any) throws JSDLException
+	public void consumeAny(Object currentUnderstanding, MessageElement any) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(any.getQName());
 	}
 
 	@Override
-	public Object createFacetUnderstanding(Object parentUnderstanding)
-			throws JSDLException
+	public Object createFacetUnderstanding(Object parentUnderstanding) throws JSDLException
 	{
 		return parentUnderstanding;
 	}

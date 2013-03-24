@@ -8,18 +8,15 @@ import java.util.Set;
 
 public class FromString
 {
-	static private Object fromString(String value, Class<?> targetType,
-		Set<Class<?>> attemptedConversions)
+	static private Object fromString(String value, Class<?> targetType, Set<Class<?>> attemptedConversions)
 	{
 		if (targetType.equals(String.class))
 			return value;
-		
-		if (targetType.equals(char.class) || targetType.equals(Character.class))
-		{
+
+		if (targetType.equals(char.class) || targetType.equals(Character.class)) {
 			if (value.length() != 1)
-				throw new IllegalArgumentException(String.format(
-					"Cannot convert \"%s\" to a character.", value));
-			
+				throw new IllegalArgumentException(String.format("Cannot convert \"%s\" to a character.", value));
+
 			return value.charAt(0);
 		} else if (targetType.equals(short.class) || targetType.equals(Short.class))
 			return Short.parseShort(value);
@@ -41,42 +38,32 @@ public class FromString
 			return new StringReader(value);
 		else if (targetType.isAssignableFrom(ByteArrayInputStream.class))
 			return new ByteArrayInputStream(value.getBytes());
-		
-		try
-		{
+
+		try {
 			Constructor<?> cons = targetType.getConstructor(String.class);
 			return cons.newInstance(value);
-		} 
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			// Ignore
 		}
-		
-		for (Constructor<?> cons : targetType.getConstructors())
-		{
-			if (cons.getParameterTypes().length == 1)
-			{
+
+		for (Constructor<?> cons : targetType.getConstructors()) {
+			if (cons.getParameterTypes().length == 1) {
 				Class<?> paramType = cons.getParameterTypes()[0];
 				if (attemptedConversions.contains(paramType))
 					continue;
-				
+
 				attemptedConversions.add(paramType);
-				try
-				{
+				try {
 					return fromString(value, paramType, attemptedConversions);
-				}
-				catch (Throwable cause)
-				{
+				} catch (Throwable cause) {
 					// Ignore
 				}
 			}
 		}
-		
-		throw new IllegalArgumentException(String.format(
-			"Don't know how to create a %s from a String.",
-			targetType));
+
+		throw new IllegalArgumentException(String.format("Don't know how to create a %s from a String.", targetType));
 	}
-	
+
 	static public Object fromString(String value, Class<?> targetType)
 	{
 		Set<Class<?>> attemptedConversions = new HashSet<Class<?>>();

@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class Size extends UnitableValue<SizeUnits>
 {
 	static final long serialVersionUID = 0L;
-	
+
 	@Override
 	protected SizeUnits defaultUnits()
 	{
@@ -24,7 +24,7 @@ public class Size extends UnitableValue<SizeUnits>
 	{
 		return targetUnits.convert(value(), units());
 	}
-	
+
 	public Size()
 	{
 		super();

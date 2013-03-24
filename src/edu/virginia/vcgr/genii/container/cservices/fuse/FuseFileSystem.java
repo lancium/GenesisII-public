@@ -12,16 +12,16 @@ import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 class FuseFileSystem implements JSDLFileSystem
 {
 	static final long serialVersionUID = 0L;
-	
+
 	static private Log _logger = LogFactory.getLog(FuseFileSystem.class);
 
 	private File _mountPoint;
-	
+
 	FuseFileSystem(File mountPoint)
 	{
 		_mountPoint = mountPoint;
 	}
-	
+
 	@Override
 	final public File relativeTo(String relativePath) throws IOException
 	{
@@ -31,14 +31,10 @@ class FuseFileSystem implements JSDLFileSystem
 	@Override
 	final public void release()
 	{
-		try
-		{
-			FuseFilesystemService ffs = ContainerServices.findService(
-				FuseFilesystemService.class);
+		try {
+			FuseFilesystemService ffs = ContainerServices.findService(FuseFilesystemService.class);
 			ffs.release(_mountPoint);
-		}
-		catch (Throwable cause)
-		{
+		} catch (Throwable cause) {
 			_logger.error("Unable to release swap file system.", cause);
 		}
 	}

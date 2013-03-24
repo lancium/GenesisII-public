@@ -18,55 +18,49 @@ import edu.virginia.vcgr.genii.client.dialog.ComboBoxDialog;
 import edu.virginia.vcgr.genii.client.dialog.MenuItem;
 
 @SuppressWarnings("rawtypes")
-public class GuiSingleSelectionListDialog extends AbstractGuiDialog
-	implements ComboBoxDialog
+public class GuiSingleSelectionListDialog extends AbstractGuiDialog implements ComboBoxDialog
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private JList _list;
-	
-	public GuiSingleSelectionListDialog(String title, String prompt,
-		MenuItem defaultItem, MenuItem...items)
+
+	public GuiSingleSelectionListDialog(String title, String prompt, MenuItem defaultItem, MenuItem... items)
 	{
 		super(title, prompt, defaultItem, items);
-		
+
 		if (_list.isSelectionEmpty())
 			_okAction.setEnabled(false);
 		else
 			_okAction.setEnabled(true);
 	}
-	
+
 	@SuppressWarnings("unchecked")
-    @Override
+	@Override
 	protected JComponent createBody(Object[] parameters)
 	{
-		String prompt = (String)parameters[0];
-		MenuItem defaultItem = (MenuItem)parameters[1];
-		MenuItem []items = (MenuItem[])parameters[2];
-		
+		String prompt = (String) parameters[0];
+		MenuItem defaultItem = (MenuItem) parameters[1];
+		MenuItem[] items = (MenuItem[]) parameters[2];
+
 		_list = new JList(items);
-		
+
 		_list.addListSelectionListener(new SelectionListener());
 		_list.addMouseListener(new MouseClickListener());
-		
+
 		JScrollPane scroller = new JScrollPane(_list);
-		
+
 		JPanel panel = new JPanel(new GridBagLayout());
-		panel.add(scroller, new GridBagConstraints(
-			0, 0, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+		panel.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(new JLabel(prompt), new GridBagConstraints(
-			0, 1, 1, 1, 1.0, 0.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		
+		panel.add(new JLabel(prompt), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+
 		if (defaultItem != null)
 			_list.setSelectedValue(defaultItem, true);
-		
+
 		return panel;
 	}
-	
+
 	private class SelectionListener implements ListSelectionListener
 	{
 		@Override
@@ -76,16 +70,14 @@ public class GuiSingleSelectionListDialog extends AbstractGuiDialog
 				_okAction.setEnabled(!_list.isSelectionEmpty());
 		}
 	}
-	
+
 	private class MouseClickListener extends MouseAdapter
 	{
 		@Override
 		public void mouseClicked(MouseEvent e)
 		{
-			if (e.getClickCount() == 2) 
-			{
-				if (!_list.isSelectionEmpty())
-				{
+			if (e.getClickCount() == 2) {
+				if (!_list.isSelectionEmpty()) {
 					_cancelled = false;
 					okCalled();
 					dispose();
@@ -97,6 +89,6 @@ public class GuiSingleSelectionListDialog extends AbstractGuiDialog
 	@Override
 	public MenuItem getSelectedItem()
 	{
-		return (MenuItem)_list.getSelectedValue();
+		return (MenuItem) _list.getSelectedValue();
 	}
 }

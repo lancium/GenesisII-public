@@ -5,7 +5,7 @@ import javax.xml.namespace.QName;
 class SimpleTopicQueryExpression extends AbstractTopicQueryExpression
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private QName _root;
 
 	@Override
@@ -14,14 +14,14 @@ class SimpleTopicQueryExpression extends AbstractTopicQueryExpression
 		String prefix = prefixFactory.getPrefix(_root.getNamespaceURI());
 		return String.format("%s:%s", prefix, _root.getLocalPart());
 	}
-	
+
 	SimpleTopicQueryExpression(QName root)
 	{
 		super(TopicQueryDialects.Simple);
-		
+
 		_root = root;
 	}
-	
+
 	@Override
 	final public boolean matches(TopicPath topic)
 	{

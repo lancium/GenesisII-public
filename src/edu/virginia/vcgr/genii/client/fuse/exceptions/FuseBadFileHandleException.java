@@ -5,7 +5,7 @@ import fuse.FuseException;
 public class FuseBadFileHandleException extends FuseException
 {
 	static final long serialVersionUID = 0L;
-	
+
 	public FuseBadFileHandleException(String msg)
 	{
 		this(msg, null);

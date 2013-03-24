@@ -8,8 +8,7 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider;
 public class WSIteratorDBResourceProvider extends BasicDBResourceProvider
 {
 	@Override
-	protected WSIteratorDBResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
-		throws SQLException
+	protected WSIteratorDBResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool) throws SQLException
 	{
 		return new WSIteratorDBResourceFactory(pool);
 	}

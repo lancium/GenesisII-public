@@ -4,8 +4,7 @@ import org.morgan.util.gui.table.AbstractRowTableColumnDefinition;
 
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 
-class AttemptNumberColumn 
-	extends AbstractRowTableColumnDefinition<JobInformation, Integer>
+class AttemptNumberColumn extends AbstractRowTableColumnDefinition<JobInformation, Integer>
 {
 	AttemptNumberColumn()
 	{

@@ -42,22 +42,20 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
-public class QueueProcessPhase extends AbstractRunProcessPhase 
-	implements TerminateableExecutionPhase
+public class QueueProcessPhase extends AbstractRunProcessPhase implements TerminateableExecutionPhase
 {
 	static final long serialVersionUID = 0L;
-	
+
 	static private Log _logger = LogFactory.getLog(QueueProcessPhase.class);
-	
-	static private final String JOB_TOKEN_PROPERTY = 
-		"edu.virginia.vcgr.genii.container.bes.phases.queue.job-token";
+
+	static private final String JOB_TOKEN_PROPERTY = "edu.virginia.vcgr.genii.container.bes.phases.queue.job-token";
 	static private final long DEFAULT_LOOP_CYCLE = 1000L * 10;
-	
+
 	private String _phaseShiftLock = new String();
-	
+
 	transient private NativeQueueState _state = null;
 	transient private BESWorkingDirectory _workingDirectory = null;
-	
+
 	private File _fuseMountPoint;
 	private URI _spmdVariation;
 	private Integer _numProcesses;
@@ -68,24 +66,18 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	private File _stdout;
 	private File _stderr;
 	private Map<String, String> _environment;
-	
+
 	private ResourceConstraints _resourceConstraints;
-	
+
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
-	
-	public QueueProcessPhase(File fuseMountPoint,
-		URI spmdVariation, Integer numProcesses,
-		Integer numProcessesPerHost, File executable, 
-		Collection<String> arguments, Map<String, String> environment,
-		File stdin, File stdout, File stderr, 
-		BESConstructionParameters constructionParameters, 
-		ResourceConstraints resourceConstraints)
+
+	public QueueProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
+		File executable, Collection<String> arguments, Map<String, String> environment, File stdin, File stdout, File stderr,
+		BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints)
 	{
-		super(new ActivityState(
-			ActivityStateEnumeration.Running, "Enqueing", false),
-			constructionParameters);
-	
+		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing", false), constructionParameters);
+
 		_fuseMountPoint = fuseMountPoint;
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
@@ -98,43 +90,32 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 		_stderr = stderr;
 		_resourceConstraints = resourceConstraints;
 	}
-	
+
 	@Override
-	public void terminate(boolean countAsFailedAttempt)
-		throws ExecutionException
+	public void terminate(boolean countAsFailedAttempt) throws ExecutionException
 	{
-		HistoryContext history = HistoryContextFactory.createContext(
-			HistoryEventCategory.Terminating);
-		
-		history.createTraceWriter("BES Terminating Job").format(
-			"The BES was asked to terminate the job (countAsFailedAttempt = %s)",
-			countAsFailedAttempt).close();
-		
-		try
-		{
-			synchronized(_phaseShiftLock)
-			{
-				if (_workingDirectory == null || _jobToken == null)
-				{
+		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Terminating);
+
+		history.createTraceWriter("BES Terminating Job")
+			.format("The BES was asked to terminate the job (countAsFailedAttempt = %s)", countAsFailedAttempt).close();
+
+		try {
+			synchronized (_phaseShiftLock) {
+				if (_workingDirectory == null || _jobToken == null) {
 					_terminate = Boolean.TRUE;
 					return;
 				}
-				
-				NativeQueueConnection queue = connectQueue(
-					_workingDirectory.getWorkingDirectory());
+
+				NativeQueueConnection queue = connectQueue(_workingDirectory.getWorkingDirectory());
 				history.trace("Asking Batch System (%s) to Cancel", queue);
-				_logger.info(String.format(
-					"Asking batch system (%s) to cancel the job.", queue));
+				_logger.info(String.format("Asking batch system (%s) to cancel the job.", queue));
 				queue.cancel(_jobToken);
-				
+
 				_phaseShiftLock.notifyAll();
 			}
-		}
-		catch (NativeQueueException nqe)
-		{
+		} catch (NativeQueueException nqe) {
 			history.error(nqe, "Unable to Cancel Job");
-			throw new ExecutionException("Unable to cancel job in queue.", 
-				nqe);
+			throw new ExecutionException("Unable to cancel job in queue.", nqe);
 		}
 	}
 
@@ -143,203 +124,151 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	{
 		String stderrPath = null;
 		File resourceUsageFile = null;
-		
-		HistoryContext history = HistoryContextFactory.createContext(
-			HistoryEventCategory.CreatingActivity);
-		
+
+		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
+
 		if (_environment == null)
 			_environment = new HashMap<String, String>();
-		
+
 		setExportedEnvironment(_environment);
-		history.createDebugWriter("Activity Environment Set").format(
-			"Activity environment set to %s", _environment).close();
-		
-		synchronized(_phaseShiftLock)
-		{
-			if (_terminate != null && _terminate.booleanValue())
-			{
+		history.createDebugWriter("Activity Environment Set").format("Activity environment set to %s", _environment).close();
+
+		synchronized (_phaseShiftLock) {
+			if (_terminate != null && _terminate.booleanValue()) {
 				history.debug("Activity Terminate Early");
 				return;
 			}
-			
+
 			_workingDirectory = context.getCurrentWorkingDirectory();
-			NativeQueueConnection queue = connectQueue(
-				_workingDirectory.getWorkingDirectory());
-			
-			_jobToken = (JobToken)context.getProperty(JOB_TOKEN_PROPERTY);
-			if (_jobToken == null)
-			{
-				if (_environment != null)
-				{
+			NativeQueueConnection queue = connectQueue(_workingDirectory.getWorkingDirectory());
+
+			_jobToken = (JobToken) context.getProperty(JOB_TOKEN_PROPERTY);
+			if (_jobToken == null) {
+				if (_environment != null) {
 					String ogrshConfig = _environment.get("OGRSH_CONFIG");
-					if (ogrshConfig != null)
-					{
-						File f = new File(
-							context.getCurrentWorkingDirectory(
-								).getWorkingDirectory(), 
-							ogrshConfig);
+					if (ogrshConfig != null) {
+						File f = new File(context.getCurrentWorkingDirectory().getWorkingDirectory(), ogrshConfig);
 						_environment.put("OGRSH_CONFIG", f.getAbsolutePath());
 					}
 				}
-				
-				_logger.info(String.format(
-					"Asking batch system (%s) to submit the job.", queue));
+
+				_logger.info(String.format("Asking batch system (%s) to submit the job.", queue));
 				history.trace("Batch System (%s) Starting Activity", queue);
-				resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory(
-					)).getNewResourceUsageFile();
+				resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory())
+					.getNewResourceUsageFile();
 				preDelay();
 				stderrPath = fileToPath(_stderr, null);
-				PrintWriter hWriter = history.createInfoWriter(
-					"Queue BES Submitting Activity").format(
-						"BES submitting job to batch system:  ");
+				PrintWriter hWriter = history.createInfoWriter("Queue BES Submitting Activity").format(
+					"BES submitting job to batch system:  ");
 				hWriter.print(_executable.getAbsolutePath());
 				for (String arg : _arguments)
 					hWriter.format(" %s", arg);
 				hWriter.close();
-				
-				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint,
-					_spmdVariation, _numProcesses, _numProcessesPerHost, _executable.getAbsolutePath(),
-					_arguments,
-					_environment, fileToPath(_stdin, null),
-					fileToPath(_stdout, null), stderrPath, _resourceConstraints,
-					resourceUsageFile));
-				
-				_logger.info(String.format(
-					"Queue submitted job %s using command line:\n\t%s", 
-					_jobToken, _jobToken.getCmdLine()));
-				history.createTraceWriter("Job Queued into Batch System").format(
-					"BES submitted job %s using command line:\n\t%s",
-					_jobToken, _jobToken.getCmdLine()).close();
-				
+
+				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses,
+					_numProcessesPerHost, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null),
+					fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
+
+				_logger.info(String.format("Queue submitted job %s using command line:\n\t%s", _jobToken,
+					_jobToken.getCmdLine()));
+				history.createTraceWriter("Job Queued into Batch System")
+					.format("BES submitted job %s using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()).close();
+
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
-			
+
 			String lastState = null;
-			while (true)
-			{
+			while (true) {
 				_state = queue.getStatus(_jobToken);
-				context.updateState(new ActivityState(
-					ActivityStateEnumeration.Running, 
-					_state.toString(), false));
-				if (lastState == null || !lastState.equals(_state.toString()))
-				{
+				context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
+				if (lastState == null || !lastState.equals(_state.toString())) {
 					history.trace("Batch System State:  %s", _state);
 					lastState = _state.toString();
 				}
-				
+
 				if (_state.isFinalState())
 					break;
-				
+
 				_phaseShiftLock.wait(DEFAULT_LOOP_CYCLE);
 			}
 			context.setProperty(JOB_TOKEN_PROPERTY, null);
 			postDelay();
-			
+
 			int exitCode = queue.getExitCode(_jobToken);
 			history.info("Job Exited with Exit Code %d", exitCode);
-			
-			if (resourceUsageFile != null)
-			{
-				try
-				{
-					ExitResults eResults = ProcessWrapper.readResults(
-						resourceUsageFile);
+
+			if (resourceUsageFile != null) {
+				try {
+					ExitResults eResults = ProcessWrapper.readResults(resourceUsageFile);
 					exitCode = eResults.exitCode();
-					
-					AccountingService acctService =
-						ContainerServices.findService(AccountingService.class);
-					if (acctService != null)
-					{
-						OperatingSystemNames osName = 
-							_constructionParameters.getResourceOverrides(
-								).operatingSystemName();
-						
-						ProcessorArchitecture arch = 
-							_constructionParameters.getResourceOverrides(
-								).cpuArchitecture();
-						
-						Vector<String> command = new Vector<String>(
-							_arguments);
+
+					AccountingService acctService = ContainerServices.findService(AccountingService.class);
+					if (acctService != null) {
+						OperatingSystemNames osName = _constructionParameters.getResourceOverrides().operatingSystemName();
+
+						ProcessorArchitecture arch = _constructionParameters.getResourceOverrides().cpuArchitecture();
+
+						Vector<String> command = new Vector<String>(_arguments);
 						command.add(0, _executable.getAbsolutePath());
-						acctService.addAccountingRecord(
-							context.getCallingContext(), context.getBESEPI(),
-							arch, osName, null, _jobToken.getCmdLine(), exitCode,
-							eResults.userTime(), eResults.kernelTime(),
+						acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), arch, osName, null,
+							_jobToken.getCmdLine(), exitCode, eResults.userTime(), eResults.kernelTime(),
 							eResults.wallclockTime(), eResults.maximumRSS());
 					}
-					
-				}
-				catch (ProcessWrapperException pwe)
-				{
+
+				} catch (ProcessWrapperException pwe) {
 					history.warn(pwe, "Error Acquiring Accounting Info");
-					throw new IgnoreableFault(
-						"Error trying to read resource usage information.",
-						pwe);
+					throw new IgnoreableFault("Error trying to read resource usage information.", pwe);
 				}
 			}
-			
+
 			ExitCondition exitCondition = interpretExitCode(exitCode);
 			_logger.info(String.format("Process exited with %s.",
-				(exitCondition instanceof SignaledExit) ?
-					("Signal " + exitCondition) :
-					("Exit code " + exitCondition)));
+				(exitCondition instanceof SignaledExit) ? ("Signal " + exitCondition) : ("Exit code " + exitCondition)));
 			if (exitCode == 257)
-				throw new IgnoreableFault(
-					"Queue process exited with signal.");
+				throw new IgnoreableFault("Queue process exited with signal.");
 		}
-		
+
 		appendStandardError(history, stderrPath);
 	}
-	
+
 	static private ExitCondition interpretExitCode(int exitCode)
 	{
-		if (exitCode > 128)
-		{
+		if (exitCode > 128) {
 			int index = exitCode - 128 - 1;
 			if (index < 0 || index >= Signals.values().length)
 				return new NormalExit(exitCode);
-			
+
 			return new SignaledExit(Signals.values()[exitCode - 128 - 1]);
 		}
-		
+
 		return new NormalExit(exitCode);
 	}
-	
+
 	@Override
 	public ActivityState getPhaseState()
 	{
-		synchronized(_phaseShiftLock)
-		{
+		synchronized (_phaseShiftLock) {
 			if (_state == null)
 				return super.getPhaseState();
-			
-			return new ActivityState(ActivityStateEnumeration.Running,
-				_state.toString(), false);
+
+			return new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false);
 		}
 	}
-	
+
 	private NativeQueueConnection connectQueue(File workingDirectory)
 	{
 		if (workingDirectory == null)
 			throw new IllegalArgumentException("Working directory cannot be null.");
-		
-		try
-		{
-			NativeQueueConfiguration conf = 
-			_constructionParameters.getNativeQueueConfiguration();
+
+		try {
+			NativeQueueConfiguration conf = _constructionParameters.getNativeQueueConfiguration();
 			if (conf == null)
-				throw new RuntimeException(
-					"Unable to acquire connection to native queue -- no queue defined.");
-			
-			return conf.connect(
-				_constructionParameters.getResourceOverrides(),
-				_constructionParameters.getCmdLineManipulatorConfiguration(),
-				workingDirectory);
-		}
-		catch (NativeQueueException nqe)
-		{
-			throw new RuntimeException(
-				"Unable to acquire connection to native queue.", nqe);
+				throw new RuntimeException("Unable to acquire connection to native queue -- no queue defined.");
+
+			return conf.connect(_constructionParameters.getResourceOverrides(),
+				_constructionParameters.getCmdLineManipulatorConfiguration(), workingDirectory);
+		} catch (NativeQueueException nqe) {
+			throw new RuntimeException("Unable to acquire connection to native queue.", nqe);
 		}
 	}
 }

@@ -20,56 +20,54 @@ public class PrimaryFileSegment
 
 	public PrimaryFileSegment(long firstBlock, int blockCount)
 	{
-		_logger.debug("segment firstBlock=" + firstBlock + " blockCount=" + blockCount);
+		if (_logger.isDebugEnabled())
+			_logger.debug("segment firstBlock=" + firstBlock + " blockCount=" + blockCount);
 		_firstBlock = firstBlock;
 		_blockCount = blockCount;
 	}
 
-	public void download(RandomByteIOTransferer transferer, int blockSize)
-		throws RemoteException
+	public void download(RandomByteIOTransferer transferer, int blockSize) throws RemoteException
 	{
-		_logger.debug("download firstBlock=" + _firstBlock + " blockCount=" + _blockCount);
+		if (_logger.isDebugEnabled())
+			_logger.debug("download firstBlock=" + _firstBlock + " blockCount=" + _blockCount);
 		_data = null;
 		long firstByte = _firstBlock * blockSize;
 		int byteCount = _blockCount * blockSize;
-		while (byteCount > 0)
-		{
+		while (byteCount > 0) {
 			byte[] tdata = transferer.read(firstByte, byteCount, 1, 0);
 			if ((tdata == null) || (tdata.length == 0))
 				break;
 			if (_data == null)
 				_data = tdata;
-			else
-			{
+			else {
 				int length = _data.length;
 				_data = Arrays.copyOf(_data, length + tdata.length);
 				System.arraycopy(tdata, 0, _data, length, tdata.length);
-				_logger.debug("download merged length=" + _data.length);
+				if (_logger.isDebugEnabled())
+					_logger.debug("download merged length=" + _data.length);
 			}
 			byteCount -= tdata.length;
 			firstByte += tdata.length;
 		}
 	}
 
-	public void write(BitmapFile bitmapFile, RandomAccessFile raf, int blockSize)
-		throws IOException
+	public void write(BitmapFile bitmapFile, RandomAccessFile raf, int blockSize) throws IOException
 	{
-		_logger.debug("write firstBlock=" + _firstBlock + " blockCount=" + _blockCount);
+		if (_logger.isDebugEnabled())
+			_logger.debug("write firstBlock=" + _firstBlock + " blockCount=" + _blockCount);
 		bitmapFile.seekBit(_firstBlock);
 		int startOfWrite = 0;
-		while (startOfWrite < _blockCount)
-		{
+		while (startOfWrite < _blockCount) {
 			int isValid = bitmapFile.readBit();
-			if (isValid == 1)
-			{
-				_logger.debug("write skip " + (_firstBlock + startOfWrite));
+			if (isValid == 1) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("write skip " + (_firstBlock + startOfWrite));
 				startOfWrite++;
 				continue;
 			}
 			// Find the next valid block
 			int blocksToWrite = 1;
-			while (startOfWrite + blocksToWrite < _blockCount)
-			{
+			while (startOfWrite + blocksToWrite < _blockCount) {
 				isValid = bitmapFile.readBit();
 				if (isValid == 1)
 					break;

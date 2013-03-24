@@ -7,9 +7,8 @@ import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
 
-
-public class CloudStat {
-
+public class CloudStat
+{
 
 	private int _available;
 	private int _total;
@@ -19,12 +18,9 @@ public class CloudStat {
 	private String _type;
 	private String _description;
 
+	public CloudStat(int _available, int _total, int _busy, int _pending, int preparing, String _type, String _description)
+	{
 
-
-	public CloudStat(int _available, int _total, int _busy,
-			int _pending, int preparing,String _type, String _description) {
-		
-		
 		this._available = _available;
 		this._total = _total;
 		this._busy = _busy;
@@ -34,45 +30,27 @@ public class CloudStat {
 		this._description = _description;
 	}
 
-
-
 	@Override
-	public String toString() {
-		return " Available=" + _available + "\n Total=" + _total + "\n" +  
-		" Busy=" + _busy + "\n Pending=" + _pending +
-		"\n Preparing= " + _preparing;
+	public String toString()
+	{
+		return " Available=" + _available + "\n Total=" + _total + "\n" + " Busy=" + _busy + "\n Pending=" + _pending
+			+ "\n Preparing= " + _preparing;
 	}
-
 
 	public MessageElement toMessageElement(QName elementName)
 	{
 		MessageElement ret = new MessageElement(elementName);
 
-		MessageElement available = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"available"), _available);
-		MessageElement total = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"total"), _total);
-		MessageElement busy = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"busy"), _busy);
-		MessageElement pending = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"pending"), _pending);
-		MessageElement preparing = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"preparing"), _preparing);
-		MessageElement type = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"type"), _type);
-		MessageElement description = new MessageElement(
-				new QName(CloudConstants.GENII_CLOUDBES_NS,
-						"description"), _description);
+		MessageElement available = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "available"), _available);
+		MessageElement total = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "total"), _total);
+		MessageElement busy = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "busy"), _busy);
+		MessageElement pending = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "pending"), _pending);
+		MessageElement preparing = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "preparing"), _preparing);
+		MessageElement type = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "type"), _type);
+		MessageElement description = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "description"),
+			_description);
 
-
-		try
-		{
+		try {
 			ret.addChild(available);
 			ret.addChild(total);
 			ret.addChild(busy);
@@ -81,11 +59,8 @@ public class CloudStat {
 			ret.addChild(type);
 			ret.addChild(description);
 
-		}
-		catch (SOAPException se)
-		{
-			throw new RuntimeException(
-			"Unexpected exception thrown while packageing policy.");
+		} catch (SOAPException se) {
+			throw new RuntimeException("Unexpected exception thrown while packageing policy.");
 		}
 
 		return ret;
@@ -102,37 +77,28 @@ public class CloudStat {
 		String description = "";
 
 		Iterator<?> iter = element.getChildElements();
-		while (iter.hasNext())
-		{
-			MessageElement child = (MessageElement)iter.next();
+		while (iter.hasNext()) {
+			MessageElement child = (MessageElement) iter.next();
 			QName childName = child.getQName();
 
-			if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "available")))
+			if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "available")))
 				available = Integer.parseInt(child.getValue());
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "total")))
+			else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "total")))
 				total = Integer.parseInt(child.getValue());
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "busy")))
+			else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "busy")))
 				busy = Integer.parseInt(child.getValue());
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "pending")))
+			else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "pending")))
 				pending = Integer.parseInt(child.getValue());
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "preparing")))
+			else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "preparing")))
 				preparing = Integer.parseInt(child.getValue());
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "type")))
+			else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "type")))
 				type = child.getValue();
-			else if (childName.equals(
-					new QName(CloudConstants.GENII_CLOUDBES_NS, "description")))
+			else if (childName.equals(new QName(CloudConstants.GENII_CLOUDBES_NS, "description")))
 				description = child.getValue();
 
 		}
 
-		return new CloudStat(available, total, busy,
-				pending, preparing, type, description);
+		return new CloudStat(available, total, busy, pending, preparing, type, description);
 	}
 
 }

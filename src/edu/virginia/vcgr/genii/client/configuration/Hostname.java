@@ -35,69 +35,61 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
 public class Hostname
 {
-	static private final String _EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY =
-		"edu.virginia.vcgr.genii.container.external-hostname-override";
-	static private final String _EPR_ADDRESSING_MODE_PROPERTY =
-		"edu.virginia.vcgr.genii.container.epr-addressing-mode";
+	static private final String _EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY = "edu.virginia.vcgr.genii.container.external-hostname-override";
+	static private final String _EPR_ADDRESSING_MODE_PROPERTY = "edu.virginia.vcgr.genii.container.epr-addressing-mode";
 	static private final String _EPR_ADDRESSING_MODE_DEFAULT_VALUE = "auto";
-	
+
 	static private Log _logger = LogFactory.getLog(Hostname.class);
-	
+
 	private InetAddress _address = null;
 	private String _externalName;
-	
+
 	static private String getGlobalProperty(String propertyName)
 	{
-		try
-		{
-			XMLConfiguration conf =
-				ConfigurationManager.getCurrentConfiguration().getRoleSpecificConfiguration();
+		try {
+			XMLConfiguration conf = ConfigurationManager.getCurrentConfiguration().getRoleSpecificConfiguration();
 			if (conf == null)
 				return null;
-			
-			Properties props = (Properties)conf.retrieveSection(
-				GenesisIIConstants.GLOBAL_PROPERTY_SECTION_NAME);
-			
+
+			Properties props = (Properties) conf.retrieveSection(GenesisIIConstants.GLOBAL_PROPERTY_SECTION_NAME);
+
 			return props.getProperty(propertyName);
-		}
-		catch (ConfigurationException ce)
-		{
-			_logger.debug(ce);
+		} catch (ConfigurationException ce) {
+			if (_logger.isDebugEnabled())
+				_logger.debug(ce);
 			return null;
 		}
 	}
-	
+
 	static private String getHostnameOverride()
 	{
 		String toReturn = getGlobalProperty(_EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
 		// consider a blank name to be a non-established one.
-		if ((toReturn != null) && (toReturn.length() == 0)) return null;
+		if ((toReturn != null) && (toReturn.length() == 0))
+			return null;
 		return toReturn;
 	}
-	
+
 	static private String getEPRAddressingMode()
 	{
 		return getGlobalProperty(_EPR_ADDRESSING_MODE_PROPERTY);
 	}
-	
-	static private InetAddress getMostGlobal(InetAddress []addrs)
+
+	static private InetAddress getMostGlobal(InetAddress[] addrs)
 	{
-		InetAddress []ret = new InetAddress[5];
+		InetAddress[] ret = new InetAddress[5];
 		for (int lcv = 0; lcv < ret.length; lcv++)
 			ret[lcv] = null;
-		
-		for (InetAddress addr : addrs)
-		{
+
+		for (InetAddress addr : addrs) {
 			int score = 4;
-			
-			if (addr instanceof Inet6Address)
-			{
-				_logger.debug(String.format(
-					"Skipping address \"%s\" because it's an IPv6 address.",
-					addr));
+
+			if (addr instanceof Inet6Address) {
+				if (_logger.isDebugEnabled())
+					_logger.debug(String.format("Skipping address \"%s\" because it's an IPv6 address.", addr));
 				continue;
 			}
-			
+
 			if (addr.isAnyLocalAddress())
 				continue;
 			else if (addr.isSiteLocalAddress())
@@ -108,85 +100,77 @@ public class Hostname
 				score = 1;
 			else if (addr.isLoopbackAddress())
 				score = 0;
-			
+
 			ret[score] = addr;
 		}
-		
-		for (int lcv = 4; lcv >= 0; lcv--)
-		{
+
+		for (int lcv = 4; lcv >= 0; lcv--) {
 			if (ret[lcv] != null)
 				return ret[lcv];
 		}
-		
+
 		return null;
 	}
-	
+
 	static private String formString(InetAddress addr)
 	{
 		String mode = getEPRAddressingMode();
 		if (mode == null)
 			mode = _EPR_ADDRESSING_MODE_DEFAULT_VALUE;
-		
-		if (mode.equals("ip"))
-		{
+
+		if (mode.equals("ip")) {
 			if (addr instanceof Inet6Address)
 				return String.format("[%s]", addr.getHostAddress());
 			else
 				return addr.getHostAddress();
 		} else if (mode.equals("dns"))
 			return addr.getCanonicalHostName();
-		
+
 		String dns = addr.getCanonicalHostName();
 		if (dns.indexOf('.') >= 0)
 			return dns;
-		
+
 		return addr.getHostAddress();
 	}
-	
+
 	static public InetAddress getMostGlobal() throws SocketException
 	{
 		ArrayList<InetAddress> tmp = new ArrayList<InetAddress>();
-		Enumeration<NetworkInterface> interfaces =
-			NetworkInterface.getNetworkInterfaces();
-		
-		while (interfaces.hasMoreElements())
-		{
+		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+
+		while (interfaces.hasMoreElements()) {
 			NetworkInterface iface = interfaces.nextElement();
 			Enumeration<InetAddress> addrs = iface.getInetAddresses();
-			while (addrs.hasMoreElements())
-			{
+			while (addrs.hasMoreElements()) {
 				tmp.add(addrs.nextElement());
 			}
 		}
-		
-		InetAddress []addrs = new InetAddress[tmp.size()];
+
+		InetAddress[] addrs = new InetAddress[tmp.size()];
 		tmp.toArray(addrs);
 		return getMostGlobal(addrs);
 	}
 
-	private Hostname(String givenAddress)
-		throws UnknownHostException, SocketException
+	private Hostname(String givenAddress) throws UnknownHostException, SocketException
 	{
-		InetAddress []addrs = InetAddress.getAllByName(givenAddress);
+		InetAddress[] addrs = InetAddress.getAllByName(givenAddress);
 		InetAddress addr = getMostGlobal(addrs);
 		if (addr == null)
 			throw new UnknownHostException(givenAddress);
-		
-		if (addr.isLoopbackAddress())
-		{
+
+		if (addr.isLoopbackAddress()) {
 			_externalName = getHostnameOverride();
 			if (_externalName != null)
 				return;
 
 			_address = getMostGlobal();
 			_externalName = formString(_address);
-		} else
-		{
+		} else {
 			_externalName = givenAddress;
-//			_externalName = formString(addr);
+			// _externalName = formString(addr);
 		}
 	}
-	
+
 	private Hostname() throws SocketException
 	{
 		_externalName = getHostnameOverride();
@@ -196,88 +180,77 @@ public class Hostname
 		_address = getMostGlobal();
 		_externalName = formString(_address);
 	}
-	
+
 	public String toString()
 	{
 		return _externalName;
 	}
-	
+
 	public String toShortString()
 	{
 		String ret = toString();
-		
+
 		int index = ret.indexOf('.');
 		if (index > 0)
 			ret = ret.substring(0, index);
-		
+
 		return ret;
 	}
-	
-	synchronized public InetAddress getAddress()
-		throws UnknownHostException
+
+	synchronized public InetAddress getAddress() throws UnknownHostException
 	{
 		if (_address == null)
 			_address = InetAddress.getByName(_externalName);
-		
+
 		return _address;
 	}
-	
+
 	static private Hostname _localHost = null;
+
 	synchronized static public Hostname getLocalHostname()
 	{
-		try
-		{
+		try {
 			if (_localHost == null)
 				_localHost = new Hostname();
-			
+
 			return _localHost;
-		}
-		catch (SocketException se)
-		{
+		} catch (SocketException se) {
 			_logger.error(se);
 			throw new RuntimeException("Unable to determine local IP addr.", se);
 		}
 	}
-	
-	static public Hostname lookupHostname(String givenHostname)
-		throws UnknownHostException
+
+	static public Hostname lookupHostname(String givenHostname) throws UnknownHostException
 	{
-		try
-		{
+		try {
 			return new Hostname(givenHostname);
-		}
-		catch (SocketException se)
-		{
+		} catch (SocketException se) {
 			throw new UnknownHostException(givenHostname);
 		}
 	}
-	
-	static private Pattern _URL_PATTERN = Pattern.compile(
-		"([^:]+):\\/\\/([^:\\/]+)(.*)");
-	
+
+	static private Pattern _URL_PATTERN = Pattern.compile("([^:]+):\\/\\/([^:\\/]+)(.*)");
+
 	static public String normalizeURL(String url) throws UnknownHostException
 	{
 		Matcher urlMatcher = _URL_PATTERN.matcher(url);
-		if (!urlMatcher.matches())
-		{
-			/* This doesn't allow for URI's in the name
-			throw new IllegalArgumentException(
-				"url \"" + url + "\" does not appear valid.");
-			*/
+		if (!urlMatcher.matches()) {
+			/*
+			 * This doesn't allow for URI's in the name throw new IllegalArgumentException( "url \""
+			 * + url + "\" does not appear valid.");
+			 */
 			return url;
 		}
-		
-		try
-		{
+
+		try {
 			String proto = urlMatcher.group(1);
 			String host = (new Hostname(urlMatcher.group(2))).toString();
 			String rest = urlMatcher.group(3);
-			
+
 			return proto + "://" + host + rest;
-		}
-		catch (SocketException se)
-		{
-			_logger.debug(se);
+		} catch (SocketException se) {
+			if (_logger.isDebugEnabled())
+				_logger.debug(se);
 			throw new UnknownHostException(urlMatcher.group(2));
 		}
 	}

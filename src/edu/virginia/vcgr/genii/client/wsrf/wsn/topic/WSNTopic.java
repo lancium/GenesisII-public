@@ -9,7 +9,6 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface WSNTopic
-{
+public @interface WSNTopic {
 	Class<? extends NotificationMessageContents> contentsType();
 }

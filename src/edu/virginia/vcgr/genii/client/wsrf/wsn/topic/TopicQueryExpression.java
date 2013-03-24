@@ -8,10 +8,10 @@ import org.apache.axis.message.MessageElement;
 public interface TopicQueryExpression
 {
 	public TopicQueryDialects dialect();
-	
+
 	public boolean matches(TopicPath topic);
-	
-	public MessageElement toTopicExpressionElement(QName elementName,
-		String namespacePrefix) throws SOAPException;
+
+	public MessageElement toTopicExpressionElement(QName elementName, String namespacePrefix) throws SOAPException;
+
 	public TopicPath toTopicPath();
 }

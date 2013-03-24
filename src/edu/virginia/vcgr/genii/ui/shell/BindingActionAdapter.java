@@ -79,13 +79,13 @@ public class BindingActionAdapter implements BindingActionListener
 	{
 		// Do nothing
 	}
-	
+
 	@Override
 	public void search()
 	{
 		// Do nothing
 	}
-	
+
 	@Override
 	public void stopSearch()
 	{

@@ -31,57 +31,44 @@ import org.mortbay.jetty.handler.AbstractHandler;
 public class ResourceFileHandler extends AbstractHandler
 {
 	static final long serialVersionUID = 0;
-		
+
 	private String _resourceBase;
-	
+
 	public ResourceFileHandler(String resourceBase)
 	{
 		_resourceBase = resourceBase;
-		while (_resourceBase.endsWith("/"))
-		{
+		while (_resourceBase.endsWith("/")) {
 			_resourceBase = _resourceBase.substring(0, _resourceBase.length());
 		}
 	}
-	
-	public void handle(String target, HttpServletRequest arg2, 
-			HttpServletResponse arg3, int dispatch) 
-			throws HttpException, IOException, ServletException
+
+	public void handle(String target, HttpServletRequest arg2, HttpServletResponse arg3, int dispatch) throws HttpException,
+		IOException, ServletException
 	{
 		InputStream in = null;
 		OutputStream out = null;
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		
-		try
-		{
+
+		try {
 			out = arg3.getOutputStream();
-			
-			if (!target.endsWith("/"))
-			{
+
+			if (!target.endsWith("/")) {
 				in = loader.getResourceAsStream(_resourceBase + target);
-				if (in == null)
-				{
-					in = loader.getResourceAsStream(
-							_resourceBase + target + "/index.html");
+				if (in == null) {
+					in = loader.getResourceAsStream(_resourceBase + target + "/index.html");
 				}
-			} else
-			{
-				in = loader.getResourceAsStream(_resourceBase + target +
-					"index.html");
+			} else {
+				in = loader.getResourceAsStream(_resourceBase + target + "index.html");
 			}
-			
-			if (in == null)
-			{
-				throw new IOException(
-					"Couldn't find resource \"" + target + "\".");
+
+			if (in == null) {
+				throw new IOException("Couldn't find resource \"" + target + "\".");
 			}
-			
+
 			StreamUtils.copyStream(in, out);
-//			arg3.commit();
-		}
-		catch (IOException ioe)
-		{
-			if (out != null)
-			{
+			// arg3.commit();
+		} catch (IOException ioe) {
+			if (out != null) {
 				PrintStream ps = new PrintStream(out);
 				ps.println("<html><head><title>Error Page</title></head><body>");
 				ps.println("Error trying to generate static web page:");
@@ -90,9 +77,7 @@ public class ResourceFileHandler extends AbstractHandler
 				ps.println("</pre>");
 			} else
 				throw ioe;
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(in);
 			StreamUtils.close(out);
 		}

@@ -15,47 +15,38 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfi
 public class PBSQueue extends AbstractNativeQueue<PBSQueueConfiguration>
 {
 	static final public String PROVIDER_NAME = "pbs";
-	
+
 	private JobStateCache _statusCache = new JobStateCache();
-	
+
 	public PBSQueue()
 	{
 		super(PROVIDER_NAME, PBSQueueConfiguration.class);
 	}
-	
+
 	@Override
-	public NativeQueueConnection connect(
-		ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorConf,
-		File workingDirectory,
-		NativeQueueConfiguration nativeQueueConfiguration,
-		Object providerConfiguration) throws NativeQueueException
+	public NativeQueueConnection connect(ResourceOverrides resourceOverrides,
+		CmdLineManipulatorConfiguration cmdLineManipulatorConf, File workingDirectory,
+		NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException
 	{
-		PBSQueueConfiguration pbsConfig = (PBSQueueConfiguration)providerConfiguration;
-		
+		PBSQueueConfiguration pbsConfig = (PBSQueueConfiguration) providerConfiguration;
+
 		if (nativeQueueConfiguration == null)
 			nativeQueueConfiguration = new NativeQueueConfiguration();
-		
+
 		if (pbsConfig == null)
 			pbsConfig = new PBSQueueConfiguration();
-		
+
 		if (cmdLineManipulatorConf == null)
 			cmdLineManipulatorConf = new CmdLineManipulatorConfiguration();
-		
+
 		String qname = pbsConfig.queueName();
-		
-		try
-		{
-			return new PBSQueueConnection(resourceOverrides,
-				cmdLineManipulatorConf, workingDirectory,
-				nativeQueueConfiguration, pbsConfig, qname, 
-				pbsConfig.startQSub(), pbsConfig.startQStat(),
+
+		try {
+			return new PBSQueueConnection(resourceOverrides, cmdLineManipulatorConf, workingDirectory,
+				nativeQueueConfiguration, pbsConfig, qname, pbsConfig.startQSub(), pbsConfig.startQStat(),
 				pbsConfig.startQDel(), _statusCache);
-		}
-		catch (FileNotFoundException fnfe)
-		{
-			throw new NativeQueueException(
-				"Unable to find queue binaries.", fnfe);
+		} catch (FileNotFoundException fnfe) {
+			throw new NativeQueueException("Unable to find queue binaries.", fnfe);
 		}
 	}
 

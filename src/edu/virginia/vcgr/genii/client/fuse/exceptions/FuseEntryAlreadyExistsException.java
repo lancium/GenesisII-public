@@ -5,7 +5,7 @@ import fuse.FuseException;
 public class FuseEntryAlreadyExistsException extends FuseException
 {
 	static final long serialVersionUID = 0L;
-	
+
 	public FuseEntryAlreadyExistsException(String msg)
 	{
 		this(msg, null);

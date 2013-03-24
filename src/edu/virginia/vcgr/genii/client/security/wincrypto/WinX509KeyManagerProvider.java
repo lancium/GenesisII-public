@@ -27,8 +27,8 @@ public class WinX509KeyManagerProvider extends java.security.Provider
 	static final long serialVersionUID = 0L;
 
 	/**
-	 * String identifiying the instance-name to be supplied to KeyManagerFactory
-	 * for obtaining a WinX509KeyManagerFactory
+	 * String identifiying the instance-name to be supplied to KeyManagerFactory for obtaining a
+	 * WinX509KeyManagerFactory
 	 */
 	public static final String KM_NAME = "WinX509KM";
 
@@ -36,21 +36,18 @@ public class WinX509KeyManagerProvider extends java.security.Provider
 	{
 		super(KM_NAME, 1.0, KM_NAME + " implements MS Windows Key Factory");
 
-		put("KeyManagerFactory." + KM_NAME, WinX509KeyManagerFactorySpi.class
-				.getName());
+		put("KeyManagerFactory." + KM_NAME, WinX509KeyManagerFactorySpi.class.getName());
 	}
 
 	/**
-	 * Installs the WinX509KeyManagerProvider into the provider hierarchy if it
-	 * was not done in the JDK/JRE's lib/security/java.security file. Using this
-	 * mechanism may require that the codebase comprising this code be signed
-	 * appropriately
+	 * Installs the WinX509KeyManagerProvider into the provider hierarchy if it was not done in the
+	 * JDK/JRE's lib/security/java.security file. Using this mechanism may require that the codebase
+	 * comprising this code be signed appropriately
 	 */
 	public static synchronized void install()
 	{
 
-		if (Security.getProvider(KM_NAME) == null)
-		{
+		if (Security.getProvider(KM_NAME) == null) {
 			Security.insertProviderAt(new WinX509KeyManagerProvider(), 1);
 		}
 	}

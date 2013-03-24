@@ -6,14 +6,13 @@ import java.io.Serializable;
 import edu.virginia.vcgr.genii.container.deployer.AbstractReifier;
 import edu.virginia.vcgr.genii.container.deployer.IJSDLReifier;
 
-public class ZipJarJSDLReifier
-	extends AbstractReifier implements IJSDLReifier, Serializable
+public class ZipJarJSDLReifier extends AbstractReifier implements IJSDLReifier, Serializable
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private String _binaryName;
 	private String _relativeCWD;
-	
+
 	public ZipJarJSDLReifier(String binaryName, String relativeCWD)
 	{
 		_binaryName = binaryName;

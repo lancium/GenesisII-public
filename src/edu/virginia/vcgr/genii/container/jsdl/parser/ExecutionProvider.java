@@ -37,8 +37,7 @@ public class ExecutionProvider extends DefaultPersonalityProvider
 	}
 
 	@Override
-	public JobIdentificationFacet getJobIdentificationFacet(
-		Object currentUnderstanding)
+	public JobIdentificationFacet getJobIdentificationFacet(Object currentUnderstanding)
 	{
 		return new ExecutionJobIdentificationFacet();
 	}
@@ -54,51 +53,45 @@ public class ExecutionProvider extends DefaultPersonalityProvider
 	{
 		return new ExecutionTargetURIFacet();
 	}
-	
+
 	@Override
 	public ResourcesFacet getResourcesFacet(Object currentUnderstanding)
 	{
 		return new ExecutionResourcesFacet();
 	}
-	
+
 	@Override
-	public POSIXApplicationFacet getPOSIXApplicationFacet(
-		Object currentUnderstanding)
+	public POSIXApplicationFacet getPOSIXApplicationFacet(Object currentUnderstanding)
 	{
 		return new ExecutionPOSIXApplicationFacet();
 	}
-	
+
 	@Override
-	public HPCApplicationFacet getHPCApplicationFacet(
-		Object currentUnderstanding)
+	public HPCApplicationFacet getHPCApplicationFacet(Object currentUnderstanding)
 	{
 		return new ExecutionHPCApplicationFacet();
 	}
-	
+
 	@Override
-	public SPMDApplicationFacet getSPMDApplicationFacet(
-		Object currentUnderstanding)
+	public SPMDApplicationFacet getSPMDApplicationFacet(Object currentUnderstanding)
 	{
 		return new ExecutionSPMDApplicationFacet();
 	}
 
 	@Override
-	public CPUArchitectureFacet getCPUArchitectureFacet(
-			Object currentUnderstanding) throws JSDLException
+	public CPUArchitectureFacet getCPUArchitectureFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new ExecutionCPUArchitectureFacet();
 	}
 
 	@Override
-	public OperatingSystemFacet getOperatingSystemFacet(
-			Object currentUnderstanding) throws JSDLException
+	public OperatingSystemFacet getOperatingSystemFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new ExecutionOperatingSystemFacet();
 	}
 
 	@Override
-	public OperatingSystemTypeFacet getOperatingSystemTypeFacet(
-			Object currentUnderstanding) throws JSDLException
+	public OperatingSystemTypeFacet getOperatingSystemTypeFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new ExecutionOperatingSystemTypeFacet();
 	}

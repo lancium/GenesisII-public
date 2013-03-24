@@ -18,11 +18,10 @@ package edu.virginia.vcgr.genii.client.rns;
 public class RNSMultiLookupResultException extends RNSException
 {
 	static final long serialVersionUID = 0;
-	
-	static private final String _MESSAGE_FORMAT =
-		"Path expression \"%1$s\" resolved to more then one entry when" +
-		" a singleton was required.";
-	
+
+	static private final String _MESSAGE_FORMAT = "Path expression \"%1$s\" resolved to more then one entry when"
+		+ " a singleton was required.";
+
 	public RNSMultiLookupResultException(String pathExpression)
 	{
 		super(String.format(_MESSAGE_FORMAT, pathExpression));

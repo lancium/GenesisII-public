@@ -13,9 +13,8 @@ public class DBPullPointResource extends BasicDBResource
 	{
 		super(key, connection);
 	}
-	
-	public DBPullPointResource(ResourceKey parentKey,
-		DatabaseConnectionPool connectionPool) throws SQLException
+
+	public DBPullPointResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

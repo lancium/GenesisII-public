@@ -20,53 +20,41 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 public class MakeFilePlugin extends AbstractCombinedUIMenusPlugin
 {
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType)
-			throws UIPluginException
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
 		Closeable contextToken = null;
-		
-		while (true)
-		{
+
+		while (true) {
 			contextToken = null;
-			
-			try
-			{
-				contextToken = ContextManager.temporarilyAssumeContext(
-					context.uiContext().callingContext());
-				
-				
+
+			try {
+				contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+
 				String answer = JOptionPane.showInputDialog(context.ownerComponent(),
 					"What would you like to call the new file?");
 				if (answer == null)
 					return;
-				
-				Collection<RNSPath> paths = 
-					context.endpointRetriever().getTargetEndpoints();
+
+				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 				RNSPath path = paths.iterator().next();
 				path = path.lookup(answer, RNSPathQueryFlags.MUST_NOT_EXIST);
 				path.createNewFile();
 				context.endpointRetriever().refresh();
 				return;
-			}
-			catch (Throwable cause)
-			{
-				ErrorHandler.handleError(context.uiContext(),
-					context.ownerComponent(), cause);
-			}
-			finally
-			{
+			} catch (Throwable cause) {
+				ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
+			} finally {
 				StreamUtils.close(contextToken);
 			}
 		}
 	}
 
 	@Override
-	public boolean isEnabled(
-		Collection<EndpointDescription> selectedDescriptions)
+	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
 	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-		
+
 		return selectedDescriptions.iterator().next().typeInformation().isRNS();
 	}
 }

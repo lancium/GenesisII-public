@@ -40,14 +40,12 @@ public class AutoReplicate
 	static private Log _logger = LogFactory.getLog(AutoReplicate.class);
 
 	/**
-	 * If "resource" is a directory with an auto-replicate policy,
-	 * and "primaryEPR" is a non-local resource that can be replicated,
-	 * then quickly create and return a local replica.
-	 * Otherwise, return null.
+	 * If "resource" is a directory with an auto-replicate policy, and "primaryEPR" is a non-local
+	 * resource that can be replicated, then quickly create and return a local replica. Otherwise,
+	 * return null.
 	 */
 	@SuppressWarnings("unchecked")
-	public static ReplicationItem autoReplicate(IResource resource, EndpointReferenceType primaryEPR)
-		throws RemoteException
+	public static ReplicationItem autoReplicate(IResource resource, EndpointReferenceType primaryEPR) throws RemoteException
 	{
 		// If this resource is in this container, then don't replicate it in this container.
 		GUID containerID = Container.getContainerID();
@@ -64,8 +62,7 @@ public class AutoReplicate
 			return null;
 		// If this resource is already replicated in this container,
 		// then ask the resolver for the replica's EPR, including the resolver element.
-		if (haveLocalInstance(endpointIdentifier))
-		{
+		if (haveLocalInstance(endpointIdentifier)) {
 			EndpointReferenceType localEPR = getLocalReplicaEPR(resolverList, containerID);
 			if (localEPR != null)
 				return new ReplicationItem(null, localEPR);
@@ -76,11 +73,10 @@ public class AutoReplicate
 
 		// To support replication, a resource type must send update messages with version vectors.
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, primaryEPR);
-		MessageElement element = VersionedResourceUtils.getResourceProperty(
-				common, SyncProperty.REPLICATION_STATUS_QNAME);
+		MessageElement element = VersionedResourceUtils.getResourceProperty(common, SyncProperty.REPLICATION_STATUS_QNAME);
 		if ((element == null) || (element.getValue() == null))
 			return null;
-		
+
 		// Find the type of local resource that best represents the remote resource.
 		TypeInformation type = new TypeInformation(primaryEPR);
 		String serviceName = type.getBestMatchServiceName();
@@ -93,56 +89,52 @@ public class AutoReplicate
 		if ((serviceURL == null) || (desc == null))
 			return null;
 		GenesisIIBase service;
-		try
-		{
+		try {
 			Class<? extends GenesisIIBase> serviceClass = (Class<? extends GenesisIIBase>) desc.getImplClass();
 			service = serviceClass.newInstance();
-		}
-		catch (Exception exception)
-		{
-			_logger.debug("Local getImplClass() and serviceClass.newInstance(): " + exception);
+		} catch (Exception exception) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Local getImplClass() and serviceClass.newInstance(): " + exception);
 			return null;
 		}
 		ResourceSyncRunner runner = service.getClassResourceSyncRunner();
 		if (runner == null)
 			return null;
-		
+
 		// Create a new resource as an uninitialized replica.
 		// Get the new EPR, which will be added to the local replica of the directory.
 		MessageElement[] elementArr = new MessageElement[1];
-		elementArr[0] = new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM,
-				endpointIdentifier);
+		elementArr[0] = new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, endpointIdentifier);
 		EndpointReferenceType localEPR = service.CreateEPR(elementArr, serviceURL);
 		AddressingParameters ap = new AddressingParameters(localEPR.getReferenceParameters());
 		String rkString = ap.getResourceKey();
-		
+
 		// Update the resolver and get a local EPR with a resolver element.
-		// Unfortunately, this step sends an RPC.  It would be nice if we could avoid
+		// Unfortunately, this step sends an RPC. It would be nice if we could avoid
 		// sending any RPCs at this time, because the local directory replica is locked,
 		// and the primary directory instance is still waiting for a response.
 		UpdateResponseType response = VersionedResourceUtils.updateResolver(resolverList, localEPR, rkString);
 		localEPR = response.getNew_EPR();
 		int targetID = response.getTargetID();
-		
+
 		// Get the DBResource that corresponds to the new resource.
 		// Store the primary EPR in the replica resource.
 		ResourceKey replicaKey = ResourceManager.getTargetResource(serviceName, rkString);
 		IResource replicaResource = (IResource) replicaKey.dereference();
 		VersionedResourceUtils.initializeReplica(replicaResource, primaryEPR, targetID);
-		
+
 		return new ReplicationItem(runner, localEPR);
 	}
-	
+
 	/**
-	 * Optimization: Don't ask the resolver about this resource unless the local database
-	 * indicates that we have a local instance of this resource.
+	 * Optimization: Don't ask the resolver about this resource unless the local database indicates
+	 * that we have a local instance of this resource.
 	 * 
 	 * This breaks abstraction barriers and it may be removed.
 	 */
 	public static boolean haveLocalInstance(URI endpointIdentifier)
 	{
-		try
-		{
+		try {
 			ResourceKey rKey = ResourceManager.getCurrentResource();
 			IResource resource = rKey.dereference();
 			if (!(resource instanceof BasicDBResource))
@@ -150,11 +142,10 @@ public class AutoReplicate
 			BasicDBResource dbResource = (BasicDBResource) resource;
 			Connection connection = dbResource.getConnection();
 			String resourceID = BasicDBResource.getResourceID(connection, endpointIdentifier.toString());
-			return(resourceID != null);
-		}
-		catch (Exception exception)
-		{
-			_logger.debug("haveLocalInstance: " + exception);
+			return (resourceID != null);
+		} catch (Exception exception) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("haveLocalInstance: " + exception);
 		}
 		return false;
 	}
@@ -162,28 +153,24 @@ public class AutoReplicate
 	private static EndpointReferenceType getLocalReplicaEPR(List<ResolverDescription> resolverList, GUID containerID)
 		throws RemoteException
 	{
-		_logger.debug("AutoReplicate.getLocalReplica");
-		MessageElement param = new MessageElement(
-				GeniiResolverServiceImpl.TARGET_CONTAINER_PARAMETER, containerID.toString());
-		MessageElement[] params = new MessageElement[]{ param };
-		for (ResolverDescription resolver : resolverList)
-		{
+		if (_logger.isDebugEnabled())
+			_logger.debug("AutoReplicate.getLocalReplica");
+		MessageElement param = new MessageElement(GeniiResolverServiceImpl.TARGET_CONTAINER_PARAMETER, containerID.toString());
+		MessageElement[] params = new MessageElement[] { param };
+		for (ResolverDescription resolver : resolverList) {
 			if (resolver.getType() != ResolverDescription.ResolverType.EPI_RESOLVER)
 				continue;
-			URI targetEPI = resolver.getEPI();		
-			GeniiResolverPortType proxy = ClientUtils.createProxy(
-					GeniiResolverPortType.class, resolver.getEPR());
+			URI targetEPI = resolver.getEPI();
+			GeniiResolverPortType proxy = ClientUtils.createProxy(GeniiResolverPortType.class, resolver.getEPR());
 			ExtResolveRequestType request = new ExtResolveRequestType(targetEPI, params);
-			try
-			{
+			try {
 				return proxy.extResolveEPI(request);
-			}
-			catch (Exception exception)
-			{
+			} catch (Exception exception) {
 				// Given resource does not exist in the given container.
 				if (exception instanceof ResolveFailedFaultType)
 					break;
-				_logger.debug("getLocalReplica: " + exception);
+				if (_logger.isDebugEnabled())
+					_logger.debug("getLocalReplica: " + exception);
 			}
 		}
 		return null;

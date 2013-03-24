@@ -16,25 +16,28 @@ import edu.virginia.vcgr.genii.container.context.ClientConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ClientConfigHandler extends BasicHandler {
+public class ClientConfigHandler extends BasicHandler
+{
 
 	private static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(ClientConfigHandler.class);
 
 	@Override
-	public void invoke(MessageContext msgContext) throws AxisFault {
+	public void invoke(MessageContext msgContext) throws AxisFault
+	{
 		try {
 			SOAPHeader header = msgContext.getCurrentMessage().getSOAPHeader();
 			Iterator<?> iterator = header.examineAllHeaderElements();
 			while (iterator.hasNext()) {
 				SOAPHeaderElement element = (SOAPHeaderElement) iterator.next();
-				if (element.getNamespaceURI().equals(GenesisIIConstants.GENESISII_NS) 
-						&& element.getLocalName().equals(GenesisIIConstants.CLIENT_ID_ATTRIBUTE_NAME)) {
+				if (element.getNamespaceURI().equals(GenesisIIConstants.GENESISII_NS)
+					&& element.getLocalName().equals(GenesisIIConstants.CLIENT_ID_ATTRIBUTE_NAME)) {
 					String clientId = element.getValue();
 					ClientConfig.setClientConfig(clientId);
 					break;
-				} else continue;
+				} else
+					continue;
 			}
 		} catch (SOAPException e) {
 			_logger.info("exception occurred in invoke", e);

@@ -11,10 +11,10 @@ public class MemoryBasedContextResolver implements IContextResolver
 	{
 		if (context == null)
 			throw new IllegalArgumentException("Context cannot be null.");
-		
+
 		_context = context.deriveNewContext();
 	}
-	
+
 	@Override
 	public ICallingContext load() throws IOException, FileNotFoundException
 	{
@@ -22,15 +22,14 @@ public class MemoryBasedContextResolver implements IContextResolver
 	}
 
 	@Override
-	public void store(ICallingContext ctxt) throws FileNotFoundException,
-			IOException
+	public void store(ICallingContext ctxt) throws FileNotFoundException, IOException
 	{
 		if (ctxt == null)
 			throw new IllegalArgumentException("Context cannot be null.");
 
 		_context = ctxt.deriveNewContext();
 	}
-	
+
 	@Override
 	public Object clone()
 	{

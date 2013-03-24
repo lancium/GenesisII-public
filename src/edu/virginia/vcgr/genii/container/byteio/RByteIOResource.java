@@ -36,61 +36,40 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 {
-	static public QName FILE_PATH_PROPERTY = new QName(
-		GenesisIIConstants.GENESISII_NS, "file-path");
-	static protected final String _INTERNAL_FILE_PATH_PROP_NAME =
-		"edu.virginia.vcgr.genii.byteio.rbyteio.file-path";
-	static private final String _INTERNAL_CREATE_TIME_PROP_NAME=
-		"edu.virginia.vcgr.genii.byteio.rbyteio.create-time";
-	static private final String _INTERNAL_ACCESS_TIME_PROP_NAME=
-		"edu.virginia.vcgr.genii.byteio.rbyteio.access-time";
-	static protected final String _INTERNAL_BITMAP_FILE_PATH_PROP_NAME =
-		"edu.virginia.vcgr.genii.byteio.rbyteio.bitmap-path";
+	static public QName FILE_PATH_PROPERTY = new QName(GenesisIIConstants.GENESISII_NS, "file-path");
+	static protected final String _INTERNAL_FILE_PATH_PROP_NAME = "edu.virginia.vcgr.genii.byteio.rbyteio.file-path";
+	static private final String _INTERNAL_CREATE_TIME_PROP_NAME = "edu.virginia.vcgr.genii.byteio.rbyteio.create-time";
+	static private final String _INTERNAL_ACCESS_TIME_PROP_NAME = "edu.virginia.vcgr.genii.byteio.rbyteio.access-time";
+	static protected final String _INTERNAL_BITMAP_FILE_PATH_PROP_NAME = "edu.virginia.vcgr.genii.byteio.rbyteio.bitmap-path";
 
 	static private Log _logger = LogFactory.getLog(RByteIOResource.class);
-	
-	protected RByteIOResource(
-			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool)
-		throws SQLException
+
+	protected RByteIOResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}
-	
-	public File chooseFile(HashMap<QName, Object> creationProperties)
-		throws ResourceException
+
+	public File chooseFile(HashMap<QName, Object> creationProperties) throws ResourceException
 	{
 		File userDir = Container.getConfigurationManager().getUserDirectory();
 		File file = null;
-		try
-		{
-			if (creationProperties != null)
-			{
-				MessageElement any = (MessageElement)creationProperties.get(
-					FILE_PATH_PROPERTY);
-				if (any != null)
-				{
+		try {
+			if (creationProperties != null) {
+				MessageElement any = (MessageElement) creationProperties.get(FILE_PATH_PROPERTY);
+				if (any != null) {
 					file = new File(userDir, any.getAsString());
 				}
 			}
-		}
-		catch (ResourceException re)
-		{
+		} catch (ResourceException re) {
 			throw re;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			throw new ResourceException(e.getLocalizedMessage(), e);
 		}
-		try
-		{
-			if (file == null)
-			{
+		try {
+			if (file == null) {
 				file = ByteIOFileCreator.createFile(userDir);
 			}
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			throw new ResourceException(ioe.getLocalizedMessage(), ioe);
 		}
 		String path = ByteIOFileCreator.getRelativePath(userDir, file);
@@ -100,80 +79,68 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 
 	public File getCurrentFile() throws ResourceException
 	{
-		String path = (String)getProperty(_INTERNAL_FILE_PATH_PROP_NAME);
+		String path = (String) getProperty(_INTERNAL_FILE_PATH_PROP_NAME);
 		if (path == null)
 			return chooseFile(null);
 		File userDir = Container.getConfigurationManager().getUserDirectory();
 		return ByteIOFileCreator.getAbsoluteFile(userDir, path);
 	}
-	
+
 	public void destroy() throws ResourceException
 	{
-		try
-		{
+		try {
 			File myFile = getCurrentFile();
 			myFile.delete();
-		}
-		catch (ResourceException re)
-		{
+		} catch (ResourceException re) {
 			_logger.error(re.getMessage());
 		}
-		
+
 		super.destroy();
 	}
-	
-	public String getFilePath()
-		throws ResourceException
+
+	public String getFilePath() throws ResourceException
 	{
 		return (String) getProperty(_INTERNAL_FILE_PATH_PROP_NAME);
 	}
 
-	public void setCreateTime(Calendar tm)
-		throws ResourceException
+	public void setCreateTime(Calendar tm) throws ResourceException
 	{
 		setProperty(_INTERNAL_CREATE_TIME_PROP_NAME, tm);
 	}
 
-	public Calendar getCreateTime()
-		throws ResourceException
+	public Calendar getCreateTime() throws ResourceException
 	{
 		return (Calendar) getProperty(_INTERNAL_CREATE_TIME_PROP_NAME);
 	}
-	
-	public void setModTime(Calendar tm)
-		throws ResourceException
+
+	public void setModTime(Calendar tm) throws ResourceException
 	{
 		getCurrentFile().setLastModified(tm.getTimeInMillis());
 	}
 
-	public Calendar getModTime()
-		throws ResourceException
+	public Calendar getModTime() throws ResourceException
 	{
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(getCurrentFile().lastModified());
 		return c;
 	}
-	
-	public void setAccessTime(Calendar tm)
-		throws ResourceException
+
+	public void setAccessTime(Calendar tm) throws ResourceException
 	{
 		setProperty(_INTERNAL_ACCESS_TIME_PROP_NAME, tm);
 	}
 
-	public Calendar getAccessTime()
-		throws ResourceException
+	public Calendar getAccessTime() throws ResourceException
 	{
 		return (Calendar) getProperty(_INTERNAL_ACCESS_TIME_PROP_NAME);
 	}
-	
-	public void setBitmapFilePath(String path)
-		throws ResourceException
+
+	public void setBitmapFilePath(String path) throws ResourceException
 	{
 		setProperty(_INTERNAL_BITMAP_FILE_PATH_PROP_NAME, path);
 	}
 
-	public File getBitmapFile()
-		throws ResourceException
+	public File getBitmapFile() throws ResourceException
 	{
 		String path = (String) getProperty(_INTERNAL_BITMAP_FILE_PATH_PROP_NAME);
 		if (path == null)

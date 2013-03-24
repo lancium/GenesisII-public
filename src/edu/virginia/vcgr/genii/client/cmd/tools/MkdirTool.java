@@ -32,135 +32,137 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 
 public class MkdirTool extends BaseGridTool
 {
-    static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dmkdir";
-    static private final String _USAGE_RESOURCE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/umkdir";
-    static private final String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/mkdir";
-    static private Log logger = LogFactory.getLog(MkdirTool.class);
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dmkdir";
+	static private final String _USAGE_RESOURCE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/umkdir";
+	static private final String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/mkdir";
+	static private Log logger = LogFactory.getLog(MkdirTool.class);
 
-    private boolean _parents = false;
-    private String _rnsService = null;
+	private boolean _parents = false;
+	private String _rnsService = null;
 
-    public MkdirTool()
-    {
-        super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE), false, ToolCategory.DATA);
-        addManPage(new FileResource(_MANPAGE));
-    }
+	public MkdirTool()
+	{
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE), false, ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
+	}
 
-    @Option({ "parents", "p" })
-    public void setParents()
-    {
-        _parents = true;
-    }
+	@Option({ "parents", "p" })
+	public void setParents()
+	{
+		_parents = true;
+	}
 
-    @Option({ "rns-service" })
-    public void setRns_service(String service)
-    {
-        _rnsService = service;
-    }
+	@Option({ "rns-service" })
+	public void setRns_service(String service)
+	{
+		_rnsService = service;
+	}
 
-    @Override
-    protected int runCommand() throws Throwable
-    {
-        return makeDirectory(_parents, _rnsService, getArguments(), stderr);
-    }
+	@Override
+	protected int runCommand() throws Throwable
+	{
+		return makeDirectory(_parents, _rnsService, getArguments(), stderr);
+	}
 
-    @Override
-    protected void verify() throws ToolException
-    {
-        if (numArguments() < 1)
-            throw new InvalidToolUsageException();
-    }
+	@Override
+	protected void verify() throws ToolException
+	{
+		if (numArguments() < 1)
+			throw new InvalidToolUsageException();
+	}
 
-    public static EndpointReferenceType lookupPath(String path)
-            throws RNSPathDoesNotExistException, RNSException, FileNotFoundException
-    {
+	public static EndpointReferenceType lookupPath(String path) throws RNSPathDoesNotExistException, RNSException,
+		FileNotFoundException
+	{
 
-        return RNSUtilities.findService("/containers/BootstrapContainer",
-                "EnhancedRNSPortType",
-                new PortType[] { WellKnownPortTypes.RNS_PORT_TYPE }, new GeniiPath(path).path()).getEndpoint();
-    }
+		return RNSUtilities.findService("/containers/BootstrapContainer", "EnhancedRNSPortType",
+			new PortType[] { WellKnownPortTypes.RNS_PORT_TYPE }, new GeniiPath(path).path()).getEndpoint();
+	}
 
-    public static int makeDirectory(boolean parents, String rnsService, List<String> pathsToCreate,
-            PrintWriter stderr) throws Exception
-    {
-        boolean createParents = false;
-        EndpointReferenceType service = null;
+	public static int makeDirectory(boolean parents, String rnsService, List<String> pathsToCreate, PrintWriter stderr)
+		throws Exception
+	{
+		boolean createParents = false;
+		EndpointReferenceType service = null;
 
-        if (rnsService != null) {
-            GeniiPath gPath = new GeniiPath(rnsService);
-            if (gPath.pathType() != GeniiPathType.Grid)
-                throw new InvalidToolUsageException("RNSService must be a grid path. ");
-            service = lookupPath(rnsService);
-        }
+		if (rnsService != null) {
+			GeniiPath gPath = new GeniiPath(rnsService);
+			if (gPath.pathType() != GeniiPathType.Grid)
+				throw new InvalidToolUsageException("RNSService must be a grid path. ");
+			service = lookupPath(rnsService);
+		}
 
-        ICallingContext ctxt = ContextManager.getCurrentContext();
+		ICallingContext ctxt = ContextManager.getExistingContext();
 
-        if (parents)
-            createParents = true;
+		if (parents)
+			createParents = true;
 
-        RNSPath path = ctxt.getCurrentPath();
-        for (String sPath : pathsToCreate) {
-            GeniiPath gPath = new GeniiPath(sPath);
-            if (gPath.exists())
-                throw new RNSPathAlreadyExistsException(gPath.path());
-            if (gPath.pathType() == GeniiPathType.Grid) {
-                RNSPath newDir = lookup(gPath, RNSPathQueryFlags.MUST_NOT_EXIST);
+		RNSPath path = ctxt.getCurrentPath();
+		for (String sPath : pathsToCreate) {
+			GeniiPath gPath = new GeniiPath(sPath);
+			if (gPath.exists())
+				throw new RNSPathAlreadyExistsException(gPath.path());
+			if (gPath.pathType() == GeniiPathType.Grid) {
+				RNSPath newDir = lookup(gPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 
-                path = newDir;
+				path = newDir;
 
-                if (service == null) {
-                    if (createParents)
-                        path.mkdirs();
-                    else
-                        path.mkdir();
-                } else {
-                    RNSPath parent = path.getParent();
+				if (service == null) {
+					if (createParents)
+						path.mkdirs();
+					else
+						path.mkdir();
+				} else {
+					RNSPath parent = path.getParent();
 
-                    if (!parent.exists()) {
-                        String msg = "Can't create directory \"" + path.pwd() + "\".";
-                        logger.error(msg);
-                        if (stderr != null) stderr.println(msg);
-                        return 1;
-                    }
+					if (!parent.exists()) {
+						String msg = "Can't create directory \"" + path.pwd() + "\".";
+						logger.error(msg);
+						if (stderr != null)
+							stderr.println(msg);
+						return 1;
+					}
 
-                    TypeInformation typeInfo = new TypeInformation(parent.getEndpoint());
-                    if (!typeInfo.isRNS()) {
-                        String msg = "\"" + parent.pwd() + "\" is not a directory.";
-                        logger.error(msg);                        
-                        if (stderr != null) stderr.println(msg);
-                        return 1;
-                    }
+					TypeInformation typeInfo = new TypeInformation(parent.getEndpoint());
+					if (!typeInfo.isRNS()) {
+						String msg = "\"" + parent.pwd() + "\" is not a directory.";
+						logger.error(msg);
+						if (stderr != null)
+							stderr.println(msg);
+						return 1;
+					}
 
-                    GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, service);
-                    EndpointReferenceType newEPR = common.vcgrCreate(new VcgrCreate(null))
-                            .getEndpoint();
-                    try {
-                        path.link(newEPR);
-                        newEPR = null;
-                    } finally {
-                        if (newEPR != null) {
-                            common = ClientUtils.createProxy(GeniiCommon.class, newEPR);
-                            common.destroy(new Destroy());
-                        }
-                    }
-                }
-            } else {
-                File newFile = new File(gPath.path());
-                if (createParents) {
-                    if (!newFile.mkdirs()) {
-                        String msg = "Could not create directory " + gPath.path();
-                        logger.error(msg);                        
-                        if (stderr != null) stderr.println(msg);
-                        return 1;
-                    }
-                } else if (!newFile.mkdir()) {
-                    String msg = "Could not create directory " + gPath.path();
-                    logger.error(msg);                        
-                    if (stderr != null) stderr.println(msg);
-                    return 1;
-                }
-            }
-        }
-        return 0;
-    }
+					GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, service);
+					EndpointReferenceType newEPR = common.vcgrCreate(new VcgrCreate(null)).getEndpoint();
+					try {
+						path.link(newEPR);
+						newEPR = null;
+					} finally {
+						if (newEPR != null) {
+							common = ClientUtils.createProxy(GeniiCommon.class, newEPR);
+							common.destroy(new Destroy());
+						}
+					}
+				}
+			} else {
+				File newFile = new File(gPath.path());
+				if (createParents) {
+					if (!newFile.mkdirs()) {
+						String msg = "Could not create directory " + gPath.path();
+						logger.error(msg);
+						if (stderr != null)
+							stderr.println(msg);
+						return 1;
+					}
+				} else if (!newFile.mkdir()) {
+					String msg = "Could not create directory " + gPath.path();
+					logger.error(msg);
+					if (stderr != null)
+						stderr.println(msg);
+					return 1;
+				}
+			}
+		}
+		return 0;
+	}
 }

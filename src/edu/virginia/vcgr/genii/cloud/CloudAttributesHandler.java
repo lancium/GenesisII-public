@@ -11,57 +11,51 @@ import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-public class CloudAttributesHandler extends AbstractAttributeHandler
-implements CloudConstants{
+public class CloudAttributesHandler extends AbstractAttributeHandler implements CloudConstants
+{
 
+	static private Log _logger = LogFactory.getLog(CloudAttributesHandler.class);
 
-	static private Log _logger = LogFactory.getLog(
-			CloudAttributesHandler.class);
-
-	public CloudAttributesHandler(AttributePackage pkg) 
-	throws NoSuchMethodException {
+	public CloudAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
+	{
 		super(pkg);
 	}
 
 	@Override
-	protected void registerHandlers() throws NoSuchMethodException {
-		addHandler(SPAWN_RESOURCES_ATTR, "getStatus", "spawnResources");  
+	protected void registerHandlers() throws NoSuchMethodException
+	{
+		addHandler(SPAWN_RESOURCES_ATTR, "getStatus", "spawnResources");
 		addHandler(SHRINK_RESOURCES_ATTR, "getStatus", "shrinkResources");
 		addHandler(RESOURCE_KILL_ATTR, "getStatus", "killResource");
 		addHandler(STATUS_ATTR, "getStatus");
 		addHandler(VM_INFO_ATTR, "getVMInfo");
 	}
 
-
-	public void spawnResources(MessageElement element)
-	throws ResourceException, ResourceUnknownFaultType
+	public void spawnResources(MessageElement element) throws ResourceException, ResourceUnknownFaultType
 	{
 		IBESResource resource = null;
-		resource =
-			(IBESResource)ResourceManager.getCurrentResource().dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		String besid = resource.getKey();
 		CloudManager tManage = CloudMonitor.getManager(besid);
 
-		if (tManage != null){
+		if (tManage != null) {
 			try {
-				int count = (Integer)(element.getObjectValue(Integer.class));
+				int count = (Integer) (element.getObjectValue(Integer.class));
 				tManage.spawnResources(count);
 			} catch (Exception e) {
 				_logger.error(e);
 			}
 		}
 	}
-	
-	public void killResource(MessageElement element)
-	throws ResourceException, ResourceUnknownFaultType
+
+	public void killResource(MessageElement element) throws ResourceException, ResourceUnknownFaultType
 	{
 		IBESResource resource = null;
-		resource =
-			(IBESResource)ResourceManager.getCurrentResource().dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		String besid = resource.getKey();
 		CloudManager tManage = CloudMonitor.getManager(besid);
 
-		if (tManage != null){
+		if (tManage != null) {
 			try {
 				tManage.killResource(element.getValue());
 			} catch (Exception e) {
@@ -70,19 +64,17 @@ implements CloudConstants{
 		}
 	}
 
-	public void shrinkResources(MessageElement element)
-	throws ResourceException, ResourceUnknownFaultType
+	public void shrinkResources(MessageElement element) throws ResourceException, ResourceUnknownFaultType
 	{
 		IBESResource resource = null;
 
-		resource = 
-			(IBESResource)ResourceManager.getCurrentResource().dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 
 		String besid = resource.getKey();
 		CloudManager tManage = CloudMonitor.getManager(besid);
-		if (tManage != null){
+		if (tManage != null) {
 			try {
-				int count = (Integer)(element.getObjectValue(Integer.class));
+				int count = (Integer) (element.getObjectValue(Integer.class));
 				tManage.killResources(count);
 			} catch (Exception e) {
 				_logger.error(e);
@@ -94,25 +86,22 @@ implements CloudConstants{
 	{
 
 		IBESResource resource = null;
-		resource = 
-			(IBESResource)ResourceManager.getCurrentResource().dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		String besid = resource.getKey();
 		CloudManager tManage = CloudMonitor.getManager(besid);
-		if (tManage != null){
+		if (tManage != null) {
 			VMStats tStat = new VMStats(tManage.getResourceStatus());
 			return tStat.toMessageElement(VM_INFO_ATTR);
-		}
-		else
+		} else
 			return null;
 
 	}
-	
+
 	public MessageElement getStatus() throws Exception
 	{
 
 		IBESResource resource = null;
-		resource = 
-			(IBESResource)ResourceManager.getCurrentResource().dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		String besid = resource.getKey();
 		CloudManager tManage = CloudMonitor.getManager(besid);
 		if (tManage != null)

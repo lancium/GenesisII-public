@@ -22,46 +22,37 @@ public class GeniiResolverSyncRunner implements ResourceSyncRunner
 {
 	static private Log _logger = LogFactory.getLog(GeniiResolverSyncRunner.class);
 
-	public void doSync(IResource vResource,
-			EndpointReferenceType primaryEPR,
-			EndpointReferenceType myEPR,
-			ReplicationThread replicator)
-		throws Throwable
+	public void doSync(IResource vResource, EndpointReferenceType primaryEPR, EndpointReferenceType myEPR,
+		ReplicationThread replicator) throws Throwable
 	{
 		// Synchronize the attributes -- resolver and replication policies.
 		IGeniiResolverResource resource = (IGeniiResolverResource) vResource;
 		ObjectInputStream objstream = null;
-		try
-		{
+		try {
 			InputStream istream = ByteIOStreamFactory.createInputStream(primaryEPR);
 			objstream = new ObjectInputStream(istream);
-			while (true)
-			{
+			while (true) {
 				Object object = null;
-				try
-				{
+				try {
 					object = objstream.readObject();
-				}
-				catch (EOFException eof)
-				{
+				} catch (EOFException eof) {
 					break;
 				}
 				URI targetEPI = new URI((String) object);
 				int targetID = objstream.readInt();
 				byte[] data = (byte[]) objstream.readObject();
 				EndpointReferenceType targetEPR = EPRUtils.fromBytes(data);
-				_logger.debug("resolver: " + targetEPR.getAddress());
+				if (_logger.isDebugEnabled())
+					_logger.debug("resolver: " + targetEPR.getAddress());
 				resource.addTargetEPR(targetEPI, targetID, targetEPR);
 				GeniiResolverUtils.createTerminateSubscription(targetID, targetEPR, myEPR, resource);
 			}
-		}
-		finally
-		{
+		} finally {
 			StreamUtils.close(objstream);
 		}
 		GeniiResolverUtils.initializeNextTargetIDinReplica(resource);
 	}
-	
+
 	public TopicPath getSyncTopic()
 	{
 		return ResolverTopics.RESOLVER_UPDATE_TOPIC;

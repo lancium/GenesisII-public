@@ -11,7 +11,7 @@ public class WSNotificationConfiguration
 {
 	@XmlAttribute(name = "num-threads", required = true)
 	private int _numThreads;
-	
+
 	final int numThreads()
 	{
 		return _numThreads;

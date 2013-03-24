@@ -6,8 +6,7 @@ import javax.swing.JComponent;
 
 public interface UITabPlugin extends UIPlugin
 {
-	public void configureTabPlugin(Properties properties)
-		throws UIPluginException;
-	
+	public void configureTabPlugin(Properties properties) throws UIPluginException;
+
 	public JComponent getComponent(UIPluginContext context);
 }

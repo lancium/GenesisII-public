@@ -26,12 +26,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Responsible for managing the key material which is used to authenticate the
- * local SSLSocket to its peer. If no key material is available, the socket will
- * be unable to present authentication credentials.
+ * Responsible for managing the key material which is used to authenticate the local SSLSocket to
+ * its peer. If no key material is available, the socket will be unable to present authentication
+ * credentials.
  * 
- * This particular key manager uses key material from the "My" Windows
- * cryptography key provider
+ * This particular key manager uses key material from the "My" Windows cryptography key provider
  * 
  * @author dmerrill
  */
@@ -49,42 +48,31 @@ public class WinX509KeyManager implements X509KeyManager
 	}
 
 	/**
-	 * Choose an alias to authenticate the client side of a secure socket given
-	 * the public key type and the list of certificate issuer authorities
-	 * recognized by the peer (if any).
+	 * Choose an alias to authenticate the client side of a secure socket given the public key type
+	 * and the list of certificate issuer authorities recognized by the peer (if any).
 	 */
-	public String chooseClientAlias(String[] keyType, Principal[] issuers,
-			Socket socket)
+	public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
 	{
 
 		String alias = null;
 
-		try
-		{
+		try {
 			String[] aliases = getClientAliases(keyType[0], issuers);
-			if (aliases == null)
-			{
+			if (aliases == null) {
 				return null;
 			}
 
 			// pick one that has a public key
-			for (int i = 0; i < aliases.length; i++)
-			{
-				try
-				{
-					if (cryptoLib.getPrivateKey("My", aliases[i]) != null)
-					{
+			for (int i = 0; i < aliases.length; i++) {
+				try {
+					if (cryptoLib.getPrivateKey("My", aliases[i]) != null) {
 						alias = aliases[i];
 					}
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 				}
 			}
 
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_logger.info("exception occurred in chooseClientAlias", e);
 		}
 
@@ -92,42 +80,31 @@ public class WinX509KeyManager implements X509KeyManager
 	}
 
 	/**
-	 * Choose an alias to authenticate the server side of a secure socket given
-	 * the public key type and the list of certificate issuer authorities
-	 * recognized by the peer (if any).
+	 * Choose an alias to authenticate the server side of a secure socket given the public key type
+	 * and the list of certificate issuer authorities recognized by the peer (if any).
 	 */
-	public String chooseServerAlias(String keyType, Principal[] issuers,
-			Socket socket)
+	public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket)
 	{
 
 		String alias = null;
 
-		try
-		{
+		try {
 			String[] aliases = getServerAliases(keyType, issuers);
-			if (aliases == null)
-			{
+			if (aliases == null) {
 				return null;
 			}
 
 			// pick one that has a public key
-			for (int i = 0; i < aliases.length; i++)
-			{
-				try
-				{
-					if (cryptoLib.getPrivateKey("My", aliases[i]) != null)
-					{
+			for (int i = 0; i < aliases.length; i++) {
+				try {
+					if (cryptoLib.getPrivateKey("My", aliases[i]) != null) {
 						alias = aliases[i];
 					}
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 				}
 			}
 
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			_logger.info("exception occurred in chooseServerAlias", e);
 		}
 
@@ -135,96 +112,73 @@ public class WinX509KeyManager implements X509KeyManager
 	}
 
 	/**
-	 * Returns the certificate chain associated with the given alias. Returns
-	 * null if the certificate chain is invalid for any reason
+	 * Returns the certificate chain associated with the given alias. Returns null if the
+	 * certificate chain is invalid for any reason
 	 * 
 	 */
 	public X509Certificate[] getCertificateChain(String alias)
 	{
-		try
-		{
+		try {
 			return cryptoLib.getCertificateChain("My", alias);
 
-		}
-		catch (WinCryptoException e)
-		{
-		}
-		catch (CertificateException e)
-		{
+		} catch (WinCryptoException e) {
+		} catch (CertificateException e) {
 		}
 
 		return null;
 	}
 
 	/**
-	 * Get the matching aliases for authenticating the client side of a secure
-	 * socket given the public key type and the list of certificate issuer
-	 * authorities recognized by the peer (if any).
+	 * Get the matching aliases for authenticating the client side of a secure socket given the
+	 * public key type and the list of certificate issuer authorities recognized by the peer (if
+	 * any).
 	 * 
 	 */
 	public String[] getClientAliases(String keyType, Principal[] issuers)
 	{
 		// get the aliases within the local user keystore
 		ArrayList<String> aliases;
-		try
-		{
+		try {
 			aliases = cryptoLib.getAliases("My");
-		}
-		catch (WinCryptoException e)
-		{
+		} catch (WinCryptoException e) {
 			return null;
 		}
 
 		// put the issuers into a set for easy matching
 		HashSet<Principal> issuerSet = null;
-		if (issuers != null)
-		{
+		if (issuers != null) {
 			issuerSet = new HashSet<Principal>(Arrays.asList(issuers));
 		}
 
 		// iterate through the aliases...
 		Iterator<String> itr = aliases.iterator();
-		while (itr.hasNext())
-		{
+		while (itr.hasNext()) {
 			String alias = itr.next();
-			try
-			{
+			try {
 				// iterate though the cert chain, checking issuers. Invalid
 				// alias certs
 				// will throw exceptions during cert chain lookup.
 				boolean matchingIssuer = false;
-				X509Certificate[] aliasCertChain =
-						cryptoLib.getCertificateChain("My", alias);
-				if (issuerSet == null)
-				{
+				X509Certificate[] aliasCertChain = cryptoLib.getCertificateChain("My", alias);
+				if (issuerSet == null) {
 					// no issuers specified and no exceptions during chain
 					// lookup
 					matchingIssuer = true;
-				}
-				else
-				{
-					for (int i = 0; i < aliasCertChain.length; i++)
-					{
-						if (issuerSet.contains(aliasCertChain[i]
-								.getIssuerX500Principal()))
-						{
+				} else {
+					for (int i = 0; i < aliasCertChain.length; i++) {
+						if (issuerSet.contains(aliasCertChain[i].getIssuerX500Principal())) {
 							matchingIssuer = true;
 							break;
 						}
 					}
 				}
 
-				if (!matchingIssuer)
-				{
+				if (!matchingIssuer) {
 					// no matching issuer found
 					itr.remove();
 				}
-			}
-			catch (WinCryptoException e)
-			{
-			}
-			catch (CertificateException e)
-			{
+			} catch (WinCryptoException e) {
+			} catch (CertificateException e) {
 			}
 		}
 
@@ -233,9 +187,9 @@ public class WinX509KeyManager implements X509KeyManager
 	}
 
 	/**
-	 * Get the matching aliases for authenticating the server side of a secure
-	 * socket given the public key type and the list of certificate issuer
-	 * authorities recognized by the peer (if any).
+	 * Get the matching aliases for authenticating the server side of a secure socket given the
+	 * public key type and the list of certificate issuer authorities recognized by the peer (if
+	 * any).
 	 */
 	public String[] getServerAliases(String keyType, Principal[] issuers)
 	{
@@ -249,12 +203,9 @@ public class WinX509KeyManager implements X509KeyManager
 	public PrivateKey getPrivateKey(String alias)
 	{
 
-		try
-		{
+		try {
 			return cryptoLib.getPrivateKey("My", alias);
-		}
-		catch (WinCryptoException e)
-		{
+		} catch (WinCryptoException e) {
 		}
 
 		return null;
@@ -263,12 +214,9 @@ public class WinX509KeyManager implements X509KeyManager
 
 	public String getFriendlyName(String alias)
 	{
-		try
-		{
+		try {
 			return cryptoLib.getFriendlyName("My", alias);
-		}
-		catch (WinCryptoException e)
-		{
+		} catch (WinCryptoException e) {
 		}
 
 		return null;

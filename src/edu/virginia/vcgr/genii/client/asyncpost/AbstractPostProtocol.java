@@ -11,17 +11,16 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractPostProtocol implements PostProtocol
 {
 	static private Log _logger = LogFactory.getLog(AbstractPostProtocol.class);
-	
-	private String []_handledProtocols;
-	
-	protected abstract void doPost(URI target, byte []content)
-		throws Throwable;
-	
-	protected AbstractPostProtocol(String []handledProtocols)
+
+	private String[] _handledProtocols;
+
+	protected abstract void doPost(URI target, byte[] content) throws Throwable;
+
+	protected AbstractPostProtocol(String[] handledProtocols)
 	{
 		_handledProtocols = handledProtocols;
 	}
-	
+
 	@Override
 	final public String[] handledProtocols()
 	{
@@ -33,24 +32,22 @@ public abstract class AbstractPostProtocol implements PostProtocol
 	{
 		return new StoringOutputStream(target);
 	}
-	
+
 	private class StoringOutputStream extends OutputStream
 	{
 		private ByteArrayOutputStream _baos = new ByteArrayOutputStream();
 		private URI _target;
-		
+
 		private StoringOutputStream(URI target)
 		{
 			_target = target;
 		}
-		
+
 		@Override
 		public void close() throws IOException
 		{
 			_baos.close();
-			Thread th = new Thread(
-				new PostWorker(_target, _baos.toByteArray()), 
-				"Asynchronous Post Thread");
+			Thread th = new Thread(new PostWorker(_target, _baos.toByteArray()), "Asynchronous Post Thread");
 			th.setDaemon(true);
 			th.start();
 		}
@@ -79,27 +76,24 @@ public abstract class AbstractPostProtocol implements PostProtocol
 			_baos.write(b);
 		}
 	}
-	
+
 	private class PostWorker implements Runnable
 	{
 		private URI _target;
-		private byte []_contents;
-		
-		private PostWorker(URI target, byte []contents)
+		private byte[] _contents;
+
+		private PostWorker(URI target, byte[] contents)
 		{
 			_target = target;
 			_contents = contents;
 		}
-		
+
 		@Override
 		public void run()
 		{
-			try
-			{
+			try {
 				doPost(_target, _contents);
-			}
-			catch (Throwable cause)
-			{
+			} catch (Throwable cause) {
 				_logger.warn("Unable to post to remote target.", cause);
 			}
 		}
