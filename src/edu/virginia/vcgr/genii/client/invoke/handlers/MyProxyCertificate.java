@@ -14,6 +14,7 @@ import org.bouncycastle.openssl.PEMWriter;
 import sun.misc.BASE64Encoder;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
@@ -91,8 +92,12 @@ public class MyProxyCertificate
 
 	private static boolean getMyProxyCertificate() throws Throwable
 	{
-
-		ICallingContext callContext = ContextManager.getCurrentContext(true);
+		ICallingContext callContext;
+		try {
+			callContext = ContextManager.getCurrentContext(true);
+		} catch (ContextException e) {
+			return false;
+		}
 		if (callContext == null)
 			return false;
 

@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.io.gsiftp;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 import edu.virginia.vcgr.genii.client.io.DataTransferStatistics;
 
@@ -14,9 +13,8 @@ public class GsiFtpUtility
 		DataTransferStatistics stats = DataTransferStatistics.startTransfer();
 
 		GsiFtp copier = new GsiFtp();
-		copier.setPort(destinationPort);
 		copier.setSourceFile(source.getAbsolutePath());
-		copier.setDestinationfile("gsiftp://" + destinationHost + destinationPath);
+		copier.setDestinationfile("gsiftp://" + destinationHost + ":" + String.valueOf(destinationPort) + destinationPath);
 		copier.setWorkingDirectory(source.getParentFile());
 
 		copier.execute();
@@ -24,15 +22,12 @@ public class GsiFtpUtility
 		return stats.finishTransfer();
 	}
 
-	static private Pattern FNF_PATTERN = Pattern.compile("scp: .*: No such file or directory");
-
-	static public DataTransferStatistics get(File destination, String sourceFileHost, int port, String sourceFilePath)
+	static public DataTransferStatistics get(File destination, String sourceFileHost, int sourcePort, String sourceFilePath)
 		throws IOException
 	{
 		DataTransferStatistics stats = DataTransferStatistics.startTransfer();
 		GsiFtp copier = new GsiFtp();
-		copier.setPort(port);
-		copier.setSourceFile("gsiftp://" + sourceFileHost + sourceFilePath);
+		copier.setSourceFile("gsiftp://" + sourceFileHost + ":" + String.valueOf(sourcePort) + sourceFilePath);
 		copier.setDestinationfile(destination.getAbsolutePath());
 		copier.setWorkingDirectory(destination.getParentFile());
 		copier.execute();

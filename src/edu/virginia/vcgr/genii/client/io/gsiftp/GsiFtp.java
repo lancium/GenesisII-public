@@ -12,7 +12,6 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
 public class GsiFtp
 {
-	private int port;
 	private String sourceFile = "";
 	private String destinationFile = "";
 	private File workingDirectory;
@@ -22,11 +21,6 @@ public class GsiFtp
 	public void setWorkingDirectory(File workingDirectory)
 	{
 		this.workingDirectory = workingDirectory;
-	}
-
-	public void setPort(int port)
-	{
-		this.port = port;
 	}
 
 	public void setSourceFile(String localFile)
