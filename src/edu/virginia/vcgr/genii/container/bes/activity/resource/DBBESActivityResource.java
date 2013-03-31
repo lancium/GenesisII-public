@@ -24,14 +24,14 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
-import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class DBBESActivityResource extends BasicDBResource implements IBESActivityResource
 {

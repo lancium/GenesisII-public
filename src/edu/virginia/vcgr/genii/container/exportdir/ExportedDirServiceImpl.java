@@ -27,12 +27,15 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.resource.ResourceLock;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -44,14 +47,11 @@ import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.exportdir.ExportedDirPortType;
@@ -78,14 +78,14 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.EXPORTED_DIR_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.EXPORTED_DIR_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE());
 	}
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.EXPORTED_DIR_SERVICE_PORT_TYPE;
+		return WellKnownPortTypes.EXPORTED_DIR_SERVICE_PORT_TYPE();
 	}
 
 	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters) throws ResourceException, BaseFaultType

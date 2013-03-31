@@ -7,10 +7,10 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.SOAPHeaderElement;
 
+import edu.virginia.vcgr.genii.client.notification.NotificationBrokerConstants;
 import edu.virginia.vcgr.genii.container.context.ClientConfig;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.wsn.WSNotificationContainerService;
-import edu.virginia.vcgr.genii.container.notification.NotificationBrokerConstants;
 
 public class NotificationMessageIndexPropagator extends BasicHandler
 {

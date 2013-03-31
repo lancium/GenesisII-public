@@ -9,7 +9,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 
 public class TimingSink
 {

@@ -8,8 +8,8 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.sync.VersionVector;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
-import edu.virginia.vcgr.genii.container.sync.VersionVector;
 
 @XmlRootElement(namespace = ResolverUpdateContents.RESOLVER_NAMESPACE, name = "ResolverUpdateContents")
 public class ResolverUpdateContents extends NotificationMessageContents

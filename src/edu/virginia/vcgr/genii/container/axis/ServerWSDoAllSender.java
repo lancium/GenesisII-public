@@ -41,7 +41,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 
 public class ServerWSDoAllSender extends WSDoAllSender
 {

@@ -12,19 +12,19 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription.ResolverType;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.sync.SyncProperty;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.Subscription;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
-import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.sync.SyncProperty;
 
 public class GeniiResolverUtils
 {

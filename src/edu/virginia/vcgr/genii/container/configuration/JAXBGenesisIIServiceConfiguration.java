@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
+import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 @XmlAccessorType(XmlAccessType.NONE)
 public class JAXBGenesisIIServiceConfiguration implements GenesisIIServiceConfiguration
@@ -32,7 +33,7 @@ public class JAXBGenesisIIServiceConfiguration implements GenesisIIServiceConfig
 			return null;
 
 		try {
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			ClassLoader loader = GenesisClassLoader.classLoaderFactory();
 			Class<?> cl = loader.loadClass(className);
 			Constructor<?> cons = cl.getConstructor();
 			return typeCast.cast(cons.newInstance());

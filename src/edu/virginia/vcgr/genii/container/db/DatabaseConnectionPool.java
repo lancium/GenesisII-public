@@ -24,6 +24,7 @@ import edu.virginia.vcgr.genii.client.stats.DBConnectionDataPoint;
 import edu.virginia.vcgr.genii.client.stats.DatabaseHistogramStatistics;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.cleanup.CleanupManager;
+import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 public class DatabaseConnectionPool
 {
@@ -217,8 +218,8 @@ public class DatabaseConnectionPool
 
 		Connection conn = DriverManager.getConnection(_connectString, _user, _password);
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-		return (Connection) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-			new Class[] { Connection.class }, new ConnectionInterceptor(conn));
+		return (Connection) Proxy.newProxyInstance(GenesisClassLoader.classLoaderFactory(), new Class[] { Connection.class },
+			new ConnectionInterceptor(conn));
 	}
 
 	private void rejuvenate() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException

@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlElement;
 import org.morgan.util.macro.MacroUtils;
 
 import edu.virginia.vcgr.genii.container.cservices.ContainerService;
+import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 class Version1ContainerService
 {
@@ -27,8 +28,8 @@ class Version1ContainerService
 		if (className.endsWith(".GridLoggerContainerService"))
 			return null;
 
-		Class<? extends ContainerService> serviceClass = (Class<? extends ContainerService>) Version1Upgrader.class
-			.getClassLoader().loadClass(className);
+		Class<? extends ContainerService> serviceClass = (Class<? extends ContainerService>) GenesisClassLoader
+			.classLoaderFactory().loadClass(className);
 
 		return serviceClass;
 	}

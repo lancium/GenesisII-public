@@ -45,15 +45,23 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.resource.ResourceLock;
+import edu.virginia.vcgr.genii.client.rns.GeniiDirPolicy;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
+import edu.virginia.vcgr.genii.client.rns.RNSOperation;
 import edu.virginia.vcgr.genii.client.rns.RNSOperations;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
+import edu.virginia.vcgr.genii.client.sync.SyncProperty;
+import edu.virginia.vcgr.genii.client.sync.VersionVector;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
@@ -71,14 +79,11 @@ import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AclTopics;
@@ -89,11 +94,8 @@ import edu.virginia.vcgr.genii.container.sync.MessageFlags;
 import edu.virginia.vcgr.genii.container.sync.ReplicationItem;
 import edu.virginia.vcgr.genii.container.sync.ReplicationThread;
 import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
-import edu.virginia.vcgr.genii.container.sync.SyncProperty;
-import edu.virginia.vcgr.genii.container.sync.VersionVector;
 import edu.virginia.vcgr.genii.container.sync.VersionedResourceAttributeHandlers;
 import edu.virginia.vcgr.genii.container.sync.VersionedResourceUtils;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
@@ -131,14 +133,14 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE());
 	}
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE;
+		return WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE();
 	}
 
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,

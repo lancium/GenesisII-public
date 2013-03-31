@@ -1,2 +1,0 @@
-script [--global-properties=<properties-file>] [var=val ...] [--language=<language>] [<script-file>]
-

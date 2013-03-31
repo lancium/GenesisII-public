@@ -49,9 +49,9 @@ import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.axis.CertGeneratorUtils;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
@@ -68,19 +68,19 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 	{
 		super("CertGeneratorPortType");
 
-		addImplementedPortType(WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE());
 	}
 
 	protected CertGeneratorServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE());
 	}
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE;
+		return WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE();
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)

@@ -31,13 +31,13 @@ import javax.xml.namespace.QName;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.io.ChecksumStream;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.resource.ResourceLock;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
 public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler

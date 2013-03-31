@@ -100,25 +100,28 @@ import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 import org.xml.sax.InputSource;
 
+import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHook;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextException;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
-import edu.virginia.vcgr.genii.client.iterator.WSIteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.DefaultNotificationMultiplexer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
@@ -141,7 +144,6 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.container.IContainerManaged;
 import edu.virginia.vcgr.genii.container.alarms.AlarmIdentifier;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
@@ -151,7 +153,6 @@ import edu.virginia.vcgr.genii.container.common.notification.SubscriptionConstru
 import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfiguration;
 import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigurationFactory;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.history.CloseableIterator;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
@@ -167,9 +168,9 @@ import edu.virginia.vcgr.genii.container.invoker.timing.TimingHandler;
 import edu.virginia.vcgr.genii.container.iterator.AbstractIteratorBuilder;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
+import edu.virginia.vcgr.genii.container.iterator.WSIteratorConstructionParameters;
 import edu.virginia.vcgr.genii.container.iterator.WSIteratorServiceImpl;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -178,7 +179,6 @@ import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AclAuthZProvider;
 import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
 import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 import edu.virginia.vcgr.genii.iterator.IterableElementType;
@@ -187,12 +187,13 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 @GAroundInvoke({ ServiceInitializationLocker.class, BaseFaultFixer.class, SoapHeaderHandler.class, DatabaseHandler.class,
 	DebugInvoker.class, ScheduledTerminationInvoker.class, MInjectionInvoker.class, TimingHandler.class })
 @ConstructionParametersType(ConstructionParameters.class)
 @GeniiServiceConfiguration(resourceProvider = BasicDBResourceProvider.class, defaultAuthZProvider = AclAuthZProvider.class)
-public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged, GenesisIIBaseTopics
+public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupHook, GenesisIIBaseTopics
 {
 	static private Log _logger = LogFactory.getLog(GenesisIIBase.class);
 
@@ -255,17 +256,19 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged, G
 
 	protected GenesisIIBase(String serviceName) throws RemoteException
 	{
+		GenesisClassLoader.classLoaderFactory().addLoader(Thread.currentThread().getContextClassLoader());
+		// normally one uses: this.getClass().getClassLoader();
 		_serviceName = serviceName;
 
-		addImplementedPortType(WellKnownPortTypes.GENII_RESOURCE_ATTRS_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.GENII_RESOURCE_FACTORY_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.VCGR_COMMON_PORT_TYPE);
-		addImplementedPortType(WSRFConstants.WSRF_RLW_IMMEDIATE_TERMINATE_PORT);
-		addImplementedPortType(WSRFConstants.WSRF_RLW_SCHEDULED_TERMINATE_PORT);
-		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_RP_PORT);
-		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_MULTIPLE_RP_PORT);
-		addImplementedPortType(WSRFConstants.WSN_NOTIFICATION_CONSUMER_PORT);
-		addImplementedPortType(WSRFConstants.WSN_NOTIFICATION_PRODUCER_PORT);
+		addImplementedPortType(WellKnownPortTypes.GENII_RESOURCE_ATTRS_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.GENII_RESOURCE_FACTORY_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.VCGR_COMMON_PORT_TYPE());
+		addImplementedPortType(WSRFConstants.WSRF_RLW_IMMEDIATE_TERMINATE_PORT());
+		addImplementedPortType(WSRFConstants.WSRF_RLW_SCHEDULED_TERMINATE_PORT());
+		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_RP_PORT());
+		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_MULTIPLE_RP_PORT());
+		addImplementedPortType(WSRFConstants.WSN_NOTIFICATION_CONSUMER_PORT());
+		addImplementedPortType(WSRFConstants.WSN_NOTIFICATION_PRODUCER_PORT());
 
 		try {
 			setAttributeHandlers();
@@ -1281,7 +1284,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged, G
 			WorkingContext ctxt = (WorkingContext) WorkingContext.getCurrentWorkingContext();
 			myEPR = (EndpointReferenceType) ctxt.getProperty(WorkingContext.EPR_PROPERTY_NAME);
 			ResourceKey rKey = ResourceManager.getCurrentResource();
-			resourceInterfaces = PortType.translate(getImplementedPortTypes(rKey));
+			resourceInterfaces = PortType.portTypeFactory().translate(getImplementedPortTypes(rKey));
 		} catch (Throwable cause) {
 			_logger.warn("Failed to get current EPR and resource.", cause);
 			return;

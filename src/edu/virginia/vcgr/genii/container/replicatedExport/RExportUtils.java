@@ -22,6 +22,7 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeException;
@@ -34,7 +35,6 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public class RExportUtils
 {

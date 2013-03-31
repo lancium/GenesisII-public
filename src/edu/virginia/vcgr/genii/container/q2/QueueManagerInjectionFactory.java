@@ -7,7 +7,7 @@ import org.morgan.inject.MInject;
 import org.morgan.inject.MInjectFactory;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.resource.StringResourceIdentifier;
+import edu.virginia.vcgr.genii.client.resource.StringResourceIdentifier;
 
 class QueueManagerInjectionFactory implements MInjectFactory
 {

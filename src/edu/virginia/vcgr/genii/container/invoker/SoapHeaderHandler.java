@@ -17,10 +17,10 @@ import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher;
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncherConsole;
 import edu.virginia.vcgr.appmgr.version.Version;
 import edu.virginia.vcgr.genii.client.comm.GeniiSOAPHeaderConstants;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.container.axis.WSAddressingExtractor;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.version.VersionHelper;
 
 public class SoapHeaderHandler implements IAroundInvoker

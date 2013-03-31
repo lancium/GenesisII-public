@@ -12,9 +12,9 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
@@ -61,14 +61,14 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 	{
 		super("LightWeightExportPortType");
 
-		addImplementedPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.EXPORTED_LIGHTWEIGHT_ROOT_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.EXPORTED_LIGHTWEIGHT_ROOT_SERVICE_PORT_TYPE());
 	}
 
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE;
+		return WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE();
 	}
 
 	@Override

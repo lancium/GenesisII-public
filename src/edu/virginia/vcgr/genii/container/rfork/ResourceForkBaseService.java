@@ -63,14 +63,17 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.utils.IterableIterable;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.Container;
@@ -80,12 +83,10 @@ import edu.virginia.vcgr.genii.container.byteio.TransferAgent;
 import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.iterator.IterableSnapshot;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.cmd.CommandChannelManager;
@@ -95,7 +96,6 @@ import edu.virginia.vcgr.genii.container.rfork.sd.StateDescription;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.rns.Prefetcher;
 import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.rfork.ResourceForkPortType;
@@ -318,8 +318,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		if (_forkLock == null)
 			_forkLock = new Object();
 
-		addImplementedPortType(WellKnownPortTypes.RESOURCE_FORK_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RESOURCE_FORK_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE());
 	}
 
 	@Override
@@ -343,13 +343,13 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 	private PortType[] getPortType(ResourceFork fork)
 	{
 		if (fork instanceof RNSResourceFork) {
-			return new PortType[] { WellKnownPortTypes.RNS_PORT_TYPE, WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE };
+			return new PortType[] { WellKnownPortTypes.RNS_PORT_TYPE(), WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE() };
 		} else if (fork instanceof RandomByteIOResourceFork)
-			return new PortType[] { WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE };
+			return new PortType[] { WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE() };
 		else if (fork instanceof StreamableByteIOFactoryResourceFork)
-			return new PortType[] { WellKnownPortTypes.SBYTEIO_FACTORY_PORT_TYPE };
+			return new PortType[] { WellKnownPortTypes.SBYTEIO_FACTORY_PORT_TYPE() };
 		else if (fork instanceof StreamableByteIOResourceFork)
-			return new PortType[] { WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE };
+			return new PortType[] { WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE() };
 		else
 			throw new ConfigurationException("Class \"" + fork.getClass() + "\" does not implement one "
 				+ "of the resource fork types.");
@@ -443,7 +443,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			}
 		}
 
-		mdtList.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.translate(portTypes)));
+		mdtList.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.portTypeFactory()
+			.translate(portTypes)));
 
 		mdtList.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(
 			GenesisIIConstants.GENESISII_NS, rif.forkClass().getSimpleName())));

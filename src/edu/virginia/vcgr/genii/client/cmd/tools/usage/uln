@@ -1,6 +1,0 @@
-ln <source-path> [<target-path>]
-
-ln --no-lookup --epr-file=<epr-file> <target-path>
-
-ln --no-lookup --service-url=<url> <target-path>
-

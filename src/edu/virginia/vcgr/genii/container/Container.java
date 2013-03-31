@@ -49,12 +49,15 @@ import org.mortbay.jetty.webapp.WebAppContext;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.algorithm.structures.queue.BarrieredWorkQueue;
+import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHook;
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
@@ -67,20 +70,19 @@ import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
-import edu.virginia.vcgr.genii.client.utils.barrier.BarrieredWorkQueue;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllSender;
-import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
+import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
+import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 import edu.virginia.vcgr.secrun.SecureRunnableHooks;
 import edu.virginia.vcgr.secrun.SecureRunnerManager;
 
@@ -135,7 +137,7 @@ public class Container extends ApplicationBase
 		LowMemoryWarning.INSTANCE.addLowMemoryListener(new LowMemoryExitHandler(7));
 
 		_logger.info(String.format("Deployment name is '%s'.\n", new DeploymentName()));
-		_secRunManager = SecureRunnerManager.createSecureRunnerManager(Container.class.getClassLoader(),
+		_secRunManager = SecureRunnerManager.createSecureRunnerManager(GenesisClassLoader.classLoaderFactory(),
 			Installation.getDeployment(new DeploymentName()));
 		Properties secRunProperties = new Properties();
 		_secRunManager.run(SecureRunnableHooks.CONTAINER_PRE_STARTUP, secRunProperties);
@@ -256,16 +258,17 @@ public class Container extends ApplicationBase
 		ContainerServices.loadAll();
 		ContainerServices.startAll();
 
-		Collection<Class<? extends IContainerManaged>> containerServices = initializeServices(webAppCtxt);
+		Collection<Class<? extends IServiceWithCleanupHook>> containerServices = initializeServices(webAppCtxt);
 
 		ServiceDeployer.startServiceDeployer(_axisServer, _postStartupWorkQueue,
 			Installation.getDeployment(new DeploymentName()).getServicesDirectory());
 
-		Collection<IContainerManaged> containerServiceObjects = new ArrayList<IContainerManaged>(containerServices.size());
-		for (Class<? extends IContainerManaged> service : containerServices) {
+		Collection<IServiceWithCleanupHook> containerServiceObjects = new ArrayList<IServiceWithCleanupHook>(
+			containerServices.size());
+		for (Class<? extends IServiceWithCleanupHook> service : containerServices) {
 			try {
 				Constructor<?> cons = service.getConstructor(new Class[0]);
-				IContainerManaged base = (IContainerManaged) cons.newInstance(new Object[0]);
+				IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons.newInstance(new Object[0]);
 				containerServiceObjects.add(base);
 
 				try {
@@ -282,7 +285,7 @@ public class Container extends ApplicationBase
 
 		CacheConfigurer.disableSubscriptionBasedCaching();
 
-		for (IContainerManaged service : containerServiceObjects) {
+		for (IServiceWithCleanupHook service : containerServiceObjects) {
 			try {
 				service.startup();
 				_postStartupWorkQueue.enqueue(service);
@@ -293,10 +296,10 @@ public class Container extends ApplicationBase
 	}
 
 	@SuppressWarnings("unchecked")
-	static private Collection<Class<? extends IContainerManaged>> initializeServices(WebAppContext ctxt)
+	static private Collection<Class<? extends IServiceWithCleanupHook>> initializeServices(WebAppContext ctxt)
 		throws ServletException, AxisFault
 	{
-		Collection<Class<? extends IContainerManaged>> managedServiceClasses = new LinkedList<Class<? extends IContainerManaged>>();
+		Collection<Class<? extends IServiceWithCleanupHook>> managedServiceClasses = new LinkedList<Class<? extends IServiceWithCleanupHook>>();
 
 		ServletHolder[] holders = ctxt.getServletHandler().getServlets();
 		for (ServletHolder holder : holders) {
@@ -329,8 +332,8 @@ public class Container extends ApplicationBase
 				Object obj = iter.next();
 				if (obj instanceof JavaServiceDesc) {
 					Class<?> implClass = ((JavaServiceDesc) obj).getImplClass();
-					if (IContainerManaged.class.isAssignableFrom(implClass))
-						managedServiceClasses.add((Class<? extends IContainerManaged>) implClass);
+					if (IServiceWithCleanupHook.class.isAssignableFrom(implClass))
+						managedServiceClasses.add((Class<? extends IServiceWithCleanupHook>) implClass);
 				}
 			}
 

@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.resource;
 
 import java.util.HashMap;
 
+import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfiguration;

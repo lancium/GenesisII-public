@@ -21,10 +21,10 @@ import java.util.Collection;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.bes.BESPolicy;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.bes.BES;
-import edu.virginia.vcgr.genii.container.bes.BESPolicy;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IBESResource extends IResource
 {

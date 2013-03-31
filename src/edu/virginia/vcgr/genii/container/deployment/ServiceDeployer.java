@@ -35,9 +35,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import edu.virginia.vcgr.genii.algorithm.structures.queue.BarrieredWorkQueue;
+import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHook;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
-import edu.virginia.vcgr.genii.client.utils.barrier.BarrieredWorkQueue;
-import edu.virginia.vcgr.genii.container.IContainerManaged;
+import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 public class ServiceDeployer extends Thread
 {
@@ -188,7 +189,7 @@ public class ServiceDeployer extends Thread
 				try {
 					in = new FileInputStream(file);
 					Document element = XMLUtils.newDocument(in);
-					info._loader = Thread.currentThread().getContextClassLoader();
+					info._loader = GenesisClassLoader.classLoaderFactory();
 					className = attemptDeploy(element);
 				} catch (ParserConfigurationException pce) {
 					_logger.warn(pce);
@@ -204,9 +205,10 @@ public class ServiceDeployer extends Thread
 			if (className != null && info._loader != null) {
 				try {
 					Class<?> cl = info._loader.loadClass(className);
-					if (IContainerManaged.class.isAssignableFrom(cl)) {
+					if (IServiceWithCleanupHook.class.isAssignableFrom(cl)) {
 						Constructor<?> cons = cl.getConstructor(new Class[0]);
-						IContainerManaged base = (IContainerManaged) cons.newInstance(new Object[0]);
+						_logger.debug("constructing new instance of " + cl.toString());
+						IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons.newInstance(new Object[0]);
 						base.startup();
 						_postStartupQueue.enqueue(base);
 					}

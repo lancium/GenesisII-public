@@ -35,8 +35,8 @@ import com.sun.security.auth.module.Krb5LoginModule;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AclAuthZProvider;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
@@ -99,7 +99,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 		try {
 			callingContext = ContextManager.getExistingContext();
 		} catch (IOException e) {
-			_logger.error("Calling context exception in JNDIAuthZProvider.", e);
+			_logger.error("Calling context exception", e);
 			return false;
 		}
 

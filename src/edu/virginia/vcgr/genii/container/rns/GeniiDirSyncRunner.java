@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.rns;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -12,12 +13,13 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.resource.IResource;
+import edu.virginia.vcgr.genii.client.rns.GeniiDirPolicy;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSTopics;
 
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.sync.ReplicationItem;
@@ -51,6 +53,8 @@ public class GeniiDirSyncRunner implements ResourceSyncRunner
 		if (element != null)
 			value = element.getValue();
 		resource.setProperty(GeniiDirPolicy.REPLICATION_POLICY_PROP_NAME, value);
+
+		retrieveAndStoreResourcePropertiesFromPrimary(proxy, resource);
 
 		// Get a name -> EPR map of the contents of the target resource.
 		SortedMap<String, EndpointReferenceType> targetMap = new TreeMap<String, EndpointReferenceType>();
@@ -94,5 +98,20 @@ public class GeniiDirSyncRunner implements ResourceSyncRunner
 	public TopicPath getSyncTopic()
 	{
 		return RNSTopics.RNS_OPERATION_TOPIC;
+	}
+
+	@Override
+	public Collection<MessageElement> getDefaultAttributes(EndpointReferenceType primaryEPR)
+	{
+		return Collections.emptyList();
+	}
+
+	/*
+	 * Method that subclasses should override to retrieve and save properties that are usually been
+	 * passed from the client when a primary copy is been created and not directly available during
+	 * the replica creation process.
+	 */
+	protected void retrieveAndStoreResourcePropertiesFromPrimary(GeniiCommon proxyToPrimary, IRNSResource resource)
+	{
 	}
 }

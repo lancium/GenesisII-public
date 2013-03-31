@@ -25,14 +25,14 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.pipe.PipeConstants;
 import edu.virginia.vcgr.genii.client.pipe.PipeConstructionParameters;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.byteio.TransferAgent;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.pipe.PipePortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
@@ -102,14 +102,14 @@ public class PipeServiceImpl extends GenesisIIBase implements PipePortType
 	{
 		super("PipePortType");
 
-		addImplementedPortType(PipeConstants.PIPE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE);
+		addImplementedPortType(PipeConstants.PIPE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE());
 	}
 
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return PipeConstants.PIPE_PORT_TYPE;
+		return PipeConstants.PIPE_PORT_TYPE();
 	}
 
 	@Override

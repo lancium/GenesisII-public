@@ -12,7 +12,7 @@ import edu.virginia.g3.fsview.FSViewEntry;
 import edu.virginia.g3.fsview.FSViewEntryType;
 import edu.virginia.g3.fsview.FSViewSession;
 import edu.virginia.vcgr.genii.client.exportdir.FSProxyConstructionParameters;
-import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRNSResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.RNSResourceFork;

@@ -1,1 +1,0 @@
-resource-history --dump=<path> <resource-path> [resource-hint]

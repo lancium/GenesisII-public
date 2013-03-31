@@ -9,12 +9,12 @@ import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionConstants;
 import edu.virginia.vcgr.genii.client.appdesc.ApplicationVersion;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;

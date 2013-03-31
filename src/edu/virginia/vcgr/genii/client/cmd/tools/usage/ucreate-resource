@@ -1,2 +1,0 @@
-create-resource [--rns | --url] <service-path-or-url> [<new-rns-path>]
-

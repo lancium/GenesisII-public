@@ -13,11 +13,11 @@ import org.oasis_open.wsn.base.UnableToGetMessagesFaultType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.resource.PortType;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.common.notification.GeniiPullPointPortType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
@@ -28,13 +28,13 @@ public class GeniiPullPointServiceImpl extends GenesisIIBase implements GeniiPul
 	{
 		super("GeniiPullPointPortType");
 
-		addImplementedPortType(WSRFConstants.WSN_PULL_POINT_PORT);
+		addImplementedPortType(WSRFConstants.WSN_PULL_POINT_PORT());
 	}
 
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.GENII_PULL_POINT_PORT;
+		return WellKnownPortTypes.GENII_PULL_POINT_PORT();
 	}
 
 	@Override

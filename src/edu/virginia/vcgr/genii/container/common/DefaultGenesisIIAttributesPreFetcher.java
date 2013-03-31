@@ -12,6 +12,7 @@ import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.gfs.GenesisIIACLManager;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.axis.AxisAcl;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
@@ -19,7 +20,7 @@ import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributePreFetcher;
 import edu.virginia.vcgr.genii.container.notification.EnhancedNotificationBrokerFactoryServiceImpl;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
-import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
@@ -52,7 +53,8 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extend
 	{
 		IResource resource = getResource();
 
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+			.getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
@@ -63,7 +65,8 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extend
 	protected AuthZConfig getAuthZConfig() throws Throwable
 	{
 		IResource resource = getResource();
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+			.getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);

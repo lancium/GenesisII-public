@@ -21,6 +21,7 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
@@ -33,7 +34,6 @@ import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.wsn.WSNotificationContainerService;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
@@ -77,15 +77,15 @@ public class GeniiWSNBrokerServiceImpl extends GenesisIIBase implements GeniiWSN
 	{
 		super("GeniiWSNBrokerPortType");
 
-		addImplementedPortType(WSRFConstants.WSN_CREATE_PULL_POINT_PORT);
-		addImplementedPortType(WSRFConstants.WSN_BROKERED_NOTIFICATION_PORT);
-		addImplementedPortType(WSRFConstants.WSN_REGISTER_PUBLISHER_PORT);
+		addImplementedPortType(WSRFConstants.WSN_CREATE_PULL_POINT_PORT());
+		addImplementedPortType(WSRFConstants.WSN_BROKERED_NOTIFICATION_PORT());
+		addImplementedPortType(WSRFConstants.WSN_REGISTER_PUBLISHER_PORT());
 	}
 
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.GENII_WSNBROKER_PORT_TYPE;
+		return WellKnownPortTypes.GENII_WSNBROKER_PORT_TYPE();
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 
 public class StreamRedirectionDescription implements Serializable
 {

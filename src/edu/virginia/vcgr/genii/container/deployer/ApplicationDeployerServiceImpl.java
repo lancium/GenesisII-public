@@ -27,19 +27,19 @@ import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionUtils;
 import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.sysinfo.SystemUtils;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.deployer.bin.BinDeploymentProvider;
 import edu.virginia.vcgr.genii.container.deployer.zipjar.ZipJarDeploymentProvider;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.deployer.ApplicationDeployerPortType;
 import edu.virginia.vcgr.genii.deployer.CreateDeploymentRequestType;
 import edu.virginia.vcgr.genii.deployer.CreateDeploymentResponseType;
@@ -52,7 +52,7 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 {
 	static private Log _logger = LogFactory.getLog(ApplicationDeployerServiceImpl.class);
 
-	static private QName DEPLOYMENT_CONSTRUCTION_PARAM = new QName(WellKnownPortTypes.DEPLOYER_PORT_TYPE.getQName()
+	static private QName DEPLOYMENT_CONSTRUCTION_PARAM = new QName(WellKnownPortTypes.DEPLOYER_PORT_TYPE().getQName()
 		.getNamespaceURI(), "deployment");
 
 	static private final String _DEPLOYMENT_PROPERTY = "edu.virginia.vcgr.genii.container.deployer.deployment-property";
@@ -68,12 +68,12 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 	{
 		super("ApplicationDeployerPortType");
 
-		addImplementedPortType(WellKnownPortTypes.DEPLOYER_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.DEPLOYER_PORT_TYPE());
 	}
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.DEPLOYER_PORT_TYPE;
+		return WellKnownPortTypes.DEPLOYER_PORT_TYPE();
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)

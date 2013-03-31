@@ -9,9 +9,9 @@ import java.io.StreamCorruptedException;
 
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 
 public class ByteIORedirectionSink implements StreamRedirectionSink
 {

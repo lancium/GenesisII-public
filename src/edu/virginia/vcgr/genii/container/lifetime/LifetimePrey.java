@@ -22,9 +22,9 @@ import java.util.Date;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
 public class LifetimePrey
 {

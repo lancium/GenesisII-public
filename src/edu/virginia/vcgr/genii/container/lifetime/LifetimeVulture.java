@@ -33,7 +33,7 @@ import org.morgan.util.event.IEvent;
 import org.morgan.util.event.IEventHandler;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 
 public class LifetimeVulture implements IEventHandler
 {

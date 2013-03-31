@@ -6,10 +6,10 @@ import java.util.Calendar;
 import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IExportedEntryResource extends IResource
 {

@@ -2,8 +2,8 @@ package edu.virginia.vcgr.genii.container.resource;
 
 import java.io.Closeable;
 import java.io.IOException;
-import org.apache.axis.types.URI;
 import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,17 +12,22 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
+import edu.virginia.vcgr.genii.client.resource.IResource;
+import edu.virginia.vcgr.genii.client.resource.MissingConstructionParamException;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.resource.ResourceLock;
+import edu.virginia.vcgr.genii.client.resource.ResourceLockImpl;
+import edu.virginia.vcgr.genii.client.resource.Rollbackable;
 import edu.virginia.vcgr.genii.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 /**
  * This class implements an abstract notion of resource key. It can translate between WS-Addressing
@@ -31,7 +36,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
  * 
  * @author Mark Morgan (mmm2a@cs.virginia.edu)
  */
-public class ResourceKey implements Closeable
+public class ResourceKey implements Closeable, Rollbackable
 {
 	static private HashMap<Object, ReferenceCounter> _lockTable = new HashMap<Object, ReferenceCounter>();
 	static private Log _logger = LogFactory.getLog(ResourceKey.class);
@@ -267,31 +272,36 @@ public class ResourceKey implements Closeable
 			throw new MissingConstructionParamException(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
 		}
 
-		CertCreationSpec spec = (CertCreationSpec) consParms.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
-		if (spec != null) {
-			try {
-				// Add in any additional CNs specified
-				ArrayList<String> CNs = new ArrayList<String>();
-				String[] additionalCNs = (String[]) consParms.get(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM);
-				if (additionalCNs != null) {
-					CNs.addAll(Arrays.asList(additionalCNs));
+		X509Certificate[] duplicatedCertificate = (X509Certificate[]) consParms.get(IResource.DUPLICATED_CERTIFICATE_PARAM);
+		if (duplicatedCertificate != null) {
+			consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM, duplicatedCertificate);
+		} else {
+			CertCreationSpec spec = (CertCreationSpec) consParms.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
+			if (spec != null) {
+				try {
+					// Add in any additional CNs specified
+					ArrayList<String> CNs = new ArrayList<String>();
+					String[] additionalCNs = (String[]) consParms.get(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM);
+					if (additionalCNs != null) {
+						CNs.addAll(Arrays.asList(additionalCNs));
+					}
+					CNs.add(serviceName);
+
+					// Add in any additional orgnaizations specified
+					ArrayList<String> orgs = new ArrayList<String>();
+					String[] additionalOrgs = (String[]) consParms.get(IResource.ADDITIONAL_ORGS_CONSTRUCTION_PARAM);
+					if (additionalOrgs != null) {
+						orgs.addAll(Arrays.asList(additionalOrgs));
+					}
+
+					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields = CertTool.constructCommonDnFields(
+						epi.toString(), orgs, CNs, null); // uid
+
+					consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
+						CertTool.createResourceCertChain(spec, additionalFields));
+				} catch (GeneralSecurityException gse) {
+					throw new ResourceException(gse.getLocalizedMessage(), gse);
 				}
-				CNs.add(serviceName);
-
-				// Add in any additional orgnaizations specified
-				ArrayList<String> orgs = new ArrayList<String>();
-				String[] additionalOrgs = (String[]) consParms.get(IResource.ADDITIONAL_ORGS_CONSTRUCTION_PARAM);
-				if (additionalOrgs != null) {
-					orgs.addAll(Arrays.asList(additionalOrgs));
-				}
-
-				Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields = CertTool.constructCommonDnFields(
-					epi.toString(), orgs, CNs, null); // uid
-
-				consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
-					CertTool.createResourceCertChain(spec, additionalFields));
-			} catch (GeneralSecurityException gse) {
-				throw new ResourceException(gse.getLocalizedMessage(), gse);
 			}
 		}
 	}
@@ -304,5 +314,17 @@ public class ResourceKey implements Closeable
 	public AddressingParameters getAddressingParameters()
 	{
 		return _addressingParameters;
+	}
+
+	@Override
+	public void rollbackResource()
+	{
+		this.dereference().rollback();
+	}
+
+	@Override
+	public void commitResource() throws ResourceException
+	{
+		this.dereference().commit();
 	}
 }

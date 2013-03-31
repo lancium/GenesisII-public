@@ -11,7 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummaryInformation;

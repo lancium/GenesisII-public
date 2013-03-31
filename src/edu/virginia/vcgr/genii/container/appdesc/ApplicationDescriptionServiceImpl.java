@@ -36,18 +36,18 @@ import edu.virginia.vcgr.genii.client.appdesc.ApplicationVersion;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.EnhancedRNSServiceImpl;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
@@ -93,7 +93,7 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 	{
 		super("ApplicationDescriptionPortType");
 
-		addImplementedPortType(WellKnownPortTypes.APPDESC_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.APPDESC_PORT_TYPE());
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)

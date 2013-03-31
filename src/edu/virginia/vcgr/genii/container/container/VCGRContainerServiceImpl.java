@@ -66,13 +66,13 @@ public class VCGRContainerServiceImpl extends ResourceForkBaseService implements
 	{
 		super(SERVICE_NAME);
 
-		addImplementedPortType(WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE());
 	}
 
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE;
+		return WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE();
 	}
 
 	@Override

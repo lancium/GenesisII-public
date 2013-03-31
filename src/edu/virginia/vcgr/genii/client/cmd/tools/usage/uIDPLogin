@@ -1,1 +1,0 @@
-login [--validDuration=<duration-string>] rns:<identity provider path>

@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.container.configuration;
 
-import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
+import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 
 public interface GenesisIIServiceConfiguration

@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 
 public class TeeRedirectionSink implements StreamRedirectionSink
 {

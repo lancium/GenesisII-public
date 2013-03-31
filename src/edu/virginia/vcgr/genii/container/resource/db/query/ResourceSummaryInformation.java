@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.container.resource.db.query;
 
+import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
+
 public class ResourceSummaryInformation
 {
 	private String _resourceID;
@@ -40,7 +42,7 @@ public class ResourceSummaryInformation
 	{
 		synchronized (_implementingClassString) {
 			if (_implementingClass == null) {
-				_implementingClass = Thread.currentThread().getContextClassLoader().loadClass(_implementingClassString);
+				_implementingClass = GenesisClassLoader.classLoaderFactory().loadClass(_implementingClassString);
 			}
 		}
 

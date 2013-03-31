@@ -2,10 +2,10 @@ package edu.virginia.vcgr.genii.container.byteio.export;
 
 import java.util.Calendar;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributePreFetcher;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.LightWeightExportUtils;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportFile;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public class ExportedRandomByteIOForkAttributePrefetcher extends RandomByteIOAttributePreFetcher<IResource>

@@ -21,7 +21,7 @@ import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
 import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
+import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudCheckStatusPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudCopyDirectoryPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudExecutePhase;
@@ -34,8 +34,8 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudSetPerm
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudSetupContextDirectoryPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudStageInPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudStageOutPhase;
-import edu.virginia.vcgr.genii.container.jsdl.FilesystemRelative;
-import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelative;
+import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 
 public class CloudJobWrapper
 {

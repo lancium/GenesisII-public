@@ -5,10 +5,10 @@ import java.security.GeneralSecurityException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.stats.MethodDataPoint;
 import edu.virginia.vcgr.genii.client.stats.MethodHistogramStatistics;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 
 public class DatabaseHandler implements IAroundInvoker
 {

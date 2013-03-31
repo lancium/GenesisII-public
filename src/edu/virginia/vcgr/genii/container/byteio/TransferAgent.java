@@ -39,7 +39,7 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachmentException;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 
 public class TransferAgent
 {

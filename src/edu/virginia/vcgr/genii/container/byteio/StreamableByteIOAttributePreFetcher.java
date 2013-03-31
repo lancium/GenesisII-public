@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.container.byteio;
 import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
-import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 
 public abstract class StreamableByteIOAttributePreFetcher<Type extends IResource> extends ByteIOAttributePreFetcher<Type>
 {

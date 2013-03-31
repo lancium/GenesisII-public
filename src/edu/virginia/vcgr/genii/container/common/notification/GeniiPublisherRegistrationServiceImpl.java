@@ -24,13 +24,13 @@ public class GeniiPublisherRegistrationServiceImpl extends GenesisIIBase impleme
 	{
 		super("GeniiPublisherRegistrationPortType");
 
-		addImplementedPortType(WSRFConstants.WSN_PUBLISHER_REGISTRATION_MANAGER_PORT);
+		addImplementedPortType(WSRFConstants.WSN_PUBLISHER_REGISTRATION_MANAGER_PORT());
 	}
 
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.GENII_PUB_REG_MGR_PORT_TYPE;
+		return WellKnownPortTypes.GENII_PUB_REG_MGR_PORT_TYPE();
 	}
 
 	@Override

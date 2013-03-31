@@ -7,10 +7,10 @@ import org.apache.commons.logging.LogFactory;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class ScheduledTerminationInvoker implements IAroundInvoker
 {

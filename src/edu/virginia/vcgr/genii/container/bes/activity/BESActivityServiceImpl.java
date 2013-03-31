@@ -18,11 +18,11 @@ package edu.virginia.vcgr.genii.container.bes.activity;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
-import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
 
@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.inject.MInject;
 import org.morgan.util.GUID;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsn.base.Subscribe;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
@@ -41,25 +42,28 @@ import edu.virginia.vcgr.genii.bes.activity.BESActivityGetErrorResponseType;
 import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
-import edu.virginia.vcgr.genii.client.context.*;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
-import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
+import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
+import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.client.jsdl.personality.common.ExecutionUnderstanding;
+import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
 import edu.virginia.vcgr.genii.cloud.CloudConfiguration;
 import edu.virginia.vcgr.genii.cloud.CloudJobWrapper;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
@@ -67,19 +71,13 @@ import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivi
 import edu.virginia.vcgr.genii.container.bes.activity.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.BESActivityDBResourceProvider;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
-import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
-import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ExecutionUnderstanding;
-import edu.virginia.vcgr.genii.container.bes.jsdl.personality.forkexec.ForkExecPersonalityProvider;
-import edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub.QSubPersonalityProvider;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
-import edu.virginia.vcgr.genii.container.jsdl.parser.ExecutionProvider;
+import edu.virginia.vcgr.genii.container.jsdl.personality.forkexec.ForkExecPersonalityProvider;
+import edu.virginia.vcgr.genii.container.jsdl.personality.qsub.QSubPersonalityProvider;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
@@ -87,13 +85,13 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 @ForkRoot(RootRNSFork.class)
 @ConstructionParametersType(BESConstructionParameters.class)
 @GeniiServiceConfiguration(resourceProvider = BESActivityDBResourceProvider.class)
-public class BESActivityServiceImpl extends ResourceForkBaseService implements BESActivityPortType, BESActivityConstants,
-	BESActivityTopics
+public class BESActivityServiceImpl extends ResourceForkBaseService implements BESActivityPortType, BESActivityTopics
 {
 	static private Log _logger = LogFactory.getLog(BESActivityServiceImpl.class);
 
 	// One week of life
 	static private final long BES_ACTIVITY_LIFETIME = 1000L * 60 * 60 * 24 * 7 * 4;
+	private BESActivityConstants bconsts = new BESActivityConstants();
 
 	@MInject(lazy = true)
 	private IBESActivityResource _resource;
@@ -102,12 +100,12 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 	{
 		super("BESActivityPortType");
 
-		addImplementedPortType(GENII_BES_ACTIVITY_PORT_TYPE);
+		addImplementedPortType(bconsts.GENII_BES_ACTIVITY_PORT_TYPE());
 	}
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return GENII_BES_ACTIVITY_PORT_TYPE;
+		return bconsts.GENII_BES_ACTIVITY_PORT_TYPE();
 	}
 
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType activityEPR, ConstructionParameters cParams,

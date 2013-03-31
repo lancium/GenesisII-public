@@ -5,8 +5,8 @@ import java.util.Collection;
 import org.apache.axis.message.MessageElement;
 import org.morgan.util.Pair;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface WSIteratorResource extends IResource
 {

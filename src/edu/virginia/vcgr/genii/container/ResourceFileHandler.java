@@ -28,6 +28,8 @@ import org.morgan.util.io.StreamUtils;
 import org.mortbay.jetty.HttpException;
 import org.mortbay.jetty.handler.AbstractHandler;
 
+import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
+
 public class ResourceFileHandler extends AbstractHandler
 {
 	static final long serialVersionUID = 0;
@@ -47,7 +49,7 @@ public class ResourceFileHandler extends AbstractHandler
 	{
 		InputStream in = null;
 		OutputStream out = null;
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		ClassLoader loader = GenesisClassLoader.classLoaderFactory();
 
 		try {
 			out = arg3.getOutputStream();

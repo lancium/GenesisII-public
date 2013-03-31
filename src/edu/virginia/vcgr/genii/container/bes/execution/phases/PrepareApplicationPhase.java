@@ -6,10 +6,10 @@ import java.io.Serializable;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.container.appmgr.ApplicationManager;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 
 public class PrepareApplicationPhase extends AbstractExecutionPhase implements Serializable
 {

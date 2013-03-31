@@ -35,7 +35,6 @@
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.RNSURIHandler</genii:uri-handler>
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.ScpURIHandler</genii:uri-handler>
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.SFtpURIHandler</genii:uri-handler>
-		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.GsiFtpURIHandler</genii:uri-handler>
 	</genii:uri-handlers>
 	
 	<genii:locator-registry>
@@ -101,8 +100,8 @@
 			locator-type="edu.virginia.vcgr.genii.x509authn.X509AuthnServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.kerbauthn.KerbAuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.kerbauthn.KerbAuthnServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnPortType"
-			locator-type="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnServiceLocator"/>
+<!--		<locator interface="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnPortType"
+			locator-type="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnServiceLocator"/> -->
 		<locator interface="edu.virginia.vcgr.genii.tty.TTYPortType"
 			locator-type="edu.virginia.vcgr.genii.tty.TTYServiceLocator"/>
         <locator interface="edu.virginia.vcgr.genii.notification.factory.EnhancedNotificationBrokerFactoryPortType"
@@ -126,9 +125,6 @@
 			base="java.lang.Object" />
         <mconf:instance name="subscription-processor"
             type="edu.virginia.vcgr.genii.client.invoke.handlers.SubscriptionInfoProcessor"
-            base="java.lang.Object"/>
-        <mconf:instance name="header-attacher"
-            type="edu.virginia.vcgr.genii.client.invoke.handlers.SecurityHeaderAttacher"
             base="java.lang.Object"/>
 	</genii:configured-instances>
 
@@ -227,8 +223,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetUserConfigTool</mconf:class>
 		<mconf:class name="create-user"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserTool</mconf:class>
-		<mconf:class name="create-jndi-sts"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateJndiStsTool</mconf:class>
+<!--		<mconf:class name="create-jndi-sts"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateJndiStsTool</mconf:class> -->
 		<mconf:class name="create-user-delegate"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserDelegateTool</mconf:class>
 		<mconf:class name="bes-policy"
@@ -266,7 +262,7 @@
 		<mconf:class name="client-ui"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ClientApplicationUITool</mconf:class>
 		<mconf:class name="accounting"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.AccountingTool</mconf:class>
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.gui.AccountingTool</mconf:class>
 		<mconf:class name="env"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.EnvTool</mconf:class>
 		<mconf:class name="clearenv"
@@ -286,7 +282,7 @@
 		<mconf:class name="mv"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MoveTool</mconf:class>
 		<mconf:class name="cloudTool"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CloudTool</mconf:class>
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.container.cmd.tools.CloudTool</mconf:class>
 		<mconf:class name="parseJSDL"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ParseJSDLTool</mconf:class>
 		<mconf:class name="stageData"
@@ -311,6 +307,5 @@
 		<genii:pipeline-handler>attribute-cache</genii:pipeline-handler>
 		<genii:pipeline-handler>lookup-cache</genii:pipeline-handler>
 		<genii:pipeline-handler>subscription-processor</genii:pipeline-handler>
-		<genii:pipeline-handler>header-attacher</genii:pipeline-handler>		
 	</genii:client-pipeline>
 </mconf:configuration>

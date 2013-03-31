@@ -27,6 +27,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.MessageElementUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -37,12 +38,11 @@ import edu.virginia.vcgr.genii.container.byteio.IRByteIOResource;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.replicatedExport.RExportUtils;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 
 public class RExportDBResource extends BasicDBResource implements IRExportResource
 {

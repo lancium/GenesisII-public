@@ -86,8 +86,9 @@
 		</mconf:instance>
 -->		
 		
-		<mconf:instance name="jndi-authz-provider"
+<!--		<mconf:instance name="jndi-authz-provider"
 			type="edu.virginia.vcgr.genii.container.jndiauthn.JNDIAuthZProvider">
+-->
 			
 			<!-- Denotes the X.509 identity to be used for *new* resources are created 
 			     without the presence of a caller credential (e.g., service resources
@@ -97,7 +98,10 @@
 				value="admin.cer"/>
 			-->
 						
+<!--
 		</mconf:instance>
+-->
+
 	</genii:configured-instances>
 	
 	<genii:deployment-configuration>

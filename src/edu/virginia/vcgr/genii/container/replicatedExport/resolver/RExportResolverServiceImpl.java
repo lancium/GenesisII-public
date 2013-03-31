@@ -45,6 +45,7 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOOperations;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
@@ -57,15 +58,14 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminati
 
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
 import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverPortType;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.InvalidWSNameFaultType;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.UpdateRequestType;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.UpdateResponseType;
 import edu.virginia.vcgr.genii.container.replicatedExport.RExportUtils;
-import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateReplicaRequest;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateReplicaResponse;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.ResolverQueryRequest;
@@ -99,17 +99,17 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.ENDPOINT_IDENTIFIER_RESOLVER_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.REFERENCE_RESOLVER_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.ENDPOINT_IDENTIFIER_RESOLVER_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.REFERENCE_RESOLVER_SERVICE_PORT_TYPE());
 		// addImplementedPortType(WellKnownPortTypes.GENII_RESOLVER_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE());
 	}
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE;
+		return WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE();
 	}
 
 	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,

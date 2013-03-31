@@ -52,15 +52,15 @@ public class RExportResolverFactoryServiceImpl extends GenesisIIBase implements 
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.REXPORT_RESOLVER_FACTORY_PORT_TYPE;
+		return WellKnownPortTypes.REXPORT_RESOLVER_FACTORY_PORT_TYPE();
 	}
 
 	protected RExportResolverFactoryServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.REXPORT_RESOLVER_FACTORY_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.REXPORT_RESOLVER_FACTORY_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE());
 	}
 
 	/**

@@ -3,11 +3,13 @@ package edu.virginia.vcgr.genii.container.sync;
 import org.apache.axis.message.MessageElement;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.client.sync.SyncProperty;
+import edu.virginia.vcgr.genii.client.sync.VersionVector;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 

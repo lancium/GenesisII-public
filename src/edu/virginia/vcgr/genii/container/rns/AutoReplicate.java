@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.rns;
 
 import java.rmi.RemoteException;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.axis.description.JavaServiceDesc;
@@ -18,18 +19,19 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.GeniiDirPolicy;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resolver.GeniiResolverServiceImpl;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
+import edu.virginia.vcgr.genii.client.sync.SyncProperty;
 import edu.virginia.vcgr.genii.container.sync.ReplicationItem;
 import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
-import edu.virginia.vcgr.genii.container.sync.SyncProperty;
 import edu.virginia.vcgr.genii.container.sync.VersionedResourceUtils;
 import edu.virginia.vcgr.genii.resolver.ExtResolveRequestType;
 import edu.virginia.vcgr.genii.resolver.GeniiResolverPortType;
@@ -103,9 +105,11 @@ public class AutoReplicate
 
 		// Create a new resource as an uninitialized replica.
 		// Get the new EPR, which will be added to the local replica of the directory.
-		MessageElement[] elementArr = new MessageElement[1];
-		elementArr[0] = new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, endpointIdentifier);
-		EndpointReferenceType localEPR = service.CreateEPR(elementArr, serviceURL);
+		List<MessageElement> attributes = new ArrayList<MessageElement>();
+		attributes.addAll(runner.getDefaultAttributes(primaryEPR));
+		attributes.add(new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, endpointIdentifier));
+		EndpointReferenceType localEPR = service.CreateEPR(attributes.toArray(new MessageElement[attributes.size()]),
+			serviceURL);
 		AddressingParameters ap = new AddressingParameters(localEPR.getReferenceParameters());
 		String rkString = ap.getResourceKey();
 

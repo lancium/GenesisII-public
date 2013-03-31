@@ -9,9 +9,9 @@ import org.ggf.jsdl.CreationFlagEnumeration;
 import org.morgan.util.io.DataTransferStatistics;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.io.URIManager;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.downloadmgr.DownloadManagerContainerService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;

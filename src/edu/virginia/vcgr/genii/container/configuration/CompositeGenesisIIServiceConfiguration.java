@@ -4,8 +4,8 @@ import java.util.LinkedList;
 
 import org.morgan.util.configuration.ConfigurationException;
 
-import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
+import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 
 class CompositeGenesisIIServiceConfiguration implements GenesisIIServiceConfiguration

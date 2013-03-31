@@ -20,13 +20,13 @@ import edu.virginia.vcgr.genii.byteio.streamable.factory.OpenStreamResponse;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
 import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.common.SByteIOFactory;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.exportdir.ExportedFilePortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
@@ -40,7 +40,7 @@ public class ExportedFileServiceImpl extends RandomByteIOServiceImpl implements 
 	{
 		super("ExportedFilePortType");
 
-		addImplementedPortType(WellKnownPortTypes.EXPORTED_FILE_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.EXPORTED_FILE_SERVICE_PORT_TYPE());
 	}
 
 	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters) throws ResourceException, BaseFaultType

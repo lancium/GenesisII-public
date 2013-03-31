@@ -41,13 +41,14 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityType;
 import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityTypeMin;
 import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
@@ -166,7 +167,8 @@ public class ResourceManager
 			}
 
 			// get authz/enc requirements
-			IAuthZProvider handler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+			IAuthZProvider handler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+				.getServiceName());
 			MessageLevelSecurityRequirements minMsgSec = new MessageLevelSecurityRequirements(
 				MessageLevelSecurityRequirements.NONE);
 			if ((handler != null) && (handler.getMinIncomingMsgLevelSecurity(resource) != null)) {
@@ -301,7 +303,8 @@ public class ResourceManager
 			}
 
 			// add minimum level of message level security
-			IAuthZProvider handler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+			IAuthZProvider handler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+				.getServiceName());
 			if (handler != null) {
 				MessageLevelSecurityRequirements minMsgSec = handler.getMinIncomingMsgLevelSecurity(resource);
 
@@ -332,7 +335,8 @@ public class ResourceManager
 
 		ArrayList<MessageElement> any = new ArrayList<MessageElement>();
 
-		any.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.translate(portTypes)));
+		any.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.portTypeFactory().translate(
+			portTypes)));
 
 		if (resourceKey != null) {
 

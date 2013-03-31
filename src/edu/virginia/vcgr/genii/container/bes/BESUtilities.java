@@ -16,10 +16,14 @@ public class BESUtilities
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(BESUtilities.class);
 
+	BESConstants bconsts = new BESConstants();
+
 	static public File getBESWorkerDir()
 	{
+		BESConstants bconsts = new BESConstants();
+
 		String workerDirString = Container.getContainerConfiguration().getGlobalProperties()
-			.getProperty(BESConstants.CONFIG_PROPERTY_WORKER_DIR);
+			.getProperty(bconsts.CONFIG_PROPERTY_WORKER_DIR);
 
 		if (workerDirString == null)
 			throw new ConfigurationException("Unable to find BES worker dir configuration property.");
@@ -32,8 +36,10 @@ public class BESUtilities
 
 	static public boolean canOverrideBESWorkerDir()
 	{
+		BESConstants bconsts = new BESConstants();
+
 		String canOverrideString = Container.getContainerConfiguration().getGlobalProperties()
-			.getProperty(BESConstants.CONFIG_PROPERTY_WORKER_DIR_ALLOW_OVERRIDE);
+			.getProperty(bconsts.CONFIG_PROPERTY_WORKER_DIR_ALLOW_OVERRIDE);
 		if (canOverrideString != null && canOverrideString.equalsIgnoreCase("true"))
 			return true;
 

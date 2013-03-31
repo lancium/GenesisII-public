@@ -3,9 +3,9 @@ package edu.virginia.vcgr.genii.container.exportdir.lightweight;
 import java.io.File;
 import java.io.IOException;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.disk.DiskExportRoot;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.zipjar.ZipJarExportRoot;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 

@@ -61,12 +61,14 @@ import edu.virginia.cs.vcgr.genii.job_management.QueryErrorRequest;
 import edu.virginia.cs.vcgr.genii.job_management.ReducedJobInformationType;
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobRequestType;
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobResponseType;
+import edu.virginia.vcgr.genii.algorithm.graph.GridDependency;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
@@ -86,7 +88,6 @@ import edu.virginia.vcgr.genii.common.IterateHistoryEventsRequestType;
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
 import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.iterator.FileOrDir;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
@@ -104,7 +105,6 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
-import edu.virginia.vcgr.genii.graph.GridDependency;
 import edu.virginia.vcgr.genii.queue.QueuePortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
@@ -145,7 +145,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		 * Now we have to add our own port types to the list of port types implemented by this
 		 * service.
 		 */
-		addImplementedPortType(QueueConstants.QUEUE_PORT_TYPE);
+		addImplementedPortType(QueueConstants.QUEUE_PORT_TYPE());
 	}
 
 	@Override
@@ -161,7 +161,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return QueueConstants.QUEUE_PORT_TYPE;
+		return QueueConstants.QUEUE_PORT_TYPE();
 	}
 
 	@Override

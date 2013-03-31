@@ -3,8 +3,8 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases;
 import java.io.File;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
+import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 
 abstract class AbstractFUSEPhases extends AbstractExecutionPhase
 {

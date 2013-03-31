@@ -1,2 +1,0 @@
-connect { <connect-url> | <connect-path> } [<deployment name>]
-

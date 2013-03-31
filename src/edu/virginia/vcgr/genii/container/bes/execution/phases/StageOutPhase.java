@@ -8,10 +8,10 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.morgan.util.io.DataTransferStatistics;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;

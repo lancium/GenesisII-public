@@ -64,23 +64,23 @@ public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPo
 	{
 		this("RExportDirPortType");
 
-		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE());
 
-		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE());
 
 	}
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.REXPORT_DIR_PORT_TYPE;
+		return WellKnownPortTypes.REXPORT_DIR_PORT_TYPE();
 	}
 
 	protected RExportDirServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE());
 	}
 
 	private class LegacyResourceTerminatedNotificationHandler extends AbstractNotificationHandler<ResourceTerminationContents>

@@ -31,43 +31,43 @@ import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.bes.BESPolicy;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
+import edu.virginia.vcgr.genii.client.sysinfo.SystemInfoUtils;
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeed;
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeedUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.sysinfo.SystemInfoUtils;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
-public class BESAttributesHandler extends AbstractAttributeHandler implements BESConstants
+public class BESAttributesHandler extends AbstractAttributeHandler
 {
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(BESAttributesHandler.class);
 
 	static private final String _DESCRIPTION_PROPERTY = "attribute:description";
 	static private final String _DEPLOYER_PROPERTY = "attribute:deployer";
+	static private BESConstants consts = new BESConstants();
 
 	public BESAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
 	{
@@ -77,24 +77,24 @@ public class BESAttributesHandler extends AbstractAttributeHandler implements BE
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException
 	{
-		addHandler(NAME_ATTR, "getNameAttr");
-		addHandler(TOTAL_NUMBER_OF_ACTIVITIES_ATTR, "getTotalNumberOfActivitiesAttr");
-		addHandler(ACTIVITY_REFERENCE_ATTR, "getActivityReferencesAttr");
-		addHandler(DESCRIPTION_ATTR, "getDescriptionAttr", "setDescriptionAttr");
-		addHandler(OPERATING_SYSTEM_ATTR, "getOperatingSystemAttr");
-		addHandler(CPU_ARCHITECTURE_ATTR, "getCPUArchitectureAttr");
-		addHandler(CPU_COUNT_ATTR, "getCPUCountAttr");
-		addHandler(IS_ACCEPTING_NEW_ACTIVITIES_ATTR, "getIsAcceptingNewActivitiesAttr");
-		addHandler(SPMD_PROVIDER_ATTR, "getSPMDProvidersAttr");
-		addHandler(BES_POLICY_ATTR, "getBESPolicyAttr", "setBESPolicyAttr");
-		addHandler(BES_THRESHOLD_ATTR, "getBESThresholdAttr", "setBESThresholdAttr");
-		addHandler(CPU_SPEED_ATTR, "getCPUSpeedAttr");
-		addHandler(PHYSICAL_MEMORY_ATTR, "getPhysicalMemoryAttr");
-		addHandler(VIRTUAL_MEMORY_ATTR, "getVirtualMemoryAttr");
-		addHandler(BESConstants.DEPLOYER_EPR_ATTR, "getDeployersAttr", "setDeployersAttr");
-		addHandler(OGRSH_VERSIONS_ATTR, "getOGRSHVersionsAttr");
-		addHandler(BES_WALLCLOCK_TIMELIMIT_ATTR, "getWallclockTimeLimitAttr");
-		addHandler(FILESYSTEM_SUPPORT_ATTR, "getSupportedFilesystemsAttr");
+		addHandler(consts.NAME_ATTR, "getNameAttr");
+		addHandler(consts.TOTAL_NUMBER_OF_ACTIVITIES_ATTR, "getTotalNumberOfActivitiesAttr");
+		addHandler(consts.ACTIVITY_REFERENCE_ATTR, "getActivityReferencesAttr");
+		addHandler(consts.DESCRIPTION_ATTR, "getDescriptionAttr", "setDescriptionAttr");
+		addHandler(consts.OPERATING_SYSTEM_ATTR, "getOperatingSystemAttr");
+		addHandler(consts.CPU_ARCHITECTURE_ATTR, "getCPUArchitectureAttr");
+		addHandler(consts.CPU_COUNT_ATTR, "getCPUCountAttr");
+		addHandler(consts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, "getIsAcceptingNewActivitiesAttr");
+		addHandler(consts.SPMD_PROVIDER_ATTR, "getSPMDProvidersAttr");
+		addHandler(consts.BES_POLICY_ATTR, "getBESPolicyAttr", "setBESPolicyAttr");
+		addHandler(consts.BES_THRESHOLD_ATTR, "getBESThresholdAttr", "setBESThresholdAttr");
+		addHandler(consts.CPU_SPEED_ATTR, "getCPUSpeedAttr");
+		addHandler(consts.PHYSICAL_MEMORY_ATTR, "getPhysicalMemoryAttr");
+		addHandler(consts.VIRTUAL_MEMORY_ATTR, "getVirtualMemoryAttr");
+		addHandler(consts.DEPLOYER_EPR_ATTR, "getDeployersAttr", "setDeployersAttr");
+		addHandler(consts.OGRSH_VERSIONS_ATTR, "getOGRSHVersionsAttr");
+		addHandler(consts.BES_WALLCLOCK_TIMELIMIT_ATTR, "getWallclockTimeLimitAttr");
+		addHandler(consts.FILESYSTEM_SUPPORT_ATTR, "getSupportedFilesystemsAttr");
 	}
 
 	static public String getName()
@@ -287,14 +287,14 @@ public class BESAttributesHandler extends AbstractAttributeHandler implements BE
 
 	public MessageElement getIsAcceptingNewActivitiesAttr() throws ResourceUnknownFaultType, ResourceException, RemoteException
 	{
-		return new MessageElement(IS_ACCEPTING_NEW_ACTIVITIES_ATTR, getIsAcceptingNewActivities());
+		return new MessageElement(consts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, getIsAcceptingNewActivities());
 	}
 
 	public MessageElement getBESPolicyAttr() throws ResourceUnknownFaultType, ResourceException, RemoteException
 	{
 		IBESResource resource;
 		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
-		return resource.getPolicy().toMessageElement(BES_POLICY_ATTR);
+		return resource.getPolicy().toMessageElement(consts.BES_POLICY_ATTR);
 	}
 
 	public void setBESPolicyAttr(MessageElement policy) throws ResourceUnknownFaultType, ResourceException, RemoteException
@@ -311,7 +311,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler implements BE
 		IBESResource resource;
 		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		Integer threshold = (Integer) resource.getProperty(IBESResource.THRESHOLD_DB_PROPERTY_NAME);
-		return new MessageElement(BES_THRESHOLD_ATTR, threshold);
+		return new MessageElement(consts.BES_THRESHOLD_ATTR, threshold);
 	}
 
 	public void setBESThresholdAttr(MessageElement policy) throws ResourceUnknownFaultType, ResourceException, RemoteException
@@ -326,13 +326,13 @@ public class BESAttributesHandler extends AbstractAttributeHandler implements BE
 
 	public MessageElement getNameAttr()
 	{
-		return new MessageElement(NAME_ATTR, getName());
+		return new MessageElement(consts.NAME_ATTR, getName());
 	}
 
 	public MessageElement getTotalNumberOfActivitiesAttr() throws ResourceException, ResourceUnknownFaultType, RemoteException,
 		SQLException
 	{
-		return new MessageElement(TOTAL_NUMBER_OF_ACTIVITIES_ATTR, getTotalNumberOfActivities());
+		return new MessageElement(consts.TOTAL_NUMBER_OF_ACTIVITIES_ATTR, getTotalNumberOfActivities());
 	}
 
 	public ArrayList<MessageElement> getSPMDProvidersAttr() throws RemoteException
@@ -340,7 +340,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler implements BE
 		Collection<String> spmdProviders = getSPMDProviders();
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(spmdProviders.size());
 		for (String provider : spmdProviders) {
-			ret.add(new MessageElement(SPMD_PROVIDER_ATTR, provider));
+			ret.add(new MessageElement(consts.SPMD_PROVIDER_ATTR, provider));
 		}
 
 		return ret;
@@ -352,7 +352,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler implements BE
 		EndpointReferenceType[] eprs = getActivityReferences();
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(eprs.length);
 		for (int lcv = 0; lcv < eprs.length; lcv++) {
-			ret.add(new MessageElement(ACTIVITY_REFERENCE_ATTR, eprs[lcv]));
+			ret.add(new MessageElement(consts.ACTIVITY_REFERENCE_ATTR, eprs[lcv]));
 		}
 
 		return ret;
@@ -362,7 +362,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler implements BE
 	{
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
 		for (String version : Installation.getOGRSH().getInstalledVersions().keySet()) {
-			ret.add(new MessageElement(OGRSH_VERSIONS_ATTR, version));
+			ret.add(new MessageElement(consts.OGRSH_VERSIONS_ATTR, version));
 		}
 
 		return ret;
@@ -373,7 +373,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler implements BE
 		ArrayList<MessageElement> result = new ArrayList<MessageElement>();
 		String desc = getDescription();
 		if (desc != null)
-			result.add(new MessageElement(DESCRIPTION_ATTR, desc));
+			result.add(new MessageElement(consts.DESCRIPTION_ATTR, desc));
 
 		return result;
 	}
@@ -385,48 +385,48 @@ public class BESAttributesHandler extends AbstractAttributeHandler implements BE
 
 	public MessageElement getOperatingSystemAttr() throws RemoteException
 	{
-		return new MessageElement(OPERATING_SYSTEM_ATTR, getOperatingSystem());
+		return new MessageElement(consts.OPERATING_SYSTEM_ATTR, getOperatingSystem());
 	}
 
 	public MessageElement getCPUArchitectureAttr() throws RemoteException
 	{
-		return new MessageElement(CPU_ARCHITECTURE_ATTR, getCPUArchitecture());
+		return new MessageElement(consts.CPU_ARCHITECTURE_ATTR, getCPUArchitecture());
 	}
 
 	public MessageElement getCPUCountAttr() throws RemoteException
 	{
-		return new MessageElement(CPU_COUNT_ATTR, getCPUCount());
+		return new MessageElement(consts.CPU_COUNT_ATTR, getCPUCount());
 	}
 
 	public MessageElement getCPUSpeedAttr() throws RemoteException
 	{
-		return new MessageElement(CPU_SPEED_ATTR, getCPUSpeed());
+		return new MessageElement(consts.CPU_SPEED_ATTR, getCPUSpeed());
 	}
 
 	static public MessageElement getWallclockTimeLimitAttr() throws ResourceUnknownFaultType, ResourceException
 	{
+		BESConstants consts = new BESConstants();
 		Long value = getWallclockTimeLimit();
 		if (value != null)
-			return new MessageElement(BES_WALLCLOCK_TIMELIMIT_ATTR, value);
-
+			return new MessageElement(consts.BES_WALLCLOCK_TIMELIMIT_ATTR, value);
 		return null;
 	}
 
 	public MessageElement getPhysicalMemoryAttr() throws RemoteException
 	{
-		return new MessageElement(PHYSICAL_MEMORY_ATTR, getPhysicalMemory());
+		return new MessageElement(consts.PHYSICAL_MEMORY_ATTR, getPhysicalMemory());
 	}
 
 	public MessageElement getVirtualMemoryAttr() throws RemoteException
 	{
-		return new MessageElement(VIRTUAL_MEMORY_ATTR, getVirtualMemory());
+		return new MessageElement(consts.VIRTUAL_MEMORY_ATTR, getVirtualMemory());
 	}
 
 	public ArrayList<MessageElement> getDeployersAttr() throws ResourceException, ResourceUnknownFaultType
 	{
 		ArrayList<MessageElement> deployers = new ArrayList<MessageElement>();
 		for (EndpointReferenceType deployer : getDeployers()) {
-			deployers.add(new MessageElement(BESConstants.DEPLOYER_EPR_ATTR, deployer));
+			deployers.add(new MessageElement(consts.DEPLOYER_EPR_ATTR, deployer));
 		}
 
 		return deployers;
@@ -446,10 +446,12 @@ public class BESAttributesHandler extends AbstractAttributeHandler implements BE
 
 	static public ArrayList<MessageElement> getSupportedFilesystemsAttr()
 	{
+		BESConstants consts = new BESConstants();
+
 		String[] supported = getSupportedFilesystems();
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(supported.length);
 		for (String sup : supported)
-			ret.add(new MessageElement(FILESYSTEM_SUPPORT_ATTR, sup));
+			ret.add(new MessageElement(consts.FILESYSTEM_SUPPORT_ATTR, sup));
 
 		return ret;
 	}

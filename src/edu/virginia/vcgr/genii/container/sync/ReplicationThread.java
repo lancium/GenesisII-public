@@ -9,10 +9,16 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.resource.IResource;
+import edu.virginia.vcgr.genii.client.resource.ResourceLock;
+import edu.virginia.vcgr.genii.client.security.axis.ResourceSecurityPolicy;
+import edu.virginia.vcgr.genii.client.sync.SyncProperty;
+import edu.virginia.vcgr.genii.client.sync.VersionVector;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.AbstractSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
@@ -22,10 +28,7 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPoli
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AclTopics;
 import edu.virginia.vcgr.genii.resolver.UpdateResponseType;
@@ -189,6 +192,11 @@ public class ReplicationThread extends Thread
 			// The replica may service read and write requests as soon as we release the lock.
 			resource.setProperty(SyncProperty.ERROR_STATE_PROP_NAME, null);
 			resource.commit();
+
+			// copy ACL entries from primary resource to replicated resource
+			ResourceSecurityPolicy oldSP = new ResourceSecurityPolicy(primaryEPR);
+			ResourceSecurityPolicy newSP = new ResourceSecurityPolicy(myEPR);
+			newSP.copyFrom(oldSP);
 		} catch (Throwable fault) {
 			_logger.error("ReplicationThread: failed", fault);
 		} finally {

@@ -59,14 +59,16 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.w3c.dom.Document;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
-import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
@@ -89,7 +91,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 	static private Log _logger = LogFactory.getLog(ServerWSDoAllReceiver.class);
 
-	static public final String CRYPTO_ALIAS = "CRYPTO_ALIAS";
 	static private final String CRYTO_PASS = "pwd";
 	static private final String SIG_CRYPTO_PROPERTY = GIIBouncyCrypto.class.getCanonicalName();
 
@@ -106,7 +107,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		setOption(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " "
 			+ WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT);
 		setOption(WSHandlerConstants.PW_CALLBACK_CLASS, ServerWSDoAllReceiver.ServerPWCallback.class.getName());
-		setOption(WSHandlerConstants.USER, ServerWSDoAllReceiver.CRYPTO_ALIAS);
+		setOption(WSHandlerConstants.USER, GenesisIIConstants.CRYPTO_ALIAS);
 	}
 
 	public ServerWSDoAllReceiver(PrivateKey serverPrivateKey)
@@ -119,7 +120,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		try {
 			IResource resource = ResourceManager.getCurrentResource().dereference();
 
-			IAuthZProvider authZHandler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+			IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+				.getServiceName());
 
 			if ((authZHandler == null) || (authZHandler.getMinIncomingMsgLevelSecurity(resource).isNone())) {
 				resource.commit();
@@ -170,7 +172,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			// get the resource's min messsage-sec level
 			MessageLevelSecurityRequirements resourceMinMsgSec;
 			IResource resource = ResourceManager.getCurrentResource().dereference();
-			IAuthZProvider authZHandler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+			IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+				.getServiceName());
 
 			if (authZHandler == null) {
 				resourceMinMsgSec = new MessageLevelSecurityRequirements();
@@ -458,7 +461,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 			// Get the resource's authz handler
 			IResource resource = ResourceManager.getCurrentResource().dereference();
-			IAuthZProvider authZHandler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+			IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+				.getServiceName());
 
 			// Let the authZ handler make the decision
 			boolean accessOkay = authZHandler.checkAccess(authenticatedCallerCreds, resource,
@@ -600,7 +604,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	{
 		ICallingContext callContext = ContextManager.getExistingContext();
 		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
-		String serviceName = resource.getParentResourceKey().getServiceName();
+		String serviceName = ((ResourceKey) resource.getParentResourceKey()).getServiceName();
 		IAuthZProvider authZHandler = AuthZProviders.getProvider(serviceName);
 		return authZHandler.checkAccess(transientCredentials.getCredentials(), resource, category);
 	}

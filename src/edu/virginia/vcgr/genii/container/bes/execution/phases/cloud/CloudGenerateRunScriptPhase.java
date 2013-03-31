@@ -10,11 +10,11 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
+import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.cloud.CloudJobWrapper;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
-import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
 
 public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 {

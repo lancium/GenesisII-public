@@ -52,7 +52,7 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl implements R
 	{
 		this("RExportFilePortType");
 
-		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE());
 
 	}
 
@@ -60,8 +60,8 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl implements R
 	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE());
 	}
 
 	public WriteResponse write(Write write) throws RemoteException, CustomFaultType, ReadNotPermittedFaultType,

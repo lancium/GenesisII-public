@@ -18,6 +18,7 @@ package edu.virginia.vcgr.genii.container.x509authn;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
@@ -45,7 +45,6 @@ import org.ggf.rns.NameMappingType;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSEntryType;
-import org.ggf.rns.RNSMetadataType;
 import org.ggf.rns.WriteNotPermittedFaultType;
 import org.morgan.inject.MInject;
 import org.morgan.util.configuration.ConfigurationException;
@@ -59,36 +58,28 @@ import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestedProofTokenType;
 import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestedSecurityTokenType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
-import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
-import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
-import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.commonauthn.BaseAuthenticationServiceImpl;
+import edu.virginia.vcgr.genii.container.commonauthn.ReplicaSynchronizer.STSResourcePropertiesRetriever;
+import edu.virginia.vcgr.genii.container.commonauthn.STSCertificationSpec;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
-import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResourceProvider;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
-import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.XMLCompatible;
 import edu.virginia.vcgr.genii.security.axis.AxisSAMLCredentials;
@@ -104,7 +95,7 @@ import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 
 @GeniiServiceConfiguration(resourceProvider = RNSDBResourceProvider.class)
-public class X509AuthnServiceImpl extends GenesisIIBase implements X509AuthnPortType
+public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implements X509AuthnPortType
 {
 	static private Log _logger = LogFactory.getLog(X509AuthnServiceImpl.class);
 
@@ -113,21 +104,21 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements X509AuthnPort
 
 	public X509AuthnServiceImpl() throws RemoteException
 	{
-		this(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE.getQName().getLocalPart());
+		this(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE().getQName().getLocalPart());
 	}
 
 	protected X509AuthnServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.STS_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.STS_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE());
 	}
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE;
+		return WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE();
 	}
 
 	protected Object translateConstructionParameter(MessageElement property) throws Exception
@@ -145,14 +136,35 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements X509AuthnPort
 		}
 	}
 
-	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters) throws ResourceException, BaseFaultType
+	// hmmm: this needs to move to a more general location.
+	public static NuCredential loadResourceCredential(IRNSResource resource)
 	{
+		NuCredential credential = null;
+		try {
+			credential = (NuCredential) resource.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart());
+		} catch (ResourceException e) {
+			_logger.error("resource exception loading credential, quashing");
+		}
 
-		String[] newCNs = { (String) constructionParameters.get(SecurityConstants.NEW_IDP_NAME_QNAME) };
+		if (credential == null) {
+			_logger.warn("found null credential for resource: " + resource.toString() + "  is this db conversion issue?");
+			X509Certificate[] resourceCertChain = null;
+			try {
+				resourceCertChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+			} catch (ResourceException e) {
+				_logger.error("failed to load resource certificate chain!  this is quite bad.  resource is: "
+					+ resource.toString());
+			}
+			credential = new X509Identity(resourceCertChain, IdentityType.OTHER);
+			// store the new credential back for the resource.
+			try {
+				resource.setProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(), credential);
+			} catch (ResourceException e) {
+				_logger.error("failed to save credential for: " + resource.toString());
+			}
+		}
 
-		constructionParameters.put(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM, newCNs);
-
-		return super.createResource(constructionParameters);
+		return credential;
 	}
 
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
@@ -160,18 +172,12 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements X509AuthnPort
 		throws ResourceException, BaseFaultType, RemoteException
 	{
 
-		// make sure the specific IDP doesn't yet exist
-		String newIdpName = (String) constructionParameters.get(SecurityConstants.NEW_IDP_NAME_QNAME);
-		ResourceKey serviceKey = ResourceManager.getCurrentResource();
-		IRNSResource serviceResource = (IRNSResource) serviceKey.dereference();
-		Collection<String> entries = serviceResource.listEntries(null);
-		if (entries.contains(newIdpName)) {
-			throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(null, null, null, null, null, null, newIdpName));
+		if (skipPortTypeSpecificPostProcessing(constructionParameters)) {
+			super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
+			return;
 		}
 
-		// add the delegated identity to the service's list of IDPs
-		serviceResource.addEntry(new InternalEntry(newIdpName, newEPR, null));
-		serviceResource.commit();
+		String newIdpName = addResourceInServiceResourceList(newEPR, constructionParameters);
 
 		// get the IDP resource's db resource
 		IResource resource = rKey.dereference();
@@ -188,6 +194,11 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements X509AuthnPort
 		NuCredential credential = null;
 		MessageElement encodedCredential = (MessageElement) constructionParameters
 			.get(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME);
+
+		STSCertificationSpec stsCertificationSpec = (STSCertificationSpec) constructionParameters
+			.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
+		PrivateKey privateKey = stsCertificationSpec.getSubjectPrivateKey();
+
 		try {
 			if (encodedCredential != null) {
 				AxisSAMLCredentials wallet = new AxisSAMLCredentials(
@@ -225,7 +236,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements X509AuthnPort
 							System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset, Long.MAX_VALUE,
 							SecurityConstants.MaxDelegationDepth), TrustCredential.FULL_ACCESS);
 					newTC.delegateTrust(wrapped);
-					newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);
+					newTC.signAssertion(privateKey);
 
 					credential = newTC;
 				}
@@ -243,17 +254,8 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements X509AuthnPort
 				credential = new X509Identity(resourceCertChain, type);
 			}
 
-			// add the identity to the resource's saved calling context
-			ICallingContext resourceContext = (ICallingContext) resource
-				.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
-			if (credential != null) {
-				TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(resourceContext);
-				transientCredentials.add(credential);
-				resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, resourceContext);
+			storeCallingContextAndCertificate(resource, credential);
 
-				// add the identity to our resource state
-				resource.setProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(), credential);
-			}
 		} catch (IOException e) {
 			throw new RemoteException(e.getMessage(), e);
 		}
@@ -261,41 +263,11 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements X509AuthnPort
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 	}
 
-	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
+	@Override
+	protected void preDestroy() throws RemoteException, ResourceException
 	{
-		super.setAttributeHandlers();
-		new X509AuthnAttributeHandlers(getAttributePackage());
-	}
-
-	// hmmm: this needs to move to a more general location.
-	public static NuCredential loadResourceCredential(IRNSResource resource)
-	{
-		NuCredential credential = null;
-		try {
-			credential = (NuCredential) resource.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart());
-		} catch (ResourceException e) {
-			_logger.error("resource exception loading credential, quashing");
-		}
-
-		if (credential == null) {
-			_logger.warn("found null credential for resource: " + resource.toString() + "  is this db conversion issue?");
-			X509Certificate[] resourceCertChain = null;
-			try {
-				resourceCertChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-			} catch (ResourceException e) {
-				_logger.error("failed to load resource certificate chain!  this is quite bad.  resource is: "
-					+ resource.toString());
-			}
-			credential = new X509Identity(resourceCertChain, IdentityType.OTHER);
-			// store the new credential back for the resource.
-			try {
-				resource.setProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(), credential);
-			} catch (ResourceException e) {
-				_logger.error("failed to save credential for: " + resource.toString());
-			}
-		}
-
-		return credential;
+		super.preDestroy();
+		preDestroy(_resource);
 	}
 
 	protected RequestSecurityTokenResponseType delegateCredential(X509Certificate[] delegateToChain, Date created, Date expiry)
@@ -528,88 +500,21 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements X509AuthnPort
 	public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, RNSEntryExistsFaultType,
 		ResourceUnknownFaultType
 	{
-		if (addRequest == null || addRequest.length == 0)
-			addRequest = new RNSEntryType[] { null };
-
-		RNSEntryResponseType[] ret = new RNSEntryResponseType[addRequest.length];
-		for (int lcv = 0; lcv < ret.length; lcv++) {
-			try {
-				ret[lcv] = add(addRequest[lcv]);
-			} catch (BaseFaultType bft) {
-				ret[lcv] = new RNSEntryResponseType(null, null, bft, addRequest[lcv].getEntryName());
-			} catch (Throwable cause) {
-				ret[lcv] = new RNSEntryResponseType(null, null,
-					FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry!") }, null)),
-					addRequest[lcv].getEntryName());
-			}
-		}
-
-		return ret;
-	}
-
-	protected RNSEntryResponseType add(RNSEntryType addRequest) throws RemoteException, ResourceException,
-		RNSEntryExistsFaultType
-	{
-		EndpointReferenceType entryReference;
-
-		if (addRequest == null)
-			throw new RemoteException("Incomplete add request.");
-
-		String name = addRequest.getEntryName();
-		entryReference = addRequest.getEndpoint();
-		RNSMetadataType mdt = addRequest.getMetadata();
-		MessageElement[] attrs = (mdt == null) ? null : mdt.get_any();
-
-		if (entryReference == null)
-			throw new RemoteException("Incomplete add request.");
-
-		TypeInformation type = new TypeInformation(entryReference);
-		if (!type.isIDP())
-			throw new RemoteException("Entry is not an IDP.");
-
-		if (_resource.isServiceResource())
-			throw new RemoteException("Cannot add entries to this service.");
-
-		_resource.addEntry(new InternalEntry(name, entryReference, attrs));
-		_resource.commit();
-
-		return new RNSEntryResponseType(entryReference, mdt, null, name);
+		return addRNSEntries(addRequest, _resource);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public LookupResponseType lookup(String[] lookupRequest) throws RemoteException, ResourceUnknownFaultType
 	{
-		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
-
-		if (lookupRequest == null || lookupRequest.length == 0)
-			lookupRequest = new String[] { null };
-
-		for (String request : lookupRequest) {
-			entries.addAll(_resource.retrieveEntries(request));
-		}
-
-		Collection<RNSEntryResponseType> ret = new LinkedList<RNSEntryResponseType>();
-		for (InternalEntry entry : entries)
-			ret.add(new RNSEntryResponseType(entry.getEntryReference(), RNSUtilities.createMetadata(entry.getEntryReference(),
-				entry.getAttributes()), null, entry.getName()));
-
-		return RNSContainerUtilities.translate(ret, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()));
+		return lookup(lookupRequest, _resource);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
 	public RNSEntryResponseType[] remove(String[] removeRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
-		RNSEntryResponseType[] ret = new RNSEntryResponseType[removeRequest.length];
-
-		for (int lcv = 0; lcv < removeRequest.length; lcv++) {
-			_resource.removeEntries(removeRequest[lcv]);
-			ret[lcv] = new RNSEntryResponseType(null, null, null, removeRequest[lcv]);
-		}
-
-		return ret;
+		return remove(removeRequest, _resource);
 	}
 
 	@Override
@@ -627,32 +532,9 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements X509AuthnPort
 		throw new RemoteException("\"setMetadata\" not applicable.");
 	}
 
-	static public class X509AuthnAttributeHandlers extends AbstractAttributeHandler
+	@Override
+	public STSResourcePropertiesRetriever getResourcePropertyRetriver()
 	{
-		public X509AuthnAttributeHandlers(AttributePackage pkg) throws NoSuchMethodException
-		{
-			super(pkg);
-		}
-
-		public Collection<MessageElement> getTransferMechsAttr()
-		{
-			ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
-
-			ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
-			ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				ByteIOConstants.TRANSFER_TYPE_DIME_URI));
-			ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
-
-			return ret;
-		}
-
-		@Override
-		protected void registerHandlers() throws NoSuchMethodException
-		{
-			addHandler(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				"getTransferMechsAttr");
-		}
+		return new CommonSTSPropertiesRetriever();
 	}
 }

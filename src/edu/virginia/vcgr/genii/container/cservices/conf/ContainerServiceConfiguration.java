@@ -24,6 +24,7 @@ import org.w3c.dom.Element;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.utils.file.ExtensionFileFilter;
 import edu.virginia.vcgr.genii.container.cservices.ContainerService;
+import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 @XmlRootElement(name = "container-service")
 public class ContainerServiceConfiguration
@@ -82,8 +83,7 @@ public class ContainerServiceConfiguration
 	final public Class<? extends ContainerService> serviceClass() throws ClassNotFoundException
 	{
 		if (_serviceClass == null) {
-			_serviceClass = (Class<? extends ContainerService>) ContainerServiceConfiguration.class.getClassLoader().loadClass(
-				_className);
+			_serviceClass = (Class<? extends ContainerService>) GenesisClassLoader.classLoaderFactory().loadClass(_className);
 		}
 
 		return _serviceClass;

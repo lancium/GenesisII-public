@@ -100,6 +100,6 @@ public class EnhancedNotificationBrokerFactoryServiceImpl extends GenesisIIBase 
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.ENHANCED_NOTIFICATION_BROKER_FACTORY__PORT;
+		return WellKnownPortTypes.ENHANCED_NOTIFICATION_BROKER_FACTORY__PORT();
 	}
 }

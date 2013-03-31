@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 
 public class FileRedirectionSource implements StreamRedirectionSource
 {

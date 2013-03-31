@@ -9,9 +9,9 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 
 public class CloudSetPermissionsPhase extends AbstractCloudExecutionPhase implements Serializable
 {

@@ -7,8 +7,8 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.exportdir.FSProxyConstructionParameters;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
@@ -28,13 +28,13 @@ public class FSProxyServiceImpl extends ResourceForkBaseService implements FSPro
 	{
 		super(SERVICE_NAME);
 
-		addImplementedPortType(WellKnownPortTypes.EXPORTED_FSPROXY_ROOT_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.EXPORTED_FSPROXY_ROOT_SERVICE_PORT_TYPE());
 	}
 
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.EXPORTED_FSPROXY_ROOT_SERVICE_PORT_TYPE;
+		return WellKnownPortTypes.EXPORTED_FSPROXY_ROOT_SERVICE_PORT_TYPE();
 	}
 
 	@Override

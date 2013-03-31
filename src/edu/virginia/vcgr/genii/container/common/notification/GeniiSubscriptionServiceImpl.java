@@ -33,6 +33,7 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.TerminationTimeType;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPolicy;
@@ -42,7 +43,6 @@ import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
@@ -81,15 +81,15 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements Genii
 	{
 		super("GeniiSubscriptionPortType");
 
-		addImplementedPortType(WSRFConstants.WSN_CREATE_PULL_POINT_PORT);
-		addImplementedPortType(WSRFConstants.WSN_SUBSCRIPTION_MANAGER_PORT);
-		addImplementedPortType(WSRFConstants.WSN_PAUSABLE_SUBSCRIPTION_MANAGER_PORT);
+		addImplementedPortType(WSRFConstants.WSN_CREATE_PULL_POINT_PORT());
+		addImplementedPortType(WSRFConstants.WSN_SUBSCRIPTION_MANAGER_PORT());
+		addImplementedPortType(WSRFConstants.WSN_PAUSABLE_SUBSCRIPTION_MANAGER_PORT());
 	}
 
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.GENII_SUBSCRIPTION_PORT_TYPE;
+		return WellKnownPortTypes.GENII_SUBSCRIPTION_PORT_TYPE();
 	}
 
 	@Override

@@ -10,7 +10,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
-import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRNSResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;

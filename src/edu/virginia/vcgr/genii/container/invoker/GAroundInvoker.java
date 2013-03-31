@@ -9,16 +9,20 @@ import java.util.HashMap;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.providers.java.RPCProvider;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class GAroundInvoker extends RPCProvider
 {
 	static final long serialVersionUID = 0L;
+	static private Log _logger = LogFactory.getLog(GAroundInvoker.class);
 
 	static private HashMap<Method, IAroundInvoker[]> _cachedHandlers = new HashMap<Method, IAroundInvoker[]>();
 
 	protected Object invokeMethod(MessageContext msgContext, Method method, Object obj, Object[] argValues) throws Exception
 	{
 		Method realMethod = obj.getClass().getMethod(method.getName(), method.getParameterTypes());
+		_logger.debug("invoking: " + realMethod.toString());
 		IAroundInvoker[] handlers;
 		synchronized (_cachedHandlers) {
 			handlers = _cachedHandlers.get(realMethod);
@@ -57,8 +61,10 @@ public class GAroundInvoker extends RPCProvider
 		GAroundInvoke annotation = cl.getAnnotation(GAroundInvoke.class);
 		if (annotation != null) {
 			Class<? extends IAroundInvoker>[] handlers = annotation.value();
-			for (Class<? extends IAroundInvoker> handler : handlers)
+			for (Class<? extends IAroundInvoker> handler : handlers) {
+				_logger.debug("adding case1 handler: " + handler.toString() + " for method: " + m.toString());
 				invokers.add(getInvoker(handler));
+			}
 		}
 
 		Method realM = null;
@@ -71,8 +77,10 @@ public class GAroundInvoker extends RPCProvider
 			annotation = realM.getAnnotation(GAroundInvoke.class);
 			if (annotation != null) {
 				Class<? extends IAroundInvoker>[] handlers = annotation.value();
-				for (Class<? extends IAroundInvoker> handler : handlers)
+				for (Class<? extends IAroundInvoker> handler : handlers) {
+					_logger.debug("adding case2 handler: " + handler.toString() + " for method: " + m.toString());
 					invokers.add(getInvoker(handler));
+				}
 			}
 		}
 	}
@@ -81,6 +89,7 @@ public class GAroundInvoker extends RPCProvider
 		IllegalAccessException, InstantiationException, InvocationTargetException
 	{
 		Constructor<? extends IAroundInvoker> cons = cl.getConstructor(new Class[0]);
+		_logger.debug("creating invoker for: " + cl.toString());
 		return cons.newInstance(new Object[0]);
 	}
 }

@@ -9,7 +9,7 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 
 public class SetupOGRSHPhase extends AbstractExecutionPhase
 {

@@ -19,9 +19,9 @@ import java.util.Collection;
 
 import org.ggf.rns.RNSEntryExistsFaultType;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IRNSResource extends IResource
 {

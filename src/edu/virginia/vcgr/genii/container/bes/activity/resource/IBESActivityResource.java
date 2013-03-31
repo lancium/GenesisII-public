@@ -19,8 +19,8 @@ import java.sql.Connection;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IBESActivityResource extends IResource
 {

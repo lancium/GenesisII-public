@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
@@ -45,7 +45,6 @@ import org.ggf.rns.NameMappingType;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSEntryType;
-import org.ggf.rns.RNSMetadataType;
 import org.ggf.rns.WriteNotPermittedFaultType;
 import org.morgan.inject.MInject;
 import org.morgan.util.configuration.ConfigurationException;
@@ -58,39 +57,32 @@ import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestTypeOpenEnum;
 import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestedProofTokenType;
 import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestedSecurityTokenType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rp_2.GetMultipleResourcePropertiesResponse;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
-import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
-import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
-import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.container.commonauthn.BaseAuthenticationServiceImpl;
+import edu.virginia.vcgr.genii.container.commonauthn.ReplicaSynchronizer.STSResourcePropertiesRetriever;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
-import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResourceProvider;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.x509authn.X509AuthnServiceImpl;
 import edu.virginia.vcgr.genii.kerbauthn.KerbAuthnPortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
-import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.XMLCompatible;
 import edu.virginia.vcgr.genii.security.axis.WSSecurityUtils;
 import edu.virginia.vcgr.genii.security.axis.XMLConverter;
@@ -103,7 +95,7 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 @GeniiServiceConfiguration(resourceProvider = RNSDBResourceProvider.class, defaultAuthZProvider = KerbAuthZProvider.class)
-public class KerbAuthnServiceImpl extends GenesisIIBase implements KerbAuthnPortType
+public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implements KerbAuthnPortType
 {
 	static private Log _logger = LogFactory.getLog(KerbAuthnServiceImpl.class);
 
@@ -112,21 +104,28 @@ public class KerbAuthnServiceImpl extends GenesisIIBase implements KerbAuthnPort
 
 	public KerbAuthnServiceImpl() throws RemoteException
 	{
-		this(WellKnownPortTypes.KERB_AUTHN_SERVICE_PORT_TYPE.getQName().getLocalPart());
+		this(WellKnownPortTypes.KERB_AUTHN_SERVICE_PORT_TYPE().getQName().getLocalPart());
 	}
 
 	protected KerbAuthnServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.KERB_AUTHN_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.STS_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.KERB_AUTHN_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.STS_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE());
 	}
 
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.KERB_AUTHN_SERVICE_PORT_TYPE;
+		return WellKnownPortTypes.KERB_AUTHN_SERVICE_PORT_TYPE();
+	}
+
+	@Override
+	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
+	{
+		super.setAttributeHandlers();
+		new KerbAuthnAttributesHandler(getAttributePackage());
 	}
 
 	protected Object translateConstructionParameter(MessageElement property) throws Exception
@@ -146,17 +145,19 @@ public class KerbAuthnServiceImpl extends GenesisIIBase implements KerbAuthnPort
 
 	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters) throws ResourceException, BaseFaultType
 	{
-
-		// Specify additional CN fields for our resource's certificate
-		String[] newCNs = { (String) constructionParameters.get(SecurityConstants.NEW_IDP_NAME_QNAME) };
-
-		constructionParameters.put(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM, newCNs);
+		// to go away?
+		// // Specify additional CN fields for our resource's certificate
+		// String[] newCNs = { (String)
+		// constructionParameters.get(SecurityConstants.NEW_IDP_NAME_QNAME) };
+		//
+		// constructionParameters.put(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM, newCNs);
 
 		// Specify additional O (org) field for our resource's certificate (viz. realm)
 		String realm = (String) constructionParameters.get(SecurityConstants.NEW_KERB_IDP_REALM_QNAME);
-		String[] newOrgs = { realm };
-		constructionParameters.put(IResource.ADDITIONAL_ORGS_CONSTRUCTION_PARAM, newOrgs);
-
+		if (realm != null) {
+			String[] newOrgs = { realm };
+			constructionParameters.put(IResource.ADDITIONAL_ORGS_CONSTRUCTION_PARAM, newOrgs);
+		}
 		return super.createResource(constructionParameters);
 	}
 
@@ -165,18 +166,12 @@ public class KerbAuthnServiceImpl extends GenesisIIBase implements KerbAuthnPort
 		throws ResourceException, BaseFaultType, RemoteException
 	{
 
-		// make sure the specific IDP doesn't yet exist
-		String newIdpName = (String) constructionParameters.get(SecurityConstants.NEW_IDP_NAME_QNAME);
-		ResourceKey serviceKey = ResourceManager.getCurrentResource();
-		IRNSResource serviceResource = (IRNSResource) serviceKey.dereference();
-		Collection<String> entries = serviceResource.listEntries(null);
-		if (entries.contains(newIdpName)) {
-			throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(null, null, null, null, null, null, newIdpName));
+		if (skipPortTypeSpecificPostProcessing(constructionParameters)) {
+			super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
+			return;
 		}
 
-		// add the delegated identity to the service's list of IDPs
-		serviceResource.addEntry(new InternalEntry(newIdpName, newEPR, null));
-		serviceResource.commit();
+		String newIdpName = addResourceInServiceResourceList(newEPR, constructionParameters);
 
 		// get the IDP resource's db resource
 		IResource resource = rKey.dereference();
@@ -197,18 +192,8 @@ public class KerbAuthnServiceImpl extends GenesisIIBase implements KerbAuthnPort
 		// determine the credential the idp will front
 		NuCredential credential = null;
 		try {
-			// store our identity credential.
 			credential = new X509Identity(resourceCertChain, IdentityType.OTHER);
-
-			// add the identity to the resource's saved calling context.
-			ICallingContext resourceContext = (ICallingContext) resource
-				.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
-			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(resourceContext);
-			transientCredentials.add(credential);
-			resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, resourceContext);
-
-			// add the identity to our resource state
-			resource.setProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(), credential);
+			storeCallingContextAndCertificate(resource, credential);
 		} catch (IOException e) {
 			throw new RemoteException(e.getMessage(), e);
 		}
@@ -216,10 +201,11 @@ public class KerbAuthnServiceImpl extends GenesisIIBase implements KerbAuthnPort
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 	}
 
-	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
+	@Override
+	protected void preDestroy() throws RemoteException, ResourceException
 	{
-		super.setAttributeHandlers();
-		new KerbAuthnAttributeHandlers(getAttributePackage());
+		super.preDestroy();
+		preDestroy(_resource);
 	}
 
 	protected RequestSecurityTokenResponseType delegateCredential(X509Certificate[] delegateToChain, Date created, Date expiry)
@@ -451,88 +437,21 @@ public class KerbAuthnServiceImpl extends GenesisIIBase implements KerbAuthnPort
 	public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, RNSEntryExistsFaultType,
 		ResourceUnknownFaultType
 	{
-		if (addRequest == null || addRequest.length == 0)
-			addRequest = new RNSEntryType[] { null };
-
-		RNSEntryResponseType[] ret = new RNSEntryResponseType[addRequest.length];
-		for (int lcv = 0; lcv < ret.length; lcv++) {
-			try {
-				ret[lcv] = add(addRequest[lcv]);
-			} catch (BaseFaultType bft) {
-				ret[lcv] = new RNSEntryResponseType(null, null, bft, addRequest[lcv].getEntryName());
-			} catch (Throwable cause) {
-				ret[lcv] = new RNSEntryResponseType(null, null,
-					FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry!") }, null)),
-					addRequest[lcv].getEntryName());
-			}
-		}
-
-		return ret;
-	}
-
-	protected RNSEntryResponseType add(RNSEntryType addRequest) throws RemoteException, ResourceException,
-		RNSEntryExistsFaultType
-	{
-		EndpointReferenceType entryReference;
-
-		if (addRequest == null)
-			throw new RemoteException("Incomplete add request.");
-
-		String name = addRequest.getEntryName();
-		entryReference = addRequest.getEndpoint();
-		RNSMetadataType mdt = addRequest.getMetadata();
-		MessageElement[] attrs = (mdt == null) ? null : mdt.get_any();
-
-		if (entryReference == null)
-			throw new RemoteException("Incomplete add request.");
-
-		TypeInformation type = new TypeInformation(entryReference);
-		if (!type.isIDP())
-			throw new RemoteException("Entry is not an IDP.");
-
-		if (_resource.isServiceResource())
-			throw new RemoteException("Cannot add entries to this service.");
-
-		_resource.addEntry(new InternalEntry(name, entryReference, attrs));
-		_resource.commit();
-
-		return new RNSEntryResponseType(entryReference, mdt, null, name);
+		return addRNSEntries(addRequest, _resource);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public LookupResponseType lookup(String[] lookupRequest) throws RemoteException, ResourceUnknownFaultType
 	{
-		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
-
-		if (lookupRequest == null || lookupRequest.length == 0)
-			lookupRequest = new String[] { null };
-
-		for (String request : lookupRequest) {
-			entries.addAll(_resource.retrieveEntries(request));
-		}
-
-		Collection<RNSEntryResponseType> ret = new LinkedList<RNSEntryResponseType>();
-		for (InternalEntry entry : entries)
-			ret.add(new RNSEntryResponseType(entry.getEntryReference(), RNSUtilities.createMetadata(entry.getEntryReference(),
-				entry.getAttributes()), null, entry.getName()));
-
-		return RNSContainerUtilities.translate(ret, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()));
+		return lookup(lookupRequest, _resource);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
 	public RNSEntryResponseType[] remove(String[] removeRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
-		RNSEntryResponseType[] ret = new RNSEntryResponseType[removeRequest.length];
-
-		for (int lcv = 0; lcv < removeRequest.length; lcv++) {
-			_resource.removeEntries(removeRequest[lcv]);
-			ret[lcv] = new RNSEntryResponseType(null, null, null, removeRequest[lcv]);
-		}
-
-		return ret;
+		return remove(removeRequest, _resource);
 	}
 
 	@Override
@@ -550,32 +469,51 @@ public class KerbAuthnServiceImpl extends GenesisIIBase implements KerbAuthnPort
 		throw new RemoteException("\"setMetadata\" not applicable.");
 	}
 
-	static public class KerbAuthnAttributeHandlers extends AbstractAttributeHandler
+	@Override
+	public STSResourcePropertiesRetriever getResourcePropertyRetriver()
 	{
-		public KerbAuthnAttributeHandlers(AttributePackage pkg) throws NoSuchMethodException
-		{
-			super(pkg);
-		}
+		return new kerberosResourcePropertiesRetriever();
+	}
 
-		public Collection<MessageElement> getTransferMechsAttr()
-		{
-			ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
+	@Override
+	public Set<QName> getSensitivePropertyNames()
+	{
+		Set<QName> propertyNames = super.getSensitivePropertyNames();
+		propertyNames.add(SecurityConstants.NEW_KERB_IDP_REALM_QNAME);
+		propertyNames.add(SecurityConstants.NEW_KERB_IDP_KDC_QNAME);
+		return propertyNames;
+	}
 
-			ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
-			ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				ByteIOConstants.TRANSFER_TYPE_DIME_URI));
-			ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
-
-			return ret;
-		}
+	public static class kerberosResourcePropertiesRetriever extends CommonSTSPropertiesRetriever
+	{
 
 		@Override
-		protected void registerHandlers() throws NoSuchMethodException
+		public void retrieveAndStoreResourceProperties(GeniiCommon proxyToPrimary, IRNSResource resource) throws Exception
 		{
-			addHandler(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				"getTransferMechsAttr");
+
+			super.retrieveAndStoreResourceProperties(proxyToPrimary, resource);
+
+			QName[] propertyNames = new QName[2];
+			propertyNames[0] = SecurityConstants.NEW_KERB_IDP_REALM_QNAME;
+			propertyNames[1] = SecurityConstants.NEW_KERB_IDP_KDC_QNAME;
+			GetMultipleResourcePropertiesResponse response = proxyToPrimary.getMultipleResourceProperties(propertyNames);
+
+			MessageElement[] propertyValues = response.get_any();
+			if (propertyValues == null || propertyValues.length < propertyNames.length) {
+				throw new RemoteException("Could not retrieve all necessary resource properties");
+			}
+
+			for (MessageElement element : propertyValues) {
+				QName name = element.getQName();
+				String value = element.getValue();
+				if (value == null)
+					throw new RuntimeException("A required Kerberos attribute is missing.");
+				if (SecurityConstants.NEW_KERB_IDP_REALM_QNAME.equals(name)) {
+					resource.setProperty(SecurityConstants.NEW_KERB_IDP_REALM_QNAME.getLocalPart(), value);
+				} else if (SecurityConstants.NEW_KERB_IDP_KDC_QNAME.equals(name)) {
+					resource.setProperty(SecurityConstants.NEW_KERB_IDP_KDC_QNAME.getLocalPart(), value);
+				}
+			}
 		}
 	}
 }

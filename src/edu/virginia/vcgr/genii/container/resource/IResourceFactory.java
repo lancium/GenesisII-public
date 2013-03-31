@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.resource;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 /**
@@ -11,7 +12,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 public interface IResourceFactory
 {
 	/**
-	 * Instiante a new resource class.
+	 * Instantiate a new resource class.
 	 * 
 	 * @return The new resource class.
 	 */

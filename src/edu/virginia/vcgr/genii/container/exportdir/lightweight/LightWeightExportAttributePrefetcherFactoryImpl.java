@@ -5,12 +5,12 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.byteio.export.ExportedRandomByteIOForkAttributePrefetcher;
 import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.RandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceFork;

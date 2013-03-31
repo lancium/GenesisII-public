@@ -2,8 +2,8 @@ package edu.virginia.vcgr.genii.container.rfork;
 
 import java.util.Calendar;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributePreFetcher;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public class RandomByteIOForkAttributePreFetcher extends RandomByteIOAttributePreFetcher<IResource>
 {

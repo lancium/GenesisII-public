@@ -1,9 +1,12 @@
 package edu.virginia.vcgr.genii.container.sync;
 
+import java.util.Collection;
+
+import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface ResourceSyncRunner
 {
@@ -17,4 +20,9 @@ public interface ResourceSyncRunner
 	 * Return the topic to which this replica must subscribe.
 	 */
 	public TopicPath getSyncTopic();
+
+	/**
+	 * Return attributes that are used to the govern behavior of a replica EPR creation process.
+	 * */
+	public Collection<MessageElement> getDefaultAttributes(EndpointReferenceType primaryEPR);
 }

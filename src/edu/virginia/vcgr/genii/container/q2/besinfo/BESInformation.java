@@ -48,6 +48,8 @@ public class BESInformation
 	private boolean _isAcceptingNewActivites;
 	private long _numContainedActivities;
 
+	BESConstants bconsts = new BESConstants();
+
 	private Set<String> _supportedFilesystems = new HashSet<String>();
 
 	public BESInformation(GetFactoryAttributesDocumentResponseType attrs)
@@ -95,7 +97,7 @@ public class BESInformation
 				MessageElement[] resourceAny = d2.get_any();
 				if (resourceAny != null) {
 					for (MessageElement anyE : resourceAny) {
-						if (anyE.getQName().equals(BESConstants.BES_WALLCLOCK_TIMELIMIT_ATTR)) {
+						if (anyE.getQName().equals(bconsts.BES_WALLCLOCK_TIMELIMIT_ATTR)) {
 							try {
 								_wallclockTimeLimit = (Double) ObjectDeserializer.toObject(anyE, Double.class);
 							} catch (Throwable cause) {
@@ -122,7 +124,7 @@ public class BESInformation
 						} catch (Throwable cause) {
 							_logger.warn("Unable to parse matching parameters " + "from BES information.");
 						}
-					} else if (elementName.equals(BESConstants.FILESYSTEM_SUPPORT_ATTR)) {
+					} else if (elementName.equals(bconsts.FILESYSTEM_SUPPORT_ATTR)) {
 						String fs = a.getValue();
 						if (fs != null && fs.length() > 0)
 							_supportedFilesystems.add(fs);

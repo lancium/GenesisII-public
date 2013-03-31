@@ -5,11 +5,11 @@ import org.morgan.inject.MInject;
 import org.morgan.inject.MInjectResolver;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.resource.ResourceLock;
+import edu.virginia.vcgr.genii.client.resource.ResourceLock;
+import edu.virginia.vcgr.genii.client.resource.StringResourceIdentifier;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.resource.StringResourceIdentifier;
 
 public class ResourceMInjectResolver implements MInjectResolver
 {

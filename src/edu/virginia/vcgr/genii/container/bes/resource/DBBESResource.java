@@ -31,20 +31,20 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.bes.BESPolicy;
+import edu.virginia.vcgr.genii.client.bes.BESPolicyActions;
 import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.bes.BES;
-import edu.virginia.vcgr.genii.container.bes.BESPolicy;
-import edu.virginia.vcgr.genii.container.bes.BESPolicyActions;
 import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class DBBESResource extends BasicDBResource implements IBESResource
 {

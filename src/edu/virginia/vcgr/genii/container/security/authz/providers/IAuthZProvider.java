@@ -21,11 +21,11 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
@@ -43,7 +43,7 @@ public interface IAuthZProvider
 
 	/**
 	 * Configures the resource with default access control state. This configuration may be based
-	 * upon informatin within the specified working context
+	 * upon information within the specified working context
 	 */
 	public void setDefaultAccess(ICallingContext callingContext, IResource resource, X509Certificate[] serviceCertChain)
 		throws AuthZSecurityException, ResourceException;

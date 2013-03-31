@@ -1,10 +1,12 @@
 package edu.virginia.vcgr.genii.container;
 
+import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHook;
+
 public class PostStartupRunnable implements Runnable
 {
-	private IContainerManaged _service;
+	private IServiceWithCleanupHook _service;
 
-	public PostStartupRunnable(IContainerManaged service)
+	public PostStartupRunnable(IServiceWithCleanupHook service)
 	{
 		_service = service;
 	}

@@ -23,15 +23,17 @@ import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.gfs.GenesisIIACLManager;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAQNameList;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AxisAcl;
+import edu.virginia.vcgr.genii.client.utils.units.AxisDuration;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
-import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryDialects;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.AuthZConfigUpdateNotification;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.container.Container;
@@ -40,7 +42,7 @@ import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
 import edu.virginia.vcgr.genii.container.notification.EnhancedNotificationBrokerFactoryServiceImpl;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
-import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
@@ -122,7 +124,7 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 	{
 		Duration gDur = _baseService.getCacheCoherenceWindow();
 		if (gDur != null) {
-			return new MessageElement(GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_QNAME, gDur.toApacheDuration());
+			return new MessageElement(GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_QNAME, AxisDuration.toApacheDuration(gDur));
 		} else
 			return null;
 	}
@@ -134,7 +136,7 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 			try {
 				org.apache.axis.types.Duration aDur = (org.apache.axis.types.Duration) mel
 					.getObjectValue(org.apache.axis.types.Duration.class);
-				gDur = Duration.fromApacheDuration(aDur);
+				gDur = AxisDuration.fromApacheDuration(aDur);
 			} catch (Exception e) {
 				throw new ResourceException("Unable to set cache coherence window.", e);
 			}
@@ -146,7 +148,8 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getPermissionsString() throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+			.getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
@@ -158,7 +161,8 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getAuthZConfig() throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+			.getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null) {
 			config = authZHandler.getAuthZConfig(resource);
@@ -187,7 +191,8 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 		}
 
 		// get the authZ handler
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+			.getServiceName());
 		if (authZHandler == null) {
 			throw new ResourceException("Resource does not have an AuthZ module");
 		}
@@ -225,15 +230,15 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 
 	public MessageElement getFixedTopicSet() throws SOAPException
 	{
-		return new MessageElement(WSRFConstants.FIXED_TOPIC_SET_QNAME, false);
+		return new MessageElement(WSRFConstants.FIXED_TOPIC_SET_QNAME(), false);
 	}
 
 	public Collection<MessageElement> getTopicExpressionDialect() throws SOAPException, MalformedURIException
 	{
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(2);
-		ret.add(new MessageElement(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP, new URI(TopicQueryDialects.Simple.dialect()
+		ret.add(new MessageElement(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP(), new URI(TopicQueryDialects.Simple.dialect()
 			.toString())));
-		ret.add(new MessageElement(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP, new URI(TopicQueryDialects.Concrete.dialect()
+		ret.add(new MessageElement(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP(), new URI(TopicQueryDialects.Concrete.dialect()
 			.toString())));
 		return ret;
 	}
@@ -245,7 +250,7 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 		Collection<MessageElement> ret = new ArrayList<MessageElement>(paths.size());
 
 		for (TopicPath path : paths) {
-			ret.add(path.asConcreteQueryExpression().toTopicExpressionElement(WSRFConstants.TOPIC_EXPRESSION_RP, "ts%d"));
+			ret.add(path.asConcreteQueryExpression().toTopicExpressionElement(WSRFConstants.TOPIC_EXPRESSION_RP(), "ts%d"));
 		}
 
 		return ret;
@@ -254,7 +259,7 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getTopicSet() throws SOAPException
 	{
 		TopicSet set = TopicSet.forPublisher(_baseService.getClass());
-		return set.describe(WSRFConstants.TOPIC_SET_RP);
+		return set.describe(WSRFConstants.TOPIC_SET_RP());
 	}
 
 	public MessageElement getNotificationBrokerFactoryAddress() throws SOAPException
@@ -266,10 +271,10 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException
 	{
-		addHandler(WSRFConstants.FIXED_TOPIC_SET_QNAME, "getFixedTopicSet");
-		addHandler(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP, "getTopicExpressionDialect");
-		addHandler(WSRFConstants.TOPIC_EXPRESSION_RP, "getTopicExpressions");
-		addHandler(WSRFConstants.TOPIC_SET_RP, "getTopicSet");
+		addHandler(WSRFConstants.FIXED_TOPIC_SET_QNAME(), "getFixedTopicSet");
+		addHandler(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP(), "getTopicExpressionDialect");
+		addHandler(WSRFConstants.TOPIC_EXPRESSION_RP(), "getTopicExpressions");
+		addHandler(WSRFConstants.TOPIC_SET_RP(), "getTopicSet");
 		addHandler(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, "getMatchingParameters");
 
 		addHandler(OGSAWSRFBPConstants.CURRENT_TIME_ATTR_QNAME, "getCurrentTimeAttr");

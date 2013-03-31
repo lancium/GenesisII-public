@@ -1,4 +1,0 @@
-Usage:
-
-qsub <queue-path> [--priority=<priority>] <jsdl-file>
-

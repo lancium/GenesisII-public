@@ -29,11 +29,11 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.tty.TTYConstants;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.byteio.TransferAgent;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.tty.TTYPortType;
@@ -46,8 +46,8 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 	{
 		super("TTYPortType");
 
-		addImplementedPortType(TTYConstants.TTY_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE);
+		addImplementedPortType(TTYConstants.TTY_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE());
 	}
 
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
@@ -60,7 +60,7 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return TTYConstants.TTY_PORT_TYPE;
+		return TTYConstants.TTY_PORT_TYPE();
 	}
 
 	private void handleSeek(URI seekOrigin, long offset) throws SeekNotPermittedFaultType

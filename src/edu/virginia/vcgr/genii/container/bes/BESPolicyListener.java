@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.container.bes;
 
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
+import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 
 public interface BESPolicyListener
 {

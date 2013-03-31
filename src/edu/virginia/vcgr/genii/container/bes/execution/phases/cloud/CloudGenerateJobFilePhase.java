@@ -7,9 +7,9 @@ import java.io.Serializable;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
-import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
+import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 
 public class CloudGenerateJobFilePhase implements ExecutionPhase, Serializable
 {

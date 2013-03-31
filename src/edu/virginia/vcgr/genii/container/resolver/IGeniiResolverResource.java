@@ -6,8 +6,9 @@ import java.util.HashMap;
 
 import org.apache.axis.types.URI;
 import org.ws.addressing.EndpointReferenceType;
+
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IGeniiResolverResource extends IResource
 {

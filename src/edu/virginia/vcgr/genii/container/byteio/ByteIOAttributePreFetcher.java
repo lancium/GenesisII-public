@@ -10,8 +10,8 @@ import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public abstract class ByteIOAttributePreFetcher<Type extends IResource> extends DefaultGenesisIIAttributesPreFetcher<Type>
 {

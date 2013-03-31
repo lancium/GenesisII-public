@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 
 public interface StreamRedirectionSource extends Serializable
 {

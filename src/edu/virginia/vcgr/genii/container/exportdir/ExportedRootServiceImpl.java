@@ -20,6 +20,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -27,15 +28,14 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescent;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallback;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallbackResult;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.exportdir.ExportedDirPortType;
 import edu.virginia.vcgr.genii.exportdir.ExportedRootPortType;
 import edu.virginia.vcgr.genii.exportdir.QuitExport;
@@ -60,7 +60,7 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements E
 	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE());
 	}
 
 	protected ResourceKey createResource(HashMap<QName, Object> creationParameters) throws ResourceException, BaseFaultType

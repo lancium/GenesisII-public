@@ -6,10 +6,10 @@ import java.io.Serializable;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
+import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.context.ClientContextResolver;
 import edu.virginia.vcgr.genii.client.context.ContextFileSystem;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 
 public class CloudSetupContextDirectoryPhase implements ExecutionPhase, Serializable
 {

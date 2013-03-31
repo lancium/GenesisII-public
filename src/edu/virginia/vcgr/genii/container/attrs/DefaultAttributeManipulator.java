@@ -29,7 +29,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rp_2.UnableToModifyResourcePropertyFaultType;
 import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesRequestFailedFaultType;
 
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 
 public class DefaultAttributeManipulator implements IAttributeManipulator
 {

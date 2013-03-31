@@ -14,15 +14,15 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.history.HistoryEventSource;
 import edu.virginia.vcgr.genii.client.history.SimpleStringHistoryEventSource;
 import edu.virginia.vcgr.genii.client.history.WSNamingHistoryEventSource;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
@@ -131,7 +131,7 @@ public class HistoryContextFactory
 			if (contextObject instanceof String)
 				resourceID = (String) contextObject;
 			else if (contextObject instanceof IResource)
-				rKey = ((IResource) contextObject).getParentResourceKey();
+				rKey = (ResourceKey) ((IResource) contextObject).getParentResourceKey();
 			else if (contextObject instanceof ResourceKey)
 				rKey = (ResourceKey) contextObject;
 			else if (contextObject instanceof ICallingContext)

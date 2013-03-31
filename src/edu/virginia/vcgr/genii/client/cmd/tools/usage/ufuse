@@ -1,3 +1,0 @@
-fuse --mount <mount-point> [--sandbox=<path>] [--uid=<uid>] --daemon
-	OR
-fuse --unmount <mount-point>

@@ -7,10 +7,13 @@ import java.io.IOException;
 
 import javax.xml.namespace.QName;
 
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.resource.IResource;
+import edu.virginia.vcgr.genii.client.resource.MissingConstructionParamException;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
+import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 
 public class RequiredConstructionParamWorker
 {
@@ -31,7 +34,8 @@ public class RequiredConstructionParamWorker
 		try {
 			// perform any authz initialization of the resource for the authz
 			// handler specified
-			IAuthZProvider handler = AuthZProviders.getProvider(resource.getParentResourceKey().getServiceName());
+			IAuthZProvider handler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
+				.getServiceName());
 			ICallingContext context = null;
 			try {
 				context = ContextManager.getExistingContext();

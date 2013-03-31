@@ -26,8 +26,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 final public class AttributePackage
 {

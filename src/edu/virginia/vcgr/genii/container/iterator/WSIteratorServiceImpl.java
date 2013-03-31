@@ -17,7 +17,6 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.iterator.IteratorConstants;
-import edu.virginia.vcgr.genii.client.iterator.WSIteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
@@ -51,13 +50,13 @@ public class WSIteratorServiceImpl extends GenesisIIBase implements WSIteratorPo
 	{
 		super(SERVICE_NAME);
 
-		addImplementedPortType(IteratorConstants.ITERATOR_PORT_TYPE);
+		addImplementedPortType(IteratorConstants.ITERATOR_PORT_TYPE());
 	}
 
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return IteratorConstants.ITERATOR_PORT_TYPE;
+		return IteratorConstants.ITERATOR_PORT_TYPE();
 	}
 
 	@Override

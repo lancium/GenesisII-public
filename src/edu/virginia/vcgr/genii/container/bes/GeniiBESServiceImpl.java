@@ -57,6 +57,7 @@ import edu.virginia.cs.vcgr.genii.job_management.JobErrorPacket;
 import edu.virginia.cs.vcgr.genii.job_management.QueryErrorRequest;
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobRequestType;
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobResponseType;
+import edu.virginia.vcgr.genii.algorithm.graph.GridDependency;
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
@@ -66,6 +67,7 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -87,7 +89,6 @@ import edu.virginia.vcgr.genii.container.bes.resource.BESDBResourceProvider;
 import edu.virginia.vcgr.genii.container.bes.resource.DBBESResourceFactory;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 import edu.virginia.vcgr.genii.container.cservices.history.InMemoryHistoryEventSink;
@@ -96,7 +97,6 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
-import edu.virginia.vcgr.genii.graph.GridDependency;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.jsdl.JobDefinition;
@@ -105,9 +105,11 @@ import edu.virginia.vcgr.jsdl.JobDefinition;
 @ConstructionParametersType(BESConstructionParameters.class)
 @GeniiServiceConfiguration(resourceProvider = BESDBResourceProvider.class)
 @GridDependency(BESActivityServiceImpl.class)
-public class GeniiBESServiceImpl extends ResourceForkBaseService implements GeniiBESPortType, BESConstants
+public class GeniiBESServiceImpl extends ResourceForkBaseService implements GeniiBESPortType
 {
 	static private Log _logger = LogFactory.getLog(GeniiBESServiceImpl.class);
+
+	BESConstants bconsts = new BESConstants();
 
 	@MInject(lazy = true)
 	private IBESResource _resource;
@@ -225,15 +227,15 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	{
 		super("GeniiBESPortType");
 
-		addImplementedPortType(BES_FACTORY_PORT_TYPE);
-		addImplementedPortType(BES_MANAGEMENT_PORT_TYPE);
-		addImplementedPortType(GENII_BES_PORT_TYPE);
+		addImplementedPortType(bconsts.BES_FACTORY_PORT_TYPE());
+		addImplementedPortType(bconsts.BES_MANAGEMENT_PORT_TYPE());
+		addImplementedPortType(bconsts.GENII_BES_PORT_TYPE());
 	}
 
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return GENII_BES_PORT_TYPE;
+		return bconsts.GENII_BES_PORT_TYPE();
 	}
 
 	@Override
@@ -271,7 +273,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		if (any != null) {
 			for (MessageElement a : any) {
 				QName name = a.getQName();
-				if (name.equals(BESConstants.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME)) {
+				if (name.equals(bconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME)) {
 					subscribe = a;
 				}
 			}
@@ -389,8 +391,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		URI localResourceManagerType = null;
 
 		try {
-			namingProfiles = new URI[] { new URI(BESConstants.NAMING_PROFILE_WS_ADDRESSING),
-				new URI(BESConstants.NAMING_PROFILE_WS_NAMING) };
+			namingProfiles = new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING),
+				new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
 			besExtensions = new URI[0];
 
 			BESConstructionParameters consParms = (BESConstructionParameters) _resource.constructionParameters(getClass());

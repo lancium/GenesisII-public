@@ -33,7 +33,11 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.notification.NotificationBrokerConstants;
+import edu.virginia.vcgr.genii.client.notification.NotificationBrokerTopics;
+import edu.virginia.vcgr.genii.client.notification.TestNotificationMessageContents;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
@@ -50,7 +54,6 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.ClientConfig;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerPortType;
@@ -272,7 +275,7 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 	@Override
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.ENHANCED_NOTIFICATION_BROKER_PORT;
+		return WellKnownPortTypes.ENHANCED_NOTIFICATION_BROKER_PORT();
 	}
 
 	@RWXMapping(RWXCategory.WRITE)

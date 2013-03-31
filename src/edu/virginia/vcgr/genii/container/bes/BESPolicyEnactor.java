@@ -7,6 +7,8 @@ import java.util.Collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.bes.BESPolicy;
+import edu.virginia.vcgr.genii.client.bes.BESPolicyActions;
 import edu.virginia.vcgr.genii.client.machine.MachineFacetUpdater;
 import edu.virginia.vcgr.genii.client.machine.MachineListener;
 

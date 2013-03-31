@@ -9,7 +9,6 @@
 	<classpathentry kind="lib" path="ext/jfreechart/jcommon-1.0.16.jar"/>
 	<classpathentry kind="lib" path="ext/wss4j-1.5.6.jar" sourcepath="/home/fred/xsede/code/others/wss4j/src"/>
 	<classpathentry kind="lib" path="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
-	<classpathentry kind="lib" path="lib/GenesisII-ws.jar" sourcepath="/Axis 1.4/src"/>
 	<classpathentry kind="lib" path="bundles/org.eclipse.osgi_3.8.0.v20120529-1548.jar"/>
 	<classpathentry kind="lib" path="bundles/com.jcraft.jsch_0.1.46.v201205102330.jar"/>
 	<classpathentry kind="lib" path="bundles/javax.xml.ws_2.1.0.v200902101523.jar"/>
@@ -42,7 +41,6 @@
 	<classpathentry kind="lib" path="ext/MorganUtilities.jar"/>
 	<classpathentry kind="lib" path="ext/CmdLineManipulator.jar"/>
 	<classpathentry kind="lib" path="ext/svnkit.jar"/>
-	<classpathentry kind="lib" path="ext/dpage.jar"/>
 	<classpathentry kind="lib" path="ext/MyProxyLogon.jar"/>
 	<classpathentry kind="lib" path="ext/typica.jar"/>
 	<classpathentry kind="lib" path="ext/fuse-j.jar"/>
@@ -50,7 +48,11 @@
 	<classpathentry kind="lib" path="ext/MNaming.jar"/>
 	<classpathentry kind="lib" path="ext/derby.jar"/>
 	<classpathentry kind="lib" path="bundles/bundle-u6security_1.0.66.jar"/>
+	<classpathentry kind="lib" path="ext/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="ext/dpage.jar"/>
 	<classpathentry kind="lib" path="ext/gffs-basics.jar"/>
 	<classpathentry kind="lib" path="ext/gffs-security.jar"/>
+	<classpathentry kind="lib" path="ext/gffs-structure.jar" sourcepath="/gffs-structure"/>
+	<classpathentry kind="lib" path="ext/gffs-webservices.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

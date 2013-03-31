@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
-import edu.virginia.vcgr.genii.client.osgi.OSGiSupport;
+import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 
 public class TestCommandLineParser
 {

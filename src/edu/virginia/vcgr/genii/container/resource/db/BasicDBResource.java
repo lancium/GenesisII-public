@@ -26,10 +26,13 @@ import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.resource.Rollbackable;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -38,10 +41,8 @@ import edu.virginia.vcgr.genii.container.common.notification.SubscriptionsDataba
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class BasicDBResource implements IResource
 {
@@ -324,9 +325,10 @@ public class BasicDBResource implements IResource
 		}
 	}
 
-	public ResourceKey getParentResourceKey()
+	@Override
+	public Rollbackable getParentResourceKey()
 	{
-		return _parentKey;
+		return (Rollbackable) _parentKey;
 	}
 
 	static protected void destroyAll(Connection connection, Collection<String> keys) throws ResourceException
@@ -632,4 +634,10 @@ public class BasicDBResource implements IResource
 			StreamUtils.close(stmt);
 		}
 	}
+
+	/*
+	 * @Override public void commitResource() throws ResourceException { commit(); }
+	 * 
+	 * @Override public void rollbackResource() { rollback(); }
+	 */
 }

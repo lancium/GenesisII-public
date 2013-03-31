@@ -2,9 +2,9 @@ package edu.virginia.vcgr.genii.container.replicatedExport.resolver;
 
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 
 interface IRExportResolverResource extends IResource
 {

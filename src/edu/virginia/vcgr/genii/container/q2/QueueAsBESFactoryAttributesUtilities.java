@@ -41,6 +41,8 @@ class QueueAsBESFactoryAttributesUtilities
 	private ResourceOverrides _resO;
 	private Collection<BESInformation> _allBESInformation;
 
+	BESConstants bconsts = new BESConstants();
+
 	private OperatingSystem_Type operatingSystem()
 	{
 		OperatingSystemNames osName = _resO.operatingSystemName();
@@ -73,7 +75,7 @@ class QueueAsBESFactoryAttributesUtilities
 
 		Collection<MessageElement> ret = new ArrayList<MessageElement>(supportedFilesystems.size());
 		for (String fs : supportedFilesystems)
-			ret.add(new MessageElement(BESConstants.FILESYSTEM_SUPPORT_ATTR, fs));
+			ret.add(new MessageElement(bconsts.FILESYSTEM_SUPPORT_ATTR, fs));
 
 		return ret;
 	}
@@ -227,8 +229,8 @@ class QueueAsBESFactoryAttributesUtilities
 		URI localResourceManagerType = ResourceManagerType.GridQueue.toApacheAxisURI();
 
 		try {
-			namingProfiles = new URI[] { new URI(BESConstants.NAMING_PROFILE_WS_ADDRESSING),
-				new URI(BESConstants.NAMING_PROFILE_WS_NAMING) };
+			namingProfiles = new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING),
+				new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
 		} catch (MalformedURIException e) {
 			namingProfiles = new URI[0];
 		}
@@ -242,7 +244,7 @@ class QueueAsBESFactoryAttributesUtilities
 
 		Long wallclockTimeLimit = wallclockTimeLimit();
 		if (wallclockTimeLimit != null)
-			any.add(new MessageElement(BESConstants.BES_WALLCLOCK_TIMELIMIT_ATTR, wallclockTimeLimit));
+			any.add(new MessageElement(bconsts.BES_WALLCLOCK_TIMELIMIT_ATTR, wallclockTimeLimit));
 		for (MatchingParameter parameter : allMatchingParameters())
 			any.add(new MessageElement(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, parameter.toAxisType()));
 

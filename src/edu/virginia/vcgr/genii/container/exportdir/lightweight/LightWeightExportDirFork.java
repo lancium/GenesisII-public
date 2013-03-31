@@ -16,6 +16,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.disk.DiskExportEntry;
 import edu.virginia.vcgr.genii.container.iterator.FileOrDir;
@@ -32,7 +33,6 @@ import edu.virginia.vcgr.genii.container.rfork.iterator.InMemoryIterableFork;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.rns.Prefetcher;
 import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 

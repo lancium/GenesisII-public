@@ -31,7 +31,7 @@ public class WSIteratorDBResourceFactory extends BasicDBResourceFactory
 	public WSIteratorResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
 		try {
-			return new WSIteratorDBResource(parentKey, _pool);
+			return new WSIteratorDBResource((ResourceKey) parentKey, _pool);
 		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}

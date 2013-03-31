@@ -3,9 +3,9 @@ package edu.virginia.vcgr.genii.container.security.authz.providers;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import edu.virginia.vcgr.genii.client.sync.VersionVector;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.common.security.AclEntryListType;
-import edu.virginia.vcgr.genii.container.sync.VersionVector;
 
 @XmlRootElement(namespace = AclChangeContents.GENII_ACL_NAMESPACE, name = "AclContentsChangedContents")
 public class AclChangeContents extends NotificationMessageContents

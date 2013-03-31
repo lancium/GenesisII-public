@@ -3,7 +3,10 @@ package edu.virginia.vcgr.genii.container.resolver;
 import java.io.EOFException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.util.Collection;
+import java.util.Collections;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,9 +15,9 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.sync.ReplicationThread;
 import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
 
@@ -56,5 +59,11 @@ public class GeniiResolverSyncRunner implements ResourceSyncRunner
 	public TopicPath getSyncTopic()
 	{
 		return ResolverTopics.RESOLVER_UPDATE_TOPIC;
+	}
+
+	@Override
+	public Collection<MessageElement> getDefaultAttributes(EndpointReferenceType primaryEPR)
+	{
+		return Collections.emptyList();
 	}
 }

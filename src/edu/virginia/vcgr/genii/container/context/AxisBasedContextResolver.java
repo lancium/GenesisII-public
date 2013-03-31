@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
@@ -34,6 +35,8 @@ import javax.xml.soap.SOAPMessage;
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
@@ -42,17 +45,21 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.CallingContextUtilities;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.IContextResolver;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 public class AxisBasedContextResolver implements IContextResolver
 {
+
+	private static Log _logger = LogFactory.getLog(AxisBasedContextResolver.class);
+
 	static private void storeToFile(Element em) throws IOException
 	{
 		/* For debugging only */
@@ -121,10 +128,14 @@ public class AxisBasedContextResolver implements IContextResolver
 		// place the resource's key material in the transient calling context
 		// so that it may be properly used for outgoing messages
 		try {
+			PrivateKey privateKey = (PrivateKey) resource.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
+			if (privateKey != null) {
+				_logger.info("Using resource's own private key: " + ResourceManager.getCurrentResource().getServiceName());
+			}
 			Certificate[] targetCertChain = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			if ((targetCertChain != null) && (targetCertChain.length > 0)) {
-				retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) targetCertChain, Container
-					.getContainerPrivateKey()));
+				retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) targetCertChain,
+					(privateKey != null) ? privateKey : Container.getContainerPrivateKey()));
 			}
 		} catch (GeneralSecurityException e) {
 			throw new AuthZSecurityException(e.getMessage(), e);

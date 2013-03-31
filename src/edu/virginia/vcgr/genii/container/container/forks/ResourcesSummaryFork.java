@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;

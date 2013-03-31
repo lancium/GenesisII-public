@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -16,10 +18,10 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.sync.ReplicationThread;
 import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
 
@@ -84,6 +86,12 @@ public class GeniiFileSyncRunner implements ResourceSyncRunner
 	public TopicPath getSyncTopic()
 	{
 		return ByteIOTopics.BYTEIO_CONTENTS_CHANGED_TOPIC;
+	}
+
+	@Override
+	public Collection<MessageElement> getDefaultAttributes(EndpointReferenceType primaryEPR)
+	{
+		return Collections.emptyList();
 	}
 
 	/**

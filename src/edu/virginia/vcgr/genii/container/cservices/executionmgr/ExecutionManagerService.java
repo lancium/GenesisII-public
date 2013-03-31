@@ -4,8 +4,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
-import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
 
 public class ExecutionManagerService extends AbstractContainerService
 {

@@ -21,7 +21,6 @@ import org.morgan.util.Pair;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
-import edu.virginia.vcgr.genii.client.iterator.WSIteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -29,6 +28,7 @@ import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
+import edu.virginia.vcgr.genii.container.iterator.WSIteratorConstructionParameters;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 

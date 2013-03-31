@@ -19,8 +19,8 @@ public class GridTesterTool extends BaseGridTool
 		RESULT_WIDTH - MIN_DOT_WIDTH;
 	
 	static final private String DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dgrid-tester";
-	static final private FileResource _MANPAGE = new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/man/grid-tester");
+		"config/tooldocs/description/dgrid-tester";
+	static final private FileResource _MANPAGE = new FileResource("config/tooldocs/man/grid-tester");
 	
 	/*
 	static final private String USAGE_PATTERN = "grid-tester { %s }";
