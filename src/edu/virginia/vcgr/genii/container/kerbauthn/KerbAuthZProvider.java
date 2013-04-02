@@ -65,8 +65,6 @@ public class KerbAuthZProvider extends AclAuthZProvider
 	@SuppressWarnings("unchecked")
 	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
 		Class<?> serviceClass, Method operation)
-	// throws PermissionDeniedException
-	// , AuthZSecurityException, ResourceException
 	{
 		// Try regular ACLs
 		try {

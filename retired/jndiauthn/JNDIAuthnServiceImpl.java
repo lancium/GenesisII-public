@@ -93,7 +93,7 @@ import edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnPortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.XMLCompatible;
-import edu.virginia.vcgr.genii.security.axis.AxisSAMLCredentials;
+import edu.virginia.vcgr.genii.security.axis.AxisCredentialWallet;
 import edu.virginia.vcgr.genii.security.axis.WSSecurityUtils;
 import edu.virginia.vcgr.genii.security.axis.XMLConverter;
 import edu.virginia.vcgr.genii.security.credentials.BasicConstraints;
@@ -328,7 +328,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
 
-		AxisSAMLCredentials creds = new AxisSAMLCredentials();
+		AxisCredentialWallet creds = new AxisCredentialWallet();
 
 		// Delegate the assertion to delegateTo
 		TrustCredential tc = new TrustCredential(delegateToChain, IdentityType.CONNECTION,
