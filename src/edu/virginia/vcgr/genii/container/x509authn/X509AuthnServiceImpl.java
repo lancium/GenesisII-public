@@ -82,7 +82,7 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.XMLCompatible;
-import edu.virginia.vcgr.genii.security.axis.AxisSAMLCredentials;
+import edu.virginia.vcgr.genii.security.axis.AxisCredentialWallet;
 import edu.virginia.vcgr.genii.security.axis.WSSecurityUtils;
 import edu.virginia.vcgr.genii.security.axis.XMLConverter;
 import edu.virginia.vcgr.genii.security.credentials.BasicConstraints;
@@ -201,7 +201,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 		try {
 			if (encodedCredential != null) {
-				AxisSAMLCredentials wallet = new AxisSAMLCredentials(
+				AxisCredentialWallet wallet = new AxisCredentialWallet(
 					(org.apache.axis.message.SOAPHeaderElement) encodedCredential);
 
 				if (wallet.getRealCreds().isEmpty()) {
@@ -277,7 +277,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			_logger.info("delegating to " + delegateToChain[0].getIssuerDN());
 
 		NuCredential credential = loadResourceCredential(_resource);
-		AxisSAMLCredentials creds = new AxisSAMLCredentials();
+		AxisCredentialWallet creds = new AxisCredentialWallet();
 		_logger.info("resource's credential is: " + credential.toString());
 		if (delegateToChain == null) {
 			_logger.info("delegate to chain was null...  ignoring credential.");
