@@ -289,8 +289,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		}
 
 		// set the identity of the service into the creation params
-		X509Certificate[] serviceChain = (X509Certificate[]) ResourceManager.getCurrentResource().dereference()
-			.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+		X509Certificate[] serviceChain =
+			(X509Certificate[]) ResourceManager.getCurrentResource().dereference()
+				.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 		creationParameters.put(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM, serviceChain);
 
 		return ResourceManager.createNewResource(_serviceName, creationParameters);
@@ -513,14 +514,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		TerminationTimeType ttt = request.terminationTime();
 		Calendar terminationTime = (ttt == null) ? null : ttt.terminationTime();
 
-		SubscriptionConstructionParameters cons = new SubscriptionConstructionParameters(resourceKey,
-			request.consumerReference(), request.topicFilter(), request.policies(), request.additionalUserData());
+		SubscriptionConstructionParameters cons =
+			new SubscriptionConstructionParameters(resourceKey, request.consumerReference(), request.topicFilter(),
+				request.policies(), request.additionalUserData());
 
 		if (terminationTime != null)
 			cons.timeToLive(terminationTime.getTimeInMillis() - currentTime.getTimeInMillis());
 
-		EndpointReferenceType subscription = new GeniiSubscriptionServiceImpl().CreateEPR(
-			new MessageElement[] { cons.serializeToMessageElement() }, Container.getServiceURL("GeniiSubscriptionPortType"));
+		EndpointReferenceType subscription =
+			new GeniiSubscriptionServiceImpl().CreateEPR(new MessageElement[] { cons.serializeToMessageElement() },
+				Container.getServiceURL("GeniiSubscriptionPortType"));
 
 		return new SubscribeResponse(subscription, currentTime, terminationTime, null);
 	}
@@ -541,8 +544,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	public final String ping(String request)
 	{
 		try {
-			EndpointReferenceType epr = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-				WorkingContext.EPR_PROPERTY_NAME);
+			EndpointReferenceType epr =
+				(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 			_logger.info(String.format("Container ID \"%s\".\n", EPRUtils.getGeniiContainerID(epr)));
 		} catch (ContextException ce) {
 			_logger.warn("Unable to get current EPR.");
@@ -595,8 +598,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		IAttributeManipulator manipulator = _attributePackage.getManipulator(getResourcePropertyRequest);
 
 		if (manipulator == null) {
-			Map<QName, Collection<MessageElement>> unknowns = _attributePackage.getUnknownAttributes(ResourceManager
-				.getCurrentResource().dereference());
+			Map<QName, Collection<MessageElement>> unknowns =
+				_attributePackage.getUnknownAttributes(ResourceManager.getCurrentResource().dereference());
 
 			if (!unknowns.containsKey(getResourcePropertyRequest))
 				throw FaultManipulator.fillInFault(new InvalidResourcePropertyQNameFaultType(null, null, null, null,
@@ -649,16 +652,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			}
 		}
 
-		ConstructionParameters cParams = (ConstructionParameters) constructionParameters
-			.get(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME);
+		ConstructionParameters cParams =
+			(ConstructionParameters) constructionParameters.get(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME);
 		if (cParams == null) {
 			cParams = ConstructionParameters.instantiateDefault(getClass());
 			constructionParameters.put(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME, cParams);
 		}
 
 		ResourceKey rKey = createResource(constructionParameters);
-		EndpointReferenceType epr = ResourceManager.createEPR(rKey, targetServiceURL, getImplementedPortTypes(rKey),
-			getMasterType(rKey));
+		EndpointReferenceType epr =
+			ResourceManager.createEPR(rKey, targetServiceURL, getImplementedPortTypes(rKey), getMasterType(rKey));
 
 		WorkingContext.temporarilyAssumeNewIdentity(epr);
 		WorkingContext.getCurrentWorkingContext().setProperty(WorkingContext.CURRENT_RESOURCE_KEY, rKey);
@@ -712,12 +715,12 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		if (!allowVcgrCreate()) {
 			throw new RemoteException("\"vcgrCreate\" not applicable.");
 		}
-		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-			WorkingContext.EPR_PROPERTY_NAME);
+		EndpointReferenceType myEPR =
+			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 
 		if (myEPR == null) {
-			myEPR = new EndpointReferenceType(new AttributedURITypeSmart(Container.getServiceURL(_serviceName)), null, null,
-				null);
+			myEPR =
+				new EndpointReferenceType(new AttributedURITypeSmart(Container.getServiceURL(_serviceName)), null, null, null);
 			WorkingContext.getCurrentWorkingContext().setProperty(WorkingContext.EPR_PROPERTY_NAME, myEPR);
 		}
 
@@ -738,8 +741,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			}
 		}
 
-		ConstructionParameters cParams = (ConstructionParameters) constructionParameters
-			.get(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME);
+		ConstructionParameters cParams =
+			(ConstructionParameters) constructionParameters.get(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME);
 		if (cParams == null) {
 			cParams = ConstructionParameters.instantiateDefault(getClass());
 			constructionParameters.put(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME, cParams);
@@ -748,12 +751,13 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		ResourceKey rKey = createResource(constructionParameters);
 		AttributedURIType targetAddress = myEPR.getAddress();
 		if (EPRUtils.getGeniiContainerID(myEPR) == null) {
-			targetAddress = new AttributedURIType(String.format("%s?%s=%s", targetAddress.get_value(),
-				EPRUtils.GENII_CONTAINER_ID_PARAMETER, Container.getContainerID()));
+			targetAddress =
+				new AttributedURIType(String.format("%s?%s=%s", targetAddress.get_value(),
+					EPRUtils.GENII_CONTAINER_ID_PARAMETER, Container.getContainerID()));
 		}
 
-		EndpointReferenceType epr = ResourceManager.createEPR(rKey, targetAddress.toString(), getImplementedPortTypes(rKey),
-			getMasterType(rKey));
+		EndpointReferenceType epr =
+			ResourceManager.createEPR(rKey, targetAddress.toString(), getImplementedPortTypes(rKey), getMasterType(rKey));
 
 		if (!(this instanceof GeniiNoOutCalls)) {
 			try {
@@ -811,8 +815,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		try {
 			IResolverFactoryProxy resolverFactoryProxy = getDefaultResolverFactoryProxy();
 			if (resolverFactoryProxy != null) {
-				EndpointReferenceType resolvedEPR = resolverFactoryProxy.createResolver(newEPR, null,
-					resolverCreationParamsArray);
+				EndpointReferenceType resolvedEPR =
+					resolverFactoryProxy.createResolver(newEPR, null, resolverCreationParamsArray);
 				if (resolvedEPR == null) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Resolver proxy failed for service " + _serviceName);
@@ -863,8 +867,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				X509Certificate[] containerChain = Container.getContainerCertChain();
 				// If this is null, then security isn't turned on.
 				if (containerChain != null) {
-					serviceCertSpec = new CertCreationSpec(containerChain[0].getPublicKey(), containerChain,
-						Container.getContainerPrivateKey(), getServiceCertificateLifetime());
+					serviceCertSpec =
+						new CertCreationSpec(containerChain[0].getPublicKey(), containerChain,
+							Container.getContainerPrivateKey(), getServiceCertificateLifetime());
 
 					constructionParameters.put(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM, serviceCertSpec);
 				}
@@ -1107,8 +1112,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			writer.flush();
 			InputSource inputSource = new InputSource(new ByteArrayInputStream(baos.toByteArray()));
 
-			String str = (String) XPathFactory.newInstance().newXPath()
-				.evaluate("/*/Ticker", inputSource, XPathConstants.STRING);
+			String str =
+				(String) XPathFactory.newInstance().newXPath().evaluate("/*/Ticker", inputSource, XPathConstants.STRING);
 			System.err.println("The String is \"" + str + "\".");
 
 			return null;
@@ -1333,8 +1338,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				firstBlockList.add(item);
 			}
 
-			WSIteratorConstructionParameters consParms = new WSIteratorConstructionParameters(iterator(), preferredBatchSize(),
-				imiw);
+			WSIteratorConstructionParameters consParms =
+				new WSIteratorConstructionParameters(iterator(), preferredBatchSize(), imiw);
 
 			try {
 				MessageElement[] firstBlock = firstBlockList.toArray(new MessageElement[firstBlockList.size()]);
@@ -1342,16 +1347,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				if (firstBlock != null) {
 					batchElements = new IterableElementType[firstBlock.length];
 					for (int lcv = 0; lcv < firstBlock.length; lcv++)
-						batchElements[lcv] = new IterableElementType(new MessageElement[] { firstBlock[lcv] },
-							new UnsignedLong(lcv));
+						batchElements[lcv] =
+							new IterableElementType(new MessageElement[] { firstBlock[lcv] }, new UnsignedLong(lcv));
 				}
 
 				Object tempObj = new Object();
 
 				if (consParms.remainingContents(tempObj))
-					iteratorEndpoint = new WSIteratorServiceImpl().CreateEPR(
-						new MessageElement[] { consParms.serializeToMessageElement() },
-						Container.getServiceURL("WSIteratorPortType"));
+					iteratorEndpoint =
+						new WSIteratorServiceImpl().CreateEPR(new MessageElement[] { consParms.serializeToMessageElement() },
+							Container.getServiceURL("WSIteratorPortType"));
 
 				return new IteratorInitializationType(iteratorEndpoint, batchElements);
 			} finally {

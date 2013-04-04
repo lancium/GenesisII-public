@@ -108,8 +108,8 @@ public class AutoReplicate
 		List<MessageElement> attributes = new ArrayList<MessageElement>();
 		attributes.addAll(runner.getDefaultAttributes(primaryEPR));
 		attributes.add(new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, endpointIdentifier));
-		EndpointReferenceType localEPR = service.CreateEPR(attributes.toArray(new MessageElement[attributes.size()]),
-			serviceURL);
+		EndpointReferenceType localEPR =
+			service.CreateEPR(attributes.toArray(new MessageElement[attributes.size()]), serviceURL);
 		AddressingParameters ap = new AddressingParameters(localEPR.getReferenceParameters());
 		String rkString = ap.getResourceKey();
 

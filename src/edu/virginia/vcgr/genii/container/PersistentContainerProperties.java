@@ -97,8 +97,8 @@ public class PersistentContainerProperties
 			stmt.setString(1, name);
 			stmt.executeUpdate();
 			stmt.close();
-			stmt = connection.prepareStatement("INSERT INTO containerproperties("
-				+ "propertyname, propertyvalue) VALUES (?, ?)");
+			stmt =
+				connection.prepareStatement("INSERT INTO containerproperties(" + "propertyname, propertyvalue) VALUES (?, ?)");
 			stmt.setString(1, name);
 
 			Blob b = DBSerializer.toBlob(value, "containerproperties", "propertyvalue");

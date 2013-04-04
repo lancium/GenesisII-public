@@ -24,8 +24,8 @@ public class NotificationMessageIndexPropagator extends BasicHandler
 		ClientConfig clientConfig = ClientConfig.getCurrentClientConfig();
 		if (clientConfig != null) {
 			String clientId = clientConfig.getClientId();
-			WSNotificationContainerService notificationService = ContainerServices
-				.findService(WSNotificationContainerService.class);
+			WSNotificationContainerService notificationService =
+				ContainerServices.findService(WSNotificationContainerService.class);
 			Integer messageIndex = notificationService.getMessageIndexOfBroker(clientId);
 			if (messageIndex != null) {
 				setNotificationMessageIndex(messageIndex, msgContext);
@@ -35,8 +35,8 @@ public class NotificationMessageIndexPropagator extends BasicHandler
 
 	private void setNotificationMessageIndex(int messageIndex, MessageContext msgContext) throws AxisFault
 	{
-		SOAPHeaderElement messageIndexHeader = new SOAPHeaderElement(NotificationBrokerConstants.MESSAGE_INDEX_QNAME,
-			messageIndex);
+		SOAPHeaderElement messageIndexHeader =
+			new SOAPHeaderElement(NotificationBrokerConstants.MESSAGE_INDEX_QNAME, messageIndex);
 		messageIndexHeader.setActor(null);
 		messageIndexHeader.setMustUnderstand(false);
 		try {

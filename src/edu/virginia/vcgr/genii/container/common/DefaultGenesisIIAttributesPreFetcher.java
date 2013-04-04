@@ -53,8 +53,8 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extend
 	{
 		IResource resource = getResource();
 
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-			.getServiceName());
+		IAuthZProvider authZHandler =
+			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
@@ -65,8 +65,8 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extend
 	protected AuthZConfig getAuthZConfig() throws Throwable
 	{
 		IResource resource = getResource();
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-			.getServiceName());
+		IAuthZProvider authZHandler =
+			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
@@ -82,8 +82,8 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extend
 			}
 
 			String brokerFactoryUrl = Container.getServiceURL(EnhancedNotificationBrokerFactoryServiceImpl.SERVICE_URL);
-			MessageElement notificationBrokerFactoryElement = new MessageElement(
-				GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS, brokerFactoryUrl);
+			MessageElement notificationBrokerFactoryElement =
+				new MessageElement(GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS, brokerFactoryUrl);
 			attributes.add(notificationBrokerFactoryElement);
 		} catch (Throwable cause) {
 			_logger.warn("Unable to fill in permissions attribute.", cause);

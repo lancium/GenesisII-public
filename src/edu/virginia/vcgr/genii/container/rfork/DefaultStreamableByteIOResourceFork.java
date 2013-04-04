@@ -41,10 +41,10 @@ public class DefaultStreamableByteIOResourceFork extends AbstractStreamableByteI
 				if (ap != null) {
 					ResourceForkInformation info = (ResourceForkInformation) ap.getResourceForkInformation();
 					if (info != null) {
-						DefaultStreamableByteIOResourceFork fork = (DefaultStreamableByteIOResourceFork) info
-							.instantiateFork(null);
-						Class<? extends StreamableByteIOFactoryResourceFork> dependentForkClass = fork._dependentFork
-							.getClass();
+						DefaultStreamableByteIOResourceFork fork =
+							(DefaultStreamableByteIOResourceFork) info.instantiateFork(null);
+						Class<? extends StreamableByteIOFactoryResourceFork> dependentForkClass =
+							fork._dependentFork.getClass();
 
 						Method targetMethod;
 

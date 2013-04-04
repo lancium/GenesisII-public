@@ -43,7 +43,8 @@ import edu.virginia.vcgr.genii.exportdir.QuitExportResponse;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-@GeniiServiceConfiguration(resourceProvider = ExportedRootDBResourceProvider.class, defaultResolverFactoryProxy = RExportResolverFactoryProxy.class)
+@GeniiServiceConfiguration(resourceProvider = ExportedRootDBResourceProvider.class,
+	defaultResolverFactoryProxy = RExportResolverFactoryProxy.class)
 public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements ExportedRootPortType
 {
 	static private Log _logger = LogFactory.getLog(ExportedRootServiceImpl.class);
@@ -92,8 +93,8 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements E
 		if (_logger.isDebugEnabled())
 			_logger.debug("ADDING Exported Root");
 
-		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-			WorkingContext.EPR_PROPERTY_NAME);
+		EndpointReferenceType myEPR =
+			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 		myEPR.setAddress(new AttributedURITypeSmart(Container.getServiceURL("ExportedDirPortType")));
 		ExportedDirPortType ed = ClientUtils.createProxy(ExportedDirPortType.class, myEPR);
 		return ed.add(addRequest);

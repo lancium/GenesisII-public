@@ -34,8 +34,8 @@ public class RequiredConstructionParamWorker
 		try {
 			// perform any authz initialization of the resource for the authz
 			// handler specified
-			IAuthZProvider handler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-				.getServiceName());
+			IAuthZProvider handler =
+				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 			ICallingContext context = null;
 			try {
 				context = ContextManager.getExistingContext();
@@ -43,8 +43,8 @@ public class RequiredConstructionParamWorker
 				// No current context
 			}
 
-			X509Certificate[] serviceCertChain = (X509Certificate[]) consParms
-				.get(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM);
+			X509Certificate[] serviceCertChain =
+				(X509Certificate[]) consParms.get(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM);
 
 			handler.setDefaultAccess(context, resource, serviceCertChain);
 

@@ -81,8 +81,8 @@ public class BESActivityTerminatorActor implements OutcallActor
 					if (parentNumber != null) {
 						HistoryContainerService service = ContainerServices.findService(HistoryContainerService.class);
 
-						IterateHistoryEventsResponseType resp = common
-							.iterateHistoryEvents(new IterateHistoryEventsRequestType());
+						IterateHistoryEventsResponseType resp =
+							common.iterateHistoryEvents(new IterateHistoryEventsRequestType());
 						if (resp != null) {
 							iter = WSIterable.axisIterable(HistoryEventBundleType.class, resp.getResult(), 25);
 							for (HistoryEventBundleType bundle : iter) {
@@ -90,8 +90,9 @@ public class BESActivityTerminatorActor implements OutcallActor
 
 								HistoryEventSource source = event.eventSource();
 								if (_besName != null)
-									source = new SimpleStringHistoryEventSource(String.format("BES Resource %s", _besName),
-										null, source);
+									source =
+										new SimpleStringHistoryEventSource(String.format("BES Resource %s", _besName), null,
+											source);
 
 								service.addRecord(_historyKey, event.eventNumber().wrapWith(parentNumber),
 									event.eventTimestamp(), event.eventCategory(), event.eventLevel(), event.eventProperties(),
@@ -109,8 +110,8 @@ public class BESActivityTerminatorActor implements OutcallActor
 
 			// Now, go ahead and kill it.
 			ClientUtils.setTimeout(bes, 8 * 1000);
-			TerminateActivitiesResponseType resp = bes.terminateActivities(new TerminateActivitiesType(
-				new EndpointReferenceType[] { _activityEPR }, null));
+			TerminateActivitiesResponseType resp =
+				bes.terminateActivities(new TerminateActivitiesType(new EndpointReferenceType[] { _activityEPR }, null));
 			if (resp != null) {
 				TerminateActivityResponseType[] resps = resp.getResponse();
 				if (resps != null && resps.length == 1) {

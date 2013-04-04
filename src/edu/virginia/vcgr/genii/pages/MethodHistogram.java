@@ -26,8 +26,9 @@ public class MethodHistogram extends ImageSourceDynamicPage implements DynamicPa
 			dataset.setValue(dataPoint.second(), "Max Methods Active", dataPoint.first());
 		}
 
-		JFreeChart chart = ChartFactory.createBarChart3D("Container Method Statistics", "Time Interval", "Max Methods Active",
-			dataset, PlotOrientation.VERTICAL, true, true, true);
+		JFreeChart chart =
+			ChartFactory.createBarChart3D("Container Method Statistics", "Time Interval", "Max Methods Active", dataset,
+				PlotOrientation.VERTICAL, true, true, true);
 		return chart.createBufferedImage(width(), height());
 	}
 }

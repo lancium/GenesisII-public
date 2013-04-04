@@ -40,7 +40,8 @@ public class NotificationBrokerDatabase
 
 	private static final String UPDATE_MODE_STMT = "UPDATE enhanced_notification_broker SET mode = ? WHERE resource_id = ?";
 
-	private static final String UPDATE_MESSAGE_INDEX_STMT = "UPDATE enhanced_notification_broker SET message_index = ? WHERE resource_id = ?";
+	private static final String UPDATE_MESSAGE_INDEX_STMT =
+		"UPDATE enhanced_notification_broker SET message_index = ? WHERE resource_id = ?";
 
 	private static final String LOAD_BROKER_STMT = "SELECT mode, message_index, forwarding_port_reference "
 		+ "FROM enhanced_notification_broker WHERE resource_id = ?";
@@ -53,9 +54,11 @@ public class NotificationBrokerDatabase
 
 	private static final String DELETE_BROKER_STMT = "DELETE FROM enhanced_notification_broker WHERE resource_id = ?";
 
-	private static final String DELETE_ALL_SUBSCRIPTIONS_STMT = "DELETE FROM notification_broker_subscription WHERE broker_id = ?";
+	private static final String DELETE_ALL_SUBSCRIPTIONS_STMT =
+		"DELETE FROM notification_broker_subscription WHERE broker_id = ?";
 
-	private static final String DELETE_SUBSCRIPTION_STMT = "DELETE FROM notification_broker_subscription WHERE broker_id = ? AND subscription_identifier = ?";
+	private static final String DELETE_SUBSCRIPTION_STMT =
+		"DELETE FROM notification_broker_subscription WHERE broker_id = ? AND subscription_identifier = ?";
 
 	private static final String INSERT_SUBSCRIPTION_STMT = "INSERT INTO notification_broker_subscription "
 		+ "(broker_id, subscription_identifier, publisher_key, termination_time) " + "VALUES (?, ?, ?, ?)";
@@ -247,19 +250,20 @@ public class NotificationBrokerDatabase
 		String publisherKeysStr = joinStringsForInClause(publisherKeys);
 		String brokerIdsStr = joinStringsForInClause(resourceIds);
 
-		String activeBrokerQuery = "SELECT resource_id, message_index, forwarding_port_reference "
-			+ "FROM enhanced_notification_broker broker WHERE broker.mode = 1 "
-			+ "AND EXISTS (SELECT * FROM notification_broker_subscription subscription "
-			+ "	WHERE subscription.broker_id = broker.resource_id " + "	AND subscription.publisher_key in (" + publisherKeysStr
-			+ ")" + "	AND subscription.termination_time > ? ) " + "AND broker.resource_id IN (" + brokerIdsStr + ") "
-			+ "AND broker.client_id != ?";
+		String activeBrokerQuery =
+			"SELECT resource_id, message_index, forwarding_port_reference "
+				+ "FROM enhanced_notification_broker broker WHERE broker.mode = 1 "
+				+ "AND EXISTS (SELECT * FROM notification_broker_subscription subscription "
+				+ "	WHERE subscription.broker_id = broker.resource_id " + "	AND subscription.publisher_key in ("
+				+ publisherKeysStr + ")" + "	AND subscription.termination_time > ? ) " + "AND broker.resource_id IN ("
+				+ brokerIdsStr + ") " + "AND broker.client_id != ?";
 
-		String passiveBrokerQuery = "SELECT resource_id, message_index "
-			+ "FROM enhanced_notification_broker broker WHERE broker.mode = 0 "
-			+ "AND EXISTS (SELECT * FROM notification_broker_subscription subscription "
-			+ "	WHERE subscription.broker_id = broker.resource_id " + "	AND subscription.publisher_key in (" + publisherKeysStr
-			+ ")" + "	AND subscription.termination_time > ? ) " + "AND broker.resource_id IN (" + brokerIdsStr + ") "
-			+ "AND broker.client_id != ?";
+		String passiveBrokerQuery =
+			"SELECT resource_id, message_index " + "FROM enhanced_notification_broker broker WHERE broker.mode = 0 "
+				+ "AND EXISTS (SELECT * FROM notification_broker_subscription subscription "
+				+ "	WHERE subscription.broker_id = broker.resource_id " + "	AND subscription.publisher_key in ("
+				+ publisherKeysStr + ")" + "	AND subscription.termination_time > ? ) " + "AND broker.resource_id IN ("
+				+ brokerIdsStr + ") " + "AND broker.client_id != ?";
 
 		List<NotificationBrokerDBResource> listOfBrokers = new ArrayList<NotificationBrokerDBResource>();
 		PreparedStatement stmt1 = null;
@@ -272,8 +276,8 @@ public class NotificationBrokerDatabase
 			stmt1.setString(2, clientId);
 			resultSet1 = stmt1.executeQuery();
 			while (resultSet1.next()) {
-				NotificationBrokerDBResource resource = new NotificationBrokerDBResource(resultSet1.getString("resource_id"),
-					null);
+				NotificationBrokerDBResource resource =
+					new NotificationBrokerDBResource(resultSet1.getString("resource_id"), null);
 				resource.setMessageIndex(resultSet1.getInt("message_index"));
 				Blob blob = resultSet1.getBlob("forwarding_port_reference");
 				resource.setForwardingPort(EPRUtils.fromBlob(blob));
@@ -285,8 +289,8 @@ public class NotificationBrokerDatabase
 			stmt2.setString(2, clientId);
 			resultSet2 = stmt2.executeQuery();
 			while (resultSet2.next()) {
-				NotificationBrokerDBResource resource = new NotificationBrokerDBResource(resultSet2.getString("resource_id"),
-					null);
+				NotificationBrokerDBResource resource =
+					new NotificationBrokerDBResource(resultSet2.getString("resource_id"), null);
 				resource.setMessageIndex(resultSet2.getInt("message_index"));
 				resource.setMode(false);
 				listOfBrokers.add(resource);

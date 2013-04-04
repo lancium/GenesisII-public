@@ -143,9 +143,10 @@ public class JobInformationFork extends AbstractStreamableByteIOFactoryResourceF
 						throw new RuntimeException("Unable to deserialize owner identities.", e);
 					}
 
-					jInfo = new JobInformation(ticket, jit.getJobName(), identities, QueueStates.fromQueueStateType(jit
-						.getJobStatus()), (int) jit.getPriority(), jit.getSubmitTime(), jit.getStartTime(),
-						jit.getFinishTime(), jit.getAttempts().intValue(), jit.getBesStatus(), jit.getScheduledOn());
+					jInfo =
+						new JobInformation(ticket, jit.getJobName(), identities, QueueStates.fromQueueStateType(jit
+							.getJobStatus()), (int) jit.getPriority(), jit.getSubmitTime(), jit.getStartTime(),
+							jit.getFinishTime(), jit.getAttempts().intValue(), jit.getBesStatus(), jit.getScheduledOn());
 				}
 			} else {
 				for (ReducedJobInformationType rjit : mgr.listJobs(jobTicket)) {

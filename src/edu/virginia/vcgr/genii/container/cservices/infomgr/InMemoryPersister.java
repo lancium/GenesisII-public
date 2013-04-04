@@ -12,7 +12,8 @@ import java.util.Map;
  */
 public class InMemoryPersister<InformationType> implements InformationPersister<InformationType>
 {
-	private Map<InformationEndpoint, InformationResult<InformationType>> _storage = new HashMap<InformationEndpoint, InformationResult<InformationType>>();
+	private Map<InformationEndpoint, InformationResult<InformationType>> _storage =
+		new HashMap<InformationEndpoint, InformationResult<InformationType>>();
 
 	/** {@inheritDoc} */
 	@Override

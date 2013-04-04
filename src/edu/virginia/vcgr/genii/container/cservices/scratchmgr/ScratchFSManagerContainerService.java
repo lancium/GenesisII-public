@@ -26,7 +26,8 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 	static final public String SERVICE_NAME = "Swap File Manager";
 
 	static final public String SCRATCH_DIRECTORY_PROPERTY = "scratch-directory";
-	static final public String SCRATCH_SPACE_CSERVICES_PROPERTY = "edu.virginia.vcgr.genii.container.cservices.scratchmgr.scratch-directory";
+	static final public String SCRATCH_SPACE_CSERVICES_PROPERTY =
+		"edu.virginia.vcgr.genii.container.cservices.scratchmgr.scratch-directory";
 
 	/*
 	 * Amount of time a swap file can remain idle before it is reclaimed -- 1 day
@@ -103,8 +104,9 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 
 		if (propertyValue == null) {
 			if (_configuredScratchSpaceName == null) {
-				path = String.format("%s/scratch-space", ConfigurationManager.getCurrentConfiguration().getUserDirectory()
-					.getAbsolutePath());
+				path =
+					String.format("%s/scratch-space", ConfigurationManager.getCurrentConfiguration().getUserDirectory()
+						.getAbsolutePath());
 			} else
 				path = _configuredScratchSpaceName;
 		} else

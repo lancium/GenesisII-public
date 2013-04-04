@@ -28,7 +28,8 @@ public class DownloadManagerContainerService extends AbstractContainerService
 	static public final String SERVICE_NAME = "Download Manager";
 
 	static public final String DOWNLOAD_TMP_DIR_PROPERTY = "download-tmpdir";
-	static public final String DOWNLOAD_TMP_DIR_CSERVICE_PROPERTY = "edu.virginia.vcgr.genii.container.cservices.downloadmgr.download-tmpdir";
+	static public final String DOWNLOAD_TMP_DIR_CSERVICE_PROPERTY =
+		"edu.virginia.vcgr.genii.container.cservices.downloadmgr.download-tmpdir";
 
 	private Map<File, InProgressLock> _inProgressLocks = new HashMap<File, InProgressLock>();
 
@@ -42,8 +43,9 @@ public class DownloadManagerContainerService extends AbstractContainerService
 
 		if (propertyValue == null) {
 			if (_configuredDownloadTmpDir == null) {
-				dirPath = String.format("%s/download-tmp", ConfigurationManager.getCurrentConfiguration().getUserDirectory()
-					.getAbsolutePath());
+				dirPath =
+					String.format("%s/download-tmp", ConfigurationManager.getCurrentConfiguration().getUserDirectory()
+						.getAbsolutePath());
 			} else
 				dirPath = _configuredDownloadTmpDir;
 		} else

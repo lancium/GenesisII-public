@@ -94,9 +94,10 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			_logger.debug("Creating new ExportedDir Resource.");
 
 		if (constructionParameters == null) {
-			ResourceCreationFaultType rcft = new ResourceCreationFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-					"Could not create ExportedDir resource without cerationProperties") }, null);
+			ResourceCreationFaultType rcft =
+				new ResourceCreationFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+						"Could not create ExportedDir resource without cerationProperties") }, null);
 			throw FaultManipulator.fillInFault(rcft);
 		}
 
@@ -151,13 +152,15 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 				WorkingContext.temporarilyAssumeNewIdentity(EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType"),
 					false));
 
-				entryReference = new ExportedFileServiceImpl().vcgrCreate(
-					new VcgrCreate(ExportedFileUtils.createCreationProperties(fullPath, parentIds,
-						_resource.getReplicationState()))).getEndpoint();
+				entryReference =
+					new ExportedFileServiceImpl().vcgrCreate(
+						new VcgrCreate(ExportedFileUtils.createCreationProperties(fullPath, parentIds,
+							_resource.getReplicationState()))).getEndpoint();
 
 				String newEntryId = (new GUID()).toString();
-				ExportedDirEntry newEntry = new ExportedDirEntry(_resource.getId(), filename, entryReference, newEntryId,
-					ExportedDirEntry._FILE_TYPE, null);
+				ExportedDirEntry newEntry =
+					new ExportedDirEntry(_resource.getId(), filename, entryReference, newEntryId, ExportedDirEntry._FILE_TYPE,
+						null);
 				_resource.addEntry(newEntry, false);
 				_resource.commit();
 			} catch (Throwable t) {
@@ -223,13 +226,14 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			String fullPath = ExportedFileUtils.createFullPath(_resource.getLocalPath(), name);
 			String parentIds = ExportedDirUtils.createParentIdsString(_resource.getParentIds(), _resource.getId());
 			String isReplicated = _resource.getReplicationState();
-			newRef = vcgrCreate(
-				new VcgrCreate(ExportedDirUtils.createCreationProperties(null, fullPath, null, null, null, parentIds,
-					isReplicated))).getEndpoint();
+			newRef =
+				vcgrCreate(
+					new VcgrCreate(ExportedDirUtils.createCreationProperties(null, fullPath, null, null, null, parentIds,
+						isReplicated))).getEndpoint();
 
 			String newEntryId = (new GUID()).toString();
-			ExportedDirEntry newEntry = new ExportedDirEntry(_resource.getId(), name, newRef, newEntryId,
-				ExportedDirEntry._DIR_TYPE, attrs);
+			ExportedDirEntry newEntry =
+				new ExportedDirEntry(_resource.getId(), name, newRef, newEntryId, ExportedDirEntry._DIR_TYPE, attrs);
 			_resource.addEntry(newEntry, true);
 			_resource.commit();
 		} finally {
@@ -258,10 +262,10 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			} catch (BaseFaultType bft) {
 				ret[lcv] = new RNSEntryResponseType(null, null, bft, addRequest[lcv].getEntryName());
 			} catch (Throwable cause) {
-				ret[lcv] = new RNSEntryResponseType(null, null,
-					FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
+				ret[lcv] =
+					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
 						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry!") }, null)),
-					addRequest[lcv].getEntryName());
+						addRequest[lcv].getEntryName());
 			}
 		}
 
@@ -294,9 +298,9 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 		entryCollection = new LinkedList<RNSEntryResponseType>();
 		timer = tSink.getTimer("Prepare Entries");
 		for (ExportedDirEntry exportDirEntry : entries) {
-			RNSEntryResponseType entry = new RNSEntryResponseType(exportDirEntry.getEntryReference(),
-				RNSUtilities.createMetadata(exportDirEntry.getEntryReference(), exportDirEntry.getAttributes()), null,
-				exportDirEntry.getName());
+			RNSEntryResponseType entry =
+				new RNSEntryResponseType(exportDirEntry.getEntryReference(), RNSUtilities.createMetadata(
+					exportDirEntry.getEntryReference(), exportDirEntry.getAttributes()), null, exportDirEntry.getName());
 
 			entryCollection.add(entry);
 		}

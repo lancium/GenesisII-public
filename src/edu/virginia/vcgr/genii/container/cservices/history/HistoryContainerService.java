@@ -181,8 +181,9 @@ public class HistoryContainerService extends AbstractContainerService
 			if (number == null)
 				number = nextSequenceNumber(connection, resourceID);
 
-			long ret = HistoryDatabase.addRecord(connection, resourceID, number, createTimestamp, category, level, properties,
-				eventSource, eventData, expirationTime);
+			long ret =
+				HistoryDatabase.addRecord(connection, resourceID, number, createTimestamp, category, level, properties,
+					eventSource, eventData, expirationTime);
 			connection.commit();
 			return new HistoryEventTokenImpl(ret);
 		} catch (SQLException sqe) {

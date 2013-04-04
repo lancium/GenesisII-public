@@ -37,7 +37,8 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 	static private final String _RETRIEVE_FILE_INFO = "SELECT path, parentIds, isReplicated FROM exportedfile WHERE fileid = ?";
 	static private final String _DELETE_EXPORTED_FILE_STMT = "DELETE FROM exportedfile WHERE fileid = ?";
 
-	static private final String _RETRIEVE_ALL_FILE_IDS_FOR_PARENT_STMT = "SELECT fileid FROM exportedfile WHERE parentIds LIKE ?";
+	static private final String _RETRIEVE_ALL_FILE_IDS_FOR_PARENT_STMT =
+		"SELECT fileid FROM exportedfile WHERE parentIds LIKE ?";
 	static private final String _DESTROY_ALL_FILES_FOR_PARENT_STMT = "DELETE FROM exportedfile WHERE parentIds LIKE ?";
 
 	static private final String _RETRIEVE_ALL_EPRS_FOR_PARENT_STMT = "SELECT endpoint " + "FROM exporteddirentry "
@@ -52,8 +53,8 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 	static void fileDestroyAllForParentDir(Connection connection, String parentId, boolean hardDestroy, String isReplicated)
 		throws ResourceException
 	{
-		String parentIdSearch = "%" + ExportedFileUtils._PARENT_ID_BEGIN_DELIMITER + parentId
-			+ ExportedFileUtils._PARENT_ID_END_DELIMITER + "%";
+		String parentIdSearch =
+			"%" + ExportedFileUtils._PARENT_ID_BEGIN_DELIMITER + parentId + ExportedFileUtils._PARENT_ID_END_DELIMITER + "%";
 
 		PreparedStatement stmt = null;
 		ResultSet rs = null;

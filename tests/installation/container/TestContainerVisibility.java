@@ -6,7 +6,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.junit.Assert;
-//import org.junit.BeforeClass;
+// import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.virginia.vcgr.genii.client.configuration.Hostname;

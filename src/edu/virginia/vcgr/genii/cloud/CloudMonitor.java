@@ -51,8 +51,9 @@ public class CloudMonitor
 
 		EC2Manager tManager = new EC2Manager(config, 30, besid);
 
-		EC2TypicaController tController = new EC2TypicaController(config.getPublicKey(), config.getSecretKey(),
-			config.getEndPoint(), config.getPort(), !config.isEucalyptus(), config.isEucalyptus(), config.getKeyPair());
+		EC2TypicaController tController =
+			new EC2TypicaController(config.getPublicKey(), config.getSecretKey(), config.getEndPoint(), config.getPort(),
+				!config.isEucalyptus(), config.isEucalyptus(), config.getKeyPair());
 
 		tController.set_imageID(config.getImageID());
 		tManager.setController(tController);
@@ -73,8 +74,9 @@ public class CloudMonitor
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt = connection.prepareStatement("SELECT resourceid, host, load, port, setup "
-				+ "FROM cloudResources WHERE besid = ?");
+			stmt =
+				connection.prepareStatement("SELECT resourceid, host, load, port, setup "
+					+ "FROM cloudResources WHERE besid = ?");
 			stmt.setString(1, besid);
 			rs = stmt.executeQuery();
 
@@ -133,8 +135,9 @@ public class CloudMonitor
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt = connection.prepareStatement("INSERT INTO cloudResources " + "(resourceid, host, port, load, besid, setup) "
-				+ "VALUES (?, ?, ?, ?, ?, ?)");
+			stmt =
+				connection.prepareStatement("INSERT INTO cloudResources " + "(resourceid, host, port, load, besid, setup) "
+					+ "VALUES (?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, resourceID);
 			stmt.setString(2, host);
 			stmt.setInt(3, port);
@@ -159,8 +162,9 @@ public class CloudMonitor
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt = connection.prepareStatement("UPDATE cloudResources SET " + "load = ?, setup = ? "
-				+ "WHERE besid = ? AND resourceID = ?");
+			stmt =
+				connection.prepareStatement("UPDATE cloudResources SET " + "load = ?, setup = ? "
+					+ "WHERE besid = ? AND resourceID = ?");
 			stmt.setInt(1, load);
 			stmt.setInt(2, setup);
 			stmt.setString(3, besid);

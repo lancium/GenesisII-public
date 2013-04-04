@@ -75,8 +75,9 @@ public class QueueDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement("SELECT resourceid, resourcename, totalslots "
-				+ "FROM q2resources WHERE queueid = ?");
+			stmt =
+				connection.prepareStatement("SELECT resourceid, resourcename, totalslots "
+					+ "FROM q2resources WHERE queueid = ?");
 			stmt.setString(1, _queueID);
 			rs = stmt.executeQuery();
 
@@ -112,8 +113,9 @@ public class QueueDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement("INSERT INTO q2resources "
-				+ "(queueid, resourcename, resourceendpoint, totalslots) " + "VALUES (?, ?, ?, 1)");
+			stmt =
+				connection.prepareStatement("INSERT INTO q2resources "
+					+ "(queueid, resourcename, resourceendpoint, totalslots) " + "VALUES (?, ?, ?, 1)");
 			stmt.setString(1, _queueID);
 			stmt.setString(2, name);
 			stmt.setBlob(3, EPRUtils.toBlob(epr, "q2resources", "resourceendpoint"));
@@ -287,9 +289,10 @@ public class QueueDatabase
 		Collection<JobData> allJobs = new LinkedList<JobData>();
 
 		try {
-			stmt = connection.prepareStatement("SELECT a.jobid, a.jobticket, a.priority, a.state, a.submittime, "
-				+ "a.runattempts, a.resourceid, b.historytoken, a.callingcontext," + "a.jsdl "
-				+ "FROM q2jobs AS a LEFT OUTER JOIN q2jobhistorytokens AS b " + "ON a.jobid = b.jobid WHERE a.queueid = ?");
+			stmt =
+				connection.prepareStatement("SELECT a.jobid, a.jobticket, a.priority, a.state, a.submittime, "
+					+ "a.runattempts, a.resourceid, b.historytoken, a.callingcontext," + "a.jsdl "
+					+ "FROM q2jobs AS a LEFT OUTER JOIN q2jobhistorytokens AS b " + "ON a.jobid = b.jobid WHERE a.queueid = ?");
 			stmt.setString(1, _queueID);
 			rs = stmt.executeQuery();
 
@@ -305,10 +308,11 @@ public class QueueDatabase
 					_logger.warn("Error getting JSDL for job.", cause);
 				}
 
-				JobData data = new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3),
-					QueueStates.valueOf(rs.getString(4)), new Date(rs.getTimestamp(5).getTime()), rs.getShort(6),
-					(Long) rs.getObject(7), HistoryContextFactory.createContext(HistoryEventCategory.Default,
-						DBSerializer.fromBlob(rs.getBlob(9)), historyKey(jobTicket)));
+				JobData data =
+					new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs
+						.getString(4)), new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7),
+						HistoryContextFactory.createContext(HistoryEventCategory.Default, DBSerializer.fromBlob(rs.getBlob(9)),
+							historyKey(jobTicket)));
 
 				Blob blob = rs.getBlob(8);
 				if (blob != null) {
@@ -361,8 +365,9 @@ public class QueueDatabase
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = connection.prepareStatement("UPDATE q2jobs SET runattempts = ?, state = ?, "
-				+ "finishtime = ?, jobendpoint = ?, resourceid = ?, " + "resourceendpoint = ? WHERE jobid = ?");
+			stmt =
+				connection.prepareStatement("UPDATE q2jobs SET runattempts = ?, state = ?, "
+					+ "finishtime = ?, jobendpoint = ?, resourceid = ?, " + "resourceendpoint = ? WHERE jobid = ?");
 			stmt.setShort(1, attempts);
 			stmt.setString(2, newState.name());
 			stmt.setTimestamp(3, new Timestamp(finishTime.getTime()));
@@ -394,8 +399,9 @@ public class QueueDatabase
 			stmt = null;
 
 			if (newToken != null) {
-				stmt = connection.prepareStatement("INSERT INTO " + "q2jobhistorytokens (jobid, queueid, historytoken) "
-					+ "VALUES (?, ?, ?)");
+				stmt =
+					connection.prepareStatement("INSERT INTO " + "q2jobhistorytokens (jobid, queueid, historytoken) "
+						+ "VALUES (?, ?, ?)");
 				stmt.setLong(1, jobID);
 				stmt.setString(2, _queueID);
 				stmt.setBlob(3, DBSerializer.toBlob(newToken, "q2jobhistorytokens", "historytoken"));
@@ -460,8 +466,9 @@ public class QueueDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
-				+ "jsdl, owners, priority, state, runattempts, submittime) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)");
+			stmt =
+				connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
+					+ "jsdl, owners, priority, state, runattempts, submittime) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)");
 			stmt.setString(1, ticket);
 			stmt.setString(2, _queueID);
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "q2jobs", "callingcontext"));
@@ -575,8 +582,9 @@ public class QueueDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement("SELECT callingcontext, jobendpoint, resourceendpoint "
-				+ "FROM q2jobs WHERE jobid = ?");
+			stmt =
+				connection.prepareStatement("SELECT callingcontext, jobendpoint, resourceendpoint "
+					+ "FROM q2jobs WHERE jobid = ?");
 			stmt.setLong(1, jobID);
 			rs = stmt.executeQuery();
 
@@ -613,8 +621,9 @@ public class QueueDatabase
 
 		try {
 			query = connection.prepareStatement("SELECT resourceendpoint " + "FROM q2resources WHERE resourceid = ?");
-			stmt = connection.prepareStatement("UPDATE q2jobs SET state = ?, starttime = ?, "
-				+ "resourceid = ?, resourceendpoint = ? WHERE jobid = ?");
+			stmt =
+				connection.prepareStatement("UPDATE q2jobs SET state = ?, starttime = ?, "
+					+ "resourceid = ?, resourceendpoint = ? WHERE jobid = ?");
 
 			for (ResourceMatch match : matches) {
 				query.setLong(1, match.getBESID());
@@ -844,8 +853,9 @@ public class QueueDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement("SELECT callingcontext, jobendpoint, resourceendpoint "
-				+ "FROM q2jobs WHERE jobid = ?");
+			stmt =
+				connection.prepareStatement("SELECT callingcontext, jobendpoint, resourceendpoint "
+					+ "FROM q2jobs WHERE jobid = ?");
 			stmt.setLong(1, jobID);
 
 			rs = stmt.executeQuery();
@@ -895,8 +905,8 @@ public class QueueDatabase
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = connection.prepareStatement("INSERT INTO q2errors (queueid, jobid, attempt, errors) "
-				+ "VALUES (?, ?, ?, ?)");
+			stmt =
+				connection.prepareStatement("INSERT INTO q2errors (queueid, jobid, attempt, errors) " + "VALUES (?, ?, ?, ?)");
 			stmt.setString(1, _queueID);
 			stmt.setLong(2, jobid);
 			stmt.setShort(3, attempt);
@@ -990,14 +1000,16 @@ public class QueueDatabase
 			stmt.close();
 			stmt = null;
 			if (value == null) {
-				stmt = connection.prepareStatement("INSERT INTO properties " + "(resourceid, propname, propvalue) "
-					+ "VALUES (?, ?, ?)");
+				stmt =
+					connection.prepareStatement("INSERT INTO properties " + "(resourceid, propname, propvalue) "
+						+ "VALUES (?, ?, ?)");
 				stmt.setString(1, _queueID);
 				stmt.setString(2, IQueueResource.TOTAL_COUNT_PROPERTY_NAME);
 				stmt.setBlob(3, DBSerializer.toBlob(new Long(1), "properties", "propvalue"));
 			} else {
-				stmt = connection.prepareStatement("UPDATE properties SET propvalue = ? "
-					+ "WHERE resourceid = ? AND propname = ?");
+				stmt =
+					connection.prepareStatement("UPDATE properties SET propvalue = ? "
+						+ "WHERE resourceid = ? AND propname = ?");
 				stmt.setBlob(1, DBSerializer.toBlob(new Long(value.longValue() + 1), "properties", "propvalue"));
 				stmt.setString(2, _queueID);
 				stmt.setString(3, IQueueResource.TOTAL_COUNT_PROPERTY_NAME);

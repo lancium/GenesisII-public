@@ -45,8 +45,8 @@ public class ContainerStatistics extends GenesisIIStyledPage
 	@Override
 	protected void generateContent(PrintStream ps) throws IOException
 	{
-		edu.virginia.vcgr.genii.client.stats.ContainerStatistics stats = edu.virginia.vcgr.genii.client.stats.ContainerStatistics
-			.instance();
+		edu.virginia.vcgr.genii.client.stats.ContainerStatistics stats =
+			edu.virginia.vcgr.genii.client.stats.ContainerStatistics.instance();
 
 		DatabaseStatistics dbStats = stats.getDatabaseStatistics();
 		MethodStatistics mStats = stats.getMethodStatistics();

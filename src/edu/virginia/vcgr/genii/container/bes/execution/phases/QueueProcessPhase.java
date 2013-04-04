@@ -154,20 +154,22 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 				_logger.info(String.format("Asking batch system (%s) to submit the job.", queue));
 				history.trace("Batch System (%s) Starting Activity", queue);
-				resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory())
-					.getNewResourceUsageFile();
+				resourceUsageFile =
+					new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory()).getNewResourceUsageFile();
 				preDelay();
 				stderrPath = fileToPath(_stderr, null);
-				PrintWriter hWriter = history.createInfoWriter("Queue BES Submitting Activity").format(
-					"BES submitting job to batch system:  ");
+				PrintWriter hWriter =
+					history.createInfoWriter("Queue BES Submitting Activity").format("BES submitting job to batch system:  ");
 				hWriter.print(_executable.getAbsolutePath());
 				for (String arg : _arguments)
 					hWriter.format(" %s", arg);
 				hWriter.close();
 
-				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses,
-					_numProcessesPerHost, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null),
-					fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
+				_jobToken =
+					queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses,
+						_numProcessesPerHost, _executable.getAbsolutePath(), _arguments, _environment,
+						fileToPath(_stdin, null), fileToPath(_stdout, null), stderrPath, _resourceConstraints,
+						resourceUsageFile));
 
 				_logger.info(String.format("Queue submitted job %s using command line:\n\t%s", _jobToken,
 					_jobToken.getCmdLine()));

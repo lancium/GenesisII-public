@@ -57,8 +57,9 @@ public class CloudCopyDirectoryPhase extends AbstractCloudExecutionPhase impleme
 		history.createInfoWriter("Working directory set up").close();
 	}
 
-	private void copyDirectory(CloudManager tManage, File root, File dir, String resourceID, OutputStream out, OutputStream err)
-		throws Exception
+	private void
+		copyDirectory(CloudManager tManage, File root, File dir, String resourceID, OutputStream out, OutputStream err)
+			throws Exception
 	{
 		File[] fileList = dir.listFiles();
 

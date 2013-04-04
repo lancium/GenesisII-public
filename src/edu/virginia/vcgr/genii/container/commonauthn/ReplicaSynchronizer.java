@@ -13,12 +13,14 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.container.rns.GeniiDirSyncRunner;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 
-/* The behavior of a IDP resource is determined by its various resource properties. In addition, it has the same
- * capabilities that are available in an RNS resource. Therefore the replica synchronization class for RNS, Genii-
- * DirSyncRunner, can perform a bulk of the tasks warranted by a IDP replication. The remaining places where we
- * need to deal with IDP specific properties such as specialized resource-create operation and resource properties
- * synchronization are controlled by this extension of the GeniiDirSyncRunner class. 
- * */
+/*
+ * The behavior of a IDP resource is determined by its various resource properties. In addition, it
+ * has the same capabilities that are available in an RNS resource. Therefore the replica
+ * synchronization class for RNS, Genii- DirSyncRunner, can perform a bulk of the tasks warranted by
+ * a IDP replication. The remaining places where we need to deal with IDP specific properties such
+ * as specialized resource-create operation and resource properties synchronization are controlled
+ * by this extension of the GeniiDirSyncRunner class.
+ */
 public class ReplicaSynchronizer extends GeniiDirSyncRunner
 {
 

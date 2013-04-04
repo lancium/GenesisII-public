@@ -34,7 +34,8 @@ public class InformationPortal<InformationType> implements Closeable
 
 	private Set<InformationEndpoint> _currentlyResolving = new HashSet<InformationEndpoint>();
 
-	private Map<InformationEndpoint, Collection<WaitingListener<InformationType>>> _waitingListeners = new HashMap<InformationEndpoint, Collection<WaitingListener<InformationType>>>();
+	private Map<InformationEndpoint, Collection<WaitingListener<InformationType>>> _waitingListeners =
+		new HashMap<InformationEndpoint, Collection<WaitingListener<InformationType>>>();
 
 	private void handleTimeout(InformationEndpoint endpoint, InformationListener<InformationType> listener)
 	{
@@ -44,8 +45,9 @@ public class InformationPortal<InformationType> implements Closeable
 		synchronized (_persister) {
 			oldResult = _persister.get(endpoint);
 			if (oldResult != null)
-				newResult = new InformationResult<InformationType>(oldResult.information(), Calendar.getInstance(),
-					new TimeoutException());
+				newResult =
+					new InformationResult<InformationType>(oldResult.information(), Calendar.getInstance(),
+						new TimeoutException());
 			else
 				newResult = new InformationResult<InformationType>(null, Calendar.getInstance(), new TimeoutException());
 			_persister.persist(endpoint, newResult);
@@ -236,8 +238,9 @@ public class InformationPortal<InformationType> implements Closeable
 					if (exception != null) {
 						InformationResult<InformationType> oldResult = _persister.get(_endpoint);
 						if (oldResult != null)
-							result = new InformationResult<InformationType>(oldResult.information(), Calendar.getInstance(),
-								exception);
+							result =
+								new InformationResult<InformationType>(oldResult.information(), Calendar.getInstance(),
+									exception);
 						else
 							result = new InformationResult<InformationType>(null, Calendar.getInstance(), exception);
 					}

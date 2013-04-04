@@ -16,15 +16,17 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSTopics;
 
 /*
- * This class protects the container from overloading of notification outcalls. It works by tracking the number of 
- * notifications a particular resource has made within a short interval. If that number crosses the allowed threshold, 
- * it blocks the resource from publishing any more notifications for a specific period of time. To notify the 
- * consumer that the resource will not notify again within the defined blockage period, it updates the notification 
- * message with a blockage flag. After the blocked period is over the resource can send notification again. 
+ * This class protects the container from overloading of notification outcalls. It works by tracking
+ * the number of notifications a particular resource has made within a short interval. If that
+ * number crosses the allowed threshold, it blocks the resource from publishing any more
+ * notifications for a specific period of time. To notify the consumer that the resource will not
+ * notify again within the defined blockage period, it updates the notification message with a
+ * blockage flag. After the blocked period is over the resource can send notification again.
  * 
- * This mechanism of blocking notification is intended for prohibiting notification outcalls when a resource is undergoing 
- * rapid changes -- it does not stop notifications when these are simultaneously issued from many resources. 
- * */
+ * This mechanism of blocking notification is intended for prohibiting notification outcalls when a
+ * resource is undergoing rapid changes -- it does not stop notifications when these are
+ * simultaneously issued from many resources.
+ */
 public class NotificationRateController
 {
 

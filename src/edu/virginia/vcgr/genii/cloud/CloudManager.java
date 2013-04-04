@@ -4,7 +4,7 @@ import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.Collection;
 
-//Warning: It is expected that any implementor of this interface is thread safe
+// Warning: It is expected that any implementor of this interface is thread safe
 
 public interface CloudManager
 {

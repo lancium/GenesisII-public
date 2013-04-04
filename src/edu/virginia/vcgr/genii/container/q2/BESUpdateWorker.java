@@ -89,8 +89,8 @@ public class BESUpdateWorker implements OutcallHandler
 			/*
 			 * Make the out call to the BES object to get it's factory attributes
 			 */
-			GetFactoryAttributesDocumentResponseType resp = clientStub
-				.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
+			GetFactoryAttributesDocumentResponseType resp =
+				clientStub.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
 
 			/*
 			 * If the bes container is currently accepting new activities, and it responded at all,

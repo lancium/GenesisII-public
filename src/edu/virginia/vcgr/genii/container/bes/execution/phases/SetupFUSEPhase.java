@@ -54,8 +54,9 @@ public class SetupFUSEPhase extends AbstractFUSEPhases
 
 		String sandbox = (_sandbox == null) ? "/" : _sandbox;
 
-		ProcessBuilder builder = new ProcessBuilder(Installation.getGridCommand().getAbsolutePath(), "fuse", "--mount",
-			String.format("--sandbox=%s", sandbox), getMountPoint(context).getAbsolutePath());
+		ProcessBuilder builder =
+			new ProcessBuilder(Installation.getGridCommand().getAbsolutePath(), "fuse", "--mount", String.format(
+				"--sandbox=%s", sandbox), getMountPoint(context).getAbsolutePath());
 		builder.redirectErrorStream(true);
 
 		StreamRedirectionSink sink = new FileRedirectionSink(new File("fuse-output.log"));

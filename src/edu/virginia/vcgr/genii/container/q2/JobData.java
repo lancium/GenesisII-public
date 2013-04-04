@@ -202,8 +202,8 @@ public class JobData
 			StringWriter writer = new StringWriter();
 			ObjectSerializer.serialize(writer, ast, tmp);
 			StringReader reader = new StringReader(writer.toString());
-			_besActivityStatus = (ActivityStatusType) ObjectDeserializer.deserialize(new InputSource(reader),
-				ActivityStatusType.class);
+			_besActivityStatus =
+				(ActivityStatusType) ObjectDeserializer.deserialize(new InputSource(reader), ActivityStatusType.class);
 		} catch (Throwable cause) {
 			_besActivityStatus = null;
 		}

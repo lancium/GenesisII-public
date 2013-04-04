@@ -74,9 +74,11 @@ class AccountingDatabase
 		Collection<Long> keys = new Vector<Long>(identities.size());
 
 		try {
-			stmt = conn.prepareStatement("INSERT INTO accountingrecords (besepi,"
-				+ "arch, os, besmachinename, exitcode, usertimemicrosecs, " + "kerneltimemicrosecs, wallclocktimemicrosecs, "
-				+ "maxrssbytes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+			stmt =
+				conn.prepareStatement("INSERT INTO accountingrecords (besepi,"
+					+ "arch, os, besmachinename, exitcode, usertimemicrosecs, "
+					+ "kerneltimemicrosecs, wallclocktimemicrosecs, " + "maxrssbytes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
 			if (besepi == null)
 				stmt.setNull(1, Types.VARCHAR);
 			else
@@ -100,8 +102,9 @@ class AccountingDatabase
 
 			stmt.close();
 			stmt = null;
-			stmt = conn.prepareStatement("INSERT INTO credentials(credentialhash, credential) VALUES (?, ?)",
-				Statement.RETURN_GENERATED_KEYS);
+			stmt =
+				conn.prepareStatement("INSERT INTO credentials(credentialhash, credential) VALUES (?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
 			boolean failure = false;
 			for (Identity identity : identities) {
 				stmt.setInt(1, identity.hashCode());
@@ -264,8 +267,9 @@ class AccountingDatabase
 
 		long startTime = System.currentTimeMillis();
 		try {
-			stmt = conn.prepareStatement("SELECT arec.*, cl.index, cl.value "
-				+ "FROM accountingrecords AS arec, acctcommandlines AS cl " + "WHERE arec.arid = cl.arid");
+			stmt =
+				conn.prepareStatement("SELECT arec.*, cl.index, cl.value "
+					+ "FROM accountingrecords AS arec, acctcommandlines AS cl " + "WHERE arec.arid = cl.arid");
 
 			rs = stmt.executeQuery();
 			while (rs.next()) {
@@ -274,10 +278,11 @@ class AccountingDatabase
 				if (ar == null)
 					map.put(
 						new Long(arid),
-						ar = new AccountingRecord(arid, rs.getString("besepi"), rs.getString("arch"), rs.getString("os"), rs
-							.getString("besmachinename"), rs.getInt("exitcode"), rs.getLong("usertimemicrosecs"), rs
-							.getLong("kerneltimemicrosecs"), rs.getLong("wallclocktimemicrosecs"), rs.getLong("maxrssbytes"),
-							convert(rs.getTimestamp("addtime"))));
+						ar =
+							new AccountingRecord(arid, rs.getString("besepi"), rs.getString("arch"), rs.getString("os"), rs
+								.getString("besmachinename"), rs.getInt("exitcode"), rs.getLong("usertimemicrosecs"), rs
+								.getLong("kerneltimemicrosecs"), rs.getLong("wallclocktimemicrosecs"), rs
+								.getLong("maxrssbytes"), convert(rs.getTimestamp("addtime"))));
 
 				int clineIndex = rs.getInt("index");
 				String clineElement = rs.getString("value");
@@ -290,8 +295,9 @@ class AccountingDatabase
 			stmt.close();
 			stmt = null;
 
-			stmt = conn.prepareStatement("SELECT c.credential " + "FROM credentials AS c, acctreccredmap AS a "
-				+ "WHERE a.arid = ? AND a.cid = c.cid");
+			stmt =
+				conn.prepareStatement("SELECT c.credential " + "FROM credentials AS c, acctreccredmap AS a "
+					+ "WHERE a.arid = ? AND a.cid = c.cid");
 
 			Collection<AccountingRecordType> ret = new Vector<AccountingRecordType>(map.size());
 			for (AccountingRecord ar : map.values()) {
@@ -322,8 +328,9 @@ class AccountingDatabase
 		PreparedStatement stmt1 = null;
 
 		try {
-			stmt1 = conn.prepareStatement("DELETE FROM credentials WHERE cid IN "
-				+ "(SELECT cid FROM acctreccredmap WHERE arid <= ?)");
+			stmt1 =
+				conn.prepareStatement("DELETE FROM credentials WHERE cid IN "
+					+ "(SELECT cid FROM acctreccredmap WHERE arid <= ?)");
 			stmt1.setLong(1, lastRecordToDelete);
 			stmt1.executeUpdate();
 

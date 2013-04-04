@@ -117,8 +117,8 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 	@Override
 	public UpdateModeResponse updateMode(boolean updateModeRequest) throws RemoteException
 	{
-		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
-			.dereference();
+		NotificationBrokerDBResource resource =
+			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 		resource.updateModeInDB(updateModeRequest);
 		return null;
 	}
@@ -136,14 +136,15 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 	public TestNotificationResponse testNotification(TestNotificationRequest testNotificationRequest) throws RemoteException
 	{
 
-		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
-			.dereference();
+		NotificationBrokerDBResource resource =
+			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 
 		resource.initializeResourceFromDB();
 		EndpointReferenceType forwardingPort = resource.getForwardingPort();
 		if (forwardingPort != null) {
-			NotificationMessageHolder holder = new NotificationMessageHolder(forwardingPort, getMyEPR(false),
-				TEST_NOTIFICAION_TOPIC, new TestNotificationMessageContents());
+			NotificationMessageHolder holder =
+				new NotificationMessageHolder(forwardingPort, getMyEPR(false), TEST_NOTIFICAION_TOPIC,
+					new TestNotificationMessageContents());
 			try {
 				ICallingContext callingContext = ContextManager.getExistingContext();
 				Notify notification = new Notify(new NotificationMessageHolderType[] { holder.toAxisType() }, null);
@@ -176,9 +177,10 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			TopicQueryExpression topicFilter = RNSTopics.RNS_CONTENT_CHANGE_TOPIC.asConcreteQueryExpression();
 			Subscription subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			EndpointReferenceType subscriptionReference = subscription.subscriptionReference();
-			response[0] = new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
-				NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
-				NotificationBrokerConstants.RNS_CONTENT_CHANGE_SUBSCRIPTION) }, subscriptionReference);
+			response[0] =
+				new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
+					NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
+					NotificationBrokerConstants.RNS_CONTENT_CHANGE_SUBSCRIPTION) }, subscriptionReference);
 
 			// Subscribe to attributes update on byteIOs that are children of the directory
 			// represented by the
@@ -187,9 +189,10 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			topicFilter = ByteIOTopics.BYTEIO_ATTRIBUTES_UPDATE_TOPIC.asConcreteQueryExpression();
 			subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			subscriptionReference = subscription.subscriptionReference();
-			response[1] = new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
-				NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
-				NotificationBrokerConstants.BYTEIO_ATTRIBUTE_CHANGE_SUBSCRIPTION) }, subscriptionReference);
+			response[1] =
+				new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
+					NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
+					NotificationBrokerConstants.BYTEIO_ATTRIBUTE_CHANGE_SUBSCRIPTION) }, subscriptionReference);
 
 			// Subscribe to authorization parameter update on the RNS resources and byteIOs that are
 			// children of
@@ -199,19 +202,20 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			topicFilter = GenesisIIBaseTopics.AUTHZ_CONFIG_UPDATE_TOPIC.asConcreteQueryExpression();
 			subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			subscriptionReference = subscription.subscriptionReference();
-			response[2] = new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
-				NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
-				NotificationBrokerConstants.RESOURCE_AUTHORIZATION_CHANGE_SUBSCRIPTION) }, subscriptionReference);
+			response[2] =
+				new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
+					NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
+					NotificationBrokerConstants.RESOURCE_AUTHORIZATION_CHANGE_SUBSCRIPTION) }, subscriptionReference);
 		} catch (Exception ex) {
 			_logger.info("Subscription request has been failed: " + ex.getMessage());
-			final SubscriptionFailedFaultType subscriptionFault = new SubscriptionFailedFaultType(null, Calendar.getInstance(),
-				publisher, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-					"Unable to create subscriptions.") }, null);
+			final SubscriptionFailedFaultType subscriptionFault =
+				new SubscriptionFailedFaultType(null, Calendar.getInstance(), publisher, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to create subscriptions.") }, null);
 			throw subscriptionFault;
 		}
 
-		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
-			.dereference();
+		NotificationBrokerDBResource resource =
+			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 
 		long subscriptionEndTime = System.currentTimeMillis() + subscriptionLifeTime + SUBSCRIPTION_TERMINATION_SAFETY_INTERVAL;
 		resource.storeSubscriptionTracesInDB(extractSubscriptionEPIs(response), publisher, subscriptionEndTime);
@@ -224,8 +228,8 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 	public GetMessagesResponse getUnreadMessages(BigInteger getUnreadMessagesRequest) throws RemoteException,
 		MessageMissedFaultType
 	{
-		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
-			.dereference();
+		NotificationBrokerDBResource resource =
+			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 		resource.loadMessageIndexFromDB();
 		int messageIndex = resource.getMessageIndex();
 		int clientsMessageIndex = getUnreadMessagesRequest.intValue();
@@ -241,8 +245,9 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			if (unsentMessages != null) {
 				manager.setMessageQueueOfBroker(resource.getKey(), unsentMessages);
 			}
-			final MessageMissedFaultType messageMissedFault = new MessageMissedFaultType(null, Calendar.getInstance(), null,
-				null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Messages are missing") }, null);
+			final MessageMissedFaultType messageMissedFault =
+				new MessageMissedFaultType(null, Calendar.getInstance(), null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Messages are missing") }, null);
 			throw messageMissedFault;
 		}
 		GetMessagesResponse response = manager.getMessagesResponseFromHeldMessages(unsentMessages, messageIndex);
@@ -262,8 +267,8 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 		UnableToGetMessagesFaultType, ResourceUnknownFaultType
 	{
 
-		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
-			.dereference();
+		NotificationBrokerDBResource resource =
+			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 		NotificationBrokerMessageManager manager = NotificationBrokerMessageManager.getManager();
 		List<OnHoldNotificationMessage> unsentMessages = manager.getMessageQueueOfBroker(resource.getKey());
 		resource.loadMessageIndexFromDB();
@@ -290,8 +295,8 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 	public void notify(Notify msg) throws RemoteException
 	{
 
-		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource()
-			.dereference();
+		NotificationBrokerDBResource resource =
+			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 		resource.initializeResourceFromDB();
 
 		EndpointReferenceType forwardingPort = resource.getForwardingPort();

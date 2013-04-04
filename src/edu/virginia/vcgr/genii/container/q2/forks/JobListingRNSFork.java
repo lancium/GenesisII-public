@@ -54,9 +54,10 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 		String[] acceptableStatuses = null;
 
 		if (forkPath.endsWith("/all"))
-			acceptableStatuses = new String[] { JobStateEnumerationType._ERROR, JobStateEnumerationType._FINISHED,
-				JobStateEnumerationType._QUEUED, JobStateEnumerationType._REQUEUED, JobStateEnumerationType._RUNNING,
-				JobStateEnumerationType._STARTING };
+			acceptableStatuses =
+				new String[] { JobStateEnumerationType._ERROR, JobStateEnumerationType._FINISHED,
+					JobStateEnumerationType._QUEUED, JobStateEnumerationType._REQUEUED, JobStateEnumerationType._RUNNING,
+					JobStateEnumerationType._STARTING };
 		else if (forkPath.endsWith("/queued"))
 			acceptableStatuses = new String[] { JobStateEnumerationType._QUEUED, JobStateEnumerationType._REQUEUED };
 		else if (forkPath.endsWith("/running")) {

@@ -57,8 +57,8 @@ public class CloudJobWrapper
 
 			ResourceOverrides overrides = new ResourceOverrides();
 
-			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(tmpDir, overrides.operatingSystemName(),
-				overrides.cpuArchitecture());
+			ProcessWrapper wrapper =
+				ProcessWrapperFactory.createWrapper(tmpDir, overrides.operatingSystemName(), overrides.cpuArchitecture());
 			boolean first = true;
 
 			String execName = job.getExecutable().getTarget();

@@ -54,9 +54,9 @@ public abstract class MatchingParameter
 		while (iter.hasNext()) {
 			MessageElement element = (MessageElement) iter.next();
 			// or only comes from jsdl does not support nested OR
-			DefaultMatchingParameter child = new DefaultMatchingParameter(
-				element.getAttribute(GeniiPropertyFacet.PROPERTY_NAME_ATTRIBUTE),
-				element.getAttribute(GeniiPropertyFacet.PROPERTY_VALUE_ATTRIBUTE), true);
+			DefaultMatchingParameter child =
+				new DefaultMatchingParameter(element.getAttribute(GeniiPropertyFacet.PROPERTY_NAME_ATTRIBUTE),
+					element.getAttribute(GeniiPropertyFacet.PROPERTY_VALUE_ATTRIBUTE), true);
 			if (child != null)
 				parameter.addMatchingParameter(child);
 		}

@@ -80,8 +80,9 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 	public CreateDeploymentResponseType createDeployment(CreateDeploymentRequestType createDeploymentRequest)
 		throws RemoteException
 	{
-		VcgrCreate create = new VcgrCreate(new MessageElement[] { new MessageElement(DEPLOYMENT_CONSTRUCTION_PARAM,
-			createDeploymentRequest.getDeploymentDescription()) });
+		VcgrCreate create =
+			new VcgrCreate(new MessageElement[] { new MessageElement(DEPLOYMENT_CONSTRUCTION_PARAM,
+				createDeploymentRequest.getDeploymentDescription()) });
 		VcgrCreateResponse resp = vcgrCreate(create);
 		return new CreateDeploymentResponseType(resp.getEndpoint());
 	}
@@ -100,8 +101,8 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 		InputStream bin = null;
 		try {
 			bin = ByteIOStreamFactory.createInputStream(depDescEPR);
-			deployDoc = (DeploymentDocumentType) ObjectDeserializer.deserialize(new InputSource(bin),
-				DeploymentDocumentType.class);
+			deployDoc =
+				(DeploymentDocumentType) ObjectDeserializer.deserialize(new InputSource(bin), DeploymentDocumentType.class);
 
 			MessageElement[] any = deployDoc.get_any();
 			if (any == null || any.length != 1)
@@ -112,7 +113,8 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 				throw new RemoteException("Deployment document not recognized.");
 
 			if (name.equals(ApplicationDescriptionUtils.ZIPJAR_DEPLOYMENT_ELEMENT_QNAME)) {
-				deployment = createZipJarDeployment(depDescEPR, ObjectDeserializer.toObject(any[0], ZipJarDeploymentType.class));
+				deployment =
+					createZipJarDeployment(depDescEPR, ObjectDeserializer.toObject(any[0], ZipJarDeploymentType.class));
 
 			} else if (name.equals(ApplicationDescriptionUtils.BINARY_DEPLOYMENT_ELEMENT_QNAME)) {
 				deployment = createBinaryDeployment(depDescEPR, ObjectDeserializer.toObject(any[0], BinDeploymentType.class));

@@ -22,7 +22,7 @@ import edu.virginia.vcgr.genii.cloud.VMStat;
 import edu.virginia.vcgr.genii.cloud.VMState;
 import edu.virginia.vcgr.genii.cloud.ssh.SSHSession;
 
-//This class must be thread safe!!
+// This class must be thread safe!!
 public class EC2Manager implements CloudManager
 {
 

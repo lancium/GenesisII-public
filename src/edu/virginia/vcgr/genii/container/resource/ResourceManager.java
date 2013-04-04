@@ -167,10 +167,10 @@ public class ResourceManager
 			}
 
 			// get authz/enc requirements
-			IAuthZProvider handler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-				.getServiceName());
-			MessageLevelSecurityRequirements minMsgSec = new MessageLevelSecurityRequirements(
-				MessageLevelSecurityRequirements.NONE);
+			IAuthZProvider handler =
+				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+			MessageLevelSecurityRequirements minMsgSec =
+				new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
 			if ((handler != null) && (handler.getMinIncomingMsgLevelSecurity(resource) != null)) {
 				minMsgSec = handler.getMinIncomingMsgLevelSecurity(resource);
 			}
@@ -188,8 +188,9 @@ public class ResourceManager
 					org.apache.axis.types.URI serverTlsUri = new org.apache.axis.types.URI(SecurityConstants.SERVER_TLS_URI);
 					PolicyReference serverTlsReference = new PolicyReference();
 					serverTlsReference.setURI(serverTlsUri);
-					MessageElement tlsMel = new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(),
-						"PolicyReference", serverTlsReference);
+					MessageElement tlsMel =
+						new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference",
+							serverTlsReference);
 					policyComponents.add(tlsMel);
 				}
 
@@ -200,8 +201,9 @@ public class ResourceManager
 					org.apache.axis.types.URI mutualX509Uri = new org.apache.axis.types.URI(SecurityConstants.MUTUAL_X509_URI);
 					PolicyReference mutualX509Reference = new PolicyReference();
 					mutualX509Reference.setURI(mutualX509Uri);
-					MessageElement x509Mel = new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(),
-						"PolicyReference", mutualX509Reference);
+					MessageElement x509Mel =
+						new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference",
+							mutualX509Reference);
 					policyComponents.add(x509Mel);
 
 					// add our optional blend of Credentials
@@ -216,19 +218,21 @@ public class ResourceManager
 					// create saml token
 					TokenAssertionType samlToken = new TokenAssertionType();
 					samlToken.setIncludeToken(includeToken);
-					MessageElement[] samlSubEls = { new MessageElement(ClaimsType.getTypeDesc().getXmlType().getNamespaceURI(),
-						"Claims", claims) };
+					MessageElement[] samlSubEls =
+						{ new MessageElement(ClaimsType.getTypeDesc().getXmlType().getNamespaceURI(), "Claims", claims) };
 					samlToken.set_any(samlSubEls);
 
 					// create policy
 					Policy samlPolicy = new Policy();
-					MessageElement[] policySubEls = { new MessageElement(TokenAssertionType.getTypeDesc().getXmlType()
-						.getNamespaceURI(), "SamlToken", samlToken) };
+					MessageElement[] policySubEls =
+						{ new MessageElement(TokenAssertionType.getTypeDesc().getXmlType().getNamespaceURI(), "SamlToken",
+							samlToken) };
 					samlPolicy.set_any(policySubEls);
 
 					// create SignedSupporting Tokens
-					MessageElement signedSupportingTokensMel = new MessageElement(new QName(NestedPolicyType.getTypeDesc()
-						.getXmlType().getNamespaceURI(), "SignedSupportingTokens"));
+					MessageElement signedSupportingTokensMel =
+						new MessageElement(new QName(NestedPolicyType.getTypeDesc().getXmlType().getNamespaceURI(),
+							"SignedSupportingTokens"));
 					signedSupportingTokensMel.setAttribute(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Optional",
 						"true");
 					signedSupportingTokensMel.addChild(new MessageElement(Policy.getTypeDesc().getXmlType().getNamespaceURI(),
@@ -241,17 +245,20 @@ public class ResourceManager
 				if (minMsgSec.isEncrypt()) {
 					SePartsType encryptedParts = new SePartsType();
 					encryptedParts.setBody(new EmptyType());
-					MessageElement encryptMel = new MessageElement(SePartsType.getTypeDesc().getXmlType().getNamespaceURI(),
-						"EncryptedParts", encryptedParts);
+					MessageElement encryptMel =
+						new MessageElement(SePartsType.getTypeDesc().getXmlType().getNamespaceURI(), "EncryptedParts",
+							encryptedParts);
 					policyComponents.add(encryptMel);
 				}
 
 				// add optional username/token
-				org.apache.axis.types.URI usernameTokenUri = new org.apache.axis.types.URI(SecurityConstants.USERNAME_TOKEN_URI);
+				org.apache.axis.types.URI usernameTokenUri =
+					new org.apache.axis.types.URI(SecurityConstants.USERNAME_TOKEN_URI);
 				PolicyReference usernameTokenReference = new PolicyReference();
 				usernameTokenReference.setURI(usernameTokenUri);
-				MessageElement usernameTokenMel = new MessageElement(PolicyReference.getTypeDesc().getXmlType()
-					.getNamespaceURI(), "PolicyReference", usernameTokenReference);
+				MessageElement usernameTokenMel =
+					new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference",
+						usernameTokenReference);
 				usernameTokenMel.setAttribute(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Optional", "true");
 				policyComponents.add(usernameTokenMel);
 
@@ -268,8 +275,8 @@ public class ResourceManager
 				PolicyAttachment policyAttachment = new PolicyAttachment();
 				policyAttachment.setAppliesTo(appliesTo);
 				policyAttachment.setPolicy(metaPolicy);
-				MessageElement policyAttachmentMel = new MessageElement(PolicyAttachment.getTypeDesc().getXmlType(),
-					policyAttachment);
+				MessageElement policyAttachmentMel =
+					new MessageElement(PolicyAttachment.getTypeDesc().getXmlType(), policyAttachment);
 
 				metaDataAny.add(policyAttachmentMel);
 			}
@@ -303,8 +310,8 @@ public class ResourceManager
 			}
 
 			// add minimum level of message level security
-			IAuthZProvider handler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-				.getServiceName());
+			IAuthZProvider handler =
+				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 			if (handler != null) {
 				MessageLevelSecurityRequirements minMsgSec = handler.getMinIncomingMsgLevelSecurity(resource);
 
@@ -371,11 +378,12 @@ public class ResourceManager
 			// add security metadata (Use OGSA Secure Addressing depending on
 			// config setting)
 			try {
-				String useEap = Installation
-					.getDeployment(new DeploymentName())
-					.security()
-					.getProperty(
-						edu.virginia.vcgr.genii.client.configuration.SecurityConstants.Container.RESOURCE_IDENTITY_USE_OGSA_EAP_PROP);
+				String useEap =
+					Installation
+						.getDeployment(new DeploymentName())
+						.security()
+						.getProperty(
+							edu.virginia.vcgr.genii.client.configuration.SecurityConstants.Container.RESOURCE_IDENTITY_USE_OGSA_EAP_PROP);
 				if (useEap.equalsIgnoreCase("true")) {
 					addSecureAddressingElements(any, resource);
 				} else {

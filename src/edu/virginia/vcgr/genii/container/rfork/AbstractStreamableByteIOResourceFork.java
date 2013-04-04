@@ -42,8 +42,8 @@ public abstract class AbstractStreamableByteIOResourceFork extends AbstractByteI
 	{
 		try {
 			ResourceKey rKey = getService().getResourceKey();
-			Long position = (Long) rKey.dereference()
-				.getProperty(String.format(POSITION_PROPERTY_FORMAT_STRING, getForkPath()));
+			Long position =
+				(Long) rKey.dereference().getProperty(String.format(POSITION_PROPERTY_FORMAT_STRING, getForkPath()));
 			if (position == null)
 				return 0L;
 			return position.longValue();
@@ -65,8 +65,8 @@ public abstract class AbstractStreamableByteIOResourceFork extends AbstractByteI
 
 		try {
 			ResourceKey rKey = getService().getResourceKey();
-			Boolean dirty = (Boolean) rKey.dereference()
-				.getProperty(String.format(DIRTY_PROPERTY_FORMAT_STRING, getForkPath()));
+			Boolean dirty =
+				(Boolean) rKey.dereference().getProperty(String.format(DIRTY_PROPERTY_FORMAT_STRING, getForkPath()));
 			if (dirty == null)
 				ret = false;
 			else

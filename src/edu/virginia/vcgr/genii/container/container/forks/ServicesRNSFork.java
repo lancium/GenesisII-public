@@ -26,8 +26,8 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 {
 	private String shortenedURL() throws ResourceException
 	{
-		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-			WorkingContext.EPR_PROPERTY_NAME);
+		EndpointReferenceType myEPR =
+			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 		String ret = myEPR.getAddress().get_value().toString();
 		int last = ret.lastIndexOf('/');
 		if (last <= 0)
@@ -65,10 +65,10 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 			if (entryName == null || entryName.equals(serviceName)) {
 				ResourceKey targetKey = ResourceManager.getServiceResource(serviceName);
 
-				EndpointReferenceType targetEPR = ResourceManager.createEPR(
-					targetKey,
-					String.format("%s%s?%s=%s", shortenedURL(), serviceName, EPRUtils.GENII_CONTAINER_ID_PARAMETER,
-						Container.getContainerID()), findImplementedPortTypes(desc.getImplClass()), serviceName);
+				EndpointReferenceType targetEPR =
+					ResourceManager.createEPR(targetKey, String.format("%s%s?%s=%s", shortenedURL(), serviceName,
+						EPRUtils.GENII_CONTAINER_ID_PARAMETER, Container.getContainerID()), findImplementedPortTypes(desc
+						.getImplClass()), serviceName);
 				ret.add(new InternalEntry(serviceName, targetEPR));
 			}
 		}

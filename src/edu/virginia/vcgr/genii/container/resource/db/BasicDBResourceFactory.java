@@ -18,12 +18,14 @@ public class BasicDBResourceFactory implements IResourceFactory
 {
 	static private Log _logger = LogFactory.getLog(BasicDBResourceFactory.class);
 
-	static private final String _CREATE_UNKNOWN_ATTRS_TABLE_STMT = "CREATE TABLE unknownattrs (resourceid VARCHAR(128) PRIMARY KEY,"
-		+ "attrname VARCHAR(256) NOT NULL," + "attrvalues BLOB(2G) NOT NULL)";
+	static private final String _CREATE_UNKNOWN_ATTRS_TABLE_STMT =
+		"CREATE TABLE unknownattrs (resourceid VARCHAR(128) PRIMARY KEY," + "attrname VARCHAR(256) NOT NULL,"
+			+ "attrvalues BLOB(2G) NOT NULL)";
 	static private final String _CREATE_KEY_TABLE_STMT = "CREATE TABLE resources (resourceid VARCHAR(128) PRIMARY KEY,"
 		+ "createtime TIMESTAMP)";
-	static private final String _CREATE_PROPERTY_TABLE_STMT = "CREATE TABLE properties (resourceid VARCHAR(128), propname VARCHAR(256),"
-		+ "propvalue BLOB(2G), CONSTRAINT propertiesconstraint1 " + "PRIMARY KEY (resourceid, propname))";
+	static private final String _CREATE_PROPERTY_TABLE_STMT =
+		"CREATE TABLE properties (resourceid VARCHAR(128), propname VARCHAR(256),"
+			+ "propvalue BLOB(2G), CONSTRAINT propertiesconstraint1 " + "PRIMARY KEY (resourceid, propname))";
 	static private final String _CREATE_MATCHING_PARAMS_STMT = "CREATE TABLE matchingparams ("
 		+ "resourceid VARCHAR(128), paramname VARCHAR(256)," + "paramvalue VARCHAR(256), "
 		+ "CONSTRAINT matchingparamsconstraint1 PRIMARY KEY " + "(resourceid, paramname, paramvalue))";

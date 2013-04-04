@@ -86,7 +86,8 @@ public class RExportResolverUtils
 	 * 
 	 * @return newEPR: EPR with both primary and resolver EPRs
 	 */
-	static public EndpointReferenceType createResolutionEPR(EndpointReferenceType primaryEPR, EndpointReferenceType resolverEPR)
+	static public EndpointReferenceType
+		createResolutionEPR(EndpointReferenceType primaryEPR, EndpointReferenceType resolverEPR)
 	{
 		// disect components of primaryEPR
 		org.ws.addressing.AttributedURIType origAddress = primaryEPR.getAddress();
@@ -96,8 +97,8 @@ public class RExportResolverUtils
 
 		// create new metadata element containing resolver epr
 		org.ws.addressing.MetadataType newMetadata = null;
-		org.apache.axis.message.MessageElement newResolverElement = new org.apache.axis.message.MessageElement(
-			WSName.REFERENCE_RESOLVER_QNAME, resolverEPR);
+		org.apache.axis.message.MessageElement newResolverElement =
+			new org.apache.axis.message.MessageElement(WSName.REFERENCE_RESOLVER_QNAME, resolverEPR);
 
 		// preserve any existing metadata elements
 		if (origMetadata == null) {
@@ -110,7 +111,8 @@ public class RExportResolverUtils
 		}
 
 		// setup new metadata elements with old elements and new resolver addition
-		org.apache.axis.message.MessageElement[] newMetadataElements = new org.apache.axis.message.MessageElement[numMetadataElements + 1];
+		org.apache.axis.message.MessageElement[] newMetadataElements =
+			new org.apache.axis.message.MessageElement[numMetadataElements + 1];
 
 		for (int i = 0; i < numMetadataElements; i++) {
 			newMetadataElements[i] = origMetadataElements[i];
@@ -135,8 +137,8 @@ public class RExportResolverUtils
 		try {
 			EndpointReferenceType resolverEPR = entry.getResolverEPR();
 			SubscriptionFactory factory = new DefaultSubscriptionFactory(resolverEPR);
-			RExportResolverTerminateUserData userData = new RExportResolverTerminateUserData(URI.create(entry.getCommonEPI()
-				.toString()));
+			RExportResolverTerminateUserData userData =
+				new RExportResolverTerminateUserData(URI.create(entry.getCommonEPI().toString()));
 			factory.subscribe(entry.getPrimaryEPR(),
 				GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(), null, userData);
 		} catch (SubscribeException se) {
@@ -171,8 +173,9 @@ public class RExportResolverUtils
 		RExportResolverFactoryPortType resolverFactoryProxy = null;
 
 		try {
-			resolverFactoryProxy = ClientUtils.createProxy(RExportResolverFactoryPortType.class,
-				EPRUtils.makeEPR(Container.getServiceURL("RExportResolverFactoryPortType")));
+			resolverFactoryProxy =
+				ClientUtils.createProxy(RExportResolverFactoryPortType.class,
+					EPRUtils.makeEPR(Container.getServiceURL("RExportResolverFactoryPortType")));
 		} catch (Exception e) {
 			throw new CreationException("Could not create proxy to resolver factory", e);
 		}
@@ -184,8 +187,8 @@ public class RExportResolverUtils
 		MessageElement[] resolverCreationProperties = new MessageElement[3];
 
 		// pass export path to local primary location
-		resolverCreationProperties[0] = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME),
-			primaryLocalPath);
+		resolverCreationProperties[0] =
+			new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), primaryLocalPath);
 
 		// set type of resolver
 		// non-root resolvers do not create replica resource with resolver creation
@@ -195,14 +198,14 @@ public class RExportResolverUtils
 		EndpointReferenceType replicationServiceEPR = getResolverServiceEPR(dirResolverEPR);
 
 		// pass resolver service epr to create replica at specified location
-		resolverCreationProperties[2] = new MessageElement(RExportResolverServiceImpl.REXPORT_RESOLVER_SERVICE_EPR_NAME,
-			replicationServiceEPR);
+		resolverCreationProperties[2] =
+			new MessageElement(RExportResolverServiceImpl.REXPORT_RESOLVER_SERVICE_EPR_NAME, replicationServiceEPR);
 
 		// create new resolver using resolver factory
 		CreateResolverResponseType resolverCreationResponse = null;
 		try {
-			resolverCreationResponse = resolverFactoryProxy.createResolver(new CreateResolverRequestType(oldEPR,
-				resolverCreationProperties));
+			resolverCreationResponse =
+				resolverFactoryProxy.createResolver(new CreateResolverRequestType(oldEPR, resolverCreationProperties));
 		} catch (Throwable t) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Could not create rexport resolver.");
@@ -225,14 +228,15 @@ public class RExportResolverUtils
 			// setup proxy to export resolver (to container where resolver was created)
 			RExportResolverPortType resolverService = ClientUtils.createProxy(RExportResolverPortType.class, resolverEPR);
 
-			replicaEPR = resolverService.createReplica(
-				new CreateReplicaRequest(resolvedEPR, primaryDataStream, replicaType, replicaName)).getReplica_EPR();
+			replicaEPR =
+				resolverService.createReplica(
+					new CreateReplicaRequest(resolvedEPR, primaryDataStream, replicaType, replicaName)).getReplica_EPR();
 		} catch (Exception e) {
 			throw new ResourceException("Unable to connect to rexport resolver to create replica.", e);
 		} finally {
 			if (primaryDataStream != null) {
-				StreamableByteIOPortType streamProxy = ClientUtils.createProxy(StreamableByteIOPortType.class,
-					primaryDataStream);
+				StreamableByteIOPortType streamProxy =
+					ClientUtils.createProxy(StreamableByteIOPortType.class, primaryDataStream);
 				streamProxy.destroy(new Destroy());
 			}
 		}
@@ -267,8 +271,8 @@ public class RExportResolverUtils
 
 		/* create instance of correct replication service */
 		try {
-			ExportedFilePortType exportedFileService = ClientUtils
-				.createProxy(ExportedFilePortType.class, exportFileServiceEPR);
+			ExportedFilePortType exportedFileService =
+				ClientUtils.createProxy(ExportedFilePortType.class, exportFileServiceEPR);
 			primaryDataEPR = (exportedFileService.openStream(primaryLocalPath).getEndpoint());
 
 		} catch (Exception e) {
@@ -418,8 +422,8 @@ public class RExportResolverUtils
 		try {
 			// get epr of rexport resolver service
 			// at current (primary) container where new export entry was created
-			EndpointReferenceType rexportResolverServiceEPR = EPRUtils.makeEPR(Container
-				.getServiceURL("RExportResolverPortType"));
+			EndpointReferenceType rexportResolverServiceEPR =
+				EPRUtils.makeEPR(Container.getServiceURL("RExportResolverPortType"));
 
 			ResourceKey rKey = ResourceManager.getTargetResource(rexportResolverServiceEPR);
 			IRExportResolverResource resource = (IRExportResolverResource) rKey.dereference();
@@ -532,8 +536,8 @@ public class RExportResolverUtils
 		// set new parameters
 		resolverCreationProperties[0] = new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
 		resolverCreationProperties[0].setValue(WSName.generateNewEPI().toString());
-		resolverCreationProperties[1] = new MessageElement(
-			RExportResolverServiceImpl.REXPORT_RESOLVER_TARGET_CONSTRUCTION_PARAMETER, targetEPR);
+		resolverCreationProperties[1] =
+			new MessageElement(RExportResolverServiceImpl.REXPORT_RESOLVER_TARGET_CONSTRUCTION_PARAMETER, targetEPR);
 
 		// add old parameters to new parameters
 		for (int i = 0; i < numExistingElements; i++) {
@@ -579,8 +583,8 @@ public class RExportResolverUtils
 			RExportResolverPortType resolverProxy = ClientUtils.createProxy(RExportResolverPortType.class, resolverEPR);
 
 			// !replace with own method called "getResolverServiceEPR(void)"
-			resolverServiceEPR = resolverProxy.getResolverServiceEPR(new ServiceEPRRequest(resolverEPR))
-				.getResolverServiceEPR();
+			resolverServiceEPR =
+				resolverProxy.getResolverServiceEPR(new ServiceEPRRequest(resolverEPR)).getResolverServiceEPR();
 		} catch (Exception ce) {
 			throw FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
 				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(ce.getLocalizedMessage()) }, null));

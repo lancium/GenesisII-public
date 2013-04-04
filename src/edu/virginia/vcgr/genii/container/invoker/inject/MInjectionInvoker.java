@@ -12,8 +12,8 @@ public class MInjectionInvoker implements IAroundInvoker
 	static private MInjector _injector;
 
 	static {
-		_injector = new MInjector(new ResourceMInjectResolver(), new CallingContextInjectionResolver(),
-			new MNamingInjectionResolver());
+		_injector =
+			new MInjector(new ResourceMInjectResolver(), new CallingContextInjectionResolver(), new MNamingInjectionResolver());
 	}
 
 	static public void inject(Object target) throws InjectionException

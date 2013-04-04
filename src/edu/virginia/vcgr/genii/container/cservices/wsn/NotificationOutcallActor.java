@@ -62,8 +62,9 @@ public class NotificationOutcallActor implements OutcallActor
 		MessageElement[] additionalAttributes = null;
 
 		for (NotificationMessageOutcallContent content : _contents) {
-			NotificationMessageHolder holder = new NotificationMessageHolder(content.subscriptionReference(),
-				content.publisher(), content.topic(), content.contents());
+			NotificationMessageHolder holder =
+				new NotificationMessageHolder(content.subscriptionReference(), content.publisher(), content.topic(),
+					content.contents());
 			holders.add(holder.toAxisType());
 			additionalAttributes = content.contents().getAdditionalAttributes();
 
@@ -82,8 +83,8 @@ public class NotificationOutcallActor implements OutcallActor
 		Notify notify = new Notify(holders.toArray(new NotificationMessageHolderType[holders.size()]), null);
 		notify.set_any(messageElements.toArray(new MessageElement[messageElements.size()]));
 
-		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, target, (callingContext == null) ? _callingContext
-			: callingContext);
+		GeniiCommon common =
+			ClientUtils.createProxy(GeniiCommon.class, target, (callingContext == null) ? _callingContext : callingContext);
 		if (attachment != null) {
 			Collection<GeniiAttachment> attachments = new LinkedList<GeniiAttachment>();
 			attachments.add(attachment);

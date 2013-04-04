@@ -140,7 +140,8 @@ public class EC2TypicaController implements CloudController
 
 	@Override
 	// Work on this make sure reliable? (persistent with exponential backoff?
-	public boolean killResources(Collection<VMStat> vms) throws Exception
+		public
+		boolean killResources(Collection<VMStat> vms) throws Exception
 	{
 		List<String> idList = new ArrayList<String>();
 		for (VMStat tStat : vms) {

@@ -19,7 +19,8 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 {
 	static final long serialVersionUID = 0L;
 
-	static private Map<String, WSIteratorConstructionParameters> _originalConsParms = new HashMap<String, WSIteratorConstructionParameters>();
+	static private Map<String, WSIteratorConstructionParameters> _originalConsParms =
+		new HashMap<String, WSIteratorConstructionParameters>();
 
 	transient private int _preferredBatchSize;
 

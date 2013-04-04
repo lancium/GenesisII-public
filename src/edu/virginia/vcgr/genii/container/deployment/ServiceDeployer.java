@@ -155,8 +155,8 @@ public class ServiceDeployer extends Thread
 			if (_DEPLOYMENT_FILE_PATTERN.matcher(file.getName()).matches()) {
 				JarFile jFile = null;
 				try {
-					URLClassLoader loader = new URLClassLoader(new URL[] { file.toURI().toURL() }, Thread.currentThread()
-						.getContextClassLoader());
+					URLClassLoader loader =
+						new URLClassLoader(new URL[] { file.toURI().toURL() }, Thread.currentThread().getContextClassLoader());
 
 					jFile = new JarFile(file);
 					Enumeration<JarEntry> entries = jFile.entries();

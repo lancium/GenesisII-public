@@ -31,8 +31,8 @@ public class ContainerServices
 	static private Collection<ContainerService> getServices(HierarchicalDirectory configDirectory) throws IOException
 	{
 		HierarchicalDirectory configurationDirectory = configDirectory.lookupDirectory("cservices");
-		Collection<ContainerServiceConfiguration> configs = ContainerServiceConfiguration
-			.loadConfigurations(configurationDirectory);
+		Collection<ContainerServiceConfiguration> configs =
+			ContainerServiceConfiguration.loadConfigurations(configurationDirectory);
 		Collection<ContainerService> ret = new ArrayList<ContainerService>(configs.size());
 		Class<? extends ContainerService> serviceClass = null;
 

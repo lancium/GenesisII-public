@@ -38,8 +38,8 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 
 		try {
 			connection = getConnectionPool().acquire(false);
-			PersistentOutcallEntry entry = PersistentOutcallDatabase.add(connection, target, callingContext, actor, scheduler,
-				attachment);
+			PersistentOutcallEntry entry =
+				PersistentOutcallDatabase.add(connection, target, callingContext, actor, scheduler, attachment);
 			connection.commit();
 
 			synchronized (_entries) {

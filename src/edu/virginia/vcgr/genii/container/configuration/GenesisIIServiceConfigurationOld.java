@@ -71,7 +71,8 @@ public class GenesisIIServiceConfigurationOld
 		return _defaultResolverFactoryProxy;
 	}
 
-	static private Map<Class<?>, GenesisIIServiceConfigurationOld> _confMap = new HashMap<Class<?>, GenesisIIServiceConfigurationOld>();
+	static private Map<Class<?>, GenesisIIServiceConfigurationOld> _confMap =
+		new HashMap<Class<?>, GenesisIIServiceConfigurationOld>();
 
 	static private GenesisIIServiceConfigurationOld discoverServiceConfiguration(Class<?> serviceClass)
 	{

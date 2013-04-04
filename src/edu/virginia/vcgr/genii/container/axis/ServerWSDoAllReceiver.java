@@ -1,17 +1,15 @@
 /*
- * Copyright 2006 University of Virginia 
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
+ * Copyright 2006 University of Virginia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package edu.virginia.vcgr.genii.container.axis;
@@ -120,8 +118,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		try {
 			IResource resource = ResourceManager.getCurrentResource().dereference();
 
-			IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-				.getServiceName());
+			IAuthZProvider authZHandler =
+				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 
 			if ((authZHandler == null) || (authZHandler.getMinIncomingMsgLevelSecurity(resource).isNone())) {
 				resource.commit();
@@ -129,6 +127,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				// there
 				// are no incoming headers, don't do any crypto processing
 
+				_logger.debug("beginning server message processing");
 				Message sm = msgContext.getCurrentMessage();
 				if (sm == null) {
 					// We did not receive anything...Usually happens when we get
@@ -172,8 +171,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			// get the resource's min messsage-sec level
 			MessageLevelSecurityRequirements resourceMinMsgSec;
 			IResource resource = ResourceManager.getCurrentResource().dereference();
-			IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-				.getServiceName());
+			IAuthZProvider authZHandler =
+				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 
 			if (authZHandler == null) {
 				resourceMinMsgSec = new MessageLevelSecurityRequirements();
@@ -358,8 +357,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				}
 
 				if (!match) {
-					String msg = "credential failed to match incoming message sender: \""
-						+ assertion.describe(VerbosityLevel.HIGH) + "\"";
+					String msg =
+						"credential failed to match incoming message sender: \"" + assertion.describe(VerbosityLevel.HIGH)
+							+ "\"";
 					_logger.error(msg);
 					throw new AuthZSecurityException(msg);
 				}
@@ -380,7 +380,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	@SuppressWarnings("unchecked")
 	protected void performAuthz() throws AxisFault
 	{
-
+		if (_logger.isDebugEnabled())
+			_logger.debug("entering authorization checks...");
 		try {
 			// Grab working and message contexts
 			WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
@@ -407,13 +408,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 			// Grab the client-hello authenticated SSL cert-chain (if there
 			// was one)
-			org.mortbay.jetty.Request req = (org.mortbay.jetty.Request) messageContext
-				.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+			org.mortbay.jetty.Request req =
+				(org.mortbay.jetty.Request) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
 			Object transport = req.getConnection().getEndPoint().getTransport();
 			if (transport instanceof SSLSocket) {
 				try {
-					X509Certificate[] clientSslCertChain = (X509Certificate[]) ((SSLSocket) transport).getSession()
-						.getPeerCertificates();
+					X509Certificate[] clientSslCertChain =
+						(X509Certificate[]) ((SSLSocket) transport).getSession().getPeerCertificates();
 					if (clientSslCertChain != null) {
 						authenticatedCertChains.add(clientSslCertChain);
 					}
@@ -433,10 +434,10 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 			// Retrieve and authenticate other accumulated
 			// message-level credentials (e.g., GII delegated assertions, etc.)
-			ArrayList<NuCredential> bearerCredentials = (ArrayList<NuCredential>) callContext
-				.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
-			Collection<NuCredential> authenticatedCallerCreds = authenticateBearerCredentials(bearerCredentials,
-				authenticatedCertChains, targetCertChain);
+			ArrayList<NuCredential> bearerCredentials =
+				(ArrayList<NuCredential>) callContext.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
+			Collection<NuCredential> authenticatedCallerCreds =
+				authenticateBearerCredentials(bearerCredentials, authenticatedCertChains, targetCertChain);
 
 			// Finally add all of our callerIds to the calling-context's
 			// outgoing credentials
@@ -461,12 +462,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 			// Get the resource's authz handler
 			IResource resource = ResourceManager.getCurrentResource().dereference();
-			IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-				.getServiceName());
+			IAuthZProvider authZHandler =
+				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 
 			// Let the authZ handler make the decision
-			boolean accessOkay = authZHandler.checkAccess(authenticatedCallerCreds, resource,
-				(jDesc == null) ? operation.getDeclaringClass() : jDesc.getImplClass(), operation);
+			boolean accessOkay =
+				authZHandler.checkAccess(authenticatedCallerCreds, resource, (jDesc == null) ? operation.getDeclaringClass()
+					: jDesc.getImplClass(), operation);
 
 			if (accessOkay) {
 				resource.commit();
@@ -496,14 +498,14 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		// calling context. This is done because we traditionally use the calling context, not the
 		// working context, for all security related purposes. Furthermore, this usage matches the
 		// client-side credentials handling logic.
-		CredentialWallet credentialsWallet = (CredentialWallet) workingContext
-			.getProperty(SAMLConstants.SAML_CREDENTIALS_WORKING_CONTEXT_CREDS_PROPERTY_NAME);
+		CredentialWallet credentialsWallet =
+			(CredentialWallet) workingContext.getProperty(SAMLConstants.SAML_CREDENTIALS_WORKING_CONTEXT_CREDS_PROPERTY_NAME);
 		callContext.setTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME, credentialsWallet);
 
 		// Like the credential wallet, we copy client's SSL certificate from the working context to
 		// the calling context.
-		X509Certificate[] clientSSLCertificate = (X509Certificate[]) workingContext
-			.getProperty(SAMLConstants.SAML_CLIENT_SSL_CERTIFICATE_PROPERTY_NAME);
+		X509Certificate[] clientSSLCertificate =
+			(X509Certificate[]) workingContext.getProperty(SAMLConstants.SAML_CLIENT_SSL_CERTIFICATE_PROPERTY_NAME);
 		callContext.setTransientProperty(SAMLConstants.SAML_CLIENT_SSL_CERTIFICATE_PROPERTY_NAME, clientSSLCertificate);
 	}
 
@@ -561,8 +563,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 						case WSPasswordCallback.USERNAME_TOKEN_UNKNOWN:
 
 							// Grab the supplied username token
-							UsernamePasswordIdentity identity = new UsernamePasswordIdentity(pc.getIdentifer(),
-								pc.getPassword());
+							UsernamePasswordIdentity identity =
+								new UsernamePasswordIdentity(pc.getIdentifer(), pc.getPassword());
 
 							// Extract our calling context (any decryption
 							// should be over with)
@@ -574,8 +576,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 							}
 
 							// add the UT to the caller's credential list
-							ArrayList<NuCredential> callerCredentials = (ArrayList<NuCredential>) callContext
-								.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
+							ArrayList<NuCredential> callerCredentials =
+								(ArrayList<NuCredential>) callContext
+									.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
 							callerCredentials.add(identity);
 
 							break;

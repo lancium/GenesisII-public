@@ -134,8 +134,8 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 		Duration gDur = null;
 		if (mel != null) {
 			try {
-				org.apache.axis.types.Duration aDur = (org.apache.axis.types.Duration) mel
-					.getObjectValue(org.apache.axis.types.Duration.class);
+				org.apache.axis.types.Duration aDur =
+					(org.apache.axis.types.Duration) mel.getObjectValue(org.apache.axis.types.Duration.class);
 				gDur = AxisDuration.fromApacheDuration(aDur);
 			} catch (Exception e) {
 				throw new ResourceException("Unable to set cache coherence window.", e);
@@ -148,8 +148,8 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getPermissionsString() throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-			.getServiceName());
+		IAuthZProvider authZHandler =
+			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
@@ -161,8 +161,8 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getAuthZConfig() throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-			.getServiceName());
+		IAuthZProvider authZHandler =
+			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null) {
 			config = authZHandler.getAuthZConfig(resource);
@@ -191,8 +191,8 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 		}
 
 		// get the authZ handler
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey())
-			.getServiceName());
+		IAuthZProvider authZHandler =
+			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		if (authZHandler == null) {
 			throw new ResourceException("Resource does not have an AuthZ module");
 		}

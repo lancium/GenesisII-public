@@ -31,8 +31,8 @@ public class ClassMethodStatistics extends GenesisIIStyledPage
 		int index = classShortName.lastIndexOf('.');
 		classShortName = classShortName.substring(index + 1);
 
-		edu.virginia.vcgr.genii.client.stats.ContainerStatistics stats = edu.virginia.vcgr.genii.client.stats.ContainerStatistics
-			.instance();
+		edu.virginia.vcgr.genii.client.stats.ContainerStatistics stats =
+			edu.virginia.vcgr.genii.client.stats.ContainerStatistics.instance();
 
 		MethodStatistics mStats = stats.getMethodStatistics();
 		Map<TimeInterval, MethodStatisticsReport> report = mStats.report();

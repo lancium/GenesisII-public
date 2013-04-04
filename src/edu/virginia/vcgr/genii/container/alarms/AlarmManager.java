@@ -188,8 +188,9 @@ public class AlarmManager
 
 		if (targetEPR == null) {
 			try {
-				targetEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-					WorkingContext.EPR_PROPERTY_NAME);
+				targetEPR =
+					(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
+						WorkingContext.EPR_PROPERTY_NAME);
 			} catch (Throwable cause) {
 				_logger.error("Unable to get current target EPR.", cause);
 			}
@@ -197,8 +198,9 @@ public class AlarmManager
 
 		try {
 			conn = _connectionPool.acquire(true);
-			addStmt = conn.prepareStatement("INSERT INTO alarmtable(" + "nextoccurance, repeatinterval, callingcontext, "
-				+ "target, methodname, userdata) " + "VALUES (?, ?, ?, ?, ?, ?)");
+			addStmt =
+				conn.prepareStatement("INSERT INTO alarmtable(" + "nextoccurance, repeatinterval, callingcontext, "
+					+ "target, methodname, userdata) " + "VALUES (?, ?, ?, ?, ?, ?)");
 			addStmt.setTimestamp(1, new Timestamp(nextOccurance.getTime()));
 			addStmt.setLong(2, repeatIntervalMS);
 			addStmt.setBlob(3, DBSerializer.toBlob(callingContext, "alarmtable", "callingcontext"));
@@ -334,8 +336,9 @@ public class AlarmManager
 
 		try {
 			conn = _connectionPool.acquire(false);
-			getInfoStmt = conn.prepareStatement("SELECT repeatinterval, callingcontext, target, " + "methodname, userdata "
-				+ "FROM alarmtable WHERE alarmid = ?");
+			getInfoStmt =
+				conn.prepareStatement("SELECT repeatinterval, callingcontext, target, " + "methodname, userdata "
+					+ "FROM alarmtable WHERE alarmid = ?");
 			removeStmt = conn.prepareStatement("DELETE FROM alarmtable WHERE alarmid = ?");
 			updateStmt = conn.prepareStatement("UPDATE alarmtable SET nextoccurance = ? WHERE alarmid = ?");
 
@@ -345,10 +348,10 @@ public class AlarmManager
 					getInfoStmt.setLong(1, desc.getAlarmID());
 					rs = getInfoStmt.executeQuery();
 					if (rs.next()) {
-						aInfo = new AlarmInformation(desc.getAlarmID(), rs.getLong(1),
-							(ICallingContext) DBSerializer.fromBlob(rs.getBlob(2)),
-							(EndpointReferenceType) EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4), DBSerializer.fromBlob(rs
-								.getBlob(5)));
+						aInfo =
+							new AlarmInformation(desc.getAlarmID(), rs.getLong(1), (ICallingContext) DBSerializer.fromBlob(rs
+								.getBlob(2)), (EndpointReferenceType) EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4),
+								DBSerializer.fromBlob(rs.getBlob(5)));
 						StreamUtils.close(rs);
 						rs = null;
 

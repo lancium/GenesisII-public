@@ -40,8 +40,8 @@ public class ExponentialBackoffScheduler implements AttemptScheduler
 		_lifetime = lifetime;
 		_maxFailedAttempts = maxFailedAttempts;
 		_backoffBase = TimeUnit.MILLISECONDS.convert(backoffBase, backoffBaseUnits);
-		_backoffTwitterBase = (backoffTwitterBase == null) ? null : TimeUnit.MILLISECONDS.convert(backoffTwitterBase,
-			backoffTwitterBaseUnits);
+		_backoffTwitterBase =
+			(backoffTwitterBase == null) ? null : TimeUnit.MILLISECONDS.convert(backoffTwitterBase, backoffTwitterBaseUnits);
 	}
 
 	public ExponentialBackoffScheduler(long lifetime, TimeUnit lifetimeUnits, Integer maxFailedAttempts,
@@ -63,8 +63,8 @@ public class ExponentialBackoffScheduler implements AttemptScheduler
 		_exponentAttemptCap = exponentAttemptCap;
 		_maxFailedAttempts = maxFailedAttempts;
 		_backoffBase = TimeUnit.MILLISECONDS.convert(backoffBase, backoffBaseUnits);
-		_backoffTwitterBase = (backoffTwitterBase == null) ? null : TimeUnit.MILLISECONDS.convert(backoffTwitterBase,
-			backoffTwitterBaseUnits);
+		_backoffTwitterBase =
+			(backoffTwitterBase == null) ? null : TimeUnit.MILLISECONDS.convert(backoffTwitterBase, backoffTwitterBaseUnits);
 	}
 
 	@Override

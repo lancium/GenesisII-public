@@ -73,9 +73,10 @@ public class ScratchFSDatabase
 			stmt = conn.createStatement();
 			pStmt = conn.prepareStatement("DELETE FROM swapmgrdirectories WHERE dirid = ?");
 
-			rs = stmt.executeQuery(String
-				.format("SELECT dirid, directory FROM swapmgrdirectories " + "WHERE " + "{fn TIMESTAMPDIFF(SQL_TSI_SECOND, "
-					+ "lastidlestart, CURRENT_TIMESTAMP)} > %d", (idleTimeoutMillis / 1000L)));
+			rs =
+				stmt.executeQuery(String.format("SELECT dirid, directory FROM swapmgrdirectories " + "WHERE "
+					+ "{fn TIMESTAMPDIFF(SQL_TSI_SECOND, " + "lastidlestart, CURRENT_TIMESTAMP)} > %d",
+					(idleTimeoutMillis / 1000L)));
 			while (rs.next()) {
 				pStmt.setLong(1, rs.getLong(1));
 				pStmt.addBatch();
@@ -118,8 +119,9 @@ public class ScratchFSDatabase
 			stmt.close();
 			stmt = null;
 
-			stmt = conn.prepareStatement("INSERT INTO swapmgrdirectoryreservations "
-				+ "(dirid, timeacquired) VALUES (?, CURRENT_TIMESTAMP)");
+			stmt =
+				conn.prepareStatement("INSERT INTO swapmgrdirectoryreservations "
+					+ "(dirid, timeacquired) VALUES (?, CURRENT_TIMESTAMP)");
 			stmt.setLong(1, dirid);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to insert new reservation into database.");
@@ -209,8 +211,9 @@ public class ScratchFSDatabase
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = conn.prepareStatement("UPDATE swapmgrdirectories " + "SET lastidlestart = CURRENT_TIMESTAMP "
-				+ "WHERE dirid = ? AND " + "dirid NOT IN " + "(SELECT dirid FROM swapmgrdirectoryreservations)");
+			stmt =
+				conn.prepareStatement("UPDATE swapmgrdirectories " + "SET lastidlestart = CURRENT_TIMESTAMP "
+					+ "WHERE dirid = ? AND " + "dirid NOT IN " + "(SELECT dirid FROM swapmgrdirectoryreservations)");
 			stmt.setLong(1, dirid);
 
 			stmt.executeUpdate();

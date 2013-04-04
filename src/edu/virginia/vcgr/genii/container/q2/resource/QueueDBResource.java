@@ -16,7 +16,8 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class QueueDBResource extends BasicDBResource implements IQueueResource
 {
-	static final public String IS_ACCEPTING_NEW_ACTIVITIES_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.q2.resource.is-accepting-new-activities";
+	static final public String IS_ACCEPTING_NEW_ACTIVITIES_PROPERTY_NAME =
+		"edu.virginia.vcgr.genii.container.q2.resource.is-accepting-new-activities";
 
 	public QueueDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
 	{

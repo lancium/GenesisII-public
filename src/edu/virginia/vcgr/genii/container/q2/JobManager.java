@@ -144,7 +144,8 @@ public class JobManager implements Closeable
 	 * All jobs in the queue, separated into lists for each user. Each user map is sorted like the
 	 * full map above.
 	 */
-	private HashMap<String, TreeMap<SortableJobKey, JobData>> _usersWithJobs = new HashMap<String, TreeMap<SortableJobKey, JobData>>();
+	private HashMap<String, TreeMap<SortableJobKey, JobData>> _usersWithJobs =
+		new HashMap<String, TreeMap<SortableJobKey, JobData>>();
 
 	/**
 	 * A map of all jobs currently running (or starting) in the queue.
@@ -232,8 +233,9 @@ public class JobManager implements Closeable
 
 					HashMap<Long, PartialJobInfo> jobInfo = _database.getPartialJobInfos(connection, jobID);
 
-					Collection<Identity> identities = SecurityUtils.filterCredentials(jobInfo.get(job.getJobID()).getOwners(),
-						SecurityUtils.GROUP_TOKEN_PATTERN);
+					Collection<Identity> identities =
+						SecurityUtils.filterCredentials(jobInfo.get(job.getJobID()).getOwners(),
+							SecurityUtils.GROUP_TOKEN_PATTERN);
 
 					identities = SecurityUtils.filterCredentials(identities, SecurityUtils.CLIENT_IDENTITY_PATTERN);
 
@@ -585,8 +587,8 @@ public class JobManager implements Closeable
 			QueueStates state = QueueStates.QUEUED;
 			Date submitTime = new Date();
 
-			HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Default,
-				_database.historyKey(ticket));
+			HistoryContext history =
+				HistoryContextFactory.createContext(HistoryEventCategory.Default, _database.historyKey(ticket));
 
 			/*
 			 * Submit the job information into the queue (and get a new jobID from the database for
@@ -616,8 +618,8 @@ public class JobManager implements Closeable
 			 * Create a new data structure for the job's in memory information and put it into the
 			 * in-memory lists.
 			 */
-			JobData job = new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0,
-				history);
+			JobData job =
+				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history);
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
@@ -1866,7 +1868,8 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public void addJobErrorInformation(Connection connection, long jobid, short attempt, Collection<String> errors)
+	synchronized public void
+		addJobErrorInformation(Connection connection, long jobid, short attempt, Collection<String> errors)
 	{
 		try {
 			_database.addError(connection, jobid, attempt, errors);
@@ -2100,8 +2103,8 @@ public class JobManager implements Closeable
 			 * If the caller doesn't own the job, it's a security exception
 			 */
 			if (!QueueSecurity.isOwner(pji.getOwners())) {
-				GenesisIISecurityException t = new GenesisIISecurityException("Don't have permission to kill job \""
-					+ jobData.getJobTicket() + "\".");
+				GenesisIISecurityException t =
+					new GenesisIISecurityException("Don't have permission to kill job \"" + jobData.getJobTicket() + "\".");
 				jobData.history(HistoryEventCategory.Terminating).createWarnWriter("Termination Request Denied")
 					.format("Denying termination request.  Caller not authorized.").close();
 				throw t;
@@ -2291,8 +2294,8 @@ public class JobManager implements Closeable
 
 					startCtxt = history.setContextProperties(startCtxt);
 
-					GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, entryType.getEntry_reference(),
-						startCtxt);
+					GeniiBESPortType bes =
+						ClientUtils.createProxy(GeniiBESPortType.class, entryType.getEntry_reference(), startCtxt);
 
 					ClientUtils.setTimeout(bes, 120 * 1000);
 					ActivityDocumentType adt = new ActivityDocumentType(startInfo.getJSDL(), null);
@@ -2302,8 +2305,8 @@ public class JobManager implements Closeable
 							BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(), null,
 							new JobCompletedAdditionUserData(_jobID)));
 
-					HistoryEventWriter hWriter = history.createDebugWriter("Making CreateActivity Outcall on %s",
-						_besManager.getBESName(_besID));
+					HistoryEventWriter hWriter =
+						history.createDebugWriter("Making CreateActivity Outcall on %s", _besManager.getBESName(_besID));
 
 					hWriter.format("Making outcall to resource %s.", _besManager.getBESName(_besID)).close();
 					historyToken = hWriter.getToken();
@@ -2318,8 +2321,9 @@ public class JobManager implements Closeable
 					history.debug("CreateActivity Outcall Succeeded");
 
 					SequenceNumber parentNumber = historyToken.retrieve();
-					historyToken = InMemoryHistoryEventSink.wrapEvents(parentNumber, _besManager.getBESName(_besID), null,
-						_database.historyKey(data.getJobTicket()), resp == null ? null : resp.get_any());
+					historyToken =
+						InMemoryHistoryEventSink.wrapEvents(parentNumber, _besManager.getBESName(_besID), null,
+							_database.historyKey(data.getJobTicket()), resp == null ? null : resp.get_any());
 
 					data.historyToken(historyToken);
 					_database.historyToken(connection, _jobID, historyToken);
@@ -2597,8 +2601,9 @@ public class JobManager implements Closeable
 						jobID.add(_jobData.getJobID());
 						HashMap<Long, PartialJobInfo> jobInfo = _database.getPartialJobInfos(connection, jobID);
 
-						Collection<Identity> identities = SecurityUtils.filterCredentials(jobInfo.get(_jobData.getJobID())
-							.getOwners(), SecurityUtils.GROUP_TOKEN_PATTERN);
+						Collection<Identity> identities =
+							SecurityUtils.filterCredentials(jobInfo.get(_jobData.getJobID()).getOwners(),
+								SecurityUtils.GROUP_TOKEN_PATTERN);
 						identities = SecurityUtils.filterCredentials(identities, SecurityUtils.CLIENT_IDENTITY_PATTERN);
 
 						String username = identities.iterator().next().toString();

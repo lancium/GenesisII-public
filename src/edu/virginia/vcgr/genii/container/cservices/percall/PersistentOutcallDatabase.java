@@ -71,16 +71,17 @@ class PersistentOutcallDatabase
 		int success = 0;
 		int total = 0;
 
-		TreeSet<PersistentOutcallEntry> ret = new TreeSet<PersistentOutcallEntry>(
-			PersistentOutcallEntry.NEXT_ATTEMPT_COMPARATOR);
+		TreeSet<PersistentOutcallEntry> ret =
+			new TreeSet<PersistentOutcallEntry>(PersistentOutcallEntry.NEXT_ATTEMPT_COMPARATOR);
 		Statement stmt = null;
 		PreparedStatement pStmt = null;
 		ResultSet rs = null;
 
 		try {
 			stmt = connection.createStatement();
-			rs = stmt.executeQuery("SELECT id, nextattempt, createtime,"
-				+ "attemptscheduler, numattempts FROM persistentoutcalls");
+			rs =
+				stmt.executeQuery("SELECT id, nextattempt, createtime,"
+					+ "attemptscheduler, numattempts FROM persistentoutcalls");
 			while (rs.next()) {
 				total++;
 				long id = -1L;
@@ -154,9 +155,10 @@ class PersistentOutcallDatabase
 		}
 
 		try {
-			stmt = connection.prepareStatement("INSERT INTO persistentoutcalls(target, outcallhandler, "
-				+ "callingcontext, nextattempt, createtime, attemptscheduler, "
-				+ "numattempts, attachment) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+			stmt =
+				connection.prepareStatement("INSERT INTO persistentoutcalls(target, outcallhandler, "
+					+ "callingcontext, nextattempt, createtime, attemptscheduler, "
+					+ "numattempts, attachment) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setBlob(1, EPRUtils.toBlob(target, "persistentoutcalls", "target"));
 			stmt.setBlob(2, DBSerializer.toBlob(outcallActor, "persistentoutcalls", "outcallhandler"));
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "persistentoutcalls", "callingcontext"));
@@ -207,8 +209,9 @@ class PersistentOutcallDatabase
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			stmt = connection.prepareStatement("SELECT target, callingcontext, outcallhandler, attachment "
-				+ "FROM persistentoutcalls WHERE id = ?");
+			stmt =
+				connection.prepareStatement("SELECT target, callingcontext, outcallhandler, attachment "
+					+ "FROM persistentoutcalls WHERE id = ?");
 			stmt.setLong(1, entry.entryID());
 			rs = stmt.executeQuery();
 			if (rs.next()) {
@@ -254,8 +257,8 @@ class PersistentOutcallDatabase
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = connection.prepareStatement("UPDATE persistentoutcalls "
-				+ "SET nextattempt = ?, numattempts = ? WHERE id = ?");
+			stmt =
+				connection.prepareStatement("UPDATE persistentoutcalls " + "SET nextattempt = ?, numattempts = ? WHERE id = ?");
 			stmt.setTimestamp(1, convert(entry.nextAttempt()));
 			stmt.setInt(2, entry.numAttempts());
 			stmt.setLong(3, entry.entryID());

@@ -102,8 +102,9 @@ public class JobUpdateWorker implements OutcallHandler
 			try {
 				jobEndpoint = _jobEndpointResolver.getJobEndpoint(connection, _jobInfo.getJobID());
 			} catch (Throwable cause) {
-				String message = String.format("Failure to get job endpoint on job %s with connection=%s jobId=%s", _data,
-					connection, _jobInfo.getJobID());
+				String message =
+					String.format("Failure to get job endpoint on job %s with connection=%s jobId=%s", _data, connection,
+						_jobInfo.getJobID());
 				_logger.error(message);
 				history.error(message);
 				throw cause;
@@ -142,8 +143,9 @@ public class JobUpdateWorker implements OutcallHandler
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Making grid outcall to check status of job %s", _data));
 				/* call the BES container to get the activity's status. */
-				activityStatuses = clientStub.getActivityStatuses(
-					new GetActivityStatusesType(new EndpointReferenceType[] { jobEndpoint }, null)).getResponse();
+				activityStatuses =
+					clientStub.getActivityStatuses(
+						new GetActivityStatusesType(new EndpointReferenceType[] { jobEndpoint }, null)).getResponse();
 				_jobManager.resetJobCommunicationAttempts(connection, _jobInfo.getJobID());
 				connection.commit();
 			} catch (GenesisIISecurityException gse) {
@@ -153,8 +155,9 @@ public class JobUpdateWorker implements OutcallHandler
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("There was a security exception checking on status of job %s.", _data), gse);
 				wasSecurityException = true;
-				activityStatuses = new GetActivityStatusResponseType[] { new GetActivityStatusResponseType(jobEndpoint,
-					new ActivityStatusType(null, ActivityStateEnumeration.Failed), null, null) };
+				activityStatuses =
+					new GetActivityStatusResponseType[] { new GetActivityStatusResponseType(jobEndpoint,
+						new ActivityStatusType(null, ActivityStateEnumeration.Failed), null, null) };
 			} finally {
 				_data.clearJobAction();
 			}

@@ -137,7 +137,8 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		return null;
 	}
 
-	static protected List<String> resetCommand(List<String> commandLine, File workingDirectory, Map<String, String> environment)
+	static protected List<String>
+		resetCommand(List<String> commandLine, File workingDirectory, Map<String, String> environment)
 	{
 		ArrayList<String> newCommandLine = new ArrayList<String>(commandLine.size());
 

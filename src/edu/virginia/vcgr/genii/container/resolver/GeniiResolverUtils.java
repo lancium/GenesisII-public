@@ -47,16 +47,17 @@ public class GeniiResolverUtils
 		// The target EPR contains the resolver EPR (in case the target address is down),
 		// and the resolver EPR contains the target EPR's ID (so that the resolver can select
 		// another replica when the target EPR is down).
-		resolverEPR = createUserInfoEPR(resolverEPR, GeniiResolverServiceImpl.GENII_RESOLVER_TARGET_ID_KEY, new Integer(
-			targetID), true);
+		resolverEPR =
+			createUserInfoEPR(resolverEPR, GeniiResolverServiceImpl.GENII_RESOLVER_TARGET_ID_KEY, new Integer(targetID), true);
 		resolvers.add(new ResolverDescription(targetEPI, resolverEPR, ResolverType.EPI_RESOLVER));
 
 		Integer nextID = (Integer) resource.getProperty(NEXT_TARGET_ID_PROP_NAME);
 		if (nextID != null) {
 			URI resolverEPI = EPRUtils.extractEndpointIdentifier(resolverEPR);
 			resolverEPR = resource.getTargetEPR(resolverEPI, nextID);
-			resolverEPR = createUserInfoEPR(resolverEPR, GeniiResolverServiceImpl.GENII_RESOLVER_TARGET_ID_KEY, new Integer(
-				targetID), true);
+			resolverEPR =
+				createUserInfoEPR(resolverEPR, GeniiResolverServiceImpl.GENII_RESOLVER_TARGET_ID_KEY, new Integer(targetID),
+					true);
 			resolvers.add(new ResolverDescription(targetEPI, resolverEPR, ResolverType.EPI_RESOLVER));
 		}
 
@@ -75,15 +76,17 @@ public class GeniiResolverUtils
 		EndpointReferenceType subscriptionEPR = null;
 		try {
 			if (resolverEPR == null) {
-				resolverEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-					WorkingContext.EPR_PROPERTY_NAME);
+				resolverEPR =
+					(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
+						WorkingContext.EPR_PROPERTY_NAME);
 			}
 			SubscriptionFactory factory = new DefaultSubscriptionFactory(resolverEPR);
 			WSName wsname = new WSName(targetEPR);
 			URI targetEPI = wsname.getEndpointIdentifier();
 			SimpleResolverTerminateUserData userData = new SimpleResolverTerminateUserData(targetEPI, targetID);
-			Subscription subscription = factory.subscribe(targetEPR,
-				GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(), null, userData);
+			Subscription subscription =
+				factory.subscribe(targetEPR, GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(), null,
+					userData);
 			subscriptionEPR = subscription.subscriptionReference();
 			// String subscriptionID = targetEPI + ":" + targetID;
 			// resource.recordSubscription(subscriptionID, subscriptionEPR);
@@ -133,8 +136,8 @@ public class GeniiResolverUtils
 		if (targetIDList.length > 0)
 			return targetIDList;
 		// Not this EPI? Do nothing.
-		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-			WorkingContext.EPR_PROPERTY_NAME);
+		EndpointReferenceType myEPR =
+			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 		if (!targetEPI.equals(EPRUtils.extractEndpointIdentifier(myEPR)))
 			return targetIDList;
 		// Initialize.
@@ -157,8 +160,8 @@ public class GeniiResolverUtils
 		throws ResourceException
 	{
 		// Not this EPI? Do nothing.
-		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-			WorkingContext.EPR_PROPERTY_NAME);
+		EndpointReferenceType myEPR =
+			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 		if (!targetEPI.equals(EPRUtils.extractEndpointIdentifier(myEPR)))
 			return;
 		Integer nextID = (Integer) resource.getProperty(NEXT_TARGET_ID_PROP_NAME);

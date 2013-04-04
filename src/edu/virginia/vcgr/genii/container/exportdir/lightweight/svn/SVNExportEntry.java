@@ -137,8 +137,8 @@ class SVNExportEntry extends AbstractVExportEntry implements VExportFile, VExpor
 		Collection<VExportEntry> ret = new LinkedList<VExportEntry>();
 
 		try {
-			Collection<SVNDirEntry> contents = _repository.getDir(getRelativePath(), _revision, (SVNProperties) null,
-				(Collection<?>) null);
+			Collection<SVNDirEntry> contents =
+				_repository.getDir(getRelativePath(), _revision, (SVNProperties) null, (Collection<?>) null);
 			for (SVNDirEntry entry : contents) {
 				String myPath = getRelativePath();
 				if (name == null || name.equals(entry.getName()))

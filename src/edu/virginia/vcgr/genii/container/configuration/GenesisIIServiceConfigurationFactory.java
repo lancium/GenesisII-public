@@ -17,7 +17,8 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 
 public class GenesisIIServiceConfigurationFactory
 {
-	static private Map<Class<?>, GenesisIIServiceConfiguration> _configurationMap = new HashMap<Class<?>, GenesisIIServiceConfiguration>();
+	static private Map<Class<?>, GenesisIIServiceConfiguration> _configurationMap =
+		new HashMap<Class<?>, GenesisIIServiceConfiguration>();
 
 	static private GenesisIIServiceConfiguration loadConfiguration(Class<?> serviceClass)
 	{
@@ -33,8 +34,8 @@ public class GenesisIIServiceConfigurationFactory
 					try {
 						JAXBContext context = JAXBContext.newInstance(composite.jaxbServiceConfigurationClass());
 						Unmarshaller u = context.createUnmarshaller();
-						jaxbConf = u.unmarshal(new StreamSource(configFile), composite.jaxbServiceConfigurationClass())
-							.getValue();
+						jaxbConf =
+							u.unmarshal(new StreamSource(configFile), composite.jaxbServiceConfigurationClass()).getValue();
 					} catch (JAXBException e) {
 						throw new ConfigurationException(String.format("Unable to deserialize %s into %s for service %s.",
 							configFile, composite.jaxbServiceConfigurationClass(), serviceClass), e);

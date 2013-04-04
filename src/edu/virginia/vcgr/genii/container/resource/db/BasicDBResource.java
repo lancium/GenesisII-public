@@ -46,7 +46,8 @@ import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 
 public class BasicDBResource implements IResource
 {
-	static protected final String _SPECIAL_SERVICE_KEY_TEMPLATE = "edu.virginia.vcgr.genii.container.resource.db.special-service-key.";
+	static protected final String _SPECIAL_SERVICE_KEY_TEMPLATE =
+		"edu.virginia.vcgr.genii.container.resource.db.special-service-key.";
 
 	static private final String _VERIFY_STMT = "SELECT createtime FROM resources WHERE resourceid = ?";
 	static private final String _CREATE_STMT = "INSERT INTO resources VALUES(?, ?)";
@@ -396,8 +397,9 @@ public class BasicDBResource implements IResource
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = _connection.prepareStatement("INSERT INTO matchingparams" + "(resourceid, paramname, paramvalue) "
-				+ "VALUES (?, ?, ?)");
+			stmt =
+				_connection.prepareStatement("INSERT INTO matchingparams" + "(resourceid, paramname, paramvalue) "
+					+ "VALUES (?, ?, ?)");
 
 			for (MatchingParameter param : parameters) {
 				stmt.setString(1, _resourceKey);
@@ -420,8 +422,9 @@ public class BasicDBResource implements IResource
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = _connection.prepareStatement("DELETE FROM matchingparams " + "WHERE resourceid = ? AND paramname = ? "
-				+ "AND paramvalue = ?");
+			stmt =
+				_connection.prepareStatement("DELETE FROM matchingparams " + "WHERE resourceid = ? AND paramname = ? "
+					+ "AND paramvalue = ?");
 
 			for (MatchingParameter param : parameters) {
 				stmt.setString(1, _resourceKey);
@@ -520,11 +523,12 @@ public class BasicDBResource implements IResource
 		}
 	}
 
-	static public ConstructionParameters constructionParameters(Connection connection, Class<?> serviceClass, String resourceid)
-		throws SQLException
+	static public ConstructionParameters
+		constructionParameters(Connection connection, Class<?> serviceClass, String resourceid) throws SQLException
 	{
-		ConstructionParameters cParams = (ConstructionParameters) getProperty(connection, resourceid,
-			ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString());
+		ConstructionParameters cParams =
+			(ConstructionParameters) getProperty(connection, resourceid,
+				ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString());
 
 		if (cParams == null)
 			cParams = ConstructionParameters.instantiateDefault(serviceClass);
@@ -535,8 +539,8 @@ public class BasicDBResource implements IResource
 	@Override
 	public ConstructionParameters constructionParameters(Class<?> serviceClass) throws ResourceException
 	{
-		ConstructionParameters cParams = (ConstructionParameters) getProperty(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME
-			.toString());
+		ConstructionParameters cParams =
+			(ConstructionParameters) getProperty(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString());
 
 		if (cParams == null)
 			cParams = ConstructionParameters.instantiateDefault(serviceClass);

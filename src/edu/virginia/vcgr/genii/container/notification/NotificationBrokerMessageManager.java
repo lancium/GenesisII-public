@@ -25,12 +25,13 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.NotificationMessageH
 import edu.virginia.vcgr.genii.container.cservices.wsn.NotificationMessageOutcallContent;
 
 /*
- * This class holds the notification messages that are addressed to notification brokers that do not support
- * outcalls to client because of interim firewall or NAT in the network. It holds the processed notification 
- * messages, not the original published content. This is done to avoid XML parsing overhead when each broker
- * pulls the notification messages. Finally, it expects the broker to claim its notification messages within
- * five minutes of the generation time. Longer lived messages are get cleaned up by a cleaner thread.
- * */
+ * This class holds the notification messages that are addressed to notification brokers that do not
+ * support outcalls to client because of interim firewall or NAT in the network. It holds the
+ * processed notification messages, not the original published content. This is done to avoid XML
+ * parsing overhead when each broker pulls the notification messages. Finally, it expects the broker
+ * to claim its notification messages within five minutes of the generation time. Longer lived
+ * messages are get cleaned up by a cleaner thread.
+ */
 public class NotificationBrokerMessageManager
 {
 
@@ -71,8 +72,9 @@ public class NotificationBrokerMessageManager
 	{
 
 		OnHoldNotificationMessage onHoldNotificationMessage = new OnHoldNotificationMessage();
-		NotificationMessageHolder holder = new NotificationMessageHolder(message.subscriptionReference(), message.publisher(),
-			message.topic(), message.contents());
+		NotificationMessageHolder holder =
+			new NotificationMessageHolder(message.subscriptionReference(), message.publisher(), message.topic(),
+				message.contents());
 		onHoldNotificationMessage.setHolderType(holder.toAxisType());
 		onHoldNotificationMessage.setAdditionalAttributes(message.contents().getAdditionalAttributes());
 		onHoldNotificationMessage.setMessagePublicationTime(new Date());
@@ -127,8 +129,8 @@ public class NotificationBrokerMessageManager
 			iteration++;
 			messageIndex++;
 		}
-		GetMessagesResponse response = new GetMessagesResponse(holders, attributeList.toArray(new MessageElement[attributeList
-			.size()]));
+		GetMessagesResponse response =
+			new GetMessagesResponse(holders, attributeList.toArray(new MessageElement[attributeList.size()]));
 		return response;
 	}
 

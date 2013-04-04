@@ -230,8 +230,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			}
 		}
 
-		InMemoryIteratorWrapper imiw = new InMemoryIteratorWrapper(this.getClass().getName(), indices,
-			new Object[] { _queueMgr });
+		InMemoryIteratorWrapper imiw =
+			new InMemoryIteratorWrapper(this.getClass().getName(), indices, new Object[] { _queueMgr });
 		IteratorBuilder<MessageElement> builder = iteratorBuilder();
 		builder.preferredBatchSize(QueueConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(col);
@@ -332,8 +332,9 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			JobDefinition jobDefinition = JSDLUtils.convert(submitJobRequest.getJobDefinition());
 			if (jobDefinition.parameterSweeps().size() > 0) {
 				SweepToken token;
-				token = SweepUtility.performSweep(jobDefinition,
-					listener = new SweepListenerImpl(_queueMgr, submitJobRequest.getPriority()));
+				token =
+					SweepUtility.performSweep(jobDefinition,
+						listener = new SweepListenerImpl(_queueMgr, submitJobRequest.getPriority()));
 				token.join();
 				ticket = listener.firstTicket();
 			} else {
@@ -379,8 +380,9 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			/*
 			 * Now we get the database connection pool configured with this service
 			 */
-			DatabaseConnectionPool connectionPool = ((QueueDBResourceFactory) ResourceManager.getServiceResource(_serviceName)
-				.getProvider().getFactory()).getConnectionPool();
+			DatabaseConnectionPool connectionPool =
+				((QueueDBResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory())
+					.getConnectionPool();
 
 			_logger.info("Restarting all BES Managers.");
 			QueueManager.startAllManagers(connectionPool);
@@ -454,8 +456,9 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	private boolean submitJobTryMulti(InputStream in) throws IOException
 	{
-		JobDefinition_Type[] jobDefs = ((JobMultiDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in),
-			JobMultiDefinition_Type.class)).getJobDefinition();
+		JobDefinition_Type[] jobDefs =
+			((JobMultiDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobMultiDefinition_Type.class))
+				.getJobDefinition();
 		if (jobDefs == null)
 			return false;
 
@@ -467,8 +470,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	private boolean submitJobTrySingle(InputStream in) throws IOException
 	{
-		JobDefinition_Type jobDef = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in),
-			JobDefinition_Type.class);
+		JobDefinition_Type jobDef =
+			(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
 		if (jobDef == null || jobDef.getJobDescription() == null)
 			return false;
 
@@ -666,8 +669,9 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 				+ "cannot currently be used as a BES!");
 		}
 
-		QueueAsBESFactoryAttributesUtilities utils = new QueueAsBESFactoryAttributesUtilities(_queueMgr.getBESManager()
-			.allBESInformation(), (QueueConstructionParameters) baseCP);
+		QueueAsBESFactoryAttributesUtilities utils =
+			new QueueAsBESFactoryAttributesUtilities(_queueMgr.getBESManager().allBESInformation(),
+				(QueueConstructionParameters) baseCP);
 		boolean isAcceptingNewActivities = _resource.isAcceptingNewActivites();
 		long totalNumberOfActivities = _queueMgr.getJobCount();
 		return new GetFactoryAttributesDocumentResponseType(utils.factoryResourceAttributes(isAcceptingNewActivities,
@@ -679,8 +683,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	public CreateActivityResponseType createActivity(CreateActivityType parameters) throws RemoteException,
 		NotAcceptingNewActivitiesFaultType, InvalidRequestMessageFaultType, UnsupportedFeatureFaultType, NotAuthorizedFaultType
 	{
-		SubmitJobResponseType resp = submitJob(new SubmitJobRequestType(parameters.getActivityDocument().getJobDefinition(),
-			(byte) 0));
+		SubmitJobResponseType resp =
+			submitJob(new SubmitJobRequestType(parameters.getActivityDocument().getJobDefinition(), (byte) 0));
 		String jobTicket = resp.getJobTicket();
 		String forkPath = String.format("/jobs/mine/all/%s", jobTicket);
 		EndpointReferenceType target = createForkEPR(forkPath, new JobFork(this, forkPath).describe());

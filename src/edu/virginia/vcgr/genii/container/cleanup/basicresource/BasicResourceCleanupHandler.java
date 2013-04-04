@@ -29,8 +29,9 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions "
-				+ "WHERE publisherresourcekey = ?");
+			stmt =
+				connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions "
+					+ "WHERE publisherresourcekey = ?");
 			stmt.setString(1, publisherKey);
 			rs = stmt.executeQuery();
 
@@ -50,8 +51,9 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = connection.prepareStatement(String.format("DELETE FROM %s WHERE %s = ?", tableResourceTriple.first(),
-				tableResourceTriple.second()));
+			stmt =
+				connection.prepareStatement(String.format("DELETE FROM %s WHERE %s = ?", tableResourceTriple.first(),
+					tableResourceTriple.second()));
 			stmt.setString(1, tableResourceTriple.third());
 			stmt.executeUpdate();
 		} finally {

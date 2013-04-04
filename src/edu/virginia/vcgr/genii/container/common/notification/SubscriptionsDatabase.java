@@ -58,9 +58,10 @@ public class SubscriptionsDatabase
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = connection.prepareStatement("INSERT INTO wsnsubscriptions(subscriptionresourcekey,"
-				+ "publisherresourcekey, subscriptionreference," + "consumerreference, topicquery,"
-				+ "policies, additionaluserdata) " + "VALUES (?, ?, ?, ?, ?, ?, ?)");
+			stmt =
+				connection.prepareStatement("INSERT INTO wsnsubscriptions(subscriptionresourcekey,"
+					+ "publisherresourcekey, subscriptionreference," + "consumerreference, topicquery,"
+					+ "policies, additionaluserdata) " + "VALUES (?, ?, ?, ?, ?, ?, ?)");
 
 			stmt.setString(1, subscriptionResourceKey);
 			stmt.setString(2, publisherResourceKey);
@@ -117,8 +118,9 @@ public class SubscriptionsDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions "
-				+ "WHERE publisherresourcekey = ?");
+			stmt =
+				connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions "
+					+ "WHERE publisherresourcekey = ?");
 			stmt.setString(1, publisherKey);
 			rs = stmt.executeQuery();
 
@@ -147,8 +149,9 @@ public class SubscriptionsDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement("SELECT subscriptionreference, consumerreference, topicquery, "
-				+ "policies, additionaluserdata FROM wsnsubscriptions " + "WHERE publisherresourcekey = ? AND paused = 0");
+			stmt =
+				connection.prepareStatement("SELECT subscriptionreference, consumerreference, topicquery, "
+					+ "policies, additionaluserdata FROM wsnsubscriptions " + "WHERE publisherresourcekey = ? AND paused = 0");
 			stmt.setString(1, publisherKey);
 			rs = stmt.executeQuery();
 
@@ -176,9 +179,10 @@ public class SubscriptionsDatabase
 		ResultSet rs = null;
 
 		try {
-			String sql = "SELECT subscriptionreference, consumerreference, topicquery, "
-				+ "policies, additionaluserdata FROM wsnsubscriptions " + "WHERE paused = 0 and publisherresourcekey in ("
-				+ joinStringsForInClause(publishers) + ")";
+			String sql =
+				"SELECT subscriptionreference, consumerreference, topicquery, "
+					+ "policies, additionaluserdata FROM wsnsubscriptions " + "WHERE paused = 0 and publisherresourcekey in ("
+					+ joinStringsForInClause(publishers) + ")";
 
 			stmt = connection.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -241,8 +245,8 @@ public class SubscriptionsDatabase
 			TopicQueryExpression topicFilter = (TopicQueryExpression) DBSerializer.fromBlob(rs.getBlob(3));
 
 			@SuppressWarnings("unchecked")
-			Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies = (Map<SubscriptionPolicyTypes, SubscriptionPolicy>) DBSerializer
-				.fromBlob(rs.getBlob(4));
+			Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies =
+				(Map<SubscriptionPolicyTypes, SubscriptionPolicy>) DBSerializer.fromBlob(rs.getBlob(4));
 
 			AdditionalUserData additionalUserData = (AdditionalUserData) DBSerializer.fromBlob(rs.getBlob(5));
 

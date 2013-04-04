@@ -112,8 +112,8 @@ public class InMemoryHistoryEventSink
 			MessageElement[] ret = new MessageElement[events.size()];
 			int lcv = 0;
 			for (HistoryEvent event : events) {
-				ret[lcv] = new MessageElement(SERIALIZATION_QNAME, new HistoryEventBundleType(
-					DBSerializer.serialize(event, -1L)));
+				ret[lcv] =
+					new MessageElement(SERIALIZATION_QNAME, new HistoryEventBundleType(DBSerializer.serialize(event, -1L)));
 				lcv++;
 			}
 

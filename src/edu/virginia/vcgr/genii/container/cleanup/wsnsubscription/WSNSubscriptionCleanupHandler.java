@@ -28,8 +28,9 @@ public class WSNSubscriptionCleanupHandler extends BasicResourceCleanupHandler
 
 		try {
 			stmt = connection.createStatement();
-			rs = stmt.executeQuery("SELECT subscriptionresourcekey, publisherresourcekey " + "FROM wsnsubscriptions "
-				+ "WHERE publisherresourcekey NOT IN " + "(SELECT resourceid FROM resources)");
+			rs =
+				stmt.executeQuery("SELECT subscriptionresourcekey, publisherresourcekey " + "FROM wsnsubscriptions "
+					+ "WHERE publisherresourcekey NOT IN " + "(SELECT resourceid FROM resources)");
 
 			while (rs.next()) {
 				String subkey = rs.getString(1);

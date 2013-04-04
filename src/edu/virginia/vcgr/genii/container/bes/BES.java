@@ -132,8 +132,8 @@ public class BES implements Closeable
 			rs = stmt.executeQuery("SELECT besid, userloggedinaction, screensaverinactiveaction " + "FROM bespolicytable");
 			while (rs.next()) {
 				String besid = rs.getString(1);
-				BESPolicy policy = new BESPolicy(BESPolicyActions.valueOf(rs.getString(2)), BESPolicyActions.valueOf(rs
-					.getString(3)));
+				BESPolicy policy =
+					new BESPolicy(BESPolicyActions.valueOf(rs.getString(2)), BESPolicyActions.valueOf(rs.getString(3)));
 
 				_logger.info(String.format("Loading BES with id: %s", besid));
 				supplementCreationParamsWithTweakerConfig(besid, connection);
@@ -142,8 +142,9 @@ public class BES implements Closeable
 				_knownInstances.put(besid, bes);
 
 				// Load CloudMangaer if BES is a cloudBES
-				BESConstructionParameters cParam = (BESConstructionParameters) DBBESResource.constructionParameters(connection,
-					GeniiBESServiceImpl.class, besid);
+				BESConstructionParameters cParam =
+					(BESConstructionParameters) DBBESResource.constructionParameters(connection, GeniiBESServiceImpl.class,
+						besid);
 				if (cParam.getCloudConfiguration() != null) {
 					try {
 						CloudMonitor.loadCloudInstance(besid, cParam.getCloudConfiguration());
@@ -180,8 +181,9 @@ public class BES implements Closeable
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt = connection.prepareStatement("INSERT INTO bespolicytable "
-				+ "(besid, userloggedinaction, screensaverinactiveaction) " + "VALUES (?, ?, ?)");
+			stmt =
+				connection.prepareStatement("INSERT INTO bespolicytable "
+					+ "(besid, userloggedinaction, screensaverinactiveaction) " + "VALUES (?, ?, ?)");
 			stmt.setString(1, besid);
 			stmt.setString(2, initialPolicy.getUserLoggedInAction().name());
 			stmt.setString(3, initialPolicy.getScreenSaverInactiveAction().name());
@@ -346,10 +348,12 @@ public class BES implements Closeable
 			else
 				connection = _connectionPool.acquire(false);
 
-			stmt = connection.prepareStatement("INSERT INTO besactivitiestable "
-				+ "(activityid, besid, jsdl, owners, callingcontext, " + "state, submittime, suspendrequested, "
-				+ "terminaterequested, activitycwd, executionplan, " + "nextphase, activityepr, activityservicename, jobname) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			stmt =
+				connection.prepareStatement("INSERT INTO besactivitiestable "
+					+ "(activityid, besid, jsdl, owners, callingcontext, " + "state, submittime, suspendrequested, "
+					+ "terminaterequested, activitycwd, executionplan, "
+					+ "nextphase, activityepr, activityservicename, jobname) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, activityid);
 			stmt.setString(2, _besid);
 			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl, "besactivitiestable", "jsdl"));
@@ -370,8 +374,9 @@ public class BES implements Closeable
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
 
-			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-				activityServiceName, jobName, false, false);
+			BESActivity activity =
+				new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0, activityServiceName,
+					jobName, false, false);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;
@@ -444,9 +449,10 @@ public class BES implements Closeable
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement("SELECT activityid, state, suspendrequested, "
-				+ "terminaterequested, activitycwd, executionplan, " + "nextphase, activityservicename, jobname "
-				+ "FROM besactivitiestable WHERE besid = ?");
+			stmt =
+				connection.prepareStatement("SELECT activityid, state, suspendrequested, "
+					+ "terminaterequested, activitycwd, executionplan, " + "nextphase, activityservicename, jobname "
+					+ "FROM besactivitiestable WHERE besid = ?");
 
 			int count = 0;
 			stmt.setString(1, _besid);
@@ -474,8 +480,9 @@ public class BES implements Closeable
 
 					_logger.info(String.format("Starting activity %d\n", count++));
 
-					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD,
-						executionPlan, nextPhase, activityServiceName, jobName, suspendRequested, terminateRequested);
+					BESActivity activity =
+						new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
+							activityServiceName, jobName, suspendRequested, terminateRequested);
 					_containedActivities.put(activityid, activity);
 					addActivityToBESMapping(activityid, this);
 				} catch (Throwable cause) {

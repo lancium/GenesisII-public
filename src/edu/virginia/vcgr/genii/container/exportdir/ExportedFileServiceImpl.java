@@ -49,9 +49,10 @@ public class ExportedFileServiceImpl extends RandomByteIOServiceImpl implements 
 			_logger.debug("Creating new ExportedFile Resource.");
 
 		if (constructionParameters == null) {
-			ResourceCreationFaultType rcft = new ResourceCreationFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-					"Could not create ExportedFile resource without cerationProperties") }, null);
+			ResourceCreationFaultType rcft =
+				new ResourceCreationFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+						"Could not create ExportedFile resource without cerationProperties") }, null);
 			throw FaultManipulator.fillInFault(rcft);
 		}
 

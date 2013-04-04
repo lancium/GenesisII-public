@@ -294,8 +294,8 @@ public class ResourceKey implements Closeable, Rollbackable
 						orgs.addAll(Arrays.asList(additionalOrgs));
 					}
 
-					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields = CertTool.constructCommonDnFields(
-						epi.toString(), orgs, CNs, null); // uid
+					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields =
+						CertTool.constructCommonDnFields(epi.toString(), orgs, CNs, null); // uid
 
 					consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
 						CertTool.createResourceCertChain(spec, additionalFields));

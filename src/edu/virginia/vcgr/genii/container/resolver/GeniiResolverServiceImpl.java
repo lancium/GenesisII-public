@@ -146,8 +146,8 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 		super.postCreate(rKey, myEPR, cParams, constructionParameters, resolverCreationParams);
 
 		IGeniiResolverResource resource = (IGeniiResolverResource) rKey.dereference();
-		EndpointReferenceType primaryEPR = (EndpointReferenceType) constructionParameters
-			.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		EndpointReferenceType primaryEPR =
+			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		EndpointReferenceType targetEPR = (EndpointReferenceType) constructionParameters.get(TARGET_EPR_PARAMETER);
 		if (primaryEPR != null) {
 			VersionedResourceUtils.initializeReplica(resource, primaryEPR, 0);
@@ -203,8 +203,8 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 			URI[] targetEPIList = _resource.getTargetEPIList();
 			targetEPI = targetEPIList[0];
 		}
-		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-			WorkingContext.EPR_PROPERTY_NAME);
+		EndpointReferenceType myEPR =
+			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 		int targetID = -1;
 		try {
 			AddressingParameters addParams = new AddressingParameters(myEPR.getReferenceParameters());
@@ -278,8 +278,8 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 		} finally {
 			_resourceLock.unlock();
 		}
-		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-			WorkingContext.EPR_PROPERTY_NAME);
+		EndpointReferenceType myEPR =
+			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 		newEPR = GeniiResolverUtils.createResolutionEPR(_resource, newEPR, myEPR, targetID);
 		return new UpdateResponseType(newEPR, targetID);
 	}
@@ -380,8 +380,9 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 			EndpointReferenceType targetEPR = resource.getTargetEPR(targetEPI, targetID);
 			GUID guid = EPRUtils.extractContainerID(targetEPR);
 			if (guid.toString().equals(containerID)) {
-				EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-					WorkingContext.EPR_PROPERTY_NAME);
+				EndpointReferenceType myEPR =
+					(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
+						WorkingContext.EPR_PROPERTY_NAME);
 				return GeniiResolverUtils.createResolutionEPR(resource, targetEPR, myEPR, targetID);
 			}
 		}
@@ -400,8 +401,8 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 	public LookupResponseType lookup(String[] lookupRequest) throws RemoteException, ResourceException
 	{
 		fixMetadataInWorkingContext();
-		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-			WorkingContext.EPR_PROPERTY_NAME);
+		EndpointReferenceType myEPR =
+			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 		Collection<RNSEntryResponseType> result = new LinkedList<RNSEntryResponseType>();
 
 		// If service, list all resolved resources (Target EPI --> Resolver EPR)
@@ -420,10 +421,10 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 					if (requestContainsFilename(lookupRequest, targetEPI.toString())) {
 						String entryResourceKey = mapEntry.getValue();
 						ResourceKey entryKey = ResourceManager.getTargetResource(serviceName, entryResourceKey);
-						EndpointReferenceType resolverEPR = ResourceManager.createEPR(entryKey, currentURL,
-							implementedPortTypes, null);
-						resolverEPR = GeniiResolverUtils.createUserInfoEPR(resolverEPR, GENII_RESOLVER_TARGET_EPI_KEY,
-							targetEPI, true);
+						EndpointReferenceType resolverEPR =
+							ResourceManager.createEPR(entryKey, currentURL, implementedPortTypes, null);
+						resolverEPR =
+							GeniiResolverUtils.createUserInfoEPR(resolverEPR, GENII_RESOLVER_TARGET_EPI_KEY, targetEPI, true);
 						result.add(new RNSEntryResponseType(resolverEPR, null, null, targetEPI.toString()));
 					}
 				}
@@ -441,8 +442,8 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 				for (int idx = 0; idx < targetEPIList.length; idx++) {
 					targetEPI = targetEPIList[idx];
 					if (requestContainsFilename(lookupRequest, targetEPI.toString())) {
-						EndpointReferenceType resolverEPR = GeniiResolverUtils.createUserInfoEPR(myEPR,
-							GENII_RESOLVER_TARGET_EPI_KEY, targetEPI, true);
+						EndpointReferenceType resolverEPR =
+							GeniiResolverUtils.createUserInfoEPR(myEPR, GENII_RESOLVER_TARGET_EPI_KEY, targetEPI, true);
 						result.add(new RNSEntryResponseType(resolverEPR, null, null, targetEPI.toString()));
 					}
 				}

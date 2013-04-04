@@ -96,8 +96,8 @@ public class PipeAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getPipeSizeAttr() throws ResourceUnknownFaultType, ResourceException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		PipeConstructionParameters consParms = (PipeConstructionParameters) resource
-			.constructionParameters(PipeServiceImpl.class);
+		PipeConstructionParameters consParms =
+			(PipeConstructionParameters) resource.constructionParameters(PipeServiceImpl.class);
 
 		return new MessageElement(PIPE_SIZE_QNAME, consParms.pipeSize());
 	}

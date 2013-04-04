@@ -110,8 +110,8 @@ public class WSNotificationContainerService extends AbstractContainerService
 				Set<String> indirectPublishers = getIndirectPublishers(publisherKey, contents, conn);
 				if (indirectPublishers == null || indirectPublishers.isEmpty())
 					return;
-				Collection<WSNSubscriptionInformation> indirectSubscriptions = SubscriptionsDatabase
-					.getSubscriptionsForIndirectPublishers(conn, indirectPublishers, topic);
+				Collection<WSNSubscriptionInformation> indirectSubscriptions =
+					SubscriptionsDatabase.getSubscriptionsForIndirectPublishers(conn, indirectPublishers, topic);
 				if (indirectSubscriptions != null) {
 					subscriptions.addAll(indirectSubscriptions);
 				}
@@ -121,8 +121,9 @@ public class WSNotificationContainerService extends AbstractContainerService
 			for (WSNSubscriptionInformation subscription : subscriptions) {
 				NotificationOutcallActor actor;
 
-				actor = new NotificationOutcallActor(new NotificationMessageOutcallContent(
-					subscription.subscriptionReference(), topic, publisherEPR, contents, subscription.additionalUserData()));
+				actor =
+					new NotificationOutcallActor(new NotificationMessageOutcallContent(subscription.subscriptionReference(),
+						topic, publisherEPR, contents, subscription.additionalUserData()));
 
 				boolean isPersistent = subscription.policies().containsKey(SubscriptionPolicyTypes.PersistentNotification);
 				if (_logger.isDebugEnabled())
@@ -131,8 +132,8 @@ public class WSNotificationContainerService extends AbstractContainerService
 
 				if (isPersistent) {
 					actor.setPersistent(true);
-					PersistentOutcallContainerService service = ContainerServices
-						.findService(PersistentOutcallContainerService.class);
+					PersistentOutcallContainerService service =
+						ContainerServices.findService(PersistentOutcallContainerService.class);
 					service.schedule(actor, new ExponentialBackoffScheduler(7L, TimeUnit.DAYS, null, null, 1L,
 						TimeUnit.MINUTES, 30L, TimeUnit.MILLISECONDS), subscription.consumerReference(), null, attachment);
 				} else {
@@ -178,8 +179,8 @@ public class WSNotificationContainerService extends AbstractContainerService
 	private Set<String> getIndirectPublishers(String publisherKey, NotificationMessageContents contents, Connection conn)
 	{
 
-		Set<String> indirectPublishers = SubscriptionsDatabase.getIndirectPublishersKeys(publisherKey,
-			contents.getIndirectPublishersRetrieveQuery(), conn);
+		Set<String> indirectPublishers =
+			SubscriptionsDatabase.getIndirectPublishersKeys(publisherKey, contents.getIndirectPublishersRetrieveQuery(), conn);
 		if (indirectPublishers == null || indirectPublishers.isEmpty())
 			return null;
 
@@ -209,11 +210,11 @@ public class WSNotificationContainerService extends AbstractContainerService
 				ClientConfig clientConfig = ClientConfig.getCurrentClientConfig();
 				String clientId = (clientConfig == null) ? null : clientConfig.getClientId();
 
-				List<NotificationBrokerDBResource> brokerDBResources = NotificationBrokerDatabase.getBrokers(publisherKeys,
-					brokerSubscribers, clientId, connection);
+				List<NotificationBrokerDBResource> brokerDBResources =
+					NotificationBrokerDatabase.getBrokers(publisherKeys, brokerSubscribers, clientId, connection);
 
-				NotificationMessageOutcallContent outcallContent = new NotificationMessageOutcallContent(null, topic,
-					originalPublisherEPR, contents, null);
+				NotificationMessageOutcallContent outcallContent =
+					new NotificationMessageOutcallContent(null, topic, originalPublisherEPR, contents, null);
 				processNotificationMessageForBrokers(brokerDBResources, outcallContent, connection);
 			}
 		} catch (Exception e) {
@@ -236,7 +237,8 @@ public class WSNotificationContainerService extends AbstractContainerService
 			WSNSubscriptionInformation subscriptionInfo = iterator.next();
 			EndpointReferenceType consumerReference = subscriptionInfo.consumerReference();
 			if (brokerUrlInContainer.equalsIgnoreCase(consumerReference.getAddress().toString())) {
-				AddressingParameters addressingParameters = new AddressingParameters(consumerReference.getReferenceParameters());
+				AddressingParameters addressingParameters =
+					new AddressingParameters(consumerReference.getReferenceParameters());
 				brokerResourceKeys.add(addressingParameters.getResourceKey());
 				iterator.remove();
 			}

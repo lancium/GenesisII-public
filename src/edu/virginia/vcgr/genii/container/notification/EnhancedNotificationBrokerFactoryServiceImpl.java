@@ -50,16 +50,18 @@ public class EnhancedNotificationBrokerFactoryServiceImpl extends GenesisIIBase 
 		cParams.setScheduledTerminationTime(lifeTimeOfBroker);
 		cParams.setMode(false);
 		try {
-			EndpointReferenceType brokerEndpoint = new EnhancedNotificationBrokerServiceImpl().CreateEPR(
-				new MessageElement[] { cParams.serializeToMessageElement() },
-				Container.getServiceURL(EnhancedNotificationBrokerServiceImpl.PORT_NAME));
+			EndpointReferenceType brokerEndpoint =
+				new EnhancedNotificationBrokerServiceImpl().CreateEPR(
+					new MessageElement[] { cParams.serializeToMessageElement() },
+					Container.getServiceURL(EnhancedNotificationBrokerServiceImpl.PORT_NAME));
 			_logger.info("notification broker is created without any forwarding port");
 			return brokerEndpoint;
 
 		} catch (Exception ex) {
-			final NotificationBrokerCreationFailedFaultType fault = new NotificationBrokerCreationFailedFaultType(null,
-				Calendar.getInstance(), null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-					"Unable to create notification broker.") }, null, null);
+			final NotificationBrokerCreationFailedFaultType fault =
+				new NotificationBrokerCreationFailedFaultType(null, Calendar.getInstance(), null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to create notification broker.") },
+					null, null);
 			throw fault;
 		}
 	}
@@ -77,17 +79,19 @@ public class EnhancedNotificationBrokerFactoryServiceImpl extends GenesisIIBase 
 		cParams.setMode(false);
 		cParams.setForwardingPort(request.getNotificationForwardingPort());
 		try {
-			EndpointReferenceType brokerEndpoint = new EnhancedNotificationBrokerServiceImpl().CreateEPR(
-				new MessageElement[] { cParams.serializeToMessageElement() },
-				Container.getServiceURL(EnhancedNotificationBrokerServiceImpl.PORT_NAME));
+			EndpointReferenceType brokerEndpoint =
+				new EnhancedNotificationBrokerServiceImpl().CreateEPR(
+					new MessageElement[] { cParams.serializeToMessageElement() },
+					Container.getServiceURL(EnhancedNotificationBrokerServiceImpl.PORT_NAME));
 
 			_logger.info("notification broker is created with a forwarding port.");
 			return brokerEndpoint;
 
 		} catch (Exception ex) {
-			final NotificationBrokerCreationFailedFaultType fault = new NotificationBrokerCreationFailedFaultType(null,
-				Calendar.getInstance(), null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-					"Unable to create notification broker.") }, null, null);
+			final NotificationBrokerCreationFailedFaultType fault =
+				new NotificationBrokerCreationFailedFaultType(null, Calendar.getInstance(), null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to create notification broker.") },
+					null, null);
 			throw fault;
 		}
 	}

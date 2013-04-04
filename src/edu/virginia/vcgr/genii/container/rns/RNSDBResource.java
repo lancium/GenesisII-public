@@ -29,17 +29,20 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class RNSDBResource extends BasicDBResource implements IRNSResource
 {
-	static private final String _ADD_ENTRY_STATEMENT = "INSERT INTO entries (resourceid, name, endpoint, id, attrs, endpoint_id) "
-		+ "VALUES(?, ?, ?, ?, ?, ?)";
+	static private final String _ADD_ENTRY_STATEMENT =
+		"INSERT INTO entries (resourceid, name, endpoint, id, attrs, endpoint_id) " + "VALUES(?, ?, ?, ?, ?, ?)";
 	static private final String _SELECT_ENTRIES_STMT = "SELECT name FROM entries WHERE resourceid = ?";
 	static private final String _SELECT_SINGLETON_ENTRY_STMT = "SELECT name FROM entries WHERE resourceid = ? AND name = ?";
-	static private final String _RETRIEVE_ONE_STMT = "SELECT name, endpoint, id, attrs, endpoint_id FROM entries WHERE resourceid = ? AND name = ?";
-	static private final String _RETRIEVE_ALL_STMT = "SELECT name, endpoint, id, attrs, endpoint_id FROM entries WHERE resourceid = ?";
+	static private final String _RETRIEVE_ONE_STMT =
+		"SELECT name, endpoint, id, attrs, endpoint_id FROM entries WHERE resourceid = ? AND name = ?";
+	static private final String _RETRIEVE_ALL_STMT =
+		"SELECT name, endpoint, id, attrs, endpoint_id FROM entries WHERE resourceid = ?";
 	static private final String _REMOVE_ENTRIES_STMT = "DELETE FROM entries WHERE resourceid = ? AND name = ?";
 	static private String _RETRIEVE_COUNT_STMT = "SELECT COUNT(*) FROM entries WHERE resourceid = ?";
 	static private String _RETRIEVE_PART_ENTRY_ONE_STMT = "SELECT name, id FROM entries WHERE resourceid = ? AND name = ?";
 	static private String _RETRIEVE_PART_ENTRY_ALL_STMT = "SELECT name, id FROM entries WHERE resourceid = ? ";
-	static private String _RETRIEVE_ENTRY_FROM_ID = "SELECT name, endpoint, id, attrs, resourceid, endpoint_id FROM entries WHERE id = ?";
+	static private String _RETRIEVE_ENTRY_FROM_ID =
+		"SELECT name, endpoint, id, attrs, resourceid, endpoint_id FROM entries WHERE id = ?";
 	static private final String _ENTRY_ID_UPDATE_STMT = "UPDATE entries SET endpoint_id = ? "
 		+ "WHERE resourceid = ? AND name = ?";
 
@@ -195,7 +198,8 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 				}
 			}
 			if (!entriesWithMissingResourceKeys.isEmpty()) {
-				Map<String, String> entryNameToResourceKeyMappings = getEntryNameToResourceKeyMappings(entriesWithMissingResourceKeys);
+				Map<String, String> entryNameToResourceKeyMappings =
+					getEntryNameToResourceKeyMappings(entriesWithMissingResourceKeys);
 				if (!entryNameToResourceKeyMappings.isEmpty()) {
 					stmt2 = _connection.prepareStatement(_ENTRY_ID_UPDATE_STMT);
 					for (Map.Entry<String, String> entry : entryNameToResourceKeyMappings.entrySet()) {
@@ -276,22 +280,27 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 
 			if (isBatch) {
 				while (rs.next()) {
-					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), rs.getString(2), true,
-						FileOrDir.UNKNOWN); // entry exists
+					InMemoryIteratorEntry imie =
+						new InMemoryIteratorEntry(rs.getString(1), rs.getString(2), true, FileOrDir.UNKNOWN); // entry
+																												// exists
 					ret.add(imie);
 				}
 			}
 
 			else {
 				if (rs.next()) {
-					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), rs.getString(2), true,
-						FileOrDir.UNKNOWN); // entry exists
+					InMemoryIteratorEntry imie =
+						new InMemoryIteratorEntry(rs.getString(1), rs.getString(2), true, FileOrDir.UNKNOWN); // entry
+																												// exists
 					ret.add(imie);
 				}
 
 				else {
-					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), new String(""), false,
-						FileOrDir.UNKNOWN); // entry does not exist
+					InMemoryIteratorEntry imie =
+						new InMemoryIteratorEntry(rs.getString(1), new String(""), false, FileOrDir.UNKNOWN); // entry
+																												// does
+																												// not
+																												// exist
 					ret.add(imie);
 				}
 

@@ -188,8 +188,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		InMemoryIteratorWrapper imiw = null;
 
 		if (imieList.size() > 0) {
-			imiw = new InMemoryIteratorWrapper(this.getClass().getName(), imieList, new Object[] { exemplarEPR, getService(),
-				myKey });
+			imiw =
+				new InMemoryIteratorWrapper(this.getClass().getName(), imieList, new Object[] { exemplarEPR, getService(),
+					myKey });
 		}
 
 		return new IterableSnapshot(entries, imiw);
@@ -232,23 +233,24 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 			try {
 				FileOrDir stat = statify(dName, forkPath, rKey);
 				if (stat == FileOrDir.DIRECTORY) {
-					LightWeightExportDirFork lwedf = new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(
-						forkPath, dName));
+					LightWeightExportDirFork lwedf =
+						new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
 					info = lwedf.describe();
 				}
 
 				else if (stat == FileOrDir.FILE) {
-					LightWeightExportFileFork lweff = new LightWeightExportFileFork(service, RForkUtils.formForkPathFromPath(
-						forkPath, dName));
+					LightWeightExportFileFork lweff =
+						new LightWeightExportFileFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
 
 					info = lweff.describe();
 				}
 
 				else {
 
-					resp = new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(
-						null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format(
-							"Entry" + " %s does not exist!", dName)) }, null, dName)), dName);
+					resp =
+						new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(
+							null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String
+								.format("Entry" + " %s does not exist!", dName)) }, null, dName)), dName);
 
 					return (MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp));
 				}
@@ -260,15 +262,15 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		}
 
 		else if (fd == FileOrDir.DIRECTORY) {
-			LightWeightExportDirFork lwedf = new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath,
-				dName));
+			LightWeightExportDirFork lwedf =
+				new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
 			info = lwedf.describe();
 
 		}
 
 		else if (fd == FileOrDir.FILE) {
-			LightWeightExportFileFork lweff = new LightWeightExportFileFork(service, RForkUtils.formForkPathFromPath(forkPath,
-				dName));
+			LightWeightExportFileFork lweff =
+				new LightWeightExportFileFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
 
 			info = lweff.describe();
 		}
@@ -283,8 +285,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		EndpointReferenceType epr = ie.getEntryReference();
 		AttributesPreFetcherFactory factory = new LightWeightExportAttributePrefetcherFactoryImpl();
 
-		resp = new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
-			Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey, service)), null, ie.getName());
+		resp =
+			new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
+				Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey, service)), null, ie.getName());
 
 		return (MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp));
 
@@ -323,8 +326,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
 		List<InMemoryIteratorEntry> imieList = new LinkedList<InMemoryIteratorEntry>();
 
-		int min = (lookupRequest.length > RNSConstants.PREFERRED_BATCH_SIZE) ? RNSConstants.PREFERRED_BATCH_SIZE
-			: lookupRequest.length;
+		int min =
+			(lookupRequest.length > RNSConstants.PREFERRED_BATCH_SIZE) ? RNSConstants.PREFERRED_BATCH_SIZE
+				: lookupRequest.length;
 
 		for (int lcv = 0; lcv < min; lcv++) {
 			String request = lookupRequest[lcv];
@@ -352,8 +356,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				imieList.add(imie);
 			}
 
-			imiw = new InMemoryIteratorWrapper(this.getClass().getName(), imieList, new Object[] { exemplarEPR, getService(),
-				resourceKey });
+			imiw =
+				new InMemoryIteratorWrapper(this.getClass().getName(), imieList, new Object[] { exemplarEPR, getService(),
+					resourceKey });
 
 			return new IterableSnapshot(entries, imiw);
 		}

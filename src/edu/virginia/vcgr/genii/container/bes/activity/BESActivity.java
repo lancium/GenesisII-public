@@ -293,8 +293,9 @@ public class BESActivity implements Closeable
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection.prepareStatement("UPDATE besactivitiestable "
-				+ "SET suspendrequested = ?, terminaterequested = ? " + "WHERE activityid = ?");
+			stmt =
+				connection.prepareStatement("UPDATE besactivitiestable " + "SET suspendrequested = ?, terminaterequested = ? "
+					+ "WHERE activityid = ?");
 			stmt.setShort(1, suspendRequested ? (short) 1 : (short) 0);
 			stmt.setShort(2, terminateRequested ? (short) 1 : (short) 0);
 			stmt.setString(3, _activityid);
@@ -317,8 +318,8 @@ public class BESActivity implements Closeable
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection.prepareStatement("UPDATE besactivitiestable SET nextphase = ?, state = ? "
-				+ "WHERE activityid = ?");
+			stmt =
+				connection.prepareStatement("UPDATE besactivitiestable SET nextphase = ?, state = ? " + "WHERE activityid = ?");
 			stmt.setInt(1, nextPhase);
 			stmt.setBlob(2, DBSerializer.toBlob(state, "besactivitiestable", "state"));
 			stmt.setString(3, _activityid);
@@ -348,8 +349,9 @@ public class BESActivity implements Closeable
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection.prepareStatement("SELECT callingcontext, activityepr " + "FROM besactivitiestable "
-				+ "WHERE activityid = ?");
+			stmt =
+				connection.prepareStatement("SELECT callingcontext, activityepr " + "FROM besactivitiestable "
+					+ "WHERE activityid = ?");
 			stmt.setString(1, _activityid);
 			rs = stmt.executeQuery();
 			if (!rs.next())
@@ -426,8 +428,8 @@ public class BESActivity implements Closeable
 
 				try {
 					connection = _connectionPool.acquire(true);
-					stmt = connection.prepareStatement("SELECT callingcontext FROM besactivitiestable "
-						+ "WHERE activityid = ?");
+					stmt =
+						connection.prepareStatement("SELECT callingcontext FROM besactivitiestable " + "WHERE activityid = ?");
 					stmt.setString(1, _activityid);
 					rs = stmt.executeQuery();
 					if (!rs.next())
@@ -462,8 +464,9 @@ public class BESActivity implements Closeable
 
 				try {
 					connection = _connectionPool.acquire(true);
-					stmt = connection.prepareStatement("SELECT propertyvalue FROM besactivitypropertiestable "
-						+ "WHERE activityid = ? AND propertyname = ?");
+					stmt =
+						connection.prepareStatement("SELECT propertyvalue FROM besactivitypropertiestable "
+							+ "WHERE activityid = ? AND propertyname = ?");
 					stmt.setString(1, _activityid);
 					stmt.setString(2, name);
 
@@ -489,8 +492,9 @@ public class BESActivity implements Closeable
 
 				try {
 					connection = _connectionPool.acquire(false);
-					stmt = connection.prepareStatement("DELETE FROM besactivitypropertiestable "
-						+ "WHERE activityid = ? AND propertyname = ?");
+					stmt =
+						connection.prepareStatement("DELETE FROM besactivitypropertiestable "
+							+ "WHERE activityid = ? AND propertyname = ?");
 					stmt.setString(1, _activityid);
 					stmt.setString(2, name);
 					stmt.executeUpdate();
@@ -537,8 +541,8 @@ public class BESActivity implements Closeable
 				return;
 			}
 
-			stmt = connection.prepareStatement("INSERT INTO besactivityfaultstable " + "(besactivityid, fault) "
-				+ "VALUES(?, ?)");
+			stmt =
+				connection.prepareStatement("INSERT INTO besactivityfaultstable " + "(besactivityid, fault) " + "VALUES(?, ?)");
 			stmt.setString(1, _activityid);
 			stmt.setBlob(2, blob);
 			stmt.executeUpdate();

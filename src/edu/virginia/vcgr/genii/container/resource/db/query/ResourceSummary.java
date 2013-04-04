@@ -68,8 +68,9 @@ public class ResourceSummary
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement("SELECT resourceid, humanname, epi FROM resources2 "
-				+ "WHERE implementingClass = ?");
+			stmt =
+				connection.prepareStatement("SELECT resourceid, humanname, epi FROM resources2 "
+					+ "WHERE implementingClass = ?");
 			stmt.setString(1, implementingClassName);
 			rs = stmt.executeQuery();
 
@@ -131,8 +132,9 @@ public class ResourceSummary
 		String epi = name.getEndpointIdentifier().toString();
 
 		try {
-			stmt = connection.prepareStatement("INSERT INTO resources2("
-				+ "resourceid, humanname, epi, epr, implementingclass) " + "VALUES(?, ?, ?, ?, ?)");
+			stmt =
+				connection.prepareStatement("INSERT INTO resources2(" + "resourceid, humanname, epi, epr, implementingclass) "
+					+ "VALUES(?, ?, ?, ?, ?)");
 			stmt.setString(1, resourceID);
 			if (humanName == null)
 				stmt.setNull(2, Types.VARCHAR);
@@ -169,8 +171,9 @@ public class ResourceSummary
 	{
 		PreparedStatement stmt = null;
 		try {
-			stmt = connection.prepareStatement("DELETE FROM resources2 " + "WHERE resourceid NOT IN "
-				+ "(SELECT resourceid FROM resources)");
+			stmt =
+				connection.prepareStatement("DELETE FROM resources2 " + "WHERE resourceid NOT IN "
+					+ "(SELECT resourceid FROM resources)");
 			stmt.executeUpdate();
 		} finally {
 			StreamUtils.close(stmt);

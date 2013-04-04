@@ -57,8 +57,10 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 {
 	static private Log _logger = LogFactory.getLog(ApplicationDescriptionServiceImpl.class);
 
-	static final public String APPLICATION_DESCRIPTION_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.appdesc.app_desc_property";
-	static final public String APPLICATION_VERSION_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.appdesc.app_vers_property";
+	static final public String APPLICATION_DESCRIPTION_PROPERTY_NAME =
+		"edu.virginia.vcgr.genii.container.appdesc.app_desc_property";
+	static final public String APPLICATION_VERSION_PROPERTY_NAME =
+		"edu.virginia.vcgr.genii.container.appdesc.app_vers_property";
 
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
@@ -115,8 +117,9 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 
 		try {
 			CreateFileResponseType response = null;
-			response = super.createFile(createFile, new MessageElement[] { new MessageElement(
-				ApplicationDescriptionConstants.SUPPORT_DOCUMENT_ATTR_QNAME, supportDoc) });
+			response =
+				super.createFile(createFile, new MessageElement[] { new MessageElement(
+					ApplicationDescriptionConstants.SUPPORT_DOCUMENT_ATTR_QNAME, supportDoc) });
 			newFile = response.getEndpoint();
 			bos = ByteIOStreamFactory.createOutputStream(newFile);
 			writer = new OutputStreamWriter(bos);

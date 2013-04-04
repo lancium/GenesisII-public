@@ -229,8 +229,8 @@ class QueueAsBESFactoryAttributesUtilities
 		URI localResourceManagerType = ResourceManagerType.GridQueue.toApacheAxisURI();
 
 		try {
-			namingProfiles = new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING),
-				new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
+			namingProfiles =
+				new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING), new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
 		} catch (MalformedURIException e) {
 			namingProfiles = new URI[0];
 		}
@@ -248,9 +248,9 @@ class QueueAsBESFactoryAttributesUtilities
 		for (MatchingParameter parameter : allMatchingParameters())
 			any.add(new MessageElement(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, parameter.toAxisType()));
 
-		BasicResourceAttributesDocumentType basicResourceAttributesDocument = new BasicResourceAttributesDocumentType(
-			machineName, operatingSystem(), cpuArchitecture(), cpuCount(), cpuSpeed(), physicalMemory(), virtualMemory(),
-			any.toArray(new MessageElement[any.size()]));
+		BasicResourceAttributesDocumentType basicResourceAttributesDocument =
+			new BasicResourceAttributesDocumentType(machineName, operatingSystem(), cpuArchitecture(), cpuCount(), cpuSpeed(),
+				physicalMemory(), virtualMemory(), any.toArray(new MessageElement[any.size()]));
 
 		return new FactoryResourceAttributesDocumentType(basicResourceAttributesDocument, isAcceptingNewActivities,
 			machineName, machineName, totalNumberOfActivities, null, _allBESInformation.size(), null, namingProfiles,

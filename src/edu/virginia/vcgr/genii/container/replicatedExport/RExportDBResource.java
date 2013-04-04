@@ -232,8 +232,9 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 		// update entryref to include resolver epr
 		try {
-			entryReference = RExportResolverUtils.setupRExport(entryReference, entryType, creationProperties[0].getValue(),
-				null, nextRealName);
+			entryReference =
+				RExportResolverUtils.setupRExport(entryReference, entryType, creationProperties[0].getValue(), null,
+					nextRealName);
 		} catch (Exception e) {
 			_logger.error("Unable to create rexport resolver: " + e.getLocalizedMessage());
 			throw new ResourceException("Unable to create rexport resolver.", e);
@@ -446,8 +447,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 	static void dirDestroyAllForParentDir(Connection connection, String parentId, boolean hardDestroy) throws ResourceException
 	{
-		String parentIdSearch = "%" + RExportUtils._PARENT_ID_BEGIN_DELIMITER + parentId
-			+ RExportUtils._PARENT_ID_END_DELIMITER + "%";
+		String parentIdSearch =
+			"%" + RExportUtils._PARENT_ID_BEGIN_DELIMITER + parentId + RExportUtils._PARENT_ID_END_DELIMITER + "%";
 
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -588,8 +589,9 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				RExportEntry entry = new RExportEntry(rs.getString(1), rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)),
-					rs.getString(4), rs.getString(5), null);
+				RExportEntry entry =
+					new RExportEntry(rs.getString(1), rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4),
+						rs.getString(5), null);
 				ret.add(entry);
 			}
 
@@ -659,8 +661,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		attrs.add(new MessageElement(transMechName, ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
 
 		try {
-			IRByteIOResource resource = (IRByteIOResource) (ResourceManager.getTargetResource(entry.getEntryReference())
-				.dereference());
+			IRByteIOResource resource =
+				(IRByteIOResource) (ResourceManager.getTargetResource(entry.getEntryReference()).dereference());
 			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME),
 				resource.getAccessTime()));
 			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME),

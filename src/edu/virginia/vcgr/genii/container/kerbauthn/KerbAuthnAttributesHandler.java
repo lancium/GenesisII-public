@@ -12,13 +12,13 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 
 /*
- * This attribute handler has been added to make Kerberos IDP specific attributes retrievable within STS 
- * replication feature. Note that the IDP name is the sensitive attribute for a Kerberos IDP resource, which
- * is taken care of in common-STS-attribute-handler class, not the realm and KDB attributes. Hence, although 
- * this handler is added for only replication purpose. We added no additional security checking that might 
- * restrict access to its methods beyond what is already employed by GenesisIIBase class's default access 
- * checking code.  
- * */
+ * This attribute handler has been added to make Kerberos IDP specific attributes retrievable within
+ * STS replication feature. Note that the IDP name is the sensitive attribute for a Kerberos IDP
+ * resource, which is taken care of in common-STS-attribute-handler class, not the realm and KDB
+ * attributes. Hence, although this handler is added for only replication purpose. We added no
+ * additional security checking that might restrict access to its methods beyond what is already
+ * employed by GenesisIIBase class's default access checking code.
+ */
 public class KerbAuthnAttributesHandler extends AbstractAttributeHandler
 {
 

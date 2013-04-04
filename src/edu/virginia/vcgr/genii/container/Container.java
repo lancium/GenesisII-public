@@ -117,6 +117,7 @@ public class Container extends ApplicationBase
 		}
 
 		if (!OSGiSupport.setUpFramework()) {
+			System.err.println("Exiting due to OSGi startup failure.");
 			System.exit(1);
 		}
 
@@ -137,8 +138,9 @@ public class Container extends ApplicationBase
 		LowMemoryWarning.INSTANCE.addLowMemoryListener(new LowMemoryExitHandler(7));
 
 		_logger.info(String.format("Deployment name is '%s'.\n", new DeploymentName()));
-		_secRunManager = SecureRunnerManager.createSecureRunnerManager(GenesisClassLoader.classLoaderFactory(),
-			Installation.getDeployment(new DeploymentName()));
+		_secRunManager =
+			SecureRunnerManager.createSecureRunnerManager(GenesisClassLoader.classLoaderFactory(),
+				Installation.getDeployment(new DeploymentName()));
 		Properties secRunProperties = new Properties();
 		_secRunManager.run(SecureRunnableHooks.CONTAINER_PRE_STARTUP, secRunProperties);
 
@@ -263,8 +265,8 @@ public class Container extends ApplicationBase
 		ServiceDeployer.startServiceDeployer(_axisServer, _postStartupWorkQueue,
 			Installation.getDeployment(new DeploymentName()).getServicesDirectory());
 
-		Collection<IServiceWithCleanupHook> containerServiceObjects = new ArrayList<IServiceWithCleanupHook>(
-			containerServices.size());
+		Collection<IServiceWithCleanupHook> containerServiceObjects =
+			new ArrayList<IServiceWithCleanupHook>(containerServices.size());
 		for (Class<? extends IServiceWithCleanupHook> service : containerServices) {
 			try {
 				Constructor<?> cons = service.getConstructor(new Class[0]);
@@ -299,7 +301,8 @@ public class Container extends ApplicationBase
 	static private Collection<Class<? extends IServiceWithCleanupHook>> initializeServices(WebAppContext ctxt)
 		throws ServletException, AxisFault
 	{
-		Collection<Class<? extends IServiceWithCleanupHook>> managedServiceClasses = new LinkedList<Class<? extends IServiceWithCleanupHook>>();
+		Collection<Class<? extends IServiceWithCleanupHook>> managedServiceClasses =
+			new LinkedList<Class<? extends IServiceWithCleanupHook>>();
 
 		ServletHolder[] holders = ctxt.getServletHandler().getServlets();
 		for (ServletHolder holder : holders) {
@@ -317,13 +320,13 @@ public class Container extends ApplicationBase
 			EngineConfiguration config = _axisServer.getConfig();
 
 			// configure the listening request security handler
-			ServerWSDoAllReceiver receiver = (ServerWSDoAllReceiver) getHandler((SimpleChain) config.getGlobalRequest(),
-				ServerWSDoAllReceiver.class);
+			ServerWSDoAllReceiver receiver =
+				(ServerWSDoAllReceiver) getHandler((SimpleChain) config.getGlobalRequest(), ServerWSDoAllReceiver.class);
 			receiver.configure(_containerPrivateKey);
 
 			// configure listening response security handler
-			ServerWSDoAllSender sender = (ServerWSDoAllSender) getHandler((SimpleChain) config.getGlobalResponse(),
-				ServerWSDoAllSender.class);
+			ServerWSDoAllSender sender =
+				(ServerWSDoAllSender) getHandler((SimpleChain) config.getGlobalResponse(), ServerWSDoAllSender.class);
 			sender.configure(_containerPrivateKey);
 
 			// configure the services individually
@@ -349,16 +352,17 @@ public class Container extends ApplicationBase
 		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
 
 		String keyStoreLoc = resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
-		String keyStoreType = resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP,
-			"PKCS12");
+		String keyStoreType =
+			resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP, "PKCS12");
 		String keyPassword = resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_KEY_PASSWORD_PROP);
-		String keyStorePassword = resourceIdSecProps
-			.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PASSWORD_PROP);
-		String containerAlias = resourceIdSecProps.getProperty(
-			SecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP, GenesisIIConstants.CONTAINER_CERT_ALIAS);
+		String keyStorePassword =
+			resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PASSWORD_PROP);
+		String containerAlias =
+			resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP,
+				GenesisIIConstants.CONTAINER_CERT_ALIAS);
 
-		String certificateLifetime = resourceIdSecProps
-			.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_DEFAULT_CERT_LIFETIME_PROP);
+		String certificateLifetime =
+			resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_DEFAULT_CERT_LIFETIME_PROP);
 		if (certificateLifetime != null)
 			_defaultCertificateLifetime = Long.parseLong(certificateLifetime);
 
@@ -373,9 +377,10 @@ public class Container extends ApplicationBase
 		if (keyPassword != null)
 			keyPassChars = keyPassword.toCharArray();
 
-		KeyStore ks = CertTool.openStoreDirectPath(
-			Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyStoreLoc), keyStoreType,
-			keyStorePassChars);
+		KeyStore ks =
+			CertTool.openStoreDirectPath(
+				Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyStoreLoc), keyStoreType,
+				keyStorePassChars);
 		// load the container private key and certificate
 		_containerPrivateKey = (PrivateKey) ks.getKey(containerAlias, keyPassChars);
 
@@ -609,8 +614,9 @@ public class Container extends ApplicationBase
 			return;
 
 		try {
-			File scratchSpaceDirectory = new GuaranteedDirectory(ConfigurationManager.getCurrentConfiguration()
-				.getUserDirectory(), "dynamic-pages-scratch");
+			File scratchSpaceDirectory =
+				new GuaranteedDirectory(ConfigurationManager.getCurrentConfiguration().getUserDirectory(),
+					"dynamic-pages-scratch");
 
 			ScratchSpaceManager scratchManager = new ScratchSpaceManager(scratchSpaceDirectory);
 			for (File entry : dynPagesDir.listFiles()) {

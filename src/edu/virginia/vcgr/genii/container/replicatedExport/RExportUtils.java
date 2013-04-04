@@ -71,8 +71,8 @@ public class RExportUtils
 
 		// specify primary's local path
 		// is this used in creation?
-		replicaCreationProperties[1] = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PRIMARY_LOCALPATH_NAME),
-			primaryLocalPath);
+		replicaCreationProperties[1] =
+			new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PRIMARY_LOCALPATH_NAME), primaryLocalPath);
 
 		/* set appropriate rexport service to be instantiated */
 		String RExportService = _REXPORT_SERVICE;

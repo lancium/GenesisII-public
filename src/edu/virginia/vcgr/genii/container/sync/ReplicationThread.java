@@ -80,8 +80,9 @@ public class ReplicationThread extends Thread
 		ResourceKey rKey = null;
 		try {
 			if (myEPR == null) {
-				myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-					WorkingContext.EPR_PROPERTY_NAME);
+				myEPR =
+					(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
+						WorkingContext.EPR_PROPERTY_NAME);
 			} else {
 				WorkingContext.temporarilyAssumeNewIdentity(myEPR);
 			}
@@ -156,8 +157,8 @@ public class ReplicationThread extends Thread
 					factory.subscribe(replicaEPR, topicFilter, null, null, policy);
 					factory.subscribe(replicaEPR, secondFilter, null, null, policy);
 					// Create subscription so this will send to that.
-					SubscribeRequest request = AbstractSubscriptionFactory.createRequest(replicaEPR, topicFilter, null, null,
-						policy);
+					SubscribeRequest request =
+						AbstractSubscriptionFactory.createRequest(replicaEPR, topicFilter, null, null, policy);
 					GenesisIIBase.processSubscribeRequest(resource.getKey(), request);
 					request = AbstractSubscriptionFactory.createRequest(replicaEPR, secondFilter, null, null, policy);
 					GenesisIIBase.processSubscribeRequest(resource.getKey(), request);

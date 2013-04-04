@@ -48,7 +48,8 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 {
 	static private Log _logger = LogFactory.getLog(ExportedDirDBResource.class);
 
-	static private final String _RETRIEVE_DIR_INFO = "SELECT path, parentIds, isReplicated, lastModified FROM exporteddir WHERE dirid = ?";
+	static private final String _RETRIEVE_DIR_INFO =
+		"SELECT path, parentIds, isReplicated, lastModified FROM exporteddir WHERE dirid = ?";
 	static private final String _CREATE_DIR_INFO = "INSERT INTO exporteddir VALUES(?, ?, ?, ?, ?)";
 	static private final String _UPDATE_MODIFY_TIME = "UPDATE exporteddir SET lastModified = ? WHERE dirid = ?";
 	static private final String _ADD_ENTRY_STMT = "INSERT INTO exporteddirentry VALUES(?, ?, ?, ?, ?)";
@@ -600,16 +601,17 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 					 */
 					serviceEPR = _fileServiceEPR;
 					entryType = ExportedDirEntry._FILE_TYPE;
-					creationProperties = ExportedFileUtils.createCreationProperties(newPath, childrenParentIds,
-						getReplicationState());
+					creationProperties =
+						ExportedFileUtils.createCreationProperties(newPath, childrenParentIds, getReplicationState());
 
 				} else if (nextReal.isDirectory()) {
 					try {
 						/* moved code to check if _dirServiceEPR set to constructor */
 						serviceEPR = _dirServiceEPR;
 						entryType = ExportedDirEntry._DIR_TYPE;
-						creationProperties = ExportedDirUtils.createCreationProperties(null, newPath, null, null, null,
-							childrenParentIds, getReplicationState());
+						creationProperties =
+							ExportedDirUtils.createCreationProperties(null, newPath, null, null, null, childrenParentIds,
+								getReplicationState());
 					} catch (RemoteException re) {
 						throw new ResourceException("Unable to create construction parameters.", re);
 					}
@@ -740,8 +742,9 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 			rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				ExportedDirEntry entry = new ExportedDirEntry(rs.getString(1), rs.getString(2),
-					EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4), rs.getString(5), null);
+				ExportedDirEntry entry =
+					new ExportedDirEntry(rs.getString(1), rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4),
+						rs.getString(5), null);
 				ret.add(entry);
 			}
 
@@ -841,8 +844,8 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 	static void dirDestroyAllForParentDir(Connection connection, String parentId, boolean hardDestroy, String isReplicated)
 		throws ResourceException
 	{
-		String parentIdSearch = "%" + ExportedDirUtils._PARENT_ID_BEGIN_DELIMITER + parentId
-			+ ExportedDirUtils._PARENT_ID_END_DELIMITER + "%";
+		String parentIdSearch =
+			"%" + ExportedDirUtils._PARENT_ID_BEGIN_DELIMITER + parentId + ExportedDirUtils._PARENT_ID_END_DELIMITER + "%";
 
 		PreparedStatement stmt = null;
 		ResultSet rs = null;

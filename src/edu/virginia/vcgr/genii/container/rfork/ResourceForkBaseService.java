@@ -529,10 +529,10 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			} catch (BaseFaultType bft) {
 				ret[lcv] = new RNSEntryResponseType(null, null, bft, addRequest[lcv].getEntryName());
 			} catch (Throwable cause) {
-				ret[lcv] = new RNSEntryResponseType(null, null,
-					FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
+				ret[lcv] =
+					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
 						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry!") }, null)),
-					addRequest[lcv].getEntryName());
+						addRequest[lcv].getEntryName());
 			}
 		}
 
@@ -622,16 +622,17 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			for (InternalEntry internalEntry : entries) {
 				if (internalEntry.isExistent()) {
 					EndpointReferenceType epr = internalEntry.getEntryReference();
-					RNSEntryResponseType entry = new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
-						Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null)), null,
-						internalEntry.getName());
+					RNSEntryResponseType entry =
+						new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
+							Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null)), null,
+							internalEntry.getName());
 					resultEntries.add(entry);
 				} else {
 					String name = internalEntry.getName();
-					RNSEntryResponseType entry = new RNSEntryResponseType(null, null,
-						FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null, null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry"
-								+ " %s does not exist!", name)) }, null, name)), name);
+					RNSEntryResponseType entry =
+						new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(
+							null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String
+								.format("Entry" + " %s does not exist!", name)) }, null, name)), name);
 					resultEntries.add(entry);
 				}
 
@@ -693,17 +694,18 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 				if (fork.remove(removeRequest[lcv]))
 					ret[lcv] = new RNSEntryResponseType(null, null, null, removeRequest[lcv]);
 				else
-					ret[lcv] = new RNSEntryResponseType(null, null,
-						FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null, null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format(
-								"Entry %s does not exist!", removeRequest[lcv])) }, null, removeRequest[lcv])),
-						removeRequest[lcv]);
+					ret[lcv] =
+						new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(
+							null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String
+								.format("Entry %s does not exist!", removeRequest[lcv])) }, null, removeRequest[lcv])),
+							removeRequest[lcv]);
 			} catch (BaseFaultType bft) {
 				ret[lcv] = new RNSEntryResponseType(null, null, bft, removeRequest[lcv]);
 			} catch (Throwable cause) {
-				ret[lcv] = new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null,
-					null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to remove entry!") },
-					null)), removeRequest[lcv]);
+				ret[lcv] =
+					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to remove entry!") }, null)),
+						removeRequest[lcv]);
 			}
 		}
 
@@ -921,8 +923,9 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 					notifyOnDestroy = description.writable();
 			}
 
-			DefaultStreamableByteIOResourceFork newFork = new DefaultStreamableByteIOResourceFork(this, "/" + new GUID(),
-				(configuration == null) ? true : configuration.destroyOnClose(), notifyOnDestroy, fork);
+			DefaultStreamableByteIOResourceFork newFork =
+				new DefaultStreamableByteIOResourceFork(this, "/" + new GUID(), (configuration == null) ? true
+					: configuration.destroyOnClose(), notifyOnDestroy, fork);
 
 			return new OpenStreamResponse(createForkEPR(newFork.getForkPath(), newFork.describe()));
 		} catch (IOException ioe) {

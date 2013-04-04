@@ -44,8 +44,8 @@ public class SoapHeaderHandler implements IAroundInvoker
 	{
 		MessageContext msgCtxt = invocationContext.getMessageContext();
 
-		EndpointReferenceType target = (EndpointReferenceType) msgCtxt
-			.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
+		EndpointReferenceType target =
+			(EndpointReferenceType) msgCtxt.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
 
 		if (target == null) {
 			_logger.warn("Couldn't find target EPR in Working Context.");
@@ -144,8 +144,8 @@ public class SoapHeaderHandler implements IAroundInvoker
 		if (console != null) {
 			Version serverVersion = console.currentVersion();
 			if (serverVersion != null && !(serverVersion.equals(Version.EMPTY_VERSION))) {
-				SOAPHeaderElement versionElement = new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION,
-					serverVersion.toString());
+				SOAPHeaderElement versionElement =
+					new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION, serverVersion.toString());
 				versionElement.setActor(null);
 				versionElement.setMustUnderstand(false);
 				header.addChildElement(versionElement);

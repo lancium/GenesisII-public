@@ -43,8 +43,9 @@ final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = connection
-				.prepareStatement("SELECT b.propvalue FROM bespolicytable AS a, properties AS b WHERE a.besid = b.resourceid AND b.propname = ?");
+			stmt =
+				connection
+					.prepareStatement("SELECT b.propvalue FROM bespolicytable AS a, properties AS b WHERE a.besid = b.resourceid AND b.propname = ?");
 			stmt.setString(1, ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString());
 			rs = stmt.executeQuery();
 

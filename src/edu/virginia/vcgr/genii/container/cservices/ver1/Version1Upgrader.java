@@ -44,8 +44,8 @@ public class Version1Upgrader
 			for (Version1ContainerService v1Service : v1Conf.services()) {
 				Class<? extends ContainerService> serviceClass = v1Service.serviceClass(macros);
 				if (serviceClass != null) {
-					ContainerServiceConfiguration v2Conf = new ContainerServiceConfiguration(serviceClass,
-						v1Service.properties(macros));
+					ContainerServiceConfiguration v2Conf =
+						new ContainerServiceConfiguration(serviceClass, v1Service.properties(macros));
 					writeUpgrade(targetDirectory, v2Conf);
 				}
 			}

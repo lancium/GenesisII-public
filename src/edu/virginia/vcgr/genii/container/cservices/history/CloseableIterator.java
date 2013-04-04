@@ -4,5 +4,4 @@ import java.io.Closeable;
 import java.util.Iterator;
 
 public interface CloseableIterator<Type> extends Closeable, Iterator<Type>
-{
-}
+{}

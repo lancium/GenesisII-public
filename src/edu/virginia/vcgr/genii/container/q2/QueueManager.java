@@ -94,8 +94,9 @@ public class QueueManager implements Closeable
 	{
 		if (_informationPortal == null) {
 			InformationContainerService service = ContainerServices.findService(InformationContainerService.class);
-			_informationPortal = service.createNewPortal(new InMemoryPersister<BESInformation>(), new BESInformationResolver(
-				_connectionPool), new Duration(30, TimeUnit.SECONDS), new Duration(10, TimeUnit.MINUTES));
+			_informationPortal =
+				service.createNewPortal(new InMemoryPersister<BESInformation>(), new BESInformationResolver(_connectionPool),
+					new Duration(30, TimeUnit.SECONDS), new Duration(10, TimeUnit.MINUTES));
 		}
 
 		return _informationPortal;
@@ -238,14 +239,16 @@ public class QueueManager implements Closeable
 		BESUpdateInformation updateInfo = _besManager.getUpdateInformation(data.getID());
 
 		boolean isAccepting = (info == null) ? false : info.isAcceptingNewActivities();
-		ProcessorArchitecture arch = (info == null) ? ProcessorArchitecture.other : ProcessorArchitecture.valueOf(info
-			.getProcessorArchitecture().toString());
-		OperatingSystemNames osName = (info == null) ? OperatingSystemNames.Unknown : OperatingSystemNames.valueOf(info
-			.getOperatingSystemType().toString());
+		ProcessorArchitecture arch =
+			(info == null) ? ProcessorArchitecture.other : ProcessorArchitecture.valueOf(info.getProcessorArchitecture()
+				.toString());
+		OperatingSystemNames osName =
+			(info == null) ? OperatingSystemNames.Unknown : OperatingSystemNames.valueOf(info.getOperatingSystemType()
+				.toString());
 		String osVersion = (info == null) ? null : info.getOperatingSystemVersion();
 		Double physicalMemory = (info == null) ? null : info.getPhysicalMemory();
-		ResourceManagerType mgrType = (info == null) ? ResourceManagerType.Unknown : ResourceManagerType.fromURI(info
-			.resourceManagerType());
+		ResourceManagerType mgrType =
+			(info == null) ? ResourceManagerType.Unknown : ResourceManagerType.fromURI(info.resourceManagerType());
 
 		boolean isAvailable = (updateInfo == null) ? false : updateInfo.isAvailable();
 		Date lastUpdated = (updateInfo == null) ? null : updateInfo.lastUpdated();
@@ -309,8 +312,8 @@ public class QueueManager implements Closeable
 		try {
 			connection = _connectionPool.acquire(true);
 			_besManager = new BESManager(_database, _schedulingEvent, connection, informationPortal(), _connectionPool);
-			_jobManager = new JobManager(_outcallThreadPool, _database, _schedulingEvent, _besManager, connection,
-				_connectionPool);
+			_jobManager =
+				new JobManager(_outcallThreadPool, _database, _schedulingEvent, _besManager, connection, _connectionPool);
 			_scheduler = new Scheduler(_queueid, _schedulingEvent, _connectionPool, _jobManager, _besManager);
 		} catch (GenesisIISecurityException gse) {
 			throw new ResourceException("UInable to create BES Manager.", gse);

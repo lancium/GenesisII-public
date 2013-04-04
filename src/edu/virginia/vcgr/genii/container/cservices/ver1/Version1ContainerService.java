@@ -28,8 +28,8 @@ class Version1ContainerService
 		if (className.endsWith(".GridLoggerContainerService"))
 			return null;
 
-		Class<? extends ContainerService> serviceClass = (Class<? extends ContainerService>) GenesisClassLoader
-			.classLoaderFactory().loadClass(className);
+		Class<? extends ContainerService> serviceClass =
+			(Class<? extends ContainerService>) GenesisClassLoader.classLoaderFactory().loadClass(className);
 
 		return serviceClass;
 	}

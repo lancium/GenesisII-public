@@ -8,5 +8,4 @@ package edu.virginia.vcgr.genii.container.cservices.infomgr;
  * @author mmm2a
  */
 public interface InformationEndpoint
-{
-}
+{}

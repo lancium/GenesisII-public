@@ -97,8 +97,9 @@ class FuseFilesystemDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt = conn.prepareStatement("INSERT INTO fusefilesystems(" + "parentdir, mountpoint, deathtime) VALUES(?, ?, ?)",
-				Statement.RETURN_GENERATED_KEYS);
+			stmt =
+				conn.prepareStatement("INSERT INTO fusefilesystems(" + "parentdir, mountpoint, deathtime) VALUES(?, ?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, parent.getAbsolutePath());
 			stmt.setString(2, mount);
 			Timestamp deathTime = new Timestamp(System.currentTimeMillis() + DEFAULT_TTL);

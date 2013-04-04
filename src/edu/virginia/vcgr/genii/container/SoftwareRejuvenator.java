@@ -15,8 +15,9 @@ public class SoftwareRejuvenator
 
 	static public void startRejuvenator()
 	{
-		String rejuvCycleString = Installation.getDeployment(new DeploymentName()).softwareRejuvenationProperties()
-			.getProperty(RejuvenationConstants.SOFTWARE_REJUVENATION_CYCLE_PROP);
+		String rejuvCycleString =
+			Installation.getDeployment(new DeploymentName()).softwareRejuvenationProperties()
+				.getProperty(RejuvenationConstants.SOFTWARE_REJUVENATION_CYCLE_PROP);
 		if (rejuvCycleString == null) {
 			_logger.info("No software rejuvenation cycle given -- " + "skipping rejuvenation.");
 			return;
@@ -24,8 +25,9 @@ public class SoftwareRejuvenator
 
 		try {
 			Duration d = new Duration(rejuvCycleString);
-			Thread th = new Thread(new Rejuvenator(System.currentTimeMillis() + (long) d.as(DurationUnits.Milliseconds)),
-				"Software Rejuvenator Thread");
+			Thread th =
+				new Thread(new Rejuvenator(System.currentTimeMillis() + (long) d.as(DurationUnits.Milliseconds)),
+					"Software Rejuvenator Thread");
 			th.setDaemon(true);
 			th.start();
 			_logger.info(String.format("Started software rejuvenator with cycle of \"%s\".", rejuvCycleString));

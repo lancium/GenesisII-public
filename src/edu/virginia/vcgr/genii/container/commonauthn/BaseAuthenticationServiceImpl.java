@@ -89,17 +89,18 @@ import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 
 /*
- * This class incorporates the IDP specific functionalities that are common to all IDP port-types. Although 
- * technically it is a super-class of all IDP port-type implementation classes we have in the system, for 
- * many operations -- for example RNS operations -- subclasses have to explicitly call methods on this class
- * instead of having the operations automatically handled here when there is no override. This peculiar behavior
- * is due to the mechanism of service class generation that we have in our system. When multiple port-types
- * are registered to implement some common methods in a WSDL file, the generation procedure don't extract a 
- * common interface for the common methods; rather it creates independent interface classes having the same
- * methods. So a common implementation class like this should have name conflicts for the common methods if it 
- * implements all the interfaces. We avoid the problem of name conflict by asking subclasses to explicitly 
- * call this class's method for conflicting methods.
- * */
+ * This class incorporates the IDP specific functionalities that are common to all IDP port-types.
+ * Although technically it is a super-class of all IDP port-type implementation classes we have in
+ * the system, for many operations -- for example RNS operations -- subclasses have to explicitly
+ * call methods on this class instead of having the operations automatically handled here when there
+ * is no override. This peculiar behavior is due to the mechanism of service class generation that
+ * we have in our system. When multiple port-types are registered to implement some common methods
+ * in a WSDL file, the generation procedure don't extract a common interface for the common methods;
+ * rather it creates independent interface classes having the same methods. So a common
+ * implementation class like this should have name conflicts for the common methods if it implements
+ * all the interfaces. We avoid the problem of name conflict by asking subclasses to explicitly call
+ * this class's method for conflicting methods.
+ */
 public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implements RNSTopics
 {
 
@@ -131,11 +132,11 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		}
 
 		// retrieve primary resources EPR during replica creation
-		EndpointReferenceType certificateOwnerEPR = (EndpointReferenceType) constructionParameters
-			.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		EndpointReferenceType certificateOwnerEPR =
+			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (certificateOwnerEPR == null) {
-			MessageElement certificateOwner = (MessageElement) constructionParameters
-				.get(STSConfigurationProperties.CERTIFICATE_OWNER_EPR);
+			MessageElement certificateOwner =
+				(MessageElement) constructionParameters.get(STSConfigurationProperties.CERTIFICATE_OWNER_EPR);
 			if (certificateOwner != null)
 				try {
 					certificateOwnerEPR = (EndpointReferenceType) certificateOwner.getObjectValue(EndpointReferenceType.class);
@@ -150,8 +151,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			try {
 				GetResourcePropertyResponse response = common.getResourceProperty(SecurityConstants.CERTIFICATE_CHAIN_QNAME);
 				MessageElement property = response.get_any()[0];
-				X509Certificate[] certificate = (X509Certificate[]) CommonSTSAttributesHandler
-					.deserializeObjectFromString(property.getValue());
+				X509Certificate[] certificate =
+					(X509Certificate[]) CommonSTSAttributesHandler.deserializeObjectFromString(property.getValue());
 				constructionParameters.put(IResource.DUPLICATED_CERTIFICATE_PARAM, certificate);
 			} catch (Exception e) {
 				throw new ResourceException("failed to load certificate from the primary", e);
@@ -167,9 +168,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	 * instances having the same name cannot reside in a single container for a single IDP
 	 * port-type. This apparent restriction simplifies tracking of IDP instances for later use.
 	 */
-	protected String addResourceInServiceResourceList(EndpointReferenceType newEPR,
-		HashMap<QName, Object> constructionParameters) throws ResourceUnknownFaultType, ResourceException,
-		RNSEntryExistsFaultType
+	public String addResourceInServiceResourceList(EndpointReferenceType newEPR, HashMap<QName, Object> constructionParameters)
+		throws ResourceUnknownFaultType, ResourceException, RNSEntryExistsFaultType
 	{
 
 		// make sure the specific IDP doesn't yet exist
@@ -187,10 +187,10 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		return newIdpName;
 	}
 
-	protected void storeCallingContextAndCertificate(IResource resource, NuCredential credential) throws ResourceException
+	public void storeCallingContextAndCertificate(IResource resource, NuCredential credential) throws ResourceException
 	{
-		ICallingContext resourceContext = (ICallingContext) resource
-			.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+		ICallingContext resourceContext =
+			(ICallingContext) resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
 		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(resourceContext);
 		transientCredentials.add(credential);
 		resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, resourceContext);
@@ -212,14 +212,14 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	{
 
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
-		STSCertificationSpec stsCertificationSpec = (STSCertificationSpec) constructionParameters
-			.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
+		STSCertificationSpec stsCertificationSpec =
+			(STSCertificationSpec) constructionParameters.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
 
 		IResource resource = rKey.dereference();
 		resource.setProperty(IResource.PRIVATE_KEY_PROPERTY_NAME, stsCertificationSpec.getSubjectPrivateKey());
 
-		EndpointReferenceType primaryEPR = (EndpointReferenceType) constructionParameters
-			.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		EndpointReferenceType primaryEPR =
+			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (primaryEPR != null) {
 
 			// storeReplicaInServicesResourceList(newEPR, primaryEPR);
@@ -263,12 +263,12 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	protected boolean skipPortTypeSpecificPostProcessing(HashMap<QName, Object> constructionParameters)
 	{
 
-		EndpointReferenceType primaryEPR = (EndpointReferenceType) constructionParameters
-			.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
-		MessageElement isReplica = (MessageElement) constructionParameters
-			.get(STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM);
-		boolean skipPostCreateOverride = primaryEPR != null
-			|| (isReplica != null && "TRUE".equalsIgnoreCase(isReplica.getValue()));
+		EndpointReferenceType primaryEPR =
+			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		MessageElement isReplica =
+			(MessageElement) constructionParameters.get(STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM);
+		boolean skipPostCreateOverride =
+			primaryEPR != null || (isReplica != null && "TRUE".equalsIgnoreCase(isReplica.getValue()));
 		return skipPostCreateOverride;
 	}
 
@@ -283,8 +283,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		if (flags != null) {
 			TopicSet space = TopicSet.forPublisher(getClass());
 			PublisherTopic topic = space.createPublisherTopic(RNS_OPERATION_TOPIC);
-			EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-				WorkingContext.EPR_PROPERTY_NAME);
+			EndpointReferenceType myEPR =
+				(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 			RNSOperations operation = (flags.isUnlinked ? RNSOperations.Unlink : RNSOperations.Destroy);
 			topic.publish(new RNSOperationContents(operation, ".", myEPR, flags.vvr));
 		}
@@ -397,8 +397,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				resource.setProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart(), property.getValue());
 
 			} else if (SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.equals(propertyName)) {
-				NuCredential delegatedCredential = (NuCredential) CommonSTSAttributesHandler
-					.deserializeObjectFromString(property.getValue());
+				NuCredential delegatedCredential =
+					(NuCredential) CommonSTSAttributesHandler.deserializeObjectFromString(property.getValue());
 				if (delegatedCredential == null)
 					_logger.info("Missing delegated credential");
 				resource.setProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(), delegatedCredential);
@@ -411,15 +411,15 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, storedContext);
 
 			} else if (SecurityConstants.CERTIFICATE_CHAIN_QNAME.equals(propertyName)) {
-				X509Certificate[] certificate = (X509Certificate[]) CommonSTSAttributesHandler
-					.deserializeObjectFromString(property.getValue());
+				X509Certificate[] certificate =
+					(X509Certificate[]) CommonSTSAttributesHandler.deserializeObjectFromString(property.getValue());
 				if (certificate == null)
 					_logger.info("Missing resource certificate");
 				resource.setProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME, certificate);
 
 			} else if (SecurityConstants.IDP_PRIVATE_KEY_QNAME.equals(propertyName)) {
-				PrivateKey privateKey = (PrivateKey) CommonSTSAttributesHandler
-					.deserializeObjectFromString(property.getValue());
+				PrivateKey privateKey =
+					(PrivateKey) CommonSTSAttributesHandler.deserializeObjectFromString(property.getValue());
 				if (privateKey == null)
 					_logger.info("Missing private key");
 				resource.setProperty(IResource.PRIVATE_KEY_PROPERTY_NAME, privateKey);
@@ -437,15 +437,15 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		{
 
 			// update key and certificate materials
-			ICallingContext storedContext = (ICallingContext) resource
-				.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+			ICallingContext storedContext =
+				(ICallingContext) resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
 			PrivateKey privateKey = (PrivateKey) resource.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
 			X509Certificate[] certificate = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			storedContext.setActiveKeyAndCertMaterial(new KeyAndCertMaterial(certificate, privateKey));
 
 			// update transient credentials list
-			NuCredential delegatedCredential = (NuCredential) resource
-				.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart());
+			NuCredential delegatedCredential =
+				(NuCredential) resource.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart());
 			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(storedContext);
 			transientCredentials.add(delegatedCredential);
 			resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, storedContext);
@@ -493,9 +493,10 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			} catch (BaseFaultType fault) {
 				response[index] = new RNSEntryResponseType(null, null, fault, addRequest[index].getEntryName());
 			} catch (Throwable cause) {
-				response[index] = new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null,
-					null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry!") },
-					null)), addRequest[index].getEntryName());
+				response[index] =
+					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry!") }, null)),
+						addRequest[index].getEntryName());
 			}
 		}
 		return response;

@@ -55,8 +55,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 		if (isServiceResource())
 			return;
 
-		WSIteratorConstructionParameters consParms = (WSIteratorConstructionParameters) constructionParams
-			.get(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME);
+		WSIteratorConstructionParameters consParms =
+			(WSIteratorConstructionParameters) constructionParams.get(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME);
 		if (consParms == null)
 			throw new ResourceException("Can't create a WS-iterator without construction parameters!");
 
@@ -78,8 +78,9 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 
 			try {
 
-				stmt = getConnection().prepareStatement(
-					"INSERT INTO iterators(" + "iteratorid, elementindex, contents) " + "VALUES (?, ?, ?)");
+				stmt =
+					getConnection().prepareStatement(
+						"INSERT INTO iterators(" + "iteratorid, elementindex, contents) " + "VALUES (?, ?, ?)");
 
 				if (rest != null) {
 					while (rest.hasNext()) {
@@ -142,9 +143,10 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 		if (isIndexed == false) {
 			try {
 
-				stmt = getConnection().prepareStatement(
-					"SELECT elementindex, contents FROM iterators WHERE "
-						+ "iteratorid = ? AND elementindex >= ? AND elementindex < ?");
+				stmt =
+					getConnection().prepareStatement(
+						"SELECT elementindex, contents FROM iterators WHERE "
+							+ "iteratorid = ? AND elementindex >= ? AND elementindex < ?");
 
 				stmt.setString(1, getKey());
 				stmt.setLong(2, firstElement);
@@ -180,8 +182,9 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 
 			try {
 				clazz = Class.forName(invokee);
-				meth = clazz.getMethod("getIndexedContent", new Class[] { Connection.class, InMemoryIteratorEntry.class,
-					Object[].class });
+				meth =
+					clazz.getMethod("getIndexedContent", new Class[] { Connection.class, InMemoryIteratorEntry.class,
+						Object[].class });
 			} catch (ClassNotFoundException e) {
 				throw new ResourceException("Unable to retrieve entries!", e);
 			} catch (NoSuchMethodException e) {

@@ -43,8 +43,9 @@ public class NotificationForwarder implements Runnable
 			return;
 
 		MessageElement[] additionalAttributes = message.contents().getAdditionalAttributes();
-		NotificationMessageHolder holder = new NotificationMessageHolder(message.subscriptionReference(), message.publisher(),
-			message.topic(), message.contents());
+		NotificationMessageHolder holder =
+			new NotificationMessageHolder(message.subscriptionReference(), message.publisher(), message.topic(),
+				message.contents());
 
 		List<MessageElement> messageElements = new ArrayList<MessageElement>();
 		if (additionalAttributes != null && additionalAttributes.length > 0) {

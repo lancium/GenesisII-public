@@ -32,15 +32,16 @@ import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 
 /*
- * This attribute handler class is particularly useful for exchanging replication related attributes that
- * are necessary for IDP resources. It makes some sensitive information such as IDP certificates and 
- * private keys available for inspection. So additional security checking is imposed to attribute getter
- * methods to ensure that the system is not giving away such information to any arbitrary entity leading
- * to a security compromise.
+ * This attribute handler class is particularly useful for exchanging replication related attributes
+ * that are necessary for IDP resources. It makes some sensitive information such as IDP
+ * certificates and private keys available for inspection. So additional security checking is
+ * imposed to attribute getter methods to ensure that the system is not giving away such information
+ * to any arbitrary entity leading to a security compromise.
  * 
- * However, there are some attributes such as transfer mechanisms and replication policy that are not 
- * protected information. We keep them in this class too to have a common place for attribute retrievals. 
- * */
+ * However, there are some attributes such as transfer mechanisms and replication policy that are
+ * not protected information. We keep them in this class too to have a common place for attribute
+ * retrievals.
+ */
 public class CommonSTSAttributesHandler extends AbstractAttributeHandler
 {
 
@@ -85,8 +86,8 @@ public class CommonSTSAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getDelegatedCredentials() throws IOException
 	{
 		IResource resource = getResourceAfterAccessChecking("Delegated Credentials");
-		NuCredential credential = (NuCredential) resource.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME
-			.getLocalPart());
+		NuCredential credential =
+			(NuCredential) resource.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart());
 		return new MessageElement(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME,
 			serializeObjectToString((Serializable) credential));
 	}

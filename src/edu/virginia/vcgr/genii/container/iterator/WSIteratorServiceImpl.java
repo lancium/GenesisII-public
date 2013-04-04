@@ -68,13 +68,13 @@ public class WSIteratorServiceImpl extends GenesisIIBase implements WSIteratorPo
 		extendLifeTime(ResourceManager.getCurrentResource()); // extend the lifetime of this
 																// resource between each iteration
 
-		Collection<Pair<Long, MessageElement>> entries = resource.retrieveEntries(request.getStartOffset().intValue(), request
-			.getElementCount().intValue());
+		Collection<Pair<Long, MessageElement>> entries =
+			resource.retrieveEntries(request.getStartOffset().intValue(), request.getElementCount().intValue());
 		IterableElementType[] iterableElements = new IterableElementType[entries.size()];
 		int lcv = 0;
 		for (Pair<Long, MessageElement> entry : entries) {
-			iterableElements[lcv++] = new IterableElementType(new MessageElement[] { entry.second() }, new UnsignedLong(
-				entry.first()));
+			iterableElements[lcv++] =
+				new IterableElementType(new MessageElement[] { entry.second() }, new UnsignedLong(entry.first()));
 		}
 
 		return new IterateResponseType(new UnsignedLong(resource.iteratorSize()), iterableElements);

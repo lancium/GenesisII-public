@@ -115,8 +115,9 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 		resource.setProperty(ISByteIOResource.DESTROY_ON_CLOSE_PROPERTY, destroyOnClose);
 		MetadataType mdt = newEPR.getMetadata();
 		if (mdt == null)
-			newEPR.setMetadata(mdt = new MetadataType(new MessageElement[] { new MessageElement(
-				ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG, destroyOnClose) }));
+			newEPR.setMetadata(mdt =
+				new MetadataType(new MessageElement[] { new MessageElement(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG,
+					destroyOnClose) }));
 		else {
 			ArrayList<MessageElement> tmp = new ArrayList<MessageElement>();
 			for (MessageElement e : mdt.get_any())

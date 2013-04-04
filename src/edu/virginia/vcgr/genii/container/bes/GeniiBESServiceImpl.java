@@ -186,8 +186,9 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			/*
 			 * Now we get the database connection pool configured with this service
 			 */
-			DatabaseConnectionPool connectionPool = ((DBBESResourceFactory) ResourceManager.getServiceResource(_serviceName)
-				.getProvider().getFactory()).getConnectionPool();
+			DatabaseConnectionPool connectionPool =
+				((DBBESResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory())
+					.getConnectionPool();
 
 			// Set cloud connection DB pool
 			CloudMonitor.setConnectionPool((new CloudDBResourceFactory(connectionPool).getConnectionPool()));
@@ -297,10 +298,11 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
 		history.info("BES Creating Activity Instance");
 
-		EndpointReferenceType entryReference = new BESActivityServiceImpl().CreateEPR(
-			BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
-				(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe),
-			Container.getServiceURL("BESActivityPortType"));
+		EndpointReferenceType entryReference =
+			new BESActivityServiceImpl().CreateEPR(
+				BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
+					(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe),
+				Container.getServiceURL("BESActivityPortType"));
 
 		return new CreateActivityResponseType(entryReference, adt, historySink.eventMessages());
 
@@ -391,8 +393,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		URI localResourceManagerType = null;
 
 		try {
-			namingProfiles = new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING),
-				new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
+			namingProfiles =
+				new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING), new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
 			besExtensions = new URI[0];
 
 			BESConstructionParameters consParms = (BESConstructionParameters) _resource.constructionParameters(getClass());

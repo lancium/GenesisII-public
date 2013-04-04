@@ -1,17 +1,15 @@
 /*
  * Copyright 2006 University of Virginia
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package edu.virginia.vcgr.genii.container.axis;
@@ -58,8 +56,9 @@ public class WorkingContextHandler extends BasicHandler
 					else if (value.equals(_FLOW_SIDE_RESPONSE_VALUE))
 						_isRequest = Boolean.FALSE;
 					else
-						fault = new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected "
-							+ _FLOW_SIDE_REQUEST_VALUE + " or " + _FLOW_SIDE_RESPONSE_VALUE);
+						fault =
+							new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected " + _FLOW_SIDE_REQUEST_VALUE
+								+ " or " + _FLOW_SIDE_RESPONSE_VALUE);
 				} else {
 					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY + " parameter.");
 				}
@@ -88,8 +87,8 @@ public class WorkingContextHandler extends BasicHandler
 		WorkingContext newContext = new WorkingContext();
 		WorkingContext.setCurrentWorkingContext(newContext);
 
-		EndpointReferenceType epr = (EndpointReferenceType) ctxt
-			.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
+		EndpointReferenceType epr =
+			(EndpointReferenceType) ctxt.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
 		if (epr == null) {
 			throw new AxisFault("Couldn't find \"" + WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY
 				+ "\" property in message context.");
@@ -112,8 +111,9 @@ public class WorkingContextHandler extends BasicHandler
 		// from the message context's operation).
 		try {
 			ResourceKey rKey = ResourceManager.getCurrentResource();
-			epr = ResourceManager.createEPR(rKey, epr.getAddress().get_value().toString(),
-				EPRUtils.getImplementedPortTypes(epr), EPRUtils.getMasterPortType(epr));
+			epr =
+				ResourceManager.createEPR(rKey, epr.getAddress().get_value().toString(), EPRUtils.getImplementedPortTypes(epr),
+					EPRUtils.getMasterPortType(epr));
 			newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
 		} catch (Throwable t) {
 		}

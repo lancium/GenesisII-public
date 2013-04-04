@@ -47,8 +47,8 @@ public class PipeServiceImpl extends GenesisIIBase implements PipePortType
 	private PipeBuffer createPipeBuffer(ResourceKey rKey) throws ResourceException
 	{
 		IResource resource = rKey.dereference();
-		PipeConstructionParameters consParms = (PipeConstructionParameters) resource
-			.constructionParameters(PipeServiceImpl.class);
+		PipeConstructionParameters consParms =
+			(PipeConstructionParameters) resource.constructionParameters(PipeServiceImpl.class);
 		return new PipeBuffer(consParms.pipeSize());
 	}
 

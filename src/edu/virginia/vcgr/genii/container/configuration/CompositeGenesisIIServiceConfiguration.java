@@ -17,8 +17,8 @@ class CompositeGenesisIIServiceConfiguration implements GenesisIIServiceConfigur
 		Class<?> lastJAXBClassOverride = null;
 		Class<?> lastJAXBClassOverrideService = null;
 
-		for (Class<?> newServiceClass = serviceClass; newServiceClass != Object.class; newServiceClass = newServiceClass
-			.getSuperclass()) {
+		for (Class<?> newServiceClass = serviceClass; newServiceClass != Object.class; newServiceClass =
+			newServiceClass.getSuperclass()) {
 			GeniiServiceConfiguration serviceConf = newServiceClass.getAnnotation(GeniiServiceConfiguration.class);
 
 			if (serviceConf != null) {

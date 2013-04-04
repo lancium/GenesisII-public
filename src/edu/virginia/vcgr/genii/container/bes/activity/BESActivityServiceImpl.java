@@ -1,17 +1,15 @@
 /*
  * Copyright 2006 University of Virginia
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package edu.virginia.vcgr.genii.container.bes.activity;
 
@@ -126,8 +124,9 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 		String activityServiceName = "BESActivityPortType";
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities(true);
 
-		BESWorkingDirectory workingDirectory = new BESWorkingDirectory(chooseDirectory(
-			(BESConstructionParameters) _resource.constructionParameters(getClass()), 5), true);
+		BESWorkingDirectory workingDirectory =
+			new BESWorkingDirectory(
+				chooseDirectory((BESConstructionParameters) _resource.constructionParameters(getClass()), 5), true);
 
 		FilesystemManager fsManager = new FilesystemManager();
 		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
@@ -142,8 +141,9 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			if (cConfig != null) {
 				PersonalityProvider provider = new ExecutionProvider();
 				JobRequest tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
-				executionPlan = CloudJobWrapper.createExecutionPlan(_resource.getKey().toString(), initInfo.getContainerID(),
-					tJob, ((BESConstructionParameters) cParams));
+				executionPlan =
+					CloudJobWrapper.createExecutionPlan(_resource.getKey().toString(), initInfo.getContainerID(), tJob,
+						((BESConstructionParameters) cParams));
 				jobName = tJob.getJobName();
 			} else {
 
@@ -151,12 +151,12 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 				ExecutionUnderstanding executionUnderstanding;
 
 				if (qConf != null) {
-					Object understanding = JSDLInterpreter.interpretJSDL(new QSubPersonalityProvider(fsManager,
-						workingDirectory), jsdl);
+					Object understanding =
+						JSDLInterpreter.interpretJSDL(new QSubPersonalityProvider(fsManager, workingDirectory), jsdl);
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				} else {
-					Object understanding = JSDLInterpreter.interpretJSDL(new ForkExecPersonalityProvider(fsManager,
-						workingDirectory), jsdl);
+					Object understanding =
+						JSDLInterpreter.interpretJSDL(new ForkExecPersonalityProvider(fsManager, workingDirectory), jsdl);
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				}
 

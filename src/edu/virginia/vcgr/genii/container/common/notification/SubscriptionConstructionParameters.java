@@ -34,8 +34,8 @@ public class SubscriptionConstructionParameters extends ConstructionParameters
 	private EndpointReferenceType _consumerReference;
 
 	private TopicQueryExpression _topicQuery;
-	private Map<SubscriptionPolicyTypes, SubscriptionPolicy> _policies = new EnumMap<SubscriptionPolicyTypes, SubscriptionPolicy>(
-		SubscriptionPolicyTypes.class);
+	private Map<SubscriptionPolicyTypes, SubscriptionPolicy> _policies =
+		new EnumMap<SubscriptionPolicyTypes, SubscriptionPolicy>(SubscriptionPolicyTypes.class);
 
 	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "additional-user-data", nillable = true, required = false)
 	private AdditionalUserData _additionalUserData = null;

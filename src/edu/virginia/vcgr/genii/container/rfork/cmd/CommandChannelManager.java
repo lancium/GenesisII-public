@@ -239,8 +239,8 @@ public class CommandChannelManager
 					description = null;
 			}
 
-			XMLCommandFunction function = new XMLCommandFunction(description,
-				parameters.toArray(new XMLCommandParameter[parameters.size()]), commandName);
+			XMLCommandFunction function =
+				new XMLCommandFunction(description, parameters.toArray(new XMLCommandParameter[parameters.size()]), commandName);
 			metadata.add(new MessageElement(GenesisIIConstants.COMMAND_FUNCTION_QNAME, function));
 		}
 

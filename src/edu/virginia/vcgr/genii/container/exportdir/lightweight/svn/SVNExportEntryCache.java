@@ -18,8 +18,9 @@ class SVNExportEntryCache extends LRUCache<SVNPathIdentifier, SVNExportEntry>
 		SVNPathIdentifier id = (SVNPathIdentifier) key;
 		SVNExportEntry entry = get(id);
 		if (entry == null) {
-			entry = new SVNExportEntry(id.repository(), id.repositoryURL(), id.revision(), id.repository().info(
-				id.relativePath(), id.revision()), id.relativePath(), this);
+			entry =
+				new SVNExportEntry(id.repository(), id.repositoryURL(), id.revision(), id.repository().info(id.relativePath(),
+					id.revision()), id.relativePath(), this);
 			put(id, entry);
 		}
 
