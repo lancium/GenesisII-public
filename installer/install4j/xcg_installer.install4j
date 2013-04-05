@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="5.0.11" transformSequenceNumber="3">
-  <directoryPresets config="" />
-  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesisII.virginia.edu" version="2.6.4" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
+<install4j version="5.1.5" transformSequenceNumber="4">
+  <directoryPresets config="../../../../../.." />
+  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesisII.virginia.edu" version="2.7.0" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="4711" description="" category="" />
+      <variable name="genii.build-number" value="5300" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -25,6 +25,7 @@
       <variable name="genii.bitSize" value="" description="" category="" />
     </variables>
     <mergedProjects />
+    <codeSigning macEnabled="false" macPkcs12File="" windowsEnabled="false" windowsKeySource="pkcs12" windowsPvkFile="" windowsSpcFile="" windowsPkcs12File="" />
   </application>
   <files keepModificationTimes="false" missingFilesStrategy="warn" globalExcludeSuffixes="" defaultOverwriteMode="4" defaultUninstallMode="0" launcherOverwriteMode="3" defaultFileMode="644" defaultDirMode="755">
     <filesets>
@@ -454,7 +455,7 @@
     </components>
   </files>
   <launchers>
-    <launcher name="grid" id="39" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" swtApp="false" fileset="">
+    <launcher name="grid" id="39" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
       <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
@@ -481,9 +482,12 @@
       <customScript mode="1" file="">
         <content />
       </customScript>
+      <infoPlist mode="1" file="">
+        <content />
+      </infoPlist>
       <iconImageFiles />
     </launcher>
-    <launcher name="grid-update" id="76" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" swtApp="false" fileset="">
+    <launcher name="grid-update" id="76" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
       <executable name="grid-update" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
@@ -510,10 +514,13 @@
       <customScript mode="1" file="">
         <content />
       </customScript>
+      <infoPlist mode="1" file="">
+        <content />
+      </infoPlist>
       <iconImageFiles />
     </launcher>
     <launcher name="XCGContainer" id="264" customizedId="" external="true" excludeFromMenu="true" unixMode="755" menuName="" externalFile="JavaServiceWrapper/wrapper/bin/XCGContainer" />
-    <launcher name="Export" id="1229" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" swtApp="false" fileset="">
+    <launcher name="Export" id="1229" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
       <executable name="export" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
@@ -540,9 +547,12 @@
       <customScript mode="1" file="">
         <content />
       </customScript>
+      <infoPlist mode="1" file="">
+        <content />
+      </infoPlist>
       <iconImageFiles />
     </launcher>
-    <launcher name="runContainer" id="1450" customizedId="" external="false" excludeFromMenu="true" unixMode="755" menuName="" icnsFile="" swtApp="false" fileset="23">
+    <launcher name="runContainer" id="1450" customizedId="" external="false" excludeFromMenu="true" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="23" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
       <executable name="runContainer" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
@@ -569,9 +579,12 @@
       <customScript mode="1" file="">
         <content />
       </customScript>
+      <infoPlist mode="1" file="">
+        <content />
+      </infoPlist>
       <iconImageFiles />
     </launcher>
-    <launcher name="client-ui" id="1773" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" swtApp="false" fileset="">
+    <launcher name="client-ui" id="1773" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
       <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
@@ -598,6 +611,9 @@
       <customScript mode="1" file="">
         <content />
       </customScript>
+      <infoPlist mode="1" file="">
+        <content />
+      </infoPlist>
       <iconImageFiles />
     </launcher>
   </launchers>
@@ -608,7 +624,7 @@
       <customAttributes />
     </autoUpdate>
     <applications>
-      <application name="" id="installer" customizedId="" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" fileset="" customIcnsFile="" customIcoFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
+      <application name="" id="installer" customizedId="" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="" customIcoFile="" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
         <serializedBean>
           <java class="java.beans.XMLDecoder">
             <object class="com.install4j.runtime.beans.applications.InstallerApplication">
@@ -621,7 +637,7 @@
         <launcherIds />
         <variables />
         <startup>
-          <screen name="" id="1" customizedId="" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="1" customizedId="" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.StartupScreen" />
@@ -632,7 +648,7 @@
             <preActivation />
             <postActivation />
             <actions>
-              <action name="" id="1916" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="1916" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" />
@@ -645,7 +661,7 @@
           </screen>
         </startup>
         <screens>
-          <screen name="" id="2" customizedId="" beanClass="com.install4j.runtime.beans.screens.WelcomeScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="2" customizedId="" beanClass="com.install4j.runtime.beans.screens.WelcomeScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.WelcomeScreen" />
@@ -656,7 +672,7 @@
             <preActivation />
             <postActivation />
             <actions>
-              <action name="" id="1917" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+              <action name="" id="1917" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" />
@@ -667,7 +683,7 @@
             </actions>
             <formComponents />
           </screen>
-          <screen name="" id="3" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="3" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" />
@@ -678,7 +694,7 @@
             <preActivation />
             <postActivation />
             <actions>
-              <action name="" id="4" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+              <action name="" id="4" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" />
@@ -689,7 +705,7 @@
             </actions>
             <formComponents />
           </screen>
-          <screen name="" id="6" customizedId="" beanClass="com.install4j.runtime.beans.screens.StandardProgramGroupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="6" customizedId="" beanClass="com.install4j.runtime.beans.screens.StandardProgramGroupScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.StandardProgramGroupScreen">
@@ -709,7 +725,7 @@
             <actions />
             <formComponents />
           </screen>
-          <screen name="Deployment Configuration" id="2063" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="Deployment Configuration" id="2063" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.FormScreen">
@@ -727,7 +743,7 @@
             <preActivation />
             <postActivation />
             <actions>
-              <action name="Set deployment variables" id="3026" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
+              <action name="Set deployment variables" id="3026" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
@@ -751,7 +767,7 @@ return true;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Guess Hostname" id="3027" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Guess Hostname" id="3027" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
@@ -956,7 +972,7 @@ if (selected){
               </formComponent>
             </formComponents>
           </screen>
-          <screen name="" id="7" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="true" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="7" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="true" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.InstallationScreen" />
@@ -967,7 +983,7 @@ if (selected){
             <preActivation />
             <postActivation />
             <actions>
-              <action name="" id="4309" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="4309" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
@@ -988,7 +1004,7 @@ if (selected){
                 </serializedBean>
                 <condition />
               </action>
-              <action name="" id="8" customizedId="" beanClass="com.install4j.runtime.beans.actions.InstallFilesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="${i18n:FileCorrupted}">
+              <action name="" id="8" customizedId="" beanClass="com.install4j.runtime.beans.actions.InstallFilesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="${i18n:FileCorrupted}">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.InstallFilesAction" />
@@ -996,7 +1012,7 @@ if (selected){
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Set Initialization Variables" id="309" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Set Initialization Variables" id="309" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
@@ -1027,14 +1043,14 @@ return true;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <group name="Patch Core Files" id="42" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+              <group name="Patch Core Files" id="42" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.groups.ActionGroup" />
                   </java>
                 </serializedBean>
                 <beans>
-                  <action name="Patch jar-desc.xml" id="46" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch jar-desc.xml">
+                  <action name="Patch jar-desc.xml" id="46" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch jar-desc.xml">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1058,7 +1074,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch RELEASE file" id="75" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch RELEASE file.">
+                  <action name="Patch RELEASE file" id="75" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch RELEASE file.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1079,7 +1095,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch genii-base-application.properties" id="222" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Patch genii-base-application.properties" id="222" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1103,7 +1119,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch genii-client-application.properties" id="225" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Patch genii-client-application.properties" id="225" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1127,7 +1143,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch genii-update-application.properties" id="227" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Patch genii-update-application.properties" id="227" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1151,7 +1167,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch genii-container-application.properties" id="229" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Patch genii-container-application.properties" id="229" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1175,7 +1191,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch production.client.log4j.properties" id="4154" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Patch production.client.log4j.properties" id="4154" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1199,7 +1215,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch production.container.log4j.properties" id="231" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Patch production.container.log4j.properties" id="231" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1223,7 +1239,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch current-verison.txt" id="357" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Patch current-verison.txt" id="357" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1247,7 +1263,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch XCG.plist" id="1461" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch XCG.plist file for service installation.">
+                  <action name="Patch XCG.plist" id="1461" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch XCG.plist file for service installation.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1274,7 +1290,7 @@ return true;</string>
                   </action>
                 </beans>
               </group>
-              <action name="" id="9" customizedId="" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="9" customizedId="" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction">
@@ -1286,7 +1302,7 @@ return true;</string>
                 </serializedBean>
                 <condition>!context.getBooleanVariable("sys.programGroupDisabled")</condition>
               </action>
-              <action name="" id="10" customizedId="" beanClass="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="10" customizedId="" beanClass="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction">
@@ -1301,7 +1317,7 @@ return true;</string>
             </actions>
             <formComponents />
           </screen>
-          <group name="Pre Container Configuration" id="2069" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+          <group name="Pre Container Configuration" id="2069" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.groups.ScreenGroup">
@@ -1316,7 +1332,7 @@ return true;</string>
               </java>
             </serializedBean>
             <beans>
-              <screen name="Host Configuration" id="1029" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+              <screen name="Host Configuration" id="1029" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.screens.FormScreen">
@@ -1334,7 +1350,7 @@ return true;</string>
                 <preActivation />
                 <postActivation />
                 <actions>
-                  <action name="copy server config" id="2858" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="copy server config" id="2858" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
@@ -1357,7 +1373,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Replace port number in web-container.properties" id="1030" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Replace port number in web-container.properties" id="1030" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1381,7 +1397,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="replace hostname" id="2715" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="replace hostname" id="2715" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1399,7 +1415,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Create service url file" id="3028" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.WriteTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Create service url file" id="3028" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.WriteTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.WriteTextFileAction">
@@ -1477,7 +1493,7 @@ return true;</string>
                     <initScript />
                     <visibilityScript />
                   </formComponent>
-                  <group name="" id="2713" customizedId="" beanClass="com.install4j.runtime.beans.groups.HorizontalFormComponentGroup" enabled="true" commentSet="false" comment="">
+                  <group name="" id="2713" customizedId="" beanClass="com.install4j.runtime.beans.groups.HorizontalFormComponentGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.groups.HorizontalFormComponentGroup" />
@@ -1522,14 +1538,14 @@ Hostnames should be globally resolvable via DNS.</string>
               </screen>
             </beans>
           </group>
-          <group name="Post Installation Configuration" id="1013" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+          <group name="Post Installation Configuration" id="1013" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.groups.ScreenGroup" />
               </java>
             </serializedBean>
             <beans>
-              <screen name="Connect Client Progress" id="1014" customizedId="" beanClass="com.install4j.runtime.beans.screens.CustomizableProgressScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+              <screen name="Connect Client Progress" id="1014" customizedId="" beanClass="com.install4j.runtime.beans.screens.CustomizableProgressScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.screens.CustomizableProgressScreen">
@@ -1550,7 +1566,7 @@ Hostnames should be globally resolvable via DNS.</string>
                 <preActivation />
                 <postActivation />
                 <actions>
-                  <action name="Copy JCE Unlimited Jars" id="3949" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
+                  <action name="Copy JCE Unlimited Jars" id="3949" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
@@ -1587,7 +1603,7 @@ String medium = context.getMediaName();
 return ! medium.startsWith("genesis2_client_macosx");
 </condition>
                   </action>
-                  <action name="fix installation dir" id="4474" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="fix installation dir" id="4474" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
@@ -1606,7 +1622,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Create container.properties file" id="1015" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.WriteTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to create container.properties file">
+                  <action name="Create container.properties file" id="1015" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.WriteTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to create container.properties file">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.WriteTextFileAction">
@@ -1629,7 +1645,7 @@ edu.virginia.vcgr.genii.gridInitCommand="local:${installer:gen.fixedInstallDir}/
                     <condition>File propFile = new File(context.getInstallationDirectory(), "container.properties");
 return !propFile.exists();</condition>
                   </action>
-                  <action name="" id="1016" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to connect to the grid.">
+                  <action name="" id="1016" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to connect to the grid.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -1665,7 +1681,7 @@ return !propFile.exists();</condition>
                     <condition>File propFile = new File(context.getInstallationDirectory(), "container.properties");
 return propFile.exists();</condition>
                   </action>
-                  <action name="" id="1017" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="" id="1017" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
@@ -1680,7 +1696,7 @@ return propFile.exists();</condition>
                 </actions>
                 <formComponents />
               </screen>
-              <group name="Service Install and Start Confirmations" id="1018" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+              <group name="Service Install and Start Confirmations" id="1018" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.groups.ScreenGroup">
@@ -1695,7 +1711,7 @@ return propFile.exists();</condition>
                   </java>
                 </serializedBean>
                 <beans>
-                  <group name="Owner Group" id="1034" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+                  <group name="Owner Group" id="1034" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.groups.ScreenGroup">
@@ -1705,6 +1721,9 @@ return propFile.exists();</condition>
                                 <string>!(context.getCompilerVariable("genii.isBootstrap").equals("true"))</string>
                               </void>
                             </object>
+                          </void>
+                          <void property="loop">
+                            <boolean>true</boolean>
                           </void>
                           <void property="loopExpression">
                             <object class="com.install4j.api.beans.ScriptProperty">
@@ -1720,7 +1739,7 @@ return !ownerCer.exists();</string>
                       </java>
                     </serializedBean>
                     <beans>
-                      <screen name="Owner Screen" id="1035" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                      <screen name="Owner Screen" id="1035" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.screens.FormScreen">
@@ -1738,7 +1757,7 @@ return !ownerCer.exists();</string>
                         <preActivation />
                         <postActivation />
                         <actions>
-                          <action name="Download Certificate" id="1036" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to download owner certificate.">
+                          <action name="Download Certificate" id="1036" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to download owner certificate.">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -1773,7 +1792,7 @@ return !ownerCer.exists();</string>
                             </serializedBean>
                             <condition />
                           </action>
-                          <action name="copy in unlimited jce jars" id="1915" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+                          <action name="copy in unlimited jce jars" id="1915" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
@@ -1835,21 +1854,21 @@ return !ownerCer.exists();</string>
                       </screen>
                     </beans>
                   </group>
-                  <group name="Grid Config" id="2593" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+                  <group name="Grid Config" id="2593" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.groups.ScreenGroup" />
                       </java>
                     </serializedBean>
                     <beans>
-                      <group name="Get Container Cert" id="2604" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+                      <group name="Get Container Cert" id="2604" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.groups.ScreenGroup" />
                           </java>
                         </serializedBean>
                         <beans>
-                          <screen name="Choose Source" id="2594" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                          <screen name="Choose Source" id="2594" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.screens.FormScreen">
@@ -1886,7 +1905,7 @@ return !ownerCer.exists();</string>
                               </formComponent>
                             </formComponents>
                           </screen>
-                          <screen name="Cert Generator" id="2603" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                          <screen name="Cert Generator" id="2603" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.screens.FormScreen">
@@ -1904,7 +1923,7 @@ return !ownerCer.exists();</string>
                             <preActivation />
                             <postActivation />
                             <actions>
-                              <action name="login" id="2597" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="false" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Failed to login">
+                              <action name="login" id="2597" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="false" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Failed to login">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -1939,7 +1958,7 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="get container keypair" id="2712" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Unable to generate container keypair">
+                              <action name="get container keypair" id="2712" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Unable to generate container keypair">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -2010,7 +2029,7 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="copy tls to signing cert" id="3952" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Failed to copy tls cert to signing cert.">
+                              <action name="copy tls to signing cert" id="3952" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Failed to copy tls cert to signing cert.">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
@@ -2036,7 +2055,7 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="logout" id="2718" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="false" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                              <action name="logout" id="2718" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="false" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -2065,7 +2084,7 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="update keystore properties" id="3022" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                              <action name="update keystore properties" id="3022" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -2144,7 +2163,7 @@ return !ownerCer.exists();</string>
                               </formComponent>
                             </formComponents>
                           </screen>
-                          <screen name="Provide Keypair" id="2605" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                          <screen name="Provide Keypair" id="2605" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.screens.FormScreen">
@@ -2162,7 +2181,7 @@ return !ownerCer.exists();</string>
                             <preActivation />
                             <postActivation />
                             <actions>
-                              <action name="Copy tls keypair" id="2608" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
+                              <action name="Copy tls keypair" id="2608" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
@@ -2188,7 +2207,7 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="Copy signing keypair" id="3832" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
+                              <action name="Copy signing keypair" id="3832" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
@@ -2214,7 +2233,7 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="update keystore properties" id="3023" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                              <action name="update keystore properties" id="3023" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -2288,7 +2307,7 @@ return !ownerCer.exists();</string>
                       </group>
                     </beans>
                   </group>
-                  <group name="Windows" id="1019" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+                  <group name="Windows" id="1019" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.groups.ScreenGroup">
@@ -2303,7 +2322,7 @@ return !ownerCer.exists();</string>
                       </java>
                     </serializedBean>
                     <beans>
-                      <screen name="Windows Service Confirmations" id="1020" customizedId="" beanClass="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                      <screen name="Windows Service Confirmations" id="1020" customizedId="" beanClass="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" />
@@ -2410,7 +2429,7 @@ port for you.</string>
                       </screen>
                     </beans>
                   </group>
-                  <group name="Non-Windows Service Configuration" id="1026" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+                  <group name="Non-Windows Service Configuration" id="1026" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.groups.ScreenGroup">
@@ -2425,7 +2444,7 @@ port for you.</string>
                       </java>
                     </serializedBean>
                     <beans>
-                      <screen name="Non-Windows Service Configuration" id="1027" customizedId="" beanClass="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+                      <screen name="Non-Windows Service Configuration" id="1027" customizedId="" beanClass="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" />
@@ -2459,7 +2478,7 @@ port for you.</string>
                   </group>
                 </beans>
               </group>
-              <screen name="Configure Container Service Progress" id="1043" customizedId="" beanClass="com.install4j.runtime.beans.screens.CustomizableProgressScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+              <screen name="Configure Container Service Progress" id="1043" customizedId="" beanClass="com.install4j.runtime.beans.screens.CustomizableProgressScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.screens.CustomizableProgressScreen">
@@ -2477,7 +2496,7 @@ port for you.</string>
                 <preActivation />
                 <postActivation />
                 <actions>
-                  <action name="Set Progress to 0%" id="1064" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set Progress to 0%" id="1064" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetProgressAction" />
@@ -2485,7 +2504,7 @@ port for you.</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Set genii.container-memory" id="1044" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetVariableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set genii.container-memory" id="1044" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetVariableAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetVariableAction">
@@ -2517,7 +2536,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Set Progress to 12%" id="1065" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set Progress to 12%" id="1065" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
@@ -2529,7 +2548,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Replace Variables in wrapper.conf" id="1045" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
+                  <action name="Replace Variables in wrapper.conf" id="1045" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -2550,7 +2569,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Set Progress to 25%" id="1066" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set Progress to 25%" id="1066" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
@@ -2562,7 +2581,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch broken properties" id="1046" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
+                  <action name="Patch broken properties" id="1046" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
@@ -2586,7 +2605,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Re-patch wrapper.conf" id="1149" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Re-patch wrapper.conf" id="1149" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
@@ -2610,7 +2629,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Set Progress to 37%" id="1067" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set Progress to 37%" id="1067" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
@@ -2622,7 +2641,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="" id="1047" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
+                  <action name="" id="1047" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.files.SetModeAction">
@@ -2643,7 +2662,7 @@ return memory;</string>
                     </serializedBean>
                     <condition>context.getCompilerVariable("genii.isLinux").equals("true")</condition>
                   </action>
-                  <action name="Set the MacOS access permissions" id="1372" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
+                  <action name="Set the MacOS access permissions" id="1372" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.files.SetModeAction">
@@ -2664,7 +2683,7 @@ return memory;</string>
                     </serializedBean>
                     <condition>context.getCompilerVariable("genii.isMacOSX").equals("true")</condition>
                   </action>
-                  <action name="Set Progress to 50%" id="1068" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set Progress to 50%" id="1068" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
@@ -2676,7 +2695,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <group name="Prepare XCGContainer Script" id="1048" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                  <group name="Prepare XCGContainer Script" id="1048" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.groups.ActionGroup">
@@ -2694,7 +2713,7 @@ return memory;</string>
                       </java>
                     </serializedBean>
                     <beans>
-                      <action name="Indicate:  Preparing XCGContainer Script" id="1074" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                      <action name="Indicate:  Preparing XCGContainer Script" id="1074" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
@@ -2709,7 +2728,7 @@ return memory;</string>
                         </serializedBean>
                         <condition />
                       </action>
-                      <action name="Replace Variables in XCGContainer" id="1049" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                      <action name="Replace Variables in XCGContainer" id="1049" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -2730,7 +2749,7 @@ return memory;</string>
                         </serializedBean>
                         <condition />
                       </action>
-                      <action name="" id="1050" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
+                      <action name="" id="1050" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.files.SetModeAction">
@@ -2751,7 +2770,7 @@ return memory;</string>
                         </serializedBean>
                         <condition />
                       </action>
-                      <action name="" id="1051" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CreateSymlinkAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                      <action name="" id="1051" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CreateSymlinkAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.files.CreateSymlinkAction">
@@ -2772,7 +2791,7 @@ return memory;</string>
                       </action>
                     </beans>
                   </group>
-                  <action name="Set Progress to 62%" id="1069" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set Progress to 62%" id="1069" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
@@ -2784,7 +2803,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <group name="Open Firewall" id="1052" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                  <group name="Open Firewall" id="1052" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.groups.ActionGroup">
@@ -2802,7 +2821,7 @@ return memory;</string>
                       </java>
                     </serializedBean>
                     <beans>
-                      <action name="Indicate:  Opening Firewall" id="1075" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                      <action name="Indicate:  Opening Firewall" id="1075" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
@@ -2817,7 +2836,7 @@ return memory;</string>
                         </serializedBean>
                         <condition />
                       </action>
-                      <action name="Open Port" id="1054" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                      <action name="Open Port" id="1054" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -2863,7 +2882,7 @@ return memory;</string>
                       </action>
                     </beans>
                   </group>
-                  <action name="Set Progress to 75%" id="1070" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set Progress to 75%" id="1070" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
@@ -2875,7 +2894,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <group name="Install Service" id="1055" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                  <group name="Install Service" id="1055" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.groups.ActionGroup">
@@ -2893,7 +2912,7 @@ return memory;</string>
                       </java>
                     </serializedBean>
                     <beans>
-                      <action name="Indicate:  Installing Container Service" id="1076" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                      <action name="Indicate:  Installing Container Service" id="1076" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
@@ -2908,7 +2927,7 @@ return memory;</string>
                         </serializedBean>
                         <condition />
                       </action>
-                      <action name="Install Container Wrapper" id="1057" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to install Container as a Service">
+                      <action name="Install Container Wrapper" id="1057" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to install Container as a Service">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -2945,7 +2964,7 @@ return memory;</string>
                       </action>
                     </beans>
                   </group>
-                  <action name="Set Progress to 87%" id="1071" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set Progress to 87%" id="1071" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
@@ -2957,7 +2976,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <group name="Start Service" id="1058" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                  <group name="Start Service" id="1058" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.groups.ActionGroup">
@@ -2982,7 +3001,7 @@ return startService;</string>
                       </java>
                     </serializedBean>
                     <beans>
-                      <action name="Indicate:  Starting Service" id="1077" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                      <action name="Indicate:  Starting Service" id="1077" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
@@ -2997,7 +3016,7 @@ return startService;</string>
                         </serializedBean>
                         <condition />
                       </action>
-                      <group name="Start Windows Service" id="1060" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                      <group name="Start Windows Service" id="1060" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.groups.ActionGroup">
@@ -3012,7 +3031,7 @@ return startService;</string>
                           </java>
                         </serializedBean>
                         <beans>
-                          <action name="Run wrapper.exe" id="1061" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to start Container Service">
+                          <action name="Run wrapper.exe" id="1061" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to start Container Service">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -3046,7 +3065,7 @@ return startService;</string>
                           </action>
                         </beans>
                       </group>
-                      <group name="Start Non-WIndows Service" id="1062" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                      <group name="Start Non-WIndows Service" id="1062" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.groups.ActionGroup">
@@ -3061,7 +3080,7 @@ return startService;</string>
                           </java>
                         </serializedBean>
                         <beans>
-                          <action name="Start Container" id="1063" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to start Container Service">
+                          <action name="Start Container" id="1063" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to start Container Service">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -3094,7 +3113,7 @@ return startService;</string>
                       </group>
                     </beans>
                   </group>
-                  <action name="Set Progress to 100%" id="1072" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set Progress to 100%" id="1072" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
@@ -3111,7 +3130,7 @@ return startService;</string>
               </screen>
             </beans>
           </group>
-          <screen name="" id="11" customizedId="" beanClass="com.install4j.runtime.beans.screens.FinishedScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="11" customizedId="" beanClass="com.install4j.runtime.beans.screens.FinishedScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="true" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.FinishedScreen" />
@@ -3122,7 +3141,7 @@ return startService;</string>
             <preActivation />
             <postActivation />
             <actions>
-              <action name="" id="354" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.SaveInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="354" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.SaveInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.registry.SaveInstallerVariablesAction">
@@ -3170,7 +3189,7 @@ return startService;</string>
           </screen>
         </screens>
       </application>
-      <application name="" id="uninstaller" customizedId="" beanClass="com.install4j.runtime.beans.applications.UninstallerApplication" enabled="true" commentSet="false" comment="" fileset="" customIcnsFile="" customIcoFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
+      <application name="" id="uninstaller" customizedId="" beanClass="com.install4j.runtime.beans.applications.UninstallerApplication" enabled="true" commentSet="false" comment="" actionElevationType="none" fileset="" customIcnsFile="" customIcoFile="" macEntitlementsFile="" automaticLauncherIntegration="false" launchMode="startupFirstWindow" launchInNewProcess="false" launchSchedule="updateSchedule" allLaunchers="true">
         <serializedBean>
           <java class="java.beans.XMLDecoder">
             <object class="com.install4j.runtime.beans.applications.UninstallerApplication">
@@ -3183,7 +3202,7 @@ return startService;</string>
         <launcherIds />
         <variables />
         <startup>
-          <screen name="" id="12" customizedId="" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="12" customizedId="" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.StartupScreen" />
@@ -3195,7 +3214,7 @@ return startService;</string>
             <postActivation />
             <actions>
               <link name="" id="1918" customizedId="" beanClass="" enabled="true" targetId="1916" mergedProjectId="" />
-              <action name="" id="332" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.LoadInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="332" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.LoadInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.registry.LoadInstallerVariablesAction">
@@ -3207,7 +3226,7 @@ return startService;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="" id="18" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="18" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" />
@@ -3220,7 +3239,7 @@ return startService;</string>
           </screen>
         </startup>
         <screens>
-          <screen name="" id="13" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallWelcomeScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="13" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallWelcomeScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.UninstallWelcomeScreen" />
@@ -3233,7 +3252,7 @@ return startService;</string>
             <actions />
             <formComponents />
           </screen>
-          <screen name="Manage Container" id="328" customizedId="" beanClass="com.install4j.runtime.beans.screens.CustomizableProgressScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="Manage Container" id="328" customizedId="" beanClass="com.install4j.runtime.beans.screens.CustomizableProgressScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.CustomizableProgressScreen">
@@ -3254,7 +3273,7 @@ return startService;</string>
             <preActivation />
             <postActivation />
             <actions>
-              <action name="" id="338" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="338" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
@@ -3266,7 +3285,7 @@ return startService;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <group name="Close Firewall Port" id="368" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+              <group name="Close Firewall Port" id="368" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.groups.ActionGroup">
@@ -3284,7 +3303,7 @@ return startService;</string>
                   </java>
                 </serializedBean>
                 <beans>
-                  <action name="" id="369" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="" id="369" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
@@ -3299,7 +3318,7 @@ return startService;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="" id="370" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="" id="370" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -3342,7 +3361,7 @@ return startService;</string>
                   </action>
                 </beans>
               </group>
-              <group name="Non-Windows Container Management" id="337" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+              <group name="Non-Windows Container Management" id="337" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.groups.ActionGroup">
@@ -3357,7 +3376,7 @@ return startService;</string>
                   </java>
                 </serializedBean>
                 <beans>
-                  <action name="" id="353" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="" id="353" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
@@ -3372,7 +3391,7 @@ return startService;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Stop XCGContainer" id="340" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Stop XCGContainer" id="340" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -3403,7 +3422,7 @@ return startService;</string>
                   </action>
                 </beans>
               </group>
-              <group name="Windows Container Management" id="335" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+              <group name="Windows Container Management" id="335" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.groups.ActionGroup">
@@ -3418,7 +3437,7 @@ return startService;</string>
                   </java>
                 </serializedBean>
                 <beans>
-                  <action name="" id="352" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="" id="352" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
@@ -3433,7 +3452,7 @@ return startService;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Uninstall Service" id="349" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="3" errorMessage="Unable to uninstall container service">
+                  <action name="Uninstall Service" id="349" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="3" errorMessage="Unable to uninstall container service">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -3470,7 +3489,7 @@ return startService;</string>
             </actions>
             <formComponents />
           </screen>
-          <screen name="Cleanup State Directory" id="62" customizedId="" beanClass="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="Cleanup State Directory" id="62" customizedId="" beanClass="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" />
@@ -3516,7 +3535,7 @@ return startService;</string>
               </formComponent>
             </formComponents>
           </screen>
-          <screen name="" id="14" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallationScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="14" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallationScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.UninstallationScreen" />
@@ -3527,7 +3546,7 @@ return startService;</string>
             <preActivation />
             <postActivation />
             <actions>
-              <action name="Delete Deployments" id="514" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Delete Deployments" id="514" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
@@ -3548,7 +3567,7 @@ return startService;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Cleanup State Directory" id="65" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to clean up state directory.">
+              <action name="Cleanup State Directory" id="65" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to clean up state directory.">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
@@ -3569,7 +3588,7 @@ return startService;</string>
                 </serializedBean>
                 <condition>context.getBooleanVariable("genii.cleanupStateDir")</condition>
               </action>
-              <action name="Delete container.log" id="56" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Delete container.log" id="56" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
@@ -3587,7 +3606,7 @@ return startService;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Delete Update Directory" id="53" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Delete Update Directory" id="53" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
@@ -3608,7 +3627,7 @@ return startService;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Delete container.properties" id="51" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Delete container.properties" id="51" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
@@ -3626,7 +3645,7 @@ return startService;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Delete JavaServiceWrapper" id="262" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Delete JavaServiceWrapper" id="262" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
@@ -3647,7 +3666,7 @@ return startService;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Delete webapps" id="263" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Delete webapps" id="263" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
@@ -3668,7 +3687,7 @@ return startService;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="" id="15" customizedId="" beanClass="com.install4j.runtime.beans.actions.UninstallFilesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="15" customizedId="" beanClass="com.install4j.runtime.beans.actions.UninstallFilesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.UninstallFilesAction" />
@@ -3679,7 +3698,7 @@ return startService;</string>
             </actions>
             <formComponents />
           </screen>
-          <screen name="" id="17" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallFailureScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="17" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallFailureScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="true" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.UninstallFailureScreen" />
@@ -3692,7 +3711,7 @@ return startService;</string>
             <actions />
             <formComponents />
           </screen>
-          <screen name="" id="16" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallSuccessScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true" wizardIndexChangeType="unchanged" wizardIndexKey="">
+          <screen name="" id="16" customizedId="" beanClass="com.install4j.runtime.beans.screens.UninstallSuccessScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="true" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
                 <object class="com.install4j.runtime.beans.screens.UninstallSuccessScreen" />
@@ -3710,7 +3729,7 @@ return startService;</string>
     </applications>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="linux_client_64" id="2073" customizedId="" mediaFileName="genesis2_client_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_04" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux_client_64" id="2073" customizedId="" mediaFileName="genesis2_client_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -3740,7 +3759,7 @@ return startService;</string>
         <content />
       </installerScript>
     </unixInstaller>
-    <unixInstaller name="linux_container_32" id="2078" customizedId="" mediaFileName="genesis2_container_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_04" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux_container_32" id="2078" customizedId="" mediaFileName="genesis2_container_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
       </excludedLaunchers>
@@ -3769,7 +3788,7 @@ return startService;</string>
         <content />
       </installerScript>
     </unixInstaller>
-    <windows name="windows_client_32" id="2081" customizedId="" mediaFileName="genesis2_client_windows${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_04" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows_client_32" id="2081" customizedId="" mediaFileName="genesis2_client_windows${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -3796,7 +3815,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </windows>
-    <windows name="windows_container_32" id="2084" customizedId="" mediaFileName="genesis2_container_windows${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_04" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows_container_32" id="2084" customizedId="" mediaFileName="genesis2_container_windows${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="1450" />
       </excludedLaunchers>
@@ -3822,7 +3841,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </windows>
-    <macosFolder name="mac_client_64" id="2088" customizedId="" mediaFileName="genesis2_client_macosx${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <macosFolder name="mac_client_64" id="2088" customizedId="" mediaFileName="genesis2_client_macosx${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -3848,7 +3867,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </macosFolder>
-    <unixInstaller name="linux_client_32" id="3414" customizedId="" mediaFileName="genesis2_client_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_04" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux_client_32" id="3414" customizedId="" mediaFileName="genesis2_client_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -3878,7 +3897,7 @@ return startService;</string>
         <content />
       </installerScript>
     </unixInstaller>
-    <unixInstaller name="linux_container_64" id="3416" customizedId="" mediaFileName="genesis2_container_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_04" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux_container_64" id="3416" customizedId="" mediaFileName="genesis2_container_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
       </excludedLaunchers>
@@ -3909,8 +3928,8 @@ return startService;</string>
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="false">
-    <mediaSet refId="2073" />
+    <mediaSet refId="3416" />
   </buildIds>
-  <buildOptions verbose="true" faster="false" debug="false" />
+  <buildOptions verbose="true" faster="false" disableSigning="false" debug="false" />
 </install4j>
 
