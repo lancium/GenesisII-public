@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="scripts" name="GenesisII.scripts">
 
+	<target name="app-manager.jar" >
+		<copy file="${ext.dir}/app-manager.jar"
+			tofile="${basedir}/ApplicationWatcher/app-manager.jar"/>
+	</target>
+
 	<target name="build-script-win" if="windows.scripts">
 		<copy file="${win-script-src-dir}/${win-script-base-name}.bat"
 			tofile="${basedir}/${win-script-base-name}.bat"/>

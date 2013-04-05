@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="5300" description="" category="" />
+      <variable name="genii.build-number" value="5331" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -88,33 +88,29 @@
       <fileEntry mountPoint="3944" file="../unlimited_jce_java7/local_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <dirEntry mountPoint="34" file="../.." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp" dirMode="755" overrideDirMode="true">
         <exclude>
-          <entry location="build.properties" fileType="regular" />
-          <entry location="container.properties.example" fileType="regular" />
-          <entry location=".project" fileType="regular" />
-          <entry location="save_these" fileType="regular" />
-          <entry location="deployments/default" fileType="regular" />
-          <entry location="deployments/installer_base" fileType="regular" />
-          <entry location="deployments/backup" fileType="regular" />
-          <entry location="bin.eclipse" fileType="regular" />
-          <entry location="JavaServiceWrapper" fileType="regular" />
-          <entry location="unit-test-reports" fileType="regular" />
-          <entry location="eclipse" fileType="regular" />
-          <entry location="scripts" fileType="regular" />
-          <entry location="build.secrun.properties" fileType="regular" />
-          <entry location="mappings.properties" fileType="regular" />
-          <entry location="installer" fileType="regular" />
           <entry location="init.build.xml" fileType="regular" />
-          <entry location="code-examples" fileType="regular" />
           <entry location="context.xml" fileType="regular" />
-          <entry location="QAsBESConstructionProperties" fileType="regular" />
-          <entry location="subprojects" fileType="regular" />
-          <entry location=".settings" fileType="regular" />
-          <entry location="retired" fileType="regular" />
-          <entry location="src" fileType="regular" />
-          <entry location="insert-trusted" fileType="regular" />
+          <entry location="code-examples" fileType="regular" />
+          <entry location="unit-test-reports" fileType="regular" />
+          <entry location="build.properties" fileType="regular" />
+          <entry location="build.secrun.properties" fileType="regular" />
           <entry location="build.xml" fileType="regular" />
-          <entry location=".classpath" fileType="regular" />
           <entry location="change-port.sh" fileType="regular" />
+          <entry location="container.properties.example" fileType="regular" />
+          <entry location="eclipse" fileType="regular" />
+          <entry location=".settings" fileType="regular" />
+          <entry location="scripts" fileType="regular" />
+          <entry location=".classpath" fileType="regular" />
+          <entry location="QAsBESConstructionProperties" fileType="regular" />
+          <entry location="installer" fileType="regular" />
+          <entry location="mappings.properties" fileType="regular" />
+          <entry location="save_these" fileType="regular" />
+          <entry location="insert-trusted" fileType="regular" />
+          <entry location="deployments" fileType="regular" />
+          <entry location="src" fileType="regular" />
+          <entry location="retired" fileType="regular" />
+          <entry location="subprojects" fileType="regular" />
+          <entry location=".project" fileType="regular" />
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="34" file="../../scripts/jar-desc.xml" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
