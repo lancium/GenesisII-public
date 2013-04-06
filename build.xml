@@ -160,6 +160,7 @@
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>
 		<delete dir="${services.dir}"/>
+		<delete dir="unit-test-reports"/>
 		<delete file="${basedir}/jserver.sh"/>
 		<delete file="${basedir}/runContainer.sh"/>
 		<delete file="${basedir}/runContainer.bat"/>
@@ -169,6 +170,8 @@
 		<delete file="${basedir}/cert-tool.bat"/>
 		<delete file="${basedir}/jar-desc.xml"/>
 		<delete file="${basedir}/jserver-jar-desc.xml"/>
+		<delete file="ApplicationWatcher/app-manager.jar"/>
+
 		<delete>
 			<fileset dir="${basedir}/ApplicationWatcher"
 				includes="**/*.properties"/>
@@ -182,8 +185,6 @@
 				includes="Media/**/*" />
 			<fileset dir="${bundles.home}"
 				includes="endorsed/**/*" />
-			<fileset dir="${basedir}"
-				includes="unit-test-reports/**/*" />
 		</delete>
 		<antcall target="clean-all-scripts" />
 	</target>

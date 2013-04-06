@@ -35,6 +35,7 @@
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.RNSURIHandler</genii:uri-handler>
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.ScpURIHandler</genii:uri-handler>
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.SFtpURIHandler</genii:uri-handler>
+		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.GsiFtpURIHandler</genii:uri-handler>
 	</genii:uri-handlers>
 	
 	<genii:locator-registry>
@@ -125,6 +126,9 @@
 			base="java.lang.Object" />
         <mconf:instance name="subscription-processor"
             type="edu.virginia.vcgr.genii.client.invoke.handlers.SubscriptionInfoProcessor"
+            base="java.lang.Object"/>
+        <mconf:instance name="header-attacher"
+            type="edu.virginia.vcgr.genii.client.invoke.handlers.SecurityHeaderAttacher"
             base="java.lang.Object"/>
 	</genii:configured-instances>
 
@@ -307,5 +311,6 @@
 		<genii:pipeline-handler>attribute-cache</genii:pipeline-handler>
 		<genii:pipeline-handler>lookup-cache</genii:pipeline-handler>
 		<genii:pipeline-handler>subscription-processor</genii:pipeline-handler>
+		<genii:pipeline-handler>header-attacher</genii:pipeline-handler>		
 	</genii:client-pipeline>
 </mconf:configuration>
