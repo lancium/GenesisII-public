@@ -211,6 +211,5 @@ public class ReplicationThread extends Thread
 					_logger.debug(exception);
 			}
 		}
-		// if (_logger.isDebugEnabled()) _logger.debug("ReplicationThread: done");
 	}
 }

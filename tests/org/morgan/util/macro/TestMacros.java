@@ -35,7 +35,7 @@ public class TestMacros
 		Assert.assertEquals("Hello, Mark Morgan", macros.toString("Hello, ${user.name}"));
 	}
 
-	// hmmm: this is bad; this is supposed to work, and it looks like the test is correct, but the
+	// TODO: this is bad; this is supposed to work, and it looks like the test is correct, but the
 	// results are not.
 	// @Test
 	public void testEscapes()

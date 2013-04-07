@@ -72,7 +72,6 @@ public class GeniiResolverUtils
 	static public EndpointReferenceType createTerminateSubscription(int targetID, EndpointReferenceType targetEPR,
 		EndpointReferenceType resolverEPR, IResource resource) throws ResourceException
 	{
-		// if (_logger.isDebugEnabled()) _logger.debug("resolver: createTerminateSubscription()");
 		EndpointReferenceType subscriptionEPR = null;
 		try {
 			if (resolverEPR == null) {

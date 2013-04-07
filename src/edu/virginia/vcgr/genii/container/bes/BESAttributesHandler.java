@@ -403,10 +403,10 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 
 	static public MessageElement getWallclockTimeLimitAttr() throws ResourceUnknownFaultType, ResourceException
 	{
-		BESConstants consts = new BESConstants();
+		BESConstants sconsts = new BESConstants();
 		Long value = getWallclockTimeLimit();
 		if (value != null)
-			return new MessageElement(consts.BES_WALLCLOCK_TIMELIMIT_ATTR, value);
+			return new MessageElement(sconsts.BES_WALLCLOCK_TIMELIMIT_ATTR, value);
 		return null;
 	}
 
@@ -444,12 +444,12 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 
 	static public ArrayList<MessageElement> getSupportedFilesystemsAttr()
 	{
-		BESConstants consts = new BESConstants();
+		BESConstants sconsts = new BESConstants();
 
 		String[] supported = getSupportedFilesystems();
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(supported.length);
 		for (String sup : supported)
-			ret.add(new MessageElement(consts.FILESYSTEM_SUPPORT_ATTR, sup));
+			ret.add(new MessageElement(sconsts.FILESYSTEM_SUPPORT_ATTR, sup));
 
 		return ret;
 	}

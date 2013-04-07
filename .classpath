@@ -48,11 +48,11 @@
 	<classpathentry kind="lib" path="bundles/bundle-u6security_1.0.66.jar"/>
 	<classpathentry kind="lib" path="ext/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="ext/dpage.jar"/>
-	<classpathentry kind="lib" path="ext/gffs-basics.jar"/>
-	<classpathentry kind="lib" path="ext/gffs-security.jar" sourcepath="/gffs-security"/>
-	<classpathentry kind="lib" path="ext/gffs-structure.jar" sourcepath="/gffs-structure"/>
-	<classpathentry kind="lib" path="ext/gffs-webservices.jar"/>
 	<classpathentry kind="lib" path="ext/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="ext/app-manager.jar"/>
+	<classpathentry kind="lib" path="ext/gffs-basics.jar"/>
+	<classpathentry kind="lib" path="ext/gffs-security.jar"/>
+	<classpathentry kind="lib" path="ext/gffs-structure.jar" sourcepath="/gffs-structure"/>
+	<classpathentry kind="lib" path="ext/gffs-webservices.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

@@ -62,7 +62,8 @@ public class GAroundInvoker extends RPCProvider
 		if (annotation != null) {
 			Class<? extends IAroundInvoker>[] handlers = annotation.value();
 			for (Class<? extends IAroundInvoker> handler : handlers) {
-				_logger.debug("adding case1 handler: " + handler.toString() + " for method: " + m.toString());
+				if (_logger.isDebugEnabled())
+					_logger.debug("adding case1 handler: " + handler.toString() + " for method: " + m.toString());
 				invokers.add(getInvoker(handler));
 			}
 		}
@@ -78,7 +79,8 @@ public class GAroundInvoker extends RPCProvider
 			if (annotation != null) {
 				Class<? extends IAroundInvoker>[] handlers = annotation.value();
 				for (Class<? extends IAroundInvoker> handler : handlers) {
-					_logger.debug("adding case2 handler: " + handler.toString() + " for method: " + m.toString());
+					if (_logger.isDebugEnabled())
+						_logger.debug("adding case2 handler: " + handler.toString() + " for method: " + m.toString());
 					invokers.add(getInvoker(handler));
 				}
 			}
@@ -89,7 +91,8 @@ public class GAroundInvoker extends RPCProvider
 		IllegalAccessException, InstantiationException, InvocationTargetException
 	{
 		Constructor<? extends IAroundInvoker> cons = cl.getConstructor(new Class[0]);
-		_logger.debug("creating invoker for: " + cl.toString());
+		if (_logger.isDebugEnabled())
+			_logger.debug("creating invoker for: " + cl.toString());
 		return cons.newInstance(new Object[0]);
 	}
 }

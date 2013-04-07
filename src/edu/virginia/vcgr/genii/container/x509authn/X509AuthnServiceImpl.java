@@ -408,7 +408,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 						new TrustCredential(resourceCertChain, IdentityType.OTHER, resourceKeyMaterial._clientCertChain,
 							wrapped.getDelegateeType(), new BasicConstraints(System.currentTimeMillis()
 								- SecurityConstants.CredentialGoodFromOffset, Long.MAX_VALUE,
-								SecurityConstants.MaxDelegationDepth), TrustCredential.FULL_ACCESS);
+								SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 					newTC.delegateTrust(wrapped);
 					newTC.signAssertion(privateKey);
 
@@ -487,7 +487,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				TrustCredential newTC =
 					new TrustCredential(delegateToChain, IdentityType.OTHER, resourceKeyMaterial._clientCertChain,
 						wrapped.getDelegateeType(), new BasicConstraints(created.getTime(), expiry.getTime()
-							- created.getTime(), SecurityConstants.MaxDelegationDepth), TrustCredential.FULL_ACCESS);
+							- created.getTime(), SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);
 				creds.getRealCreds().addCredential(newTC);
 			} else if (credential instanceof FullX509Identity) {
@@ -498,7 +498,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				TrustCredential newTC =
 					new TrustCredential(delegateToChain, IdentityType.OTHER, realId.getOriginalAsserter(), realId.getType(),
 						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
-							SecurityConstants.MaxDelegationDepth), TrustCredential.FULL_ACCESS);
+							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(realId.getKey());
 				creds.getRealCreds().addCredential(newTC);
 			} else if (credential instanceof X509Identity) {
@@ -509,7 +509,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				TrustCredential newTC =
 					new TrustCredential(delegateToChain, IdentityType.OTHER, realId.getOriginalAsserter(), realId.getType(),
 						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
-							SecurityConstants.MaxDelegationDepth), TrustCredential.FULL_ACCESS);
+							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);
 				creds.getRealCreds().addCredential(newTC);
 			} else {

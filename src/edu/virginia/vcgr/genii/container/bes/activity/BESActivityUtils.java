@@ -86,7 +86,7 @@ public class BESActivityUtils
 		JobDefinition_Type jobDef = null;
 		String containerID = null;
 		Subscribe subscribe = null;
-		BESConstants bconsts = new BESConstants();
+		BESConstants sbconsts = new BESConstants();
 
 		if (properties == null)
 			throw new IllegalArgumentException("Can't have a null creation properites parameter.");
@@ -101,7 +101,7 @@ public class BESActivityUtils
 			jobDef = (JobDefinition_Type) ObjectDeserializer.toObject(any, JobDefinition_Type.class);
 			containerID = ((MessageElement) properties.get(CONTAINER_ID_QNAME)).getValue();
 
-			any = (MessageElement) properties.get(bconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME);
+			any = (MessageElement) properties.get(sbconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME);
 			if (any != null)
 				subscribe = (Subscribe) ObjectDeserializer.toObject(any, Subscribe.class);
 		} catch (Exception e) {

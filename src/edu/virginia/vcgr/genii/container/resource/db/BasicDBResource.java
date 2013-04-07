@@ -638,10 +638,4 @@ public class BasicDBResource implements IResource
 			StreamUtils.close(stmt);
 		}
 	}
-
-	/*
-	 * @Override public void commitResource() throws ResourceException { commit(); }
-	 * 
-	 * @Override public void rollbackResource() { rollback(); }
-	 */
 }

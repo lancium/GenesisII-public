@@ -25,7 +25,7 @@ public class TestingHypersonic
 
 	static public void main(String[] args) throws Throwable
 	{
-		// hmmm: currently disabled due to failing when run as unit test.
+		// TODO: currently disabled due to failing when run as unit test.
 		boolean fud = true;
 		if (fud)
 			return;

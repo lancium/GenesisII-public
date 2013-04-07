@@ -38,12 +38,6 @@ public class PlannedScheduler implements AttemptScheduler
 			addToSchedule(new Long(TimeUnit.MILLISECONDS.convert(value, units)));
 	}
 
-	/*
-	 * public PlannedScheduler(Pair<Long, TimeUnit>...schedule) { _schedule = new
-	 * Vector<Long>(schedule.length); for (Pair<Long, TimeUnit> value : schedule) addToSchedule(new
-	 * Long( TimeUnit.MILLISECONDS.convert(value.first(), value.second()))); }
-	 */
-
 	@Override
 	final public Calendar nextAttempt(Calendar now, int numFailedAttempts)
 	{
