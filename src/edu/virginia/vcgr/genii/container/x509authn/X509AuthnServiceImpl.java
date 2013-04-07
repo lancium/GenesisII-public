@@ -76,6 +76,7 @@ import edu.virginia.vcgr.genii.container.kerbauthn.KerbAuthnServiceImpl;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
+import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResourceProvider;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
@@ -461,7 +462,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		if (delegateToChain != null)
 			_logger.info("delegating to " + delegateToChain[0].getIssuerDN());
 
-		NuCredential credential = loadResourceCredential(resource);
+		NuCredential credential = RNSContainerUtilities.loadRNSResourceCredential(resource);
 		AxisCredentialWallet creds = new AxisCredentialWallet();
 		_logger.info("resource's credential is: " + credential.toString());
 
@@ -540,36 +541,5 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		return response;
-	}
-
-	// hmmm: this needs to move to a more general location.
-	public static NuCredential loadResourceCredential(IRNSResource resource)
-	{
-		NuCredential credential = null;
-		try {
-			credential = (NuCredential) resource.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart());
-		} catch (ResourceException e) {
-			_logger.error("resource exception loading credential, quashing");
-		}
-
-		if (credential == null) {
-			_logger.warn("found null credential for resource: " + resource.toString() + "  is this db conversion issue?");
-			X509Certificate[] resourceCertChain = null;
-			try {
-				resourceCertChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-			} catch (ResourceException e) {
-				_logger.error("failed to load resource certificate chain!  this is quite bad.  resource is: "
-					+ resource.toString());
-			}
-			credential = new X509Identity(resourceCertChain, IdentityType.OTHER);
-			// store the new credential back for the resource.
-			try {
-				resource.setProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(), credential);
-			} catch (ResourceException e) {
-				_logger.error("failed to save credential for: " + resource.toString());
-			}
-		}
-
-		return credential;
 	}
 }
