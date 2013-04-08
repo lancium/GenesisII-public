@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.5" transformSequenceNumber="4">
   <directoryPresets config="" />
-  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesisII.virginia.edu" version="2.7.0" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
+  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesis2.virginia.edu" version="2.7.1" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="5330" description="" category="" />
+      <variable name="genii.build-number" value="5392" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -88,27 +88,46 @@
       <fileEntry mountPoint="3944" file="../unlimited_jce_java7/local_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <dirEntry mountPoint="34" file="../.." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp" dirMode="755" overrideDirMode="true">
         <exclude>
+          <entry location="wsdd" fileType="regular" />
           <entry location="init.build.xml" fileType="regular" />
-          <entry location="context.xml" fileType="regular" />
           <entry location="code-examples" fileType="regular" />
           <entry location="unit-test-reports" fileType="regular" />
           <entry location="build.properties" fileType="regular" />
+          <entry location="dpages" fileType="regular" />
           <entry location="build.secrun.properties" fileType="regular" />
+          <entry location="jar-desc.xml" fileType="regular" />
           <entry location="build.xml" fileType="regular" />
+          <entry location="cert-tool" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-client-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-update-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-simple-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-ogrshserv-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-base-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-certtool-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-container-application.properties" fileType="regular" />
           <entry location="change-port.sh" fileType="regular" />
           <entry location="container.properties.example" fileType="regular" />
-          <entry location="eclipse" fileType="regular" />
+          <entry location="runContainer.sh" fileType="regular" />
           <entry location=".settings" fileType="regular" />
           <entry location="scripts" fileType="regular" />
+          <entry location="linux-cmd-wrapper" fileType="regular" />
           <entry location=".classpath" fileType="regular" />
           <entry location="QAsBESConstructionProperties" fileType="regular" />
           <entry location="installer" fileType="regular" />
           <entry location="mappings.properties" fileType="regular" />
-          <entry location="save_these" fileType="regular" />
+          <entry location="jserver-jar-desc.xml" fileType="regular" />
           <entry location="insert-trusted" fileType="regular" />
-          <entry location="deployments" fileType="regular" />
+          <entry location="bin.eclipse" fileType="regular" />
+          <entry location="deployments/current_grid" fileType="regular" />
+          <entry location="deployments/installer_base" fileType="regular" />
+          <entry location="deployments/default" fileType="regular" />
+          <entry location="deployments/backup" fileType="regular" />
+          <entry location="bin" fileType="regular" />
+          <entry location="JavaServiceWrapper" fileType="regular" />
           <entry location="src" fileType="regular" />
+          <entry location="simple-command" fileType="regular" />
           <entry location="retired" fileType="regular" />
+          <entry location="grid" fileType="regular" />
           <entry location="subprojects" fileType="regular" />
           <entry location=".project" fileType="regular" />
         </exclude>
