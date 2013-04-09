@@ -87,7 +87,7 @@ function snag_dependencies()
 
 for i in \
 \
-  ApplicationManager CmdLineManipulator FSViewII GeniiJSDL GeniiProcessMgmt MNaming \
+  ApplicationManager CmdLineManipulator FSViewII GeniiJSDL GeniiProcessMgmt MacOSXSwing MNaming \
   GridJobTool gffs-basics \
   gffs-webservices gffs-security \
   gffs-structure \
