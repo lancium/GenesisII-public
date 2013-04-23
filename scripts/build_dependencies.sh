@@ -10,6 +10,9 @@ export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's work
 export TOPDIR="$WORKDIR/.."
 pushd "$TOPDIR"
 
+# set up some important variables for the success of the build.
+export ANT_OPTS='-Xms512m -Xmx768m -XX:MaxPermSize=768m'
+
 # prints an error message (from parameters) and exits if the previous command failed.
 function check_result()
 {
@@ -60,7 +63,7 @@ fi
 # given a project name, we load it up with the jars it needs.
 function snag_dependencies()
 {
-  projname="$1"; shift
+  local projname="$1"; shift
   # ugly dependency management section.
   if [ $projname == gffs-basics ]; then
     cp -v -f $TOPDIR/ext/app-manager.jar ./ext
@@ -85,7 +88,7 @@ function snag_dependencies()
 # first tier, etc.
 # DPage is last since it's a weird optional package for dynamic server pages.
 
-for i in \
+for subproject in \
 \
   ApplicationManager CmdLineManipulator FSViewII GeniiJSDL GeniiProcessMgmt MacOSXSwing MNaming \
   GridJobTool gffs-basics \
@@ -95,8 +98,8 @@ for i in \
 \
 ; do 
   echo "=============="
-  echo "Building subproject $i"
-  DIRNAME="$CHECKOUT_DIR$i"
+  echo "Building subproject $subproject"
+  DIRNAME="$CHECKOUT_DIR$subproject"
   if [ ! -d "$DIRNAME" ]; then mkdir -p "$DIRNAME"; fi
   check_result "making dependency folder $DIRNAME"
   pushd "$DIRNAME"
@@ -106,31 +109,41 @@ for i in \
       false
       check_result "failing because there is no existing checkout folder '$DIRNAME'\nand update was not requested."
     fi
-    svn co "$LIBRARY_REPO/$i/trunk"
+    svn co "$LIBRARY_REPO/$subproject/trunk"
   else
     if [ ! -z "$SVN_UPDATE" ]; then
       svn up trunk
     fi
   fi
-  check_result "checking out subproject $i"
+  check_result "checking out subproject $subproject"
   cd trunk
-  check_result "entering trunk for $i"
+  check_result "entering trunk for $subproject"
 
   if [ ! -z "$CLEAN_UP" ]; then
     ant clean
-    check_result "ant clean for $i"
+    check_result "ant clean for $subproject"
   else
     # copy in the jars that we depend on.
-    snag_dependencies "$i"
+    snag_dependencies "$subproject"
     ant build
-    check_result "ant build for $i"
+    retval=$?
+    if [ $retval -ne 0 -a $subproject == gffs-security ]; then
+      echo -e "\n======="
+      echo "Failures in gffs-security often result from not having the unlimited JCE jar"
+      echo "files installed in the jre/lib/security folder.  These are available at:"
+      echo "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
+      echo -e "=======\n"
+    fi
+    # re-enact the retval...
+    if [ $retval -ne 0 ]; then false; else true; fi
+    check_result "ant build for $subproject"
     # publish the newly crafted jars into the main build's ext folder.
     cp -v -f lib/*.jar $TOPDIR/ext
-    check_result "publishing jar file produced by $i"
+    check_result "publishing jar file produced by $subproject"
   fi
 
   popd
-  echo "SUCCESS for subproject $i"
+  echo "SUCCESS for subproject $subproject"
   echo "=============="
   echo
 done

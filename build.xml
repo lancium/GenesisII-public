@@ -144,18 +144,20 @@
 		</javac>
 	</target>
 
-	<target name="clean">
+	<target name="clean" depends="init">
 		<exec executable="bash" failonerror="true">
 			<arg value="scripts/build_dependencies.sh"/>
 			<arg value="trunk"/>
 			<arg value="clean"/>
 		</exec>
-		<delete >
+		<delete>
 			<fileset dir="${basedir}/deployments/default" includes="services/**/*"/>
 		</delete>
 		<delete dir="${wsdd.dir}"/>
 		<delete dir="${dpages.dir}"/>
-		<delete dir="${obj.dir}"/>
+		<delete>
+			<fileset dir="${obj.dir}" includes="**/*"/>
+		</delete>
 		<delete quiet="true">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>
