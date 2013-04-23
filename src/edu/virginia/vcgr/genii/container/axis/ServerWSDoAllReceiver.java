@@ -309,7 +309,10 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 		// Add the authenticated certificate chains
 		for (X509Certificate[] certChain : authenticatedCertChains) {
-			retval.add(new X509Identity(certChain, IdentityType.CONNECTION));
+			X509Identity authCred = new X509Identity(certChain, IdentityType.CONNECTION);
+			if (_logger.isDebugEnabled())
+				_logger.debug("adding CONNECTION type for this identity: " + authCred.toString());
+			retval.add(authCred);
 		}
 
 		// Corroborate the bearer credentials
@@ -326,13 +329,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					if (!(assertion instanceof TrustCredential)) {
 						throw new AuthZSecurityException("assertion \"" + assertion + "\" is the wrong object type");
 					}
-					TrustCredential tc = (TrustCredential) assertion;
-					if (tc.getPriorDelegation() == null) {
-						throw new AuthZSecurityException("assertion \"" + assertion + "\" had no next delegation");
+					if (assertion.getPriorDelegation() == null) {
+						throw new AuthZSecurityException("assertion \"" + assertion + "\" had no prior delegation");
 					}
-					assertion = tc.getPriorDelegation();
-					if (_logger.isTraceEnabled())
-						_logger.trace("unwrapped preauthorized assertion into a: " + tc.toString());
+					assertion = assertion.getPriorDelegation();
+					if (_logger.isDebugEnabled())
+						_logger.debug("unwrapped preauthorized assertion to yield: " + assertion.toString());
 				}
 
 				if (_logger.isTraceEnabled())

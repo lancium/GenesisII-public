@@ -410,8 +410,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 								- SecurityConstants.CredentialGoodFromOffset, Long.MAX_VALUE,
 								SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 					newTC.delegateTrust(wrapped);
-					newTC.signAssertion(privateKey);
-
+					newTC.signAssertion(privateKey);					
 					credential = newTC;
 				} else if (credential instanceof X509Identity) {
 					if (_logger.isDebugEnabled())
@@ -496,7 +495,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				FullX509Identity realId = (FullX509Identity) credential;
 				// Delegate the assertion to delegateTo.
 				TrustCredential newTC =
-					new TrustCredential(delegateToChain, IdentityType.OTHER, realId.getOriginalAsserter(), realId.getType(),
+					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
 						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
 							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(realId.getKey());
@@ -507,7 +506,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				X509Identity realId = (X509Identity) credential;
 				// Delegate the assertion to delegateTo.
 				TrustCredential newTC =
-					new TrustCredential(delegateToChain, IdentityType.OTHER, realId.getOriginalAsserter(), realId.getType(),
+					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
 						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
 							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);

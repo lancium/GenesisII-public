@@ -72,11 +72,13 @@ import edu.virginia.vcgr.genii.security.rwx.RWXManager;
  * indicates no access
  * 
  * @author dmerrill
- * 
  */
 public class AclAuthZProvider implements IAuthZProvider, AclTopics
 {
-	// cak: this one seems too dangerous to change over to a saml-named counterpart.
+	/*
+	 * cak: this one seems too dangerous to change over to a SAML-named counterpart. it is the name
+	 * under which all the Acl information is stored in any grid we would want to migrate.
+	 */
 	static public final String GENII_ACL_PROPERTY_NAME = "genii.container.security.authz.gaml-acl";
 
 	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec = new MessageLevelSecurityRequirements(
@@ -295,7 +297,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 						if (((X509Identity) cred).checkRWXAccess(category)) {
 							if (checkAclAccess((Identity) cred, category, acl)) {
 								if (_logger.isDebugEnabled())
-									_logger.debug(messagePrefix + "granted to identity bearing signed assertion: "
+									_logger.debug(messagePrefix + "granted to identity with x509: "
 										+ cred.describe(VerbosityLevel.LOW));
 								return true;
 							}
@@ -314,9 +316,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 						X509Identity ia = (X509Identity) sa.getRootIdentity();
 						if (checkAclAccess(ia, category, acl)) {
 							if (_logger.isDebugEnabled())
-								if (_logger.isDebugEnabled())
-									_logger.debug(messagePrefix + "granted to x509 identity: "
-										+ sa.describe(VerbosityLevel.LOW));
+								_logger
+									.debug(messagePrefix + "granted to trust credential: " + sa.describe(VerbosityLevel.LOW));
 							return true;
 						}
 					}

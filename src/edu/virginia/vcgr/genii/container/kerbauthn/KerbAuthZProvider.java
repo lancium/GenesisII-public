@@ -66,6 +66,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 	{
 		// Try regular ACLs
 		try {
+			//hmmm: this seems highly dubious since it means that anyone with ACL access gets to skip login?
 			super.checkAccess(authenticatedCallerCredentials, resource, serviceClass, operation);
 			return true;
 		} catch (Exception AclException) {

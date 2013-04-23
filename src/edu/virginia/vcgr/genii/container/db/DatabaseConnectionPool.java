@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -14,7 +13,6 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.locking.GReadWriteLock;
@@ -36,8 +34,8 @@ public class DatabaseConnectionPool
 	static private final String _SPECIAL_STRING = "${server-dir}";
 
 	static private final String _DB_POOL_SIZE_DEFAULT = "16";
-	static private final long REJUVENATION_CYCLE = 1000L * 60 * 1;
-
+//	static private final long REJUVENATION_CYCLE = 1000L * 60 * 1;
+	
 	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
 
 	static private int _poolInstances = 0;
@@ -89,11 +87,6 @@ public class DatabaseConnectionPool
 		_user = connectionProperties.getProperty(_DB_USER_PROPERTY);
 		_password = connectionProperties.getProperty(_DB_PASSWORD_PROPERTY);
 
-		Thread t = new Thread(new DBRejuvenator());
-		t.setDaemon(true);
-		t.setName("DB Rejuvenator Thread");
-		t.start();
-
 		Connection connection = null;
 		try {
 			connection = acquire(false);
@@ -113,7 +106,7 @@ public class DatabaseConnectionPool
 			_logger.debug("Acquiring DB connection[" + _connPool.size() + "]");
 		boolean succeeded = false;
 
-		int maxSnooze = 10 * 1000; // 10 seconds, in miliseconds.
+		int maxSnooze = 30 * 1000; // 10 seconds, in miliseconds.
 		int eachSleep = 40; // number of milliseconds to snooze.
 		int attempts = maxSnooze / eachSleep + 1;
 
@@ -160,7 +153,6 @@ public class DatabaseConnectionPool
 
 	public void release(Connection conn)
 	{
-		boolean needRejuvenation = false;
 		if (_logger.isDebugEnabled())
 			_logger.debug("Releasing a database connection [" + _connPool.size() + "].");
 
@@ -176,37 +168,18 @@ public class DatabaseConnectionPool
 						return;
 					}
 				} catch (SQLException sqe) {
-					needRejuvenation = true;
 					_logger.error("Exception releasing connection.", sqe);
 				}
 
 				try {
 					((ConnectionInterceptor) Proxy.getInvocationHandler(conn)).getConnection().close();
 				} catch (Throwable t) {
-					needRejuvenation = true;
 					_logger.error("Error closing the connection.", t);
 				}
 			} finally {
 				_lock.readLock().unlock();
 
 				((ConnectionInterceptor) Proxy.getInvocationHandler(conn)).setReleased();
-			}
-		}
-
-		if (needRejuvenation) {
-			// If we got this far, something is seriously wrong with the
-			// database. Do a rejuvenation in the hopes that that will
-			// fix it.
-			try {
-				rejuvenate();
-			} catch (SQLException sqe) {
-				throw new RuntimeException("Unable to reload JDBC Driver.", sqe);
-			} catch (InstantiationException e) {
-				throw new RuntimeException("Unable to reload JDBC Driver.", e);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException("Unable to reload JDBC Driver.", e);
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException("Unable to reload JDBC Driver.", e);
 			}
 		}
 	}
@@ -220,106 +193,6 @@ public class DatabaseConnectionPool
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 		return (Connection) Proxy.newProxyInstance(GenesisClassLoader.classLoaderFactory(), new Class[] { Connection.class },
 			new ConnectionInterceptor(conn));
-	}
-
-	private void rejuvenate() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
-	{
-		boolean skipRejuvenate = true;
-
-		if (skipRejuvenate)
-			return;
-
-		_logger.info("Rejuvenating database.");
-		Connection connection = null;
-		Driver oldDriver = null;
-		String oldDriverClass = null;
-
-		try {
-			_lock.writeLock().lock();
-
-			// There's no need to synchronize on the connection pool,
-			// we have the only thread, because of the write lock, that
-			// could be in here.
-
-			for (Connection conn : _connPool) {
-				try {
-					((ConnectionInterceptor) Proxy.getInvocationHandler(conn)).getConnection().close();
-				} catch (Throwable cause) {
-					_logger.error("Exception occurred trying to close connection.", cause);
-				}
-			}
-
-			/*
-			 * Force the GC to unload the database driver. It'll get reloaded when the next
-			 * connection is made.
-			 */
-			_connPool.clear();
-
-			oldDriver = DriverManager.getDriver("jdbc:derby:");
-			try {
-				/*
-				 * I know that this breaks the pluggability of our database, but I don't have enough
-				 * time to do this right right now.
-				 */
-				connection = DriverManager.getConnection("jdbc:derby:;shutdown=true");
-			} catch (Throwable cause) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("Expected exception for rejuvenation.", cause);
-			} finally {
-				StreamUtils.close(connection);
-				connection = null;
-			}
-
-			try {
-				if (oldDriver != null) {
-					oldDriverClass = oldDriver.getClass().getName();
-					DriverManager.deregisterDriver(oldDriver);
-				} else
-					System.err.format("Old driver was null!\n");
-			} catch (Throwable cause) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("Unable to deregister db driver.", cause);
-			}
-
-			/*
-			 * There's no way in our system to "guarantee" that all references to all connections
-			 * are released to the system, so we are just going to hang out for a few seconds to
-			 * give them a chance.
-			 */
-			try {
-				Thread.sleep(1000L * 5);
-			} catch (Throwable cause) {
-			}
-			System.gc();
-
-			if (oldDriverClass != null) {
-				System.err.format("Re-registering \"%s\".\n", oldDriverClass);
-				DriverManager.registerDriver((Driver) Class.forName(oldDriverClass).newInstance());
-				System.err.format("Done re-registering \"%s\".\n", oldDriverClass);
-			}
-
-			ContainerStatistics.instance().getDatabaseStatistics().resetDatabase();
-		} finally {
-			_lock.writeLock().unlock();
-			_logger.info("Done rejuvenating database.");
-		}
-	}
-
-	private class DBRejuvenator implements Runnable
-	{
-		public void run()
-		{
-			ContainerStatistics.instance().getDatabaseStatistics().resetDatabase();
-
-			while (true) {
-				try {
-					Thread.sleep(REJUVENATION_CYCLE);
-					rejuvenate();
-				} catch (Throwable cause) {
-					_logger.error("DB Rejuvenation Thread caugh an exception.", cause);
-				}
-			}
-		}
 	}
 
 	static protected class ConnectionInterceptor implements InvocationHandler
