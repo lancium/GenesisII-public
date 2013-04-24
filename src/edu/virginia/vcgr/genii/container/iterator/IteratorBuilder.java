@@ -7,7 +7,7 @@ import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 
 public interface IteratorBuilder<SourceType>
 {
-	static final public int DEFAULT_PREFERRED_BATCH_SIZE = 20;
+	static final public int DEFAULT_PREFERRED_BATCH_SIZE = 500;
 
 	public int preferredBatchSize();
 
