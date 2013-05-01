@@ -15,9 +15,12 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
+import edu.virginia.vcgr.genii.container.security.authz.providers.AclAuthZProvider;
 import edu.virginia.vcgr.genii.iterator.IterableElementType;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
+import edu.virginia.vcgr.genii.security.acl.Acl;
+import edu.virginia.vcgr.genii.security.acl.AclEntry;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.X509Identity;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
@@ -76,7 +79,37 @@ public class RNSContainerUtilities
 				_logger.error("failed to load resource certificate chain!  this is quite bad.  resource is: "
 					+ resource.toString());
 			}
-			credential = new X509Identity(resourceCertChain, IdentityType.OTHER);
+			
+			// trying to find the real types involved by looking at ACLs.
+			Acl acl = null;
+			try {
+				acl = (Acl) resource.getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+			} catch (ResourceException e1) {
+				_logger.warn("failed to look up the ACL for resource " + resource);
+			}
+
+			// we will fill this in if we can find it in the resource ACL.
+			X509Identity found = null;
+			if (acl != null) {
+				Collection<AclEntry> trustList = acl.readAcl;
+				for (AclEntry entry : trustList) {
+					if (entry instanceof X509Identity) {
+						X509Identity id = (X509Identity)entry;
+						if (id.getOriginalAsserter()[0].equals(resourceCertChain[0])) {
+							found = id;
+						}
+					}
+				}
+			}				
+			if (found != null) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("found an identity that matches our certificate: " + found);
+				credential = found;
+			} else { 
+				if (_logger.isDebugEnabled())
+					_logger.debug("found no identity matching our certificate, so using type of OTHER.");
+				credential = new X509Identity(resourceCertChain, IdentityType.OTHER);
+			}
 			// store the new credential back for the resource.
 			try {
 				resource.setProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(), credential);

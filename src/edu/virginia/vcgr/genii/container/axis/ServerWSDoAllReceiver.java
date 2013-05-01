@@ -333,8 +333,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 						throw new AuthZSecurityException("assertion \"" + assertion + "\" had no prior delegation");
 					}
 					assertion = assertion.getPriorDelegation();
-					if (_logger.isDebugEnabled())
-						_logger.debug("unwrapped preauthorized assertion to yield: " + assertion.toString());
+					if (_logger.isTraceEnabled())
+						_logger.trace("unwrapped preauthorized assertion to yield: " + assertion.toString());
 				}
 
 				if (_logger.isTraceEnabled())

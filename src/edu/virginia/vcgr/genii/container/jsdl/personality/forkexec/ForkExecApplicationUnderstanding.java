@@ -15,7 +15,7 @@ import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
-import edu.virginia.vcgr.genii.client.jsdl.GridFileSystem;
+import edu.virginia.vcgr.genii.client.jsdl.DirBasedGridFileSystem;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityServiceImpl;
@@ -53,8 +53,8 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		FilesystemManager fsManager = getFilesystemManager();
 
 		for (JSDLFileSystem fs : fsManager.getFileSystems()) {
-			if (fs instanceof GridFileSystem) {
-				GridFileSystem gfs = (GridFileSystem) fs;
+			if (fs instanceof DirBasedGridFileSystem) {
+				DirBasedGridFileSystem gfs = (DirBasedGridFileSystem) fs;
 				executionPlan.add(new SetupFUSEPhase(gfs.getMountPoint().getAbsolutePath(), gfs.getSandbox()));
 				cleanupPhases.add(new TeardownFUSEPhase(gfs.getMountPoint().getAbsolutePath()));
 			}

@@ -154,9 +154,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 						_logger.trace("adding identity to UMask... " + cred.describe(VerbosityLevel.HIGH));
 					if (((Identity) cred).placeInUMask())
 						defaultOwners.add((Identity) cred);
-
 				} else if (cred instanceof TrustCredential) {
-
 					X509Identity assertedIdentity = ((TrustCredential) cred).getRootIdentity();
 					if (assertedIdentity.placeInUMask()) {
 						if (_logger.isTraceEnabled())
@@ -167,6 +165,9 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 							_logger.trace("NOT adding cred to UMask... " + assertedIdentity.describe(VerbosityLevel.HIGH));
 					}
 
+				} else {
+					if (_logger.isTraceEnabled())
+						_logger.trace("NOT adding this thing to UMask... " + cred.describe(VerbosityLevel.HIGH));
 				}
 			}
 		}
