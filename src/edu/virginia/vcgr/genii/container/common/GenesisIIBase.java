@@ -247,6 +247,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		synchronized (_implementedPortTypes) {
 			_implementedPortTypes.add(portType);
 		}
+		if (_logger.isTraceEnabled())
+			_logger.trace("added port type " + portType + " for this class " + this.toString());
 	}
 
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType

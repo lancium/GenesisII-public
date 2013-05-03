@@ -326,9 +326,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 				// If the assertion is pre-authorized for us, unwrap one layer.
 				if ((targetCertChain != null) && (assertion.getDelegatee()[0].equals(targetCertChain[0]))) {
-					if (!(assertion instanceof TrustCredential)) {
+/*dead code					if (!(assertion instanceof TrustCredential)) {
 						throw new AuthZSecurityException("assertion \"" + assertion + "\" is the wrong object type");
-					}
+					}*/
 					if (assertion.getPriorDelegation() == null) {
 						throw new AuthZSecurityException("assertion \"" + assertion + "\" had no prior delegation");
 					}
