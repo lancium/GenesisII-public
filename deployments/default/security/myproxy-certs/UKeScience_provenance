@@ -1,5 +1,21 @@
+[ Removed (again?) expiring UK eScience CA certs 53729190.* 367b75c3.* 2013-01-28 dsimmel ]
+
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
+
+[ Updated UK eScience CA certificate, validity extended to March 31, 2013 (jam,dsimmel 2012-11-01) ]
+
+$ openssl version
+OpenSSL 1.0.0-fips 29 Mar 2010
+
+$ openssl x509 -in 367b75c3.0 -serial -issuer -subject -dates -hash -subject_hash_old -noout
+serial=0121
+issuer= /C=UK/O=eScienceRoot/OU=Authority/CN=UK e-Science Root
+subject= /C=UK/O=eScienceCA/OU=Authority/CN=UK e-Science CA
+notBefore=Oct 30 09:00:00 2007 GMT
+notAfter=Mar 31 23:59:59 2013 GMT
+53729190
+367b75c3
 
 [ Replacement UK eScience certificates, May 2008 (mccreary) ]
 
@@ -48,7 +64,7 @@ diff ./367b75c3.signing_policy ../teragrid-certs/367b75c3.signing_policy
 <  access_id_CA     X509    '/C=UK/O=eScienceCA/OU=Authority/CN=UK e-Science CA'
 <  pos_rights       globus  CA:sign
 <  cond_subjects    globus  '"/C=UK/O=eScience/*"'
-- ---
+- - ---
 >  # Signing policy for UK e-Science CA
 >  # This file should be installed in
 >  # /etc/grid-security/certificates
@@ -69,7 +85,7 @@ diff ./98ef0ee5.signing_policy ../teragrid-certs/98ef0ee5.signing_policy
 <  access_id_CA   X509    '/C=UK/O=eScienceRoot/OU=Authority/CN=UK e-Science Root'
 <  pos_rights     globus  CA:sign
 <  cond_subjects  globus  '"/C=UK/O=eScienceCA/OU=Authority/CN=UK e-Science CA"'
-- ---
+- - ---
 >  # Signing policy for UK e-Science ROOT CA.
 >  # This file should be installed in
 >  # /etc/grid-security/certificates
@@ -90,7 +106,7 @@ diff ./98ef0ee5.signing_policy ../teragrid-certs/98ef0ee5.signing_policy
 
 1c1
 < http://ca.grid-support.ac.uk/pub/crl/ca-crl.der
-- ---
+- - ---
 > http://ca.grid-support.ac.uk/pub/crl/ca-crl.pem
 
 Also verified old UKeScience CA and Root certs:
@@ -109,12 +125,13 @@ Note that *crl_url for these certs also differs in the extension
 
 1c1
 < http://ca.grid-support.ac.uk/pub/crl/escience-root-crl.crl
-- ---
+- - ---
 > http://ca.grid-support.ac.uk/pub/crl/escience-root-crl.pem
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.7 (Darwin)
+Version: GnuPG v1.4.8 (Darwin)
+Comment: GPGTools - http://gpgtools.org
 
-iD8DBQFINeYwYjEf42hR7yYRArgRAKC54h3iD7GxvL6C7VsH29zSO1KkfwCdGnag
-9NKCV6UuBbfmdM4wcYmeynI=
-=iMEP
+iEYEARECAAYFAlCS8voACgkQhXXPgPKIJgbvvgCfWJkk24m0qIcLmQU1795J22ya
+fh0AoK/7uerxMR1LhW6603A7CfCHKyuw
+=xdW1
 -----END PGP SIGNATURE-----

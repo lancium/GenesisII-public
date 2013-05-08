@@ -1,3 +1,128 @@
+[ retired 3/10/2013 ]
+
+Return-Path: <jbasney@illinois.edu>
+Received: from mailer2.psc.edu (mailer2.psc.edu [128.182.70.106])
+	by pscuxb.psc.edu (8.13.8/8.13.1) with ESMTP id r28EsJQW025484
+	for <dsimmel@pscuxb.psc.edu>; Fri, 8 Mar 2013 09:54:20 -0500
+Received: from pps02.cites.illinois.edu (pps02.cites.illinois.edu [192.17.82.100])
+	by mailer2.psc.edu (8.13.8/8.13.8) with ESMTP id r28EsFUw020693
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO)
+	for <dsimmel@psc.edu>; Fri, 8 Mar 2013 09:54:15 -0500
+Received: from citesht3.cites.illinois.edu (citesht3.cites.illinois.edu [128.174.34.208])
+	by pps02.cites.illinois.edu (8.14.5/8.14.5) with ESMTP id r28EroLW023335
+	(version=TLSv1/SSLv3 cipher=AES128-SHA bits=128 verify=NOT);
+	Fri, 8 Mar 2013 08:54:04 -0600
+Received: from o2.ncsa.illinois.edu (141.142.220.178) by smtp.illinois.edu
+ (128.174.34.208) with Microsoft SMTP Server (TLS) id 14.2.328.9; Fri, 8 Mar
+ 2013 08:53:54 -0600
+Message-ID: <5139FB83.1030402@illinois.edu>
+Date: Fri, 8 Mar 2013 08:53:55 -0600
+From: Jim Basney <jbasney@illinois.edu>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:17.0) Gecko/20130216 Thunderbird/17.0.3
+MIME-Version: 1.0
+To: David Groep <davidg@nikhef.nl>, Derek Simmel <dsimmel@psc.edu>
+Subject: CILogon/NCSA changes for IGTF distribution
+X-Enigmail-Version: 1.5.1
+OpenPGP: id=0A33BE15;
+	url=http://www.ncsa.illinois.edu/~jbasney/pgp.asc
+Content-Type: multipart/mixed;
+	boundary="------------090305060403060509020700"
+X-Originating-IP: [141.142.220.178]
+X-Spam-Score: 0
+X-Spam-Details: rule=cautious_plus_nq_notspam policy=cautious_plus_nq score=0
+ kscore.is_bulkscore=3.2647351377868e-08 kscore.compositescore=0
+ circleOfTrustscore=0 compositescore=0.234807148660411
+ urlsuspect_oldscore=0.234807148660411 suspectscore=0
+ recipient_domain_to_sender_totalscore=0 phishscore=0 bulkscore=0
+ kscore.is_spamscore=0 recipient_to_sender_totalscore=0
+ recipient_domain_to_sender_domain_totalscore=0 rbsscore=0.234807148660411
+ spamscore=0 recipient_to_sender_domain_totalscore=0 urlsuspectscore=0.9
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=7.0.1-1211240000 definitions=main-1303080094
+X-Spam-OrigSender: jbasney@illinois.edu
+X-Spam-Bar: 
+X-Spam-Status: No, score=-4.819, required=5, tests=BAYES_00,RCVD_IN_DNSWL_MED,RP_MATCHES_RCVD,SPF_PASS,T_FILL_THIS_FORM_SHORT
+X-Scanned-By: MIMEDefang 2.70 on 128.182.70.106
+
+--------------090305060403060509020700
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+Hi David and Derek,
+
+The NCSA GridShib CA (CN=GridShib CA) has now stopped issuing
+certificates, and all issued certificate have expired. Please remove
+this CA (files: ncsa-gridshib-ca.*, hashes e8ac4b61 and d87163a8) from
+the IGTF distribution. We'll keep issuing CRLs for this CA for at least
+another few months to avoid problems for relying parties.
+
+The 3 other NCSA CAs (CN=CACL, CN=MyProxy, and CN=Two Factor CA) are
+still actively used, so please don't remove those.
+
+Also, with the upcoming retirement of the DOEGrids CA, CILogon needs to
+stop using crl.doegrids.org as a backup CRL distribution point. Updated
+cilogon-*.crl_url and cilogon-*.info files are attached. Please include
+these updated versions in future IGTF distributions.
+
+Thanks,
+Jim
+
+--------------090305060403060509020700
+Content-Type: text/plain; charset="UTF-8"; x-mac-type=0; x-mac-creator=0;
+	name="cilogon-silver.info"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="cilogon-silver.info"
+
+YWxpYXMgPSBjaWxvZ29uLXNpbHZlcgp1cmwgPSBodHRwOi8vY2EuY2lsb2dvbi5vcmcvCmNh
+X3VybCA9IGh0dHBzOi8vY2lsb2dvbi5vcmcvY2lsb2dvbi1zaWx2ZXIucGVtCmNybF91cmwg
+PSBodHRwOi8vY3JsLmNpbG9nb24ub3JnL2NpbG9nb24tc2lsdmVyLmNybAplbWFpbCA9IGNh
+QGNpbG9nb24ub3JnCnN0YXR1cyA9IGFjY3JlZGl0ZWQ6bWljcwp2ZXJzaW9uID0gQFZFUlNJ
+T05ACnNoYTFmcC4wID0gQFNIQTFGUC4wQAo=
+--------------090305060403060509020700
+Content-Type: text/plain; charset="UTF-8"; x-mac-type=0; x-mac-creator=0;
+	name="cilogon-openid.info"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="cilogon-openid.info"
+
+YWxpYXMgPSBjaWxvZ29uLW9wZW5pZAp1cmwgPSBodHRwOi8vY2EuY2lsb2dvbi5vcmcvCmNh
+X3VybCA9IGh0dHBzOi8vY2lsb2dvbi5vcmcvY2lsb2dvbi1vcGVuaWQucGVtCmNybF91cmwg
+PSBodHRwOi8vY3JsLmNpbG9nb24ub3JnL2NpbG9nb24tb3BlbmlkLmNybAplbWFpbCA9IGNh
+QGNpbG9nb24ub3JnCnN0YXR1cyA9IGV4cGVyaW1lbnRhbAp2ZXJzaW9uID0gQFZFUlNJT05A
+CnNoYTFmcC4wID0gQFNIQTFGUC4wQAo=
+--------------090305060403060509020700
+Content-Type: text/plain; charset="UTF-8"; x-mac-type=0; x-mac-creator=0;
+	name="cilogon-basic.info"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="cilogon-basic.info"
+
+YWxpYXMgPSBjaWxvZ29uLWJhc2ljCnVybCA9IGh0dHA6Ly9jYS5jaWxvZ29uLm9yZy8KY2Ff
+dXJsID0gaHR0cHM6Ly9jaWxvZ29uLm9yZy9jaWxvZ29uLWJhc2ljLnBlbQpjcmxfdXJsID0g
+aHR0cDovL2NybC5jaWxvZ29uLm9yZy9jaWxvZ29uLWJhc2ljLmNybAplbWFpbCA9IGNhQGNp
+bG9nb24ub3JnCnN0YXR1cyA9IGV4cGVyaW1lbnRhbAp2ZXJzaW9uID0gQFZFUlNJT05ACnNo
+YTFmcC4wID0gQFNIQTFGUC4wQAo=
+--------------090305060403060509020700
+Content-Type: text/plain; charset="UTF-8"; x-mac-type=0; x-mac-creator=0;
+	name="cilogon-silver.crl_url"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="cilogon-silver.crl_url"
+
+aHR0cDovL2NybC5jaWxvZ29uLm9yZy9jaWxvZ29uLXNpbHZlci5jcmwK
+--------------090305060403060509020700
+Content-Type: text/plain; charset="UTF-8"; x-mac-type=0; x-mac-creator=0;
+	name="cilogon-openid.crl_url"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="cilogon-openid.crl_url"
+
+aHR0cDovL2NybC5jaWxvZ29uLm9yZy9jaWxvZ29uLW9wZW5pZC5jcmwK
+--------------090305060403060509020700
+Content-Type: text/plain; charset="UTF-8"; x-mac-type=0; x-mac-creator=0;
+	name="cilogon-basic.crl_url"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="cilogon-basic.crl_url"
+
+aHR0cDovL2NybC5jaWxvZ29uLm9yZy9jaWxvZ29uLWJhc2ljLmNybAo=
+--------------090305060403060509020700--
+
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
