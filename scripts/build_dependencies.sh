@@ -4,6 +4,9 @@
 # it is designed to run from the genesis build directory, since it plans
 # on storing jars into the ext directory.
 
+# the svn repository at the root of the libraries.
+LIBRARY_REPO="svn://svn.xcg.virginia.edu:9002/GENREPO/libraries"
+
 # WORKDIR is the directory where this script started out in.
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 # we're assuming that this script lives in the genesis2 scripts directory.
