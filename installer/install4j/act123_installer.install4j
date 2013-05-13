@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="5592" description="" category="" />
+      <variable name="genii.build-number" value="5645" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -2059,7 +2059,7 @@ return !ownerCer.exists();</string>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
                                       <void property="arguments">
-                                        <array class="java.lang.String" length="11">
+                                        <array class="java.lang.String" length="12">
                                           <void index="0">
                                             <string>cert-generator</string>
                                           </void>
@@ -2076,21 +2076,24 @@ return !ownerCer.exists();</string>
                                             <string>--ks-pword=${installer:genii.container-keystore-password}</string>
                                           </void>
                                           <void index="5">
-                                            <string>--cn=${installer:genii.hostname}</string>
+                                            <string>--ks-alias=Container</string>
                                           </void>
                                           <void index="6">
-                                            <string>--o=XSEDE</string>
+                                            <string>--cn=${installer:genii.hostname}</string>
                                           </void>
                                           <void index="7">
-                                            <string>--l=Nationwide</string>
+                                            <string>--o=XSEDE</string>
                                           </void>
                                           <void index="8">
-                                            <string>--c=US</string>
+                                            <string>--l=Nationwide</string>
                                           </void>
                                           <void index="9">
-                                            <string>--ou=GFFS</string>
+                                            <string>--c=US</string>
                                           </void>
                                           <void index="10">
+                                            <string>--ou=GFFS</string>
+                                          </void>
+                                          <void index="11">
                                             <string>/etc/ContainerGroupCertGenerator</string>
                                           </void>
                                         </array>
@@ -3963,7 +3966,7 @@ return startService;</string>
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="false">
-    <mediaSet refId="2073" />
+    <mediaSet refId="3416" />
   </buildIds>
   <buildOptions verbose="true" faster="false" disableSigning="false" debug="false" />
 </install4j>

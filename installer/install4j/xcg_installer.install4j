@@ -2059,7 +2059,7 @@ return !ownerCer.exists();</string>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
                                       <void property="arguments">
-                                        <array class="java.lang.String" length="11">
+                                        <array class="java.lang.String" length="12">
                                           <void index="0">
                                             <string>cert-generator</string>
                                           </void>
