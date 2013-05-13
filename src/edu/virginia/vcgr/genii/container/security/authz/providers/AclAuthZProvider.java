@@ -121,7 +121,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 						}
 						ownerCerts.add(ownerCert);
 						if (_logger.isDebugEnabled())
-							_logger.debug("setting up administrator access for " + ownerCert.getIssuerDN());
+							_logger.debug("setting up administrator access for " + ownerCert.getSubjectDN());
 					}
 
 					_defaultInitialResourceOwners = ownerCerts.toArray(new X509Certificate[ownerCerts.size()]);
@@ -247,10 +247,10 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		return false;
 	}
 
+	@Override
 	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
 		Class<?> serviceClass, Method operation)
 	{
-
 		RWXCategory category = RWXManager.lookup(serviceClass, operation);
 
 		if (!checkAccess(authenticatedCallerCredentials, resource, category)) {
@@ -259,6 +259,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			try {
 				if (resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()) != null) {
 					asset.concat("--" + (String) resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()));
+				} else {
+					asset.concat("--" + resource.getKey());
 				}
 			} catch (Throwable e) {
 				// ignore, will just miss part of print-out.
@@ -270,15 +272,35 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		return true;
 	}
 
+	public void blurtCredentials(String prefixedMessage, Collection<NuCredential> creds)
+	{
+		if (!_logger.isDebugEnabled())
+			return; // no printing unless debug mode allowed.
+		StringBuilder credsAsString = new StringBuilder(prefixedMessage);
+		credsAsString.append("\n");
+		for (NuCredential cred : creds) {
+			credsAsString.append("\n----\n");
+			credsAsString.append(cred.toString());
+			credsAsString.append("\n----\n");
+		}
+		_logger.debug(credsAsString);
+	}
+
+	@Override
 	public boolean
 		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
 	{
 		String messagePrefix = "checkAccess for " + category + " on ";
+		String resourceName = null;
 		try {
-			messagePrefix.concat(resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME) + " ");
+			resourceName = (String) resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME);
 		} catch (Throwable e) {
 			// ignore.
 		}
+		if (resourceName == null) {
+			resourceName = resource.getKey();
+		}
+		messagePrefix = messagePrefix.concat(resourceName + " ");
 
 		try {
 			ICallingContext callContext = ContextManager.getExistingContext();
@@ -333,6 +355,9 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			}
 
 			// Nobody appreciates us
+			if (_logger.isTraceEnabled()) {
+				blurtCredentials(messagePrefix + " was not granted for cred set: ", authenticatedCallerCredentials);
+			}
 			return false;
 		} catch (AuthZSecurityException ase) {
 			_logger.error("failure, saw authorization security exception for " + messagePrefix + ":" + ase.getMessage());
@@ -450,8 +475,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				}
 			}
 			if (!found) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("entryList.add " + entry);
+				if (_logger.isTraceEnabled())
+					_logger.trace("adding acl to list: " + entry == null ? "wildcard" : entry);
 				entryList.add(entry);
 				tagList.add("+" + mode);
 			}
@@ -459,8 +484,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		Iterator<AclEntry> oldIter = oldAcl.iterator();
 		while (oldIter.hasNext()) {
 			AclEntry oldEntry = oldIter.next();
-			if (_logger.isDebugEnabled())
-				_logger.debug("entryList.del " + oldEntry);
+			if (_logger.isTraceEnabled())
+				_logger.trace("removing acl from list " + oldEntry == null ? "wildcard" : oldEntry);
 			entryList.add(oldEntry);
 			tagList.add("-" + mode);
 		}

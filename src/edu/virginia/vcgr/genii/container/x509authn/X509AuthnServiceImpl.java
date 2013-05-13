@@ -152,6 +152,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	{
 		ArrayList<RequestSecurityTokenResponseType> gatheredResponses = new ArrayList<RequestSecurityTokenResponseType>();
 		Collection<InternalEntry> entries = _resource.retrieveEntries(null);
+
 		for (InternalEntry entry : entries) {
 			try {
 				EndpointReferenceType idpEpr = entry.getEntryReference();
@@ -164,9 +165,10 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 					}
 				}
 			} catch (Exception e) {
-				throw new RuntimeException("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
+				_logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
 			}
 		}
+
 		return gatheredResponses;
 	}
 
@@ -409,8 +411,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 							wrapped.getDelegateeType(), new BasicConstraints(System.currentTimeMillis()
 								- SecurityConstants.CredentialGoodFromOffset, Long.MAX_VALUE,
 								SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
-					newTC.delegateTrust(wrapped);
-					newTC.signAssertion(privateKey);					
+					newTC.extendTrustChain(wrapped);
+					newTC.signAssertion(privateKey);
 					credential = newTC;
 				} else if (credential instanceof X509Identity) {
 					if (_logger.isDebugEnabled())
@@ -459,7 +461,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		SOAPException, ConfigurationException, RemoteException
 	{
 		if (delegateToChain != null)
-			_logger.info("delegating to " + delegateToChain[0].getIssuerDN());
+			_logger.info("delegating to " + delegateToChain[0].getSubjectDN());
 
 		NuCredential credential = RNSContainerUtilities.loadRNSResourceCredential(resource);
 		AxisCredentialWallet creds = new AxisCredentialWallet();
@@ -478,41 +480,50 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			} catch (IOException e) {
 				throw new GeneralSecurityException(e.getMessage(), e);
 			}
+			// to be filled with a valid delegated credential, if possible.
+			TrustCredential newTC = null;
 			if (credential instanceof TrustCredential) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("wrapping this trust credential: " + credential.toString());
 				TrustCredential wrapped = (TrustCredential) credential;
 				// Delegate the assertion to delegateTo.
-				TrustCredential newTC =
+				newTC =
 					new TrustCredential(delegateToChain, IdentityType.OTHER, resourceKeyMaterial._clientCertChain,
 						wrapped.getDelegateeType(), new BasicConstraints(created.getTime(), expiry.getTime()
 							- created.getTime(), SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);
-				creds.getRealCreds().addCredential(newTC);
 			} else if (credential instanceof FullX509Identity) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("creating trust credential from full x509 with key: " + credential.toString());
 				FullX509Identity realId = (FullX509Identity) credential;
 				// Delegate the assertion to delegateTo.
-				TrustCredential newTC =
-					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
-						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
+				newTC =
+					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(),
+						realId.getType(), new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
 							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(realId.getKey());
-				creds.getRealCreds().addCredential(newTC);
 			} else if (credential instanceof X509Identity) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("creating trust credential from x509: " + credential.toString());
 				X509Identity realId = (X509Identity) credential;
 				// Delegate the assertion to delegateTo.
-				TrustCredential newTC =
-					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
-						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
+				newTC =
+					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(),
+						realId.getType(), new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
 							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);
-				creds.getRealCreds().addCredential(newTC);
 			} else {
 				_logger.error("failure, unknown type of assertion found.");
+			}
+			if (newTC != null) {
+				// add the newly minted credential into the list to send back.
+				creds.getRealCreds().addCredential(newTC);
+				/*
+				 * we now add the credential to the calling context also, since the actor may need
+				 * to be in possession of their full identity for the steps of aggregating the
+				 * baggage tokens (logging into groups).
+				 */
+				// TransientCredentials.getTransientCredentials(callingContext).add(newTC);
 			}
 		}
 

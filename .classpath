@@ -3,7 +3,6 @@
 	<classpathentry excluding="**/.svn/**|edu/virginia/vcgr/genii/container/factory/GeniiFactoryServiceImpl.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="tests"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="lib" path="ext/jfreechart/jfreechart-1.0.13.jar"/>
 	<classpathentry kind="lib" path="ext/jfreechart/jcommon-1.0.16.jar"/>
 	<classpathentry kind="lib" path="ext/wss4j-1.5.6.jar" sourcepath="/home/fred/xsede/code/others/wss4j/src"/>
@@ -50,9 +49,10 @@
 	<classpathentry kind="lib" path="ext/dpage.jar"/>
 	<classpathentry kind="lib" path="ext/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="ext/app-manager.jar"/>
-	<classpathentry kind="lib" path="ext/gffs-basics.jar" sourcepath="/gffs-basics"/>
-	<classpathentry kind="lib" path="ext/gffs-security.jar" sourcepath="/gffs-security"/>
-	<classpathentry kind="lib" path="ext/gffs-structure.jar" sourcepath="/gffs-structure"/>
-	<classpathentry kind="lib" path="ext/gffs-webservices.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gffs-basics"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gffs-security"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gffs-structure"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gffs-webservices"/>
+	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

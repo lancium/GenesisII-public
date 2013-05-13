@@ -48,9 +48,6 @@ while true; do
   fi
 done
 
-# the svn repository at the root of the libraries.
-LIBRARY_REPO="svn://svn.xcg.virginia.edu:9002/GENREPO/libraries"
-
 # make the storage area if it doesn't exist.
 if [ ! -d "$TOPDIR/ext" ]; then mkdir "$TOPDIR/ext"; fi
 
@@ -75,7 +72,7 @@ function snag_dependencies()
     cp -v -f $TOPDIR/ext/gffs-basics.jar ./ext
   fi
   if [ $projname == gffs-security ]; then
-    cp -v -f $TOPDIR/ext/gffs-basics.jar ./ext
+    cp -v -f $TOPDIR/ext/app-manager.jar $TOPDIR/ext/gffs-basics.jar ./ext
   fi
   if [ $projname == gffs-structure ]; then
     cp -v -f $TOPDIR/ext/gffs-basics.jar $TOPDIR/ext/gffs-webservices.jar $TOPDIR/ext/gffs-security.jar $TOPDIR/ext/app-manager.jar $TOPDIR/ext/CmdLineManipulator.jar $TOPDIR/ext/fsview.jar $TOPDIR/ext/GeniiJSDL.jar $TOPDIR/ext/GeniiProcMgmt.jar $TOPDIR/ext/GridJobTool.jar ./ext

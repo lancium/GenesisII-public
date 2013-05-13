@@ -1,17 +1,15 @@
 /*
  * Copyright 2006 University of Virginia
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package edu.virginia.vcgr.genii.container.jndiauthn;
@@ -50,6 +48,7 @@ import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
+
 /**
  * 
  * NOTES: - The presence of a NULL certificate in the ACL indicates open access. - A NULL ACL
@@ -112,7 +111,8 @@ public class JNDIAuthZProvider implements IAuthZProvider
 	/**
 	 * Check that the caller has a type of access to the given resource.
 	 */
-	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
+	public boolean
+		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
 	{
 		JNDIResource jndiResource = (JNDIResource) resource;
 		if (!jndiResource.isIdpResource()) {
@@ -134,8 +134,8 @@ public class JNDIAuthZProvider implements IAuthZProvider
 		}
 
 		// try each identity in the caller's credentials
-		ArrayList<NuCredential> callerCredentials = (ArrayList<NuCredential>) callingContext
-			.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
+		ArrayList<NuCredential> callerCredentials =
+			(ArrayList<NuCredential>) callingContext.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
 		for (NuCredential cred : callerCredentials) {
 			if (cred instanceof UsernamePasswordIdentity) {
 				try {
@@ -150,9 +150,9 @@ public class JNDIAuthZProvider implements IAuthZProvider
 						case NIS:
 
 							jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.nis.NISCtxFactory");
-							providerUrl = "nis://"
-								+ jndiResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()) + "/"
-								+ jndiResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());
+							providerUrl =
+								"nis://" + jndiResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart())
+									+ "/" + jndiResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());
 							jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
 
 							InitialDirContext initialContext = new InitialDirContext(jndiEnv);

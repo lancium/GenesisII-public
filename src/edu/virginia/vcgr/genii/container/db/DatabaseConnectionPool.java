@@ -34,8 +34,8 @@ public class DatabaseConnectionPool
 	static private final String _SPECIAL_STRING = "${server-dir}";
 
 	static private final String _DB_POOL_SIZE_DEFAULT = "16";
-//	static private final long REJUVENATION_CYCLE = 1000L * 60 * 1;
-	
+	// static private final long REJUVENATION_CYCLE = 1000L * 60 * 1;
+
 	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
 
 	static private int _poolInstances = 0;

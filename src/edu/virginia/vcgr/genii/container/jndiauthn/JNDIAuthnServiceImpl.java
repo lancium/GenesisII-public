@@ -1,17 +1,15 @@
 /*
  * Copyright 2006 University of Virginia
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package edu.virginia.vcgr.genii.container.jndiauthn;
 
@@ -171,8 +169,9 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		}
 
 		// STS for a JNDI directory resource
-		PortType[] response = { WellKnownPortTypes.STS_SERVICE_PORT_TYPE(), WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE(),
-			WellKnownPortTypes.RNS_PORT_TYPE(), };
+		PortType[] response =
+			{ WellKnownPortTypes.STS_SERVICE_PORT_TYPE(), WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE(),
+				WellKnownPortTypes.RNS_PORT_TYPE(), };
 
 		return response;
 	}
@@ -220,7 +219,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		String newStsName = (String) constructionParameters.get(SecurityConstants.NEW_JNDI_STS_NAME_QNAME);
 		Collection<String> entries = myResource.listEntries(null);
 		if (entries.contains(newStsName)) {
-			throw edu.virginia.vcgr.genii.client.wsrf.FaultManipulator.fillInFault(new RNSEntryExistsFaultType(null, null, null, null, null, null, newStsName));
+			throw edu.virginia.vcgr.genii.client.wsrf.FaultManipulator.fillInFault(new RNSEntryExistsFaultType(null, null,
+				null, null, null, null, newStsName));
 		}
 
 		// add the entry to the service's list of STSs
@@ -291,21 +291,24 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		response.set_any(elements);
 
 		// Add TokenType element
-		elements[0] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"),
-			PKIPathSecurity.getType());
+		elements[0] =
+			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"),
+				PKIPathSecurity.getType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
 
 		MessageElement wseTokenRef = WSSecurityUtils.makePkiPathSecTokenRef(identity);
 
-		elements[1] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-			"RequestedSecurityToken"), new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
+		elements[1] =
+			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
+				new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		return response;
 	}
 
-	protected RequestSecurityTokenResponseType formatDelegateToken(X509Certificate[] delegateToChain, Date created, Date expiry)
-		throws GeneralSecurityException, SOAPException, ConfigurationException, RemoteException
+	protected RequestSecurityTokenResponseType
+		formatDelegateToken(X509Certificate[] delegateToChain, Date created, Date expiry) throws GeneralSecurityException,
+			SOAPException, ConfigurationException, RemoteException
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("hitting the formatDelegateToken in jndi authn");
@@ -330,9 +333,10 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		AxisCredentialWallet creds = new AxisCredentialWallet();
 
 		// Delegate the assertion to delegateTo
-		TrustCredential tc = new TrustCredential(delegateToChain, IdentityType.CONNECTION,
-			resourceKeyMaterial._clientCertChain, IdentityType.USER, new BasicConstraints(created.getTime(), expiry.getTime()
-				- created.getTime(), SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
+		TrustCredential tc =
+			new TrustCredential(delegateToChain, IdentityType.CONNECTION, resourceKeyMaterial._clientCertChain,
+				IdentityType.USER, new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
+					SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 		tc.signAssertion(resourceKeyMaterial._clientPrivateKey);
 
 		creds.getRealCreds().addCredential(tc);
@@ -352,14 +356,15 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		}
 
 		// Add TokenType element
-		elements[0] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"),
-			xup.getTokenType());
+		elements[0] =
+			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"), xup.getTokenType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
 
 		MessageElement wseTokenRef = creds.convertToSOAPElement();
 
-		elements[1] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-			"RequestedSecurityToken"), new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
+		elements[1] =
+			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
+				new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		return response;
@@ -496,8 +501,9 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 			String epiString = (String) idpResource.getKey();
 			String userName = idpResource.getIdpName();
 
-			CertCreationSpec certSpec = new CertCreationSpec(containerChain[0].getPublicKey(), containerChain,
-				Container.getContainerPrivateKey(), getResourceCertificateLifetime());
+			CertCreationSpec certSpec =
+				new CertCreationSpec(containerChain[0].getPublicKey(), containerChain, Container.getContainerPrivateKey(),
+					getResourceCertificateLifetime());
 
 			Properties jndiEnv = new Properties();
 			String providerUrl = null;
@@ -507,8 +513,9 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 				case NIS:
 
 					jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.nis.NISCtxFactory");
-					providerUrl = "nis://" + stsResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart())
-						+ "/" + stsResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());
+					providerUrl =
+						"nis://" + stsResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()) + "/"
+							+ stsResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());
 					jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
 
 					InitialDirContext initialContext = new InitialDirContext(jndiEnv);
@@ -519,7 +526,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 
 					// get CNs for cert (gecos common string)
 					ArrayList<String> cnList = new ArrayList<String>();
-					cnList.add(((ResourceKey)idpResource.getParentResourceKey()).getServiceName());
+					cnList.add(((ResourceKey) idpResource.getParentResourceKey()).getServiceName());
 					if (attrs.get("gecos") != null) {
 						cnList.add((String) attrs.get("gecos").get());
 					}
@@ -527,8 +534,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 					// get UID for cert
 					String uid = (attrs.get("uidnumber") == null) ? null : (String) attrs.get("uidnumber").get();
 
-					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields = CertTool.constructCommonDnFields(
-						epiString, null, cnList, uid);
+					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields =
+						CertTool.constructCommonDnFields(epiString, null, cnList, uid);
 
 					return CertTool.createResourceCertChain(certSpec, additionalFields);
 
@@ -559,8 +566,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		if (_logger.isDebugEnabled())
 			_logger.debug("Entered resolveEPI method.");
 
-		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-			WorkingContext.EPR_PROPERTY_NAME);
+		EndpointReferenceType myEPR =
+			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 
 		ResourceKey stsKey = ResourceManager.getCurrentResource();
 		IJNDIResource stsResource = (IJNDIResource) stsKey.dereference();
@@ -580,10 +587,11 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 			X509Certificate[] resourceCertChain = createCertChainForListing(idpResource, stsResource);
 			idpResource.setProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME, resourceCertChain);
 
-			PortType[] implementedPortTypes = { WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE(),
-				WellKnownPortTypes.STS_SERVICE_PORT_TYPE() };
-			EndpointReferenceType retval = ResourceManager.createEPR(idpKey, myEPR.getAddress().toString(),
-				implementedPortTypes, new String("JNDIWithSTSPortType"));
+			PortType[] implementedPortTypes =
+				{ WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE(), WellKnownPortTypes.STS_SERVICE_PORT_TYPE() };
+			EndpointReferenceType retval =
+				ResourceManager.createEPR(idpKey, myEPR.getAddress().toString(), implementedPortTypes, new String(
+					"JNDIWithSTSPortType"));
 
 			return retval;
 

@@ -38,7 +38,7 @@ public class BESActivityCleanupHandler extends BasicResourceCleanupHandler
 					if (id instanceof X509Identity) {
 						X509Identity xid = (X509Identity) id;
 						try {
-							xid.checkValidity(0, new Date());
+							xid.checkValidity(new Date());
 						} catch (Throwable cause) {
 							invalidCount++;
 							_logger.warn("Not counting an expired certificate for " + "cleanup purposes.", cause);

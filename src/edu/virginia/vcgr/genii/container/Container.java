@@ -56,6 +56,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
+import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -64,7 +65,6 @@ import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
-import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.container.ContainerIDFile;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
@@ -205,6 +205,7 @@ public class Container extends ApplicationBase
 		initializeIdentitySecurity(getConfigurationManager().getContainerConfiguration());
 
 		_containerConfiguration = new ContainerConfiguration(getConfigurationManager());
+		ContainerConfiguration.setTheContainerConfig(_containerConfiguration);
 
 		server = new Server();
 
@@ -351,18 +352,18 @@ public class Container extends ApplicationBase
 	{
 		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
 
-		String keyStoreLoc = resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
+		String keyStoreLoc = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
 		String keyStoreType =
-			resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP, "PKCS12");
-		String keyPassword = resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_KEY_PASSWORD_PROP);
+			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP, "PKCS12");
+		String keyPassword = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_PASSWORD_PROP);
 		String keyStorePassword =
-			resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PASSWORD_PROP);
+			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PASSWORD_PROP);
 		String containerAlias =
-			resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP,
+			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP,
 				GenesisIIConstants.CONTAINER_CERT_ALIAS);
 
 		String certificateLifetime =
-			resourceIdSecProps.getProperty(SecurityConstants.Container.RESOURCE_IDENTITY_DEFAULT_CERT_LIFETIME_PROP);
+			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_DEFAULT_CERT_LIFETIME_PROP);
 		if (certificateLifetime != null)
 			_defaultCertificateLifetime = Long.parseLong(certificateLifetime);
 

@@ -383,7 +383,7 @@ public class ResourceManager
 						.getDeployment(new DeploymentName())
 						.security()
 						.getProperty(
-							edu.virginia.vcgr.genii.client.configuration.SecurityConstants.Container.RESOURCE_IDENTITY_USE_OGSA_EAP_PROP);
+							edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_USE_OGSA_EAP_PROP);
 				if (useEap.equalsIgnoreCase("true")) {
 					addSecureAddressingElements(any, resource);
 				} else {

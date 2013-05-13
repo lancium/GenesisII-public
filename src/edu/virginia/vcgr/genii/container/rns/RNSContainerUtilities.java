@@ -79,7 +79,7 @@ public class RNSContainerUtilities
 				_logger.error("failed to load resource certificate chain!  this is quite bad.  resource is: "
 					+ resource.toString());
 			}
-			
+
 			// trying to find the real types involved by looking at ACLs.
 			Acl acl = null;
 			try {
@@ -94,18 +94,18 @@ public class RNSContainerUtilities
 				Collection<AclEntry> trustList = acl.readAcl;
 				for (AclEntry entry : trustList) {
 					if (entry instanceof X509Identity) {
-						X509Identity id = (X509Identity)entry;
+						X509Identity id = (X509Identity) entry;
 						if (id.getOriginalAsserter()[0].equals(resourceCertChain[0])) {
 							found = id;
 						}
 					}
 				}
-			}				
+			}
 			if (found != null) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("found an identity that matches our certificate: " + found);
 				credential = found;
-			} else { 
+			} else {
 				if (_logger.isDebugEnabled())
 					_logger.debug("found no identity matching our certificate, so using type of OTHER.");
 				credential = new X509Identity(resourceCertChain, IdentityType.OTHER);

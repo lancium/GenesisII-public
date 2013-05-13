@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.5" transformSequenceNumber="4">
   <directoryPresets config="" />
-  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesis2.virginia.edu" version="2.7.7" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
+  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesis2.virginia.edu" version="2.7.11" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="5487" description="" category="" />
+      <variable name="genii.build-number" value="5592" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -981,10 +981,15 @@ if (selected){
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
                       <void property="files">
-                        <array class="java.io.File" length="1">
+                        <array class="java.io.File" length="2">
                           <void index="0">
                             <object class="java.io.File">
                               <string>ext</string>
+                            </object>
+                          </void>
+                          <void index="1">
+                            <object class="java.io.File">
+                              <string>lib</string>
                             </object>
                           </void>
                         </array>
@@ -1878,7 +1883,102 @@ return !ownerCer.exists();</string>
                             <validation />
                             <preActivation />
                             <postActivation />
-                            <actions />
+                            <actions>
+                              <action name="get signing keypair" id="4609" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Unable to generate container signing keypair">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                                      <void property="arguments">
+                                        <array class="java.lang.String" length="12">
+                                          <void index="0">
+                                            <string>cert-generator</string>
+                                          </void>
+                                          <void index="1">
+                                            <string>--gen-cert</string>
+                                          </void>
+                                          <void index="2">
+                                            <string>--keysize=2048</string>
+                                          </void>
+                                          <void index="3">
+                                            <string>--ks-path=deployments/${installer:genii.deployment}/security/generated1.pfx</string>
+                                          </void>
+                                          <void index="4">
+                                            <string>--ks-pword=container</string>
+                                          </void>
+                                          <void index="5">
+                                            <string>--ks-alias=Container</string>
+                                          </void>
+                                          <void index="6">
+                                            <string>--cn=${installer:genii.hostname}</string>
+                                          </void>
+                                          <void index="7">
+                                            <string>--o=XSEDE</string>
+                                          </void>
+                                          <void index="8">
+                                            <string>--l=Nationwide</string>
+                                          </void>
+                                          <void index="9">
+                                            <string>--c=US</string>
+                                          </void>
+                                          <void index="10">
+                                            <string>--ou=GFFS</string>
+                                          </void>
+                                          <void index="11">
+                                            <string>/etc/ContainerGroupCertGenerator</string>
+                                          </void>
+                                        </array>
+                                      </void>
+                                      <void property="executable">
+                                        <object class="java.io.File">
+                                          <string>grid</string>
+                                        </object>
+                                      </void>
+                                      <void property="keepConsoleWindow">
+                                        <boolean>true</boolean>
+                                      </void>
+                                      <void property="showWindowsConsole">
+                                        <boolean>true</boolean>
+                                      </void>
+                                      <void property="wait">
+                                        <boolean>true</boolean>
+                                      </void>
+                                      <void property="workingDirectory">
+                                        <object class="java.io.File">
+                                          <string>.</string>
+                                        </object>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                              <action name="copy generated to signing cert" id="4610" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Failed to copy generated cert to signing cert.">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                                      <void property="destinationFile">
+                                        <object class="java.io.File">
+                                          <string>deployments/${installer:genii.deployment}/security/signing-cert.pfx</string>
+                                        </object>
+                                      </void>
+                                      <void property="files">
+                                        <array class="java.io.File" length="1">
+                                          <void index="0">
+                                            <object class="java.io.File">
+                                              <string>deployments/${installer:genii.deployment}/security/generated1.pfx</string>
+                                            </object>
+                                          </void>
+                                        </array>
+                                      </void>
+                                      <void property="overwriteMode">
+                                        <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                            </actions>
                             <formComponents>
                               <formComponent name="Use Container Service" id="2602" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                                 <serializedBean>
@@ -1886,6 +1986,9 @@ return !ownerCer.exists();</string>
                                     <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
                                       <void property="checkboxText">
                                         <string>Use Grid Keypair Generating Service</string>
+                                      </void>
+                                      <void property="initiallySelected">
+                                        <boolean>true</boolean>
                                       </void>
                                       <void property="variableName">
                                         <string>genii.cert-generator</string>
@@ -1951,12 +2054,12 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="get container keypair" id="2712" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Unable to generate container keypair">
+                              <action name="get tls keypair" id="2712" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Unable to generate container keypair">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
                                       <void property="arguments">
-                                        <array class="java.lang.String" length="13">
+                                        <array class="java.lang.String" length="11">
                                           <void index="0">
                                             <string>cert-generator</string>
                                           </void>
@@ -1967,34 +2070,28 @@ return !ownerCer.exists();</string>
                                             <string>--keysize=2048</string>
                                           </void>
                                           <void index="3">
-                                            <string>--ks-path=deployments/${installer:genii.deployment}/security/tls-cert.pfx</string>
+                                            <string>--ks-path=deployments/${installer:genii.deployment}/security/generated2.pfx</string>
                                           </void>
                                           <void index="4">
                                             <string>--ks-pword=${installer:genii.container-keystore-password}</string>
                                           </void>
                                           <void index="5">
-                                            <string>--ks-alias=${installer:genii.container-keystore-alias}</string>
-                                          </void>
-                                          <void index="6">
                                             <string>--cn=${installer:genii.hostname}</string>
                                           </void>
+                                          <void index="6">
+                                            <string>--o=XSEDE</string>
+                                          </void>
                                           <void index="7">
-                                            <string>--o=UVA</string>
+                                            <string>--l=Nationwide</string>
                                           </void>
                                           <void index="8">
-                                            <string>--l=Charlottesville</string>
-                                          </void>
-                                          <void index="9">
                                             <string>--c=US</string>
                                           </void>
+                                          <void index="9">
+                                            <string>--ou=GFFS</string>
+                                          </void>
                                           <void index="10">
-                                            <string>--st=VA</string>
-                                          </void>
-                                          <void index="11">
-                                            <string>--ou=XSEDE</string>
-                                          </void>
-                                          <void index="12">
-                                            <string>${installer:genii.cert-generator-path}</string>
+                                            <string>/etc/ContainerGroupCertGenerator</string>
                                           </void>
                                         </array>
                                       </void>
@@ -2022,20 +2119,20 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="copy tls to signing cert" id="3952" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Failed to copy tls cert to signing cert.">
+                              <action name="copy generated to tls cert" id="3952" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Failed to copy generated cert to tls cert.">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
                                       <void property="destinationFile">
                                         <object class="java.io.File">
-                                          <string>deployments/${installer:genii.deployment}/security/signing-cert.pfx</string>
+                                          <string>deployments/${installer:genii.deployment}/security/tls-cert.pfx</string>
                                         </object>
                                       </void>
                                       <void property="files">
                                         <array class="java.io.File" length="1">
                                           <void index="0">
                                             <object class="java.io.File">
-                                              <string>deployments/${installer:genii.deployment}/security/tls-cert.pfx</string>
+                                              <string>deployments/${installer:genii.deployment}/security/generated2.pfx</string>
                                             </object>
                                           </void>
                                         </array>
@@ -2097,25 +2194,6 @@ return !ownerCer.exists();</string>
                               </action>
                             </actions>
                             <formComponents>
-                              <formComponent name="Cert Signer" id="2607" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                                <serializedBean>
-                                  <java class="java.beans.XMLDecoder">
-                                    <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
-                                      <void property="initialText">
-                                        <string>/etc/ContainerGroupCertGenerator</string>
-                                      </void>
-                                      <void property="labelText">
-                                        <string>Path to Service</string>
-                                      </void>
-                                      <void property="variableName">
-                                        <string>genii.cert-generator-path</string>
-                                      </void>
-                                    </object>
-                                  </java>
-                                </serializedBean>
-                                <initScript />
-                                <visibilityScript />
-                              </formComponent>
                               <formComponent name="Keystore Password" id="3020" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
@@ -2128,25 +2206,6 @@ return !ownerCer.exists();</string>
                                       </void>
                                       <void property="variableName">
                                         <string>genii.container-keystore-password</string>
-                                      </void>
-                                    </object>
-                                  </java>
-                                </serializedBean>
-                                <initScript />
-                                <visibilityScript />
-                              </formComponent>
-                              <formComponent name="Alias" id="3021" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                                <serializedBean>
-                                  <java class="java.beans.XMLDecoder">
-                                    <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
-                                      <void property="initialText">
-                                        <string>Container</string>
-                                      </void>
-                                      <void property="labelText">
-                                        <string>Keystore Alias</string>
-                                      </void>
-                                      <void property="variableName">
-                                        <string>genii.container-keystore-alias</string>
                                       </void>
                                     </object>
                                   </java>
@@ -2174,39 +2233,13 @@ return !ownerCer.exists();</string>
                             <preActivation />
                             <postActivation />
                             <actions>
-                              <action name="Copy tls keypair" id="2608" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
+                              <action name="Copy tls keypair" id="2608" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="4" errorMessage="">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
                                       <void property="destinationFile">
                                         <object class="java.io.File">
                                           <string>deployments/${installer:genii.deployment}/security/tls-cert.pfx</string>
-                                        </object>
-                                      </void>
-                                      <void property="files">
-                                        <array class="java.io.File" length="1">
-                                          <void index="0">
-                                            <object class="java.io.File">
-                                              <string>${installer:genii.container-keypair-path}</string>
-                                            </object>
-                                          </void>
-                                        </array>
-                                      </void>
-                                      <void property="mode">
-                                        <string>600</string>
-                                      </void>
-                                    </object>
-                                  </java>
-                                </serializedBean>
-                                <condition />
-                              </action>
-                              <action name="Copy signing keypair" id="3832" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
-                                <serializedBean>
-                                  <java class="java.beans.XMLDecoder">
-                                    <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
-                                      <void property="destinationFile">
-                                        <object class="java.io.File">
-                                          <string>deployments/${installer:genii.deployment}/security/signing-cert.pfx</string>
                                         </object>
                                       </void>
                                       <void property="files">
@@ -2246,10 +2279,32 @@ return !ownerCer.exists();</string>
                               </action>
                             </actions>
                             <formComponents>
-                              <formComponent name="Keypair path" id="2606" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                              <formComponent name="" id="4732" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.FileChooserComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.formcomponents.FileChooserComponent">
+                                      <void property="initialBrowserDirectory">
+                                        <string>${installer:sys.userHome}</string>
+                                      </void>
+                                      <void property="labelText">
+                                        <string>Keypair Path</string>
+                                      </void>
+                                      <void property="variableName">
+                                        <string>genii.container-keypair-path</string>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <initScript />
+                                <visibilityScript />
+                              </formComponent>
+                              <formComponent name="Keypair path" id="2606" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="false" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
+                                      <void property="checkIfEmpty">
+                                        <boolean>true</boolean>
+                                      </void>
                                       <void property="labelText">
                                         <string>Keypair Path</string>
                                       </void>
@@ -2266,27 +2321,14 @@ return !ownerCer.exists();</string>
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
+                                      <void property="checkIfEmpty">
+                                        <boolean>true</boolean>
+                                      </void>
                                       <void property="labelText">
                                         <string>Keystore Password</string>
                                       </void>
                                       <void property="variableName">
                                         <string>genii.container-keystore-password</string>
-                                      </void>
-                                    </object>
-                                  </java>
-                                </serializedBean>
-                                <initScript />
-                                <visibilityScript />
-                              </formComponent>
-                              <formComponent name="Alias" id="3019" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                                <serializedBean>
-                                  <java class="java.beans.XMLDecoder">
-                                    <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
-                                      <void property="labelText">
-                                        <string>Alias</string>
-                                      </void>
-                                      <void property="variableName">
-                                        <string>genii.container-keystore-alias</string>
                                       </void>
                                     </object>
                                   </java>
@@ -3921,7 +3963,7 @@ return startService;</string>
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="false">
-    <mediaSet refId="3416" />
+    <mediaSet refId="2073" />
   </buildIds>
   <buildOptions verbose="true" faster="false" disableSigning="false" debug="false" />
 </install4j>

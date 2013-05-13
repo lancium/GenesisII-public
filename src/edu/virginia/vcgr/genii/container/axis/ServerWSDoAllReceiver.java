@@ -65,11 +65,13 @@ import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
+import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
@@ -122,17 +124,19 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 
 			if ((authZHandler == null) || (authZHandler.getMinIncomingMsgLevelSecurity(resource).isNone())) {
+				/*
+				 * We have no requirements for incoming message security. If there are no incoming
+				 * headers, don't do any crypto processing.
+				 */
 				resource.commit();
-				// We have no requirements for incoming message security. If
-				// there
-				// are no incoming headers, don't do any crypto processing
+				// hmmm: why commit before doing anything?
 
-				_logger.debug("beginning server message processing");
 				Message sm = msgContext.getCurrentMessage();
 				if (sm == null) {
-					// We did not receive anything...Usually happens when we get
-					// a
-					// HTTP 202 message (with no content)
+					/*
+					 * We did not receive anything...Usually happens when we get a HTTP 202 message
+					 * (with no content).
+					 */
 					return;
 				}
 
@@ -257,11 +261,11 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(null, null);
 
-			// place the resource's cert chain and epi in the working context --
-			// necessary for
-			// response message-security in case we actually delete this
-			// resource
-			// as part of this operation
+			/* place the resource's cert chain and epi in the working context --
+			 necessary for
+			 response message-security in case we actually delete this
+			 resource
+			 as part of this operation. */
 			IResource resource = ResourceManager.getCurrentResource().dereference();
 			Certificate[] targetCertChain = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			String epi = (resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME)).toString();
@@ -322,46 +326,43 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				TrustCredential assertion = (TrustCredential) cred;
 
 				// Check validity and verify integrity
-				assertion.checkValidity(0, new Date());
-
-				// If the assertion is pre-authorized for us, unwrap one layer.
-				if ((targetCertChain != null) && (assertion.getDelegatee()[0].equals(targetCertChain[0]))) {
-/*dead code					if (!(assertion instanceof TrustCredential)) {
-						throw new AuthZSecurityException("assertion \"" + assertion + "\" is the wrong object type");
-					}*/
-					if (assertion.getPriorDelegation() == null) {
-						throw new AuthZSecurityException("assertion \"" + assertion + "\" had no prior delegation");
-					}
-					assertion = assertion.getPriorDelegation();
-					if (_logger.isTraceEnabled())
-						_logger.trace("unwrapped preauthorized assertion to yield: " + assertion.toString());
-				}
+				assertion.checkValidity(new Date());
 
 				if (_logger.isTraceEnabled())
-					_logger.trace("credential has delegatee...\n" + assertion.getDelegatee()[0].getIssuerDN()
-						+ "\n...and original signer...\n" + assertion.getOriginalAsserter()[0].getIssuerDN());
+					_logger.trace("credential to test has first delegatee: "
+						+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
+						+ assertion.getOriginalAsserter()[0].getSubjectDN());
 
 				// Verify that the request message signer is the same as the
 				// one of the holder-of-key certificates.
 				boolean match = false;
 				for (X509Certificate[] callerCertChain : authenticatedCertChains) {
 					if (_logger.isTraceEnabled())
-						_logger.trace("...comparing with " + callerCertChain[0].getIssuerDN());
-					if (callerCertChain[0].equals(assertion.getDelegatee()[0])) {
-						if (_logger.isTraceEnabled())
-							_logger.trace("...found the delegatee to be the same.");
-						match = true;
-						break;
-					} else {
-						if (_logger.isTraceEnabled())
-							_logger.trace("...found them to be different.");
+						_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
+					try {
+						if (callerCertChain[0].equals(assertion.getRootOfTrust().getDelegatee()[0])) {
+							if (_logger.isTraceEnabled())
+								_logger.trace("...found the initial delegatee to be the same as tls cert.");
+							match = true;
+							break;
+						} else if (CertificateValidatorFactory.getValidator().validateCertInKeyStore(
+							assertion.getOriginalAsserter(), SecurityUtils.getResourceTrustStore()) == true) {
+							if (_logger.isTraceEnabled())
+								_logger.trace("...allowed incoming message using resource trust store.");
+							match = true;
+							break;
+						} else {
+							if (_logger.isTraceEnabled())
+								_logger.trace("...found them to be different.");
+						}
+					} catch (Throwable e) {
+						_logger.error("failure: exception thrown during holder of key checks", e);
 					}
 				}
 
 				if (!match) {
 					String msg =
-						"credential failed to match incoming message sender: \"" + assertion.describe(VerbosityLevel.HIGH)
-							+ "\"";
+						"credential failed to match incoming message sender: '" + assertion.describe(VerbosityLevel.HIGH) + "'";
 					_logger.error(msg);
 					throw new AuthZSecurityException(msg);
 				}
@@ -382,8 +383,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	@SuppressWarnings("unchecked")
 	protected void performAuthz() throws AxisFault
 	{
-		if (_logger.isDebugEnabled())
-			_logger.debug("entering authorization checks...");
 		try {
 			// Grab working and message contexts
 			WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
@@ -486,7 +485,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			_logger.error("failing request due to: " + e.getMessage());
 			throw new AxisFault(e.getMessage(), e);
 		}
-
 	}
 
 	/*
