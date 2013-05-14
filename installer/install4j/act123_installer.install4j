@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.5" transformSequenceNumber="4">
   <directoryPresets config="" />
-  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesis2.virginia.edu" version="2.7.11" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
+  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesis2.virginia.edu" version="2.7.12" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -976,6 +976,32 @@ if (selected){
             <preActivation />
             <postActivation />
             <actions>
+              <action name="" id="4839" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CreateZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.CreateZipFileAction">
+                      <void property="addTopLevelDirectoriesToRelativePath">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>deployments</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="zipFile">
+                        <object class="java.io.File">
+                          <string>${installer:sys.installationDir}/deployment-backup-${compiler:sys.version}-${compiler:sys.date}-${compiler:sys.time}.zip</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>context.getCompilerVariable("genii.isContainer").equals("true")</condition>
+              </action>
               <action name="" id="4309" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -1322,7 +1348,7 @@ return true;</string>
                   <void property="conditionExpression">
                     <object class="com.install4j.api.beans.ScriptProperty">
                       <void property="value">
-                        <string>context.getCompilerVariable("genii.isContainer").equals("true")</string>
+                        <string>context.getCompilerVariable("genii.isContainer").equals("true") </string>
                       </void>
                     </object>
                   </void>
@@ -1548,13 +1574,13 @@ Hostnames should be globally resolvable via DNS.</string>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.screens.CustomizableProgressScreen">
                       <void property="initialStatusMessage">
-                        <string>Connecting Grid Client</string>
+                        <string>Connecting to the Grid</string>
                       </void>
                       <void property="subTitle">
-                        <string>Connecting Grid Client</string>
+                        <string>Connecting to the Grid</string>
                       </void>
                       <void property="title">
-                        <string>Grid Client Connect</string>
+                        <string>Grid Connection</string>
                       </void>
                     </object>
                   </java>
@@ -1701,7 +1727,7 @@ return propFile.exists();</condition>
                       <void property="conditionExpression">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>context.getCompilerVariable("genii.isContainer").equals("true")</string>
+                            <string>context.getCompilerVariable("genii.isContainer").equals("true") </string>
                           </void>
                         </object>
                       </void>
@@ -1716,7 +1742,7 @@ return propFile.exists();</condition>
                           <void property="conditionExpression">
                             <object class="com.install4j.api.beans.ScriptProperty">
                               <void property="value">
-                                <string>!(context.getCompilerVariable("genii.isBootstrap").equals("true"))</string>
+                                <string>!context.getCompilerVariable("genii.isBootstrap").equals("true")  </string>
                               </void>
                             </object>
                           </void>
@@ -1855,7 +1881,15 @@ return !ownerCer.exists();</string>
                   <group name="Grid Config" id="2593" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.groups.ScreenGroup" />
+                        <object class="com.install4j.runtime.beans.groups.ScreenGroup">
+                          <void property="conditionExpression">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string />
+                              </void>
+                            </object>
+                          </void>
+                        </object>
                       </java>
                     </serializedBean>
                     <beans>
@@ -2006,7 +2040,7 @@ return !ownerCer.exists();</string>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.screens.FormScreen">
                                   <void property="subTitle">
-                                    <string>Select grid path of container keypair generating service</string>
+                                    <string>Select password for generated TLS certificate</string>
                                   </void>
                                   <void property="title">
                                     <string>Container Keypair Generating Service</string>
@@ -2019,41 +2053,6 @@ return !ownerCer.exists();</string>
                             <preActivation />
                             <postActivation />
                             <actions>
-                              <action name="login" id="2597" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="false" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Failed to login">
-                                <serializedBean>
-                                  <java class="java.beans.XMLDecoder">
-                                    <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
-                                      <void property="arguments">
-                                        <array class="java.lang.String" length="2">
-                                          <void index="0">
-                                            <string>login</string>
-                                          </void>
-                                          <void index="1">
-                                            <string>--username=${installer:genii.cert-username}</string>
-                                          </void>
-                                        </array>
-                                      </void>
-                                      <void property="executable">
-                                        <object class="java.io.File">
-                                          <string>grid</string>
-                                        </object>
-                                      </void>
-                                      <void property="showWindowsConsole">
-                                        <boolean>true</boolean>
-                                      </void>
-                                      <void property="wait">
-                                        <boolean>true</boolean>
-                                      </void>
-                                      <void property="workingDirectory">
-                                        <object class="java.io.File">
-                                          <string>.</string>
-                                        </object>
-                                      </void>
-                                    </object>
-                                  </java>
-                                </serializedBean>
-                                <condition />
-                              </action>
                               <action name="get tls keypair" id="2712" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Unable to generate container keypair">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
@@ -2148,36 +2147,7 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="logout" id="2718" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="false" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                                <serializedBean>
-                                  <java class="java.beans.XMLDecoder">
-                                    <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
-                                      <void property="arguments">
-                                        <array class="java.lang.String" length="2">
-                                          <void index="0">
-                                            <string>logout</string>
-                                          </void>
-                                          <void index="1">
-                                            <string>--all</string>
-                                          </void>
-                                        </array>
-                                      </void>
-                                      <void property="executable">
-                                        <object class="java.io.File">
-                                          <string>grid</string>
-                                        </object>
-                                      </void>
-                                      <void property="workingDirectory">
-                                        <object class="java.io.File">
-                                          <string>.</string>
-                                        </object>
-                                      </void>
-                                    </object>
-                                  </java>
-                                </serializedBean>
-                                <condition />
-                              </action>
-                              <action name="update keystore properties" id="3022" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                              <action name="update keystore properties" id="5007" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -2262,7 +2232,7 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="update keystore properties" id="3023" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                              <action name="update keystore properties" id="5005" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -2529,7 +2499,7 @@ port for you.</string>
                     </object>
                   </java>
                 </serializedBean>
-                <condition>context.getCompilerVariable("genii.isContainer").equals("true")</condition>
+                <condition>context.getCompilerVariable("genii.isContainer").equals("true") </condition>
                 <validation />
                 <preActivation />
                 <postActivation />
@@ -3966,6 +3936,7 @@ return startService;</string>
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="false">
+    <mediaSet refId="2073" />
     <mediaSet refId="3416" />
   </buildIds>
   <buildOptions verbose="true" faster="false" disableSigning="false" debug="false" />

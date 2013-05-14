@@ -261,11 +261,11 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(null, null);
 
-			/* place the resource's cert chain and epi in the working context --
-			 necessary for
-			 response message-security in case we actually delete this
-			 resource
-			 as part of this operation. */
+			/*
+			 * place the resource's cert chain and epi in the working context -- necessary for
+			 * response message-security in case we actually delete this resource as part of this
+			 * operation.
+			 */
 			IResource resource = ResourceManager.getCurrentResource().dereference();
 			Certificate[] targetCertChain = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			String epi = (resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME)).toString();
@@ -340,15 +340,16 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					if (_logger.isTraceEnabled())
 						_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
 					try {
-						if (callerCertChain[0].equals(assertion.getRootOfTrust().getDelegatee()[0])) {
-							if (_logger.isTraceEnabled())
-								_logger.trace("...found the initial delegatee to be the same as tls cert.");
+						if (assertion.findDelegateeInChain(callerCertChain[0]) >= 0) {
+////							callerCertChain[0].equals(assertion.getRootOfTrust().getDelegatee()[0])) {
+							if (_logger.isDebugEnabled())
+								_logger.debug("...found delegatee at position " + assertion.findDelegateeInChain(callerCertChain[0]) + " to be the same as incoming tls cert.");
 							match = true;
 							break;
 						} else if (CertificateValidatorFactory.getValidator().validateCertInKeyStore(
 							assertion.getOriginalAsserter(), SecurityUtils.getResourceTrustStore()) == true) {
 							if (_logger.isTraceEnabled())
-								_logger.trace("...allowed incoming message using resource trust store.");
+								_logger.trace("...allowed incoming message using resource trust store for original asserter.");
 							match = true;
 							break;
 						} else {
@@ -494,15 +495,19 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	private void populateSAMLPropertiesInContext(WorkingContext workingContext, ICallingContext callContext)
 	{
 
-		// We retrieve delegated SAML credentials from the working context and store them in the
-		// calling context. This is done because we traditionally use the calling context, not the
-		// working context, for all security related purposes. Furthermore, this usage matches the
+		// We retrieve delegated SAML credentials from the working context and
+		// store them in the
+		// calling context. This is done because we traditionally use the
+		// calling context, not the
+		// working context, for all security related purposes. Furthermore, this
+		// usage matches the
 		// client-side credentials handling logic.
 		CredentialWallet credentialsWallet =
 			(CredentialWallet) workingContext.getProperty(SAMLConstants.SAML_CREDENTIALS_WORKING_CONTEXT_CREDS_PROPERTY_NAME);
 		callContext.setTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME, credentialsWallet);
 
-		// Like the credential wallet, we copy client's SSL certificate from the working context to
+		// Like the credential wallet, we copy client's SSL certificate from the
+		// working context to
 		// the calling context.
 		X509Certificate[] clientSSLCertificate =
 			(X509Certificate[]) workingContext.getProperty(SAMLConstants.SAML_CLIENT_SSL_CERTIFICATE_PROPERTY_NAME);
@@ -551,7 +556,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 					switch (pc.getUsage()) {
 						case WSPasswordCallback.USERNAME_TOKEN:
-							// broken, but WSS4J seems to call USERNAME_TOKEN_UNKNOWN
+							// broken, but WSS4J seems to call
+							// USERNAME_TOKEN_UNKNOWN
 							// case below anyway
 
 							/*
