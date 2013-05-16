@@ -75,10 +75,19 @@
 		</exec>
 	</target>
 
-	<target name="subprojects" >
+	<!-- a helper target that gets out the latest libraries from svn and builds them. -->
+	<target name="update" >
 		<exec executable="bash" failonerror="true">
 			<arg value="scripts/build_dependencies.sh"/>
 			<arg value="update"/>
+			<arg value="trunk"/>
+		</exec>
+	</target>
+
+	<!-- the normal target for building the subprojects; does not update them first. -->
+	<target name="subprojects" >
+		<exec executable="bash" failonerror="true">
+			<arg value="scripts/build_dependencies.sh"/>
 			<arg value="trunk"/>
 		</exec>
 	</target>
