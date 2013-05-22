@@ -296,6 +296,8 @@ public class Container extends ApplicationBase
 				_logger.warn(String.format("Unable to configure service:  %s.", service), cause);
 			}
 		}
+		
+		ServerWSDoAllReceiver.beginNormalRuntime();
 	}
 
 	@SuppressWarnings("unchecked")

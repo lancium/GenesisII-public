@@ -5,7 +5,7 @@
   <parameter name="disablePrettyXML" value="true"/>
   <parameter name="adminPassword" value="admin"/>
 <!--
-  <parameter name="attachments.Directory" value="/home/mmm2a/workspace/vcgr-htc/webapps/axis/WEB-INF/attachments"/>
+  <parameter name="attachments.Directory" value="/home/fred/attachments-crud"/>
 -->
   <parameter name="dotNetSoapEncFix" value="true"/>
   <parameter name="enableNamespacePrefixOptimization" value="false"/>

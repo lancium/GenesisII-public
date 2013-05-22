@@ -16,6 +16,10 @@ package edu.virginia.vcgr.genii.container.axis;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.SocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -24,6 +28,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Vector;
 
@@ -96,6 +101,14 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 	private static PrivateKey _serverPrivateKey;
 
+	// startup mode is true until the container tells us we are ready to go.
+	private static volatile Boolean _inStartupMode = true;
+
+	public final static int MAXIMUM_CONCURRENT_CLIENTS = 32;
+
+	// tracks how many clients are currently requesting rpc services.
+	private static volatile Integer _concurrentCalls = 0;
+
 	public ServerWSDoAllReceiver()
 	{
 	}
@@ -110,6 +123,14 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		setOption(WSHandlerConstants.USER, GenesisIIConstants.CRYPTO_ALIAS);
 	}
 
+	public static void beginNormalRuntime()
+	{
+		_logger.info("Server starting normal runtime; allowing incoming off-machine connections.");
+		synchronized (_inStartupMode) {
+			_inStartupMode = false;
+		}
+	}
+
 	public ServerWSDoAllReceiver(PrivateKey serverPrivateKey)
 	{
 		_serverPrivateKey = serverPrivateKey;
@@ -117,7 +138,26 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 	public void invoke(MessageContext msgContext) throws AxisFault
 	{
+		int currentClients = 0;
+		synchronized (_concurrentCalls) {
+			// snapshot here for check...
+			currentClients = _concurrentCalls;
+		}
+		if (_concurrentCalls >= MAXIMUM_CONCURRENT_CLIENTS) {
+			String msg = "Refusing call due to too many concurrent clients; please try again.";
+			_logger.warn(msg);
+			throw new AuthZSecurityException(msg);
+		}
+		synchronized (_concurrentCalls) {
+			_concurrentCalls++;
+			// snapshot client count here to avoid logging inside synchronization.
+			currentClients = _concurrentCalls;
+		}
+		if (_logger.isDebugEnabled())
+			_logger.debug("concurrent client count up to " + currentClients);
+
 		try {
+
 			IResource resource = ResourceManager.getCurrentResource().dereference();
 
 			IAuthZProvider authZHandler =
@@ -151,17 +191,28 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			}
 			resource.commit();
 
+			// process all incoming security headers
+			super.invoke(msgContext);
+			// check authorization.
+			performAuthz();
+
+		} catch (AxisFault e) {
+			// re-throw and also hit the finally clause to decrement concurrency counter.
+			throw e;
 		} catch (Exception e) {
-			String msg = "An error occurred while receiving security headers on the server side: " + e.getMessage();
+			// wrap this exception and re-throw.
+			String msg = "An exception occurred while receiving security headers on the server side: " + e.getMessage();
 			_logger.error(msg);
 			throw new AxisFault(msg, e);
+		} finally {
+			synchronized (_concurrentCalls) {
+				_concurrentCalls--;
+				currentClients = _concurrentCalls;
+			}
+			if (_logger.isDebugEnabled())
+				_logger.debug("concurrent client count down to " + currentClients);
+
 		}
-
-		// process all incoming security headers
-		super.invoke(msgContext);
-
-		// check authorization.
-		performAuthz();
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -341,9 +392,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 						_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
 					try {
 						if (assertion.findDelegateeInChain(callerCertChain[0]) >= 0) {
-////							callerCertChain[0].equals(assertion.getRootOfTrust().getDelegatee()[0])) {
+							// //
+							// callerCertChain[0].equals(assertion.getRootOfTrust().getDelegatee()[0]))
+							// {
 							if (_logger.isDebugEnabled())
-								_logger.debug("...found delegatee at position " + assertion.findDelegateeInChain(callerCertChain[0]) + " to be the same as incoming tls cert.");
+								_logger.debug("...found delegatee at position "
+									+ assertion.findDelegateeInChain(callerCertChain[0])
+									+ " to be the same as incoming tls cert.");
 							match = true;
 							break;
 						} else if (CertificateValidatorFactory.getValidator().validateCertInKeyStore(
@@ -394,18 +449,10 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			// tokens should be within CALLER_CREDENTIALS_PROPERTY by now.
 			ICallingContext callContext = ContextManager.getExistingContext();
 
-			populateSAMLPropertiesInContext(workingContext, callContext);
-
-			// Get the destination certificate from the calling context
-			KeyAndCertMaterial targetKeyMaterial = ContextManager.getExistingContext().getActiveKeyAndCertMaterial();
-			X509Certificate[] targetCertChain = null;
-			if (targetKeyMaterial != null) {
-				targetCertChain = targetKeyMaterial._clientCertChain;
-			}
-
-			// Create a list of public certificate chains that have been
-			// verified as holder-of-key (e.g., though SSL or
-			// message-level security).
+			/*
+			 * Create a list of public certificate chains that have been verified as holder-of-key
+			 * (e.g., though SSL or message-level security).
+			 */
 			ArrayList<X509Certificate[]> authenticatedCertChains = new ArrayList<X509Certificate[]>();
 
 			// Grab the client-hello authenticated SSL cert-chain (if there
@@ -414,6 +461,44 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				(org.mortbay.jetty.Request) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
 			Object transport = req.getConnection().getEndPoint().getTransport();
 			if (transport instanceof SSLSocket) {
+				// hmmm: new code to prevent off machine connections during startup.
+				boolean stillStarting;
+				synchronized (_inStartupMode) {
+					stillStarting = _inStartupMode;
+				}
+				if (stillStarting == true) {
+					HashSet<String> ips = new HashSet<String>();
+
+					// hmmm: move this code!
+					Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+					StringBuilder log = new StringBuilder();
+					while (e.hasMoreElements()) {
+						NetworkInterface n = (NetworkInterface) e.nextElement();
+						Enumeration<InetAddress> ee = n.getInetAddresses();
+						while (ee.hasMoreElements()) {
+							InetAddress i = (InetAddress) ee.nextElement();
+							ips.add(i.getHostAddress());
+							if (_logger.isDebugEnabled())
+								log.append(i.getHostAddress() + " ");
+						}
+					}
+					if (_logger.isDebugEnabled())
+						_logger.debug("IP addresses for server: " + log);
+					SocketAddress addr = ((SSLSocket) transport).getRemoteSocketAddress();
+					String clientIP = "";
+					if (addr instanceof InetSocketAddress) {
+						clientIP = ((InetSocketAddress) addr).getAddress().getHostAddress();
+					}
+					if (ips.contains(clientIP) == true) {
+						if (_logger.isDebugEnabled())
+							_logger.debug("startup: allowing client on local address: " + clientIP);
+					} else {
+						if (_logger.isDebugEnabled())
+							_logger.debug("startup: rejecting client at remote address: " + clientIP);
+						throw new AxisFault("container in startup mode; access temporarily denied for remote connections.");
+					}
+				}
+
 				try {
 					X509Certificate[] clientSslCertChain =
 						(X509Certificate[]) ((SSLSocket) transport).getSession().getPeerCertificates();
@@ -421,8 +506,16 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 						authenticatedCertChains.add(clientSslCertChain);
 					}
 				} catch (SSLPeerUnverifiedException unverified) {
-
 				}
+			}
+
+			populateSAMLPropertiesInContext(workingContext, callContext);
+
+			// Get the destination certificate from the calling context
+			KeyAndCertMaterial targetKeyMaterial = ContextManager.getExistingContext().getActiveKeyAndCertMaterial();
+			X509Certificate[] targetCertChain = null;
+			if (targetKeyMaterial != null) {
+				targetCertChain = targetKeyMaterial._clientCertChain;
 			}
 
 			// Retrieve the message-level cert-chains that have been

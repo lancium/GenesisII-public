@@ -34,7 +34,6 @@ public class DatabaseConnectionPool
 	static private final String _SPECIAL_STRING = "${server-dir}";
 
 	static private final String _DB_POOL_SIZE_DEFAULT = "16";
-	// static private final long REJUVENATION_CYCLE = 1000L * 60 * 1;
 
 	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
 
@@ -106,8 +105,8 @@ public class DatabaseConnectionPool
 			_logger.debug("Acquiring DB connection[" + _connPool.size() + "]");
 		boolean succeeded = false;
 
-		int maxSnooze = 30 * 1000; // 10 seconds, in miliseconds.
-		int eachSleep = 40; // number of milliseconds to snooze.
+		int maxSnooze = 4 * 1000; // 4 seconds, in miliseconds.
+		int eachSleep = 500; // number of milliseconds to snooze between lock attempts.
 		int attempts = maxSnooze / eachSleep + 1;
 
 		for (int lcv = 0; lcv < attempts; lcv++) {
