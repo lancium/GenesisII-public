@@ -102,12 +102,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	private static PrivateKey _serverPrivateKey;
 
 	// startup mode is true until the container tells us we are ready to go.
-	private static volatile Boolean _inStartupMode = true;
+	private static volatile Boolean _inStartupMode = new Boolean(true);
 
 	public final static int MAXIMUM_CONCURRENT_CLIENTS = 32;
 
-	// tracks how many clients are currently requesting rpc services.
-	private static volatile Integer _concurrentCalls = 0;
+	// tracks how many clients are currently requesting RPC services.
+	private static volatile Integer _concurrentCalls = new Integer(0);
 
 	public ServerWSDoAllReceiver()
 	{
@@ -141,20 +141,20 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		int currentClients = 0;
 		synchronized (_concurrentCalls) {
 			// snapshot here for check...
-			currentClients = _concurrentCalls;
+			currentClients = _concurrentCalls.intValue();
 		}
-		if (_concurrentCalls >= MAXIMUM_CONCURRENT_CLIENTS) {
+		if (_concurrentCalls.intValue() >= MAXIMUM_CONCURRENT_CLIENTS) {
 			String msg = "Refusing call due to too many concurrent clients; please try again.";
 			_logger.warn(msg);
 			throw new AuthZSecurityException(msg);
 		}
 		synchronized (_concurrentCalls) {
-			_concurrentCalls++;
+			_concurrentCalls = new Integer(_concurrentCalls.intValue() + 1);
 			// snapshot client count here to avoid logging inside synchronization.
-			currentClients = _concurrentCalls;
+			currentClients = _concurrentCalls.intValue();
 		}
 		if (_logger.isDebugEnabled())
-			_logger.debug("concurrent client count up to " + currentClients);
+			_logger.debug("rpc clients up to " + currentClients);
 
 		try {
 
@@ -198,19 +198,21 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 		} catch (AxisFault e) {
 			// re-throw and also hit the finally clause to decrement concurrency counter.
+			String msg = "An AxisFault occurred during authorization: " + e.getMessage();
+			_logger.error(msg);
 			throw e;
 		} catch (Exception e) {
 			// wrap this exception and re-throw.
-			String msg = "An exception occurred while receiving security headers on the server side: " + e.getMessage();
+			String msg = "An exception occurred during authorization: " + e.getMessage();
 			_logger.error(msg);
 			throw new AxisFault(msg, e);
 		} finally {
 			synchronized (_concurrentCalls) {
-				_concurrentCalls--;
-				currentClients = _concurrentCalls;
+				_concurrentCalls = new Integer(_concurrentCalls.intValue() - 1);
+				currentClients = _concurrentCalls.intValue();;
 			}
 			if (_logger.isDebugEnabled())
-				_logger.debug("concurrent client count down to " + currentClients);
+				_logger.debug("rpc clients down to " + currentClients);
 
 		}
 	}
