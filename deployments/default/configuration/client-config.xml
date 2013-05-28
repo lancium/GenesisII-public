@@ -105,10 +105,13 @@
 			locator-type="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnServiceLocator"/> -->
 		<locator interface="edu.virginia.vcgr.genii.tty.TTYPortType"
 			locator-type="edu.virginia.vcgr.genii.tty.TTYServiceLocator"/>
-        <locator interface="edu.virginia.vcgr.genii.notification.factory.EnhancedNotificationBrokerFactoryPortType"
-            locator-type="edu.virginia.vcgr.genii.notification.factory.EnhancedNotificationBrokerFactoryServiceLocator"/>
-        <locator interface="edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerPortType"
-            locator-type="edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerServiceLocator"/> 
+                <locator interface="edu.virginia.vcgr.genii.notification.factory.EnhancedNotificationBrokerFactoryPortType"
+                        locator-type="edu.virginia.vcgr.genii.notification.factory.EnhancedNotificationBrokerFactoryServiceLocator"/>
+                <locator interface="edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerPortType"
+                        locator-type="edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerServiceLocator"/> 
+                <locator interface="edu.virginia.vcgr.genii.dlog.DLogPortType"
+                        locator-type="edu.virginia.vcgr.genii.dlog.DLogServiceLocator"/> 
+
 	</genii:locator-registry>
 	
 	<genii:configured-instances>
@@ -305,6 +308,11 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ReplicateTool</mconf:class>
 		<mconf:class name="byteio"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOTool</mconf:class>
+                <mconf:class name="log"
+                        base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LogTool</mconf:class>
+                <mconf:class name="readlog"
+                        base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LogReaderTool</mconf:class>
+
 	</genii:tools>
 	
 	<genii:client-pipeline>
