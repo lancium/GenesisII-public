@@ -140,9 +140,10 @@ public class KerbAuthZProvider extends AclAuthZProvider
 		if (keypr == null) {
 			_logger.warn("INSECURE Kerberos authentication in realm " + realm + " due to missing keytab or principal!");
 			if (realm.equals("TERAGRID.ORG")) {
-				_logger.error("TERAGRID.ORG realm requires authorization to a service principal.  Please ensure "
-					+ "keytab and principal are defined in deployment's configuration/security.properties file.");
-				throw new SecurityException("");
+				String msg = "TERAGRID.ORG realm requires authorization to a service principal.  Please ensure "
+					+ "keytab and principal are defined in deployment's configuration/security.properties file.";
+				_logger.error(msg);
+				throw new SecurityException(msg);
 			}
 		}
 
@@ -174,7 +175,6 @@ public class KerbAuthZProvider extends AclAuthZProvider
 					Map<String, String> options = new HashMap<String, String>();
 					options.put("useTicketCache", "false");
 					options.put("refreshKrb5Config", "true");
-					options.put("doNotPrompt", "true");
 
 					// fill in the keytab and principal if we have them.
 					if (keypr != null) {
@@ -188,6 +188,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 								+ fullKeytabPath.getAbsolutePath());
 						options.put("keyTab", fullKeytabPath.getAbsolutePath());
 						options.put("principal", keypr._principal);
+						options.put("doNotPrompt", "true");
 					}
 
 					if (!realm.equals(System.getProperty("java.security.krb5.realm"))
