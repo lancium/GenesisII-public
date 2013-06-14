@@ -354,19 +354,18 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			_resourceLock.lock();
 			Timer rTimer = tSink.getTimer("Retrieve Entries");
 
-			if (lookupRequest == null || lookupRequest.length == 0) // A batch lookup
-			{
+			if (lookupRequest == null || lookupRequest.length == 0) {
+				// this is a batch lookup
 				lookupRequest = new String[] { null };
-				if (_resource.retrieveOccurrenceCount() > batchLimit) // we will be building an
-																		// iterator as number of
-																		// entries > threshold
+				// we will be building an iterator as number of entries > threshold.
+				if (_resource.retrieveOccurrenceCount() > batchLimit)
 					isIndexedIterate = true;
 			}
 
 			else {
-				if (lookupRequest.length > batchLimit) // Identify the number of responses by
-														// looking at the number of requests. There
-														// is a 1-1 correspondance between the two
+				// Identify the number of responses by looking at the number of requests. There is a
+				// 1-1 correspondence between the two.
+				if (lookupRequest.length > batchLimit)
 					isIndexedIterate = true;
 			}
 
@@ -380,29 +379,17 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 					if (imie.isExistent()) {
 						InternalEntry ie = _resource.retrieveInternalEntryFromID(imie.getId());
 
-						if (ie == null)
-							entries.add(new InternalEntry(imie.getEntryName(), null, null, false)); // this
-																									// shouldn't
-																									// happen
-																									// as
-																									// isExists
-																									// wouldn't
-																									// have
-																									// been
-																									// set
-						else
+						if (ie == null) {
+							// this shouldn't happen as isExists wouldn't have been set.
+							entries.add(new InternalEntry(imie.getEntryName(), null, null, false));
+						} else {
 							entries.add(ie);
-					}
-
-					else {
+						}
+					} else {
 						entries.add(new InternalEntry(imie.getEntryName(), null, null, false));
 					}
-
 				}
-
-			}
-
-			else {
+			} else {
 				for (String request : lookupRequest)
 					entries.addAll(_resource.retrieveEntries(request));
 			}
@@ -418,9 +405,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		Collection<RNSEntryResponseType> resultEntries = new LinkedList<RNSEntryResponseType>();
 		Timer prepTimer = tSink.getTimer("Prepare Entries");
 		for (InternalEntry internalEntry : entries) {
-			if (!internalEntry.isExistent()) // the looked-up entry does not exist . Only for
-												// non-batch
-			{
+			if (!internalEntry.isExistent()) {
+				// the looked-up entry does not exist . Only for non-batch
 				String name = internalEntry.getName();
 				RNSEntryResponseType entry =
 					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null,
@@ -442,7 +428,6 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		Timer createTimer = tSink.getTimer("Create Iterator");
 		try {
 			InMemoryIteratorWrapper imiw = new InMemoryIteratorWrapper(this.getClass().getName(), indices, null);
-
 			return RNSContainerUtilities.indexedTranslate(resultEntries, iteratorBuilder(RNSEntryResponseType.getTypeDesc()
 				.getXmlType()), imiw);
 		} finally {

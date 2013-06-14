@@ -146,7 +146,6 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 	 */
 	public PortType[] getImplementedPortTypes(ResourceKey rKey) throws ResourceException, ResourceUnknownFaultType
 	{
-
 		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource))) {
 			// JNDIAuthnPortType
 			PortType[] response = { WellKnownPortTypes.RNS_PORT_TYPE(), WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE() };

@@ -556,6 +556,18 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		RNSResourceFork fork = (RNSResourceFork) tFork;
 		AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();
 
+		if (_logger.isTraceEnabled()) {
+			StringBuilder tony = new StringBuilder();
+			if (lookupRequest == null) {
+				tony.append("null ");
+			} else {
+				for (String s : lookupRequest) {
+					tony.append(s + " ");
+				}
+			}
+			_logger.trace("looking up: " + tony.toString());
+		}
+
 		try {
 			/* Complete listing ! */
 			if (lookupRequest == null || lookupRequest.length == 0) {
@@ -563,24 +575,17 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 
 				if (fork.isInMemoryIterable()) {
 					InMemoryIterableFork iFork = fork.getInMemoryIterableFork();
-
-					if (iFork == null)
+					if (iFork == null) {
 						entries = fork.list(getExemplarEPR(), null);
-
-					else {
-
+					} else {
 						IterableSnapshot snapshot = iFork.splitAndList(getExemplarEPR(), getResourceKey());
-
 						entries = snapshot.getReturns();
 						wrapper = snapshot.getWrapper();
-
 					}
-				}
-
-				// Not in-memory iterable
-				else
+				} else {
+					// Not in-memory iterable.
 					entries = fork.list(getExemplarEPR(), null);
-
+				}
 				timer.noteTime();
 			}
 
