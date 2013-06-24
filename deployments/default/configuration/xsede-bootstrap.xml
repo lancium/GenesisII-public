@@ -149,6 +149,8 @@
                 <gsh:param>/groups/xcg.virginia.edu</gsh:param>
                 <gsh:param>/home/xcg.virginia.edu</gsh:param>
                 <gsh:param>/resources/xcg.virginia.edu/containers</gsh:param>
+                <gsh:param>/resources/xcg.virginia.edu/bes-containers</gsh:param>
+                <gsh:param>/resources/xcg.virginia.edu/queues</gsh:param>
         </geniix:mkdir>
 
 	<geniix:ln>
@@ -312,6 +314,16 @@
         </geniix:chmod>
 	<geniix:chmod>
 		<gsh:param>/resources/xcg.virginia.edu/containers</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/resources/xcg.virginia.edu/bes-containers</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/resources/xcg.virginia.edu/queues</gsh:param>
                 <gsh:param>+rwx</gsh:param>
                 <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
         </geniix:chmod>
