@@ -148,7 +148,7 @@
                 <gsh:param>/users/xcg.virginia.edu</gsh:param>
                 <gsh:param>/groups/xcg.virginia.edu</gsh:param>
                 <gsh:param>/home/xcg.virginia.edu</gsh:param>
-                <gsh:param>/resources/xcg.virginia.edu</gsh:param>
+                <gsh:param>/resources/xcg.virginia.edu/containers</gsh:param>
         </geniix:mkdir>
 
 	<geniix:ln>
@@ -256,6 +256,30 @@
                 <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
         </geniix:chmod>
 
+	<!-- chmod /bin +rwx gffs-admins, +r gffs-users -->
+	<geniix:chmod>
+		<gsh:param>/bin</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/bin</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /doc +rwx gffs-admins, +r everyone -->
+	<geniix:chmod>
+		<gsh:param>/doc</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/doc</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
 	<!-- chmod /resources/xsede.org +rwx gffs-admins, +r gffs-users -->
 	<geniix:chmod>
 		<gsh:param>/resources/xsede.org</gsh:param>
@@ -278,6 +302,18 @@
 		<gsh:param>/resources/xsede.org/queues</gsh:param>
                 <gsh:param>+r</gsh:param>
                 <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /resources/xcg.virginia.edu +rwx gffs-admins -->
+	<geniix:chmod>
+		<gsh:param>/resources/xcg.virginia.edu</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/resources/xcg.virginia.edu/containers</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
         </geniix:chmod>
 
 	<gsh:echo message="Setting security on container ${BOOTSTRAP_CONTAINER}"/>	
