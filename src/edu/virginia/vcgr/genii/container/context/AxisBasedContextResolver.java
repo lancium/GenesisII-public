@@ -15,9 +15,11 @@ package edu.virginia.vcgr.genii.container.context;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -58,16 +60,27 @@ public class AxisBasedContextResolver implements IContextResolver
 
 	private static Log _logger = LogFactory.getLog(AxisBasedContextResolver.class);
 
-	static private void storeToFile(Element em) throws IOException
+	static private void storeToFile(Element em, String homeDir) throws IOException
 	{
 		/* For debugging only */
-		/*
-		 * File dir = new File("/Users/morgan/all-contexts"); dir.mkdirs(); for (int lcv = 0; true;
-		 * lcv++) { File file = new File(dir, String.format("context.%d", lcv)); if
-		 * (file.createNewFile()) { PrintWriter writer = new PrintWriter(file); MessageElement me =
-		 * new MessageElement(em); try { writer.println(me.getAsString()); } catch (Exception e) {
-		 * throw new IOException("Unable to serialize!", e); } writer.close(); return; } }
-		 */
+		File dir = new File(homeDir + "/all-contexts");
+		dir.mkdirs();
+		for (int lcv = 0; true; lcv++) {
+			File file = new File(dir, String.format("context.%d", lcv));
+			if (file.createNewFile()) {
+				PrintWriter writer = new PrintWriter(file);
+				MessageElement me = new MessageElement(em);
+				try {
+					writer.println(me.getAsString());
+				} catch (Exception e) {
+					throw new IOException("Unable to serialize!", e);
+				} finally {
+					writer.close();					
+				}
+				return;
+			}
+		}
+		 
 	}
 
 	@SuppressWarnings("unchecked")
@@ -94,7 +107,11 @@ public class AxisBasedContextResolver implements IContextResolver
 					QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
 					if (heName.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME)) {
 						Element em = ((MessageElement) he).getRealElement();
-						storeToFile(em);
+						// debugging call.
+						boolean debuggingMode = false;
+						if (debuggingMode == true) {							
+							storeToFile(em, System.getProperty("user.home"));
+						}
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						PrintStream ps = new PrintStream(baos);
 						ps.println(em);
@@ -128,7 +145,8 @@ public class AxisBasedContextResolver implements IContextResolver
 		try {
 			PrivateKey privateKey = (PrivateKey) resource.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
 			if (privateKey != null) {
-				_logger.info("Using resource's own private key: " + ResourceManager.getCurrentResource().getServiceName());
+				if (_logger.isDebugEnabled())
+					_logger.debug("Using resource's own private key: " + ResourceManager.getCurrentResource().getServiceName());
 			}
 			Certificate[] targetCertChain = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			if ((targetCertChain != null) && (targetCertChain.length > 0)) {

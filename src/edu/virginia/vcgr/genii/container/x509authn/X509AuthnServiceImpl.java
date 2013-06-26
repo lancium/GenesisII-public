@@ -272,7 +272,6 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		}
 
 		// Assemble response.
-
 		ArrayList<RequestSecurityTokenResponseType> responseArray = new ArrayList<RequestSecurityTokenResponseType>();
 
 		try {
@@ -518,12 +517,6 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			if (newTC != null) {
 				// add the newly minted credential into the list to send back.
 				creds.getRealCreds().addCredential(newTC);
-				/*
-				 * we now add the credential to the calling context also, since the actor may need
-				 * to be in possession of their full identity for the steps of aggregating the
-				 * baggage tokens (logging into groups).
-				 */
-				// TransientCredentials.getTransientCredentials(callingContext).add(newTC);
 			}
 		}
 

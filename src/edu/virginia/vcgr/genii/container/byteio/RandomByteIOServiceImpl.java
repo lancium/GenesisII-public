@@ -283,7 +283,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 		if (segmentList.size() == 0) {
 			return;
 		}
-		// TODO incrementVersionLockCount(_resource);
+		// TODO: incrementVersionLockCount(_resource);
 		_resourceLock.unlock();
 		try {
 			EndpointReferenceType primaryEPR =
@@ -296,7 +296,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			}
 		} finally {
 			_resourceLock.lock();
-			// TODO decrementVersionLockCount(_resource);
+			// TODO: decrementVersionLockCount(_resource);
 		}
 		RandomAccessFile raf = null;
 		bitmapFile = null;

@@ -200,6 +200,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			// re-throw and also hit the finally clause to decrement concurrency counter.
 			String msg = "An AxisFault occurred during authorization: " + e.getMessage();
 			_logger.error(msg);
+			if (_logger.isDebugEnabled()) {
+				_logger.error("AxisFault full trace: ", e);
+			}
 			throw e;
 		} catch (Exception e) {
 			// wrap this exception and re-throw.

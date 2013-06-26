@@ -41,8 +41,8 @@ public class LightWeightExportUtils
 				 * 
 				 * vroot = new SVNExportRoot(rootDirString, (String)resource.getProperty(
 				 * LightWeightExportConstants.SVN_USER_PROPERTY_NAME), (String)resource.getProperty(
-				 * LightWeightExportConstants.SVN_PASS_PROPERTY_NAME), revision); // TODO: if
-				 * (revision == null) return vroot; } else
+				 * LightWeightExportConstants.SVN_PASS_PROPERTY_NAME), revision); 
+				 * if (revision == null) return vroot; } else
 				 */
 				{
 					File root = new File(rootDirString);

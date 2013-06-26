@@ -498,7 +498,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		topic.publish(new RNSOperationContents(RNSOperations.Remove, name, null, vvr));
 	}
 
-	// TODO setResourceProperties() does not send "policy" update.
+	// TODO: setResourceProperties() does not send "policy" update.
 
 	/**
 	 * Given a new resource which was just created and which is about to be added to this directory
