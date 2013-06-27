@@ -2,6 +2,7 @@
 
 <!-- Author: Vanamala Venkataswamy (xsede namespace, increment 3) -->
 <!-- Author: Mark Morgan (certificate code) -->
+<!-- Author: Chris Koeritz (xsede increment 1 & 2 updates) -->
 
 <gsh:script
 	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
