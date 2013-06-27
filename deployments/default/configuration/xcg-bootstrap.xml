@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<!-- Author: Mark Morgan? -->
-<!-- Modified by: Chris Koeritz -->
+<!-- Author: Mark Morgan -->
+<!-- Author: Chris Koeritz (xsede increment 1 & 2 updates) -->
 
 <gsh:script
 	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
