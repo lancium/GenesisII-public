@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<!-- Author: Mark Morgan? -->
+<!-- Author: Vanamala Venkataswamy  -->
+<!-- Initial version: Mark Morgan? -->
 <!-- Modified by: Chris Koeritz (xsede increments 1 & 2) -->
-<!-- Modified by: Vanamala Venkataswamy (namespace updates for xsede increment 3) -->
 
 <gsh:script
 	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
@@ -271,7 +271,7 @@
 	<geniix:chmod>
 		<gsh:param>/users/deleted.xsede.org</gsh:param>
                 <gsh:param>+rwx</gsh:param>
-                <gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
         </geniix:chmod>
 
 	<!-- chmod /groups/xsede.org +rwx gffs-admins, +r gffs-users -->
