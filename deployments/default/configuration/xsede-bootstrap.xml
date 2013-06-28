@@ -56,8 +56,6 @@
 		<gsh:param>/resources/xsede.org</gsh:param>
 		<gsh:param>/resources/xsede.org/queues</gsh:param>
 		<gsh:param>/resources/xsede.org/containers</gsh:param>
-		<gsh:param>/resources/xsede.org/bes-containers</gsh:param>
-		<gsh:param>/resources/xsede.org/storage-containers</gsh:param>
 	</geniix:mkdir>
 	<geniix:chmod>
 		<gsh:param>/resources</gsh:param>
