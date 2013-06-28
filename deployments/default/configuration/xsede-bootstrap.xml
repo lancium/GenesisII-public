@@ -375,30 +375,6 @@
                 <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
         </geniix:chmod>
 
-	<!-- chmod /resources/xsede.org/bes-containers +rwx gffs-admins, +r gffs-users -->
-	<geniix:chmod>
-		<gsh:param>/resources/xsede.org/bes-containers</gsh:param>
-                <gsh:param>+rwx</gsh:param>
-                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
-        </geniix:chmod>
-	<geniix:chmod>
-		<gsh:param>/resources/xsede.org/bes-containers</gsh:param>
-                <gsh:param>+r</gsh:param>
-                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
-        </geniix:chmod>
-
-	<!-- chmod /resources/xsede.org/storage-containers +rwx gffs-admins, +r gffs-users -->
-	<geniix:chmod>
-		<gsh:param>/resources/xsede.org/storage-containers</gsh:param>
-                <gsh:param>+rwx</gsh:param>
-                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
-        </geniix:chmod>
-	<geniix:chmod>
-		<gsh:param>/resources/xsede.org/storage-containers</gsh:param>
-                <gsh:param>+r</gsh:param>
-                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
-        </geniix:chmod>
-
 	<!-- chmod /resources/xcg.virginia.edu +rwx gffs-admins -->
 	<geniix:chmod>
 		<gsh:param>/resources/xcg.virginia.edu</gsh:param>
