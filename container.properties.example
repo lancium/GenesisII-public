@@ -2,6 +2,6 @@
   # the env-GENII_USER_DIR value above will be translated into the value of
   # the GENII_USER_DIR variable in the environment.
 
-#edu.virginia.vcgr.genii.container.deployment-name=xcg3
+edu.virginia.vcgr.genii.container.deployment-name=example
   # this should be changed to the actual deployment name in use.
 
