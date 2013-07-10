@@ -462,6 +462,8 @@
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
+          <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
+          <archive location="ext/log4j-1.2.17.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories>
           <directory name="jni-lib" />
@@ -494,6 +496,8 @@
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
+          <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
+          <archive location="ext/log4j-1.2.17.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories>
           <directory name="jni-lib" />
@@ -527,6 +531,8 @@
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
+          <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
+          <archive location="ext/log4j-1.2.17.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories>
           <directory name="jni-lib" />
@@ -559,6 +565,8 @@
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
+          <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
+          <archive location="ext/log4j-1.2.17.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories>
           <directory name="jni-lib" />
@@ -591,6 +599,8 @@
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
+          <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
+          <archive location="ext/log4j-1.2.17.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories>
           <directory name="jni-lib" />

@@ -54,6 +54,7 @@
 		<antcall target="jni-lin32" />
 		<antcall target="jni-lin64" />
 		<antcall target="jni-win32" />
+		<antcall target="jni-win64" />
 		<antcall target="jni-osx64" />
 	</target>
 
@@ -69,9 +70,15 @@
 		</antcall>
 	</target>
 	
-	<target name="jni-win32" if="windows.scripts">
+	<target name="jni-win32" if="windows.32">
 		<antcall target="set-jni-replace">
 			<param name="build-target-jni" value="jni-libs/win32"/>
+		</antcall>
+	</target>
+	
+	<target name="jni-win64" if="windows.64">
+		<antcall target="set-jni-replace">
+			<param name="build-target-jni" value="jni-libs/win64"/>
 		</antcall>
 	</target>
 	
@@ -150,6 +157,22 @@
 				<isset property="linux.scripts" />
 				<not>
 					<isset property="linux.64" />
+				</not>
+			</and>
+    		</condition>
+
+		<condition property="windows.64">
+			<and>
+				<isset property="windows.scripts" />
+				<equals arg1="${build.targetArch}" arg2="64"/>
+			</and>
+		</condition>
+		
+		<condition property="windows.32">
+			<and>
+				<isset property="windows.scripts" />
+				<not>
+					<isset property="windows.64" />
 				</not>
 			</and>
     		</condition>

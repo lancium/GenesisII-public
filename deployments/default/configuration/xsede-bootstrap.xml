@@ -2,7 +2,7 @@
 
 <!-- Author: Vanamala Venkataswamy (xsede namespace, increment 3) -->
 <!-- Author: Mark Morgan (certificate code) -->
-<!-- Author: Chris Koeritz (xsede increment 1 & 2 updates) -->
+<!-- Author: Chris Koeritz (xsede increment 1-3 updates) -->
 
 <gsh:script
 	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
@@ -50,12 +50,27 @@
 		<gsh:param>--everyone</gsh:param>
 	</geniix:chmod>
 
-	<gsh:echo message="Creating /resources directory"/>
+	<gsh:echo message="Creating main containers directory"/>
 	<geniix:mkdir>
 		<gsh:param>-p</gsh:param>
-		<gsh:param>/resources/xsede.org</gsh:param>
-		<gsh:param>/resources/xsede.org/queues</gsh:param>
 		<gsh:param>/resources/xsede.org/containers</gsh:param>
+	</geniix:mkdir>
+
+	<geniix:ln>
+		<gsh:param>--service-url=https://localhost:${PORT}/axis/services/VCGRContainerPortType</gsh:param>
+		<gsh:param>${BOOTSTRAP_CONTAINER}</gsh:param>
+	</geniix:ln>
+
+	<geniix:chmod>
+		<gsh:param>${BOOTSTRAP_CONTAINER}/Services/EnhancedNotificationBrokerFactoryPortType</gsh:param>
+		<gsh:param>+rx</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</geniix:chmod>
+
+	<gsh:echo message="Creating queues directory"/>
+	<geniix:mkdir>
+		<gsh:param>-p</gsh:param>
+		<gsh:param>/resources/xsede.org/queues</gsh:param>
 	</geniix:mkdir>
 	<geniix:chmod>
 		<gsh:param>/resources</gsh:param>
@@ -158,9 +173,22 @@
                 <gsh:param>/resources/xcg.virginia.edu</gsh:param>
         </geniix:mkdir>
 
+        <gsh:echo message="Setting access on authorization port types"/>
+        <geniix:chmod>
+                <gsh:param>${BOOTSTRAP_CONTAINER}/Services/X509AuthnPortType</gsh:param>
+                <gsh:param>+rx</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+        <geniix:chmod>
+                <gsh:param>${BOOTSTRAP_CONTAINER}/Services/KerbAuthnPortType</gsh:param>
+                <gsh:param>+rx</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+	<gsh:echo message="adding temporary link for primary sts container"/>
 	<geniix:ln>
-		<gsh:param>--service-url=https://localhost:${PORT}/axis/services/VCGRContainerPortType</gsh:param>
 		<gsh:param>${BOOTSTRAP_CONTAINER}</gsh:param>
+		<gsh:param>/resources/xsede.org/containers/sts-1.xsede.org</gsh:param>
 	</geniix:ln>
 
 	<gsh:echo message="Adding gffs-admins group"/>
@@ -429,6 +457,12 @@
 		<gsh:param>--ks-alias=VCGR Container</gsh:param>
 		<gsh:param>/etc/ContainerGroupCertGenerator</gsh:param>
 	</geniix:cert-generator>
+
+	<geniix:chmod>
+		<gsh:param>/etc/ContainerGroupCertGenerator</gsh:param>
+		<gsh:param>+rx</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</geniix:chmod>
 
 	<gsh:echo message="Logging out"/>
 	<geniix:logout>

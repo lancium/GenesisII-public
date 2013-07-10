@@ -86,8 +86,8 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AclTopics;
 import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
-import edu.virginia.vcgr.genii.container.sync.DestroyFlags;
 import edu.virginia.vcgr.genii.container.sync.AclChangeNotificationHandler;
+import edu.virginia.vcgr.genii.container.sync.DestroyFlags;
 import edu.virginia.vcgr.genii.container.sync.MessageFlags;
 import edu.virginia.vcgr.genii.container.sync.ReplicationItem;
 import edu.virginia.vcgr.genii.container.sync.ReplicationThread;
@@ -191,6 +191,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	{
 		String filename = createFile.getFilename();
 		try {
+			// TODO - rather than building a list of all the files in the directory and seeing if this one is there - just check if is there
 			_resourceLock.lock();
 			Collection<String> entries = _resource.listEntries(filename);
 			_resource.commit();
@@ -201,7 +202,9 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 				throw FaultManipulator.fillInFault(fault);
 			}
 			// ASG modified to make a direct create in the current container
+			//System.err.println("About to create the file " + createFile.getFilename());
 			RandomByteIOServiceImpl service = new RandomByteIOServiceImpl();
+			//System.err.println("created the file");
 			String serviceURL = Container.getServiceURL("RandomByteIOPortType");
 			EndpointReferenceType entryReference = service.CreateEPR(null, serviceURL);
 

@@ -9,6 +9,7 @@ import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.stats.MethodDataPoint;
 import edu.virginia.vcgr.genii.client.stats.MethodHistogramStatistics;
+import edu.virginia.vcgr.genii.notification.broker.SubscriptionFailedFaultType;
 
 public class DatabaseHandler implements IAroundInvoker
 {
@@ -45,13 +46,17 @@ public class DatabaseHandler implements IAroundInvoker
 			succeeded = true;
 			return result;
 		} catch (Exception e) {
-			_logger.error("exception occurred in dbhandler invoke: " + e.getMessage(), e);
+			if ( (e.getCause() != null) && (e.getCause() instanceof SubscriptionFailedFaultType) ) {
+				_logger.info("subscription exception in dbhandler, rethrowing: " + e.getCause().getMessage());
+			} else {
+				_logger.error("exception occurred in dbhandler invoke: " + e.getMessage(), e);
+			}
 			throw e;
 		} finally {
 			mhs.removeActiveMethod();
 
 			if (!succeeded) {
-				_logger.error("Did not succeed at invoking method " + mdp.toString() + ".  Setting the context to failed.");
+				_logger.info("Did not succeed at invoking method " + mdp.toString() + ".  Marking context appropriately.");
 				mdp.complete(false);
 				try {
 					WorkingContext.getCurrentWorkingContext().setFailed();

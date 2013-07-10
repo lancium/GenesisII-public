@@ -15,6 +15,8 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
+import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AclAuthZProvider;
 import edu.virginia.vcgr.genii.iterator.IterableElementType;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
@@ -38,12 +40,41 @@ public class RNSContainerUtilities
 
 	public static LookupResponseType indexedTranslate(Iterable<RNSEntryResponseType> entries, IteratorBuilder<Object> builder,
 		InMemoryIteratorWrapper imiw) throws RemoteException
-	{
+ {
 
 		builder.preferredBatchSize(RNSConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(entries);
-
+		// Next create the iterator as before
 		IteratorInitializationType iit = builder.create(imiw);
+		// Changed by ASG to have RNS iterators have the same access control as
+		// the directory from which they are created. 7/3/2013
+		// First, get the ACL of the directory itself
+		// resource=null;
+		if (iit.getIteratorEndpoint() != null) {
+			Acl acl = null;
+			ResourceKey rKey = ResourceManager.getCurrentResource();
+			if (rKey != null) {
+				try {
+					// Get the access control list of the directory
+					acl = (Acl) rKey.dereference().getProperty(
+							AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+					// Now add "w" everyone -- so the client can clean up
+					// (destroy) the iterator properly later
+					acl.writeAcl.add(null);
+				} catch (ResourceException e1) {
+					_logger.warn("failed to look up the ACL for resource "
+							+ rKey.dereference());
+				}
+				// Now that the iterator is created and the ACL built up, set
+				// the ACL of the iterator to that of the directory.
+				ResourceManager
+						.getTargetResource(iit.getIteratorEndpoint())
+						.dereference()
+						.setProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME,
+								acl);
+			}
+		}
+
 		Collection<RNSEntryResponseType> batch = null;
 		IterableElementType[] iet = iit.getBatchElement();
 		if (iet != null && iet.length > 0) {
@@ -57,8 +88,9 @@ public class RNSContainerUtilities
 			}
 		}
 
-		return new LookupResponseType(batch == null ? null : batch.toArray(new RNSEntryResponseType[batch.size()]),
-			iit.getIteratorEndpoint());
+		return new LookupResponseType(batch == null ? null
+				: batch.toArray(new RNSEntryResponseType[batch.size()]),
+				iit.getIteratorEndpoint());
 	}
 
 	public static NuCredential loadRNSResourceCredential(IRNSResource resource)
