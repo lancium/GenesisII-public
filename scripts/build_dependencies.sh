@@ -5,8 +5,7 @@
 # on storing jars into the ext directory.
 
 # the svn repository at the root of the libraries.
-#LIBRARY_REPO="svn://svn.xcg.virginia.edu:9002/GENREPO/libraries"
-LIBRARY_REPO="svn://svn.xcg.virginia.edu:9002/GENREPO/GenesisII/branches/cak0l/libraries"
+LIBRARY_REPO="svn://svn.xcg.virginia.edu:9002/GENREPO/libraries"
 
 # WORKDIR is the directory where this script started out in.
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
