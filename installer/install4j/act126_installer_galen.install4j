@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.5" transformSequenceNumber="4">
   <directoryPresets config="" />
-  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesis2.virginia.edu" version="2.7.21" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
+  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="XSEDE: Extreme Science and Engineering Discovery Environment" publisherWeb="xsede.org" version="2.7.26" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="5829" description="" category="" />
+      <variable name="genii.build-number" value="5948" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -81,7 +81,7 @@
           <entry location="security/skynet.cer" fileType="regular" />
         </exclude>
       </dirEntry>
-      <dirEntry mountPoint="3421" file="../../deployments/installer_base/xcg3" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
+      <dirEntry mountPoint="3421" file="../../deployments/installer_base/act126_galen" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude />
       </dirEntry>
       <fileEntry mountPoint="3944" file="../unlimited_jce_java7/US_export_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
@@ -756,7 +756,7 @@
                             <string>if ((Integer)context.getVariable("genii.deployment-index") == 0) {
     String depName = "current_grid";
     context.setVariable("genii.deployment", depName);
-    String connUrl = "deployments/current_grid/xcg3_context.xml";
+    String connUrl = "deployments/current_grid/act126_context.xml";
     context.setVariable("genii.connect-url", connUrl);
     context.setVariable("genii.patch-url", "DISABLED");
 }
@@ -864,7 +864,7 @@ return true;
                       <void property="listEntries">
                         <array class="java.lang.String" length="1">
                           <void index="0">
-                            <string>Cross Campus Grid (XCG)</string>
+                            <string>Galen's SDIACT-126 Test Grid</string>
                           </void>
                         </array>
                       </void>
@@ -1670,7 +1670,7 @@ return true;</string>
                           </void>
                           <void property="text">
                             <string>edu.virginia.vcgr.genii.container.deployment-name=${installer:genii.deployment}
-edu.virginia.vcgr.genii.gridInitCommand="local:${installer:gen.fixedInstallDir}/deployments/${installer:genii.deployment}/xcg3_context.xml" "${installer:genii.deployment}"
+edu.virginia.vcgr.genii.gridInitCommand="local:${installer:gen.fixedInstallDir}/deployments/${installer:genii.deployment}/act126_context.xml" "${installer:genii.deployment}"
 </string>
                           </void>
                         </object>
@@ -1825,7 +1825,7 @@ return !ownerCer.exists();</string>
                                         <string>download-certificate</string>
                                       </void>
                                       <void index="1">
-                                        <string>/users/${installer:genii.owner-username}</string>
+                                        <string>/users/xsede.org/${installer:genii.owner-username}</string>
                                       </void>
                                       <void index="2">
                                         <string>local:owner.cer</string>
@@ -2054,9 +2054,6 @@ return !ownerCer.exists();</string>
                                     <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
                                       <void property="checkboxText">
                                         <string>Use Grid Keypair Generating Service</string>
-                                      </void>
-                                      <void property="initiallySelected">
-                                        <boolean>true</boolean>
                                       </void>
                                       <void property="variableName">
                                         <string>genii.cert-generator</string>
