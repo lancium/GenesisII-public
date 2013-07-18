@@ -167,12 +167,6 @@
                 <gsh:param>--everyone</gsh:param>
         </geniix:chmod>
 
-        <gsh:echo message="Creating /resources/xcg.virginia.edu directory"/>
-        <geniix:mkdir>
-                <gsh:param>-p</gsh:param>
-                <gsh:param>/resources/xcg.virginia.edu</gsh:param>
-        </geniix:mkdir>
-
         <gsh:echo message="Setting access on authorization port types"/>
         <geniix:chmod>
                 <gsh:param>${BOOTSTRAP_CONTAINER}/Services/X509AuthnPortType</gsh:param>
@@ -401,13 +395,6 @@
 		<gsh:param>/resources/xsede.org/containers</gsh:param>
                 <gsh:param>+r</gsh:param>
                 <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
-        </geniix:chmod>
-
-	<!-- chmod /resources/xcg.virginia.edu +rwx gffs-admins -->
-	<geniix:chmod>
-		<gsh:param>/resources/xcg.virginia.edu</gsh:param>
-                <gsh:param>+rwx</gsh:param>
-                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
         </geniix:chmod>
 
 	<gsh:echo message="Setting security on container ${BOOTSTRAP_CONTAINER}"/>	
