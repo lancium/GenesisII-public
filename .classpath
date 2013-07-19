@@ -54,5 +54,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-structure"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-webservices"/>
 	<classpathentry kind="lib" path="lib"/>
+	<classpathentry kind="lib" path="ext/MacOSXSwing.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>
