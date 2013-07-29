@@ -212,7 +212,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		} finally {
 			synchronized (_concurrentCalls) {
 				_concurrentCalls = new Integer(_concurrentCalls.intValue() - 1);
-				currentClients = _concurrentCalls.intValue();;
+				currentClients = _concurrentCalls.intValue();
+				;
 			}
 			if (_logger.isDebugEnabled())
 				_logger.debug("rpc clients down to " + currentClients);

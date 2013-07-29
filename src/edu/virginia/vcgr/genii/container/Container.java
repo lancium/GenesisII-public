@@ -296,7 +296,7 @@ public class Container extends ApplicationBase
 				_logger.warn(String.format("Unable to configure service:  %s.", service), cause);
 			}
 		}
-		
+
 		ServerWSDoAllReceiver.beginNormalRuntime();
 	}
 
@@ -354,10 +354,12 @@ public class Container extends ApplicationBase
 	{
 		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
 
-		String keyStoreLoc = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
+		String keyStoreLoc =
+			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
 		String keyStoreType =
 			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP, "PKCS12");
-		String keyPassword = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_PASSWORD_PROP);
+		String keyPassword =
+			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_PASSWORD_PROP);
 		String keyStorePassword =
 			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PASSWORD_PROP);
 		String containerAlias =

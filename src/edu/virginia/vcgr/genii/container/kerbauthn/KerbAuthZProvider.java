@@ -140,8 +140,9 @@ public class KerbAuthZProvider extends AclAuthZProvider
 		if (keypr == null) {
 			_logger.warn("INSECURE Kerberos authentication in realm " + realm + " due to missing keytab or principal!");
 			if (realm.equals("TERAGRID.ORG")) {
-				String msg = "TERAGRID.ORG realm requires authorization to a service principal.  Please ensure "
-					+ "keytab and principal are defined in deployment's configuration/security.properties file.";
+				String msg =
+					"TERAGRID.ORG realm requires authorization to a service principal.  Please ensure "
+						+ "keytab and principal are defined in deployment's configuration/security.properties file.";
 				_logger.error(msg);
 				throw new SecurityException(msg);
 			}

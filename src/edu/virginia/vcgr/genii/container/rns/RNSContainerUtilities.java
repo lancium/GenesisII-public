@@ -40,7 +40,7 @@ public class RNSContainerUtilities
 
 	public static LookupResponseType indexedTranslate(Iterable<RNSEntryResponseType> entries, IteratorBuilder<Object> builder,
 		InMemoryIteratorWrapper imiw) throws RemoteException
- {
+	{
 
 		builder.preferredBatchSize(RNSConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(entries);
@@ -56,22 +56,17 @@ public class RNSContainerUtilities
 			if (rKey != null) {
 				try {
 					// Get the access control list of the directory
-					acl = (Acl) rKey.dereference().getProperty(
-							AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+					acl = (Acl) rKey.dereference().getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
 					// Now add "w" everyone -- so the client can clean up
 					// (destroy) the iterator properly later
 					acl.writeAcl.add(null);
 				} catch (ResourceException e1) {
-					_logger.warn("failed to look up the ACL for resource "
-							+ rKey.dereference());
+					_logger.warn("failed to look up the ACL for resource " + rKey.dereference());
 				}
 				// Now that the iterator is created and the ACL built up, set
 				// the ACL of the iterator to that of the directory.
-				ResourceManager
-						.getTargetResource(iit.getIteratorEndpoint())
-						.dereference()
-						.setProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME,
-								acl);
+				ResourceManager.getTargetResource(iit.getIteratorEndpoint()).dereference()
+					.setProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME, acl);
 			}
 		}
 
@@ -88,9 +83,8 @@ public class RNSContainerUtilities
 			}
 		}
 
-		return new LookupResponseType(batch == null ? null
-				: batch.toArray(new RNSEntryResponseType[batch.size()]),
-				iit.getIteratorEndpoint());
+		return new LookupResponseType(batch == null ? null : batch.toArray(new RNSEntryResponseType[batch.size()]),
+			iit.getIteratorEndpoint());
 	}
 
 	public static NuCredential loadRNSResourceCredential(IRNSResource resource)

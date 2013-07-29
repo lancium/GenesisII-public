@@ -75,12 +75,12 @@ public class AxisBasedContextResolver implements IContextResolver
 				} catch (Exception e) {
 					throw new IOException("Unable to serialize!", e);
 				} finally {
-					writer.close();					
+					writer.close();
 				}
 				return;
 			}
 		}
-		 
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -109,7 +109,7 @@ public class AxisBasedContextResolver implements IContextResolver
 						Element em = ((MessageElement) he).getRealElement();
 						// debugging call.
 						boolean debuggingMode = false;
-						if (debuggingMode == true) {							
+						if (debuggingMode == true) {
 							storeToFile(em, System.getProperty("user.home"));
 						}
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();

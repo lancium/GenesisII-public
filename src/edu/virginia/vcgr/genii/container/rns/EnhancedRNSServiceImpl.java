@@ -191,7 +191,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	{
 		String filename = createFile.getFilename();
 		try {
-			// TODO - rather than building a list of all the files in the directory and seeing if this one is there - just check if is there
+			// TODO - rather than building a list of all the files in the directory and seeing if
+			// this one is there - just check if is there
 			_resourceLock.lock();
 			Collection<String> entries = _resource.listEntries(filename);
 			_resource.commit();
@@ -202,9 +203,9 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 				throw FaultManipulator.fillInFault(fault);
 			}
 			// ASG modified to make a direct create in the current container
-			//System.err.println("About to create the file " + createFile.getFilename());
+			// System.err.println("About to create the file " + createFile.getFilename());
 			RandomByteIOServiceImpl service = new RandomByteIOServiceImpl();
-			//System.err.println("created the file");
+			// System.err.println("created the file");
 			String serviceURL = Container.getServiceURL("RandomByteIOPortType");
 			EndpointReferenceType entryReference = service.CreateEPR(null, serviceURL);
 

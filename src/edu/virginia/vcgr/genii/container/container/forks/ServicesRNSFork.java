@@ -63,11 +63,11 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 		for (JavaServiceDesc desc : Container.getInstalledServices()) {
 			String serviceName = desc.getName();
 
-			//TODO: remove this when JNDI is working again, if ever.  
+			// TODO: remove this when JNDI is working again, if ever.
 			if (serviceName.equals("JNDIAuthnPortType")) {
 				continue;
 			}
-			
+
 			if (entryName == null || entryName.equals(serviceName)) {
 				ResourceKey targetKey = ResourceManager.getServiceResource(serviceName);
 

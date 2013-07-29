@@ -22,30 +22,31 @@ public class ByteIOFileCreator
 	 */
 	synchronized public static File createFile(File userDir) throws IOException
 	{
-		File baseDir,uroot;;
-		baseDir= new GuaranteedDirectory(userDir, "rbyteio-data");
-		uroot=baseDir;
+		File baseDir, uroot;
+		;
+		baseDir = new GuaranteedDirectory(userDir, "rbyteio-data");
+		uroot = baseDir;
 
 		// ** First get the calling context
-		//System.err.println("about to call getexistingcontext");
+		// System.err.println("about to call getexistingcontext");
 		ICallingContext callContext = ContextManager.getExistingContext();
-		//System.err.println("called getexistingcontext");
+		// System.err.println("called getexistingcontext");
 		// **Then get the credential wallet
-		CredentialWallet Wallet = (CredentialWallet) callContext
-				.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);
+		CredentialWallet Wallet =
+			(CredentialWallet) callContext.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);
 		// **Then, get the list of USER names from the credential wallet
-		//System.err.println("called getwallet");
+		// System.err.println("called getwallet");
 		if (!Wallet.isEmpty()) {
 			// Then pick the first one
 			// Be careful - usernames may not always be unique - they are these
 			// days, but maybe not in future
 			String userName = Wallet.getFirstUserName();
-//			System.err.println("The username is: " + userName);
+			// System.err.println("The username is: " + userName);
 			baseDir = new GuaranteedDirectory(uroot, userName);
 		}
 
 		String filePrefix = "rbyteio";
-		//if (fileName !=null) filePrefix=fileName+"-";
+		// if (fileName !=null) filePrefix=fileName+"-";
 		String fileSuffix = ".dat";
 		for (int lcv = 0; lcv < DISPERSION_LEVELS; lcv++) {
 			int value = _directoryBalancer.nextInt(DISPERSION_WIDTH);
