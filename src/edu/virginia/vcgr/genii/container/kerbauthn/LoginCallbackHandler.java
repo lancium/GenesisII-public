@@ -7,11 +7,15 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Password callback handler for resolving password/usernames for a JAAS login.
  */
 public class LoginCallbackHandler implements CallbackHandler
 {
+	static private Log _logger = LogFactory.getLog(CallbackHandler.class);
 
 	private String password;
 	private String username;
@@ -33,7 +37,6 @@ public class LoginCallbackHandler implements CallbackHandler
 	 */
 	public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
 	{
-
 		for (int i = 0; i < callbacks.length; i++) {
 			if (callbacks[i] instanceof NameCallback && username != null) {
 				NameCallback nc = (NameCallback) callbacks[i];

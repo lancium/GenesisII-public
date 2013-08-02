@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="5954" description="" category="" />
+      <variable name="genii.build-number" value="6016" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -1600,7 +1600,7 @@ Hostnames should be globally resolvable via DNS.</string>
                 <preActivation />
                 <postActivation />
                 <actions>
-                  <action name="Copy JCE Unlimited Jars" id="3949" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
+                  <action name="Copy JCE Unlimited Jars - non mac" id="3949" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
@@ -1632,9 +1632,44 @@ Hostnames should be globally resolvable via DNS.</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>
-String medium = context.getMediaName();
+                    <condition>String medium = context.getMediaName();
 return ! medium.startsWith("genesis2_client_macosx");
+</condition>
+                  </action>
+                  <action name="Copy JCE Unlimited Jars - mac" id="5310" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                          <void property="destinationFile">
+                            <object class="java.io.File">
+                              <string>${installer:sys.installationDir}/.install4j/jre.bundle/Contents/Home/jre/lib/security</string>
+                            </object>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="2">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>jre-addin/US_export_policy.jar</string>
+                                </object>
+                              </void>
+                              <void index="1">
+                                <object class="java.io.File">
+                                  <string>jre-addin/local_policy.jar</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                          <void property="overwriteMode">
+                            <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                          </void>
+                          <void property="showProgress">
+                            <boolean>true</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>String medium = context.getMediaName();
+return medium.startsWith("genesis2_client_macosx");
 </condition>
                   </action>
                   <action name="fix installation dir" id="4474" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">

@@ -194,6 +194,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 
 					if (!realm.equals(System.getProperty("java.security.krb5.realm"))
 						|| !kdc.equals(System.getProperty("java.security.krb5.kdc"))) {
+						_logger.debug("switching kerberos realm for auth attempt");
 						// Wants different KDC/realm. Upgrade lock
 						kdc_lock.readLock().unlock();
 						kdc_lock.writeLock().lock();

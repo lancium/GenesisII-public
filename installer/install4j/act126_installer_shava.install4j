@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.5" transformSequenceNumber="4">
   <directoryPresets config="" />
-  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="XSEDE: Extreme Science and Engineering Discovery Environment" publisherWeb="xsede.org" version="2.7.29" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
+  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="XSEDE: Extreme Science and Engineering Discovery Environment" publisherWeb="xsede.org" version="2.7.31" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="5940" description="" category="" />
+      <variable name="genii.build-number" value="6016" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -1600,7 +1600,7 @@ Hostnames should be globally resolvable via DNS.</string>
                 <preActivation />
                 <postActivation />
                 <actions>
-                  <action name="Copy JCE Unlimited Jars" id="3949" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
+                  <action name="Copy JCE Unlimited Jars - non mac" id="3949" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
@@ -1632,9 +1632,44 @@ Hostnames should be globally resolvable via DNS.</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>
-String medium = context.getMediaName();
+                    <condition>String medium = context.getMediaName();
 return ! medium.startsWith("genesis2_client_macosx");
+</condition>
+                  </action>
+                  <action name="Copy JCE Unlimited Jars - mac" id="5310" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                          <void property="destinationFile">
+                            <object class="java.io.File">
+                              <string>${installer:sys.installationDir}/.install4j/jre.bundle/Contents/Home/jre/lib/security</string>
+                            </object>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="2">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>jre-addin/US_export_policy.jar</string>
+                                </object>
+                              </void>
+                              <void index="1">
+                                <object class="java.io.File">
+                                  <string>jre-addin/local_policy.jar</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                          <void property="overwriteMode">
+                            <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                          </void>
+                          <void property="showProgress">
+                            <boolean>true</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>String medium = context.getMediaName();
+return medium.startsWith("genesis2_client_macosx");
 </condition>
                   </action>
                   <action name="fix installation dir" id="4474" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
