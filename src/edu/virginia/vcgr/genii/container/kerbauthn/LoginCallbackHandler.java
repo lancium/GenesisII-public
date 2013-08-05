@@ -1,22 +1,18 @@
 package edu.virginia.vcgr.genii.container.kerbauthn;
 
 import java.io.IOException;
+
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Password callback handler for resolving password/usernames for a JAAS login.
  */
 public class LoginCallbackHandler implements CallbackHandler
 {
-	static private Log _logger = LogFactory.getLog(CallbackHandler.class);
-
 	private String password;
 	private String username;
 
