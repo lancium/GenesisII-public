@@ -139,6 +139,15 @@
                 <gsh:param>+r</gsh:param>
                 <gsh:param>--everyone</gsh:param>
         </geniix:chmod>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/etc/resolvers</gsh:param>
+        </geniix:mkdir>
+ 	<geniix:chmod>
+                <gsh:param>/etc/resolvers</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
 
         <gsh:echo message="Creating /bin directory"/>
         <geniix:mkdir>
