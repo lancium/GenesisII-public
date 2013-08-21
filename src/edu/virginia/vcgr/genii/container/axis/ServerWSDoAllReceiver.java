@@ -382,51 +382,64 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				// Holder-of-key token
 				TrustCredential assertion = (TrustCredential) cred;
 
-				// Check validity and verify integrity
-				assertion.checkValidity(new Date());
-
-				if (_logger.isTraceEnabled())
-					_logger.trace("credential to test has first delegatee: "
-						+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
-						+ assertion.getOriginalAsserter()[0].getSubjectDN());
-
-				// Verify that the request message signer is the same as the
-				// one of the holder-of-key certificates.
-				boolean match = false;
-				for (X509Certificate[] callerCertChain : authenticatedCertChains) {
-					if (_logger.isTraceEnabled())
-						_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
-					try {
-						if (assertion.findDelegateeInChain(callerCertChain[0]) >= 0) {
-							// //
-							// callerCertChain[0].equals(assertion.getRootOfTrust().getDelegatee()[0]))
-							// {
-							if (_logger.isDebugEnabled())
-								_logger.debug("...found delegatee at position "
-									+ assertion.findDelegateeInChain(callerCertChain[0])
-									+ " to be the same as incoming tls cert.");
-							match = true;
-							break;
-						} else if (CertificateValidatorFactory.getValidator().validateCertInKeyStore(
-							assertion.getOriginalAsserter(), SecurityUtils.getResourceTrustStore()) == true) {
-							if (_logger.isTraceEnabled())
-								_logger.trace("...allowed incoming message using resource trust store for original asserter.");
-							match = true;
-							break;
-						} else {
-							if (_logger.isTraceEnabled())
-								_logger.trace("...found them to be different.");
-						}
-					} catch (Throwable e) {
-						_logger.error("failure: exception thrown during holder of key checks", e);
-					}
+				try {
+					// Check validity and verify integrity
+					assertion.checkValidity(new Date());
+				} catch (Throwable t) {
+					_logger.debug("caught exception testing certificate validity; dropping this credential: " + t.getMessage());
+					continue; // no longer anything to check on that one; we don't want it.
 				}
 
-				if (!match) {
-					String msg =
-						"credential failed to match incoming message sender: '" + assertion.describe(VerbosityLevel.HIGH) + "'";
-					_logger.error(msg);
-					throw new AuthZSecurityException(msg);
+				/*
+				 * this section came from the days when we were always running on tls certificates
+				 * as the resource identities. it cannot be in place any more because it hinders the
+				 * new usage of trust delegations, which are not always from the connecting
+				 * identity, but which are still totally valid.
+				 */
+				boolean enable_old_credential_checking = false;
+				if (enable_old_credential_checking) {
+					if (_logger.isTraceEnabled())
+						_logger.trace("credential to test has first delegatee: "
+							+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
+							+ assertion.getOriginalAsserter()[0].getSubjectDN());
+
+					// Verify that the request message signer is the same as the
+					// one of the holder-of-key certificates.
+					boolean match = false;
+					for (X509Certificate[] callerCertChain : authenticatedCertChains) {
+						if (_logger.isTraceEnabled())
+							_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
+						try {
+							if (assertion.findDelegateeInChain(callerCertChain[0]) >= 0) {
+								if (_logger.isDebugEnabled())
+									_logger.debug("...found delegatee at position "
+										+ assertion.findDelegateeInChain(callerCertChain[0])
+										+ " to be the same as incoming tls cert.");
+								match = true;
+								break;
+							} else if (CertificateValidatorFactory.getValidator().validateCertInKeyStore(
+								assertion.getOriginalAsserter(), SecurityUtils.getResourceTrustStore()) == true) {
+								if (_logger.isTraceEnabled())
+									_logger
+										.trace("...allowed incoming message using resource trust store for original asserter.");
+								match = true;
+								break;
+							} else {
+								if (_logger.isTraceEnabled())
+									_logger.trace("...found them to be different.");
+							}
+						} catch (Throwable e) {
+							_logger.error("failure: exception thrown during holder of key checks", e);
+						}
+					}
+
+					if (!match) {
+						String msg =
+							"credential failed to match incoming message sender: '" + assertion.describe(VerbosityLevel.HIGH)
+								+ "'";
+						_logger.error(msg);
+						throw new AuthZSecurityException(msg);
+					}
 				}
 			}
 
@@ -544,13 +557,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			// outgoing credentials
 			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 			transientCredentials.addAll(authenticatedCallerCreds);
-
 			// Grab the operation method from the message context
 			org.apache.axis.description.OperationDesc desc = messageContext.getOperation();
 			if (desc == null) {
 				// pretend security doesn't exist -- axis will do what it does
-				// when it can't figure out how to dispatch to a non-existant
-				// method
+				// when it can't figure out how to dispatch to a non-existent
+				// method.
+				_logger.warn("bailing out due to a null operation description.");
 				return;
 			}
 			JavaServiceDesc jDesc = null;
@@ -559,7 +572,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				jDesc = (JavaServiceDesc) serviceDescription;
 			Method operation = desc.getMethod();
 			if (_logger.isDebugEnabled())
-				_logger.debug("client requests " + operation.getDeclaringClass().getName() + "." + operation.getName() + "()");
+				_logger.debug("client invokes " + operation.getDeclaringClass().getName() + "." + operation.getName() + "()");
 
 			// Get the resource's authz handler
 			IResource resource = ResourceManager.getCurrentResource().dereference();
@@ -574,7 +587,11 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			if (accessOkay) {
 				resource.commit();
 			} else {
-				PermissionDeniedException temp = new PermissionDeniedException(operation.getName(), resource.toString());
+				//hmmm: we NEED this to be printing the rns path being checked.  not right yet.
+				PermissionDeniedException temp =
+					new PermissionDeniedException(operation.getName(),
+						resource.toString());
+						///hmmm: this does not work: callContext.getCurrentPath().pwd());
 				_logger.error("failed to check access: " + temp.getMessage());
 				throw new AxisFault(temp.getMessage());
 			}

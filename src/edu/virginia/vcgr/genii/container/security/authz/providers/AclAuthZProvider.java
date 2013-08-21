@@ -306,6 +306,9 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			ICallingContext callContext = ContextManager.getExistingContext();
 			Acl acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
 
+///hmmm: this does not work.  it's always root (/).
+///			messagePrefix = messagePrefix.concat(callContext.getCurrentPath() + " ");
+
 			// pre-emptive check of the wildcard access
 			if ((acl == null) || checkAclAccess(null, category, acl)) {
 				if (_logger.isDebugEnabled())

@@ -77,11 +77,6 @@
 		<gsh:param>+r</gsh:param>
 		<gsh:param>--everyone</gsh:param>
 	</geniix:chmod>
-	<geniix:chmod>
-		<gsh:param>/resources/xsede.org</gsh:param>
-		<gsh:param>+r</gsh:param>
-		<gsh:param>--everyone</gsh:param>
-	</geniix:chmod>
 
 	<gsh:echo message="Creating /users/xsede.org, /users/deleted.xsede.org directories"></gsh:echo>
         <geniix:mkdir>
@@ -123,6 +118,7 @@
                 <gsh:param>+r</gsh:param>
                 <gsh:param>--everyone</gsh:param>
         </geniix:chmod>
+		<!-- allow anyone to enter home, since some users may not be members of allowed groups. -->
         <geniix:chmod>
                 <gsh:param>/home/xsede.org</gsh:param>
                 <gsh:param>+r</gsh:param>
@@ -170,6 +166,12 @@
                 <gsh:param>+r</gsh:param>
                 <gsh:param>--everyone</gsh:param>
         </geniix:chmod>
+
+        <gsh:echo message="Creating /mount directory"/>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/mount</gsh:param>
+        </geniix:mkdir>
 
         <gsh:echo message="Setting access on authorization port types"/>
         <geniix:chmod>
@@ -291,6 +293,11 @@
                 <gsh:param>+rwx</gsh:param>
                 <gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
         </geniix:chmod>
+    <geniix:chmod>
+                <gsh:param>/home/xsede.org</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
 
 	<!-- chmod /users/deleted.xsede.org +rwx gffs-amie, gffs-users  -->
 	<geniix:chmod>
@@ -410,24 +417,25 @@
 	<gsh:echo message="Setting security on container ${BOOTSTRAP_CONTAINER}"/>	
 
 	<geniix:chmod>
+		<gsh:param>${BOOTSTRAP_CONTAINER}</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>${BOOTSTRAP_CONTAINER}</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+	</geniix:chmod>
+
+	<geniix:chmod>
 		<gsh:param>${BOOT_SRVS}</gsh:param>
 		<gsh:param>+rwx</gsh:param>
 		<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
 	</geniix:chmod>
 	<geniix:chmod>
-		<gsh:param>/resources/xsede.org/containers</gsh:param>
-		<gsh:param>+r</gsh:param>
-		<gsh:param>--everyone</gsh:param>
-	</geniix:chmod>
-	<geniix:chmod>
-		<gsh:param>${BOOTSTRAP_CONTAINER}</gsh:param>
-		<gsh:param>+r</gsh:param>
-		<gsh:param>--everyone</gsh:param>
-	</geniix:chmod>
-	<geniix:chmod>
 		<gsh:param>${BOOT_SRVS}</gsh:param>
 		<gsh:param>+r</gsh:param>
-		<gsh:param>--everyone</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
 	</geniix:chmod>
 
 	<gsh:foreach param-name="SERVICE"
@@ -441,7 +449,7 @@
 		<geniix:chmod>
 			<gsh:param>${BOOT_SRVS}/${SERVICE}</gsh:param>
 			<gsh:param>+r</gsh:param>
-			<gsh:param>--everyone</gsh:param>
+			<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
 		</geniix:chmod>
 	</gsh:foreach>
 
