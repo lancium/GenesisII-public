@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Creates an XSEDE kerberos/myproxy user within the XSEDE namespace. -->
+
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+	xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+
+<!--
+Script parameters are:
+
+1: user name (ex. johndoe)
+
+-->
+       <gsh:default name="USER" value="${ARGV[1]}"/>
+       <gsh:default name="USER_DIR" value="/users/xsede.org"/>
+       <gsh:default name="USER_PATH" value="${USER_DIR}/${USER}"/>
+       <gsh:default name="HOME_DIR" value="/home/xsede.org"/>
+       <gsh:default name="HOME_PATH" value="${HOME_DIR}/${USER}"/>
+       <gsh:default name="CONTAINER_RESOURCE" value="/resources/xsede.org/containers/sts-1.xsede.org"/>
+
+	<geniix:idp>
+		<param>--kerbRealm=TERAGRID.ORG</param>
+		<param>--kerbKdc=kerberos.teragrid.org</param>
+		<param>--validDuration=10years</param>
+		<param>${CONTAINER_RESOURCE}/Services/KerbAuthnPortType</param>
+		<param>${USER}</param>
+	</geniix:idp>
+
+	<geniix:ln>
+		<param>${CONTAINER_RESOURCE}/Services/KerbAuthnPortType/${USER}</param>
+		<param>${USER_PATH}</param>
+	</geniix:ln>
+
+	<geniix:chmod>
+		<param>${USER_PATH}</param>
+		<param>5</param>
+		<param>${USER_PATH}</param>
+	</geniix:chmod>
+			
+	<geniix:mkdir>
+		<param>${HOME_PATH}</param>
+	</geniix:mkdir>
+
+	<geniix:chmod>
+		<param>${HOME_PATH}</param>
+		<param>7</param>
+		<param>${USER_PATH}</param>
+	</geniix:chmod>
+
+	<!-- add a resolver for this user and also replicate their STS to the secondary. -->
+	<geniix:resolver>
+		<param>-p</param>
+		<param>-r</param>
+		<param>${USER_PATH}</param>
+		<param>/etc/resolvers/stsResolver</param>
+	</geniix:resolver>
+
+	<geniix:replicate>
+		<param>-p</param>
+		<param>${USER_PATH}</param>
+		<param>/resources/xsede.org/containers/sts-2.xsede.org</param>
+	</geniix:replicate>
+
+</gsh:script>
+

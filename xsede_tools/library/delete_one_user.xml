@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!-- removes one particular user. -->
+<!-- Author: Chris Koeritz -->
+
+<!-- args:
+  1=container
+  2=username
+  3=userpath
+  4=group
+-->
+
+<gsh:script
+        xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+        xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+        xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script"> 
+
+  <condition property="correct_number_of_arguments">
+    <compare numeric="true" arg1="5" arg2="${ARGV}" comparison="eq"/>
+  </condition>
+
+  <if test="correct_number_of_arguments">
+    <then>
+        <echo message="Removing user ${ARGV[2]}."/>
+        <foreach param-name="F" source-rns="/home/${ARGV[2]}">
+          <echo message="File ${F}"/>
+          <try>
+            <block>
+              <geniix:rm>
+                <param>-r</param>
+                <param>/home/${ARGV[2]}/${F}</param>
+              </geniix:rm>
+            </block>
+            <catch class="edu.virginia.vcgr.genii.client.rns.RNSException">
+              <try>
+                <block>
+                  <geniix:rm>
+                    <param>-rf</param>
+                    <param>/home/${ARGV[2]}/${F}</param>
+                  </geniix:rm>
+                </block>
+                <catch class="edu.virginia.vcgr.genii.client.rns.RNSException">
+                  <geniix:unlink>
+                    <param>/home/${ARGV[2]}/${F}</param>
+                  </geniix:unlink>
+                </catch>
+              </try>
+            </catch>
+          </try>
+        </foreach>
+
+        <try>
+          <block>
+            <geniix:rm>
+              <param>/home/${ARGV[2]}</param>
+            </geniix:rm>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Failed to delete home dir, maybe already gone?"/>
+          </catch>
+        </try>
+
+        <!-- remove access to the group for that user. -->
+        <try>
+          <block>
+            <geniix:chmod>
+              <param>${ARGV[4]}</param>
+              <param>0</param>
+              <param>${ARGV[3]}</param>
+            </geniix:chmod>
+
+            <geniix:unlink>
+              <param>${ARGV[3]}</param>
+            </geniix:unlink>
+            <geniix:rm>
+              <param>${ARGV[1]}/Services/X509AuthnPortType/${ARGV[2]}</param>
+            </geniix:rm>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Failed to revoke rights and remove user, maybe not there?"/>
+          </catch>
+        </try>
+    </then>
+    <else>
+      <echo message="Wrong number of arguments: wanted 5 (plus command as first argument), got ${ARGV}"/>
+      <echo message="Usage: script delete_one_user.xml {container-name} {user-name} {user-path} {group-name}"/>
+      <echo message="[FAILURE] invalid number of arguments."/>
+      <exit exitcode="-1"/>
+    </else>
+  </if>
+</gsh:script>

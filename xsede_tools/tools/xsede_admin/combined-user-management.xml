@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+  combination script that can create users, delete them, or link them to a group.
+  user creation is combined with linking the user to a group, but the groups list
+  can be empty.  existing users can also be linked to one or two groups.
+-->
+
+<gsh:script
+        xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+        xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+        xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+
+<!--
+Inputs for the script:
+
+1.  action: c=create user and link user to group(s), l=link user to group(s), d=delete user.
+2.  user name (ex. johndoe)
+3.  first group name (optional, ex. gffs-users)
+4.  second group name (optional, ex. gffs-admins)
+
+-->
+  <gsh:default name="ACTION" value="${ARGV[1]}"/>
+  <gsh:default name="USER" value="${ARGV[2]}"/>
+  <gsh:default name="GROUP1" value="${ARGV[3]}"/>
+  <gsh:default name="GROUP2" value="${ARGV[4]}"/>
+
+  <gsh:default name="VERBOSE" value="false"/>
+
+  <condition property="createUser">
+    <compare numeric="false" arg1="${ACTION}" arg2="c" comparison="eq"/>
+  </condition>
+  <condition property="deleteUser">
+    <compare numeric="false" arg1="${ACTION}" arg2="d" comparison="eq"/>
+  </condition>
+  <condition property="linkUser">
+    <compare numeric="false" arg1="${ACTION}" arg2="l" comparison="eq"/>
+  </condition>
+  <condition property="badUser">
+    <compare numeric="false" arg1="${USER}" arg2="" comparison="eq"/>
+  </condition>
+  <condition property="badGroup1">
+    <compare numeric="false" arg1="${GROUP1}" arg2="" comparison="eq"/>
+  </condition>
+  <condition property="badGroup2">
+    <compare numeric="false" arg1="${GROUP2}" arg2="" comparison="eq"/>
+  </condition>
+
+  <if test="badUser">
+    <then>
+      <echo message="This script requires a user name as the second parameter."/>
+      <exit exitcode="1" />
+    </then>
+  </if>
+
+  <if test="createUser">
+    <then>
+      <if test="VERBOSE">
+        <then>
+          <echo message="creating a user called ${USER}"/>
+        </then>
+      </if>
+      <gsh:default name="actionName" value="create"/>
+
+      <try>
+        <block>
+          <geniix:script >
+            <param>local:create-xsede-user.xml</param>
+            <param>${USER}</param>
+          </geniix:script>
+        </block>
+        <catch class="java.lang.Exception">
+          <echo message="failed to create user named ${USER}!"/>
+          <exit exitcode="1" />
+        </catch>
+      </try>
+
+      <!-- force us to try our linking code now. -->
+      <condition property="linkUser">
+        <compare numeric="true" arg1="1" arg2="1" comparison="eq"/>
+      </condition>
+
+      <!-- establish that we at least thought we did something. -->
+      <gsh:default name="didSomething" value="true"/>
+
+    </then>
+  </if>
+
+  <if test="deleteUser">
+    <then>
+      <if test="VERBOSE">
+        <then>
+          <echo message="deleting a user called ${USER}"/>
+        </then>
+      </if>
+      <gsh:default name="actionName" value="delete"/>
+
+      <try>
+        <block>
+          <geniix:script >
+            <param>local:delete-xsede-user.xml</param>
+            <param>${USER}</param>
+          </geniix:script>
+        </block>
+        <catch class="java.lang.Exception">
+          <echo message="failed to delete user named ${USER}!"/>
+          <exit exitcode="1" />
+        </catch>
+      </try>
+
+      <!-- establish that we at least thought we did something. -->
+      <gsh:default name="didSomething" value="true"/>
+
+    </then>
+  </if>
+
+  <if test="linkUser">
+    <then>
+      <gsh:default name="actionName" value="link"/>
+
+      <if test="badGroup1">
+        <then>
+          <if test="VERBOSE">
+            <then>
+              <echo message="ignoring empty first group."/>
+            </then>
+          </if>
+        </then>
+        <else>
+          <if test="VERBOSE">
+            <then>
+              <echo message="linking a user called ${USER} to group ${GROUP1}"/>
+            </then>
+          </if>
+          <try>
+            <block>
+              <geniix:script >
+                <param>local:link-xsede-user-to-group.xml</param>
+                <param>${USER}</param>
+                <param>${GROUP1}</param>
+              </geniix:script>
+            </block>
+            <catch class="java.lang.Exception">
+              <echo message="failed to link user named ${USER} to group named ${GROUP1}!"/>
+              <exit exitcode="1" />
+            </catch>
+          </try>
+        </else>
+      </if>
+
+      <if test="badGroup2">
+        <then>
+          <if test="VERBOSE">
+            <then>
+              <echo message="ignoring empty second group."/>
+            </then>
+          </if>
+        </then>
+        <else>
+          <if test="VERBOSE">
+            <then>
+              <echo message="linking a user called ${USER} to group ${GROUP2}"/>
+            </then>
+          </if>
+          <try>
+            <block>
+              <geniix:script >
+                <param>local:link-xsede-user-to-group.xml</param>
+                <param>${USER}</param>
+                <param>${GROUP2}</param>
+              </geniix:script>
+            </block>
+            <catch class="java.lang.Exception">
+              <echo message="failed to link user named ${USER} to group named ${GROUP2}!"/>
+              <exit exitcode="1" />
+            </catch>
+          </try>
+        </else>
+      </if>
+
+      <!-- establish that we at least thought we did something. -->
+      <gsh:default name="didSomething" value="true"/>
+
+    </then>
+  </if>
+
+  <if test="didSomething">
+    <then>
+      <if test="VERBOSE">
+        <then>
+          <echo message="sucessfully finished with ${actionName} action."/>
+        </then>
+      </if>
+    </then>
+    <else>
+      <echo message="No action flag was found on command line."/>
+    </else>
+  </if>
+
+</gsh:script>
+

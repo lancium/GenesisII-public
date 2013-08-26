@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-15-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<gsh:echo message="Testing 'history' command - List of all the commands executed so far"/>
+<geniix:history/>
+
+<gsh:echo message="Testing 'history -c' command - clear list of all the commands executed so far"/>
+<geniix:history>
+	<gsh:param>-c</gsh:param>
+</geniix:history>
+
+<gsh:echo message="Testing 'history' command - History AFTER clear"/>
+<geniix:history/>
+
+<geniix:ls>
+	<gsh:param>${rnsPath}</gsh:param>
+</geniix:ls>
+
+<geniix:echo>
+	<gsh:param>"HIstory command - file</gsh:param>
+	<gsh:param>></gsh:param>
+	<gsh:param>${rnsPath}/history.txt</gsh:param>
+</geniix:echo>
+
+<geniix:ls>
+        <gsh:param>${rnsPath}/</gsh:param>
+</geniix:ls>
+
+<geniix:cat>
+	<gsh:param>${rnsPath}/history.txt</gsh:param>
+</geniix:cat>
+
+<geniix:rm>
+	<gsh:param>${rnsPath}/history.txt</gsh:param>
+</geniix:rm>
+
+<gsh:echo message="Testing 'history' command - History AFTER executing echo, ls, cat and rm"/>
+<geniix:history/>
+
+<gsh:echo message="Testing 'history 3' command - List of last 3 commands in history "/>
+<geniix:history>
+	<gsh:param>3</gsh:param>
+</geniix:history>
+
+</gsh:script>
+
+

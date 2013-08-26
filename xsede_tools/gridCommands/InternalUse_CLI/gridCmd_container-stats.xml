@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-16-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="containerPath" source="${ARGV[1]}"/>
+
+<gsh:echo message="Testing 'container-stats ${containerPath}' command - this should print the statistics of the container ${containerPath}"/>
+<geniix:container-stats>
+	<gsh:param>${containerPath}</gsh:param>
+</geniix:container-stats>
+
+</gsh:script>

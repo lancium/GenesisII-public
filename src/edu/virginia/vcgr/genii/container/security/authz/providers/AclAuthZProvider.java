@@ -247,26 +247,33 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		return false;
 	}
 
+	static public String getResourceName(IResource resource)
+	{
+		String toReturn = resource.getKey();
+		try {
+			if (resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()) != null) {
+				toReturn.concat("--" + (String) resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()));
+			} else {
+				toReturn.concat("--" + "unknown details");
+			}
+		} catch (Throwable e) {
+			// ignore, will just miss part of print-out.
+		}		
+		return toReturn;
+	}
+	
 	@Override
 	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation)
+		Class<?> serviceClass, Method operation, String errorText)
 	{
 		RWXCategory category = RWXManager.lookup(serviceClass, operation);
 
-		if (!checkAccess(authenticatedCallerCredentials, resource, category)) {
+		if (!checkAccess(authenticatedCallerCredentials, resource, category, errorText)) {
 			String msg = "denying access for operation: " + operation.getName();
-			String asset = resource.toString();
-			try {
-				if (resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()) != null) {
-					asset.concat("--" + (String) resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()));
-				} else {
-					asset.concat("--" + resource.getKey());
-				}
-			} catch (Throwable e) {
-				// ignore, will just miss part of print-out.
-			}
+			String asset = getResourceName(resource);
 			msg.concat(asset + " at " + ProgramTools.showLastFewOnStack(4));
 			_logger.error(msg);
+			errorText = msg;
 			return false;
 		}
 		return true;
@@ -288,7 +295,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 
 	@Override
 	public boolean
-		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
+		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category, String errorText)
 	{
 		String messagePrefix = "checkAccess for " + category + " on ";
 		String resourceName = null;
@@ -305,18 +312,15 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		try {
 			ICallingContext callContext = ContextManager.getExistingContext();
 			Acl acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
-
-///hmmm: this does not work.  it's always root (/).
-///			messagePrefix = messagePrefix.concat(callContext.getCurrentPath() + " ");
-
-			// pre-emptive check of the wildcard access
+			
+			// pre-emptive check of wildcard access.
 			if ((acl == null) || checkAclAccess(null, category, acl)) {
 				if (_logger.isDebugEnabled())
 					_logger.debug(messagePrefix + "granted to everyone.");
 				return true;
 			}
 
-			// try each identity in the caller's credentials
+			// try each identity in the caller's credentials.
 			for (NuCredential cred : authenticatedCallerCredentials) {
 				if (cred instanceof Identity) {
 					if (cred instanceof X509Identity) {
@@ -359,17 +363,21 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 
 			// Nobody appreciates us
 			if (_logger.isTraceEnabled()) {
-				blurtCredentials(messagePrefix + " was not granted for cred set: ", authenticatedCallerCredentials);
+				errorText = messagePrefix + " was not granted for credential set: ";
+				blurtCredentials(errorText, authenticatedCallerCredentials);
 			}
 			return false;
 		} catch (AuthZSecurityException ase) {
-			_logger.error("failure, saw authorization security exception for " + messagePrefix + ":" + ase.getMessage());
+			errorText = "failure, saw authorization security exception for " + messagePrefix + ":" + ase.getMessage();
+			_logger.error(errorText);
 			return false;
 		} catch (IOException e) {
-			_logger.error("failure, saw IO exception processing credential for " + messagePrefix + ":" + e.getMessage());
+			errorText = "failure, saw IO exception processing credential for " + messagePrefix + ":" + e.getMessage();
+			_logger.error(errorText);
 			return false;
 		} catch (ConfigurationException e) {
-			_logger.error("saw config exception for " + messagePrefix + ":" + e.getMessage());
+			errorText = "saw config exception for " + messagePrefix + ":" + e.getMessage();
+			_logger.error(errorText);
 			return false;
 		}
 	}

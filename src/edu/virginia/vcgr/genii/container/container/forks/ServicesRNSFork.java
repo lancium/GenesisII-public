@@ -63,10 +63,14 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 		for (JavaServiceDesc desc : Container.getInstalledServices()) {
 			String serviceName = desc.getName();
 
-			// TODO: remove this when JNDI is working again, if ever.
-			if (serviceName.equals("JNDIAuthnPortType")) {
-				continue;
-			}
+			/*
+			 * example of making certain port types disappear. this needs to be done with a list
+			 * instead. there are several port types that are deprecated and should no longer be
+			 * shown in the list of services.
+			 */
+			/*
+			 * if (serviceName.equals("JNDIAuthnPortType")) continue;
+			 */
 
 			if (entryName == null || entryName.equals(serviceName)) {
 				ResourceKey targetKey = ResourceManager.getServiceResource(serviceName);

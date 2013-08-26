@@ -1,0 +1,123 @@
+NAME:	queue-submission-test-sh
+
+DESCRIPTION:	This is the main script that runs all the other scripts to test BES job submission, stage-in and  stage-out 
+
+INPUT:	inputfile.txt
+	Contents of inputfile.txt
+	GENII_INSTALL_DIR : GenesisII client is installation path
+	DEPLOYMENT_NAME	: deployment name you want to use (usually default)
+	GENII_USER_DIR : GenesisII state directory path (usually ~/.genesisII-2.0)
+	QUEUE_PATH  : Path tp Grid queue on which jobs will be submitted
+	RNSPATH  : Grid path where you can stage-in and stage out the files. 
+
+OUTPUT:		env-file, Job Tickets for all the jobs submitted
+
+USAGE/EXAMPLE:		./queue-submission-test-sh
+	
+LIMITATIONS:	Should have properly set all the environment variables in inputfile.txt
+
+----------------------------------------------------------------------------------------------------------------------------
+
+NAME:	ls-single-job.jsdl
+	
+DESCRIPTION:	Submits a single 'ls' job to specified queue
+
+INPUT:	N/A
+
+OUTPUT: Ticket Number for the job
+
+USAGE/EXAMPLE: <GenesisII-Install-Dir>/grid qsub <grid-queue-path> local:<local-path>/ls-single-job.jsdl
+
+LIMITATIONS: None
+
+----------------------------------------------------------------------------------------------------------------------------
+
+NAME:   hostname-sleep-60s.jsdl
+
+DESCRIPTION:    Submits a single 'hostname' job to specified queue,
+job sleeps for 60s
+
+INPUT:  N/A
+
+OUTPUT: Ticket Number for the job
+
+USAGE/EXAMPLE: <GenesisII-Install-Dir>/grid qsub <grid-queue-path>
+local:<local-path>/hostname-sleep-60s.jsdl
+
+LIMITATIONS:    None
+
+----------------------------------------------------------------------------------------------------------------------------
+
+NAME:   hostname-stage-out.jsdl
+
+DESCRIPTION:    Submits a single 'hostname' job to specified queue,
+stages-out the output.txt to user's grid home directory
+
+INPUT:  N/A
+
+OUTPUT: Ticket Number for the job, output.txt
+
+USAGE/EXAMPLE: <GenesisII-Install-Dir>/grid qsub <grid-queue-path>
+local:<local-path>/hostname-stage-out.jsdl
+
+LIMITATIONS: None
+
+----------------------------------------------------------------------------------------------------------------------------
+
+NAME:   cat-stdin-stageout.jsdl
+
+DESCRIPTION:    Submits a 'cat' job that takes filename as input and
+cat's the filename to a output file.
+
+INPUT:  File name to be 'cat'
+
+OUTPUT: File that has 'cat' output (cat.out, cat.err)
+
+USAGE/EXAMPLE:  <GenesisII-Install-Dir>/grid qsub <grid-queue-path>
+local:<local-path>/cat-stdin-stageout.jsdl
+
+LIMITATIONS: Input file name should exist
+
+----------------------------------------------------------------------------------------------------------------------------
+
+NAME:   hostname-sweep-100.jsdl
+
+DESCRIPTION:    Submits 100 'hostname' jobs to specified queue,
+staging in the executable
+
+INPUT: N/A
+
+OUTPUT: 100 Ticket Numbers for the job
+
+USAGE/EXAMPLE: <GenesisII-Install-Dir>/grid qsub <grid-queue-path>
+local:<local-path>/hostname-stageout-parameter-sweep-100.jsdl
+
+LIMITATIONS: None
+
+----------------------------------------------------------------------------------------------------------------------------
+
+NAME: 	ls-parameter-sweep-1000.jsdl
+
+DESCRIPTION:	Submits 1000 'ls' job to specified queue (parameter sweep)
+
+INPUT: N/A
+
+OUTPUT:	1000 Ticket Number for the job
+
+USAGE/EXAMPLE: <GenesisII-Install-Dir>/grid qsub <grid-queue-path> local:<local-path>/ls-parameter-sweep-1000.jsdl
+
+LIMITATIONS: None
+
+----------------------------------------------------------------------------------------------------------------------------
+
+NAME:	ls-submit-1000.xml
+
+DESCRIPTION: Xscript that submits 1000 'ls' jobs (one job at a time, not parameter sweep)
+
+INPUT: Path to the grid queue
+
+OUTPUT: 100 job ticket numbers 
+
+USAGE/EXAMPLE:	<GenesisII-Install-Dir>/grid script local:./ls-submit-1000.xml $QUEUE_PATH	
+
+LIMITATIONS:	None 

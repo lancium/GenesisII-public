@@ -1,0 +1,25 @@
+/*
+
+$query="SELECT *
+FROM xcgaccountingrecords
+INNER JOIN xcgbescontainers
+ON xcgaccountingrecords.besid=xcgbescontainers.besid
+WHERE os=$_POST['arch1'] || $_POST['arch2'] || $_POST['arch3']
+ORDER BY wallclocktimemicrosecs DESC
+LIMIT 0 , 30";
+
+echo $query;
+
+
+$result = mysql_query("SELECT * FROM xcgaccountingweeklyuserhrs");
+
+Frequency <?php echo $_POST['freq']; ?><br />
+Linux <?php echo $_POST['arch1']; ?><br />
+Windows <?php echo $_POST['arch2']; ?><br />
+Mac <?php echo $_POST['arch3']; ?><br />
+Start Date <?php echo $_POST['startm']; ?>-<?php echo $_POST['startd']; ?>-<?php echo $_POST['starty']; ?><br />
+End Date <?php echo $_POST['endm']; ?>-<?php echo $_POST['endd']; ?>-<?php echo $_POST['endm']; ?><br />
+Machine/Cluster <?php echo $_POST['machine']; ?><br />
+<br />
+
+*/

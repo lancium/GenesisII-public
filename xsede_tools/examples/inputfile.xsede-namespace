@@ -1,0 +1,156 @@
+##############
+
+# these items are generally used in all tests.
+
+# The installation location for the GenesisII package (client or container).
+# Update this if Genesis is installed elsewhere, e.g. the installation path on
+# Mac OSX is instead "/Applications/GenesisII".
+GENII_INSTALL_DIR=$HOME/GenesisII
+
+# The name of the deployment to use.  Modern (2012 and onwards) installers
+# use the name "current_grid" for this.
+DEPLOYMENT_NAME=xsedebeta
+
+# The namespace variable defines what template to use for the GFFS namespace.
+# The two choices currently available are 'xcg' and 'xsede'.  The older xcg
+# namespace type has /containers at the top-level, and the xsede namespace
+# type has a /resources folder with many intermediate hierarchies for
+# containers, queues and so forth.
+#NAMESPACE=xcg
+#NAMESPACE=xsede
+
+# The user state directory for Genesis.  If not set, the default will be used.
+# Note that this directory should never be put on an NFS or other mounted
+# location, or the grid software will run terribly slowly.
+#GENII_USER_DIR=$HOME/.genesisII-2.0
+
+# userX below should be changed to your grid user's account.
+
+# The area in which to test.  Many junk files and directories are created
+# under this path, so it should be a directory without a lot of other
+# important files in it.  Note that this directory *must* be writable by
+# the grid user running the tests.
+RNSPATH=/home/userX/sandbox
+
+# Path to the user identity that will be running the tests.  This needs to be
+# a user that is already valid within the grid under test.  Most tests assume
+# that this user is already logged in.
+USERPATH=/users/userX
+
+# Used for windows testing; provides the path to the binaries directory of cygwin.
+#CYGWIN_BIN_PATH=c:/cygwin/bin
+
+##############
+
+#### GFFS settings...
+
+# The main CONTAINERPATH is used for creating export directories in some of
+# the tests.  This container needs visibility of the EXPORTPATH below.
+CONTAINERPATH=/containers/BootstrapContainer
+
+# REMOTE/LOCAL container paths are used for GFFS Performance Testing: the user
+# must have permissions to create files on these containers.  Note that the
+# local container should be close on the network to the user (short number of
+# hops, high bandwidth connection) whereas the remote container can be far
+# away from the user.  The test will run very slowly over a low-speed WAN
+# though, so it's recommended that the remote container still have high
+# bandwidth available.
+REMOTE_CONTAINER=/containers/BootstrapContainer
+LOCAL_CONTAINER=/containers/BootstrapContainer
+
+#   This is a path to export to the grid from the local filesystem.  Be
+# careful because this is tricky; it must be a valid path that the container
+# listed in CONTAINERPATH can actually see.
+#   So, if you are using the bootstrap container for the grid, it is important
+# to get a valid export path from the grid administrator that will actually be
+# present on the root container's machine.
+#   If you are running your own grid, then the local system user running the
+# container must be able to see this export path.  Further, the permissions
+# on that path for the container-running user id must match the desired export
+# permissions (e.g., container's unix user should have write access to the
+# export path if the export path would ever be written to *from* the grid).
+EXPORTPATH=/tmp
+
+##############
+
+#### EMS settings...
+
+# The queue to be used for submitting jobs.
+QUEUE_PATH=/queues/grid-queue
+
+# The group which has rights to submit jobs on the queue, plus possibly the
+# right to use any BES hooked to the queue.
+SUBMIT_GROUP=/groups/xsede.org/gffs-admins
+
+# This specifies what type of BES to test.  the options are either "Genesis"
+# or "Unicore" currently.
+BES_TYPE=Genesis
+
+# If this is not blank, then it is used as the only BES to target in the queue's
+# resources.  This will not work if that resource does not exist on the queue.
+BES_RESOURCE_OVERRIDE=
+
+# How long to wait for the jobs to finish...
+# The queue sleep duration is the interval between each queue check.  If this
+# is too fast, the queue will be slowed down by the continual questioning.
+QUEUE_SLEEP_DURATION=120
+# The queue tries is the number of times the above sleep duration is allowed
+# to occur in between seeing a change in the job count in the queue.  So if
+# the sleep duration is 2 minutes, and this number is 30, then the queue has
+# to change at least every hour or an error is reported.
+QUEUE_TRIES_ALLOWED=60
+# 60 tries is 2 hours worth of waiting for just one job to complete.
+
+# These items are all for the file staging tests.  The arrays below hold these items:
+#   hostname, test directory, username, password.
+# For example: FTP=("ftp.dartmouth.edu" "/home/userX/flummox" userX GrumbleCake)
+FTP=("filestaging.xcg.virginia.edu" "upload" ftpsecure OolaMoophutz26)
+HTTP=("people.virginia.edu" "/~cak0l/stuff" barry SnackyCake)
+SCP=("filestaging.xcg.virginia.edu" "/srv/ftp/ftpsecure/upload" ftpsecure OolaMoophutz26)
+SFTP=("filestaging.xcg.virginia.edu" "/srv/ftp/ftpsecure/upload" ftpsecure OolaMoophutz26)
+
+# The stage-out to email test needs the recipient address.  (It uses SCP
+# parameters for the stage-in portion.)
+EMAIL=userX@emailsomewhere.com
+
+##############
+
+#### multi-user settings for both GFFS and EMS...
+
+# These arrays are needed for the multi-user testing.  Those tests can use up to
+# 10 accounts in the array below.  Note that the account names must all be unique,
+# and should provide the full path to the user location.
+# Also note that the password list must have the correct passwords for each account,
+# and must be in the same order as the account names.
+MULTI_USER_LIST=(/users/demo_user1 /users/demo_user2 /users/demo_user3 /users/demo_user4 /users/demo_user5 /users/demo_user6 /users/demo_user7 /users/demo_user8 /users/demo_user9 /users/demo_user10)
+MULTI_PASSWORD_LIST=(passwd1 passwd2 passwd3 passwd4 passwd5 passwd6 passwd7 passwd8 passwd9 passwd10)
+
+##############
+
+# replication test settings...
+
+# To bootstrap a second container with a configuration that is identical
+# to the $DEPLOYMENT_DIR container except for the port number,
+# set the container name and port number here, and run bootstrap_backup.sh.
+# The script will create the necessary configuration and deployment files.
+#BACKUP_DEPLOYMENT_NAME=backup
+#BACKUP_PORT_NUMBER=21003
+
+# The bootstrap script will link the container at localhost:backup_port
+# into the default container's RNS namespace under this name.
+#BACKUP_CONTAINER=/containers/backup
+
+# Set the location of the runtime directory of the second container.
+#BACKUP_USER_DIR=$HOME/.backup-genesisII-2.0
+
+##############
+
+#### less frequently used settings...
+
+# These items are only needed for Unicore EMS tests, where the current process
+# for logging in requires a keystore login first, and then a normal user login.
+#KEYSTORE_FILE=$HOME/my_key.pfx
+#KEYSTORE_PASSWORD=HopsAndMalt34
+
+##############
+

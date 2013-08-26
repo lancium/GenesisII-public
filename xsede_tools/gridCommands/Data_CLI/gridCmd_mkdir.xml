@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-13-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="containerPath" source="${ARGV[2]}"/>
+
+<gsh:echo message="Testing 'mkdir' command"/>
+<geniix:mkdir>
+        <gsh:param>${rnsPath}/TestDir</gsh:param>
+</geniix:mkdir>
+
+<gsh:echo message="Testing 'mkdir' command - create multiple directories"/>
+<geniix:mkdir>
+        <gsh:param>${rnsPath}/TestDir1</gsh:param>
+        <gsh:param>${rnsPath}/TestDir2</gsh:param>
+        <gsh:param>${rnsPath}/TestDir3</gsh:param>
+</geniix:mkdir>
+
+<gsh:echo message="Testing 'mkdir -p' command - create subdirectories"/>
+<geniix:mkdir>
+	<gsh:param>-p</gsh:param>
+	<gsh:param>${rnsPath}/PTestDir/Dir1/Dir2/Dir2</gsh:param>
+</geniix:mkdir>
+
+<geniix:cd>
+	<gsh:param>${rnsPath}</gsh:param>
+</geniix:cd>
+<gsh:echo message="Testing recursive 'mkdir RTestDir' command"/>
+<gsh:for param-name="i" initial-value="0" inclusive-limit="3">
+        <geniix:mkdir>
+                <gsh:param>RTestDir</gsh:param>
+        </geniix:mkdir>
+        <geniix:cd>
+                <gsh:param>RTestDir</gsh:param>
+        </geniix:cd>
+</gsh:for>
+
+<geniix:cd>
+	<gsh:param>${rnsPath}</gsh:param>
+</geniix:cd>
+
+<gsh:echo message="Testing 'mkdir' command - path of an RNS service to use for creation"/>
+<geniix:mkdir>
+	<gsh:param>--rns-service=${containerPath}/Services/EnhancedRNSPortType</gsh:param>
+	<gsh:param>${rnsPath}/RNSDir</gsh:param>
+</geniix:mkdir>
+
+<geniix:rm>
+	<gsh:param>${rnsPath}/TestDir</gsh:param>
+	<gsh:param>${rnsPath}/TestDir1</gsh:param>
+	<gsh:param>${rnsPath}/TestDir2</gsh:param>
+	<gsh:param>${rnsPath}/TestDir3</gsh:param>
+	<gsh:param>${rnsPath}/RTestDir</gsh:param>
+	<gsh:param>${rnsPath}/RNSDir</gsh:param>
+	<gsh:param>${rnsPath}/PTestDir</gsh:param>
+</geniix:rm>
+
+</gsh:script>

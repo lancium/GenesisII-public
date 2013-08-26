@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-21-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="localMountPoint" source="${ARGV[2]}"/>
+<gsh:define name="containerPath" source="${ARGV[3]}"/>
+<gsh:define name="geniiInstallPath" source="${ARGV[4]}"/>
+
+<gsh:echo message="Testing 'cert-generator --gen-cert /containers/BootstrapContainer/Services/CertGeneratorPortType --ks-path=local:/localtmp --ks-pword=vana --keysize=1024' command"/>
+<geniix:cert-generator>
+	<gsh:param>--gen-cert</gsh:param>
+	<gsh:param>${containerPath}/Services/CertGeneratorPortType</gsh:param>
+	<gsh:param>--ks-path=local:./cert-vana</gsh:param>
+	<gsh:param>--ks-pword=vana</gsh:param>
+</geniix:cert-generator>
+
+</gsh:script>

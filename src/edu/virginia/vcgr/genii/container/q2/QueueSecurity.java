@@ -7,7 +7,7 @@ import java.util.Collection;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.SecurityUtils;
+import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AxisAcl;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -19,6 +19,7 @@ import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider
 import edu.virginia.vcgr.genii.security.acl.Acl;
 import edu.virginia.vcgr.genii.security.acl.AclEntry;
 import edu.virginia.vcgr.genii.security.identity.Identity;
+import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 /**
  * This class is a collection of utilities that the queue uses to manipulate certain aspects of
@@ -44,10 +45,10 @@ public class QueueSecurity
 			ICallingContext callingContext = ContextManager.getExistingContext();
 
 			if (filterOutGroups)
-				return SecurityUtils.filterCredentials(SecurityUtils.getCallerIdentities(callingContext),
-					SecurityUtils.GROUP_TOKEN_PATTERN);
+				return SecurityUtilities.filterCredentials(KeystoreManager.getCallerIdentities(callingContext),
+					SecurityUtilities.GROUP_TOKEN_PATTERN);
 			else
-				return SecurityUtils.getCallerIdentities(callingContext);
+				return KeystoreManager.getCallerIdentities(callingContext);
 		} catch (GeneralSecurityException gse) {
 			throw new AuthZSecurityException("Unable to load current context.", gse);
 		} catch (IOException ioe) {

@@ -1,0 +1,419 @@
+#!/usr/bin/perl
+
+###############################################################################
+#
+# manage_gffs_namespace_accounts: Manage user related global namespace entries
+# Based on: manage_sso_hub_accounts which is based on gen_mapfile.tg_myproxy
+#
+###############################################################################
+
+
+#######
+
+# Uncomment these and fill them in before using the script:
+#$DBUSER='{database-user}';
+#$DBPASSWD='{database-password}';
+#$GENII_INSTALL_DIR='/gffs/installation/location';
+
+#######
+
+# these accounts are considered important to add first.
+@ADMIN_ACCOUNTS = qw(mcnally navarro ssmallen grimshaw koeritz vana arnoldg);
+
+#@PERMITTED_NEW_ACCOUNTS = qw(spamidig sujith);
+
+#######
+
+use DBI;
+use Getopt::Long;
+use List::Compare;
+use Unix::Syslog qw(:macros);  # Syslog macros
+use Unix::Syslog qw(:subs);    # Syslog functions
+use POSIX ":sys_wait_h";       # For Forker
+use File::Basename;
+
+# Flags: 0=false, 1=true
+$DEBUG = 0;   # Display debugging information
+$TESTING = 0; # Set testing limit to small number of adds/deletes
+$MAX_ACCOUNTS_FOR_TEST = 10;  # how many to pull in for testing mode.
+$FORCEDELETES = 0;   # Force deletes; current design is no automatic deletes
+$MAX_COMBINED_COMMAND_BATCH = 20;  # number of commands to run per grid invocation.
+
+$result = GetOptions('debug'   => \$DEBUG,
+                     'testing' => \$TESTING,
+                     'forcedeletes' => \$FORCEDELETES );
+
+if ( (length($DBUSER) < 1) || (length($DBPASSWD) < 1)
+    || (length($GENII_INSTALL_DIR) < 1) ) {
+  # acquire variables from environment as fall-back.
+  use Env qw($DBUSER $DBPASSWD $GENII_INSTALL_DIR);
+
+  if ( (length($DBUSER) < 1) || (length($DBPASSWD) < 1)
+      || (length($GENII_INSTALL_DIR) < 1) ) {
+    print "This script requires that variables be established for:\n";
+    print "  DBUSER\n";
+    print "  DBPASSWD\n";
+    print "  GENII_INSTALL_DIR\n";
+    print "They can be set inside the script as defaults or they can come from\n";
+    print "environment variables.\n";
+    exit 1;
+  }
+}
+
+#######
+
+# get the working directory where this script is stored.
+use Cwd 'abs_path';
+$SCRIPT_DIR = dirname(abs_path($0));
+
+# XSEDE_ADMIN_SCRIPTS is the path to administrative XML scripts used by this script.
+#
+# standard version for when scripts are in local file system.
+$XSEDE_ADMIN_SCRIPTS = "local:$SCRIPT_DIR";
+#
+# example of scripts being available inside grid.
+#$XSEDE_ADMIN_SCRIPTS = 'local:/home/joe/admin-tools';
+
+print "Expecting to find user scripts in: $XSEDE_ADMIN_SCRIPTS\n";
+
+#######
+
+# Commands
+$GRIDCMD = "$GENII_INSTALL_DIR/grid";
+
+# Global namespace paths
+$XSEDE_NAMESPACE_BASE     = '';
+$XSEDE_STS_CONTAINER      = '/resources/xsede.org/containers/sts-1.xsede.org';
+$XSEDE_USERS_PATH         = "$XSEDE_NAMESPACE_BASE/users/xsede.org";
+$XSEDE_DELETED_USERS_PATH = "$XSEDE_NAMESPACE_BASE/users/deleted.xsede.org";
+$XSEDE_GROUPS_PATH        = "$XSEDE_NAMESPACE_BASE/groups/xsede.org";
+$XSEDE_HOME_PATH          = "$XSEDE_NAMESPACE_BASE/home/xsede.org";
+$XSEDE_DELETED_HOME_PATH  = "$XSEDE_NAMESPACE_BASE/home/deleted.xsede.org";
+
+# Global namespace scripts
+$XSEDE_ADDUSER_SCRIPT     = "$XSEDE_ADMIN_SCRIPTS/create-xsede-user.xml";
+$XSEDE_DELUSER_SCRIPT     = "$XSEDE_ADMIN_SCRIPTS/delete-xsede-user.xml";
+$XSEDE_GROUPUSER_SCRIPT   = "$XSEDE_ADMIN_SCRIPTS/link-xsede-user-to-group.xml";
+$XSEDE_COMBINED_SCRIPT    = "$XSEDE_ADMIN_SCRIPTS/combined-user-management.xml";
+
+$XSEDE_USERS_GROUP = 'gffs-users';
+$XSEDE_ADMINS_GROUP = 'gffs-admins';
+
+openlog $0, LOG_ODELAY, LOG_AUTHPRIV;
+$oldmask = setlogmask(LOG_UPTO(LOG_INFO));
+
+eval {
+    chdir $XSEDE_ADMIN_SCRIPTS;
+
+    # Connect to the TGCDB.
+    $dbh = DBI->connect(
+        "dbi:Pg:host=tgcdb.xsede.org;dbname=teragrid", $DBUSER, $DBPASSWD,
+        {
+            PrintError => 1,
+            RaiseError => 1,
+            AutoCommit => 1
+        }
+    );
+
+    # Retrieve XSEDE portal logins.
+    $cursor = $dbh->prepare( qq{ select dn, username from myproxy.dns where site = 'NCSA' order by dn});
+
+    $cursor->execute;
+
+    my @usernames_from_db = ();
+    my %usernames_from_db = ();
+
+    # Get portal logins
+    while ( ($dn, $login) = $cursor->fetchrow_array ) {
+        if ($dn eq $last_dn) {
+            if ($dn_login_string =~ /^u\d+/) {
+                $dn_login_string = "$login,$dn_login_string";
+            } else {
+                $dn_login_string = "$dn_login_string,$login";
+            }
+        } else {
+            # cpond: hacks and exceptions
+            if ($last_dn =~ /Sudhakar V. Pamidighantam/) {
+                $dn_login_string =~ s#(.*),spamidig(.*)#spamidig,$1$2#;
+            }
+            if ($last_dn) {
+                @usernames_from_db = (@usernames_from_db, $dn_login_string);
+                $usernames_from_db{$dn_login_string} = $last_dn;
+            }
+            $dn_login_string = "$login";
+        }
+        $last_dn = $dn;
+    }
+    $cursor->finish;
+    $dbh->disconnect;
+
+    if (defined $dn_login_string) {
+        @usernames_from_db = (@usernames_from_db, $dn_login_string);
+    }
+
+    print "Allocated user count from database = " . scalar(@usernames_from_db) . "\n" if ($DEBUG);
+
+    # Override if specified
+    if (@PERMITTED_NEW_ACCOUNTS) {
+        my $lc = List::Compare->new('--unsorted', \@usernames_from_db, \@PERMITTED_NEW_ACCOUNTS);
+        @usernames_from_db = $lc->get_intersection;
+    }
+
+    # this command finds the users in the GFFS namespace.
+    my $cmd = "$GRIDCMD ls $XSEDE_USERS_PATH" . (($DEBUG) ? '' : ' 2>/dev/null');
+    print "Executing: $cmd\n" if ($DEBUG);
+    my @ls_output = `$cmd`;
+    # this loops turns the command output into an array of usernames.
+    my $cnt = 0;
+    my @usernames_from_namespace = ();
+    foreach (@ls_output) {
+        $cnt++;
+        chomp;
+        next if (/^\./); # Leading dots
+        next if (/^\s*$/); # Only whitespace
+        next if (/\:$/ && $cnt eq 1); # Leading directory name
+        @usernames_from_namespace = (@usernames_from_namespace, $_);
+    }
+    print "GFFS existing user count = " . scalar(@usernames_from_namespace) . "\n" if ($DEBUG);
+
+    # calculate the difference between names in database and names in gffs.
+    $lc = List::Compare->new('--unsorted', \@usernames_from_db, \@usernames_from_namespace);
+    @newaccounts = $lc->get_Lonly;
+    
+    # remove admin accounts from list if they are there
+    $lc = List::Compare->new('--unsorted', \@newaccounts, \@ADMIN_ACCOUNTS);
+    @newaccounts = $lc->get_Lonly;
+  
+    # get admin accounts that need to be created
+    $lcAdmins = List::Compare->new('--unsorted', \@ADMIN_ACCOUNTS, \@usernames_from_namespace);
+    @newadminaccounts = $lcAdmins->get_Lonly;
+  
+    # add newadmin accounts to front of list so they get created first
+    unshift( @newaccounts, @newadminaccounts );
+
+    if ($TESTING) {
+        @newaccounts = @newaccounts[1 .. $MAX_ACCOUNTS_FOR_TEST];
+        print "For testing new account limit set = " . scalar(@newaccounts) . "\n" if ($DEBUG);
+    }
+    my @add_commands;
+#trying out single-file, but conjoined, create operations.
+    my @serialized_add_commands;
+    foreach my $account_name (@newaccounts) {
+        my @pairs = split(/\//, $usernames_from_db{$account_name});
+        my %key_values = map { split(/=/, $_, 2) } @pairs;
+
+        my $admin_group = ( grep(/^$account_name$/, @ADMIN_ACCOUNTS) ) ? $XSEDE_ADMINS_GROUP : '';
+        my $verbose = ($DEBUG) ? '' : '>/dev/null';
+        my $cmd = "$GRIDCMD script $XSEDE_COMBINED_SCRIPT c $account_name $XSEDE_USERS_GROUP $admin_group $verbose";
+        push @add_commands, $cmd;
+
+        my $s_cmd = "script $XSEDE_COMBINED_SCRIPT c $account_name $XSEDE_USERS_GROUP $admin_group\n"
+           . "onerror Failure to create user account $account_name\n";
+        push @serialized_add_commands, $s_cmd;
+
+#       Old pre-COMBINED code moved below
+    }
+
+    # If in testing mode, only do a small set of users.
+    @add_commands = @add_commands[0 .. $MAX_ACCOUNTS_FOR_TEST] if ($TESTING);
+
+#    forker(@add_commands);
+
+    # run batches of commands in a single grid command.
+    batch_runner(@serialized_add_commands);
+
+    @deletedaccounts = $lc->get_Ronly;
+    %accounts_to_be_preserved = map { $_ => 1 } @ADMIN_ACCOUNTS;
+    print "GFFS to be deleted user count = " . scalar(@deletedaccounts) . "\n" if ($DEBUG);
+    if ($FORCEDELETES) {
+        foreach my $account_name (@deletedaccounts) {
+            my $cmd = "$GRIDCMD script $XSEDE_DELUSER_SCRIPT $account_name" . (($DEBUG) ? '' : ' 2>/dev/null');
+            print "Executing: $cmd\n" if ($DEBUG);
+            my @cmd_output = `$cmd`;
+            if ( $? == -1 ) {
+                print "grid script $XSEDE_DELUSER_SCRIPT failed for $account_name: $!\n";
+                syslog LOG_ERR, "grid script $XSEDE_DELUSER_SCRIPT failed: Account $account_name could not be deleted", @formatargs;
+            } else {
+                if ( ($? >> 8) != 0 ) {
+                    $tmp = $? >> 8;
+                    syslog LOG_ERR, "grid script $XSEDE_DELUSER_SCRIPT exited with value $tmp: Account $account_name could not be deleted", @formatargs;
+                    die "grid script $XSEDE_DELUSER_SCRIPT exited with value $tmp: Account $account_name could not be deleted";
+                }
+                syslog LOG_INFO, "Account $account_name moved to deleted.xsede.org", @formatargs;
+            }
+        }
+    }
+};    # eval
+
+# Catch any errors, and send mail if $MAILTO is set.  Otherwise, just report
+# errors on STDERR.
+if ($@) {
+    $err = $@;
+    if ($MAILTO) {
+        $msg = new Mail::Send;
+        $msg->to($MAILTO);
+        $msg->subject("Error From XSEDE GFFS Namespace Management");
+        $fh = $msg->open;
+        print $fh $err;
+        $fh->close;
+    } else {
+        print STDERR $err;
+    }
+}
+
+closelog;
+
+exit 0;
+
+###############################################################################
+sub minimum ($$) { $_[$_[0] > $_[1]] }
+
+# takes a list of commands and bundles them into smaller batches, which will
+# be run through the grid command as its input stream.
+sub batch_runner {
+  my @commands = @_;
+  my $cmd_length = scalar @commands;
+  use Env qw($HOME);
+  my $temp_file = "$HOME/.temp-batch";
+  my $index = 0;
+
+#print "got cmd length of $cmd_length\n";
+
+  while (@commands && ($index < $cmd_length) ) {
+    my $stop_index = &minimum($index + $MAX_COMBINED_COMMAND_BATCH, $cmd_length);
+	if ($DEBUG) {
+		print "batch from $index - " . ($stop_index - 1) . "\n";
+	}
+    open (BATCHFILE, "> $temp_file"); 
+    for (local($b) = $index; $b < $stop_index; $b++)  {
+      print BATCHFILE $commands[$b];
+#print "added elem: $commands[$b]\n";
+      $index = $stop_index;
+    }
+    close BATCHFILE;
+
+#print "current batch is:\n";
+#open (BATCHFILE, "< $temp_file"); 
+#while (<BATCHFILE>) {
+#print $_ . "\n";
+#}
+#close BATCHFILE;
+
+    # run command with batch of commands as input.
+    open STDIN, "$temp_file";
+    system($GRIDCMD);
+    local $exitval = $?;
+    if ($exitval != 0) {
+      print "saw failure in grid command ($exitval).\nthere is an error log in: $temp_file\n";
+      exit $exitval;
+    }
+    close STDIN;
+  }
+}
+
+###############################################################################
+sub forker {
+  my @commands = @_;
+  my $FORKER_DEBUG = 0;
+  my ($todo, $done, $active, $maxrc) = (scalar @commands, 0, 0, 0);
+  my ($pid, $rc, %child);
+  my $max_threads = 8; # Degree of parallelism
+
+  while (@commands || $done < $todo) {
+    # Reap children
+    while (($pid = waitpid(-1, &WNOHANG)) > 0) {
+      if (exists $child{$pid}) { # A little paranoid about who we reap
+        $rc = $? >> 8;
+        $maxrc = $rc if ($rc > $maxrc);
+        $active-- if ($active > 0);
+        $todo--   if ($todo > 0);
+        $done++;
+        print "Forker: todo=$todo, done=$done, active=$active, maxrc=$maxrc\n" if ($FORKER_DEBUG);
+      }
+    }
+
+    # No commands or at max active
+    unless (@commands && $active < $max_threads) {
+      select undef, undef, undef, 0.1; # sleep 0.1 seconds
+      next;
+    }
+
+    # Fork a command
+    unless ($pid = fork()) { # Child
+      exit(exec(pop(@commands)) >> 8);
+    }
+    $child{$pid}{cmd} = pop(@commands);
+    $active++;
+    print "Forker: todo=$todo, done=$done, active=$active, maxrc=$maxrc\n" if ($FORKER_DEBUG);
+  }
+
+  my $sleep = 600; # Max seconds waiting for children to finish
+  while ( $active > 0 && $sleep ) {
+    sleep(1);
+    $sleep--;
+    while (($pid = waitpid(-1, &WNOHANG)) > 0) {
+      if (exists $child{$pid}) { # A little paranoid about who we reap
+        $rc = $? >> 8;
+        $maxrc = $rc if ($rc > $maxrc);
+        $active-- if ($active > 0);
+        $todo--   if ($todo > 0);
+        $done++;
+        print "Forker: todo=$todo, done=$done, active=$active, maxrc=$maxrc\n" if ($FORKER_DEBUG);
+        if ($rc != 0) {
+          print "Failed (rc=$rc) Command: $child{$pid}{cmd}\n";
+          syslog LOG_ERR, "Failed (rc=$rc) Command: $child{$pid}{cmd}\n";
+        }
+      }
+    }
+  }
+  print "Forker: sleep=$sleep, done=$done, maxrc=$maxrc\n" if ($FORKER_DEBUG);
+  return($maxrc);
+}
+
+# Old pre-COMBINED code
+#       my $cmd = "$GRIDCMD script $XSEDE_ADDUSER_SCRIPT $account_name" . (($DEBUG) ? '' : ' 2>/dev/null');
+#       print "Executing: $cmd\n" if ($DEBUG);
+#       my @cmd_output = `$cmd`;
+#       if ( $? == -1 ) {
+#           print "grid script $XSEDE_ADDUSER_SCRIPT failed for account $account_name: $!\n";
+#           syslog LOG_ERR, "grid script $XSEDE_ADDUSER_SCRIPT failed: Account $account_name could not be created for $key_values{\"CN\"}", @formatargs;
+#       } else {
+#           if ( ($? >> 8) != 0 ) {
+#               $tmp = $? >> 8;
+#               syslog LOG_ERR, "grid script $XSEDE_ADDUSER_SCRIPT exited with value $tmp: Account $account_name could not be created for $key_values{\"CN\"}", @formatargs;
+#               die "grid script $XSEDE_ADDUSER_SCRIPT exited with value $tmp: Account $account_name could not be created for $key_values{\"CN\"}";
+#           }
+#           syslog LOG_INFO, "Account $account_name created for $key_values{\"CN\"}", @formatargs;
+#       }
+
+#       my $cmd = "$GRIDCMD script $XSEDE_GROUPUSER_SCRIPT $account_name $XSEDE_USERS_GROUP" . (($DEBUG) ? '' : ' 2>/dev/null');
+#       print "Executing: $cmd\n" if ($DEBUG);
+#       my @cmd_output = `$cmd`;
+#       if ( $? == -1 ) {
+#           print "grid script $XSEDE_GROUPUSER_SCRIPT failed for account $account_name: $!\n";
+#           syslog LOG_ERR, "grid script $XSEDE_GROUPUSER_SCRIPT failed: Account $account_name could not be created for $key_values{\"CN\"}", @formatargs;
+#       } else {
+#           if ( ($? >> 8) != 0 ) {
+#               $tmp = $? >> 8;
+#               syslog LOG_ERR, "grid script $XSEDE_GROUPUSER_SCRIPT exited with value $tmp: Account $account_name could not be created for $key_values{\"CN\"}", @formatargs;
+#               die "grid script $XSEDE_GROUPUSER_SCRIPT exited with value $tmp: Account $account_name could not be created for $key_values{\"CN\"}";
+#           }
+#           syslog LOG_INFO, "Account $account_name added to group $XSEDE_USERS_GROUP", @formatargs;
+#       }
+
+#       if ( grep(/^$account_name$/, @ADMIN_ACCOUNTS) )  {
+#           my $cmd = "$GRIDCMD script $XSEDE_GROUPUSER_SCRIPT $account_name $XSEDE_ADMINS_GROUP" . (($DEBUG) ? '' : ' 2>/dev/null');
+#           print "Executing: $cmd\n" if ($DEBUG);
+#           my @cmd_output = `$cmd`;
+#           if ( $? == -1 ) {
+#               print "grid script $XSEDE_GROUPUSER_SCRIPT failed for account $account_name: $!\n";
+#               syslog LOG_ERR, "grid script $XSEDE_GROUPUSER_SCRIPT failed: Account $account_name could not be created for $key_values{\"CN\"}", @formatargs;
+#           } else {
+#               if ( ($? >> 8) != 0 ) {
+#                   $tmp = $? >> 8;
+#                   syslog LOG_ERR, "grid script $XSEDE_GROUPUSER_SCRIPT exited with value $tmp: Account $account_name could not be created for $key_values{\"CN\"}", @formatargs;
+#                   die "grid script $XSEDE_GROUPUSER_SCRIPT exited with value $tmp: Account $account_name could not be created for $key_values{\"CN\"}";
+#               }
+#               syslog LOG_INFO, "Account $account_name added to group $XSEDE_ADMINS_GROUP", @formatargs;
+#           }
+#       }

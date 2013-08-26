@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-15-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="localMountPoint" source="${ARGV[2]}"/>
+
+<gsh:echo message="Testing 'fuse --mount --daemon' command"/>
+<geniix:fuse>
+        <gsh:param>--mount</gsh:param>
+        <gsh:param>local:${localMountPoint}</gsh:param>
+        <gsh:param>--daemon</gsh:param>
+</geniix:fuse>
+
+<gsh:sleep value="20" units="SECONDS"/>
+
+<gsh:echo message="Listing the mounted directory"/>
+<geniix:ls>
+        <gsh:param>local:${localMountPoint}</gsh:param>
+</geniix:ls>
+
+<gsh:echo message="Testing 'fuse --unmount' command"/>
+<geniix:fuse>
+        <gsh:param>--unmount</gsh:param>
+        <gsh:param>local:${localMountPoint}</gsh:param>
+</geniix:fuse>
+
+<gsh:sleep value="20" units="SECONDS"/>
+
+<gsh:echo message="Testing 'fuse mount --daemon --sandbox' command"/>
+<geniix:fuse>
+        <gsh:param>--mount</gsh:param>
+        <gsh:param>--sandbox=${rnsPath}</gsh:param>
+        <gsh:param>local:${localMountPoint}</gsh:param>
+        <gsh:param>--daemon</gsh:param>
+</geniix:fuse>
+
+<gsh:sleep value="20" units="SECONDS"/>
+
+<gsh:echo message="Listing the mounted directory"/>
+<geniix:ls>
+        <gsh:param>local:${localMountPoint}</gsh:param>
+</geniix:ls>
+
+<geniix:fuse>
+        <gsh:param>--unmount</gsh:param>
+        <gsh:param>local:${localMountPoint}</gsh:param>
+</geniix:fuse>
+
+<gsh:sleep value="20" units="SECONDS"/>
+
+<gsh:echo message="Testing 'fuse mount --daemon --uid' command"/>
+<geniix:fuse>
+        <gsh:param>--mount</gsh:param>
+        <gsh:param>--uid=501359</gsh:param>
+        <gsh:param>local:${localMountPoint}</gsh:param>
+        <gsh:param>--daemon</gsh:param>
+</geniix:fuse>
+
+<gsh:sleep value="20" units="SECONDS"/>
+
+<gsh:echo message="Listing the mounted directory"/>
+<geniix:ls>
+        <gsh:param>local:${localMountPoint}</gsh:param>
+</geniix:ls>
+
+<geniix:fuse>
+        <gsh:param>--unmount</gsh:param>
+        <gsh:param>local:${localMountPoint}</gsh:param>
+</geniix:fuse>
+
+<gsh:sleep value="20" units="SECONDS"/>
+
+<gsh:echo message="Testing 'ls --long --epr --all' command on local directory"/>
+<geniix:ls>
+        <gsh:param>--long</gsh:param>
+        <gsh:param>--epr</gsh:param>
+        <gsh:param>--all</gsh:param>
+        <gsh:param>local:${localMountPoint}</gsh:param>
+</geniix:ls>
+
+</gsh:script>

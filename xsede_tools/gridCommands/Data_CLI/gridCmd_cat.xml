@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-13-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<gsh:echo message="Testing 'cat' command"/>
+<geniix:echo>
+        <gsh:param>"Hello "</gsh:param>
+        <gsh:param>"File1: line1 "</gsh:param>
+        <gsh:param>"File1: line2 "</gsh:param>
+        <gsh:param>></gsh:param>
+        <gsh:param>${rnsPath}/test1.txt</gsh:param>
+</geniix:echo>
+<geniix:cat>
+        <gsh:param>${rnsPath}/test1.txt</gsh:param>
+</geniix:cat>
+
+
+<gsh:echo message="Testing 'cat' command - multiple files"/>
+<geniix:echo>
+        <gsh:param>"Hello "</gsh:param>
+        <gsh:param>"File2: line1 "</gsh:param>
+        <gsh:param>"File2: line2 "</gsh:param>
+        <gsh:param>></gsh:param>
+        <gsh:param>${rnsPath}/test2.txt</gsh:param>
+</geniix:echo>
+<geniix:cat>
+        <gsh:param>${rnsPath}/test1.txt</gsh:param>
+        <gsh:param>${rnsPath}/test2.txt</gsh:param>
+</geniix:cat>
+
+<geniix:rm>
+	<gsh:param>${rnsPath}/test*.txt</gsh:param>
+</geniix:rm>
+
+</gsh:script>
+

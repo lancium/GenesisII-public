@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl" xmlns:ns2="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix" xmlns:ns3="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcpa" xmlns:ns4="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd" xmlns:ns5="http://vcgr.cs.virginia.edu/jsdl/genii" xmlns:ns6="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:ns7="http://schemas.ogf.org/hpcp/2007/11/ac" xmlns:ns8="http://schemas.ogf.org/jsdl/2009/03/sweep" xmlns:ns9="http://schemas.ogf.org/jsdl/2009/03/sweep/functions">
+    <JobDescription>
+        <JobIdentification>
+            <JobName>parameter-sweep-mpi</JobName>
+        </JobIdentification>
+        <Application>
+            <ns4:SPMDApplication>
+                <ns2:Executable>a.out</ns2:Executable>
+                <ns2:Argument>i</ns2:Argument>
+                <ns2:Environment name="C_SOURCES">parameter-sweep-mpi.c</ns2:Environment>
+		<ns2:Output>mpi-out</ns2:Output>
+                <ns2:Error>mpi-err</ns2:Error>
+                <ns4:NumberOfProcesses>4</ns4:NumberOfProcesses>
+                <ns4:ProcessesPerHost>1</ns4:ProcessesPerHost>
+                <ns4:ThreadsPerProcess xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+                <ns4:SPMDVariation>http://www.ogf/org/jsdl/2007/02/jsdl-spmd/MPICH2</ns4:SPMDVariation>
+            </ns4:SPMDApplication>
+        </Application>
+	<Resources>
+          <IndividualCPUCount>
+            <Exact>1.0</Exact>
+          </IndividualCPUCount>
+          <TotalResourceCount>
+            <Exact>4.0</Exact>
+          </TotalResourceCount>
+        </Resources>
+        <DataStaging>
+            <FileName>parameter-sweep-mpi.c</FileName>
+            <CreationFlag>overwrite</CreationFlag>
+            <DeleteOnTermination>true</DeleteOnTermination>
+            <Source>
+                <URI>rns:PATH/parameter-sweep-mpi.c</URI>
+            </Source>
+        </DataStaging>
+        <DataStaging>
+            <FileName>hostname.sh</FileName>
+            <CreationFlag>overwrite</CreationFlag>
+            <DeleteOnTermination>true</DeleteOnTermination>
+            <Source>
+                <URI>rns:PATH/hostname.sh</URI>
+            </Source>
+        </DataStaging>
+        <DataStaging>
+            <FileName>mpi-out</FileName>
+            <CreationFlag>overwrite</CreationFlag>
+            <DeleteOnTermination>true</DeleteOnTermination>
+            <Target>
+                <URI>rns:PATH/mpi-out</URI>
+            </Target>
+        </DataStaging>
+        <DataStaging>
+            <FileName>mpi-err</FileName>
+            <CreationFlag>overwrite</CreationFlag>
+            <DeleteOnTermination>true</DeleteOnTermination>
+            <Target>
+                <URI>rns:PATH/mpi-err</URI>
+            </Target>
+        </DataStaging>
+        <DataStaging>
+            <FileName>mpi-hostname.txt</FileName>
+            <CreationFlag>overwrite</CreationFlag>
+            <DeleteOnTermination>true</DeleteOnTermination>
+            <Target>
+                <URI>rns:PATH/mpi-hostname-i.txt</URI>
+            </Target>
+        </DataStaging>
+    </JobDescription>
+    <ns8:Sweep>
+        <ns8:Assignment>
+            <ns8:DocumentNode>
+                <ns8:NamespaceBinding prefix="ns2" ns="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"/>
+                <ns8:NamespaceBinding prefix="ns1" ns="http://schemas.ggf.org/jsdl/2005/11/jsdl"/>
+                <ns8:NamespaceBinding prefix="ns3" ns="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"/>
+                <ns8:Match>substring(/ns1:JobDefinition/ns1:JobDescription/ns1:Application/ns2:SPMDApplication/ns3:Argument[1], 1, 1)</ns8:Match>
+            </ns8:DocumentNode>
+            <ns8:DocumentNode>
+                <ns8:NamespaceBinding prefix="ns1" ns="http://schemas.ggf.org/jsdl/2005/11/jsdl"/>
+                <ns8:Match>substring(/ns1:JobDefinition/ns1:JobDescription/ns1:DataStaging[5]/ns1:Target/ns1:URI, PLENGTH + 20, 1)</ns8:Match>
+            </ns8:DocumentNode>
+            <ns9:LoopInteger step="1" end="4" start="1"/>
+        </ns8:Assignment>
+    </ns8:Sweep>
+</JobDefinition>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Author: Vanamala Venkataswamy (xsede namespace, increment 3) -->
+<!-- This script is used to link an external grid into xsede namespace -->
+
+<gsh:script
+    xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+    xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+  <gsh:default name="EXT_GRID" value="xcg.virginia.edu"/>
+
+  <gsh:echo message="Unlinking /users/${EXT_GRID}"/>
+  <geniix:unlink>
+    <gsh:param>/users/${EXT_GRID}</gsh:param>
+  </geniix:unlink>
+
+  <gsh:echo message="Unlinking /groups/${EXT_GRID}"/>
+  <geniix:unlink>
+    <gsh:param>/groups/${EXT_GRID}</gsh:param>
+  </geniix:unlink>
+
+  <gsh:echo message="Unlinking /home/${EXT_GRID}"/>
+  <geniix:unlink>
+    <gsh:param>/home/${EXT_GRID}</gsh:param>
+  </geniix:unlink>
+
+  <gsh:echo message="Unlinking /resources/${EXT_GRID}/containers"/>
+  <geniix:unlink>
+    <gsh:param>/resources/${EXT_GRID}/containers</gsh:param>
+  </geniix:unlink>
+
+  <gsh:echo message="Unlinking /resources/${EXT_GRID}/bes-containers"/>
+  <geniix:unlink>
+    <gsh:param>/resources/${EXT_GRID}/bes-containers</gsh:param>
+  </geniix:unlink>
+
+  <gsh:echo message="Unlinking /queues/${EXT_GRID}"/>
+  <geniix:unlink>
+    <gsh:param>/resources/${EXT_GRID}/queues</gsh:param>
+  </geniix:unlink>
+
+  <gsh:echo message="Removing /resources/${EXT_GRID}"/>
+  <geniix:rm>
+    <gsh:param>/resources/${EXT_GRID}</gsh:param>
+  </geniix:rm>
+
+  <gsh:echo message="Unlinking /mount/${EXT_GRID}"/>
+  <geniix:unlink>
+    <gsh:param>/mount/${EXT_GRID}</gsh:param>
+  </geniix:unlink>
+
+</gsh:script>
+

@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.pwrapper.ElapsedTime;
-import edu.virginia.vcgr.genii.client.security.SecurityUtils;
+import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.container.AccountingRecordType;
 import edu.virginia.vcgr.genii.container.bes.BESAttributesHandler;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
@@ -69,7 +69,7 @@ public class AccountingService extends AbstractContainerService
 		if (machineName == null)
 			machineName = BESAttributesHandler.getName();
 
-		Collection<Identity> identities = SecurityUtils.getCallerIdentities(callingContext);
+		Collection<Identity> identities = KeystoreManager.getCallerIdentities(callingContext);
 
 		try {
 			conn = getConnectionPool().acquire(false);

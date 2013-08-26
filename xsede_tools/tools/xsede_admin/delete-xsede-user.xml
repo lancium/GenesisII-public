@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Delete an XSEDE kerberos/myproxy user within the XSEDE namespace. -->
+
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+	xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+
+<!--
+parameters for this script are:
+
+1: user name (ex. johndoe)
+
+-->
+	<gsh:default name="USER" value="${ARGV[1]}"/>
+	<gsh:default name="USER_DIR" value="/users/xsede.org"/>
+	<gsh:default name="USER_PATH" value="${USER_DIR}/${USER}"/>
+	<gsh:default name="HOME_DIR" value="/home/xsede.org"/>
+	<gsh:default name="HOME_PATH" value="${HOME_DIR}/${USER}"/>
+	<gsh:default name="DELUSER_DIR" value="/users/deleted.xsede.org"/>
+	<gsh:default name="DELUSER_PATH" value="${DELUSER_DIR}/${USER}"/>
+	<gsh:default name="DELHOME_DIR" value="/home/deleted.xsede.org"/>
+	<gsh:default name="DELHOME_PATH" value="${DELHOME_DIR}/${USER}"/>
+
+	<geniix:mv>
+		<param>${USER_PATH}</param>
+		<param>${DELUSER_PATH}</param>
+	</geniix:mv>
+
+	<geniix:mv>
+		<param>${HOME_PATH}</param>
+		<param>${DELHOME_PATH}</param>
+	</geniix:mv>
+
+</gsh:script>

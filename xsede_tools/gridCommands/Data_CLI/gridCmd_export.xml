@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-13-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="containerPath" source="${ARGV[2]}"/>
+
+<gsh:echo message="Testing 'export' command"/>
+<gsh:echo message="# container path is ${containerPath}"/>
+<geniix:export>
+        <gsh:param>--create</gsh:param>
+        <gsh:param>${containerPath}/Services/LightWeightExportPortType</gsh:param>
+        <gsh:param>local:/tmp</gsh:param>
+        <gsh:param>${rnsPath}/exportTest</gsh:param>
+</geniix:export>
+
+<gsh:echo message="Listing the exported directory"/>
+<geniix:ls>
+        <gsh:param>${rnsPath}/exportTest</gsh:param>
+</geniix:ls>
+
+<gsh:echo message="Testing 'export --quit' command"/>
+<geniix:export>
+        <gsh:param>--quit</gsh:param>
+        <gsh:param>${rnsPath}/exportTest</gsh:param>
+</geniix:export>
+
+</gsh:script>
+

@@ -1,0 +1,19 @@
+
+# checks that the grid container is running.  if it is not running, it is started up.
+
+SHELL=/bin/bash
+
+# m h dom mon dow command
+
+# cron has very simple variables; variables cannot use the values of other variables, and
+# only a few are provided like HOME.  that's why we set the USER below.
+
+# set the user appropriately to distinguish output files.
+USER=jurgis
+# modify this according to where you put the xsede test hierarchy.
+XSEDE_TESTS_FOLDER=/home/jurgis/xsede/xsede_tests
+
+# make sure the grid container is started if we can't detect it as running.
+*/10 * * * * export logname=/tmp/container_restarter_${USER}_$(hostname).log; bash $XSEDE_TESTS_FOLDER/library/maybe_restart_container.sh &>>$logname ; /bin/chmod g+w $logname
+
+

@@ -1,0 +1,11 @@
+
+2012 01 19 CAK:
+  We have recreated the iozone and gzip tar files used by the gnuMake.sh
+script because we determined that tar was trying to recreate exact file and
+folder permissions from the archive, and some of these permissions did not
+have owner-write enabled.  This causes a problem on fuse mounts, where the
+owner can no longer modify the new folders after the tar extraction occurs.
+  The new tars simply contain rwx permissions for everything, and when tar
+operates on them, it does not break the fuse-mounted permission attributes
+any longer.
+

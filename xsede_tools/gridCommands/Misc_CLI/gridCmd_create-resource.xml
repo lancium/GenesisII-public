@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-19-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="containerPath" source="${ARGV[2]}"/>
+
+<gsh:echo message="Testing 'create-resource ${containerPath}/Services/GeniiBESPortType ${rnsPath}/dummy-bes  ' command "/>
+<geniix:create-resource>
+        <gsh:param>${containerPath}/Services/GeniiBESPortType</gsh:param>
+        <gsh:param>${rnsPath}/dummy-bes</gsh:param>
+</geniix:create-resource>
+
+<gsh:echo message="Testing 'create-resource ${containerPath}/Services/EnhancedRNSPortType ${rnsPath}/dummy-rns  ' command "/>
+<geniix:create-resource>
+        <gsh:param>${containerPath}/Services/EnhancedRNSPortType</gsh:param>
+        <gsh:param>${rnsPath}/dummy-rns</gsh:param>
+</geniix:create-resource>
+
+<gsh:echo message="Testing 'create-resource --url https://localhost/${h}/Services/EnhancedRNSPortType ${rnsPath}/dummy-rns2  ' command "/>
+<geniix:create-resource>
+        <gsh:param>${containerPath}/Services/EnhancedRNSPortType</gsh:param>
+        <gsh:param>${rnsPath}/dummy-rns2</gsh:param>
+</geniix:create-resource>
+
+<geniix:ls>
+	<gsh:param>${rnsPath}/</gsh:param>
+</geniix:ls>
+
+<geniix:unlink>
+	<gsh:param>${rnsPath}/dummy-bes</gsh:param>
+	<gsh:param>${rnsPath}/dummy-rns</gsh:param>
+	<gsh:param>${rnsPath}/dummy-rns2</gsh:param>
+</geniix:unlink>
+
+</gsh:script>

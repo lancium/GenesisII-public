@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Creates an XSEDE kerberos/myproxy user within the XSEDE namespace. -->
+
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+	xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+
+<!--
+Script parameters are:
+
+1: service_provider (e.g., nics, sdsc, etc.)
+-->
+
+  <gsh:default name="SP" value="${ARGV[1]}"/>
+  <gsh:default name="GROUP" value="gffs-admins.${SP}"/>
+  <gsh:default name="GROUP_PATH" value="/groups/xsede.org/${GROUP}"/>
+  <gsh:default name="SP_PATH" value="/home/${SP}.xsede.org"/>
+  <gsh:default name="ROOT_RESOLVER" value="/etc/resolvers/rootResolver"/>
+  <gsh:default name="STS_RESOLVER" value="/etc/resolvers/stsResolver"/>
+  <gsh:default name="REPLICA"
+        value="/resources/xsede.org/containers/gffs-2.xsede.org"/>
+  <gsh:default name="STS1PATH" 
+    value="/resources/xsede.org/containers/sts-1.xsede.org"/>
+  <gsh:default name="STS2PATH" 
+    value="/resources/xsede.org/containers/sts-2.xsede.org"/>
+
+
+  <echo message="Creating group ${GROUP}"/>
+	<geniix:idp>
+		<param>${STS1PATH}/Services/X509AuthnPortType</param>
+		<param>${GROUP}</param>
+	</geniix:idp>
+
+	<geniix:ln>
+		<param>${STS1PATH}/Services/X509AuthnPortType/${GROUP}</param>
+		<param>${GROUP_PATH}</param>
+	</geniix:ln>
+	<geniix:chmod>
+		<param>${GROUP_PATH}</param>
+		<param>+rwx</param>
+		<param>${GROUP_PATH}</param>
+	</geniix:chmod>
+
+  <echo message="Setting up replication for ${GROUP}"/>
+	<geniix:resolver>
+		<param>-p</param>
+		<param>-r</param>
+		<param>${GROUP_PATH}</param>
+		<param>${STS_RESOLVER}</param>
+	</geniix:resolver>
+	<geniix:replicate>
+		<param>-p</param>
+		<param>${GROUP_PATH}</param>
+		<param>${STS2PATH}</param>
+	</geniix:replicate>
+
+  <echo message="Creating ${SP_PATH}"/>
+	<geniix:mkdir>
+		<param>-p</param>
+		<param>${SP_PATH}</param>
+	</geniix:mkdir>
+	<geniix:chmod>
+		<param>${SP_PATH}</param>
+		<param>+rwx</param>
+		<param>${GROUP_PATH}</param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<param>${SP_PATH}</param>
+		<param>+rwx</param>
+		<param>/groups/xsede.org/gffs-users</param>
+	</geniix:chmod>
+
+  <echo message="Creating ${SP_PATH}/user"/>
+	<geniix:mkdir>
+		<param>-p</param>
+		<param>${SP_PATH}/user</param>
+	</geniix:mkdir>
+	<geniix:chmod>
+		<param>${SP_PATH}/user</param>
+		<param>+rwx</param>
+		<param>${GROUP_PATH}</param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<param>${SP_PATH}/user</param>
+		<param>+rwx</param>
+		<param>/groups/xsede.org/gffs-users</param>
+	</geniix:chmod>
+
+  <echo message="Creating ${SP_PATH}/project"/>
+	<geniix:mkdir>
+		<param>-p</param>
+		<param>${SP_PATH}/project</param>
+	</geniix:mkdir>
+	<geniix:chmod>
+		<param>${SP_PATH}/project</param>
+		<param>+rwx</param>
+		<param>${GROUP_PATH}</param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<param>${SP_PATH}/project</param>
+		<param>+rwx</param>
+		<param>/groups/xsede.org/gffs-users</param>
+	</geniix:chmod>
+
+  <echo message="Setting up replication for ${SP_PATH}"/>
+	<geniix:resolver>
+		<param>-p</param>
+		<param>-r</param>
+		<param>${SP_PATH}</param>
+		<param>${ROOT_RESOLVER}</param>
+	</geniix:resolver>
+	<geniix:replicate>
+		<param>-p</param>
+		<param>${SP_PATH}</param>
+		<param>${REPLICA}</param>
+	</geniix:replicate>
+
+<!-- Commenting out for Increment 3 as w/o more control for cleaning up
+replication, we should limit privilge to gffs-admins rather than
+gffs-admins.<service_provider> 
+
+  <echo message="Adding replica priviliges for ${GROUP}"/>
+	<geniix:chmod>
+		<param>/etc/resolvers/rootResolver</param>
+		<param>+rx</param>
+		<param>${GROUP_PATH}</param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<param>/resources/xsede.org/containers/gffs-2.xsede.org</param>
+		<param>+r</param>
+		<param>${GROUP_PATH}</param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<param>/resources/xsede.org/containers/gffs-2.xsede.org/Services</param>
+		<param>+r</param>
+		<param>${GROUP_PATH}</param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<param>/resources/xsede.org/containers/gffs-2.xsede.org/Services/EnhancedRNSPortType</param>
+		<param>+rx</param>
+		<param>${GROUP_PATH}</param>
+	</geniix:chmod>
+  -->
+
+  
+</gsh:script>

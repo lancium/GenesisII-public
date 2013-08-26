@@ -56,7 +56,6 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
-import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -64,13 +63,14 @@ import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.container.ContainerIDFile;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.security.SecurityUtils;
+import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
@@ -81,6 +81,7 @@ import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
+import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 import edu.virginia.vcgr.secrun.SecureRunnableHooks;
@@ -121,30 +122,30 @@ public class Container extends ApplicationBase
 			System.exit(1);
 		}
 
-		CertificateValidatorFactory.setValidator(new SecurityUtils());
-
-		GridEnvironment.loadGridEnvironment();
-
-		ContainerStatistics.instance();
-
-		if (args.length == 1)
-			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, args[0]);
-
-		prepareServerApplication();
-
-		// Set Trust Store Provider
-		java.security.Security.setProperty("ssl.SocketFactory.provider", VcgrSslSocketFactory.class.getName());
-
-		LowMemoryWarning.INSTANCE.addLowMemoryListener(new LowMemoryExitHandler(7));
-
-		_logger.info(String.format("Deployment name is '%s'.\n", new DeploymentName()));
-		_secRunManager =
-			SecureRunnerManager.createSecureRunnerManager(GenesisClassLoader.classLoaderFactory(),
-				Installation.getDeployment(new DeploymentName()));
-		Properties secRunProperties = new Properties();
-		_secRunManager.run(SecureRunnableHooks.CONTAINER_PRE_STARTUP, secRunProperties);
-
 		try {
+			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
+
+			GridEnvironment.loadGridEnvironment();
+
+			ContainerStatistics.instance();
+
+			if (args.length == 1)
+				System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, args[0]);
+
+			prepareServerApplication();
+
+			// Set Trust Store Provider
+			java.security.Security.setProperty("ssl.SocketFactory.provider", VcgrSslSocketFactory.class.getName());
+
+			LowMemoryWarning.INSTANCE.addLowMemoryListener(new LowMemoryExitHandler(7));
+
+			_logger.info(String.format("Deployment name is '%s'.\n", new DeploymentName()));
+			_secRunManager =
+				SecureRunnerManager.createSecureRunnerManager(GenesisClassLoader.classLoaderFactory(),
+					Installation.getDeployment(new DeploymentName()));
+			Properties secRunProperties = new Properties();
+			_secRunManager.run(SecureRunnableHooks.CONTAINER_PRE_STARTUP, secRunProperties);
+
 			WSDDProvider.registerProvider(GAroundInvokerFactory.PROVIDER_QNAME, new GAroundInvokerFactory());
 
 			runContainer();

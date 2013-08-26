@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-13-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<geniix:mkdir>
+        <gsh:param>${rnsPath}/mvDir1</gsh:param>
+</geniix:mkdir>
+
+<geniix:echo>
+        <gsh:param>"Hello copy file "</gsh:param>
+        <gsh:param>"File1: line1 "</gsh:param>
+        <gsh:param>"File1: line2 "</gsh:param>
+        <gsh:param>></gsh:param>
+        <gsh:param>${rnsPath}/test1.txt</gsh:param>
+</geniix:echo>
+
+<geniix:cp>
+	<gsh:param>${rnsPath}/test1.txt</gsh:param>
+	<gsh:param>local:./test1.txt</gsh:param>
+</geniix:cp>
+
+<gsh:echo message="Testing 'mv' command for file -  within grid namespace"/>
+<geniix:mv>
+        <gsh:param>${rnsPath}/test1.txt</gsh:param>
+        <gsh:param>${rnsPath}/test2.txt</gsh:param>
+</geniix:mv>
+
+<gsh:echo message="Testing 'mv' command for directory -  within grid namespace"/>
+<geniix:mv>
+        <gsh:param>mvDir1</gsh:param>
+        <gsh:param>mvDir2</gsh:param>
+</geniix:mv>
+
+<gsh:echo message="Testing 'mv' command for file -  in local file system namespace"/>
+<geniix:mv>
+        <gsh:param>local:./test1.txt</gsh:param>
+        <gsh:param>local:./test2.txt</gsh:param>
+</geniix:mv>
+
+<geniix:rm>
+	<gsh:param>mvDir*</gsh:param>
+	<gsh:param>test*.txt</gsh:param>
+</geniix:rm>
+
+<geniix:rm>
+        <gsh:param>local:./test2.txt</gsh:param>
+</geniix:rm>
+
+</gsh:script>

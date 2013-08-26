@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-13-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<geniix:mkdir>
+	<gsh:param>${rnsPath}/lnDir</gsh:param>
+</geniix:mkdir>
+
+<geniix:echo>
+        <gsh:param>"Hello copy file "</gsh:param>
+        <gsh:param>"File1: line1 "</gsh:param>
+        <gsh:param>"File1: line2 "</gsh:param>
+        <gsh:param>></gsh:param>
+        <gsh:param>test1.txt</gsh:param>
+</geniix:echo>
+
+<geniix:echo>
+        <gsh:param>"serviceUrl File"</gsh:param>
+        <gsh:param>></gsh:param>
+        <gsh:param>local:./testServiceUrl.txt</gsh:param>
+</geniix:echo>
+
+<gsh:echo message="Testing 'ln lnDir lnDir1' command - linking directory"/>
+<geniix:ln>
+        <gsh:param>${rnsPath}/lnDir</gsh:param>
+        <gsh:param>${rnsPath}/lnDir1</gsh:param>
+</geniix:ln>
+
+<gsh:echo message="Testing 'ln test1.txt test2.txt' command - linking file"/>
+<geniix:ln>
+        <gsh:param>${rnsPath}/test1.txt</gsh:param>
+        <gsh:param>${rnsPath}/test2.txt</gsh:param>
+</geniix:ln>
+
+<gsh:echo message="Testing 'ln test2.txt test3.txt' command - linking and already linked file"/>
+<geniix:ln>
+        <gsh:param>${rnsPath}/test2.txt</gsh:param>
+        <gsh:param>${rnsPath}/test3.txt</gsh:param>
+</geniix:ln>
+
+<gsh:echo message="Listing all the linked files test1.txt, test2.txt, test3.txt - NOTICE: All the linked files have the same epr number"/>
+<geniix:ls>
+	<gsh:param>-l</gsh:param>
+	<gsh:param>${rnsPath}/</gsh:param>
+</geniix:ls>
+
+<gsh:echo message="Minting epr for grid file"/>
+<geniix:mint-epr>
+	<gsh:param>grid:${rnsPath}/test1.txt</gsh:param>
+	<gsh:param>></gsh:param>
+	<gsh:param>${rnsPath}/eprFile-test1</gsh:param>
+</geniix:mint-epr>
+
+<gsh:echo message="Testing 'ln --epr-file' command - linking file"/>
+<geniix:ln>
+	<gsh:param>--epr-file=${rnsPath}/eprFile-test1</gsh:param>
+        <gsh:param>${rnsPath}/test1-epr-link</gsh:param>
+</geniix:ln>
+
+<gsh:echo message="Listing the epr-file and epr-linked file"/>
+<geniix:ls>
+	<gsh:param>-l</gsh:param>
+	<gsh:param>${rnsPath}/test1-epr-link</gsh:param>
+	<gsh:param>${rnsPath}/eprFile-test1</gsh:param>
+</geniix:ls>
+
+<gsh:echo message="Testing 'ln --no-lookup --epr-file' command - linking file"/>
+<geniix:ln>
+        <gsh:param>--no-lookup</gsh:param>
+        <gsh:param>--epr-file=${rnsPath}/eprFile-test1</gsh:param>
+        <gsh:param>${rnsPath}/test2-epr-link</gsh:param>
+</geniix:ln>
+
+<gsh:echo message="Listing the --no-lookup epr-file and epr-linked file"/>
+<geniix:ls>
+        <gsh:param>-l</gsh:param>
+        <gsh:param>${rnsPath}/test2-epr-link</gsh:param>
+        <gsh:param>${rnsPath}/eprFile-test1</gsh:param>
+</geniix:ls>
+
+<gsh:echo message="Testing 'ln --no-lookup --service-url' command - linking a local file system file to grid RNS namespace"/>
+<geniix:ln>
+        <gsh:param>--no-lookup</gsh:param>
+        <gsh:param>--service-url=local:./testServiceUrl.txt</gsh:param>
+        <gsh:param>${rnsPath}/serviceUrl-link</gsh:param>
+</geniix:ln>
+
+<gsh:echo message="Listing the service-url link file serviceUrl-link"/>
+<geniix:ls>
+        <gsh:param>-l</gsh:param>
+        <gsh:param>${rnsPath}/serviceUrl-link</gsh:param>
+</geniix:ls>
+
+
+<gsh:echo message="Test 'unlink' - Unlinking the linked directory lnDir1"/>
+<geniix:unlink>
+	<gsh:param>${rnsPath}/lnDir1</gsh:param>
+</geniix:unlink>
+
+<gsh:echo message="Test 'unlink' - Unlinking the epr-file link test1-epr-link, test2-epr-link"/>
+<geniix:unlink>
+	<gsh:param>${rnsPath}/test1-epr-link</gsh:param>
+	<gsh:param>${rnsPath}/test2-epr-link</gsh:param>
+</geniix:unlink>
+
+<gsh:echo message="Test- 'unlink test2.txt test3.txt' - Unlinking the multiple linked files test2.txt, test3.txt"/>
+<geniix:unlink>
+        <gsh:param>${rnsPath}/test2.txt</gsh:param>
+        <gsh:param>${rnsPath}/test3.txt</gsh:param>
+</geniix:unlink>
+
+<gsh:echo message="Test 'unlink' - Unlinking the service-url link serviceUrl-link"/>
+<geniix:unlink>
+        <gsh:param>${rnsPath}/serviceUrl-link</gsh:param>
+</geniix:unlink>
+
+<geniix:rm>
+	<gsh:param>${rnsPath}/test1.txt</gsh:param>
+</geniix:rm>
+
+<geniix:rm>
+        <gsh:param>${rnsPath}/lnDir</gsh:param>
+</geniix:rm>
+
+<geniix:rm>
+	<gsh:param>${rnsPath}/eprFile-test1</gsh:param>
+</geniix:rm>
+
+<geniix:rm>
+        <gsh:param>local:./testServiceUrl.txt</gsh:param>
+</geniix:rm>
+
+</gsh:script>

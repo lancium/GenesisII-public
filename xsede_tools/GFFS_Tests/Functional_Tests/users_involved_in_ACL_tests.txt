@@ -1,0 +1,27 @@
+
+
+unix user A is running grid container and is the one who would be granted
+      access to an FS path that he does not already have.
+  + this allows him to export a path from his container.
+
+unix user B wants to add an exported path to unix user A's grid that unix user
+      B has full access to.
+  + unix user B runs the set_acls script to give A access.
+    * should mask always be rwx?
+       -> for now has to be, or ugly exceptions result on failed accesses.
+
+admin user runs an export command at behest of grid user C,
+    which unix user A's container can now do.
+
+unix user B logs in as grid user C.
+
+grid user C can then access files on export per the permissions granted to
+    unix user A.
+
+grid user D has no special access to the folders involved.
+  + grid user D tries to do things on the exported grid path but is not allowed.
+
+unix user E has no ACL rights to the folder involved.
+  + unix user E tries to do things on the unix path but is not allowed.
+
+

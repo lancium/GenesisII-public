@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-19-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<gsh:echo message="Testing 'echo test-string' command"/>
+<geniix:echo>
+	<gsh:param>test-string</gsh:param>
+</geniix:echo>
+
+<gsh:echo message="Testing 'echo test-string test-string test-string' command"/>
+<geniix:echo>
+        <gsh:param>"test-string test-string test-string"</gsh:param>
+</geniix:echo>
+
+<gsh:echo message="Testing 'echo test-string > ${rnsPath}/output.txt' command - redirecting the output to file output.txt"/>
+<geniix:echo>
+        <gsh:param>"test-string test-string test-string"</gsh:param>
+	<gsh:param>></gsh:param>
+	<gsh:param>${rnsPath}/output.txt</gsh:param>
+</geniix:echo>
+
+<gsh:echo message="Cat'ing the file ${rnsPath}/output.txt created using echo above "/>
+<geniix:cat>
+	<gsh:param>${rnsPath}/output.txt</gsh:param>
+</geniix:cat>
+
+<geniix:rm>
+	<gsh:param>${rnsPath}/output.txt</gsh:param>
+</geniix:rm>
+
+</gsh:script>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Author: Vanamala Venkataswamy (xsede namespace, increment 3) -->
+<!-- Author: Mark Morgan (certificate code) -->
+<!-- Author: Chris Koeritz (xsede increment 1-3 updates) -->
+
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+	
+	<gsh:default name="CONTAINER" value="${ARGV[1]}"/>
+	<gsh:define name="CONTAINER_SRVS"
+		source="${CONTAINER}/Services"/>
+
+	<gsh:echo message="Setting security on container ${CONTAINER}"/>	
+
+	<geniix:chmod>
+		<gsh:param>${CONTAINER}</gsh:param>
+		<gsh:param>+rwx</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>${CONTAINER}</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+	</geniix:chmod>
+
+	<geniix:chmod>
+		<gsh:param>${CONTAINER_SRVS}</gsh:param>
+		<gsh:param>+rwx</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>${CONTAINER_SRVS}</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+	</geniix:chmod>
+
+	<gsh:foreach param-name="SERVICE"
+		source-rns="${CONTAINER_SRVS}">
+		<gsh:echo message="Setting security on ${SERVICE} in container ${CONTAINER}"/>
+		<geniix:chmod>
+			<gsh:param>${CONTAINER_SRVS}/${SERVICE}</gsh:param>
+			<gsh:param>+rwx</gsh:param>
+			<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+		</geniix:chmod>
+		<geniix:chmod>
+			<gsh:param>${CONTAINER_SRVS}/${SERVICE}</gsh:param>
+			<gsh:param>+r</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+		</geniix:chmod>
+	</gsh:foreach>
+
+</gsh:script>

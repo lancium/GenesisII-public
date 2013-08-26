@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-15-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<geniix:mkdir>
+	<gsh:param>${rnsPath}/term-dir</gsh:param>
+</geniix:mkdir>
+
+<geniix:ls>
+        <gsh:param>-l</gsh:param>
+        <gsh:param>${rnsPath}/</gsh:param>
+</geniix:ls>
+
+<gsh:echo message="Testing 'schedule-temination ${rnsPath}/term-dir +10s' command - Terminate ${rnsPath}/term-dir in 10 second "/>
+<geniix:schedule-termination>
+	<gsh:param>${rnsPath}/term-dir</gsh:param>
+	<gsh:param>+10s</gsh:param>
+</geniix:schedule-termination>
+
+<gsh:echo message="Sleeping for 20 seconds to allow termination"/>
+<gsh:sleep value="20" units="SECONDS"/>
+
+<gsh:echo message="Trying to list the terminated directory, it should not list the contents - ${rnsPath}term-dir"/>
+<gsh:try>
+	<gsh:block>
+		<geniix:ls>
+			<gsh:param>-l</gsh:param>
+			<gsh:param>${rnsPath}/term-dir</gsh:param>
+		</geniix:ls>
+	 </gsh:block>
+	<gsh:catch class="java.lang.Exception" message="message">
+                <gsh:echo message="Error Message - ${message}"/>
+	</gsh:catch>
+</gsh:try>
+
+<geniix:unlink>
+	<gsh:param>${rnsPath}/term-dir</gsh:param>
+</geniix:unlink>
+
+</gsh:script>
+

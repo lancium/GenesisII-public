@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+	xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+
+<!--
+parameters for this script are:
+
+1: the new user name.
+
+-->
+
+			<geniix:idp>
+				<param>--kerbRealm=UVACSE</param>
+				<param>--kerbKdc=uvacse-002.cs.virginia.edu</param>
+				<param>--validDuration=10years</param>
+				<param>/containers/BootstrapContainer/Services/KerbAuthnPortType</param>
+				<param>${ARGV[1]}</param>
+			</geniix:idp>
+
+			<geniix:ln>
+				<param>/containers/BootstrapContainer/Services/KerbAuthnPortType/${ARGV[1]}</param>
+				<param>/users/${ARGV[1]}</param>
+			</geniix:ln>
+
+			<geniix:mkdir>
+				<param>--parents</param>
+				<param>/home/${ARGV[1]}</param>
+			</geniix:mkdir>
+
+			<geniix:chmod>
+				<param>/users/${ARGV[1]}</param>
+				<param>5</param>
+				<param>/users/${ARGV[1]}</param>
+			</geniix:chmod>
+			
+			<geniix:chmod>
+				<param>/home/${ARGV[1]}</param>
+				<param>7</param>
+				<param>/users/${ARGV[1]}</param>
+			</geniix:chmod>
+
+</gsh:script>

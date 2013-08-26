@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-19-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="geniiInstallPath" source="${ARGV[2]}"/>
+
+<gsh:echo message="Testing 'connect local:${geniiInstallPath}/deployments/default/configuration/bootstrap.xml' command"/>
+<geniix:connect>
+	<gsh:param>local:${geniiInstallPath}/deployments/default/configuration/bootstrap.xml</gsh:param>
+</geniix:connect> 
+
+<geniix:cat>
+	<gsh:param>local:./output.txt</gsh:param>
+</geniix:cat>
+
+</gsh:script>

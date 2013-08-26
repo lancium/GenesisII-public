@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-15-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<gsh:echo message="Testing 'ping ${rnsPath}' command - Ping the ${rnsPath}"/>
+<geniix:ping>
+	<gsh:param>${rnsPath}</gsh:param>
+</geniix:ping>
+
+<gsh:echo message="Testing 'ping ${rnsPath} --attempts=3' command - Ping the ${rnsPath}"/>
+<geniix:ping>
+	<gsh:param>--attempts=3</gsh:param>
+        <gsh:param>${rnsPath}</gsh:param>
+</geniix:ping>
+
+<gsh:echo message="Testing 'ping --attempts=3 ${rnsPath} 'I am Alive'' command - Ping the ${rnsPath}, 3 attempts, replies with 'I am Alive'"/>
+<geniix:ping>
+        <gsh:param>--attempts=3</gsh:param>
+        <gsh:param>${rnsPath}</gsh:param>
+	<gsh:param>"I am Alive"</gsh:param>
+</geniix:ping>
+
+</gsh:script>
+
+

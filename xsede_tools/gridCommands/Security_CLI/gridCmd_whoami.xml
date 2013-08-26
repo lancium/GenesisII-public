@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-19-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="localMountPoint" source="${ARGV[2]}"/>
+<gsh:define name="containerPath" source="${ARGV[3]}"/>
+<gsh:define name="geniiInstallPath" source="${ARGV[4]}"/>
+
+<gsh:echo message="Testing 'whoami' command"/>
+<geniix:whoami/>
+
+<gsh:echo message="Testing 'whoami --verbosity=OFF' command"/>
+<geniix:whoami>
+	<gsh:param>--verbosity=OFF</gsh:param>
+</geniix:whoami>
+
+<gsh:echo message="Testing 'whoami --verbosity=LOW' command"/>
+<geniix:whoami>
+	<gsh:param>--verbosity=LOW</gsh:param>
+</geniix:whoami>
+
+<gsh:echo message="Testing 'whoami --verbosity=MEDIUM' command"/>
+<geniix:whoami>
+	<gsh:param>--verbosity=MEDIUM</gsh:param>
+</geniix:whoami>
+
+<gsh:echo message="Testing 'whoami --verbosity=HIGH' command"/>
+<geniix:whoami>
+	<gsh:param>--verbosity=HIGH</gsh:param>
+</geniix:whoami>
+
+</gsh:script>

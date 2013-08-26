@@ -32,9 +32,9 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.certGenerator.CertGeneratorPortType;
 import edu.virginia.vcgr.genii.certGenerator.CertificateChainType;
 import edu.virginia.vcgr.genii.certGenerator.GenerateX509V3CertificateChainRequestType;
-import edu.virginia.vcgr.genii.certGenerator.CertGeneratorPortType;
 import edu.virginia.vcgr.genii.certGenerator.GenerateX509V3CertificateChainResponseType;
 import edu.virginia.vcgr.genii.certGenerator.InvalidCertificateRequestFaultType;
 import edu.virginia.vcgr.genii.certGenerator.PublicKeyType;
@@ -43,15 +43,15 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.SecurityUtils;
-import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.client.security.axis.CertGeneratorUtils;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
+import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
+import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 
 @GeniiServiceConfiguration(resourceProvider = CertGeneratorDBResourceProvider.class)
@@ -98,7 +98,7 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 
 		PublicKey pk = null;
 		try {
-			pk = SecurityUtils.deserializePublicKey(pkt.getPublicKey());
+			pk = SecurityUtilities.deserializePublicKey(pkt.getPublicKey());
 		} catch (Throwable t) {
 			_logger.error("Invalid Certificate Request", t);
 			throw FaultManipulator.fillInFault(new InvalidCertificateRequestFaultType());

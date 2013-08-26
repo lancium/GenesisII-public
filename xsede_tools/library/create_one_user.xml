@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!-- creates a particular user, in a particular group. -->
+<!-- Author: Chris Koeritz -->
+
+<!--
+
+Note that the number of arguments required seems immense, but they allow specification of
+all the important parts of the user, home and group paths involved.  These are all necessary
+for setting up grid structure per organizational schemes as potentially required by our
+customers, be they universities, ngos, corporations, or what not.
+
+Script arguments:
+  1=container path (e.g. /containers/BootstrapContainer or /containers/geology/Forbinz).
+  2=user (e.g. joe).
+  3=user path (e.g. /users/joe or /users/toledo/joe etc.)
+  4=password.
+  5=group (short name for group, such as cremora-idp-group).
+  6=group path (full path to group, e.g. /groups/grange/tillingham).
+  7=root of home for user (e.g. allows /home/company/division/dept/userX and other arrangements).
+  8=root of user path for user (e.g. allows /users/caltech/astro/userX for structure).
+-->
+
+<gsh:script
+        xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+        xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+        xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script"> 
+
+  <condition property="correct_number_of_arguments">
+    <compare numeric="true" arg1="9" arg2="${ARGV}" comparison="eq"/>
+  </condition>
+
+  <if test="correct_number_of_arguments">
+    <then>
+
+        <echo message="Creating root of user area ${ARGV[8]}"/>
+        <try>
+          <block>
+            <geniix:mkdir>
+              <param>${ARGV[8]}</param>
+            </geniix:mkdir>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not create root of user area, accepting that it may exist."/>
+          </catch>
+        </try>
+        <echo message="  giving everyone basic rights to the user area"/>
+        <try>
+          <block>
+            <geniix:chmod>
+              <param>${ARGV[8]}</param>
+              <param>+r</param>
+              <param>--everyone</param>
+            </geniix:chmod>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not give rights to everyone, accepting that grid may disallow."/>
+          </catch>
+        </try>
+
+        <echo message="Creating user ${ARGV[2]}"/>
+        <try>
+          <block>
+            <geniix:ls>
+              <param>${ARGV[1]}/Services/X509AuthnPortType/${ARGV[2]}</param>
+            </geniix:ls>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Exception listing user, so proceeding to create it."/>
+            <geniix:create-user>
+              <param>${ARGV[1]}/Services/X509AuthnPortType</param>
+              <param>${ARGV[2]}</param>
+              <param>--login-name=${ARGV[2]}</param>
+              <param>--login-password=${ARGV[4]}</param>
+              <param>--validDuration=10years</param>
+            </geniix:create-user>
+            <echo message="  linking user entry to ${ARGV[3]} folder."/>
+            <geniix:ln>
+              <param>${ARGV[1]}/Services/X509AuthnPortType/${ARGV[2]}</param>
+              <param>${ARGV[3]}</param>
+            </geniix:ln>
+          </catch>
+        </try>
+
+        <echo message="  restricting user self-administration rights."/>
+        <try>
+          <block>
+            <geniix:chmod>
+              <param>${ARGV[3]}</param>
+              <param>5</param>
+              <param>${ARGV[3]}</param>
+            </geniix:chmod>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not restrict permissions, accepting grid may not allow."/>
+          </catch>
+        </try>
+
+        <echo message="  making root of home directories."/>
+        <try>
+          <block>
+            <geniix:mkdir>
+              <param>${ARGV[7]}</param>
+            </geniix:mkdir>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not create root of homes, accepting that it may exist."/>
+          </catch>
+        </try>
+
+<!-- contra-indicated for official xsede namespace.
+        <echo message="  giving everyone access to root of home dirs."/>
+        <try>
+          <block>
+            <geniix:chmod>
+              <param>${ARGV[7]}</param>
+              <param>+r</param>
+              <param>- -everyone</param>
+            </geniix:chmod>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not change home root permission, accepting that."/>
+          </catch>
+        </try>
+-->
+
+        <echo message="  making home directory."/>
+        <try>
+          <block>
+            <geniix:mkdir>
+              <param>-p</param>
+              <param>${ARGV[7]}/${ARGV[2]}</param>
+            </geniix:mkdir>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not create home folder, accepting that it may exist."/>
+          </catch>
+        </try>
+
+        <echo message="  giving user access to home folder."/>
+        <geniix:chmod>
+          <param>${ARGV[7]}/${ARGV[2]}</param>
+          <param>+rwx</param>
+          <param>${ARGV[3]}</param>
+        </geniix:chmod>
+<!--        <echo message="  giving group access to home folder."/>
+        <geniix:chmod>
+          <param>${ARGV[7]}/${ARGV[2]}</param>
+          <param>+rx</param>
+          <param>${ARGV[6]}</param>
+        </geniix:chmod>
+-->
+        <echo message="  giving everyone access to home folder."/>
+        <!-- this seems necessary now based on new scheme for creating users.
+             they cannot log in unless everyone has access to get to the home
+             folder and down into where the users are stored. -->
+        <geniix:chmod>
+          <param>${ARGV[7]}/${ARGV[2]}</param>
+          <param>+r</param>
+          <param>--everyone</param>
+        </geniix:chmod>
+
+        <!-- need to add access to the queue and BES -->
+        <echo message="  adding access to the group for the user."/>
+        <try>
+          <block>
+            <geniix:chmod>
+              <param>${ARGV[6]}</param>
+              <param>+rx</param>
+              <param>${ARGV[3]}</param>
+            </geniix:chmod>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not give group +rx access to user, accepting that, but it may cause problems later."/>
+          </catch>
+        </try>
+        <echo message="  adding access to the user for the group."/>
+<!-- why are we doing this step? -->
+        <try>
+          <block>
+            <geniix:chmod>
+              <param>${ARGV[3]}</param>
+              <param>+r</param>
+              <param>${ARGV[6]}</param>
+            </geniix:chmod>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not give group +r access to group on user, accepting that, but it may cause problems later."/>
+          </catch>
+        </try>
+        <echo message="  adding access to the container export port-type for the group."/>
+        <geniix:chmod>
+          <param>${ARGV[1]}/Services/LightWeightExportPortType</param>
+          <param>+rx</param>
+          <param>${ARGV[6]}</param>
+        </geniix:chmod>
+        <echo message="  adding access to the container RNS port-type for the group."/>
+        <geniix:chmod>
+          <param>${ARGV[1]}/Services/EnhancedRNSPortType</param>
+          <param>+rx</param>
+          <param>${ARGV[6]}</param>
+        </geniix:chmod>
+        <echo message="  linking group into user's credentials as ${ARGV[5]}."/>
+        <try>
+          <block>
+            <geniix:ln>
+              <param>${ARGV[6]}</param>
+              <param>${ARGV[3]}/${ARGV[5]}</param>
+            </geniix:ln>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not create group link ${ARGV[5]}; possibly already present."/>
+          </catch>
+        </try>
+    </then>
+    <else>
+      <echo message="Wrong number of arguments: need 9 (plus command as first argument), got ${ARGV}"/>
+      <echo message="Usage: script create_one_user.xml {container-name} {user-name} {user-path} {password} {group-name} {group-path} {home-root} {users-root}"/>
+      <echo message="The script will create the users based on the x509 service on the container"/>
+      <echo message="and the user will also be given the rights permitted by the group."/>
+      <echo message="[FAILURE] invalid number of arguments."/>
+      <exit exitcode="-1"/>
+    </else>
+  </if>
+</gsh:script>
+

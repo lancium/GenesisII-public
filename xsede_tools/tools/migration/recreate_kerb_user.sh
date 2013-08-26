@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# this actually recreates a specifc type of kerberos user; one that
+# authenticates against the xsede myproxy server.
+
+# standard start-up boilerplate.
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+cd $WORKDIR
+
+if [ -z "$XSEDE_TEST_ROOT" ]; then
+  source ../../prepare_tests.sh ../../prepare_tests.sh 
+fi
+source $XSEDE_TEST_ROOT/library/establish_environment.sh
+
+user="$1"; shift
+
+if [ -z "$user" ]; then
+  echo "This script requires an xsede portal user name.  An xsede compatible user will"
+  echo "be created in the current bootstrapped grid."
+  exit 1
+fi
+
+#hmmm: below is not right for path to xsede tests, if we are to generalize this.
+
+$GENII_INSTALL_DIR/grid logout --all
+$GENII_INSTALL_DIR/grid keystoreLogin --password=keys local:$GENII_INSTALL_DIR/deployments/default/security/admin.pfx 
+$GENII_INSTALL_DIR/grid script local:$GENII_INSTALL_DIR/xsede_tools/library/create-xsede-user.xml "$user"
+$GENII_INSTALL_DIR/grid chmod $SUBMIT_GROUP +x "$USERS_LOC/$user"
+$GENII_INSTALL_DIR/grid ln $SUBMIT_GROUP "$USERS_LOC/$user/$(basename $SUBMIT_GROUP)"
+$GENII_INSTALL_DIR/grid logout --all
+

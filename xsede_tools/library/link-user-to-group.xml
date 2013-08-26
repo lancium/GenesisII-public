@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- links a given user to a given group -->
+
+<gsh:script
+        xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+        xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+        xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+
+<!--
+Inputs for the script:
+
+1.  user directory (ex. /users/xsede.org/)
+1.  user name (ex. johndoe)
+2.  group directory (ex. /groups/xsede.org/)
+2.  group name (ex. gffs-users)
+
+-->
+       <gsh:default name="USER_DIR" value="${ARGV[1]}"/>
+       <gsh:default name="USER" value="${ARGV[2]}"/>
+       <gsh:default name="GROUP_DIR" value="${ARGV[3]}"/>
+       <gsh:default name="GROUP" value="${ARGV[4]}"/>
+
+       <echo message=" Checking if ${USER_DIR}/${USER} exists"/>
+        <try>
+          <block>
+            <geniix:ls>
+              <param>${USER_DIR}/${USER}</param>
+            </geniix:ls>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not find ${USER_DIR}/${USER}."/>
+          </catch>
+        </try>
+       <echo message=" Checking if ${GROUP_DIR}/${GROUP} exists."/>
+        <try>
+          <block>
+            <geniix:ls>
+              <param>${GROUP_DIR}/${GROUP}</param>
+            </geniix:ls>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not find ${GROUP_DIR}/${GROUP}."/>
+          </catch>
+        </try>
+       <echo message=" Adding +rx access to the ${GROUP_DIR}/${GROUP} for the ${USER_DIR}/${USER}."/>
+        <try>
+          <block>
+            <geniix:chmod>
+              <param>${GROUP_DIR}/${GROUP}</param>
+              <param>+rx</param>
+              <param>${USER_DIR}/${USER}</param>
+            </geniix:chmod>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not give group +rx access to user."/>
+          </catch>
+        </try>
+        <echo message="  Linking ${GROUP_DIR}/${GROUP} in ${USER_DIR}/${USER}/${GROUP}"/>
+        <try>
+          <block>
+            <geniix:ln>
+              <param>${GROUP_DIR}/${GROUP}</param>
+              <param>${USER_DIR}/${USER}/${GROUP}</param>
+            </geniix:ln>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not link ${GROUP_DIR}/${GROUP} to ${USER_DIR}/${USER}/${GROUP}."/>
+          </catch>
+        </try>
+
+</gsh:script>
+
+
+

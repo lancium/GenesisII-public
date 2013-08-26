@@ -51,14 +51,14 @@ public interface IAuthZProvider
 	 * allowable with the given working context.
 	 */
 	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation);
+		Class<?> serviceClass, Method operation, String errorText);
 
 	/**
 	 * Checks whether or not the caller has read, write, or execute permission on the given
 	 * resource.
 	 */
 	public boolean
-		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category);
+		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category, String errorText);
 
 	/**
 	 * Returns the minimum level of incoming message level security required for the specified

@@ -27,13 +27,13 @@
 	</geniix:set-user-config>
 	
 	<gsh:echo
-		message="Logging in as ${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/keys.pfx."/>
+		message="Logging in as ${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/admin.pfx."/>
 	<geniix:keystoreLogin>
 		<gsh:param>--no-gui</gsh:param>
 		<gsh:param>--password=keys</gsh:param>
 		<gsh:param>--pattern=skynet</gsh:param>
 		<gsh:param>--storetype=PKCS12</gsh:param>
-		<gsh:param>local:${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/keys.pfx</gsh:param>
+		<gsh:param>local:${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/admin.pfx</gsh:param>
 	</geniix:keystoreLogin>
 	
 	<gsh:echo
@@ -287,13 +287,13 @@
 		</gsh:foreach>
 	</gsh:foreach>
 
-	<gsh:echo message="Creating Certificate Generator for containers using keys.pfx."/>
+	<gsh:echo message="Creating Certificate Generator for containers using signing-cert.pfx."/>
 	<geniix:cert-generator>
 		<gsh:param>--create-generator</gsh:param>
 		<gsh:param>${BOOT_SRVS}/CertGeneratorPortType</gsh:param>
-		<gsh:param>--ks-path=${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/keys.pfx</gsh:param>
-		<gsh:param>--ks-pword=keys</gsh:param>
-		<gsh:param>--ks-alias=VCGR Container</gsh:param>
+		<gsh:param>--ks-path=${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/signing-cert.pfx</gsh:param>
+		<gsh:param>--ks-pword=signer</gsh:param>
+		<gsh:param>--ks-alias=signing-cert</gsh:param>
 		<gsh:param>/etc/ContainerGroupCertGenerator</gsh:param>
 	</geniix:cert-generator>
 

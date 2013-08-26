@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-13-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<geniix:echo>
+        <gsh:param>"Hello "</gsh:param>
+        <gsh:param>"File1: line1 "</gsh:param>
+        <gsh:param>"File1: line2 "</gsh:param>
+        <gsh:param>></gsh:param>
+        <gsh:param>test1.txt</gsh:param>
+</geniix:echo>
+
+<geniix:mkdir>
+	<gsh:param>${rnsPath}/cpDir</gsh:param>
+</geniix:mkdir>
+
+<gsh:echo message="Testing 'cp' command - within grid namespace"/>
+<geniix:cp>
+        <gsh:param>test1.txt</gsh:param>
+        <gsh:param>test2.txt</gsh:param>
+</geniix:cp>
+
+<gsh:echo message="Testing 'cp' command - from grid namespace to local directory"/>
+<geniix:cp>
+        <gsh:param>grid:${rnsPath}/test2.txt</gsh:param>
+        <gsh:param>local:./test1.txt</gsh:param>
+</geniix:cp>
+
+<gsh:echo message="Testing 'cp' command - from local directory to grid namespace"/>
+<geniix:cp>
+        <gsh:param>local:./test1.txt</gsh:param>
+        <gsh:param>grid:${rnsPath}/cpDir/test3.txt</gsh:param>
+</geniix:cp>
+
+<gsh:echo message="Testing 'cp' command - from local (using file:/path instead of local:/path) directory to grid namespace"/>
+<geniix:cp>
+        <gsh:param>file:./test1.txt</gsh:param>
+        <gsh:param>grid:${rnsPath}/cpDir/test4.txt</gsh:param>
+</geniix:cp>
+
+<gsh:echo message="Testing 'cp' command - from local directory to grid namespace (w/o using keyword grid:/path)"/>
+<geniix:cp>
+        <gsh:param>local:./test1.txt</gsh:param>
+        <gsh:param>${rnsPath}/cpDir/test5.txt</gsh:param>
+</geniix:cp>
+
+<gsh:echo message="List all the copied files"/>
+<geniix:ls>
+	 <gsh:param>${rnsPath}/cpDir</gsh:param>
+</geniix:ls>
+
+<geniix:rm>
+	<gsh:param>test*.txt</gsh:param>
+	<gsh:param>${rnsPath}/cpDir</gsh:param>
+</geniix:rm>
+
+<geniix:rm>
+        <gsh:param>local:./test1.txt</gsh:param>
+</geniix:rm>
+
+</gsh:script>
+
+

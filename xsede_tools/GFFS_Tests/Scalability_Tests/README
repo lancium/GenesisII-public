@@ -1,0 +1,44 @@
+NAME: ReadWrite.sh
+
+DESCRIPTION: This is the main script that runs reatest.sh and writetest.sh
+
+INPUT: N/A 
+
+OUTPUT: out-read.o$PID 
+	out-write.o$PID
+
+USAGE/EXAMPLE: ./ReadWrite.sh
+
+LIMITATIONS: Should support make/gmake, tar, qsub and mpicc on the machine
+
+---------------------------------------------------------------------
+
+NAME:	readtest.sh (Run Makefile before running this script)
+
+DESCRIPTION: PBS script to submit readtest.c MPI program
+
+INPUT: GENII_INSTALL_DIR 
+       RNSPATH
+
+OUTPUT: out-read.o$PID
+
+USAGE/EXAMPLE: qsub "GENII_INSTALL_DIR=<nfs-installation-path>","RNSPATH=<grid-rns-path>" readtest.sh
+
+LIMITATIONS: GENII_INSTALL_DIR shoudl be available from all nodes in the cluster, RNSPATH should be accessible
+            User should have logged in to grid, Grid state dir should be present in ~/.genesisII
+
+---------------------------------------------------------------------
+
+NAME: 	writetest.sh (Run Makefile before running this script)
+
+DESCRIPTION: PBS script to submit writetest.c MPI program
+
+INPUT:	GENII_INSTALL_DIR 
+       RNSPATH
+
+OUTPUT: out-write.o$PID
+
+USAGE/EXAMPLE: qsub "GENII_INSTALL_DIR=<nfs-installation-path>","RNSPATH=<grid-rns-path>" writetest.sh
+
+LIMITATIONS: GENII_INSTALL_DIR shoudl be available from all nodes in the cluster, RNSPATH should be accessible
+            User should have logged in to grid, Grid state dir should be present in ~/.genesisII

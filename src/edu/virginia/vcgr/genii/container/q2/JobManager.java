@@ -59,7 +59,6 @@ import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.AbstractSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
@@ -78,6 +77,7 @@ import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.identity.Identity;
+import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 /**
  * The Job Manager class is the main class to handle adding/removing/managing jobs in the queue. It
@@ -234,10 +234,10 @@ public class JobManager implements Closeable
 					HashMap<Long, PartialJobInfo> jobInfo = _database.getPartialJobInfos(connection, jobID);
 
 					Collection<Identity> identities =
-						SecurityUtils.filterCredentials(jobInfo.get(job.getJobID()).getOwners(),
-							SecurityUtils.GROUP_TOKEN_PATTERN);
+						SecurityUtilities.filterCredentials(jobInfo.get(job.getJobID()).getOwners(),
+							SecurityUtilities.GROUP_TOKEN_PATTERN);
 
-					identities = SecurityUtils.filterCredentials(identities, SecurityUtils.CLIENT_IDENTITY_PATTERN);
+					identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 					String username = identities.iterator().next().toString();
 
@@ -629,7 +629,7 @@ public class JobManager implements Closeable
 
 			// As jobs are added to the primary list, they are also added to the
 			// appropriate user list (newly created, if needed)
-			identities = SecurityUtils.filterCredentials(identities, SecurityUtils.CLIENT_IDENTITY_PATTERN);
+			identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 			String username = identities.iterator().next().toString();
 			if (!_usersWithJobs.keySet().contains(username)) {
@@ -2605,9 +2605,9 @@ public class JobManager implements Closeable
 						HashMap<Long, PartialJobInfo> jobInfo = _database.getPartialJobInfos(connection, jobID);
 
 						Collection<Identity> identities =
-							SecurityUtils.filterCredentials(jobInfo.get(_jobData.getJobID()).getOwners(),
-								SecurityUtils.GROUP_TOKEN_PATTERN);
-						identities = SecurityUtils.filterCredentials(identities, SecurityUtils.CLIENT_IDENTITY_PATTERN);
+							SecurityUtilities.filterCredentials(jobInfo.get(_jobData.getJobID()).getOwners(),
+								SecurityUtilities.GROUP_TOKEN_PATTERN);
+						identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 						String username = identities.iterator().next().toString();
 

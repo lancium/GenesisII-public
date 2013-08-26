@@ -16,9 +16,7 @@ package edu.virginia.vcgr.genii.container.axis;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -28,7 +26,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Vector;
 
@@ -70,12 +67,13 @@ import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
-import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.security.authz.providers.AclAuthZProvider;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
+import edu.virginia.vcgr.genii.network.NetworkConfigTools;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
@@ -417,8 +415,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 										+ " to be the same as incoming tls cert.");
 								match = true;
 								break;
-							} else if (CertificateValidatorFactory.getValidator().validateCertInKeyStore(
-								assertion.getOriginalAsserter(), SecurityUtils.getResourceTrustStore()) == true) {
+							} else if (CertificateValidatorFactory.getValidator().validateIsTrustedResource(
+								assertion.getOriginalAsserter()) == true) {
 								if (_logger.isTraceEnabled())
 									_logger
 										.trace("...allowed incoming message using resource trust store for original asserter.");
@@ -480,29 +478,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				(org.mortbay.jetty.Request) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
 			Object transport = req.getConnection().getEndPoint().getTransport();
 			if (transport instanceof SSLSocket) {
-				// hmmm: new code to prevent off machine connections during startup.
 				boolean stillStarting;
 				synchronized (_inStartupMode) {
 					stillStarting = _inStartupMode;
 				}
 				if (stillStarting == true) {
-					HashSet<String> ips = new HashSet<String>();
-
-					// hmmm: move this code!
-					Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
-					StringBuilder log = new StringBuilder();
-					while (e.hasMoreElements()) {
-						NetworkInterface n = (NetworkInterface) e.nextElement();
-						Enumeration<InetAddress> ee = n.getInetAddresses();
-						while (ee.hasMoreElements()) {
-							InetAddress i = (InetAddress) ee.nextElement();
-							ips.add(i.getHostAddress());
-							if (_logger.isDebugEnabled())
-								log.append(i.getHostAddress() + " ");
-						}
-					}
-					if (_logger.isDebugEnabled())
-						_logger.debug("IP addresses for server: " + log);
+					Collection<String> ips = NetworkConfigTools.getIPAddresses();
 					SocketAddress addr = ((SSLSocket) transport).getRemoteSocketAddress();
 					String clientIP = "";
 					if (addr instanceof InetSocketAddress) {
@@ -574,25 +555,25 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			if (_logger.isDebugEnabled())
 				_logger.debug("client invokes " + operation.getDeclaringClass().getName() + "." + operation.getName() + "()");
 
+if (jDesc != null) _logger.debug("  jDesc non-null with: " + jDesc.getImplClass().toString());
+
 			// Get the resource's authz handler
 			IResource resource = ResourceManager.getCurrentResource().dereference();
 			IAuthZProvider authZHandler =
 				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 
-			// Let the authZ handler make the decision
+			// Let the authZ handler make the decision.
+			String errorText = "";
 			boolean accessOkay =
 				authZHandler.checkAccess(authenticatedCallerCreds, resource, (jDesc == null) ? operation.getDeclaringClass()
-					: jDesc.getImplClass(), operation);
+					: jDesc.getImplClass(), operation, errorText);
 
 			if (accessOkay) {
 				resource.commit();
 			} else {
-				//hmmm: we NEED this to be printing the rns path being checked.  not right yet.
-				PermissionDeniedException temp =
-					new PermissionDeniedException(operation.getName(),
-						resource.toString());
-						///hmmm: this does not work: callContext.getCurrentPath().pwd());
+				PermissionDeniedException temp = new PermissionDeniedException(operation.getName(), AclAuthZProvider.getResourceName(resource));
 				_logger.error("failed to check access: " + temp.getMessage());
+				_logger.error("==>" + errorText);
 				throw new AxisFault(temp.getMessage());
 			}
 		} catch (IOException e) {
@@ -731,6 +712,11 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 		String serviceName = ((ResourceKey) resource.getParentResourceKey()).getServiceName();
 		IAuthZProvider authZHandler = AuthZProviders.getProvider(serviceName);
-		return authZHandler.checkAccess(transientCredentials.getCredentials(), resource, category);
+		String errorText = "";
+		boolean success = authZHandler.checkAccess(transientCredentials.getCredentials(), resource, category, errorText);
+		if (!success) {
+			_logger.error("authorization failure with message:" + errorText);
+		}
+		return success;
 	}
 }

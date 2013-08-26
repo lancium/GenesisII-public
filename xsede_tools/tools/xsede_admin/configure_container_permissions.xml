@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Author: Vanamala Venkataswamy-->
+
+<gsh:script
+        xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+        xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+	xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+
+	<gsh:default name="CONTAINER" value="${ARGV[1]}"/>
+	<gsh:default name="IDENTITY" value="${ARGV[2]}"/>
+	<gsh:echo message="${CONTAINER} ${IDENTITY}"/>
+	<try>
+        	<block>
+			<geniix:ls>
+				<gsh:param>${CONTAINER}</gsh:param>
+			</geniix:ls>
+	    	</block>
+		<catch class="java.lang.Exception">
+            		<gsh:echo message="Make sure ${CONTAINER} already exists in grid name space"/>
+          	</catch>
+        </try>
+	  
+	<try>
+        	<block>
+			<geniix:ls>
+				<gsh:param>${IDENTITY}</gsh:param>
+			</geniix:ls>
+	    	</block>
+		<catch class="java.lang.Exception">
+            		<gsh:echo message="Make sure ${IDENTIRY} is a valid user/group"/>
+          	</catch>
+        </try>
+
+        <gsh:echo message="Setting security on Services for container ${CONTAINER}"/>
+        <gsh:foreach param-name="SERVICE"
+                source-rns="${CONTAINER}/Services">
+                <geniix:chmod>
+                        <gsh:param>${CONTAINER}/${SERVICES}</gsh:param>
+                        <gsh:param>+rwx</gsh:param>
+                        <gsh:param>${IDENTITY}</gsh:param>
+                </geniix:chmod>
+                <geniix:chmod>
+                        <gsh:param>${CONTAINER}/${SERVICES}</gsh:param>
+                        <gsh:param>+r</gsh:param>
+                        <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+                </geniix:chmod>
+        </gsh:foreach>
+</gsh:script>

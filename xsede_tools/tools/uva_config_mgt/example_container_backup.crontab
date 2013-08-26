@@ -1,0 +1,23 @@
+
+# m h dom mon dow command
+
+# this file is an example of how to deploy the container backup script.
+
+SHELL=/bin/bash
+
+USER=jurgis
+
+# these need to match the installed or configured locations...
+XSEDE_TESTS_FOLDER=/home/jurgis/xsede/gffs-source/trunk/xsede_tools
+GENII_INSTALL_DIR=/home/jurgis/GenesisII
+GENII_USER_DIR=/home/jurgis/.tmp/dot-genesis-xcg3
+
+# if this is enabled, then the backup will be copied into the backups area within
+# the grid.  this only makes sense for a live grid with a previously configured
+# backups folder.
+#BACKUP_INTO_GRID=true
+
+# backup the container on a weekly basis.
+14 5 * * 2 export FOOP=/tmp/container_backup_${USER}_$(hostname).log; set &>$FOOP ; bash $XSEDE_TESTS_FOLDER/tools/uva_config_mgt/container_backup.sh &>>$FOOP ; /bin/chmod g+w $FOOP
+
+

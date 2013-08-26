@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Author: Chris Koeritz -->
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+	xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+
+<!--
+ parameters for this script:
+ 1) the user name to create.
+ 2) the container on which to create the user.
+ 3) the folder under which the user's home directory will live.
+ 4) the folder under which the user entry should be linked.
+-->
+
+			<geniix:idp>
+				<param>--kerbRealm=TERAGRID.ORG</param>
+				<param>--kerbKdc=kerberos.teragrid.org</param>
+				<param>--validDuration=10years</param>
+				<param>${ARGV[2]}/Services/KerbAuthnPortType</param>
+				<param>${ARGV[1]}</param>
+			</geniix:idp>
+
+			<geniix:mkdir>
+				<param>--parents</param>
+				<param>${ARGV[3]}</param>
+			</geniix:mkdir>
+
+			<geniix:mkdir>
+				<param>--parents</param>
+				<param>${ARGV[4]}</param>
+			</geniix:mkdir>
+
+			<geniix:ln>
+				<param>${ARGV[2]}/Services/KerbAuthnPortType/${ARGV[1]}</param>
+				<param>${ARGV[4]}/${ARGV[1]}</param>
+			</geniix:ln>
+
+			<geniix:mkdir>
+				<param>--parents</param>
+				<param>${ARGV[3]}/${ARGV[1]}</param>
+			</geniix:mkdir>
+
+			<geniix:chmod>
+				<param>${ARGV[4]}/${ARGV[1]}</param>
+				<param>5</param>
+				<param>${ARGV[4]}/${ARGV[1]}</param>
+			</geniix:chmod>
+			
+			<geniix:chmod>
+				<param>${ARGV[3]}/${ARGV[1]}</param>
+				<param>7</param>
+				<param>${ARGV[4]}/${ARGV[1]}</param>
+			</geniix:chmod>
+
+</gsh:script>

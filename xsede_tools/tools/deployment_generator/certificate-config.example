@@ -1,0 +1,13 @@
+# These certificate elements should be changed to appropriate values.
+
+# C is country.
+C="US"
+# ST is state.
+ST="Virginia"
+# L is locality, e.g. city.
+L="Charlottesville"
+# O is organization.
+O="University of Virginia"
+# OU is organizational unit, e.g. department.
+OU="Genesis II"
+
