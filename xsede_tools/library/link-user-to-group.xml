@@ -13,7 +13,7 @@ Inputs for the script:
 1.  user directory (ex. /users/xsede.org/)
 1.  user name (ex. johndoe)
 2.  group directory (ex. /groups/xsede.org/)
-2.  group name (ex. gffs-users)
+2.  group name (ex. gffs-amie)
 
 -->
        <gsh:default name="USER_DIR" value="${ARGV[1]}"/>

@@ -257,7 +257,7 @@ PORT=$PORT\n\
       $GENII_INSTALL_DIR/cert-tool gen "-dn=C=$C, ST=$ST, L=$L, O=$O, OU=$OU, CN=GenesisII Certificate Base" -output-storetype=PKCS12 "-output-entry-pass=$CA_PASSWORD" -output-keystore=$GENERATED_CERTS/$UBER_CA_PFX "-output-keystore-pass=$CA_PASSWORD" "-output-alias=$UBER_CA_ALIAS" -keysize=2048
       check_if_failed "generating base certificate PFX"
 
-      create_certificate_using_CA "$UBER_CA_PFX" "$CA_PASSWORD" "$UBER_CA_ALIAS" "$CA_PFX" "$CA_PASSWORD" "$CA_ALIAS" "GenesisII Certificate Authority"
+      create_certificate_using_CA "$GENERATED_CERTS/$UBER_CA_PFX" "$CA_PASSWORD" "$UBER_CA_ALIAS" "$GENERATED_CERTS/$CA_PFX" "$CA_PASSWORD" "$CA_ALIAS" "GenesisII Certificate Authority"
       check_if_failed "generating CA PFX"
     fi
 

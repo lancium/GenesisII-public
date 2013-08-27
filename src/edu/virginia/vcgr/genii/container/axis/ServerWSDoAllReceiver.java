@@ -70,7 +70,6 @@ import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.security.authz.providers.AclAuthZProvider;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 import edu.virginia.vcgr.genii.network.NetworkConfigTools;
@@ -137,6 +136,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	public void invoke(MessageContext msgContext) throws AxisFault
 	{
 		int currentClients = 0;
+		boolean shouldnt_be_here = false;
 		synchronized (_concurrentCalls) {
 			// snapshot here for check...
 			currentClients = _concurrentCalls.intValue();
@@ -144,6 +144,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		if (_concurrentCalls.intValue() >= MAXIMUM_CONCURRENT_CLIENTS) {
 			String msg = "Refusing call due to too many concurrent clients; please try again.";
 			_logger.warn(msg);
+			shouldnt_be_here = true;
 			throw new AuthZSecurityException(msg);
 		}
 		synchronized (_concurrentCalls) {
@@ -154,13 +155,27 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		if (_logger.isDebugEnabled())
 			_logger.debug("rpc clients up to " + currentClients);
 
+		IResource resource;
 		try {
+			resource = ResourceManager.getCurrentResource().dereference();
+		} catch (Throwable e) {
+			String msg = "failure to dereference resource: " + e.getMessage();
+			_logger.error(msg, e);
+			throw new AxisFault(msg);
+		}
 
-			IResource resource = ResourceManager.getCurrentResource().dereference();
+		IAuthZProvider authZHandler;
+		try {
+			authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+		} catch (ResourceException e) {
+			String msg =
+				"failure to get authorization provider for resource " + ResourceManager.getResourceName(resource) + ": "
+					+ e.getMessage();
+			_logger.error(msg, e);
+			throw new AxisFault(msg);
+		}
 
-			IAuthZProvider authZHandler =
-				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
-
+		try {
 			if ((authZHandler == null) || (authZHandler.getMinIncomingMsgLevelSecurity(resource).isNone())) {
 				/*
 				 * We have no requirements for incoming message security. If there are no incoming
@@ -202,16 +217,18 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				_logger.error("AxisFault full trace: ", e);
 			}
 			throw e;
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			// wrap this exception and re-throw.
 			String msg = "An exception occurred during authorization: " + e.getMessage();
 			_logger.error(msg);
 			throw new AxisFault(msg, e);
 		} finally {
+			if (shouldnt_be_here) {
+				_logger.debug("that explains some things; the shouldn't be here check was activated for rpc client count.");
+			}
 			synchronized (_concurrentCalls) {
 				_concurrentCalls = new Integer(_concurrentCalls.intValue() - 1);
 				currentClients = _concurrentCalls.intValue();
-				;
 			}
 			if (_logger.isDebugEnabled())
 				_logger.debug("rpc clients down to " + currentClients);
@@ -555,7 +572,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			if (_logger.isDebugEnabled())
 				_logger.debug("client invokes " + operation.getDeclaringClass().getName() + "." + operation.getName() + "()");
 
-if (jDesc != null) _logger.debug("  jDesc non-null with: " + jDesc.getImplClass().toString());
+			if (jDesc != null)
+				_logger.debug("  jDesc non-null with: " + jDesc.getImplClass().toString());
 
 			// Get the resource's authz handler
 			IResource resource = ResourceManager.getCurrentResource().dereference();
@@ -571,9 +589,10 @@ if (jDesc != null) _logger.debug("  jDesc non-null with: " + jDesc.getImplClass(
 			if (accessOkay) {
 				resource.commit();
 			} else {
-				PermissionDeniedException temp = new PermissionDeniedException(operation.getName(), AclAuthZProvider.getResourceName(resource));
+				PermissionDeniedException temp =
+					new PermissionDeniedException(operation.getName(), ResourceManager.getResourceName(resource));
 				_logger.error("failed to check access: " + temp.getMessage());
-				_logger.error("==>" + errorText);
+				_logger.error("error text is ==>" + errorText);
 				throw new AxisFault(temp.getMessage());
 			}
 		} catch (IOException e) {

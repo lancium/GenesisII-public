@@ -404,4 +404,28 @@ public class ResourceManager
 		return new MetadataType(anyArray);
 	}
 
+	static public String getResourceName(IResource resource)
+	{
+		String toReturn = resource.getKey();
+		try {
+			/* this never ever seems to work.
+			if (resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()) != null) {
+				try {
+					toReturn.concat("--" + (String) resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()));
+				} catch (Throwable e) {
+					// ignore, will just miss part of print-out.
+				}
+			} else {
+				toReturn.concat("--" + "unknown details");
+			}
+			*/			
+		
+			
+		} catch (Throwable e) {
+			// ignore, will just miss part of print-out.
+		}
+	
+		return toReturn;
+	}
+
 }

@@ -3,36 +3,37 @@
 <!-- links a given user to a given group -->
 
 <gsh:script
-        xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
-        xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
-        xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+  xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+  xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+  xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
 
 <!--
 Inputs for the script:
 
 1.  user name (ex. johndoe)
-2.  group name (ex. gffs-users)
+2.  group name (ex. gffs-amie)
 
 -->
-       <gsh:default name="USER" value="${ARGV[1]}"/>
-       <gsh:default name="USER_DIR" value="/users/xsede.org"/>
-       <gsh:default name="USER_PATH" value="${USER_DIR}/${USER}"/>
-       <gsh:default name="GROUP" value="${ARGV[2]}"/>
-       <gsh:default name="GROUP_DIR" value="/groups/xsede.org"/>
-       <gsh:default name="GROUP_PATH" value="${GROUP_DIR}/${GROUP}"/>
+  <gsh:default name="USER" value="${ARGV[1]}"/>
+  <gsh:default name="USER_DIR" value="/users/xsede.org"/>
+  <gsh:default name="USER_PATH" value="${USER_DIR}/${USER}"/>
+  <gsh:default name="GROUP" value="${ARGV[2]}"/>
+  <gsh:default name="GROUP_DIR" value="/groups/xsede.org"/>
+  <gsh:default name="GROUP_PATH" value="${GROUP_DIR}/${GROUP}"/>
 
-        <try>
-          <block>
-            <geniix:ls>
-              <param>${USER_PATH}</param>
-              <param>></param>
-              <param>local:/dev/null</param>
-            </geniix:ls>
-          </block>
-          <catch class="java.lang.Exception">
-            <echo message="Could not find ${USER_PATH}."/>
-          </catch>
-        </try>
+  <try>
+    <block>
+      <geniix:ls>
+        <param>${USER_PATH}</param>
+        <param>></param>
+        <param>local:/dev/null</param>
+      </geniix:ls>
+    </block>
+    <catch class="java.lang.Exception">
+      <echo message="Could not find ${USER_PATH}."/>
+    </catch>
+  </try>
+
         <try>
           <block>
             <geniix:ls>
@@ -45,18 +46,33 @@ Inputs for the script:
             <echo message="Could not find ${GROUP_PATH}."/>
           </catch>
         </try>
-        <try>
-          <block>
-            <geniix:chmod>
-              <param>${GROUP_PATH}</param>
-              <param>+rx</param>
-              <param>${USER_PATH}</param>
-            </geniix:chmod>
-          </block>
-          <catch class="java.lang.Exception">
-            <echo message="Could not give group access on ${GROUP_PATH} to user ${USER_PATH}."/>
-          </catch>
-        </try>
+
+        <!-- make sure we aren't adding all thousands of users to the basic group. -->
+        <condition property="isUsersGroup">
+           <compare numeric="false" arg1="${GROUP_PATH}" arg2="/groups/xsede.org/gffs-users" comparison="eq"/>
+        </condition>
+
+        <if test="isUsersGroup">
+          <then>
+            <!-- we do nothing for group perms if it's the main gffs-users group. -->
+          </then>
+          <else>
+            <try>
+              <block>
+                <geniix:chmod>
+                  <param>${GROUP_PATH}</param>
+                  <param>+rx</param>
+                  <param>${USER_PATH}</param>
+                </geniix:chmod>
+              </block>
+              <catch class="java.lang.Exception">
+                <echo message="Could not give group access on ${GROUP_PATH} to user ${USER_PATH}."/>
+              </catch>
+            </try>
+          </else>
+        </if>
+
+        <!-- always link the group name under the user's sts, so that they will try to log in. -->
         <try>
           <block>
             <geniix:ln>
@@ -68,5 +84,6 @@ Inputs for the script:
             <echo message="Could not link ${GROUP_PATH} to ${USER_PATH}/${GROUP}."/>
           </catch>
         </try>
+
 </gsh:script>
 

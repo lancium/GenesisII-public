@@ -48,11 +48,11 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.common.security.AclEntryListType;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.sync.VersionedResourceUtils;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 import edu.virginia.vcgr.genii.security.RWXCategory;
-import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.acl.Acl;
@@ -247,21 +247,6 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		return false;
 	}
 
-	static public String getResourceName(IResource resource)
-	{
-		String toReturn = resource.getKey();
-		try {
-			if (resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()) != null) {
-				toReturn.concat("--" + (String) resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()));
-			} else {
-				toReturn.concat("--" + "unknown details");
-			}
-		} catch (Throwable e) {
-			// ignore, will just miss part of print-out.
-		}		
-		return toReturn;
-	}
-	
 	@Override
 	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
 		Class<?> serviceClass, Method operation, String errorText)
@@ -270,7 +255,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 
 		if (!checkAccess(authenticatedCallerCredentials, resource, category, errorText)) {
 			String msg = "denying access for operation: " + operation.getName();
-			String asset = getResourceName(resource);
+			String asset = ResourceManager.getResourceName(resource);
 			msg.concat(asset + " at " + ProgramTools.showLastFewOnStack(4));
 			_logger.error(msg);
 			errorText = msg;
@@ -294,8 +279,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	}
 
 	@Override
-	public boolean
-		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category, String errorText)
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
+		RWXCategory category, String errorText)
 	{
 		String messagePrefix = "checkAccess for " + category + " on ";
 		String resourceName = null;
@@ -312,7 +297,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		try {
 			ICallingContext callContext = ContextManager.getExistingContext();
 			Acl acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
-			
+
 			// pre-emptive check of wildcard access.
 			if ((acl == null) || checkAclAccess(null, category, acl)) {
 				if (_logger.isDebugEnabled())

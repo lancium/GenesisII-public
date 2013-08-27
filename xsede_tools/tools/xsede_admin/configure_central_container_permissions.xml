@@ -47,7 +47,7 @@
 		<geniix:chmod>
 			<gsh:param>${CONTAINER_SRVS}/${SERVICE}</gsh:param>
 			<gsh:param>+r</gsh:param>
-		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+   			<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
 		</geniix:chmod>
 	</gsh:foreach>
 

@@ -177,7 +177,7 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 					}
 				}
 			} catch (Exception e) {
-				throw new RuntimeException("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
+				_logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
 			}
 		}
 
