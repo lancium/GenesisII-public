@@ -572,9 +572,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			if (_logger.isDebugEnabled())
 				_logger.debug("client invokes " + operation.getDeclaringClass().getName() + "." + operation.getName() + "()");
 
-			if (jDesc != null)
-				_logger.debug("  jDesc non-null with: " + jDesc.getImplClass().toString());
-
 			// Get the resource's authz handler
 			IResource resource = ResourceManager.getCurrentResource().dereference();
 			IAuthZProvider authZHandler =

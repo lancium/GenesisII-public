@@ -187,18 +187,18 @@ grid_chk chmod "$new_admin_name" +rwx "$new_admin_name"
 grid_chk logout --all
 grid_chk login --username="$(basename $new_admin_name)" --password="$new_password"
 
-echo "Creating test user 'test1'..."
-bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$USERS_LOC/test1" "password1" "$new_group" "$HOMES_LOC" "$USERS_LOC"
-if [ $? -ne 0 ]; then
-  echo "Failure in setting up user 'test1'."
-  exit 1
-fi
-echo "Creating test user 'test2'..."
-bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$USERS_LOC/test2" "password2" "$new_group" "$HOMES_LOC" "$USERS_LOC"
-if [ $? -ne 0 ]; then
-  echo "Failure in setting up user 'test2'."
-  exit 1
-fi
+#echo "Creating test user 'test1'..."
+#bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$USERS_LOC/test1" "password1" "$new_group" "$HOMES_LOC" "$USERS_LOC"
+#if [ $? -ne 0 ]; then
+#  echo "Failure in setting up user 'test1'."
+#  exit 1
+#fi
+#echo "Creating test user 'test2'..."
+#bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$USERS_LOC/test2" "password2" "$new_group" "$HOMES_LOC" "$USERS_LOC"
+#if [ $? -ne 0 ]; then
+#  echo "Failure in setting up user 'test2'."
+#  exit 1
+#fi
 
 ##############
 

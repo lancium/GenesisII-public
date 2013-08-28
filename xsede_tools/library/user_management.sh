@@ -82,7 +82,6 @@ echo "establish_identity: idp_path is: $idp_path"
       keystoreLogin --toolIdentity --password=$KEYSTORE_PASSWORD --validDuration=10years local:$KEYSTORE_FILE
       login --username=${user} --password=${password} $idp_path
 eof
-#echo after keystore step.
   else
     # assert the new identity.  this is the big one that had better work.
     grid login --username=${user} --password=${password} $idp_path
@@ -209,11 +208,16 @@ function create_group()
   local grp="$(basename $full_group)"
   grid ls "$BOOTSTRAP_LOC/Services/X509AuthnPortType/$grp" &>/dev/null
   if [ $? -ne 0 ]; then
-    echo "Creating group '$grp'..."
-    grid_chk idp --validDuration=10years $BOOTSTRAP_LOC/Services/X509AuthnPortType "$grp"
-    echo "  linking group identity to '$full_group'..."
-    grid_chk ln $BOOTSTRAP_LOC/Services/X509AuthnPortType/"$grp" "$full_group"
-    echo "  done."
+    multi_grid <<eof
+      idp --validDuration=10years $BOOTSTRAP_LOC/Services/X509AuthnPortType "$grp"
+      onerror Failed to create group for $grp using $BOOTSTRAP_LOC.
+      ln $BOOTSTRAP_LOC/Services/X509AuthnPortType/"$grp" "$full_group"
+      onerror Failed to add $grp group link for to groups directory.
+eof
+    local retval=$?
+#    echo "output from creating group:"
+#    cat $GRID_OUTPUT_FILE
+    return $retval
   fi
 }
 

@@ -248,6 +248,12 @@ function create_bootstrap_signing_certificate()
   $CERTO gen -dn="C=US, ST=Virginia, L=Charlottesville, O=GENIITEST, OU=Genesis II, CN=skynet" -output-storetype=PKCS12 "-output-entry-pass=$CA_PASSWORD" -output-keystore=$UBER_CA_PFX "-output-keystore-pass=$CA_PASSWORD" "-output-alias=$UBER_CA_ALIAS" -keysize=2048
   check_if_failed "generating base of CA keypair"
 
+  # and create the base key's certificate file.
+#  local cert_file="$(echo $UBER_CA_PFX | sed -e 's/\.pfx$/\.cer/')"
+  local cert_file="$(dirname $UBER_CA_PFX)/$(basename $UBER_CA_PFX ".pfx").cer"
+  $JAVA_HOME/bin/keytool -export -file "$cert_file" -keystore "$UBER_CA_PFX" -storepass "$CA_PASSWORD" -alias "$UBER_CA_ALIAS" -storetype "PKCS12"
+  check_if_failed "generating certificate file $cert_file for $UBER_CA_PFX"
+
   # now create the real signing certificate, with full CA apparel.
   create_certificate_using_CA "$UBER_CA_PFX" "$CA_PASSWORD" "$UBER_CA_ALIAS" "$CA_PFX" "$CA_PASSWORD" "$CA_ALIAS" "skynet"
   check_if_failed "generating signing keypair"
@@ -299,7 +305,8 @@ function create_certificate_using_CA()
   $CERTO gen "-dn=C=$C, ST=$ST, L=$L, O=$O, OU=$OU, CN=$CN_GIVEN" -output-storetype=PKCS12 "-output-entry-pass=$NEW_PASS" "-output-keystore=$NEW_PFX" "-output-keystore-pass=$NEW_PASS" "-output-alias=$NEW_ALIAS" "-input-keystore=$THE_CA_PFX" "-input-keystore-pass=$THE_CA_PASS" -input-storetype=PKCS12 "-input-entry-pass=$THE_CA_PASS" -input-alias="$THE_CA_ALIAS" -keysize=2048
   check_if_failed "generating $NEW_PFX from $THE_CA_PFX"
   # and create its certificate file.
-  local cert_file="$(echo $NEW_PFX | sed -e 's/\.pfx/\.cer/')"
+#  local cert_file="$(echo $NEW_PFX | sed -e 's/\.pfx/\.cer/')"
+  local cert_file="$(dirname $NEW_PFX)/$(basename $NEW_PFX ".pfx").cer"
   $JAVA_HOME/bin/keytool -export -file "$cert_file" -keystore "$NEW_PFX" -storepass "$NEW_PASS" -alias "$NEW_ALIAS" -storetype "PKCS12"
   check_if_failed "generating certificate file $cert_file for $NEW_PFX"
 }
@@ -404,9 +411,12 @@ function give_administrative_privileges()
   # this set of commands makes the rns path into an admin, mainly on the container.
   # the bes for the container is assumed to be created by us, so one may have to add
   # perms manually if it is not in "$BES_CONTAINERS_LOC/{shortContainerName}-bes".
+#hmmm: this should use the xsede admin script to do the perms on services!
   multi_grid &>/dev/null <<eof
     chmod "$rnspath" +rwx "$rnspath"
+    onerror chmod for rnspath failed.
     chmod "/" +rwx $rnspath
+    onerror chmod for / failed.
     chmod "$CONTAINERS_LOC" +rwx $rnspath
     chmod "$container" +rwx $rnspath
     chmod "$container/Services/X509AuthnPortType" +rwx $rnspath
