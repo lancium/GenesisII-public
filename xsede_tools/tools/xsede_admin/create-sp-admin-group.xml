@@ -68,7 +68,7 @@ Script parameters are:
 	</geniix:chmod>
 	<geniix:chmod>
 		<param>${SP_PATH}</param>
-		<param>+rwx</param>
+		<param>+r</param>
 		<param>/groups/xsede.org/gffs-users</param>
 	</geniix:chmod>
 
@@ -84,7 +84,7 @@ Script parameters are:
 	</geniix:chmod>
 	<geniix:chmod>
 		<param>${SP_PATH}/user</param>
-		<param>+rwx</param>
+		<param>+r</param>
 		<param>/groups/xsede.org/gffs-users</param>
 	</geniix:chmod>
 
@@ -100,7 +100,7 @@ Script parameters are:
 	</geniix:chmod>
 	<geniix:chmod>
 		<param>${SP_PATH}/project</param>
-		<param>+rwx</param>
+		<param>+r</param>
 		<param>/groups/xsede.org/gffs-users</param>
 	</geniix:chmod>
 

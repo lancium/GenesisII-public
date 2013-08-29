@@ -47,32 +47,20 @@ Inputs for the script:
           </catch>
         </try>
 
-        <!-- make sure we aren't adding all thousands of users to the basic group. -->
-        <condition property="isUsersGroup">
-           <compare numeric="false" arg1="${GROUP_PATH}" arg2="/groups/xsede.org/gffs-users" comparison="eq"/>
-        </condition>
+        <try>
+          <block>
+            <geniix:chmod>
+              <param>${GROUP_PATH}</param>
+              <param>+rx</param>
+              <param>${USER_PATH}</param>
+            </geniix:chmod>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not give group access on ${GROUP_PATH} to user ${USER_PATH}."/>
+          </catch>
+        </try>
 
-        <if test="isUsersGroup">
-          <then>
-            <!-- we do nothing for group perms if it's the main gffs-users group. -->
-          </then>
-          <else>
-            <try>
-              <block>
-                <geniix:chmod>
-                  <param>${GROUP_PATH}</param>
-                  <param>+rx</param>
-                  <param>${USER_PATH}</param>
-                </geniix:chmod>
-              </block>
-              <catch class="java.lang.Exception">
-                <echo message="Could not give group access on ${GROUP_PATH} to user ${USER_PATH}."/>
-              </catch>
-            </try>
-          </else>
-        </if>
-
-        <!-- always link the group name under the user's sts, so that they will try to log in. -->
+        <!-- link the group name under the user's sts, so that they will try to log in. -->
         <try>
           <block>
             <geniix:ln>
@@ -84,6 +72,5 @@ Inputs for the script:
             <echo message="Could not link ${GROUP_PATH} to ${USER_PATH}/${GROUP}."/>
           </catch>
         </try>
-
 </gsh:script>
 

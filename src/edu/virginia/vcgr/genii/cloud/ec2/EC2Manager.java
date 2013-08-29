@@ -121,7 +121,7 @@ public class EC2Manager implements CloudManager
 						// Set besid in each vm
 						tStat.setBESID(_besid);
 						_vms.put(tStat.getID(), tStat);
-						CloudMonitor.createResource(_besid, tStat.getID(), tStat.getHost(), tStat.getPort(), 0, 0);
+						CloudMonitor.createResource(_besid, tStat.getID(), tStat.getHost(), tStat.getPort(), 0, 1);
 
 					}
 					return true;

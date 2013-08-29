@@ -635,17 +635,21 @@ function check_logs_for_errors()
   fi
   echo "Looking for issues and actions in the logs..."
   file="$(get_container_logfile "$DEP_NAME")"
-  echo "File: $file..."
-  for i in grant fail warn error; do
-    show_count "$i" "$file"
-  done
+  if [ -f "$file" ]; then
+    echo "File: $file..."
+    for i in grant fail warn error; do
+      show_count "$i" "$file"
+    done
+  fi
   # only print client stats for the main container.
   if [ "$DEP_NAME" == "default" ]; then
     file="$(get_client_logfile)"
-    echo "File: $file..."
-    for i in fail warn error; do
-      show_count "$i" "$file"
-    done
+    if [ -f "$file" ]; then
+      echo "File: $file..."
+      for i in fail warn error; do
+        show_count "$i" "$file"
+      done
+    fi
   fi
 }
 

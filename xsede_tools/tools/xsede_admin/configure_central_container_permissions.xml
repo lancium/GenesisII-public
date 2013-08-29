@@ -51,4 +51,19 @@
 		</geniix:chmod>
 	</gsh:foreach>
 
+  <!-- 
+  needed to allow gffs-amie members to replicate
+  /home/<service_proviers>.xsede.org dirs during creation of sp admin groups
+  -->
+	<geniix:chmod>
+		<gsh:param>${CONTAINER_SRVS}/${SERVICE}/VCGRContainerPortType</gsh:param>
+		<gsh:param>+rwx</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>${CONTAINER_SRVS}/${SERVICE}/EnhancedRNSPortType</gsh:param>
+		<gsh:param>+rwx</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+	</geniix:chmod>
+
 </gsh:script>

@@ -204,19 +204,18 @@ eval {
 
         my $admin_group = ( grep(/^$account_name$/, @ADMIN_ACCOUNTS) ) ? $XSEDE_ADMINS_GROUP : '';
         my $verbose = ($DEBUG) ? '' : '>/dev/null';
-        my $cmd = "$GRIDCMD script $XSEDE_COMBINED_SCRIPT c $account_name $XSEDE_USERS_GROUP $admin_group $verbose";
+        my $cmd = "$GRIDCMD script $XSEDE_COMBINED_SCRIPT c $account_name $admin_group $verbose";
         push @add_commands, $cmd;
 
-        my $s_cmd = "script $XSEDE_COMBINED_SCRIPT c $account_name $XSEDE_USERS_GROUP $admin_group\n"
+        my $s_cmd = "script $XSEDE_COMBINED_SCRIPT c $account_name $admin_group\n"
            . "onerror Failure to create user account $account_name\n";
         push @serialized_add_commands, $s_cmd;
-
-#       Old pre-COMBINED code moved below
     }
 
     # If in testing mode, only do a small set of users.
     @add_commands = @add_commands[0 .. $MAX_ACCOUNTS_FOR_TEST] if ($TESTING);
 
+    # run some number of the commands in parallel.
 #    forker(@add_commands);
 
     # run batches of commands in a single grid command.

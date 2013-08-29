@@ -182,13 +182,13 @@ for ((test_iter=0; $test_iter < ${#FULL_TEST_SET[*]}; test_iter++)); do
   output_file="$(mktemp $REG_TEMP/regression.XXXXXX)"
   echo "  Test output file: $output_file"
 
-  echo "==============" &>"$output_file"
-  echo "Log state prior to test:" &>>"$output_file"
-  check_logs_for_errors &>>"$output_file"
-  echo "==============" &>>"$output_file"
+  echo "==============" >"$output_file"
+  echo "Log state prior to test:" >>"$output_file"
+  check_logs_for_errors >>"$output_file"
+  echo "==============" >>"$output_file"
 
   if [ $VERBOSE -ne 1 ]; then
-    bash $XSEDE_TEST_ROOT/${FULL_TEST_SET[$test_iter]} &>>"$output_file"
+    bash $XSEDE_TEST_ROOT/${FULL_TEST_SET[$test_iter]} >>"$output_file" 2>&1
     retval=$?
   else
     bash $XSEDE_TEST_ROOT/${FULL_TEST_SET[$test_iter]} 2>&1 | tee -a "$output_file"
@@ -204,10 +204,10 @@ for ((test_iter=0; $test_iter < ${#FULL_TEST_SET[*]}; test_iter++)); do
     TEST_RESULTS[$test_iter]="OKAY"
   fi
 
-  echo "==============" &>>"$output_file"
-  echo "Log state after test:" &>>"$output_file"
-  check_logs_for_errors &>>"$output_file"
-  echo "==============" &>>"$output_file"
+  echo "==============" >>"$output_file"
+  echo "Log state after test:" >>"$output_file"
+  check_logs_for_errors >>"$output_file"
+  echo "==============" >>"$output_file"
 done
 
 # final analysis--how did the test run do?
