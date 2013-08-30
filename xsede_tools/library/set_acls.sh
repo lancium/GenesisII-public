@@ -96,7 +96,14 @@ fi
 forbidden_paths=(.globus .globusonline .secrets .ssh .subversion .ucc .Xauthority)
 targdirbase="$(basename $dirpath)"
 for i in ${forbidden_paths[@]}; do
-  if [ "$targdirbase" == "$i" -o -e "$dirpath/$i" ]; then
+  no_good=
+  if [ "$targdirbase" == "$i" ]; then
+    no_good=true
+  fi
+  if [ ! -z "$recursive" -a -e "$dirpath/$i" ]; then
+    no_good=true
+  fi
+  if [ ! -z "$no_good" ]; then
     echo "The path includes a component ($i) that is explicitly blocked from"
     echo "being exported.  This is because that folder is known to contain private data"
     echo "(such as private keys or passwords)."

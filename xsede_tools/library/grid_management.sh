@@ -249,10 +249,13 @@ function create_bootstrap_signing_certificate()
   check_if_failed "generating base of CA keypair"
 
   # and create the base key's certificate file.
-#  local cert_file="$(echo $UBER_CA_PFX | sed -e 's/\.pfx$/\.cer/')"
-  local cert_file="$(dirname $UBER_CA_PFX)/$(basename $UBER_CA_PFX ".pfx").cer"
-  $JAVA_HOME/bin/keytool -export -file "$cert_file" -keystore "$UBER_CA_PFX" -storepass "$CA_PASSWORD" -alias "$UBER_CA_ALIAS" -storetype "PKCS12"
-  check_if_failed "generating certificate file $cert_file for $UBER_CA_PFX"
+####
+#hmmm: this was added as a possible fix for a problem, but it had no effect.  still it would be
+#      nice to be able to easily generate the cer file again, so saving the code.
+####
+#  local cert_file="$(dirname $UBER_CA_PFX)/$(basename $UBER_CA_PFX ".pfx").cer"
+#  $JAVA_HOME/bin/keytool -export -file "$cert_file" -keystore "$UBER_CA_PFX" -storepass "$CA_PASSWORD" -alias "$UBER_CA_ALIAS" -storetype "PKCS12"
+#  check_if_failed "generating certificate file $cert_file for $UBER_CA_PFX"
 
   # now create the real signing certificate, with full CA apparel.
   create_certificate_using_CA "$UBER_CA_PFX" "$CA_PASSWORD" "$UBER_CA_ALIAS" "$CA_PFX" "$CA_PASSWORD" "$CA_ALIAS" "skynet"
