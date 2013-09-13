@@ -103,9 +103,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 	public final static int MAXIMUM_CONCURRENT_CLIENTS = 32;
 
-	// tracks how many clients are currently requesting RPC services.
-	private static volatile Integer _concurrentCalls = new Integer(0);
-
 	public ServerWSDoAllReceiver()
 	{
 	}
@@ -135,26 +132,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 	public void invoke(MessageContext msgContext) throws AxisFault
 	{
-		int currentClients = 0;
-		boolean shouldnt_be_here = false;
-		synchronized (_concurrentCalls) {
-			// snapshot here for check...
-			currentClients = _concurrentCalls.intValue();
-		}
-		if (_concurrentCalls.intValue() >= MAXIMUM_CONCURRENT_CLIENTS) {
-			String msg = "Refusing call due to too many concurrent clients; please try again.";
-			_logger.warn(msg);
-			shouldnt_be_here = true;
-			throw new AuthZSecurityException(msg);
-		}
-		synchronized (_concurrentCalls) {
-			_concurrentCalls = new Integer(_concurrentCalls.intValue() + 1);
-			// snapshot client count here to avoid logging inside synchronization.
-			currentClients = _concurrentCalls.intValue();
-		}
-		if (_logger.isDebugEnabled())
-			_logger.debug("rpc clients up to " + currentClients);
-
 		IResource resource;
 		try {
 			resource = ResourceManager.getCurrentResource().dereference();
@@ -222,17 +199,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			String msg = "An exception occurred during authorization: " + e.getMessage();
 			_logger.error(msg);
 			throw new AxisFault(msg, e);
-		} finally {
-			if (shouldnt_be_here) {
-				_logger.debug("that explains some things; the shouldn't be here check was activated for rpc client count.");
-			}
-			synchronized (_concurrentCalls) {
-				_concurrentCalls = new Integer(_concurrentCalls.intValue() - 1);
-				currentClients = _concurrentCalls.intValue();
-			}
-			if (_logger.isDebugEnabled())
-				_logger.debug("rpc clients down to " + currentClients);
-
 		}
 	}
 
@@ -561,7 +527,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				// pretend security doesn't exist -- axis will do what it does
 				// when it can't figure out how to dispatch to a non-existent
 				// method.
-				_logger.warn("bailing out due to a null operation description.");
+				_logger.debug("deferring to axis for null operation description.");
 				return;
 			}
 			JavaServiceDesc jDesc = null;
