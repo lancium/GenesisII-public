@@ -287,7 +287,7 @@
                 <gsh:param>+rwx</gsh:param>
                 <gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
         </geniix:chmod>
-    <geniix:chmod>
+	<geniix:chmod>
                 <gsh:param>/home/xsede.org</gsh:param>
                 <gsh:param>+r</gsh:param>
                 <gsh:param>/groups/xsede.org/gffs-users</gsh:param>

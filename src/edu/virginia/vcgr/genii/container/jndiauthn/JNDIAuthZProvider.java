@@ -114,8 +114,8 @@ public class JNDIAuthZProvider implements IAuthZProvider
 	 * Check that the caller has a type of access to the given resource.
 	 */
 	@Override
-	public boolean
-		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category, String errorText)
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
+		RWXCategory category, String errorText)
 	{
 		JNDIResource jndiResource = (JNDIResource) resource;
 		if (!jndiResource.isIdpResource()) {

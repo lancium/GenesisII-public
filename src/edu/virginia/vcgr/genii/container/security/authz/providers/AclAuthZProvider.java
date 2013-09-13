@@ -328,11 +328,12 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 					if (sa.checkRWXAccess(category)) {
 						// check the root identity of the trust delegation to see if they have
 						// access.
+						// _logger.debug("trying normal acl check");
 						X509Identity ia = (X509Identity) sa.getRootIdentity();
 						if (checkAclAccess(ia, category, acl)) {
 							if (_logger.isDebugEnabled())
-								_logger
-									.debug(messagePrefix + "granted to trust credential: " + sa.describe(VerbosityLevel.LOW));
+								_logger.debug(messagePrefix + "granted to trust credential (for root identity): "
+									+ sa.describe(VerbosityLevel.LOW));
 							return true;
 						}
 					}

@@ -2223,9 +2223,11 @@ public class JobManager implements Closeable
 				history = data.history(HistoryEventCategory.CreatingJob);
 
 				SecurityUpdateResults checkResults = new SecurityUpdateResults();
-				// hmmm: where does this 10 hour time limit come from? why block it like that with a
-				// constant? instead, we should grab the current credentials deadline and use that
-				// directly.
+				/*
+				 * hmmm: where does this 10 hour time limit come from? why block it like that with a
+				 * constant? instead, we should grab the current credentials deadline and use that
+				 * directly.
+				 */
 				ClientUtils.checkAndRenewCredentials(startInfo.getCallingContext(), new Date(
 					System.currentTimeMillis() + 1000l * 60 * 10), checkResults);
 				if (checkResults.removedCredentials().size() > 0) {

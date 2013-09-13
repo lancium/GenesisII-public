@@ -107,7 +107,7 @@ public class DatabaseConnectionPool
 
 		int maxSnooze = 4 * 1000; // 4 seconds, in miliseconds.
 		int eachSleep = 500; // number of milliseconds to snooze between lock attempts.
-		int attempts = maxSnooze / eachSleep + 1;
+		int attempts = (int)((double)maxSnooze / (double)eachSleep + 1);
 
 		for (int lcv = 0; lcv < attempts; lcv++) {
 			try {

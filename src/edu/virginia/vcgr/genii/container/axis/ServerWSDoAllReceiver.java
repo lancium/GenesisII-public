@@ -103,6 +103,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 	public final static int MAXIMUM_CONCURRENT_CLIENTS = 32;
 
+	// tracks how many clients are currently requesting RPC services.
+	private static volatile Integer _concurrentCalls = new Integer(0);
+
 	public ServerWSDoAllReceiver()
 	{
 	}
@@ -141,6 +144,15 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			throw new AxisFault(msg);
 		}
 
+		int concurrencyLevel;  // snapshot for logging the client count.
+		synchronized (_concurrentCalls) {
+			_concurrentCalls++;
+			// snapshot client count here to avoid logging inside synchronization.
+			concurrencyLevel = _concurrentCalls.intValue();
+		}
+		if (_logger.isDebugEnabled())
+			_logger.debug("rpc clients up to " + concurrencyLevel);
+
 		IAuthZProvider authZHandler;
 		try {
 			authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
@@ -149,6 +161,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				"failure to get authorization provider for resource " + ResourceManager.getResourceName(resource) + ": "
 					+ e.getMessage();
 			_logger.error(msg, e);
+			synchronized (_concurrentCalls) {
+				_concurrentCalls--;
+				concurrencyLevel = _concurrentCalls.intValue();
+			}
+			if (_logger.isDebugEnabled())
+				_logger.debug("after authz failure, rpc clients down to " + concurrencyLevel);
 			throw new AxisFault(msg);
 		}
 
@@ -199,6 +217,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			String msg = "An exception occurred during authorization: " + e.getMessage();
 			_logger.error(msg);
 			throw new AxisFault(msg, e);
+		} finally {
+			synchronized (_concurrentCalls) {
+				_concurrentCalls--;
+				concurrencyLevel = _concurrentCalls.intValue();
+			}
+			if (_logger.isDebugEnabled())
+				_logger.debug("rpc clients down to " + concurrencyLevel);
 		}
 	}
 
