@@ -93,17 +93,17 @@ function build_installer()
 
 # first build 32-bit:
 
-echo Building 32 bit Genesis...
-pushd $GENII_INSTALL_DIR
-ant clean
-ant update
-ant build
-popd
-
-build_installer 3414 genesis2_linux_client_32
-build_installer 2078 genesis2_linux_container_32
-build_installer 2081 genesis2_windows_client_32
-build_installer 2084 genesis2_windows_container_32
+#echo Building 32 bit Genesis...
+#pushd $GENII_INSTALL_DIR
+#ant clean
+#ant update
+#ant build
+#popd
+#
+#build_installer 3414 genesis2_linux_client_32
+#build_installer 2078 genesis2_linux_container_32
+#build_installer 2081 genesis2_windows_client_32
+#build_installer 2084 genesis2_windows_container_32
 
 ##############
 
@@ -111,11 +111,11 @@ build_installer 2084 genesis2_windows_container_32
 
 echo Building 64 bit Genesis...
 
-pushd $GENII_INSTALL_DIR
-ant clean
-ant update
-ant -Dbuild.targetArch=64 build
-popd
+#pushd $GENII_INSTALL_DIR
+#ant clean
+#ant update
+#ant -Dbuild.targetArch=64 build
+#popd
 
 build_installer 2073 genesis2_linux_client_64
 build_installer 3416 genesis2_linux_container_64

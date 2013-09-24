@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# an unfinished idea for how to manage identifiers that are randomly
+# generated but are also uniquely identified for later use.
+#
 # Author: Chris Koeritz
 
 declare -A RANDOM_IDS=()

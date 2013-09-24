@@ -14,7 +14,7 @@ progname="$(basename $0)"
 
 if [ $# -lt 1 ]; then
   echo "$progname: This script needs a single parameter, which is the container"
-  echo "path to use for the authentication (e.g. $BOOTSTRAP_LOC)"
+  echo "path to use for the authentication (e.g. $STS_LOC)"
   exit 3
 fi
 

@@ -93,13 +93,9 @@ ls $(dirname $OUR_MOUNT_POINT)
 fi
 fuse --mount local:$OUR_MOUNT_POINT
 sleep 30  # give process time to get mounted.
-checkMount=`mount`
-if [[ "$checkMount" =~ .*$OUR_MOUNT_POINT.* ]]; then
-  retval=0
-else
-  echo "Mount failed... Exiting out."
-  exit 1
-fi
+
+test_fuse_mount $OUR_MOUNT_POINT
+check_if_failed "Mounting grid to local directory"
 
 # run the test a partially random number of times.
 test_count=$(expr $RANDOM % 3 + 1)

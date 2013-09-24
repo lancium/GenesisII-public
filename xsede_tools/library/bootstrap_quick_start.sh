@@ -1,14 +1,8 @@
 #!/bin/bash
 
-# Author: Chris Koeritz
-
 # coded to build a bootstrapped grid on a fast local partition.
-
-user_password="$1"; shift
-if [ -z "$user_password" ]; then
-  # we plug in this password for the USERPATH identity.
-  user_password=FOOP
-fi
+#
+# Author: Chris Koeritz
 
 # standard start-up boilerplate.
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
@@ -44,6 +38,19 @@ source $XSEDE_TEST_ROOT/library/establish_environment.sh
 
 echo -e "** After establishing test environment:\n\tGENII_INSTALL_DIR is $GENII_INSTALL_DIR\n\tGENII_USER_DIR is $GENII_USER_DIR"
 
+##############
+
+# load passwords if they've seen fit to give us any.
+if [ -f "$HOME/.secrets/grid_passwords.txt" ]; then 
+  source "$HOME/.secrets/grid_passwords.txt"
+fi
+
+# set defaults for any passwords we didn't find a value for.
+if [ -z "$ADMIN_ACCOUNT_PASSWD" ]; then ADMIN_ACCOUNT_PASSWD="admin"; fi
+if [ -z "$NORMAL_ACCOUNT_PASSWD" ]; then NORMAL_ACCOUNT_PASSWD="FOOP"; fi
+
+##############
+
 containerlog="$(get_container_logfile "$DEPLOYMENT_NAME")"
 clientlog="$(get_client_logfile "$DEPLOYMENT_NAME")"
 # clean out old state directory and old logs.
@@ -53,25 +60,33 @@ clientlog="$(get_client_logfile "$DEPLOYMENT_NAME")"
   "${clientlog}" "${clientlog}".[0-9]*
 
 # bootstrap and configure a bunch of rights for the admin account.
-bash $XSEDE_TEST_ROOT/library/grid-bootstrap-single.sh "$USERS_LOC/admin" admin $SUBMIT_GROUP $(basename $CONTAINERPATH)
-if [ $? -ne 0 ]; then echo "===> script failure, exiting."; exit 1;  fi
+bash $XSEDE_TEST_ROOT/library/configure_root_container.sh "$USERS_LOC/admin" "$ADMIN_ACCOUNT_PASSWD" $SUBMIT_GROUP $(basename $CONTAINERPATH)
+check_if_failed "bootstrap procedure"
+#if [ $? -ne 0 ]; then echo "===> script failure, exiting."; exit 1;  fi
 
 export NON_INTERACTIVE=true
-bash $XSEDE_TEST_ROOT/first_steps/setup_test_infrastructure.sh $CONTAINERPATH $user_password
-if [ $? -ne 0 ]; then echo "===> script failure, exiting."; exit 1;  fi
+bash $XSEDE_TEST_ROOT/library/setup_test_infrastructure.sh $CONTAINERPATH $NORMAL_ACCOUNT_PASSWD
+check_if_failed "setting up test infrastructure"
+#if [ $? -ne 0 ]; then echo "===> script failure, exiting."; exit 1;  fi
+
+# set up the RNSPATH folder for testing.
+#already done: grid mkdir --parents grid:$RNSPATH &>/dev/null
+grid chmod -R grid:$RNSPATH +rwx $USERPATH
+check_if_failed Could not give $USERPATH permission to the work area $RNSPATH
 
 # logout and get into normal garb.
 grid logout --all 
-grid login --username=$(basename $USERPATH) --password=$user_password
-if [ $? -ne 0 ]; then echo "===> script failure, exiting."; exit 1;  fi
+grid login --username=$(basename $USERPATH) --password=$NORMAL_ACCOUNT_PASSWD
+check_if_failed "logging in as $USERPATH"
+#if [ $? -ne 0 ]; then echo "===> script failure, exiting."; exit 1;  fi
 
 # now add a second container for replication if desired.
-bash $XSEDE_TEST_ROOT/library/grid-bootstrap-backup.sh $user_password
+bash $XSEDE_TEST_ROOT/library/configure_mirror_container.sh $NORMAL_ACCOUNT_PASSWD
+check_if_failed "deploying mirror container"
 
 # stop the container again so we can snapshot the config.
 echo "Stopping the container and making a snapshot of the user directory..."
 bash $XSEDE_TEST_ROOT/library/zap_genesis_javas.sh
-sleep 2
 
 #hmmm: could use a variable for where this file lives.
 save_grid_data $TMP/bootstrap_save.zip

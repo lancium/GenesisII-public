@@ -19,6 +19,8 @@ Script parameters are:
        <gsh:default name="HOME_DIR" value="/home/xsede.org"/>
        <gsh:default name="HOME_PATH" value="${HOME_DIR}/${USER}"/>
        <gsh:default name="CONTAINER_RESOURCE" value="/resources/xsede.org/containers/sts-1.xsede.org"/>
+       <gsh:default name="ADMINS_GROUP" value="/groups/xsede.org/gffs-admins"/>
+       <gsh:default name="AMIE_GROUP" value="/groups/xsede.org/gffs-amie"/>
 
 	<geniix:idp>
 		<param>--kerbRealm=TERAGRID.ORG</param>
@@ -39,6 +41,17 @@ Script parameters are:
 		<param>${USER_PATH}</param>
 	</geniix:chmod>
 			
+	<geniix:chmod>
+		<param>${USER_PATH}</param>
+		<param>7</param>
+		<param>${ADMINS_GROUP}</param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<param>${USER_PATH}</param>
+		<param>7</param>
+		<param>${AMIE_GROUP}</param>
+	</geniix:chmod>
+			
 	<geniix:mkdir>
 		<param>${HOME_PATH}</param>
 	</geniix:mkdir>
@@ -50,18 +63,51 @@ Script parameters are:
 	</geniix:chmod>
 
 	<!-- add a resolver for this user and also replicate their STS to the secondary. -->
-	<geniix:resolver>
+
+        <try>
+          <block>
+            <geniix:ping>
+              <param>/etc/resolvers/stsResolver</param>
+              <param>></param>
+              <param>local:/dev/null</param>
+            </geniix:ping>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Finished creating ${USER} without resolver."/>
+            <exit exitcode="0" />
+          </catch>
+        </try>
+
+        <echo message="Adding resolver for user ${USER}"/>
+	    <geniix:resolver>
 		<param>-p</param>
 		<param>-r</param>
 		<param>${USER_PATH}</param>
 		<param>/etc/resolvers/stsResolver</param>
-	</geniix:resolver>
+	    </geniix:resolver>
 
-	<geniix:replicate>
+        <try>
+          <block>
+            <geniix:ping>
+              <param>/resources/xsede.org/containers/sts-2.xsede.org</param>
+              <param>></param>
+              <param>local:/dev/null</param>
+            </geniix:ping>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Did not see sts-2 container; failed to add replication for user ${USER}"/>
+            <exit exitcode="1" />
+          </catch>
+        </try>
+
+        <echo message="Adding replication for user ${USER}"/>
+	    <geniix:replicate>
 		<param>-p</param>
 		<param>${USER_PATH}</param>
 		<param>/resources/xsede.org/containers/sts-2.xsede.org</param>
-	</geniix:replicate>
+	    </geniix:replicate>
+
+     <echo message="Finished creating ${USER} with resolver and replication."/>
 
 </gsh:script>
 

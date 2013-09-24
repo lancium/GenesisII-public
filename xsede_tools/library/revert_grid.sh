@@ -3,14 +3,8 @@
 # stops any running container, wipes out its configuration, and undoes a
 # supposedly pre-existing file called bootstrap_save.zip to get a saved
 # configuration back.  after that, the container is restarted.
-# coded for the generals.
-
+#
 # Author: Chris Koeritz
-
-user_password="$1"; shift
-if [ -z "$user_password" ]; then
-  user_password=FOOP
-fi
 
 # standard start-up boilerplate.
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
@@ -55,7 +49,7 @@ mkdir "$TEST_TEMP"
 if [ $? -ne 0 ]; then echo "===> script failure removing user dir, exiting."; exit 1;  fi
 if [ ! -z "$BACKUP_USER_DIR" ]; then
   \rm -rf "$BACKUP_USER_DIR"
-  if [ $? -ne 0 ]; then echo "===> script failure removing backup user dir, exiting."; exit 1;  fi
+  if [ $? -ne 0 ]; then echo "===> script failure removing mirror's user dir, exiting."; exit 1;  fi
 fi
 umask 077
 mkdir "$GENII_USER_DIR"
@@ -65,40 +59,30 @@ newdir="$(mktemp -d $TMP/reverting_grid.XXXXXX)"
 pushd "$newdir" &>/dev/null
 unzip $TMP/bootstrap_save.zip  &>/dev/null
 retval=$?
-#echo before move step retval=$retval
 # put back the main user directory.
 mv "$(basename $GENII_USER_DIR)"/* $GENII_USER_DIR
 retval=$(($retval + $?))
-# backup user directory gets put back too.
+# mirror container's state directory gets put back too.
 if [ ! -z "$BACKUP_USER_DIR" ]; then
   mkdir "$BACKUP_USER_DIR"
   mv "$(basename $BACKUP_USER_DIR)"/* $BACKUP_USER_DIR
   retval=$(($retval + $?))
 fi
 # and restore the deployments directory.
-#echo before copy step retval=$retval
 if [ ! -d "$GENII_INSTALL_DIR/deployments" ]; then
   mkdir "$GENII_INSTALL_DIR/deployments"
 fi
 \cp -r -f -n deployments/* "$GENII_INSTALL_DIR/deployments"
 retval=$(($retval + $?))
-#echo before rm deploy temp step retval=$retval
 \rm -rf "$newdir"
 if [ $retval -ne 0 ]; then echo "===> script failure cleaning up temporary saved grid, exiting."; exit 1;  fi
 popd &>/dev/null
 
 # start container up.
 launch_container_if_not_running "$DEPLOYMENT_NAME"
-if [ ! -z "$BACKUP_DEPLOYMENT_NAME" ]; then
+if [ ! -z "$BACKUP_DEPLOYMENT_NAME" -a ! -z "$BACKUP_USER_DIR" ]; then
   save_and_switch_userdir "$BACKUP_USER_DIR"
   launch_container_if_not_running "$BACKUP_DEPLOYMENT_NAME"
   restore_userdir
 fi
-
-# logout and get into normal garb.
-grid logout --all 
-grid_chk login --username=$(basename $USERPATH) --password=${user_password}
-cat $GRID_OUTPUT_FILE
-grid_chk whoami
-cat $GRID_OUTPUT_FILE
 

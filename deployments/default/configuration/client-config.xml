@@ -307,6 +307,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOTool</mconf:class>
 		<mconf:class name="onerror"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.OnErrorTool</mconf:class>
+		<mconf:class name="version"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.VersionTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

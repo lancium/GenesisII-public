@@ -22,20 +22,9 @@ oneTimeSetUp()
   echo "creating 5KB file..."
   dd if=/dev/urandom of=random5KB.dat bs=1 count=5120
 
-  HUGE_TEST_FILE=./random5GB.dat
-  if [ ! -f "$HUGE_TEST_FILE" ]; then
-    # to speed up continuous integration builds, we will re-use the following
-    # file if it's already available.  only defect is if it isn't actually 5
-    # gigs.  but this should not be an issue for people doing normal testing.
-    local PREMADE_FILE=$TMP/premade_5gig.dat
-    if [ -f $PREMADE_FILE ]; then
-      echo "using a pre-constructed file for 5gigs example: $PREMADE_FILE" 
-      HUGE_TEST_FILE="$PREMADE_FILE"
-    else
-      echo "creating 5GB file, this may take a few minutes..."
-      dd if=/dev/urandom of=$HUGE_TEST_FILE bs=1048576 count=5120
-    fi
-  fi
+  HUGE_TEST_FILE=./randomhalfgig.dat
+  echo "creating half GB file, this may take a couple minutes..."
+  dd if=/dev/urandom of=$HUGE_TEST_FILE bs=1048576 count=512
 }
 
 testCopyFilesToGFFS()
@@ -50,17 +39,15 @@ testCopyFilesToGFFS()
   exitCode=$?
   result=`expr $exitCode + $result`
   assertEquals "Copied 5KB file" 0 $exitCode
-  echo "Copying 5GB file to GFFS"
-  grid cp local:$HUGE_TEST_FILE grid:$RNSPATH/random5GB.dat
+  echo "Copying half GB file to GFFS"
+  grid cp local:$HUGE_TEST_FILE grid:$RNSPATH/randomhalfgig.dat
   exitCode=$?
   result=`expr $exitCode + $result`
-  assertEquals "Copied 5GB file" 0 $exitCode
-  if [ $result -ne 0 ]
-  then
+  assertEquals "Copied half GB file" 0 $exitCode
+  if [ $result -ne 0 ]; then
     echo "Copying input files to GFFS failed, failing test.."
     exit 1
   fi
-
 }
 
 testFileStagingPerformance()
@@ -68,8 +55,8 @@ testFileStagingPerformance()
   grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/stage-100-files-5KB.jsdl
   assertEquals "Submitting ls job with 100 5KB stage-ins" 0 $?
 
-  grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/stage-1-file-5GB.jsdl
-  assertEquals "Submitting ls job with a 5GB stage-in/stage-out" 0 $?
+  grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/stage-1-file-halfgig.jsdl
+  assertEquals "Submitting ls job with a half GB stage-in/stage-out" 0 $?
   echo `date`": jobs submitted"
 }
 
@@ -94,21 +81,19 @@ testFileConsistency()
   diff ./random5KB.dat ./random5KB.transferred
   assertEquals "Checking File consistency, local copy vs copy on grid namespace" 0 $?
 
-  grid cp $RNSPATH/random5GB.transferred local:./random5GB.transferred
-  diff $HUGE_TEST_FILE ./random5GB.transferred
+  grid cp $RNSPATH/randomhalfgig.transferred local:./randomhalfgig.transferred
+  diff $HUGE_TEST_FILE ./randomhalfgig.transferred
   assertEquals "Checking File consistency, local copy vs copy on grid namespace" 0 $?
   echo `date`": test ended"
 }
 
 oneTimeTearDown()
 {
-  rm -f ./random5KB.*
-  # we still remove based on the normal name, so we only clean up one we just created.
-  rm -f ./random5GB.*
+  rm -f ./random5KB.* ./randomhalfgig.*
   grid rm $RNSPATH/random5KB.dat
   grid rm $RNSPATH/random5KB.transferred
-  grid rm $RNSPATH/random5GB.dat
-  grid rm $RNSPATH/random5GB.transferred
+  grid rm $RNSPATH/randomhalfgig.dat
+  grid rm $RNSPATH/randomhalfgig.transferred
 }
 
 # load and run shUnit2

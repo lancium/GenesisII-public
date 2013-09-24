@@ -61,9 +61,9 @@ Script arguments:
         <echo message="Creating user ${ARGV[2]}"/>
         <try>
           <block>
-            <geniix:ls>
-              <param>${ARGV[1]}/Services/X509AuthnPortType/${ARGV[2]}</param>
-            </geniix:ls>
+            <geniix:ping>
+              <param>${ARGV[3]}</param>
+            </geniix:ping>
           </block>
           <catch class="java.lang.Exception">
             <echo message="Exception listing user, so proceeding to create it."/>
@@ -108,22 +108,6 @@ Script arguments:
           </catch>
         </try>
 
-<!-- contra-indicated for official xsede namespace.
-        <echo message="  giving everyone access to root of home dirs."/>
-        <try>
-          <block>
-            <geniix:chmod>
-              <param>${ARGV[7]}</param>
-              <param>+r</param>
-              <param>- -everyone</param>
-            </geniix:chmod>
-          </block>
-          <catch class="java.lang.Exception">
-            <echo message="Could not change home root permission, accepting that."/>
-          </catch>
-        </try>
--->
-
         <echo message="  making home directory."/>
         <try>
           <block>
@@ -143,22 +127,6 @@ Script arguments:
           <param>+rwx</param>
           <param>${ARGV[3]}</param>
         </geniix:chmod>
-<!--        <echo message="  giving group access to home folder."/>
-        <geniix:chmod>
-          <param>${ARGV[7]}/${ARGV[2]}</param>
-          <param>+rx</param>
-          <param>${ARGV[6]}</param>
-        </geniix:chmod>
--->
-        <echo message="  giving everyone access to home folder."/>
-        <!-- this seems necessary now based on new scheme for creating users.
-             they cannot log in unless everyone has access to get to the home
-             folder and down into where the users are stored. -->
-        <geniix:chmod>
-          <param>${ARGV[7]}/${ARGV[2]}</param>
-          <param>+r</param>
-          <param>--everyone</param>
-        </geniix:chmod>
 
         <!-- need to add access to the queue and BES -->
         <echo message="  adding access to the group for the user."/>
@@ -174,32 +142,7 @@ Script arguments:
             <echo message="Could not give group +rx access to user, accepting that, but it may cause problems later."/>
           </catch>
         </try>
-        <echo message="  adding access to the user for the group."/>
-<!-- why are we doing this step? -->
-        <try>
-          <block>
-            <geniix:chmod>
-              <param>${ARGV[3]}</param>
-              <param>+r</param>
-              <param>${ARGV[6]}</param>
-            </geniix:chmod>
-          </block>
-          <catch class="java.lang.Exception">
-            <echo message="Could not give group +r access to group on user, accepting that, but it may cause problems later."/>
-          </catch>
-        </try>
-        <echo message="  adding access to the container export port-type for the group."/>
-        <geniix:chmod>
-          <param>${ARGV[1]}/Services/LightWeightExportPortType</param>
-          <param>+rx</param>
-          <param>${ARGV[6]}</param>
-        </geniix:chmod>
-        <echo message="  adding access to the container RNS port-type for the group."/>
-        <geniix:chmod>
-          <param>${ARGV[1]}/Services/EnhancedRNSPortType</param>
-          <param>+rx</param>
-          <param>${ARGV[6]}</param>
-        </geniix:chmod>
+
         <echo message="  linking group into user's credentials as ${ARGV[5]}."/>
         <try>
           <block>

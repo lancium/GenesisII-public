@@ -1,4 +1,4 @@
-# Author: Chris Koeritz
+#!/bin/bash
 
 # lists processes that seem to be GenesisII java processes.  this takes one
 # optional parameter that is a pattern to seek in the process info for the
@@ -8,6 +8,8 @@
 # one example usage:
 #   bash list_genesis_javas.sh backup
 # should find any backup container.
+#
+# Author: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd $WORKDIR

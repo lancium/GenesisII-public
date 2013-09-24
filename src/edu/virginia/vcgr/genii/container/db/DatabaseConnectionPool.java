@@ -105,7 +105,7 @@ public class DatabaseConnectionPool
 			_logger.debug("Acquiring DB connection[" + _connPool.size() + "]");
 		boolean succeeded = false;
 
-		int maxSnooze = 4 * 1000; // 4 seconds, in miliseconds.
+		int maxSnooze = 4 * 1000; // in milliseconds.
 		int eachSleep = 500; // number of milliseconds to snooze between lock attempts.
 		int attempts = (int)((double)maxSnooze / (double)eachSleep + 1);
 

@@ -13,8 +13,10 @@ script_lib_dir="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's work
 export SCRIPT_TOP="$( \cd "$script_lib_dir/.." && \pwd )"  # go to top of hierarchy.
 cd $SCRIPT_TOP
 
-# stuff one important value into the environment.  this tells the regression test
-# to run some extra tests that don't make sense on "real" grids.
+# stuff important values into the environment.
+#
+# this tells the regression test to run some extra tests that don't
+# make sense on "real" grids.
 export AUTOBUILD_RUNNING=true
 
 # get required parameters...
@@ -53,6 +55,39 @@ if [ -z "$JAVA_HOME" ]; then
   echo the local Java installation.
   exit 3
 fi
+
+##############
+
+function bail_on_fail()
+{
+  if [ $? -ne 0 ]; then
+    echo "Failed previous step.  Now leaving test."
+    # shut down any running containers if we can.
+    bash $GRITTY_TESTING_TOP_LEVEL/library/zap_genesis_javas.sh
+    exit 1
+  fi
+}
+
+##############
+
+# need to fix up an input file to use for all our testing.
+
+INPUTFILE_FOR_JENKINS=$GRITTY_TESTING_TOP_LEVEL/examples/inputfile.jenkins
+if [ "$NAMESPACE" == "xsede" ]; then
+  INPUTFILE_FOR_JENKINS=$GRITTY_TESTING_TOP_LEVEL/examples/inputfile.jenkins-xsede
+fi
+
+# give the build an input file it can use.  this one relies on our having set
+# the crucial variables beforehand in the code above; they will percolate down
+# to the bootstrapping scripts and test scripts.
+sed -e "s/GENII_INSTALL_DIR=.*/GENII_INSTALL_DIR=\$GENII_INSTALL_DIR/" \
+  -e "s/GENII_USER_DIR=.*/GENII_USER_DIR=\$GENII_USER_DIR/" \
+  -e "s/BACKUP_USER_DIR=.*/BACKUP_USER_DIR=\$BACKUP_USER_DIR/" \
+  < $INPUTFILE_FOR_JENKINS \
+  > $GRITTY_TESTING_TOP_LEVEL/inputfile.txt
+bail_on_fail
+
+##############
 
 # take out any existing container that's running.  we need to ensure the install folder
 # is not slathered with running processes.
@@ -110,18 +145,6 @@ bash $GRITTY_TESTING_TOP_LEVEL/library/genesis2_path_fixer.sh $GENII_INSTALL_DIR
 
 ##############
 
-function bail_on_fail()
-{
-  if [ $? -ne 0 ]; then
-    echo "Failed previous step.  Now leaving test."
-    # shut down any running containers if we can.
-    bash $GRITTY_TESTING_TOP_LEVEL/library/zap_genesis_javas.sh
-    exit 1
-  fi
-}
-
-##############
-
 # active part of test begins.
 
 echo "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
@@ -134,27 +157,12 @@ echo "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
 
 ################
 
-INPUTFILE_FOR_JENKINS=$GRITTY_TESTING_TOP_LEVEL/examples/inputfile.jenkins
-if [ "$NAMESPACE" == "xsede" ]; then
-  INPUTFILE_FOR_JENKINS=$GRITTY_TESTING_TOP_LEVEL/examples/inputfile.jenkins-xsede
-fi
-
-# give the build an input file it can use.  this one relies on our having set
-# the crucial variables beforehand in the code above; they will percolate down
-# to the bootstrapping scripts and test scripts.
-sed -e "s/GENII_INSTALL_DIR=.*/GENII_INSTALL_DIR=\$GENII_INSTALL_DIR/" \
-  -e "s/GENII_USER_DIR=.*/GENII_USER_DIR=\$GENII_USER_DIR/" \
-  -e "s/BACKUP_USER_DIR=.*/BACKUP_USER_DIR=\$BACKUP_USER_DIR/" \
-  < $INPUTFILE_FOR_JENKINS \
-  > $GRITTY_TESTING_TOP_LEVEL/inputfile.txt
-bail_on_fail
-
 # fix the logging level so we don't get noisy BS in our command output.
 # also point the logging directory at our local logs folder instead of at default
 # location of ${user.home}/.GenesisII.
 for i in $GENII_INSTALL_DIR/lib/genesisII*log4j.properties; do
   sed -i \
-    -e "s/log4j.rootCategory=.*, *VCONSOLE, *LOGFILE/log4j.rootCategory=INFO, VCONSOLE, LOGFILE/" \
+    -e "s/log4j.rootCategory=.*, *VCONSOLE, *LOGFILE/log4j.rootCategory=DEBUG, VCONSOLE, LOGFILE/" \
     -e "s%\${user.home}\/.GenesisII%$GRITTY_TESTING_TOP_LEVEL\/logs%" \
       "$i" &>/dev/null
 done
@@ -162,7 +170,7 @@ done
 ################
 
 # get the test environment loaded up.
-source $GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh
+source $GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh $GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh
 
 source $XSEDE_TEST_ROOT/library/establish_environment.sh
 
@@ -204,21 +212,9 @@ echo "Cleaning previous test run."
 echo "Re-establishing temporary directories"
 source $GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh
 
-echo "Running bootstrap."
-bash $XSEDE_TEST_ROOT/library/grid-bootstrap-single.sh $USERS_LOC/admin admin $SUBMIT_GROUP localhost
+echo "quick-start grid bootstrap commencing..."
+bash $XSEDE_TEST_ROOT/library/bootstrap_quick_start.sh
 bail_on_fail
-
-echo "Creating extended setup with demo users."
-bash $XSEDE_TEST_ROOT/first_steps/setup_test_infrastructure.sh $CONTAINERS_LOC/localhost $user_password
-bail_on_fail
-
-echo "Becoming test user."
-grid logout --all
-grid_chk login --username=$(basename $USERPATH) --password=$user_password
-bail_on_fail
-
-# now add a second container for replication if desired.
-bash $XSEDE_TEST_ROOT/library/grid-bootstrap-backup.sh $user_password
 
 # go through the full regression test suite now and see how it does.
 echo "Running entire regression test suite."
@@ -249,5 +245,4 @@ echo "Automated regression test finished at $(date)"
 # if we get to here, we call that a success.
 echo "Totally done with test run, exiting now."
 exit 0
-
 

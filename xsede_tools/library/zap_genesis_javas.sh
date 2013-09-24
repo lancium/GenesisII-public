@@ -1,4 +1,4 @@
-# Author: Chris Koeritz
+#!/bin/bash
 
 # zaps processes that seem to be GenesisII java processes.  this takes one
 # optional parameter that is a pattern to seek in the process info for the
@@ -7,7 +7,9 @@
 #
 # one example usage:
 #   bash zap_genesis_javas.sh backup
-# should find any backup container and whack it.
+# should find any mirror container and whack it.
+#
+# Author: Chris Koeritz
 
 #hmmm: currently also zaps install4j if it's running with genesis loaded up in it.
 

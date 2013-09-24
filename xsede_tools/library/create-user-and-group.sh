@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#
 # establishes a user with appropriate rights to the grid resources configured in the
 # input file (e.g., the queue, etc.).
 # this assumes that an admin user is already logged in; that user must be able to chmod
@@ -8,7 +7,6 @@
 #
 # Author: Chris Koeritz
 # Author: Vanamala Venkataswamy
-#
 
 if [ -z "$XSEDE_TEST_ROOT" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
 source $XSEDE_TEST_ROOT/library/establish_environment.sh
@@ -44,7 +42,8 @@ fi
 
 ##############
  
-grid_chk script local:$XSEDE_TEST_ROOT/library/create_one_user.xml "$CONTAINERPATH" "$(basename $new_username)" "$new_username" "$new_password" "$(basename "$new_group")" "$new_group" "$home_path" "$(dirname "$new_username")"
+grid script local:$XSEDE_TEST_ROOT/library/create_one_user.xml "$CONTAINERPATH" "$(basename $new_username)" "$new_username" "$new_password" "$(basename "$new_group")" "$new_group" "$home_path" "$(dirname "$new_username")"
+check_if_failed user creation for $new_username
 
 # we would have bailed if there were an error during the creation process.
 echo "Successful creation of user '$new_username' in group '$new_group'."

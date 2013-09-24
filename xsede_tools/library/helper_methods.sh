@@ -1,13 +1,10 @@
 #!/bin/bash
 
-# prints an error message (from parameters) and exits if the previous command failed.
-function check_if_failed()
-{
-  if [ $? -ne 0 ]; then
-    echo Step failed: $*
-    exit 1
-  fi
-}
+# useful functions that are somewhat general.  these are not needed for
+# the basic setup of the test environment, but they are used by other
+# test and tool functions and also by specific tests.
+#
+# Author: Chris Koeritz
 
 # prints out a timestamp with the current date and time up to seconds.
 function date_string()
@@ -74,4 +71,93 @@ fan_out_directories()
     done
   done
 }
+##############
+
+# copied from open source codebase at: http://feistymeow.org
+# locates a process given a search pattern to match in the process list.
+function psfind() {
+  local PID_DUMP="$(mktemp "$TEST_TEMP/grid_logs/zz_pidlist.XXXXXX")"
+  local PIDS_SOUGHT=()
+  local patterns=($*)
+  if [ "$OS" == "Windows_NT" ]; then
+    # needs to be a windows format filename for 'type' to work.
+    if [ ! -d c:/tmp ]; then
+      mkdir c:/tmp
+    fi
+    # windows7 magical mystery tour lets us create a file c:\\tmp_pids.txt, but then it's not really there
+    # in the root of drive c: when we look for it later.  hoping to fix that problem by using a subdir, which
+    # also might be magical thinking from windows perspective.
+    tmppid=c:\\tmp\\pids.txt
+    # we have abandoned all hope of relying on ps on windows.  instead
+    # we use wmic to get full command lines for processes.
+    # this does not exist on windows home edition.  we are hosed if that's
+    # what they insist on testing on.
+    wmic /locale:ms_409 PROCESS get processid,commandline </dev/null >"$tmppid"
+    local flag='/c'
+    if [ ! -z "$(uname -a | grep "^MING" )" ]; then
+      flag='//c'
+    fi
+    # we 'type' the file to get rid of the unicode result from wmic.
+    cmd $flag type "$tmppid" >$PID_DUMP
+    \rm "$tmppid"
+    local CR='
+'  # embedded carriage return.
+    local appropriate_pattern="s/^.*  *\([0-9][0-9]*\)[ $CR]*\$/\1/p"
+    for i in "${patterns[@]}"; do
+      PIDS_SOUGHT+=$(cat $PID_DUMP \
+        | grep -i "$i" \
+        | sed -n -e "$appropriate_pattern")
+      if [ ${#PIDS_SOUGHT[*]} -ne 0 ]; then
+        # we want to bail as soon as we get matches, because on the same
+        # platform, the same set of patterns should work to find all
+        # occurrences of the genesis java.
+        break;
+      fi
+    done
+  else
+    /bin/ps $extra_flags wux >$PID_DUMP
+    # pattern to use for peeling off the process numbers.
+    local appropriate_pattern='s/^[-a-zA-Z_0-9][-a-zA-Z_0-9]*  *\([0-9][0-9]*\).*$/\1/p'
+    # remove the first line of the file, search for the pattern the
+    # user wants to find, and just pluck the process ids out of the
+    # results.
+    for i in "${patterns[@]}"; do
+      PIDS_SOUGHT=$(cat $PID_DUMP \
+        | sed -e '1d' \
+        | grep -i "$i" \
+        | sed -n -e "$appropriate_pattern")
+      if [ ${#PIDS_SOUGHT[*]} -ne 0 ]; then
+        # we want to bail as soon as we get matches, because on the same
+        # platform, the same set of patterns should work to find all
+        # occurrences of the genesis java.
+        break;
+      fi
+    done
+  fi
+  if [ ! -z "$PIDS_SOUGHT" ]; then echo "$PIDS_SOUGHT"; fi
+  /bin/rm $PID_DUMP
+}
+
+#######
+
+# tests the supposed fuse mount that is passed in as the first parameter.
+function test_fuse_mount()
+{
+  local mount_point="$1"; shift
+  local trunc_mount="$(basename $(dirname $mount_point))/$(basename $mount_point)"
+
+  checkMount="$(mount)"
+#echo checkmount is: $checkMount
+#echo mount point seeking is: $trunc_mount
+  retval=1
+  if [[ "$checkMount" =~ .*$trunc_mount* ]]; then retval=0; fi
+  if [ $retval -ne 0 ]; then
+    echo "Finding mount point '$trunc_mount' failed."
+    return 1
+  fi
+  ls -l $MOUNT_POINT &>/dev/null
+  return $?
+}
+
+#######
 

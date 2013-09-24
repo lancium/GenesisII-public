@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# bootstraps a small grid with no connectivity to other grids and sets up some default
-# users, as well as a "normal" account from the command line parameters.
+# bootstraps a small grid with no connectivity to other grids and sets up an
+# administrative account that should have god-like powers over the grid.
 #
 # Author: Chris Koeritz
 # Author: Vanamala Venkataswamy
@@ -13,15 +13,6 @@ if [ -z "$XSEDE_TEST_ROOT" ]; then
   source ../prepare_tests.sh ../prepare_tests.sh 
 fi
 source $XSEDE_TEST_ROOT/library/establish_environment.sh
-
-##############
-
-# constants used in script...
-
-# the number of slots configured on each BES resource.
-if [ -z "$QUEUE_SLOTS" ]; then
-  QUEUE_SLOTS=4
-fi
 
 ##############
 
@@ -43,6 +34,22 @@ fi
 
 ##############
 
+# constants...
+
+# the number of slots configured on each BES resource.
+if [ -z "$QUEUE_SLOTS" ]; then
+  QUEUE_SLOTS=4
+fi
+
+# these are needed for the certificate generators.
+if [ -z "$C" ]; then C=US; fi
+if [ -z "$ST" ]; then ST=Virginia; fi
+if [ -z "$L" ]; then L=Charlottesville; fi
+if [ -z "$O" ]; then O='Testing Grid'; fi
+if [ -z "$OU" ]; then OU='Genesis II'; fi
+
+##############
+
 # begin the active install steps.
 
 echo "[$(date)]"
@@ -52,8 +59,6 @@ echo "[$(date)]"
 # container is already running or there's an existing user directory, it's an
 # oversight.
 echo "Cleaning out user directory '$GENII_USER_DIR'"
-bash $XSEDE_TEST_ROOT/library/zap_genesis_javas.sh
-sleep 2
 bash $XSEDE_TEST_ROOT/library/zap_genesis_javas.sh
 \rm -rf "$GENII_USER_DIR" "$XSEDE_TEST_ROOT/"*.log "$XSEDE_TEST_ROOT/"*.log.*
 
@@ -70,21 +75,13 @@ fi
 
 ##############
 
-# add some variables needed for the certificate generators.
-C=US
-ST=Virginia
-L=Charlottesville
-O=GENIITEST
-OU='Genesis II'
-
-##############
-
 # we will generate new certs unless told not to.  the default is to always
 # regenerate, since we do not want any vulnerability in a simple bootstrap
 # grid from using certs that might have just been hanging around or which were
 # retrieved from the repository.
 if [ -z "$REUSE_GRID_CERTIFICATES" ]; then
   create_grid_certificates
+  check_if_failed "creating certificates for test grid"
 fi
 
 launch_container_if_not_running "$DEPLOYMENT_NAME"
@@ -96,6 +93,7 @@ if [ ! -z "$BACKUP_DEPLOYMENT_NAME" ]; then
 fi
 
 bootstrap_grid
+check_if_failed "bootstrapping test grid"
 
 echo After grid basic infrastructure created...
 check_logs_for_errors
@@ -104,27 +102,38 @@ if [ ! -z "$BACKUP_DEPLOYMENT_NAME" ]; then
 fi
 
 get_root_privileges
+check_if_failed "acquiring root privileges"
 
 ##############
 
-# basic creation of the admin user occurs here.
+# basic creation of the admin user.
 create_group "$new_group"
+check_if_failed "creating group $new_group"
 create_user "$new_admin_name" "$new_password" "$new_group"
+check_if_failed "creating user $new_admin_name"
 
-# test logging in as the new id before doing anything else.
-grid_chk logout --all
-grid_chk login --username="$(basename $new_admin_name)" --password="$new_password"
+# power up the new admin guy.
+give_administrative_privileges "$new_admin_name" "${primary_hostname}" "" "" admin
+check_if_failed "granting admin privileges to $new_admin_name"
 
-# okay, if we're still here, the admin user works and we can go back to grid setup.
+# then log in as the new admin before doing anything else.  everything else is done as
+# that user, since the admin should have been given complete control over all services
+# on the container.
 grid_chk logout --all
-get_root_privileges
+grid login --username="$(basename $new_admin_name)" --password="$new_password"
+check_if_failed Logging in as $new_admin_name
 
 ##############
 
-# copy up the flag that shows this is not a useful, real, secure grid.
-grid_chk cp local:$WORKDIR/a_bogus_grid.txt /
-# and let everyone read that file.
-grid_chk chmod /a_bogus_grid.txt +r --everyone
+# copy up the flag that shows this is *not* a useful, real, secure grid
+# and also let everyone read that file.
+multi_grid <<eof
+  cp local:$WORKDIR/a_bogus_grid.txt /
+  onerror Failed copy bogus grid file up to root directory.
+  chmod /a_bogus_grid.txt +r --everyone
+  onerror Failed to change permissions on bogus grid file.
+eof
+check_if_failed Setting up bogus grid marker file.
 
 ##############
 
@@ -132,75 +141,29 @@ grid_chk chmod /a_bogus_grid.txt +r --everyone
 if [ "$BOOTSTRAP_LOC" != "$CONTAINERS_LOC/$primary_hostname" ]; then
   echo "Adding container alias '$primary_hostname' for bootstrap..."
   grid_chk ln $BOOTSTRAP_LOC "$CONTAINERS_LOC/$primary_hostname"
+  check_if_failed "linking in hostname alias for bootstrap container"
 fi
 
-# allow everyone to read the container's top-level.
-grid_chk chmod "$CONTAINERS_LOC/$primary_hostname" +r --everyone
-
 ##############
 
-# one thing the bootstrap does not do is give us a queues directory.
-echo "Creating top-level queues folder..."
-# we just run grid for the queues mkdir and don't check it; it didn't used to
-# be created by the bootstrap, but it is now.  still creating it is just
-# supporting older versions of the bootstrap.
-grid mkdir $QUEUES_LOC
-grid_chk chmod $QUEUES_LOC +r --everyone
-
-##############
-
-# create a queue and a BES that the queue can use for job submission.
+# create a queue for the grid and create a BES that the queue can use for job submission.
 
 create_queue "$QUEUE_PATH" "$CONTAINERS_LOC/$primary_hostname" "$new_admin_name" "$new_group"
-
+check_if_failed "creating queue $QUEUE_PATH"
 create_BES "$CONTAINERS_LOC/$primary_hostname" "$new_admin_name" "$QUEUE_PATH" "$new_group"
-
+check_if_failed "creating BES for $CONTAINERS_LOC/$primary_hostname"
 give_queue_a_resource "$QUEUE_PATH" "$BES_CONTAINERS_LOC/${primary_hostname}-bes" $QUEUE_SLOTS
+check_if_failed "giving queue a BES resource"
 
 ##############
 
-# now power up that admin guy.
-give_administrative_privileges "$new_admin_name" "${primary_hostname}"
-# give admin total control over the group.
-grid_chk chmod "$new_group" +rwx "$new_admin_name"
-# give admin the right to administrate the container.
-grid_chk chmod "$CONTAINERS_LOC/$primary_hostname" +rwx "$new_admin_name"
+# power up admin again, now that there are some assets to administrate.
+give_administrative_privileges "$new_admin_name" "${primary_hostname}" queues beses
+check_if_failed "granting admin privileges after more infrastructure established"
 
 ##############
 
 # by here, the basic infrastructure of the grid itself should be established.
-
-# fix up the admin user from the command line and turn it into a grid god.
-echo "Creating administrative user '$new_admin_name'..."
-bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$new_admin_name" "$new_password" "$new_group" "$HOMES_LOC" "$(dirname "$new_admin_name")"
-if [ $? -ne 0 ]; then
-  echo "Failure in setting up user '$new_admin_name'."
-  exit 1
-fi
-
-# give the admin back his rights to his own self.
-grid_chk chmod "$new_admin_name" +rwx "$new_admin_name"
-
-##############
-
-# become the user from the command line, leaving things ready to test or navigate.
-grid_chk logout --all
-grid_chk login --username="$(basename $new_admin_name)" --password="$new_password"
-
-#echo "Creating test user 'test1'..."
-#bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$USERS_LOC/test1" "password1" "$new_group" "$HOMES_LOC" "$USERS_LOC"
-#if [ $? -ne 0 ]; then
-#  echo "Failure in setting up user 'test1'."
-#  exit 1
-#fi
-#echo "Creating test user 'test2'..."
-#bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$USERS_LOC/test2" "password2" "$new_group" "$HOMES_LOC" "$USERS_LOC"
-#if [ $? -ne 0 ]; then
-#  echo "Failure in setting up user 'test2'."
-#  exit 1
-#fi
-
-##############
 
 echo Final log state for mainline single grid setup...
 check_logs_for_errors

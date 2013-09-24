@@ -44,10 +44,10 @@ testReplication()
   grid resolver -q dir1 --link=dir2 &> /dev/null
   assertEquals "query resolver" 0 $?
 
-  grid echo "This is file 1" ">" dir1/file1.txt
+  grid echo "This is file 1" "'>'" dir1/file1.txt
   assertEquals "create replicated file" 0 $?
-  grid echo "File 2 is this" ">" dir1/file2.txt
-  grid echo "Is this file 3" ">" dir1/file3.txt
+  grid echo "File 2 is this" "'>'" dir1/file2.txt
+  grid echo "Is this file 3" "'>'" dir1/file3.txt
   grid rm dir1/file2.txt
   assertEquals "remove replicated file" 0 $?
   grid mkdir dir1/subdirectory
@@ -57,7 +57,7 @@ testReplication()
   assertEquals "modify replicated file" 0 $?
 
   grid rm -f ufile.txt &>/dev/null
-  grid echo "This is not replicated" ">" ufile.txt
+  grid echo "This is not replicated" "'>'" ufile.txt
   grid ln ufile.txt dir1/ufile-link.txt
   assertEquals "link unreplicated file in replicated dir" 0 $?
 

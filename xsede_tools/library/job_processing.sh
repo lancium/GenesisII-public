@@ -3,7 +3,7 @@
 # Functions for managing jobs in a grid queue.
 #
 # Author: Chris Koeritz
-#Modifications: Vanamala Venkataswamy
+# Author: Vanamala Venkataswamy
 
 ############################
 
@@ -13,11 +13,9 @@
 compute_remaining_jobs()
 {
   local queue_path=$1
-  local my_output="$(mktemp $TEST_TEMP/uniqgridout.XXXXXX)"
   local grid_app="$(pick_grid_app)"
-  remaining=$(raw_grid "$my_output" "$grid_app" qstat $queue_path; retval=$?; cat "$my_output" | grep -v "Updates Disabled" | grep 'QUEUED\|RUNNING\|On' | wc | gawk '{print $1 }'; if [ $retval -eq 0 ]; then true; else false; fi)
-  retval=$?
-  \rm -f "$my_output"
+  remaining=$(raw_grid "$grid_app" qstat $queue_path | grep 'QUEUED\|RUNNING\|On' | wc | gawk '{print $1 }')
+  retval=${PIPESTATUS[0]}
   if [ $retval -ne 0 ]; then
     # the qstat call failed, and we want to send back an error signal.
     remaining="-1"
@@ -27,23 +25,18 @@ compute_remaining_jobs()
 
 compute_error_jobs()
 {
-  local queue_path=$1
-  local my_output="$(mktemp $TEST_TEMP/uniqgridout.XXXXXX)"
+  local queue_path="$1"; shift
   local grid_app="$(pick_grid_app)"
-  echo $(raw_grid "$my_output" "$grid_app" qstat $queue_path; cat $my_output | grep -v "Updates Disabled" | grep 'ERROR' | wc | gawk '{print $1 }')
-  \rm -f "$my_output"
+  echo $(raw_grid "$grid_app" qstat $queue_path | grep 'ERROR' | wc | gawk '{print $1 }')
 }
 
 show_error_jobs()
 {
   local queue_path=$1
   if [ "$(compute_error_jobs $queue_path)" != "0" ]; then
-    local my_output="$(mktemp $TEST_TEMP/uniqgridout.XXXXXX)"
     echo "FAILURE: These jobs had errors:"
     local grid_app="$(pick_grid_app)"
-    raw_grid "$my_output" "$grid_app" qstat $queue_path
-    cat $my_output | grep -v "Updates Disabled" | grep 'ERROR'
-    \rm -f "$my_output"
+    raw_grid "$grid_app" qstat $queue_path | grep 'ERROR'
     return 1
   else
     echo "SUCCESS: No jobs in an error state were seen."
@@ -62,7 +55,7 @@ function cancel_all_in_queue()
 
   # get a listing of all the stuff in the queue.
   holding="$GRID_OUTPUT_FILE"
-  GRID_OUTPUT_FILE="$(mktemp $TEST_TEMP/cancellation_list.XXXXXX)"
+  GRID_OUTPUT_FILE="$(mktemp $TEST_TEMP/job_processing/cancellation_list.XXXXXX)"
   grid qstat $queue_path
   tickets=($(gawk '{ print $1 }' <$GRID_OUTPUT_FILE))
   # show what we're going to whack.
@@ -116,7 +109,6 @@ function wait_for_all_pending_jobs()
 
   # start by clearing out any that are finished.
   grid qcomplete $queue_path --all
-
 
   local left=$(compute_remaining_jobs $queue_path)
   local last_left=$left
@@ -203,9 +195,6 @@ function check_job_status_file()
   return $retval
 }
 
-mkdir "$TEST_TEMP/job_processing" &>/dev/null
-JOB_OUTPUT_FILE="$(mktemp $TEST_TEMP/job_processing/status.XXXXXX)"
-
 # given a list of asynchronously submitted jobs (i.e. a list of RNS paths to the
 # asynchronous output folder), this will scan through them and await their
 # completion.  it will not return until all jobs are complete, or a failure
@@ -217,8 +206,10 @@ function poll_job_dirs_until_finished()
   local pending=($*)
   local jobname
   local resource
+
+  JOB_OUTPUT_FILE="$(mktemp $TEST_TEMP/job_processing/status.XXXXXX)"
   echo "Status of job completions can be found in $JOB_OUTPUT_FILE"
-  local my_output="$(mktemp "$TEST_TEMP/poll_job_dirs_output.XXXXXX")"
+  local my_output="$(mktemp "$TEST_TEMP/job_processing/out_poll_job_dirs.XXXXXX")"
   while [ ${#pending[*]} -ne 0 ]; do
     for resource in $available_resources; do
       for jobname in ${pending[*]}; do
@@ -306,12 +297,11 @@ function drain_my_jobs_out_of_queue()
 echo "examining job $i"
       count=120
       retval=1
-      local my_output="$(mktemp $TEST_TEMP/uniqgridout.XXXXXX)"
       local grid_app="$(pick_grid_app)"
       until [ $count -le 0 ]; do
 echo "seconds left: $count"
         sleep 10
-        jobStatus="$(raw_grid "$my_output" "$grid_app" qstat $QUEUE_PATH $i && cat "$my_output")"
+        jobStatus="$(raw_grid "$grid_app" qstat $QUEUE_PATH $i)"
         # stop waiting for a job if it's marked as finished.
         if [[ "$jobStatus" =~ .*FINISHED.* ]]; then
 echo "  saw job in finished state"
@@ -332,8 +322,6 @@ echo "  saw job in error state"
         fi
         count=$(( $count - 10 ))
       done
-      \rm -f "$my_output"
-
       assertEquals "requesting job $i complete." 0 $retval
     done
 
@@ -374,7 +362,7 @@ get_BES_resources()
     done
     return 0
   fi
-  local RESRC_FILE="$(mktemp "$TEST_TEMP/queue_resources.XXXXXX")"
+  local RESRC_FILE="$(mktemp "$TEST_TEMP/job_processing/queue_resources.XXXXXX")"
   grid ls $QUEUE_PATH/resources 
   # check for a failure of the resource check.
   if [ $? -ne 0 ]; then echo ""; return 1; fi

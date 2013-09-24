@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # backs up the container state based on the GENII_USER_DIR and GENII_INSTALL_DIR variables.
+#
+# Author: Chris Koeritz
 
 if [ -z "$GENII_USER_DIR" -o -z "$GENII_INSTALL_DIR" ]; then
   echo "This script requires two variables in the environment, the user state"

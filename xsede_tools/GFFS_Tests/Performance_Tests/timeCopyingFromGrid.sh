@@ -24,7 +24,7 @@ testTimeCopyingGridFileToLocal()
 {
   local tmpfile=$(mktemp $TEST_TEMP/filesize.XXXXXXX)
   # get the size of our target file.
-  raw_grid $tmpfile $(pick_grid_app) ls -al rns:$LARGE_DATA_FILE 
+  logged_grid $tmpfile ls -al rns:$LARGE_DATA_FILE 
   assertEquals "Checking data file $LARGE_DATA_FILE exists." 0 $?
   # extract the size from the printout we made.
   local actual_size=$(awk '{print $1}' <$tmpfile)

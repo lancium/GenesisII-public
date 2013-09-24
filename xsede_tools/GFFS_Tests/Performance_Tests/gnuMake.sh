@@ -37,15 +37,20 @@ testMountingFuseDirectory()
   mkdir $MOUNT_POINT
   fuse --mount local:$MOUNT_POINT
   sleep 30  # pause to let it establish the mount.
-  checkMount=`mount`
-  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]
-  then
-        retval=0
-  else
-	retval=1
-	echo  "Could not mount...Bailing out"
-	exit 0
-  fi
+
+  test_fuse_mount $MOUNT_POINT
+  check_if_failed "Mounting grid to local directory"
+
+#old  checkMount=`mount`
+#old  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]
+#old  then
+#old        retval=0
+#old  else
+#old	retval=1
+#old	echo  "Could not mount...Bailing out"
+#old	exit 0
+#old  fi
+
   grid ls /
   assertEquals "Simple check on root of filesystem on $MOUNT_POINT" 0 $retval
 }

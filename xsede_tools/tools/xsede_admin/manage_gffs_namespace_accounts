@@ -102,9 +102,9 @@ $XSEDE_ADMINS_GROUP = 'gffs-admins';
 openlog $0, LOG_ODELAY, LOG_AUTHPRIV;
 $oldmask = setlogmask(LOG_UPTO(LOG_INFO));
 
-eval {
-    chdir $XSEDE_ADMIN_SCRIPTS;
+chdir $SCRIPT_DIR;
 
+eval {
     # Connect to the TGCDB.
     $dbh = DBI->connect(
         "dbi:Pg:host=tgcdb.xsede.org;dbname=teragrid", $DBUSER, $DBPASSWD,
@@ -163,6 +163,19 @@ eval {
     my $cmd = "$GRIDCMD ls $XSEDE_USERS_PATH" . (($DEBUG) ? '' : ' 2>/dev/null');
     print "Executing: $cmd\n" if ($DEBUG);
     my @ls_output = `$cmd`;
+    $retval = $?;
+    if ( $retval == -1 ) {
+        my $failure_msg = "ls command failed: $cmd\n";
+        print $failure_msg;
+        die $failure_msg;
+    } else {
+        if ( ($retval >> 8) != 0 ) {
+            $tmp = $retval >> 8;
+            my $failure_msg = "ls command failed with $tmp: $cmd\n";
+            syslog LOG_ERR, $failure_msg;
+            die $failure_msg;
+        }
+    }
     # this loops turns the command output into an array of usernames.
     my $cnt = 0;
     my @usernames_from_namespace = ();
@@ -202,7 +215,7 @@ eval {
         my @pairs = split(/\//, $usernames_from_db{$account_name});
         my %key_values = map { split(/=/, $_, 2) } @pairs;
 
-        my $admin_group = ( grep(/^$account_name$/, @ADMIN_ACCOUNTS) ) ? $XSEDE_ADMINS_GROUP : '';
+        my $admin_group = '';  #( grep(/^$account_name$/, @ADMIN_ACCOUNTS) ) ? $XSEDE_ADMINS_GROUP : '';
         my $verbose = ($DEBUG) ? '' : '>/dev/null';
         my $cmd = "$GRIDCMD script $XSEDE_COMBINED_SCRIPT c $account_name $admin_group $verbose";
         push @add_commands, $cmd;
@@ -223,8 +236,8 @@ eval {
 
     @deletedaccounts = $lc->get_Ronly;
     %accounts_to_be_preserved = map { $_ => 1 } @ADMIN_ACCOUNTS;
-    print "GFFS to be deleted user count = " . scalar(@deletedaccounts) . "\n" if ($DEBUG);
     if ($FORCEDELETES) {
+        print "GFFS to be deleted user count = " . scalar(@deletedaccounts) . "\n" if ($DEBUG);
         foreach my $account_name (@deletedaccounts) {
             my $cmd = "$GRIDCMD script $XSEDE_DELUSER_SCRIPT $account_name" . (($DEBUG) ? '' : ' 2>/dev/null');
             print "Executing: $cmd\n" if ($DEBUG);

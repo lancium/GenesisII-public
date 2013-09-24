@@ -2,6 +2,8 @@
 
 # fixes the paths in a pre-built version of Genesis II to use a different path.
 # this only effective if done before bootstrapping a container using the target directory.
+#
+# Author: Chris Koeritz
 
 current_path="$1"; shift
 old_location="$1"; shift

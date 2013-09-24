@@ -22,6 +22,11 @@
 	<geniix:chmod>
 		<gsh:param>${CONTAINER}</gsh:param>
 		<gsh:param>+r</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>${CONTAINER}</gsh:param>
+		<gsh:param>+r</gsh:param>
 		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
 	</geniix:chmod>
 
@@ -29,6 +34,11 @@
 		<gsh:param>${CONTAINER_SRVS}</gsh:param>
 		<gsh:param>+rwx</gsh:param>
 		<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>${CONTAINER_SRVS}</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
 	</geniix:chmod>
 	<geniix:chmod>
 		<gsh:param>${CONTAINER_SRVS}</gsh:param>
@@ -44,26 +54,42 @@
 			<gsh:param>+rwx</gsh:param>
 			<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
 		</geniix:chmod>
+		<!-- gffs-amie needs "use" of the port types for replication and other actions where the user may not be an admin. -->
+		<geniix:chmod>
+			<gsh:param>${CONTAINER_SRVS}/${SERVICE}</gsh:param>
+			<gsh:param>+rx</gsh:param>
+			<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+		</geniix:chmod>
 		<geniix:chmod>
 			<gsh:param>${CONTAINER_SRVS}/${SERVICE}</gsh:param>
 			<gsh:param>+r</gsh:param>
-   			<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+			<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
 		</geniix:chmod>
 	</gsh:foreach>
 
-  <!-- 
-  needed to allow gffs-amie members to replicate
-  /home/<service_proviers>.xsede.org dirs during creation of sp admin groups
-  -->
+	<!-- add gffs-amie as an admin of authorization port types. -->
 	<geniix:chmod>
-		<gsh:param>${CONTAINER_SRVS}/${SERVICE}/VCGRContainerPortType</gsh:param>
-		<gsh:param>+rwx</gsh:param>
+		<gsh:param>${CONTAINER_SRVS}/KerbAuthnPortType</gsh:param>
+		<gsh:param>+w</gsh:param>
 		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
 	</geniix:chmod>
 	<geniix:chmod>
-		<gsh:param>${CONTAINER_SRVS}/${SERVICE}/EnhancedRNSPortType</gsh:param>
-		<gsh:param>+rwx</gsh:param>
+		<gsh:param>${CONTAINER_SRVS}/X509AuthnPortType</gsh:param>
+		<gsh:param>+w</gsh:param>
 		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
 	</geniix:chmod>
 
+	<!-- allow gffs-amie and gffs-users to create resolvers. -->
+	<geniix:chmod>
+		<gsh:param>${CONTAINER_SRVS}/GeniiResolverPortType</gsh:param>
+		<gsh:param>+w</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>${CONTAINER_SRVS}/GeniiResolverPortType</gsh:param>
+		<gsh:param>+w</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+	</geniix:chmod>
+
 </gsh:script>
+

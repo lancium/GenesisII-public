@@ -23,11 +23,11 @@ Inputs for the script:
 
   <try>
     <block>
-      <geniix:ls>
+      <geniix:ping>
         <param>${USER_PATH}</param>
         <param>></param>
         <param>local:/dev/null</param>
-      </geniix:ls>
+      </geniix:ping>
     </block>
     <catch class="java.lang.Exception">
       <echo message="Could not find ${USER_PATH}."/>
@@ -36,11 +36,11 @@ Inputs for the script:
 
         <try>
           <block>
-            <geniix:ls>
+            <geniix:ping>
               <param>${GROUP_PATH}</param>
               <param>></param>
               <param>local:/dev/null</param>
-            </geniix:ls>
+            </geniix:ping>
           </block>
           <catch class="java.lang.Exception">
             <echo message="Could not find ${GROUP_PATH}."/>

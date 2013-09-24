@@ -143,7 +143,7 @@ testGoodUsersProvided()
   # stay logged in as the admin for now; we will use that soon.
 
   # test logging in as unix flimsy.
-  run_and_check expect $XSEDE_TEST_ROOT/library/ssh_expecter.tcl $Flimsy $FlimsyPassword localhost "echo hello venus"
+  run_any_command expect $XSEDE_TEST_ROOT/library/ssh_expecter.tcl $Flimsy $FlimsyPassword localhost "echo hello venus"
   reval=$?
   # make sure we didn't experience a failure on the other side.
   grep YO_FAILURE $GRID_OUTPUT_FILE &>/dev/null
@@ -156,15 +156,15 @@ testGoodUsersProvided()
 
 testPreparePathBasicRights()
 {
-  run_and_check bash $XSEDE_TEST_ROOT/library/set_acls.sh "$Flimsy" "$LOCAL_PATH" "000"
+  run_any_command bash $XSEDE_TEST_ROOT/library/set_acls.sh "$Flimsy" "$LOCAL_PATH" "000"
   assertEquals "Revoking all rights for Flimsy account $Flimsy should work" 0 $?
-  run_and_check bash $XSEDE_TEST_ROOT/library/set_acls.sh "$Grantee" "$LOCAL_PATH" "rwx"
+  run_any_command bash $XSEDE_TEST_ROOT/library/set_acls.sh "$Grantee" "$LOCAL_PATH" "rwx"
   assertEquals "Adding all rights for Flimsy account $Flimsy should work" 0 $?
 }
 
 testCheckFlimsyCannotAccess()
 {
-  run_and_check expect $XSEDE_TEST_ROOT/library/ssh_expecter.tcl $Flimsy $FlimsyPassword localhost "echo hello venus >$LOCAL_PATH/gerkins.txt" "mkdir $LOCAL_PATH/grommet"
+  run_any_command expect $XSEDE_TEST_ROOT/library/ssh_expecter.tcl $Flimsy $FlimsyPassword localhost "echo hello venus >$LOCAL_PATH/gerkins.txt" "mkdir $LOCAL_PATH/grommet"
   reval=$?
   # make sure we didn't experience a failure on the other side.
   grep YO_FAILURE $GRID_OUTPUT_FILE &>/dev/null

@@ -26,16 +26,50 @@ Script parameters are:
   <gsh:default name="STS2PATH" 
     value="/resources/xsede.org/containers/sts-2.xsede.org"/>
   <gsh:default name="TIMEOUT" value="120"/>
-  <gsh:default name="ADMINS_GROUP" value="/groups/xsede.org/gffs-admins"/>
-  <gsh:default name="AMIE_GROUP" value="/groups/xsede.org/gffs-amie"/>
+
+  <!-- Creation of groups seems to be a asynchronous process;  adding a wait 
+       to make sure the group is listable before moving on -->
+  <function name="waitForGroupToList">
+    <for param-name="i" increment-value="1" inclusive-limit="${TIMEOUT}">
+      <sleep value="1000"/>
+      <try>
+         <block>
+           <geniix:ls>
+             <param>${STS1PATH}/Services/X509AuthnPortType/${GROUP}</param>
+             <param>></param>
+             <param>local:/dev/null</param>
+           </geniix:ls>
+           <echo message="Group ${GROUP} created in ${i} seconds"/>
+           <return value="false"/>
+         </block>
+         <catch class="edu.virginia.vcgr.genii.client.rns.RNSException"/>
+       </try>
+    </for>
+    <return value="true"/>
+  </function>
 
 <!-- Check that the group and group link don't already exist -->
  <try>
     <block>
-      <geniix:ping>
+      <geniix:ls>
         <param>${GROUP_PATH}</param>
-      </geniix:ping>
+        <param>></param>
+        <param>local:/dev/null</param>
+      </geniix:ls>
       <echo message="Error: group ${GROUP} already exists at ${GROUP_PATH}."/>
+      <exit exitcode="1" />
+    </block>
+    <catch class="edu.virginia.vcgr.genii.client.rns.RNSException"/>
+  </try>
+
+ <try>
+    <block>
+      <geniix:ls>
+        <param>${STS1PATH}/Services/X509AuthnPortType/${GROUP}</param>
+        <param>></param>
+        <param>local:/dev/null</param>
+      </geniix:ls>
+      <echo message="Error: group ${GROUP} already exists on ${STS1PATH}."/>
       <exit exitcode="1" />
     </block>
     <catch class="edu.virginia.vcgr.genii.client.rns.RNSException"/>
@@ -47,6 +81,12 @@ Script parameters are:
 		<param>${GROUP}</param>
 	</geniix:idp>
   
+  <call function="waitForGroupToList" property="groupNotCreated"/>
+  <if test="groupNotCreated"><then>
+    <echo message="Failed to create ${GROUP} after ${TIMEOUT} seconds"/>
+    <exit exitcode="1" />
+  </then></if>
+
 	<geniix:ln>
 		<param>${STS1PATH}/Services/X509AuthnPortType/${GROUP}</param>
 		<param>${GROUP_PATH}</param>
@@ -56,23 +96,16 @@ Script parameters are:
 		<param>+rwx</param>
 		<param>${GROUP_PATH}</param>
 	</geniix:chmod>
-	<geniix:chmod>
-		<param>${GROUP_PATH}</param>
-		<param>+rwx</param>
-		<param>${ADMINS_GROUP}</param>
-	</geniix:chmod>
-	<geniix:chmod>
-		<param>${GROUP_PATH}</param>
-		<param>+rwx</param>
-		<param>${AMIE_GROUP}</param>
-	</geniix:chmod>
 
   <echo message="Setting up replication for ${GROUP}"/>
 	<geniix:resolver>
+		<param>-p</param>
+		<param>-r</param>
 		<param>${GROUP_PATH}</param>
 		<param>${STS_RESOLVER}</param>
 	</geniix:resolver>
 	<geniix:replicate>
+		<param>-p</param>
 		<param>${GROUP_PATH}</param>
 		<param>${STS2PATH}</param>
 	</geniix:replicate>
@@ -92,16 +125,6 @@ Script parameters are:
 		<param>+r</param>
 		<param>/groups/xsede.org/gffs-users</param>
 	</geniix:chmod>
-	<geniix:chmod>
-		<param>${SP_PATH}</param>
-		<param>+rwx</param>
-		<param>${ADMINS_GROUP}</param>
-	</geniix:chmod>
-	<geniix:chmod>
-		<param>${SP_PATH}</param>
-		<param>+rwx</param>
-		<param>${AMIE_GROUP}</param>
-	</geniix:chmod>
 
   <echo message="Creating ${SP_PATH}/user"/>
 	<geniix:mkdir>
@@ -117,16 +140,6 @@ Script parameters are:
 		<param>${SP_PATH}/user</param>
 		<param>+r</param>
 		<param>/groups/xsede.org/gffs-users</param>
-	</geniix:chmod>
-	<geniix:chmod>
-		<param>${SP_PATH}/user</param>
-		<param>+rwx</param>
-		<param>${ADMINS_GROUP}</param>
-	</geniix:chmod>
-	<geniix:chmod>
-		<param>${SP_PATH}/user</param>
-		<param>+rwx</param>
-		<param>${AMIE_GROUP}</param>
 	</geniix:chmod>
 
   <echo message="Creating ${SP_PATH}/project"/>
@@ -144,18 +157,8 @@ Script parameters are:
 		<param>+r</param>
 		<param>/groups/xsede.org/gffs-users</param>
 	</geniix:chmod>
-	<geniix:chmod>
-		<param>${SP_PATH}/project</param>
-		<param>+rwx</param>
-		<param>${ADMINS_GROUP}</param>
-	</geniix:chmod>
-	<geniix:chmod>
-		<param>${SP_PATH}/project</param>
-		<param>+rwx</param>
-		<param>${AMIE_GROUP}</param>
-	</geniix:chmod>
 
-	<echo message="Setting up replication for ${SP_PATH}"/>
+  <echo message="Setting up replication for ${SP_PATH}"/>
 	<geniix:resolver>
 		<param>-p</param>
 		<param>-r</param>

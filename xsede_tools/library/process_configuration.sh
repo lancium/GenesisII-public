@@ -56,6 +56,7 @@ define_and_export_variables()
   # this switchboard sets up the variables we will want to use for storage locations.
   if [ $NAMESPACE == 'xsede' ]; then
     BOOTSTRAP_LOC=/resources/xsede.org/containers/BootstrapContainer
+    STS_LOC=/resources/xsede.org/containers/sts-1.xsede.org
     CONTAINERS_LOC=/resources/xsede.org/containers
     USERS_LOC=/users/xsede.org
     HOMES_LOC=/home/xsede.org
@@ -64,6 +65,7 @@ define_and_export_variables()
     QUEUES_LOC=/resources/xsede.org/queues
   elif [ $NAMESPACE == 'xcg' ]; then
     BOOTSTRAP_LOC=/containers/BootstrapContainer
+    STS_LOC=/containers/BootstrapContainer
     CONTAINERS_LOC=/containers
     USERS_LOC=/users
     HOMES_LOC=/home
@@ -91,9 +93,5 @@ define_and_export_variables()
       return 1
     fi
   fi
-
-  # clear out obnoxious axis attachment file leakage.
-#  rm -f /tmp/Axis*.att "$GENII_INSTALL_DIR/webapps/axis/WEB-INF/attachments"/Axis*.att
-#holding off on this cleanup to see if fixes worked.
 }
 

@@ -45,18 +45,23 @@ testFuseMounting()
   echo Making new fuse mount.
   fuse --mount local:$MOUNT_POINT
   sleep 20
-  checkMount=`mount` 
-  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]
-  then
-	retval=0
-  else
-	echo "Mount failed...Bailing out"
-	exit 0
-  fi
-  assertEquals "mounting new directory with fuse locally" 0 $retval
-  echo Checking new fuse mount.
-  ls -l $MOUNT_POINT$RNSPATH
-  assertEquals "listing new fuse mounted directory" 0 $?
+
+  test_fuse_mount $MOUNT_POINT
+  check_if_failed "Mounting grid to local directory"
+
+#old  checkMount=`mount` 
+#old  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]
+#old  then
+#old	retval=0
+#old  else
+#old	echo "Mount failed...Bailing out"
+#old	exit 0
+#old  fi
+#old  assertEquals "mounting new directory with fuse locally" 0 $retval
+#old
+#old  echo Checking new fuse mount.
+#old  ls -l $MOUNT_POINT$RNSPATH
+#old  assertEquals "listing new fuse mounted directory" 0 $?
 }
 
 testFileOperations()

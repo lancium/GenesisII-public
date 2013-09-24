@@ -39,20 +39,25 @@ testMounting()
   echo "Mounting $MOUNT_POINT"
   fuse --mount local:$MOUNT_POINT
   sleep 30
-  checkMount="$(mount)"
-#echo checkmount is: $checkMount
-#echo mount point seeking is: $MOUNT_POINT
-  retval=1
-  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]; then retval=0; fi
-  assertEquals "Mounting to local directory" 0 $retval
-  if [ $retval == 0 ]; then
-    ls -l $MOUNT_POINT
-    assertEquals "Can list the fuse mounted directory" 0 $retval
-  else
-    rmdir $MOUNT_POINT
-    fail "Failed to mount the GFFS mount point, bailing."
-    exit 1
-  fi
+
+  test_fuse_mount $MOUNT_POINT
+  check_if_failed "Mounting grid to local directory"
+
+#old  checkMount="$(mount)"
+#old#echo checkmount is: $checkMount
+#old#echo mount point seeking is: $MOUNT_POINT
+#old  retval=1
+#old  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]; then retval=0; fi
+#old  assertEquals "Mounting to local directory" 0 $retval
+#old  if [ $retval == 0 ]; then
+#old    ls -l $MOUNT_POINT
+#old    assertEquals "Can list the fuse mounted directory" 0 $retval
+#old  else
+#old    rmdir $MOUNT_POINT
+#old    fail "Failed to mount the GFFS mount point, bailing."
+#old    exit 1
+#old  fi
+
 }
 
 # makes all of the files in the rns path.  we want this as a single

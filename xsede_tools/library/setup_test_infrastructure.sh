@@ -15,7 +15,7 @@ progname="$(basename $0)"
 
 if [ $# -lt 1 ]; then
   echo "$progname: This script needs a single parameter, which is the container"
-  echo "path to use for the authentication (e.g. $BOOTSTRAP_LOC)."
+  echo "path to use for the authentication (e.g. $STS_LOC)."
   echo "An optional second parameter can provide the password for the path"
   echo "'$USERPATH', but that is only required if the $USERPATH needs to be"
   echo "created as part of bootstrapping.  If it is blank, then no new user"
@@ -61,18 +61,7 @@ testGetTestUserEstablished()
     return 0
   fi
 
-#  if [ ! -z "$PASSWORD_PROVIDED" ]; then
-    new_password=$PASSWORD_PROVIDED
-#  elif [ -z "$NON_INTERACTIVE" ]; then
-#    echo "Please input the password to use for $(basename $USERPATH)..."
-#    read -s new_password
-#    if [ -z "$new_password" ]; then
-#      echo "The user's password cannot be empty.  Bailing out."
-#      exit 1
-#    else
-#      echo "Password for '$USERPATH' given..."
-#    fi
-#  fi
+  new_password=$PASSWORD_PROVIDED
 
   if [ -z "$new_password" ]; then
     echo "Cannot use an empty password for the new user.  Failing user creation."
@@ -80,7 +69,17 @@ testGetTestUserEstablished()
   fi
 
   bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$USERPATH" "$new_password" "$SUBMIT_GROUP" "$HOMES_LOC" "$(dirname "$USERPATH")"
-  assertEquals "Should create user on '$USERPATH' successfully" 0 $?
+  assertEquals "Create user at '$USERPATH'" 0 $?
+
+  multi_grid <<eof
+    mkdir --parents grid:$RNSPATH
+    chmod "grid:$RNSPATH" +rwx "$USERPATH"
+    onerror Failed to chmod $RNSPATH.
+    chmod $BOOTSTRAP_LOC/Services/LightWeightExportPortType +rx $USERPATH
+    chmod $BOOTSTRAP_LOC/Services/EnhancedRNSPortType +rx $USERPATH
+    onerror Failed to give export capabilities to $USERPATH.
+eof
+  check_if_failed Could not give $USERPATH permission to the work area $RNSPATH
 }
 
 # now create a ton of demo users.
@@ -92,22 +91,23 @@ testCreateUsers()
     echo "Creating user '$username'..."
     passwd="${MULTI_PASSWORD_LIST[$x]}"
     # now do the heavy lifting to get that user set up.
-    bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$username" "$passwd" "$SUBMIT_GROUP" "$RNSPATH" "$(dirname "$username")"
-    assertEquals "Should create user '$username' successfully" 0 $?
+    bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$username" "$passwd" "$SUBMIT_GROUP" "$HOMES_LOC" "$(dirname "$username")"
+    assertEquals "Create user '$username'" 0 $?
+    # also provide writability to the test user for staging job data.
+    multi_grid <<eof
+      chmod "grid:$RNSPATH" +rwx "$username"
+      chmod "grid:$RNSPATH/.." +r "$username"
+      chmod "grid:$RNSPATH/../.." +r "$username"
+eof
+    assertEquals "Allow '$username' to operate on '$RNSPATH'" 0 $?
   done
-}
-
-# make sure we don't leave the user logged in as an administrator.
-testLogoutAgain()
-{
-  grid logout --all
-  assertEquals "Final logout of the grid" 0 $?
 }
 
 testLoginNormalUser()
 {
   if [ -z "$NON_INTERACTIVE" ]; then
     echo "[$(date)]"
+    grid logout --all
     login_a_user normal
   fi
 }

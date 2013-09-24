@@ -9,6 +9,13 @@
 #
 # Author: Chris Koeritz
 
+# Extra notes:
+#
+#   Currently the parallel jobs test is disabled unless TEST_PARALLEL_JOBS is a variable
+# with a non-empty value.  The current test requires MPICH, but can be adapted to OpenMPI
+# by changing the type in the JSDL files for the queue-parallel-jobs-test.sh.  The JSDL
+# files need to be modified in the <ns4:SPMDVariation> section.
+
 export REGRESSION_DIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd $REGRESSION_DIR
 
@@ -90,21 +97,18 @@ if [ ! -z "$AUTOBUILD_RUNNING" ]; then
   # only add the multiple user tests for automated, testing, bootstrap builds.
   GFFS_TESTS+=( \
     GFFS_Tests/Scalability_Tests/multiuser-gffs-submit.sh \
+    GFFS_Tests/Functional_Tests/test_sts_replication.sh \
   )
 fi
-
-#still misbehaving on autobuild machine.  need to investigate.
-#  GFFS_Tests/Functional_Tests/test_sts_replication.sh \
 
 # the standard tests for the execution management services.
 EMS_TESTS=( \
   EMS_Tests/besStatus/bes-attributes-and-activities.sh \
-  EMS_Tests/queueFunctionalityTests/queue-submission-test.sh \
   EMS_Tests/fileStagingTests/protocols-test.sh \
   EMS_Tests/besFunctionality/bes-submission-test-sync.sh \
+  EMS_Tests/queueFunctionalityTests/queue-submission-test.sh \
   EMS_Tests/performanceTests/queue-performance-test.sh \
   EMS_Tests/performanceTests/file-staging-performance-test.sh \
-  EMS_Tests/queueParallelJobs/queue-parallel-jobs-test.sh \
   EMS_Tests/faultJobsTests/bes-submission-sync-fault.sh \
 )
 
@@ -127,6 +131,12 @@ if [ "$BES_TYPE" = "Genesis" ]; then
   # async test is currently enabled for multi-instance testing, and does not
   # clean up after itself.  the submission point test will clean up.
   EMS_TESTS+=(EMS_Tests/rnsEnabledBESTests/bes-test-submission-point.sh)
+else
+  # Unicore specific tests...
+  if [ ! -z "TEST_PARALLEL_JOBS" ]; then
+    # only add this one if the flag above is set.
+    EMS_TESTS+=(EMS_Tests/queueParallelJobs/queue-parallel-jobs-test.sh)
+  fi
 fi
 
 #holding onto these until fully vetted:
@@ -162,6 +172,21 @@ if [ ! -f "grid.exe" ]; then
   if [ -f grid.bat ]; then sed -i -e "s/-Xmx512[Mm]/-Xmx1G/" grid.bat; chmod 755 grid.bat; fi
 fi
 popd &>/dev/null
+
+##############
+
+echo Checking work area in $RNSPATH
+grid whoami
+if [ $(grep -ic "additional credentials" <$GRID_OUTPUT_FILE) -gt 0 ]; then
+  # set up the RNSPATH folder, in case it doesn't already exist.
+  grid mkdir --parents grid:$RNSPATH &>/dev/null
+  grid chmod grid:$RNSPATH +rwx $USERPATH
+  check_if_failed Could not give $USERPATH permission to the work area $RNSPATH
+else
+  echo Failed to find any credentials for running the regression tests.
+  echo Please use login or xsedeLogin to authenticate as a grid identity.
+  exit 1
+fi
 
 ##############
 

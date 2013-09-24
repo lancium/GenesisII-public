@@ -1,6 +1,10 @@
 #!/bin/bash
 
+# automates running an installer on a remote host.
+#
 # Author: Chris Koeritz
+
+#NOTE: this is not working yet.  it was close before the installer changed a bunch.
 
 if [ -z "$OFFICIAL_DISTRIBUTION_DIR" ]; then
   OFFICIAL_DISTRIBUTION_DIR="http://www.cs.virginia.edu/~mts5x/xsede/2_5_0"
@@ -68,7 +72,7 @@ echo Wiping out any previous version of install.
 \rm -rf "$GENII_USER_DIR" "$GENII_INSTALL_DIR"
 
 # set up a place where we can download and run the installer.
-playground="$(mktemp -d $TEST_TEMP/installer.XXXXXX)"
+playground="$(mktemp -d $TEST_TEMP/grid_logs/installer.XXXXXX)"
 # count up any problems during the run.
 errors=0
 

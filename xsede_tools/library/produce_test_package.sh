@@ -18,16 +18,10 @@ pushd "$XSEDE_TEST_ROOT/.." &>/dev/null
 justdir="$(basename $XSEDE_TEST_ROOT)"
 
 date_string="$(date +"%Y_%b_%e_%H%M" | sed -e 's/ //g')"
-#echo date_string is $date_string
 
 EXCLUDES=(--exclude=".svn" --exclude="docs" --exclude="random*.dat" --exclude=gzip-1.2.4 --exclude=iozone3_397 --exclude="mount-*" --exclude="releases" --exclude="passwords.txt" --exclude="saved_deployment_info.txt" --exclude="generated_certs" --exclude="gridwide_certs" --exclude="inputfile.txt*")
-
-#tar -czf "$HOME/XSEDE_EMS_tests_${date_string}.tar.gz" "$justdir" ${EXCLUDES[*]} --exclude="GFFS_Tests"
-
-#tar -czf "$HOME/XSEDE_GFFS_tests_${date_string}.tar.gz" "$justdir" ${EXCLUDES[*]} --exclude="EMS_Tests"
 
 tar -czf "$HOME/XSEDE_tools_${date_string}.tar.gz" "$justdir" ${EXCLUDES[*]} 
 
 popd &>/dev/null
-
 

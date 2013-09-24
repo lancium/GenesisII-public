@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# establishes a mirror container for the root, but does not add any resolvers or replication yet.
+#
+# Author: Salvatore Valente
+# Author: Chris Koeritz
+
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd $WORKDIR
 
@@ -17,18 +22,18 @@ if [ -z "$XSEDE_TEST_ROOT" ]; then
 fi
 source $XSEDE_TEST_ROOT/library/establish_environment.sh
 
-# Bootstrap backup container for testing replicated resources?
+# check if we have a config for the mirror container.
 if [ -z "$BACKUP_DEPLOYMENT_NAME" -o -z "$BACKUP_USER_DIR" \
     -o -z "$BACKUP_CONTAINER" -o -z "$BACKUP_PORT_NUMBER" ]; then
-  echo -e "\nNot setting up backup container for replication testing.\n"
+  echo -e "\nNot setting up mirror container for replication testing.\n"
 else
-  echo -e "\nSetting up backup container for replication testing.\n"
+  echo -e "\nSetting up mirror container for replication testing.\n"
 
   # clean up old logs.
   \rm -f "$(get_container_logfile "$BACKUP_DEPLOYMENT_NAME")"
 
   if [ "$BACKUP_DEPLOYMENT_NAME" == "default" ]; then
-    echo "Failure--backup deployment name cannot be 'default'"
+    echo "Failure--mirror's deployment name cannot be 'default'"
     exit 1
   fi
 
@@ -55,20 +60,26 @@ else
   restore_userdir
 
   get_root_privileges
-  grid_chk ln --service-url="https://127.0.0.1:${BACKUP_PORT_NUMBER}/axis/services/VCGRContainerPortType" "$BACKUP_CONTAINER"
 
-  grid_chk chmod "$LOCAL_CONTAINER"/Services/GeniiResolverPortType +rwx --everyone
-  grid_chk chmod "$LOCAL_CONTAINER"/Services/RandomByteIOPortType +rwx --everyone
-  grid_chk chmod "$LOCAL_CONTAINER"/Services/EnhancedRNSPortType +rwx --everyone
+  multi_grid <<eof
+    ln --service-url="https://127.0.0.1:${BACKUP_PORT_NUMBER}/axis/services/VCGRContainerPortType" "$BACKUP_CONTAINER"
 
-  grid_chk chmod "$BACKUP_CONTAINER" +rx --everyone
-  grid_chk chmod "$BACKUP_CONTAINER"/Services +rx --everyone
-  grid_chk chmod "$BACKUP_CONTAINER"/Services/GeniiResolverPortType +rwx --everyone
-  grid_chk chmod "$BACKUP_CONTAINER"/Services/RandomByteIOPortType +rwx --everyone
-  grid_chk chmod "$BACKUP_CONTAINER"/Services/EnhancedRNSPortType +rwx --everyone
+    chmod "$BACKUP_CONTAINER" +rx --everyone
+    chmod "$BACKUP_CONTAINER"/Services +rx --everyone
+    chmod "$BACKUP_CONTAINER"/Services/GeniiResolverPortType +rx --everyone
+    chmod "$BACKUP_CONTAINER"/Services/RandomByteIOPortType +rx --everyone
+    chmod "$BACKUP_CONTAINER"/Services/EnhancedRNSPortType +rx --everyone
 
-  grid_chk logout --all 
-  grid_chk login --username=$(basename $USERPATH) --password=$user_password
+    logout --all 
+    login --username=$(basename $USERPATH) --password=$user_password
+eof
+  check_if_failed setting up mirror container deployment
+
+#older
+#    chmod "$LOCAL_CONTAINER"/Services/GeniiResolverPortType +rx --everyone
+#    chmod "$LOCAL_CONTAINER"/Services/RandomByteIOPortType +rx --everyone
+#    chmod "$LOCAL_CONTAINER"/Services/EnhancedRNSPortType +rx --everyone
+
 fi
 
 

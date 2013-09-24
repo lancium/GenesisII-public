@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # restores the container state from a prior backup file.
+#
+# Author: Chris Koeritz
 
 if [ -z "$GENII_USER_DIR" -o -z "$GENII_INSTALL_DIR" ]; then
   echo "This script requires two variables in the environment, the user state"

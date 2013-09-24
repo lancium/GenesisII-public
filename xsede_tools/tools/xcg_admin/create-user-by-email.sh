@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#
 # establishes a user with appropriate rights to the grid resources configured in the
 # input file (e.g., the queue, etc.).
 # this assumes that an admin user is already logged in; that user must be able to chmod
@@ -8,7 +7,7 @@
 #
 # Author: Vanamala Venkataswamy
 # Author: Chris Koeritz
-#
+
 if [ -z "$XSEDE_TEST_ROOT" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
 source $XSEDE_TEST_ROOT/library/establish_environment.sh
 

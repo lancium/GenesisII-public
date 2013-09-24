@@ -25,11 +25,6 @@ put_on_hat()
   password="$1"; shift
   idp_path="$1"; shift
   OLD_STATE_DIR="$GENII_USER_DIR"
-#  # we are still expecting a normal state directory here, so we will re-use the
-#  # osgi bundle storage, rather than replicating that.
-#  if [ -z "$GENII_OSGI_DIR" ]; then
-#    export GENII_OSGI_DIR="$GENII_USER_DIR/osgi_storage"
-#  fi
   # we have a simple root area for these states.
   new_dir="$TEST_TEMP/$DIR_KEYWORD"
   if [ ! -d "$new_dir" ]; then mkdir $new_dir; fi
@@ -76,7 +71,6 @@ echo "establish_identity: idp_path is: $idp_path"
     # make sure we do the extra step for unicore authentication, if it seems
     # needed.  this step has to be done inside one grid client activation to
     # ensure the tool doesn't re-identify itself in between any steps.
-#echo before keystore step.
     multi_grid <<eof
       logout --all
       keystoreLogin --toolIdentity --password=$KEYSTORE_PASSWORD --validDuration=10years local:$KEYSTORE_FILE
@@ -132,10 +126,10 @@ function login_a_user()
   assertEquals "Logging in to the grid as an administrative user" 0 $retval
   if [ $retval == 0 ]; then
     # a very simplistic check that some id got mapped to some certificate.
-    local my_output="$(mktemp $TEST_TEMP/uniqgridout.XXXXXX)"
+    local my_output="$(mktemp $TEST_TEMP/grid_logs/out_login_user.XXXXXX)"
     local grid_app="$(pick_grid_app)"
-    betterBeUs=$(raw_grid "$my_output" "$grid_app" whoami && cat "$my_output" | grep '" -> "')
-    retval=$?
+    betterBeUs=$(raw_grid "$grid_app" whoami 2>&1 | grep '" -> "' &>"$my_output")
+    retval=${PIPESTATUS[0]}
     rm -f "$my_output"
     assertEquals "Checking for non-vanilla credentials" 0 $retval
   fi
@@ -143,14 +137,6 @@ function login_a_user()
     fail "Bailing out since the login process did not succeed"
     exit 3
   fi
-}
-
-# acquires super-user access on this grid.
-function get_root_privileges()
-{
-  # login with rights to do everything we need.
-  echo "Acquiring administrative rights..."
-  grid_chk keystoreLogin --password=keys local:$GENII_INSTALL_DIR/deployments/$DEPLOYMENT_NAME/security/admin.pfx
 }
 
 # performs the steps necessary to create a user and her home folder, and to link in
@@ -165,35 +151,14 @@ function create_user() {
   fi
   local user=$(basename $full_user)
   if [ "$user" == "$full_user" ]; then
-    echo "Error in create_user function--user name is short name, but we need full path to user identity location"
-    exit 1
+    full_user="$USERS_LOC/$user"
   fi
   local grp=$(basename $full_group)
-  grid ls "$BOOTSTRAP_LOC/Services/X509AuthnPortType/$user" &>/dev/null
-  if [ $? -ne 0 ]; then
-    echo "Creating user '$user' identity..."
-    grid_chk create-user $BOOTSTRAP_LOC/Services/X509AuthnPortType "$user" --login-name="$user" --login-password="$passwd" --validDuration=10years
-    echo "  linking '$full_user' folder to identity..."
-    grid_chk ln $BOOTSTRAP_LOC/Services/X509AuthnPortType/"$user" "$full_user"
+  if [ "$grp" == "$full_group" ]; then
+    full_group="$GROUPS_LOC/$grp"
   fi
-  # test whether home directory already present before making it.  this can happen if
-  # the test file specifies RNSPATH being the same as a home directory.
-  grid ls "$HOMES_LOC/$user" &>/dev/null
-  if [ $? -ne 0 ]; then
-    echo "  making home directory '$HOMES_LOC/$user'..."
-    grid_chk mkdir "$HOMES_LOC/$user"
-  fi
-  echo "  giving user +rwx access to home directory..."
-  grid_chk chmod "$HOMES_LOC/$user" +rwx "$full_user"
-  echo "  giving user +rx permission to '$grp'..."
-  grid_chk chmod "$full_group" +rx "$full_user"
 
-  grid ls "$full_user/$grp" &>/dev/null
-  if [ $? -ne 0 ]; then
-    echo "  linking group '$grp' credentials to user..."
-    grid_chk ln "$full_group" "$full_user/$grp"
-  fi
-  echo "  done."
+  grid script local:$XSEDE_TEST_ROOT/library/create_one_user.xml "$STS_LOC" "$user" "$full_user" "$passwd" "$grp" "$full_group" "$HOMES_LOC" "$(dirname "$full_user")"
 }
 
 # creates a group in the grid.  this group is not expected to have any special
@@ -206,18 +171,14 @@ function create_group()
     exit 1
   fi
   local grp="$(basename $full_group)"
-  grid ls "$BOOTSTRAP_LOC/Services/X509AuthnPortType/$grp" &>/dev/null
+  grid ls "$STS_LOC/Services/X509AuthnPortType/$grp" &>/dev/null
   if [ $? -ne 0 ]; then
     multi_grid <<eof
-      idp --validDuration=10years $BOOTSTRAP_LOC/Services/X509AuthnPortType "$grp"
-      onerror Failed to create group for $grp using $BOOTSTRAP_LOC.
-      ln $BOOTSTRAP_LOC/Services/X509AuthnPortType/"$grp" "$full_group"
+      idp --validDuration=10years $STS_LOC/Services/X509AuthnPortType "$grp"
+      onerror Failed to create group for $grp using $STS_LOC.
+      ln $STS_LOC/Services/X509AuthnPortType/"$grp" "$full_group"
       onerror Failed to add $grp group link for to groups directory.
 eof
-    local retval=$?
-#    echo "output from creating group:"
-#    cat $GRID_OUTPUT_FILE
-    return $retval
   fi
 }
 
@@ -231,4 +192,25 @@ function give_create_perms()
   grid_chk chmod "$resrc" +rx "$grp"
 }
 
+# gets the groups found under a user path.  this is handy for later removing
+# those groups with an unlink (the proper way) instead of just recursively
+# deleting the user entry.
+function listGroups()
+{
+  local userpath=$1; shift
+  $GENII_INSTALL_DIR/grid ls $userpath | tail -n +2
+}
+
+# safely clean out any groups listed under a user path.
+function unlinkGroupsUnderUser()
+{
+  local userpath=$1; shift
+  local grplist="$(listGroups $userpath)"
+  local grp
+  for grp in $grplist; do 
+    if [ ! -z "$grp" ]; then
+      grid_chk unlink $userpath/$grp
+    fi
+  done 
+}
 

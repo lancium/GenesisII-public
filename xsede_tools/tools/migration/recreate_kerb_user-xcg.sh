@@ -20,10 +20,7 @@ if [ -z "$user" ]; then
   exit 1
 fi
 
-#$GENII_INSTALL_DIR/grid logout --all
-#$GENII_INSTALL_DIR/grid keystoreLogin --password=keys local:$GENII_INSTALL_DIR/deployments/default/security/admin.pfx 
-$GENII_INSTALL_DIR/grid script local:$HOME/$GENII_INSTALL_DIR/xsede_tools/library/create-xsede-user-xcg.xml "$user"
+$GENII_INSTALL_DIR/grid script local:$XSEDE_TEST_ROOT/tools/xcg_admin/create-xsede-user.xml "$user"
 $GENII_INSTALL_DIR/grid chmod $SUBMIT_GROUP +x "$USERS_LOC/$user"
 $GENII_INSTALL_DIR/grid ln $SUBMIT_GROUP "$USERS_LOC/$user/$(basename $SUBMIT_GROUP)"
-#$GENII_INSTALL_DIR/grid logout --all
 

@@ -62,16 +62,23 @@ testCreateExport() {
 testFuseMount () {
   if ! fuse_supported; then return 0; fi
   # Create a grid mount point, mount the grid
+echo mount point is $MOUNT_POINT
   fuse --mount local:$MOUNT_POINT
   sleep 20
-  checkMount=`mount`
-  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]; then
-    retval=0
-  else
-    echo "Mount failed... Bailing out"
-    exit 0
-  fi
-  assertEquals "Fuse mounting grid to local $MOUNT_POINT dir" 0 $retval
+
+  test_fuse_mount $MOUNT_POINT
+  check_if_failed "Mounting grid to local directory"
+
+#old  checkMount=`mount`
+#oldecho checkmnt is $checkMount
+#old  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]; then
+#old    retval=0
+#old  else
+#old    echo "Mount failed... Bailing out"
+#old    exit 0
+#old  fi
+#old  assertEquals "Fuse mounting grid to local $MOUNT_POINT dir" 0 $retval
+
   grid ls
   cat $GRID_OUTPUT_FILE
 }
