@@ -13,10 +13,10 @@ create_jsdl_from_templates()
     mkdir -p "$GENERATED_JSDL_FOLDER"
   fi
   # patching user name in the jsdl input files...
-  FPATH=$(grep "^[^#]*RNSPATH" $XSEDE_TEST_ROOT/inputfile.txt | sed -e 's/RNSPATH=//')
+  local FPATH=$RNSPATH
+#not needed: $(grep "^[^#]*RNSPATH" $XSEDE_TEST_ROOT/inputfile.txt | sed -e 's/RNSPATH=//')
   echo RNSPATH is $FPATH
   export REAL_LENGTH=$(expr length $FPATH)
-#not needed  FPATH=$(echo $FPATH | sed -e 's/\//\\\//g')
 
   local i
   local j
@@ -30,6 +30,7 @@ create_jsdl_from_templates()
 };' $i >"$GENERATED_JSDL_FOLDER/$i"
     sed -i -e 's%PATH%'$FPATH'%g' \
       -e 's%EMAIL%'$EMAIL'%g' \
+      -e 's%SPMD_VARIATION%'$SPMD_VARIATION'%g' \
       "$GENERATED_JSDL_FOLDER/$i"
     # note that SFTP and GRIDFTP have to go first so we don't erroneously match FTP instead.
     for j in SFTP GRIDFTP FTP HTTP SCP; do

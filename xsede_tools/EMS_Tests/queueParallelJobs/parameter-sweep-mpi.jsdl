@@ -14,7 +14,7 @@
                 <ns4:NumberOfProcesses>4</ns4:NumberOfProcesses>
                 <ns4:ProcessesPerHost>1</ns4:ProcessesPerHost>
                 <ns4:ThreadsPerProcess xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
-                <ns4:SPMDVariation>http://www.ogf/org/jsdl/2007/02/jsdl-spmd/MPICH2</ns4:SPMDVariation>
+                <ns4:SPMDVariation>SPMD_VARIATION</ns4:SPMDVariation>
             </ns4:SPMDApplication>
         </Application>
 	<Resources>

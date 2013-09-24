@@ -16,17 +16,19 @@ oneTimeSetUp()
     exit 1
   fi
 
-  echo "Copying necessary file to Grid namespace"
-  grid cp local:./hostname.sh grid:$RNSPATH
-  grid cp local:./simple-mpi.c grid:$RNSPATH
-  grid cp local:./parameter-sweep-mpi.c grid:$RNSPATH
-
+  # skip copies if we're not even going to test.
+  if [ -z "$SPMD_VARIATION" ]; then
+    echo "Copying necessary file to Grid namespace"
+    grid cp local:./hostname.sh grid:$RNSPATH
+    grid cp local:./simple-mpi.c grid:$RNSPATH
+    grid cp local:./parameter-sweep-mpi.c grid:$RNSPATH
+  fi
 }
 
 testQueueParallelJobsSubmission()
 {
-  if [ "$BES_TYPE" = "Genesis" ]; then
-  	echo "Skipping MPI jobs on Genesis BES."
+  if [ -z "$SPMD_VARIATION" ]; then
+    echo "Skipping MPI jobs as the SPMD_VARIATION is not defined."
   else
     grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/simple-mpi.jsdl
     assertEquals "Submitting simple MPI job - stageout output files" 0 $?
@@ -39,8 +41,10 @@ testQueueParallelJobsSubmission()
 
 testWaitingOnJobs()
 {
-  wait_for_all_pending_jobs $QUEUE_PATH
-  assertEquals "No jobs should be left" 0 $?
+  if [ ! -z "$SPMD_VARIATION" ]; then
+    wait_for_all_pending_jobs $QUEUE_PATH
+    assertEquals "No jobs should be left" 0 $?
+  fi
 }
 
 # load and run shUnit2
