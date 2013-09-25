@@ -91,6 +91,16 @@ SUBMIT_GROUP=/groups/uva-idp-group
 # or "Unicore" currently.
 BES_TYPE=Genesis
 
+# The SPMD type needs to reflect the type of MPI in use on the BES or queue.
+# This depends on knowing the external configuration for the BES.  If this is
+# not set, then parallel tests will not be executed.
+# Disabled:
+SPMD_VARIATION=
+# OpenMPI:
+#SPMD_VARIATION="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd/OpenMPI"
+# MPICH:
+#SPMD_VARIATION="http://www.ogf/org/jsdl/2007/02/jsdl-spmd/MPICH2"
+
 # If this is not blank, then it is used as the only BES to target in the queue's
 # resources.  This will not work if that resource does not exist on the queue.
 BES_RESOURCE_OVERRIDE=
