@@ -61,13 +61,13 @@
 	</path>
 			
 	<!-- Imports -->	
-	<import file="${basedir}/init.build.xml"/>
+	<import file="${basedir}/build-initial.xml"/>
 	<import file="${scripts.dir}/scripts.build.xml"/>
 	<import file="${lib.dir}/lib.build.xml"/>
 	<import file="${src.dir}/jni/genii_jni_win32/vcgrJniLibs.build.xml"/>
 
 	<!-- Build Targets -->
-	<target name="build" depends="announce,subprojects,jars,lib-setup,scripts,run.unit.tests"/>
+	<target name="build" depends="announce,libraries,jars,lib-setup,scripts,run.unit.tests"/>
 
 	<target name="announce" >
 		<exec executable="java">
@@ -76,16 +76,16 @@
 	</target>
 
 	<!-- a helper target that gets out the latest libraries from svn and builds them. -->
-	<target name="update" >
+<!--	<target name="update" >
 		<exec executable="bash" failonerror="true">
 			<arg value="scripts/build_dependencies.sh"/>
 			<arg value="update"/>
 			<arg value="trunk"/>
 		</exec>
-	</target>
+	</target> -->
 
-	<!-- the normal target for building the subprojects; does not update them first. -->
-	<target name="subprojects" >
+	<!-- main target for building the libraries. -->
+	<target name="libraries" >
 		<exec executable="bash" failonerror="true">
 			<arg value="scripts/build_dependencies.sh"/>
 			<arg value="trunk"/>
@@ -192,7 +192,7 @@
 				includes="**/*.log"/>
 			<fileset dir="${basedir}"
 				includes="**/*.log.*" />
-			<fileset dir="${basedir}/installer/install4j"
+			<fileset dir="${basedir}/installer"
 				includes="Media/**/*" />
 			<fileset dir="${bundles.home}"
 				includes="endorsed/**/*" />
@@ -222,8 +222,7 @@
 			<classpath refid="project.classpath" />
 			<batchtest todir="unit-test-reports/raw">
 				<fileset dir="${tests.dir}">
-<!--				<exclude name="com/inovasolutions/net/ssh/TestMultipleActivities.java" />
-				<exclude name="com/inovasolutions/net/ssh/TestPatterns.java" /> -->
+				<!-- <exclude name="com/example/ssh/TestSomethingSsh.java" /> -->
 				</fileset>
 				<formatter type="xml" />
 			</batchtest>

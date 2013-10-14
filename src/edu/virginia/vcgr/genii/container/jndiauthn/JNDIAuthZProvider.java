@@ -90,11 +90,11 @@ public class JNDIAuthZProvider implements IAuthZProvider
 	 */
 	@Override
 	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation, String errorText)
+		Class<?> serviceClass, Method operation)
 	{
 		JNDIResource jndiResource = (JNDIResource) resource;
 		if (!jndiResource.isIdpResource()) {
-			return _aclProvider.checkAccess(authenticatedCallerCredentials, resource, serviceClass, operation, errorText);
+			return _aclProvider.checkAccess(authenticatedCallerCredentials, resource, serviceClass, operation);
 		}
 		if (!checkJndiAccess(jndiResource)) {
 			String idpName = "";
@@ -103,7 +103,7 @@ public class JNDIAuthZProvider implements IAuthZProvider
 			} catch (Throwable e) {
 				// ignore since just for diagnostics.
 			}
-			errorText = "failure: permission denied on " + operation.getName() + " -- " + idpName;
+			String errorText = "failure: permission denied on " + operation.getName() + " -- " + idpName;
 			_logger.error(errorText);
 			return false;
 		}
@@ -114,12 +114,12 @@ public class JNDIAuthZProvider implements IAuthZProvider
 	 * Check that the caller has a type of access to the given resource.
 	 */
 	@Override
-	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		RWXCategory category, String errorText)
+	public boolean
+		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
 	{
 		JNDIResource jndiResource = (JNDIResource) resource;
 		if (!jndiResource.isIdpResource()) {
-			_aclProvider.checkAccess(authenticatedCallerCredentials, resource, category, errorText);
+			_aclProvider.checkAccess(authenticatedCallerCredentials, resource, category);
 			return true;
 		}
 		return checkJndiAccess(jndiResource);

@@ -71,7 +71,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation, String errorText)
+		Class<?> serviceClass, Method operation)
 	{
 		// Try regular ACLs for administrative access.
 		try {
@@ -82,22 +82,20 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			 * authentication process to occur.
 			 */
 			ArrayList<NuCredential> prunedCredentials = new ArrayList<NuCredential>();
+			X509Certificate[] resourceCertChain = null;
+			try {
+				resourceCertChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+			} catch (ResourceException e) {
+				_logger.error("failed to load resource certificate chain for kerberos auth.  resource is: "
+					+ resource.toString());
+				// this seems really pretty bad. the resource is bogus.
+				return false;
+			}
 			for (NuCredential cred : authenticatedCallerCredentials) {
-				X509Certificate[] resourceCertChain = null;
-				try {
-					resourceCertChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-				} catch (ResourceException e) {
-					_logger.error("failed to load resource certificate chain for kerberos auth.  resource is: "
-						+ resource.toString());
-					// this seems really pretty bad. the resource is bogus.
-					return false;
-				}
-
 				if (cred.getOriginalAsserter().equals(resourceCertChain)) {
 					_logger.debug("dropping kerberos own identity from cred set so we can authorize it.");
 					continue;
 				}
-
 				prunedCredentials.add(cred);
 			}
 
@@ -105,7 +103,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			 * we must check that the resource is writable if we're going to skip authentication.
 			 * this must only be true for the admin of the STS.
 			 */
-			boolean accessOkay = checkAccess(prunedCredentials, resource, RWXCategory.WRITE, errorText);
+			boolean accessOkay = checkAccess(prunedCredentials, resource, RWXCategory.WRITE);
 			if (accessOkay) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("skipping kerberos authentication due to administrative access to resource.");
@@ -228,6 +226,14 @@ public class KerbAuthZProvider extends AclAuthZProvider
 					kdc_lock.readLock().unlock();
 				}
 			}
+		}
+
+		// just try a traditional access check now.
+		boolean accessOkay = super.checkAccess(authenticatedCallerCredentials, resource, serviceClass, operation);
+		if (accessOkay) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("allowing kerberos auth due to base class permission.");
+			return true;
 		}
 
 		// Nobody appreciates us.

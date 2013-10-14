@@ -182,7 +182,7 @@ function save_grid_data()
     popd &>/dev/null
   fi
   # and back up the deployment info.
-  pushd "$GENII_INSTALL_DIR/deployments/.." &>/dev/null
+  pushd "$DEPLOYMENTS_ROOT/.." &>/dev/null
   zip -r $HOME/bootstrap_save.zip deployments &>/dev/null
   popd &>/dev/null
   \mv $HOME/bootstrap_save.zip "$data_zip"
@@ -216,17 +216,21 @@ function bootstrap_grid()
   # perform the basic setup of the grid, already canned for us.
   echo "Bootstrapping default grid configuration..."
 
-  bootstrap_file="deployments/$DEPLOYMENT_NAME/configuration/bootstrap.xml"
+  bootstrap_file="$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/bootstrap.xml"
   if [ $NAMESPACE == 'xsede' ]; then
     echo -e "\n---- Choosing 'xsede' namespace for bootstrap ----"
-    cp "deployments/$DEPLOYMENT_NAME/configuration/xsede-bootstrap.xml" $bootstrap_file
+    cp "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/xsede-bootstrap.xml" $bootstrap_file
   elif [ $NAMESPACE == 'xcg' ]; then
     echo -e "\n---- Choosing 'xcg' namespace for bootstrap ----"
-    cp "deployments/$DEPLOYMENT_NAME/configuration/xcg-bootstrap.xml" $bootstrap_file
+    cp "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/xcg-bootstrap.xml" $bootstrap_file
   else
     echo "Unknown namespace type--the NAMESPACE variable is unset or unknown"
     exit 1
   fi
+
+  # fix the bootstrap to point to the right deployments folder.
+  replace_phrase_in_file $bootstrap_file '${GENII_INSTALL_DIR}/deployments' "${DEPLOYMENTS_ROOT}"
+
   grid_chk script "local:${bootstrap_file}"
 
   # jump back out of the install directory.  the deployment behaves

@@ -35,6 +35,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.container.ContainerConstants;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -48,7 +49,6 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityType;
 import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityTypeMin;
 import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
@@ -404,19 +404,16 @@ public class ResourceManager
 		return new MetadataType(anyArray);
 	}
 
+	/**
+	 * returns a textual name for the resource specified. this is very limited in capabilities, and
+	 * currently only returns the key name for the resource. there seems to be no general and simple
+	 * way to map a resource to its RNS path.
+	 */
 	static public String getResourceName(IResource resource)
 	{
-		String toReturn = resource.getKey();
+		String toReturn = null;
 		try {
-			/*
-			 * this never ever seems to work. if
-			 * (resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()) != null) {
-			 * try { toReturn.concat("--" + (String)
-			 * resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart())); } catch
-			 * (Throwable e) { // ignore, will just miss part of print-out. } } else {
-			 * toReturn.concat("--" + "unknown details"); }
-			 */
-
+			toReturn = resource.getKey();
 		} catch (Throwable e) {
 			// ignore, will just miss part of print-out.
 		}

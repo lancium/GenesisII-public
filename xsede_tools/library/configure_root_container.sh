@@ -64,10 +64,10 @@ bash $XSEDE_TEST_ROOT/library/zap_genesis_javas.sh
 
 if [ $NAMESPACE == 'xsede' ]; then
   echo Copying xsede namespace properties into place.
-  cp $GENII_INSTALL_DIR/deployments/default/configuration/xsede-namespace.properties $GENII_INSTALL_DIR/deployments/$DEPLOYMENT_NAME/configuration/namespace.properties
+  cp $DEPLOYMENTS_ROOT/default/configuration/xsede-namespace.properties $DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/namespace.properties
 elif [ $NAMESPACE == 'xcg' ]; then
   echo Copying xcg namespace properties into place.
-  cp $GENII_INSTALL_DIR/deployments/default/configuration/xcg-namespace.properties $GENII_INSTALL_DIR/deployments/$DEPLOYMENT_NAME/configuration/namespace.properties
+  cp $DEPLOYMENTS_ROOT/default/configuration/xcg-namespace.properties $DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/namespace.properties
 else
   echo "Unknown namespace type--the NAMESPACE variable is unset or unknown"
   exit 1

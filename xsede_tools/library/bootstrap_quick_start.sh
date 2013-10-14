@@ -54,10 +54,16 @@ if [ -z "$NORMAL_ACCOUNT_PASSWD" ]; then NORMAL_ACCOUNT_PASSWD="FOOP"; fi
 containerlog="$(get_container_logfile "$DEPLOYMENT_NAME")"
 clientlog="$(get_client_logfile "$DEPLOYMENT_NAME")"
 # clean out old state directory and old logs.
-\rm -rf "$GENII_USER_DIR" "$BACKUP_USER_DIR" \
+\rm -rf "$GENII_USER_DIR" \
   "$GENII_INSTALL_DIR/webapps/axis/WEB-INF/attachments"/* \
   "${containerlog}" "${containerlog}".[0-9]* \
   "${clientlog}" "${clientlog}".[0-9]*
+if [ ! -z "$BACKUP_DEPLOYMENT_NAME" -a ! -z "$BACKUP_USER_DIR" ]; then
+  # clean out mirror container cruds also.
+  mirrorlog="$(get_container_logfile "$BACKUP_DEPLOYMENT_NAME")"
+  \rm -rf "$BACKUP_USER_DIR" \
+    "${mirrorlog}" "${mirrorlog}".[0-9]*
+fi
 
 # bootstrap and configure a bunch of rights for the admin account.
 bash $XSEDE_TEST_ROOT/library/configure_root_container.sh "$USERS_LOC/admin" "$ADMIN_ACCOUNT_PASSWD" $SUBMIT_GROUP $(basename $CONTAINERPATH)

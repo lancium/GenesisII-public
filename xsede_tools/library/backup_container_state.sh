@@ -23,7 +23,7 @@ function date_stringer()
     date +"%Y$sep%m$sep%d$sep%H%M$sep%S" | tr -d '/\n/'
 }
 
-backup_file=$HOME/state_backup_$(date_stringer).zip
+backup_file="$(\pwd)/state_backup_$(date_stringer).zip"
 
 if [ -z "$TMP" ]; then
   TMP=$HOME/.tmp

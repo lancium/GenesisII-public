@@ -21,16 +21,20 @@ source $XSEDE_TEST_ROOT/library/establish_environment.sh
 
 ##############
 
+export INSTALLER_DIR="$GENII_INSTALL_DIR/installer"
+
+##############
+
 export installer_name="$1"
 
 if [ -z "$installer_name" \
-    -o ! -f "$GENII_INSTALL_DIR/installer/install4j/$installer_name" ]; then
+    -o ! -f "$INSTALLER_DIR/$installer_name" ]; then
   echo
   echo A valid installer file name needs to be passed on the command line.
   echo The first parameter should be the basename of the install4j file.
   echo
   echo The available choices so far are:
-  pushd $GENII_INSTALL_DIR/installer/install4j &>/dev/null
+  pushd $INSTALLER_DIR &>/dev/null
   ls -1 *.install4j
   popd &>/dev/null
   echo
@@ -39,9 +43,9 @@ fi
 
 # check for any stray keytabs that we absolutely do not want to include in
 # the installer package.
-if [ ! -z "$(find $GENII_INSTALL_DIR/deployments/default -iname "*keytab")" ]; then
+if [ ! -z "$(find $DEPLOYMENTS_ROOT/default -iname "*keytab")" ]; then
   echo "There is a keytab file present under the path:"
-  echo "    $GENII_INSTALL_DIR/deployments/default"
+  echo "    $DEPLOYMENTS_ROOT/default"
   echo "It is not safe to build an installer with private kerberos keytabs"
   echo "embedded in it."
   exit 1
@@ -49,7 +53,7 @@ fi
 
 ##############
 
-OUTPUT_DIRECTORY=$GENII_INSTALL_DIR/installer/products
+OUTPUT_DIRECTORY=$HOME/installer_products
 \rm -rf $OUTPUT_DIRECTORY
 mkdir $OUTPUT_DIRECTORY
 
@@ -70,9 +74,9 @@ function build_installer()
   fi
 
   # clean out the media folder.
-  \rm -f $GENII_INSTALL_DIR/installer/install4j/Media/*
+  \rm -f $INSTALLER_DIR/Media/*
 
-  pushd $GENII_INSTALL_DIR/installer/install4j &>/dev/null
+  pushd $INSTALLER_DIR &>/dev/null
   install4jc -b "$media_num" "$installer_name"
   check_if_failed "building installer for $name_piece"
   for i in Media/*.dmg Media/*.sh Media/*.exe; do
@@ -86,7 +90,7 @@ function build_installer()
   popd &>/dev/null
 
   # clean it out again so as not to leave cruft.
-  \rm -f $GENII_INSTALL_DIR/installer/install4j/Media/*
+  \rm -f $INSTALLER_DIR/Media/*
 }
 
 ##############

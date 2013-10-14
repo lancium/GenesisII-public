@@ -26,7 +26,6 @@
 	<classpathentry kind="lib" path="ext/axis/mail.jar"/>
 	<classpathentry kind="lib" path="ext/axis/commons-discovery-0.5.jar"/>
 	<classpathentry kind="lib" path="ext/axis/wsdl4j-1.5.1.jar"/>
-	<classpathentry kind="lib" path="ext/bcprov-jdk16-1.46.jar"/>
 	<classpathentry kind="lib" path="ext/slf4j-log4j12-1.6.6.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/jetty-6.1.26.jar" sourcepath="/home/fred/.m2/repository/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26-sources.jar"/>
@@ -44,7 +43,6 @@
 	<classpathentry kind="lib" path="ext/fsview.jar"/>
 	<classpathentry kind="lib" path="ext/MNaming.jar"/>
 	<classpathentry kind="lib" path="ext/derby.jar"/>
-	<classpathentry kind="lib" path="bundles/bundle-u6security_1.0.66.jar"/>
 	<classpathentry kind="lib" path="ext/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="ext/dpage.jar"/>
 	<classpathentry kind="lib" path="ext/log4j-1.2.17.jar"/>
@@ -55,5 +53,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-webservices"/>
 	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="lib" path="ext/MacOSXSwing.jar"/>
+	<classpathentry kind="lib" path="ext/bcprov-jdk16-1.46.jar"/>
+	<classpathentry kind="lib" path="ext/canl-1.2.1.jar"/>
+	<classpathentry kind="lib" path="bundles/bundle-u6security_1.0.67.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

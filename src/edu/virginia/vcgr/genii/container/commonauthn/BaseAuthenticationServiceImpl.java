@@ -24,6 +24,8 @@ import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSEntryType;
 import org.ggf.rns.RNSMetadataType;
 import org.ggf.rns.WriteNotPermittedFaultType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestSecurityTokenResponseType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestSecurityTokenType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -51,9 +53,6 @@ import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.sync.SyncProperty;
 import edu.virginia.vcgr.genii.client.sync.VersionVector;
-import edu.virginia.vcgr.genii.security.x509.CertCreationSpec;
-import edu.virginia.vcgr.genii.security.x509.CertTool;
-import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
@@ -82,11 +81,16 @@ import edu.virginia.vcgr.genii.container.sync.VersionedResourceAttributeHandlers
 import edu.virginia.vcgr.genii.container.sync.VersionedResourceUtils;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
+import edu.virginia.vcgr.genii.container.x509authn.BaggageAggregatable;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
-import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
+import edu.virginia.vcgr.genii.security.credentials.NuCredential;
+import edu.virginia.vcgr.genii.security.x509.CertCreationSpec;
+import edu.virginia.vcgr.genii.security.x509.CertTool;
+import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 
 /*
  * This class incorporates the IDP specific functionalities that are common to all IDP port-types.
@@ -101,7 +105,7 @@ import edu.virginia.vcgr.genii.security.TransientCredentials;
  * all the interfaces. We avoid the problem of name conflict by asking subclasses to explicitly call
  * this class's method for conflicting methods.
  */
-public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implements RNSTopics
+public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implements RNSTopics, BaggageAggregatable
 {
 
 	private static Log _logger = LogFactory.getLog(BaseAuthenticationServiceImpl.class);
@@ -109,6 +113,31 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	protected BaseAuthenticationServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
+	}
+
+	@Override
+	public ArrayList<RequestSecurityTokenResponseType> aggregateBaggageTokens(IRNSResource resource,
+		RequestSecurityTokenType request) throws java.rmi.RemoteException
+	{
+		ArrayList<RequestSecurityTokenResponseType> gatheredResponses = new ArrayList<RequestSecurityTokenResponseType>();
+		Collection<InternalEntry> entries = resource.retrieveEntries(null);
+
+		for (InternalEntry entry : entries) {
+			try {
+				EndpointReferenceType idpEpr = entry.getEntryReference();
+				// create a proxy to the remote idp and invoke it.
+				X509AuthnPortType idp = ClientUtils.createProxy(X509AuthnPortType.class, idpEpr);
+				RequestSecurityTokenResponseType[] responses = idp.requestSecurityToken2(request);
+				if (responses != null) {
+					for (RequestSecurityTokenResponseType response : responses) {
+						gatheredResponses.add(response);
+					}
+				}
+			} catch (Exception e) {
+				_logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
+			}
+		}
+		return gatheredResponses;
 	}
 
 	/*
@@ -124,7 +153,6 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	@Override
 	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters) throws ResourceException, BaseFaultType
 	{
-
 		// insert construction parameter to affect DN names of the certificate
 		String CN = (String) constructionParameters.get(SecurityConstants.NEW_IDP_NAME_QNAME);
 		if (CN != null) {
@@ -137,12 +165,13 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		if (certificateOwnerEPR == null) {
 			MessageElement certificateOwner =
 				(MessageElement) constructionParameters.get(STSConfigurationProperties.CERTIFICATE_OWNER_EPR);
-			if (certificateOwner != null)
+			if (certificateOwner != null) {
 				try {
 					certificateOwnerEPR = (EndpointReferenceType) certificateOwner.getObjectValue(EndpointReferenceType.class);
 				} catch (Exception e) {
 					throw new ResourceException("failed reconstruct primary resource's EPR", e);
 				}
+			}
 		}
 
 		// retrieve primary resource's certificate for duplication

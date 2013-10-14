@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="VcgrClientLib" name="vcgrJniLibs-build">
 
-	<import file="../../../init.build.xml"/>
+	<import file="../../../build-initial.xml"/>
 
 	<target name="jni-dirs" depends="init">
 		<mkdir dir="${basedir}/jni-libs"/>

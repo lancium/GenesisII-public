@@ -2,7 +2,8 @@ package edu.virginia.vcgr.genii.container.container.forks;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 import org.apache.axis.description.JavaServiceDesc;
@@ -58,7 +59,7 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 	@RWXMapping(RWXCategory.READ)
 	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR, String entryName) throws IOException
 	{
-		Collection<InternalEntry> ret = new LinkedList<InternalEntry>();
+		LinkedList<InternalEntry> ret = new LinkedList<InternalEntry>();
 
 		for (JavaServiceDesc desc : Container.getInstalledServices()) {
 			String serviceName = desc.getName();
@@ -83,6 +84,13 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 			}
 		}
 
+		Comparator<InternalEntry> comparator = new Comparator<InternalEntry>() {
+		    public int compare(InternalEntry c1, InternalEntry c2) {
+		    	return c1.getName().compareTo(c2.getName());
+		    }
+		};
+
+		Collections.sort(ret, comparator);		
 		return ret;
 	}
 }

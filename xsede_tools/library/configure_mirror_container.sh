@@ -37,7 +37,7 @@ else
     exit 1
   fi
 
-  ddir="${GENII_INSTALL_DIR}/deployments/${BACKUP_DEPLOYMENT_NAME}"
+  ddir="${DEPLOYMENTS_ROOT}/${BACKUP_DEPLOYMENT_NAME}"
   if [ -d "$ddir" ]; then
     echo "Warning--Erasing directory $ddir"
     \rm -rf "$ddir"

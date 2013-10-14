@@ -60,15 +60,15 @@ public class OpenAuthZProvider implements IAuthZProvider
 	}
 
 	@Override
-	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		RWXCategory category, String errorText)
+	public boolean
+		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
 	{
 		return true;
 	}
 
 	@Override
 	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation, String errorText)
+		Class<?> serviceClass, Method operation)
 	{
 		return true; // all is allowed.
 	}

@@ -21,6 +21,6 @@ if [ -z "$user" ]; then
 fi
 
 $GENII_INSTALL_DIR/grid script local:$XSEDE_TEST_ROOT/tools/xsede_admin/create-xsede-user.xml "$user"
-$GENII_INSTALL_DIR/grid chmod $SUBMIT_GROUP +x "$USERS_LOC/$user"
+$GENII_INSTALL_DIR/grid chmod $SUBMIT_GROUP +rx "$USERS_LOC/$user"
 $GENII_INSTALL_DIR/grid ln $SUBMIT_GROUP "$USERS_LOC/$user/$(basename $SUBMIT_GROUP)"
 

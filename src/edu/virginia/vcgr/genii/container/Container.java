@@ -121,6 +121,7 @@ public class Container extends ApplicationBase
 			System.err.println("Exiting due to OSGi startup failure.");
 			System.exit(1);
 		}
+		SecurityUtilities.initializeSecurity();
 
 		try {
 			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));

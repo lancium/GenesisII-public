@@ -59,7 +59,6 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -75,7 +74,6 @@ import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration
 import edu.virginia.vcgr.genii.container.kerbauthn.KerbAuthnServiceImpl;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
-import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResourceProvider;
 import edu.virginia.vcgr.genii.security.RWXCategory;
@@ -96,7 +94,8 @@ import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 
 @GeniiServiceConfiguration(resourceProvider = RNSDBResourceProvider.class)
-public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implements X509AuthnPortType, BaggageAggregatable
+public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implements X509AuthnPortType
+// , BaggageAggregatable
 {
 	static private Log _logger = LogFactory.getLog(X509AuthnServiceImpl.class);
 
@@ -144,32 +143,6 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	{
 		super.preDestroy();
 		preDestroy(_resource);
-	}
-
-	@Override
-	public ArrayList<RequestSecurityTokenResponseType> aggregateBaggageTokens(RequestSecurityTokenType request)
-		throws java.rmi.RemoteException
-	{
-		ArrayList<RequestSecurityTokenResponseType> gatheredResponses = new ArrayList<RequestSecurityTokenResponseType>();
-		Collection<InternalEntry> entries = _resource.retrieveEntries(null);
-
-		for (InternalEntry entry : entries) {
-			try {
-				EndpointReferenceType idpEpr = entry.getEntryReference();
-				// create a proxy to the remote idp and invoke it.
-				X509AuthnPortType idp = ClientUtils.createProxy(X509AuthnPortType.class, idpEpr);
-				RequestSecurityTokenResponseType[] responses = idp.requestSecurityToken2(request);
-				if (responses != null) {
-					for (RequestSecurityTokenResponseType response : responses) {
-						gatheredResponses.add(response);
-					}
-				}
-			} catch (Exception e) {
-				_logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
-			}
-		}
-
-		return gatheredResponses;
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
@@ -281,7 +254,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			// add the listed tokens.
 			if (theThis instanceof BaggageAggregatable) {
 				BaggageAggregatable bagger = (BaggageAggregatable) theThis;
-				responseArray.addAll(bagger.aggregateBaggageTokens(request));
+				responseArray.addAll(bagger.aggregateBaggageTokens(resource, request));
 			} else {
 				_logger.error("unknown type to aggregate baggage for: " + theThis.getClass().getName());
 			}
@@ -464,10 +437,10 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 		NuCredential credential = RNSContainerUtilities.loadRNSResourceCredential(resource);
 		AxisCredentialWallet creds = new AxisCredentialWallet();
-		_logger.info("resource's credential is: " + credential.toString());
+		_logger.debug("resource's credential is: " + credential.toString());
 
 		if (delegateToChain == null) {
-			_logger.info("delegate to chain was null...  ignoring credential.");
+			_logger.debug("delegate to chain was null...  ignoring credential.");
 		} else {
 			// delegate to the chain we were given...
 			// Get this resource's assertion, key and cert material

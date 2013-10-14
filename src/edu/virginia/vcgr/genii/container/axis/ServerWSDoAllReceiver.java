@@ -85,7 +85,6 @@ import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
 import edu.virginia.vcgr.genii.security.credentials.X509Identity;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
-import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 public class ServerWSDoAllReceiver extends WSDoAllReceiver
 {
@@ -144,7 +143,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			throw new AxisFault(msg);
 		}
 
-		int concurrencyLevel;  // snapshot for logging the client count.
+		int concurrencyLevel; // snapshot for logging the client count.
 		synchronized (_concurrentCalls) {
 			_concurrentCalls++;
 			// snapshot client count here to avoid logging inside synchronization.
@@ -369,8 +368,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	 * 
 	 */
 	public static Collection<NuCredential> authenticateBearerCredentials(ArrayList<NuCredential> bearerCredentials,
-		ArrayList<X509Certificate[]> authenticatedCertChains, X509Certificate[] targetCertChain) throws AuthZSecurityException,
-		GeneralSecurityException
+		ArrayList<X509Certificate[]> authenticatedCertChains, X509Certificate[] callerTLSCert, ICallingContext callContext)
+		throws AuthZSecurityException, GeneralSecurityException
 	{
 		HashSet<NuCredential> retval = new HashSet<NuCredential>();
 
@@ -396,19 +395,38 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					continue; // no longer anything to check on that one; we don't want it.
 				}
 
-				/*
-				 * this section came from the days when we were always running on tls certificates
-				 * as the resource identities. it cannot be in place any more because it hinders the
-				 * new usage of trust delegations, which are not always from the connecting
-				 * identity, but which are still totally valid.
-				 */
-				boolean enable_old_credential_checking = false;
-				if (enable_old_credential_checking) {
-					if (_logger.isTraceEnabled())
-						_logger.trace("credential to test has first delegatee: "
-							+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
-							+ assertion.getOriginalAsserter()[0].getSubjectDN());
+				// discover when the sender trusts a credential, and include it if there's a
+				// matching pass through identity.
+				if (callerTLSCert[0].equals(assertion.getOriginalAsserter()[0])) {
+					if (_logger.isDebugEnabled())
+						_logger.debug("found an assertion matching the target TLS cert chain: " + assertion.toString());
+					X509Certificate passThrough =
+						(X509Certificate) callContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
+					if (passThrough != null) {
+						if (_logger.isDebugEnabled())
+							_logger.debug("got a pass through cert, checking next: " + passThrough.getSubjectDN().toString());
+						if (assertion.getDelegatee()[0].equals(passThrough)) {
+							X509Certificate[] pt = new X509Certificate[1];
+							pt[0] = passThrough;
+							// found a matching pass-through identity, so allow the caller to act as
+							// this.
+							X509Identity x509 = new X509Identity(pt, IdentityType.CONNECTION);
+							_logger.debug("found matching pass-through identity for: " + x509.toString());
+							retval.add(x509);
+						}
+					} else {
+						// downgrade this!
+						_logger.debug("did not get a pass through credential.");
+					}
+				}
 
+				if (_logger.isTraceEnabled())
+					_logger.trace("credential to test has first delegatee: "
+						+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
+						+ assertion.getOriginalAsserter()[0].getSubjectDN());
+
+				boolean enable_trust_checking_that_fails = false;
+				if (enable_trust_checking_that_fails) {
 					// Verify that the request message signer is the same as the
 					// one of the holder-of-key certificates.
 					boolean match = false;
@@ -480,11 +498,16 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			 */
 			ArrayList<X509Certificate[]> authenticatedCertChains = new ArrayList<X509Certificate[]>();
 
+			// ensure that we aren't fooled by a malicious client into accepting their view of
+			// reality.
+			callContext.removeProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
+
 			// Grab the client-hello authenticated SSL cert-chain (if there
 			// was one)
 			org.mortbay.jetty.Request req =
 				(org.mortbay.jetty.Request) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
 			Object transport = req.getConnection().getEndPoint().getTransport();
+			X509Certificate[] clientSslCertChain = null;
 			if (transport instanceof SSLSocket) {
 				boolean stillStarting;
 				synchronized (_inStartupMode) {
@@ -508,10 +531,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				}
 
 				try {
-					X509Certificate[] clientSslCertChain =
-						(X509Certificate[]) ((SSLSocket) transport).getSession().getPeerCertificates();
+					clientSslCertChain = (X509Certificate[]) ((SSLSocket) transport).getSession().getPeerCertificates();
 					if (clientSslCertChain != null) {
 						authenticatedCertChains.add(clientSslCertChain);
+
+						// remember last TLS certificate from this client, so we can compare later.
+						callContext.setSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT, clientSslCertChain[0]);
 					}
 				} catch (SSLPeerUnverifiedException unverified) {
 				}
@@ -520,11 +545,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			populateSAMLPropertiesInContext(workingContext, callContext);
 
 			// Get the destination certificate from the calling context
-			KeyAndCertMaterial targetKeyMaterial = ContextManager.getExistingContext().getActiveKeyAndCertMaterial();
-			X509Certificate[] targetCertChain = null;
-			if (targetKeyMaterial != null) {
-				targetCertChain = targetKeyMaterial._clientCertChain;
-			}
+			/*
+			 * KeyAndCertMaterial targetKeyMaterial =
+			 * ContextManager.getExistingContext().getActiveKeyAndCertMaterial(); X509Certificate[]
+			 * targetCertChain = null; if (targetKeyMaterial != null) { targetCertChain =
+			 * targetKeyMaterial._clientCertChain; }
+			 */
 
 			// Retrieve the message-level cert-chains that have been
 			// recorded in the signature-Crypto instance. (Unfortunately
@@ -540,12 +566,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			ArrayList<NuCredential> bearerCredentials =
 				(ArrayList<NuCredential>) callContext.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
 			Collection<NuCredential> authenticatedCallerCreds =
-				authenticateBearerCredentials(bearerCredentials, authenticatedCertChains, targetCertChain);
+				authenticateBearerCredentials(bearerCredentials, authenticatedCertChains, clientSslCertChain, callContext);
 
-			// Finally add all of our callerIds to the calling-context's
-			// outgoing credentials
+			// Finally add all of our callerIds to the calling-context's outgoing credentials.
 			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 			transientCredentials.addAll(authenticatedCallerCreds);
+
 			// Grab the operation method from the message context
 			org.apache.axis.description.OperationDesc desc = messageContext.getOperation();
 			if (desc == null) {
@@ -569,10 +595,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 
 			// Let the authZ handler make the decision.
-			String errorText = "";
 			boolean accessOkay =
 				authZHandler.checkAccess(authenticatedCallerCreds, resource, (jDesc == null) ? operation.getDeclaringClass()
-					: jDesc.getImplClass(), operation, errorText);
+					: jDesc.getImplClass(), operation);
 
 			if (accessOkay) {
 				resource.commit();
@@ -580,7 +605,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				PermissionDeniedException temp =
 					new PermissionDeniedException(operation.getName(), ResourceManager.getResourceName(resource));
 				_logger.error("failed to check access: " + temp.getMessage());
-				_logger.error("error text is ==>" + errorText);
 				throw new AxisFault(temp.getMessage());
 			}
 		} catch (IOException e) {
@@ -719,10 +743,10 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 		String serviceName = ((ResourceKey) resource.getParentResourceKey()).getServiceName();
 		IAuthZProvider authZHandler = AuthZProviders.getProvider(serviceName);
-		String errorText = "";
-		boolean success = authZHandler.checkAccess(transientCredentials.getCredentials(), resource, category, errorText);
+		boolean success = authZHandler.checkAccess(transientCredentials.getCredentials(), resource, category);
 		if (!success) {
-			_logger.error("authorization failure with message:" + errorText);
+			_logger.error("authorization failure on " + ResourceManager.getResourceName(resource) + " for access "
+				+ category.toString());
 		}
 		return success;
 	}

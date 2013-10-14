@@ -87,7 +87,7 @@ function create_grid_certificates()
 {
   pushd $GENII_INSTALL_DIR &>/dev/null
 
-  local SECURITY_DIR="deployments/$DEPLOYMENT_NAME/security"
+  local SECURITY_DIR="$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/security"
 
   local SIGNING_PFX="$SECURITY_DIR/signing-cert.pfx"
   local SIGNING_ALIAS="signing-cert"
@@ -137,7 +137,7 @@ function get_root_privileges()
 {
   # login with rights to do everything we need.
   echo "Acquiring admin keystore superpowers..."
-  grid_chk keystoreLogin --password=keys local:$GENII_INSTALL_DIR/deployments/$DEPLOYMENT_NAME/security/admin.pfx
+  grid_chk keystoreLogin --password=keys local:$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/security/admin.pfx
 }
 
 ##############

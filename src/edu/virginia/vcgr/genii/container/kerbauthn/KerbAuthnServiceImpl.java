@@ -14,7 +14,6 @@
 package edu.virginia.vcgr.genii.container.kerbauthn;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
@@ -40,7 +39,6 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -51,9 +49,7 @@ import edu.virginia.vcgr.genii.container.commonauthn.ReplicaSynchronizer.STSReso
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
-import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResourceProvider;
-import edu.virginia.vcgr.genii.container.x509authn.BaggageAggregatable;
 import edu.virginia.vcgr.genii.container.x509authn.X509AuthnServiceImpl;
 import edu.virginia.vcgr.genii.kerbauthn.KerbAuthnPortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
@@ -61,7 +57,8 @@ import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = RNSDBResourceProvider.class, defaultAuthZProvider = KerbAuthZProvider.class)
-public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implements KerbAuthnPortType, BaggageAggregatable
+public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implements KerbAuthnPortType
+// , BaggageAggregatable
 {
 	static private Log _logger = LogFactory.getLog(KerbAuthnServiceImpl.class);
 
@@ -156,33 +153,27 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		preDestroy(_resource);
 	}
 
-	@Override
-	public ArrayList<RequestSecurityTokenResponseType> aggregateBaggageTokens(RequestSecurityTokenType request)
-		throws java.rmi.RemoteException
-	{
-		ArrayList<RequestSecurityTokenResponseType> gatheredResponses = new ArrayList<RequestSecurityTokenResponseType>();
-		Collection<InternalEntry> entries = _resource.retrieveEntries(null);
-
-		for (InternalEntry entry : entries) {
-			try {
-				EndpointReferenceType idpEpr = entry.getEntryReference();
-
-				// create a proxy to the remote idp and invoke it
-				KerbAuthnPortType idp = ClientUtils.createProxy(KerbAuthnPortType.class, idpEpr);
-				RequestSecurityTokenResponseType[] responses = idp.requestSecurityToken2(request);
-
-				if (responses != null) {
-					for (RequestSecurityTokenResponseType response : responses) {
-						gatheredResponses.add(response);
-					}
-				}
-			} catch (Exception e) {
-				_logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
-			}
-		}
-
-		return gatheredResponses;
-	}
+	/*
+	 * @Override public ArrayList<RequestSecurityTokenResponseType>
+	 * aggregateBaggageTokens(RequestSecurityTokenType request) throws java.rmi.RemoteException {
+	 * ArrayList<RequestSecurityTokenResponseType> gatheredResponses = new
+	 * ArrayList<RequestSecurityTokenResponseType>(); Collection<InternalEntry> entries =
+	 * _resource.retrieveEntries(null);
+	 * 
+	 * for (InternalEntry entry : entries) { try { EndpointReferenceType idpEpr =
+	 * entry.getEntryReference();
+	 * 
+	 * // create a proxy to the remote idp and invoke it X509AuthnPortType idp =
+	 * ClientUtils.createProxy(X509AuthnPortType.class, idpEpr); RequestSecurityTokenResponseType[]
+	 * responses = idp.requestSecurityToken2(request);
+	 * 
+	 * if (responses != null) { for (RequestSecurityTokenResponseType response : responses) {
+	 * gatheredResponses.add(response); } } } catch (Exception e) {
+	 * _logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(),
+	 * e); } }
+	 * 
+	 * return gatheredResponses; }
+	 */
 
 	@RWXMapping(RWXCategory.EXECUTE)
 	public RequestSecurityTokenResponseType[] requestSecurityToken2(RequestSecurityTokenType request)

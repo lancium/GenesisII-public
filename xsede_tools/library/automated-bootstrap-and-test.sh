@@ -181,7 +181,7 @@ pushd $GENII_INSTALL_DIR &>/dev/null
 if [ -z "$DIFFERENT_PORT" ]; then
   DIFFERENT_PORT=10402
 fi
-bash change-port.sh deployments/$DEPLOYMENT_NAME 18080 $DIFFERENT_PORT
+bash change-port.sh $DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME 18080 $DIFFERENT_PORT
   # we don't check for failure here, because a previous bootstrap may have
   # run against the same build, and we won't change those port numbers again.
 popd &>/dev/null

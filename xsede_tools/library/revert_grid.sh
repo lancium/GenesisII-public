@@ -72,7 +72,8 @@ fi
 if [ ! -d "$GENII_INSTALL_DIR/deployments" ]; then
   mkdir "$GENII_INSTALL_DIR/deployments"
 fi
-\cp -r -f -n deployments/* "$GENII_INSTALL_DIR/deployments"
+# for this to work, the container.properties does need to exist.
+\cp -r -f -n deployments/* "$DEPLOYMENTS_ROOT"
 retval=$(($retval + $?))
 \rm -rf "$newdir"
 if [ $retval -ne 0 ]; then echo "===> script failure cleaning up temporary saved grid, exiting."; exit 1;  fi

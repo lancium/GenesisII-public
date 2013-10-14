@@ -249,16 +249,15 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 
 	@Override
 	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation, String errorText)
+		Class<?> serviceClass, Method operation)
 	{
 		RWXCategory category = RWXManager.lookup(serviceClass, operation);
 
-		if (!checkAccess(authenticatedCallerCredentials, resource, category, errorText)) {
+		if (!checkAccess(authenticatedCallerCredentials, resource, category)) {
 			String msg = "denying access for operation: " + operation.getName();
 			String asset = ResourceManager.getResourceName(resource);
-			msg.concat(asset + " at " + ProgramTools.showLastFewOnStack(4));
+			msg = msg.concat("on " + asset + " at " + ProgramTools.showLastFewOnStack(4));
 			_logger.error(msg);
-			errorText = msg;
 			return false;
 		}
 		return true;
@@ -279,20 +278,10 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	}
 
 	@Override
-	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		RWXCategory category, String errorText)
+	public boolean
+		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
 	{
-		String messagePrefix = "checkAccess for " + category + " on ";
-		String resourceName = null;
-		try {
-			resourceName = (String) resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME);
-		} catch (Throwable e) {
-			// ignore.
-		}
-		if (resourceName == null) {
-			resourceName = resource.getKey();
-		}
-		messagePrefix = messagePrefix.concat(resourceName + " ");
+		String messagePrefix = "checkAccess for " + category + " on " + ResourceManager.getResourceName(resource) + " ";
 
 		try {
 			ICallingContext callContext = ContextManager.getExistingContext();
@@ -326,9 +315,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				} else if (cred instanceof TrustCredential) {
 					TrustCredential sa = (TrustCredential) cred;
 					if (sa.checkRWXAccess(category)) {
-						// check the root identity of the trust delegation to see if they have
-						// access.
-						// _logger.debug("trying normal acl check");
+						// check root identity of trust delegation to see if it has access.
 						X509Identity ia = (X509Identity) sa.getRootIdentity();
 						if (checkAclAccess(ia, category, acl)) {
 							if (_logger.isDebugEnabled())
@@ -347,23 +334,19 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				return true;
 			}
 
-			// Nobody appreciates us
+			// Nobody appreciates us.
 			if (_logger.isTraceEnabled()) {
-				errorText = messagePrefix + " was not granted for credential set: ";
-				blurtCredentials(errorText, authenticatedCallerCredentials);
+				blurtCredentials(messagePrefix + " was not granted for credential set: ", authenticatedCallerCredentials);
 			}
 			return false;
 		} catch (AuthZSecurityException ase) {
-			errorText = "failure, saw authorization security exception for " + messagePrefix + ":" + ase.getMessage();
-			_logger.error(errorText);
+			_logger.error("failure, saw authorization security exception for " + messagePrefix + ":" + ase.getMessage());
 			return false;
 		} catch (IOException e) {
-			errorText = "failure, saw IO exception processing credential for " + messagePrefix + ":" + e.getMessage();
-			_logger.error(errorText);
+			_logger.error("failure, saw IO exception processing credential for " + messagePrefix + ":" + e.getMessage());
 			return false;
 		} catch (ConfigurationException e) {
-			errorText = "saw config exception for " + messagePrefix + ":" + e.getMessage();
-			_logger.error(errorText);
+			_logger.error("saw config exception for " + messagePrefix + ":" + e.getMessage());
 			return false;
 		}
 	}

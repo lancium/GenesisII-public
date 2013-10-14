@@ -1,7 +1,13 @@
+
+# container.properties is actually used by both client and container installations.
+
 #edu.virginia.vcgr.genii.container.user-dir=env-GENII_USER_DIR
   # the env-GENII_USER_DIR value above will be translated into the value of
   # the GENII_USER_DIR variable in the environment.
 
-edu.virginia.vcgr.genii.container.deployment-name=example
+#edu.virginia.vcgr.genii.container.deployment-name=example
   # this should be changed to the actual deployment name in use.
+
+#edu.virginia.vcgr.genii.container.deployment-directory=
+  # absolute path of the deployments folder for this installation.
 
