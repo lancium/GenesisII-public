@@ -28,10 +28,10 @@ public class DeleteFilePlugin extends AbstractCombinedUIMenusPlugin
 			try {
 				contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 
-
 				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 				RNSPath path = paths.iterator().next();
-				// We really need to figure out how to refresh directories after deleting things - ASG
+				// We really need to figure out how to refresh directories after deleting things -
+				// ASG
 				path.delete();
 
 				return;
@@ -49,8 +49,9 @@ public class DeleteFilePlugin extends AbstractCombinedUIMenusPlugin
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
 
-		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS and NOT (isContainer, isBES ...
-		// Perhaps should be even more selective, 
+		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS
+		// and NOT (isContainer, isBES ...
+		// Perhaps should be even more selective,
 		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
 		return (tp.isByteIO() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
 	}

@@ -28,7 +28,6 @@ public class DeleteDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 	static private Log _logger = LogFactory.getLog(DeleteDirectoryPlugin.class);
 	JFileChooser _fileDialog = new JFileChooser();
 
-
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
@@ -42,24 +41,27 @@ public class DeleteDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 			try {
 				contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
-				
+
 				RNSPath path = paths.iterator().next();
-				
-				// We really need to figure out how to refresh directories after deleting things - ASG
-				int reply = JOptionPane.showConfirmDialog(context.ownerComponent(), "Are you sure you want to recursively delete? " + path.getName(), "Yes - DELETE WITHOUT UNDO " + path.getName(), JOptionPane.YES_NO_OPTION);
-                if (reply == JOptionPane.YES_OPTION)
-                {
-                	RmTool rmtool = new RmTool();
-                	PathOutcome ret;
-                	ret=rmtool.rm(path,true,false);
-        			if (PathOutcome.OUTCOME_SUCCESS.differs(ret)) {
-        				String msg = "failed to delete the chosen path: " + path.getName() + " because " + PathOutcome.outcomeText(ret);
-        				LoggingTarget.logInfo(msg, null);
-        				_logger.error(msg);
-        			}
-        			//context.endpointRetriever().refresh();
-                	//path.delete();
-                }
+
+				// We really need to figure out how to refresh directories after deleting things -
+				// ASG
+				int reply =
+					JOptionPane.showConfirmDialog(context.ownerComponent(), "Are you sure you want to recursively delete? "
+						+ path.getName(), "Yes - DELETE WITHOUT UNDO " + path.getName(), JOptionPane.YES_NO_OPTION);
+				if (reply == JOptionPane.YES_OPTION) {
+					RmTool rmtool = new RmTool();
+					PathOutcome ret;
+					ret = rmtool.rm(path, true, false);
+					if (PathOutcome.OUTCOME_SUCCESS.differs(ret)) {
+						String msg =
+							"failed to delete the chosen path: " + path.getName() + " because " + PathOutcome.outcomeText(ret);
+						LoggingTarget.logInfo(msg, null);
+						_logger.error(msg);
+					}
+					// context.endpointRetriever().refresh();
+					// path.delete();
+				}
 				return;
 			} catch (Throwable cause) {
 				ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
@@ -75,8 +77,9 @@ public class DeleteDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
 
-		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS and NOT (isContainer, isBES ...
-		// Perhaps should be even more selective, 
+		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS
+		// and NOT (isContainer, isBES ...
+		// Perhaps should be even more selective,
 		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
 		return (tp.isRNS() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
 	}

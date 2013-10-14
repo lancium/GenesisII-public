@@ -14,12 +14,15 @@ import java.util.Collection;
 
 import javax.swing.JComponent;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
+import edu.virginia.vcgr.genii.client.cmd.tools.CopyTool;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -40,6 +43,7 @@ import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 
 public class EditPlugin extends AbstractCombinedUIMenusPlugin
 {
+	static private Log _logger = LogFactory.getLog(EditPlugin.class);
 	static private final int BUFFER_SIZE = 1024 * 8;
 
 	static private class DownloadTask extends AbstractContextSwitchingTask<File>
@@ -58,7 +62,7 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 		{
 
 			File toEdit = null;
-			System.out.println("ASG: downloading" + _sourcePath);
+			// System.out.println("ASG: downloading" + _sourcePath);
 
 			String extension = _sourcePath.getName();
 			int index = extension.lastIndexOf('.');
@@ -127,7 +131,7 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 
 				if (isReadOnly) {
 					tmpFile.setReadOnly();
-					System.out.println("ASG: readonly" + tmpFile.getPath());
+					// System.out.println("ASG: readonly" + tmpFile.getPath());
 				}
 
 				toEdit = tmpFile;
@@ -139,7 +143,7 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 				if (tmpFile != null)
 					tmpFile.delete();
 			}
-			System.out.println("ASG: downloaded " + toEdit.getName() + " " + toEdit.length());
+			// System.out.println("ASG: downloaded " + toEdit.getName() + " " + toEdit.length());
 			return toEdit;
 		}
 	}
@@ -151,8 +155,7 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 		private RNSPath _source;
 		private boolean _edit;
 
-		private DownloadTaskCompletionListener(JComponent ownerComponent, UIContext context, RNSPath source,
-			boolean edit)
+		private DownloadTaskCompletionListener(JComponent ownerComponent, UIContext context, RNSPath source, boolean edit)
 		{
 			_ownerComponent = ownerComponent;
 			_context = context;
@@ -160,52 +163,49 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 			_edit = edit;
 		}
 
-		
 		private int WaitForEditor(String filestr)
 		{
-			/*							
-			 * WaitForEditor(String editFile) that searches the process list on windows or unix looking for 
-			 * a process opened with an argument that includes the specified file name that will be of the form grid<somefilename>integers
+			/*
+			 * WaitForEditor(String editFile) that searches the process list on windows or unix
+			 * looking for a process opened with an argument that includes the specified file name
+			 * that will be of the form grid<somefilename>integers
 			 * 
-			 * We start by getting this list of processes using some form of ps, note this varies by OS.
-			 * We then search for the existence of the file string in the output line.
-			 * If the processes is still running, we sleep for a second and do it all over again.
-			 * Written by ASG while on sabbatical in Munich. September 10, 2013
+			 * We start by getting this list of processes using some form of ps, note this varies by
+			 * OS. We then search for the existence of the file string in the output line. If the
+			 * processes is still running, we sleep for a second and do it all over again. Written
+			 * by ASG while on sabbatical in Munich. September 10, 2013
 			 */
-			int found=0, everFound=-1;
-			do  {
-				found=0;
+			int found = 0, everFound = -1;
+			do {
+				found = 0;
 
 				try {
 					String line;
 					Process p;
 
 					String osName = System.getProperty("os.name");
-					if (osName.contains("OS X")) { 
-						/* Mac OS code */	
+					if (osName.contains("OS X")) {
+						/* Mac OS code */
 						p = Runtime.getRuntime().exec("ps ef ");
-					}
-					else if (osName.contains("Windows")) { 
+					} else if (osName.contains("Windows")) {
 						/* Windows code */
 
-						p = Runtime.getRuntime().exec
-								(System.getenv("windir") +"\\system32\\"+"tasklist.exe /v");
-					}
-					else  if (osName.contains("")) { 
+						p = Runtime.getRuntime().exec(System.getenv("windir") + "\\system32\\" + "tasklist.exe /v");
+					} else if (osName.contains("")) {
 						p = Runtime.getRuntime().exec("ps ef ");
-						/* Unix OS code */ 
-					}
-					else return -1;
-					BufferedReader input =
-							new BufferedReader(new InputStreamReader(p.getInputStream()));
+						/* Unix OS code */
+					} else
+						return -1;
+					BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 					while ((line = input.readLine()) != null) {
-						if (line.indexOf(filestr) >= 0 ) {
+						if (line.indexOf(filestr) >= 0) {
 							// Found it, sleep
-							found=1;
-							everFound=1;
+							found = 1;
+							everFound = 1;
 							continue;
 						}
-						//System.out.println("FILE is " + filestr + " process entry is " + line); //<-- Parse data here.
+						// System.out.println("FILE is " + filestr + " process entry is " + line);
+						// //<-- Parse data here.
 					}
 					input.close();
 				} catch (Exception err) {
@@ -218,7 +218,7 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} while (found==1);
+			} while (found == 1);
 
 			return everFound;
 		}
@@ -227,32 +227,38 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 		public void taskCompleted(Task<File> task, File result)
 		{
 			try {
-				// System.out.println("ASG: about to call external application with input " + result.getAbsolutePath());
-				//		ASG August 18, 2013, change to not use _application, instead the OS file associations
-				if (Desktop.isDesktopSupported()){
-					Desktop desktop=Desktop.getDesktop();
-					if (desktop.isSupported(Desktop.Action.OPEN)) {				
+				// System.out.println("ASG: about to call external application with input " +
+				// result.getAbsolutePath());
+				// ASG August 18, 2013, change to not use _application, instead the OS file
+				// associations
+				if (Desktop.isDesktopSupported()) {
+					Desktop desktop = Desktop.getDesktop();
+					if (desktop.isSupported(Desktop.Action.OPEN)) {
 						try {
 							long lastModified = result.lastModified();
 							if (!_edit) {
 								if (_ownerComponent.getTopLevelAncestor() instanceof ClientApplication) {
-									   ClientApplication top = (ClientApplication) _ownerComponent.getTopLevelAncestor(); 
-									   top.addStatusLine("Please note:  you are viewing "+_source.getName()+", updates WILL NOT be propagated.",
-												"Double clicking on a file invokes the viewer, not the editor. Changes made with the viewer WILL NOT be propagated back to the GFFS.");
+									ClientApplication top = (ClientApplication) _ownerComponent.getTopLevelAncestor();
+									top.addStatusLine(
+										"Please note:  you are viewing " + _source.getName()
+											+ ", updates WILL NOT be propagated.",
+										"Double clicking on a file invokes the viewer, not the editor. Changes made with the viewer WILL NOT be propagated back to the GFFS.");
 								}
-							}
-							else {
+							} else {
 								if (_ownerComponent.getTopLevelAncestor() instanceof ClientApplication) {
-									   ClientApplication top = (ClientApplication) _ownerComponent.getTopLevelAncestor(); 
-									   top.addStatusLine("Please note:  you are editing "+_source.getName()+", the GUI remains locked while editing due to how Java Swing is implemented.");
+									ClientApplication top = (ClientApplication) _ownerComponent.getTopLevelAncestor();
+									top.addStatusLine("Please note:  you are editing " + _source.getName()
+										+ ", the GUI remains locked while editing due to how Java Swing is implemented.");
 								}
 							}
 							desktop.open(result);
-							if (!_edit) return;
+							if (!_edit)
+								return;
 							Thread.sleep(3000); // Wait for the application to start
 							if (WaitForEditor(result.getName()) < 0) {
 								System.err.println("Could not determine editor status");
-							};
+							}
+							;
 							if (result.lastModified() > lastModified) {
 								// The file was updated
 								// Now upload
@@ -261,19 +267,17 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 									.createMonitor(_ownerComponent, "Uploading File", "Uploading edited file.", 1L,
 										new UploadTask(_context, result, _source),
 										new UploadCompletionListener(_context, _ownerComponent, result)).start();
-							}
-							else {
+							} else {
 								// We need to clean up and throw away the old files
-								result.delete();								
-							}															
+								result.delete();
+							}
+						} catch (IOException ioe) {
+							_logger.error("Cannot perform the given operation on the file: " + result.getAbsolutePath());
 						}
-						catch (IOException ioe) {
-				            //ioe.printStackTrace();
-				            System.out.println("ASG: Cannot perform the given operation to the " + result.getAbsolutePath() + " file");
-				         }
-			        }
+					}
 				}
-				//_application.launch(result, new ExternalApplicationCallbackImpl(_ownerComponent, _context, _source, result));
+				// _application.launch(result, new ExternalApplicationCallbackImpl(_ownerComponent,
+				// _context, _source, result));
 
 			} catch (Throwable cause) {
 				ErrorHandler.handleError(_context, _ownerComponent, cause);
@@ -311,7 +315,7 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 		{
 			InputStream in = null;
 			OutputStream out = null;
-			System.out.println("ASG: should be uploading 2ASG");
+			// System.out.println("ASG: should be uploading 2ASG");
 
 			try {
 				in = new FileInputStream(_source);
@@ -374,8 +378,9 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 
 	static public void performEdit(JComponent ownerComponent, UIContext context, RNSPath path, boolean edit)
 	/*
-	 * ASG 9-28-2013 Added boolean edit, to indicate whether it is an edit op or a view op
-	 * Also removed the external application type stuff, we're just going to use the java desktop to find it for us.
+	 * ASG 9-28-2013 Added boolean edit, to indicate whether it is an edit op or a view op Also
+	 * removed the external application type stuff, we're just going to use the java desktop to find
+	 * it for us.
 	 */
 	{
 		Closeable contextToken = null;
@@ -384,19 +389,18 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 			ContextManager.temporarilyAssumeContext(context.callingContext());
 			ProgressMonitorFactory factory = context.progressMonitorFactory();
 
-	
-
 			/*
-			String mimeType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(path.getName());
-			ExternalApplication externalApplication = ApplicationDatabase.database().getExternalApplication(mimeType);			if (externalApplication == null) {
-				JOptionPane.showMessageDialog(ownerComponent, "No editor registered for this file type!",
-					"No Editor Available", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+			 * String mimeType =
+			 * MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(path.getName());
+			 * ExternalApplication externalApplication =
+			 * ApplicationDatabase.database().getExternalApplication(mimeType); if
+			 * (externalApplication == null) { JOptionPane.showMessageDialog(ownerComponent,
+			 * "No editor registered for this file type!", "No Editor Available",
+			 * JOptionPane.ERROR_MESSAGE); return; }
 			 */
 			factory.createMonitor(ownerComponent, "Edit", "Downloading grid file for edit.", 1L,
-				new DownloadTask(context, path),
-				new DownloadTaskCompletionListener(ownerComponent, context, path, edit)).start();
+				new DownloadTask(context, path), new DownloadTaskCompletionListener(ownerComponent, context, path, edit))
+				.start();
 
 		} catch (Throwable cause) {
 			ErrorHandler.handleError(context, ownerComponent, cause);
@@ -418,7 +422,6 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-
 
 		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
 		return (tp.isByteIO() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));

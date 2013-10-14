@@ -35,14 +35,14 @@ public class Installation
 			throw new RuntimeException("Installation directory \"" + _installationDirectory + "\" does not exist.");
 		if (!_installationDirectory.isDirectory())
 			throw new RuntimeException("Installation path \"" + _installationDirectory + "\" is not a directory.");
-		
+
 		_logger.debug("got installation directory of: " + _installationDirectory.toString());
 
 		// special creation of container properties that's not static...
 		ContainerProperties cp = new ContainerProperties();
-		_deploymentsDirectory = new File(cp.getDeploymentsDirectory()); 
+		_deploymentsDirectory = new File(cp.getDeploymentsDirectory());
 		_logger.debug("got deployments directory of: " + _deploymentsDirectory.toString());
-		
+
 		_webAppDirectory = new File(_installationDirectory, WEBAPPS_DIR_NAME);
 		if (!_webAppDirectory.exists())
 			throw new RuntimeException("Installation is corrupt -- couldn't find " + WEBAPPS_DIR_NAME + " directory.");

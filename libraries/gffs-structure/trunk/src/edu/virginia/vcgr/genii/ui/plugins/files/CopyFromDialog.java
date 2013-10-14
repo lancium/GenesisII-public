@@ -45,10 +45,11 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS and NOT (isContainer, isBES ...
-		// Perhaps should be even more selective, 
+		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS
+		// and NOT (isContainer, isBES ...
+		// Perhaps should be even more selective,
 		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
-		return ((tp.isRNS()|| tp.isByteIO() ) && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
+		return ((tp.isRNS() || tp.isByteIO()) && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 					.uiContext()
 					.progressMonitorFactory()
 					.createMonitor(context.ownerComponent(), "Copy from local filesystem", "", 1000L,
-						new SaveToTask("local:" +_fileDialog.getSelectedFile().toString(), path.pwd()), null).start();
+						new SaveToTask("local:" + _fileDialog.getSelectedFile().toString(), path.pwd()), null).start();
 			}
 		} catch (Throwable cause) {
 			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
@@ -106,7 +107,7 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 		{
 			if (progressListener == null)
 				return 1;
-			PathOutcome ret = performSave( progressListener);
+			PathOutcome ret = performSave(progressListener);
 			if (PathOutcome.OUTCOME_SUCCESS.differs(ret)) {
 				String msg = "failed to save to the chosen path: " + target + " because " + PathOutcome.outcomeText(ret);
 				LoggingTarget.logInfo(msg, null);

@@ -177,8 +177,7 @@ public class ClientUtils
 				retval =
 					generateKeyAndCertMaterial(
 						Math.max(edu.virginia.vcgr.genii.security.SecurityConstants.dailyCredentialExpirationMillis,
-							validUntil.getTime() - System.currentTimeMillis() + 10000),							
-							TimeUnit.MILLISECONDS);
+							validUntil.getTime() - System.currentTimeMillis() + 10000), TimeUnit.MILLISECONDS);
 				callContext.setActiveKeyAndCertMaterial(retval);
 				updated = true;
 
@@ -245,7 +244,7 @@ public class ClientUtils
 		// whack any current key and certificate.
 		callContext.setActiveKeyAndCertMaterial(null);
 
-		TransientCredentials.globalLogout(callContext);		
+		TransientCredentials.globalLogout(callContext);
 	}
 
 	static public Method getLocatorPortTypeMethod(Class<?> locator) throws ResourceException

@@ -31,10 +31,11 @@ public class ContainerProperties extends Properties
 	/**
 	 * for all normal run-time classes, the container properties is accessed this way.
 	 */
-	static public ContainerProperties getContainerProperties() {
+	static public ContainerProperties getContainerProperties()
+	{
 		return _realContainerProperties;
 	}
-	
+
 	/**
 	 * This is not to be used in general; normally the containerProperties member should be used.
 	 */

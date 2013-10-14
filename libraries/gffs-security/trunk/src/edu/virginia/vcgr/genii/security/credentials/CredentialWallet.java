@@ -182,10 +182,10 @@ public class CredentialWallet implements Externalizable, Describable
 	/**
 	 * if credentials have been added willy nilly, possibly without their being linked together,
 	 * this will find and relink all of them properly. the only thing remaining in the wallet will
-	 * be isolated assertions or an assertion chain's most recent element.  if removeInvalid is
-	 * true, then any expired or invalid delegations will be trashed.  it is important not to
-	 * clear those out during deserialization though or one will not get back any credential,
-	 * which leads to unanticipated exceptions. 
+	 * be isolated assertions or an assertion chain's most recent element. if removeInvalid is true,
+	 * then any expired or invalid delegations will be trashed. it is important not to clear those
+	 * out during deserialization though or one will not get back any credential, which leads to
+	 * unanticipated exceptions.
 	 */
 	public void reattachDelegations(boolean removeInvalid)
 	{

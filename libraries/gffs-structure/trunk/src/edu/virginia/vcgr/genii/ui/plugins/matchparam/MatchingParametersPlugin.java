@@ -86,7 +86,8 @@ public class MatchingParametersPlugin extends AbstractCombinedUIMenusPlugin
 
 		TypeInformation typeInfo = selectedDescriptions.iterator().next().typeInformation();
 
-			// ASG: 09-13-2013 - Fixed this to check if the endpoint is a BES or BESContainer, not whether it had a container ID
+		// ASG: 09-13-2013 - Fixed this to check if the endpoint is a BES or BESContainer, not
+		// whether it had a container ID
 		// return typeInfo.getGenesisIIContainerID() != null;
 		return (typeInfo.isBES() || typeInfo.isBESContainer());
 	}

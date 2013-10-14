@@ -84,13 +84,15 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 			}
 		}
 
-		Comparator<InternalEntry> comparator = new Comparator<InternalEntry>() {
-		    public int compare(InternalEntry c1, InternalEntry c2) {
-		    	return c1.getName().compareTo(c2.getName());
-		    }
+		Comparator<InternalEntry> comparator = new Comparator<InternalEntry>()
+		{
+			public int compare(InternalEntry c1, InternalEntry c2)
+			{
+				return c1.getName().compareTo(c2.getName());
+			}
 		};
 
-		Collections.sort(ret, comparator);		
+		Collections.sort(ret, comparator);
 		return ret;
 	}
 }

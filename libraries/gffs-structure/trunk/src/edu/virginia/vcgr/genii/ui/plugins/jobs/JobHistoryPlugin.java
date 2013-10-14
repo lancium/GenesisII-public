@@ -102,7 +102,6 @@ public class JobHistoryPlugin extends AbstractCombinedUIMenusPlugin
 		TypeInformation typeInfo = selectedDescriptions.iterator().next().typeInformation();
 		// need to see if what we are really looking for
 		return (typeInfo.isBESActivity());
-	
-		
+
 	}
 }

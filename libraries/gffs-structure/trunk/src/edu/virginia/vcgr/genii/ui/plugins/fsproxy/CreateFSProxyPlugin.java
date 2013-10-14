@@ -106,7 +106,7 @@ public class CreateFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-		// ASG: 9-13-2013	This should be checking that it is a container ... not that is an RNS.
+		// ASG: 9-13-2013 This should be checking that it is a container ... not that is an RNS.
 		return selectedDescriptions.iterator().next().typeInformation().isContainer();
 	}
 }

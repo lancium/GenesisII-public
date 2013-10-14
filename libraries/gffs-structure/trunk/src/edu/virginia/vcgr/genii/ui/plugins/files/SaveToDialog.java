@@ -46,10 +46,11 @@ public class SaveToDialog extends AbstractCombinedUIMenusPlugin
 	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS and NOT (isContainer, isBES ...
-		// Perhaps should be even more selective, 
+		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS
+		// and NOT (isContainer, isBES ...
+		// Perhaps should be even more selective,
 		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
-		return ((tp.isRNS()|| tp.isByteIO() ) && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
+		return ((tp.isRNS() || tp.isByteIO()) && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
 	}
 
 	@Override
