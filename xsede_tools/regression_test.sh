@@ -175,18 +175,7 @@ popd &>/dev/null
 
 ##############
 
-echo Checking work area in $RNSPATH
-grid whoami
-if [ $(grep -ic "additional credentials" <$GRID_OUTPUT_FILE) -gt 0 ]; then
-  # set up the RNSPATH folder, in case it doesn't already exist.
-  grid mkdir --parents grid:$RNSPATH &>/dev/null
-  grid chmod grid:$RNSPATH +rwx $USERPATH
-  check_if_failed Could not give $USERPATH permission to the work area $RNSPATH
-else
-  echo Failed to find any credentials for running the regression tests.
-  echo Please use login or xsedeLogin to authenticate as a grid identity.
-  exit 1
-fi
+create_work_area
 
 ##############
 

@@ -68,6 +68,23 @@ function run_any_command()
 
 ##############
 
+# makes sure that the RNSPATH is established before tests run.
+function create_work_area()
+{
+  echo Checking work area in $RNSPATH
+  grid whoami
+  if [ $(grep -ic "additional credentials" <$GRID_OUTPUT_FILE) -gt 0 ]; then
+    # set up the RNSPATH folder, in case it doesn't already exist.
+    grid mkdir --parents grid:$RNSPATH &>/dev/null
+    grid chmod grid:$RNSPATH +rwx $USERPATH
+    check_if_failed Could not give $USERPATH permission to the work area $RNSPATH
+  else
+    echo Failed to find any credentials for running the regression tests.
+    echo Please use login or xsedeLogin to authenticate as a grid identity.
+    exit 1
+  fi
+}
+
 # a helper method above and beyond the normal grid helper function;
 # this should be called first, in oneTimeSetUp, in every test script that uses shunit.
 function sanity_test_and_init()
@@ -78,6 +95,8 @@ function sanity_test_and_init()
   fi
   # establish this for shunit so tests do not have to run in current directory.
   export SHUNIT_PARENT="$WORKDIR/$(basename $0)"
+
+  create_work_area
 
   # show who we're logged in as.
   echo -e "\nCurrently logged in to the grid as:"

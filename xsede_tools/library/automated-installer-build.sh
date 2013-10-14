@@ -124,6 +124,8 @@ popd
 build_installer 2073 genesis2_linux_client_64
 build_installer 3416 genesis2_linux_container_64
 build_installer 2088 genesis2_mac_client_64
+build_installer 5987 genesis2_linux_client_64_rpm
+build_installer 5991 genesis2_linux_client_64_deb
 
 ##############
 
