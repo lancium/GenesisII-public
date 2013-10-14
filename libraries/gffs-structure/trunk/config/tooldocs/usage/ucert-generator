@@ -1,0 +1,29 @@
+cert-generator --create-generator 
+        { --url <cert-generator-service-url> | <cert-generator-service-rns-path> } 
+        --ks-path=<local-path-issuer-key-store> 
+        --ks-pword=<issuer-key-store-password> 
+        --ks-alias=<issuer-key-store-alias>
+        --entry-pword=<issuer-key-password>
+        [ --default-validity=<validity seconds> ]
+        [new-rns-path-for-cert-generator]
+	
+	OR
+	
+cert-generator --gen-cert <cert-generator-rns-path> 
+	--ks-path=<local-path-for-ks>
+	--ks-pword=<password>
+	--ks-alias=<password>
+	[ --keysize=<rsa-keysize> ]
+	[ --cn={ <cn text> | LOCAL_MACHINE_NAME | LOCAL_MACHINE_IP } ]
+	[ --c=<country abbrev> ]
+	[ --st=<state> ]
+	[ --l=<locality> ]
+	[ --o=<org name> ]
+	[ --email=<email addr> ]
+	defaults: 
+		cn: LOCAL_MACHINE_IP
+		c: US
+		st: Virginia
+		l: empty
+		o: empty
+		email: empty

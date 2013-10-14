@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://edu.virginia.vcgr.genii/fork-root"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:fork="http://edu.virginia.vcgr.genii/fork-root"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	targetNamespace="http://edu.virginia.vcgr.genii/fork-root"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:complexType name="ForkEntryType">
+		<xsd:sequence>
+			<xsd:element
+				name="entry-name" type="xsd:string"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:any namespace="##any" processContents="lax" 
+				minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element
+				name="entry-reference" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ForkEntryType"
+		type="fork:ForkEntryType"/>
+
+	<xsd:complexType name="ForkEntryListType">
+		<xsd:sequence>
+			<xsd:element
+				name="entry" type="fork:ForkEntryType"
+				minOccurs="0" maxOccurs="unbounded"
+				nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ForkEntryListType"
+		type="fork:ForkEntryListType"/>
+</xsd:schema>

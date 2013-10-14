@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    xmlns="http://schemas.ggf.org/byteio/2005/10/byte-io"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:gdesc="http://vcgr.cs.virginia.edu/genii/application-description"
+	xmlns:genii-zj="http://vcgr.cs.virginia.edu/genii/application-description/zip-jar"
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/application-description/zip-jar"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+	<xsd:import
+		namespace="http://vcgr.cs.virginia.edu/genii/application-description"
+		schemaLocation="./gdescription.xsd"/>
+
+	<xsd:simpleType name="ZipJarEnumeration">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="zip"/>
+			<xsd:enumeration value="jar"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="ZipJarSourceType">
+		<xsd:complexContent>
+			<xsd:extension base="gdesc:SourceElementType">
+				<xsd:attribute name="package-type"
+					type="genii-zj:ZipJarEnumeration" use="required"/>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="ZipJarDeploymentType">
+		<xsd:complexContent>
+			<xsd:extension base="gdesc:CommonDeploymentDescriptionType">
+				<xsd:sequence>
+					<xsd:element name="source"
+						type="genii-zj:ZipJarSourceType"
+						minOccurs="1" maxOccurs="1" nillable="false"/>
+					<xsd:any namespace="##other" processContents="lax"
+						minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:complexType name="DummyDeploymentType">
+		<xsd:complexContent>
+			<xsd:extension base="genii-zj:ZipJarDeploymentType">
+				<xsd:sequence>
+					<xsd:element name="dummy"
+						type="xsd:string"
+						minOccurs="1" maxOccurs="1" nillable="false"/>
+					<xsd:any namespace="##other" processContents="lax"
+						minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+</xsd:schema>

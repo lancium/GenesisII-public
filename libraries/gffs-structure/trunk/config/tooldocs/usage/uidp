@@ -1,0 +1,17 @@
+
+idp
+		+ [--storetype=<PKCS12|JKS|WIN>] 
+		+ [--password=<keystore-password>]  
+		+ [--alias] 
+		+ [--pattern=<certificate/token pattern>] 
+		+ [--validDuration=<duration-string>]  
+		+ [<authentication source URL>] 
+		+ <IDP service path> 
+		+ <new IDP name>
+		
+idp
+		+ [--kerbRealm=<Kerberos realm>] 
+		+ [--kerbKdc=<Kerberos KDC>]  
+		+ [--validDuration=<duration-string>]  
+		+ <Kerberos IDP service path> 
+		+ <Kerberos Id>		

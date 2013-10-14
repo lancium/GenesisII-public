@@ -1,0 +1,8 @@
+login
+
+login [--validDuration=<duration-string>]
+	[--username=<username> [--password=<password>]] 
+	rns:<identity provider path>
+
+login --username=<username> [--password=<password>]
+

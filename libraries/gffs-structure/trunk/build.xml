@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="gffs-structure">
+
+	<!-- Properties -->
+	<property environment="env"/>
+	<property file="${basedir}/build.properties"/>
+	<property name="project.dir" value="${basedir}"/>
+
+<!--	<path id="ant.classpath">
+		<fileset dir="${ant.home.override}" includes="**/*.jar"/>
+	</path> -->
+
+	<path id="axis.classpath">
+                        <fileset dir="${axis.home}" includes="**/*.jar"/>
+        </path>
+
+        <path id="jetty.classpath">
+                <fileset dir="${jetty.home}" includes="**/*.jar"/>
+        </path>
+
+	<path id="bundles.classpath">
+		<fileset dir="${bundles.home}" includes="bundle-*.jar"/> 
+		<fileset dir="${bundles.home}" includes="com.jcraft.jsch*.jar"/>
+		<fileset dir="${bundles.home}" includes="org.eclipse.osgi*.jar"/>
+		<fileset dir="${bundles.home}" includes="org.apache.commons.logging*.jar"/>
+<!--		<fileset dir="${bundles.home}" includes="org.apache.xalan*.jar"/> -->
+<!--		<fileset dir="${bundles.home}" includes="org.apache.xml.serializer*.jar"/> -->
+<!--		<fileset dir="${bundles.home}" includes="org.apache.xerces*.jar"/> -->
+		<fileset dir="${bundles.home}" includes="org.apache.commons.lang*.jar"/>
+		<fileset dir="${bundles.home}" includes="org.apache.log4j*.jar"/>
+		<fileset dir="${bundles.home}" includes="org.slf4j*.jar"/>
+	</path>
+
+	<path id="ext.classpath">
+		<fileset dir="${ext.dir}" includes="*.jar"/>
+	</path>
+
+	<path id="project.classpath">
+		<pathelement location="${obj.dir}"/>
+		<pathelement location="${generated.obj.dir}"/>
+<!--		<path refid="ant.classpath"/> -->
+		<path refid="axis.classpath"/>
+		<path refid="ext.classpath"/>
+		<path refid="bundles.classpath"/>
+		<path refid="jetty.classpath"/>
+	</path>
+			
+	<!-- Imports -->	
+	<import file="${basedir}/init.build.xml"/>
+
+	<!-- Build Targets -->
+	<target name="build" depends="announce,jars"/>
+<!-- on hold til we have tests in here. ,run.unit.tests -->
+
+	<target name="announce" >
+		<exec executable="java">
+		<arg value="-version"/>
+		</exec>
+	</target>
+
+	<target name="jars" depends="gffs-structure.jar"/>
+
+	<target name="gffs-structure.jar" depends="genii.compile">
+		<jar destfile="${lib.dir}/gffs-structure.jar">
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/**/*"/>
+			</fileset>
+			<fileset dir="${basedir}">
+				<include name="config/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="genii.compile" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}"
+			includeAntRuntime="${include.ant.runtime}">
+			<src path="${src.dir}"/>
+			<classpath refid="project.classpath"/>
+			<include name="**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}">
+				<include name="${default.compile.copy.includes}"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="tests.compile" depends="genii.compile">
+		<javac debug="${debug.on}" destdir="${obj.dir}" includeAntRuntime="${include.ant.runtime}">
+			<src path="${tests.dir}"/>
+			<classpath refid="project.classpath"/>
+			<include name="**/*.java"/>
+		</javac>
+	</target>
+
+	<target name="clean" depends="init">
+		<delete dir="${temporary.codegen.dir}"/>
+		<delete dir="${dpages.dir}"/>
+		<delete dir="${generated.source.dir}"/>
+		<delete dir="${generated.obj.dir}"/>
+                <delete>
+                        <fileset dir="${obj.dir}" includes="**/*"/>
+                </delete>
+		<delete quiet="true">
+			<fileset dir="${lib.dir}" includes="**/*.jar"/>
+		</delete>
+		<delete dir="${services.dir}"/>
+		<delete file="${basedir}/jserver.sh"/>
+		<delete file="${basedir}/runContainer.sh"/>
+		<delete file="${basedir}/runContainer.bat"/>
+		<delete file="${basedir}/grid"/>
+		<delete file="${basedir}/grid.bat"/>
+		<delete file="${basedir}/cert-tool"/>
+		<delete file="${basedir}/cert-tool.bat"/>
+		<delete file="${basedir}/jar-desc.xml"/>
+		<delete file="${basedir}/jserver-jar-desc.xml"/>
+		<delete>
+			<fileset dir="${basedir}"
+				includes="**/*.log"/>
+			<fileset dir="${basedir}"
+				includes="**/*.log.*" />
+			<fileset dir="${bundles.home}"
+				includes="endorsed/**/*" />
+			<fileset dir="${basedir}"
+				includes="unit-test-reports/**/*" />
+		</delete>
+	</target>
+	
+	<target name="run.unit.tests" description="Run All Unit Tests" depends="tests.compile">
+		<mkdir dir="unit-test-reports/raw" />
+		<junit printsummary="true" failureproperty="junit.failure" fork="yes">
+			<sysproperty key="baseDir" value="${basedir}" />
+			<classpath refid="project.classpath" />
+			<batchtest todir="unit-test-reports/raw">
+				<fileset dir="${tests.dir}">
+				</fileset>
+				<formatter type="xml" />
+			</batchtest>
+		</junit>
+		<junitreport todir="unit-test-reports">
+			<fileset dir="unit-test-reports/raw" />
+			<report todir="unit-test-reports" />
+		</junitreport>
+		<fail if="junit.failure" message="Unit test(s) failed.  Check out the test reports." />
+	</target>
+
+</project>

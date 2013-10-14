@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.light-export">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.light-export.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/light-export.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/light-export.flag">
+				<srcfiles dir="${wsdl.dir}/rns">
+					<include name="rns.xsd"/>
+					<include name="rns.gwsdl"/>
+				</srcfiles>
+				<srcfiles dir="${wsdl.dir}/exported">
+					<include name="exported-dir.gwsdl"/>
+					<include name="exported-root.gwsdl"/>
+					<include name="light-export.gwsdl"/>
+				</srcfiles>
+				<srcfiles dir="${wsdl.dir}/rfork">
+					<include name="rfork.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.light-export" unless="gen.light-export.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/rns">
+				<include name="rns.xsd"/>
+				<include name="rns.gwsdl"/>
+			</fileset>
+			<fileset dir="${wsdl.dir}/exported">
+				<include name="exported-dir.gwsdl"/>
+				<include name="exported-root.gwsdl"/>
+				<include name="light-export.gwsdl"/>
+			</fileset>
+			<fileset dir="${wsdl.dir}/rfork">
+				<include name="rfork.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/light-export.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/light-export-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/light-export-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/light-export-service.wsdl"
+    		portType="{http://vcgr.cs.virginia.edu/export/2009/05/light-export}LightWeightExportPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/light-export"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/light-export-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/light-export.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/light-export/edu/virginia/vcgr/genii/exportdir/lightweight/deploy.wsdd"
+			tofile="${wsdd.dir}/light-export.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/light-export.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.exportdir.lightweight.LightWeightExportSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.exportdir.lightweight.LightWeightExportServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/light-export.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

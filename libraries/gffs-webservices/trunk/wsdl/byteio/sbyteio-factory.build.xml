@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.sbyteio-factory">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.sbyteio-factory.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/sbyteio-factory.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/sbyteio-factory.flag">
+				<srcfiles dir="${wsdl.dir}/byteio">
+					<include name="sbyteio-factory.wsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.sbyteio-factory" unless="gen.sbyteio-factory.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/byteio">
+				<include name="sbyteio-factory.wsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/sbyteio-factory.wsdl"
+			target="${temporary.codegen.dir}/wsdl/sbyteio-factory-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory}StreamableByteIOFactory"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/sbyteio-factory"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/sbyteio-factory-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/sbyteio-factory.flag"/>
+		</antcall>
+	</target>
+
+</project>

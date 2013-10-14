@@ -1,0 +1,4 @@
+Usage: 
+
+qcomplete <queue-path> { --all | <ticket1> ... <ticketN> }
+

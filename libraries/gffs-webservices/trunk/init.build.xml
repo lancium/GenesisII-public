@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="init" name="GenesisII.init">
+
+	<target name="init">
+		<mkdir dir="${wsdd.dir}"/>
+		<mkdir dir="${temporary.codegen.dir}"/>
+		<mkdir dir="${temporary.codegen.dir}/wsdl"/>
+		<mkdir dir="${generated.source.dir}"/>
+		<mkdir dir="${generated.obj.dir}"/>
+		<mkdir dir="${obj.dir}"/>
+		<mkdir dir="${dpages.dir}"/>
+		<mkdir dir="${services.dir}"/>
+	</target>
+	
+</project>

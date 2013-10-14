@@ -1,0 +1,11 @@
+Definitions:
+
+version
+    A representation of a software release number, which is tracked by major and minor version numbers, plus a build number.
+    For example, version 2.7.45 could represent the 45th release (or build) of the 2.7 product.
+    Major versions change very infrequently and happen when there are significant changes in the product's feature set.  Minor versions change when there are important feature updates within an existing release.  Build numbers change whenever any new release of the software is available.
+
+Description:
+
+This tool displays the current version of the installed GenesisII software.
+

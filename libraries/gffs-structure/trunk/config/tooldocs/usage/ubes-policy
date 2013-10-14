@@ -1,0 +1,11 @@
+bes-policy <target-bes>
+
+    OR
+
+bes-policy <target-bes> --query
+
+    OR
+
+bes-policy <target-bes>
+    --set-user-logged-in=<policy-action> --set-screensaver-insactive=<policy-action>
+

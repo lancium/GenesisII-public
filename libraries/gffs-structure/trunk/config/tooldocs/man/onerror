@@ -1,0 +1,19 @@
+Definitions:
+
+argn    
+	String of characters to be printed to the terminal if failure occurred.
+
+Description:
+
+Tests the result of the command executed just prior to the error check.  If that command failed, then this command will print the command arguments and generate an exception that should stop the grid shell.  This is useful in running batches of commands, as previous results can be checked and cause the entire batch to be halted.
+
+Example:
+
+grid <<eof
+ls /home/fred
+onerror fred folder is missing or inaccessible.
+cp local:bigfile.dat /home/fred/bigfile-0031.dat
+...
+<<eof
+
+If the 'ls' command fails, then the batch of commands will stop after the 'onerror' check.

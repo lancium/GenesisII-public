@@ -1,0 +1,36 @@
+Read an X.509 certificate file and optionally place it in another store as a trusted certificate.
+
+cert-tool import 
+       -base64-cert-file=<cert file path> 
+	[ -output-keystore=<keystore>
+	  -output-keystore-pass=<keystore password>
+	  -output-storetype=<storetype: PKCS12(default) | BKS>
+	  -output-alias=<trusted-alias> ]
+
+Retrieve an X.509 certificate from one keystore and optionally place it in another keystore as a trusted certificate.
+
+cert-tool import
+	-input-keystore=<keystore>
+	-input-keystore-pass=<keystore password>
+	-input-storetype=<storetype: PKCS12|BKS>
+	-input-alias=<alias>
+	[ -output-keystore=<keystore>
+	  -output-keystore-pass=<keystore password>
+	  -output-storetype=<storetype: PKCS12|BKS>
+	  -output-alias=<trusted-alias> ]
+
+Generate a new X.509 certificate and corresponding keypair and optionally place it in a keystore.
+
+cert-tool gen
+	-dn=<distinguished name>
+	[ -validity=<days> ]
+	[ -input-keystore=<keystore>
+	  -input-keystore-pass=<keystore password>
+	  -input-storetype=<storetype: PKCS12|BKS>
+	  -input-alias=<alias>
+	  -input-entry-pass=<password> ]
+	[ -output-keystore=<keystore>
+	  -output-keystore-pass=<keystore password>
+	  -output-storetype=<storetype: PKCS12|BKS>
+	  -output-alias=<alias>
+	  -output-entry-pass=<password> ]

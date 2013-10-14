@@ -1,0 +1,1 @@
+Configures a given resource contained within a queue to have a different number of slots then it currently does.

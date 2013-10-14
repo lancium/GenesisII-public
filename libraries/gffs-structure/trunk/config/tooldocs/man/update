@@ -1,0 +1,1 @@
+This functionality is not supported through the normal command line client.  Instead, if you want to manually update the grid client, you need to exit this grid client (and any other grid software that you might have running on your local machine) and instead issue the separate "grid-update" program.

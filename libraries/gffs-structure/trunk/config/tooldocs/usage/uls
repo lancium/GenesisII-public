@@ -1,0 +1,1 @@
+ls [-Rladem] [--long] [--all] [--directory] [--epr] [--recursive] [--multiline] [<target> *]

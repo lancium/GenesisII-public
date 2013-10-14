@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="JobManagement"
+	xmlns="http://vcgr.cs.virginia.edu/genii/job-management"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:rfork="http://vcgr.cs.virginia.edu/genii/resource-fork"
+	xmlns:bes-mgmt="http://schemas.ggf.org/bes/2006/08/bes-management"
+	xmlns:bes-factory="http://schemas.ggf.org/bes/2006/08/bes-factory"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:job-management="http://vcgr.cs.virginia.edu/genii/job-management"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
+	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+    xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:rns="http://schemas.ogf.org/rns/2009/12/rns"
+	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2011/04/enhanced-rns"
+	xmlns:rbyteio="http://schemas.ggf.org/byteio/2005/10/random-access"
+	xmlns:byteio="http://schemas.ggf.org/byteio/2005/10/byte-io"
+    xmlns:sbyteio="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+	xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/job-management">
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="./wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
+
+    <wsdl:import
+        namespace="http://schemas.ogf.org/rns/2009/12/rns"
+        location="./rns.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/container/2011/04/enhanced-rns"
+        location="./enhanced-rns-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://schemas.ggf.org/byteio/2005/10/random-access"
+		location="./rbyteio-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+		location="./sbyteio-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+		location="./sbyteio-factory.wsdl"/>
+
+	<wsdl:import namespace="http://schemas.ggf.org/bes/2006/08/bes-factory"
+		location="./bes-factory.wsdl"/>
+
+    <wsdl:import namespace="http://schemas.ggf.org/bes/2006/08/bes-management"
+		location="./bes-management.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/resource-fork"
+		location="./rfork-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="wsrf/wsResourceLifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsn/bw-2"
+		location="wsrf/wsBaseNotification.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/job-management">
+
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/genii/job-management"
+				schemaLocation="./job-management.xsd"/>
+
+			<xsd:import
+				namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+				schemaLocation="./jsdl.xsd"/>
+
+            <xsd:import
+				namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+				schemaLocation="./jsdl-posix.xsd"/>
+
+            <xsd:import
+				namespace="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
+				schemaLocation="./jsdl-spmd.xsd"/>
+
+			<xsd:import
+                namespace="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcp"
+				schemaLocation="./jsdl-hpcp.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="SubmitJobRequest">
+		<wsdl:part name="SubmitJobRequest"
+			element="job-management:SubmitJobRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="SubmitJobResponse">
+		<wsdl:part name="SubmitJobResponse"
+			element="job-management:SubmitJobResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="IterateStatusRequest">
+		<wsdl:part name="IterateStatusRequest"
+			element="job-management:IterateStatusRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="IterateStatusResponse">
+		<wsdl:part name="IterateStatusResponse"
+			element="job-management:IterateStatusResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="IterateListRequest">
+		<wsdl:part name="IterateListRequest"
+			element="job-management:IterateListRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="IterateListResponse">
+		<wsdl:part name="IterateListResponse"
+			element="job-management:IterateListResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="KillRequest">
+		<wsdl:part name="KillRequest"
+			element="job-management:KillRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="KillResponse">
+		<wsdl:part name="KillResponse"
+			element="job-management:KillResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="CompleteRequest">
+		<wsdl:part name="CompleteRequest"
+			element="job-management:CompleteRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="CompleteResponse">
+		<wsdl:part name="CompleteResponse"
+			element="job-management:CompleteResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="ForceUpdateRequest">
+		<wsdl:part name="ForceUpdateRequest"
+			element="job-management:ForceUpdateRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="ForceUpdateResponse">
+		<wsdl:part name="ForceUpdateResponse"
+			element="job-management:ForceUpdateResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="RescheduleJobsRequest">
+		<wsdl:part name="RescheduleJobsRequest"
+			element="job-management:RescheduleJobsRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="RescheduleJobsResponse">
+		<wsdl:part name="RescheduleJobsResponse"
+			element="job-management:RescheduleJobsResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="ConfigureRequest">
+		<wsdl:part name="ConfigureRequest"
+			element="job-management:ConfigureRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="ConfigureResponse">
+		<wsdl:part name="ConfigureResponse"
+			element="job-management:ConfigureResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="QueryErrorRequest">
+		<wsdl:part name="QueryErrorRequest"
+			element="job-management:QueryErrorRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="QueryErrorResponse">
+		<wsdl:part name="QueryErrorResponse"
+			element="job-management:QueryErrorResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="GetJobLogRequest">
+		<wsdl:part name="GetJobLogRequest"
+			element="job-management:GetJobLogRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="GetJobLogResponse">
+		<wsdl:part name="GetJobLogResponse"
+			element="job-management:GetJobLogResponse"/>
+	</wsdl:message>
+	
+	<wsdl:portType name="JobManagementPortType">
+
+		<wsdl:operation name="submitJob">
+			<wsdl:input message="job-management:SubmitJobRequest"/>
+			<wsdl:output message="job-management:SubmitJobResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="iterateStatus">
+			<wsdl:input message="job-management:IterateStatusRequest"/>
+			<wsdl:output message="job-management:IterateStatusResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="iterateListJobs">
+			<wsdl:input message="job-management:IterateListRequest"/>
+			<wsdl:output message="job-management:IterateListResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="killJobs">
+			<wsdl:input message="job-management:KillRequest"/>
+			<wsdl:output message="job-management:KillResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="completeJobs">
+			<wsdl:input message="job-management:CompleteRequest"/>
+			<wsdl:output message="job-management:CompleteResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="forceUpdate">
+			<wsdl:input message="job-management:ForceUpdateRequest"/>
+			<wsdl:output message="job-management:ForceUpdateResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="rescheduleJobs">
+			<wsdl:input message="job-management:RescheduleJobsRequest"/>
+			<wsdl:output message="job-management:RescheduleJobsResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="configureResource">
+			<wsdl:input message="job-management:ConfigureRequest"/>
+			<wsdl:output message="job-management:ConfigureResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="queryErrorInformation">
+			<wsdl:input message="job-management:QueryErrorRequest"/>
+			<wsdl:output message="job-management:QueryErrorResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="getJobLog">
+			<wsdl:input message="job-management:GetJobLogRequest"/>
+			<wsdl:output message="job-management:GetJobLogResponse"/>
+		</wsdl:operation>
+		
+	</wsdl:portType>
+
+</wsdl:definitions>

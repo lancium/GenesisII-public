@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.rfork">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.rfork.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/rfork.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/rfork.flag">
+				<srcfiles dir="${wsdl.dir}/rfork">
+					<include name="rfork.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.rfork" unless="gen.rfork.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/rfork">
+				<include name="rfork.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/rfork.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/rfork-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/rfork-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/rfork-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/resource-fork}ResourceForkPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/rfork"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/rfork-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/rfork.flag"/>
+		</antcall>
+	</target>
+</project>

@@ -1,0 +1,5 @@
+cloudTool [--shrink=<count>] <path-to-cloud-bes>
+cloudTool [--spawn=<count>] <path-to-cloud-bes>
+cloudTool <path-to-cloud-bes>
+cloudTool [--kill=<id>] <path-to-cloud-bes>
+cloudTool [--vmstatus] <path-to-cloud-bes>

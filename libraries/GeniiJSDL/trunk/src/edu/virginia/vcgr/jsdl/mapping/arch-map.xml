@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genii:arch-map
+	xmlns:genii="http://vcgr.cs.virginia.edu/genii"
+	xmlns="http://vcgr.cs.virginia.edu/genii">
+	
+	<genii:arch-mapping jsdl-value="x86" java-value="x86"/>
+	<genii:arch-mapping jsdl-value="x86" java-value="i386"/>
+	<genii:arch-mapping jsdl-value="sparc" java-value="sparc"/>
+	<genii:arch-mapping jsdl-value="powerpc" java-value="ppc"/>
+	<genii:arch-mapping jsdl-value="arm" java-value="armv41"/>
+	<genii:arch-mapping jsdl-value="x86" java-value="i686"/>
+	<genii:arch-mapping jsdl-value="powerpc" java-value="ppc64"/>
+	<genii:arch-mapping jsdl-value="powerpc" java-value="PowerPC"/>
+	<genii:arch-mapping jsdl-value="arm" java-value="arm"/>
+	<genii:arch-mapping jsdl-value="parisc" java-value="PA-RISC"/>
+	<genii:arch-mapping jsdl-value="powerpc" java-value="Power"/>
+	<genii:arch-mapping jsdl-value="mips" java-value="mips"/>
+	<genii:arch-mapping jsdl-value="ia64" java-value="IA64N"/>
+	<genii:arch-mapping jsdl-value="x86_64" java-value="x86_64"/>
+	<genii:arch-mapping jsdl-value="x86_64" java-value="amd64"/>
+</genii:arch-map>

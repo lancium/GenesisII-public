@@ -1,0 +1,5 @@
+<pages>
+	<page context="/pages" resource-base="edu/virginia/vcgr/genii/container/pages"
+		injetion-handler-factory="org.morgan.dpage.NullValueInjectionHandlerFactory/>
+	<page context="/pages2" resource-base="edu/virginia/vcgr/genii/container/pages2"/>
+</pages>

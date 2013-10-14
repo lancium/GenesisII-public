@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="ForkRoot"
+	targetNamespace="http://edu.virginia.vcgr.genii/fork-root"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:fork="http://edu.virginia.vcgr.genii/fork-root"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://edu.virginia.vcgr.genii/fork-root">
+
+            <xsd:import
+        		namespace="http://edu.virginia.vcgr.genii/fork-root"
+            	schemaLocation="./fork-root.xsd"/>
+
+			<xsd:element name="listForks">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element
+							name="entry-regexp" type="xsd:string"
+							minOccurs="1" maxOccurs="1"
+							nillable="true"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="listForksResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element
+							name="ForkEntryList" type="fork:ForkEntryListType"
+							minOccurs="1" maxOccurs="1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="listForksRequest">
+		<wsdl:part name="listForksRequest" element="fork:listForks"/>
+	</wsdl:message>
+	<wsdl:message name="listForksResponse">
+		<wsdl:part name="listForksResponse" element="fork:listForksResponse"/>
+	</wsdl:message>
+
+	<wsdl:portType name="ForkRootPortType">
+		<wsdl:operation name="listForks">
+			<wsdl:input message="fork:listForksRequest"/>
+			<wsdl:output message="fork:listForksResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+</wsdl:definitions>

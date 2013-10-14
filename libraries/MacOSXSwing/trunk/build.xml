@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="MacOSXSwing">
+
+	<!-- Properties -->
+	<property file="${basedir}/build.properties"/>
+
+	<!-- Static Classpath -->
+	<path id="project.classpath">
+		<pathelement location="${obj.dir}"/>
+                <fileset dir="${ext.dir}/log4j" includes="*.jar"/>
+	</path>
+			
+
+	<!-- Build Targets -->
+	<target name="build" depends="jars"/>
+
+	<target name="jars" depends="MacOSXSwing.jar"/>
+
+	<target name="MacOSXSwing.jar" depends="MacOSXSwing.compile">
+		<jar destfile="${lib.dir}/MacOSXSwing.jar">
+			<fileset dir="${obj.dir}">
+				<include name="org/morgan/mac/gui/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="MacOSXSwing.compile" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}">
+			<src path="${src.dir}"/>
+			<classpath refid="project.classpath"/>
+			<include name="org/morgan/mac/gui/**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="clean">
+		<delete dir="${obj.dir}"/>
+		<delete dir="${lib.dir}"/>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${obj.dir}"/>
+		<mkdir dir="${lib.dir}"/>
+	</target>
+</project>

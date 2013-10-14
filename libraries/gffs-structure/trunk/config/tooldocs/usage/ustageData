@@ -1,0 +1,1 @@
+stageData <scratchDir> <jobFile>  [--type=<jsdl|binary>] [--direction=<in|out>]

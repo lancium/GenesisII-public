@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="ApplicationManager">
+
+	<!-- Properties -->
+	<property file="${basedir}/build.properties"/>
+
+	<!-- Static Class paths -->
+	<path id="jetty.classpath">
+		<fileset dir="${jetty.dir}" includes="**/*.jar"/>
+	</path>
+
+        <path id="ext.classpath">
+                <fileset dir="${ext.dir}" includes="**/*.jar"/>
+        </path>
+
+	<path id="project.classpath">
+		<pathelement location="${obj-dir}"/>
+		<path refid="jetty.classpath"/>
+		<path refid="ext.classpath"/>
+	</path>
+			
+	<!-- Build Targets -->
+	<target name="init">
+		<mkdir dir="${lib.dir}"/>
+		<mkdir dir="${obj.dir}"/>
+	</target>
+
+	<target name="build" depends="jars"/>
+
+	<target name="jars" depends="dpage.jar"/>
+
+	<target name="dpage.jar" depends="dpage.compile">
+		<jar destfile="${lib.dir}/dpage.jar">
+			<fileset dir="${obj.dir}">
+				<include name="org/morgan/dpage/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="dpage.compile" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}">
+			<src path="${src.dir}"/>
+			<classpath refid="project.classpath"/>
+			<include name="**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="clean">
+		<delete dir="${obj.dir}"/>
+		<delete quiet="true">
+			<fileset dir="${lib.dir}" includes="**/*.jar"/>
+		</delete>
+	</target>
+</project>

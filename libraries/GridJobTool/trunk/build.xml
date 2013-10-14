@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="GridJobTool">
+
+	<!-- Properties -->
+	<property file="${basedir}/build.properties"/>
+
+	<!-- Static Classpath -->
+	<path id="log4j.classpath">
+		<fileset dir="${log4j.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="genii-jsdl.classpath">
+		<fileset dir="${genii-jsdl.home}" includes="**/GeniiJSDL.jar"/>
+	</path>
+
+	<path id="macosxswing.classpath">
+		<fileset dir="${macosxswing.home}" includes="**/MacOSXSwing.jar"/>
+	</path>
+
+	<path id="project.classpath">
+		<pathelement location="${obj-dir}"/>
+		<path refid="log4j.classpath"/>
+		<path refid="genii-jsdl.classpath"/>
+		<path refid="macosxswing.classpath"/>
+	</path>
+			
+
+	<!-- Build Targets -->
+	<target name="build" depends="jars"/>
+
+	<target name="jars" depends="GridJobTool.jar"/>
+
+	<target name="GridJobTool.jar" depends="GridJobTool.compile">
+		<jar destfile="${lib.dir}/GridJobTool.jar">
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/genii/gjt/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="GridJobTool.compile" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}">
+			<src path="${src.dir}"/>
+			<classpath refid="project.classpath"/>
+			<include name="edu/virginia/vcgr/genii/gjt/**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="clean">
+		<delete dir="${obj.dir}"/>
+		<delete dir="${lib.dir}"/>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${obj.dir}"/>
+		<mkdir dir="${lib.dir}"/>
+	</target>
+</project>

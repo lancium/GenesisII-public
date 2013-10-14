@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/genii/application-description"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:gdesc="http://vcgr.cs.virginia.edu/genii/application-description"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/application-description"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:import
+		namespace="http://vcgr.cs.virginia.edu/genii/application-description"
+		schemaLocation="./gdescription.xsd"/>
+		
+	<xsd:import
+		namespace="http://vcgr.cs.virginia.edu/genii/application-description/zip-jar"
+		schemaLocation="./gdescription-zipjar.xsd"/>
+		
+	<xsd:import
+		namespace="http://vcgr.cs.virginia.edu/genii/application-description/bin"
+		schemaLocation="./gdescription-bin.xsd"/>
+
+<!-- Messace Types -->
+	<xsd:complexType name="CreateDeploymentDocumentRequestType">
+		<xsd:sequence>
+			<xsd:element name="Name" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="DeploymentDocument"
+				type="gdesc:DeploymentDocumentType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CreateDeploymentDocumentRequestType"
+		type="gdesc:CreateDeploymentDocumentRequestType"/>
+
+	<xsd:complexType name="CreateDeploymentDocumentResponseType">
+		<xsd:sequence>
+			<xsd:element name="NewDeploymentDocument"
+				type="wsa:EndpointReferenceType" minOccurs="1" maxOccurs="1"
+				nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CreateDeploymentDocumentResponseType"
+		type="gdesc:CreateDeploymentDocumentResponseType"/>
+
+<!-- Fault Types -->
+	<xsd:complexType name="DeploymentExistsFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType">
+				<xsd:sequence>
+					<xsd:element name="Name" type="xsd:string"
+						minOccurs="1" maxOccurs="1"/>
+					<xsd:element
+						name="ExistingDeployment"
+						type="gdesc:DeploymentDocumentType"
+						minOccurs="1" maxOccurs="1"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DeploymentExistsFaultType"
+		type="gdesc:DeploymentExistsFaultType"/>
+</xsd:schema>

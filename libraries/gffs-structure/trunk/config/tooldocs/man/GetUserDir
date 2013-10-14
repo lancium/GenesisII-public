@@ -1,0 +1,7 @@
+Definitions:
+
+No arguments
+
+Description:
+	Returns the path to the GenesisII state directory. This path is in the local file-system namespace.
+

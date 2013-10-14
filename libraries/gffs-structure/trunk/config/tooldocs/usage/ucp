@@ -1,0 +1,2 @@
+cp [-rf | --recursive --force] <source-path> <target-path>
+

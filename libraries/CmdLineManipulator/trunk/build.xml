@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="CmdLineManipulator">
+
+	<!-- Properties -->
+	<property file="${basedir}/build.properties"/>
+
+	<path id="project.classpath">
+		<pathelement location="${obj-dir}"/>
+	</path>
+
+	<path id="build.classpath">
+		<fileset dir="${ext.dir}" includes="**/*.jar"/>
+	</path>
+	
+	<target name="build" depends="jar"/>
+
+	<target name="jar" depends="compile">
+		<jar destfile="${lib.dir}/CmdLineManipulator.jar">
+			<manifest>
+				<attribute name="Main-Class"
+					value="edu.virginia.vcgr.genii.CmdLineManipulator.CmdLineManipulator"/>
+			</manifest>
+			<service type="edu.virginia.vcgr.genii.CmdLineManipulator.CmdLineManipulator">
+			    <provider classname="edu.virginia.vcgr.genii.cmdLineManipulator.variation.mpichManipulator"/>
+			    <provider classname="edu.virginia.vcgr.genii.cmdLineManipulator.variation.pwrapperManipulator"/>
+				<provider classname="edu.virginia.vcgr.genii.cmdLineManipulator.variation.aprunManipulator"/>
+				<provider classname="edu.virginia.vcgr.genii.cmdLineManipulator.variation.sudoPwrapperManipulator"/>
+			</service>
+			<fileset dir="${obj.dir}" includes="**/*"/>
+		</jar>
+	</target>
+
+	<target name="compile" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}" includeantruntime="false">
+			<src path="${src.dir}"/>
+			<classpath refid="build.classpath"/>
+			<include name="**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${obj.dir}"/>
+		<mkdir dir="${lib.dir}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${obj.dir}"/>
+		<delete dir="${lib.dir}"/>
+	</target>
+</project>	

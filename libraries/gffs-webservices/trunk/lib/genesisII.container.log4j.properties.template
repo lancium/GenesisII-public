@@ -1,0 +1,2 @@
+log4j.rootCategory=, VCONSOLE, LOGFILE
+log4j.appender.LOGFILE.File=${user.home}/.GenesisII/container.log

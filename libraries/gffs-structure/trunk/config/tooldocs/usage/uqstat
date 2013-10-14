@@ -1,0 +1,4 @@
+Usage:
+
+qstat <queue-path> [<ticket0> ... <ticketN>]
+

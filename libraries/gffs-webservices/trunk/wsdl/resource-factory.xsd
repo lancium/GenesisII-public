@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/common/2006/06/common"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:genii-rfact="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+<!-- Common Faults -->
+		<xsd:complexType name="ResourceCreationFaultType">
+			<xsd:complexContent>
+				<xsd:extension base="wsbf:BaseFaultType"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+		<xsd:element name="ResourceCreationFaultType"
+			type="genii-rfact:ResourceCreationFaultType"/>
+
+</xsd:schema>

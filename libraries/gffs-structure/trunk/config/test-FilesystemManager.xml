@@ -1,0 +1,48 @@
+<filesystems xmlns="http://vcgr.cs.virginia.edu/filesystems">
+	<filesystem name="Filesystem 1" path="/Users/morgan/print">
+		<filesystem-property>Local</filesystem-property>
+		<filesystem-property>Shared</filesystem-property>
+		<filesystem-sandbox name="BES" relative-path="bes"/>
+	</filesystem>
+	
+	<filesystem name="Filesystem 2" path="/Users/morgan/tmp">
+		<filesystem-property>Local</filesystem-property>
+		<filesystem-property>Scratch</filesystem-property>
+		<filesystem-sandbox name="download-tmp" relative-path="download-tmp"/>
+		<filesystem-sandbox name="scratch" relative-path="scratch"/>
+	</filesystem>
+	
+	<filesystem-watcher check-period="15 seconds" filesystem-name="Filesystem 1">
+		<filter-expression>
+			<or xmlns="http://vcgr.cs.virginia.edu/filesystems/filter-script">
+				<less>
+					<variable name="spaceUsable"/>
+					<literal value="10000000"/>
+				</less>
+				<less>
+					<variable name="percentAvailable"/>
+					<literal value="82"/>
+				</less>
+			</or>
+		</filter-expression>
+		
+		<watch-callback call-limit="1"
+			class="edu.virginia.vcgr.genii.filesystems.log.EmailWatchHandler">
+			<email-watch-config xmlns="http://vcgr.cs.virginia.edu/filesystems/email-watch">
+				<connection xmlns="http://vcgr.cs.virginia.edu/filesystems/connect" isSSL="true">
+					<smtp-server>smtp.gmail.com</smtp-server>
+					<port>465</port>
+					<username>pointless94</username>
+					<password>insecure</password>
+				</connection>
+				<addressing-info xmlns="http://vcgr.cs.virginia.edu/filesystems/address-info">
+					<addressTo>mvn3w@virginia.edu</addressTo>
+					<addressTo>pointless94@gmail.com</addressTo>
+					<addressFrom>mvn3w@virginia.edu</addressFrom>
+				</addressing-info>
+				<subject>Testing...</subject>
+				<message>Filesystem "%s" is %.2f%% full</message>
+			</email-watch-config>
+		</watch-callback>
+	</filesystem-watcher>
+</filesystems>

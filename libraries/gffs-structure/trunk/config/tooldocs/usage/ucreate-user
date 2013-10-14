@@ -1,0 +1,3 @@
+create-user [rns-path-to-idp-service [new-user] ]
+	[--login-name=<login-name>] [--login-password=<login-password>]
+	[--validDuration=<duration-string>]

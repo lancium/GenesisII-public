@@ -1,0 +1,2 @@
+ping [--attempts=<number>] <target-path> <query>
+

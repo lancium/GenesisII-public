@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/rns/2007/08/rexport-dir"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:rexport-dir="http://vcgr.cs.virginia.edu/rns/2007/08/rexport-dir"
+	targetNamespace="http://vcgr.cs.virginia.edu/rns/2007/08/rexport-dir"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:complexType name="PopulateDirRequestType">
+			<xsd:sequence>
+				<xsd:element
+					name="replica_EPR" type="wsa:EndpointReferenceType"
+					minOccurs="1" maxOccurs="1"/>
+				<xsd:element
+					name="replica_name" type="xsd:string"
+					minOccurs="1" maxOccurs="1"/>
+				<xsd:element
+					name="replica_type" type="xsd:string"
+					minOccurs="1" maxOccurs="1"/>
+			</xsd:sequence>
+	</xsd:complexType>
+			
+</xsd:schema>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.enhanced-notification-broker">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not><isset property="wsdl.dir"/></not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.enhanced-notification-broker.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/enhancedNotificationBroker.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/enhancedNotificationBroker.flag">
+				<srcfiles dir="${wsdl.dir}/notification">
+					<include name="enhancednb.xsd"/>
+					<include name="enhancednb.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.enhanced-notification-broker" unless="gen.enhanced-notification-broker.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/notification">
+				<include name="enhancednb.xsd"/>
+				<include name="enhancednb.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/enhancednb.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/enhancednb-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/enhancednb-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/enhanced-notification-broker-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker}EnhancedNotificationBrokerPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/enhanced-notification-broker"/>
+			<param name="stub.gen.source-wsdl" value="${temporary.codegen.dir}/wsdl/enhanced-notification-broker-service.wsdl"/>
+			<param name="stub.gen.target-flag-file" value="${temporary.codegen.dir}/wsdl/enhancedNotificationBroker.flag"/>
+		</antcall>
+		
+		<move file="${temporary.codegen.dir}/enhanced-notification-broker/edu/virginia/vcgr/genii/notification/broker/deploy.wsdd"
+			tofile="${wsdd.dir}/enhancedNotificationBroker.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/enhancedNotificationBroker.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.notification.EnhancedNotificationBrokerServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/enhancedNotificationBroker.deploy.wsdd" todir="${services.dir}"/>
+	</target>
+
+</project>

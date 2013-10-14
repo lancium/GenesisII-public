@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:rbyteio="http://schemas.ggf.org/byteio/2005/10/random-access"
+    xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+    targetNamespace="http://schemas.ggf.org/byteio/2005/10/random-access"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <xsd:import
+        namespace="http://docs.oasis-open.org/wsrf/bf-2"
+        schemaLocation="./wsrf/basefaults.xsd"/>
+
+    <xsd:complexType name="TruncateNotPermittedFaultType">
+        <xsd:complexContent>
+            <xsd:extension base="wsbf:BaseFaultType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:element name="TruncateNotPermittedFault"
+        type="rbyteio:TruncateNotPermittedFaultType"/>
+</xsd:schema>

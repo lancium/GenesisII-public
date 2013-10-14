@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genii:os-map
+	xmlns:genii="http://vcgr.cs.virginia.edu/genii"
+	xmlns="http://vcgr.cs.virginia.edu/genii">
+
+	<genii:os-mapping jsdl-value="LINUX" java-value="Linux"/>
+	<genii:os-mapping jsdl-value="MACOS" java-value="Mac OS"/>
+	<genii:os-mapping jsdl-value="MACOS" java-value="Mac OS X"/>
+	<genii:os-mapping jsdl-value="WIN95" java-value="Windows 95"/>
+	<genii:os-mapping jsdl-value="WIN98" java-value="Windows 98"/>
+	<genii:os-mapping jsdl-value="WINNT" java-value="Windows NT"/>
+	<genii:os-mapping jsdl-value="Windows_2000" java-value="Windows 2000"/>
+	<genii:os-mapping jsdl-value="Windows_XP" java-value="Windows 2003"/>
+	<genii:os-mapping jsdl-value="Windows_XP" java-value="Windows XP"/>
+	<genii:os-mapping jsdl-value="WINCE" java-value="Windows CE"/>
+	<genii:os-mapping jsdl-value="Windows_XP" java-value="Windows Vista"/>
+	<genii:os-mapping jsdl-value="Windows_XP" java-value="Windows 7"/>
+	<genii:os-mapping jsdl-value="OS_2" java-value="OS 2"/>
+	<genii:os-mapping jsdl-value="Solaris" java-value="Solaris"/>
+	<genii:os-mapping jsdl-value="SunOS" java-value="SunOS"/>
+	<genii:os-mapping jsdl-value="AIX" java-value="AIX"/>
+	<genii:os-mapping jsdl-value="OS_390" java-value="OS 390"/>
+	<genii:os-mapping jsdl-value="FreeBSD" java-value="FreeBSD"/>
+	<genii:os-mapping jsdl-value="IRIX" java-value="Irix"/>
+	<genii:os-mapping jsdl-value="HPUX" java-value="HP-UX"/>
+	<genii:os-mapping jsdl-value="DGUX" java-value="Digital Unix"/>
+	<genii:os-mapping jsdl-value="OSF" java-value="OFS"/>
+	<genii:os-mapping jsdl-value="OpenVMS" java-value="OpenVMS"/>
+</genii:os-map>

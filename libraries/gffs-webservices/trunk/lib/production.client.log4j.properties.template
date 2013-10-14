@@ -1,0 +1,2 @@
+log4j.rootCategory=INFO, LOGFILE
+log4j.appender.LOGFILE.File=${user.home}/.GenesisII/grid-client.log

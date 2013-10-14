@@ -1,0 +1,21 @@
+<xsd:schema
+    targetNamespace="http://vcgr.cs.virginia.edu/bes/2006/06/bes-activity"
+    xmlns="http://vcgr.cs.virginia.edu/bes/2006/06/bes-activity"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:bes-activity="http://vcgr.cs.virginia.edu/bes/2006/06/bes-activity"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+		
+	<xsd:complexType name="BESActivityGetErrorResponseType">
+		<xsd:sequence>
+		    <xsd:element name="SerializedFault" type="xsd:base64Binary"
+		    	minOccurs="0" maxOccurs="1" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+</xsd:schema>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="GeniiProcMgmt">
+
+	<!-- Properties -->
+	<property environment="env"/>
+	<property file="${basedir}/build.properties"/>
+	<property name="project.dir" value="${basedir}"/>
+
+	<path id="project.classpath">
+		<pathelement location="${obj-dir}"/>
+	</path>
+			
+	<!-- Build Targets -->
+	<target name="build" depends="jar,jni"/>
+
+	<target name="jar" depends="compile">
+		<jar destfile="${lib.dir}/GeniiProcMgmt.jar">
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/genii/procmgmt/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile" depends="init.java">
+		<javac debug="${debug.on}" destdir="${obj.dir}">
+			<src path="${src.dir}"/>
+			<classpath refid="project.classpath"/>
+			<include name="**/*.java"/>
+			<exclude name="edu/virginia/vcgr/genii/procmgmt/test/**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="init.java">
+		<mkdir dir="${obj.dir}"/>
+		<mkdir dir="${lib.dir}"/>
+		<mkdir dir="${api.doc.dir}"/>
+	</target>
+
+	<target name="init.jni">
+		<mkdir dir="${jni.inc-gen.dir}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${obj.dir}"/>
+		<delete dir="${lib.dir}"/>
+		<delete dir="${api.doc.dir}"/>
+		<delete dir="${jni.inc-gen.dir}"/>
+	</target>
+
+	<target name="jni" depends="init.jni,jar">
+		<javah outputFile="${jni.inc-gen.dir}/ProcessManager.h"
+			classpath="${lib.dir}/GeniiProcMgmt.jar">
+			<class name="edu.virginia.vcgr.genii.procmgmt.ProcessManager"/>
+		</javah>
+	</target>
+</project>

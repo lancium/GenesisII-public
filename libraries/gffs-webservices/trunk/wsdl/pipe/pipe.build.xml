@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.pipe">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.pipe.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/pipe.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/pipe.flag">
+				<srcfiles dir="${wsdl.dir}/byteio">
+					<include name="sbyteio.gwsdl"/>
+				</srcfiles>
+				<srcfiles dir="${wsdl.dir}/pipe">
+					<include name="pipe.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.pipe" unless="gen.pipe.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/pipe">
+				<include name="pipe.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/pipe.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/pipe-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/pipe-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/pipe-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/pipe/2011/03/pipe}PipePortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/pipe"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/pipe-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/pipe.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/pipe/edu/virginia/vcgr/genii/pipe/deploy.wsdd"
+			tofile="${wsdd.dir}/pipe.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/pipe.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.pipe.PipeSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.pipe.PipeServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/pipe.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

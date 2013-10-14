@@ -1,0 +1,49 @@
+<xsd:schema
+	xmlns="http://schemas.ogf.org/ws-iterator/2008/06/iterator"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:iterator="http://schemas.ogf.org/ws-iterator/2008/06/iterator"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	targetNamespace="http://schemas.ogf.org/ws-iterator/2008/06/iterator"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import
+		namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<!-- Resource Property Related -->
+	<xsd:element name="elementCount" type="xsd:unsignedLong"/>
+	<xsd:element name="preferredBlockSize" type="xsd:unsignedInt"/>
+
+	<!-- Message Related -->
+	<xsd:complexType name="IterableElementType">
+		<xsd:sequence>
+			<xsd:any namespace="##other" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="index" type="xsd:unsignedLong" use="required"/>
+	</xsd:complexType>
+
+	<!-- Message Types -->
+	<xsd:complexType name="IterateRequestType">
+		<xsd:sequence>
+			<xsd:element name="start-offset" type="xsd:unsignedLong"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="element-count" type="xsd:unsignedLong"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="IterateRequestType" type="iterator:IterateRequestType"/>
+
+	<xsd:complexType name="IterateResponseType">
+		<xsd:sequence>
+			<xsd:element name="iterator-size" type="xsd:unsignedLong"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="iterable-element"
+				type="iterator:IterableElementType" minOccurs="0"
+				maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="IterateResponseType"
+		type="iterator:IterateResponseType"/>
+</xsd:schema>

@@ -1,0 +1,21 @@
+export
+
+export --create { <export-service-path> | --url <export-service-url> } 
+	[--svn-user=<svn-username>] [--svn-pass=<svn-pass>] [--svn-revision=<svn-revision>]
+	<local-path> [new-rns-path]
+
+export --quit { <export-root-rns-path> | --url <export-root-url> }
+
+export --replicate { <primary-container-name> <resolver-container-name> | --url <primary-machine-url> <resolver-machine-url> }
+       <primary-local-path> [new-rns-path]
+
+Example:
+
+export --create /containers/khandroma_jurgis/Services/LightWeightExportPortType local:/home/jurgis/xsede/code/trunk /src/GenesisII.trunk
+
+This creates an export of the source code from a local copy owned by a unix
+user named jurgis.  Jurgis has a grid container running on the machine which
+is linked into the grid at '/containers/khandroma_jurgis'.  The source code
+will reside inside the grid at '/src/GenesisII.trunk', which will offer a
+view into jurgis's local folder where the source code actually resides.
+

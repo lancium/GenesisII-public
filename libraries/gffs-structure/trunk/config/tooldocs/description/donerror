@@ -1,0 +1,1 @@
+Prints a failure message if the previous command exited with a failure.

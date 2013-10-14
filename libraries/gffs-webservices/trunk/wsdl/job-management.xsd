@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/genii/application-description"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:job-management="http://vcgr.cs.virginia.edu/genii/job-management"
+	xmlns:bes="http://schemas.ggf.org/bes/2006/08/bes-factory"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:ifactory="http://vcgr.cs.virginia.edu/genii/iterator-factory"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/job-management"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/iterator-factory"
+		schemaLocation="./iterator-factory.xsd"/>
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+		
+	<xsd:import
+      namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	  schemaLocation="./jsdl.xsd"/>
+
+	<xsd:import
+		namespace="http://schemas.ggf.org/bes/2006/08/bes-factory"
+		schemaLocation="./bes-factory.xsd"/>
+
+	<xsd:simpleType name="JobStateEnumerationType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="QUEUED"/>
+			<xsd:enumeration value="REQUEUED"/>
+			<xsd:enumeration value="STARTING"/>
+			<xsd:enumeration value="RUNNING"/>
+			<xsd:enumeration value="FINISHED"/>
+			<xsd:enumeration value="ERROR"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="ReducedJobInformationType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="owner" type="xsd:base64Binary"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+			<xsd:element name="job-status" type="job-management:JobStateEnumerationType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="JobInformationType">
+		<xsd:complexContent>
+			<xsd:extension base="job-management:ReducedJobInformationType">
+				<xsd:sequence>
+					<xsd:element name="priority" type="xsd:byte"
+						minOccurs="1" maxOccurs="1" nillable="false"/>
+					<xsd:element name="submit-time" type="xsd:dateTime"
+						minOccurs="1" maxOccurs="1" nillable="false"/>
+					<xsd:element name="start-time" type="xsd:dateTime"
+						minOccurs="0" maxOccurs="1" nillable="true"/>
+					<xsd:element name="finish-time" type="xsd:dateTime"
+						minOccurs="0" maxOccurs="1" nillable="true"/>
+					<xsd:element name="attempts" type="xsd:unsignedShort"
+						minOccurs="1" maxOccurs="1" nillable="false"/>
+					<xsd:element name="scheduled-on" type="xsd:string"
+						minOccurs="0" maxOccurs="1" nillable="true"/>
+					<xsd:element name="bes-status"
+						type="bes:ActivityStatusType" minOccurs="0"
+						maxOccurs="1" nillable="false"/>
+				</xsd:sequence>
+				<xsd:attribute name="job-name" type="xsd:string"
+					use="optional"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+<!-- Message Types -->
+	<xsd:complexType name="SubmitJobRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-definition" type="jsdl:JobDefinition_Type"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="priority" type="xsd:byte"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="SubmitJobRequestType"
+		type="job-management:SubmitJobRequestType"/>
+	
+	<xsd:complexType name="SubmitJobResponseType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="SubmitJobResponseType"
+		type="job-management:SubmitJobResponseType"/>
+	
+	<xsd:complexType name="IterateStatusRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="IterateStatusRequestType"
+		type="job-management:IterateStatusRequestType"/>
+	
+	<xsd:complexType name="IterateStatusResponseType">
+		<xsd:sequence>
+			<xsd:element name="result"
+				type="ifactory:IteratorInitializationType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="IterateStatusResponseType"
+		type="job-management:IterateStatusResponseType"/>
+	
+	<xsd:element name="IterateListRequest"/>
+	<xsd:complexType name="IterateListResponseType">
+		<xsd:sequence>
+			<xsd:element name="result"
+				type="ifactory:IteratorInitializationType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="IterateListResponseType"
+		type="job-management:IterateListResponseType"/>
+	
+	<xsd:complexType name="KillRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="1" maxOccurs="unbounded" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="KillRequestType"
+		type="job-management:KillRequestType"/>
+	<xsd:element name="KillResponse"/>
+	
+	<xsd:complexType name="CompleteRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CompleteRequestType"
+		type="job-management:CompleteRequestType"/>
+	<xsd:element name="CompleteResponse"/>
+
+	<xsd:complexType name="ForceUpdateRequestType">
+		<xsd:sequence>
+			<xsd:element name="resource-name" type="xsd:string"
+				minOccurs="1" maxOccurs="unbounded" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ForceUpdateRequestType"
+		type="job-management:ForceUpdateRequestType"/>
+	<xsd:element name="ForceUpdateResponse"/>
+
+	<xsd:complexType name="RescheduleJobsRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="1" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RescheduleJobsRequest"
+		type="job-management:RescheduleJobsRequestType"/>
+	<xsd:element name="RescheduleJobsResponse"/>
+	
+	<xsd:complexType name="ConfigureRequestType">
+		<xsd:sequence>
+			<xsd:element name="queue-resource" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="num-slots" type="xsd:unsignedInt"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ConfigureRequestType"
+		type="job-management:ConfigureRequestType"/>
+		
+	<xsd:element name="ConfigureResponse"/>
+
+	<xsd:complexType name="JobErrorPacket">
+		<xsd:sequence>
+			<xsd:element name="attempt" type="xsd:unsignedShort"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="fault-text" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="QueryErrorRequest">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="QueryErrorRequest" type="job-management:QueryErrorRequest"/>
+
+	<xsd:complexType name="QueryErrorResponse">
+		<xsd:sequence>
+			<xsd:element name="fault-packet" type="job-management:JobErrorPacket"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="QueryErrorResponse" type="job-management:QueryErrorResponse"/>
+
+	<xsd:complexType name="GetJobLogRequest">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="GetJobLogRequest" type="job-management:GetJobLogRequest"/>
+
+	<xsd:complexType name="GetJobLogResponse">
+		<xsd:sequence>
+			<xsd:element name="log-endpoint" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="GetJobLogResponse" type="job-management:GetJobLogResponse"/>
+
+</xsd:schema>

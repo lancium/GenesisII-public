@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="GeniiJSDL">
+
+	<!-- Properties -->
+	<property file="${basedir}/build.properties"/>
+
+	<!-- Static Classpath -->
+	<path id="log4j.classpath">
+		<fileset dir="${ext.dir}/log4j"
+			includes="**/*.jar"/>
+	</path>
+
+	<path id="project.classpath">
+		<pathelement location="${obj-dir}"/>
+		<path refid="log4j.classpath"/>
+	</path>
+			
+
+	<!-- Build Targets -->
+	<target name="build" depends="jars,api.doc"/>
+
+	<target name="jars" depends="GeniiJSDL.jar"/>
+
+	<target name="GeniiJSDL.jar" depends="GeniiJSDL.compile">
+		<jar destfile="${lib.dir}/GeniiJSDL.jar">
+			<manifest>
+				<attribute name="Main-Class"
+					value="edu.virginia.vcgr.jsdl.ParameterSweeper"/>
+			</manifest>
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/jsdl/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="GeniiJSDL.compile" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}">
+			<src path="${src.dir}"/>
+			<classpath refid="project.classpath"/>
+			<include name="edu/virginia/vcgr/jsdl/**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="clean">
+		<delete dir="${obj.dir}"/>
+		<delete dir="${lib.dir}"/>
+		<delete dir="${api.doc.dir}"/>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${obj.dir}"/>
+		<mkdir dir="${lib.dir}"/>
+		<mkdir dir="${api.doc.dir}"/>
+	</target>
+
+	<target name="api.doc" depends="init">
+		<javadoc destdir="${api.doc.dir}" classpathref="project.classpath"
+			Overview="${basedir}/api-overview.html" link="http://java.sun.com/javase/6/docs/api/">
+			<fileset dir="${src.dir}">
+				<include name="edu/virginia/vcgr/jsdl/**/*.java"/>
+			</fileset>
+		</javadoc>
+	</target>
+</project>

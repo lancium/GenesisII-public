@@ -1,0 +1,7 @@
+Certificate paths can be given either as relative or absolute
+local file system paths (in which case it is expected that the
+path will lead to a PKCS12 formatted keystore), or they can be
+given as URIs.  If a URI is given, the URI may be any common URI
+which leads to a PKCS12 keystore, or it may be a URI whose
+protocol is rns: which then indicates an absolute or relative RNS
+path leading to a Genesis II IDP service instance.

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.rbyteio">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.rbyteio.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/rbyteio.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/rbyteio.flag">
+				<srcfiles dir="${wsdl.dir}/byteio">
+					<include name="rbyteio.xsd"/>
+					<include name="byteio.xsd"/>
+					<include name="rbyteio.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.rbyteio" unless="gen.rbyteio.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/byteio">
+				<include name="rbyteio.gwsdl"/>
+				<include name="rbyteio.xsd"/>
+				<include name="byteio.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/rbyteio.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/rbyteio-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/rbyteio-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/rbyteio-service.wsdl"
+			portType="{http://schemas.ggf.org/byteio/2005/10/random-access}RandomByteIOPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/rbyteio"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/rbyteio-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/rbyteio.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/rbyteio/org/ggf/rbyteio/deploy.wsdd"
+			tofile="${wsdd.dir}/rbyteio.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/rbyteio.deploy.wsdd"
+			token="org.ggf.rbyteio.RandomByteIOSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/rbyteio.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

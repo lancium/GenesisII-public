@@ -1,0 +1,5 @@
+manage-windows-container-service { -u | -i } [--service-name=<service-name>]
+		[--account=<account>] [--password=<password>]
+		If the <account> string has the token $MACHINENAME in it,
+		that token will be replaced with the short name of the
+		local machine.

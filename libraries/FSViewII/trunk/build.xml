@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="FSView">
+	<!-- Properties -->
+	<property environment="env"/>
+	<property file="${basedir}/build.properties"/>
+
+	<!-- Static Class paths -->
+	<path id="commons.net.classpath">
+		<fileset dir="${commons.net.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="jcifs.classpath">
+		<fileset dir="${jcifs.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="jsch.classpath">
+		<fileset dir="${jsch.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="project.classpath">
+		<pathelement location="${obj.dir}"/>
+		<path refid="commons.net.classpath"/>
+		<path refid="jcifs.classpath"/>
+		<path refid="jsch.classpath"/>
+	</path>
+			
+	<!-- Build Targets -->
+	<target name="build" depends="jars"/>
+
+	<target name="jars" depends="fsview.jar"/>
+
+	<target name="fsview.jar" depends="fsview.compile">
+		<jar destfile="${lib.dir}/fsview.jar">
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/g3/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="fsview.compile" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}"
+			includeAntRuntime="${include.ant.runtime}">
+			<src path="${src.dir}"/>
+			<classpath refid="project.classpath"/>
+			<include name="**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${obj.dir}"/>
+		<mkdir dir="${lib.dir}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${obj.dir}"/>
+		<delete quiet="true">
+			<fileset dir="${lib.dir}" includes="**/*.jar"/>
+		</delete>
+	</target>
+	
+</project>

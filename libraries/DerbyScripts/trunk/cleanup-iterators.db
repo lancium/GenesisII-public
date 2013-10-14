@@ -1,0 +1,7 @@
+DELETE FROM unknownattrs WHERE resourceid IN (SELECT iteratorid FROM ITERATORS);
+DELETE FROM resources WHERE resourceid IN (SELECT iteratorid FROM ITERATORS);
+DELETE FROM properties WHERE resourceid IN (SELECT iteratorid FROM ITERATORS);
+DELETE FROM matchingparams WHERE resourceid IN (SELECT iteratorid FROM ITERATORS);
+DELETE FROM resources2 WHERE resourceid IN (SELECT iteratorid FROM ITERATORS);
+DELETE FROM persistedproperties WHERE resourceid IN (SELECT iteratorid FROM ITERATORS);
+DROP TABLE ITERATORS;

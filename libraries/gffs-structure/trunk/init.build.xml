@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="init" name="gffs-structure.init">
+
+	<target name="init">
+		<mkdir dir="${obj.dir}"/>
+	</target>
+	
+</project>

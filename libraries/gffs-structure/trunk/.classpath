@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="ext/axis/axis.jar" sourcepath="/home/fred/xsede/code/genesis2/axis1.4"/>
+	<classpathentry kind="lib" path="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
+	<classpathentry kind="lib" path="ext/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="ext/axis/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="ext/wss4j-1.5.6.jar"/>
+	<classpathentry kind="lib" path="ext/CmdLineManipulator.jar"/>
+	<classpathentry kind="lib" path="ext/GeniiJSDL.jar"/>
+	<classpathentry kind="lib" path="ext/fuse-j.jar"/>
+	<classpathentry kind="lib" path="ext/app-manager.jar"/>
+	<classpathentry kind="lib" path="ext/xmlbeans-2.4.0.jar"/>
+	<classpathentry kind="lib" path="ext/MorganUtilities.jar"/>
+	<classpathentry kind="lib" path="ext/GridJobTool.jar"/>
+	<classpathentry kind="lib" path="ext/MyProxyLogon.jar"/>
+	<classpathentry kind="lib" path="bundles/org.eclipse.osgi_3.8.0.v20120529-1548.jar" sourcepath="/home/fred/.m2/repository/org/eclipse/tycho/org.eclipse.osgi/3.8.0.v20120529-1548/org.eclipse.osgi-3.8.0.v20120529-1548-sources.jar"/>
+	<classpathentry kind="lib" path="ext/GeniiProcMgmt.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/servlet-api-2.5-20081211.jar"/>
+	<classpathentry kind="lib" path="ext/axis/mail.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/jetty-6.1.26.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/jetty-util-6.1.26.jar"/>
+	<classpathentry kind="lib" path="ext/fsview.jar"/>
+	<classpathentry kind="lib" path="bundles/com.jcraft.jsch_0.1.46.v201205102330.jar"/>
+	<classpathentry kind="lib" path="ext/ant/ant-jsch.jar"/>
+	<classpathentry kind="lib" path="ext/ant/ant.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gffs-basics"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gffs-security"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gffs-webservices"/>
+	<classpathentry kind="lib" path="bundles/org.apache.commons.lang_2.6.0.v201205030909.jar"/>
+	<classpathentry kind="lib" path="ext/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="ext/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="ext/bcprov-jdk16-1.46.jar"/>
+	<classpathentry kind="lib" path="bundles/bundle-u6security_1.0.67.jar"/>
+	<classpathentry kind="output" path="bin.eclipse"/>
+</classpath>
