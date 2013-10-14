@@ -25,7 +25,7 @@ public class UIPlugins
 {
 	static private Log _logger = LogFactory.getLog(UIPlugins.class);
 
-	static private final int MAX_GROUP_SIZE = 4;
+	static private final int MAX_GROUP_SIZE = 8;
 
 	static private Collection<UIPluginDescription> _plugins;
 

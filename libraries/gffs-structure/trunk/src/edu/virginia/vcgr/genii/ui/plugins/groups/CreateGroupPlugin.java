@@ -8,6 +8,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.tools.IdpTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.RmTool;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamespaceDefinitions;
@@ -172,7 +173,9 @@ public class CreateGroupPlugin extends AbstractCombinedUIMenusPlugin
 	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-
-		return selectedDescriptions.iterator().next().typeInformation().isRNS();
+		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS and NOT (isContainer, isBES ...
+		// Perhaps should be even more selective, 
+		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
+		return (tp.isRNS() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP() || tp.isExport() || tp.isFSProxy()));
 	}
 }

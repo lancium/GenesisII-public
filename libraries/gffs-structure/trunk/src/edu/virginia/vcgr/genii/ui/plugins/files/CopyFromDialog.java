@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.ui.plugins.files;
 
 import java.io.Closeable;
-import java.io.File;
 import java.util.Collection;
 
 import javax.swing.JFileChooser;
@@ -26,16 +25,16 @@ import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 import edu.virginia.vcgr.genii.ui.utils.LoggingTarget;
 
 /**
- * Provides a dialog for saving an RNS asset to a file system path.
+ * Provides a dialog for copying a local directory system to RNS path
  * 
- * @author Chris Koeritz
- * @copyright Copyright (c) 2012-$now By University of Virginia
+ * @author Andrew Grimshaw based on code by Chris Koeritz
+ * @copyright Copyright (c) 2013 By University of Virginia
  * @license This file is free software; you can modify and redistribute it under the terms of the
  *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
-public class SaveToDialog extends AbstractCombinedUIMenusPlugin
+public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 {
-	static private Log _logger = LogFactory.getLog(SaveToDialog.class);
+	static private Log _logger = LogFactory.getLog(CopyFromDialog.class);
 	JFileChooser _fileDialog = new JFileChooser();
 
 	/**
@@ -58,7 +57,7 @@ public class SaveToDialog extends AbstractCombinedUIMenusPlugin
 		if (context == null)
 			return;
 		if (_logger.isDebugEnabled())
-			_logger.debug("SaveToDialog performMenuAction called.");
+			_logger.debug("CopyFromDialog performMenuAction called.");
 		Closeable contextToken = null;
 		contextToken = null;
 		try {
@@ -72,8 +71,8 @@ public class SaveToDialog extends AbstractCombinedUIMenusPlugin
 				context
 					.uiContext()
 					.progressMonitorFactory()
-					.createMonitor(context.ownerComponent(), "Saving to local filesystem...", "", 1000L,
-						new SaveToTask(path, _fileDialog.getSelectedFile().toString()), null).start();
+					.createMonitor(context.ownerComponent(), "Copy from local filesystem", "", 1000L,
+						new SaveToTask("local:" +_fileDialog.getSelectedFile().toString(), path.pwd()), null).start();
 			}
 		} catch (Throwable cause) {
 			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
@@ -84,23 +83,21 @@ public class SaveToDialog extends AbstractCombinedUIMenusPlugin
 
 	private class SaveToTask extends AbstractTask<Integer>
 	{
-		RNSPath path;
+		String src;
 		String target;
 
-		SaveToTask(RNSPath pathIn, String targetIn)
+		SaveToTask(String pathIn, String targetIn)
 		{
-			path = pathIn;
+			src = pathIn;
 			target = targetIn;
 		}
 
-		private PathOutcome performSave(RNSPath source, TaskProgressListener progressListener)
+		private PathOutcome performSave(TaskProgressListener progressListener)
 		{
-			if ((source == null) || (progressListener == null))
+			if ((src == null) || (progressListener == null))
 				return null;
-			File file = _fileDialog.getSelectedFile();
-			String target = "local:" + file.toString();
 			// we assume they don't want to overwrite files without knowing it.
-			CopyMachine cm = new CopyMachine(source.pwd(), target, progressListener, false, null, null);
+			CopyMachine cm = new CopyMachine(src, target, progressListener, false, null, null);
 			return cm.copyTree();
 		}
 
@@ -109,7 +106,7 @@ public class SaveToDialog extends AbstractCombinedUIMenusPlugin
 		{
 			if (progressListener == null)
 				return 1;
-			PathOutcome ret = performSave(path, progressListener);
+			PathOutcome ret = performSave( progressListener);
 			if (PathOutcome.OUTCOME_SUCCESS.differs(ret)) {
 				String msg = "failed to save to the chosen path: " + target + " because " + PathOutcome.outcomeText(ret);
 				LoggingTarget.logInfo(msg, null);

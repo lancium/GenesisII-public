@@ -83,6 +83,8 @@ public class ProgressMonitorFactory
 					while (true) {
 						try {
 							_result = future.get();
+							System.out.println("ASG: about to call taskcomploeted worker constructor");
+
 							if (_completionListener != null)
 								new TaskCompletedWorker<ResultType>(this, _completionListener, _task, _result).run();
 							return;
@@ -158,7 +160,11 @@ public class ProgressMonitorFactory
 			}
 
 			_listener.taskCompleted(_task, _result);
+			System.out.println("ASG: task completed worker");
+
 			_monitor.fireTaskCompleted();
+			System.out.println("ASG: task completed work second half");
+
 		}
 	}
 

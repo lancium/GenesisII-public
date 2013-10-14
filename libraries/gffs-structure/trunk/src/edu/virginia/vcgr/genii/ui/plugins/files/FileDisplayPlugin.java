@@ -13,6 +13,7 @@ import javax.swing.text.Style;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.ui.plugins.AbstractUITabPlugin;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
@@ -36,7 +37,8 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
 
-		return selectedDescriptions.iterator().next().typeInformation().isByteIO();
+		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
+		return (tp.isByteIO() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
 	}
 
 	static private class TextLoadHandler implements LazyLoadTabHandler

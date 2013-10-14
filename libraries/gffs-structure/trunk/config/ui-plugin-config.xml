@@ -1,14 +1,29 @@
 <plugins>
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.EditPlugin">
-		<top-menu menu-name="Edit" group="Basic File" item-name="Edit"/>
+		<top-menu menu-name="File" group="Basic File" item-name="Edit"/>
 		<popup-menu group="Basic File" item-name="Edit"/>
 	</plugin>
+
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.matchparam.MatchingParametersPlugin">
+		<popup-menu menu-name="Basic Resource" item-name="Matching Parameters"/>
+	</plugin>
 	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeDirectoryPlugin">
+		<top-menu menu-name="Directory" group="Basic File" item-name="Make Directory"/>
+		<popup-menu group="Basic File" item-name="Make Directory"/>
+	</plugin>
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.SaveToDialog">
-		<top-menu menu-name="File" group="Basic File" item-name="Save To..."/>
-		<popup-menu group="Basic File" item-name="Save To..."/>
+		<top-menu menu-name="File" group="Basic File" item-name="Copy To Local File System From GFFS"/>
+		<popup-menu group="Basic File" item-name="Copy To Local File System From GFFS"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.CopyFromDialog">
+		<top-menu menu-name="File" group="Basic File" item-name="Copy From Local File System To GFFS"/>
+		<popup-menu group="Basic File" item-name="Copy From Local File System To GFFS"/>
 	</plugin>
 
+
+		
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.fsproxy.CreateFSProxyPlugin">
 		<popup-menu menu-name="FSProxy" item-name="Create Filesystem Proxy"/>
 	</plugin>
@@ -16,18 +31,32 @@
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.fsproxy.QuitFSProxyPlugin">
 		<popup-menu menu-name="FSProxy" item-name="Quit Filesystem Proxy"/>
 	</plugin>
+
+<!-- -	
+
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.CopyFromDialog">
+		<top-menu menu-name="File" group="Basic File" item-name="Copy From Local File System To GFFS"/>
+		<popup-menu group="Basic File" item-name="Copy From Local File System To GFFS"/>
+	</plugin>
+
+
+
+	-->
+
 	
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.matchparam.MatchingParametersPlugin">
-		<popup-menu menu-name="Basic Resource" item-name="Matching Parameters"/>
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.DeleteDirectoryPlugin">
+		<top-menu menu-name="Directory" group="Basic File" item-name="Delete Directory"/>
+		<popup-menu group="Basic File" item-name="Delete Directory"/>
 	</plugin>
 	
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeDirectoryPlugin">
-		<top-menu menu-name="File" group="Basic File" item-name="Make Directory"/>
-		<popup-menu group="Basic File" item-name="Make Directory"/>
+		
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.DeleteFilePlugin">
+		<top-menu menu-name="File" group="Basic File" item-name="Delete File"/>	
+		<popup-menu group="Basic File" item-name="Delete File"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.view.RefreshPlugin">
-		<top-menu menu-name="View" group="Basic File" item-name="Refresh (F5)"/>
+		<top-menu menu-name="Directory" group="Basic File" item-name="Refresh (F5)"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.jobs.JobHistoryPlugin">

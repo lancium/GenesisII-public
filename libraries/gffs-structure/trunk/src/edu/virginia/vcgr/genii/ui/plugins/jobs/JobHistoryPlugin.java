@@ -94,6 +94,15 @@ public class JobHistoryPlugin extends AbstractCombinedUIMenusPlugin
 	@Override
 	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
 	{
-		return true;
+		// return true;
+		// ASG: 09-13-2013 ARG $%&$# who thought returning true always was a good idea?
+		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
+			return false;
+
+		TypeInformation typeInfo = selectedDescriptions.iterator().next().typeInformation();
+		// need to see if what we are really looking for
+		return (typeInfo.isBESActivity());
+	
+		
 	}
 }
