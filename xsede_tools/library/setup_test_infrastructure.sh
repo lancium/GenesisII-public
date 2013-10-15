@@ -38,10 +38,10 @@ else
   echo "No password provided, but it's only needed for bootstrapping."
 fi
 
-oneTimeSetUp()
-{
-  sanity_test_and_init  # make sure test environment is good.
-}
+#oneTimeSetUp()
+#{
+#  sanity_test_and_init  # make sure test environment is good.
+#}
 
 # login the right power user that can create other user entries.
 testLoginAsAdmin()
