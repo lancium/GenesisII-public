@@ -36,6 +36,8 @@ import eu.unicore.security.etd.TrustDelegation;
  */
 public class CredentialWallet implements Externalizable, Describable
 {
+	static public final long serialVersionUID = 2636486491170348968L;
+
 	private static Log _logger = LogFactory.getLog(CredentialWallet.class);
 
 	/**
