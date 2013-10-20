@@ -594,9 +594,7 @@ public class BESManager implements Closeable
 		/*
 		 * See if that resource is currently listed in the "available" resources list.
 		 */
-		if (!_scheduleableContainers.containsKey(new Long(besID)))
-			;
-		{
+		if (!_scheduleableContainers.containsKey(new Long(besID))) {
 			/*
 			 * If it isn't, we need to add it to that list. Get's it's in memory data structure and
 			 * put the data structure into the available list.

@@ -51,8 +51,9 @@ public class HttpPostProtocol extends AbstractPostProtocol implements PostProtoc
 			out = null;
 
 			in = connection.getInputStream();
-			while (in.read(content) > 0)
-				;
+			while (in.read(content) > 0) {
+				// do nothing.
+			}
 		} finally {
 			StreamUtils.close(out);
 			StreamUtils.close(in);

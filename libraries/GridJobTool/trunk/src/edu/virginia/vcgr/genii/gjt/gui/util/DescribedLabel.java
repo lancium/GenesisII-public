@@ -31,7 +31,6 @@ public class DescribedLabel<Type> extends JLabel
 			Rectangle2D rectangle = g.getFont().getStringBounds(toDisplay, g.getFontRenderContext());
 			if (rectangle.getWidth() <= (getWidth() - BUFFER))
 				break;
-			;
 		}
 
 		setText(toDisplay);

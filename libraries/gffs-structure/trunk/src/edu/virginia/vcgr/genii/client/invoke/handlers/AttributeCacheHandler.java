@@ -274,7 +274,6 @@ public class AttributeCacheHandler
 
 		if (ret == null)
 			return new GetMultipleResourcePropertiesResponse(new MessageElement[0]);
-		;
 
 		return new GetMultipleResourcePropertiesResponse(ret.toArray(new MessageElement[0]));
 	}
@@ -314,7 +313,6 @@ public class AttributeCacheHandler
 
 		if (ret == null)
 			return new GetResourcePropertyResponse(new MessageElement[0]);
-		;
 
 		return new GetResourcePropertyResponse(ret.toArray(new MessageElement[0]));
 	}

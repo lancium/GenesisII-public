@@ -23,7 +23,6 @@ public class ByteIOFileCreator
 	synchronized public static File createFile(File userDir) throws IOException
 	{
 		File baseDir, uroot;
-		;
 		baseDir = new GuaranteedDirectory(userDir, "rbyteio-data");
 		uroot = baseDir;
 

@@ -196,9 +196,9 @@ public class InformationPortal<InformationType> implements Closeable
 						timeout = Long.MAX_VALUE;
 					else
 						timeout = nextTimeout.getTimeInMillis() - System.currentTimeMillis();
-					if (timeout < 0L)
-						;
-					timeout = 0L;
+					if (timeout < 0L) {
+						timeout = 1L;
+					}
 
 					try {
 						_waitingListeners.wait(timeout);

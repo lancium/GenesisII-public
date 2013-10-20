@@ -492,7 +492,6 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		TopicSet space = TopicSet.forPublisher(getClass());
 		PublisherTopic topic = space.createPublisherTopic(RNS_OPERATION_TOPIC);
 		topic.publish(new RNSOperationContents(RNSOperations.Add, name, entry, vvr));
-		;
 	}
 
 	private void fireRNSEntryRemoved(VersionVector vvr, String name) throws ResourceUnknownFaultType, ResourceException

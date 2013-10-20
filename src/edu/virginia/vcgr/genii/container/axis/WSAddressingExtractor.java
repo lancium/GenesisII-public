@@ -76,7 +76,6 @@ public class WSAddressingExtractor extends BasicHandler
 			QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
 			if (heName.equals(_WSA_METADATA_QName)) {
 				epr.setMetadata((MetadataType) ObjectDeserializer.toObject(he, MetadataType.class));
-				;
 			} else if (heName.equals(_WSA_TO_QNAME)) {
 				epr.setAddress(new AttributedURIType(he.getFirstChild().getNodeValue()));
 				if (_logger.isDebugEnabled())

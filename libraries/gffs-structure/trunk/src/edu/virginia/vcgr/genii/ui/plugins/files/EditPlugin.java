@@ -257,7 +257,6 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 							if (WaitForEditor(result.getName()) < 0) {
 								System.err.println("Could not determine editor status");
 							}
-							;
 							if (result.lastModified() > lastModified) {
 								// The file was updated
 								// Now upload
