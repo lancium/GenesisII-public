@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.gui.exportdir;
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -11,6 +12,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
 public class QuitExportAction extends AbstractAction implements ListSelectionListener
 {
@@ -51,17 +53,28 @@ public class QuitExportAction extends AbstractAction implements ListSelectionLis
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		try {
-			int selectedRow = _table.getSelectedRow();
-			ExportTableModel model = (ExportTableModel) _table.getModel();
+		int selectedRow = _table.getSelectedRow();
+		ExportTableModel model = (ExportTableModel) _table.getModel();
 
-			ExportDirInformation info = model.getRow(selectedRow);
+		ExportDirInformation info = model.getRow(selectedRow);
+
+		try {
 
 			ExportManipulator.quitExport(info.getRNSPath());
-			ExportDirState.removeExport(info);
-			fireExportsChanged();
+
 		} catch (Throwable cause) {
 			GuiUtils.displayError(_table, "Export Exception", cause);
+		} finally {
+			try {
+				ExportDirState.removeExport(info);
+			} catch (FileLockException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			fireExportsChanged();
 		}
 	}
 

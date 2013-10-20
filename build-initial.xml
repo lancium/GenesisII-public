@@ -2,10 +2,10 @@
 <project basedir="." default="init" name="GenesisII.init">
 
 	<target name="init">
-		<mkdir dir="${wsdd.dir}"/>
+<!--		<mkdir dir="${wsdd.dir}"/> -->
 		<mkdir dir="${obj.dir}"/>
 		<mkdir dir="${dpages.dir}"/>
-		<mkdir dir="${deployments.dir}/default"/>
+<!-- why still create this?		<mkdir dir="${deployments.dir}/default"/> -->
 	</target>
 	
 </project>

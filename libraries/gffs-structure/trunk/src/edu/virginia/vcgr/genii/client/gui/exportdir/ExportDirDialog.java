@@ -26,12 +26,16 @@ public class ExportDirDialog extends JDialog
 
 	private ExportTableModel _model;
 	private JTable _table;
+	String _container_path;
+	String _target_path;
 
-	public ExportDirDialog() throws FileLockException
+	public ExportDirDialog(String ContainerPath, String TargetPath) throws FileLockException
 	{
 		Container container;
 		JPanel panel;
 		JButton button;
+		_container_path = ContainerPath;
+		_target_path = TargetPath;
 
 		setTitle(_TITLE);
 
@@ -42,7 +46,7 @@ public class ExportDirDialog extends JDialog
 		container.add(panel, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5), 5, 5));
 
-		ExportDataAction action = new ExportDataAction(this);
+		ExportDataAction action = new ExportDataAction(this, ContainerPath, TargetPath);
 		action.addExportChangeListener(_model);
 		button = new JButton(action);
 		container.add(button, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,

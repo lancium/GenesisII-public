@@ -108,7 +108,7 @@ public class ExportTool extends BaseGridTool
 	{
 		int numArgs = numArguments();
 		if (_create) {
-			/* get rns path for exported root and ensure dne */
+			/* get rns path for exported root and ensure does not exist */
 			String targetRNSName = null;
 			if (numArgs == 3) {
 				GeniiPath gPath = new GeniiPath(getArgument(2));
@@ -205,7 +205,9 @@ public class ExportTool extends BaseGridTool
 			stdout.println("Exported root stopped successfully");
 			return 0;
 		} else {
-			ExportDirDialog dialog = new ExportDirDialog();
+			String ContainerPath = null;
+			String TargetPath = null;
+			ExportDirDialog dialog = new ExportDirDialog(ContainerPath, TargetPath);
 			dialog.pack();
 			GuiUtils.centerComponent(dialog);
 			dialog.setVisible(true);

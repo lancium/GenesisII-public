@@ -7,11 +7,6 @@ run the build script:
 
   bash scripts/build_dependencies.sh
 
-If you want it to also update the libraries to the latest from svn before
-building, then add the 'update' flag:
-
-  bash scripts/build_dependencies.sh update
-
 And to clean up all the generated files in the libraries, the 'clean' flag
 is available:
 

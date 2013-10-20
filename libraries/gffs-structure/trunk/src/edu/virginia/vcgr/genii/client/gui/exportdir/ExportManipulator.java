@@ -3,39 +3,97 @@ package edu.virginia.vcgr.genii.client.gui.exportdir;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
 
+import org.ws.addressing.EndpointReferenceType;
+
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.tools.ExportTool;
-import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 
 public class ExportManipulator
 {
-	static public RNSPath createExport(URL containerURL, File localPath, String rnsPath, boolean isLightweight)
+	static public RNSPath createExport(String containerPath, String localPath, String rnsPath, boolean isLightweight)
 		throws FileNotFoundException, ExportException, RNSException, CreationException, ResourceCreationFaultType,
 		RemoteException, IOException, InvalidToolUsageException
 	{
-		validate(localPath);
 
-		RNSPath target = RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_NOT_EXIST);
-		validate(target);
+		RNSPath cpath, targetpath, servicepath;
+		targetpath = RNSPath.getCurrent();
+		cpath = RNSPath.getCurrent();
+		servicepath = cpath;
+		try {
+			// First check that the target rns path is ok
+			try {
+				targetpath = RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_NOT_EXIST);
+			} catch (RNSPathAlreadyExistsException r) {
+				throw new ResourceException("Path " + targetpath.toString() + " already exists.");
+			} catch (Exception r) {
+				throw new ResourceException("Problem with ensuring target RNS path does not already exist.");
+			}
+			// Ok it does not exist, now we need to make sure the
+			// base part of the path exists
 
-		ExportTool.createExportedRoot(
-			rnsPath,
-			EPRUtils.makeEPR(containerURL.toString() + "/axis/services/"
-				+ (isLightweight ? "LightWeightExportPortType" : "ExportedRootPortType")), localPath.getAbsolutePath(), null,
-			null, null, rnsPath, false);
+			if (!targetpath.getParent().exists()) {
+				// Need to try again!
+				throw new ResourceException("Path " + targetpath.toString() + " MUST exist.");
+			}
+
+			// Now check to make sure that the container info is OK
+			cpath = cpath.lookup(containerPath);
+			servicepath = cpath;
+			String service = "";
+			try {
+				if (isLightweight) {
+					service = "LightWeightExportPortType";
+				} else {
+					service = "ExportedDirPortType";
+				}
+				servicepath = cpath.lookup("Services/" + service, RNSPathQueryFlags.MUST_EXIST);
+			} catch (RNSPathDoesNotExistException r) {
+				throw new ResourceException("There is no Services/" + service + " on the container " + cpath.toString());
+			} catch (Exception r) {
+				throw new ResourceException("Problem with ensuring that there is a LightWeightExportPortType service.");
+			}
+
+		} catch (Exception r) {
+
+		}
+		// Now we have both the container path and the target
+		// path.
+		try {
+			EndpointReferenceType exEPR =
+				ExportTool.createExportedRoot(targetpath.toString(), servicepath.getEndpoint(), localPath, "", "", 0L,
+					targetpath.toString(), false);
+		} catch (Exception r) {
+
+		}
 		return RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST);
 	}
+
+	/*
+	 * static public RNSPath createExport(URL containerURL, File localPath, String rnsPath, boolean
+	 * isLightweight) throws FileNotFoundException, ExportException, RNSException,
+	 * CreationException, ResourceCreationFaultType, RemoteException, IOException,
+	 * InvalidToolUsageException { validate(localPath);
+	 * 
+	 * RNSPath target = RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_NOT_EXIST);
+	 * validate(target);
+	 * 
+	 * ExportTool.createExportedRoot( rnsPath, EPRUtils.makeEPR(containerURL.toString() +
+	 * "/axis/services/" + (isLightweight ? "LightWeightExportPortType" : "ExportedRootPortType")),
+	 * localPath.getAbsolutePath(), null, null, null, rnsPath, false); return
+	 * RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST); }
+	 */
 
 	static public void validate(File localPath) throws FileNotFoundException, ExportException
 	{

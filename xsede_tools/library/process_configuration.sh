@@ -82,11 +82,15 @@ define_and_export_variables()
   # calculate the deployments directory if there's an override.
   if [ -e "$GENII_INSTALL_DIR/container.properties" ]; then
     export DEPLOYMENTS_ROOT=$(sed -n -e 's/edu.virginia.vcgr.genii.container.deployment-directory=\(.*\)/\1/p' < "$GENII_INSTALL_DIR/container.properties")
+    if [[ $DEPLOYMENTS_ROOT =~ '#'* ]]; then
+      unset DEPLOYMENTS_ROOT
+    else
+      echo "calculated deployments root as: $DEPLOYMENTS_ROOT"
+    fi
   fi
   if [ -z "$DEPLOYMENTS_ROOT" ]; then
     export DEPLOYMENTS_ROOT=$GENII_INSTALL_DIR/deployments
   fi
-  echo "Deployments root is $DEPLOYMENTS_ROOT"
 
   # we will not do the file existence check if there's a chance that the code
   # has not been built yet, and the caller knows this and tells us.

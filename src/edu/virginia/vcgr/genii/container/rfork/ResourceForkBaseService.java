@@ -645,6 +645,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			timer.noteTime();
 
 			timer = tSink.getTimer("Create Iterator");
+
 			return RNSContainerUtilities.indexedTranslate(resultEntries, iteratorBuilder(RNSEntryResponseType.getTypeDesc()
 				.getXmlType()), wrapper);
 		} catch (IOException ioe) {

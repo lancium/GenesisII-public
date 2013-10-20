@@ -6,7 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
@@ -32,7 +31,8 @@ public class ExportCreationDialog extends JDialog
 	private JRadioButton _standardExportService = null;
 	private JRadioButton _lightweightExportService = null;
 
-	public ExportCreationDialog(JDialog owner) throws FileLockException, NoContainersException
+	public ExportCreationDialog(JDialog owner, String ContainerPath, String TargetPath) throws FileLockException,
+		NoContainersException
 	{
 		super(owner);
 
@@ -40,18 +40,19 @@ public class ExportCreationDialog extends JDialog
 
 		setTitle(_TITLE);
 		container = getContentPane();
-
+		_deployments = new DeploymentsWidget();
 		container.setLayout(new GridBagLayout());
-		container.add(_deployments = new DeploymentsWidget(), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 2, 1, 1.0,
-			0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(_standardExportService = new JRadioButton("Standard Export"), new GridBagConstraints(0,
-			GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5,
-				5), 5, 5));
-		container.add(_lightweightExportService = new JRadioButton("Light-weight Export"), new GridBagConstraints(0,
-			GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5,
-				5), 5, 5));
-		container.add(_paths = new ExportPathsWidget(), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		/*
+		 * container.add(_deployments = new DeploymentsWidget(), new GridBagConstraints(0,
+		 * GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+		 * GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		 */
+		container.add(_standardExportService = new JRadioButton("Standard Export"), new GridBagConstraints(0, 0, 2, 1, 1.0,
+			0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+		container.add(_lightweightExportService = new JRadioButton("Light-weight Export"), new GridBagConstraints(0, 1, 2, 1,
+			1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_paths = new ExportPathsWidget(ContainerPath, TargetPath), new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0,
+			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		_lightweightExportService.setSelected(true);
 		_standardExportService.setSelected(false);
@@ -64,7 +65,7 @@ public class ExportCreationDialog extends JDialog
 		_paths.addInformationListener(action);
 
 		container.add(new JButton(action), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		container.add(new JButton(new CancelAction()), new GridBagConstraints(1, GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0,
 			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 	}
@@ -74,9 +75,10 @@ public class ExportCreationDialog extends JDialog
 		ContainerInformation containerInfo = _deployments.getSelectedDeployment();
 		String localPath = _paths.getLocalPath();
 		String rnsPath = _paths.getRNSPath();
+		String containerPath = _paths.getContainerPath();
 
 		return containerInfo != null && localPath != null && localPath.trim().length() > 0 && rnsPath != null
-			&& rnsPath.trim().length() > 0;
+			&& rnsPath.trim().length() > 0 && containerPath != null && containerPath.trim().length() > 0;
 	}
 
 	public ExportCreationInformation getExportCreationInformation()
@@ -98,18 +100,18 @@ public class ExportCreationDialog extends JDialog
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
+
 			try {
-				File localPath = new File(_paths.getLocalPath());
-				ExportManipulator.validate(localPath);
 				RNSPath rnsPath = RNSPath.getCurrent().lookup(_paths.getRNSPath(), RNSPathQueryFlags.MUST_NOT_EXIST);
 				ExportManipulator.validate(rnsPath);
 				_information =
-					new ExportCreationInformation(_deployments.getSelectedDeployment(), _paths.getLocalPath(),
-						_paths.getRNSPath(), _lightweightExportService.isSelected());
+					new ExportCreationInformation(_paths.getContainerPath(), _paths.getLocalPath(), _paths.getRNSPath(),
+						_lightweightExportService.isSelected());
 				setVisible(false);
 			} catch (Throwable cause) {
 				GuiUtils.displayError((Component) e.getSource(), "Export Creation Error", cause);
 			}
+
 		}
 
 		@Override

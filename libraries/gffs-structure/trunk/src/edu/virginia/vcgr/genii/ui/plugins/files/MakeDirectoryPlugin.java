@@ -6,10 +6,15 @@ import java.util.Collection;
 import javax.swing.JOptionPane;
 
 import org.morgan.util.io.StreamUtils;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.rcreate.ResourceCreationContext;
+import edu.virginia.vcgr.genii.client.rcreate.ResourceCreator;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
+import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 import edu.virginia.vcgr.genii.ui.plugins.AbstractCombinedUIMenusPlugin;
@@ -20,6 +25,7 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 
 public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 {
+
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
@@ -30,16 +36,81 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 
 			try {
 				contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
-
-				String answer =
-					JOptionPane.showInputDialog(context.ownerComponent(), "What would you like to call the new directory?");
-				if (answer == null)
-					return;
-
 				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 				RNSPath path = paths.iterator().next();
-				path = path.lookup(answer, RNSPathQueryFlags.MUST_NOT_EXIST);
-				path.mkdir();
+				RNSPath linkPath = path;
+				String answer = null;
+				while (answer == null) {
+					// Keep trying until they get a good path or they give up
+					answer =
+						JOptionPane.showInputDialog(context.ownerComponent(), "New Directory Path <pwd=" + path.toString()
+							+ ">?");
+					if (answer == null)
+						return;
+					// Now check path
+					try {
+						path = path.lookup(answer, RNSPathQueryFlags.MUST_NOT_EXIST);
+						linkPath = path;
+					} catch (RNSPathAlreadyExistsException r) {
+						JOptionPane.showMessageDialog(null, answer, "Inidcated path already exists", JOptionPane.ERROR_MESSAGE);
+						answer = null;
+					}
+					if (!path.getParent().exists()) {
+						JOptionPane.showMessageDialog(null, answer, "Parent directory " + path.getParent().toString()
+							+ " does not exist!", JOptionPane.ERROR_MESSAGE);
+						answer = null;
+					}
+				}
+
+				// Now see if they want on the same storage service as the parent directory, or
+				// somewhere else
+				int sameStorage =
+					JOptionPane.showConfirmDialog(null, "Store directory on same storage server as parent directory "
+						+ path.getParent().toString(), "Decide where to store the directory and things created in it",
+						JOptionPane.YES_NO_OPTION);
+				// System.err.println("samestorage = " + sameStorage);
+				if (sameStorage == 0) {
+					// They said yes - go figure 0 is yes
+					path.mkdir();
+				} else {
+					String dirPath = path.toString();
+					String containerPath = null;
+					// Much more complicated. First must get the container they want to use.
+
+					while (containerPath == null) {
+						// Keep trying till they get a good container path or they give up
+						containerPath = JOptionPane.showInputDialog(context.ownerComponent(), "Input storage container path: ");
+						if (containerPath == null)
+							return;
+						try {
+							path = path.lookup(containerPath, RNSPathQueryFlags.MUST_EXIST);
+							path = path.lookup(containerPath + "/Services/EnhancedRNSPortType", RNSPathQueryFlags.MUST_EXIST);
+						} catch (RNSPathDoesNotExistException r) {
+							JOptionPane.showMessageDialog(null, containerPath, "Storage container path does not exist",
+								JOptionPane.ERROR_MESSAGE);
+							containerPath = null;
+						}
+
+						if (containerPath != null)
+							break;
+					}
+					if (new TypeInformation(path.lookup(containerPath).getEndpoint()).isContainer()) {
+						// System.err.println("About to mkdir: container " + path.toString() +
+						// " : link to " + linkPath.toString());
+						EndpointReferenceType newEPR =
+							ResourceCreator.createNewResource(path.getEndpoint(), null, new ResourceCreationContext());
+						linkPath.link(newEPR);
+
+					} else {
+						JOptionPane.showMessageDialog(null, containerPath, "Storage container is not a container",
+							JOptionPane.ERROR_MESSAGE);
+						containerPath = null;
+					}
+
+					path = path.lookup(containerPath, RNSPathQueryFlags.MUST_EXIST);
+					// Then create the directory on that container, linked to the path we want
+				}
+
 				context.endpointRetriever().refresh();
 				return;
 			} catch (Throwable cause) {

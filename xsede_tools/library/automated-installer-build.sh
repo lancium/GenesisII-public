@@ -76,10 +76,18 @@ function build_installer()
   # clean out the media folder.
   \rm -f $INSTALLER_DIR/Media/*
 
+  # clean up any certificates that exist in the default deployment.
+  pushd $DEPLOYMENTS_ROOT/default/security &>/dev/null
+  \rm -f *.pfx *.cer
+  pushd default-owners &>/dev/null
+  \rm -f *.pfx *.cer
+  popd &>/dev/null
+  popd &>/dev/null
+
   pushd $INSTALLER_DIR &>/dev/null
   install4jc -b "$media_num" "$installer_name"
   check_if_failed "building installer for $name_piece"
-  for i in Media/*.dmg Media/*.sh Media/*.exe; do
+  for i in Media/*.dmg Media/*.sh Media/*.exe Media/*.rpm Media/*.deb; do
     if [ -f "$i" ]; then
       cp $i $OUTPUT_DIRECTORY
       check_if_failed "copying built installer for $name_piece to products"

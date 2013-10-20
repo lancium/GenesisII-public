@@ -13,7 +13,7 @@ public class ExportTableModel extends AbstractTableModel implements IExportChang
 {
 	static final long serialVersionUID = 0L;
 
-	static final private String[] _COLUMN_NAMES = new String[] { "Deployment", "Local Path", "RNS Path" };
+	static final private String[] _COLUMN_NAMES = new String[] { "Container Path", "Local Path", "RNS Path" };
 
 	static private class RowData
 	{

@@ -84,7 +84,6 @@ public class ProgressMonitorFactory
 						try {
 							_result = future.get();
 							// System.out.println("ASG: about to call taskcomploeted worker constructor");
-
 							if (_completionListener != null)
 								new TaskCompletedWorker<ResultType>(this, _completionListener, _task, _result).run();
 							return;

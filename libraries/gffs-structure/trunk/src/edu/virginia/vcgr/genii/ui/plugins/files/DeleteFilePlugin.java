@@ -30,10 +30,9 @@ public class DeleteFilePlugin extends AbstractCombinedUIMenusPlugin
 
 				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 				RNSPath path = paths.iterator().next();
-				// We really need to figure out how to refresh directories after deleting things -
-				// ASG
-				path.delete();
 
+				path.delete();
+				context.endpointRetriever().refreshParent();
 				return;
 			} catch (Throwable cause) {
 				ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);

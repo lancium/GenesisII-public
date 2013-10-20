@@ -76,6 +76,7 @@ fan_out_directories()
 # copied from open source codebase at: http://feistymeow.org
 # locates a process given a search pattern to match in the process list.
 function psfind() {
+  mkdir $TEST_TEMP/grid_logs &>/dev/null
   local PID_DUMP="$(mktemp "$TEST_TEMP/grid_logs/zz_pidlist.XXXXXX")"
   local PIDS_SOUGHT=()
   local patterns=($*)

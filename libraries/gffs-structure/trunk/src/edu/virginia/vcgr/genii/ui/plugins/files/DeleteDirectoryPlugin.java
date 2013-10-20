@@ -47,8 +47,8 @@ public class DeleteDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 				// We really need to figure out how to refresh directories after deleting things -
 				// ASG
 				int reply =
-					JOptionPane.showConfirmDialog(context.ownerComponent(), "Are you sure you want to recursively delete? "
-						+ path.getName(), "Yes - DELETE WITHOUT UNDO " + path.getName(), JOptionPane.YES_NO_OPTION);
+					JOptionPane.showConfirmDialog(context.ownerComponent(), "Are you sure you want to recursively delete "
+						+ path.getName() + "?", "Yes - DELETE WITHOUT UNDO " + path.getName(), JOptionPane.YES_NO_OPTION);
 				if (reply == JOptionPane.YES_OPTION) {
 					RmTool rmtool = new RmTool();
 					PathOutcome ret;
@@ -59,7 +59,7 @@ public class DeleteDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 						LoggingTarget.logInfo(msg, null);
 						_logger.error(msg);
 					}
-					// context.endpointRetriever().refresh();
+					context.endpointRetriever().refreshParent();
 					// path.delete();
 				}
 				return;

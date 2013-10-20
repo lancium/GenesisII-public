@@ -15,20 +15,22 @@ public class BrowseRNSPathAction extends AbstractAction
 
 	private JDialog _parent;
 	private JTextField _target;
+	String _title;
 
-	public BrowseRNSPathAction(JDialog parent, String label, JTextField target)
+	public BrowseRNSPathAction(JDialog parent, String label, JTextField target, String title)
 	{
 		super(label);
 
 		_parent = parent;
 		_target = target;
+		_title = title;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
 		try {
-			RNSBrowserDialog dialog = new RNSBrowserDialog(_parent);
+			RNSBrowserDialog dialog = new RNSBrowserDialog(_parent, _title);
 			dialog.setModalityType(ModalityType.APPLICATION_MODAL);
 			dialog.pack();
 

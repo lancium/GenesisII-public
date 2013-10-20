@@ -196,6 +196,13 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		stubInstance._setProperty("attachments.implementation", "org.apache.axis.attachments.AttachmentsImpl");
 
 		X509Certificate[] chain = EPRUtils.extractCertChain(_epr);
+		if ((chain != null) && _logger.isDebugEnabled()) {
+			int which = 0;
+			for (X509Certificate cert : chain) {
+				_logger.debug("got chain[" + which++ + "] for epr as: " + cert.toString());
+			}
+		}
+
 		URI epi = EPRUtils.extractEndpointIdentifier(_epr);
 
 		// determine the level of message security we need

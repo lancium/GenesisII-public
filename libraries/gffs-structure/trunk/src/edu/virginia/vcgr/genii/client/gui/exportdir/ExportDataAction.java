@@ -26,13 +26,17 @@ class ExportDataAction extends AbstractAction
 	static final private String _EXPORT_DATA_BUTTON = "Export Data";
 
 	private ExportDirDialog _owner;
+	private String _ContainerPath;
+	private String _TargetPath;
 	private Collection<IExportChangeListener> _listeners = new ArrayList<IExportChangeListener>();
 
-	public ExportDataAction(ExportDirDialog owner)
+	public ExportDataAction(ExportDirDialog owner, String ContainerPath, String TargetPath)
 	{
 		super(_EXPORT_DATA_BUTTON);
 
 		_owner = owner;
+		_ContainerPath = ContainerPath;
+		_TargetPath = TargetPath;
 	}
 
 	public void addExportChangeListener(IExportChangeListener listener)
@@ -56,7 +60,7 @@ class ExportDataAction extends AbstractAction
 	public void actionPerformed(ActionEvent e)
 	{
 		try {
-			ExportCreationDialog creation = new ExportCreationDialog(_owner);
+			ExportCreationDialog creation = new ExportCreationDialog(_owner, _ContainerPath, _TargetPath);
 			creation.setModalityType(ModalityType.APPLICATION_MODAL);
 			creation.pack();
 			GuiUtils.centerComponent(creation);
@@ -75,12 +79,11 @@ class ExportDataAction extends AbstractAction
 		RNSException, CreationException, ResourceCreationFaultType, RemoteException, InvalidToolUsageException
 	{
 		String rnsPath = creationInfo.getRNSPath();
-		File localPath = new File(creationInfo.getLocalPath());
 		RNSPath rPath =
-			ExportManipulator.createExport(creationInfo.getContainerInformation().getContainerURL(), localPath, rnsPath,
+			ExportManipulator.createExport(creationInfo.getContainerPath(), creationInfo.getLocalPath(), rnsPath,
 				creationInfo.isLightWeight());
-		ExportDirState.addExport(creationInfo.getContainerInformation().getDeploymentName(), new ExportDirInformation(rPath,
-			localPath));
+		ExportDirState.addExport(creationInfo.getContainerPath(),
+			new ExportDirInformation(rPath, new File(creationInfo.getLocalPath())));
 		fireExportChanged();
 	}
 }

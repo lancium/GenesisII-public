@@ -73,7 +73,7 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 					.uiContext()
 					.progressMonitorFactory()
 					.createMonitor(context.ownerComponent(), "Copy from local filesystem", "", 1000L,
-						new SaveToTask("local:" + _fileDialog.getSelectedFile().toString(), path.pwd()), null).start();
+						new SaveToTask(context, "local:" + _fileDialog.getSelectedFile().toString(), path.pwd()), null).start();
 			}
 		} catch (Throwable cause) {
 			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
@@ -86,11 +86,14 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 	{
 		String src;
 		String target;
+		UIPluginContext _context;
 
-		SaveToTask(String pathIn, String targetIn)
+		SaveToTask(UIPluginContext context, String pathIn, String targetIn)
 		{
 			src = pathIn;
 			target = targetIn;
+			_context = context;
+
 		}
 
 		private PathOutcome performSave(TaskProgressListener progressListener)
@@ -99,7 +102,9 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 				return null;
 			// we assume they don't want to overwrite files without knowing it.
 			CopyMachine cm = new CopyMachine(src, target, progressListener, false, null, null);
-			return cm.copyTree();
+			PathOutcome result = cm.copyTree();
+			_context.endpointRetriever().refresh();
+			return result;
 		}
 
 		@Override

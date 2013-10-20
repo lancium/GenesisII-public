@@ -38,7 +38,7 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 			return false;
 
 		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
-		return (tp.isByteIO() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
+		return (tp.isByteIO() && !(/* tp.isContainer() || tp.isBESContainer() || */tp.isQueue() || tp.isIDP()));
 	}
 
 	static private class TextLoadHandler implements LazyLoadTabHandler

@@ -21,11 +21,15 @@ public class ExportPathsWidget extends JComponent
 	static final long serialVersionUID = 0L;
 
 	static private final String _LOCAL_LABEL = "Local Path";
-	static private final String _RNS_LABEL = "RNS Path";
+	static private final String _RNS_LABEL = "Target Path";
 	static private final String _BUTTON_LABEL = "Browse";
+	static private final String _CONTAINER_LABEL = "Container Path";
+	static private final String _BROWSE_CONTAINER = "Chose the container from which to export the data";
+	static private final String _BROWSE_TARGET_PATH = "Chose the path name for your new export";
 
 	private JTextField _localPath;
 	private JTextField _rnsPath;
+	private JTextField _containerPath;
 	private Collection<IInformationListener> _listeners = new ArrayList<IInformationListener>();
 
 	private JButton createLocalBrowseButton()
@@ -41,27 +45,35 @@ public class ExportPathsWidget extends JComponent
 		return browseLocal;
 	}
 
-	public ExportPathsWidget()
+	public ExportPathsWidget(String ContainerPath, String TargetPath)
 	{
 		super();
 
 		setLayout(new GridBagLayout());
-		add(new JLabel(_LOCAL_LABEL), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
+
+		add(new JLabel(_LOCAL_LABEL), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		add(_localPath = new JTextField(), new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-
 		JButton browseLocal = createLocalBrowseButton();
-
 		if (browseLocal != null)
 			add(browseLocal, new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5), 5, 5));
+
 		add(new JLabel(_RNS_LABEL), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_rnsPath = new JTextField(), new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+		add(_rnsPath = new JTextField(TargetPath), new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		add(new JButton(new BrowseRNSPathAction(null, _BUTTON_LABEL, _rnsPath)), new GridBagConstraints(2, 1, 1, 1, 0.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JButton(new BrowseRNSPathAction(null, _BUTTON_LABEL, _rnsPath, _BROWSE_TARGET_PATH)), new GridBagConstraints(2,
+			1, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+
+		add(new JLabel(_CONTAINER_LABEL), new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(_containerPath = new JTextField(ContainerPath), new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0,
+			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JButton(new BrowseRNSPathAction(null, _BUTTON_LABEL, _containerPath, _BROWSE_CONTAINER)),
+			new GridBagConstraints(2, 2, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5,
+				5, 5), 5, 5));
 
 		_localPath.addCaretListener(new CaretListener()
 		{
@@ -72,6 +84,15 @@ public class ExportPathsWidget extends JComponent
 			}
 		});
 		_rnsPath.addCaretListener(new CaretListener()
+		{
+			@Override
+			public void caretUpdate(CaretEvent e)
+			{
+				fireInformationUpdated();
+			}
+		});
+
+		_containerPath.addCaretListener(new CaretListener()
 		{
 			@Override
 			public void caretUpdate(CaretEvent e)
@@ -104,6 +125,11 @@ public class ExportPathsWidget extends JComponent
 	public String getLocalPath()
 	{
 		return _localPath.getText();
+	}
+
+	public String getContainerPath()
+	{
+		return _containerPath.getText();
 	}
 
 	public String getRNSPath()

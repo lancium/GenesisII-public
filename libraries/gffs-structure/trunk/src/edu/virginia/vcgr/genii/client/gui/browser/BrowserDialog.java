@@ -47,13 +47,13 @@ public class BrowserDialog extends JFrame
 {
 	static final long serialVersionUID = 0L;
 
-	static private final int GROUP_SIZE_LIMIT = 4;
+	static private final int GROUP_SIZE_LIMIT = 8;
 
 	static private Log _logger = LogFactory.getLog(BrowserDialog.class);
 
 	static private LinkedHashSet<String> PREFERRED_MENU_ORDER;
 	static private final String HELP_MENU_NAME = "Help";
-	static public final String GENESISII_BROWSER_TITLE = "Genesis II RNS Browser";
+	static public final String GENESISII_BROWSER_TITLE = "Genesis II GFFS Browser";
 
 	static {
 		/*
@@ -104,7 +104,7 @@ public class BrowserDialog extends JFrame
 
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
-		contentPane.add(new JLabel("RNS Browser"), new GridBagConstraints(0, 0, 1, 1, 0.3, 0.0, GridBagConstraints.WEST,
+		contentPane.add(new JLabel("GFFS Browser"), new GridBagConstraints(0, 0, 1, 1, 0.3, 0.0, GridBagConstraints.WEST,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 		contentPane.add(new JScrollPane(_rnsTree), new GridBagConstraints(0, 1, 1, 1, 0.3, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
@@ -243,6 +243,10 @@ public class BrowserDialog extends JFrame
 			 * popup-menu to handle the large group.
 			 */
 			if (nonHiddenItems.size() > GROUP_SIZE_LIMIT) {
+				/*
+				 * ASG 10-07-2013: This code does not work. Rather than fix it, when i am not sure
+				 * what it is trying to do, i will increae group size limit.
+				 */
 				JMenu menu = new JMenu(group);
 
 				for (ContextMenuDescriptor desc : nonHiddenItems) {

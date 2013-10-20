@@ -34,13 +34,16 @@ public class RNSBrowserDialog extends JDialog
 	private JTextField _rnsPath;
 	private String _selectedPath = null;
 
-	public RNSBrowserDialog(JDialog owner) throws RNSException
+	public RNSBrowserDialog(JDialog owner, String title) throws RNSException
 	{
 		super(owner);
 
 		Container container;
 
-		setTitle(_TITLE);
+		if (title != null)
+			setTitle(title);
+		else
+			setTitle(_TITLE);
 		container = getContentPane();
 
 		container.setLayout(new GridBagLayout());

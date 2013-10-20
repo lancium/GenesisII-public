@@ -189,6 +189,9 @@ public class GeniiPath implements Serializable
 	{
 		String basename = path();
 		int slash_posn = basename.lastIndexOf('/');
+		// ASG September 28, 2013. The code only checked for '/', not '\' as we see in Windows
+		if (slash_posn < 0) // there was no '/'
+			slash_posn = basename.lastIndexOf('\\');
 		if (slash_posn >= 0)
 			basename = basename.substring(slash_posn + 1);
 		return basename;

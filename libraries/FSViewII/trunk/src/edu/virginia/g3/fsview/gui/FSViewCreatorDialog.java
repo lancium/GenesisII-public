@@ -185,8 +185,8 @@ final public class FSViewCreatorDialog extends JDialog
 				message =
 					"Enter Filesytem path."
 						+ "\n"
-						+ "This path should be shared filesystem path on remote machine, path must be visible to the Container you choose in next steps"
-						+ "\n" + "User should have access rights to this path.";
+						+ "This path should be a shared filesystem path on remote machine, and the path must be visible to the Container you choose in next steps."
+						+ "\n" + "User MUST have access rights to this path.";
 				JOptionPane.showMessageDialog(panel, message);
 			} else if (panel.model().modelName() == "SSH Access") {
 				message =

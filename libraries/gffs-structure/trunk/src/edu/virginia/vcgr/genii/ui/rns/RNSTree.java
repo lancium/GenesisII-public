@@ -382,6 +382,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 
 				if (answer == JOptionPane.YES_OPTION)
 					deletePaths(paths);
+				// Need to figure out how to refresh here ...
+
 			}
 		}
 	}

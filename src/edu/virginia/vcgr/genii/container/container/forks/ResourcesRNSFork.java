@@ -32,7 +32,7 @@ public class ResourcesRNSFork extends ReadOnlyRNSResourceFork
 	}
 
 	@Override
-	@RWXMapping(RWXCategory.CLOSED)
+	@RWXMapping(RWXCategory.READ)
 	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR, String entryName) throws IOException
 	{
 		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
