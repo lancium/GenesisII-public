@@ -1801,7 +1801,7 @@ Hostnames should be globally resolvable via DNS.</string>
                       </java>
                     </serializedBean>
                     <condition>String medium = context.getMediaName();
-return ! medium.startsWith("genesis2-macosx");
+return ! medium.startsWith("genesis2-gffs-macosx");
 </condition>
                   </action>
                   <action name="Copy JCE Unlimited Jars - mac" id="5310" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
@@ -1837,7 +1837,7 @@ return ! medium.startsWith("genesis2-macosx");
                       </java>
                     </serializedBean>
                     <condition>String medium = context.getMediaName();
-return medium.startsWith("genesis2-macosx");
+return medium.startsWith("genesis2-gffs-macosx");
 </condition>
                   </action>
                   <action name="fix installation dir" id="4474" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
