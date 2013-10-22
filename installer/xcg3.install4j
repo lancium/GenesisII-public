@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.6" transformSequenceNumber="4">
   <directoryPresets config="../.." />
-  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2" publisher="University of Virginia" publisherWeb="genesis2.virginia.edu" version="2.7.74" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
+  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2" publisher="University of Virginia" publisherWeb="genesis2.virginia.edu" version="2.7.75" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="6375" description="" category="" />
+      <variable name="genii.build-number" value="6376" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -692,6 +692,32 @@
                   </java>
                 </serializedBean>
                 <condition>context.getBooleanVariable("sys.confirmedUpdateInstallation")</condition>
+              </action>
+              <action name="Detect former container install" id="6626" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>
+String host = (String)context.getVariable("genii.hostname");
+
+//System.out.println("got a hostname from install of " + host);
+
+if (host != null) {
+    context.setVariable("genii.isContainer", "true");
+    context.setVariable("genii.radioInstallType", 1);
+}
+
+return true;</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
               </action>
             </actions>
             <formComponents />
