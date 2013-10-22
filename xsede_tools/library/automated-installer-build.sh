@@ -112,10 +112,8 @@ ant update
 ant build
 popd
 
-build_installer 3414 genesis2_linux_client_32
-build_installer 2078 genesis2_linux_container_32
-build_installer 2081 genesis2_windows_client_32
-build_installer 2084 genesis2_windows_container_32
+build_installer 2078 genesis2-gffs-linux32
+build_installer 2084 genesis2-gffs-windows32
 
 ##############
 
@@ -129,11 +127,10 @@ ant update
 ant -Dbuild.targetArch=64 build
 popd
 
-build_installer 2073 genesis2_linux_client_64
-build_installer 3416 genesis2_linux_container_64
-build_installer 2088 genesis2_mac_client_64
-build_installer 5987 genesis2_linux_client_64_rpm
-build_installer 5991 genesis2_linux_client_64_deb
+build_installer 3416 genesis2-gffs-linux64
+build_installer 2088 genesis2-gffs-mac64
+build_installer 5987 genesis2-gffs-rpm
+build_installer 5991 genesis2-gffs-deb
 
 ##############
 

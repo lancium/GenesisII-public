@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.6" transformSequenceNumber="4">
   <directoryPresets config="../.." />
-  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2" publisher="XSEDE: Extreme Science and Engineering Discovery Environment" publisherWeb="xsede.org" version="2.7.73" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
+  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2" publisher="XSEDE: Extreme Science and Engineering Discovery Environment" publisherWeb="xsede.org" version="2.7.74" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -21,7 +21,6 @@
       <variable name="genii.isLinux" value="false" description="" category="" />
       <variable name="genii.isMacOSX" value="false" description="" category="" />
       <variable name="genii.isBootstrap" value="false" description="" category="" />
-      <variable name="genii.isContainer" value="false" description="" category="" />
       <variable name="genii.bitSize" value="" description="" category="" />
       <variable name="genii.client-memory.normal" value="2048" description="" category="" />
       <variable name="genii.client-memory.win32" value="1536" description="" category="" />
@@ -34,7 +33,6 @@
       <fileset name="Windows Only Files" id="19" customizedId="" />
       <fileset name="Linux64 Only Files" id="21" customizedId="" />
       <fileset name="Mac OS X Only Files" id="23" customizedId="" />
-      <fileset name="State Directory" id="25" customizedId="" />
       <fileset name="Linux32 Only Files" id="3620" customizedId="" />
       <fileset name="Deployment Files" id="5992" customizedId="" />
     </filesets>
@@ -42,8 +40,6 @@
       <root id="20" fileset="19" location="" />
       <root id="22" fileset="21" location="" />
       <root id="24" fileset="23" location="" />
-      <root id="26" fileset="25" location="" />
-      <root id="27" fileset="25" location="${installer:sys.userHome}/.genesisII-2.0" />
       <root id="3621" fileset="3620" location="" />
       <root id="5993" fileset="5992" location="" />
     </roots>
@@ -722,6 +718,89 @@
             </actions>
             <formComponents />
           </screen>
+          <screen name="Pick client or container install type" id="6431" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.FormScreen">
+                  <void property="subTitle">
+                    <string>Please Select the Type of Install to Perform</string>
+                  </void>
+                  <void property="title">
+                    <string>Installation Type</string>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="set install type variable" id="6432" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>
+//System.out.println("got a setting for radio of " + (Integer)context.getVariable("genii.radioInstallType"));
+
+if ((Integer)context.getVariable("genii.radioInstallType") == 0) {
+    context.setVariable("genii.isContainer", "false");
+} else {
+    context.setVariable("genii.isContainer", "true");
+}
+
+return true;</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents>
+              <formComponent name="" id="6441" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
+                      <void property="labelText">
+                        <string>This installation can provide GFFS client-only support or it can function as a GFFS container.  Which would you prefer to install?</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibilityScript />
+              </formComponent>
+              <formComponent name="" id="6443" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent">
+                      <void property="radioButtonLabels">
+                        <array class="java.lang.String" length="2">
+                          <void index="0">
+                            <string>Client-Only GFFS</string>
+                          </void>
+                          <void index="1">
+                            <string>GFFS Client and Container</string>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="variableName">
+                        <string>genii.radioInstallType</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibilityScript />
+              </formComponent>
+            </formComponents>
+          </screen>
           <screen name="" id="6" customizedId="" beanClass="com.install4j.runtime.beans.screens.StandardProgramGroupScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
@@ -878,7 +957,7 @@ return true;
                       <void property="listEntries">
                         <array class="java.lang.String" length="1">
                           <void index="0">
-                            <string>Activity 126 and Onwards Test Grid</string>
+                            <string>XSEDE Namepsace and Onwards Test Grid</string>
                           </void>
                         </array>
                       </void>
@@ -1073,7 +1152,7 @@ if (selected){
                     </object>
                   </java>
                 </serializedBean>
-                <condition>context.getCompilerVariable("genii.isContainer").equals("true")</condition>
+                <condition>context.getVariable("genii.isContainer").equals("true")</condition>
               </action>
               <action name="" id="4309" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
@@ -1421,7 +1500,7 @@ return true;</string>
                   <void property="conditionExpression">
                     <object class="com.install4j.api.beans.ScriptProperty">
                       <void property="value">
-                        <string>context.getCompilerVariable("genii.isContainer").equals("true") </string>
+                        <string>context.getVariable("genii.isContainer").equals("true") </string>
                       </void>
                     </object>
                   </void>
@@ -1696,7 +1775,7 @@ Hostnames should be globally resolvable via DNS.</string>
                       </java>
                     </serializedBean>
                     <condition>String medium = context.getMediaName();
-return ! medium.startsWith("genesis2_client_macosx");
+return ! medium.startsWith("genesis2-macosx");
 </condition>
                   </action>
                   <action name="Copy JCE Unlimited Jars - mac" id="5310" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
@@ -1732,7 +1811,7 @@ return ! medium.startsWith("genesis2_client_macosx");
                       </java>
                     </serializedBean>
                     <condition>String medium = context.getMediaName();
-return medium.startsWith("genesis2_client_macosx");
+return medium.startsWith("genesis2-macosx");
 </condition>
                   </action>
                   <action name="fix installation dir" id="4474" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
@@ -1859,7 +1938,7 @@ return propFile.exists();</condition>
                       <void property="conditionExpression">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>context.getCompilerVariable("genii.isContainer").equals("true") </string>
+                            <string>context.getVariable("genii.isContainer").equals("true") </string>
                           </void>
                         </object>
                       </void>
@@ -2622,7 +2701,7 @@ port for you.</string>
                     </object>
                   </java>
                 </serializedBean>
-                <condition>context.getCompilerVariable("genii.isContainer").equals("true") </condition>
+                <condition>context.getVariable("genii.isContainer").equals("true") </condition>
                 <validation />
                 <preActivation />
                 <postActivation />
@@ -3959,40 +4038,7 @@ return startService;</string>
     </applications>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="linux_client_64" id="2073" customizedId="" mediaFileName="genesis2_client_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_40" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
-      <excludedLaunchers>
-        <launcher id="264" />
-        <launcher id="1450" />
-        <launcher id="5619" />
-        <launcher id="5622" />
-      </excludedLaunchers>
-      <excludedBeans />
-      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude>
-        <entry location=".i4j_fileset_19" fileType="regular" />
-        <entry location=".i4j_fileset_23" fileType="regular" />
-        <entry location=".i4j_fileset_3620" fileType="regular" />
-        <entry location=".i4j_fileset_6220" fileType="regular" />
-      </exclude>
-      <variables>
-        <variable name="genii.isLInux" value="true" description="" category="" />
-        <variable name="genii.isLinux" value="true" description="" category="" />
-        <variable name="genii.bitSize" value="64" description="" category="" />
-      </variables>
-      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
-        <commentFiles />
-        <customAttributes />
-      </autoUpdate>
-      <excludedComponents>
-        <component id="30" />
-        <component id="40" />
-      </excludedComponents>
-      <includedDownloadableComponents />
-      <installerScript mode="1" file="">
-        <content />
-      </installerScript>
-    </unixInstaller>
-    <unixInstaller name="linux_container_32" id="2078" customizedId="" mediaFileName="genesis2_container_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux_gui_32" id="2078" customizedId="" mediaFileName="genesis2-gffs-linux${compiler:genii.bitSize}-v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4024,36 +4070,7 @@ return startService;</string>
         <content />
       </installerScript>
     </unixInstaller>
-    <windows name="windows_client_32" id="2081" customizedId="" mediaFileName="genesis2_client_windows${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_40" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
-      <excludedLaunchers>
-        <launcher id="264" />
-        <launcher id="1450" />
-        <launcher id="39" />
-        <launcher id="1773" />
-      </excludedLaunchers>
-      <excludedBeans />
-      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude>
-        <entry location=".i4j_fileset_21" fileType="regular" />
-        <entry location=".i4j_fileset_23" fileType="regular" />
-        <entry location=".i4j_fileset_6220" fileType="regular" />
-      </exclude>
-      <variables>
-        <variable name="genii.isWindows" value="true" description="" category="" />
-        <variable name="genii.container-memory.upper-limit" value="1536" description="" category="" />
-        <variable name="genii.bitSize" value="32" description="" category="" />
-      </variables>
-      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
-        <commentFiles />
-        <customAttributes />
-      </autoUpdate>
-      <excludedComponents>
-        <component id="30" />
-        <component id="40" />
-      </excludedComponents>
-      <includedDownloadableComponents />
-    </windows>
-    <windows name="windows_container_32" id="2084" customizedId="" mediaFileName="genesis2_container_windows${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_40" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows_gui_32" id="2084" customizedId="" mediaFileName="genesis2-gffs-windows${compiler:genii.bitSize}-v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_40" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="39" />
@@ -4081,7 +4098,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </windows>
-    <macosFolder name="mac_client_64" id="2088" customizedId="" mediaFileName="genesis2_client_macosx${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
+    <macosFolder name="mac_gui_64" id="2088" customizedId="" mediaFileName="genesis2-gffs-macosx${compiler:genii.bitSize}-v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -4109,40 +4126,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </macosFolder>
-    <unixInstaller name="linux_client_32" id="3414" customizedId="" mediaFileName="genesis2_client_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
-      <excludedLaunchers>
-        <launcher id="264" />
-        <launcher id="1450" />
-        <launcher id="5619" />
-        <launcher id="5622" />
-      </excludedLaunchers>
-      <excludedBeans />
-      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude>
-        <entry location=".i4j_fileset_19" fileType="regular" />
-        <entry location=".i4j_fileset_21" fileType="regular" />
-        <entry location=".i4j_fileset_23" fileType="regular" />
-        <entry location=".i4j_fileset_6220" fileType="regular" />
-      </exclude>
-      <variables>
-        <variable name="genii.isLInux" value="true" description="" category="" />
-        <variable name="genii.isLinux" value="true" description="" category="" />
-        <variable name="genii.bitSize" value="32" description="" category="" />
-      </variables>
-      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
-        <commentFiles />
-        <customAttributes />
-      </autoUpdate>
-      <excludedComponents>
-        <component id="30" />
-        <component id="40" />
-      </excludedComponents>
-      <includedDownloadableComponents />
-      <installerScript mode="1" file="">
-        <content />
-      </installerScript>
-    </unixInstaller>
-    <unixInstaller name="linux_container_64" id="3416" customizedId="" mediaFileName="genesis2_container_linux${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_40" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux_gui_64" id="3416" customizedId="" mediaFileName="genesis2-gffs-linux${compiler:genii.bitSize}-v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_40" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4174,7 +4158,7 @@ return startService;</string>
         <content />
       </installerScript>
     </unixInstaller>
-    <linuxRPM name="linux_client_64_rpm" id="5987" customizedId="" mediaFileName="${compiler:sys.shortName}_gffs_client_v${compiler:sys.version}" installDir="/opt/genii" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" os="linux" arch="i386">
+    <linuxRPM name="gffs_rpm_64" id="5987" customizedId="" mediaFileName="${compiler:sys.shortName}-gffs-v${compiler:sys.version}" installDir="/opt/genesis2" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" os="linux" arch="i386">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -4187,8 +4171,6 @@ return startService;</string>
         <entry location=".i4j_fileset_19" fileType="regular" />
         <entry location=".i4j_fileset_23" fileType="regular" />
         <entry location=".i4j_fileset_3620" fileType="regular" />
-        <entry location=".i4j_fileset_5992" fileType="regular" />
-        <entry location=".i4j_fileset_6220" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
@@ -4208,7 +4190,7 @@ return startService;</string>
         <content />
       </postUninstallScript>
     </linuxRPM>
-    <linuxDeb name="Linux_client_64_deb" id="5991" customizedId="" mediaFileName="${compiler:sys.shortName}_gffs_client_v${compiler:sys.version}" installDir="/opt/genii" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bzip="false" description="GenesisII GFFS Client Software" dependencies="" maintainerEmail="xcghelp@cs.virginia.edu" architectureSet="false" architecture="">
+    <linuxDeb name="gffs_deb_64" id="5991" customizedId="" mediaFileName="${compiler:sys.shortName}-gffs-v${compiler:sys.version}" installDir="/opt/genesis2" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bzip="false" description="GenesisII GFFS Client Software" dependencies="" maintainerEmail="xcghelp@cs.virginia.edu" architectureSet="false" architecture="">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -4221,29 +4203,27 @@ return startService;</string>
         <entry location=".i4j_fileset_19" fileType="regular" />
         <entry location=".i4j_fileset_23" fileType="regular" />
         <entry location=".i4j_fileset_3620" fileType="regular" />
-        <entry location=".i4j_fileset_5992" fileType="regular" />
-        <entry location=".i4j_fileset_6220" fileType="regular" />
       </exclude>
       <variables />
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
         <commentFiles />
         <customAttributes />
       </autoUpdate>
-      <preInstallScript mode="1" file="">
+      <preInstallScript mode="2" file="./scripts/software_pre_install.sh">
         <content />
       </preInstallScript>
-      <postInstallScript mode="1" file="">
+      <postInstallScript mode="2" file="./scripts/software_post_install.sh">
         <content />
       </postInstallScript>
-      <preUninstallScript mode="1" file="">
+      <preUninstallScript mode="2" file="./scripts/software_pre_uninstall.sh">
         <content />
       </preUninstallScript>
-      <postUninstallScript mode="1" file="">
+      <postUninstallScript mode="2" file="./scripts/software_post_uninstall.sh">
         <content />
       </postUninstallScript>
     </linuxDeb>
   </mediaSets>
-  <buildIds buildAll="true">
+  <buildIds buildAll="false">
     <mediaSet refId="2088" />
     <mediaSet refId="5991" />
   </buildIds>

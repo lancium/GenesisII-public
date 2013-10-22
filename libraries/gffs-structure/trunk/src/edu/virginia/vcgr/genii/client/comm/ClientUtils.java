@@ -171,13 +171,17 @@ public class ClientUtils
 
 				_logger.warn("Renewing client tool identity until " + validUntil);
 				/*
-				 * We create an identity for either 24 hours, or until the valid duration expires
-				 * (which ever is longer) + 10 seconds of slop for in transit time outs.
+				 * old rule: We create an identity for either 24 hours, or until the valid duration
+				 * expires (which ever is longer) + 10 seconds of slop for in transit time outs.
+				 * 
+				 * new rule: we create an identity for the duration requested or our current default
+				 * time-out, based on whichever is longer, plus 10 seconds of slop for in transit
+				 * time outs.
 				 */
 				retval =
-					generateKeyAndCertMaterial(
-						Math.max(edu.virginia.vcgr.genii.security.SecurityConstants.dailyCredentialExpirationMillis,
-							validUntil.getTime() - System.currentTimeMillis() + 10000), TimeUnit.MILLISECONDS);
+					generateKeyAndCertMaterial(Math.max(
+						edu.virginia.vcgr.genii.security.SecurityConstants.defaultCredentialExpirationMillis,
+						validUntil.getTime() - System.currentTimeMillis() + 10000), TimeUnit.MILLISECONDS);
 				callContext.setActiveKeyAndCertMaterial(retval);
 				updated = true;
 

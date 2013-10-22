@@ -46,7 +46,7 @@ public abstract class BaseGridTool implements ITool
 	protected List<String> _arguments = new ArrayList<String>();
 
 	// tool credential validity; used when recreating a TLS certificate for the tool.
-	protected static long _credentialValidMillis = SecurityConstants.dailyCredentialExpirationMillis;
+	protected static long _credentialValidMillis = SecurityConstants.defaultCredentialExpirationMillis;
 
 	/*
 	 * tracks the last command's exit value. this is managed per-program instance. zero implies

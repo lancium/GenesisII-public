@@ -8,16 +8,18 @@ public class SecurityConstants
 
 	// General security properties...
 
+	static public final long oneDayInMs = 1000L * 60L * 60L * 24L;  // one day.
+
 	// credentials are valid 10 years by default.
-	static public final long CredentialExpirationMillis = 1000L * 60L * 60L * 24L * 365L * 10L;
+	static public final long CredentialExpirationMillis = oneDayInMs * 365L * 10L;  // 10 years.
 	static public final long CredentialGoodFromOffset = 1000L * 60L * 15L; // 15 minutes ago
 	static public final long CredentialCacheTimeout = 1000L * 60L * 60L; // 1 hour lifetime in cache
 
+	// temporary credentials for our client connection TLS certificate lifetime.
+	static public final long defaultCredentialExpirationMillis = oneDayInMs * 32L;
+
 	// maximum number of delegations we accept in a delegation chain.
 	static public final int MaxDelegationDepth = 10;
-
-	// temporary credentials for our client connection TLS certificate lifetime.
-	static public final long dailyCredentialExpirationMillis = 1000L * 60L * 60L * 24L;
 
 	// Secure addressing constants...
 
