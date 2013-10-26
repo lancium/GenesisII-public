@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<patches
+	xmlns="http://edu.virginia.vcgr/patch"
+	xmlns:patch="http://edu.virginia.vcgr/patch"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+	
+	<patch>
+		<restrictions>
+			<jsdl:OperatingSystem>
+				<jsdl:OperatingSystemType>
+					<jsdl:OperatingSystemName>LINUX</jsdl:OperatingSystemName>
+				</jsdl:OperatingSystemType>
+				<jsdl:OperatingSystemVersion>2.14</jsdl:OperatingSystemVersion>
+			</jsdl:OperatingSystem>
+			<jsdl:CPUArchitecture>
+				<jsdl:CPUArchitectureName>x86</jsdl:CPUArchitectureName>
+			</jsdl:CPUArchitecture>
+			<host use-ip="false">
+				<pattern>^[^.]\.cs\.virginia\.edu$</pattern>
+			</host>
+		</restrictions>
+		
+		<write permissions="rwxr-x">write/outfile.dat</write>
+		<delete>delete/delete-file.dat</delete>
+		<run par-file="par-files/example.par"
+			class="edu.virginia.vcgr.appmgr.ExamplePatchRunner">
+			<property name="property1" value="value1"/>
+			<property name="property2" value="value2"/>
+		</run>
+	</patch>
+</patches>
