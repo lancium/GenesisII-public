@@ -30,10 +30,11 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 
 public class Hostname
 {
-	static private final String _EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY =
+	static public final String _EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY =
 		"edu.virginia.vcgr.genii.container.external-hostname-override";
 	static private final String _EPR_ADDRESSING_MODE_PROPERTY = "edu.virginia.vcgr.genii.container.epr-addressing-mode";
 	static private final String _EPR_ADDRESSING_MODE_DEFAULT_VALUE = "auto";
@@ -62,7 +63,9 @@ public class Hostname
 
 	static private String getHostnameOverride()
 	{
-		String toReturn = getGlobalProperty(_EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
+		String toReturn = InstallationProperties.getInstallationProperties().getContainerHostname();
+		if (toReturn == null)
+			toReturn = getGlobalProperty(_EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
 		// consider a blank name to be a non-established one.
 		if ((toReturn != null) && (toReturn.length() == 0))
 			return null;

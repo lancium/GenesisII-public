@@ -221,10 +221,11 @@ public class QSlotManagerTool extends BaseGridTool
 		if (!qPath.exists()) {
 			throw new ResourceException("No file for max slot counts at " + _QUEUE_MAX_FILE);
 		} else {
+			BufferedReader in = null;
 			InputStream inStream = null;
 			try {
 				inStream = qPath.openInputStream();
-				BufferedReader in = new BufferedReader(new InputStreamReader(inStream));
+				in = new BufferedReader(new InputStreamReader(inStream));
 				String line;
 				while ((line = in.readLine()) != null) {
 					if (line.length() == 0)
@@ -241,6 +242,7 @@ public class QSlotManagerTool extends BaseGridTool
 					statTable.get(BES).max = slotCount;
 				}
 			} finally {
+				StreamUtils.close(in);
 				StreamUtils.close(inStream);
 			}
 		}

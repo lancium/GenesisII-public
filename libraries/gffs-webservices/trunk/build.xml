@@ -208,14 +208,6 @@
 		</delete>
 	</target>
 	
-	<target name="init.secrun">
-		<property file="${basedir}/build.secrun.properties"/>
-		<mkdir dir="${secrun.scratch.dir}"/>
-		<input
-			message="Input password for certificate store ${secrun.certstore}?"
-			addproperty="secrun.storepass"/>
-	</target>
-
 	<target name="register-ifs">
 		<copy file="${basedir}/jni-libs/win32/IFS/nulmrx.sys"
 			tofile="${env.SystemRoot}/system32/drivers/nulmrx.sys"/>

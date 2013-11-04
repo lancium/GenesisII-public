@@ -70,12 +70,13 @@ public class ContainerProperties extends Properties
 		return null;
 	}
 
-	public String getUserDirectory()
+	/**
+	 * Intended only for use by ApplicationBase.getUserDir. This loads the user directory setting
+	 * from container.properties if it exists or returns null.
+	 */
+	public String getUserDirectoryProperty()
 	{
-		String val = getProperty(GENII_USER_DIR_PROPERTY_NAME);
-		if ((val == null) || val.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE))
-			val = ApplicationBase.getUserDirFromEnvironment();
-		return val;
+		return getProperty(GENII_USER_DIR_PROPERTY_NAME);
 	}
 
 	/**
@@ -84,10 +85,13 @@ public class ContainerProperties extends Properties
 	 */
 	public String getDeploymentsDirectory()
 	{
-		String toReturn = getProperty(GENII_DEPLOYMENT_DIRECTORY_PROPERTY_NAME);
-		if (toReturn != null)
-			return toReturn;
-		toReturn = new File(Installation.getInstallDirectory(), DEPLOYMENTS_DIRECTORY_NAME).getAbsolutePath();
+		// use the environment variable first.
+		String toReturn = ApplicationBase.getDeploymentDirFromEnvironment();
+		if (toReturn == null)
+			toReturn = getProperty(GENII_DEPLOYMENT_DIRECTORY_PROPERTY_NAME);
+		// well, nothing worked, so use a default based on the installation directory.
+		if (toReturn == null)
+			toReturn = new File(Installation.getInstallDirectory(), DEPLOYMENTS_DIRECTORY_NAME).getAbsolutePath();
 		return toReturn;
 	}
 

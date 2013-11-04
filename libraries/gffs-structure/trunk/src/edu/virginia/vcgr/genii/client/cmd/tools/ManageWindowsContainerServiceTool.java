@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -72,7 +73,10 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 		int result = 0;
 
 		Properties webContainerProperties = Installation.getDeployment(new DeploymentName()).webContainerProperties();
-		int port = Integer.parseInt(webContainerProperties.getProperty(WebContainerConstants.LISTEN_PORT_PROP, "18080"));
+		String portString = InstallationProperties.getInstallationProperties().getContainerPort();
+		if (portString == null)
+			portString = webContainerProperties.getProperty(WebContainerConstants.LISTEN_PORT_PROP, "18080");
+		int port = Integer.parseInt(portString);
 
 		ExecutionTask tasks[];
 

@@ -4,10 +4,6 @@
 # it is designed to run from the genesis build directory, since it plans
 # on storing jars into the ext directory.
 
-# the svn repository at the root of the libraries.
-#LIBRARY_REPO="svn://svn.xcg.virginia.edu:9002/GENREPO/libraries"
-#LIBRARY_REPO="svn://svn.xcg.virginia.edu:9002/GENREPO/GenesisII/branches/cak0l/libraries"
-
 # WORKDIR is the directory where this script started out in.
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 # we're assuming that this script lives in the genesis2 scripts directory.
@@ -33,10 +29,6 @@ TRUNK_BUILD=
 
 # we support some flags on the command line:
 #   "clean" requests that we should clean the projects.
-
-####gone   "update" says that it's okay to do an svn update to get the source code.
-####gone      otherwise checkouts must already exist.
-
 #   "trunk" means that we should expect that this script is in the trunk, and
 #      we will create a new subdirectory for the projects.
 while true; do
@@ -46,8 +38,6 @@ while true; do
     CLEAN_UP=true
   elif [ "$flag" == "trunk" ]; then
     TRUNK_BUILD=true
-#  elif [ "$flag" == "update" ]; then
-#    SVN_UPDATE=true
   else
     false
     check_result "this script cannot use a flag of '$flag'"
@@ -68,21 +58,22 @@ function snag_dependencies()
 {
   local projname="$1"; shift
   # ugly dependency management section.
-  if [ $projname == gffs-basics ]; then
-    cp -v -f $TOPDIR/ext/app-manager.jar ./ext
-  fi
-  if [ $projname == GridJobTool ]; then
-    cp -v -f $TOPDIR/ext/GeniiJSDL.jar ./ext
-  fi
-  if [ $projname == gffs-webservices ]; then
-    cp -v -f $TOPDIR/ext/gffs-basics.jar ./ext
-  fi
-  if [ $projname == gffs-security ]; then
-    cp -v -f $TOPDIR/ext/app-manager.jar $TOPDIR/ext/gffs-basics.jar ./ext
-  fi
-  if [ $projname == gffs-structure ]; then
-    cp -v -f $TOPDIR/ext/gffs-basics.jar $TOPDIR/ext/gffs-webservices.jar $TOPDIR/ext/gffs-security.jar $TOPDIR/ext/app-manager.jar $TOPDIR/ext/CmdLineManipulator.jar $TOPDIR/ext/fsview.jar $TOPDIR/ext/GeniiJSDL.jar $TOPDIR/ext/GeniiProcMgmt.jar $TOPDIR/ext/GridJobTool.jar ./ext
-  fi
+#  if [ $projname == GridJobTool ]; then
+#    cp -v -f $TOPDIR/ext/GeniiJSDL.jar ./ext
+#  fi
+#  if [ $projname == gffs-webservices ]; then
+#    cp -v -f $TOPDIR/ext/gffs-basics.jar ./ext
+#  fi
+#  if [ $projname == gffs-security ]; then
+#    cp -v -f $TOPDIR/ext/gffs-basics.jar ./ext
+#  fi
+#  if [ $projname == gffs-structure ]; then
+#    cp -v -f $TOPDIR/ext/gffs-basics.jar $TOPDIR/ext/gffs-webservices.jar $TOPDIR/ext/gffs-security.jar $TOPDIR/ext/CmdLineManipulator.jar $TOPDIR/ext/fsview.jar $TOPDIR/ext/GeniiJSDL.jar $TOPDIR/ext/GeniiProcMgmt.jar $TOPDIR/ext/GridJobTool.jar ./ext
+#  fi
+
+#no longer copying.
+true
+
   check_result "copying dependent jars for subproject $projname"
 }
 
@@ -93,7 +84,7 @@ function snag_dependencies()
 
 for subproject in \
 \
-  ApplicationManager CmdLineManipulator FSViewII GeniiJSDL GeniiProcessMgmt MacOSXSwing MNaming \
+  CmdLineManipulator FSViewII GeniiJSDL GeniiProcessMgmt MacOSXSwing MNaming \
   GridJobTool gffs-basics \
   gffs-webservices gffs-security \
   gffs-structure \
@@ -107,18 +98,6 @@ for subproject in \
   check_result "making dependency folder $DIRNAME"
   pushd "$DIRNAME"
   check_result "entering folder $DIRNAME"
-#  if [ ! -d "trunk" ]; then
-#    if [ -z "$SVN_UPDATE" -a -z "$CLEAN_UP" ]; then
-#      false
-#      check_result "failing because there is no existing checkout folder '$DIRNAME'."
-#    fi
-#    svn co "$LIBRARY_REPO/$subproject/trunk"
-#  else
-#    if [ ! -z "$SVN_UPDATE" ]; then
-#      svn up trunk
-#    fi
-#  fi
-#  check_result "checking out subproject $subproject"
   cd trunk
   check_result "entering trunk for $subproject"
 

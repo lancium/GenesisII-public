@@ -1,1 +1,1 @@
-Genesis II ${installer:sys.version}
+Genesis II ${compiler:genii.app-version}

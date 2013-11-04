@@ -79,7 +79,7 @@ errors=0
 echo "Changing to build area: $playground"
 pushd "$playground" &>/dev/null
 
-# first grab latest container installer:
+# first grab latest container installer.
 wget "$OFFICIAL_DISTRIBUTION_DIR/$INSTALLER_TO_RUN"
 
 # next install it with a bunch of console interaction...

@@ -5,23 +5,9 @@
 	<property file="${basedir}/build.properties"/>
 
 	<!-- Static Classpath -->
-	<path id="log4j.classpath">
-		<fileset dir="${log4j.home}" includes="**/*.jar"/>
-	</path>
-
-	<path id="genii-jsdl.classpath">
-		<fileset dir="${genii-jsdl.home}" includes="**/GeniiJSDL.jar"/>
-	</path>
-
-	<path id="macosxswing.classpath">
-		<fileset dir="${macosxswing.home}" includes="**/MacOSXSwing.jar"/>
-	</path>
-
 	<path id="project.classpath">
+		<fileset dir="${ext.dir}" includes="**/*.jar"/>
 		<pathelement location="${obj-dir}"/>
-		<path refid="log4j.classpath"/>
-		<path refid="genii-jsdl.classpath"/>
-		<path refid="macosxswing.classpath"/>
 	</path>
 			
 

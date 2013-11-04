@@ -46,15 +46,15 @@
 	<classpathentry kind="lib" path="ext/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="ext/dpage.jar"/>
 	<classpathentry kind="lib" path="ext/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="ext/app-manager.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-basics"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-security"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-structure"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-webservices"/>
 	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="lib" path="ext/MacOSXSwing.jar"/>
-	<classpathentry kind="lib" path="ext/bcprov-jdk16-1.46.jar"/>
-	<classpathentry kind="lib" path="ext/canl-1.2.1.jar"/>
 	<classpathentry kind="lib" path="bundles/bundle-u6security_1.0.67.jar"/>
+	<classpathentry kind="lib" path="ext/bcpkix-jdk15on-149.jar"/>
+	<classpathentry kind="lib" path="ext/bcprov-jdk15on-149.jar"/>
+	<classpathentry kind="lib" path="ext/canl-2.0.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

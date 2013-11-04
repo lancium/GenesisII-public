@@ -8,12 +8,16 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.macro.MacroUtils;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 
 class FilesystemConfiguration extends FilesystemSandboxContainerConfiguration
 {
+	static private Log _logger = LogFactory.getLog(FilesystemConfiguration.class);
+
 	@XmlAttribute(name = "path", required = true)
 	private String _path = null;
 
@@ -25,9 +29,14 @@ class FilesystemConfiguration extends FilesystemSandboxContainerConfiguration
 	private void afterUnmarshal(Unmarshaller u, Object parent)
 	{
 		_path = MacroUtils.replaceMacros(System.getProperties(), _path);
-		if (_path.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE)) {
+		_path = ApplicationBase.replaceKeywords(_path);
+/*		if (_path.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE)) {
 			_path = ApplicationBase.getUserDirFromEnvironment();
-		}
+			// use the default since there is no environment variable currently.
+			if (_path == null) _path = ApplicationBase.getDefaultUserDir();
+		}*/
+		if (_logger.isTraceEnabled())
+			_logger.trace("path after unmarshal is: " + _path);
 	}
 
 	final String path()

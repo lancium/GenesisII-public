@@ -53,6 +53,7 @@ import edu.virginia.vcgr.genii.algorithm.structures.queue.BarrieredWorkQueue;
 import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHook;
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
@@ -356,8 +357,18 @@ public class Container extends ApplicationBase
 	{
 		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
 
-		String keyStoreLoc =
-			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
+		// use override signing key name if possible.
+		String keyStoreLoc = InstallationProperties.getInstallationProperties().getSigningKeystoreFile();
+		File keystoreLocPath = null;
+		if (keyStoreLoc == null) {
+			// we didn't have the local installation properties, so fall back to old-school methods.
+			keyStoreLoc = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
+			keystoreLocPath = Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyStoreLoc);
+		} else {
+			// that local version should already have the full path.
+			keystoreLocPath = new File(keyStoreLoc);
+		}
+		// the rest come from deployment still...
 		String keyStoreType =
 			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP, "PKCS12");
 		String keyPassword =
@@ -384,10 +395,7 @@ public class Container extends ApplicationBase
 		if (keyPassword != null)
 			keyPassChars = keyPassword.toCharArray();
 
-		KeyStore ks =
-			CertTool.openStoreDirectPath(
-				Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyStoreLoc), keyStoreType,
-				keyStorePassChars);
+		KeyStore ks = CertTool.openStoreDirectPath(keystoreLocPath, keyStoreType, keyStorePassChars);
 		// load the container private key and certificate
 		_containerPrivateKey = (PrivateKey) ks.getKey(containerAlias, keyPassChars);
 

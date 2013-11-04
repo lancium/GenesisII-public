@@ -66,7 +66,7 @@ testStartup()
   grid ping $REPLICATION_VM
   if [ $? -ne 0 ]; then
     echo "VM container is not running; restarting the container"
-    ssh -i $keyFileForVM root@"$CLOUD_VM" /home/act123/GenesisII/XCGContainer start
+    ssh -i $keyFileForVM root@"$CLOUD_VM" /home/act123/GenesisII/GFFSContainer start
     echo "Waiting one minute to let the container restart"
     sleep 1m
     echo "checking again if container restart is successfull"
@@ -161,7 +161,7 @@ testCreateUserAndGroup()
 testStopVMContainerforFailureTest()
 {
   echo "shutdown the VM container"
-  ssh -i $keyFileForVM root@"$CLOUD_VM" /home/act123/GenesisII/XCGContainer stop
+  ssh -i $keyFileForVM root@"$CLOUD_VM" /home/act123/GenesisII/GFFSContainer stop
   sleep 10
 
   echo "try to login again to the created user account; this time login should fail"
@@ -187,7 +187,7 @@ testLoginGridAccountAgain()
 testRestartVMContainerforReplication()
 {
   echo "restart the VM container" 
-  ssh -i $keyFileForVM root@"$CLOUD_VM" /home/act123/GenesisII/XCGContainer start
+  ssh -i $keyFileForVM root@"$CLOUD_VM" /home/act123/GenesisII/GFFSContainer start
   echo "Waiting one minute to let the container restart"
   sleep 1m
   echo "checking again if container restart is successfull"
@@ -211,7 +211,7 @@ testReplicateUserAndGroup()
 testStopVMContainerforReplicationTest()
 {
   echo "again shutdown the VM container" 
-  ssh -i $keyFileForVM root@"$CLOUD_VM" /home/act123/GenesisII/XCGContainer stop
+  ssh -i $keyFileForVM root@"$CLOUD_VM" /home/act123/GenesisII/GFFSContainer stop
   sleep 10
   assertEquals "stopping vm again to test replication" 0 0
 }
@@ -248,7 +248,7 @@ testReplicatedLogin()
 testRestartVMContainerforCleanup()
 {
   echo "restart the VM container for future use"
-  ssh -i $keyFileForVM root@"$CLOUD_VM" /home/act123/GenesisII/XCGContainer start
+  ssh -i $keyFileForVM root@"$CLOUD_VM" /home/act123/GenesisII/GFFSContainer start
   echo "Waiting one minute to let the container restart"
   sleep 1m
   echo "checking again if container restart is successfull"

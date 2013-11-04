@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.security.x509.CertEntry;
 import edu.virginia.vcgr.genii.security.x509.SimpleKeystoreLoader;
 
@@ -120,9 +121,11 @@ public class ContainerConfiguration
 
 	private void setupProperties(Properties props)
 	{
-		String sListenPort =
-			Installation.getDeployment(new DeploymentName()).webContainerProperties()
-				.getProperty(WebContainerConstants.LISTEN_PORT_PROP, _DEFAULT_LISTEN_PORT_VALUE);
+		String sListenPort = InstallationProperties.getInstallationProperties().getContainerPort();
+		if (sListenPort == null)
+			sListenPort =
+				Installation.getDeployment(new DeploymentName()).webContainerProperties()
+					.getProperty(WebContainerConstants.LISTEN_PORT_PROP, _DEFAULT_LISTEN_PORT_VALUE);
 		_listenPort = Integer.parseInt(sListenPort);
 
 		String dListenPort =
@@ -156,8 +159,7 @@ public class ContainerConfiguration
 				} else {
 					SslInformation si = containerConf.getSslInformation();
 					SimpleKeystoreLoader skl = new SimpleKeystoreLoader();
-					File actualKeyStore =
-						Installation.getDeployment(new DeploymentName()).security().getSecurityFile(si.getKeystoreFilename());
+					File actualKeyStore = new File(si.getKeystoreFilename());
 					if (_logger.isTraceEnabled())
 						_logger.trace("loading keystore from file: " + actualKeyStore.getAbsolutePath());
 					FileInputStream keyInput = new FileInputStream(actualKeyStore);

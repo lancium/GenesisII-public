@@ -17,10 +17,10 @@ backup_file="$backup_dir/container-state-$(hostname)-backup-$(date +"%Y$sep%m$se
 
 # there's a possible conflict if an auto-start procedure will crank up the
 # container again, so we move the startup script out of the way.
-mv "$GENII_INSTALL_DIR/XCGContainer" "$GENII_INSTALL_DIR/XCGContainer.hold"
+mv "$GENII_INSTALL_DIR/GFFSContainer" "$GENII_INSTALL_DIR/GFFSContainer.hold"
 
 # stop the container.
-"$GENII_INSTALL_DIR/XCGContainer.hold" stop
+"$GENII_INSTALL_DIR/GFFSContainer.hold" stop
 
 additional_pax=()
 if [ -f "$GENII_INSTALL_DIR/context.xml" ]; then 
@@ -36,8 +36,8 @@ if [ ! -z "$BACKUP_INTO_GRID" ]; then
 fi
 
 # move the starter script back into place.
-mv "$GENII_INSTALL_DIR/XCGContainer.hold" "$GENII_INSTALL_DIR/XCGContainer"
+mv "$GENII_INSTALL_DIR/GFFSContainer.hold" "$GENII_INSTALL_DIR/GFFSContainer"
 
 # start the container.
-"$GENII_INSTALL_DIR/XCGContainer" start
+"$GENII_INSTALL_DIR/GFFSContainer" start
 

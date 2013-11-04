@@ -2,7 +2,7 @@
 
 cd /home/xcgmain/GenesisIIShell
 
-./XCGContainer stop
+./GFFSContainer stop
 
 ./grid login --username=uvaresources --password=password
 

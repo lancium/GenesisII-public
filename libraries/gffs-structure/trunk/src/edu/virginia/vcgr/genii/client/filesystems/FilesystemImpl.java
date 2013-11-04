@@ -35,11 +35,13 @@ class FilesystemImpl implements Filesystem
 
 		_filesystemRoot = root;
 
-		for (FilesystemSandboxConfiguration boxConf : conf.sandboxes())
+		for (FilesystemSandboxConfiguration boxConf : conf.sandboxes()) {
 			addSandbox(boxConf.name(), boxConf.relativePath(), boxConf.doCreate());
+		}
 
-		for (FilesystemProperties property : conf.properties())
+		for (FilesystemProperties property : conf.properties()) {
 			_properties.add(property);
+		}
 	}
 
 	@Override

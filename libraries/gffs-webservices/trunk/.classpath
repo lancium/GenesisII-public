@@ -3,13 +3,13 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="genned-src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="ext/axis/axis.jar" sourcepath="/home/fred/xsede/code/axis1.4-gen2-ed"/>
-	<classpathentry kind="lib" path="ext/axis/jaxrpc.jar"/>
-	<classpathentry kind="lib" path="ext/axis/axis-ant.jar"/>
-	<classpathentry kind="lib" path="ext/ant/ant-jsch.jar"/>
-	<classpathentry kind="lib" path="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
-	<classpathentry kind="lib" path="ext/axis/commons-discovery-0.5.jar"/>
-	<classpathentry kind="lib" path="ext/ant/ant.jar"/>
+	<classpathentry kind="lib" path="../../../ext/axis/axis.jar" sourcepath="/home/fred/xsede/code/axis1.4-gen2-ed"/>
+	<classpathentry kind="lib" path="../../../ext/axis/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="../../../ext/axis/axis-ant.jar"/>
+	<classpathentry kind="lib" path="../../../ext/ant/ant-jsch.jar"/>
+	<classpathentry kind="lib" path="../../../bundles/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
+	<classpathentry kind="lib" path="../../../ext/axis/commons-discovery-0.5.jar"/>
+	<classpathentry kind="lib" path="../../../ext/ant/ant.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-basics"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

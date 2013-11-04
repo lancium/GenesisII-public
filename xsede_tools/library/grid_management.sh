@@ -116,7 +116,7 @@ function launch_container()
   use_shell=bash
   runner="$GENII_INSTALL_DIR/runContainer.sh"
   if [ ! -f "$runner" ]; then
-    runner=$GENII_INSTALL_DIR/XCGContainer
+    runner=$GENII_INSTALL_DIR/GFFSContainer
     extra_suffix="start"
   fi
   if [ ! -f "$runner" ]; then
@@ -160,16 +160,25 @@ function launch_container()
   popd &>/dev/null
 }
 
+##############
+
 # this saves the grid deployments and user data for the normal container and
 # the mirror, if enabled.
 function save_grid_data()
 {
-  local data_zip="$1"; shift
-  if [ -z "$data_zip" ]; then
-    echo "This function requires a zip file name for storing the grid data."
+  local backup_file="$1"; shift
+  if [ -z "$backup_file" ]; then
+    echo "This function requires a backup file name for storing the grid data."
     return 1
   fi
-  \rm -f "$data_zip"
+  \rm -f "$backup_file"
+
+  bash $XSEDE_TEST_ROOT/library/backup_container_state.sh "$backup_file"
+  if [ $? -ne 0 ]; then echo "===> script failure backing up container state."; return 1; fi
+
+  return 0
+
+#older approach.
   # now grab up a copy of the normal state directory.
   # we need to zip it without a full path, so we can easily unzip it to the right place.
   pushd $GENII_USER_DIR/.. &>/dev/null
@@ -185,7 +194,7 @@ function save_grid_data()
   pushd "$DEPLOYMENTS_ROOT/.." &>/dev/null
   zip -r $HOME/bootstrap_save.zip deployments &>/dev/null
   popd &>/dev/null
-  \mv $HOME/bootstrap_save.zip "$data_zip"
+  \mv $HOME/bootstrap_save.zip "$backup_file"
 }
 
 ##############

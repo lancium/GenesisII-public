@@ -21,11 +21,11 @@ if [ ! -d "$current_path" ]; then
   echo The directory given for the current path does not seem to exist.
   exit 1
 fi
-if [ ! -f "$current_path/runContainer.sh" -a ! -f "$current_path/XCGContainer" \
+if [ ! -f "$current_path/runContainer.sh" -a ! -f "$current_path/GFFSContainer" \
     -a ! -f "$current_path/grid" ]; then
   echo The directory given for the current path does not seem to be a Genesis II
   echo directory that has been built appropriately.  For example, there is no
-  echo runContainer.sh or XCGContainer or grid script available.
+  echo runContainer.sh or GFFSContainer or grid script available.
   exit 1
 fi
 

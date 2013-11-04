@@ -13,7 +13,7 @@ public class HierarchicalDirectory
 	private String _dirName;
 	private Vector<File> _dependentEntries;
 
-	private HierarchicalDirectory(String dirName, Collection<File> dependentEntries)
+	public HierarchicalDirectory(String dirName, Collection<File> dependentEntries)
 	{
 		_dirName = dirName;
 

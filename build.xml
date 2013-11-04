@@ -7,10 +7,6 @@
 	<property name="project.dir" value="${basedir}"/>
 
 	<!-- Static Class paths -->
-	<path id="appmanager.classpath">
-		<fileset dir="${appmanager.home}" includes="**/app-manager.jar"/>
-	</path>
-
 	<path id="ant.classpath">
 		<fileset dir="${ant.home.override}" includes="**/*.jar"/>
 	</path>
@@ -54,7 +50,6 @@
 		<path refid="ant.classpath"/>
 		<path refid="jfreechart.classpath"/>
 		<path refid="jetty.classpath"/>
-		<path refid="appmanager.classpath"/>
 		<path refid="axis.classpath"/>
 		<path refid="ext.classpath"/>
 		<path refid="bundles.classpath"/>
@@ -181,7 +176,6 @@
 		<delete file="${basedir}/cert-tool.bat"/>
 		<delete file="${basedir}/jar-desc.xml"/>
 		<delete file="${basedir}/jserver-jar-desc.xml"/>
-		<delete file="ApplicationWatcher/app-manager.jar"/>
 
 		<delete>
 			<fileset dir="${basedir}/ApplicationWatcher"

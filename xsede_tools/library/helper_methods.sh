@@ -18,15 +18,15 @@ function date_string()
 # separator; phrases including the octothorpe (#) will cause syntax errors.
 function replace_phrase_in_file()
 {
-  file="$1"; shift
-  phrase="$1"; shift
-  replacement="$1"; shift
+  local file="$1"; shift
+  local phrase="$1"; shift
+  local replacement="$1"; shift
   if [ -z "$file" -o -z "$phrase" -o -z "$replacement" ]; then
     echo "replace_phrase_in_file: needs a filename, a phrase to replace, and the"
     echo "text to replace that phrase with."
     return 1
   fi
-  sed -i -e "s%$phrase%$replacement%" "$file"
+  sed -i -e "s%$phrase%$replacement%g" "$file"
 }
 
 

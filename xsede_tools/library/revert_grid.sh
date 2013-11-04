@@ -52,32 +52,37 @@ if [ ! -z "$BACKUP_USER_DIR" ]; then
   if [ $? -ne 0 ]; then echo "===> script failure removing mirror's user dir, exiting."; exit 1;  fi
 fi
 umask 077
-mkdir "$GENII_USER_DIR"
-if [ $? -ne 0 ]; then echo "===> script failure making user dir, exiting."; exit 1;  fi
+
+
 echo restoring saved grid from zip file.
-newdir="$(mktemp -d $TMP/reverting_grid.XXXXXX)"
-pushd "$newdir" &>/dev/null
-unzip $TMP/bootstrap_save.zip  &>/dev/null
-retval=$?
+bash $XSEDE_TEST_ROOT/library/restore_container_state.sh "$TMP/bootstrap_save.zip" 
+if [ $? -ne 0 ]; then echo "===> script failure restoring container state, exiting."; exit 1;  fi
+
+#mkdir "$GENII_USER_DIR"
+#if [ $? -ne 0 ]; then echo "===> script failure making user dir, exiting."; exit 1;  fi
+#newdir="$(mktemp -d $TMP/reverting_grid.XXXXXX)"
+#pushd "$newdir" &>/dev/null
+#unzip $TMP/bootstrap_save.zip  &>/dev/null
+#retval=$?
 # put back the main user directory.
-mv "$(basename $GENII_USER_DIR)"/* $GENII_USER_DIR
-retval=$(($retval + $?))
+#mv "$(basename $GENII_USER_DIR)"/* $GENII_USER_DIR
+#retval=$(($retval + $?))
 # mirror container's state directory gets put back too.
-if [ ! -z "$BACKUP_USER_DIR" ]; then
-  mkdir "$BACKUP_USER_DIR"
-  mv "$(basename $BACKUP_USER_DIR)"/* $BACKUP_USER_DIR
-  retval=$(($retval + $?))
-fi
-# and restore the deployments directory.
-if [ ! -d "$GENII_INSTALL_DIR/deployments" ]; then
-  mkdir "$GENII_INSTALL_DIR/deployments"
-fi
-# for this to work, the container.properties does need to exist.
-\cp -r -f -n deployments/* "$DEPLOYMENTS_ROOT"
-retval=$(($retval + $?))
-\rm -rf "$newdir"
-if [ $retval -ne 0 ]; then echo "===> script failure cleaning up temporary saved grid, exiting."; exit 1;  fi
-popd &>/dev/null
+#if [ ! -z "$BACKUP_USER_DIR" ]; then
+#  mkdir "$BACKUP_USER_DIR"
+#  mv "$(basename $BACKUP_USER_DIR)"/* $BACKUP_USER_DIR
+#  retval=$(($retval + $?))
+#fi
+## and restore the deployments directory.
+#if [ ! -d "$GENII_INSTALL_DIR/deployments" ]; then
+#  mkdir "$GENII_INSTALL_DIR/deployments"
+#fi
+## for this to work, the container.properties does need to exist.
+#\cp -r -f -n deployments/* "$DEPLOYMENTS_ROOT"
+#retval=$(($retval + $?))
+#\rm -rf "$newdir"
+#if [ $retval -ne 0 ]; then echo "===> script failure cleaning up temporary saved grid, exiting."; exit 1;  fi
+#popd &>/dev/null
 
 # start container up.
 launch_container_if_not_running "$DEPLOYMENT_NAME"

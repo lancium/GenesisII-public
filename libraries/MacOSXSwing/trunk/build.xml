@@ -7,7 +7,7 @@
 	<!-- Static Classpath -->
 	<path id="project.classpath">
 		<pathelement location="${obj.dir}"/>
-                <fileset dir="${ext.dir}/log4j" includes="*.jar"/>
+                <fileset dir="${ext.dir}" includes="**/*.jar"/>
 	</path>
 			
 

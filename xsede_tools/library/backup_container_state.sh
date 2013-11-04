@@ -4,17 +4,7 @@
 #
 # Author: Chris Koeritz
 
-if [ -z "$GENII_USER_DIR" -o -z "$GENII_INSTALL_DIR" ]; then
-  echo "This script requires two variables in the environment, the user state"
-  echo "directory (GENII_USER_DIR) and the genesis installation directory"
-  echo "(GENIII_INSTALL_DIR)."
-  exit 1
-fi
-
-#hmmm: add auto shutdown and resume?
-echo 
-echo "** The container should currently be shut down! **"
-echo 
+##############
 
 function date_stringer() 
 { 
@@ -23,7 +13,30 @@ function date_stringer()
     date +"%Y$sep%m$sep%d$sep%H%M$sep%S" | tr -d '/\n/'
 }
 
-backup_file="$(\pwd)/state_backup_$(date_stringer).zip"
+##############
+
+if [ -z "$GENII_USER_DIR" -o -z "$GENII_INSTALL_DIR" ]; then
+  echo "This script requires two variables in the environment, the user state"
+  echo "directory (GENII_USER_DIR) and the genesis installation directory"
+  echo "(GENIII_INSTALL_DIR)."
+  exit 1
+fi
+
+backup_file="$1"; shift
+
+if [ -z "$backup_file" ]; then
+  backup_file="$(\pwd)/state_backup_$(date_stringer).zip"
+else
+  if [ "${backup_file:0:1}" != "/" ]; then
+    # if it's not an absolute path, assume they mean wherever they are.
+    backup_file="$(\pwd)/$backup_file"
+  fi
+fi
+
+#hmmm: add auto shutdown and resume?
+echo 
+echo "** The container should currently be shut down! **"
+echo 
 
 if [ -z "$TMP" ]; then
   TMP=$HOME/.tmp

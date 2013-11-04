@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.cmd.GetHostName;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.CertGeneratorTool;
@@ -114,7 +115,9 @@ public class ContainerBootstrap implements SecureRunnable
 
 	private void generateOwnerFile(OwnerInfo info) throws Throwable
 	{
-		File ownerCer = Installation.getDeployment(new DeploymentName()).security().getSecurityFile("owner.cer");
+		File ownerCer = InstallationProperties.getInstallationProperties().getOwnerCertificate();
+		if (ownerCer == null)
+			ownerCer = Installation.getDeployment(new DeploymentName()).security().getSecurityFile("owner.cer");
 
 		if (!ownerCer.exists()) {
 			DownloadCertificateTool dTool = new DownloadCertificateTool();

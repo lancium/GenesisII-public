@@ -152,7 +152,7 @@ control_bes_container()
   local host="$1"; shift
   local cmd="$1"; shift
   local install_folder=$(get_install_folder "$host")
-  run_commands_on_bes "$host" "$install_folder/XCGContainer $cmd"
+  run_commands_on_bes "$host" "$install_folder/GFFSContainer $cmd"
 }
 
 #test 

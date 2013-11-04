@@ -5,23 +5,9 @@
 	<property file="${basedir}/build.properties"/>
 
 	<!-- Static Class paths -->
-	<path id="commons.net.classpath">
-		<fileset dir="${commons.net.home}" includes="**/*.jar"/>
-	</path>
-
-	<path id="jcifs.classpath">
-		<fileset dir="${jcifs.home}" includes="**/*.jar"/>
-	</path>
-
-	<path id="jsch.classpath">
-		<fileset dir="${jsch.home}" includes="**/*.jar"/>
-	</path>
-
 	<path id="project.classpath">
+		<fileset dir="${ext.dir}" includes="**/*.jar"/>
 		<pathelement location="${obj.dir}"/>
-		<path refid="commons.net.classpath"/>
-		<path refid="jcifs.classpath"/>
-		<path refid="jsch.classpath"/>
 	</path>
 			
 	<!-- Build Targets -->

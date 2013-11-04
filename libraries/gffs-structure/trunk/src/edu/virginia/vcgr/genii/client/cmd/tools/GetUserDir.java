@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
-import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
@@ -19,7 +18,7 @@ public class GetUserDir extends BaseGridTool
 
 	static public String getUserDir()
 	{
-		return ApplicationBase.getUserDir(ContainerProperties.getContainerProperties());
+		return ApplicationBase.getUserDir();
 	}
 
 	@Override

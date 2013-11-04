@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
@@ -63,7 +64,10 @@ public class Security
 	{
 		Collection<File> ret = new LinkedList<File>();
 
-		HierarchicalDirectory ownersDir = _securityDirectory.lookupDirectory("default-owners");
+		HierarchicalDirectory ownersDir = InstallationProperties.getInstallationProperties().getDefaultOwnersDirectory();
+		if (ownersDir == null)
+			ownersDir = _securityDirectory.lookupDirectory("default-owners");
+
 		if (ownersDir.exists()) {
 			File[] files = ownersDir.listFiles(new FileFilter()
 			{

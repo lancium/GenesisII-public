@@ -30,24 +30,27 @@ public class ApplicationBase
 	// the environment variable whose value points at our state directory.
 	static public final String USER_DIR_ENVIRONMENT_VARIABLE = "GENII_USER_DIR";
 
+	// environment variable used to point at a different deployment than the one found in the
+	// installation directory.
+	static public final String DEPLOYMENT_DIR_ENVIRONMENT_VARIABLE = "GENII_DEPLOYMENT_DIR";
+
 	// this property value can be used in certain property files as a placeholder that is
 	// translated into the value of the user state directory variable (see above).
 	static public final String USER_DIR_PROPERTY_VALUE = "env-GENII_USER_DIR";
 
-	// loads the value for the genesis user state directory from the environment.
-	static public String getUserDirFromEnvironment()
+	/**
+	 * a simple search for the deployment directory in the environment variables. this does not have
+	 * a default value implemented here, and must fall-back to a default elsewhere.
+	 */
+	static public String getDeploymentDirFromEnvironment()
 	{
-		String value = System.getenv(USER_DIR_ENVIRONMENT_VARIABLE);
-		// make this decision across the board, so we don't get caught short without
-		// a default user state directory.
-		if (value == null || value.length() == 0) {
-			value = String.format("%s/%s", System.getProperty("user.home"), GenesisIIConstants.GENESISII_STATE_DIR_NAME);
-		}
-		return value;
+		return System.getenv(DEPLOYMENT_DIR_ENVIRONMENT_VARIABLE);
 	}
 
-	// this provides a way for the osgi support to know we're running inside eclipse, which imposes
-	// a different structure on the locations of files. the
+	/*
+	 * this provides a way for the osgi support to know we're running inside eclipse, which imposes
+	 * a different structure on the locations of files.
+	 */
 	static public String getEclipseTrunkFromEnvironment()
 	{
 		return System.getenv(INSTALLATION_DIR_ENVIRONMENT_VARIABLE);
@@ -68,7 +71,7 @@ public class ApplicationBase
 	}
 
 	/**
-	 * Prepares the static configuration manager
+	 * Prepares the static configuration manager.
 	 */
 	static protected void prepareServerApplication()
 	{
@@ -76,12 +79,9 @@ public class ApplicationBase
 		String depName = cProperties.getDeploymentName();
 		if (depName != null)
 			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, depName);
-
-		String userDir = getUserDir(cProperties);
+		String userDir = getUserDir();
 		ConfigurationManager configurationManager = ConfigurationManager.initializeConfiguration(userDir);
-
 		setupUserDir(configurationManager.getUserDirectory());
-
 		configurationManager.setRoleServer();
 	}
 
@@ -89,33 +89,61 @@ public class ApplicationBase
 	 * Prepares the static configuration manager (using the config files in the explicitConfigDir).
 	 * If explicitConfigDir is null, the GENII_CONFIG_DIR is inspected. If that is not present (or
 	 * empty), the default configuration location located in a well-known spot from the installation
-	 * directory (as per the installation system property) is used;
-	 * 
-	 * @param explicitConfigDir
+	 * directory (as per the installation system property) is used.
 	 */
 	static protected void prepareClientApplication()
 	{
-		String userDir = getUserDir(null);
+		String userDir = getUserDir();
 		ConfigurationManager configurationManager = ConfigurationManager.initializeConfiguration(userDir);
-
 		setupUserDir(configurationManager.getUserDirectory());
-
 		configurationManager.setRoleClient();
 	}
 
-	static public String getUserDir(ContainerProperties cProperties)
+	/**
+	 * supports replacing a few keywords (or one really, currently) with environment variables.
+	 */
+	public static String replaceKeywords(String pathToFix)
+	{
+		// test for well-known singular replacements first.
+		if ((pathToFix != null) && pathToFix.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE)) {
+			// there's our sentinel for loading the state directory from the environment variables.
+			// let's try to load it.
+			pathToFix = ApplicationBase.getUserDirFromEnvironment();
+			if (pathToFix != null)
+				return pathToFix;
+			// nothing in environment, so fall back to default state directory, since we know this.
+			return getDefaultUserDir();
+		}
+		// test for generalized "env-NAME" patterns for other environment variables.
+		// hmmm: not implemented.
+		// if there were any changes to make, they have been made.
+		return pathToFix;
+	}
+
+	/**
+	 * The primary and recommended way to retrieve the user state directory.
+	 */
+	static public String getUserDir()
 	{
 		String userDir = null;
-
+		// see if we have a valid container properties and can retrieve the value that way.
+		ContainerProperties cProperties = ContainerProperties.getContainerProperties();
 		if (cProperties != null)
-			userDir = cProperties.getUserDirectory();
-
+			userDir = cProperties.getUserDirectoryProperty();
+		// well, see if we can just get the state directory from the environment.
 		if (userDir == null)
 			userDir = getUserDirFromEnvironment();
-
+		// now, if we have something at all, try comparing it with our replacement property.
+		userDir = ApplicationBase.replaceKeywords(userDir);
+///		if ( (userDir != null) && userDir.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE))
+///			userDir = ApplicationBase.getUserDirFromEnvironment();
+		// make sure we don't go away empty-handed.
+		if (userDir == null)
+			userDir = getDefaultUserDir();
+		// by now we'll have a state directory path, even if we have to use the default.
 		try {
+			// load the state directory so we can get an absolute path and also verify its health.
 			File userDirFile = new GuaranteedDirectory(userDir, true);
-
 			return userDirFile.getCanonicalPath();
 		} catch (Throwable cause) {
 			throw new RuntimeException("Unable to access or create state directory.", cause);
@@ -123,11 +151,14 @@ public class ApplicationBase
 	}
 
 	public enum GridStates {
-		CONNECTION_FAILED, // we were not connected, and we knew what to do, but that failed.
-		CONNECTION_MEANS_UNKNOWN, // no breadcrumbs were left for how to get connected.
-		CONNECTION_ALREADY_GOOD, // connection to the grid was already okay.
-		CONNECTION_GOOD_NOW // there was no connection, but we have established one. shell must
-							// reload.
+		// we were not connected, and we knew what to do, but that failed.
+		CONNECTION_FAILED,
+		// no breadcrumbs were left for how to get connected.
+		CONNECTION_MEANS_UNKNOWN,
+		// connection to the grid was already okay.
+		CONNECTION_ALREADY_GOOD,
+		// there was no connection, but we have established one. shell must reload.
+		CONNECTION_GOOD_NOW
 	}
 
 	static public GridStates establishGridConnection(Writer output, Writer error, Reader input)
@@ -187,5 +218,17 @@ public class ApplicationBase
 			_logger.error("failure during grid connection: " + e.getMessage(), e);
 		}
 		return GridStates.CONNECTION_FAILED;
+	}
+	
+	// loads the value for the genesis user state directory from the environment.
+	static private String getUserDirFromEnvironment()
+	{
+		return System.getenv(USER_DIR_ENVIRONMENT_VARIABLE);
+	}
+
+	// a default for the state directory, if one cannot be found elsewhere.
+	static private String getDefaultUserDir()
+	{
+		return String.format("%s/%s", System.getProperty("user.home"), GenesisIIConstants.GENESISII_STATE_DIR_NAME);
 	}
 }

@@ -8,10 +8,10 @@ public class SecurityConstants
 
 	// General security properties...
 
-	static public final long oneDayInMs = 1000L * 60L * 60L * 24L;  // one day.
+	static public final long oneDayInMs = 1000L * 60L * 60L * 24L; // one day.
 
 	// credentials are valid 10 years by default.
-	static public final long CredentialExpirationMillis = oneDayInMs * 365L * 10L;  // 10 years.
+	static public final long CredentialExpirationMillis = oneDayInMs * 365L * 10L; // 10 years.
 	static public final long CredentialGoodFromOffset = 1000L * 60L * 15L; // 15 minutes ago
 	static public final long CredentialCacheTimeout = 1000L * 60L * 60L; // 1 hour lifetime in cache
 
