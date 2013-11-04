@@ -1,0 +1,64 @@
+<?xml version="1.0" ?>
+<JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+	<JobDescription>
+		<JobIdentification>
+			<JobName>Adder</JobName>
+		</JobIdentification>
+
+		<Resources>
+			<OperatingSystem>
+				<OperatingSystemType>
+					<OperatingSystemName>LINUX</OperatingSystemName>
+				</OperatingSystemType>
+			</OperatingSystem>
+		</Resources>
+
+		<Application xmlns:genii="http://vcgr.cs.virginia.edu/jsdl/genii">
+			<POSIXApplication
+				xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+				<Executable>adder.sh</Executable>
+				<Output>stdout</Output>
+				<Argument>seven.dat</Argument>
+				<Argument>fourty-two.dat</Argument>
+				<Argument>sum.dat</Argument>
+				<Argument>10</Argument>
+			</POSIXApplication>
+		</Application>
+
+		<DataStaging>
+			<FileName>adder.sh</FileName>
+			<CreationFlag>overwrite</CreationFlag>
+			<DeleteOnTermination>true</DeleteOnTermination>
+			<Source>
+				<URI>http://www.cs.virginia.edu/~mmm2a/test/adder.sh</URI>
+			</Source>
+		</DataStaging>
+
+		<DataStaging>
+			<FileName>seven.dat</FileName>
+			<CreationFlag>overwrite</CreationFlag>
+			<DeleteOnTermination>true</DeleteOnTermination>
+			<Source>
+				<URI>http://www.cs.virginia.edu/~mmm2a/test/seven.dat</URI>
+			</Source>
+		</DataStaging>
+
+		<DataStaging>
+			<FileName>fourty-two.dat</FileName>
+			<CreationFlag>overwrite</CreationFlag>
+			<DeleteOnTermination>true</DeleteOnTermination>
+			<Source>
+				<URI>http://www.cs.virginia.edu/~mmm2a/test/fourty-two.dat</URI>
+			</Source>
+		</DataStaging>
+
+		<DataStaging>
+			<FileName>sum.dat</FileName>
+			<CreationFlag>overwrite</CreationFlag>
+			<DeleteOnTermination>true</DeleteOnTermination>
+			<Target>
+				<URI>rns:sum.dat</URI>
+			</Target>
+		</DataStaging>
+	</JobDescription>
+</JobDefinition>

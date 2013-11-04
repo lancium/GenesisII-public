@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genii:construction-parameters
+	xmlns:genii="http://vcgr.cs.virginia.edu/construction-parameters"
+	xmlns:bes="http://vcgr.cs.virginia.edu/construction-parameters/bes"
+	human-name="PBS-Centurion BES">
+
+	<bes:pre-execution-delay
+		xmlns:bes="http://vcgr.cs.virginia.edu/construction-parameters/bes">
+		4 seconds
+	</bes:pre-execution-delay>
+	<bes:post-execution-delay
+		xmlns:bes="http://vcgr.cs.virginia.edu/construction-parameters/bes">
+		35 seconds
+	</bes:post-execution-delay>
+
+	<bes:resource-overrides
+		xmlns:bes="http://vcgr.cs.virginia.edu/construction-parameters/bes">
+		<bes:operating-system-name>LINUX</bes:operating-system-name>
+		<bes:operating-system-version>MOOCH</bes:operating-system-version>
+		<bes:cpu-architecture-name>x86_64</bes:cpu-architecture-name>
+		<bes:cpu-count>4</bes:cpu-count>
+		<bes:cpu-speed>2.64 GHz</bes:cpu-speed>
+		<bes:physical-memory>4 GB</bes:physical-memory>
+		<bes:virtual-memory>16 GB</bes:virtual-memory>
+	</bes:resource-overrides>
+
+	<bes:nativeq provider="pbs" shared-directory="/Users/morgan/shared"
+		xmlns:nq="http://http://vcgr.cs.virginia.edu/native-queue">
+		<nq:trap-signal>TSTP</nq:trap-signal>
+		<nq:trap-signal>TTIN</nq:trap-signal>
+		<nq:trap-signal>TTOU</nq:trap-signal>
+		<nq:trap-signal>USR1</nq:trap-signal>
+		<nq:trap-signal>USR2</nq:trap-signal>
+
+		<nq:pbs-configuration 
+			bash-binary="/bin/bash"
+			submit-script-name="MySubmitScript.sh"
+			queue-name="lowq" 
+			bin-directory="/usr/bin">
+			
+			<nq:qsub path="/Users/morgan/Queue/qsub">
+				<nq:additional-argument>-A</nq:additional-argument>
+				<nq:additional-argument>morgan</nq:additional-argument>
+			</nq:qsub>
+			
+			<nq:qstat path="/Users/morgan/Queue/qstat"/>
+			
+			<nq:qdel path="/Users/morgan/Queue/qdel"/>
+		
+		</nq:pbs-configuration>
+	</bes:nativeq>
+	
+</genii:construction-parameters>

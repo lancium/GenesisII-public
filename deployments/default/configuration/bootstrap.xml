@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Author: Vanamala Venkataswamy (xsede namespace, increment 3) -->
+<!-- Author: Mark Morgan (certificate code) -->
+<!-- Author: Chris Koeritz (xsede increment 1-3 updates) -->
+
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+	
+	<gsh:default name="GENII_INSTALL_DIR" value="."/>
+	<gsh:default name="DEPLOYMENT_NAME" value="default"/>
+	<gsh:default name="SECURITY_DIR" value="${DEPLOYMENT_NAME}/security"/>
+	<gsh:default name="PORT" value="18080"/>
+	<gsh:default name="BOOTSTRAP_CONTAINER" value="/resources/xsede.org/containers/BootstrapContainer/"/>
+	<gsh:define name="BOOT_SRVS"
+		source="${BOOTSTRAP_CONTAINER}/Services"/>
+	
+	<gsh:echo
+		message="GENII_INSTALL_DIR is ${GENII_INSTALL_DIR}"/>
+	<gsh:echo
+		message="DEPLOYMENT_NAME is ${DEPLOYMENT_NAME}"/>
+
+	<gsh:echo
+		message="Setting user's current deployment to ${DEPLOYMENT_NAME}."/>
+	<geniix:set-user-config>
+		<gsh:param>${DEPLOYMENT_NAME}</gsh:param>
+	</geniix:set-user-config>
+	
+	<gsh:echo
+		message="Logging in as /home/fred/xsede/code/genesis-trunk/deployments/${SECURITY_DIR}/admin.pfx."/>
+	<geniix:keystoreLogin>
+		<gsh:param>--no-gui</gsh:param>
+		<gsh:param>--password=keys</gsh:param>
+		<gsh:param>--pattern=skynet</gsh:param>
+		<gsh:param>--storetype=PKCS12</gsh:param>
+		<gsh:param>local:/home/fred/xsede/code/genesis-trunk/deployments/${SECURITY_DIR}/admin.pfx</gsh:param>
+	</geniix:keystoreLogin>
+	
+	<gsh:echo message="Creating Root of RNS space."/>
+	<geniix:create-rns-root>
+		<gsh:param>--protocol=https</gsh:param>
+		<gsh:param>--host=localhost</gsh:param>
+		<gsh:param>--port=${PORT}</gsh:param>
+		<gsh:param>context.xml</gsh:param>
+	</geniix:create-rns-root>
+	<geniix:chmod>
+		<gsh:param>/</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</geniix:chmod>
+
+	<gsh:echo message="Creating main containers directory"/>
+	<geniix:mkdir>
+		<gsh:param>-p</gsh:param>
+		<gsh:param>/resources/xsede.org/containers</gsh:param>
+	</geniix:mkdir>
+
+	<geniix:ln>
+		<gsh:param>--service-url=https://localhost:${PORT}/axis/services/VCGRContainerPortType</gsh:param>
+		<gsh:param>${BOOTSTRAP_CONTAINER}</gsh:param>
+	</geniix:ln>
+
+	<geniix:chmod>
+		<gsh:param>${BOOTSTRAP_CONTAINER}/Services/EnhancedNotificationBrokerFactoryPortType</gsh:param>
+		<gsh:param>+rx</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</geniix:chmod>
+
+	<gsh:echo message="Creating queues directory"/>
+	<geniix:mkdir>
+		<gsh:param>-p</gsh:param>
+		<gsh:param>/resources/xsede.org/queues</gsh:param>
+	</geniix:mkdir>
+	<geniix:chmod>
+		<gsh:param>/resources</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</geniix:chmod>
+
+	<gsh:echo message="Creating /users/xsede.org, /users/deleted.xsede.org directories"></gsh:echo>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/users/xsede.org</gsh:param>
+                <gsh:param>/users/deleted.xsede.org</gsh:param>
+        </geniix:mkdir>
+        <geniix:chmod>
+                <gsh:param>/users</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+        <geniix:chmod>
+                <gsh:param>/users/xsede.org</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+        <gsh:echo message="Creating /groups/xsede.org, /groups/deleted.xsede.org directories"/>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/groups/xsede.org</gsh:param>
+                <gsh:param>/groups/deleted.xsede.org</gsh:param>
+        </geniix:mkdir>
+        <geniix:chmod>
+                <gsh:param>/groups</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+        <gsh:echo message="Creating /home/xsede.org, /home/deleted.xsede.org directories"/>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/home/xsede.org</gsh:param>
+                <gsh:param>/home/deleted.xsede.org</gsh:param>
+        </geniix:mkdir>
+        <geniix:chmod>
+                <gsh:param>/home</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+        <gsh:echo message="Creating /etc directory"/>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/etc</gsh:param>
+        </geniix:mkdir>
+ 	<geniix:chmod>
+                <gsh:param>/etc</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/etc/resolvers</gsh:param>
+        </geniix:mkdir>
+ 	<geniix:chmod>
+                <gsh:param>/etc/resolvers</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+        <gsh:echo message="Creating /bin directory"/>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/bin</gsh:param>
+        </geniix:mkdir>
+ 	<geniix:chmod>
+                <gsh:param>/bin</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+        <gsh:echo message="Creating /doc directory"/>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/doc</gsh:param>
+        </geniix:mkdir>
+ 	<geniix:chmod>
+                <gsh:param>/doc</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+        <gsh:echo message="Creating /mount directory"/>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/mount</gsh:param>
+        </geniix:mkdir>
+
+        <gsh:echo message="Setting access on authorization port types"/>
+        <geniix:chmod>
+                <gsh:param>${BOOTSTRAP_CONTAINER}/Services/X509AuthnPortType</gsh:param>
+                <gsh:param>+rx</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+        <geniix:chmod>
+                <gsh:param>${BOOTSTRAP_CONTAINER}/Services/KerbAuthnPortType</gsh:param>
+                <gsh:param>+rx</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+	<gsh:echo message="adding namespace standard link for root container"/>
+	<geniix:ln>
+		<gsh:param>${BOOTSTRAP_CONTAINER}</gsh:param>
+		<gsh:param>/resources/xsede.org/containers/gffs-1.xsede.org</gsh:param>
+	</geniix:ln>
+
+	<gsh:echo message="adding temporary link for primary sts container"/>
+	<geniix:ln>
+		<gsh:param>${BOOTSTRAP_CONTAINER}</gsh:param>
+		<gsh:param>/resources/xsede.org/containers/sts-1.xsede.org</gsh:param>
+	</geniix:ln>
+
+	<gsh:echo message="Adding gffs-admins group"/>
+	<geniix:idp>
+		<gsh:param>--validDuration=10years</gsh:param>
+		<gsh:param>${BOOT_SRVS}/X509AuthnPortType</gsh:param>
+		<gsh:param>gffs-admins</gsh:param>
+	</geniix:idp>
+	<geniix:ln>
+		<gsh:param>${BOOT_SRVS}/X509AuthnPortType/gffs-admins</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+	</geniix:ln>
+	<geniix:chmod>
+		<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+
+	<gsh:echo message="Adding gffs-amie group"/>
+	<geniix:idp>
+		<gsh:param>--validDuration=10years</gsh:param>
+		<gsh:param>${BOOT_SRVS}/X509AuthnPortType</gsh:param>
+		<gsh:param>gffs-amie</gsh:param>
+	</geniix:idp>
+	<geniix:ln>
+		<gsh:param>${BOOT_SRVS}/X509AuthnPortType/gffs-amie</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+	</geniix:ln>
+	<geniix:chmod>
+		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+
+	<gsh:echo message="Adding gffs-users group"/>
+	<geniix:idp>
+		<gsh:param>--validDuration=10years</gsh:param>
+		<gsh:param>${BOOT_SRVS}/X509AuthnPortType</gsh:param>
+		<gsh:param>gffs-users</gsh:param>
+	</geniix:idp>
+	<geniix:ln>
+		<gsh:param>${BOOT_SRVS}/X509AuthnPortType/gffs-users</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+	</geniix:ln>
+	<geniix:chmod>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+
+	<geniix:chmod>
+		<gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod / +rwx gffs-admin -->
+	<geniix:chmod>
+               	<gsh:param>/</gsh:param>
+               	<gsh:param>+rwx</gsh:param>
+               	<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+       	</geniix:chmod>
+
+	<!-- chmod /* +rwx gffs-admin -->
+	<gsh:foreach param-name="DIR" source-rns="/">
+		<geniix:chmod>
+                	<gsh:param>${DIR}</gsh:param>
+                	<gsh:param>+rwx</gsh:param>
+                	<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        	</geniix:chmod>
+	</gsh:foreach>
+
+	<!-- chmod /users/xsede.org +rwx gffs-amie, gffs-users  -->
+	<geniix:chmod>
+		<gsh:param>/users/xsede.org</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/users/xsede.org</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+                <gsh:param>/home/xsede.org</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /users/deleted.xsede.org +rwx gffs-amie, gffs-users  -->
+	<geniix:chmod>
+		<gsh:param>/users/deleted.xsede.org</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/users/deleted.xsede.org</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /groups/xsede.org +rwx gffs-admins, +r gffs-users -->
+	<geniix:chmod>
+		<gsh:param>/groups/xsede.org</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/groups/xsede.org</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /groups/deleted.xsede.org +rwx gffs-admins -->
+	<geniix:chmod>
+		<gsh:param>/groups/deleted.xsede.org</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /home/xsede.org +rwx gffs-amie, +r gffs-users -->
+	<geniix:chmod>
+		<gsh:param>/home/xsede.org</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/home/xsede.org</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /home/deleted.xsede.org +rwx gffs-amie, +r gffs-users -->
+	<geniix:chmod>
+		<gsh:param>/home/deleted.xsede.org</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/home/deleted.xsede.org</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /bin +rwx gffs-admins, +r gffs-users -->
+	<geniix:chmod>
+		<gsh:param>/bin</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/bin</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /doc +rwx gffs-admins, +r everyone -->
+	<geniix:chmod>
+		<gsh:param>/doc</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/doc</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /resources/xsede.org +rwx gffs-admins, +r gffs-users -->
+	<geniix:chmod>
+		<gsh:param>/resources/xsede.org</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/resources/xsede.org</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /resources/xsede.org/queues +rwx gffs-admins, +r gffs-users -->
+	<geniix:chmod>
+		<gsh:param>/resources/xsede.org/queues</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/resources/xsede.org/queues</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /resources/xsede.org/containers +rwx gffs-admins, +r gffs-users -->
+	<geniix:chmod>
+		<gsh:param>/resources/xsede.org/containers</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/resources/xsede.org/containers</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+
+	<gsh:echo message="Setting security on container ${BOOTSTRAP_CONTAINER}"/>	
+
+	<geniix:chmod>
+		<gsh:param>${BOOTSTRAP_CONTAINER}</gsh:param>
+		<gsh:param>+rwx</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>${BOOTSTRAP_CONTAINER}</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+	</geniix:chmod>
+
+	<geniix:chmod>
+		<gsh:param>${BOOT_SRVS}</gsh:param>
+		<gsh:param>+rwx</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+	</geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>${BOOT_SRVS}</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+	</geniix:chmod>
+
+	<gsh:foreach param-name="SERVICE"
+		source-rns="${BOOT_SRVS}">
+		<gsh:echo message="Setting security on ${SERVICE} in container ${BOOTSTRAP_CONTAINER}"/>
+		<geniix:chmod>
+			<gsh:param>${BOOT_SRVS}/${SERVICE}</gsh:param>
+			<gsh:param>+rwx</gsh:param>
+			<gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+		</geniix:chmod>
+		<geniix:chmod>
+			<gsh:param>${BOOT_SRVS}/${SERVICE}</gsh:param>
+			<gsh:param>+r</gsh:param>
+			<gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+		</geniix:chmod>
+	</gsh:foreach>
+
+	<gsh:echo message="Creating Certificate Generator for containers using signing-cert.pfx."/>
+	<geniix:cert-generator>
+		<gsh:param>--create-generator</gsh:param>
+		<gsh:param>${BOOT_SRVS}/CertGeneratorPortType</gsh:param>
+		<gsh:param>--ks-path=/home/fred/xsede/code/genesis-trunk/deployments/${SECURITY_DIR}/signing-cert.pfx</gsh:param>
+		<gsh:param>--ks-pword=signer</gsh:param>
+		<gsh:param>--ks-alias=signing-cert</gsh:param>
+		<gsh:param>/etc/ContainerGroupCertGenerator</gsh:param>
+	</geniix:cert-generator>
+
+	<geniix:chmod>
+		<gsh:param>/etc/ContainerGroupCertGenerator</gsh:param>
+		<gsh:param>+rx</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</geniix:chmod>
+
+	<gsh:echo message="Logging out"/>
+	<geniix:logout>
+		<gsh:param>--all</gsh:param>
+	</geniix:logout>
+
+</gsh:script>

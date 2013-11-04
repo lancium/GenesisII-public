@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genii:construction-parameters
+	xmlns:genii="http://vcgr.cs.virginia.edu/construction-parameters"
+	xmlns:bes="http://vcgr.cs.virginia.edu/construction-parameters/bes"
+	human-name="PBS-Centurion BES with MPI and Pwrapper">
+	
+	<bes:post-execution-delay>15.000000 Seconds</bes:post-execution-delay>
+	<bes:pre-execution-delay>15.000000 Seconds</bes:pre-execution-delay>
+
+	<bes:resource-overrides>
+		<bes:cpu-count>2</bes:cpu-count>
+		<bes:physical-memory>2060000000.000000 B</bes:physical-memory>
+	</bes:resource-overrides>
+
+	<bes:nativeq provider="pbs"
+		shared-directory="/home/gbg/shared-directory"
+		xmlns:nq="http://vcgr.cs.virginia.edu/native-queue">
+		<nq:pbs-configuration queue-name="centurion">
+			<nq:qsub/>
+			<nq:qstat/>
+			<nq:qdel/>
+		</nq:pbs-configuration>
+	</bes:nativeq>
+	
+	<bes:cmdline-manipulators 
+		xmlns:clm="http://vcgr.cs.virginia.edu/cmdline-manipulators">
+		
+		<clm:manipulator-variation
+			type="pwrapper"
+			name="pwrapper">
+		</clm:manipulator-variation>
+	
+		<clm:manipulator-variation
+			type="mpich"
+			name="mpi1">
+			<clm:mpich-configuration>
+				<clm:supported-spmd-variation>http://www.ogf.org/jsdl/2007/02/jsdl-spmd/MPICH1</clm:supported-spmd-variation>
+				<clm:exec-command>mpiexec</clm:exec-command>
+			</clm:mpich-configuration>
+		
+		</clm:manipulator-variation>
+		
+		<clm:call-chain>
+			<clm:manipulator-name>mpi1</clm:manipulator-name>
+			<clm:manipulator-name>pwrapper</clm:manipulator-name>
+		</clm:call-chain>
+		
+	</bes:cmdline-manipulators>
+	
+</genii:construction-parameters>

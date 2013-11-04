@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<multi>
+<jsdl:JobDefinition xmlns="http://www.example.org/"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<jsdl:JobDescription>
+		<jsdl:JobIdentification>
+			<jsdl:JobName>Adder</jsdl:JobName>
+			<jsdl:Description>A simple, example invocation to run an executable
+				which takes as input two files, each with a string integer, add
+				the integer values from those two files, and output the sum into
+				a third file.
+			</jsdl:Description>
+		</jsdl:JobIdentification>
+		
+		<jsdl:Application>
+			<jsdl:ApplicationName>adder</jsdl:ApplicationName>
+			<jsdl-posix:POSIXApplication>
+				<jsdl-posix:Executable>
+					adder.sh
+				</jsdl-posix:Executable>
+				<jsdl-posix:Output>stdout</jsdl-posix:Output>
+				<jsdl-posix:Argument>seven.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>fourty-two.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>sum.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>10</jsdl-posix:Argument>
+			</jsdl-posix:POSIXApplication>
+		</jsdl:Application>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>adder.sh</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/adder.sh</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>seven.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/seven.dat</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>fourty-two.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/fourty-two.dat</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+
+<!--	
+		<jsdl:DataStaging>
+			<jsdl:FileName>sum.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>ftp://mmm2a:!!mmm2a@warrenton.cs.virginia.edu:8021/sum.dat</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+-->
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>sum.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>rns:sum.dat</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>stdout</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>mailto:mmm2a@cs.virginia.edu?subject=jobOutput&amp;X-AttachmentFilename=stdout.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+	</jsdl:JobDescription>
+	
+</jsdl:JobDefinition>
+<jsdl:JobDefinition xmlns="http://www.example.org/"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<jsdl:JobDescription>
+		<jsdl:JobIdentification>
+			<jsdl:JobName>Adder</jsdl:JobName>
+			<jsdl:Description>A simple, example invocation to run an executable
+				which takes as input two files, each with a string integer, add
+				the integer values from those two files, and output the sum into
+				a third file.
+			</jsdl:Description>
+		</jsdl:JobIdentification>
+		
+		<jsdl:Application>
+			<jsdl:ApplicationName>adder</jsdl:ApplicationName>
+			<jsdl-posix:POSIXApplication>
+				<jsdl-posix:Executable>
+					adder.sh
+				</jsdl-posix:Executable>
+				<jsdl-posix:Output>stdout</jsdl-posix:Output>
+				<jsdl-posix:Argument>seven.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>fourty-two.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>sum.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>10</jsdl-posix:Argument>
+			</jsdl-posix:POSIXApplication>
+		</jsdl:Application>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>adder.sh</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/adder.sh</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>seven.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/seven.dat</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>fourty-two.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/fourty-two.dat</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+
+<!--	
+		<jsdl:DataStaging>
+			<jsdl:FileName>sum.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>ftp://mmm2a:!!mmm2a@warrenton.cs.virginia.edu:8021/sum.dat</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+-->
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>sum.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>rns:sum.dat</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>stdout</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>mailto:mmm2a@cs.virginia.edu?subject=jobOutput&amp;X-AttachmentFilename=stdout.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+	</jsdl:JobDescription>
+	
+</jsdl:JobDefinition>
+<jsdl:JobDefinition xmlns="http://www.example.org/"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<jsdl:JobDescription>
+		<jsdl:JobIdentification>
+			<jsdl:JobName>Adder</jsdl:JobName>
+			<jsdl:Description>A simple, example invocation to run an executable
+				which takes as input two files, each with a string integer, add
+				the integer values from those two files, and output the sum into
+				a third file.
+			</jsdl:Description>
+		</jsdl:JobIdentification>
+		
+		<jsdl:Application>
+			<jsdl:ApplicationName>adder</jsdl:ApplicationName>
+			<jsdl-posix:POSIXApplication>
+				<jsdl-posix:Executable>
+					adder.sh
+				</jsdl-posix:Executable>
+				<jsdl-posix:Output>stdout</jsdl-posix:Output>
+				<jsdl-posix:Argument>seven.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>fourty-two.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>sum.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>10</jsdl-posix:Argument>
+			</jsdl-posix:POSIXApplication>
+		</jsdl:Application>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>adder.sh</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/adder.sh</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>seven.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/seven.dat</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>fourty-two.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/fourty-two.dat</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+
+<!--	
+		<jsdl:DataStaging>
+			<jsdl:FileName>sum.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>ftp://mmm2a:!!mmm2a@warrenton.cs.virginia.edu:8021/sum.dat</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+-->
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>sum.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>rns:sum.dat</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>stdout</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>mailto:mmm2a@cs.virginia.edu?subject=jobOutput&amp;X-AttachmentFilename=stdout.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+	</jsdl:JobDescription>
+	
+</jsdl:JobDefinition>
+<jsdl:JobDefinition xmlns="http://www.example.org/"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<jsdl:JobDescription>
+		<jsdl:JobIdentification>
+			<jsdl:JobName>Adder</jsdl:JobName>
+			<jsdl:Description>A simple, example invocation to run an executable
+				which takes as input two files, each with a string integer, add
+				the integer values from those two files, and output the sum into
+				a third file.
+			</jsdl:Description>
+		</jsdl:JobIdentification>
+		
+		<jsdl:Application>
+			<jsdl:ApplicationName>adder</jsdl:ApplicationName>
+			<jsdl-posix:POSIXApplication>
+				<jsdl-posix:Executable>
+					adder.sh
+				</jsdl-posix:Executable>
+				<jsdl-posix:Output>stdout</jsdl-posix:Output>
+				<jsdl-posix:Argument>seven.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>fourty-two.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>sum.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>10</jsdl-posix:Argument>
+			</jsdl-posix:POSIXApplication>
+		</jsdl:Application>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>adder.sh</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/adder.sh</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>seven.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/seven.dat</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>fourty-two.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/fourty-two.dat</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+
+<!--	
+		<jsdl:DataStaging>
+			<jsdl:FileName>sum.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>ftp://mmm2a:!!mmm2a@warrenton.cs.virginia.edu:8021/sum.dat</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+-->
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>sum.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>rns:sum.dat</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>stdout</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>mailto:mmm2a@cs.virginia.edu?subject=jobOutput&amp;X-AttachmentFilename=stdout.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+	</jsdl:JobDescription>
+	
+</jsdl:JobDefinition>
+<jsdl:JobDefinition xmlns="http://www.example.org/"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<jsdl:JobDescription>
+		<jsdl:JobIdentification>
+			<jsdl:JobName>Adder</jsdl:JobName>
+			<jsdl:Description>A simple, example invocation to run an executable
+				which takes as input two files, each with a string integer, add
+				the integer values from those two files, and output the sum into
+				a third file.
+			</jsdl:Description>
+		</jsdl:JobIdentification>
+		
+		<jsdl:Application>
+			<jsdl:ApplicationName>adder</jsdl:ApplicationName>
+			<jsdl-posix:POSIXApplication>
+				<jsdl-posix:Executable>
+					adder.sh
+				</jsdl-posix:Executable>
+				<jsdl-posix:Output>stdout</jsdl-posix:Output>
+				<jsdl-posix:Argument>seven.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>fourty-two.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>sum.dat</jsdl-posix:Argument>
+				<jsdl-posix:Argument>10</jsdl-posix:Argument>
+			</jsdl-posix:POSIXApplication>
+		</jsdl:Application>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>adder.sh</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/adder.sh</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>seven.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/seven.dat</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>fourty-two.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/fourty-two.dat</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+
+<!--	
+		<jsdl:DataStaging>
+			<jsdl:FileName>sum.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>ftp://mmm2a:!!mmm2a@warrenton.cs.virginia.edu:8021/sum.dat</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+-->
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>sum.dat</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>rns:sum.dat</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>stdout</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>mailto:mmm2a@cs.virginia.edu?subject=jobOutput&amp;X-AttachmentFilename=stdout.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+	</jsdl:JobDescription>
+	
+</jsdl:JobDefinition>
+</multi>
