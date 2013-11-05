@@ -19,12 +19,31 @@
 # Optimized for use with version 3.3.5 of the Wrapper.
 
 # Application
-APP_NAME="XCG"
-APP_LONG_NAME="XCG Container Service"
+APP_NAME="GFFS"
+APP_LONG_NAME="GFFS Container Service"
+
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+# try to pick the right installation directory if it's not set.
+if [ -z "$GENII_INSTALL_DIR" ]; then
+  export GENII_INSTALL_DIR="$WORKDIR"
+fi
+# try to find the wrapper configuration if we know where the state directory is.
+export WRAPPER_CONF_DIR
+if [ ! -z "$GENII_USER_DIR" ]; then
+  WRAPPER_CONF_DIR="$GENII_USER_DIR/wrapper"
+  if [ ! -d "$WRAPPER_CONF_DIR" -o ! -f "$WRAPPER_CONF_DIR/wrapper.conf" ]; then
+    echo "No wrapper config in state directory; falling back to the install dir."
+    unset WRAPPER_CONF_DIR
+  fi
+fi
+# fall-back to wrapper config directory under the install directory, if we must.
+if [ -z "$WRAPPER_CONF_DIR" ]; then
+  WRAPPER_CONF_DIR="$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/conf"
+fi
 
 # Wrapper
 WRAPPER_CMD="./wrapper"
-WRAPPER_CONF="../conf/wrapper.conf"
+WRAPPER_CONF="$WRAPPER_CONF_DIR/wrapper.conf"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.
@@ -32,6 +51,12 @@ PRIORITY=
 
 # Location of the pid file.
 PIDDIR="./"
+# override this if we have a more local wrapper configuration.
+if [ ! -z "$GENII_USER_DIR" ]; then
+  if [ -d "$GENII_USER_DIR/wrapper" ]; then
+    PIDDIR="$GENII_USER_DIR/wrapper"
+  fi
+fi
 
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and
