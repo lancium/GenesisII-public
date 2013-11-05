@@ -164,8 +164,8 @@ echo Building 64 bit Genesis...
 
 build_installer 5991 genesis2-gffs-deb
 build_installer 3416 genesis2-gffs-linux64
-#build_installer 2088 genesis2-gffs-mac64
-#build_installer 5987 genesis2-gffs-rpm
+build_installer 2088 genesis2-gffs-mac64
+build_installer 5987 genesis2-gffs-rpm
 
 ##############
 

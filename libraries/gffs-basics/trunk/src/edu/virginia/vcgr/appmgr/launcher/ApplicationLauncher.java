@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.appmgr.version.Version;
+import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 // import edu.virginia.vcgr.appmgr.update.Updater;
 
@@ -58,6 +59,7 @@ public class ApplicationLauncher
 			JarDescription description = new JarDescription(appDesc.getJarDescriptionFile());
 			ClassLoader loader = description.createClassLoader();
 			Thread.currentThread().setContextClassLoader(loader);
+			GenesisClassLoader.classLoaderFactory().addLoader(loader);
 			Class<?> cl = loader.loadClass(appDesc.getApplicationClassName());
 			Method main = cl.getMethod("main", new Class[] { String[].class });
 			main.invoke(null, new Object[] { appArgs });

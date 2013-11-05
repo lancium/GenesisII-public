@@ -101,8 +101,8 @@ function create_grid_certificates()
   \rm -f $SECURITY_DIR/*.pfx $SECURITY_DIR/*.cer
 
   # fix the patch certificate, which doesn't exist yet, and the app-url.
-  sed -i -e 's/^\(edu.virginia.vcgr.appwatcher.patch-signer-certificate.0=.*\)/#\1/' -e 's/^\(edu.virginia.vcgr.appwatcher.application-url.0=.*\)/#\1/' ApplicationWatcher/genii-base-application.properties
-  check_if_failed "patching ApplicationWatcher properties for bootstrap"
+  sed -i -e 's/^\(edu.virginia.vcgr.appwatcher.patch-signer-certificate.0=.*\)/#\1/' -e 's/^\(edu.virginia.vcgr.appwatcher.application-url.0=.*\)/#\1/' ext/genii-base-application.properties
+  check_if_failed "patching application properties for bootstrap"
 
   # create the root signing certificate.  should be an actual CA now.
   create_bootstrap_signing_certificate "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS"

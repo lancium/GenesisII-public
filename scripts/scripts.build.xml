@@ -175,33 +175,33 @@
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-base-application.properties"
-			tofile="${basedir}/ApplicationWatcher/genii-base-application.properties"/>
-		<replace file="${basedir}/ApplicationWatcher/genii-base-application.properties"
+			tofile="${basedir}/ext/genii-base-application.properties"/>
+		<replace file="${basedir}/ext/genii-base-application.properties"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
-		<replace file="${basedir}/ApplicationWatcher/genii-base-application.properties"
+		<replace file="${basedir}/ext/genii-base-application.properties"
 			token="\" value="\\" summary="no"/>
-		<replace file="${basedir}/ApplicationWatcher/genii-base-application.properties"
+		<replace file="${basedir}/ext/genii-base-application.properties"
 			token="${installer:genii.deployment}" value="unspecified" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-container-application.properties"
-			tofile="${basedir}/ApplicationWatcher/genii-container-application.properties"/>
-		<replace file="${basedir}/ApplicationWatcher/genii-container-application.properties"
+			tofile="${basedir}/ext/genii-container-application.properties"/>
+		<replace file="${basedir}/ext/genii-container-application.properties"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
-		<replace file="${basedir}/ApplicationWatcher/genii-container-application.properties"
+		<replace file="${basedir}/ext/genii-container-application.properties"
 			token="\" value="\\" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-client-application.properties"
-			tofile="${basedir}/ApplicationWatcher/genii-client-application.properties"/>
-		<replace file="${basedir}/ApplicationWatcher/genii-client-application.properties"
+			tofile="${basedir}/ext/genii-client-application.properties"/>
+		<replace file="${basedir}/ext/genii-client-application.properties"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
-		<replace file="${basedir}/ApplicationWatcher/genii-client-application.properties"
+		<replace file="${basedir}/ext/genii-client-application.properties"
 			token="\" value="\\" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-certtool-application.properties"
-			tofile="${basedir}/ApplicationWatcher/genii-certtool-application.properties"/>
-		<replace file="${basedir}/ApplicationWatcher/genii-certtool-application.properties"
+			tofile="${basedir}/ext/genii-certtool-application.properties"/>
+		<replace file="${basedir}/ext/genii-certtool-application.properties"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
-		<replace file="${basedir}/ApplicationWatcher/genii-certtool-application.properties"
+		<replace file="${basedir}/ext/genii-certtool-application.properties"
 			token="\" value="\\" summary="no"/>
 
 		<antcall target="build-script-win">

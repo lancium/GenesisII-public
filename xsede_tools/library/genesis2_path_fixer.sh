@@ -39,7 +39,7 @@ echo "if [[ ! \"\$1\" =~ .*\\.jar$ ]]; then sed -i -e 's/$seeking_path/$replacem
 # fix the root of the build.
 find "$current_path" -maxdepth 1 -type f -exec bash "$path_fixer" "{}" ';'
 # fix the application watcher's directory.
-find "$current_path/ApplicationWatcher" -maxdepth 1 -type f -exec bash "$path_fixer" "{}" ';'
+find "$current_path/ext" -maxdepth 1 -type f -iname "*properties" -exec bash "$path_fixer" "{}" ';'
 
 echo "All paths should have been replaced."
 

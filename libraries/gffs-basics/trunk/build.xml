@@ -52,6 +52,11 @@
 
 	<target name="gffs-basics.jar" depends="genii.compile">
 		<jar destfile="${lib.dir}/gffs-basics.jar">
+			<manifest>
+                                <attribute name="Built-By" value="${user.name}"/>
+                                <attribute name="Main-Class" value="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher"/>
+                                <attribute name="SplashScreen-Image" value="images/splash.gif"/>
+                        </manifest>
 			<fileset dir="${obj.dir}">
 				<include name="org/morgan/**/*"/>
 				<include name="edu/virginia/**/*"/>
@@ -67,9 +72,8 @@
 			<include name="**/*.java"/>
 		</javac>
 		<copy todir="${obj.dir}">
-			<fileset dir="${src.dir}">
-				<include name="${default.compile.copy.includes}"/>
-			</fileset>
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
 		</copy>
 	</target>
 
