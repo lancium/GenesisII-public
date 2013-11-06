@@ -135,8 +135,8 @@ public class ApplicationBase
 			userDir = getUserDirFromEnvironment();
 		// now, if we have something at all, try comparing it with our replacement property.
 		userDir = ApplicationBase.replaceKeywords(userDir);
-///		if ( (userDir != null) && userDir.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE))
-///			userDir = ApplicationBase.getUserDirFromEnvironment();
+		// / if ( (userDir != null) && userDir.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE))
+		// / userDir = ApplicationBase.getUserDirFromEnvironment();
 		// make sure we don't go away empty-handed.
 		if (userDir == null)
 			userDir = getDefaultUserDir();
@@ -180,7 +180,9 @@ public class ApplicationBase
 		if (currdir != null)
 			return GridStates.CONNECTION_ALREADY_GOOD;
 
-		String connectCmd = ContainerProperties.getContainerProperties().getConnectionCommand();
+		String connectCmd = InstallationProperties.getInstallationProperties().getConnectionCommand();
+		if (connectCmd == null)
+			connectCmd = ContainerProperties.getContainerProperties().getConnectionCommand();
 		if (_logger.isDebugEnabled())
 			_logger.debug("grid connection command is: " + connectCmd);
 		if ((connectCmd == null) || connectCmd.isEmpty()) {
@@ -219,7 +221,7 @@ public class ApplicationBase
 		}
 		return GridStates.CONNECTION_FAILED;
 	}
-	
+
 	// loads the value for the genesis user state directory from the environment.
 	static private String getUserDirFromEnvironment()
 	{

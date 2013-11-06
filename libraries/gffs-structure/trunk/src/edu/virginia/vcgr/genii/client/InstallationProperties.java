@@ -34,6 +34,7 @@ public class InstallationProperties extends Properties
 	static final private String OWNER_CERTS_DIRECTORY = "edu.virginia.vcgr.genii.container.security.default-owners";
 	static final private String SIGNING_KEYSTORE_FILE_PROPERTY =
 		KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP;
+	static final private String GRID_CONNECTION_COMMAND_PROPERTY = ContainerProperties.GRID_CONNECTION_COMMAND_PROPERTY;
 
 	static private InstallationProperties _realInstallationProperties = new InstallationProperties();
 
@@ -128,6 +129,11 @@ public class InstallationProperties extends Properties
 		if (!existed())
 			return null;
 		return getProperty(CONTAINER_PORT_PROPERTY);
+	}
+	
+	public String getConnectionCommand()
+	{
+		return getProperty(GRID_CONNECTION_COMMAND_PROPERTY);
 	}
 
 	public HierarchicalDirectory getDefaultOwnersDirectory()

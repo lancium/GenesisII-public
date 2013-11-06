@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.ContainerProperties;
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
@@ -95,7 +96,10 @@ public class Driver extends ApplicationBase
 					// get on.
 					System.err.println("Failed to build a connection to the grid.");
 					System.err.println("You can try to connect manually using the configured command, e.g.:");
-					System.err.println("  grid connect " + ContainerProperties.getContainerProperties().getConnectionCommand());
+					String connectCmd = InstallationProperties.getInstallationProperties().getConnectionCommand();
+					if (connectCmd == null)
+						connectCmd = ContainerProperties.getContainerProperties().getConnectionCommand();
+					System.err.println("  grid connect " + connectCmd);
 					break;
 				}
 				case CONNECTION_ALREADY_GOOD: {

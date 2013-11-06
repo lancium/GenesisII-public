@@ -288,6 +288,12 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.se
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=$LOCAL_SIGNING_CERT"
 
+# load variables from our config file.
+context_file=$(retrieve_compiler_variable "$GENII_INSTALL_DIR/current.config" genii.deployment-context)
+new_dep=$(retrieve_compiler_variable "$GENII_INSTALL_DIR/current.config" genii.new-deployment)
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.gridInitCommand=.*" "edu.virginia.vcgr.genii.gridInitCommand=\"local:$GENII_INSTALL_DIR/deployments/$new_dep/$context_file\" \"$new_dep\""
+
 ##############
 
 # set up the service wrapper configuration.
@@ -312,8 +318,6 @@ replace_phrase_in_file "$WRAPPER_DIR/wrapper.conf" "wrapper.logfile=.*" "wrapper
 
 # get connected to the grid.
 echo Connecting to the grid...
-context_file=$(retrieve_compiler_variable "$GENII_INSTALL_DIR/current.config" genii.deployment-context)
-new_dep=$(retrieve_compiler_variable "$GENII_INSTALL_DIR/current.config" genii.new-deployment)
 "$GENII_INSTALL_DIR/grid" connect "local:$GENII_INSTALL_DIR/deployments/$new_dep/$context_file" "$new_dep"
 if [ $? -ne 0 ]; then
   echo "Failed to connect to the grid!"

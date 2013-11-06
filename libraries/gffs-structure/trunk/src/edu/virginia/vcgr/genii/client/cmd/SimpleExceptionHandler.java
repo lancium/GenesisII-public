@@ -16,10 +16,13 @@ public class SimpleExceptionHandler implements IExceptionHandler
 	{
 		PrintWriter errorStream;
 
-		if (eStream instanceof PrintWriter)
+		boolean createdStream = false;
+		if (eStream instanceof PrintWriter) {
 			errorStream = (PrintWriter) eStream;
-		else
+		} else {
+			createdStream = true;
 			errorStream = new PrintWriter(eStream);
+		}
 
 		String tab = "";
 		StringBuilder builder = new StringBuilder();
@@ -79,6 +82,9 @@ public class SimpleExceptionHandler implements IExceptionHandler
 		errorStream.print(builder);
 		errorStream.flush();
 
+		if (createdStream)
+			errorStream.close();
+		
 		return 1;
 	}
 }

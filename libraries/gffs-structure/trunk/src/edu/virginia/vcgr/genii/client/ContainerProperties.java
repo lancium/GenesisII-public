@@ -22,7 +22,7 @@ public class ContainerProperties extends Properties
 	static final private String GENII_DEPLOYMENT_DIRECTORY_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.deployment-directory";
 	static final private String GENII_DEPLOYMENT_NAME_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.deployment-name";
-	static final private String GRID_CONNECTION_COMMAND = "edu.virginia.vcgr.genii.gridInitCommand";
+	static final public String GRID_CONNECTION_COMMAND_PROPERTY = "edu.virginia.vcgr.genii.gridInitCommand";
 
 	static private ContainerProperties _realContainerProperties = new ContainerProperties();
 
@@ -106,6 +106,6 @@ public class ContainerProperties extends Properties
 	 */
 	public String getConnectionCommand()
 	{
-		return getProperty(GRID_CONNECTION_COMMAND);
+		return getProperty(GRID_CONNECTION_COMMAND_PROPERTY);
 	}
 }
