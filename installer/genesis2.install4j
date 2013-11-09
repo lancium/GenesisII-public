@@ -24,7 +24,7 @@
       <variable name="genii.client-memory.normal" value="2048" description="" category="" />
       <variable name="genii.client-memory.win32" value="1536" description="" category="" />
       <variable name="genii.app-version" value="0.0.0" description="The version of this GenesisII installer release." category="" />
-      <variable name="genii.new-deployment" value="current_grid" description="" category="" />
+      <variable name="genii.new-deployment" value="currant_urgh" description="" category="" />
       <variable name="genii.publisher" value="the-publisher" description="" category="" />
       <variable name="genii.publisher-url" value="wherethepublisheris.com" description="" category="" />
       <variable name="genii.deployment-source" value="souffle/gazelle/perseus/this/needstobe/filledin" description="" category="" />
@@ -81,40 +81,38 @@
       <fileEntry mountPoint="7211" file="./scripts/configure_container.sh" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <dirEntry mountPoint="34" file=".." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp" dirMode="755" overrideDirMode="true">
         <exclude>
-          <entry location="container.properties" fileType="regular" />
-          <entry location="change-port.sh" fileType="regular" />
-          <entry location="linux-cmd-wrapper" fileType="regular" />
-          <entry location="mappings.properties" fileType="regular" />
+          <entry location="build-initial.xml" fileType="regular" />
           <entry location="unit-test-reports" fileType="regular" />
-          <entry location="runContainer.sh" fileType="regular" />
-          <entry location="installer" fileType="regular" />
-          <entry location="grid" fileType="regular" />
-          <entry location="scripts" fileType="regular" />
-          <entry location="bin" fileType="regular" />
-          <entry location="deployments/backup" fileType="regular" />
-          <entry location="deployments/default" fileType="regular" />
-          <entry location="container.properties.example" fileType="regular" />
           <entry location="build.properties" fileType="regular" />
-          <entry location=".project" fileType="regular" />
-          <entry location="JavaServiceWrapper" fileType="regular" />
-          <entry location="config-examples" fileType="regular" />
+          <entry location="dpages" fileType="regular" />
+          <entry location="jar-desc.xml" fileType="regular" />
+          <entry location="libraries" fileType="regular" />
           <entry location="build.xml" fileType="regular" />
           <entry location="cert-tool" fileType="regular" />
-          <entry location="jar-desc.xml" fileType="regular" />
+          <entry location="change-port.sh" fileType="regular" />
+          <entry location="container.properties.example" fileType="regular" />
+          <entry location="runContainer.sh" fileType="regular" />
           <entry location=".settings" fileType="regular" />
-          <entry location="simple-command" fileType="regular" />
-          <entry location="build-initial.xml" fileType="regular" />
-          <entry location="libraries" fileType="regular" />
-          <entry location="ext/genii-simple-application.properties" fileType="regular" />
+          <entry location="scripts" fileType="regular" />
+          <entry location="linux-cmd-wrapper" fileType="regular" />
+          <entry location=".classpath" fileType="regular" />
+          <entry location="installer" fileType="regular" />
+          <entry location="mappings.properties" fileType="regular" />
+          <entry location="bin.eclipse" fileType="regular" />
+          <entry location="deployments/default" fileType="regular" />
+          <entry location="deployments/backup" fileType="regular" />
+          <entry location="bin" fileType="regular" />
+          <entry location="tests" fileType="regular" />
+          <entry location="JavaServiceWrapper" fileType="regular" />
+          <entry location="src" fileType="regular" />
+          <entry location="retired" fileType="regular" />
+          <entry location="config-examples" fileType="regular" />
           <entry location="ext/genii-client-application.properties" fileType="regular" />
           <entry location="ext/genii-base-application.properties" fileType="regular" />
-          <entry location="ext/genii-container-application.properties" fileType="regular" />
           <entry location="ext/genii-certtool-application.properties" fileType="regular" />
-          <entry location=".classpath" fileType="regular" />
-          <entry location="dpages" fileType="regular" />
-          <entry location="bin.eclipse" fileType="regular" />
-          <entry location="src" fileType="regular" />
-          <entry location="context.xml" fileType="regular" />
+          <entry location="ext/genii-container-application.properties" fileType="regular" />
+          <entry location="grid" fileType="regular" />
+          <entry location=".project" fileType="regular" />
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="34" file="../scripts/jar-desc.xml" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
@@ -349,8 +347,6 @@
           <entry location="security/tls-cert.cer" fileType="regular" />
           <entry location="security/signing-cert.cer" fileType="regular" />
           <entry location="security/default-owners/admin.cer" fileType="regular" />
-          <entry location="security/secrun.pfx" fileType="regular" />
-          <entry location="security/secrun.cer" fileType="regular" />
           <entry location="security/admin.cer" fileType="regular" />
           <entry location="security/admin.pfx" fileType="regular" />
           <entry location="security/signing-cert.pfx" fileType="regular" />
@@ -370,7 +366,8 @@
           <entry location="updates" fileType="regular" />
           <entry location="jre-addin" fileType="regular" />
           <entry location="scripts" fileType="regular" />
-          <entry location="current.config" fileType="regular" />
+          <entry location="current.deployment" fileType="regular" />
+          <entry location="current.version" fileType="regular" />
           <entry location="webapps" fileType="regular" />
           <entry location="ext/genii-base-application.properties" fileType="regular" />
           <entry location="ext/genii-client-application.properties" fileType="regular" />
@@ -514,7 +511,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.normal}m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.normal}m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ext/gffs-basics.jar" failOnError="false" />
@@ -548,7 +545,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.normal}m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.normal}m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ext/gffs-basics.jar" failOnError="false" />
@@ -582,7 +579,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.win32}m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.win32}m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ext/gffs-basics.jar" failOnError="false" />
@@ -616,7 +613,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.win32}m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.win32}m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ext/gffs-basics.jar" failOnError="false" />
@@ -966,6 +963,35 @@ return true;</string>
                   </java>
                 </serializedBean>
                 <condition>context.getCompilerVariable("genii.isWindows").equals("true")</condition>
+              </action>
+              <action name="Stop unix service" id="7826" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                      <void property="arguments">
+                        <array class="java.lang.String" length="1">
+                          <void index="0">
+                            <string>stop</string>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="executable">
+                        <object class="java.io.File">
+                          <string>GFFSContainer</string>
+                        </object>
+                      </void>
+                      <void property="wait">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="workingDirectory">
+                        <object class="java.io.File">
+                          <string>.</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>!context.getCompilerVariable("genii.isWindows").equals("true")</condition>
               </action>
               <action name="" id="5813" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SleepAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
@@ -1724,29 +1750,6 @@ return true;</string>
                       </java>
                     </serializedBean>
                     <condition />
-                  </action>
-                  <action name="Create container.properties file" id="1015" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.WriteTextFileAction" enabled="false" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to create container.properties file">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.text.WriteTextFileAction">
-                          <void property="append">
-                            <boolean>true</boolean>
-                          </void>
-                          <void property="file">
-                            <object class="java.io.File">
-                              <string>${installer:sys.installationDir}/container.properties</string>
-                            </object>
-                          </void>
-                          <void property="text">
-                            <string>edu.virginia.vcgr.genii.container.deployment-name=${compiler:genii.new-deployment}
-edu.virginia.vcgr.genii.gridInitCommand="local:${installer:gen.fixedInstallDir}/deployments/${compiler:genii.new-deployment}/${compiler:genii.deployment-context}" "${compiler:genii.new-deployment}"
-</string>
-                          </void>
-                        </object>
-                      </java>
-                    </serializedBean>
-                    <condition>File propFile = new File(context.getInstallationDirectory(), "container.properties");
-return !propFile.exists();</condition>
                   </action>
                   <action name="" id="1016" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to connect to the grid.">
                     <serializedBean>
@@ -2824,9 +2827,6 @@ return memory;</string>
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
-                              <void property="failIfNoReplacement">
-                                <boolean>true</boolean>
-                              </void>
                               <void property="files">
                                 <array class="java.io.File" length="1">
                                   <void index="0">

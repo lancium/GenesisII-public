@@ -12,7 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.macro.MacroUtils;
 
-import edu.virginia.vcgr.genii.client.ApplicationBase;
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 
 class FilesystemConfiguration extends FilesystemSandboxContainerConfiguration
 {
@@ -29,12 +29,7 @@ class FilesystemConfiguration extends FilesystemSandboxContainerConfiguration
 	private void afterUnmarshal(Unmarshaller u, Object parent)
 	{
 		_path = MacroUtils.replaceMacros(System.getProperties(), _path);
-		_path = ApplicationBase.replaceKeywords(_path);
-/*		if (_path.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE)) {
-			_path = ApplicationBase.getUserDirFromEnvironment();
-			// use the default since there is no environment variable currently.
-			if (_path == null) _path = ApplicationBase.getDefaultUserDir();
-		}*/
+		_path = InstallationProperties.replaceKeywords(_path);
 		if (_logger.isTraceEnabled())
 			_logger.trace("path after unmarshal is: " + _path);
 	}

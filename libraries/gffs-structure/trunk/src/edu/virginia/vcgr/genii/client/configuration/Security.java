@@ -12,12 +12,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.InstallationConstants;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.client.security.axis.AclAuthZClientTool;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
 public class Security
@@ -60,14 +62,10 @@ public class Security
 		}
 	}
 
-	public Collection<File> getDefaultOwnerFiles()
+	public Collection<File> getDeploymentDefaultOwnerFiles()
 	{
 		Collection<File> ret = new LinkedList<File>();
-
-		HierarchicalDirectory ownersDir = InstallationProperties.getInstallationProperties().getDefaultOwnersDirectory();
-		if (ownersDir == null)
-			ownersDir = _securityDirectory.lookupDirectory("default-owners");
-
+		HierarchicalDirectory ownersDir = _securityDirectory.lookupDirectory(InstallationConstants.OWNER_CERTS_DIRECTORY_NAME);
 		if (ownersDir.exists()) {
 			File[] files = ownersDir.listFiles(new FileFilter()
 			{
@@ -85,6 +83,11 @@ public class Security
 		}
 
 		return ret;
+	}
+
+	public HierarchicalDirectory getSecurityDirectory()
+	{
+		return _securityDirectory;
 	}
 
 	public File getSecurityFile(String filename)
@@ -108,11 +111,6 @@ public class Security
 			if (!_loadedAdministrator) {
 				_loadedAdministrator = true;
 
-				/*
-				 * hmmm: this is really wrong; the name of the admin cert is supposed to come from
-				 * config file! see the property name: BOOTSTRAP_OWNER_CERTPATH in genesisII
-				 * constants.
-				 */
 				File file = getSecurityFile(ADMIN_CERTIFICATE_FILE);
 				if (file.exists()) {
 					try {
@@ -131,19 +129,40 @@ public class Security
 	public boolean isDeploymentAdministrator(ICallingContext callingContext)
 	{
 		Identity adminIdentity = getAdminIdentity();
-
-		if (adminIdentity == null)
-			return false;
-
 		try {
-			for (Identity id : KeystoreManager.getCallerIdentities(callingContext)) {
-				if (adminIdentity.equals(id))
-					return true;
+			if (adminIdentity != null) {
+				for (Identity id : KeystoreManager.getCallerIdentities(callingContext)) {
+					if (adminIdentity.equals(id))
+						return true;
+				}
 			}
 		} catch (Throwable cause) {
-			_logger.warn("Unable to determine if caller is admin.", cause);
+			_logger.warn("Exception during admin identity checking.", cause);
 		}
 
+		// hmmm: clean all these.
+		_logger.debug("before get owner cert in isdepadmin");
+
+		// try again using any registered owner certificate.
+		Identity ownerCert = InstallationProperties.getInstallationProperties().getOwnerCertificate();
+		if (ownerCert == null) {
+			// hmmm: clean this!
+			_logger.debug("no owner certificate could be found.");
+			return false;
+		} else {
+			_logger.debug("got owner cert identity, trying iterate");
+			try {
+				for (Identity id : KeystoreManager.getCallerIdentities(callingContext)) {
+					if (ownerCert.equals(id)) {
+						if (_logger.isDebugEnabled())
+							_logger.debug("found id matching owner cert: " + ownerCert.describe(VerbosityLevel.LOW));
+						return true;
+					}
+				}
+			} catch (Throwable cause) {
+				_logger.warn("Exception during owner identity checking.", cause);
+			}
+		}
 		return false;
 	}
 

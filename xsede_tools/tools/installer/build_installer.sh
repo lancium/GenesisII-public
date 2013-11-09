@@ -72,9 +72,13 @@ function replace_compiler_variables()
   check_if_failed "copying installer for $INSTALLER_NAME"
 
   # make sure we have this file available *inside* the install also.
-  cp "$INSTALLER_DIR/$installer_config" "$GENII_INSTALL_DIR/current.config"
+  cp "$INSTALLER_DIR/$installer_config" "$GENII_INSTALL_DIR/current.deployment"
   # add version info.
-  cat "$INSTALLER_DIR/current.version" >>"$GENII_INSTALL_DIR/current.config"
+  cp "$INSTALLER_DIR/current.version" "$GENII_INSTALL_DIR"
+
+  local combo_file="$(mktemp /tmp/$USER-temp-instinfo.XXXXXX)"
+  cat "$GENII_INSTALL_DIR/current.deployment" >>"$combo_file"
+  cat "$GENII_INSTALL_DIR/current.version" >>"$combo_file"
 
   while read line; do
     if [ ${#line} -eq 0 ]; then continue; fi
@@ -91,7 +95,9 @@ function replace_compiler_variables()
     local seeking="$var\" value=\"[^\"]*\""
     local replacement="$var\" value=\"$value\""
     replace_phrase_in_file "$generated_installer_name" "$seeking" "$replacement"
-  done < "$GENII_INSTALL_DIR/current.config"
+  done < "$combo_file"
+
+  \rm -f "$combo_file"
 }
 
 # creates the installer designated by the media number passed in.

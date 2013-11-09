@@ -31,8 +31,6 @@ public class Driver extends ApplicationBase
 		System.out.println("Driver");
 	}
 
-	// static private SecureRunnerManager _secRunManager;
-
 	static public void loadClientState()
 	{
 		GridEnvironment.loadGridEnvironment();
@@ -51,16 +49,6 @@ public class Driver extends ApplicationBase
 		// Set Trust Store Provider
 		java.security.Security.setProperty("ssl.SocketFactory.provider", VcgrSslSocketFactory.class.getName());
 	}
-
-	// static public void loadSecureRunner()
-	// {
-	// _secRunManager =
-	// SecureRunnerManager.createSecureRunnerManager(GenesisClassLoader.classLoaderFactory(),
-	// Installation.getDeployment(new DeploymentName()));
-	// Properties secRunProperties = new Properties();
-	// _secRunManager.run(SecureRunnableHooks.CLIENT_PRE_STARTUP, secRunProperties);
-	// _secRunManager.run(SecureRunnableHooks.CLIENT_POST_STARTUP, secRunProperties);
-	// }
 
 	static public void main(String[] args)
 	{
@@ -124,8 +112,6 @@ public class Driver extends ApplicationBase
 				}
 			}
 		}
-
-		// loadSecureRunner();
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 

@@ -24,13 +24,11 @@ public class Deployment
 	static private final String WEB_CONTAINER_PROPERTIES_FILENAME = "web-container.properties";
 	static private final String REJUVENATION_PROPERTYIES_FILENAME = "rejuvenation.properties";
 	static private final String CLIENT_SOCKET_PROPERTIES_FILENAME = "client-socket.properties";
-	static private final String SECURE_RUNNABLE_DIRECTORY_NAME = "secure-runnable";
 
 	static private Map<String, Deployment> _knownDeployments = new HashMap<String, Deployment>(4);
 
 	private HierarchicalDirectory _deploymentDirectory;
 	private HierarchicalDirectory _configurationDirectory;
-	private File _secureRunnableDirectory;
 	private Security _security;
 	private HierarchicalDirectory _servicesDirectory;
 	private HierarchicalDirectory _dynamicPagesDirectory;
@@ -66,8 +64,6 @@ public class Deployment
 		_uriManagerProperties = loadURIManagerProperties(_deploymentDirectory.getName(), _configurationDirectory);
 		_clientSocketConfigurer = loadClientSocketConfigurer();
 		_rejuvenationProperties = loadRejuvenationProperties(_deploymentDirectory.getName(), _configurationDirectory);
-
-		_secureRunnableDirectory = new File(deploymentDirectory, SECURE_RUNNABLE_DIRECTORY_NAME);
 	}
 
 	private SocketConfigurer loadClientSocketConfigurer()
@@ -143,11 +139,6 @@ public class Deployment
 		} finally {
 			StreamUtils.close(fin);
 		}
-	}
-
-	public File secureRunnableDirectory()
-	{
-		return _secureRunnableDirectory;
 	}
 
 	public HierarchicalDirectory getConfigurationDirectory()

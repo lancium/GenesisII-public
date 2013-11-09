@@ -46,6 +46,10 @@ function replace_compiler_variables()
 {
   local file="$1"; shift
 
+  local combo_file="$(mktemp /tmp/$USER-temp-instinfo.XXXXXX)"
+  cat "$GENII_INSTALL_DIR/current.deployment" >>"$combo_file"
+  cat "$GENII_INSTALL_DIR/current.version" >>"$combo_file"
+
   # replace installer variables in files.
   while read line; do
     if [ ${#line} -eq 0 ]; then continue; fi
@@ -62,7 +66,9 @@ function replace_compiler_variables()
     local seeking="\${compiler:$var}"
     local replacement="$value"
     replace_phrase_in_file "$file" "$seeking" "$replacement"
-  done < "$GENII_INSTALL_DIR/current.config"
+  done < "$combo_file"
+
+  \rm -f "$combo_file"
 }
 
 function replace_installdir_variables()
@@ -94,9 +100,14 @@ replace_installdir_variables $GENII_INSTALL_DIR
 # make a link for the Container startup script.
 ln -s $GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer $GENII_INSTALL_DIR
 
+######
 #### undone yard of ideas ####
 
 # restore important config files from backup.
+
+
+##undone end.
+######
 
 
 

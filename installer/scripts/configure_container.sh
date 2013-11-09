@@ -22,8 +22,6 @@ INSTALLER_FILE="$GENII_USER_DIR/installation.properties"
 # where we will hide the owner certificate for the container.
 LOCAL_CERTS_DIR="$GENII_USER_DIR/certs"
 
-LOCAL_OWNER_CERTS_DIR="$LOCAL_CERTS_DIR/owners"
-
 # storage for our specialized java service wrapper config file.
 WRAPPER_DIR="$GENII_USER_DIR/wrapper"
 
@@ -131,6 +129,10 @@ function retrieve_compiler_variable()
     return 1
   fi
 
+  local combo_file="$(mktemp /tmp/$USER-temp-instinfo.XXXXXX)"
+  cat "$GENII_INSTALL_DIR/current.deployment" >>"$combo_file"
+  cat "$GENII_INSTALL_DIR/current.version" >>"$combo_file"
+
   while read line; do
     if [ ${#line} -eq 0 ]; then continue; fi
     # split the line into the variable name and value.
@@ -144,7 +146,9 @@ function retrieve_compiler_variable()
     if [ "$find_var" == "$var" ]; then
       echo "$value"
     fi
-  done < "$GENII_INSTALL_DIR/current.config"
+  done < "$combo_file"
+
+  \rm -f "$combo_file"
 }
 
 function generate_cert()
@@ -228,16 +232,16 @@ fi
 # setup the config directories.
 
 if [ ! -d "$GENII_USER_DIR" ]; then
-  mkdir $GENII_USER_DIR
+  mkdir "$GENII_USER_DIR"
 fi
 if [ ! -d "$LOCAL_CERTS_DIR" ]; then
-  mkdir $LOCAL_CERTS_DIR
+  mkdir "$LOCAL_CERTS_DIR"
 fi
-if [ ! -d "$LOCAL_OWNER_CERTS_DIR" ]; then
-  mkdir $LOCAL_OWNER_CERTS_DIR
+if [ ! -d "$LOCAL_CERTS_DIR/default-owners" ]; then
+  mkdir "$LOCAL_CERTS_DIR/default-owners"
 fi
 if [ ! -d "$WRAPPER_DIR" ]; then
-  mkdir $WRAPPER_DIR
+  mkdir "$WRAPPER_DIR"
 fi
 
 if [ ! -f "$INSTALLER_FILE" ]; then
@@ -284,13 +288,13 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.se
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=PKCS12"
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.default-owners=.*" "edu.virginia.vcgr.genii.container.security.default-owners=$LOCAL_OWNER_CERTS_DIR"
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.default-owners=.*" "edu.virginia.vcgr.genii.container.security.certs-dir=$LOCAL_CERTS_DIR"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=$LOCAL_SIGNING_CERT"
 
 # load variables from our config file.
-context_file=$(retrieve_compiler_variable "$GENII_INSTALL_DIR/current.config" genii.deployment-context)
-new_dep=$(retrieve_compiler_variable "$GENII_INSTALL_DIR/current.config" genii.new-deployment)
+context_file=$(retrieve_compiler_variable "$GENII_INSTALL_DIR/current.deployment" genii.deployment-context)
+new_dep=$(retrieve_compiler_variable "$GENII_INSTALL_DIR/current.deployment" genii.new-deployment)
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.gridInitCommand=.*" "edu.virginia.vcgr.genii.gridInitCommand=\"local:$GENII_INSTALL_DIR/deployments/$new_dep/$context_file\" \"$new_dep\""
 
@@ -314,6 +318,11 @@ replace_phrase_in_file "$WRAPPER_DIR/wrapper.conf" "wrapper.logfile=.*" "wrapper
 
 ##############
 
+# create a service-url file for this container.
+echo "https://$CONTAINER_HOSTNAME_PROPERTY:$CONTAINER_PORT_PROPERTY/axis/services/VCGRContainerPortType" >"$GENII_USER_DIR/service-url.txt"
+
+##############
+
 # now do some heavy-weight operations where we actually use the gffs software.
 
 # get connected to the grid.
@@ -327,11 +336,16 @@ fi
 
 # download the owner's certificate.
 echo "Downloading owner's certificate for user $GRID_USER_NAME..."
-user_path=$(retrieve_compiler_variable "$GENII_INSTALL_DIR/current.config" genii.user-path)
-"$GENII_INSTALL_DIR/grid" download-certificate "$user_path/$GRID_USER_NAME" "local:$LOCAL_OWNER_CERTS_DIR/owner.cer"
+user_path=$(retrieve_compiler_variable "$GENII_INSTALL_DIR/current.deployment" genii.user-path)
+"$GENII_INSTALL_DIR/grid" download-certificate "$user_path/$GRID_USER_NAME" "local:$LOCAL_CERTS_DIR/owner.cer"
 if [ $? -ne 0 ]; then
   echo "Failed to download the certificate for grid user $GRID_USER_NAME."
   echo "There may be more information in: ~/.GenesisII/grid-client.log"
+  exit 1
+fi
+cp "$LOCAL_CERTS_DIR/owner.cer" "$LOCAL_CERTS_DIR/default-owners"
+if [ $? -ne 0 ]; then
+  echo "Failed to copy the owner certificate into the default-owners folder."
   exit 1
 fi
 
@@ -366,7 +380,10 @@ fi
 echo
 echo Done configuring the container.
 echo
-echo You can start the container running with:
-echo "  $GENII_INSTALL_DIR/GFFSContainer start"
+echo The service URL for your container is stored in:
+echo "$GENII_USER_DIR/service-url.txt"
+echo
+echo You can start the container service with:
+echo "$GENII_INSTALL_DIR/GFFSContainer start"
 echo
 

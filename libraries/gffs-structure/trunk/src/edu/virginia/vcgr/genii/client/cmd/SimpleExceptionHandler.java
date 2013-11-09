@@ -84,7 +84,7 @@ public class SimpleExceptionHandler implements IExceptionHandler
 
 		if (createdStream)
 			errorStream.close();
-		
+
 		return 1;
 	}
 }

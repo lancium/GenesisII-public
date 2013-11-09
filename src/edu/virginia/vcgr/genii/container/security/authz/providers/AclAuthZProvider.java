@@ -34,8 +34,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
-import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
-import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -98,7 +97,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	public AclAuthZProvider() throws GeneralSecurityException, IOException
 	{
 		if (_defaultInitialResourceOwners == null) {
-			Collection<File> ownerFiles = Installation.getDeployment(new DeploymentName()).security().getDefaultOwnerFiles();
+			Collection<File> ownerFiles = InstallationProperties.getInstallationProperties().getDefaultOwnerFiles();
+			// Installation.getDeployment(new DeploymentName()).security().getDefaultOwnerFiles();
 
 			// read in the certificates that are to serve as default owner
 			if ((ownerFiles != null) && (ownerFiles.size() > 0)) {
@@ -106,8 +106,11 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 					Collection<X509Certificate> ownerCerts = new ArrayList<X509Certificate>(ownerFiles.size());
 
 					for (File ownerFile : ownerFiles) {
+						// skip files of the wrong type.
+						if (ownerFile.getName().endsWith(".pfx"))
+							continue;
 						if (_logger.isDebugEnabled())
-							_logger.debug("adding " + ownerFile + " as admin certificate file.");
+							_logger.debug("adding " + ownerFile + " as container owner certificate file.");
 						X509Certificate ownerCert = _defaultCertCache.get(ownerFile.getName());
 						if (ownerCert == null) {
 							CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -328,11 +331,13 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			}
 
 			// Check Administrator Access
+			_logger.debug("about to check administrator...");
 			if (Security.isAdministrator(callContext)) {
 				if (_logger.isDebugEnabled())
 					_logger.debug(messagePrefix + "granted because caller is admin.");
 				return true;
 			}
+			_logger.debug("after checking if admin, and it was not");
 
 			// Nobody appreciates us.
 			if (_logger.isTraceEnabled()) {

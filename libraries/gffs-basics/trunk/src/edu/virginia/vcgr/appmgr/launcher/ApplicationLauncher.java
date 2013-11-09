@@ -15,8 +15,6 @@ public class ApplicationLauncher
 	static private Log _logger = LogFactory.getLog(ApplicationLauncher.class);
 
 	static private final String APPLICATION_DESCRIPTION_PROPERTY = "edu.virginia.vcgr.appwatch.application-description";
-	// static private final String UPDATE_FREQUENCY_PROPERTY =
-	// "edu.virginia.vcgr.appwatcher.update-frequency";
 	static private final String APPLICATION_CLASS_FLAG_PREFIX = "--application-class=";
 
 	static private String _appNameFound = null;

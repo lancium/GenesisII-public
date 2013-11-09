@@ -114,12 +114,6 @@ function create_grid_certificates()
   cp "$ADMIN_CER" "$SECURITY_DIR/default-owners/admin.cer"
   check_if_failed "copying admin certificate into default-owners"
 
-####
-#hmmm: toss this.
-  create_certificate_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" $SECURITY_DIR/secrun.pfx sec secure-runner "Secure Runnable Cert"
-  check_if_failed "creating secrun certificate using CA"
-####
-
   create_certificate_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" $SECURITY_DIR/tls-cert.pfx tilly tls-cert "TLS certificate"
   check_if_failed "creating TLS certificate using CA"
 

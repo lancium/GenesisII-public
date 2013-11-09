@@ -5,40 +5,30 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
-import edu.virginia.vcgr.genii.client.configuration.WebContainerConstants;
+import edu.virginia.vcgr.genii.client.configuration.Security;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.security.axis.AclAuthZClientTool;
+import edu.virginia.vcgr.genii.security.identity.Identity;
 
 public class InstallationProperties extends Properties
 {
 	static final long serialVersionUID = 0L;
 	static private Log _logger = LogFactory.getLog(InstallationProperties.class);
-
-	static final private String INSTALLATION_PROPERTIES_FILENAME = "installation.properties";
-
-	static final private String TLS_KEY_PASSWORD_PROPERTY = KeystoreSecurityConstants.Container.SSL_KEY_PASSWORD_PROP;
-	static final private String TLS_KEYSTORE_PASSWORD_PROPERTY =
-		KeystoreSecurityConstants.Container.SSL_KEY_STORE_PASSWORD_PROP;
-	static final private String TLS_KEYSTORE_FILE_PROPERTY = KeystoreSecurityConstants.Container.SSL_KEY_STORE_PROP;
-	static final private String TLS_KEYSTORE_TYPE_PROPERTY = KeystoreSecurityConstants.Container.SSL_KEY_STORE_TYPE_PROP;
-	static final private String CONTAINER_HOSTNAME_PROPERTY = Hostname._EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY;
-	static final private String CONTAINER_PORT_PROPERTY = WebContainerConstants.LISTEN_PORT_PROP;
-	static final private String OWNER_CERTS_DIRECTORY = "edu.virginia.vcgr.genii.container.security.default-owners";
-	static final private String SIGNING_KEYSTORE_FILE_PROPERTY =
-		KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP;
-	static final private String GRID_CONNECTION_COMMAND_PROPERTY = ContainerProperties.GRID_CONNECTION_COMMAND_PROPERTY;
-
 	static private InstallationProperties _realInstallationProperties = new InstallationProperties();
-
-	private boolean _existed = false;
 
 	/**
 	 * for all normal run-time classes, the installation properties are accessed this way.
@@ -56,7 +46,6 @@ public class InstallationProperties extends Properties
 			try {
 				in = new FileInputStream(file);
 				load(in);
-				_existed = true;
 				_logger.debug("successfully loaded installation properties.");
 			} catch (IOException e) {
 				_logger.debug("failed to load installation properties.");
@@ -67,15 +56,11 @@ public class InstallationProperties extends Properties
 		}
 	}
 
-	public boolean existed()
-	{
-		return _existed;
-	}
-
 	static private File getInstallationPropertiesFile()
 	{
-		File ret = new File(ApplicationBase.getUserDir(), INSTALLATION_PROPERTIES_FILENAME);
-			//ContainerProperties.getContainerProperties().getUserDirectory(), INSTALLATION_PROPERTIES_FILENAME);
+		File ret = new File(InstallationProperties.getUserDir(), InstallationConstants.INSTALLATION_PROPERTIES_FILENAME);
+		// ContainerProperties.getContainerProperties().getUserDirectory(),
+		// INSTALLATION_PROPERTIES_FILENAME);
 		if (ret.exists() && ret.isFile() && ret.canRead())
 			return ret;
 		return null;
@@ -83,84 +68,193 @@ public class InstallationProperties extends Properties
 
 	public String getTLSKeyPassword()
 	{
-		if (!existed())
-			return null;
-		return getProperty(TLS_KEY_PASSWORD_PROPERTY);
+		return getProperty(InstallationConstants.TLS_KEY_PASSWORD_PROPERTY);
 	}
 
 	public String getTLSKeystorePassword()
 	{
-		if (!existed())
-			return null;
-		return getProperty(TLS_KEYSTORE_PASSWORD_PROPERTY);
+		return getProperty(InstallationConstants.TLS_KEYSTORE_PASSWORD_PROPERTY);
 	}
 
 	// this member is an absolute path; do not try to use hierarchical deployment calls on it.
 	public String getTLSKeystoreFile()
 	{
-		if (!existed())
-			return null;
-		return getProperty(TLS_KEYSTORE_FILE_PROPERTY);
+		return getProperty(InstallationConstants.TLS_KEYSTORE_FILE_PROPERTY);
 	}
 
 	public String getTLSKeystoreType()
 	{
-		if (!existed())
-			return null;
-		return getProperty(TLS_KEYSTORE_TYPE_PROPERTY);
+		return getProperty(InstallationConstants.TLS_KEYSTORE_TYPE_PROPERTY);
 	}
 
 	public String getSigningKeystoreFile()
 	{
-		if (!existed())
-			return null;
-		return getProperty(SIGNING_KEYSTORE_FILE_PROPERTY);
+		String keystoreLoc = getProperty(InstallationConstants.SIGNING_KEYSTORE_FILE_PROPERTY);
+		if (keystoreLoc == null) {
+			// we didn't have the local installation properties, so fall back to old-school methods.
+			Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
+			String keyProp =
+				resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
+			keystoreLoc =
+				Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyProp).getAbsolutePath();
+		}
+		return keystoreLoc;
 	}
 
 	public String getContainerHostname()
 	{
-		if (!existed())
-			return null;
-		return getProperty(CONTAINER_HOSTNAME_PROPERTY);
+		return getProperty(InstallationConstants.CONTAINER_HOSTNAME_PROPERTY);
 	}
 
 	public String getContainerPort()
 	{
-		if (!existed())
-			return null;
-		return getProperty(CONTAINER_PORT_PROPERTY);
+		return getProperty(InstallationConstants.CONTAINER_PORT_PROPERTY);
 	}
-	
+
 	public String getConnectionCommand()
 	{
-		return getProperty(GRID_CONNECTION_COMMAND_PROPERTY);
+		return getProperty(InstallationConstants.GRID_CONNECTION_COMMAND_PROPERTY);
+	}
+
+	public Collection<File> getDefaultOwnerFiles()
+	{
+		HierarchicalDirectory hier = getDefaultOwnersDirectory();
+		if (hier == null)
+			return null;
+		Collection<File> ret = new LinkedList<File>();
+		ret.addAll(Arrays.asList(hier.listFiles()));
+		return ret;
+	}
+
+	public HierarchicalDirectory getLocalCertsDirectory()
+	{
+		String prop = getProperty(InstallationConstants.LOCAL_CERTS_DIRECTORY_PROPERTY);
+		if (prop == null) {
+			// fall back again, since we didn't have the field.
+			return Installation.getDeployment(new DeploymentName()).security().getSecurityDirectory();
+		}
+		if (_logger.isDebugEnabled())
+			_logger.debug("found local certs dir as " + prop);
+
+		return HierarchicalDirectory.openRootHierarchicalDirectory(new File(prop));
 	}
 
 	public HierarchicalDirectory getDefaultOwnersDirectory()
 	{
-		if (!existed())
-			return null;
-		String prop = getProperty(OWNER_CERTS_DIRECTORY);
-		if (prop == null)
-			return null;
-		return new HierarchicalDirectory(prop, new ArrayList<File>());
+		String prop = getProperty(InstallationConstants.LOCAL_CERTS_DIRECTORY_PROPERTY);
+		if (prop == null) {
+			// fall back again, since we didn't have the field.
+			return Installation.getDeployment(new DeploymentName()).security().getSecurityDirectory()
+				.lookupDirectory(InstallationConstants.OWNER_CERTS_DIRECTORY_NAME);
+		}
+		if (_logger.isDebugEnabled())
+			_logger.debug("found owner certs dir as " + prop);
+
+		return HierarchicalDirectory.openRootHierarchicalDirectory(new File(prop + "/"
+			+ InstallationConstants.OWNER_CERTS_DIRECTORY_NAME));
 	}
 
-	public File getOwnerCertificate()
+	public Identity getOwnerCertificate()
 	{
-		HierarchicalDirectory dir = getDefaultOwnersDirectory();
-		if (dir == null)
+		// hmmm: cache the owner certificate!
+		_logger.debug("a");
+		// hmmm: clean debugs.
+		HierarchicalDirectory dir = getLocalCertsDirectory();
+		_logger.debug("b");
+		if (dir == null) {
+			_logger.debug("failure: in get owner cert, the default owners dir is null.");
 			return null;
+		}
+		_logger.debug("c");
+
 		File[] found = dir.listFiles(new FileFilter()
 		{
 			public boolean accept(File f)
 			{
-				return f.getName().equals("owner.cer");
+				// hmmm: toss this.
+				if (_logger.isDebugEnabled())
+					_logger.debug("comparing file called: " + f.getAbsolutePath());
+				_logger.debug("d");
+				return f.getName().equals(InstallationConstants.OWNER_CERT_FILE_NAME);
 			}
 		});
-		if (found == null)
+
+		_logger.debug("e");
+
+		if ((found == null) || (found.length == 0)) {
+			_logger.debug("failure: in get owner cert, the list of files in the owners cert dir is null.");
 			return null;
-		return found[0];
+		}
+		_logger.debug("f");
+
+		if (_logger.isDebugEnabled())
+			_logger.debug("found owner cert at " + found[0].getAbsolutePath());
+		File file = found[0];
+		if (file.exists()) {
+			try {
+				_logger.debug("g");
+
+				GeniiPath filePath = new GeniiPath("local:" + file.getAbsolutePath());
+				_logger.debug("h");
+
+				return AclAuthZClientTool.downloadIdentity(filePath);
+			} catch (Throwable cause) {
+				_logger.warn("Unable to get administrator certificate.", cause);
+			}
+		}
+		_logger.debug("i");
+
+		return null;
+	}
+
+	/**
+	 * The primary and recommended way to retrieve the user state directory.
+	 */
+	static public String getUserDir()
+	{
+		// hmmm: cache the answer; it should not change during runtime!!....
+		String userDir = null;
+		// see if we have a valid container properties and can retrieve the value that way.
+		ContainerProperties cProperties = ContainerProperties.getContainerProperties();
+		if (cProperties != null)
+			userDir = cProperties.getUserDirectoryProperty();
+		// well, see if we can just get the state directory from the environment.
+		if (userDir == null)
+			userDir = ApplicationBase.getUserDirFromEnvironment();
+		// now, if we have something at all, try comparing it with our replacement property.
+		userDir = replaceKeywords(userDir);
+		// make sure we don't go away empty-handed.
+		if (userDir == null)
+			userDir = ApplicationBase.getDefaultUserDir();
+		// by now we'll have a state directory path, even if we have to use the default.
+		try {
+			// load the state directory so we can get an absolute path and also verify its health.
+			File userDirFile = new GuaranteedDirectory(userDir, true);
+			return userDirFile.getCanonicalPath();
+		} catch (Throwable cause) {
+			throw new RuntimeException("Unable to access or create state directory.", cause);
+		}
+	}
+
+	/**
+	 * supports replacing a few keywords (or one really, currently) with environment variables.
+	 */
+	public static String replaceKeywords(String pathToFix)
+	{
+		// test for well-known singular replacements first.
+		if ((pathToFix != null) && pathToFix.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE)) {
+			// there's our sentinel for loading the state directory from the environment variables.
+			// let's try to load it.
+			pathToFix = ApplicationBase.getUserDirFromEnvironment();
+			if (pathToFix != null)
+				return pathToFix;
+			// nothing in environment, so fall back to default state directory, since we know this.
+			return ApplicationBase.getDefaultUserDir();
+		}
+		// test for generalized "env-NAME" patterns for other environment variables.
+		// hmmm: not implemented.
+		// if there were any changes to make, they have been made.
+		return pathToFix;
 	}
 
 }

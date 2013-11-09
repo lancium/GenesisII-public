@@ -80,7 +80,6 @@ function setup_key_variables()
   CA_PFX=signing-cert.pfx
   CACER=signing-cert.cer
   TLSIDENTITYPFX=tls-cert.pfx
-  SECRUNPFX=secure-run-cert.pfx
   ADMINPFX=admin.pfx
   # admincer is still used for populating default owners.
   ADMINCER=admin.cer
@@ -144,16 +143,6 @@ DEP_NAME=$DEP_NAME\n\
 MACHINE_NAME=$MACHINE_NAME\n\
 PORT=$PORT\n\
 " >$DEP_INFO_FILE
-  fi
-
-  ##############
-
-  if [ "$DEP_TYPE" == bootstrap ]; then
-    # this is a root, so we will create secure runnable.
-    if [ -z "$SECRUNPASS" ]; then
-      echo "The secure runnable SECRUNPASS is required to create a bootstrap container."
-      exit 1
-    fi
   fi
 
   ##############
@@ -279,16 +268,6 @@ PORT=$PORT\n\
   check_if_failed "fixing key-store name for CA"
   
   if [ "$DEP_TYPE" == bootstrap ]; then
-    # secure runnable is only generated on the root.
-    if [ ! -f "$GENERATED_CERTS/$SECRUNPFX" ]; then
-      # generate the secure runnable key.
-      create_certificate_using_CA "$GENERATED_CERTS/$CA_PFX" "$CA_PASSWORD" "$CA_ALIAS" "$GENERATED_CERTS/$SECRUNPFX" "$SECRUNPASS" "Genesis II Secure Runnable" "Genesis II Secure Runnable" 
-      check_if_failed "creating $SECRUNPFX from $CA_PFX"
-      # make the secure runnable certificate available also.
-      local secrun_cert_name=$(basename "$GENERATED_CERTS/$SECRUNPFX" .pfx)
-      cp $GENERATED_CERTS/${secrun_cert_name}.cer "$GRIDWIDE_CERTS"
-    fi
-
     if [ -z "$REDEPLOY" ]; then
       # this is a bootstrap, rns root, container.  we will create TRUSTEDPFX.
       # we only include the trusted certificates from trusted_certs, as well as the

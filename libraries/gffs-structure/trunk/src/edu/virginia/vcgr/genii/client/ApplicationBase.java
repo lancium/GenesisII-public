@@ -79,7 +79,7 @@ public class ApplicationBase
 		String depName = cProperties.getDeploymentName();
 		if (depName != null)
 			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, depName);
-		String userDir = getUserDir();
+		String userDir = InstallationProperties.getUserDir();
 		ConfigurationManager configurationManager = ConfigurationManager.initializeConfiguration(userDir);
 		setupUserDir(configurationManager.getUserDirectory());
 		configurationManager.setRoleServer();
@@ -93,61 +93,10 @@ public class ApplicationBase
 	 */
 	static protected void prepareClientApplication()
 	{
-		String userDir = getUserDir();
+		String userDir = InstallationProperties.getUserDir();
 		ConfigurationManager configurationManager = ConfigurationManager.initializeConfiguration(userDir);
 		setupUserDir(configurationManager.getUserDirectory());
 		configurationManager.setRoleClient();
-	}
-
-	/**
-	 * supports replacing a few keywords (or one really, currently) with environment variables.
-	 */
-	public static String replaceKeywords(String pathToFix)
-	{
-		// test for well-known singular replacements first.
-		if ((pathToFix != null) && pathToFix.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE)) {
-			// there's our sentinel for loading the state directory from the environment variables.
-			// let's try to load it.
-			pathToFix = ApplicationBase.getUserDirFromEnvironment();
-			if (pathToFix != null)
-				return pathToFix;
-			// nothing in environment, so fall back to default state directory, since we know this.
-			return getDefaultUserDir();
-		}
-		// test for generalized "env-NAME" patterns for other environment variables.
-		// hmmm: not implemented.
-		// if there were any changes to make, they have been made.
-		return pathToFix;
-	}
-
-	/**
-	 * The primary and recommended way to retrieve the user state directory.
-	 */
-	static public String getUserDir()
-	{
-		String userDir = null;
-		// see if we have a valid container properties and can retrieve the value that way.
-		ContainerProperties cProperties = ContainerProperties.getContainerProperties();
-		if (cProperties != null)
-			userDir = cProperties.getUserDirectoryProperty();
-		// well, see if we can just get the state directory from the environment.
-		if (userDir == null)
-			userDir = getUserDirFromEnvironment();
-		// now, if we have something at all, try comparing it with our replacement property.
-		userDir = ApplicationBase.replaceKeywords(userDir);
-		// / if ( (userDir != null) && userDir.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE))
-		// / userDir = ApplicationBase.getUserDirFromEnvironment();
-		// make sure we don't go away empty-handed.
-		if (userDir == null)
-			userDir = getDefaultUserDir();
-		// by now we'll have a state directory path, even if we have to use the default.
-		try {
-			// load the state directory so we can get an absolute path and also verify its health.
-			File userDirFile = new GuaranteedDirectory(userDir, true);
-			return userDirFile.getCanonicalPath();
-		} catch (Throwable cause) {
-			throw new RuntimeException("Unable to access or create state directory.", cause);
-		}
 	}
 
 	public enum GridStates {
@@ -223,13 +172,13 @@ public class ApplicationBase
 	}
 
 	// loads the value for the genesis user state directory from the environment.
-	static private String getUserDirFromEnvironment()
+	static String getUserDirFromEnvironment()
 	{
 		return System.getenv(USER_DIR_ENVIRONMENT_VARIABLE);
 	}
 
 	// a default for the state directory, if one cannot be found elsewhere.
-	static private String getDefaultUserDir()
+	static String getDefaultUserDir()
 	{
 		return String.format("%s/%s", System.getProperty("user.home"), GenesisIIConstants.GENESISII_STATE_DIR_NAME);
 	}

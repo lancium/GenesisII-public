@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,9 +83,6 @@ import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
-import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
-import edu.virginia.vcgr.secrun.SecureRunnableHooks;
-import edu.virginia.vcgr.secrun.SecureRunnerManager;
 
 public class Container extends ApplicationBase
 {
@@ -109,7 +105,6 @@ public class Container extends ApplicationBase
 	}
 
 	static private BarrieredWorkQueue _postStartupWorkQueue = new BarrieredWorkQueue();
-	static private SecureRunnerManager _secRunManager;
 
 	static public void main(String[] args)
 	{
@@ -142,11 +137,6 @@ public class Container extends ApplicationBase
 			LowMemoryWarning.INSTANCE.addLowMemoryListener(new LowMemoryExitHandler(7));
 
 			_logger.info(String.format("Deployment name is '%s'.\n", new DeploymentName()));
-			_secRunManager =
-				SecureRunnerManager.createSecureRunnerManager(GenesisClassLoader.classLoaderFactory(),
-					Installation.getDeployment(new DeploymentName()));
-			Properties secRunProperties = new Properties();
-			_secRunManager.run(SecureRunnableHooks.CONTAINER_PRE_STARTUP, secRunProperties);
 
 			WSDDProvider.registerProvider(GAroundInvokerFactory.PROVIDER_QNAME, new GAroundInvokerFactory());
 
@@ -155,7 +145,6 @@ public class Container extends ApplicationBase
 			ContainerIDFile.containerID(getContainerID());
 
 			_logger.info("Container Started");
-			_secRunManager.run(SecureRunnableHooks.CONTAINER_POST_STARTUP, secRunProperties);
 			AlarmManager.initializeAlarmManager();
 
 			_postStartupWorkQueue.release();
@@ -163,9 +152,6 @@ public class Container extends ApplicationBase
 			_logger.error("exception occurred in main", t);
 			System.exit(1);
 		}
-		/*
-		 * We have decided not to do this. SoftwareRejuvenator.startRejuvenator();
-		 */
 
 		OSGiSupport.shutDownFramework();
 	}
@@ -359,15 +345,13 @@ public class Container extends ApplicationBase
 
 		// use override signing key name if possible.
 		String keyStoreLoc = InstallationProperties.getInstallationProperties().getSigningKeystoreFile();
-		File keystoreLocPath = null;
 		if (keyStoreLoc == null) {
-			// we didn't have the local installation properties, so fall back to old-school methods.
-			keyStoreLoc = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
-			keystoreLocPath = Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyStoreLoc);
-		} else {
-			// that local version should already have the full path.
-			keystoreLocPath = new File(keyStoreLoc);
+			String msg = "Key Store Location not specified for message security.";
+			_logger.error(msg);
+			throw new ConfigurationException(msg);
 		}
+		File keystoreLocPath = new File(keyStoreLoc);
+
 		// the rest come from deployment still...
 		String keyStoreType =
 			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP, "PKCS12");
@@ -383,9 +367,6 @@ public class Container extends ApplicationBase
 			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_DEFAULT_CERT_LIFETIME_PROP);
 		if (certificateLifetime != null)
 			_defaultCertificateLifetime = Long.parseLong(certificateLifetime);
-
-		if (keyStoreLoc == null)
-			throw new ConfigurationException("Key Store Location not specified for message security.");
 
 		// open the keystore
 		char[] keyStorePassChars = null;
