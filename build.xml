@@ -127,17 +127,6 @@
 				<include name="edu/virginia/vcgr/genii/pages/META-INF/**/*"/>
 			</fileset>
 		</copy>
-<!-- turned off since maybe not needed again.
-		<copy todir="${bundles.home}/endorsed">
-			<fileset dir="${ext.dir}">
-				<include name="xmlsec*jar" />
-			</fileset>
-			<fileset dir="${bundles.home}">
-				<include name="*log4j*jar" />
-				<include name="*commons*loggi*jar" />
-			</fileset>
-		</copy>
--->
 	</target>
 
 	<target name="tests.compile" depends="genii.compile">
@@ -154,9 +143,6 @@
 			<arg value="trunk"/>
 			<arg value="clean"/>
 		</exec>
-		<delete>
-			<fileset dir="${basedir}/deployments/default" includes="services/**/*"/>
-		</delete>
 		<delete dir="${wsdd.dir}"/>
 		<delete dir="${dpages.dir}"/>
 		<delete>
@@ -168,6 +154,18 @@
 		<delete dir="${services.dir}"/>
 
 		<delete dir="${basedir}/unit-test-reports"/>
+
+		<!-- cleanup the default deployment to get rid of generated files. -->
+		<delete>
+			<fileset dir="${basedir}/deployments/default" includes="services/**/*"/>
+		</delete>
+		<delete>
+			<fileset dir="${basedir}/deployments/default" includes="**/*.cer"/>
+			<fileset dir="${basedir}/deployments/default" includes="**/*.pfx"/>
+		</delete>
+		<delete dir="${basedir}/deployments/backup"/>
+		<delete file="${basedir}/deployments/default/configuration/bootstrap.xml"/>
+		<delete file="${basedir}/deployments/default/configuration/namespace.properties"/>
 
 		<!-- whack assorted top-level files. -->
 		<delete file="${basedir}/cert-tool"/>
