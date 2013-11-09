@@ -76,6 +76,9 @@
 	</target>
 
 	<target name="clean" depends="init">
+
+		<delete file="${basedir}/id.p12"/>
+
 		<delete dir="${temporary.codegen.dir}"/>
 		<delete dir="${dpages.dir}"/>
 		<delete dir="${generated.source.dir}"/>
@@ -87,15 +90,7 @@
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>
 		<delete dir="${services.dir}"/>
-		<delete file="${basedir}/jserver.sh"/>
-		<delete file="${basedir}/runContainer.sh"/>
-		<delete file="${basedir}/runContainer.bat"/>
-		<delete file="${basedir}/grid"/>
-		<delete file="${basedir}/grid.bat"/>
-		<delete file="${basedir}/cert-tool"/>
-		<delete file="${basedir}/cert-tool.bat"/>
-		<delete file="${basedir}/jar-desc.xml"/>
-		<delete file="${basedir}/jserver-jar-desc.xml"/>
+
 		<delete>
 			<fileset dir="${basedir}"
 				includes="**/*.log"/>

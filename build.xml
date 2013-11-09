@@ -145,9 +145,7 @@
 		</exec>
 		<delete dir="${wsdd.dir}"/>
 		<delete dir="${dpages.dir}"/>
-		<delete>
-			<fileset dir="${obj.dir}" includes="**/*"/>
-		</delete>
+		<delete quiet="true" dir="${obj.dir}"/>
 		<delete quiet="true">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>
@@ -155,10 +153,12 @@
 
 		<delete dir="${basedir}/unit-test-reports"/>
 
+		<delete dir="${basedir}/installer/Media"/>
+
+		<delete dir="${basedir}/webapps/axis/WEB-INF/attachments"/>
+
 		<!-- cleanup the default deployment to get rid of generated files. -->
-		<delete>
-			<fileset dir="${basedir}/deployments/default" includes="services/**/*"/>
-		</delete>
+		<delete dir="${basedir}/deployments/default/services"/>
 		<delete>
 			<fileset dir="${basedir}/deployments/default" includes="**/*.cer"/>
 			<fileset dir="${basedir}/deployments/default" includes="**/*.pfx"/>
