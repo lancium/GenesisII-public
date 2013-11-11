@@ -28,13 +28,19 @@ public class InstallationProperties extends Properties
 {
 	static final long serialVersionUID = 0L;
 	static private Log _logger = LogFactory.getLog(InstallationProperties.class);
-	static private InstallationProperties _realInstallationProperties = new InstallationProperties();
+	// our singular instance of this class.
+	static private InstallationProperties _realInstallationProperties = null;
 
 	/**
 	 * for all normal run-time classes, the installation properties are accessed this way.
 	 */
 	static public InstallationProperties getInstallationProperties()
 	{
+		synchronized (InstallationProperties.class) {
+			if (_realInstallationProperties == null) {
+				_realInstallationProperties = new InstallationProperties();
+			}
+		}
 		return _realInstallationProperties;
 	}
 
@@ -58,7 +64,7 @@ public class InstallationProperties extends Properties
 
 	static private File getInstallationPropertiesFile()
 	{
-		File ret = new File(InstallationProperties.getUserDir(), InstallationConstants.INSTALLATION_PROPERTIES_FILENAME);
+		File ret = new File(getUserDir(), InstallationConstants.INSTALLATION_PROPERTIES_FILENAME);
 		// ContainerProperties.getContainerProperties().getUserDirectory(),
 		// INSTALLATION_PROPERTIES_FILENAME);
 		if (ret.exists() && ret.isFile() && ret.canRead())
@@ -190,18 +196,11 @@ public class InstallationProperties extends Properties
 		return null;
 	}
 
-	// stores the state directory once it's known.
-	private static String _userStateDirectory;	
-
 	/**
 	 * The primary and recommended way to retrieve the user state directory.
 	 */
 	static public String getUserDir()
 	{
-		synchronized (_userStateDirectory) {
-			if (_userStateDirectory != null) return _userStateDirectory;
-		}
-		
 		String userDir = null;
 		// see if we have a valid container properties and can retrieve the value that way.
 		ContainerProperties cProperties = ContainerProperties.getContainerProperties();
@@ -219,15 +218,13 @@ public class InstallationProperties extends Properties
 		try {
 			// load the state directory so we can get an absolute path and also verify its health.
 			File userDirFile = new GuaranteedDirectory(userDir, true);
-			synchronized (_userStateDirectory) {
-				_userStateDirectory = userDirFile.getCanonicalPath();
-			}
-			return _userStateDirectory;
+			return userDirFile.getCanonicalPath();
 		} catch (Throwable cause) {
 			throw new RuntimeException("Unable to access or create state directory.", cause);
 		}
 	}
 
+	// hmmm: move this.
 	/**
 	 * supports replacing a few keywords (or one really, currently) with environment variables.
 	 */
