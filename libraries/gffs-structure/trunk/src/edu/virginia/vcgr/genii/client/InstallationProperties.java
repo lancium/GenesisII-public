@@ -156,63 +156,52 @@ public class InstallationProperties extends Properties
 
 	public Identity getOwnerCertificate()
 	{
-		// hmmm: cache the owner certificate!
-		_logger.debug("a");
-		// hmmm: clean debugs.
+		// hmmm: cache the owner certificate here!
 		HierarchicalDirectory dir = getLocalCertsDirectory();
-		_logger.debug("b");
 		if (dir == null) {
-			_logger.debug("failure: in get owner cert, the default owners dir is null.");
+			_logger.warn("failure: in get owner cert, the default owners dir is null.");
 			return null;
 		}
-		_logger.debug("c");
 
 		File[] found = dir.listFiles(new FileFilter()
 		{
 			public boolean accept(File f)
 			{
-				// hmmm: toss this.
-				if (_logger.isDebugEnabled())
-					_logger.debug("comparing file called: " + f.getAbsolutePath());
-				_logger.debug("d");
 				return f.getName().equals(InstallationConstants.OWNER_CERT_FILE_NAME);
 			}
 		});
 
-		_logger.debug("e");
-
 		if ((found == null) || (found.length == 0)) {
-			_logger.debug("failure: in get owner cert, the list of files in the owners cert dir is null.");
+			_logger.warn("failure: in get owner cert, the list of files in the owners cert dir is null.");
 			return null;
 		}
-		_logger.debug("f");
 
-		if (_logger.isDebugEnabled())
-			_logger.debug("found owner cert at " + found[0].getAbsolutePath());
+		if (_logger.isTraceEnabled())
+			_logger.trace("found owner cert at " + found[0].getAbsolutePath());
 		File file = found[0];
 		if (file.exists()) {
 			try {
-				_logger.debug("g");
-
 				GeniiPath filePath = new GeniiPath("local:" + file.getAbsolutePath());
-				_logger.debug("h");
-
 				return AclAuthZClientTool.downloadIdentity(filePath);
 			} catch (Throwable cause) {
 				_logger.warn("Unable to get administrator certificate.", cause);
 			}
 		}
-		_logger.debug("i");
-
 		return null;
 	}
+
+	// stores the state directory once it's known.
+	private static String _userStateDirectory;	
 
 	/**
 	 * The primary and recommended way to retrieve the user state directory.
 	 */
 	static public String getUserDir()
 	{
-		// hmmm: cache the answer; it should not change during runtime!!....
+		synchronized (_userStateDirectory) {
+			if (_userStateDirectory != null) return _userStateDirectory;
+		}
+		
 		String userDir = null;
 		// see if we have a valid container properties and can retrieve the value that way.
 		ContainerProperties cProperties = ContainerProperties.getContainerProperties();
@@ -230,7 +219,10 @@ public class InstallationProperties extends Properties
 		try {
 			// load the state directory so we can get an absolute path and also verify its health.
 			File userDirFile = new GuaranteedDirectory(userDir, true);
-			return userDirFile.getCanonicalPath();
+			synchronized (_userStateDirectory) {
+				_userStateDirectory = userDirFile.getCanonicalPath();
+			}
+			return _userStateDirectory;
 		} catch (Throwable cause) {
 			throw new RuntimeException("Unable to access or create state directory.", cause);
 		}

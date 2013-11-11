@@ -132,36 +132,32 @@ public class Security
 		try {
 			if (adminIdentity != null) {
 				for (Identity id : KeystoreManager.getCallerIdentities(callingContext)) {
-					if (adminIdentity.equals(id))
+					if (adminIdentity.equals(id)) {
+						if (_logger.isTraceEnabled())
+							_logger.trace("found id matching admin cert: " + adminIdentity.describe(VerbosityLevel.LOW));
 						return true;
+					}
 				}
 			}
 		} catch (Throwable cause) {
 			_logger.warn("Exception during admin identity checking.", cause);
 		}
 
-		// hmmm: clean all these.
-		_logger.debug("before get owner cert in isdepadmin");
-
 		// try again using any registered owner certificate.
 		Identity ownerCert = InstallationProperties.getInstallationProperties().getOwnerCertificate();
 		if (ownerCert == null) {
-			// hmmm: clean this!
-			_logger.debug("no owner certificate could be found.");
 			return false;
-		} else {
-			_logger.debug("got owner cert identity, trying iterate");
-			try {
-				for (Identity id : KeystoreManager.getCallerIdentities(callingContext)) {
-					if (ownerCert.equals(id)) {
-						if (_logger.isDebugEnabled())
-							_logger.debug("found id matching owner cert: " + ownerCert.describe(VerbosityLevel.LOW));
-						return true;
-					}
+		}
+		try {
+			for (Identity id : KeystoreManager.getCallerIdentities(callingContext)) {
+				if (ownerCert.equals(id)) {
+					if (_logger.isTraceEnabled())
+						_logger.trace("found id matching owner cert: " + ownerCert.describe(VerbosityLevel.LOW));
+					return true;
 				}
-			} catch (Throwable cause) {
-				_logger.warn("Exception during owner identity checking.", cause);
 			}
+		} catch (Throwable cause) {
+			_logger.warn("Exception during owner identity checking.", cause);
 		}
 		return false;
 	}

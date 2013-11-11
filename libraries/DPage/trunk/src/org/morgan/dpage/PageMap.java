@@ -47,8 +47,10 @@ public class PageMap
 						continue;
 
 					Matcher matcher = LINE_PATTERN.matcher(line);
-					if (!matcher.matches())
+					if (!matcher.matches()) {
+						reader.close();
 						throw new IOException(String.format("Unable to parse page map line \"%s\".", line));
+					}
 
 					String pageName = matcher.group(1);
 					String type = matcher.group(2);
