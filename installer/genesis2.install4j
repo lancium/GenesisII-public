@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.6" transformSequenceNumber="4">
-  <directoryPresets config="./scripts/configure_container.sh" />
+  <directoryPresets config="../lib/META-INF/mime.types" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -43,6 +43,7 @@
       <fileset name="Mac OS X Only Files" id="23" customizedId="" />
       <fileset name="Linux32 Only Files" id="3620" customizedId="" />
       <fileset name="Deployment Files" id="5992" customizedId="" />
+      <fileset name="Careful lib folder" id="8166" customizedId="" />
     </filesets>
     <roots>
       <root id="20" fileset="19" location="" />
@@ -50,6 +51,7 @@
       <root id="24" fileset="23" location="" />
       <root id="3621" fileset="3620" location="" />
       <root id="5993" fileset="5992" location="" />
+      <root id="8167" fileset="8166" location="" />
     </roots>
     <mountPoints>
       <mountPoint id="7606" root="" location="ext" mode="755" />
@@ -69,6 +71,8 @@
       <mountPoint id="5994" root="5993" location="deployments" mode="755" />
       <mountPoint id="5995" root="5993" location="deployments/default" mode="755" />
       <mountPoint id="7004" root="5993" location="deployments/${compiler:genii.new-deployment}" mode="755" />
+      <mountPoint id="8168" root="8167" location="lib" mode="755" />
+      <mountPoint id="8169" root="8167" location="lib/META-INF" mode="755" />
     </mountPoints>
     <entries>
       <fileEntry mountPoint="7606" file="../scripts/genii-base-application.properties" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
@@ -82,11 +86,12 @@
       <dirEntry mountPoint="34" file=".." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp" dirMode="755" overrideDirMode="true">
         <exclude>
           <entry location="build-initial.xml" fileType="regular" />
+          <entry location="context.xml" fileType="regular" />
           <entry location="unit-test-reports" fileType="regular" />
           <entry location="build.properties" fileType="regular" />
-          <entry location="dpages" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
           <entry location="libraries" fileType="regular" />
+          <entry location="readme.txt" fileType="regular" />
           <entry location="build.xml" fileType="regular" />
           <entry location="cert-tool" fileType="regular" />
           <entry location="change-port.sh" fileType="regular" />
@@ -100,18 +105,16 @@
           <entry location="mappings.properties" fileType="regular" />
           <entry location="bin.eclipse" fileType="regular" />
           <entry location="deployments/default" fileType="regular" />
-          <entry location="deployments/backup" fileType="regular" />
           <entry location="bin" fileType="regular" />
           <entry location="tests" fileType="regular" />
           <entry location="JavaServiceWrapper" fileType="regular" />
           <entry location="src" fileType="regular" />
-          <entry location="retired" fileType="regular" />
-          <entry location="config-examples" fileType="regular" />
           <entry location="ext/genii-client-application.properties" fileType="regular" />
           <entry location="ext/genii-base-application.properties" fileType="regular" />
           <entry location="ext/genii-certtool-application.properties" fileType="regular" />
           <entry location="ext/genii-container-application.properties" fileType="regular" />
           <entry location="grid" fileType="regular" />
+          <entry location="lib" fileType="regular" />
           <entry location=".project" fileType="regular" />
         </exclude>
       </dirEntry>
@@ -358,6 +361,20 @@
       <dirEntry mountPoint="7004" file="${compiler:genii.deployment-source}" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude />
       </dirEntry>
+      <fileEntry mountPoint="8169" file="../lib/META-INF/mime.types" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="8168" file="../lib/genesisII.client.log4j.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="8168" file="../lib/genesisII.container.log4j.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="8168" file="../lib/production.client.log4j.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="8168" file="../lib/production.container.log4j.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <dirEntry mountPoint="8168" file="../lib" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" entryMode="direct" subDirectory="lib" excludeSuffixes="" dirMode="755" overrideDirMode="false">
+        <exclude>
+          <entry location="production.container.log4j.properties" fileType="regular" />
+          <entry location="production.client.log4j.properties" fileType="regular" />
+          <entry location="META-INF/mime.types" fileType="regular" />
+          <entry location="genesisII.container.log4j.properties" fileType="regular" />
+          <entry location="genesisII.client.log4j.properties" fileType="regular" />
+        </exclude>
+      </dirEntry>
     </entries>
     <components>
       <component name="GenesisII Core" id="28" customizedId="" displayDescription="true" hideHelpButton="false" selected="true" changeable="false" downloadable="false" hidden="false">
@@ -366,33 +383,34 @@
           <entry location="updates" fileType="regular" />
           <entry location="jre-addin" fileType="regular" />
           <entry location="scripts" fileType="regular" />
-          <entry location="current.deployment" fileType="regular" />
           <entry location="current.version" fileType="regular" />
+          <entry location="bundles" fileType="regular" />
+          <entry location="dpages" fileType="regular" />
           <entry location="webapps" fileType="regular" />
-          <entry location="ext/genii-base-application.properties" fileType="regular" />
-          <entry location="ext/genii-client-application.properties" fileType="regular" />
-          <entry location="lib" fileType="regular" />
-          <entry location="ext" fileType="regular" />
+          <entry location="eclipse" fileType="regular" />
           <entry location="xsede_tools" fileType="regular" />
+          <entry location="jni-libs" fileType="regular" />
           <entry location="RELEASE" fileType="regular" />
           <entry location="License.txt" fileType="regular" />
-          <entry location="bundles" fileType="regular" />
+          <entry location="current.deployment" fileType="regular" />
+          <entry location="ext" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
           <entry location="container.properties" fileType="regular" />
           <entry location="grid" fileType="launcher" />
           <entry location="client-ui" fileType="launcher" />
-          <entry location=".i4j_external_20/jni-lib/libdbxml_java23.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/VcgrClientLib.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/msvcr71.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/nulmrxnp.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/libdb_java45.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/VcgrContainerLib.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/libdb_java45d.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/CToGenesisCalls.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/GeniiProcessMgmt.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/libdb_java45d.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/VcgrContainerLib.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/libdbxml_java23.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/CToGenesisCalls.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/VcgrClientLib.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/nulmrxnp.dll" fileType="regular" />
           <entry location=".i4j_external_22/jni-lib" fileType="regular" />
           <entry location=".i4j_external_24/jni-lib" fileType="regular" />
           <entry location=".i4j_external_3621/jni-lib" fileType="regular" />
+          <entry location=".i4j_fileset_8166" fileType="regular" />
         </include>
         <dependencies />
       </component>
@@ -993,6 +1011,35 @@ return true;</string>
                 </serializedBean>
                 <condition>!context.getCompilerVariable("genii.isWindows").equals("true")</condition>
               </action>
+              <action name="Stop older unix service" id="7996" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                      <void property="arguments">
+                        <array class="java.lang.String" length="1">
+                          <void index="0">
+                            <string>stop</string>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="executable">
+                        <object class="java.io.File">
+                          <string>XCGContainer</string>
+                        </object>
+                      </void>
+                      <void property="wait">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="workingDirectory">
+                        <object class="java.io.File">
+                          <string>.</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>!context.getCompilerVariable("genii.isWindows").equals("true")</condition>
+              </action>
               <action name="" id="5813" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SleepAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -1041,7 +1088,7 @@ return true;</string>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
                       <void property="files">
-                        <array class="java.io.File" length="2">
+                        <array class="java.io.File" length="4">
                           <void index="0">
                             <object class="java.io.File">
                               <string>ext</string>
@@ -1049,7 +1096,17 @@ return true;</string>
                           </void>
                           <void index="1">
                             <object class="java.io.File">
-                              <string>lib</string>
+                              <string>XCGContainer</string>
+                            </object>
+                          </void>
+                          <void index="2">
+                            <object class="java.io.File">
+                              <string>ApplicationWatcher</string>
+                            </object>
+                          </void>
+                          <void index="3">
+                            <object class="java.io.File">
+                              <string>lib/gffs-container.jar</string>
                             </object>
                           </void>
                         </array>
@@ -4059,16 +4116,16 @@ return startService;</string>
         <commentFiles />
         <customAttributes />
       </autoUpdate>
-      <preInstallScript mode="1" file="">
+      <preInstallScript mode="2" file="./scripts/software_pre_install.sh">
         <content />
       </preInstallScript>
-      <postInstallScript mode="1" file="">
+      <postInstallScript mode="2" file="./scripts/software_post_install.sh">
         <content />
       </postInstallScript>
-      <preUninstallScript mode="1" file="">
+      <preUninstallScript mode="2" file="./scripts/software_pre_uninstall.sh">
         <content />
       </preUninstallScript>
-      <postUninstallScript mode="1" file="">
+      <postUninstallScript mode="2" file="./scripts/software_post_uninstall.sh">
         <content />
       </postUninstallScript>
     </linuxRPM>

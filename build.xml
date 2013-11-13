@@ -90,7 +90,7 @@
 	<target name="jars" depends="genii.container.jar,genii.dpages.jars"/>
 
 	<target name="genii.container.jar" depends="genii.compile">
-		<jar destfile="${lib.dir}/gffs-container.jar">
+		<jar destfile="${ext.dir}/gffs-container.jar">
 			<fileset dir="${obj.dir}">
 				<include name="edu/virginia/**/*"/>
 			</fileset>
@@ -145,6 +145,11 @@
 		</exec>
 		<delete dir="${wsdd.dir}"/>
 		<delete dir="${dpages.dir}"/>
+
+		<delete dir="${basedir}/genned-obj"/>
+		<delete dir="${basedir}/genned-src"/>
+		<delete dir="${basedir}/codegen"/>
+
 		<delete quiet="true" dir="${obj.dir}"/>
 		<delete quiet="true">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -152,8 +157,6 @@
 		<delete dir="${services.dir}"/>
 
 		<delete dir="${basedir}/unit-test-reports"/>
-
-		<delete dir="${basedir}/installer/Media"/>
 
 		<delete dir="${basedir}/webapps/axis/WEB-INF/attachments"/>
 
@@ -188,6 +191,7 @@
 		<delete file="${ext.dir}/dpage.jar"/>
 		<delete file="${ext.dir}/fsview.jar"/>
 		<delete file="${ext.dir}/gffs-basics.jar"/>
+		<delete file="${ext.dir}/gffs-container.jar"/>
 		<delete file="${ext.dir}/gffs-security.jar"/>
 		<delete file="${ext.dir}/gffs-structure.jar"/>
 		<delete file="${ext.dir}/gffs-webservices.jar"/>
@@ -195,6 +199,7 @@
 		<!-- clean out a couple old jars that could interfere with building. -->
 		<delete file="${ext.dir}/app-manager.jar"/>
 		<delete file="${ext.dir}/patch-builder.jar"/>
+		<delete file="${lib.dir}/gffs-container.jar"/>
 
 		<!-- clean up some deeper files that are generated. -->
 		<delete file="${lib.dir}/genesisII.client.log4j.properties"/>
@@ -212,7 +217,9 @@
 			<fileset dir="${basedir}"
 				includes="**/*.log.*" />
 			<fileset dir="${basedir}/installer"
-				includes="Media/**/*" />
+				includes="Media/**/gen*" />
+			<fileset dir="${basedir}/installer"
+				includes="Media/**/md5*" />
 			<fileset dir="${bundles.home}"
 				includes="endorsed/**/*" />
 		</delete>

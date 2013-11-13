@@ -39,7 +39,7 @@ function replace_compiler_variables()
       # assume the entry was in quotes and remove them.
       value="${value:1:$((${#value} - 2))}"
     fi
-    echo read var $var and value $value
+    #echo read var $var and value $value
     local seeking="\${compiler:$var}"
     local replacement="$value"
     replace_phrase_in_file "$file" "$seeking" "$replacement"

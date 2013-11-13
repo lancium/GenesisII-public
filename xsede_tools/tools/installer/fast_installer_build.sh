@@ -113,7 +113,7 @@ function build_installer()
   fi
 
   # clean out the media folder.
-  \rm -f $INSTALLER_DIR/Media/*
+  \rm -f $INSTALLER_DIR/Media/[a-zA-Z0-9]*
 
 #these deletes shouldn't be needed; the installer should ignore these files.
   # clean up any certificates that exist in the default deployment.
@@ -171,7 +171,7 @@ echo Building 64 bit Genesis...
 build_installer 5991 genesis2-gffs-deb
 build_installer 3416 genesis2-gffs-linux64
 #build_installer 2088 genesis2-gffs-mac64
-#build_installer 5987 genesis2-gffs-rpm
+build_installer 5987 genesis2-gffs-rpm
 
 ##############
 

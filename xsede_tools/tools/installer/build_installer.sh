@@ -113,7 +113,7 @@ function build_installer()
   fi
 
   # clean out the media folder.
-  \rm -f $INSTALLER_DIR/Media/*
+  \rm -f $INSTALLER_DIR/Media/[a-zA-Z0-9]*
 
 #these deletes shouldn't be needed; the installer should ignore these files.
   # clean up any certificates that exist in the default deployment.
