@@ -146,9 +146,11 @@
 		<delete dir="${wsdd.dir}"/>
 		<delete dir="${dpages.dir}"/>
 
+		<!-- clean up older bits. -->
 		<delete dir="${basedir}/genned-obj"/>
 		<delete dir="${basedir}/genned-src"/>
 		<delete dir="${basedir}/codegen"/>
+		<delete dir="${basedir}/simple-command"/>
 
 		<delete quiet="true" dir="${obj.dir}"/>
 		<delete quiet="true">

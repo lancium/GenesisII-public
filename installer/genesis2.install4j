@@ -1088,7 +1088,7 @@ return true;</string>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
                       <void property="files">
-                        <array class="java.io.File" length="4">
+                        <array class="java.io.File" length="6">
                           <void index="0">
                             <object class="java.io.File">
                               <string>ext</string>
@@ -1107,6 +1107,16 @@ return true;</string>
                           <void index="3">
                             <object class="java.io.File">
                               <string>lib/gffs-container.jar</string>
+                            </object>
+                          </void>
+                          <void index="4">
+                            <object class="java.io.File">
+                              <string>ext/app-manager.jar</string>
+                            </object>
+                          </void>
+                          <void index="5">
+                            <object class="java.io.File">
+                              <string>ext/patch-builder.jar</string>
                             </object>
                           </void>
                         </array>

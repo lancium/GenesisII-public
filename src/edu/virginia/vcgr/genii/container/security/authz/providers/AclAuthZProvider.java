@@ -109,6 +109,11 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 						// skip files of the wrong type.
 						if (ownerFile.getName().endsWith(".pfx"))
 							continue;
+						if (ownerFile.getName().endsWith(".txt"))
+							continue;
+						// and skip directories, since they are not files...
+						if (ownerFile.isDirectory())
+							continue;
 						if (_logger.isDebugEnabled())
 							_logger.debug("adding " + ownerFile + " as container owner certificate file.");
 						X509Certificate ownerCert = _defaultCertCache.get(ownerFile.getName());
