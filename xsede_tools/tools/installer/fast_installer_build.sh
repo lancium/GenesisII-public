@@ -153,15 +153,15 @@ function fix_endings()
 
 ##############
 
-# prepare to do the installer build.
-
-replace_compiler_variables
+# build 32-bit: (or do not)
 
 ##############
 
 # build 64-bit:
 
 echo Building 64 bit Genesis...
+
+replace_compiler_variables
 
 #pushd $GENII_INSTALL_DIR
 #ant clean

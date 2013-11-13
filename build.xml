@@ -175,8 +175,6 @@
 		<!-- whack assorted top-level files. -->
 		<delete file="${basedir}/cert-tool"/>
 		<delete file="${basedir}/cert-tool.bat"/>
-		<delete file="${basedir}/current.deployment"/>
-		<delete file="${basedir}/current.version"/>
 		<delete file="${basedir}/grid"/>
 		<delete file="${basedir}/grid.bat"/>
 		<delete file="${basedir}/jar-desc.xml"/>

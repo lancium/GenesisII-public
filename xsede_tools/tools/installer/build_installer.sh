@@ -153,15 +153,12 @@ function fix_endings()
 
 ##############
 
-# prepare to do the installer build.
-
-replace_compiler_variables
-
-##############
-
 # build 32-bit:
 
 echo Building 32 bit Genesis...
+
+replace_compiler_variables
+
 pushd $GENII_INSTALL_DIR
 ant clean
 ant build
@@ -175,6 +172,8 @@ build_installer 2084 genesis2-gffs-windows32
 # build 64-bit:
 
 echo Building 64 bit Genesis...
+
+replace_compiler_variables
 
 pushd $GENII_INSTALL_DIR
 ant clean
