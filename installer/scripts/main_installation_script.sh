@@ -2,29 +2,6 @@
 
 ##############
 
-# diagnostic noise to see variables and aliases.
-
-#debug=
-debug=true
-
-if [ ! -z "$debug" ]; then
-  myfile="$(basename $0)"
-  targfile="/tmp/gffs-install-$USER-$myfile.log"
-  # redirect output to the file.
-  exec >"${targfile}" 2>&1
-  echo "================= parameters ================"
-  echo $*
-  echo "================= pwd ================"
-  pwd
-  echo "================= set ================"
-  set
-  echo "================= env ================"
-  env 
-  echo "================= done ================"
-fi
-
-##############
-
 # given a file name and a phrase to look for, this replaces all instances of
 # it with a piece of replacement text.  note that slashes are okay in the two
 # text pieces, but we are using pound signs as the regular expression
@@ -100,16 +77,10 @@ replace_installdir_variables $GENII_INSTALL_DIR
 # make a link for the Container startup script.
 ln -s $GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer $GENII_INSTALL_DIR
 
-######
-#### undone yard of ideas ####
+# clean up some older files.
+\rm -rf "$GENII_INSTALL_DIR/ApplicationWatcher" "$GENII_INSTALL_DIR/XCGContainer" "$GENII_INSTALL_DIR/lib/gffs-container.jar" 
 
-# restore important config files from backup.
-
-
-##undone end.
-######
-
-
+##############
 
 echo "Finished preparing installation for GenesisII GFFS."
 exit 0

@@ -258,7 +258,14 @@ else
   # already configured.  let's stop it to be sure we aren't changing config
   # items while it's running.
   echo "Stopping existing container before configuration proceeds..."
-  bash "$GENII_INSTALL_DIR/GFFSContainer" stop
+  if [ -f "$GENII_INSTALL_DIR/GFFSContainer" ]; then
+    bash "$GENII_INSTALL_DIR/GFFSContainer" stop
+  fi
+  if [ -f "$GENII_INSTALL_DIR/XCGContainer" ]; then
+    bash "$GENII_INSTALL_DIR/XCGContainer" stop
+    # clean up this older file.
+    \rm "$GENII_INSTALL_DIR/XCGContainer"
+  fi
   sleep 5
 fi
 
