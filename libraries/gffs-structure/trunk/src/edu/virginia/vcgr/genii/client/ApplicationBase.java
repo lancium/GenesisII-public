@@ -76,7 +76,9 @@ public class ApplicationBase
 	static protected void prepareServerApplication()
 	{
 		ContainerProperties cProperties = ContainerProperties.getContainerProperties();
-		String depName = cProperties.getDeploymentName();
+		String depName = InstallationProperties.getInstallationProperties().getDeploymentName();
+		if (depName == null)
+			depName = cProperties.getDeploymentName();
 		if (depName != null)
 			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, depName);
 		String userDir = InstallationProperties.getUserDir();

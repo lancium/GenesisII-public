@@ -27,22 +27,27 @@ export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's work
 if [ -z "$GENII_INSTALL_DIR" ]; then
   export GENII_INSTALL_DIR="$WORKDIR"
 fi
+
+#echo "saying that workdir is $WORKDIR"
+
+export WRAPPER_ROOT_DIR="$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper"
+
 # try to find the wrapper configuration if we know where the state directory is.
 export WRAPPER_CONF_DIR
 if [ ! -z "$GENII_USER_DIR" ]; then
   WRAPPER_CONF_DIR="$GENII_USER_DIR/wrapper"
   if [ ! -d "$WRAPPER_CONF_DIR" -o ! -f "$WRAPPER_CONF_DIR/wrapper.conf" ]; then
-    echo "No wrapper config in state directory; falling back to the install dir."
+    #echo "No wrapper config in state directory; falling back to the install dir."
     unset WRAPPER_CONF_DIR
   fi
 fi
 # fall-back to wrapper config directory under the install directory, if we must.
 if [ -z "$WRAPPER_CONF_DIR" ]; then
-  WRAPPER_CONF_DIR="$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/conf"
+  WRAPPER_CONF_DIR="$WRAPPER_ROOT_DIR/conf"
 fi
 
 # Wrapper
-WRAPPER_CMD="./wrapper"
+WRAPPER_CMD="$WRAPPER_ROOT_DIR/bin/wrapper"
 WRAPPER_CONF="$WRAPPER_CONF_DIR/wrapper.conf"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
@@ -50,13 +55,18 @@ WRAPPER_CONF="$WRAPPER_CONF_DIR/wrapper.conf"
 PRIORITY=
 
 # Location of the pid file.
-PIDDIR="./"
+PIDDIR="$WRAPPER_ROOT_DIR/bin"
+if [ -f "$PIDDIR/$APP_NAME.pid" ]; then
+  PIDFILE="$PIDDIR/$APP_NAME.pid"
+fi
 # override this if we have a more local wrapper configuration.
 if [ ! -z "$GENII_USER_DIR" ]; then
   if [ -d "$GENII_USER_DIR/wrapper" ]; then
     PIDDIR="$GENII_USER_DIR/wrapper"
   fi
 fi
+
+#echo decided pid dir is $PIDDIR
 
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and
@@ -183,7 +193,16 @@ fi
 ANCHORFILE="$PIDDIR/$APP_NAME.anchor"
 STATUSFILE="$PIDDIR/$APP_NAME.status"
 JAVASTATUSFILE="$PIDDIR/$APP_NAME.java.status"
-PIDFILE="$PIDDIR/$APP_NAME.pid"
+if [ -z "$PIDFILE" ]; then
+  PIDFILE="$PIDDIR/$APP_NAME.pid"
+fi
+if [ ! -f "$PIDFILE" -a -f "$PIDDIR/XCG.pid" ]; then
+  # fall back to older name for pid file.
+  PIDFILE="$PIDDIR/XCG.pid"
+fi
+
+#echo finally decided pid file is $PIDFILE
+
 LOCKDIR="/var/lock/subsys"
 LOCKFILE="$LOCKDIR/$APP_NAME"
 pid=""
@@ -508,9 +527,13 @@ console() {
  
 start() {
     echo -n "Starting $APP_LONG_NAME..."
+
     getpid
     if [ "X$pid" = "X" ]
     then
+        # reset pid file to where we really want to create it.
+        PIDFILE="$PIDDIR/$APP_NAME.pid"
+
         # The string passed to eval must handles spaces in paths correctly.
         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $LOCKPROP"
         eval $COMMAND_LINE

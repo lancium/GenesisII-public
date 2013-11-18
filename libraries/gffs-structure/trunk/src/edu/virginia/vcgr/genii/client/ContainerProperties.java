@@ -21,7 +21,7 @@ public class ContainerProperties extends Properties
 	static final private String GENII_USER_DIR_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.user-dir";
 	static final private String GENII_DEPLOYMENT_DIRECTORY_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.deployment-directory";
-	static final private String GENII_DEPLOYMENT_NAME_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.deployment-name";
+	static final public String GENII_DEPLOYMENT_NAME_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.deployment-name";
 	static final public String GRID_CONNECTION_COMMAND_PROPERTY = "edu.virginia.vcgr.genii.gridInitCommand";
 
 	static private ContainerProperties _realContainerProperties = null;

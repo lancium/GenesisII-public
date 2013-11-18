@@ -18,5 +18,7 @@ public class InstallationConstants
 	static public final String SIGNING_KEYSTORE_FILE_PROPERTY =
 		KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP;
 	static public final String GRID_CONNECTION_COMMAND_PROPERTY = ContainerProperties.GRID_CONNECTION_COMMAND_PROPERTY;
+	static public final String GENII_DEPLOYMENT_NAME_PROPERTY = ContainerProperties.GENII_DEPLOYMENT_NAME_PROPERTY_NAME;
+
 	static public final String OWNER_CERT_FILE_NAME = "owner.cer";
 }

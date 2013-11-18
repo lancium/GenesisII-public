@@ -122,6 +122,11 @@ public class InstallationProperties extends Properties
 		return getProperty(InstallationConstants.GRID_CONNECTION_COMMAND_PROPERTY);
 	}
 
+	public String getDeploymentName()
+	{
+		return getProperty(InstallationConstants.GENII_DEPLOYMENT_NAME_PROPERTY);
+	}
+
 	public Collection<File> getDefaultOwnerFiles()
 	{
 		HierarchicalDirectory hier = getDefaultOwnersDirectory();

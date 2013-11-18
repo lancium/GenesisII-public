@@ -1,23 +1,25 @@
 #!/bin/bash
 
-# This script configures a container for separate existence from a GenesisII
-# installation.  In the past, the deployment would contain information about
-# the container install, but now we can have multiple GenesisII installs per
-# host.  Thus, the container information is now stored in a file in the state
-# directory called installation.properties.  this file provides all the info
-# required for the container to run properly without needing the installation
-# directory to record its specific details.
+# takes an existing container that was installed with the interactive installer
+# and produces a newfangled container configuration that lives inside the user
+# state directory.
 
 ##############
 
 # major variables for the script:
 
-# if this is non-empty, then we will generate certificates rather than expecting
-# them to already exist.
-GENERATE_CERTS=
-
 # the property file we will supply with container configuration.
 export INSTALLER_FILE="$GENII_USER_DIR/installation.properties"
+
+if [ -f "$INSTALLER_FILE" ]; then
+  echo "This script is intended to convert a container into the self-contained"
+  echo "configuration format.  However, it appears that it has already been run"
+  echo "because an installation.properties file already exists at:"
+  echo "  $INSTALLER_FILE"
+  echo "Please remove that if you are sure that you want to convert the container"
+  echo "that was previously installed by the interactive installer."
+  exit 1
+fi
 
 # where we will hide the owner certificate for the container.
 export LOCAL_CERTS_DIR="$GENII_USER_DIR/certs"
@@ -40,54 +42,20 @@ fi
 
 function print_instructions()
 {
-  echo "This script will configure a GFFS container and prepare it for use."
-  echo "This depends on the GenesisII software already having been installed."
-  echo "The script can also be used to reconfigure an existing container."
+  echo "This script can convert an older installation (installed by the"
+  echo "interactive GenesisII installer into a newer format where the container"
+  echo "configuration is self-contained and resides under the container's state"
+  echo "directory (pointed at by the GENII_USER_DIR variable)."
   echo
   echo "The script requires that the GENII_INSTALL_DIR and GENII_USER_DIR are"
-  echo "established as environment variables prior to configuring a container."
+  echo "established as environment variables prior to converting the container."
   echo "Those variables should be set and made persistent for the user account, or"
   echo "there will be problems finding the right settings to run the container."
   echo "This can be accomplished by, for example, adding the variables to ~/.profile"
   echo "or ~/.bashrc like so:"
   echo "   export GENII_INSTALL_DIR=\$HOME/GenesisII"
   echo
-  echo "This script uses six parameters to configure a container, and these need"
-  echo "to be passed on the command line when invoking the script.  The parms are:"
-  echo
-  echo "(1) The container host name; this must be a globally resolvable host name"
-  echo "    for the machine where the container is running.  If the host is not"
-  echo "    globally visible then the container cannot be linked to the grid."
-  echo
-  echo "(2) The port number on which this container will be running.  This port"
-  echo "    must be the exclusive property of the container, or there will be"
-  echo "    network level conflicts.  This port must also be open on any firewalls"
-  echo "    before the container can be linked into the grid."
-  echo
-  echo "(3) The grid user who will 'own' the container.  This must be an existing"
-  echo "    user that the grid already knows.  XSEDE MyProxy and X509 identities"
-  echo "    are both supported."
-  echo
-  echo "(4) A PFX file (in PKCS#12 format) for the container's TLS certificate"
-  echo "    and private key.  This can be passed as 'generate' if the script should"
-  echo "    generate the keystore rather than using an existing one."
-  echo
-  echo "(5) The keystore password for the container's TLS keypair.  The password"
-  echo "    will allow the container to open up the keystore."
-  echo
-  echo "(6) An *optional* password for the TLS key within the keystore.  This can"
-  echo "    be omitted if the key password is the same as the keystore password."
-  echo "    This is not used for the 'generate' keyword as a PFX file (the generated"
-  echo "    key will use the same keystore and key password)."
-  echo
-  echo "Examples:"
-  echo
-  local scriptname="$(basename $0)"
-  echo "$scriptname corbomite.cs.virginia.edu 23013 jones generate \\"
-  echo "  Falmouth18"
-  echo
-  echo "$scriptname fezzle.xsede.org 18843 ~/tlskey.pfx lincoln dqr891sb3 \\"
-  echo "  grezne12"
+  echo "The script does not take any additional parameters on the command line."
 }
 
 ##############
@@ -131,48 +99,31 @@ source "$GENII_INSTALL_DIR/scripts/installation_helpers.sh"
 
 ##############
 
-# retrieve the parameters passed on the command line.
-CONTAINER_HOSTNAME_PROPERTY="$1"; shift
-CONTAINER_PORT_PROPERTY="$1"; shift
-GRID_USER_NAME="$1"; shift
-TLS_KEYSTORE_FILE_PROPERTY="$1"; shift
-TLS_KEY_PASSWORD_PROPERTY="$1"; shift
-TLS_KEYSTORE_PASSWORD_PROPERTY="$1"; shift
-
-if [ -z "$CONTAINER_HOSTNAME_PROPERTY" -o \
-  -z "$CONTAINER_PORT_PROPERTY" -o \
-  -z "$TLS_KEY_PASSWORD_PROPERTY" -o \
-  -z "$TLS_KEYSTORE_FILE_PROPERTY" -o \
-  -z "$GRID_USER_NAME" ]; then
-  print_instructions
+function complain_re_missing()
+{
+  local file="$1"; shift
+  local var="$1"; shift
   echo 
-  echo "One of the required parameters is missing."
+  echo "There was a problem finding a variable in the deployment."
+  echo "It is expected to be present in:"
+  echo "  $file"
+  echo "Under an entry called:"
+  echo "  $var"
+  echo
   exit 1
-fi
-
-if [ -z "$TLS_KEYSTORE_PASSWORD_PROPERTY" ]; then
-  TLS_KEYSTORE_PASSWORD_PROPERTY="$TLS_KEY_PASSWORD_PROPERTY"
-fi
-
-if [ "$TLS_KEYSTORE_FILE_PROPERTY" == "generate" ]; then
-  echo "Script will generate a TLS certificate for container."
-  GENERATE_CERTS=true
-  TLS_KEYSTORE_FILE_PROPERTY="$LOCAL_CERTS_DIR/tls-cert.pfx"
-fi
-
-if [ -z "$GENERATE_CERTS" -a ! -f "$TLS_KEYSTORE_FILE_PROPERTY" ]; then
-  print_instructions
-  echo 
-  echo -e "The file specified for a TLS keypair cannot be found:\n$TLS_KEYSTORE_FILE_PROPERTY"
-  exit 1
-fi
+}
 
 ##############
 
 # setup the config directories.
 
 if [ ! -d "$GENII_USER_DIR" ]; then
-  mkdir "$GENII_USER_DIR"
+  print_instructions
+  echo
+  echo "The GENII_USER_DIR does not exist yet!  There is no container configuration"
+  echo "that can be converted currently.  Is this the right directory?:"
+  echo "  $GENII_USER_DIR"
+  exit 1
 fi
 if [ ! -d "$LOCAL_CERTS_DIR" ]; then
   mkdir "$LOCAL_CERTS_DIR"
@@ -195,6 +146,13 @@ fi
 # stop any running container to be sure we aren't changing config
 # items while it's running.
 echo "Stopping any existing container before configuration proceeds..."
+if [ -d "$WRAPPER_DIR" ]; then
+  # if the wrapper dir exists already, we need to whack it so we can have
+  # a clean shutdown of the running container.  this script is not meant
+  # to convert an already converted container, but sometimes there are issues
+  # while running it.  so we'll just clean up.
+  rm -rf "$WRAPPER_DIR"
+fi
 tried_stopping=
 if [ -f "$GENII_INSTALL_DIR/GFFSContainer" ]; then
   "$GENII_INSTALL_DIR/GFFSContainer" stop
@@ -214,6 +172,69 @@ fi
 if [ ! -d "$WRAPPER_DIR" ]; then
   mkdir "$WRAPPER_DIR"
 fi
+
+##############
+
+# load some of the variables from our config file.
+context_file="$(retrieve_compiler_variable genii.deployment-context)"
+new_dep="$(retrieve_compiler_variable genii.new-deployment)"
+user_path="$(retrieve_compiler_variable genii.user-path)"
+
+# find the hostname for the container.
+var="edu.virginia.vcgr.genii.container.external-hostname-override"
+file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/server-config.xml"
+CONTAINER_HOSTNAME_PROPERTY="$(seek_variable_in_xml "$var" "$file")"
+if [ -z "$CONTAINER_HOSTNAME_PROPERTY" ]; then complain_re_missing; fi
+
+# find the network port.
+var="edu.virginia.vcgr.genii.container.listen-port"
+file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/web-container.properties"
+CONTAINER_PORT_PROPERTY="$(seek_variable "$var" "$file")"
+if [ -z "$CONTAINER_PORT_PROPERTY" ]; then complain_re_missing; fi
+
+# find the tls keystore file name.  we will canonicalize this to tls-cert.pfx.
+var="edu.virginia.vcgr.genii.container.security.ssl.key-store"
+file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/security.properties"
+TLS_KEYSTORE_FILE_PROPERTY="$(seek_variable "$var" "$file")"
+if [ -z "$TLS_KEYSTORE_FILE_PROPERTY" ]; then complain_re_missing; fi
+TLS_KEYSTORE_FILE_PROPERTY="$GENII_DEPLOYMENT_DIR/$new_dep/security/$TLS_KEYSTORE_FILE_PROPERTY"
+if [ ! -f "$TLS_KEYSTORE_FILE_PROPERTY" ]; then
+  echo 
+  echo -e "The file specified for a TLS keypair cannot be found:\n$TLS_KEYSTORE_FILE_PROPERTY"
+  exit 1
+fi
+
+# find the password for the key in our tls keystore file.
+var="edu.virginia.vcgr.genii.container.security.ssl.key-password"
+file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/security.properties"
+TLS_KEY_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"
+if [ -z "$TLS_KEY_PASSWORD_PROPERTY" ]; then complain_re_missing; fi
+
+# find the password for the tls keystore file itself.
+var="edu.virginia.vcgr.genii.container.security.ssl.key-store-password"
+file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/security.properties"
+TLS_KEYSTORE_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"
+if [ -z "$TLS_KEYSTORE_PASSWORD_PROPERTY" ]; then complain_re_missing; fi
+
+# find the signing keystore file name.  we will canonicalize this to signing-cert.pfx.
+var="edu.virginia.vcgr.genii.container.security.resource-identity.key-store"
+file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/security.properties"
+SIGNING_KEYSTORE_FILE_PROPERTY="$(seek_variable "$var" "$file")"
+if [ -z "$SIGNING_KEYSTORE_FILE_PROPERTY" ]; then complain_re_missing; fi
+SIGNING_KEYSTORE_FILE_PROPERTY="$GENII_DEPLOYMENT_DIR/$new_dep/security/$SIGNING_KEYSTORE_FILE_PROPERTY"
+if [ ! -f "$SIGNING_KEYSTORE_FILE_PROPERTY" ]; then
+  echo 
+  echo -e "The file specified for a signing keypair cannot be found:\n$SIGNING_KEYSTORE_FILE_PROPERTY"
+  exit 1
+fi
+
+echo "Calculated these values from existing deployment:"
+echo "hostname: '$CONTAINER_HOSTNAME_PROPERTY'"
+echo "port: '$CONTAINER_PORT_PROPERTY'"
+echo "tls cert file: '$TLS_KEYSTORE_FILE_PROPERTY'"
+echo "tls key pass: '$TLS_KEY_PASSWORD_PROPERTY'"
+echo "tls keystore pass: '$TLS_KEYSTORE_PASSWORD_PROPERTY'"
+echo "signing cert file: '$SIGNING_KEYSTORE_FILE_PROPERTY'"
 
 ##############
 
@@ -245,10 +266,6 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.se
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=$LOCAL_SIGNING_CERT"
 
-# load variables from our config file.
-context_file=$(retrieve_compiler_variable genii.deployment-context)
-new_dep=$(retrieve_compiler_variable genii.new-deployment)
-
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.gridInitCommand=.*" "edu.virginia.vcgr.genii.gridInitCommand=\"local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file\" \"$new_dep\""
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.deployment-name=.*" "edu.virginia.vcgr.genii.container.deployment-name=$new_dep"
@@ -273,8 +290,45 @@ replace_phrase_in_file "$WRAPPER_DIR/wrapper.conf" "wrapper.logfile=.*" "wrapper
 
 ##############
 
+# set up the TLS certificate.
+echo "Copying TLS certificate for container..."
+cp -f "$TLS_KEYSTORE_FILE_PROPERTY" "$LOCAL_TLS_CERT"
+if [ $? -ne 0 ]; then
+  echo "Failed to copy the TLS keypair into place!"
+  echo "Tried copying $TLS_KEYSTORE_FILE_PROPERTY into $LOCAL_TLS_CERT"
+  exit 1
+fi
+
+# set up the signing certificate.
+echo "Copying signing certificate for container..."
+cp -f "$SIGNING_KEYSTORE_FILE_PROPERTY" "$LOCAL_SIGNING_CERT"
+if [ $? -ne 0 ]; then
+  echo "Failed to copy the signing keypair into place!"
+  echo "Tried copying $SIGNING_KEYSTORE_FILE_PROPERTY into $LOCAL_SIGNING_CERT"
+  exit 1
+fi
+
+##############
+
 # create a service-url file for this container.
 echo "https://$CONTAINER_HOSTNAME_PROPERTY:$CONTAINER_PORT_PROPERTY/axis/services/VCGRContainerPortType" >"$GENII_USER_DIR/service-url.txt"
+
+##############
+
+# get the owner's certificate.
+echo "Copying owner certificate for container..."
+cp "$GENII_DEPLOYMENT_DIR/$new_dep/security/owner.cer" "$LOCAL_CERTS_DIR/owner.cer"
+if [ $? -ne 0 ]; then
+  echo "Failed to copy the certificate from the existing container."
+  echo "This should be located at:"
+  echo "  $GENII_DEPLOYMENT_DIR/$new_dep/security/owner.cer"
+  exit 1
+fi
+cp "$LOCAL_CERTS_DIR/owner.cer" "$LOCAL_CERTS_DIR/default-owners"
+if [ $? -ne 0 ]; then
+  echo "Failed to copy the owner certificate into the default-owners folder."
+  exit 1
+fi
 
 ##############
 
@@ -289,51 +343,8 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# download the owner's certificate.
-echo "Downloading owner's certificate for user $GRID_USER_NAME..."
-user_path=$(retrieve_compiler_variable genii.user-path)
-"$GENII_INSTALL_DIR/grid" download-certificate "$user_path/$GRID_USER_NAME" "local:$LOCAL_CERTS_DIR/owner.cer"
-if [ $? -ne 0 ]; then
-  echo "Failed to download the certificate for grid user $GRID_USER_NAME."
-  echo "There may be more information in: ~/.GenesisII/grid-client.log"
-  exit 1
-fi
-cp "$LOCAL_CERTS_DIR/owner.cer" "$LOCAL_CERTS_DIR/default-owners"
-if [ $? -ne 0 ]; then
-  echo "Failed to copy the owner certificate into the default-owners folder."
-  exit 1
-fi
-
-# generate a signing key for the container, but only if it is missing one.
-if [ ! -f "$LOCAL_SIGNING_CERT" ]; then
-  echo "Generating container's signing certificate..."
-  generate_cert "$LOCAL_SIGNING_CERT" container
-fi
-
-# set up the TLS certificate.
-if [ -z "$GENERATE_CERTS" ]; then
-  # copy the file they specified into place.  we always do the copy, in case
-  # the user is trying to reconfigure the TLS cert.
-  echo "Copying specified TLS certificate for container..."
-  cp -f "$TLS_KEYSTORE_FILE_PROPERTY" "$LOCAL_TLS_CERT"
-  if [ $? -ne 0 ]; then
-    echo "Failed to copy the specified TLS keypair into place!"
-    echo "Tried copying $TLS_KEYSTORE_FILE_PROPERTY into $LOCAL_TLS_CERT"
-    exit 1
-  fi
-else
-  # generate a new tls certificate, but only if there is not one already.
-  # we go on the assumption that one tls is as good as another, if the grid
-  # generates it.  if the cert expired, then delete it before running the
-  # configure container script and it will be regenerated.
-  echo "Generating container's TLS certificate..."
-  if [ ! -f "$LOCAL_TLS_CERT" ]; then
-    generate_cert "$LOCAL_TLS_CERT" "$TLS_KEY_PASSWORD_PROPERTY"
-  fi
-fi
-
 echo
-echo Done configuring the container.
+echo Done converting your container to a self-contained configuration.
 echo
 echo The service URL for your container is stored in:
 echo "$GENII_USER_DIR/service-url.txt"

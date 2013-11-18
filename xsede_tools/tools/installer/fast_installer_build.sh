@@ -97,6 +97,11 @@ function replace_compiler_variables()
     replace_phrase_in_file "$generated_installer_name" "$seeking" "$replacement"
   done < "$combo_file"
 
+  echo "=============="
+  echo "Configuration for this installer:"
+  cat "$combo_file" | sed -e '/^$/d'
+  echo "=============="
+
   \rm -f "$combo_file"
 }
 

@@ -2,71 +2,25 @@
 
 ##############
 
-# given a file name and a phrase to look for, this replaces all instances of
-# it with a piece of replacement text.  note that slashes are okay in the two
-# text pieces, but we are using pound signs as the regular expression
-# separator; phrases including the octothorpe (#) will cause syntax errors.
-function replace_phrase_in_file()
-{
-  local file="$1"; shift
-  local phrase="$1"; shift
-  local replacement="$1"; shift
-  if [ -z "$file" -o -z "$phrase" -o -z "$replacement" ]; then
-    echo "replace_phrase_in_file: needs a filename, a phrase to replace, and the"
-    echo "text to replace that phrase with."
-    return 1
-  fi
-  sed -i -e "s%$phrase%$replacement%g" "$file"
-}
-
-function replace_compiler_variables()
-{
-  local file="$1"; shift
-
-  local combo_file="$(mktemp /tmp/$USER-temp-instinfo.XXXXXX)"
-  cat "$GENII_INSTALL_DIR/current.deployment" >>"$combo_file"
-  cat "$GENII_INSTALL_DIR/current.version" >>"$combo_file"
-
-  # replace installer variables in files.
-  while read line; do
-    if [ ${#line} -eq 0 ]; then continue; fi
-    #echo got line to replace: $line
-    # split the line into the variable name and value.
-    IFS='=' read -a assignment <<< "$line"
-    local var="${assignment[0]}"
-    local value="${assignment[1]}"
-    if [ "${value:0:1}" == '"' ]; then
-      # assume the entry was in quotes and remove them.
-      value="${value:1:$((${#value} - 2))}"
-    fi
-    #echo read var $var and value $value
-    local seeking="\${compiler:$var}"
-    local replacement="$value"
-    replace_phrase_in_file "$file" "$seeking" "$replacement"
-  done < "$combo_file"
-
-  \rm -f "$combo_file"
-}
-
-function replace_installdir_variables()
-{
-  # the passed in directory is not only where we operate, it is also
-  # the value we will be replacing install4j references with.
-  local dir="$1"; shift
-  local fname
-
-  for fname in $(find $dir -type f -exec grep -l installer:sys.installationDir {} ';'); do
-    local seeking="\${installer:sys.installationDir}"
-    local replacement="$dir"
-    replace_phrase_in_file "$fname" "$seeking" "$replacement"
-  done
-}
-
-##############
-
 # bootstrap our information about the installation, starting with where it
 # resides.
 GENII_INSTALL_DIR="$1"; shift
+
+##############
+
+# load our helper scripts.
+
+if [ ! -f "$GENII_INSTALL_DIR/scripts/installation_helpers.sh" ]; then
+  echo "The installation_helpers.sh script could not be located in the existing"
+  echo "installation.  This is most likely because this install was created with"
+  echo "the Genesisi v2.7.499 installer or earlier.  Please upgrade to the latest"
+  echo "Genesis 2.7.500+ interactive installer before proceeding."
+  exit 1
+fi
+
+source "$GENII_INSTALL_DIR/scripts/installation_helpers.sh"
+
+##############
 
 replace_compiler_variables $GENII_INSTALL_DIR/RELEASE
 replace_compiler_variables $GENII_INSTALL_DIR/updates/current-version.txt
