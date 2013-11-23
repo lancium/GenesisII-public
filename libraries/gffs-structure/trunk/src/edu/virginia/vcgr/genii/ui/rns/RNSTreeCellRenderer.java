@@ -37,11 +37,11 @@ public class RNSTreeCellRenderer extends DefaultTreeCellRenderer
 			} else if (obj.objectType() == RNSTreeObjectType.EXPANDING_OBJECT) {
 				setIcon(RNSIcons.RNSIconsFactory().getQuestionIcon());
 				Font f = getFont();
-				setFont(f.deriveFont(Font.ITALIC));
+				setFont(f.deriveFont(Font.ITALIC).deriveFont(20.0f));
 			} else {
 				setIcon(RNSIcons.RNSIconsFactory().getErrorIcon());
 				Font f = getFont();
-				setFont(f.deriveFont(Font.ITALIC));
+				setFont(f.deriveFont(Font.ITALIC).deriveFont(20.0f));
 			}
 		}
 

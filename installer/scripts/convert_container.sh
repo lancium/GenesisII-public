@@ -54,8 +54,15 @@ function print_instructions()
   echo "This can be accomplished by, for example, adding the variables to ~/.profile"
   echo "or ~/.bashrc like so:"
   echo "   export GENII_INSTALL_DIR=\$HOME/GenesisII"
+  echo "For this script, the GENII_INSTALL_DIR should point at the newer"
+  echo "installation that has been installed (either interactive or RPM/DEB)."
   echo
-  echo "The script does not take any additional parameters on the command line."
+  echo "The script requires the older installation directory as a parameter."
+  echo "It is alright for this directory to be the same as the new GENII_INSTALL_DIR"
+  echo "but both must be provided.  For example:"
+  echo
+  local scriptname="$(basename $0)"
+  echo "$scriptname $HOME/GenesisII"
 }
 
 ##############
@@ -74,6 +81,17 @@ if [ -z "$GENII_USER_DIR" -o -z "$GENII_INSTALL_DIR" ]; then
   exit 1
 fi
 
+# an extra check to make sure they're using the new installer as the GENII_INSTALL_DIR.
+if [ ! -f "$GENII_INSTALL_DIR/current.version" \
+    -o ! -f "$GENII_INSTALL_DIR/current.deployment" ]; then
+  print_instructions
+  echo
+  echo "It appears that the GENII_INSTALL_DIR variable is not pointing at the"
+  echo "newer installation.  Please set this variable to the location where the"
+  echo "2.7.500+ installation is located."
+  exit 1
+fi
+
 JAVA_PATH=$(which java)
 if [ -z "$JAVA_PATH" ]; then
   print_instructions
@@ -83,15 +101,28 @@ if [ -z "$JAVA_PATH" ]; then
   exit 1
 fi
 
+OLD_INSTALL="$1"; shift
+
+if [ -z "$OLD_INSTALL" ]; then
+  print_instructions
+  echo
+  echo The older install location was not passed on the command line.
+  exit 1
+fi
+
+export OLD_DEPLOYMENT_DIR="$OLD_INSTALL/deployments"
+
 ##############
 
 # load our helper scripts.
 
 if [ ! -f "$GENII_INSTALL_DIR/scripts/installation_helpers.sh" ]; then
-  echo "The installation_helpers.sh script could not be located in the existing"
-  echo "installation.  This is most likely because this install was created with"
-  echo "the Genesisi v2.7.499 installer or earlier.  Please upgrade to the latest"
-  echo "Genesis 2.7.500+ interactive installer before proceeding."
+  echo "The installation_helpers.sh script could not be located in the new"
+  echo "installation, located in GENII_INSTALL_DIR, which is currently:"
+  echo "  $GENII_INSTALL_DIR"
+  echo "This is most likely because the current install was created with the"
+  echo "Genesisi v2.7.499 installer or earlier.  Please upgrade to the latest"
+  echo "Genesis 2.7.500+ interactive or RPM/DEB installer before proceeding."
   exit 1
 fi
 
@@ -164,6 +195,16 @@ if [ -f "$GENII_INSTALL_DIR/XCGContainer" ]; then
   \rm "$GENII_INSTALL_DIR/XCGContainer"
   tried_stopping=true
 fi
+if [ -f "$OLD_INSTALL/GFFSContainer" ]; then
+  "$OLD_INSTALL/GFFSContainer" stop
+  tried_stopping=true
+fi
+if [ -f "$OLD_INSTALL/XCGContainer" ]; then
+  "$OLD_INSTALL/XCGContainer" stop
+  # clean up this older file.
+  \rm "$OLD_INSTALL/XCGContainer"
+  tried_stopping=true
+fi
 if [ ! -z "$tried_stopping" ]; then
   echo Waiting for container to completely stop.
   sleep 5
@@ -180,24 +221,31 @@ context_file="$(retrieve_compiler_variable genii.deployment-context)"
 new_dep="$(retrieve_compiler_variable genii.new-deployment)"
 user_path="$(retrieve_compiler_variable genii.user-path)"
 
+# find the old deployment name.
+var="edu.virginia.vcgr.genii.container.deployment-name"
+file="$OLD_INSTALL/container.properties"
+old_dep="$(seek_variable "$var" "$file")"
+if [ -z "$old_dep" ]; then complain_re_missing; fi
+
 # find the hostname for the container.
 var="edu.virginia.vcgr.genii.container.external-hostname-override"
-file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/server-config.xml"
+file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/server-config.xml"
 CONTAINER_HOSTNAME_PROPERTY="$(seek_variable_in_xml "$var" "$file")"
 if [ -z "$CONTAINER_HOSTNAME_PROPERTY" ]; then complain_re_missing; fi
 
 # find the network port.
 var="edu.virginia.vcgr.genii.container.listen-port"
-file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/web-container.properties"
+file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/web-container.properties"
 CONTAINER_PORT_PROPERTY="$(seek_variable "$var" "$file")"
 if [ -z "$CONTAINER_PORT_PROPERTY" ]; then complain_re_missing; fi
 
 # find the tls keystore file name.  we will canonicalize this to tls-cert.pfx.
 var="edu.virginia.vcgr.genii.container.security.ssl.key-store"
-file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/security.properties"
+file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 TLS_KEYSTORE_FILE_PROPERTY="$(seek_variable "$var" "$file")"
 if [ -z "$TLS_KEYSTORE_FILE_PROPERTY" ]; then complain_re_missing; fi
-TLS_KEYSTORE_FILE_PROPERTY="$GENII_DEPLOYMENT_DIR/$new_dep/security/$TLS_KEYSTORE_FILE_PROPERTY"
+# add to the keystore file to get a full path.
+TLS_KEYSTORE_FILE_PROPERTY="$OLD_DEPLOYMENT_DIR/$old_dep/security/$TLS_KEYSTORE_FILE_PROPERTY"
 if [ ! -f "$TLS_KEYSTORE_FILE_PROPERTY" ]; then
   echo 
   echo -e "The file specified for a TLS keypair cannot be found:\n$TLS_KEYSTORE_FILE_PROPERTY"
@@ -206,22 +254,23 @@ fi
 
 # find the password for the key in our tls keystore file.
 var="edu.virginia.vcgr.genii.container.security.ssl.key-password"
-file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/security.properties"
+file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 TLS_KEY_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"
 if [ -z "$TLS_KEY_PASSWORD_PROPERTY" ]; then complain_re_missing; fi
 
 # find the password for the tls keystore file itself.
 var="edu.virginia.vcgr.genii.container.security.ssl.key-store-password"
-file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/security.properties"
+file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 TLS_KEYSTORE_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"
 if [ -z "$TLS_KEYSTORE_PASSWORD_PROPERTY" ]; then complain_re_missing; fi
 
 # find the signing keystore file name.  we will canonicalize this to signing-cert.pfx.
 var="edu.virginia.vcgr.genii.container.security.resource-identity.key-store"
-file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/security.properties"
+file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 SIGNING_KEYSTORE_FILE_PROPERTY="$(seek_variable "$var" "$file")"
 if [ -z "$SIGNING_KEYSTORE_FILE_PROPERTY" ]; then complain_re_missing; fi
-SIGNING_KEYSTORE_FILE_PROPERTY="$GENII_DEPLOYMENT_DIR/$new_dep/security/$SIGNING_KEYSTORE_FILE_PROPERTY"
+# make a full path out of the signing file.
+SIGNING_KEYSTORE_FILE_PROPERTY="$OLD_DEPLOYMENT_DIR/$old_dep/security/$SIGNING_KEYSTORE_FILE_PROPERTY"
 if [ ! -f "$SIGNING_KEYSTORE_FILE_PROPERTY" ]; then
   echo 
   echo -e "The file specified for a signing keypair cannot be found:\n$SIGNING_KEYSTORE_FILE_PROPERTY"
@@ -317,12 +366,18 @@ echo "https://$CONTAINER_HOSTNAME_PROPERTY:$CONTAINER_PORT_PROPERTY/axis/service
 
 # get the owner's certificate.
 echo "Copying owner certificate for container..."
-cp "$GENII_DEPLOYMENT_DIR/$new_dep/security/owner.cer" "$LOCAL_CERTS_DIR/owner.cer"
+cp "$OLD_DEPLOYMENT_DIR/$old_dep/security/owner.cer" "$LOCAL_CERTS_DIR/owner.cer" 2>/dev/null
 if [ $? -ne 0 ]; then
-  echo "Failed to copy the certificate from the existing container."
-  echo "This should be located at:"
-  echo "  $GENII_DEPLOYMENT_DIR/$new_dep/security/owner.cer"
-  exit 1
+  # try again with admin cert.
+  cp "$OLD_DEPLOYMENT_DIR/$old_dep/security/admin.cer" "$LOCAL_CERTS_DIR/owner.cer"
+  if [ $? -ne 0 ]; then
+    echo "Failed to copy the owner certificate from the existing container."
+    echo "This should be located at:"
+    echo "  $OLD_DEPLOYMENT_DIR/$old_dep/security/owner.cer"
+    echo "or an admin certificate should be at:"
+    echo "  $OLD_DEPLOYMENT_DIR/$old_dep/security/admin.cer"
+    exit 1
+  fi
 fi
 cp "$LOCAL_CERTS_DIR/owner.cer" "$LOCAL_CERTS_DIR/default-owners"
 if [ $? -ne 0 ]; then

@@ -1923,14 +1923,14 @@ return propFile.exists();</condition>
                                 <string>File ownerCer = new File(String.format("%s/deployments/%s/security/owner.cer",
     context.getVariable("sys.installationDir"),
     (String)context.getCompilerVariable("genii.new-deployment")));
+/*
 System.out.println("got owner cer as " + ownerCer.getAbsolutePath());
 if (ownerCer.exists()) {
-System.out.println("owner cer already exists");
-    
+System.out.println("owner cer already exists");    
 } else {
 System.out.println("owner cer did not exist yet");
-    
 }
+*/
 return !ownerCer.exists();</string>
                               </void>
                             </object>
@@ -2077,23 +2077,26 @@ return !ownerCer.exists();</string>
                                 <string>File signer = new File(String.format("%s/deployments/%s/security/signing-cert.pfx",
     context.getVariable("sys.installationDir"),
     (String)context.getCompilerVariable("genii.new-deployment")));
+/*
 System.out.println("got signer cer as " + signer.getAbsolutePath());
 if (signer.exists()) {
 System.out.println("signer cer already exists");
 } else {
   System.out.println("signer cer did not exist yet");    
 }
+*/
 
 File tls = new File(String.format("%s/deployments/%s/security/tls-cert.pfx",
     context.getVariable("sys.installationDir"),
     (String)context.getCompilerVariable("genii.new-deployment")));
+/*
 System.out.println("got tls cer as " + tls.getAbsolutePath());
 if (tls.exists()) {
   System.out.println("tls cer already exists");
 } else {
   System.out.println("tls cer did not exist yet");    
 }
-
+*/
 
 return !signer.exists() || !tls.exists();
 </string>

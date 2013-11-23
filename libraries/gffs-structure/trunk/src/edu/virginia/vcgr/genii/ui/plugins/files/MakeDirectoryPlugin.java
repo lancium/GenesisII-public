@@ -9,6 +9,7 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.gui.GuiHelpAction;
 import edu.virginia.vcgr.genii.client.rcreate.ResourceCreationContext;
 import edu.virginia.vcgr.genii.client.rcreate.ResourceCreator;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
@@ -77,22 +78,26 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 					String containerPath = null;
 					// Much more complicated. First must get the container they want to use.
 
-					while (containerPath == null) {
+					boolean done = false;
+					while (!done) {
 						// Keep trying till they get a good container path or they give up
-						containerPath = JOptionPane.showInputDialog(context.ownerComponent(), "Input storage container path: ");
+						containerPath = JOptionPane.showInputDialog(context.ownerComponent(), "Input storage container path: ", containerPath);
 						if (containerPath == null)
 							return;
+						done=true; // assume this works until proven otherwise
 						try {
 							path = path.lookup(containerPath, RNSPathQueryFlags.MUST_EXIST);
 							path = path.lookup(containerPath + "/Services/EnhancedRNSPortType", RNSPathQueryFlags.MUST_EXIST);
 						} catch (RNSPathDoesNotExistException r) {
 							JOptionPane.showMessageDialog(null, containerPath, "Storage container path does not exist",
 								JOptionPane.ERROR_MESSAGE);
-							containerPath = null;
+							// lets keep what they already typed and let them edit it instead
+							//containerPath = null;
+							done=false;
 						}
 
-						if (containerPath != null)
-							break;
+						//if (containerPath != null)
+							//break;
 					}
 					if (new TypeInformation(path.lookup(containerPath).getEndpoint()).isContainer()) {
 						// System.err.println("About to mkdir: container " + path.toString() +

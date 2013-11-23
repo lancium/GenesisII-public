@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.exportdir.lightweight;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
@@ -9,12 +10,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
+import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
@@ -40,6 +44,18 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 
 		ResourceKey key = super.createResource(creationParameters);
 		key.dereference().setProperty(LightWeightExportConstants.ROOT_DIRECTORY_PROPERTY_NAME, initInfo.getPath());
+		// ensure that local dir to be exported is readable
+		// if so, proceed with export creation
+		try {
+			// check if directory exists
+			if (!ExportedDirUtils.dirReadable(initInfo.getPath())) {
+				throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
+						+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
+			}
+		} catch (IOException ioe) {
+			throw new ResourceException("Could not determine if export localpath is readable.", ioe);
+		}
 
 		String svnUser = initInfo.svnUser();
 		String svnPass = initInfo.svnPass();

@@ -59,19 +59,25 @@ class ExportDataAction extends AbstractAction
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		try {
-			ExportCreationDialog creation = new ExportCreationDialog(_owner, _ContainerPath, _TargetPath);
-			creation.setModalityType(ModalityType.APPLICATION_MODAL);
-			creation.pack();
-			GuiUtils.centerComponent(creation);
+		ExportCreationDialog creation=null;
+		while (true) {
+			try {
+				if (creation==null) {
+					creation = new ExportCreationDialog(_owner, _ContainerPath, _TargetPath);
+					creation.setModalityType(ModalityType.APPLICATION_MODAL);
+					creation.pack();
+					GuiUtils.centerComponent(creation);
+				}
 
-			creation.setVisible(true);
-			ExportCreationInformation creationInfo = creation.getExportCreationInformation();
-			if (creationInfo != null) {
-				createExport(creationInfo);
+				creation.setVisible(true);
+				ExportCreationInformation creationInfo = creation.getExportCreationInformation();
+				if (creationInfo != null) {
+					createExport(creationInfo);
+				}
+				return;
+			} catch (Throwable cause) {
+				GuiUtils.displayError(_owner, "Export Error", cause);
 			}
-		} catch (Throwable cause) {
-			GuiUtils.displayError(_owner, "Export Error", cause);
 		}
 	}
 
@@ -79,9 +85,14 @@ class ExportDataAction extends AbstractAction
 		RNSException, CreationException, ResourceCreationFaultType, RemoteException, InvalidToolUsageException
 	{
 		String rnsPath = creationInfo.getRNSPath();
-		RNSPath rPath =
+		RNSPath rPath;
+		try {
+		rPath=
 			ExportManipulator.createExport(creationInfo.getContainerPath(), creationInfo.getLocalPath(), rnsPath,
 				creationInfo.isLightWeight());
+		} catch (Exception cause) {
+			throw new ExportException("exception occurred; failed to create export", cause);
+		}
 		ExportDirState.addExport(creationInfo.getContainerPath(),
 			new ExportDirInformation(rPath, new File(creationInfo.getLocalPath())));
 		fireExportChanged();

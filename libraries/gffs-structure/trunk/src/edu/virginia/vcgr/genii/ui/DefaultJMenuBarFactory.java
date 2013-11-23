@@ -87,7 +87,7 @@ public class DefaultJMenuBarFactory implements JMenuBarFactory
 
 		private AboutAction()
 		{
-			super("About Genesis II Application");
+			super("About the GFFS");
 		}
 
 		@Override

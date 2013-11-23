@@ -2,22 +2,32 @@ package edu.virginia.vcgr.genii.client.gui.exportdir;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import edu.virginia.vcgr.genii.client.gui.GuiHelpAction;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.gui.HelpLinkConfiguration;
 import edu.virginia.vcgr.genii.client.install.ContainerInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 
 public class ExportCreationDialog extends JDialog
 {
@@ -26,7 +36,7 @@ public class ExportCreationDialog extends JDialog
 	static private final String _TITLE = "Export Creation";
 
 	private ExportPathsWidget _paths;
-	private DeploymentsWidget _deployments;
+
 	private ExportCreationInformation _information = null;
 	private JRadioButton _standardExportService = null;
 	private JRadioButton _lightweightExportService = null;
@@ -40,7 +50,7 @@ public class ExportCreationDialog extends JDialog
 
 		setTitle(_TITLE);
 		container = getContentPane();
-		_deployments = new DeploymentsWidget();
+
 		container.setLayout(new GridBagLayout());
 		/*
 		 * container.add(_deployments = new DeploymentsWidget(), new GridBagConstraints(0,
@@ -61,23 +71,41 @@ public class ExportCreationDialog extends JDialog
 		group.add(_standardExportService);
 
 		CreateExportAction action = new CreateExportAction();
-		_deployments.addInformationListener(action);
+
 		_paths.addInformationListener(action);
 
-		container.add(new JButton(action), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(new JButton(new CancelAction()), new GridBagConstraints(1, GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(createButtonPanel(owner, action), new GridBagConstraints(
+			0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new  Insets(5, 5, 5, 5), 5, 5));
+	}
+	
+	private Component createButtonPanel(JDialog owner, Action action)
+	{
+		JPanel panel = new JPanel(new GridBagLayout());
+
+		panel.add(new JButton(action),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
+			    GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			    new Insets(5, 5, 5, 5), 5, 5));		
+		panel.add(new JButton(new CancelAction()),
+			new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, 
+				new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JButton(new GuiHelpAction(owner, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.EXPORT_CREATION_HELP))), 
+			new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.EAST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
+		
+		return panel;
 	}
 
 	private boolean hasEnoughInformationToCreate()
 	{
-		ContainerInformation containerInfo = _deployments.getSelectedDeployment();
 		String localPath = _paths.getLocalPath();
 		String rnsPath = _paths.getRNSPath();
 		String containerPath = _paths.getContainerPath();
 
-		return containerInfo != null && localPath != null && localPath.trim().length() > 0 && rnsPath != null
+		return localPath != null && localPath.trim().length() > 0 && rnsPath != null
 			&& rnsPath.trim().length() > 0 && containerPath != null && containerPath.trim().length() > 0;
 	}
 
@@ -137,4 +165,38 @@ public class ExportCreationDialog extends JDialog
 			setVisible(false);
 		}
 	}
+	private class HelpAction extends AbstractAction
+	{
+		static final long serialVersionUID = 0L;
+		private String _url;
+
+		public HelpAction(String helpUrl)
+		{
+			super("Help");
+			_url=helpUrl;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			_information = null;
+			setVisible(false);
+			if (Desktop.isDesktopSupported()){
+				Desktop desktop=Desktop.getDesktop();
+				if (desktop.isSupported(Desktop.Action.OPEN))
+					try {
+						desktop.browse(new URI(_url));
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (URISyntaxException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+			}
+		}
+	}
+
 }
+
+

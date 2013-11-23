@@ -25,6 +25,8 @@ import javax.swing.tree.TreePath;
 import org.morgan.utils.gui.GUIUtils;
 import org.morgan.utils.gui.tearoff.TearoffPanel;
 
+import edu.virginia.vcgr.genii.client.gui.GuiHelpAction;
+import edu.virginia.vcgr.genii.client.gui.HelpLinkConfiguration;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.ui.LoggingLinkage.LoggingListModel;
 import edu.virginia.vcgr.genii.ui.login.CredentialManagementButton;
@@ -99,7 +101,7 @@ public class ClientApplication extends UIFrame
 	public ClientApplication(UIContext context, boolean launchShell) throws FileNotFoundException, IOException,
 		RNSPathDoesNotExistException
 	{
-		super(context, "Genesis II Client Application");
+		super(context, "XSEDE GFFS GUI - Provided as part of Genesis II from the University of Virginia");
 
 		if (!_context.isInitialized()) {
 			_context.setApplicationEventListener(new ApplicationEventListenerImpl());
@@ -130,7 +132,7 @@ public class ClientApplication extends UIFrame
 		Container content = getContentPane();
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-		splitPane.setLeftComponent(GUIUtils.addTitle("RNS Space",
+		splitPane.setLeftComponent(GUIUtils.addTitle("GFFS Directory Structure",
 			new TearoffPanel(scroller, _browserTree.createTearoffHandler(_context), new IconBasedTearoffThumb())));
 		splitPane.setRightComponent(_tabbedPane);
 
@@ -199,7 +201,8 @@ public class ClientApplication extends UIFrame
 		@Override
 		public void aboutRequested()
 		{
-			System.err.println("About not implemented.");
+			GuiHelpAction.DisplayUrlHelp(HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.MAIN_HELP));
+			//System.err.println("About not implemented.");
 		}
 
 		@Override

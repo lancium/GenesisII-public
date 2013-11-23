@@ -66,7 +66,7 @@ public class ExportManipulator
 			}
 
 		} catch (Exception r) {
-
+			throw new ResourceException("exception during export processing", r);
 		}
 		// Now we have both the container path and the target
 		// path.
@@ -75,7 +75,7 @@ public class ExportManipulator
 				ExportTool.createExportedRoot(targetpath.toString(), servicepath.getEndpoint(), localPath, "", "", 0L,
 					targetpath.toString(), false);
 		} catch (Exception r) {
-
+			throw new ResourceException("exception during export proessing", r);
 		}
 		return RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST);
 	}

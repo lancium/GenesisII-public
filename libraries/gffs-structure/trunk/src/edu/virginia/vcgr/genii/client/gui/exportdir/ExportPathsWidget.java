@@ -51,7 +51,7 @@ public class ExportPathsWidget extends JComponent
 
 		setLayout(new GridBagLayout());
 
-		add(new JLabel(_LOCAL_LABEL), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST,
+		add(new JLabel(_LOCAL_LABEL), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		add(_localPath = new JTextField(), new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
@@ -101,7 +101,7 @@ public class ExportPathsWidget extends JComponent
 			}
 		});
 
-		Dimension d = new Dimension(400, 50);
+		Dimension d = new Dimension(400, 100);
 		setPreferredSize(d);
 	}
 

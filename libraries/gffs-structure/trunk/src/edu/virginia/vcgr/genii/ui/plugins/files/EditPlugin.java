@@ -191,7 +191,7 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 
 						p = Runtime.getRuntime().exec(System.getenv("windir") + "\\system32\\" + "tasklist.exe /v");
 					} else if (osName.contains("")) {
-						p = Runtime.getRuntime().exec("ps ef ");
+						p = Runtime.getRuntime().exec("ps x ");
 						/* Unix OS code */
 					} else
 						return -1;
