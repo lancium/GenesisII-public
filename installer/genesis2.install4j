@@ -22,7 +22,7 @@
       <variable name="genii.isMacOSX" value="false" description="" category="" />
       <variable name="genii.bitSize" value="" description="" category="" />
       <variable name="genii.client-memory.normal" value="2048" description="" category="" />
-      <variable name="genii.client-memory.win32" value="1200" description="" category="" />
+      <variable name="genii.client-memory.win32" value="1000" description="" category="" />
       <variable name="genii.app-version" value="0.0.0" description="The version of this GenesisII installer release." category="" />
       <variable name="genii.new-deployment" value="currant_urgh" description="" category="" />
       <variable name="genii.publisher" value="the-publisher" description="" category="" />
