@@ -180,6 +180,8 @@
 		<delete file="${basedir}/jar-desc.xml"/>
 		<delete file="${basedir}/runContainer.sh"/>
 		<delete file="${basedir}/runContainer.bat"/>
+		<delete file="${basedir}/current.version"/>
+		<delete file="${basedir}/current.deployment"/>
 
 		<!-- clean out current jars that are generated. -->
 		<delete file="${ext.dir}/CmdLineManipulator.jar"/>
@@ -196,10 +198,11 @@
 		<delete file="${ext.dir}/gffs-structure.jar"/>
 		<delete file="${ext.dir}/gffs-webservices.jar"/>
 
-		<!-- clean out a couple old jars that could interfere with building. -->
+		<!-- clean some older jars and directories that could interfere with building. -->
 		<delete file="${ext.dir}/app-manager.jar"/>
 		<delete file="${ext.dir}/patch-builder.jar"/>
 		<delete file="${lib.dir}/gffs-container.jar"/>
+		<delete dir="${basedir}/bin"/>
 
 		<!-- clean up some deeper files that are generated. -->
 		<delete file="${lib.dir}/genesisII.client.log4j.properties"/>

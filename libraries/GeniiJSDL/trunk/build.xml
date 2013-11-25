@@ -49,6 +49,7 @@
 		<delete dir="${obj.dir}"/>
 		<delete dir="${lib.dir}"/>
 		<delete dir="${api.doc.dir}"/>
+		<delete dir="${basedir}/bin"/>
 	</target>
 
 	<target name="init">

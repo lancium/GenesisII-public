@@ -50,5 +50,6 @@
 	<target name="clean">
 		<delete dir="${obj.dir}"/>
 		<delete dir="${lib.dir}"/>
+		<delete dir="${basedir}/bin"/>
 	</target>
 </project>	

@@ -43,6 +43,7 @@
 
 	<target name="clean">
 		<delete dir="${obj.dir}"/>
+		<delete dir="${basedir}/bin"/>
 		<delete quiet="true">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>

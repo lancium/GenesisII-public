@@ -90,6 +90,7 @@
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>
 		<delete dir="${services.dir}"/>
+		<delete dir="${basedir}/bin"/>
 
 		<delete>
 			<fileset dir="${basedir}"

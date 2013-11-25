@@ -49,6 +49,7 @@
 		<delete dir="${lib.dir}"/>
 		<delete dir="${api.doc.dir}"/>
 		<delete dir="${jni.inc-gen.dir}"/>
+		<delete dir="${basedir}/bin"/>
 	</target>
 
 	<target name="jni" depends="init.jni,jar">

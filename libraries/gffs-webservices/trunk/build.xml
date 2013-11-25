@@ -180,6 +180,7 @@
 		<delete dir="${generated.source.dir}"/>
 		<delete dir="${basedir}/subdir"/>
 		<delete dir="${generated.obj.dir}"/>
+		<delete dir="${basedir}/bin"/>
                 <delete>
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>
