@@ -59,12 +59,13 @@ public class ExportDirDialog extends JDialog
 		button = new JButton(quitAction);
 		container.add(button, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		
-		container.add(new JButton(new GuiHelpAction(null, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.GENERAL_EXPORT_HELP))), 
-				new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.NONE,
-					new Insets(5, 5, 5, 5), 5, 5));
-		
+
+		container
+			.add(
+				new JButton(new GuiHelpAction(null, HelpLinkConfiguration
+					.get_help_url(HelpLinkConfiguration.GENERAL_EXPORT_HELP))), new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+
 	}
 
 	private JPanel createExportList() throws FileLockException

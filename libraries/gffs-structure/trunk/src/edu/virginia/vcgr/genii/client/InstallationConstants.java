@@ -7,6 +7,10 @@ import edu.virginia.vcgr.genii.client.configuration.WebContainerConstants;
 public class InstallationConstants
 {
 	static public final String INSTALLATION_PROPERTIES_FILENAME = "installation.properties";
+	/*
+	 * many constants used with the InstallationProperties come from KeystoreSecurityConstants, from
+	 * ContainerProperties and from WebContainerConstants.
+	 */
 	static public final String TLS_KEY_PASSWORD_PROPERTY = KeystoreSecurityConstants.Container.SSL_KEY_PASSWORD_PROP;
 	static public final String TLS_KEYSTORE_PASSWORD_PROPERTY = KeystoreSecurityConstants.Container.SSL_KEY_STORE_PASSWORD_PROP;
 	static public final String TLS_KEYSTORE_FILE_PROPERTY = KeystoreSecurityConstants.Container.SSL_KEY_STORE_PROP;

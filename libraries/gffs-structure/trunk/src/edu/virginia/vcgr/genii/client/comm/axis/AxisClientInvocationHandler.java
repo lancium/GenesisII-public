@@ -92,6 +92,13 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 {
 	private static final String STUB_CONFIGURED = "edu.virginia.vcgr.genii.client.security.stub-configured";
 
+	// hmmm: this really needs to be stored in a config file so users can change it!!!
+	/*
+	 * the amount of time that any particular client request is allowed to take before time expires.
+	 * default was raised from 2 minutes to 6.
+	 */
+	static private int _DEFAULT_CLIENT_REQUEST_TIMEOUT = 1000 * 60 * 6;
+
 	/**
 	 * We'll wait 16 seconds for a connection failure before it's considered TOO long for the
 	 * exponential back-off retry.
@@ -121,7 +128,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	private EndpointReferenceType _epr;
 
-	static private int _DEFAULT_TIMEOUT = 1000 * 360; // default raised from 2 mins to 6.
 	private Integer _timeout = null;
 
 	private ICallingContext _callContext;
@@ -441,7 +447,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		int baseTwitter = 25;
 		int attempt = 0;
 		long startAttempt = 0L;
-		int timeout = (_timeout != null) ? _timeout.intValue() : _DEFAULT_TIMEOUT;
+		int timeout = (_timeout != null) ? _timeout.intValue() : _DEFAULT_CLIENT_REQUEST_TIMEOUT;
 		TypeInformation type = null;
 
 		ResourceAccessMonitor.reportResourceUsage(origEPR);

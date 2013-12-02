@@ -33,5 +33,7 @@
 	<classpathentry kind="lib" path="../../../bundles/bundle-u6security_1.0.67.jar"/>
 	<classpathentry kind="lib" path="../../../ext/bcpkix-jdk15on-149.jar"/>
 	<classpathentry kind="lib" path="../../../ext/bcprov-jdk15on-149.jar"/>
+	<classpathentry kind="lib" path="../../../ext/httpclient-4.3.1.jar"/>
+	<classpathentry kind="lib" path="../../../ext/httpcore-4.3.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

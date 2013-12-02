@@ -202,7 +202,7 @@ public class ClientApplication extends UIFrame
 		public void aboutRequested()
 		{
 			GuiHelpAction.DisplayUrlHelp(HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.MAIN_HELP));
-			//System.err.println("About not implemented.");
+			// System.err.println("About not implemented.");
 		}
 
 		@Override

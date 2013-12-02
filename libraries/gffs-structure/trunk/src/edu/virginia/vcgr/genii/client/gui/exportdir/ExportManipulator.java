@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -22,6 +24,8 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 
 public class ExportManipulator
 {
+	static private Log _logger = LogFactory.getLog(ExportManipulator.class);
+
 	static public RNSPath createExport(String containerPath, String localPath, String rnsPath, boolean isLightweight)
 		throws FileNotFoundException, ExportException, RNSException, CreationException, ResourceCreationFaultType,
 		RemoteException, IOException, InvalidToolUsageException
@@ -68,12 +72,13 @@ public class ExportManipulator
 		} catch (Exception r) {
 			throw new ResourceException("exception during export checking.", r);
 		}
-		// Now we have both the container path and the target
-		// path.
+		// Now we have both the container path and the target path.
 		try {
 			EndpointReferenceType exEPR =
 				ExportTool.createExportedRoot(targetpath.toString(), servicepath.getEndpoint(), localPath, "", "", 0L,
 					targetpath.toString(), false);
+			if (exEPR == null)
+				_logger.debug("created null EPR with createExportedRoot");
 		} catch (Exception r) {
 			throw new ResourceException("exception during export root creation.", r);
 		}

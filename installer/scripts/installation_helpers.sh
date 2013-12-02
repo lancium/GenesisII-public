@@ -193,7 +193,7 @@ function replace_installdir_variables()
   local dir="$1"; shift
   local fname
 
-  for fname in $(find $dir -type f -exec grep -l installer:sys.installationDir {} ';'); do
+  for fname in $(find $dir -type f ! -iname "*.sh" -exec grep -l installer:sys.installationDir {} ';'); do
     local seeking="\${installer:sys.installationDir}"
     local replacement="$dir"
     replace_phrase_in_file "$fname" "$seeking" "$replacement"
