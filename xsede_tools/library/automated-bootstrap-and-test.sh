@@ -188,11 +188,11 @@ popd &>/dev/null
 ################
 
 ################
-echo Patching runContainer.sh for memory limit...
-pushd $GENII_INSTALL_DIR &>/dev/null
-sed -i -e "s/-Xmx512M/-Xmx2G/" "runContainer.sh"
-chmod 755 "runContainer.sh" 
-popd &>/dev/null
+##no. echo Patching runContainer.sh for memory limit...
+##pushd $GENII_INSTALL_DIR &>/dev/null
+##sed -i -e "s/-Xmx512M/-Xmx2G/" "runContainer.sh"
+##chmod 755 "runContainer.sh" 
+##popd &>/dev/null
 ################
 
 # clean up the current user directory and prior state.

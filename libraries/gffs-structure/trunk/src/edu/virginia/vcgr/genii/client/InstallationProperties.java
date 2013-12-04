@@ -18,12 +18,22 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
-import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
-import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.security.axis.AclAuthZClientTool;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
+/**
+ * This class supports queries for items normally found in the Security class (via the
+ * KeystoreSecurityConstants). It also supports some crucial items that were previously in
+ * ContainerProperties and WebContainerConstants. It should be used as a first resource that
+ * provides a "more local" configuration than older style (split configuration) installs. This new
+ * lookup process implements the new configuration style we've called "unified configuration" in the
+ * installer design document. Many configuration items can now be overridden in the file called
+ * "installation.properties" that lives in the state directory, which is managed by the new
+ * container configuration scripts (see trunk/installer/scripts).
+ * 
+ * @author Chris Koeritz
+ */
 public class InstallationProperties extends Properties
 {
 	static final long serialVersionUID = 0L;
@@ -65,66 +75,14 @@ public class InstallationProperties extends Properties
 	static private File getInstallationPropertiesFile()
 	{
 		File ret = new File(getUserDir(), InstallationConstants.INSTALLATION_PROPERTIES_FILENAME);
-		// ContainerProperties.getContainerProperties().getUserDirectory(),
-		// INSTALLATION_PROPERTIES_FILENAME);
 		if (ret.exists() && ret.isFile() && ret.canRead())
 			return ret;
 		return null;
 	}
 
-	public String getTLSKeyPassword()
-	{
-		return getProperty(InstallationConstants.TLS_KEY_PASSWORD_PROPERTY);
-	}
-
-	public String getTLSKeystorePassword()
-	{
-		return getProperty(InstallationConstants.TLS_KEYSTORE_PASSWORD_PROPERTY);
-	}
-
-	// this member is an absolute path; do not try to use hierarchical deployment calls on it.
-	public String getTLSKeystoreFile()
-	{
-		return getProperty(InstallationConstants.TLS_KEYSTORE_FILE_PROPERTY);
-	}
-
-	public String getTLSKeystoreType()
-	{
-		return getProperty(InstallationConstants.TLS_KEYSTORE_TYPE_PROPERTY);
-	}
-
-	public String getSigningKeystoreFile()
-	{
-		String keystoreLoc = getProperty(InstallationConstants.SIGNING_KEYSTORE_FILE_PROPERTY);
-		if (keystoreLoc == null) {
-			// we didn't have the local installation properties, so fall back to old-school methods.
-			Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
-			String keyProp =
-				resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
-			keystoreLoc =
-				Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyProp).getAbsolutePath();
-		}
-		return keystoreLoc;
-	}
-
-	public String getContainerHostname()
-	{
-		return getProperty(InstallationConstants.CONTAINER_HOSTNAME_PROPERTY);
-	}
-
 	public String getContainerPort()
 	{
 		return getProperty(InstallationConstants.CONTAINER_PORT_PROPERTY);
-	}
-
-	public String getConnectionCommand()
-	{
-		return getProperty(InstallationConstants.GRID_CONNECTION_COMMAND_PROPERTY);
-	}
-
-	public String getDeploymentName()
-	{
-		return getProperty(InstallationConstants.GENII_DEPLOYMENT_NAME_PROPERTY);
 	}
 
 	public Collection<File> getDefaultOwnerFiles()
@@ -201,6 +159,11 @@ public class InstallationProperties extends Properties
 		return null;
 	}
 
+	public File getSecurityFile(String filename)
+	{
+		return getLocalCertsDirectory().lookupFile(filename);
+	}
+
 	/**
 	 * The primary and recommended way to retrieve the user state directory.
 	 */
@@ -215,7 +178,7 @@ public class InstallationProperties extends Properties
 		if (userDir == null)
 			userDir = ApplicationBase.getUserDirFromEnvironment();
 		// now, if we have something at all, try comparing it with our replacement property.
-		userDir = replaceKeywords(userDir);
+		userDir = ApplicationBase.replaceKeywords(userDir);
 		// make sure we don't go away empty-handed.
 		if (userDir == null)
 			userDir = ApplicationBase.getDefaultUserDir();
@@ -229,26 +192,9 @@ public class InstallationProperties extends Properties
 		}
 	}
 
-	// hmmm: move this.
-	/**
-	 * supports replacing a few keywords (or one really, currently) with environment variables.
-	 */
-	public static String replaceKeywords(String pathToFix)
-	{
-		// test for well-known singular replacements first.
-		if ((pathToFix != null) && pathToFix.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE)) {
-			// there's our sentinel for loading the state directory from the environment variables.
-			// let's try to load it.
-			pathToFix = ApplicationBase.getUserDirFromEnvironment();
-			if (pathToFix != null)
-				return pathToFix;
-			// nothing in environment, so fall back to default state directory, since we know this.
-			return ApplicationBase.getDefaultUserDir();
-		}
-		// test for generalized "env-NAME" patterns for other environment variables.
-		// hmmm: not implemented.
-		// if there were any changes to make, they have been made.
-		return pathToFix;
-	}
-
+	//hmmm: ContainerProperties could become sole user.
+//	public String getDeploymentName()
+//	{
+//		return getProperty(InstallationConstants.GENII_DEPLOYMENT_NAME_PROPERTY);
+//	}
 }

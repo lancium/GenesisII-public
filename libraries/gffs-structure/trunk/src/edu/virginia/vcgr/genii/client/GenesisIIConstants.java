@@ -58,9 +58,6 @@ public class GenesisIIConstants
 
 	static public final String BOOTSTRAP_OWNER_CERTPATH = "genii.security.authz.bootstrapOwnerCertPath";
 
-	/* this is an old default. */
-	static public final String CONTAINER_CERT_ALIAS = "VCGR Container";
-
 	static public QName RNS_CACHED_METADATA_DOCUMENT_QNAME = new QName(GENESISII_NS, "rns-cached-metadata");
 
 	static public final String GENESIS_DAIR_RESULTS = "dair-results";

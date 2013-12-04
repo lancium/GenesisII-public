@@ -163,15 +163,15 @@ done
 
 ##############
 
-# patch the grid client to increase its memory limit.
-# we have seen that 512M is not enough for the test suite.
-pushd $GENII_INSTALL_DIR &>/dev/null
-# cygwin erroneously says "grid" exists if "grid.exe" exists.
-if [ ! -f "grid.exe" ]; then
-  if [ -f grid ]; then sed -i -e "s/-Xmx512[Mm]/-Xmx1G/" grid; chmod 755 grid; fi
-  if [ -f grid.bat ]; then sed -i -e "s/-Xmx512[Mm]/-Xmx1G/" grid.bat; chmod 755 grid.bat; fi
-fi
-popd &>/dev/null
+#no # patch the grid client to increase its memory limit.
+### we have seen that 512M is not enough for the test suite.
+##pushd $GENII_INSTALL_DIR &>/dev/null
+### cygwin erroneously says "grid" exists if "grid.exe" exists.
+##if [ ! -f "grid.exe" ]; then
+##  if [ -f grid ]; then sed -i -e "s/-Xmx512[Mm]/-Xmx1G/" grid; chmod 755 grid; fi
+##  if [ -f grid.bat ]; then sed -i -e "s/-Xmx512[Mm]/-Xmx1G/" grid.bat; chmod 755 grid.bat; fi
+##fi
+##popd &>/dev/null
 
 ##############
 

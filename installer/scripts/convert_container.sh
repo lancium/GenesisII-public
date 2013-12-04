@@ -27,11 +27,26 @@ export LOCAL_CERTS_DIR="$GENII_USER_DIR/certs"
 # storage for our specialized java service wrapper config file.
 export WRAPPER_DIR="$GENII_USER_DIR/wrapper"
 
+##############
+
+# tls keystore defaults.
+
 # where we expect the container to get its TLS cert now.
 export LOCAL_TLS_CERT="$LOCAL_CERTS_DIR/tls-cert.pfx"
 
+##############
+
+# signing keystore item defaults.
+
+SIGNING_KEYSTORE_FILE_PROPERTY="signing-cert.pfx"
+SIGNING_KEY_PASSWORD_PROPERTY="container"
+SIGNING_KEYSTORE_PASSWORD_PROPERTY="container"
+SIGNING_KEY_ALIAS_PROPERTY=Container
+
+##############
+
 # the container's signing cert will be stored here now.
-export LOCAL_SIGNING_CERT="$LOCAL_CERTS_DIR/signing-cert.pfx"
+export LOCAL_SIGNING_CERT="$LOCAL_CERTS_DIR/$SIGNING_KEYSTORE_FILE_PROPERTY"
 
 # make sure we support using an altered deployment if that is configured.
 if [ -z "$GENII_DEPLOYMENT_DIR" ]; then
@@ -92,15 +107,6 @@ if [ ! -f "$GENII_INSTALL_DIR/current.version" \
   exit 1
 fi
 
-JAVA_PATH=$(which java)
-if [ -z "$JAVA_PATH" ]; then
-  print_instructions
-  echo
-  echo The GFFS container requires that Java be installed and be findable in the
-  echo PATH.  The recommended JVM is the latest Java 7 available from Oracle.
-  exit 1
-fi
-
 OLD_INSTALL="$1"; shift
 
 if [ -z "$OLD_INSTALL" ]; then
@@ -112,12 +118,22 @@ fi
 
 export OLD_DEPLOYMENT_DIR="$OLD_INSTALL/deployments"
 
+
+JAVA_PATH=$(which java)
+if [ -z "$JAVA_PATH" ]; then
+  print_instructions
+  echo
+  echo The GFFS container requires that Java be installed and be findable in the
+  echo PATH.  The recommended JVM is the latest Java 7 available from Oracle.
+  exit 1
+fi
+
 ##############
 
 # load our helper scripts.
 
 if [ ! -f "$GENII_INSTALL_DIR/scripts/installation_helpers.sh" ]; then
-  echo "The installation_helpers.sh script could not be located in the new"
+  echo "The installation_helpers.sh script could not be located in the GenesisII"
   echo "installation, located in GENII_INSTALL_DIR, which is currently:"
   echo "  $GENII_INSTALL_DIR"
   echo "This is most likely because the current install was created with the"
@@ -130,7 +146,7 @@ source "$GENII_INSTALL_DIR/scripts/installation_helpers.sh"
 
 ##############
 
-function complain_re_missing()
+function complain_re_missing_deployment_variable()
 {
   echo 
   echo "There was a problem finding a variable in the deployment."
@@ -219,11 +235,13 @@ context_file="$(retrieve_compiler_variable genii.deployment-context)"
 new_dep="$(retrieve_compiler_variable genii.new-deployment)"
 user_path="$(retrieve_compiler_variable genii.user-path)"
 
+##############
+
 # find the old deployment name.
 var="edu.virginia.vcgr.genii.container.deployment-name"
 file="$OLD_INSTALL/container.properties"
 old_dep="$(seek_variable "$var" "$file")"
-if [ -z "$old_dep" ]; then complain_re_missing; fi
+if [ -z "$old_dep" ]; then complain_re_missing_deployment_variable; fi
 
 # find the hostname for the container.
 var="edu.virginia.vcgr.genii.container.external-hostname-override"
@@ -248,13 +266,13 @@ fi
 var="edu.virginia.vcgr.genii.container.listen-port"
 file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/web-container.properties"
 CONTAINER_PORT_PROPERTY="$(seek_variable "$var" "$file")"
-if [ -z "$CONTAINER_PORT_PROPERTY" ]; then complain_re_missing; fi
+if [ -z "$CONTAINER_PORT_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
 
 # find the tls keystore file name.  we will canonicalize this to tls-cert.pfx.
 var="edu.virginia.vcgr.genii.container.security.ssl.key-store"
 file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 TLS_KEYSTORE_FILE_PROPERTY="$(seek_variable "$var" "$file")"
-if [ -z "$TLS_KEYSTORE_FILE_PROPERTY" ]; then complain_re_missing; fi
+if [ -z "$TLS_KEYSTORE_FILE_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
 # add to the keystore file to get a full path.
 TLS_KEYSTORE_FILE_PROPERTY="$OLD_DEPLOYMENT_DIR/$old_dep/security/$TLS_KEYSTORE_FILE_PROPERTY"
 if [ ! -f "$TLS_KEYSTORE_FILE_PROPERTY" ]; then
@@ -267,19 +285,19 @@ fi
 var="edu.virginia.vcgr.genii.container.security.ssl.key-password"
 file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 TLS_KEY_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"
-if [ -z "$TLS_KEY_PASSWORD_PROPERTY" ]; then complain_re_missing; fi
+if [ -z "$TLS_KEY_PASSWORD_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
 
 # find the password for the tls keystore file itself.
 var="edu.virginia.vcgr.genii.container.security.ssl.key-store-password"
 file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 TLS_KEYSTORE_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"
-if [ -z "$TLS_KEYSTORE_PASSWORD_PROPERTY" ]; then complain_re_missing; fi
+if [ -z "$TLS_KEYSTORE_PASSWORD_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
 
 # find the signing keystore file name.  we will canonicalize this to signing-cert.pfx.
 var="edu.virginia.vcgr.genii.container.security.resource-identity.key-store"
 file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 SIGNING_KEYSTORE_FILE_PROPERTY="$(seek_variable "$var" "$file")"
-if [ -z "$SIGNING_KEYSTORE_FILE_PROPERTY" ]; then complain_re_missing; fi
+if [ -z "$SIGNING_KEYSTORE_FILE_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
 # make a full path out of the signing file.
 SIGNING_KEYSTORE_FILE_PROPERTY="$OLD_DEPLOYMENT_DIR/$old_dep/security/$SIGNING_KEYSTORE_FILE_PROPERTY"
 if [ ! -f "$SIGNING_KEYSTORE_FILE_PROPERTY" ]; then
@@ -288,6 +306,27 @@ if [ ! -f "$SIGNING_KEYSTORE_FILE_PROPERTY" ]; then
   exit 1
 fi
 
+# find the password for the key in our signin keystore file.
+var="edu.virginia.vcgr.genii.container.security.resource-identity.key-password"
+file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
+SIGNING_KEY_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"
+if [ -z "$SIGNING_KEY_PASSWORD_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
+
+# find the password for the signin keystore file itself.
+var="edu.virginia.vcgr.genii.container.security.resource-identity.key-store-password"
+file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
+SIGNING_KEYSTORE_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"
+if [ -z "$SIGNING_KEYSTORE_PASSWORD_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
+
+# find the alias for the key in the signing keystore.
+var="edu.virginia.vcgr.genii.container.security.resource-identity.container-alias"
+file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
+SIGNING_KEY_ALIAS_PROPERTY="$(seek_variable "$var" "$file")"
+if [ -z "$SIGNING_KEY_ALIAS_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
+
+#hmmm: add kerberos scrape.
+
+
 echo "Calculated these values from existing deployment:"
 echo "hostname: '$CONTAINER_HOSTNAME_PROPERTY'"
 echo "port: '$CONTAINER_PORT_PROPERTY'"
@@ -295,6 +334,9 @@ echo "tls cert file: '$TLS_KEYSTORE_FILE_PROPERTY'"
 echo "tls key pass: '$TLS_KEY_PASSWORD_PROPERTY'"
 echo "tls keystore pass: '$TLS_KEYSTORE_PASSWORD_PROPERTY'"
 echo "signing cert file: '$SIGNING_KEYSTORE_FILE_PROPERTY'"
+echo "signing key pass: '$SIGNING_KEY_PASSWORD_PROPERTY'"
+echo "signing keystore pass: '$SIGNING_KEYSTORE_PASSWORD_PROPERTY'"
+echo "signing key alias: '$SIGNING_KEY_ALIAS_PROPERTY'"
 
 ##############
 
@@ -304,15 +346,25 @@ echo "signing cert file: '$SIGNING_KEYSTORE_FILE_PROPERTY'"
 
 echo Writing configuration to installer file: $INSTALLER_FILE
 
+# host and port.
+
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.external-hostname-override=.*" "edu.virginia.vcgr.genii.container.external-hostname-override=$CONTAINER_HOSTNAME_PROPERTY"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.listen-port=.*" "edu.virginia.vcgr.genii.container.listen-port=$CONTAINER_PORT_PROPERTY"
 
+# tls keystore info.
+
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-password=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-password=$TLS_KEY_PASSWORD_PROPERTY"
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store=$LOCAL_TLS_CERT"
-
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store-password=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store-password=$TLS_KEYSTORE_PASSWORD_PROPERTY"
+
+# signing keystore info.
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-password=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-password=$SIGNING_KEY_PASSWORD_PROPERTY"
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-password=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-password=$SIGNING_KEYSTORE_PASSWORD_PROPERTY"
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.container-alias=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.container-alias=$SIGNING_KEY_ALIAS_PROPERTY"
 
 ##############
 
@@ -320,11 +372,15 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.se
 # if needed, although we will slam defaults back in there if they run the
 # configure container script again.
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=PKCS12"
-
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.default-owners=.*" "edu.virginia.vcgr.genii.container.security.certs-dir=$LOCAL_CERTS_DIR"
 
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store=$LOCAL_TLS_CERT"
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=PKCS12"
+
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=$LOCAL_SIGNING_CERT"
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type=PKCS12"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.gridInitCommand=.*" "edu.virginia.vcgr.genii.gridInitCommand=\"local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file\" \"$new_dep\""
 

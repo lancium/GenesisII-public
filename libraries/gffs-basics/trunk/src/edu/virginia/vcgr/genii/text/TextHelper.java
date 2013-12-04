@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.text;
 
 public class TextHelper
 {
-
 	/**
 	 * returns a string with N spaces in it.
 	 */
@@ -32,5 +31,4 @@ public class TextHelper
 		}
 		return new String(toReturn);
 	}
-
 }

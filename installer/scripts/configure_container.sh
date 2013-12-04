@@ -25,11 +25,26 @@ export LOCAL_CERTS_DIR="$GENII_USER_DIR/certs"
 # storage for our specialized java service wrapper config file.
 export WRAPPER_DIR="$GENII_USER_DIR/wrapper"
 
+##############
+
+# tls keystore defaults.
+
 # where we expect the container to get its TLS cert now.
 export LOCAL_TLS_CERT="$LOCAL_CERTS_DIR/tls-cert.pfx"
 
+##############
+
+# signing keystore item defaults.
+
+SIGNING_KEYSTORE_FILE_PROPERTY="signing-cert.pfx"
+SIGNING_KEY_PASSWORD_PROPERTY="container"
+SIGNING_KEYSTORE_PASSWORD_PROPERTY="container"
+SIGNING_KEY_ALIAS_PROPERTY=Container
+
+##############
+
 # the container's signing cert will be stored here now.
-export LOCAL_SIGNING_CERT="$LOCAL_CERTS_DIR/signing-cert.pfx"
+export LOCAL_SIGNING_CERT="$LOCAL_CERTS_DIR/$SIGNING_KEYSTORE_FILE_PROPERTY"
 
 # make sure we support using an altered deployment if that is configured.
 if [ -z "$GENII_DEPLOYMENT_DIR" ]; then
@@ -106,6 +121,17 @@ if [ -z "$GENII_USER_DIR" -o -z "$GENII_INSTALL_DIR" ]; then
   exit 1
 fi
 
+# an extra check to make sure they're using the new installer as the GENII_INSTALL_DIR.
+if [ ! -f "$GENII_INSTALL_DIR/current.version" \
+    -o ! -f "$GENII_INSTALL_DIR/current.deployment" ]; then
+  print_instructions
+  echo
+  echo "It appears that the GENII_INSTALL_DIR variable is not pointing at the"
+  echo "newer installation.  Please set this variable to the location where the"
+  echo "2.7.500+ installation is located."
+  exit 1
+fi
+
 JAVA_PATH=$(which java)
 if [ -z "$JAVA_PATH" ]; then
   print_instructions
@@ -120,10 +146,12 @@ fi
 # load our helper scripts.
 
 if [ ! -f "$GENII_INSTALL_DIR/scripts/installation_helpers.sh" ]; then
-  echo "The installation_helpers.sh script could not be located in the existing"
-  echo "installation.  This is most likely because this install was created with"
-  echo "the Genesisi v2.7.499 installer or earlier.  Please upgrade to the latest"
-  echo "Genesis 2.7.500+ interactive installer before proceeding."
+  echo "The installation_helpers.sh script could not be located in the GenesisII"
+  echo "installation, located in GENII_INSTALL_DIR, which is currently:"
+  echo "  $GENII_INSTALL_DIR"
+  echo "This is most likely because the current install was created with the"
+  echo "Genesisi v2.7.499 installer or earlier.  Please upgrade to the latest"
+  echo "Genesis 2.7.500+ interactive or RPM/DEB installer before proceeding."
   exit 1
 fi
 
@@ -217,21 +245,38 @@ fi
 
 ##############
 
+# load some of the variables from our config file.
+context_file="$(retrieve_compiler_variable genii.deployment-context)"
+new_dep="$(retrieve_compiler_variable genii.new-deployment)"
+user_path="$(retrieve_compiler_variable genii.user-path)"
+
+##############
+
 # write the config values we were given.
 # we should have at least a blank installation property file now, but possibly
 # one that is being reconfigured.  so let's replace the former values.
 
 echo Writing configuration to installer file: $INSTALLER_FILE
 
+# host and port.
+
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.external-hostname-override=.*" "edu.virginia.vcgr.genii.container.external-hostname-override=$CONTAINER_HOSTNAME_PROPERTY"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.listen-port=.*" "edu.virginia.vcgr.genii.container.listen-port=$CONTAINER_PORT_PROPERTY"
 
+# tls keystore info.
+
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-password=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-password=$TLS_KEY_PASSWORD_PROPERTY"
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store=$LOCAL_TLS_CERT"
-
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store-password=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store-password=$TLS_KEYSTORE_PASSWORD_PROPERTY"
+
+# signing keystore info.
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-password=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-password=$SIGNING_KEY_PASSWORD_PROPERTY"
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-password=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-password=$SIGNING_KEYSTORE_PASSWORD_PROPERTY"
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.container-alias=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.container-alias=$SIGNING_KEY_ALIAS_PROPERTY"
 
 ##############
 
@@ -239,15 +284,15 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.se
 # if needed, although we will slam defaults back in there if they run the
 # configure container script again.
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=PKCS12"
-
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.default-owners=.*" "edu.virginia.vcgr.genii.container.security.certs-dir=$LOCAL_CERTS_DIR"
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store=$LOCAL_TLS_CERT"
+
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=PKCS12"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=$LOCAL_SIGNING_CERT"
 
-# load variables from our config file.
-context_file=$(retrieve_compiler_variable genii.deployment-context)
-new_dep=$(retrieve_compiler_variable genii.new-deployment)
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type=PKCS12"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.gridInitCommand=.*" "edu.virginia.vcgr.genii.gridInitCommand=\"local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file\" \"$new_dep\""
 

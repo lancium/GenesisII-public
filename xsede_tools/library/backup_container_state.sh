@@ -39,7 +39,10 @@ echo "** The container should currently be shut down! **"
 echo 
 
 if [ -z "$TMP" ]; then
-  TMP=$HOME/.tmp
+  TMP="$HOME/.tmp"
+fi
+if [ ! -d "$TMP" ]; then
+  mkdir "$TMP"
 fi
 
 ( pushd / ;

@@ -76,9 +76,7 @@ public class ApplicationBase
 	static protected void prepareServerApplication()
 	{
 		ContainerProperties cProperties = ContainerProperties.getContainerProperties();
-		String depName = InstallationProperties.getInstallationProperties().getDeploymentName();
-		if (depName == null)
-			depName = cProperties.getDeploymentName();
+		String depName = cProperties.getDeploymentName();
 		if (depName != null)
 			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, depName);
 		String userDir = InstallationProperties.getUserDir();
@@ -131,9 +129,7 @@ public class ApplicationBase
 		if (currdir != null)
 			return GridStates.CONNECTION_ALREADY_GOOD;
 
-		String connectCmd = InstallationProperties.getInstallationProperties().getConnectionCommand();
-		if (connectCmd == null)
-			connectCmd = ContainerProperties.getContainerProperties().getConnectionCommand();
+		String connectCmd = ContainerProperties.getContainerProperties().getConnectionCommand();
 		if (_logger.isDebugEnabled())
 			_logger.debug("grid connection command is: " + connectCmd);
 		if ((connectCmd == null) || connectCmd.isEmpty()) {
@@ -183,5 +179,26 @@ public class ApplicationBase
 	static String getDefaultUserDir()
 	{
 		return String.format("%s/%s", System.getProperty("user.home"), GenesisIIConstants.GENESISII_STATE_DIR_NAME);
+	}
+
+	/**
+	 * supports replacing a few keywords (or one really, currently) with environment variables.
+	 */
+	public static String replaceKeywords(String pathToFix)
+	{
+		// test for well-known singular replacements first.
+		if ((pathToFix != null) && pathToFix.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE)) {
+			// there's our sentinel for loading the state directory from the environment variables.
+			// let's try to load it.
+			pathToFix = ApplicationBase.getUserDirFromEnvironment();
+			if (pathToFix != null)
+				return pathToFix;
+			// nothing in environment, so fall back to default state directory, since we know this.
+			return ApplicationBase.getDefaultUserDir();
+		}
+		// test for generalized "env-NAME" patterns for other environment variables.
+		// hmmm: not implemented.
+		// if there were any changes to make, they have been made.
+		return pathToFix;
 	}
 }

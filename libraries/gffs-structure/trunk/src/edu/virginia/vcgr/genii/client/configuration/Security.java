@@ -1,18 +1,14 @@
 package edu.virginia.vcgr.genii.client.configuration;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.InstallationConstants;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -62,28 +58,29 @@ public class Security
 		}
 	}
 
-	public Collection<File> getDeploymentDefaultOwnerFiles()
-	{
-		Collection<File> ret = new LinkedList<File>();
-		HierarchicalDirectory ownersDir = _securityDirectory.lookupDirectory(InstallationConstants.OWNER_CERTS_DIRECTORY_NAME);
-		if (ownersDir.exists()) {
-			File[] files = ownersDir.listFiles(new FileFilter()
-			{
-				@Override
-				public boolean accept(File pathname)
-				{
-					return pathname.getName().endsWith(".cer");
-				}
-			});
-
-			if (files != null && files.length > 0) {
-				for (File file : files)
-					ret.add(file);
-			}
-		}
-
-		return ret;
-	}
+	// public Collection<File> getDeploymentDefaultOwnerFiles()
+	// {
+	// Collection<File> ret = new LinkedList<File>();
+	// HierarchicalDirectory ownersDir =
+	// _securityDirectory.lookupDirectory(InstallationConstants.OWNER_CERTS_DIRECTORY_NAME);
+	// if (ownersDir.exists()) {
+	// File[] files = ownersDir.listFiles(new FileFilter()
+	// {
+	// @Override
+	// public boolean accept(File pathname)
+	// {
+	// return pathname.getName().endsWith(".cer");
+	// }
+	// });
+	//
+	// if (files != null && files.length > 0) {
+	// for (File file : files)
+	// ret.add(file);
+	// }
+	// }
+	//
+	// return ret;
+	// }
 
 	public HierarchicalDirectory getSecurityDirectory()
 	{
@@ -92,17 +89,35 @@ public class Security
 
 	public File getSecurityFile(String filename)
 	{
-		return _securityDirectory.lookupFile(filename);
+		File toReturn = InstallationProperties.getInstallationProperties().getSecurityFile(filename);
+		if (toReturn == null)
+			toReturn = _securityDirectory.lookupFile(filename);
+		return toReturn;
 	}
 
 	public String getProperty(String propertyName)
 	{
-		return getProperty(propertyName, null);
+		String toReturn = InstallationProperties.getInstallationProperties().getProperty(propertyName, null);
+		if (toReturn == null)
+			toReturn = getProperty(propertyName, null);
+		return toReturn;
 	}
 
 	public String getProperty(String propertyName, String def)
 	{
-		return _securityProperties.getProperty(propertyName, def);
+		String toReturn = InstallationProperties.getInstallationProperties().getProperty(propertyName, def);
+		if (toReturn == null)
+			toReturn = _securityProperties.getProperty(propertyName, def);
+		return toReturn;
+	}
+
+	public String getSigningKeystoreFile()
+	{
+		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
+		String keyProp = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
+		String keystoreLoc =
+			Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyProp).getAbsolutePath();
+		return keystoreLoc;
 	}
 
 	public Identity getAdminIdentity()

@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.client.configuration;
 
 import edu.virginia.vcgr.genii.client.ContainerProperties;
-import edu.virginia.vcgr.genii.client.InstallationProperties;
 
 public class DeploymentName
 {
@@ -53,9 +52,7 @@ public class DeploymentName
 		} catch (Throwable t) {
 		}
 
-		deploymentName = InstallationProperties.getInstallationProperties().getDeploymentName();
-		if (deploymentName == null)
-			deploymentName = ContainerProperties.getContainerProperties().getDeploymentName();
+		deploymentName = ContainerProperties.getContainerProperties().getDeploymentName();
 
 		// if all else fails, try "default"
 		if (deploymentName == null)

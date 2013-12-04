@@ -102,15 +102,22 @@ public class ContainerProperties extends Properties
 
 	public String getDeploymentName()
 	{
-		return getProperty(GENII_DEPLOYMENT_NAME_PROPERTY_NAME);
+		String toReturn = InstallationProperties.getInstallationProperties().getProperty(GENII_DEPLOYMENT_NAME_PROPERTY_NAME);
+		if (toReturn == null)
+			toReturn = getProperty(GENII_DEPLOYMENT_NAME_PROPERTY_NAME);
+		return toReturn;
 	}
 
 	/**
 	 * returns the command line for a grid connect command (minus 'grid' and 'connect'). if this
-	 * property has not been set, then this returns null.
+	 * property has not been set, then this returns null. this will also first consult our
+	 * installation properties in case we can locate an override there.
 	 */
 	public String getConnectionCommand()
 	{
-		return getProperty(GRID_CONNECTION_COMMAND_PROPERTY);
+		String toReturn = InstallationProperties.getInstallationProperties().getProperty(GRID_CONNECTION_COMMAND_PROPERTY);
+		if (toReturn == null)
+			toReturn = getProperty(GRID_CONNECTION_COMMAND_PROPERTY);
+		return toReturn;
 	}
 }

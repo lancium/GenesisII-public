@@ -15,6 +15,8 @@ GENII_INSTALL_DIR=$HOME/GenesisII
 # The name of the deployment to use.  Modern (2012 and onwards) installers
 # use the name "current_grid" for this.
 DEPLOYMENT_NAME=current_grid
+# For a bootstrapped grid, the deployment should be "default".
+#DEPLOYMENT_NAME=default
 
 # The namespace variable defines what template to use for the GFFS namespace.
 # The two choices currently available are 'xcg' and 'xsede'.  The older xcg

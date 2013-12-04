@@ -5,8 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 import org.mortbay.jetty.security.SslSocketConnector;
 
-import edu.virginia.vcgr.genii.client.InstallationProperties;
-
 public class SslInformation
 {
 	static private Log _logger = LogFactory.getLog(SslInformation.class);
@@ -21,32 +19,26 @@ public class SslInformation
 	public SslInformation(Security properties)
 	{
 		_properties = properties; // save the properties.
-
-		// try to use the installation properties first.
-		_keystoreFilename = InstallationProperties.getInstallationProperties().getTLSKeystoreFile();
+		// load our tls keystore filename and its properties.
+		_keystoreFilename = properties.getProperty(KeystoreSecurityConstants.Container.SSL_KEY_STORE_PROP);
 		if (_keystoreFilename == null) {
-			_keystoreFilename = properties.getProperty(KeystoreSecurityConstants.Container.SSL_KEY_STORE_PROP);
-			// now make the tls keystore path absolute.
-			_keystoreFilename =
-				(Installation.getDeployment(new DeploymentName()).security().getSecurityFile(_keystoreFilename))
-					.getAbsolutePath();
+			String msg = "Required ssl property \"" + KeystoreSecurityConstants.Container.SSL_KEY_STORE_PROP + "\" not found.";
+			_logger.error(msg);
+			throw new ConfigurationException(msg);
 		}
-		_keystoreType = InstallationProperties.getInstallationProperties().getTLSKeystoreType();
-		if (_keystoreType == null)
-			_keystoreType = properties.getProperty(KeystoreSecurityConstants.Container.SSL_KEY_STORE_TYPE_PROP);
-		_keystorePassword = InstallationProperties.getInstallationProperties().getTLSKeystorePassword();
-		if (_keystorePassword == null)
-			_keystorePassword = properties.getProperty(KeystoreSecurityConstants.Container.SSL_KEY_STORE_PASSWORD_PROP);
-		_keyPassword = InstallationProperties.getInstallationProperties().getTLSKeyPassword();
-		if (_keyPassword == null)
-			_keyPassword = properties.getProperty(KeystoreSecurityConstants.Container.SSL_KEY_PASSWORD_PROP);
-
-		if (_keystoreFilename == null)
-			throw new ConfigurationException("Required ssl property \""
-				+ KeystoreSecurityConstants.Container.SSL_KEY_STORE_PROP + "\" not found.");
-		if (_keystoreType == null)
-			throw new ConfigurationException("Required ssl property \""
-				+ KeystoreSecurityConstants.Container.SSL_KEY_STORE_TYPE_PROP + "\" not found.");
+		// make the tls keystore path absolute.
+		_keystoreFilename =
+			(Installation.getDeployment(new DeploymentName()).security().getSecurityFile(_keystoreFilename)).getAbsolutePath();
+		_keystoreType = properties.getProperty(KeystoreSecurityConstants.Container.SSL_KEY_STORE_TYPE_PROP);
+		if (_keystoreType == null) {
+			String msg =
+				"Required ssl property \"" + KeystoreSecurityConstants.Container.SSL_KEY_STORE_TYPE_PROP + "\" not found.";
+			_logger.error(msg);
+			throw new ConfigurationException(msg);
+		}
+		// get the password on the file and the password on the key, if needed.
+		_keystorePassword = properties.getProperty(KeystoreSecurityConstants.Container.SSL_KEY_STORE_PASSWORD_PROP);
+		_keyPassword = properties.getProperty(KeystoreSecurityConstants.Container.SSL_KEY_PASSWORD_PROP);
 	}
 
 	public void configure(ConfigurationManager manager, SslSocketConnector connector)

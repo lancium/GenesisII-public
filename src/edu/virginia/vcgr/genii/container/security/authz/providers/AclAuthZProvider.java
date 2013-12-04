@@ -111,6 +111,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 							continue;
 						if (ownerFile.getName().endsWith(".txt"))
 							continue;
+						if (ownerFile.getName().startsWith("."))
+							continue;
 						// and skip directories, since they are not files...
 						if (ownerFile.isDirectory())
 							continue;

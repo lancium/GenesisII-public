@@ -51,8 +51,6 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.algorithm.structures.queue.BarrieredWorkQueue;
 import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHook;
 import edu.virginia.vcgr.genii.client.ApplicationBase;
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
@@ -342,9 +340,7 @@ public class Container extends ApplicationBase
 		KeyStoreException, GeneralSecurityException, IOException
 	{
 		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
-
-		// use override signing key name if possible.
-		String keyStoreLoc = InstallationProperties.getInstallationProperties().getSigningKeystoreFile();
+		String keyStoreLoc = resourceIdSecProps.getSigningKeystoreFile();
 		if (keyStoreLoc == null) {
 			String msg = "Key Store Location not specified for message security.";
 			_logger.error(msg);
@@ -360,15 +356,14 @@ public class Container extends ApplicationBase
 		String keyStorePassword =
 			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PASSWORD_PROP);
 		String containerAlias =
-			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP,
-				GenesisIIConstants.CONTAINER_CERT_ALIAS);
+			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP);
 
 		String certificateLifetime =
 			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_DEFAULT_CERT_LIFETIME_PROP);
 		if (certificateLifetime != null)
 			_defaultCertificateLifetime = Long.parseLong(certificateLifetime);
 
-		// open the keystore
+		// open the keystore.
 		char[] keyStorePassChars = null;
 		if (keyStorePassword != null)
 			keyStorePassChars = keyStorePassword.toCharArray();
