@@ -43,6 +43,8 @@ function replace_if_exists_or_add()
   fi
 }
 
+##############
+
 # finds a variable (first parameter) in a particular property file
 # (second parameter).  the expected format for the file is:
 # varX=valueX
@@ -142,20 +144,7 @@ function retrieve_compiler_variable()
   rm -f "$combo_file"
 }
 
-function generate_cert()
-{
-  local file="$1"; shift
-  local passwd="$1"; shift
-
-  "$GENII_INSTALL_DIR/grid" cert-generator --gen-cert --keysize=2048 "--ks-path=$file" "--ks-pword=$passwd" --ks-alias=Container --cn=$CONTAINER_HOSTNAME_PROPERTY --o=XSEDE --l=Nationwide --c=US --ou=GFFS /etc/ContainerGroupCertGenerator
-
-  if [ $? -ne 0 ]; then
-    echo "Failed to generate a certificate in: $file"
-    echo "There may be more information in: ~/.GenesisII/grid-client.log"
-    echo "and in the grid's root container's log file."
-    exit 1
-  fi
-}
+##############
 
 function replace_compiler_variables()
 {
@@ -199,4 +188,52 @@ function replace_installdir_variables()
     replace_phrase_in_file "$fname" "$seeking" "$replacement"
   done
 }
+
+##############
+
+function generate_cert()
+{
+  local file="$1"; shift
+  local passwd="$1"; shift
+
+  "$GENII_INSTALL_DIR/grid" cert-generator --gen-cert --keysize=2048 "--ks-path=$file" "--ks-pword=$passwd" --ks-alias=Container --cn=$CONTAINER_HOSTNAME_PROPERTY --o=XSEDE --l=Nationwide --c=US --ou=GFFS /etc/ContainerGroupCertGenerator
+
+  if [ $? -ne 0 ]; then
+    echo "Failed to generate a certificate in: $file"
+    echo "There may be more information in: ~/.GenesisII/grid-client.log"
+    echo "and in the grid's root container's log file."
+    exit 1
+  fi
+}
+
+##############
+
+function complain_re_missing_deployment_variable()
+{
+  echo 
+  echo "There was a problem finding a variable in the deployment."
+  echo "It is expected to be present in:"
+  echo "  $file"
+  echo "Under an entry called:"
+  echo "  $var"
+  echo
+  exit 1
+}
+
+##############
+
+function dump_important_variables()
+{
+  echo "hostname: '$CONTAINER_HOSTNAME_PROPERTY'"
+  echo "port: '$CONTAINER_PORT_PROPERTY'"
+  echo "tls cert file: '$TLS_KEYSTORE_FILE_PROPERTY'"
+  echo "tls key pass: '$TLS_KEY_PASSWORD_PROPERTY'"
+  echo "tls keystore pass: '$TLS_KEYSTORE_PASSWORD_PROPERTY'"
+  echo "signing cert file: '$SIGNING_KEYSTORE_FILE_PROPERTY'"
+  echo "signing key pass: '$SIGNING_KEY_PASSWORD_PROPERTY'"
+  echo "signing keystore pass: '$SIGNING_KEYSTORE_PASSWORD_PROPERTY'"
+  echo "signing key alias: '$SIGNING_KEY_ALIAS_PROPERTY'"
+}
+
+##############
 

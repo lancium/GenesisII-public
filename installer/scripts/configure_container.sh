@@ -252,6 +252,11 @@ user_path="$(retrieve_compiler_variable genii.user-path)"
 
 ##############
 
+echo "Deployment will use these values:"
+dump_important_variables
+
+##############
+
 # write the config values we were given.
 # we should have at least a blank installation property file now, but possibly
 # one that is being reconfigured.  so let's replace the former values.
@@ -286,11 +291,11 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.se
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.default-owners=.*" "edu.virginia.vcgr.genii.container.security.certs-dir=$LOCAL_CERTS_DIR"
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store=$LOCAL_TLS_CERT"
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store=$(basename $LOCAL_TLS_CERT)"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=PKCS12"
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=$LOCAL_SIGNING_CERT"
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=$(basename $LOCAL_SIGNING_CERT)"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type=PKCS12"
 

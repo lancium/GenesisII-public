@@ -12,9 +12,9 @@
 export INSTALLER_FILE="$GENII_USER_DIR/installation.properties"
 
 if [ -f "$INSTALLER_FILE" ]; then
-  echo "This script is intended to convert a container into the self-contained"
-  echo "configuration format.  However, it appears that it has already been run"
-  echo "because an installation.properties file already exists at:"
+  echo "This script is intended to convert a container into the unified configuration"
+  echo "format.  However, it appears that it has already been run because an"
+  echo "installation.properties file already exists at:"
   echo "  $INSTALLER_FILE"
   echo "Please remove that if you are sure that you want to convert the container"
   echo "that was previously installed by the interactive installer."
@@ -57,9 +57,9 @@ fi
 
 function print_instructions()
 {
-  echo "This script can convert an older installation (installed by the"
-  echo "interactive GenesisII installer into a newer format where the container"
-  echo "configuration is self-contained and resides under the container's state"
+  echo "This script can convert an older installation (installed by the interactive"
+  echo "GenesisII installer) into the newer unified format where the container"
+  echo "configuration is more self-contained and resides under the container's state"
   echo "directory (pointed at by the GENII_USER_DIR variable)."
   echo
   echo "The script requires that the GENII_INSTALL_DIR and GENII_USER_DIR are"
@@ -146,20 +146,6 @@ source "$GENII_INSTALL_DIR/scripts/installation_helpers.sh"
 
 ##############
 
-function complain_re_missing_deployment_variable()
-{
-  echo 
-  echo "There was a problem finding a variable in the deployment."
-  echo "It is expected to be present in:"
-  echo "  $file"
-  echo "Under an entry called:"
-  echo "  $var"
-  echo
-  exit 1
-}
-
-##############
-
 # setup the config directories.
 
 if [ ! -d "$GENII_USER_DIR" ]; then
@@ -209,6 +195,11 @@ if [ -f "$GENII_INSTALL_DIR/XCGContainer" ]; then
   \rm "$GENII_INSTALL_DIR/XCGContainer"
   tried_stopping=true
 fi
+
+##############
+# swap back to old installation to try its stop methods.
+holdInst="$GENII_INSTALL_DIR"
+export GENII_INSTALL_DIR="$OLD_INSTALL"
 if [ -f "$OLD_INSTALL/GFFSContainer" ]; then
   "$OLD_INSTALL/GFFSContainer" stop
   tried_stopping=true
@@ -219,6 +210,10 @@ if [ -f "$OLD_INSTALL/XCGContainer" ]; then
   \rm "$OLD_INSTALL/XCGContainer"
   tried_stopping=true
 fi
+# and flip back to current day install.
+export GENII_INSTALL_DIR="$holdInst"
+##############
+
 if [ ! -z "$tried_stopping" ]; then
   echo Waiting for container to completely stop.
   sleep 5
@@ -324,19 +319,64 @@ file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 SIGNING_KEY_ALIAS_PROPERTY="$(seek_variable "$var" "$file")"
 if [ -z "$SIGNING_KEY_ALIAS_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
 
-#hmmm: add kerberos scrape.
+##############
 
+# grab some important certs for our new directory.
+
+# first try to use the newest trust store.  that should always work.
+cp "$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted.pfx" "$LOCAL_CERTS_DIR"
+if [ $? -ne 0 ]; then
+  cp "$OLD_DEPLOYMENT_DIR/$old_dep/security/trusted.pfx" "$LOCAL_CERTS_DIR"
+  if [ $? -ne 0 ]; then
+    echo "Failed to copy the trust store into place; tried both new and old installers."
+    echo "Tried copying '$OLD_DEPLOYMENT_DIR/$old_dep/security/trusted.pfx' to '$LOCAL_CERTS_DIR'"
+    exit 1
+  fi
+fi
+
+# create the trusted certs dir and copy in any from the installs.
+echo Copying existing trusted certificates...
+mkdir "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
+cp -R -n "$OLD_DEPLOYMENT_DIR/$old_dep/security/trusted-certificates"/* "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo no trusted certs found in old install.
+fi
+cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted-certificates"/* "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo no trusted certs found in new install.
+fi
+
+# and now get the myproxy certs also.
+echo Copying existing myproxy certificates...
+mkdir "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
+cp -R -n "$OLD_DEPLOYMENT_DIR/$old_dep/security/myproxy-certs"/* "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo no myproxy certs found in old install.
+fi
+cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/myproxy-certs"/* "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo no myproxy certs found in new install.
+fi
+
+##############
+
+# get any existing kerberos settings.
+echo Copying kerberos keytabs and settings, if found.
+cp -R -n "$OLD_DEPLOYMENT_DIR/$old_dep/security"/*keytab* "$LOCAL_CERTS_DIR" 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo no kerberos keytab files found.
+fi
+
+# grab any gffs kerberos settings from the security properties.
+grep "[ 	]*gffs-sts\.kerberos\." <"$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties" >>$INSTALLER_FILE
+if [ $? -ne 0 ]; then
+  echo no kerberos settings found.
+fi
+
+##############
 
 echo "Calculated these values from existing deployment:"
-echo "hostname: '$CONTAINER_HOSTNAME_PROPERTY'"
-echo "port: '$CONTAINER_PORT_PROPERTY'"
-echo "tls cert file: '$TLS_KEYSTORE_FILE_PROPERTY'"
-echo "tls key pass: '$TLS_KEY_PASSWORD_PROPERTY'"
-echo "tls keystore pass: '$TLS_KEYSTORE_PASSWORD_PROPERTY'"
-echo "signing cert file: '$SIGNING_KEYSTORE_FILE_PROPERTY'"
-echo "signing key pass: '$SIGNING_KEY_PASSWORD_PROPERTY'"
-echo "signing keystore pass: '$SIGNING_KEYSTORE_PASSWORD_PROPERTY'"
-echo "signing key alias: '$SIGNING_KEY_ALIAS_PROPERTY'"
+dump_important_variables
 
 ##############
 
@@ -374,11 +414,11 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.se
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.default-owners=.*" "edu.virginia.vcgr.genii.container.security.certs-dir=$LOCAL_CERTS_DIR"
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store=$LOCAL_TLS_CERT"
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store=$(basename $LOCAL_TLS_CERT)"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.ssl.key-store-type=PKCS12"
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=$LOCAL_SIGNING_CERT"
+replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=$(basename $LOCAL_SIGNING_CERT)"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type=PKCS12"
 
@@ -466,7 +506,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo
-echo Done converting your container to a self-contained configuration.
+echo Done converting your container to a unified configuration.
 echo
 echo The service URL for your container is stored in:
 echo "$GENII_USER_DIR/service-url.txt"

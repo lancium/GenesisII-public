@@ -98,7 +98,7 @@ function replace_compiler_variables()
   done < "$combo_file"
 
   echo "=============="
-  echo "Configuration for this installer:"
+  echo "++ Configuration for this installer ++"
   cat "$combo_file" | sed -e '/^$/d'
   echo "=============="
 
