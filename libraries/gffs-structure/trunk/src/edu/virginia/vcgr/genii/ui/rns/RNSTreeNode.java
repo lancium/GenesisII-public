@@ -6,10 +6,12 @@ import java.awt.event.ActionListener;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.IContextResolver;
 import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.ui.UIContext;
@@ -113,16 +115,23 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 	{
 		private RNSPath _parent;
 		private ICallingContext _context;
+		private LoggingContext logContext;
 
 		private ExpansionTask(ICallingContext context, RNSPath parent)
 		{
 			_context = context;
 			_parent = parent;
+			try {
+				logContext = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				logContext = new LoggingContext();
+			}
 		}
 
 		@Override
 		public RNSPath[] execute(TaskProgressListener progressListener) throws Exception
 		{
+			LoggingContext.assumeLoggingContext(logContext);
 			IContextResolver resolver = ContextManager.getResolver();
 
 			try {

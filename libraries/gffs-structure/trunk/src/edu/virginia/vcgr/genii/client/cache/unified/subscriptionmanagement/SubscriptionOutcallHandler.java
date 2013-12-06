@@ -20,6 +20,7 @@ import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.LightweightNotificationServer;
 import edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerPortType;
@@ -75,6 +76,7 @@ class SubscriptionOutcallHandler extends Thread
 	@Override
 	public void run()
 	{
+		LoggingContext.assumeNewLoggingContext();
 
 		// Every cache management related thread that load or store information from the Cache
 		// should have

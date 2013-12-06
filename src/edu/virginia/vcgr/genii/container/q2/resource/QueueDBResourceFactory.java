@@ -28,7 +28,7 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 			+ "jsdl BLOB(2G) NOT NULL, " + "owners BLOB(2G) NOT NULL," + "priority SMALLINT NOT NULL,"
 			+ "state VARCHAR(64) NOT NULL, " + "submittime TIMESTAMP NOT NULL, " + "starttime TIMESTAMP, "
 			+ "finishtime TIMESTAMP, " + "runattempts SMALLINT NOT NULL, " + "jobendpoint BLOB(2G), " + "resourceid BIGINT, "
-			+ "resourceendpoint BLOB(2G), " + "CONSTRAINT q2jobsticket UNIQUE (jobticket, queueid))",
+			+ "resourceendpoint BLOB(2G), " + "CONSTRAINT q2jobsticket UNIQUE (jobticket, queueid), rpcid VARCHAR(256))",
 		"CREATE TABLE q2eprs (" + "queueid VARCHAR(256) PRIMARY KEY, " + "queueepr BLOB(2G) NOT NULL)",
 		"CREATE TABLE q2errors (" + "errorid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
 			+ "queueid VARCHAR(256) NOT NULL, " + "jobid BIGINT NOT NULL, " + "attempt SMALLINT NOT NULL, "

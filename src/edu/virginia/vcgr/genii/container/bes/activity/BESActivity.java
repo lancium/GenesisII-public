@@ -24,9 +24,11 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -643,12 +645,18 @@ public class BESActivity implements Closeable
 
 		private Object _phaseLock;
 		private ExecutionPhase _currentPhase = null;
+		private LoggingContext context;
 
 		public ActivityRunner(boolean suspendRequested, boolean terminateRequested)
 		{
 			_phaseLock = BESActivity.this;
 			_terminateRequested = terminateRequested;
 			_suspendRequested = suspendRequested;
+			try {
+				context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				context = new LoggingContext();
+			}
 		}
 
 		final public boolean isSuspended()
@@ -714,6 +722,7 @@ public class BESActivity implements Closeable
 
 		public void run()
 		{
+			LoggingContext.assumeLoggingContext(context);
 			while (true) {
 				try {
 					synchronized (_phaseLock) {

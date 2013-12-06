@@ -1,0 +1,2 @@
+readlog [--rpcs-only | --entries-only] [-r] [RPCID*]
+readlog [--rpcs-only | --entries-only] [-r] [RPCID*]

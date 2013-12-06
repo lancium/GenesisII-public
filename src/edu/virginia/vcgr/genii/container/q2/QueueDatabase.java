@@ -24,6 +24,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.IResource;
@@ -291,7 +292,7 @@ public class QueueDatabase
 		try {
 			stmt =
 				connection.prepareStatement("SELECT a.jobid, a.jobticket, a.priority, a.state, a.submittime, "
-					+ "a.runattempts, a.resourceid, b.historytoken, a.callingcontext," + "a.jsdl "
+					+ "a.runattempts, a.resourceid, b.historytoken, a.callingcontext," + "a.jsdl " + ", a.rpcid "
 					+ "FROM q2jobs AS a LEFT OUTER JOIN q2jobhistorytokens AS b " + "ON a.jobid = b.jobid WHERE a.queueid = ?");
 			stmt.setString(1, _queueID);
 			rs = stmt.executeQuery();
@@ -312,7 +313,7 @@ public class QueueDatabase
 					new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs
 						.getString(4)), new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7),
 						HistoryContextFactory.createContext(HistoryEventCategory.Default, DBSerializer.fromBlob(rs.getBlob(9)),
-							historyKey(jobTicket)));
+							historyKey(jobTicket)), new LoggingContext(rs.getString(11)));
 
 				Blob blob = rs.getBlob(8);
 				if (blob != null) {
@@ -459,7 +460,7 @@ public class QueueDatabase
 	 * @throws IOException
 	 */
 	public long submitJob(Connection connection, String ticket, short priority, JobDefinition_Type jsdl,
-		ICallingContext callingContext, Collection<Identity> identities, QueueStates state, Date submitTime)
+		ICallingContext callingContext, Collection<Identity> identities, QueueStates state, Date submitTime, String rpcid)
 		throws SQLException, IOException
 	{
 		PreparedStatement stmt = null;
@@ -468,7 +469,7 @@ public class QueueDatabase
 		try {
 			stmt =
 				connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
-					+ "jsdl, owners, priority, state, runattempts, submittime) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)");
+					+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
 			stmt.setString(1, ticket);
 			stmt.setString(2, _queueID);
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "q2jobs", "callingcontext"));
@@ -477,6 +478,7 @@ public class QueueDatabase
 			stmt.setShort(6, priority);
 			stmt.setString(7, state.name());
 			stmt.setTimestamp(8, new Timestamp(submitTime.getTime()));
+			stmt.setString(9, rpcid);
 
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to add job to the queue database.");

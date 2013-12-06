@@ -65,6 +65,7 @@ import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.container.ContainerIDFile;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -110,6 +111,8 @@ public class Container extends ApplicationBase
 			usage();
 			System.exit(1);
 		}
+		
+		LoggingContext.assumeNewLoggingContext();
 
 		if (!OSGiSupport.setUpFramework()) {
 			System.err.println("Exiting due to OSGi startup failure.");

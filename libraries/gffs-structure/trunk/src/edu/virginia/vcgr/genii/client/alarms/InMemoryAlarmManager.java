@@ -8,6 +8,9 @@ import java.util.PriorityQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.context.ContextException;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
+
 public class InMemoryAlarmManager
 {
 	static private Log _logger = LogFactory.getLog(InMemoryAlarmManager.class);
@@ -61,9 +64,20 @@ public class InMemoryAlarmManager
 
 	private class InMemoryAlarmManagerWorker implements Runnable
 	{
+		private LoggingContext _context;
+
+		private InMemoryAlarmManagerWorker () {
+			try {
+				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				_context = new LoggingContext();
+			}
+		}
+		
 		@Override
 		public void run()
 		{
+			LoggingContext.assumeLoggingContext(_context);
 			Collection<AlarmInformation> alarmsToRun = new LinkedList<AlarmInformation>();
 			AlarmInformation info;
 

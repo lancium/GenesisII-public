@@ -25,6 +25,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
@@ -301,6 +302,7 @@ public class WSNotificationContainerService extends AbstractContainerService
 		@Override
 		public void run()
 		{
+			LoggingContext.assumeNewLoggingContext();
 			try {
 				_actor.enactOutcall(null, _target, _attachment);
 			} catch (Throwable cause) {

@@ -14,7 +14,11 @@ import org.morgan.util.Pair;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.logging.DLogDatabase;
+import edu.virginia.vcgr.genii.client.logging.DLogUtils;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.prefs.shell.ShellUIPreferenceSet;
 import edu.virginia.vcgr.genii.ui.progress.AbstractTask;
@@ -34,6 +38,7 @@ public class CommandField extends JTextField
 	static final long serialVersionUID = 0L;
 
 	private LineBasedReader _reader = null;
+	private DLogDatabase _logDB = null;
 
 	private ExecutionContext _executionContext;
 	private UIContext _uiContext;
@@ -108,10 +113,13 @@ public class CommandField extends JTextField
 	{
 		super(columns);
 
+		LoggingContext.adoptNewContext();
+		
 		_label = label;
 		_display = display;
 		_uiContext = uiContext;
 		_executionContext = executionContext;
+		_logDB = DLogUtils.getDBConnector();
 
 		InputBindings inputBindings = uiContext.preferences().preferenceSet(ShellUIPreferenceSet.class).createBindings();
 
@@ -136,6 +144,8 @@ public class CommandField extends JTextField
 				setCaretPosition(position);
 			}
 		});
+		
+		LoggingContext.releaseCurrentLoggingContext();
 	}
 
 	public CommandField(UIContext uiContext, JLabel label, Display display, ExecutionContext executionContext)
@@ -309,10 +319,19 @@ public class CommandField extends JTextField
 				_display.start();
 				_display.header().format("Command:  ");
 				_display.command().println(line);
+				try {
+					LoggingContext.adoptNewContext();
+					
+					if (_logDB != null)
+						_logDB.recordCommand(line);
+				} catch (Throwable e){}
+				
 				_uiContext
 					.progressMonitorFactory()
 					.createMonitor(CommandField.this, "Executing Command", "Executing command.", 1000L,
 						new CommandExecutionTask(line, reader), new CommandCompletionListener()).start();
+				
+				LoggingContext.releaseCurrentLoggingContext();
 			} else {
 				reader.addLine(line);
 			}
@@ -425,11 +444,16 @@ public class CommandField extends JTextField
 				beep();
 			else {
 				setText("forming completions...");
+				
+				LoggingContext.adoptNewContext();
+				
 				setEnabled(false);
 				_uiContext
 					.progressMonitorFactory()
 					.createMonitor(CommandField.this, "Forming Completions", "Forming completions.", 1000L,
 						new CompleterTask(completer, partial), new CompletionFinisher(lastWord, right, words, left)).start();
+				
+				LoggingContext.releaseCurrentLoggingContext();
 			}
 
 			_historyIterator = null;
@@ -469,16 +493,23 @@ public class CommandField extends JTextField
 	{
 		private WordCompleter _completer;
 		private String _partial;
+		private LoggingContext _context;
 
 		private CompleterTask(WordCompleter completer, String partial)
 		{
 			_completer = completer;
 			_partial = partial;
+			try {
+				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				_context = new LoggingContext();
+			}
 		}
 
 		@Override
 		public String[] execute(TaskProgressListener progressListener) throws Exception
 		{
+			LoggingContext.assumeLoggingContext(_context);
 			return _completer.completions(_partial);
 		}
 
@@ -495,6 +526,7 @@ public class CommandField extends JTextField
 		private String _right;
 		private Token[] _words;
 		private String _originalLeft;
+		private LoggingContext _context;
 
 		private CompletionFinisher(String lastWord, String right, Token[] words, String originalLeft)
 		{
@@ -502,6 +534,11 @@ public class CommandField extends JTextField
 			_right = right;
 			_words = words;
 			_originalLeft = originalLeft;
+			try {
+				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				_context = new LoggingContext();
+			}
 		}
 
 		@Override
@@ -517,6 +554,7 @@ public class CommandField extends JTextField
 		@Override
 		public void taskCompleted(Task<String[]> task, String[] completions)
 		{
+			LoggingContext.assumeLoggingContext(_context);
 			String newWord;
 
 			try {
@@ -571,16 +609,23 @@ public class CommandField extends JTextField
 	{
 		private String _line;
 		private LineBasedReader _reader;
-
+		private LoggingContext context;
+		
 		private CommandExecutionTask(String line, LineBasedReader reader)
 		{
 			_line = line;
 			_reader = reader;
+			try {
+				context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				context = new LoggingContext();
+			}
 		}
 
 		@Override
 		public Integer execute(TaskProgressListener progressListener) throws Exception
 		{
+			LoggingContext.assumeLoggingContext(context);
 			_executionContext.executeCommand(_line, _display, _reader);
 			return null;
 		}
@@ -594,12 +639,23 @@ public class CommandField extends JTextField
 
 	private class CommandCompletionListener implements TaskCompletionListener<Integer>
 	{
+		private LoggingContext context;
+		private CommandCompletionListener() {
+			try {
+				context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				context = new LoggingContext();
+			}
+		}
+		
 		private void finishCommand()
 		{
+			LoggingContext.assumeLoggingContext(context);
 			Closeable token = null;
 
 			try {
 				token = ContextManager.temporarilyAssumeContext(_uiContext.callingContext());
+				_display.output().println("\nLog ID is " + DLogUtils.getRPCID());
 				_label.setText(UserPreferences.preferences().shellPrompt().toString());
 				_reader = null;
 				CommandField.this.requestFocusInWindow();

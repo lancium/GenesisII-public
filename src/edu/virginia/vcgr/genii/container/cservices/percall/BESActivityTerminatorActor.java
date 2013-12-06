@@ -18,6 +18,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
@@ -25,6 +26,7 @@ import edu.virginia.vcgr.genii.client.history.HistoryEventSource;
 import edu.virginia.vcgr.genii.client.history.SequenceNumber;
 import edu.virginia.vcgr.genii.client.history.SimpleStringHistoryEventSource;
 import edu.virginia.vcgr.genii.client.iterator.WSIterable;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -45,6 +47,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 	private String _historyKey;
 	private String _besName;
 	private EndpointReferenceType _activityEPR;
+	private LoggingContext _context;
 
 	public BESActivityTerminatorActor(String historyKey, HistoryEventToken historyToken, String besName,
 		EndpointReferenceType activityEPR)
@@ -53,12 +56,19 @@ public class BESActivityTerminatorActor implements OutcallActor
 		_historyToken = historyToken;
 		_activityEPR = activityEPR;
 		_besName = besName;
+		try {
+			_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+		} catch (ContextException e) {
+			_context = new LoggingContext();
+		}
 	}
 
 	@Override
 	public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target, GeniiAttachment attachment)
 		throws Throwable
 	{
+		LoggingContext.adoptExistingContext(_context);
+		
 		if (_logger.isDebugEnabled())
 			_logger.debug("Persistent Outcall Actor attempting to kill a bes activity.");
 
@@ -134,6 +144,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 		out.writeObject(_historyToken);
 		out.writeObject(_besName);
 		out.writeObject(_historyKey);
+		out.writeObject(_context);
 	}
 
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -142,6 +153,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 		_historyToken = (HistoryEventToken) in.readObject();
 		_besName = (String) in.readObject();
 		_historyKey = (String) in.readObject();
+		_context = (LoggingContext) in.readObject();
 	}
 
 	@SuppressWarnings("unused")

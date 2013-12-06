@@ -7,6 +7,8 @@ import java.util.Calendar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.context.ContextException;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 /**
@@ -68,6 +70,16 @@ public class JobStatusChecker
 	 */
 	private class UpdaterWorker implements Runnable
 	{
+		private LoggingContext _context;
+
+		private UpdaterWorker() {
+			try {
+				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				_context = new LoggingContext();
+			}
+		}
+		
 		private void performSlowRunningCheck()
 		{
 			if (_logger.isDebugEnabled())
@@ -94,6 +106,7 @@ public class JobStatusChecker
 
 		public void run()
 		{
+			LoggingContext.assumeLoggingContext(_context);
 			while (!_closed) {
 				// we do the checks on notifications every time through the loop.
 				performNotifiedStatusChecks();

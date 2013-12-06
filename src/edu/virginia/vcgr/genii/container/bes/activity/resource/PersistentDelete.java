@@ -6,8 +6,10 @@ import java.util.concurrent.TimeUnit;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.percall.ExponentialBackoffScheduler;
 import edu.virginia.vcgr.genii.container.cservices.percall.OutcallActor;
@@ -20,16 +22,24 @@ public class PersistentDelete
 		static final long serialVersionUID = 0L;
 
 		private File _path;
+		private LoggingContext _context;
 
 		private PersistentDeleteActor(File path)
 		{
 			_path = path;
+			try {
+				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				_context = new LoggingContext();
+			}
 		}
 
 		@Override
 		final public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target,
 			GeniiAttachment attachment) throws Throwable
 		{
+			LoggingContext.assumeLoggingContext(_context);
+			
 			if (!FileSystemUtils.recursiveDelete(_path, false))
 				return false;
 

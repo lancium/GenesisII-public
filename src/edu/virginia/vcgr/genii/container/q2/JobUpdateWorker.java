@@ -22,7 +22,9 @@ import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
@@ -45,6 +47,8 @@ public class JobUpdateWorker implements OutcallHandler
 	private IJobEndpointResolver _jobEndpointResolver;
 	private JobData _data;
 
+	private LoggingContext _context;
+
 	public JobUpdateWorker(JobManager jobManager, IBESPortTypeResolver clientStubResolver,
 		IJobEndpointResolver jobEndpointResolver, DatabaseConnectionPool connectionPool, JobCommunicationInfo jobInfo,
 		JobData data)
@@ -55,6 +59,11 @@ public class JobUpdateWorker implements OutcallHandler
 		_connectionPool = connectionPool;
 		_jobEndpointResolver = jobEndpointResolver;
 		_data = data;
+		try {
+			_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+		} catch (ContextException e) {
+			_context = new LoggingContext();
+		}
 	}
 
 	public boolean equals(JobUpdateWorker other)
@@ -85,7 +94,7 @@ public class JobUpdateWorker implements OutcallHandler
 		Connection connection = null;
 		long besID = -1L;
 		HistoryContext history = _data.history(HistoryEventCategory.Checking);
-
+		LoggingContext.assumeLoggingContext(_context);
 		try {
 
 			ActivityState oldState = null;

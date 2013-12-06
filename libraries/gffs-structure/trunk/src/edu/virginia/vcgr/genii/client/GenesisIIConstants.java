@@ -85,6 +85,10 @@ public class GenesisIIConstants
 
 	static public final QName MYPROXY_QNAME = new QName(UNICORE_NS, MYPROXY_ATTRIBUTE_NAME);
 	static public final String myproxyFilenameSuffix = "teragrid_x509.pem";
+	
+	static public final String RPC_ID_ATTRIBUTE_NAME = "RPC-ID";
+	static public final QName RPC_ID_QNAME = new QName(GENESISII_NS,
+			RPC_ID_ATTRIBUTE_NAME);
 
 	// constant object for the security token ref qname.
 	static public final QName WSSE11_NS_SECURITY_QNAME = new QName(org.apache.ws.security.WSConstants.WSSE11_NS,

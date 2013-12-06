@@ -4,9 +4,14 @@
 	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
 	xmlns:ifactory="http://vcgr.cs.virginia.edu/genii/iterator-factory"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
 
 	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/iterator-factory"
 		schemaLocation="./iterator-factory.xsd"/>
@@ -48,6 +53,56 @@
 			<xsd:element name="function" type="genii-common:XMLCommandFunction"/>
 		</xsd:sequence>
 	</xsd:complexType>
+
+	<xsd:complexType name="LogEntryType">
+		<xsd:sequence>
+			<xsd:element name="date"       type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="message"    type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="logger"     type="xsd:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+			<xsd:element name="level"      type="xsd:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+			<xsd:element name="rpcid"      type="xsd:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+			<xsd:element name="stackTrace" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="LogEntryType" type="LogEntryType"/>
+	
+	<xsd:complexType name="RPCMetadataType">
+		<xsd:sequence>
+			<xsd:element name="methodName" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="issueDate" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="returnDate" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="targetEPR" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="requestMessage" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="true"/>
+			<xsd:element name="responseMessage" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RPCMetadataType" type="RPCMetadataType"/>		
+	
+	<xsd:complexType name="RPCCallerType">
+		<xsd:sequence>
+			<xsd:element name="rpcid" type="xsd:string" 
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="metadata" type="RPCMetadataType"
+				minOccurs="1" maxOccurs="1" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RPCCallerType" type="RPCCallerType"/>
+	
+	<xsd:complexType name="LogHierarchyEntryType">
+		<xsd:sequence>
+			<xsd:element name="parent" type="RPCCallerType" 
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="children" type="RPCCallerType"
+				minOccurs="1" maxOccurs="unbounded" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="LogHierarchyEntryType" type="LogHierarchyEntryType"/>
 
 <!-- Message Types -->
 	<xsd:complexType name="IterateHistoryEventsRequestType">
@@ -96,5 +151,26 @@
 	<xsd:complexType name="RemoveMatchingParameterResponseType"/>
 	<xsd:element name="RemoveMatchingParameterResponseType"
 		type="genii-common:RemoveMatchingParameterResponseType"/>
+
+	<xsd:complexType name="LogRetrieveRequestType">
+		<xsd:sequence>
+			<xsd:element name="rpcID" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="GetChildLogIDsRequestType" type="genii-common:LogRetrieveRequestType"/>
+	<xsd:element name="GetAllLogsRequestType"     type="genii-common:LogRetrieveRequestType"/>
+	<xsd:element name="GetLogsByIDRequestType"    type="genii-common:LogRetrieveRequestType"/>
 	
+	<xsd:complexType name="LogRetrieveResponseType">
+		<xsd:sequence>
+			<xsd:element name="logEntries" type="LogEntryType"
+				minOccurs="0" maxOccurs="unbounded" nillable="false"/>
+			<xsd:element name="childRPCs" type="LogHierarchyEntryType"
+				minOccurs="0" maxOccurs="unbounded" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="LogRetrieveResponseType"
+		type="genii-common:LogRetrieveResponseType"/>
+
 </xsd:schema>

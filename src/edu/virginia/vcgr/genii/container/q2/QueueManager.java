@@ -154,7 +154,7 @@ public class QueueManager implements Closeable
 
 			while (rs.next()) {
 				/*
-				 * Simplly accessing the manager in question causes it to get created and started if
+				 * Simply accessing the manager in question causes it to get created and started if
 				 * it isn't already.
 				 */
 				String rsName = rs.getString(1);
@@ -316,7 +316,7 @@ public class QueueManager implements Closeable
 				new JobManager(_outcallThreadPool, _database, _schedulingEvent, _besManager, connection, _connectionPool);
 			_scheduler = new Scheduler(_queueid, _schedulingEvent, _connectionPool, _jobManager, _besManager);
 		} catch (GenesisIISecurityException gse) {
-			throw new ResourceException("UInable to create BES Manager.", gse);
+			throw new ResourceException("Unable to create BES Manager.", gse);
 		} finally {
 			_connectionPool.release(connection);
 		}

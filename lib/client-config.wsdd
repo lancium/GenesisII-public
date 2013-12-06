@@ -7,14 +7,21 @@
    <parameter name="disablePrettyXML" value="true"/>
    <parameter name="enableNamespacePrefixOptimization" value="false"/>
   <requestFlow>
+   <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.DLogContextVerifier"/>
    <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.AxisClientHeaderHandler"/>
    <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.security.ClientUsernameTokenSender"/>
    <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.security.ClientMessageSecuritySender">
     <parameter name="encryptionParts" value="{Element}{http://vcgr.cs.virginia.edu/Genesis-II}calling-context;{}{}Body"/>
    </handler>
+   <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.DLogHierarchySender">
+    <parameter name="flow-side" value="request"/>
+   </handler>
    <handler type="log"/>
   </requestFlow>
   <responseFlow>
+   <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.DLogHierarchySender">
+    <parameter name="flow-side" value="response"/>
+   </handler>
    <handler type="log"/>
    <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.security.ClientMessageSecurityReceiver"/>
   </responseFlow>

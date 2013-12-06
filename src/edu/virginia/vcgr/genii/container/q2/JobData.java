@@ -12,6 +12,7 @@ import org.ggf.jsdl.JobDefinition_Type;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -34,6 +35,7 @@ public class JobData
 	private HistoryEventToken _historyToken = null;
 
 	private String _jobName = null;
+	private LoggingContext _loggingContext = null;
 
 	/**
 	 * This variable is used internally by the queue to maintain the current "active" state of a
@@ -100,7 +102,7 @@ public class JobData
 	private ActivityStatusType _besActivityStatus = null;
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime,
-		short runAttempts, Long besID, HistoryContext history)
+		short runAttempts, Long besID, HistoryContext history, LoggingContext loggingContext)
 	{
 		_jobName = jobName;
 		_killed = false;
@@ -112,12 +114,13 @@ public class JobData
 		_besID = besID;
 		_runAttempts = runAttempts;
 		_history = history;
+		_loggingContext = loggingContext;
 	}
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime,
-		short runAttempts, HistoryContext history)
+		short runAttempts, HistoryContext history, LoggingContext loggingContext)
 	{
-		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history);
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, loggingContext);
 	}
 
 	final public String jobName()
@@ -178,6 +181,14 @@ public class JobData
 		_jobState = jobState;
 	}
 
+	public LoggingContext getLoggingContext() {
+		return _loggingContext;
+	}
+	
+	public void setLoggingContext (LoggingContext loggingContext) {
+		_loggingContext = loggingContext;
+	}
+	
 	public Date getSubmitTime()
 	{
 		return _submitTime;

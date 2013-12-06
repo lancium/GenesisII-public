@@ -11,7 +11,9 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 
@@ -159,9 +161,18 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 
 	private class OutcallWorker implements Runnable
 	{
+		private LoggingContext _context;
+		private OutcallWorker () {
+			try {
+				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				_context = new LoggingContext();
+			}
+		}
 		@Override
 		final public void run()
 		{
+			LoggingContext.assumeLoggingContext(_context);
 			while (true) {
 				try {
 					PersistentOutcallEntry entry = null;

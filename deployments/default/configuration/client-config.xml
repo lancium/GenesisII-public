@@ -311,6 +311,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.VersionTool</mconf:class>
 		<mconf:class name="iclogin"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.InCommonLoginTool</mconf:class>
+		<mconf:class name="readlog"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LogReaderTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

@@ -1,0 +1,44 @@
+Definitions:
+
+--rpcs-only         
+
+Only the RPCIDs of any child RPCs will be returned. Mutually exclusive with --entries-only. Default is false.
+
+--entries-only      
+
+Only the log entries for the RPC will be returned.  Mutually exclusive with --rpcs-only. Default is false.
+
+-r | --recursive     
+
+The tool will recursively request the log entries/child RPCIDs for each RPCID returned from previous iterations. Currently limited to RPCs logged by the same logging service (i.e. the same container).
+                    
+RPCID
+
+The RPCID for a given set of log entries. User may enter 0 or more RPCIDs to request. If no ids are given, *all* logs will be requested from the service.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.LogReaderTool 
+Definitions:
+
+--rpcs-only         
+
+Only the RPCIDs of any child RPCs will be returned. Mutually exclusive with --entries-only. Default is false.
+
+--entries-only      
+
+Only the log entries for the RPC will be returned.  Mutually exclusive with --rpcs-only. Default is false.
+
+-r | --recursive     
+
+The tool will recursively request the log entries/child RPCIDs for each RPCID returned from previous iterations. Currently limited to RPCs logged by the same logging service (i.e. the same container).
+                    
+RPCID
+
+The RPCID for a given set of log entries. User may enter 0 or more RPCIDs to request. If no ids are given, *all* logs will be requested from the service.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.LogReaderTool 

@@ -17,8 +17,10 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.NotificationMessageHolder;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -33,8 +35,15 @@ public class NotificationOutcallActor implements OutcallActor
 	private Collection<NotificationMessageOutcallContent> _contents = new LinkedList<NotificationMessageOutcallContent>();
 	private boolean _persistent;
 
+	private LoggingContext _context;
+
 	public NotificationOutcallActor(NotificationMessageOutcallContent... contents) throws FileNotFoundException, IOException
 	{
+		try {
+			_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+		} catch (ContextException e) {
+			_context = new LoggingContext();
+		}
 		_callingContext = ContextManager.getExistingContext().deriveNewContext();
 
 		for (NotificationMessageOutcallContent content : contents)
@@ -55,6 +64,8 @@ public class NotificationOutcallActor implements OutcallActor
 	public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target, GeniiAttachment attachment)
 		throws Throwable
 	{
+		LoggingContext.assumeLoggingContext(_context);
+		
 		Collection<NotificationMessageHolderType> holders = new ArrayList<NotificationMessageHolderType>(_contents.size());
 
 		List<MessageElement> messageElements = new ArrayList<MessageElement>();

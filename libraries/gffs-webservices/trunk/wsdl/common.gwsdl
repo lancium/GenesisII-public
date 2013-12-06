@@ -92,6 +92,26 @@
 			element="genii-common:RemoveMatchingParameterResponseType"/>
 	</wsdl:message>
 
+	<wsdl:message name="GetChildLogIDsRequest">
+		<wsdl:part name="GetChildLogIDsRequest"
+			element="genii-common:GetChildLogIDsRequestType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GetAllLogsRequest">
+		<wsdl:part name="GetAllLogsRequest"
+			element="genii-common:GetAllLogsRequestType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GetLogsByIDRequest">
+		<wsdl:part name="GetLogsByIDRequest"
+			element="genii-common:GetLogsByIDRequestType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="LogRetrieveResponse">
+		<wsdl:part name="LogRetrieveResponse"
+			element="genii-common:LogRetrieveResponseType"/>
+	</wsdl:message>
+
 <!-- Port Type Definitions -->
 
 	<wsdl:portType name="GeniiCommon">
@@ -125,6 +145,21 @@
 		<wsdl:operation name="removeMatchingParameter">
 			<wsdl:input message="genii-common:RemoveMatchingParameterRequest"/>
 			<wsdl:output message="genii-common:RemoveMatchingParameterResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getAllLogs">
+			<wsdl:input message="genii-common:GetAllLogsRequest"/>
+			<wsdl:output message="genii-common:LogRetrieveResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getLogsByID">
+			<wsdl:input message="genii-common:GetLogsByIDRequest"/>
+			<wsdl:output message="genii-common:LogRetrieveResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getChildLogIDs">
+			<wsdl:input message="genii-common:GetChildLogIDsRequest"/>
+			<wsdl:output message="genii-common:LogRetrieveResponse"/>
 		</wsdl:operation>
 	</wsdl:portType>
 

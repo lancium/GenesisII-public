@@ -66,10 +66,12 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueConstructionParameters;
@@ -487,6 +489,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		private Collection<String> _tickets;
 		private short _prioroity;
 		private int _count = 0;
+		private LoggingContext _context;
 
 		private String firstTicket() throws InterruptedException
 		{
@@ -505,6 +508,11 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			_prioroity = priority;
 			_callingContext = ContextManager.getExistingContext();
 			_workingContext = (WorkingContext) WorkingContext.getCurrentWorkingContext().clone();
+			try {
+				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+			} catch (ContextException e) {
+				_context = new LoggingContext();
+			}
 		}
 
 		@Override
@@ -513,6 +521,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			Closeable token = null;
 
 			try {
+				LoggingContext.assumeLoggingContext(_context);
 				WorkingContext.setCurrentWorkingContext(_workingContext);
 				token = ContextManager.temporarilyAssumeContext(_callingContext);
 				synchronized (_tickets) {

@@ -15,7 +15,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Counter;
 
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -327,8 +329,20 @@ public class Scheduler implements Closeable
 	 */
 	private class SchedulerWorker implements Runnable
 	{
+		private LoggingContext _loggingContext;
+		
+		public SchedulerWorker() {
+			try {
+				_loggingContext = LoggingContext.getCurrentLoggingContext();
+			} catch (ContextException e) {
+				_loggingContext = new LoggingContext();
+			}
+		}
+		
 		public void run()
 		{
+			LoggingContext.assumeLoggingContext(_loggingContext);
+			
 			long startTime = 0L;
 
 			/*

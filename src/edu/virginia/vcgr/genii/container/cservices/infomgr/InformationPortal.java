@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
+import edu.virginia.vcgr.genii.client.context.ContextException;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.utils.Duration;
 
 /**
@@ -213,15 +215,25 @@ public class InformationPortal<InformationType> implements Closeable
 	private class ResolverWorker implements Runnable
 	{
 		private InformationEndpoint _endpoint;
+		private LoggingContext _loggingContext;
 
 		public ResolverWorker(InformationEndpoint endpoint)
 		{
 			_endpoint = endpoint;
+			try {
+				_loggingContext = LoggingContext.getCurrentLoggingContext();
+			} catch (ContextException e) {
+				_loggingContext = new LoggingContext();
+			}
 		}
 
 		@Override
 		public void run()
 		{
+			try {
+				LoggingContext.adoptExistingContext(_loggingContext);
+			} catch (ContextException e) {}
+			
 			InformationResult<InformationType> result = null;
 			InformationType info = null;
 			Throwable exception = null;
