@@ -252,6 +252,34 @@ user_path="$(retrieve_compiler_variable genii.user-path)"
 
 ##############
 
+# grab some important certs for our new directory.
+
+# first try to use the newest trust store.  that should always work.
+cp "$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted.pfx" "$LOCAL_CERTS_DIR"
+if [ $? -ne 0 ]; then
+    echo "Failed to copy the trust store into place."
+    echo "Tried copying '$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted.pfx' to '$LOCAL_CERTS_DIR'"
+    exit 1
+fi
+
+# create the trusted certs dir and copy in any from the installs.
+echo Copying existing trusted certificates...
+mkdir "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
+cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted-certificates"/* "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo no trusted certs found in new install.
+fi
+
+# and now get the myproxy certs also.
+echo Copying existing myproxy certificates...
+mkdir "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
+cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/myproxy-certs"/* "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo no myproxy certs found in new install.
+fi
+
+##############
+
 echo "Deployment will use these values:"
 dump_important_variables
 

@@ -82,8 +82,7 @@ public class LogManagerEntryPanel extends LogManagerPanel implements LazyLoadTab
 		popup.show(_table, e.getX(), e.getY());
 	}
 
-	public LogManagerEntryPanel(UIPluginContext context) 
-	throws RemoteException
+	public LogManagerEntryPanel(UIPluginContext context) throws RemoteException
 	{
 		super(new GridBagLayout());
 
@@ -117,10 +116,11 @@ public class LogManagerEntryPanel extends LogManagerPanel implements LazyLoadTab
 	}
 
 	@Override
-	public void updateStatus(Collection<LogPath> descriptions) {
+	public void updateStatus(Collection<LogPath> descriptions)
+	{
 		for (LogPath selection : descriptions) {
 			_selection = selection;
-			_model.refresh(_table, selection);	
+			_model.refresh(_table, selection);
 		}
 	}
 }

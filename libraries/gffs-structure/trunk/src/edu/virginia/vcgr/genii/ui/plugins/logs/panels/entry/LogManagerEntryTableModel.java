@@ -28,14 +28,15 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 {
 	static final long serialVersionUID = 0L;
 
-	static private RowTableColumnDefinition<?, ?>[] COLUMNS = { new RPCIDColumn(), new LoggerColumn(),
-		new TimestampColumn(), new LevelColumn(), new MessageColumn() };
+	static private RowTableColumnDefinition<?, ?>[] COLUMNS = { new RPCIDColumn(), new LoggerColumn(), new TimestampColumn(),
+		new LevelColumn(), new MessageColumn() };
 
 	private class LocalLogEntryListFetcherTask extends AbstractTask<Collection<LogEntryType>>
 	{
 		private LogPath _selection;
 
-		public LocalLogEntryListFetcherTask(LogPath selection) {
+		public LocalLogEntryListFetcherTask(LogPath selection)
+		{
 			_selection = selection;
 		}
 
@@ -46,12 +47,12 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 			if (_selection != null) {
 				id = _selection.getID();
 			}
-			
+
 			Collection<LogEntryType> jobInfo = new LinkedList<LogEntryType>();
-			for (LogEntryType i : _localLogger.selectLogs(id)) { 
+			for (LogEntryType i : _localLogger.selectLogs(id)) {
 				jobInfo.add(i);
 			}
-			return jobInfo; 
+			return jobInfo;
 		}
 	}
 
@@ -59,7 +60,8 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 	{
 		private LogPath _selection;
 
-		public RemoteLogEntryListFetcherTask(LogPath selection) {
+		public RemoteLogEntryListFetcherTask(LogPath selection)
+		{
 			_selection = selection;
 		}
 
@@ -67,21 +69,20 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 		final public Collection<LogEntryType> execute(TaskProgressListener progressListener) throws Exception
 		{
 			if (_selection == null) {
-				throw new LogPathDoesNotExistException(
-						"Can't retrieve remote logs without a path");
+				throw new LogPathDoesNotExistException("Can't retrieve remote logs without a path");
 			}
-			
+
 			String id = _selection.getID();
 			EndpointReferenceType epr = _selection.getEndpoint();
 			GeniiCommon logger = DLogUtils.getLogger(epr);
-			
+
 			Collection<LogEntryType> jobInfo = new LinkedList<LogEntryType>();
-		 	if (logger != null) {
-		 		for (LogEntryType i : logger.getAllLogs(new String[]{id}).getLogEntries()) {
+			if (logger != null) {
+				for (LogEntryType i : logger.getAllLogs(new String[] { id }).getLogEntries()) {
 					jobInfo.add(i);
 				}
-		 	}
-		 	return jobInfo; 
+			}
+			return jobInfo;
 		}
 	}
 
@@ -133,18 +134,18 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 		if (task == null) {
 			task = new LocalLogEntryListFetcherTask(selection);
 		}
-			
+
 		_uiContext
 			.uiContext()
-				.progressMonitorFactory()
-				.createMonitor(parentComponent, "Loading Log Entries", "Fetching log entry list from database", 1000L,
-						task, new LogEntryListCompletionListener(parentComponent)).start();
+			.progressMonitorFactory()
+			.createMonitor(parentComponent, "Loading Log Entries", "Fetching log entry list from database", 1000L, task,
+				new LogEntryListCompletionListener(parentComponent)).start();
 	}
 
-	LogManagerEntryTableModel(UIPluginContext uiContext) 
+	LogManagerEntryTableModel(UIPluginContext uiContext)
 	{
 		_localLogger = DLogUtils.getDBConnector();
-		
+
 		_uiContext = uiContext;
 
 	}

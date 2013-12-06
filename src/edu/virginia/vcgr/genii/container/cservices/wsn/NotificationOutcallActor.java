@@ -65,7 +65,7 @@ public class NotificationOutcallActor implements OutcallActor
 		throws Throwable
 	{
 		LoggingContext.assumeLoggingContext(_context);
-		
+
 		Collection<NotificationMessageHolderType> holders = new ArrayList<NotificationMessageHolderType>(_contents.size());
 
 		List<MessageElement> messageElements = new ArrayList<MessageElement>();

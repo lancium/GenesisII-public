@@ -192,9 +192,9 @@ public class InstallationProperties extends Properties
 		}
 	}
 
-	//hmmm: ContainerProperties could become sole user.
-//	public String getDeploymentName()
-//	{
-//		return getProperty(InstallationConstants.GENII_DEPLOYMENT_NAME_PROPERTY);
-//	}
+	// hmmm: ContainerProperties could become sole user.
+	// public String getDeploymentName()
+	// {
+	// return getProperty(InstallationConstants.GENII_DEPLOYMENT_NAME_PROPERTY);
+	// }
 }

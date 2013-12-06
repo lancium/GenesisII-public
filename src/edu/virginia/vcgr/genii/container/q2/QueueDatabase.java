@@ -469,7 +469,8 @@ public class QueueDatabase
 		try {
 			stmt =
 				connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
-					+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
+					+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
 			stmt.setString(1, ticket);
 			stmt.setString(2, _queueID);
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "q2jobs", "callingcontext"));

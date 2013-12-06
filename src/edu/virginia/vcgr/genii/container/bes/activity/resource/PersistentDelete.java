@@ -39,7 +39,7 @@ public class PersistentDelete
 			GeniiAttachment attachment) throws Throwable
 		{
 			LoggingContext.assumeLoggingContext(_context);
-			
+
 			if (!FileSystemUtils.recursiveDelete(_path, false))
 				return false;
 

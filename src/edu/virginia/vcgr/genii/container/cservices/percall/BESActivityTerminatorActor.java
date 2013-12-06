@@ -68,7 +68,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 		throws Throwable
 	{
 		LoggingContext.adoptExistingContext(_context);
-		
+
 		if (_logger.isDebugEnabled())
 			_logger.debug("Persistent Outcall Actor attempting to kill a bes activity.");
 

@@ -114,7 +114,7 @@ public class CommandField extends JTextField
 		super(columns);
 
 		LoggingContext.adoptNewContext();
-		
+
 		_label = label;
 		_display = display;
 		_uiContext = uiContext;
@@ -144,7 +144,7 @@ public class CommandField extends JTextField
 				setCaretPosition(position);
 			}
 		});
-		
+
 		LoggingContext.releaseCurrentLoggingContext();
 	}
 
@@ -321,16 +321,17 @@ public class CommandField extends JTextField
 				_display.command().println(line);
 				try {
 					LoggingContext.adoptNewContext();
-					
+
 					if (_logDB != null)
 						_logDB.recordCommand(line);
-				} catch (Throwable e){}
-				
+				} catch (Throwable e) {
+				}
+
 				_uiContext
 					.progressMonitorFactory()
 					.createMonitor(CommandField.this, "Executing Command", "Executing command.", 1000L,
 						new CommandExecutionTask(line, reader), new CommandCompletionListener()).start();
-				
+
 				LoggingContext.releaseCurrentLoggingContext();
 			} else {
 				reader.addLine(line);
@@ -444,15 +445,15 @@ public class CommandField extends JTextField
 				beep();
 			else {
 				setText("forming completions...");
-				
+
 				LoggingContext.adoptNewContext();
-				
+
 				setEnabled(false);
 				_uiContext
 					.progressMonitorFactory()
 					.createMonitor(CommandField.this, "Forming Completions", "Forming completions.", 1000L,
 						new CompleterTask(completer, partial), new CompletionFinisher(lastWord, right, words, left)).start();
-				
+
 				LoggingContext.releaseCurrentLoggingContext();
 			}
 
@@ -610,7 +611,7 @@ public class CommandField extends JTextField
 		private String _line;
 		private LineBasedReader _reader;
 		private LoggingContext context;
-		
+
 		private CommandExecutionTask(String line, LineBasedReader reader)
 		{
 			_line = line;
@@ -640,14 +641,16 @@ public class CommandField extends JTextField
 	private class CommandCompletionListener implements TaskCompletionListener<Integer>
 	{
 		private LoggingContext context;
-		private CommandCompletionListener() {
+
+		private CommandCompletionListener()
+		{
 			try {
 				context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				context = new LoggingContext();
 			}
 		}
-		
+
 		private void finishCommand()
 		{
 			LoggingContext.assumeLoggingContext(context);

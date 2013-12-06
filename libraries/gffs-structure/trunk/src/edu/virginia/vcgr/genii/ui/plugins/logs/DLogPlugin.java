@@ -37,21 +37,20 @@ public class DLogPlugin extends AbstractCombinedUIMenusPlugin
 {
 	private LogTree _browserTree;
 	private JTabbedPane _tabbed;
-	
+
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType) 
-			throws UIPluginException
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
 		try {
 			JFrame frame = new JFrame("Log Viewer");
 
 			LogManagerEntryPanel entryPanel = new LogManagerEntryPanel(context);
 			LogManagerMetaPanel metaPanel = new LogManagerMetaPanel(context);
-			
+
 			Collection<LogManagerPanel> panels = new ArrayList<LogManagerPanel>();
 			panels.add(entryPanel);
 			panels.add(metaPanel);
-			
+
 			_tabbed = new JTabbedPane();
 			_tabbed.addTab("Log Entries", new LazilyLoadedTab(entryPanel, entryPanel));
 			_tabbed.addTab("Entry Metadata", new LazilyLoadedTab(metaPanel, metaPanel));
@@ -66,11 +65,8 @@ public class DLogPlugin extends AbstractCombinedUIMenusPlugin
 			Container container = frame.getContentPane();
 			container.setLayout(new GridBagLayout());
 
-			container.add(splitPane, 
-					new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, 
-							GridBagConstraints.CENTER,
-							GridBagConstraints.BOTH, 
-							new Insets(5, 5, 5, 5), 5, 5));
+			container.add(splitPane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.pack();
@@ -92,7 +88,7 @@ public class DLogPlugin extends AbstractCombinedUIMenusPlugin
 	{
 		return true;
 	}
-	
+
 	private class LogSelectionListener implements TreeSelectionListener
 	{
 		private Collection<LogManagerPanel> _panels;

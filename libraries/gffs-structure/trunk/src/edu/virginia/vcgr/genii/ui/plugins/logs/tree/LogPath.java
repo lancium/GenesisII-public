@@ -18,22 +18,24 @@ import edu.virginia.vcgr.genii.common.LogRetrieveResponseType;
 import edu.virginia.vcgr.genii.common.RPCCallerType;
 import edu.virginia.vcgr.genii.common.RPCMetadataType;
 
-public class LogPath {
-	
-	private DLogDatabase 			_db; 
-	private String 					_myID;
-	private String 					_myName;
-	private LogPath 				_parent;
-	private EndpointReferenceType 	_loggerEPR;
-	private EndpointReferenceType 	_targetEPR;
-	private DisplayByType 			_displayType;
+public class LogPath
+{
 
-	public static LogPath getCurrent() {
-		return new LogPath(DLogUtils.getDBConnector(), 
-				DisplayByType.DISPLAY_BY_RPC_ID);
+	private DLogDatabase _db;
+	private String _myID;
+	private String _myName;
+	private LogPath _parent;
+	private EndpointReferenceType _loggerEPR;
+	private EndpointReferenceType _targetEPR;
+	private DisplayByType _displayType;
+
+	public static LogPath getCurrent()
+	{
+		return new LogPath(DLogUtils.getDBConnector(), DisplayByType.DISPLAY_BY_RPC_ID);
 	}
-	
-	private LogPath(DLogDatabase db, DisplayByType type) {
+
+	private LogPath(DLogDatabase db, DisplayByType type)
+	{
 		_db = db;
 		_myID = null;
 		_myName = "/";
@@ -42,9 +44,9 @@ public class LogPath {
 		_targetEPR = null;
 		_displayType = type;
 	}
-	
-	private LogPath(String id, String name, EndpointReferenceType targetEPR, 
-			DisplayByType displayType, LogPath parent) {
+
+	private LogPath(String id, String name, EndpointReferenceType targetEPR, DisplayByType displayType, LogPath parent)
+	{
 		_db = null;
 		_myID = id;
 		_myName = name;
@@ -53,19 +55,18 @@ public class LogPath {
 		_targetEPR = targetEPR;
 		_displayType = displayType;
 	}
-	
-	private LogPath createChildPath(String id, String name, EndpointReferenceType targetEPR, 
-			DisplayByType displayType) 
-	throws RemoteException {
+
+	private LogPath createChildPath(String id, String name, EndpointReferenceType targetEPR, DisplayByType displayType)
+		throws RemoteException
+	{
 		return new LogPath(id, name, targetEPR, displayType, this);
 	}
-	
-	public EndpointReferenceType getEndpoint() 
-				throws LogPathDoesNotExistException, RemoteException {
+
+	public EndpointReferenceType getEndpoint() throws LogPathDoesNotExistException, RemoteException
+	{
 		if (_loggerEPR != null) {
 			return _loggerEPR;
-		}
-		else {
+		} else {
 			if (_targetEPR != null) {
 				return DLogUtils.getLoggerEPR(_targetEPR);
 			}
@@ -75,9 +76,9 @@ public class LogPath {
 			return _parent.getEndpointFromParent(_myID);
 		}
 	}
-	
-	private EndpointReferenceType getEndpointFromParent(String id) 
-			throws LogPathDoesNotExistException, RemoteException {
+
+	private EndpointReferenceType getEndpointFromParent(String id) throws LogPathDoesNotExistException, RemoteException
+	{
 		// I am the parent...
 		EndpointReferenceType parentEPR = getEndpoint();
 		if (parentEPR == null) {
@@ -89,55 +90,51 @@ public class LogPath {
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} 
+				}
 			}
 		}
-		
+
 		try {
 			GeniiCommon dpt = DLogUtils.getLogger(getEndpoint());
-			LogRetrieveResponseType child = dpt.getChildLogIDs(new String[]{id});
+			LogRetrieveResponseType child = dpt.getChildLogIDs(new String[] { id });
 			return child.getChildRPCs(0).getParent().getMetadata().getTargetEPR();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
-	public Vector<LogPath> listContents() 
-			throws RemoteException, SQLException {
+	public Vector<LogPath> listContents() throws RemoteException, SQLException
+	{
 		EndpointReferenceType epr = null;
 		RPCCallerType[] children = null;
-		
+
 		try {
 			epr = getEndpoint();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			// means the endpoint is no longer valid
 		}
-		
+
 		if (epr != null) {
 			GeniiCommon logger = DLogUtils.getLogger(epr);
-			LogRetrieveResponseType res = 
-				logger.getChildLogIDs(new String[]{_myID});
-			
+			LogRetrieveResponseType res = logger.getChildLogIDs(new String[] { _myID });
+
 			if (res != null && res.getChildRPCs() != null)
-			for (LogHierarchyEntryType result : res.getChildRPCs()) {
-				if (result.getParent().getRpcid().equals(_myID)) {
-					children = result.getChildren();
-					break;
+				for (LogHierarchyEntryType result : res.getChildRPCs()) {
+					if (result.getParent().getRpcid().equals(_myID)) {
+						children = result.getChildren();
+						break;
+					}
 				}
-			}	
-		}
-		else {
+		} else {
 			DLogDatabase logger = DLogUtils.getDBConnector();
 			Map<String, Collection<RPCCallerType>> res;
 			if (logger != null) {
 				if (_myID != null) {
 					res = logger.selectChildren(_myID);
-				}
-				else {
+				} else {
 					Collection<String> parents = logger.selectParentIDs();
 					res = new HashMap<String, Collection<RPCCallerType>>();
 					ArrayList<RPCCallerType> values = new ArrayList<RPCCallerType>();
@@ -154,38 +151,41 @@ public class LogPath {
 				}
 			}
 		}
-		
+
 		Vector<LogPath> ret = new Vector<LogPath>();
 		if (children != null) {
 			for (RPCCallerType child : children) {
-				ret.add(createChildPath(child.getRpcid(), 
-						child.getMetadata().getMethodName(), 
-						child.getMetadata().getTargetEPR(), _displayType));
+				ret.add(createChildPath(child.getRpcid(), child.getMetadata().getMethodName(), child.getMetadata()
+					.getTargetEPR(), _displayType));
 			}
 		}
 		return ret;
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		if (_displayType.equals(DisplayByType.DISPLAY_BY_RPC_ID))
 			return getID();
 		if (_displayType.equals(DisplayByType.DISPLAY_BY_COMMAND))
 			return getMyName();
 		return "problem";
 	}
-	
-	public String getMyName() {
+
+	public String getMyName()
+	{
 		if (_myName == null) {
 			return " ";
 		}
 		return _myName;
 	}
-	
-	public String getID() {
+
+	public String getID()
+	{
 		return _myID;
 	}
 
-	public String pwd() {
+	public String pwd()
+	{
 		if (_parent == null)
 			return "/";
 
@@ -196,11 +196,13 @@ public class LogPath {
 		return parent + "/" + _myID;
 	}
 
-	public EndpointReferenceType getTargetEndpoint() {
+	public EndpointReferenceType getTargetEndpoint()
+	{
 		return _targetEPR;
 	}
 
-	public void setDisplayType(DisplayByType type) {
+	public void setDisplayType(DisplayByType type)
+	{
 		_displayType = type;
 	}
 }

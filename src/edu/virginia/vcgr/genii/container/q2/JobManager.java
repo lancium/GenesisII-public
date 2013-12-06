@@ -320,7 +320,7 @@ public class JobManager implements Closeable
 		}
 
 		LoggingContext.adoptExistingContext(job.getLoggingContext());
-		
+
 		if (_logger.isDebugEnabled())
 			_logger.debug(String.format("Failing job %s(%s, %s, %s)", job,
 				countAsAnAttempt ? "This failure counts against the job" : "This failure does NOT count against the job",
@@ -436,7 +436,7 @@ public class JobManager implements Closeable
 				_logger.debug(String.format("Couldn't find job for id %d, so I can't finish it.", jobID));
 			return;
 		}
-		
+
 		LoggingContext.adoptExistingContext(job.getLoggingContext());
 
 		if (_logger.isDebugEnabled())
@@ -482,7 +482,7 @@ public class JobManager implements Closeable
 
 		job.history(HistoryEventCategory.Terminating).debug("Finishing Job with JobKiller");
 		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false, true, besName, null));
-		
+
 		LoggingContext.releaseCurrentLoggingContext();
 	}
 
@@ -498,7 +498,7 @@ public class JobManager implements Closeable
 		}
 
 		LoggingContext.adoptExistingContext(job.getLoggingContext());
-		
+
 		if (_logger.isDebugEnabled())
 			_logger.debug("Killing a running job:" + jobID);
 
@@ -540,7 +540,7 @@ public class JobManager implements Closeable
 			besName = _besManager.getBESName(besID);
 
 		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, true, true, besName, besID));
-		
+
 		LoggingContext.releaseCurrentLoggingContext();
 
 		_schedulingEvent.notifySchedulingEvent();
@@ -603,12 +603,13 @@ public class JobManager implements Closeable
 			HistoryContext history =
 				HistoryContextFactory.createContext(HistoryEventCategory.Default, _database.historyKey(ticket));
 			String rpcid = LoggingContext.getCurrentLoggingContext().getCurrentID();
-			
+
 			/*
 			 * Submit the job information into the queue (and get a new jobID from the database for
 			 * it).
 			 */
-			long jobID = _database.submitJob(connection, ticket, priority, jsdl, callingContext, identities, state, submitTime, rpcid);
+			long jobID =
+				_database.submitJob(connection, ticket, priority, jsdl, callingContext, identities, state, submitTime, rpcid);
 			if (MyProxyCertificate.isAvailable())
 				_database.setSecurityHeader(connection, jobID, MyProxyCertificate.getPEMString());
 
@@ -634,7 +635,8 @@ public class JobManager implements Closeable
 			 * in-memory lists.
 			 */
 			JobData job =
-				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history, loggingContext);
+				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history,
+					loggingContext);
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
@@ -1675,8 +1677,8 @@ public class JobManager implements Closeable
 			LoggingContext.adoptExistingContext(job.getLoggingContext());
 		} catch (ContextException e) {
 			// not really worried about it
-		} 
-		
+		}
+
 		JobCommunicationInfo info = null;
 		try {
 			/*
@@ -1705,7 +1707,7 @@ public class JobManager implements Closeable
 		if (_logger.isDebugEnabled())
 			_logger.debug(String.format("Just finished enqueing a bunch of jobs into the thread pool "
 				+ "and the thread pool size grew from %d jobs to %d jobs.", originalCount, newCount));
-		
+
 		LoggingContext.releaseCurrentLoggingContext();
 	}
 
@@ -2225,7 +2227,7 @@ public class JobManager implements Closeable
 		public void run()
 		{
 			LoggingContext.assumeLoggingContext(_context);
-			
+
 			boolean isPermanent = false;
 			ICallingContext startCtxt = null;
 			Connection connection = null;
@@ -2579,7 +2581,7 @@ public class JobManager implements Closeable
 		public void run()
 		{
 			LoggingContext.assumeLoggingContext(_context);
-			
+
 			HistoryContext history = _jobData.history(HistoryEventCategory.Terminating);
 
 			if (_logger.isDebugEnabled())

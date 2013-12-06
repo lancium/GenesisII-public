@@ -181,14 +181,16 @@ public class JobData
 		_jobState = jobState;
 	}
 
-	public LoggingContext getLoggingContext() {
+	public LoggingContext getLoggingContext()
+	{
 		return _loggingContext;
 	}
-	
-	public void setLoggingContext (LoggingContext loggingContext) {
+
+	public void setLoggingContext(LoggingContext loggingContext)
+	{
 		_loggingContext = loggingContext;
 	}
-	
+
 	public Date getSubmitTime()
 	{
 		return _submitTime;

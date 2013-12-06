@@ -26,8 +26,10 @@ public class LogManagerMetaTableModel extends RowTableModel<LogEntryType>
 {
 	static final long serialVersionUID = 0L;
 
-	static private RowTableColumnDefinition<?, ?>[] COLUMNS = {};// new RPCIDColumn(), new LoggerColumn(),
-		//new TimestampColumn(), new LevelColumn(), new MessageColumn() };
+	static private RowTableColumnDefinition<?, ?>[] COLUMNS = {};// new RPCIDColumn(), new
+																	// LoggerColumn(),
+
+	// new TimestampColumn(), new LevelColumn(), new MessageColumn() };
 
 	private class LogEntryListFetcherTask extends AbstractTask<Collection<LogEntryType>>
 	{
@@ -35,15 +37,15 @@ public class LogManagerMetaTableModel extends RowTableModel<LogEntryType>
 		final public Collection<LogEntryType> execute(TaskProgressListener progressListener) throws Exception
 		{
 			Collection<LogEntryType> jobInfo = new LinkedList<LogEntryType>();
-			for (LogEntryType i : _localLogger.selectLogs(null)) { 
+			for (LogEntryType i : _localLogger.selectLogs(null)) {
 				jobInfo.add(i);
 			}
-	//		if (_logger != null) {
-	//			for (LogEntryType i : _logger.getAllLogs(null).getLogEntries()) {
-	//				jobInfo.add(i);
-	//			}
-	//		}
-			return jobInfo; 
+			// if (_logger != null) {
+			// for (LogEntryType i : _logger.getAllLogs(null).getLogEntries()) {
+			// jobInfo.add(i);
+			// }
+			// }
+			return jobInfo;
 		}
 	}
 
@@ -91,11 +93,10 @@ public class LogManagerMetaTableModel extends RowTableModel<LogEntryType>
 				new LogEntryListFetcherTask(), new LogEntryListCompletionListener(parentComponent)).start();
 	}
 
-	LogManagerMetaTableModel(UIPluginContext uiContext) 
-	throws RNSPathDoesNotExistException, RemoteException
+	LogManagerMetaTableModel(UIPluginContext uiContext) throws RNSPathDoesNotExistException, RemoteException
 	{
 		_localLogger = DLogUtils.getDBConnector();
-		
+
 		_uiContext = uiContext;
 	}
 

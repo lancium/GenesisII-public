@@ -14,104 +14,120 @@ import org.morgan.util.io.StreamUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
-public class G2JDBCAppender extends JDBCAppender {
-	
+public class G2JDBCAppender extends JDBCAppender
+{
+
 	// new class fields
 	protected ArrayList<PatternLayout> variableList;
 	protected String variables;
 	protected String columns;
 	protected String values;
 	protected String sql;
-	
+
 	protected DLogDatabase connector = null;
-	
+
 	protected String entryTable;
 	protected String metaTable;
 	protected String hierTable;
 
-///////////////////////////////////////////////	
-	
-	public String getColumns() {
+	// /////////////////////////////////////////////
+
+	public String getColumns()
+	{
 		return columns;
 	}
 
-	public void setColumns(String columns) {
+	public void setColumns(String columns)
+	{
 		this.columns = columns;
 	}
 
-	public String getValues() {
+	public String getValues()
+	{
 		return values;
 	}
 
-	public void setValues(String values) {
+	public void setValues(String values)
+	{
 		this.values = values;
 	}
 
-	public void setVariables(String vars) {
+	public void setVariables(String vars)
+	{
 		variables = vars;
 		variableList = new ArrayList<PatternLayout>();
-		
+
 		if (vars != null) {
 			while (vars.contains(",")) {
 				String next = vars.substring(0, vars.indexOf(",")).trim();
 				variableList.add(new PatternLayout(next));
-				vars = vars.substring(vars.indexOf(",")+1);
+				vars = vars.substring(vars.indexOf(",") + 1);
 			}
 			if (!vars.isEmpty())
 				variableList.add(new PatternLayout(vars.trim()));
 		}
 	}
-	
-	public String getVariables() {
+
+	public String getVariables()
+	{
 		return variables;
 	}
-	
-	public String getMetaTable() {
+
+	public String getMetaTable()
+	{
 		return metaTable;
 	}
 
-	public void setMetaTable(String metaTable) {
+	public void setMetaTable(String metaTable)
+	{
 		this.metaTable = metaTable;
 	}
 
-	public String getHierarchyTable() {
+	public String getHierarchyTable()
+	{
 		return hierTable;
 	}
 
-	public void setHierarchyTable(String table) {
+	public void setHierarchyTable(String table)
+	{
 		this.hierTable = table;
 	}
 
-	public String getEntryTable() {
+	public String getEntryTable()
+	{
 		return entryTable;
 	}
-	public void setEntryTable(String table) {
+
+	public void setEntryTable(String table)
+	{
 		entryTable = table;
 	}
-	
-/////////////////////////////////////////
-	
-	@Override 
-	public void append(LoggingEvent event) {
+
+	// ///////////////////////////////////////
+
+	@Override
+	public void append(LoggingEvent event)
+	{
 		String rpcid = DLogUtils.getRPCID();
 		if (rpcid != null) {
 			MDC.put("RPCID", rpcid);
 		} else {
 			MDC.put("RPCID", "NULL RPCID");
 		}
-		
+
 		String stackTrace = "";
 		if (event.getThrowableInformation() != null) {
 			for (String line : event.getThrowableStrRep()) {
-				stackTrace += line + "\n"; 
+				stackTrace += line + "\n";
 			}
 		}
 		MDC.put("stackTrace", stackTrace);
-		
+
 		super.append(event);
 	}
-	
-	protected ArrayList<String> getVariableValues(LoggingEvent event) {
+
+	protected ArrayList<String> getVariableValues(LoggingEvent event)
+	{
 		ArrayList<String> ret = new ArrayList<String>();
 		if (variableList != null) {
 			Iterator<PatternLayout> i = variableList.iterator();
@@ -122,47 +138,44 @@ public class G2JDBCAppender extends JDBCAppender {
 		}
 		return ret;
 	}
-	
+
 	@Override
-	public void activateOptions() {
+	public void activateOptions()
+	{
 		super.activateOptions();
-		connector = 
-				DLogUtils.addConnector(
-						databaseURL, databaseUser, databasePassword,
-						entryTable, metaTable, hierTable);
-		
-		setSql("INSERT INTO " + entryTable + 
-				" (" + columns + ") VALUES (" + values + ");"); 
+		connector = DLogUtils.addConnector(databaseURL, databaseUser, databasePassword, entryTable, metaTable, hierTable);
+
+		setSql("INSERT INTO " + entryTable + " (" + columns + ") VALUES (" + values + ");");
 	}
-	
-	public void execute(String eventSql, ArrayList<String> vars) 
-	throws SQLException {
+
+	public void execute(String eventSql, ArrayList<String> vars) throws SQLException
+	{
 		Connection con = null;
 		PreparedStatement stmt = null;
 		try {
 			con = DLogUtils.getConnection();
 			stmt = con.prepareStatement(eventSql);
-			
+
 			for (int i = 1; i <= vars.size(); ++i) {
-				stmt.setString(i, vars.get(i-1));
+				stmt.setString(i, vars.get(i - 1));
 			}
-			
+
 			stmt.executeUpdate();
-			
+
 		} finally {
 			StreamUtils.close(stmt);
 			DLogUtils.closeConnection(con);
 		}
 	}
-	
-	@Override 
-	public void flushBuffer() {
+
+	@Override
+	public void flushBuffer()
+	{
 		removes.ensureCapacity(buffer.size());
-		
+
 		@SuppressWarnings("unchecked")
-		LoggingEvent tmp[] = 
-				((ArrayList<LoggingEvent>)buffer).toArray(new LoggingEvent[0]);
-		
+		LoggingEvent tmp[] = ((ArrayList<LoggingEvent>) buffer).toArray(new LoggingEvent[0]);
+
 		for (LoggingEvent logEvent : tmp) {
 			try {
 				String eventSql = getLogStatement(logEvent);

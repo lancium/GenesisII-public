@@ -162,13 +162,16 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 	private class OutcallWorker implements Runnable
 	{
 		private LoggingContext _context;
-		private OutcallWorker () {
+
+		private OutcallWorker()
+		{
 			try {
 				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				_context = new LoggingContext();
 			}
 		}
+
 		@Override
 		final public void run()
 		{

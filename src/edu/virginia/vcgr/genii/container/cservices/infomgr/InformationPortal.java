@@ -232,8 +232,9 @@ public class InformationPortal<InformationType> implements Closeable
 		{
 			try {
 				LoggingContext.adoptExistingContext(_loggingContext);
-			} catch (ContextException e) {}
-			
+			} catch (ContextException e) {
+			}
+
 			InformationResult<InformationType> result = null;
 			InformationType info = null;
 			Throwable exception = null;

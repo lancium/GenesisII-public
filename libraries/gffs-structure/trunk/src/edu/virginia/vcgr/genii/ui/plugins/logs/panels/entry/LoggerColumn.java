@@ -4,7 +4,8 @@ import org.morgan.util.gui.table.AbstractRowTableColumnDefinition;
 
 import edu.virginia.vcgr.genii.common.LogEntryType;
 
-public class LoggerColumn extends AbstractRowTableColumnDefinition<LogEntryType, String> {
+public class LoggerColumn extends AbstractRowTableColumnDefinition<LogEntryType, String>
+{
 	static final private String COLUMN_NAME = "Logging Class";
 	static final private Class<String> COLUMN_CLASS = String.class;
 	static final private int PREFERRED_WIDTH = 128;

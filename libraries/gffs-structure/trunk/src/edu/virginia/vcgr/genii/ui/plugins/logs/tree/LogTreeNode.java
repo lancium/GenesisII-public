@@ -96,7 +96,8 @@ public class LogTreeNode extends DefaultMutableTreeNode
 		LogFilledInTreeObject object = (LogFilledInTreeObject) getUserObject();
 		object.path().setDisplayType(type);
 		model
-			.uiPluginContext().uiContext()
+			.uiPluginContext()
+			.uiContext()
 			.progressMonitorFactory()
 			.createMonitor(tree, null, null, 1000L * 1000,
 				new ExpansionTask(model.uiPluginContext().uiContext().callingContext(), object.path()),

@@ -111,7 +111,7 @@ public class Container extends ApplicationBase
 			usage();
 			System.exit(1);
 		}
-		
+
 		LoggingContext.assumeNewLoggingContext();
 
 		if (!OSGiSupport.setUpFramework()) {

@@ -1437,45 +1437,43 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return _serviceName;
 
 	}
-	
-	private Collection<LogEntryType> queryForEntries(String rpcid) 
-	throws SQLException {
+
+	private Collection<LogEntryType> queryForEntries(String rpcid) throws SQLException
+	{
 		if (_database == null) {
 			_database = DLogUtils.getDBConnector();
-			if (_database == null) 
-				throw new UnsupportedOperationException("Distributed Logging capabilities not currently active on this resource");
+			if (_database == null)
+				throw new UnsupportedOperationException(
+					"Distributed Logging capabilities not currently active on this resource");
 		}
 		return _database.selectLogs(rpcid);
 	}
-	
-	private Collection<LogHierarchyEntryType> queryForHierarchy(String rpcid) 
-	throws SQLException, ResourceException {
+
+	private Collection<LogHierarchyEntryType> queryForHierarchy(String rpcid) throws SQLException, ResourceException
+	{
 		if (_database == null) {
 			_database = DLogUtils.getDBConnector();
-			if (_database == null) 
-				throw new UnsupportedOperationException("Distributed Logging capabilities not currently active on this resource");
+			if (_database == null)
+				throw new UnsupportedOperationException(
+					"Distributed Logging capabilities not currently active on this resource");
 		}
-		
-		Collection<LogHierarchyEntryType> ret = 
-				new ArrayList<LogHierarchyEntryType>();
-		
+
+		Collection<LogHierarchyEntryType> ret = new ArrayList<LogHierarchyEntryType>();
+
 		if (rpcid == null) {
 			Collection<String> parents = _database.selectParentIDs();
-			
+
 			if (parents != null) {
 				for (String parent : parents) {
-					Collection<LogHierarchyEntryType> maybeChildren = 
-							queryForHierarchy(parent);
+					Collection<LogHierarchyEntryType> maybeChildren = queryForHierarchy(parent);
 					if (maybeChildren != null && !maybeChildren.isEmpty()) {
 						ret.addAll(maybeChildren);
 					}
 				}
 			}
-		}
-		else {
-			Map<String, Collection<RPCCallerType>> res = 
-					_database.selectChildren(rpcid);
-			
+		} else {
+			Map<String, Collection<RPCCallerType>> res = _database.selectChildren(rpcid);
+
 			for (String parent : res.keySet()) {
 				LogHierarchyEntryType l = new LogHierarchyEntryType();
 				l.setParent(new RPCCallerType(parent, null));
@@ -1483,15 +1481,14 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				ret.add(l);
 			}
 		}
-			
+
 		return ret;
 	}
-	
+
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public LogRetrieveResponseType getAllLogs(String[] logRetrieveRequest) 
-    throws RemoteException
-    {
+	public LogRetrieveResponseType getAllLogs(String[] logRetrieveRequest) throws RemoteException
+	{
 		Collection<LogEntryType> entries = null;
 		Collection<LogHierarchyEntryType> childIDs = null;
 		LogRetrieveResponseType ret = new LogRetrieveResponseType();
@@ -1500,84 +1497,83 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			if (logRetrieveRequest == null || logRetrieveRequest.length == 0) {
 				childIDs = queryForHierarchy(null);
 				entries = queryForEntries(null);
-			}
-			else {
+			} else {
 				childIDs = new ArrayList<LogHierarchyEntryType>();
 				entries = new ArrayList<LogEntryType>();
-				
+
 				for (String id : logRetrieveRequest) {
 					childIDs.addAll(queryForHierarchy(id));
 					entries.addAll(queryForEntries(id));
 				}
 			}
-			
+
 			ret.setChildRPCs(childIDs.toArray(new LogHierarchyEntryType[childIDs.size()]));
 			ret.setLogEntries(entries.toArray(new LogEntryType[entries.size()]));
-			
+
 		} catch (SQLException e) {
 			_logger.error("Problem accessing the log database: ", e);
 			throw new RemoteException("Problem accessing the log database: ", e);
 		}
-		
+
 		return ret;
 	}
+
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public LogRetrieveResponseType getLogsByID(String[] logRetrieveRequest) 
-	throws RemoteException {
+	public LogRetrieveResponseType getLogsByID(String[] logRetrieveRequest) throws RemoteException
+	{
 		Collection<LogEntryType> entries = new ArrayList<LogEntryType>();
-		LogRetrieveResponseType ret      = new LogRetrieveResponseType();
+		LogRetrieveResponseType ret = new LogRetrieveResponseType();
 
 		try {
 			if (logRetrieveRequest == null || logRetrieveRequest.length == 0) {
 				entries = queryForEntries(null);
-			}
-			else {
+			} else {
 				entries = new ArrayList<LogEntryType>();
-				
+
 				for (String id : logRetrieveRequest) {
 					entries.addAll(queryForEntries(id));
 				}
 			}
-			
+
 			ret.setChildRPCs(null);
 			ret.setLogEntries(entries.toArray(new LogEntryType[entries.size()]));
-			
+
 		} catch (SQLException e) {
 			_logger.error("Problem accessing the log database: ", e);
 			throw new RemoteException("Problem accessing the log database: ", e);
 		}
-		
+
 		return ret;
 
 	}
+
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public LogRetrieveResponseType getChildLogIDs(String[] logRetrieveRequest) 
-	throws RemoteException {
+	public LogRetrieveResponseType getChildLogIDs(String[] logRetrieveRequest) throws RemoteException
+	{
 		Collection<LogHierarchyEntryType> treeIDs = null;
 		LogRetrieveResponseType ret = new LogRetrieveResponseType();
 
 		try {
 			if (logRetrieveRequest == null || logRetrieveRequest.length == 0) {
 				treeIDs = queryForHierarchy(null);
-			}
-			else {
+			} else {
 				treeIDs = new ArrayList<LogHierarchyEntryType>();
-				
+
 				for (String id : logRetrieveRequest) {
 					treeIDs.addAll(queryForHierarchy(id));
 				}
 			}
-			
+
 			ret.setChildRPCs(treeIDs.toArray(new LogHierarchyEntryType[treeIDs.size()]));
 			ret.setLogEntries(null);
-			
+
 		} catch (SQLException e) {
 			_logger.error("Problem accessing the log database: ", e);
 			throw new RemoteException("Problem accessing the log database: ", e);
 		}
-		
+
 		return ret;
 	}
 }

@@ -14,8 +14,8 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.rfork.iterator.InMemoryIterableFork;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 
-public abstract class AbstractRNSByteIOResourceFork extends AbstractResourceFork 
-implements RNSResourceFork, StreamableByteIOFactoryResourceFork
+public abstract class AbstractRNSByteIOResourceFork extends AbstractResourceFork implements RNSResourceFork,
+	StreamableByteIOFactoryResourceFork
 {
 	protected AbstractRNSByteIOResourceFork(ResourceForkService service, String forkPath)
 	{

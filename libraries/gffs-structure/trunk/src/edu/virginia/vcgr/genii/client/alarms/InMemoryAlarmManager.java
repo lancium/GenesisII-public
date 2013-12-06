@@ -66,14 +66,15 @@ public class InMemoryAlarmManager
 	{
 		private LoggingContext _context;
 
-		private InMemoryAlarmManagerWorker () {
+		private InMemoryAlarmManagerWorker()
+		{
 			try {
 				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				_context = new LoggingContext();
 			}
 		}
-		
+
 		@Override
 		public void run()
 		{

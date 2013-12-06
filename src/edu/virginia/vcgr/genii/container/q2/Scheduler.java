@@ -330,19 +330,20 @@ public class Scheduler implements Closeable
 	private class SchedulerWorker implements Runnable
 	{
 		private LoggingContext _loggingContext;
-		
-		public SchedulerWorker() {
+
+		public SchedulerWorker()
+		{
 			try {
 				_loggingContext = LoggingContext.getCurrentLoggingContext();
 			} catch (ContextException e) {
 				_loggingContext = new LoggingContext();
 			}
 		}
-		
+
 		public void run()
 		{
 			LoggingContext.assumeLoggingContext(_loggingContext);
-			
+
 			long startTime = 0L;
 
 			/*

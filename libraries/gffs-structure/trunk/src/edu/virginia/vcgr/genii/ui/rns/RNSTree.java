@@ -301,14 +301,15 @@ public class RNSTree extends JTree implements EndpointRetriever
 	{
 		private LoggingContext context;
 
-		public TreeWillExpandListenerImpl() {
+		public TreeWillExpandListenerImpl()
+		{
 			try {
 				context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				context = new LoggingContext();
 			}
 		}
-		
+
 		@Override
 		public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException
 		{

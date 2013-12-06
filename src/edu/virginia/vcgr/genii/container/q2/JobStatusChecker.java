@@ -72,14 +72,15 @@ public class JobStatusChecker
 	{
 		private LoggingContext _context;
 
-		private UpdaterWorker() {
+		private UpdaterWorker()
+		{
 			try {
 				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				_context = new LoggingContext();
 			}
 		}
-		
+
 		private void performSlowRunningCheck()
 		{
 			if (_logger.isDebugEnabled())

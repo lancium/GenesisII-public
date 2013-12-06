@@ -19,12 +19,9 @@ public class LogTreeModel extends DefaultTreeModel
 		_uiContext = original._uiContext;
 	}
 
-	public LogTreeModel(UIPluginContext uiContext) 
-	throws Throwable
+	public LogTreeModel(UIPluginContext uiContext) throws Throwable
 	{
-		super(new LogTreeNode(
-				new LogFilledInTreeObject(
-						LogPath.getCurrent())));
+		super(new LogTreeNode(new LogFilledInTreeObject(LogPath.getCurrent())));
 
 		_uiContext = uiContext;
 	}
@@ -34,7 +31,7 @@ public class LogTreeModel extends DefaultTreeModel
 		return _uiContext;
 	}
 
-	public ApplicationContext appContext() 
+	public ApplicationContext appContext()
 	{
 		return _uiContext.applicationContext();
 	}
@@ -54,6 +51,5 @@ public class LogTreeModel extends DefaultTreeModel
 
 		return ret;
 	}
-
 
 }

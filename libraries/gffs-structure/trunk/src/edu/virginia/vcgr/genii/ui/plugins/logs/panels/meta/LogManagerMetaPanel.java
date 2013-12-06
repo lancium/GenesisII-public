@@ -82,8 +82,7 @@ public class LogManagerMetaPanel extends LogManagerPanel implements LazyLoadTabH
 		popup.show(_table, e.getX(), e.getY());
 	}
 
-	public LogManagerMetaPanel(UIPluginContext context) throws RemoteException,
-		RNSPathDoesNotExistException
+	public LogManagerMetaPanel(UIPluginContext context) throws RemoteException, RNSPathDoesNotExistException
 	{
 		super(new GridBagLayout());
 
@@ -117,7 +116,8 @@ public class LogManagerMetaPanel extends LogManagerPanel implements LazyLoadTabH
 	}
 
 	@Override
-	public void updateStatus(Collection<LogPath> descriptions) {
+	public void updateStatus(Collection<LogPath> descriptions)
+	{
 		_model.refresh(_table);
 	}
 }

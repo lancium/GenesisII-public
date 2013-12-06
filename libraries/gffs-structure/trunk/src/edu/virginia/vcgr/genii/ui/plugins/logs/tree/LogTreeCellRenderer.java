@@ -37,7 +37,7 @@ public class LogTreeCellRenderer extends DefaultTreeCellRenderer
 				LogFilledInTreeObject fObj = (LogFilledInTreeObject) obj;
 				boolean isLocal = fObj.isLocal(_appContext);
 				Icon icon = LogIcons.LogIconsFactory().getIcon(EndpointType.DIRECTORY, isLocal);
-			//	LogIcons.getIcon(fObj.endpointType(), fObj.isLocal(_appContext));
+				// LogIcons.getIcon(fObj.endpointType(), fObj.isLocal(_appContext));
 				setIcon(icon);
 			} else if (obj.objectType() == LogTreeObjectType.EXPANDING_OBJECT) {
 				setIcon(LogIcons.LogIconsFactory().getQuestionIcon());
