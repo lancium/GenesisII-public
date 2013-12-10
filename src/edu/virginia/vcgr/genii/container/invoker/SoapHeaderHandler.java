@@ -21,7 +21,6 @@ import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.container.axis.WSAddressingExtractor;
-import edu.virginia.vcgr.genii.container.version.VersionHelper;
 
 public class SoapHeaderHandler implements IAroundInvoker
 {
@@ -119,10 +118,6 @@ public class SoapHeaderHandler implements IAroundInvoker
 		ctxt.setProperty(GeniiSOAPHeaderConstants.GENII_ENDPOINT_NAME, isGeniiClient);
 		if (clientVersion != null)
 			ctxt.setProperty(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION_NAME, clientVersion);
-
-		if (isGeniiClient) {
-			VersionHelper.checkVersion(clientVersion, invocationContext.getMethod());
-		}
 
 		Object obj = invocationContext.proceed();
 		msg = msgCtxt.getResponseMessage();
