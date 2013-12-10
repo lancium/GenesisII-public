@@ -23,10 +23,12 @@ public class LogTreePanel extends JPanel
 
 	private LogTree _browserTree;
 
-	private JComboBox<String> _displayByBox;
+	@SuppressWarnings("rawtypes")
+	private JComboBox _displayByBox;
 
 	private static final long serialVersionUID = 1L;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public LogTreePanel(LogTree browserTree)
 	{
 		super(new GridBagLayout());
@@ -36,7 +38,7 @@ public class LogTreePanel extends JPanel
 		_browserTree = browserTree;
 
 		String[] options = { "Display logs by...", "RPC-ID", "command/procedure" };
-		_displayByBox = new JComboBox<String>(options);
+		_displayByBox = new JComboBox(options);
 		_displayByBox.setSelectedIndex(0);
 		_displayByBox.addActionListener(new DisplayBoxListener());
 		add(_displayByBox, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
