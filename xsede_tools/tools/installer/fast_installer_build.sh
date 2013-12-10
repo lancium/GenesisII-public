@@ -173,6 +173,8 @@ replace_compiler_variables
 #ant -Dbuild.targetArch=64 build
 #popd
 
+replace_compiler_variables
+
 build_installer 5991 genesis2-gffs-deb
 build_installer 3416 genesis2-gffs-linux64
 #build_installer 2088 genesis2-gffs-mac64
