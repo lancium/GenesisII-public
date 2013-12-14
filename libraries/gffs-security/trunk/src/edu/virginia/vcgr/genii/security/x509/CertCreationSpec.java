@@ -18,7 +18,6 @@ import java.security.cert.X509Certificate;
 
 public class CertCreationSpec
 {
-
 	public PublicKey newPublicKey;
 	public X509Certificate[] issuerChain;
 	public PrivateKey issuerPrivateKey;
@@ -27,11 +26,9 @@ public class CertCreationSpec
 	public CertCreationSpec(PublicKey newPublicKey, X509Certificate[] issuerChain, PrivateKey issuerPrivateKey,
 		long validityMillis)
 	{
-
 		this.newPublicKey = newPublicKey;
 		this.issuerChain = issuerChain;
 		this.issuerPrivateKey = issuerPrivateKey;
 		this.validityMillis = validityMillis;
 	}
-
 }

@@ -158,7 +158,8 @@ function fix_endings()
 
 ##############
 
-# build 32-bit: (or do not)
+# build 32-bit:
+#skip
 
 ##############
 
@@ -166,14 +167,11 @@ function fix_endings()
 
 echo Building 64 bit Genesis...
 
-replace_compiler_variables
-
 #pushd $GENII_INSTALL_DIR
 #ant clean
+replace_compiler_variables
 #ant -Dbuild.targetArch=64 build
 #popd
-
-replace_compiler_variables
 
 build_installer 5991 genesis2-gffs-deb
 build_installer 3416 genesis2-gffs-linux64

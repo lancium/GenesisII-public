@@ -161,7 +161,9 @@ public class InstallationProperties extends Properties
 
 	public File getSecurityFile(String filename)
 	{
-		return getLocalCertsDirectory().lookupFile(filename);
+		File toReturn = getLocalCertsDirectory().lookupFile(filename);
+		if (!toReturn.exists()) return null;
+		return toReturn;
 	}
 
 	/**
@@ -191,10 +193,4 @@ public class InstallationProperties extends Properties
 			throw new RuntimeException("Unable to access or create state directory.", cause);
 		}
 	}
-
-	// hmmm: ContainerProperties could become sole user.
-	// public String getDeploymentName()
-	// {
-	// return getProperty(InstallationConstants.GENII_DEPLOYMENT_NAME_PROPERTY);
-	// }
 }

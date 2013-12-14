@@ -16,6 +16,8 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.ShellPrompt;
 import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
+import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
+import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
@@ -67,6 +69,9 @@ public class Driver extends ApplicationBase
 
 		// first run through, go ahead and try to load the state.
 		loadClientState();
+
+		// new for clients; try to handle memory better.
+		LowMemoryWarning.INSTANCE.addLowMemoryListener(new LowMemoryExitHandler(7));
 
 		int lastExit = 0; // track the grid commands and how they returned.
 

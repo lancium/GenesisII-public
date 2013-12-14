@@ -104,7 +104,6 @@ public class LsTool extends BaseGridTool
 		boolean isCertChain = _certChain;
 
 		List<String> arguments = getArguments();
-		// ICallingContext ctxt = ContextManager.getExistingContext();
 		if (arguments.size() == 0)
 			arguments.add(".");
 		ArrayList<RNSPath> targets = new ArrayList<RNSPath>();

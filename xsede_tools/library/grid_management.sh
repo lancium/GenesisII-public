@@ -240,6 +240,11 @@ function bootstrap_grid()
   # fix the bootstrap to point to the right deployments folder.
   replace_phrase_in_file $bootstrap_file '${GENII_INSTALL_DIR}/deployments' "${DEPLOYMENTS_ROOT}"
 
+  # if possible, fix the password for the admin account.
+  if [ ! -z "$ADMIN_ACCOUNT_PASSWD" ]; then
+    replace_phrase_in_file $bootstrap_file "password=keys" "password=$ADMIN_ACCOUNT_PASSWD"
+  fi
+
   grid_chk script "local:${bootstrap_file}"
 
   # jump back out of the install directory.  the deployment behaves

@@ -6,9 +6,10 @@ URL:     http://genesis2.virginia.edu/wiki/
 License: Apache License 2.0
 Group: Applications/Internet
 BuildRoot: %{_tmppath}/%{name}-root
-Requires: bash
+#Requires:
 Source0: genesis2_deployment.tar.gz
 BuildArch: noarch
+Prefix: /opt/genesis2
 
 %description
 A deployment package for GenesisII that provides the configuration information
@@ -37,9 +38,9 @@ echo at clean the rpm build root is ${RPM_BUILD_ROOT}
 #no. rm -rf ${RPM_BUILD_ROOT}/deployments
 
 %files
-%defattr(-,root,root)
-%attr(644,root,root) /opt/genesis2/deployments
-#what's bindir?
+%defattr(644,root,root,755)
+#%attr(755,root,root)
+/opt/genesis2/deployments
 
 %changelog
 * Thu Dec 05 2013 Chris Koeritz <koeritz@virginia.edu>

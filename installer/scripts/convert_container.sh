@@ -321,45 +321,6 @@ if [ -z "$SIGNING_KEY_ALIAS_PROPERTY" ]; then complain_re_missing_deployment_var
 
 ##############
 
-# grab some important certs for our new directory.
-
-# first try to use the newest trust store.  that should always work.
-cp "$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted.pfx" "$LOCAL_CERTS_DIR"
-if [ $? -ne 0 ]; then
-  cp "$OLD_DEPLOYMENT_DIR/$old_dep/security/trusted.pfx" "$LOCAL_CERTS_DIR"
-  if [ $? -ne 0 ]; then
-    echo "Failed to copy the trust store into place; tried both new and old installers."
-    echo "Tried copying '$OLD_DEPLOYMENT_DIR/$old_dep/security/trusted.pfx' to '$LOCAL_CERTS_DIR'"
-    exit 1
-  fi
-fi
-
-# create the trusted certs dir and copy in any from the installs.
-echo Copying existing trusted certificates...
-mkdir "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
-cp -R -n "$OLD_DEPLOYMENT_DIR/$old_dep/security/trusted-certificates"/* "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
-if [ $? -ne 0 ]; then
-  echo no trusted certs found in old install.
-fi
-cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted-certificates"/* "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
-if [ $? -ne 0 ]; then
-  echo no trusted certs found in new install.
-fi
-
-# and now get the myproxy certs also.
-echo Copying existing myproxy certificates...
-mkdir "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
-cp -R -n "$OLD_DEPLOYMENT_DIR/$old_dep/security/myproxy-certs"/* "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
-if [ $? -ne 0 ]; then
-  echo no myproxy certs found in old install.
-fi
-cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/myproxy-certs"/* "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
-if [ $? -ne 0 ]; then
-  echo no myproxy certs found in new install.
-fi
-
-##############
-
 # get any existing kerberos settings.
 echo Copying kerberos keytabs and settings, if found.
 cp -R -n "$OLD_DEPLOYMENT_DIR/$old_dep/security"/*keytab* "$LOCAL_CERTS_DIR" 2>/dev/null
@@ -368,7 +329,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # grab any gffs kerberos settings from the security properties.
-grep "[ 	]*gffs-sts\.kerberos\." <"$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties" >>$INSTALLER_FILE
+grep "^[ 	]*gffs-sts\.kerberos\." <"$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties" >>$INSTALLER_FILE
 if [ $? -ne 0 ]; then
   echo no kerberos settings found.
 fi

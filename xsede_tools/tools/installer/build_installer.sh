@@ -162,15 +162,11 @@ function fix_endings()
 
 echo Building 32 bit Genesis...
 
-replace_compiler_variables
-
 pushd $GENII_INSTALL_DIR
 ant clean
+replace_compiler_variables
 ant build
 popd
-
-# we redo this since cleanup can eat the deployment files.
-replace_compiler_variables
 
 build_installer 2078 genesis2-gffs-linux32
 build_installer 2084 genesis2-gffs-windows32
@@ -181,14 +177,11 @@ build_installer 2084 genesis2-gffs-windows32
 
 echo Building 64 bit Genesis...
 
-replace_compiler_variables
-
 pushd $GENII_INSTALL_DIR
 ant clean
+replace_compiler_variables
 ant -Dbuild.targetArch=64 build
 popd
-
-replace_compiler_variables
 
 build_installer 5991 genesis2-gffs-deb
 build_installer 3416 genesis2-gffs-linux64

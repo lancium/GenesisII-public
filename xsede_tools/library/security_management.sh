@@ -96,6 +96,9 @@ function create_grid_certificates()
   local ADMIN_PFX="$SECURITY_DIR/admin.pfx"
   local ADMIN_CER="$SECURITY_DIR/admin.cer"
   local ADMIN_PASSWD="keys"
+  if [ ! -z "$ADMIN_ACCOUNT_PASSWD" ]; then
+    ADMIN_PASSWD="$ADMIN_ACCOUNT_PASSWD"
+  fi
 
   # clean up any existing certificates.
   \rm -f $SECURITY_DIR/*.pfx $SECURITY_DIR/*.cer
@@ -131,7 +134,14 @@ function get_root_privileges()
 {
   # login with rights to do everything we need.
   echo "Acquiring admin keystore superpowers..."
-  grid_chk keystoreLogin --password=keys local:$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/security/admin.pfx
+
+#hmmm: get the password magic below into some functional method.
+  local adminpass=keys
+  if [ ! -z "$ADMIN_ACCOUNT_PASSWD" ]; then
+    adminpass="$ADMIN_ACCOUNT_PASSWD"
+  fi
+
+  grid_chk keystoreLogin "--password=$adminpass" local:$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/security/admin.pfx
 }
 
 ##############

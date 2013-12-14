@@ -149,8 +149,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			// snapshot client count here to avoid logging inside synchronization.
 			concurrencyLevel = _concurrentCalls.intValue();
 		}
-		if (_logger.isDebugEnabled())
-			_logger.debug("rpc clients up to " + concurrencyLevel);
+		if (_logger.isTraceEnabled())
+			_logger.trace("rpc clients up to " + concurrencyLevel);
 
 		IAuthZProvider authZHandler;
 		try {
@@ -164,8 +164,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				_concurrentCalls--;
 				concurrencyLevel = _concurrentCalls.intValue();
 			}
-			if (_logger.isDebugEnabled())
-				_logger.debug("after authz failure, rpc clients down to " + concurrencyLevel);
+			if (_logger.isTraceEnabled())
+				_logger.trace("after authz failure, rpc clients down to " + concurrencyLevel);
 			throw new AxisFault(msg);
 		}
 
@@ -221,8 +221,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				_concurrentCalls--;
 				concurrencyLevel = _concurrentCalls.intValue();
 			}
-			if (_logger.isDebugEnabled())
-				_logger.debug("rpc clients down to " + concurrencyLevel);
+			if (_logger.isTraceEnabled())
+				_logger.trace("rpc clients down to " + concurrencyLevel);
 		}
 	}
 

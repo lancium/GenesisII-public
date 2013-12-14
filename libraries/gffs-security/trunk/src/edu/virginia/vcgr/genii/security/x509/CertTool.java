@@ -226,9 +226,7 @@ public class CertTool
 	public static X509Certificate[] createResourceCertChain(CertCreationSpec certSpec,
 		Map.Entry<List<DERObjectIdentifier>, List<String>> additional_fields) throws GeneralSecurityException
 	{
-
 		// replace the SN and the old CNs, if necessary
-
 		X509Name dn = new X509Name(certSpec.issuerChain[0].getSubjectDN().toString());
 		Vector<DERObjectIdentifier> oids = dn.getOIDs();
 		Vector<String> values = dn.getValues();
@@ -262,7 +260,6 @@ public class CertTool
 			newCertChain[i + 1] = certSpec.issuerChain[i];
 		}
 		return newCertChain;
-
 	}
 
 	/**

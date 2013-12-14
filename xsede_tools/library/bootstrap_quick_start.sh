@@ -40,6 +40,9 @@ echo -e "** After establishing test environment:\n\tGENII_INSTALL_DIR is $GENII_
 
 ##############
 
+# we want these to always be visible to sub-scripts.
+export ADMIN_ACCOUNT_PASSWD NORMAL_ACCOUNT_PASSWD 
+
 # load passwords if they've seen fit to give us any.
 if [ -f "$HOME/.secrets/grid_passwords.txt" ]; then 
   source "$HOME/.secrets/grid_passwords.txt"

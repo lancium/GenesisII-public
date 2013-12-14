@@ -24,8 +24,9 @@ function print_instructions()
   echo "For example, these commands will convert the paths for an older interactive"
   echo "install to the new RPM style installation:"
   echo
+  local scriptname="$(basename $0)"
   echo "  export GENII_INSTALL_DIR=/opt/genesis2"
-  echo "  bash update_install_location /home/fred/GenesisII"
+  echo "  bash $scriptname /home/fred/GenesisII"
 }
 
 ##############
