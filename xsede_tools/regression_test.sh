@@ -19,6 +19,8 @@
 export REGRESSION_DIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd $REGRESSION_DIR
 
+TIME_START="$(date +"%s")"
+
 source prepare_tests.sh prepare_tests.sh
 
 # if that didn't work, complain.
@@ -233,6 +235,18 @@ for ((test_iter=0; $test_iter < ${#FULL_TEST_SET[*]}; test_iter++)); do
   echo "$num: ${TEST_RESULTS[$test_iter]} -- ${FULL_TEST_SET[$test_iter]}"
 done
 echo
+
+# figure out how long things took.
+TIME_END="$(date +"%s")"
+duration="$(($TIME_END - $TIME_START))"
+# prepare to print duration in hours and minutes.
+minutes="$(($duration / 60))"
+hours="$(($duration / 60))"
+# grab out the hours we calculated from the minutes sum.
+minutes="$(($minutes - $hours * 60))"
+if (($minutes < 10)); then minutes="0$minutes"; fi
+if (($hours < 10)); then hours="0$hours"; fi
+echo "Total testing duration: $hours:$minutes hh:mm ($duration seconds total)"
 
 if [ $FAIL_COUNT -ne 0 ]; then
   echo "FAILURE: $FAIL_COUNT Tests Failed out of ${#FULL_TEST_SET[*]} Tests."

@@ -88,11 +88,13 @@ public class IDPLoginTool extends BaseLoginTool
 							toReturn.addAll(creds.getRealCreds().getCredentials());
 
 							if (!creds.getRealCreds().isEmpty()) {
-								_logger.info("Successfully retrieved trust delegations from IDP login:");
+								StringBuffer sb = new StringBuffer();
+								sb.append("Successfully retrieved trust delegations from IDP login:\n");
 								for (TrustCredential cred : creds.getRealCreds().getCredentials()) {
-									_logger.info(cred.describe(VerbosityLevel.LOW));
+									sb.append(cred.describe(VerbosityLevel.LOW) + "\n");
 									CallingContextUtilities.updateCallingContext(cred);
 								}
+								_logger.info(sb);
 							}
 
 							return toReturn;

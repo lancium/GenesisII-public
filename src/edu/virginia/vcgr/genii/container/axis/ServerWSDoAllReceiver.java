@@ -687,11 +687,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 							// broken, but WSS4J seems to call
 							// USERNAME_TOKEN_UNKNOWN
 							// case below anyway
-
-							/*
-							 * // return password from file to make sure of match
-							 * pc.setPassword("mooch"); return;
-							 */
 							break;
 
 						case WSPasswordCallback.USERNAME_TOKEN_UNKNOWN:

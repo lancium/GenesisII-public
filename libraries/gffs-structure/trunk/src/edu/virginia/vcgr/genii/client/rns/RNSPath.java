@@ -64,6 +64,12 @@ public class RNSPath implements Serializable, Cloneable
 
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
 
+	static public interface RNSPathApplyFunction
+	{
+		// if the apply iteration should stop, then the derived method should return false.
+		public boolean applyToPath(RNSPath applyTo) throws RNSException;
+	}
+
 	/**
 	 * Returns the current grid namespace path. This is similar to getcwd in posix systems but
 	 * refers only to grid paths here.
@@ -552,7 +558,7 @@ public class RNSPath implements Serializable, Cloneable
 				}
 			} catch (RNSException rne) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("Skipping a directory in an RSNPath expansion which " + "can't be expanded.", rne);
+					_logger.debug("Skipping a directory in an RSNPath expansion which can't be expanded.", rne);
 			}
 		}
 
@@ -744,6 +750,43 @@ public class RNSPath implements Serializable, Cloneable
 				StreamUtils.close(entries.getIterable());
 			}
 		}
+	}
+
+	/**
+	 * A more economical way of traversing and acting on the contents of an RNSPath than the
+	 * listContents methods. This applies the "applier" method to each object, which is just a way
+	 * to pass each RNSPath in the contents a specialized function without needing to instantiate
+	 * the whole list at once.
+	 */
+	public boolean applyToContents(RNSPathApplyFunction applier) throws RNSException
+	{
+		EndpointReferenceType me = resolveRequired();
+		EnhancedRNSPortType rpt = createProxy(me, EnhancedRNSPortType.class);
+		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
+		RNSIterable entries = null;
+
+		try {
+			entries = proxy.iterateList();
+			for (RNSEntryResponseType entry : entries) {
+				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), true);
+				boolean funcRet = applier.applyToPath(newEntry);
+				newEntry = null;
+				entry = null;
+				if (funcRet != true)
+					return false;
+			}
+		} catch (GenesisIISecurityException gse) {
+			throw new RNSException("Unable to list contents -- security exception.", gse);
+		} catch (RemoteException re) {
+			throw new RNSException("Unable to list contents.", re);
+		} finally {
+			try {
+				StreamUtils.close(entries.getIterable());
+			} catch (Exception e) {
+				_logger.warn("exception during attempt to close stream", e);
+			}
+		}
+		return true;
 	}
 
 	/**

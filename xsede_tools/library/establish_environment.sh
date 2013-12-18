@@ -146,6 +146,22 @@ export SHOWED_SETTINGS_ALREADY=true
 
 ##############
 
+# load in our secret passwords, if we have the appropriate file.
+
+# we want these to always be visible to sub-scripts.
+export ADMIN_ACCOUNT_PASSWD NORMAL_ACCOUNT_PASSWD 
+
+# load passwords if they've seen fit to give us any.
+if [ -f "$HOME/.secrets/grid_passwords.txt" ]; then 
+  source "$HOME/.secrets/grid_passwords.txt"
+fi
+
+# set defaults for any passwords we didn't find a value for.
+if [ -z "$ADMIN_ACCOUNT_PASSWD" ]; then ADMIN_ACCOUNT_PASSWD="admin"; fi
+if [ -z "$NORMAL_ACCOUNT_PASSWD" ]; then NORMAL_ACCOUNT_PASSWD="FOOP"; fi
+
+##############
+
 # now that we have the environment set up, we can pull in all the functions
 # for working on the grid.
 source $XSEDE_TEST_ROOT/library/helper_methods.sh

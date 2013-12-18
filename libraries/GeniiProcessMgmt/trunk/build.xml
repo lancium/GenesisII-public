@@ -45,7 +45,9 @@
 	</target>
 
 	<target name="clean">
-		<delete dir="${obj.dir}"/>
+                <delete>
+                        <fileset dir="${obj.dir}" includes="**/*"/>
+                </delete>
 		<delete dir="${lib.dir}"/>
 		<delete dir="${api.doc.dir}"/>
 		<delete dir="${jni.inc-gen.dir}"/>

@@ -1,13 +1,16 @@
 package edu.virginia.vcgr.genii.client.configuration;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.ContainerProperties;
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 
 public class Installation
 {
@@ -48,6 +51,23 @@ public class Installation
 			throw new RuntimeException("Installation is corrupt -- couldn't find " + WEBAPPS_DIR_NAME + " directory.");
 		if (!_webAppDirectory.isDirectory())
 			throw new RuntimeException("Installation is corrupt -- " + WEBAPPS_DIR_NAME + " is not a directory.");
+		if (!_webAppDirectory.canWrite()) {
+			// well, that's a pickle. the main webapps root is not writable.
+			File saveOldWA = _webAppDirectory;
+			_webAppDirectory = new File(InstallationProperties.getUserDir(), WEBAPPS_DIR_NAME);
+			_logger.trace("diverting to user directory for webapps location: " + _webAppDirectory);
+			// make the directory if it's not already there.
+			if (!_webAppDirectory.exists()) {
+				// create a copy of the main webapps into our user dir.
+				_logger.debug("creating fresh webapps directory at: " + _webAppDirectory);
+				try {
+					FileUtils.copyDirectory(saveOldWA, _webAppDirectory);
+				} catch (IOException e) {
+					throw new RuntimeException("Installation has a problem; cannot instantiate new webapps at "
+						+ WEBAPPS_DIR_NAME);
+				}
+			}
+		}
 
 		_processWrapperDirectory = new File(_installationDirectory, PROCESS_WRAPPER_DIR_NAME);
 

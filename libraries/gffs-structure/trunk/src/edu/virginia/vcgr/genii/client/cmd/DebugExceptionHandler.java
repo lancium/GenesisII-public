@@ -7,16 +7,11 @@ public class DebugExceptionHandler implements IExceptionHandler
 {
 	public int handleException(Throwable cause, Writer errorStream)
 	{
-		PrintWriter pw = null;
-		if (errorStream instanceof PrintWriter)
-			pw = (PrintWriter) errorStream;
-		else
-			pw = new PrintWriter(errorStream);
-
+		int toReturn = SimpleExceptionHandler.performBaseExceptionHandling(cause, errorStream);
+		PrintWriter pw = new PrintWriter(errorStream);
 		pw.println(cause.getLocalizedMessage());
 		cause.printStackTrace(pw);
 		pw.flush();
-
-		return 1;
+		return toReturn;
 	}
 }

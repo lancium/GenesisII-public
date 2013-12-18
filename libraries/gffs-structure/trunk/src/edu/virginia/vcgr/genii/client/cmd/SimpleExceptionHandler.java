@@ -11,27 +11,21 @@ import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
 
 public class SimpleExceptionHandler implements IExceptionHandler
 {
-	public int handleException(Throwable cause, Writer eStream)
+	public static int performBaseExceptionHandling(Throwable cause, Writer eStream)
 	{
-		PrintWriter errorStream;
-
-		boolean createdStream = false;
-		if (eStream instanceof PrintWriter) {
-			errorStream = (PrintWriter) eStream;
-		} else {
-			createdStream = true;
-			errorStream = new PrintWriter(eStream);
-		}
+		PrintWriter errorStream = new PrintWriter(eStream);
 
 		String tab = "";
 		StringBuilder builder = new StringBuilder();
+
+		int toReturn = 0; // assume we can recover by default.
 
 		while (cause != null) {
 			if (cause instanceof java.lang.OutOfMemoryError) {
 				builder.append(tab + "The client has run out of memory.  This could be fixed by increasing\n"
 					+ "the maximum memory allowed for the JVM.  On Linux, try changing -Xmx512M\n"
 					+ "to -Xmx1G or more.  On Windows, pass the memory to the grid launcher with a\n"
-					+ "-J flag first, e.g. grid.exe -J-Xmx1G");
+					+ "-J flag first, e.g. grid.exe -J-Xmx1G\n");
 				errorStream.print(builder);
 				errorStream.flush();
 				// re-throw to cause the grid client to exit.
@@ -55,8 +49,9 @@ public class SimpleExceptionHandler implements IExceptionHandler
 				} else {
 					builder.append(tab + "fault: " + message + "\n");
 				}
-			} else
+			} else {
 				builder.append(tab + cause.getLocalizedMessage() + "\n");
+			}
 
 			tab = tab + "    ";
 			cause = cause.getCause();
@@ -65,9 +60,11 @@ public class SimpleExceptionHandler implements IExceptionHandler
 		errorStream.print(builder);
 		errorStream.flush();
 
-		if (createdStream)
-			errorStream.close();
+		return toReturn;
+	}
 
-		return 1;
+	public int handleException(Throwable cause, Writer eStream)
+	{
+		return performBaseExceptionHandling(cause, eStream);
 	}
 }

@@ -124,9 +124,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		this.id = new GUID().toString();
 		this.signed = false;
 		if (_logger.isDebugEnabled())
-			_logger.debug("created trust delegation: " + toString());
-		if (_logger.isTraceEnabled())
-			_logger.trace("creation track: " + ProgramTools.showLastFewOnStack(6));
+			_logger.debug("created trust delegation: " + describe(VerbosityLevel.LOW));
 	}
 
 	/**
@@ -143,7 +141,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		}
 		constructFromTrustDelegation(trustDelegation);
 		if (_logger.isTraceEnabled())
-			_logger.trace("built trust delegation from node: " + toString());
+			_logger.trace("built trust delegation from node: " + describe(VerbosityLevel.LOW));
 	}
 
 	/**
@@ -153,7 +151,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	{
 		constructFromTrustDelegation(delegation);
 		if (_logger.isTraceEnabled())
-			_logger.trace("built trust delegation from u6 TD: " + toString());
+			_logger.trace("built trust delegation from u6 TD: " + describe(VerbosityLevel.LOW));
 	}
 
 	public boolean isSigned()

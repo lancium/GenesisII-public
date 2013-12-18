@@ -162,7 +162,8 @@ public class InstallationProperties extends Properties
 	public File getSecurityFile(String filename)
 	{
 		File toReturn = getLocalCertsDirectory().lookupFile(filename);
-		if (!toReturn.exists()) return null;
+		if (!toReturn.exists())
+			return null;
 		return toReturn;
 	}
 

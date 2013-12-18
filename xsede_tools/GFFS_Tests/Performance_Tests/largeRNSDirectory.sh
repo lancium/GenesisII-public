@@ -19,6 +19,8 @@ COPY_CHUNK=100
 MOUNT_POINT=$WORKDIR/mount-largeRNS
 # the user's home directory from fuse perspective.
 HOME_DIR=$MOUNT_POINT/$RNSPATH
+
+BIGDIRNAME=huge_dir
  
 oneTimeSetUp()
 {
@@ -64,8 +66,9 @@ testMounting()
 # function so we can time it.
 copyFilesUp()
 {
+  local i
   for (( i = 1 ; i <= $MAX_FILES; i++ )); do
-    echo blahHumbug$RANDOM$RANDOM >$HOME_DIR/big_dir/file_instance_$i.txt
+    echo blahHumbug$RANDOM$RANDOM >$HOME_DIR/$BIGDIRNAME/file_instance_$i.txt
     if [ $? -ne 0 ]; then
       return 1
     fi
@@ -79,8 +82,8 @@ testCreatingLargeDirectory()
   echo "Creating files starts at $(date)"
 
   # recreate our target directory in the grid.
-  mkdir $HOME_DIR/big_dir
-  assertEquals "Making test folder $HOME_DIR/big_dir" 0 $?
+  mkdir $HOME_DIR/$BIGDIRNAME
+  assertEquals "Making test folder $HOME_DIR/$BIGDIRNAME" 0 $?
 
   # make the files in the target directory.
   copy_time=$(time -p copyFilesUp | awk '{print $2}')
@@ -96,21 +99,21 @@ testScanningLargeDirectory()
   # snooze to allow the cache to empty out.
   sleep 30
 
-  timed_grid ls $RNSPATH/big_dir
+  timed_grid ls $RNSPATH/$BIGDIRNAME
   assertEquals "Run ls on new directory" 0 $?
   real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
-  echo "Time taken to list big_dir: $real_time s"
+  echo "Time taken to list $BIGDIRNAME: $real_time s"
 
-  timed_grid ls $RNSPATH/big_dir
+  timed_grid ls $RNSPATH/$BIGDIRNAME
   assertEquals "Run ls on new directory again" 0 $?
   real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
-  echo "Time taken to list big_dir after cached: $real_time s"
+  echo "Time taken to list $BIGDIRNAME after cached: $real_time s"
 
 ## ls doesn't support patterns??
-#  timed_grid ls $RNSPATH/big_dir/*5*
+#  timed_grid ls $RNSPATH/$BIGDIRNAME/*5*
 #  assertEquals "Run ls on new directory with pattern" 0 $?
 #  real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
-#  echo "Time taken to scan big_dir for files with pattern: $real_time s"
+#  echo "Time taken to scan $BIGDIRNAME for files with pattern: $real_time s"
 
 }
 
@@ -121,7 +124,7 @@ testCleaningOutBigDir()
   oneTimeTearDown  # leverage cleanup again.
   assertEquals "Clean up directory with $MAX_FILES entries" 0 $?
   real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
-  echo "Time taken to clean up big_dir: $real_time s"
+  echo "Time taken to clean up $BIGDIRNAME: $real_time s"
 }
 
 oneTimeTearDown()
@@ -134,10 +137,10 @@ oneTimeTearDown()
     rmdir $MOUNT_POINT
   fi
 
-  grid ls -d $RNSPATH/big_dir &>/dev/null
+  grid ls -d $RNSPATH/$BIGDIRNAME &>/dev/null
   if [ $? -eq 0 ]; then
     # seems like this directory does exist in the grid.  let's remove it.
-    timed_grid rm -r $RNSPATH/big_dir 
+    timed_grid rm -r $RNSPATH/$BIGDIRNAME 
   fi
 }
 

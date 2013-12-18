@@ -26,6 +26,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPath.RNSPathApplyFunction;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
 public class LsTool extends BaseGridTool
@@ -246,6 +247,43 @@ public class LsTool extends BaseGridTool
 		}
 	}
 
+	static public class DirLister implements RNSPathApplyFunction
+	{
+		PrintWriter _out;
+		ArrayList<RNSPath> _subdirs;
+		boolean _isLong;
+		boolean _isAll;
+		boolean _isEPR;
+		boolean _isMultiline;
+		boolean _isCertChain;
+
+		DirLister(PrintWriter out, ArrayList<RNSPath> subdirs, boolean isLong, boolean isAll, boolean isEPR,
+			boolean isMultiline, boolean isCertChain)
+		{
+			_out = out;
+			_subdirs = subdirs;
+			_isLong = isLong;
+			_isAll = isAll;
+			_isEPR = isEPR;
+			_isMultiline = isMultiline;
+			_isCertChain = isCertChain;
+		}
+
+		@Override
+		public boolean applyToPath(RNSPath applyTo) throws RNSException
+		{
+			TypeInformation type = new TypeInformation(applyTo.getEndpoint());
+			try {
+				printEntry(_out, type, applyTo, _isLong, _isAll, _isEPR, _isMultiline, _isCertChain);
+			} catch (ResourceException e) {
+				throw new RNSException("failed to print entry due to resource exception", e);
+			}
+			if (type.isRNS())
+				_subdirs.add(applyTo);
+			return true;
+		}
+	}
+
 	static private void listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll,
 		boolean isEPR, boolean isMultiline, boolean isCertChain, boolean isRecursive) throws RNSException, ResourceException
 	{
@@ -256,14 +294,15 @@ public class LsTool extends BaseGridTool
 			name = prefix + "/" + name;
 		out.println(name + ":");
 
-		Collection<RNSPath> entries = path.listContents();
+		// hmmm: this looks like a super great place to use the "apply this function" approach;
+		// instead of downloading the whole list into memory and keeping it, just iterate across
+		// the items in the rns path.
+		// /Collection<RNSPath> entries = path.listContents();
 		ArrayList<RNSPath> subdirs = new ArrayList<RNSPath>();
-		for (RNSPath entry : entries) {
-			TypeInformation type = new TypeInformation(entry.getEndpoint());
-			printEntry(out, type, entry, isLong, isAll, isEPR, isMultiline, isCertChain);
-			if (type.isRNS())
-				subdirs.add(entry);
-		}
+
+		DirLister dl = new DirLister(out, subdirs, isLong, isAll, isEPR, isMultiline, isCertChain);
+		path.applyToContents(dl);
+
 		out.println();
 		if (isRecursive) {
 			for (RNSPath entry : subdirs) {

@@ -243,7 +243,10 @@ PORT=$PORT\n\
       # generate the certificate authority signing key PFX.
       local UBER_CA_PFX="$CA_PFX-base.pfx"
       local UBER_CA_ALIAS="base-key"
-      $GENII_INSTALL_DIR/cert-tool gen "-dn=C=$C, ST=$ST, L=$L, O=$O, OU=$OU, CN=GenesisII Certificate Base" -output-storetype=PKCS12 "-output-entry-pass=$CA_PASSWORD" -output-keystore=$GENERATED_CERTS/$UBER_CA_PFX "-output-keystore-pass=$CA_PASSWORD" "-output-alias=$UBER_CA_ALIAS" -keysize=2048
+
+      local DN_STRING="$(calculate_DN "GenesisII Certificate Base")"
+      echo "generating cert with DN as: $DN_STRING"
+      $GENII_INSTALL_DIR/cert-tool gen "-dn=$DN_STRING" -output-storetype=PKCS12 "-output-entry-pass=$CA_PASSWORD" -output-keystore=$GENERATED_CERTS/$UBER_CA_PFX "-output-keystore-pass=$CA_PASSWORD" "-output-alias=$UBER_CA_ALIAS" -keysize=2048
       check_if_failed "generating base certificate PFX"
 
       create_certificate_using_CA "$GENERATED_CERTS/$UBER_CA_PFX" "$CA_PASSWORD" "$UBER_CA_ALIAS" "$GENERATED_CERTS/$CA_PFX" "$CA_PASSWORD" "$CA_ALIAS" "GenesisII Certificate Authority"

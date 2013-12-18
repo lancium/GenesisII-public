@@ -17,6 +17,36 @@ fi
 
 # certificate methods.
 
+# calculates the appropriate DN string for a collection of cert parts.
+# this requires one parameter for the CN name.
+function calculate_DN()
+{
+  local cn="$1"; shift
+  # make sure we don't get an empty one.
+  if [ -z "$cn" ]; then
+    cn="GenesisII Certificate"
+  fi
+  local DN_STRING=""
+  if [ ! -z "$C" ]; then
+    DN_STRING+="C=$C, "
+  fi
+  if [ ! -z "$ST" ]; then
+    DN_STRING+="ST=$ST, "
+  fi
+  if [ ! -z "$L" ]; then
+    DN_STRING+="L=$L, "
+  fi
+  if [ ! -z "$O" ]; then
+    DN_STRING+="O=$O, "
+  fi
+  if [ ! -z "$OU" ]; then
+    DN_STRING+="OU=$OU, "
+  fi
+  # last one we put in is the CN.
+  DN_STRING+="CN=$cn"
+  echo $DN_STRING
+}
+
 # requires three parameters, the pfx file to create, the password for it, and the
 # alias to use for the certificate inside the pfx.
 function create_bootstrap_signing_certificate()
@@ -69,10 +99,10 @@ function create_certificate_using_CA()
   local NEW_ALIAS="$1"; shift
   local CN_GIVEN="$1"; shift
 
-  echo create cert $NEW_PFX with alias $NEW_ALIAS and CN=$CN_GIVEN
-
   # first generate the private and public key into the pkcs12 archive.
-  run_any_command $CERTO gen "'-dn=C=$C, ST=$ST, L=$L, O=$O, OU=$OU, CN=$CN_GIVEN'" -output-storetype=PKCS12 "-output-entry-pass='$NEW_PASS'" "-output-keystore=$NEW_PFX" "-output-keystore-pass='$NEW_PASS'" "-output-alias='$NEW_ALIAS'" "-input-keystore=$THE_CA_PFX" "-input-keystore-pass='$THE_CA_PASS'" -input-storetype=PKCS12 "-input-entry-pass='$THE_CA_PASS'" "-input-alias='$THE_CA_ALIAS'" -keysize=2048
+  local dn="$(calculate_DN "$CN_GIVEN")"
+  echo "create cert $NEW_PFX with alias $NEW_ALIAS and DN=$dn"
+  run_any_command $CERTO gen "'-dn=$dn'" -output-storetype=PKCS12 "-output-entry-pass='$NEW_PASS'" "-output-keystore=$NEW_PFX" "-output-keystore-pass='$NEW_PASS'" "-output-alias='$NEW_ALIAS'" "-input-keystore=$THE_CA_PFX" "-input-keystore-pass='$THE_CA_PASS'" -input-storetype=PKCS12 "-input-entry-pass='$THE_CA_PASS'" "-input-alias='$THE_CA_ALIAS'" -keysize=2048
   check_if_failed "generating $NEW_PFX from $THE_CA_PFX"
   # and create its certificate file.
 #  local cert_file="$(echo $NEW_PFX | sed -e 's/\.pfx/\.cer/')"
@@ -95,10 +125,7 @@ function create_grid_certificates()
 
   local ADMIN_PFX="$SECURITY_DIR/admin.pfx"
   local ADMIN_CER="$SECURITY_DIR/admin.cer"
-  local ADMIN_PASSWD="keys"
-  if [ ! -z "$ADMIN_ACCOUNT_PASSWD" ]; then
-    ADMIN_PASSWD="$ADMIN_ACCOUNT_PASSWD"
-  fi
+  local ADMIN_PASSWD="$ADMIN_ACCOUNT_PASSWD"
 
   # clean up any existing certificates.
   \rm -f $SECURITY_DIR/*.pfx $SECURITY_DIR/*.cer

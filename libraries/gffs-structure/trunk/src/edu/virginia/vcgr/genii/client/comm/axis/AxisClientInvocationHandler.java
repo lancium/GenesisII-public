@@ -205,8 +205,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		if ((chain != null) && _logger.isDebugEnabled()) {
 			int which = 0;
 			for (X509Certificate cert : chain) {
-				// _logger.debug("got chain[" + which++ + "] for epr as: " + cert.toString());
-				_logger.debug("got chain[" + which++ + "] for epr as: " + cert.getSubjectDN());
+				if (_logger.isTraceEnabled())
+					_logger.trace("got chain[" + which++ + "] for epr as: " + cert.getSubjectDN());
 			}
 		}
 

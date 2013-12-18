@@ -241,9 +241,7 @@ function bootstrap_grid()
   replace_phrase_in_file $bootstrap_file '${GENII_INSTALL_DIR}/deployments' "${DEPLOYMENTS_ROOT}"
 
   # if possible, fix the password for the admin account.
-  if [ ! -z "$ADMIN_ACCOUNT_PASSWD" ]; then
-    replace_phrase_in_file $bootstrap_file "password=keys" "password=$ADMIN_ACCOUNT_PASSWD"
-  fi
+  replace_phrase_in_file $bootstrap_file "password=keys" "password=$ADMIN_ACCOUNT_PASSWD"
 
   grid_chk script "local:${bootstrap_file}"
 

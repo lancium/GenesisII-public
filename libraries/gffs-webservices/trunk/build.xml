@@ -174,12 +174,16 @@
 	</target>
 
 	<target name="clean" depends="init">
-		<delete dir="${temporary.codegen.dir}"/>
+                <delete>
+                        <fileset dir="${temporary.codegen.dir}" includes="**/*"/>
+                </delete>
 		<delete dir="${wsdd.dir}"/>
 		<delete dir="${dpages.dir}"/>
 		<delete dir="${generated.source.dir}"/>
 		<delete dir="${basedir}/subdir"/>
-		<delete dir="${generated.obj.dir}"/>
+                <delete>
+                        <fileset dir="${generated.obj.dir}" includes="**/*"/>
+                </delete>
 		<delete dir="${basedir}/bin"/>
                 <delete>
                         <fileset dir="${obj.dir}" includes="**/*"/>

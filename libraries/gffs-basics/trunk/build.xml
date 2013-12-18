@@ -11,13 +11,9 @@
 	</path>
 
 	<path id="bundles.classpath">
-<!--		<fileset dir="${bundles.home}" includes="bundle-*.jar"/> -->
 		<fileset dir="${bundles.home}" includes="com.jcraft.jsch*.jar"/>
 		<fileset dir="${bundles.home}" includes="org.eclipse.osgi*.jar"/>
 		<fileset dir="${bundles.home}" includes="org.apache.commons.logging*.jar"/>
-<!--		<fileset dir="${bundles.home}" includes="org.apache.xalan*.jar"/> -->
-<!--		<fileset dir="${bundles.home}" includes="org.apache.xml.serializer*.jar"/> -->
-<!--		<fileset dir="${bundles.home}" includes="org.apache.xerces*.jar"/> -->
 		<fileset dir="${bundles.home}" includes="org.apache.commons.lang*.jar"/>
 		<fileset dir="${bundles.home}" includes="org.apache.log4j*.jar"/>
 		<fileset dir="${bundles.home}" includes="org.slf4j*.jar"/>

@@ -278,7 +278,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 						if (_logger.isTraceEnabled())
 							_logger.trace("made credential for pass-through connection: " + newerTC);
 					} else {
-						_logger.warn("ignoring passThrough credential that doesn't match client's last TLS certificate.");
+						_logger.trace("ignoring passThrough credential that doesn't match client's last TLS certificate.");
 					}
 				}
 

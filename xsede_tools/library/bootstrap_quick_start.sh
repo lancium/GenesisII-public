@@ -40,20 +40,6 @@ echo -e "** After establishing test environment:\n\tGENII_INSTALL_DIR is $GENII_
 
 ##############
 
-# we want these to always be visible to sub-scripts.
-export ADMIN_ACCOUNT_PASSWD NORMAL_ACCOUNT_PASSWD 
-
-# load passwords if they've seen fit to give us any.
-if [ -f "$HOME/.secrets/grid_passwords.txt" ]; then 
-  source "$HOME/.secrets/grid_passwords.txt"
-fi
-
-# set defaults for any passwords we didn't find a value for.
-if [ -z "$ADMIN_ACCOUNT_PASSWD" ]; then ADMIN_ACCOUNT_PASSWD="admin"; fi
-if [ -z "$NORMAL_ACCOUNT_PASSWD" ]; then NORMAL_ACCOUNT_PASSWD="FOOP"; fi
-
-##############
-
 containerlog="$(get_container_logfile "$DEPLOYMENT_NAME")"
 clientlog="$(get_client_logfile "$DEPLOYMENT_NAME")"
 # clean out old state directory and old logs.

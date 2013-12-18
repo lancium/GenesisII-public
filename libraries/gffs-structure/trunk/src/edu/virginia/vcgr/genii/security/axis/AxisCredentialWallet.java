@@ -77,8 +77,8 @@ public class AxisCredentialWallet
 				encodedCredentials.appendChild(convertToAxis(unicoreToAxisConverter, assertion));
 			}
 		}
-		if (_logger.isDebugEnabled())
-			_logger.debug("encoded " + addedAny + " credentials for soap header.");
+		if (_logger.isTraceEnabled())
+			_logger.trace("encoded " + addedAny + " credentials for soap header.");
 		return encodedCredentials;
 	}
 

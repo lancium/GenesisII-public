@@ -36,7 +36,9 @@
 	</target>
 
 	<target name="clean">
-		<delete dir="${obj.dir}"/>
+                <delete>
+                        <fileset dir="${obj.dir}" includes="**/*"/>
+                </delete>
 		<delete dir="${lib.dir}"/>
 		<delete dir="${basedir}/bin"/>
 	</target>

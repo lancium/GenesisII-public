@@ -201,7 +201,12 @@ public class Driver extends ApplicationBase
 			} catch (ReloadShellException e) {
 				throw e;
 			} catch (Throwable cause) {
-				return ExceptionHandlerManager.getExceptionHandler().handleException(cause, new OutputStreamWriter(System.err));
+				int toReturn =
+					ExceptionHandlerManager.getExceptionHandler().handleException(cause, new OutputStreamWriter(System.err));
+				if (toReturn != 0)
+					return toReturn;
+				lastExit = 1; // at least let them know we were displeased, if this is the last
+								// command in the loop.
 			}
 		}
 		return lastExit;
