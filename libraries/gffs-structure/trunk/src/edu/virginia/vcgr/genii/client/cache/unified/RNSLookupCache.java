@@ -75,14 +75,11 @@ public class RNSLookupCache extends CommonCache
 	@Override
 	public void putItem(Object cacheKey, Object target, Object value) throws Exception
 	{
-
 		String path = (String) cacheKey;
 		long lifetime = getCacheLifetTime(path);
 		EndpointReferenceType EPR = (EndpointReferenceType) value;
-
 		// Get rid of all the references to the SOAPMessage associated with this endPoint.
 		EndpointReferenceType sanitizedEPR = Sanitizer.getSanitizedEpr(EPR);
-
 		getCacheForTarget(EPR).put(path, sanitizedEPR, lifetime);
 	}
 
