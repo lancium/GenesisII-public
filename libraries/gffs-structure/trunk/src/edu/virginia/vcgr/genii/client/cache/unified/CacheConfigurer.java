@@ -16,11 +16,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CacheConfigurer
 {
-
 	static private Log _logger = LogFactory.getLog(CacheConfigurer.class);
 
-	public static final long DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT = 30 * 1000L; // thirty
-																						// seconds
+	// 30 seconds by default.
+	public static final long DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT = 30 * 1000L;
 
 	private static boolean CACHING_ENABLED = true;
 	private static boolean SUBSCRIPTION_BASED_CACHING_ENABLED = true;

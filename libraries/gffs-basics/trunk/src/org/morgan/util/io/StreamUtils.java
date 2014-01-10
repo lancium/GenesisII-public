@@ -29,7 +29,7 @@ import java.sql.Statement;
  */
 public class StreamUtils
 {
-	static private final int _DEFAULT_BUFFER_SIZE = 1024 * 8;
+	static private final int _DEFAULT_BUFFER_SIZE = 1024 * 512;
 
 	static public void copyStream(Reader reader, Writer writer) throws IOException
 	{

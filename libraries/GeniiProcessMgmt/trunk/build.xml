@@ -45,7 +45,7 @@
 	</target>
 
 	<target name="clean">
-                <delete>
+                <delete failonerror="false">
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>
 		<delete dir="${lib.dir}"/>

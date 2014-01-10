@@ -123,8 +123,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		this.restrictions = restrictions;
 		this.id = new GUID().toString();
 		this.signed = false;
-		if (_logger.isDebugEnabled())
-			_logger.debug("created trust delegation: " + describe(VerbosityLevel.LOW));
+		if (_logger.isTraceEnabled())
+			_logger.trace("created trust delegation: " + describe(VerbosityLevel.LOW));
 	}
 
 	/**
@@ -703,7 +703,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	public boolean checkRWXAccess(RWXCategory category)
 	{
 		if (!accessMask.contains(category)) {
-			_logger.info("Credential does not have " + category.toString() + " access.");
+			if (_logger.isTraceEnabled())
+				_logger.trace("Credential does not have " + category.toString() + " access.");
 			return false;
 		}
 		if (priorDelegation != null)

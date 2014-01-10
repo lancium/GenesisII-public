@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="genned-src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="../../../ext/axis/axis.jar" sourcepath="/home/fred/xsede/code/axis1.4-gen2-ed"/>
+	<classpathentry kind="lib" path="../../../ext/axis/axis.jar" sourcepath="/home/fred/xsede/code/archived/axis1.4.gen2/src"/>
 	<classpathentry kind="lib" path="../../../ext/axis/jaxrpc.jar"/>
 	<classpathentry kind="lib" path="../../../ext/axis/axis-ant.jar"/>
 	<classpathentry kind="lib" path="../../../ext/ant/ant-jsch.jar"/>

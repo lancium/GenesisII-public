@@ -82,7 +82,7 @@ static PCCERT_CONTEXT findCertContext(JNIEnv *env, HCERTSTORE hSystemStore, BYTE
 		keyId = (BYTE *) malloc(keyIdLen);
 		if (!CertGetCertificateContextProperty(pCertContext, CERT_KEY_IDENTIFIER_PROP_ID,
 				keyId, &keyIdLen)) {
-		
+			free(keyId);
 			throwException(env, EXCEPTION_CLASS, "Could not get alias for certificate");
 			CertCloseStore(hSystemStore, 0);
 			return NULL;
@@ -99,6 +99,7 @@ static PCCERT_CONTEXT findCertContext(JNIEnv *env, HCERTSTORE hSystemStore, BYTE
 				}
 			}
 		}
+		free(keyId);
 		if (found) {
 			return pCertContext;
 		}
@@ -235,7 +236,7 @@ JNIEXPORT jobject JNICALL Java_edu_virginia_vcgr_genii_client_security_wincrypto
 		keyId = (BYTE *) malloc(propLen);
 		if (!CertGetCertificateContextProperty(pCertContext, CERT_KEY_IDENTIFIER_PROP_ID,
 				keyId, &propLen)) {
-		
+			free(keyId);
 			throwException(env, EXCEPTION_CLASS, "Could not get alias for certificate");
 			CertCloseStore(hSystemStore, 0);
 			return NULL;
@@ -498,6 +499,7 @@ JNIEXPORT jstring JNICALL Java_edu_virginia_vcgr_genii_client_security_wincrypto
 	if (!CertGetCertificateContextProperty(pCertContext, CERT_FRIENDLY_NAME_PROP_ID,
 		friendlyName, &propLen)) 
 	{
+		free(friendlyName);
 		throwException(env, EXCEPTION_CLASS, "Could not get friendly name for certificate");
 		CertCloseStore(hSystemStore, 0);
 		return NULL;

@@ -369,7 +369,7 @@ public class JobManager implements Closeable
 
 			/* Otherwise, we'll just requeue him */
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Requeueing job %s because we has more attempts left.", job));
+				_logger.debug(String.format("Requeueing job %s because we have more attempts left.", job));
 			newState = QueueStates.REQUEUED;
 			ret = true;
 		}

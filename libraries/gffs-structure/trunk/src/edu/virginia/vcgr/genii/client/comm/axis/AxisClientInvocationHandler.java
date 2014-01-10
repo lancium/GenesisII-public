@@ -49,6 +49,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
 import edu.virginia.vcgr.appmgr.version.Version;
+import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
@@ -202,7 +203,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		stubInstance._setProperty("attachments.implementation", "org.apache.axis.attachments.AttachmentsImpl");
 
 		X509Certificate[] chain = EPRUtils.extractCertChain(_epr);
-		if ((chain != null) && _logger.isDebugEnabled()) {
+		if ((chain != null) && _logger.isTraceEnabled()) {
 			int which = 0;
 			for (X509Certificate cert : chain) {
 				if (_logger.isTraceEnabled())
@@ -413,12 +414,40 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 		return _manager;
 	}
+	
+	// tracks re-entry / recursion in invoke.
+	private static Integer inInvokeMethod = new Integer(0);
 
 	@Override
 	public Object invoke(Object target, Method m, Object[] params) throws Throwable
 	{
-		InvocationInterceptorManager mgr = getManager();
-		return mgr.invoke(getTargetEPR(), _callContext, this, m, params);
+		Object toReturn = null;
+		synchronized (inInvokeMethod) {
+			inInvokeMethod++;
+			if (inInvokeMethod > 1) {
+				String msg = "serious error, we think: recursion in invoke() method: " + ProgramTools.showLastFewOnStack(7);
+				_logger.warn(msg);
+//				throw new RuntimeException(msg);
+			}
+		}
+		try {
+			InvocationInterceptorManager mgr = getManager();
+			toReturn = mgr.invoke(getTargetEPR(), _callContext, this, m, params);
+		} catch (Throwable t) {
+			String msg = "client failed to invoke";
+			_logger.error(msg, t);
+			throw t;
+		} finally {
+			synchronized (inInvokeMethod) {
+				inInvokeMethod--;
+				if (inInvokeMethod < 0) {
+					String msg = "logic error; invoke tracker is at erroneous value!!: " + ProgramTools.showLastFewOnStack(7);
+					_logger.error(msg);
+//					throw new RuntimeException(msg);
+				}
+			}
+		}
+		return toReturn;
 	}
 
 	static private boolean isConnectionException(Throwable cause)
@@ -462,7 +491,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			} catch (Throwable cause) {
 				if (!isConnectionException(cause)) {
 					if (_logger.isDebugEnabled())
-						_logger.debug("Unable to communicate with endpoint " + "(not a retryable-exception).");
+						_logger.debug("Unable to communicate with endpoint (not a retryable-exception).");
 					throw cause;
 				} else {
 					// Presumably, here I need to invalidate the cache for all entries that
@@ -473,7 +502,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				int maxAttempts = (type.isEpiResolver() ? 1 : 5);
 				if (attempt >= maxAttempts) {
 					if (_logger.isDebugEnabled())
-						_logger.debug("Unable to communicate with endpoint " + "after " + attempt + " attempts.");
+						_logger.debug("Unable to communicate with endpoint after " + attempt + " attempts.");
 					throw cause;
 				}
 				// deltaCommunicate is the total amount of time spent on the attempt,
@@ -482,7 +511,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				long deltaCommunicate = System.currentTimeMillis() - startAttempt;
 				if (deltaCommunicate > MAX_FAILURE_TIME_RETRY) {
 					if (_logger.isDebugEnabled())
-						_logger.debug("Unable to communicate with endpoint " + "after " + deltaCommunicate + " millis");
+						_logger.debug("Unable to communicate with endpoint after " + deltaCommunicate + " millis");
 					throw cause;
 				}
 				try {

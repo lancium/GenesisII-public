@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.text;
 
+import java.util.Random;
+
 public class TextHelper
 {
 	/**
@@ -30,5 +32,28 @@ public class TextHelper
 			toReturn[j * 2 + 1] = hexadecimalDigits[v & 0x0F];
 		}
 		return new String(toReturn);
+	}
+
+	/**
+	 * creates a random string of the requested length, using the character set provided.
+	 */
+	public static String randomString(Random rng, String characters, int length)
+	{
+		char[] text = new char[length];
+		for (int i = 0; i < length; i++) {
+			text[i] = characters.charAt(rng.nextInt(characters.length()));
+		}
+		return new String(text);
+	}
+
+	static String passwdSourceChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-+=_:;<>?/~!@#$%^&*";
+
+	/**
+	 * creates a random string of numbers, letters in both cases, and a few choice special
+	 * characters.
+	 */
+	public static String randomPasswordString(Random rng, int length)
+	{
+		return randomString(rng, passwdSourceChars, length);
 	}
 }

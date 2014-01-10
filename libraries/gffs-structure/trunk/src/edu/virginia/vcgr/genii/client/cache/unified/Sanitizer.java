@@ -34,6 +34,7 @@ public class Sanitizer
 
 	public static EndpointReferenceType getSanitizedEpr(EndpointReferenceType epr)
 	{
+		if (epr == null) return null;  // nothing's cleaner than nothing.
 		try {
 			byte[] eprBytes = ObjectSerializer.toBytes(epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint"));
 			return ObjectDeserializer.fromBytes(EndpointReferenceType.class, eprBytes);

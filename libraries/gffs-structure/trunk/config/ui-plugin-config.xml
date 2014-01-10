@@ -136,9 +136,11 @@
 		<top-menu menu-name="Tools" group="Shell" item-name="Launch Grid Shell"/>
 	</plugin>
 
+	<!--
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.logs.DLogPlugin">
 		<top-menu menu-name="Tools" group="Log" item-name="Log Manager"/>
 		<popup-menu group="Logs" item-name="Log Manager"/>
 	</plugin>
+	-->
 	
 </plugins>

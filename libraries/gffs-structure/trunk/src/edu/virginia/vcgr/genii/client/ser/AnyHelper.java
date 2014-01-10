@@ -210,7 +210,7 @@ public class AnyHelper
 
 	public static void write(Writer writer, MessageElement element) throws Exception
 	{
-		MessageContext messageContext = Config.mooch();
+		MessageContext messageContext = Config.getContext();
 		SerializationContext context = new SerializationContext(writer, messageContext);
 		context.setPretty(true);
 		element.output(context);
@@ -260,7 +260,7 @@ public class AnyHelper
 		if (elements == null) {
 			return null;
 		}
-		MessageContext messageContext = Config.mooch();
+		MessageContext messageContext = Config.getContext();
 		StringWriter writer = new StringWriter();
 		SerializationContext context = new SerializationContext(writer, messageContext);
 		context.setPretty(true);

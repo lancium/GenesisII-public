@@ -15,12 +15,16 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ivy.util.url.ApacheURLLister;
+import org.morgan.util.io.StreamUtils;
 
-/*
+/**
+ * HttpFileGrabber: a handy utility for downloading files from web sites.
+ * 
+ * @author Chris Koeritz
+ * 
  * information about apache ivy thanks to the example at:
  * http://www.java-forums.org/networking/15527-fetch-files-over-web-server.html
  */
-
 public class HttpFileGrabber
 {
 	static private Log _logger = LogFactory.getLog(HttpFileGrabber.class);
@@ -59,16 +63,9 @@ public class HttpFileGrabber
 		BufferedOutputStream bos = null;
 		try {
 			URLConnection urlc = url.openConnection();
-
 			bis = new BufferedInputStream(urlc.getInputStream());
 			bos = new BufferedOutputStream(new FileOutputStream(target.getPath()));
-
-			// hmmm: isn't there some kind of "dump from here to there" connector?
-			int i = bis.read();
-			while (i != -1) {
-				bos.write(i);
-				i = bis.read();
-			}
+			StreamUtils.copyStream(bis, bos);
 		} finally {
 			if (bis != null) {
 				try {

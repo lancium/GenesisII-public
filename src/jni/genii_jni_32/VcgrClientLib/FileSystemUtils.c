@@ -60,7 +60,7 @@ JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_client_io_FileSystemUtil
 	const char *msg;
 	const char *sFilepath = (*env)->GetStringUTFChars(env, filepath, NULL);
 	if (sFilepath == NULL)
-		return;
+		return 0;
 
 	if (lstat(sFilepath, &statBuf) < 0)
 	{

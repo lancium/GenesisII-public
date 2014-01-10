@@ -158,7 +158,7 @@ public abstract class BaseGridTool implements ITool
 			return _lastExit;
 		} catch (Throwable t) {
 			// unexpected issue, so set last exit to a failure value.
-			_logger.info("caught exception in run: " + t.getMessage());
+			_logger.info("caught exception in run.", t);
 			_lastExit = 1;
 			// re-throw the exception.
 			throw t;

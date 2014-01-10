@@ -3,25 +3,32 @@ package edu.virginia.vcgr.genii.client.cache.unified;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierType;
+import edu.virginia.vcgr.genii.client.cmd.Driver;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.fuse.DirectoryManager;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.osgi.OSGiSupport;
+import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
+import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
+import edu.virginia.vcgr.genii.text.TextHelper;
 
 public class RNSLookupCache extends CommonCache
 {
-
 	private TimedOutLRUCache<String, EndpointReferenceType> fileLookupCache;
 	private TimedOutLRUCache<String, EndpointReferenceType> directoryLookupCache;
 
-	public RNSLookupCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
+	public RNSLookupCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoringEnabled)
 	{
-
-		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
+		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
 		int directoryLookupCacheCapacity = capacity / 5;
 		int fileLookupCacheCapacity = capacity - directoryLookupCacheCapacity;
 
@@ -163,7 +170,6 @@ public class RNSLookupCache extends CommonCache
 	private void performWildcardMatching(String pathWithWildCard, Map<String, EndpointReferenceType> matchings,
 		TimedOutLRUCache<String, EndpointReferenceType> cache)
 	{
-
 		// Instead of directly iterating over the keySet of the cache we replicate the keySet into
 		// another set and iterate over that. This is done to avoid misbehavior of the iterator due
 		// to the concurrent update made by the cache itself inside the cache.get(argument) method.
@@ -177,5 +183,64 @@ public class RNSLookupCache extends CommonCache
 				}
 			}
 		}
+	}
+
+	static public void main(String[] args) throws Throwable
+	{
+		// this test checks how we do once the cache has overflowed a few times.
+
+		// hmmm: this chunk should probably go into an app base setup method. something called by
+		// both
+		// the client and container...
+		if (!OSGiSupport.setUpFramework()) {
+			System.err.println("Exiting due to OSGi startup failure.");
+			System.exit(1);
+		}
+		SecurityUtilities.initializeSecurity();
+		try {
+			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
+		} catch (Throwable t) {
+			System.err.println("Security validation setup failure: " + t.getMessage());
+			System.exit(1);
+		}
+		// hmmm: ...bit to refactor ends just above.
+		Driver.loadClientState();
+
+		RNSPath rooty = null;
+		RNSPath currentPath = null;
+		try {
+			currentPath = ContextManager.getExistingContext().getCurrentPath();
+			rooty = currentPath.getRoot();
+		} catch (Exception e) {
+			_logger.error("failed to get root EPR.");
+			return;
+		}
+		Random rng = new Random();
+		RNSLookupCache cache = new RNSLookupCache(1, 500, 1000 * 30, true);
+
+		System.out.println("about to start the test; pausing 20 seconds to allow profiler to be engaged...");
+		Thread.sleep(1000 * 20);
+		System.out.println("now running the test...");
+
+		for (int iter = 0; iter < 100000; iter++) {
+			try {
+				String path = TextHelper.randomPasswordString(rng, rng.nextInt() % 100 + 1);
+				RNSPath toCache = new RNSPath(rooty, path, rooty.getCachedEPR(), true);
+				cache.putItem(path, toCache, toCache);
+			} catch (Exception e) {
+				_logger.error("crash in RNSLookupCache tester", e);
+			}
+		}
+
+		System.out.println("Sleeping now for 20 minutes to allow analysis...  feel free to break this.");
+		Thread.sleep(1000 * 1200);
+
+		/*
+		 * results:
+		 * 
+		 * 2013-12-20: this does not seem to be leaking in isolation, with the above test. it's not
+		 * totally realistic because the EPRs involved are already sanitized, but still the leak
+		 * doesn't seem to show up here at all.
+		 */
 	}
 }

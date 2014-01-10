@@ -11,19 +11,28 @@ package edu.virginia.vcgr.genii.client.ser;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 
-import org.apache.axis.encoding.AnyContentType;
-import org.apache.axis.description.TypeDesc;
-import org.apache.axis.message.MessageElement;
-
-import org.morgan.util.io.StreamUtils;
-import org.w3c.dom.Element;
-
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPElement;
 
+import org.apache.axis.description.TypeDesc;
+import org.apache.axis.encoding.AnyContentType;
+import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
+import org.w3c.dom.Element;
+import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.cmd.Driver;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.osgi.OSGiSupport;
+import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
+import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 /**
  * Converts Java DOM Elements and SOAP Elements to Java objects. The objects must be compliant with
@@ -32,6 +41,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
  */
 public class ObjectDeserializer
 {
+	static private Log _logger = LogFactory.getLog(ObjectDeserializer.class);
 
 	/**
 	 * Converts a DOM Element object into a Java object. The type of the Java object will be
@@ -267,5 +277,71 @@ public class ObjectDeserializer
 		} finally {
 			StreamUtils.close(ois);
 		}
+	}
+
+	static public void main(String[] args) throws Throwable
+	{
+		// this tests to see if we leak any byte[] or char[]. intended to run under profiler.
+
+		// hmmm: this chunk should probably go into an app base setup method. something called by
+		// both
+		// the client and container...
+		if (!OSGiSupport.setUpFramework()) {
+			System.err.println("Exiting due to OSGi startup failure.");
+			System.exit(1);
+		}
+		SecurityUtilities.initializeSecurity();
+		try {
+			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
+		} catch (Throwable t) {
+			System.err.println("Security validation setup failure: " + t.getMessage());
+			System.exit(1);
+		}
+		// hmmm: ...bit to refactor ends just above.
+		Driver.loadClientState();
+
+		RNSPath rooty = null;
+		RNSPath currentPath = null;
+		try {
+			currentPath = ContextManager.getExistingContext().getCurrentPath();
+			rooty = currentPath.getRoot();
+		} catch (Exception e) {
+			_logger.error("failed to get root EPR.");
+			return;
+		}
+
+		EndpointReferenceType epr = rooty.getCachedEPR();
+		if (epr == null) {
+			_logger.error("failed to load root EPR; is there a grid configured?");
+			return;
+		}
+
+		System.out.println("about to start the test; pausing 20 seconds to allow profiler to be engaged...");
+		Thread.sleep(1000 * 20);
+		System.out.println("now running the test...");
+
+		for (int iter = 0; iter < 100000; iter++) {
+			// the code below was snagged from the Sanitizer class, which the profiler led us to
+			// believe was leaking.
+			try {
+				byte[] eprBytes = ObjectSerializer.toBytes(epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint"));
+				EndpointReferenceType toReturn = ObjectDeserializer.fromBytes(EndpointReferenceType.class, eprBytes);
+				if (toReturn == null) {
+					_logger.error("got a null endpoint reference.");
+					return;
+				}
+			} catch (ResourceException e) {
+				throw new RuntimeException("failed to sanitize EndpointReferenceType", e);
+			}
+		}
+		System.out.println("Sleeping now for 20 minutes to allow analysis...  feel free to break this.");
+		Thread.sleep(1000 * 1200);
+
+		/*
+		 * results:
+		 * 
+		 * 2013-12-20: no memory leaks seen. memory periodically returned to near baseline, and
+		 * nothing persistent was seen.
+		 */
 	}
 }

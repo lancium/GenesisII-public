@@ -183,6 +183,8 @@ public class ApplicationBase
 
 	/**
 	 * supports replacing a few keywords (or one really, currently) with environment variables.
+	 * 
+	 * (this must not use InstallationProperties.getUserDir, since that is based on this.)
 	 */
 	public static String replaceKeywords(String pathToFix)
 	{

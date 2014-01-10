@@ -68,9 +68,13 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 
 	static final private String CACHE_SIZE_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory.max-cache-size";
+	
 	static final private int DEFAULT_MAX_CACHE_ELEMENTS = 64; // cak: reduced from 1024.
 
 	static final private int SESSION_CACHE_SIZE_MAX = 256; // cak: reduced from 1000.
+
+	// holds the maximum elements for the socket cache, rather than reading it from file every time.
+	static private Integer _maxCacheElements = -1;
 
 	static public InheritableThreadLocal<ICallingContext> threadCallingContext = new InheritableThreadLocal<ICallingContext>();
 
@@ -108,26 +112,31 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 	static public int getMaxCacheElements()
 	{
 		InputStream in = null;
-		int maxCacheElements = DEFAULT_MAX_CACHE_ELEMENTS;
-
-		try {
-			File sslCachePropertiesFile =
-				Installation.getDeployment(new DeploymentName()).getConfigurationDirectory().lookupFile("ssl-cache.properties");
-			in = new FileInputStream(sslCachePropertiesFile);
-			Properties props = new Properties();
-			props.load(in);
-			String value = props.getProperty(CACHE_SIZE_PROPERTY_NAME);
-			if (value != null) {
-				maxCacheElements = Integer.parseInt(value);
-				if (maxCacheElements < 0)
-					maxCacheElements = 0;
+		synchronized (_maxCacheElements) {
+			if (_maxCacheElements > -1)
+				return _maxCacheElements;
+			_maxCacheElements = DEFAULT_MAX_CACHE_ELEMENTS;
+			try {
+				File sslCachePropertiesFile =
+					Installation.getDeployment(new DeploymentName()).getConfigurationDirectory()
+						.lookupFile("ssl-cache.properties");
+				in = new FileInputStream(sslCachePropertiesFile);
+				Properties props = new Properties();
+				props.load(in);
+				String value = props.getProperty(CACHE_SIZE_PROPERTY_NAME);
+				if (value != null) {
+					_maxCacheElements = Integer.parseInt(value);
+					if (_maxCacheElements < 0)
+						_maxCacheElements = 0;
+				}
+			} catch (Throwable cause) {
+				_logger.warn("Unable to lookup ssl-cache.properties configuration file.  Using default values!", cause);
+			} finally {
+				StreamUtils.close(in);
 			}
-		} catch (Throwable cause) {
-			_logger.warn("Unable to lookup ssl-cache.properties configuration file.  Using default values!", cause);
-		} finally {
-			StreamUtils.close(in);
 		}
-		return maxCacheElements;
+
+		return _maxCacheElements;
 	}
 
 	protected SSLSocketFactory getSSLSocketFactory() throws IOException
@@ -180,7 +189,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			} else {
 				if (sessionContext.getSessionCacheSize() > SESSION_CACHE_SIZE_MAX) {
 					if (_logger.isDebugEnabled())
-						_logger.debug("Setting server ssl session context cache size to 1000.");
+						_logger.debug("Setting server ssl session context cache size to max.");
 					sessionContext.setSessionCacheSize(SESSION_CACHE_SIZE_MAX);
 				}
 			}
@@ -199,7 +208,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			} else {
 				if (sessionContext.getSessionCacheSize() > SESSION_CACHE_SIZE_MAX) {
 					if (_logger.isDebugEnabled())
-						_logger.debug("Setting server ssl session context cache size to 1000.");
+						_logger.debug("Setting server ssl session context cache size to max.");
 					sessionContext.setSessionCacheSize(SESSION_CACHE_SIZE_MAX);
 				}
 			}

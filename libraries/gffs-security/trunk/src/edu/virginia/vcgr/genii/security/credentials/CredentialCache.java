@@ -26,12 +26,12 @@ public class CredentialCache
 	static private Log _logger = LogFactory.getLog(CredentialCache.class);
 
 	static public final int CACHE_SIZE = 64;
-	static public final long TIMEOUT_MS = 1000L * 60L * 60L; // 1 hour lifetime in cache
+	static public final long TIMEOUT_MS = 1000L * 60L; // 1 minute lifetime in cache
 
-	static public TimedOutLRUCache<ChainsCacheKey, TrustCredential> credentialChains =
+	static private TimedOutLRUCache<ChainsCacheKey, TrustCredential> credentialChains =
 		new TimedOutLRUCache<ChainsCacheKey, TrustCredential>(CACHE_SIZE, SecurityConstants.CredentialCacheTimeout);
 
-	static public TimedOutLRUCache<SingletonCacheKey, TrustCredential> isolatedCreds =
+	static private TimedOutLRUCache<SingletonCacheKey, TrustCredential> isolatedCreds =
 		new TimedOutLRUCache<SingletonCacheKey, TrustCredential>(CACHE_SIZE, SecurityConstants.CredentialCacheTimeout);
 
 	/**
@@ -78,8 +78,8 @@ public class CredentialCache
 			ChainsCacheKey seek = new ChainsCacheKey(cred.getId(), delegatee[0]);
 			TrustCredential delegation = credentialChains.get(seek);
 			if (delegation != null) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("credential chain cache hit--found existing delegation.");
+				if (_logger.isTraceEnabled())
+					_logger.trace("credential chain cache hit--found existing delegation.");
 			} else {
 				// not in cache: create a new linked trust credential.
 				delegation =
@@ -87,8 +87,8 @@ public class CredentialCache
 						accessCategories);
 				delegation.extendTrustChain(cred);
 				delegation.signAssertion(issuerPrivateKey);
-				if (_logger.isDebugEnabled())
-					_logger.debug("credential chain cache miss--created new delegation.");
+				if (_logger.isTraceEnabled())
+					_logger.trace("credential chain cache miss--created new delegation.");
 				credentialChains.put(seek, delegation);
 			}
 
@@ -105,23 +105,22 @@ public class CredentialCache
 		EnumSet<RWXCategory> accessCategories)
 	{
 		// check the cache to see if the credential we would create exists already.
-		synchronized (credentialChains) {
+		synchronized (isolatedCreds) {
 			SingletonCacheKey seek = new SingletonCacheKey(delegatee[0], issuer[0]);
 			TrustCredential delegation = isolatedCreds.get(seek);
 			if (delegation != null) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("singleton credential cache hit--found existing delegation.");
+				if (_logger.isTraceEnabled())
+					_logger.trace("singleton credential cache hit--found existing delegation.");
 			} else {
 				// not in cache: create a new isolated trust credential.
 				delegation =
 					new TrustCredential(delegatee, IdentityType.CONNECTION, issuer, IdentityType.OTHER, restrictions,
 						accessCategories);
 				delegation.signAssertion(issuerPrivateKey);
-				if (_logger.isDebugEnabled())
-					_logger.debug("singleton credential cache miss--created new delegation.");
+				if (_logger.isTraceEnabled())
+					_logger.trace("singleton credential cache miss--created new delegation.");
 				isolatedCreds.put(seek, delegation);
 			}
-
 			return delegation;
 		}
 	}

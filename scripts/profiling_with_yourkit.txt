@@ -2,7 +2,7 @@
 to profile with yourkit profiler, add a line like this to the trunk's
 "runContainer.sh" or "grid" after a build:
 
-"-agentpath:/usr/local/yjp-12.0.5/bin/linux-x86-64/libyjpagent.so"
+"-agentpath:/usr/local/yjp-2013/bin/linux-x86-64/libyjpagent.so"
 
 note: this addition will be wiped out if you build again.
 

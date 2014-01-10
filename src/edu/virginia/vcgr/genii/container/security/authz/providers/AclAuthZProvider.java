@@ -231,7 +231,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		}
 		if (trustList == null) {
 			// Empty ACL
-			_logger.error("failing ACL access check due to null trust list");
+			_logger.error("failing ACL access check due to null trust list.");
 			return false;
 		} else if (trustList.contains(null)) {
 			// ACL contains null (the wildcard certificate)
@@ -299,8 +299,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 
 			// pre-emptive check of wildcard access.
 			if ((acl == null) || checkAclAccess(null, category, acl)) {
-				if (_logger.isDebugEnabled())
-					_logger.debug(messagePrefix + "granted to everyone.");
+				if (_logger.isTraceEnabled())
+					_logger.trace(messagePrefix + "granted to everyone.");
 				return true;
 			}
 
@@ -310,8 +310,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 					if (cred instanceof X509Identity) {
 						if (((X509Identity) cred).checkRWXAccess(category)) {
 							if (checkAclAccess((Identity) cred, category, acl)) {
-								if (_logger.isDebugEnabled())
-									_logger.debug(messagePrefix + "granted to identity with x509: "
+								if (_logger.isTraceEnabled())
+									_logger.trace(messagePrefix + "granted to identity with x509: "
 										+ cred.describe(VerbosityLevel.LOW));
 								return true;
 							}
@@ -328,8 +328,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 						// check root identity of trust delegation to see if it has access.
 						X509Identity ia = (X509Identity) sa.getRootIdentity();
 						if (checkAclAccess(ia, category, acl)) {
-							if (_logger.isDebugEnabled())
-								_logger.debug(messagePrefix + "granted to trust credential (for root identity): "
+							if (_logger.isTraceEnabled())
+								_logger.trace(messagePrefix + "granted to trust credential's root identity: "
 									+ sa.describe(VerbosityLevel.LOW));
 							return true;
 						}
@@ -338,13 +338,11 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			}
 
 			// Check Administrator Access
-			_logger.debug("about to check administrator...");
 			if (Security.isAdministrator(callContext)) {
-				if (_logger.isDebugEnabled())
-					_logger.debug(messagePrefix + "granted because caller is admin.");
+				if (_logger.isTraceEnabled())
+					_logger.trace(messagePrefix + "granted because caller is admin.");
 				return true;
 			}
-			_logger.debug("after checking if admin, and it was not");
 
 			// Nobody appreciates us.
 			if (_logger.isTraceEnabled()) {
@@ -366,7 +364,6 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource) throws AuthZSecurityException,
 		ResourceException
 	{
-
 		try {
 			// get ACL
 			Acl acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);

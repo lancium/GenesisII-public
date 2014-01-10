@@ -83,7 +83,7 @@
 		<delete dir="${dpages.dir}"/>
 		<delete dir="${generated.source.dir}"/>
 		<delete dir="${generated.obj.dir}"/>
-                <delete>
+                <delete failonerror="false">
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>
 		<delete quiet="true">

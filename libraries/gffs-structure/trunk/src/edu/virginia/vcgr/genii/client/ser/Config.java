@@ -31,7 +31,7 @@ public class Config
 
 	static private MessageContext _cached = null;
 
-	static public MessageContext mooch()
+	static public MessageContext getContext()
 	{
 		synchronized (Config.class) {
 			if (_cached == null) {
@@ -40,7 +40,6 @@ public class Config
 				_cached.setProperty(AxisClient.PROP_DOMULTIREFS, Boolean.FALSE);
 			}
 		}
-
 		return _cached;
 	}
 }

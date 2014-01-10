@@ -8,7 +8,7 @@
 	<classpathentry kind="lib" path="../../../ext/xmlbeans-2.4.0.jar"/>
 	<classpathentry kind="lib" path="../../../bundles/org.apache.commons.lang_2.6.0.v201205030909.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-basics"/>
-	<classpathentry kind="lib" path="../../../bundles/bundle-u6security_1.0.67.jar"/>
+	<classpathentry kind="lib" path="../../../bundles/bundle-u6security_1.0.67.jar" sourcepath="/home/fred/xsede/code/archived/temp_unicore_goods/u6_security/securityLibrary-3.1.0/src/main"/>
 	<classpathentry kind="lib" path="../../../ext/bcpkix-jdk15on-149.jar"/>
 	<classpathentry kind="lib" path="../../../ext/bcprov-jdk15on-149.jar"/>
 	<classpathentry kind="lib" path="../../../ext/canl-2.0.0-SNAPSHOT.jar"/>

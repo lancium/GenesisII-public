@@ -21,7 +21,7 @@
 	<classpathentry kind="lib" path="bundles/org.apache.commons.lang_2.6.0.v201205030909.jar"/>
 	<classpathentry kind="lib" path="bundles/org.slf4j.api_1.6.4.v20120130-2120.jar"/>
 	<classpathentry kind="lib" path="ext/xmlsec-1.4.6.jar"/>
-	<classpathentry kind="lib" path="ext/axis/axis.jar" sourcepath="/Axis 1.4"/>
+	<classpathentry kind="lib" path="ext/axis/axis.jar" sourcepath="/home/fred/xsede/code/archived/axis1.4.gen2/src"/>
 	<classpathentry kind="lib" path="ext/axis/jaxrpc.jar"/>
 	<classpathentry kind="lib" path="ext/axis/mail.jar"/>
 	<classpathentry kind="lib" path="ext/axis/commons-discovery-0.5.jar"/>

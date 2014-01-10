@@ -386,8 +386,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 	private void setMyProxyCertificateHeaders(MessageContext msgContext) throws AxisFault
 	{
-		if (_logger.isDebugEnabled())
-			_logger.debug("THE HEADER IS SET TO " + MyProxyCertificate.getPEMString());
+		if (_logger.isTraceEnabled())
+			_logger.trace("the myproxy header is: " + MyProxyCertificate.getPEMString());
 		SOAPHeaderElement pemKey = new SOAPHeaderElement(GenesisIIConstants.MYPROXY_QNAME, MyProxyCertificate.getPEMString());
 		try {
 			msgContext.getMessage().getSOAPHeader().addChildElement(pemKey);

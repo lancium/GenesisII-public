@@ -163,7 +163,6 @@ public class ObjectSerializer
 	public static void serialize(Writer writer, Object obj, QName name) throws ResourceException
 	{
 		serialize(writer, obj, name, false);
-
 	}
 
 	public static void serialize(Writer writer, Object obj, QName name, boolean nillable) throws ResourceException

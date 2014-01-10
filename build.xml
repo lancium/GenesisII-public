@@ -59,7 +59,8 @@
 	<import file="${basedir}/build-initial.xml"/>
 	<import file="${scripts.dir}/scripts.build.xml"/>
 	<import file="${lib.dir}/lib.build.xml"/>
-	<import file="${src.dir}/jni/genii_jni_win32/vcgrJniLibs.build.xml"/>
+	<import file="${src.dir}/jni/genii_jni_32/vcgrJniLibs.build.xml"/>
+<!-- hmmm: does the jni xml file above matter if it's 32 or 64 bits? -->
 
 	<!-- Build Targets -->
 	<target name="build" depends="announce,libraries,jars,lib-setup,scripts,run.unit.tests"/>
@@ -152,7 +153,9 @@
 		<delete dir="${basedir}/codegen"/>
 		<delete dir="${basedir}/simple-command"/>
 
-		<delete quiet="true" dir="${obj.dir}"/>
+		<delete quiet="true" failonerror="false">
+			<fileset dir="${obj.dir}" includes="**/*" />
+		</delete>
 		<delete quiet="true">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>

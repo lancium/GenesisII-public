@@ -28,7 +28,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public class ObjectDeserializationContext extends DeserializationContext
 {
-
 	private Deserializer topDeserializer = null;
 
 	public ObjectDeserializationContext(MessageElement element) throws ResourceException
@@ -38,7 +37,7 @@ public class ObjectDeserializationContext extends DeserializationContext
 
 	public ObjectDeserializationContext(MessageElement element, Class<?> javaClass) throws ResourceException
 	{
-		super(Config.mooch(), new SOAPHandler());
+		super(Config.getContext(), new SOAPHandler());
 
 		init(element.getType(), javaClass);
 
@@ -53,7 +52,7 @@ public class ObjectDeserializationContext extends DeserializationContext
 
 	public ObjectDeserializationContext(Element element, Class<?> javaClass) throws ResourceException
 	{
-		super(Config.mooch(), new SOAPHandler());
+		super(Config.getContext(), new SOAPHandler());
 
 		String typeAttr = element.getAttributeNS(Constants.URI_DEFAULT_SCHEMA_XSI, "type");
 
@@ -71,7 +70,7 @@ public class ObjectDeserializationContext extends DeserializationContext
 
 	public ObjectDeserializationContext(InputSource input, Class<?> javaClass) throws ResourceException
 	{
-		super(Config.mooch(), new SOAPHandler());
+		super(Config.getContext(), new SOAPHandler());
 		init(null, javaClass);
 		this.inputSource = input;
 	}

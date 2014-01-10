@@ -1125,7 +1125,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			String str =
 				(String) XPathFactory.newInstance().newXPath().evaluate("/*/Ticker", inputSource, XPathConstants.STRING);
 			System.err.println("The String is \"" + str + "\".");
-
+			StreamUtils.close(writer);
 			return null;
 		} catch (SOAPException se) {
 			_logger.error("Unable to query resource properties.", se);
