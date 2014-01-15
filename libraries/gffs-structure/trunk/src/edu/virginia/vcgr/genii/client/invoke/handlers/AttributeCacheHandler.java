@@ -336,7 +336,7 @@ public class AttributeCacheHandler
 							|| elemName.equals(screatTime)) {
 							if (_logger.isDebugEnabled())
 								_logger.debug("Adding " + elemName + " to " + name);
-							cachedAttrs.add(elem);
+							cachedAttrs.add((MessageElement)elem.cloneNode(true));
 						} else {
 							if (_logger.isDebugEnabled())
 								_logger.debug("NOT Adding " + elemName + " to " + name);

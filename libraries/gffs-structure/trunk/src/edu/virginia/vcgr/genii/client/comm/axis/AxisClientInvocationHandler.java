@@ -425,9 +425,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		synchronized (inInvokeMethod) {
 			inInvokeMethod++;
 			if (inInvokeMethod > 1) {
-				String msg = "serious error, we think: recursion in invoke() method: " + ProgramTools.showLastFewOnStack(7);
-				_logger.warn(msg);
-//				throw new RuntimeException(msg);
+				_logger.debug("client invoke recursion level now at " + inInvokeMethod + ".");
 			}
 		}
 		try {
@@ -441,9 +439,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			synchronized (inInvokeMethod) {
 				inInvokeMethod--;
 				if (inInvokeMethod < 0) {
-					String msg = "logic error; invoke tracker is at erroneous value!!: " + ProgramTools.showLastFewOnStack(7);
-					_logger.error(msg);
-//					throw new RuntimeException(msg);
+					_logger.error("logic error; invoke tracker is at erroneous value!!: " + ProgramTools.showLastFewOnStack(7));
 				}
 			}
 		}

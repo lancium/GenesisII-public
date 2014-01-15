@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client;
 import java.io.File;
 import java.io.Reader;
 import java.io.Writer;
+import java.security.GeneralSecurityException;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
@@ -13,11 +14,18 @@ import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.tools.ConnectTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.context.ContextType;
+import edu.virginia.vcgr.genii.osgi.OSGiSupport;
+import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
+import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 public class ApplicationBase
 {
@@ -73,8 +81,22 @@ public class ApplicationBase
 	/**
 	 * Prepares the static configuration manager.
 	 */
-	static protected void prepareServerApplication()
+	static protected void prepareServerApplication() throws GeneralSecurityException
 	{
+		LoggingContext.assumeNewLoggingContext();
+
+		if (!OSGiSupport.setUpFramework()) {
+			System.err.println("Exiting due to OSGi startup failure.");
+			System.exit(1);
+		}
+		SecurityUtilities.initializeSecurity();
+
+		CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
+
+		GridEnvironment.loadGridEnvironment();
+
+		ContainerStatistics.instance();
+
 		ContainerProperties cProperties = ContainerProperties.getContainerProperties();
 		String depName = cProperties.getDeploymentName();
 		if (depName != null)

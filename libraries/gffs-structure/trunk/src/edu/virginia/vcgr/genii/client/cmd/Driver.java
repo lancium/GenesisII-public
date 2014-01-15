@@ -34,6 +34,20 @@ public class Driver extends ApplicationBase
 
 	static public void loadClientState()
 	{
+		if (!OSGiSupport.setUpFramework()) {
+			System.err.println("Exiting due to OSGi startup failure.");
+			System.exit(1);
+		}
+
+		SecurityUtilities.initializeSecurity();
+
+		try {
+			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
+		} catch (Throwable t) {
+			System.err.println("Security validation setup failure: " + t.getMessage());
+			System.exit(1);
+		}
+
 		GridEnvironment.loadGridEnvironment();
 		String deploymentName = System.getenv("GENII_DEPLOYMENT_NAME");
 		if (deploymentName != null) {
@@ -53,20 +67,6 @@ public class Driver extends ApplicationBase
 
 	static public void main(String[] args)
 	{
-		if (!OSGiSupport.setUpFramework()) {
-			System.err.println("Exiting due to OSGi startup failure.");
-			System.exit(1);
-		}
-
-		SecurityUtilities.initializeSecurity();
-
-		try {
-			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
-		} catch (Throwable t) {
-			System.err.println("Security validation setup failure: " + t.getMessage());
-			System.exit(1);
-		}
-
 		// first run through, go ahead and try to load the state.
 		loadClientState();
 

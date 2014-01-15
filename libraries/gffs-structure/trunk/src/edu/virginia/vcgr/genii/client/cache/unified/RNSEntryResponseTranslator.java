@@ -81,7 +81,7 @@ public class RNSEntryResponseTranslator implements CacheableItemsGenerator
 				CacheableItem item = new CacheableItem();
 				item.setKey(element.getQName());
 				item.setTarget(entryEPR);
-				item.setValue(element);
+				item.setValue(element.cloneNode(true));
 				itemList.add(item);
 			}
 		}

@@ -57,7 +57,6 @@ import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
-import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -65,12 +64,9 @@ import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.container.ContainerIDFile;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
-import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.security.KeystoreManager;
-import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
@@ -79,8 +75,6 @@ import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
-import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
-import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 
 public class Container extends ApplicationBase
@@ -111,25 +105,10 @@ public class Container extends ApplicationBase
 			usage();
 			System.exit(1);
 		}
-
-		LoggingContext.assumeNewLoggingContext();
-
-		if (!OSGiSupport.setUpFramework()) {
-			System.err.println("Exiting due to OSGi startup failure.");
-			System.exit(1);
-		}
-		SecurityUtilities.initializeSecurity();
+		if (args.length == 1)
+			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, args[0]);
 
 		try {
-			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
-
-			GridEnvironment.loadGridEnvironment();
-
-			ContainerStatistics.instance();
-
-			if (args.length == 1)
-				System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, args[0]);
-
 			prepareServerApplication();
 
 			// Set Trust Store Provider

@@ -45,6 +45,12 @@ public class LsTool extends BaseGridTool
 	private boolean _certChain = false;
 	private boolean _multiline = false;
 
+	// hmmm: fix this as soon as leak tracking is done!
+	
+	// do not enable this unless you want LsTool to accumulate memory forever.
+	static boolean enableToenailCollecting = false;
+	static ArrayList<RNSPath> _toenailCollection = new ArrayList<RNSPath>();
+
 	public LsTool()
 	{
 		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.DATA);
@@ -250,14 +256,14 @@ public class LsTool extends BaseGridTool
 	static public class DirLister implements RNSPathApplyFunction
 	{
 		PrintWriter _out;
-		ArrayList<RNSPath> _subdirs;
+		ArrayList<String> _subdirs;
 		boolean _isLong;
 		boolean _isAll;
 		boolean _isEPR;
 		boolean _isMultiline;
 		boolean _isCertChain;
 
-		DirLister(PrintWriter out, ArrayList<RNSPath> subdirs, boolean isLong, boolean isAll, boolean isEPR,
+		DirLister(PrintWriter out, ArrayList<String> subdirs, boolean isLong, boolean isAll, boolean isEPR,
 			boolean isMultiline, boolean isCertChain)
 		{
 			_out = out;
@@ -274,12 +280,14 @@ public class LsTool extends BaseGridTool
 		{
 			TypeInformation type = new TypeInformation(applyTo.getEndpoint());
 			try {
+				if (enableToenailCollecting)
+					_toenailCollection.add(applyTo);
 				printEntry(_out, type, applyTo, _isLong, _isAll, _isEPR, _isMultiline, _isCertChain);
 			} catch (ResourceException e) {
 				throw new RNSException("failed to print entry due to resource exception", e);
 			}
 			if (type.isRNS())
-				_subdirs.add(applyTo);
+				_subdirs.add(applyTo.getName());
 			return true;
 		}
 	}
@@ -294,19 +302,15 @@ public class LsTool extends BaseGridTool
 			name = prefix + "/" + name;
 		out.println(name + ":");
 
-		// hmmm: this looks like a super great place to use the "apply this function" approach;
-		// instead of downloading the whole list into memory and keeping it, just iterate across
-		// the items in the rns path.
-		// /Collection<RNSPath> entries = path.listContents();
-		ArrayList<RNSPath> subdirs = new ArrayList<RNSPath>();
-
+		ArrayList<String> subdirs = new ArrayList<String>();
 		DirLister dl = new DirLister(out, subdirs, isLong, isAll, isEPR, isMultiline, isCertChain);
 		path.applyToContents(dl);
 
 		out.println();
 		if (isRecursive) {
-			for (RNSPath entry : subdirs) {
-				listDirectory(out, name, entry, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
+			for (String entry : subdirs) {
+				RNSPath sub = new RNSPath(path, entry, null, false);
+				listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
 			}
 		}
 	}

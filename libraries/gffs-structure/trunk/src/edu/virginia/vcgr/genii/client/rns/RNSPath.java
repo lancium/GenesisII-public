@@ -64,6 +64,11 @@ public class RNSPath implements Serializable, Cloneable
 
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
 
+	private RNSPath _parent;
+	private String _nameFromParent;
+	private EndpointReferenceType _cachedEPR;
+	private boolean _attemptedResolve;
+
 	static public interface RNSPathApplyFunction
 	{
 		// if the apply iteration should stop, then the derived method should return false.
@@ -95,11 +100,6 @@ public class RNSPath implements Serializable, Cloneable
 			throw new RuntimeException("Unknown exception occurred trying to create proxy.", re);
 		}
 	}
-
-	private RNSPath _parent;
-	private String _nameFromParent;
-	private EndpointReferenceType _cachedEPR;
-	private boolean _attemptedResolve;
 
 	private EndpointReferenceType resolveRequired() throws RNSPathDoesNotExistException
 	{
@@ -170,6 +170,10 @@ public class RNSPath implements Serializable, Cloneable
 			_attemptedResolve = true;
 			storeResourceConfigInCache();
 		}
+		
+		//hmmm: super noisy object creation tracing.
+		if (_logger.isDebugEnabled())
+			_logger.debug("++ creating RNSPath for path: " + pwd());		
 	}
 
 	/**
@@ -183,6 +187,13 @@ public class RNSPath implements Serializable, Cloneable
 		this(null, null, root, true);
 	}
 
+	public void finalize()
+	{
+		//hmmm: super noisy object creation tracing.
+		if (_logger.isDebugEnabled())
+			_logger.debug("-- cleaning RNSPath at path: " + pwd());
+	}
+	
 	/**
 	 * Turn the current RNSPath into a sandbox. This essentially makes the current grid directory
 	 * the root of a new namespace.
@@ -474,8 +485,6 @@ public class RNSPath implements Serializable, Cloneable
 			throw new IllegalArgumentException("Cannot lookup a path which is null.");
 
 		String[] pathElements = PathUtils.normalizePath(pwd(), path);
-		// String fullPath = PathUtils.formPath(pathElements);
-		RNSPath ret = null;
 		ArrayList<RNSPath> arrayRep = new ArrayList<RNSPath>();
 		arrayify(arrayRep);
 
@@ -492,8 +501,7 @@ public class RNSPath implements Serializable, Cloneable
 
 		if (lcv >= pathElements.length) {
 			// We completely matched a portion of the original path
-			ret = arrayRep.get(lcv);
-			return ret;
+			return arrayRep.get(lcv);
 		}
 
 		RNSPath next = arrayRep.get(lcv);
@@ -508,6 +516,7 @@ public class RNSPath implements Serializable, Cloneable
 			if (next.exists())
 				throw new RNSPathAlreadyExistsException(next.pwd());
 		}
+
 		return next;
 	}
 
@@ -685,6 +694,9 @@ public class RNSPath implements Serializable, Cloneable
 	/**
 	 * List all of the entries in the given RNS directory.
 	 * 
+	 * This does not add the items to the cache, since the directories could potentially be huge,
+	 * and this will just wash out entries we care about, like the root RNSPath.
+	 * 
 	 * @return The set of all RNSPath entries contained in this directory.
 	 * 
 	 * @throws RNSPathDoesNotExistException
@@ -722,7 +734,12 @@ public class RNSPath implements Serializable, Cloneable
 		}
 	}
 
-	// This method performs grouped/batch-mode operation on the RNS
+	/**
+	 * This method performs grouped/batch-mode operation on the RNS paths.
+	 * 
+	 * This does not add the items to the cache, since the directories could potentially be huge,
+	 * and this will just wash out entries we care about, like the root RNSPath.
+	 */
 	public Collection<RNSPath> listContents(String... lookupPath) throws RNSPathDoesNotExistException, RNSException
 	{
 		EndpointReferenceType me = resolveRequired();
@@ -737,15 +754,12 @@ public class RNSPath implements Serializable, Cloneable
 				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), true);
 				ret.add(newEntry);
 			}
-
 			return ret;
 		} catch (GenesisIISecurityException gse) {
 			throw new RNSException("Unable to list contents -- " + "security exception.", gse);
 		} catch (RemoteException re) {
 			throw new RNSException("Unable to list the contents.", re);
-		}
-
-		finally {
+		} finally {
 			if (entries != null) {
 				StreamUtils.close(entries.getIterable());
 			}
@@ -815,6 +829,7 @@ public class RNSPath implements Serializable, Cloneable
 		try {
 			_cachedEPR = proxy.add(_nameFromParent, epr);
 			_attemptedResolve = true;
+			storeResourceConfigInCache();
 		} catch (RemoteException re) {
 			throw new RNSException("Unable to link in new EPR.", re);
 		}
@@ -838,6 +853,7 @@ public class RNSPath implements Serializable, Cloneable
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 
 		EnhancedRNSPortType rpt = createProxy(parentEPR, EnhancedRNSPortType.class);
+		removeEPRFromCache();
 		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
 		try {
 			proxy.remove(_nameFromParent);
@@ -863,6 +879,8 @@ public class RNSPath implements Serializable, Cloneable
 		if (_parent == null)
 			throw new RNSException("Attempt to unlink root not allowed.");
 
+		removeEPRFromCache();
+
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 		try {
 			if (EPRUtils.isCommunicable(_cachedEPR)) {
@@ -878,6 +896,11 @@ public class RNSPath implements Serializable, Cloneable
 		} catch (RemoteException re) {
 			throw new RNSException("Unable to delete entry.", re);
 		}
+	}
+
+	private void removeEPRFromCache()
+	{
+		CacheManager.removeItemFromCache(pwd(), EndpointReferenceType.class);
 	}
 
 	/*
