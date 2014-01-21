@@ -46,7 +46,7 @@ public class LsTool extends BaseGridTool
 	private boolean _multiline = false;
 
 	// hmmm: fix this as soon as leak tracking is done!
-	
+
 	// do not enable this unless you want LsTool to accumulate memory forever.
 	static boolean enableToenailCollecting = false;
 	static ArrayList<RNSPath> _toenailCollection = new ArrayList<RNSPath>();

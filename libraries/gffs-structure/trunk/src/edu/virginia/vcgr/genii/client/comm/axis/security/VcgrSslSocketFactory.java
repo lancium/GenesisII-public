@@ -68,7 +68,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 
 	static final private String CACHE_SIZE_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory.max-cache-size";
-	
+
 	static final private int DEFAULT_MAX_CACHE_ELEMENTS = 64; // cak: reduced from 1024.
 
 	static final private int SESSION_CACHE_SIZE_MAX = 256; // cak: reduced from 1000.

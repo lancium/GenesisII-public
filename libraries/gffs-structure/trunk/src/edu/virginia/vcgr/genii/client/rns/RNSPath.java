@@ -170,10 +170,10 @@ public class RNSPath implements Serializable, Cloneable
 			_attemptedResolve = true;
 			storeResourceConfigInCache();
 		}
-		
-		//hmmm: super noisy object creation tracing.
+
+		// hmmm: super noisy object creation tracing.
 		if (_logger.isDebugEnabled())
-			_logger.debug("++ creating RNSPath for path: " + pwd());		
+			_logger.debug("++ creating RNSPath for path: " + pwd());
 	}
 
 	/**
@@ -189,11 +189,11 @@ public class RNSPath implements Serializable, Cloneable
 
 	public void finalize()
 	{
-		//hmmm: super noisy object creation tracing.
+		// hmmm: super noisy object creation tracing.
 		if (_logger.isDebugEnabled())
 			_logger.debug("-- cleaning RNSPath at path: " + pwd());
 	}
-	
+
 	/**
 	 * Turn the current RNSPath into a sandbox. This essentially makes the current grid directory
 	 * the root of a new namespace.

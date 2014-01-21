@@ -414,7 +414,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 		return _manager;
 	}
-	
+
 	// tracks re-entry / recursion in invoke.
 	private static Integer inInvokeMethod = new Integer(0);
 

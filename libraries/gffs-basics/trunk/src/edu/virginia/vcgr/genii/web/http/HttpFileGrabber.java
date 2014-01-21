@@ -22,8 +22,8 @@ import org.morgan.util.io.StreamUtils;
  * 
  * @author Chris Koeritz
  * 
- * information about apache ivy thanks to the example at:
- * http://www.java-forums.org/networking/15527-fetch-files-over-web-server.html
+ *         information about apache ivy thanks to the example at:
+ *         http://www.java-forums.org/networking/15527-fetch-files-over-web-server.html
  */
 public class HttpFileGrabber
 {
