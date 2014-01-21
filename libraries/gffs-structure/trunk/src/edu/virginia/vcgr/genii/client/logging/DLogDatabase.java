@@ -181,6 +181,7 @@ public class DLogDatabase
 		EndpointReferenceType ret = null;
 		PreparedStatement stmt = null;
 		ResultSet res = null;
+		ResourceException errorThatOccurred = null;
 
 		try {
 			con = getConnection();
@@ -196,7 +197,8 @@ public class DLogDatabase
 					try {
 						ret = EPRUtils.fromBlob(res.getBlob(DLogConstants.DLOG_METADATA_EPR));
 					} catch (ResourceException e) {
-						throw new SQLException("Problem converting database object into EPR type", e);
+						errorThatOccurred = e;
+						break;
 					}
 				}
 			}
@@ -204,6 +206,9 @@ public class DLogDatabase
 			StreamUtils.close(res);
 			StreamUtils.close(stmt);
 			closeConnection(con);
+		}
+		if (errorThatOccurred != null) {
+			throw new SQLException("Problem converting database object into EPR type", errorThatOccurred);
 		}
 		return ret;
 	}
