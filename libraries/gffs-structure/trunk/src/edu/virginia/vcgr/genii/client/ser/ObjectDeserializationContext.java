@@ -16,7 +16,6 @@ import org.apache.axis.Constants;
 import org.apache.axis.encoding.DeserializationContext;
 import org.apache.axis.encoding.Deserializer;
 import org.apache.axis.message.EnvelopeHandler;
-import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPHandler;
 import org.apache.axis.utils.XMLUtils;
 
@@ -30,12 +29,13 @@ public class ObjectDeserializationContext extends DeserializationContext
 {
 	private Deserializer topDeserializer = null;
 
-	public ObjectDeserializationContext(MessageElement element) throws ResourceException
+	public ObjectDeserializationContext(org.apache.axis.message.MessageElement element) throws ResourceException
 	{
 		this(element, null);
 	}
 
-	public ObjectDeserializationContext(MessageElement element, Class<?> javaClass) throws ResourceException
+	public ObjectDeserializationContext(org.apache.axis.message.MessageElement element, Class<?> javaClass)
+		throws ResourceException
 	{
 		super(Config.getContext(), new SOAPHandler());
 
@@ -118,7 +118,7 @@ public class ObjectDeserializationContext extends DeserializationContext
 		return (this.topDeserializer == null) ? null : this.topDeserializer.getValue();
 	}
 
-	public MessageElement getMessageElement()
+	public org.apache.axis.message.MessageElement getMessageElement()
 	{
 		if (this.topDeserializer == null || !(this.topDeserializer instanceof SOAPHandler)) {
 			return null;
@@ -128,7 +128,7 @@ public class ObjectDeserializationContext extends DeserializationContext
 
 	public QName getQName()
 	{
-		MessageElement element = getMessageElement();
+		org.apache.axis.message.MessageElement element = getMessageElement();
 		return (element == null) ? null : element.getQName();
 	}
 
