@@ -29,8 +29,6 @@ import org.w3c.dom.Node;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 
-// import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
-
 @XmlRootElement(namespace = ConstructionParameters.CONSTRUCTION_PARAMETERS_NS,
 	name = ConstructionParameters.CONSTRUCTION_PARAMETERS_NAME)
 public class ConstructionParameters implements Serializable

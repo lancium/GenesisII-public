@@ -31,7 +31,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
  */
 public class ObjectSerializer
 {
-
 	public static SOAPElement toSOAPElement(Object obj) throws ResourceException
 	{
 		return toSOAPElement(obj, null, false);
