@@ -185,25 +185,11 @@ public class RNSLookupCache extends CommonCache
 		}
 	}
 
+	/**
+	 * this test checks how we do once the cache has overflowed a few times.
+	 */
 	static public void main(String[] args) throws Throwable
 	{
-		// this test checks how we do once the cache has overflowed a few times.
-
-		// hmmm: this chunk should probably go into an app base setup method. something called by
-		// both
-		// the client and container...
-		if (!OSGiSupport.setUpFramework()) {
-			System.err.println("Exiting due to OSGi startup failure.");
-			System.exit(1);
-		}
-		SecurityUtilities.initializeSecurity();
-		try {
-			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
-		} catch (Throwable t) {
-			System.err.println("Security validation setup failure: " + t.getMessage());
-			System.exit(1);
-		}
-		// hmmm: ...bit to refactor ends just above.
 		Driver.loadClientState();
 
 		RNSPath rooty = null;
