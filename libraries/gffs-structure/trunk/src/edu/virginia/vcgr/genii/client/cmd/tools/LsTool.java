@@ -48,8 +48,8 @@ public class LsTool extends BaseGridTool
 	// hmmm: fix this as soon as leak tracking is done!
 
 	// do not enable this unless you want LsTool to accumulate memory forever.
-	static boolean enableToenailCollecting = false;
-	static ArrayList<RNSPath> _toenailCollection = new ArrayList<RNSPath>();
+	static boolean enableCruftCollecting = false;
+	static ArrayList<RNSPath> _crufticleCollection = new ArrayList<RNSPath>();
 
 	public LsTool()
 	{
@@ -280,8 +280,8 @@ public class LsTool extends BaseGridTool
 		{
 			TypeInformation type = new TypeInformation(applyTo.getEndpoint());
 			try {
-				if (enableToenailCollecting)
-					_toenailCollection.add(applyTo);
+				if (enableCruftCollecting)
+					_crufticleCollection.add(applyTo);
 				printEntry(_out, type, applyTo, _isLong, _isAll, _isEPR, _isMultiline, _isCertChain);
 			} catch (ResourceException e) {
 				throw new RNSException("failed to print entry due to resource exception", e);
