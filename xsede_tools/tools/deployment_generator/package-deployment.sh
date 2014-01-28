@@ -45,13 +45,13 @@ bash create-one-cert.sh trusted_certs/tls-cert.pfx container Container
 
 # next, we grab a copy of context.xml from the genesis2 folder.
 # we want to include this in the package.
-if [ ! -f context.xml ]; then
+#if [ ! -f context.xml ]; then
   cp $GENII_INSTALL_DIR/context.xml .
   if [ $? -ne 0 ]; then
     echo Failed to copy the context.xml from $GENII_INSTALL_DIR
     exit 1
   fi
-fi
+#fi
 
 # now start packing up the deployment generator.
 ARCHIVE_NAME=$HOME/deployment_pack_$(date_stringer).tar

@@ -52,6 +52,5 @@
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>
 		<delete dir="${lib.dir}"/>
-		<delete dir="${basedir}/bin"/>
 	</target>
 </project>	

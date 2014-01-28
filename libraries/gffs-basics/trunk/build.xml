@@ -102,7 +102,6 @@
 		<delete file="${basedir}/cert-tool.bat"/>
 		<delete file="${basedir}/jar-desc.xml"/>
 		<delete file="${basedir}/jserver-jar-desc.xml"/>
-		<delete dir="${basedir}/bin"/>
 		<delete>
 			<fileset dir="${basedir}"
 				includes="**/*.log"/>

@@ -39,6 +39,7 @@ public class DeleteFilePlugin extends AbstractCombinedUIMenusPlugin
 			} finally {
 				StreamUtils.close(contextToken);
 			}
+			context.endpointRetriever().refreshParent();
 		}
 	}
 

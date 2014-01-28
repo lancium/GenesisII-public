@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -239,11 +240,19 @@ public class RNSTree extends JTree implements Autoscroll
 			Point location = event.getLocation();
 			TreePath path = getPathForLocation(location.x, location.y);
 			Object node = path.getLastPathComponent();
+
 			if (node == null || !(node instanceof TreeNode)) {
 				_logger.fatal("Couldn't find drop target.");
 				event.rejectDrop();
 			}
-
+			//Right here is where we should verify
+/*			
+ * 			RNSTreeNode rNode = (RNSTreeNode) node;
+			int reply = 
+			JOptionPane.showConfirmDialog( "Are you sure you want copy "
+				+ rNode.getRNSPath().getName() + "?", "Yes -  ", JOptionPane.YES_NO_OPTION);
+			if (reply != JOptionPane.YES_OPTION) return;
+			*/
 			try {
 				Transferable tr = event.getTransferable();
 				if (tr.isDataFlavorSupported(RNSTransferableTreeNode.DEFAULT_RNS_PATHS_FLAVOR)) {

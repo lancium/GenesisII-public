@@ -292,18 +292,19 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	{
 		if (!creationParameters.containsKey(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM))
 			creationParameters.put(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, WSName.generateNewEPI());
+		if (!(this instanceof GeniiNoOutCalls)) {
 
-		CertCreationSpec spec = getChildCertSpec();
-		if (spec != null) {
-			creationParameters.put(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM, spec);
+			CertCreationSpec spec = getChildCertSpec();
+			if (spec != null) {
+				creationParameters.put(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM, spec);
+			}
+
+			// set the identity of the service into the creation params
+			X509Certificate[] serviceChain =
+					(X509Certificate[]) ResourceManager.getCurrentResource().dereference()
+					.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+			creationParameters.put(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM, serviceChain);
 		}
-
-		// set the identity of the service into the creation params
-		X509Certificate[] serviceChain =
-			(X509Certificate[]) ResourceManager.getCurrentResource().dereference()
-				.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-		creationParameters.put(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM, serviceChain);
-
 		return ResourceManager.createNewResource(_serviceName, creationParameters);
 	}
 
@@ -690,6 +691,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 							new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
 				}
 			}
+			else System.err.println("In createEPR 2 params it is GeniiNoOutcalls");
 
 			Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
 

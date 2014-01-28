@@ -127,6 +127,8 @@ function create_grid_certificates()
   local ADMIN_CER="$SECURITY_DIR/admin.cer"
   local ADMIN_PASSWD="$ADMIN_ACCOUNT_PASSWD"
 
+  local OWNER_CER="$SECURITY_DIR/owner.cer"
+
   # clean up any existing certificates.
   \rm -f $SECURITY_DIR/*.pfx $SECURITY_DIR/*.cer
 
@@ -143,6 +145,10 @@ function create_grid_certificates()
   check_if_failed "creating skynet admin certificate using CA"
   cp "$ADMIN_CER" "$SECURITY_DIR/default-owners/admin.cer"
   check_if_failed "copying admin certificate into default-owners"
+  cp "$ADMIN_CER" "$OWNER_CER"
+  check_if_failed "copying admin certificate as owner cert"
+  cp "$ADMIN_CER" "$SECURITY_DIR/default-owners/owner.cer"
+  check_if_failed "copying admin certificate as owner.cer in default-owners"
 
   create_certificate_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" $SECURITY_DIR/tls-cert.pfx tilly tls-cert "TLS certificate"
   check_if_failed "creating TLS certificate using CA"

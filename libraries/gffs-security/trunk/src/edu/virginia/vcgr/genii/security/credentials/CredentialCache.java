@@ -26,7 +26,7 @@ public class CredentialCache
 	static private Log _logger = LogFactory.getLog(CredentialCache.class);
 
 	static public final int CACHE_SIZE = 64;
-	static public final long TIMEOUT_MS = 1000L * 60L; // 1 minute lifetime in cache
+	static public final long TIMEOUT_MS = 1000L * 60L * 2L; // 2 minute lifetime in cache
 
 	static private TimedOutLRUCache<ChainsCacheKey, TrustCredential> credentialChains =
 		new TimedOutLRUCache<ChainsCacheKey, TrustCredential>(CACHE_SIZE, SecurityConstants.CredentialCacheTimeout);

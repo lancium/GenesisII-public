@@ -18,7 +18,7 @@ public class QuitExportAction extends AbstractAction implements ListSelectionLis
 {
 	static final long serialVersionUID = 0L;
 
-	static final private String _QUIT_EXPORT_BUTTON = "Quit Export";
+	static final private String _QUIT_EXPORT_BUTTON = "Stop Exporting";
 
 	private JTable _table;
 	private Collection<IExportChangeListener> _listeners = new ArrayList<IExportChangeListener>();

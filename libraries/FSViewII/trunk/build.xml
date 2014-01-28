@@ -45,7 +45,6 @@
                 <delete failonerror="false">
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>
-		<delete dir="${basedir}/bin"/>
 		<delete quiet="true">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>

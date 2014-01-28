@@ -5,7 +5,9 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -17,6 +19,7 @@ import javax.swing.border.TitledBorder;
 
 import edu.virginia.vcgr.genii.client.gui.GuiHelpAction;
 import edu.virginia.vcgr.genii.client.gui.HelpLinkConfiguration;
+
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
 public class ExportDirDialog extends JDialog
@@ -30,6 +33,22 @@ public class ExportDirDialog extends JDialog
 	private JTable _table;
 	String _container_path;
 	String _target_path;
+	
+	private class QuitButton extends AbstractAction
+	{
+		static final long serialVersionUID = 0L;
+
+		public QuitButton()
+		{
+			super("Quit");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			setVisible(false);
+		}
+	}
 
 	public ExportDirDialog(String ContainerPath, String TargetPath) throws FileLockException
 	{
@@ -45,7 +64,7 @@ public class ExportDirDialog extends JDialog
 		container.setLayout(new GridBagLayout());
 
 		panel = createExportList();
-		container.add(panel, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+		container.add(panel, new GridBagConstraints(0, 0, 4, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5), 5, 5));
 
 		ExportDataAction action = new ExportDataAction(this, ContainerPath, TargetPath);
@@ -59,13 +78,17 @@ public class ExportDirDialog extends JDialog
 		button = new JButton(quitAction);
 		container.add(button, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-
-		container
-			.add(
-				new JButton(new GuiHelpAction(null, HelpLinkConfiguration
-					.get_help_url(HelpLinkConfiguration.GENERAL_EXPORT_HELP))), new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-
+		
+		container.add(new JButton(new QuitButton()),
+				new GridBagConstraints(2, 1, 1, 1, 0.0, 1.0,
+					GridBagConstraints.EAST, GridBagConstraints.NONE, 
+					new Insets(5, 5, 5, 5), 5, 5));
+		
+		container.add(new JButton(new GuiHelpAction(null, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.GENERAL_EXPORT_HELP))), 
+				new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.NONE,
+					new Insets(5, 5, 5, 5), 5, 5));
+		
 	}
 
 	private JPanel createExportList() throws FileLockException

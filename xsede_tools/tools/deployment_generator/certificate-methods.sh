@@ -366,10 +366,12 @@ function populate_deployment()
   # get the container properties right.
   cp "$GENII_INSTALL_DIR/container.properties.example" "$GENII_INSTALL_DIR/container.properties"
   check_if_failed "copying container properties example"
-  replace_phrase_in_file "$GENII_INSTALL_DIR/container.properties" "edu.virginia.vcgr.genii.container.deployment-name=.*" "edu.virginia.vcgr.genii.container.deployment-name=$DEP_NAME"
+  replace_phrase_in_file "$GENII_INSTALL_DIR/container.properties" "^.*edu.virginia.vcgr.genii.container.deployment-name=.*" "edu.virginia.vcgr.genii.container.deployment-name=$DEP_NAME"
   check_if_failed "fixing container properties for deployment"
 
   if [ ! -z "$IS_BOOTSTRAP_CONTAINER" ]; then
+    # remove any old context.xml, since there cannot be a valid one present.
+    rm -f context.xml
     # fix the bootstrap script to have all the right values.
     echo Preparing bootstrap script for GFFS root.
     bootstrap_file="$DEP_DIR/configuration/bootstrap.xml"

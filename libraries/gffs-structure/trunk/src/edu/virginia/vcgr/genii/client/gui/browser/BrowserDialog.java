@@ -47,7 +47,7 @@ public class BrowserDialog extends JFrame
 {
 	static final long serialVersionUID = 0L;
 
-	static private final int GROUP_SIZE_LIMIT = 8;
+	static private final int GROUP_SIZE_LIMIT = 10;
 
 	static private Log _logger = LogFactory.getLog(BrowserDialog.class);
 

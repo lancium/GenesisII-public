@@ -4,11 +4,24 @@
 		<popup-menu group="Basic File" item-name="Edit"/>
 	</plugin>
 
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.ViewFilePlugin">
+		<top-menu menu-name="File" group="Basic File" item-name="View"/>
+		<popup-menu group="Basic File" item-name="View"/>
+	</plugin>
+
+
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeFilePlugin">
+		<top-menu menu-name="Directory" group="Basic File" item-name="Create New File"/>
+		<popup-menu group="Basic File" item-name="Create New File"/>
+	</plugin>
+
+
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.matchparam.MatchingParametersPlugin">
 		<popup-menu menu-name="Basic Resource" item-name="Matching Parameters"/>
 	</plugin>
 	
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeDirectoryPlugin">
+<!--  	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeDirectoryPlugin">  -->
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.CreateDirectoryPlugin">
 		<top-menu menu-name="Directory" group="Basic File" item-name="Create Directory"/>
 		<popup-menu group="Basic File" item-name="Create Directory"/>
 	</plugin>
@@ -19,11 +32,13 @@
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.SaveToDialog">
 		<top-menu menu-name="File" group="Basic File" item-name="Copy To Local File System From GFFS"/>
+		<top-menu menu-name="Directory" group="Basic File" item-name="Copy To Local File System From GFFS"/>
 		<popup-menu group="Basic File" item-name="Copy To Local File System From GFFS"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.CopyFromDialog">
 		<top-menu menu-name="File" group="Basic File" item-name="Copy From Local File System To GFFS"/>
+		<top-menu menu-name="Directory" group="Basic File" item-name="Copy From Local File System To GFFS"/>
 		<popup-menu group="Basic File" item-name="Copy From Local File System To GFFS"/>
 	</plugin>
 
@@ -37,15 +52,6 @@
 		<popup-menu menu-name="FSProxy" item-name="Quit Filesystem Proxy"/>
 	</plugin>
 
-<!-- -	
-
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.CopyFromDialog">
-		<top-menu menu-name="File" group="Basic File" item-name="Copy From Local File System To GFFS"/>
-		<popup-menu group="Basic File" item-name="Copy From Local File System To GFFS"/>
-	</plugin>
-
-	-->
-
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.DeleteDirectoryPlugin">
 		<top-menu menu-name="Directory" group="Basic File" item-name="Delete Directory"/>
 		<popup-menu group="Basic File" item-name="Delete Directory"/>
@@ -58,8 +64,8 @@
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.view.RefreshPlugin">
-		<top-menu menu-name="Directory" group="Basic File" item-name="Refresh (F5)"/>
-		<popup-menu group="Basic File" item-name="Refresh Directory"/>
+		<top-menu menu-name="Directory" group="Basic File" item-name="Refresh Directory (F5)"/>
+		<popup-menu group="Basic File" item-name="Refresh Directory (F5)"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.jobs.JobHistoryPlugin">
@@ -72,14 +78,10 @@
 		<popup-menu group="Queue" item-name="Queue Manager"/>
 	</plugin>
 	
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeFilePlugin">
-		<top-menu menu-name="File" group="Basic File" item-name="Create New File"/>
-		<popup-menu group="Basic File" item-name="Create New File"/>
-	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.groups.CreateGroupPlugin">
 		<top-menu menu-name="Security" group="Security" item-name="Create Security Group"/>
-		<popup-menu group="Security" item-name="Create Security Group"/>
+		<top-menu menu-name="Directory" group="Security" item-name="Create Security Group"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.acct.AccountingUserManagerPlugin">
@@ -143,4 +145,25 @@
 	</plugin>
 	-->
 	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MainHelp">
+		<top-menu menu-name="Help" group="Basic File" item-name="Main Help Page"/>
+	</plugin>
+
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.FileHelp">
+		<top-menu menu-name="Help" group="Basic File" item-name="Files"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.DirectoryHelp">
+		<top-menu menu-name="Help" group="Basic File" item-name="Directories"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.SecurityHelp">
+		<top-menu menu-name="Help" group="Basic File" item-name="Security"/>
+	</plugin>
+
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.StorageHelp">
+		<top-menu menu-name="Help" group="Basic File" item-name="Where are files and directories located?"/>
+	</plugin>
+
+
 </plugins>
