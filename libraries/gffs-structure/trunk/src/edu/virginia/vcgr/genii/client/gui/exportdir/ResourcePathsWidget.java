@@ -53,20 +53,19 @@ public class ResourcePathsWidget extends JComponent
 
 		if (getLocalPath) {
 			// Get the local path of the file or directory
-		add(new JLabel(_LOCAL_LABEL), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_localPath = new JTextField(), new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		JButton browseLocal = createLocalBrowseButton();
-		if (browseLocal != null)
-			add(browseLocal, new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
-		}
-		else {
+			add(new JLabel(_LOCAL_LABEL), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
+				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+			add(_localPath = new JTextField(), new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+				GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+			JButton browseLocal = createLocalBrowseButton();
+			if (browseLocal != null)
+				add(browseLocal, new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
+					GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		} else {
 			_localPath = new JTextField();
 		}
-		
-			// Set up get RNS path for new resource
+
+		// Set up get RNS path for new resource
 		add(new JLabel(_RNS_LABEL), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		add(_rnsPath = new JTextField(TargetPath), new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
@@ -74,19 +73,18 @@ public class ResourcePathsWidget extends JComponent
 		add(new JButton(new BrowseRNSPathAction(null, _BUTTON_LABEL, _rnsPath, _BROWSE_TARGET_PATH)), new GridBagConstraints(2,
 			1, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
-			if (getContainerPath) {
+		if (getContainerPath) {
 			// Get RNS path of container on which the resource should reside
-		add(new JLabel(_CONTAINER_LABEL), new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_containerPath = new JTextField(ContainerPath), new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		add(new JButton(new BrowseRNSPathAction(null, _BUTTON_LABEL, _containerPath, _BROWSE_CONTAINER)),
-			new GridBagConstraints(2, 2, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5,
-				5, 5), 5, 5));
-			}
-			else {
-				_containerPath = new JTextField(ContainerPath);
-			}
+			add(new JLabel(_CONTAINER_LABEL), new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
+				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+			add(_containerPath = new JTextField(ContainerPath), new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+			add(new JButton(new BrowseRNSPathAction(null, _BUTTON_LABEL, _containerPath, _BROWSE_CONTAINER)),
+				new GridBagConstraints(2, 2, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5,
+					5, 5, 5), 5, 5));
+		} else {
+			_containerPath = new JTextField(ContainerPath);
+		}
 
 		_localPath.addCaretListener(new CaretListener()
 		{
@@ -144,13 +142,13 @@ public class ResourcePathsWidget extends JComponent
 	{
 		return _containerPath.getText();
 	}
-	
+
 	public void setContainerPath(String path)
 	{
-		_containerPath.setText(path);;
+		_containerPath.setText(path);
+		;
 	}
 
-	
 	public String getRNSPath()
 	{
 		return _rnsPath.getText();

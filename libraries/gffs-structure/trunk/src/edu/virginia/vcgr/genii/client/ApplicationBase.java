@@ -221,8 +221,8 @@ public class ApplicationBase
 			return ApplicationBase.getDefaultUserDir();
 		}
 		// test for generalized "env-NAME" patterns for other environment variables.
-		/* 
-		 * no other env variables implemented yet. 
+		/*
+		 * no other env variables implemented yet.
 		 */
 		return pathToFix;
 	}

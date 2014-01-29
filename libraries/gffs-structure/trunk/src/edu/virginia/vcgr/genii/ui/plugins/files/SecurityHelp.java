@@ -44,9 +44,6 @@ import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 
 public class SecurityHelp extends AbstractCombinedUIMenusPlugin
 {
-	
-
-
 
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
@@ -60,6 +57,7 @@ public class SecurityHelp extends AbstractCombinedUIMenusPlugin
 	{
 
 		return true;
-		//return (tp.isByteIO() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
+		// return (tp.isByteIO() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() ||
+		// tp.isIDP()));
 	}
 }

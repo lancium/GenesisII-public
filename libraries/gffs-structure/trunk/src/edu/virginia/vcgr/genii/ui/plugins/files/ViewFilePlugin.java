@@ -31,7 +31,7 @@ public class ViewFilePlugin extends AbstractCombinedUIMenusPlugin
 				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 				RNSPath path = paths.iterator().next();
 
-				// already checked below that  it is a ByteIO
+				// already checked below that it is a ByteIO
 				EditPlugin.performEdit(context.ownerComponent(), context.uiContext(), path, false);
 				return;
 			} catch (Throwable cause) {

@@ -37,7 +37,8 @@ import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class LightWeightExportDirFork extends AbstractRNSResourceFork implements RNSResourceFork, InMemoryIterableFork, GeniiNoOutCalls
+public class LightWeightExportDirFork extends AbstractRNSResourceFork implements RNSResourceFork, InMemoryIterableFork,
+	GeniiNoOutCalls
 {
 
 	final private VExportDir getTarget() throws IOException

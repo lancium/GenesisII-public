@@ -33,7 +33,7 @@ public class ExportDirDialog extends JDialog
 	private JTable _table;
 	String _container_path;
 	String _target_path;
-	
+
 	private class QuitButton extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
@@ -78,17 +78,16 @@ public class ExportDirDialog extends JDialog
 		button = new JButton(quitAction);
 		container.add(button, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		
-		container.add(new JButton(new QuitButton()),
-				new GridBagConstraints(2, 1, 1, 1, 0.0, 1.0,
-					GridBagConstraints.EAST, GridBagConstraints.NONE, 
-					new Insets(5, 5, 5, 5), 5, 5));
-		
-		container.add(new JButton(new GuiHelpAction(null, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.GENERAL_EXPORT_HELP))), 
-				new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.NONE,
-					new Insets(5, 5, 5, 5), 5, 5));
-		
+
+		container.add(new JButton(new QuitButton()), new GridBagConstraints(2, 1, 1, 1, 0.0, 1.0, GridBagConstraints.EAST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+
+		container
+			.add(
+				new JButton(new GuiHelpAction(null, HelpLinkConfiguration
+					.get_help_url(HelpLinkConfiguration.GENERAL_EXPORT_HELP))), new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+
 	}
 
 	private JPanel createExportList() throws FileLockException

@@ -28,7 +28,6 @@ import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-
 public class ExportCreationDialog extends JDialog
 {
 	static final long serialVersionUID = 0L;
@@ -61,8 +60,8 @@ public class ExportCreationDialog extends JDialog
 			0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 		container.add(_lightweightExportService = new JRadioButton("Light-weight Export"), new GridBagConstraints(0, 1, 2, 1,
 			1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(_paths = new ResourcePathsWidget(true, true, ContainerPath, TargetPath), new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0,
-			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_paths = new ResourcePathsWidget(true, true, ContainerPath, TargetPath), new GridBagConstraints(0, 2, 2,
+			1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		_lightweightExportService.setSelected(true);
 		_standardExportService.setSelected(false);
@@ -74,28 +73,24 @@ public class ExportCreationDialog extends JDialog
 
 		_paths.addInformationListener(action);
 
-		container.add(createButtonPanel(owner, action), new GridBagConstraints(
-			0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-			new  Insets(5, 5, 5, 5), 5, 5));
+		container.add(createButtonPanel(owner, action), new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 	}
-	
+
 	private Component createButtonPanel(JDialog owner, Action action)
 	{
 		JPanel panel = new JPanel(new GridBagLayout());
 
-		panel.add(new JButton(action),
-			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
-			    GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			    new Insets(5, 5, 5, 5), 5, 5));		
-		panel.add(new JButton(new CancelAction()),
-			new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0,
-				GridBagConstraints.CENTER, GridBagConstraints.NONE, 
-				new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(new JButton(new GuiHelpAction(owner, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.EXPORT_CREATION_HELP))), 
-			new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0,
-				GridBagConstraints.EAST, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
-		
+		panel.add(new JButton(action), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JButton(new CancelAction()), new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(
+			new JButton(
+				new GuiHelpAction(owner, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.EXPORT_CREATION_HELP))),
+			new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5,
+				5), 5, 5));
+
 		return panel;
 	}
 
@@ -105,8 +100,8 @@ public class ExportCreationDialog extends JDialog
 		String rnsPath = _paths.getRNSPath();
 		String containerPath = _paths.getContainerPath();
 
-		return localPath != null && localPath.trim().length() > 0 && rnsPath != null
-			&& rnsPath.trim().length() > 0 && containerPath != null && containerPath.trim().length() > 0;
+		return localPath != null && localPath.trim().length() > 0 && rnsPath != null && rnsPath.trim().length() > 0
+			&& containerPath != null && containerPath.trim().length() > 0;
 	}
 
 	public ExportCreationInformation getExportCreationInformation()
@@ -165,6 +160,7 @@ public class ExportCreationDialog extends JDialog
 			setVisible(false);
 		}
 	}
+
 	private class HelpAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
@@ -173,7 +169,7 @@ public class ExportCreationDialog extends JDialog
 		public HelpAction(String helpUrl)
 		{
 			super("Help");
-			_url=helpUrl;
+			_url = helpUrl;
 		}
 
 		@Override
@@ -181,8 +177,8 @@ public class ExportCreationDialog extends JDialog
 		{
 			_information = null;
 			setVisible(false);
-			if (Desktop.isDesktopSupported()){
-				Desktop desktop=Desktop.getDesktop();
+			if (Desktop.isDesktopSupported()) {
+				Desktop desktop = Desktop.getDesktop();
 				if (desktop.isSupported(Desktop.Action.OPEN))
 					try {
 						desktop.browse(new URI(_url));
@@ -198,5 +194,3 @@ public class ExportCreationDialog extends JDialog
 	}
 
 }
-
-

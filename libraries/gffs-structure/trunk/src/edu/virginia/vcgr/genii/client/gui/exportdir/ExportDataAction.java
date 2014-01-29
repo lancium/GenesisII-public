@@ -59,10 +59,10 @@ class ExportDataAction extends AbstractAction
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		ExportCreationDialog creation=null;
+		ExportCreationDialog creation = null;
 		while (true) {
 			try {
-				if (creation==null) {
+				if (creation == null) {
 					creation = new ExportCreationDialog(_owner, _ContainerPath, _TargetPath);
 					creation.setModalityType(ModalityType.APPLICATION_MODAL);
 					creation.pack();
@@ -87,9 +87,9 @@ class ExportDataAction extends AbstractAction
 		String rnsPath = creationInfo.getRNSPath();
 		RNSPath rPath;
 		try {
-		rPath=
-			ExportManipulator.createExport(creationInfo.getContainerPath(), creationInfo.getLocalPath(), rnsPath,
-				creationInfo.isLightWeight());
+			rPath =
+				ExportManipulator.createExport(creationInfo.getContainerPath(), creationInfo.getLocalPath(), rnsPath,
+					creationInfo.isLightWeight());
 		} catch (Exception cause) {
 			throw new ExportException("exception occurred; failed to create export", cause);
 		}

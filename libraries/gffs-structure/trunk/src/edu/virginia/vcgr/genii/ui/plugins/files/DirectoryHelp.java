@@ -44,9 +44,6 @@ import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 
 public class DirectoryHelp extends AbstractCombinedUIMenusPlugin
 {
-	
-
-
 
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
@@ -60,11 +57,10 @@ public class DirectoryHelp extends AbstractCombinedUIMenusPlugin
 	{
 		return true;
 		/*
-		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
-			return false;
-
-		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
-		return (tp.isRNS() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
-		*/
+		 * if (selectedDescriptions == null || selectedDescriptions.size() != 1) return false;
+		 * 
+		 * TypeInformation tp = selectedDescriptions.iterator().next().typeInformation(); return
+		 * (tp.isRNS() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
+		 */
 	}
 }

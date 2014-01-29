@@ -191,7 +191,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		AttributedURIType address = epr.getAddress();
 		ReferenceParametersType refParams = epr.getReferenceParameters();
 		MetadataType mdt = epr.getMetadata();
-		//_logger.debug("in get cleanepr");
+		// _logger.debug("in get cleanepr");
 		if (refParams != null)
 			refParams = new ReferenceParametersType(refParams.get_any());
 		if (mdt != null) {

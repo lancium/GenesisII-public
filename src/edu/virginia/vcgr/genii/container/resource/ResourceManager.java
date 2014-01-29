@@ -166,48 +166,51 @@ public class ResourceManager
 	 * @throws ResourceException
 	 */
 	static private void MetaDataSecurityToken(ArrayList<MessageElement> metaDataAny, IResource resource)
-			throws ResourceException
-			/* 
-			 * Added 2014-01-09 by ASG to allow us to selectively not put X.509 SecurityTokens in EPR's.
-			 * It would be great if we could use 
-			 * "if ((this instanceof GeniiNoOutCalls))" instead of the kludge with class names, but we don't have a reference to the class
-			 * For now we must explicitly list every type we want to avoid. 
-			 * The list should come out of a configuration file.
-			 * */
-			 
+		throws ResourceException
+	/*
+	 * Added 2014-01-09 by ASG to allow us to selectively not put X.509 SecurityTokens in EPR's. It
+	 * would be great if we could use "if ((this instanceof GeniiNoOutCalls))" instead of the kludge
+	 * with class names, but we don't have a reference to the class For now we must explicitly list
+	 * every type we want to avoid. The list should come out of a configuration file.
+	 */
+
 	{
 		String serviceName = ((ResourceKey) resource.getParentResourceKey()).getServiceName();
 		// ASG 2014-01-11
 		// This is where the list of classes that do not get their own X.509 goes
-		Boolean matches=false;
+		Boolean matches = false;
 		// Let's first load the EPRConstruction properties file
-		if (p==null) {
+		if (p == null) {
 			p = new Properties();
-			InputStream in=HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/EPRConstruction.properties");
+			InputStream in =
+				HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/EPRConstruction.properties");
 			try {
 				p.load(in);
-			}
-			catch (IOException e){
+			} catch (IOException e) {
 				throw new RuntimeException(e);
-			}
-			finally {
+			} finally {
 				StreamUtils.close(in);
 			}
 		}
 		// Then get the list of classes that should NOT have an X.509 in their EPR
-		String r=p.getProperty(NO_X509_CLASS_LIST);
-		if (r==null) { throw new RuntimeException("Could not find config/EPRConstructon.properties " + NO_X509_CLASS_LIST); }
-		// ASG: 2014-01-21 Now check the serviceName against the list of classes in which  we do put X.509 certs, e.g. LightWeightExportPortType
+		String r = p.getProperty(NO_X509_CLASS_LIST);
+		if (r == null) {
+			throw new RuntimeException("Could not find config/EPRConstructon.properties " + NO_X509_CLASS_LIST);
+		}
+		// ASG: 2014-01-21 Now check the serviceName against the list of classes in which we do put
+		// X.509 certs, e.g. LightWeightExportPortType
 		StringTokenizer tokenCollector = new StringTokenizer(r, ":");
 		while (tokenCollector.hasMoreTokens()) {
 			String className = tokenCollector.nextToken();
-			if (serviceName.equalsIgnoreCase(className)) matches=true;
+			if (serviceName.equalsIgnoreCase(className))
+				matches = true;
 		}
 		if (!matches) { // this EPR should get an X.509 in it
 			try {
 				// Go ahead and put in the security stuff
 				// add Security Token Reference
-				X509Certificate[] certChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+				X509Certificate[] certChain =
+					(X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 
 				if (certChain != null) {
 					// ASG: This is where the X.509 embedded security token gets added
@@ -221,13 +224,13 @@ public class ResourceManager
 			}
 		}
 	}
-	
+
 	static private void addSecureAddressingElements(ArrayList<MessageElement> metaDataAny, IResource resource)
 		throws ResourceException
 	{
 
 		MetaDataSecurityToken(metaDataAny, resource);
-		
+
 		try {
 			// get authz/enc requirements
 			IAuthZProvider handler =
@@ -356,7 +359,6 @@ public class ResourceManager
 		throws ResourceException
 	{
 
-		
 		MetaDataSecurityToken(metaDataAny, resource);
 
 		try {
@@ -374,7 +376,7 @@ public class ResourceManager
 
 				metaDataAny.add(mel);
 			}
-	
+
 		} catch (GenesisIISecurityException e) {
 			throw new ResourceException(e.getMessage(), e);
 		} catch (IOException e) {
@@ -398,27 +400,27 @@ public class ResourceManager
 
 			if (portTypes.length == 0) {
 				any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(
-					GenesisIIConstants.GENESISII_NS, porttypeString="NullPortType")));
+					GenesisIIConstants.GENESISII_NS, porttypeString = "NullPortType")));
 			}
 
 			else {
 				if (masterType == null) // handles the case for RootRNSForks !
 				{
 					if (resourceKey.getServiceName() == null) {
-						porttypeString="NullPortType";
+						porttypeString = "NullPortType";
 						throw new ResourceException("Couldn't locate target service name in the resource key");
 					} else {
 						any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(
-							GenesisIIConstants.GENESISII_NS, porttypeString=resourceKey.getServiceName())));
+							GenesisIIConstants.GENESISII_NS, porttypeString = resourceKey.getServiceName())));
 					}
 				}
 
 				else {
 					any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(
-						GenesisIIConstants.GENESISII_NS, porttypeString=masterType)));
+						GenesisIIConstants.GENESISII_NS, porttypeString = masterType)));
 				}
 			}
-			//_logger.debug("Portname = " + porttypeString);
+			// _logger.debug("Portname = " + porttypeString);
 			IResource resource = resourceKey.dereference();
 
 			// add epi

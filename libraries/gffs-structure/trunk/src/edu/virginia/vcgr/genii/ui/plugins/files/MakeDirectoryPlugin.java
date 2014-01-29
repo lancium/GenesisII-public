@@ -81,10 +81,12 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 					boolean done = false;
 					while (!done) {
 						// Keep trying till they get a good container path or they give up
-						containerPath = JOptionPane.showInputDialog(context.ownerComponent(), "Input storage container path: ", containerPath);
+						containerPath =
+							JOptionPane.showInputDialog(context.ownerComponent(), "Input storage container path: ",
+								containerPath);
 						if (containerPath == null)
 							return;
-						done=true; // assume this works until proven otherwise
+						done = true; // assume this works until proven otherwise
 						try {
 							path = path.lookup(containerPath, RNSPathQueryFlags.MUST_EXIST);
 							path = path.lookup(containerPath + "/Services/EnhancedRNSPortType", RNSPathQueryFlags.MUST_EXIST);
@@ -92,12 +94,12 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 							JOptionPane.showMessageDialog(null, containerPath, "Storage container path does not exist",
 								JOptionPane.ERROR_MESSAGE);
 							// lets keep what they already typed and let them edit it instead
-							//containerPath = null;
-							done=false;
+							// containerPath = null;
+							done = false;
 						}
 
-						//if (containerPath != null)
-							//break;
+						// if (containerPath != null)
+						// break;
 					}
 					if (new TypeInformation(path.lookup(containerPath).getEndpoint()).isContainer()) {
 						// System.err.println("About to mkdir: container " + path.toString() +

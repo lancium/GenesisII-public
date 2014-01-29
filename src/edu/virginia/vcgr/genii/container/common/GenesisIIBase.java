@@ -301,7 +301,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 			// set the identity of the service into the creation params
 			X509Certificate[] serviceChain =
-					(X509Certificate[]) ResourceManager.getCurrentResource().dereference()
+				(X509Certificate[]) ResourceManager.getCurrentResource().dereference()
 					.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			creationParameters.put(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM, serviceChain);
 		}
