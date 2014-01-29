@@ -262,10 +262,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			} catch (BaseFaultType bft) {
 				ret[lcv] = new RNSEntryResponseType(null, null, bft, addRequest[lcv].getEntryName());
 			} catch (Throwable cause) {
+				_logger.error("failure during add request", cause);
 				ret[lcv] =
 					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry!") }, null)),
-						addRequest[lcv].getEntryName());
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: "
+							+ cause.getMessage()) }, null)), addRequest[lcv].getEntryName());
 			}
 		}
 		return ret;

@@ -65,6 +65,7 @@ public class ResourceManager
 {
 	private static Properties p = null;
 	static final String NO_X509_CLASS_LIST = "NO_X509_CLASS_LIST";
+
 	static public ResourceKey getTargetResource(String serviceName, String resourceKey) throws ResourceException,
 		ResourceUnknownFaultType
 	{
@@ -417,7 +418,7 @@ public class ResourceManager
 						GenesisIIConstants.GENESISII_NS, porttypeString=masterType)));
 				}
 			}
-			//System.err.println("Portname = " + porttypeString);
+			//_logger.debug("Portname = " + porttypeString);
 			IResource resource = resourceKey.dereference();
 
 			// add epi

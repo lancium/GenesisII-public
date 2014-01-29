@@ -191,7 +191,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		AttributedURIType address = epr.getAddress();
 		ReferenceParametersType refParams = epr.getReferenceParameters();
 		MetadataType mdt = epr.getMetadata();
-		//System.err.println("in get cleanepr");
+		//_logger.debug("in get cleanepr");
 		if (refParams != null)
 			refParams = new ReferenceParametersType(refParams.get_any());
 		if (mdt != null) {
@@ -512,7 +512,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 				return new RNSEntryResponseType(fork.add(getExemplarEPR(), entryName, target), entryType.getMetadata(), null,
 					entryName);
 		} catch (IOException ioe) {
-			throw new RemoteException("Unable to add entry.", ioe);
+			_logger.error("failure during add request", ioe);
+			throw new RemoteException("Unable to add entry: " + ioe.getMessage(), ioe);
 		}
 	}
 
@@ -529,10 +530,11 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			} catch (BaseFaultType bft) {
 				ret[lcv] = new RNSEntryResponseType(null, null, bft, addRequest[lcv].getEntryName());
 			} catch (Throwable cause) {
+				_logger.error("failure during add request", cause);
 				ret[lcv] =
 					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry!") }, null)),
-						addRequest[lcv].getEntryName());
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: "
+							+ cause.getMessage()) }, null)), addRequest[lcv].getEntryName());
 			}
 		}
 
@@ -678,7 +680,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		try {
 			return new CreateFileResponseType(fork.createFile(getExemplarEPR(), request.getFilename()));
 		} catch (IOException ioe) {
-			throw new RemoteException("Unable to add entry.", ioe);
+			_logger.error("failure during add request", ioe);
+			throw new RemoteException("Unable to create file: " + ioe.getMessage(), ioe);
 		}
 	}
 

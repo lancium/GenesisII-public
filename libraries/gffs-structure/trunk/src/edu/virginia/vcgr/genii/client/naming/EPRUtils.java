@@ -77,7 +77,6 @@ public class EPRUtils
 	 */
 	static public EndpointReferenceType makeEPR(String serviceURL, boolean retrieveFromObject)
 	{
-
 		EndpointReferenceType epr = new EndpointReferenceType(new AttributedURITypeSmart(serviceURL), null, null, null);
 
 		try {

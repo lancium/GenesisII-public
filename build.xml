@@ -205,7 +205,6 @@
 		<delete file="${ext.dir}/app-manager.jar"/>
 		<delete file="${ext.dir}/patch-builder.jar"/>
 		<delete file="${lib.dir}/gffs-container.jar"/>
-		<delete dir="${basedir}/bin"/>
 
 		<!-- clean up some deeper files that are generated. -->
 		<delete file="${lib.dir}/genesisII.client.log4j.properties"/>

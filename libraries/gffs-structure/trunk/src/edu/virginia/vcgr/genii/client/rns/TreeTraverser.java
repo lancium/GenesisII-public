@@ -133,7 +133,7 @@ public class TreeTraverser<nodeType>
 		}
 
 		for (nodeType contained : _querier.getContents(path)) {
-			// if (_logger.isDebugEnabled()) logger.debug("now operating on " +
+			// if (_logger.isDebugEnabled()) _logger.debug("now operating on " +
 			// contained.toString());
 			if (_querier.isDirectory(contained)) {
 				if (_logger.isDebugEnabled())

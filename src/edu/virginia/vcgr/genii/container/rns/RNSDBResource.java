@@ -186,6 +186,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 						entriesWithMissingResourceKeys.put(entryNameFromDB, entryEPR);
 					}
 				} else {
+//hmmm: fix the comment here.
 					InternalEntry entry = new InternalEntry(entryName, null, null, false); // signifying
 																							// that
 																							// the

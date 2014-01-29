@@ -129,7 +129,7 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 				task = new RemoteLogEntryListFetcherTask(selection);
 			}
 		} catch (Exception e) {
-			// Just means we can't get the epr for a logger
+			// Just means we can't get the epr for a logger.
 		}
 		if (task == null) {
 			task = new LocalLogEntryListFetcherTask(selection);

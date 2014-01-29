@@ -69,6 +69,7 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 		new ApplicationDescriptionAttributeHandler(getAttributePackage());
 	}
 
+	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
 		HashMap<QName, Object> creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
 		BaseFaultType, RemoteException

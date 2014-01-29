@@ -184,7 +184,6 @@
                 <delete failonerror="false">
                         <fileset dir="${generated.obj.dir}" includes="**/*"/>
                 </delete>
-		<delete dir="${basedir}/bin"/>
                 <delete failonerror="false">
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>

@@ -89,6 +89,8 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 			try {
 				in = ByteIOStreamFactory.createInputStream(_path);
 				Reader reader = new InputStreamReader(in);
+//hmmm: this disappeared during recent update; is it still needed?  ask andrew.
+//				SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.PLAIN_STYLE, "", _widget));
 				while ((read = reader.read(data, 0, BUFFER_SIZE)) > 0) {
 					builder.append(data, 0, read);
 					if (builder.length() > 0) {

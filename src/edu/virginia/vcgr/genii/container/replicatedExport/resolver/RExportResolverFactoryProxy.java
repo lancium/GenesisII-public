@@ -33,6 +33,7 @@ import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 
 public class RExportResolverFactoryProxy implements IResolverFactoryProxy
 {
+	@Override
 	public EndpointReferenceType createResolver(EndpointReferenceType targetEPR, Properties params,
 		MessageElement[] creationProps) throws RemoteException, ResourceException, InvalidWSNameFaultType
 	{

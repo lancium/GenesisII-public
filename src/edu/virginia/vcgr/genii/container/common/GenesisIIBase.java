@@ -690,8 +690,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 							new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
 							new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
 				}
+			} else {
+				_logger.error("In createEPR 2 params, it is GeniiNoOutcalls");
 			}
-			else System.err.println("In createEPR 2 params it is GeniiNoOutcalls");
 
 			Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
 

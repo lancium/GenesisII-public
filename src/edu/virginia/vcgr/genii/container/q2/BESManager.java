@@ -276,7 +276,6 @@ public class BESManager implements Closeable
 		public Collection<MessageElement> preFetch()
 		{
 			Collection<MessageElement> ret = new ArrayList<MessageElement>(1);
-
 			ret.add(new MessageElement(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, "r--r--"));
 			return ret;
 		}

@@ -125,7 +125,7 @@ public class InstallationProperties extends Properties
 
 	public Identity getOwnerCertificate()
 	{
-		// hmmm: cache the owner certificate here!
+		// hmmm: cache the owner certificate here.
 		HierarchicalDirectory dir = getLocalCertsDirectory();
 		if (dir == null) {
 			_logger.warn("failure: in get owner cert, the default owners dir is null.");
@@ -141,7 +141,7 @@ public class InstallationProperties extends Properties
 		});
 
 		if ((found == null) || (found.length == 0)) {
-			_logger.warn("failure: in get owner cert, the list of files in the owners cert dir is null.");
+			_logger.warn("no owner certificate; the list of files in the owners cert dir is empty.");
 			return null;
 		}
 

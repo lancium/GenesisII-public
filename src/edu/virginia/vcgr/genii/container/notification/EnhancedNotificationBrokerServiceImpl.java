@@ -194,11 +194,12 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 					NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
 					NotificationBrokerConstants.BYTEIO_ATTRIBUTE_CHANGE_SUBSCRIPTION) }, subscriptionReference);
 
-			// Subscribe to authorization parameter update on the RNS resources and byteIOs that are
-			// children of
-			// the directory represented by the RNS resource. For byteIOs this subscription works
-			// for only those
-			// that are in the same container as this RNS resource.
+			/*
+			 * Subscribe to authorization parameter update on the RNS resources and byteIOs that are
+			 * children of the directory represented by the RNS resource. For byteIOs this
+			 * subscription works for only those that are in the same container as this RNS
+			 * resource.
+			 */
 			topicFilter = GenesisIIBaseTopics.AUTHZ_CONFIG_UPDATE_TOPIC.asConcreteQueryExpression();
 			subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			subscriptionReference = subscription.subscriptionReference();
