@@ -63,6 +63,7 @@ import java.util.StringTokenizer;
 
 public class ResourceManager
 {
+	static private Log _logger = LogFactory.getLog(ResourceManager.class);
 	private static Properties p = null;
 	static final String NO_X509_CLASS_LIST = "NO_X509_CLASS_LIST";
 
@@ -401,9 +402,7 @@ public class ResourceManager
 			if (portTypes.length == 0) {
 				any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(
 					GenesisIIConstants.GENESISII_NS, porttypeString = "NullPortType")));
-			}
-
-			else {
+			} else {
 				if (masterType == null) // handles the case for RootRNSForks !
 				{
 					if (resourceKey.getServiceName() == null) {
@@ -420,7 +419,9 @@ public class ResourceManager
 						GenesisIIConstants.GENESISII_NS, porttypeString = masterType)));
 				}
 			}
-			// _logger.debug("Portname = " + porttypeString);
+			if (_logger.isDebugEnabled()) {
+				_logger.debug("Portname = " + porttypeString);
+			}
 			IResource resource = resourceKey.dereference();
 
 			// add epi

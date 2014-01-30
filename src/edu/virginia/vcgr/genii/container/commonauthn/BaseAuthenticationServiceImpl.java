@@ -522,10 +522,11 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			} catch (BaseFaultType fault) {
 				response[index] = new RNSEntryResponseType(null, null, fault, addRequest[index].getEntryName());
 			} catch (Throwable cause) {
+				_logger.error("failure during add request", cause);
 				response[index] =
 					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry!") }, null)),
-						addRequest[index].getEntryName());
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: "
+							+ cause.getMessage()) }, null)), addRequest[index].getEntryName());
 			}
 		}
 		return response;
