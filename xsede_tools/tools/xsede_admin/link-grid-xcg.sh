@@ -16,7 +16,7 @@ if [ -z $GENII_INSTALL_DIR ]; then
   exit 1
 fi
 echo "GENII_INSTALL_DIR is set to $GENII_INSTALL_DIR"
-whoami=`$GENII_INSTALL_DIR/grid whoami`
+whoami=`$GENII_INSTALL_DIR/grid whoami | grep gffs-admins`
 if [ $? -ne 0 ]; then
   echo "User must be member of gffs-admins group"
   exit 1

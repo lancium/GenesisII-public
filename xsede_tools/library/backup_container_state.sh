@@ -46,7 +46,7 @@ if [ ! -d "$TMP" ]; then
 fi
 
 ( pushd / ;
-zip -y -r $backup_file $GENII_USER_DIR $GENII_INSTALL_DIR/deployments $GENII_INSTALL_DIR/context.xml* $GENII_INSTALL_DIR/container.properties -x "*/.svn/*" -x "*/installer_base/*";
+zip -y -r $backup_file $GENII_USER_DIR $GENII_INSTALL_DIR/deployments $GENII_INSTALL_DIR/context.xml* $GENII_INSTALL_DIR/container.properties $GENII_INSTALL_DIR/xsede_tools -x "*/.svn/*" ;
 popd ) >$TMP/zz_container_backup_$(date_stringer).log
 
 #hmmm: auto-restart
