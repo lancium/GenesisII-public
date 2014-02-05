@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.uiuc.ncsa.MyProxy.MyProxyLogon;
+import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.Deployment;
@@ -93,10 +94,9 @@ public class MyProxyLoginTool extends BaseLoginTool
 		 * with either environment variable GLOBUS_LOCATION or X509_CERT_DIR
 		 */
 
-		File installLocation = Installation.getInstallDirectory();
 		File trustRoot =
-			new File(installLocation, "/deployments/" + Installation.getDeployment(new DeploymentName()).getName().toString()
-				+ "/security/myproxy-certs/");
+			new File(ContainerProperties.getContainerProperties().getDeploymentsDirectory() + "/"
+				+ Installation.getDeployment(new DeploymentName()).getName().toString() + "/security/myproxy-certs/");
 
 		// Set trust root
 		System.setProperty("X509_CERT_DIR", trustRoot.getCanonicalPath());
@@ -131,6 +131,9 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 		// add the pass through identity to the calling context.
 		callContext.setSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY, keyMat[0]);
+
+		// update the saved context before we leave.
+		ContextManager.storeCurrentContext(callContext);
 
 		return 0;
 	}
