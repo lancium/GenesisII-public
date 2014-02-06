@@ -102,11 +102,12 @@ public class AxisBasedContextResolver implements IContextResolver
 				SOAPHeader header = m.getSOAPHeader();
 
 				Iterator<? extends SOAPHeaderElement> iter = header.examineAllHeaderElements();
+				_logger.debug("thread " + Thread.currentThread().getId() + ": LOADING CONTEXT...");
 				while (iter.hasNext()) {
 					SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
 					QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
 					if (heName.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME)) {
-						Element em = ((MessageElement) he).getRealElement();
+						Element em = ((org.apache.axis.message.MessageElement) he).getRealElement();
 						// debugging call.
 						boolean debuggingMode = false;
 						if (debuggingMode == true) {
@@ -121,6 +122,7 @@ public class AxisBasedContextResolver implements IContextResolver
 						break;
 					}
 				}
+				_logger.debug("thread " + Thread.currentThread().getId() + ": ...GOT THROUGH ALL CONTEXT LOADING.");
 			} catch (SOAPException se) {
 				throw new AxisFault("SOAP Exception loading calling context.", se);
 			} catch (IOException e) {
@@ -137,7 +139,16 @@ public class AxisBasedContextResolver implements IContextResolver
 		} else {
 			retval = resourceContext.deriveNewContext(ct);
 		}
-
+		
+		//hmmm: remove this logging.
+		CallingContextImpl trendy = (CallingContextImpl)retval;
+		String currpath = "NULL!  it's NULL!!!!";
+		if (trendy.getCurrentPath() != null)
+			currpath = trendy.getCurrentPath().toString();
+		_logger.debug("thread " + Thread.currentThread().getId() + ": has current RNSPath of " + currpath);
+		
+		
+		
 		retval = CallingContextUtilities.setupCallingContextAfterCombinedExtraction(retval);
 
 		// place the resource's key material in the transient calling context

@@ -312,6 +312,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParameters)
 		throws ResourceException, BaseFaultType, RemoteException
 	{
+		_logger.debug("postCreate: " + this.getClass().getName() + constructionParameters.size() + " construct parms, " + resolverCreationParameters.size() + " resolver creation parms");
+		
 		IResource resource = rKey.dereference();
 
 		Long timeToLive = cParams.timeToLive();
