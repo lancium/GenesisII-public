@@ -168,6 +168,10 @@ public class ObjectSerializer
 	public static void serialize(Writer writer, Object obj, QName name, boolean nillable) throws ResourceException
 	{
 		SOAPElement soapElement = ObjectSerializer.toSOAPElement(obj, name, nillable);
+
+		if (soapElement == null) {
+			_logger.error("caught a null soap element trying to serialize!");
+		}
 		try {
 			AnyHelper.write(writer, (org.apache.axis.message.MessageElement) soapElement);
 		} catch (Exception e) {

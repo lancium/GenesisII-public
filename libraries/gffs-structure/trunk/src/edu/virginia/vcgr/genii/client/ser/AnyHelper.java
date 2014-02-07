@@ -41,66 +41,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
  */
 public class AnyHelper
 {
-	static Log logger = LogFactory.getLog(AnyHelper.class.getName());
-
-	/**
-	 * Populates a SOAP MessageElement array with a single object.
-	 * 
-	 * @param obj
-	 *            object to be serialized as a text node
-	 * @return content of any element as a SOAP MessageElement array
-	 */
-	public static MessageElement[] toText(Object obj)
-	{
-		MessageElement[] result = new MessageElement[1];
-		result[0] = new MessageElement(new Text(obj.toString()));
-		return result;
-	}
-
-	// -------------------------------------------
-
-	/**
-	 * Populates a SOAP MessageElement array with an array of arbitrary objects.
-	 * 
-	 * @param obj
-	 *            array of objects to be serialized in the any element
-	 * @return content of any element as a SOAP MessageElement array
-	 */
-	public static MessageElement[] toAnyArray(Object[] obj)
-	{
-		MessageElement[] result = new MessageElement[obj.length];
-		for (int i = 0; i < obj.length; i++) {
-			result[i] = toAny(obj[i]);
-		}
-		return result;
-	}
-
-	/**
-	 * Populates a SOAP MessageElement array with a single object.
-	 * 
-	 * @param obj
-	 *            object to be serialized in the any element
-	 * @return content of any element as a SOAP MessageElement array
-	 */
-	public static MessageElement[] toAnyArray(Object obj)
-	{
-		MessageElement[] result = new MessageElement[1];
-		result[0] = toAny(obj);
-		return result;
-	}
-
-	/**
-	 * Populates a SOAP MessageElement array with a single DOM element.
-	 * 
-	 * @param element
-	 *            element to be inserted in the any element
-	 * @return content of any element as a SOAP MessageElement array
-	 */
-	public static MessageElement[] toAnyArray(Element element)
-	{
-		MessageElement[] result = { new MessageElement(element) };
-		return result;
-	}
+	static Log _logger = LogFactory.getLog(AnyHelper.class.getName());
 
 	/**
 	 * Populates a SOAP MessageElement with an arbitrary object, and wraps it inside of a value
@@ -141,74 +82,7 @@ public class AnyHelper
 		return toAnyTypeElement(obj);
 	}
 
-	// ------------------------
-
-	public static MessageElement getParent(MessageElement element)
-	{
-		return (element == null) ? null : (MessageElement) element.getParentElement();
-	}
-
-	public static MessageElement getParent(MessageElement[] elements)
-	{
-		return (elements != null && elements.length > 0) ? getParent(elements[0]) : null;
-	}
-
-	public static MessageElement getParent(AnyContentType any)
-	{
-		return (any != null) ? getParent(any.get_any()) : null;
-	}
-
-	public static void setAny(AnyContentType object, SOAPElement value)
-	{
-		if (value == null || object == null) {
-			return;
-		}
-		if (!(value instanceof MessageElement)) {
-			throw new IllegalArgumentException();
-		}
-		object.set_any(new MessageElement[] { (MessageElement) value });
-	}
-
-	public static void setAny(AnyContentType object, SOAPElement[] values)
-	{
-		if (values == null || object == null) {
-			return;
-		}
-		MessageElement[] me = null;
-		if (values instanceof MessageElement[]) {
-			me = (MessageElement[]) values;
-		} else {
-			me = new MessageElement[values.length];
-			for (int i = 0; i < values.length; i++) {
-				if (values[i] instanceof MessageElement) {
-					me[i] = (MessageElement) values[i];
-				} else {
-					throw new IllegalArgumentException();
-				}
-			}
-		}
-		object.set_any(me);
-	}
-
-	public static void setAny(AnyContentType object, List<?> values)
-	{
-		if (values == null) {
-			return;
-		}
-		Object obj;
-		MessageElement[] v = new MessageElement[values.size()];
-		for (int i = 0; i < values.size(); i++) {
-			obj = values.get(i);
-			if (obj instanceof MessageElement) {
-				v[i] = (MessageElement) obj;
-			} else {
-				throw new IllegalArgumentException();
-			}
-		}
-		object.set_any(v);
-	}
-
-	public static void write(Writer writer, MessageElement element) throws Exception
+	public static void write(Writer writer, org.apache.axis.message.MessageElement element) throws Exception
 	{
 		MessageContext messageContext = Config.getContext();
 		SerializationContext context = new SerializationContext(writer, messageContext);
@@ -251,45 +125,6 @@ public class AnyHelper
 		}
 		return result;
 	}
-
-	/**
-     *
-     */
-	public static String toSingleString(MessageElement[] elements) throws Exception
-	{
-		if (elements == null) {
-			return null;
-		}
-		MessageContext messageContext = Config.getContext();
-		StringWriter writer = new StringWriter();
-		SerializationContext context = new SerializationContext(writer, messageContext);
-		context.setPretty(true);
-		for (int i = 0; i < elements.length; i++) {
-			elements[i].output(context);
-		}
-		writer.flush();
-		return writer.toString();
-	}
-
-	/**
-     *
-     */
-	public static String toSingleString(AnyContentType any) throws Exception
-	{
-		return (any == null) ? null : toSingleString(any.get_any());
-	}
-
-	/**
-	 * Converts type containing any element to a String, representing the parent MessageElement.
-	 * 
-	 * @see #toString(MessageElement element)
-	 */
-	public static String getFirstParentAsString(AnyContentType any) throws Exception
-	{
-		return toString(getParent(any));
-	}
-
-	// ****** toElement ********
 
 	/**
 	 * Converts a SOAP MessageElement to a DOM Element representation
@@ -338,27 +173,4 @@ public class AnyHelper
 		}
 		return toElement(any.get_any());
 	}
-
-	/**
-	 * Converts type containing any element to a single DOM Element, representing the parent
-	 * MessageElement.
-	 * 
-	 * @see #toElement(MessageElement element)
-	 */
-	public static Element getFirstParentAsElement(AnyContentType any) throws Exception
-	{
-		return toElement(getParent(any));
-	}
-
-	/**
-	 * Converts type containing any element to a single DOM Element.
-	 * 
-	 * @see #toElement(MessageElement element)
-	 */
-	public static Element getFirstAsElement(AnyContentType any) throws Exception
-	{
-		Element[] values = toElement(any);
-		return (values != null && values.length > 0) ? values[0] : null;
-	}
-
 }

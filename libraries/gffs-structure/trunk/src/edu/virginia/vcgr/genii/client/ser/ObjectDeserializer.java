@@ -278,25 +278,11 @@ public class ObjectDeserializer
 		}
 	}
 
+	/**
+	 * this tests to see if we leak any byte[] or char[]. intended to run under profiler.
+	 */
 	static public void main(String[] args) throws Throwable
 	{
-		// this tests to see if we leak any byte[] or char[]. intended to run under profiler.
-
-		// hmmm: this chunk should probably go into an app base setup method. something called by
-		// both
-		// the client and container...
-		if (!OSGiSupport.setUpFramework()) {
-			System.err.println("Exiting due to OSGi startup failure.");
-			System.exit(1);
-		}
-		SecurityUtilities.initializeSecurity();
-		try {
-			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
-		} catch (Throwable t) {
-			System.err.println("Security validation setup failure: " + t.getMessage());
-			System.exit(1);
-		}
-		// hmmm: ...bit to refactor ends just above.
 		Driver.loadClientState();
 
 		RNSPath rooty = null;

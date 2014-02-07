@@ -130,14 +130,13 @@ public class BlobLimits
 	{
 		Map<String, Long> tableLimits = _limits.get(tableName);
 		if (tableLimits == null) {
-			_logger.warn(String.format("Warning:  No BLOB size limits set for table %s.", tableName));
-
+			_logger.trace(String.format("Warning:  No BLOB size limits set for table %s.", tableName));
 			return TWO_GIG;
 		}
 
 		Long value = tableLimits.get(columnName);
 		if (value == null) {
-			_logger.warn(String.format("Warning:  No BLOB size limits set for column %s in table %s.", tableName, columnName));
+			_logger.debug(String.format("Warning:  No BLOB size limits set for column %s in table %s.", tableName, columnName));
 			return TWO_GIG;
 		}
 
@@ -148,7 +147,8 @@ public class BlobLimits
 	{
 		long value = getLimit(tableName, columnName);
 		if (blobSize >= value)
-			_logger.warn(String.format("Warning:  Recommended BLOB limit (%d) for table %s and column %s was exceeded (%d).\n",
-				value, tableName, columnName, blobSize));
+			_logger.debug(String.format(
+				"Warning:  Recommended BLOB limit (%d) for table %s and column %s was exceeded (%d).\n", value, tableName,
+				columnName, blobSize));
 	}
 }

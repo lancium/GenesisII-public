@@ -179,13 +179,8 @@ public class RNSPath implements Serializable, Cloneable
 		}
 
 		// hmmm: super noisy object creation tracing.
-		if (_logger.isDebugEnabled())
-			_logger.debug("++ creating RNSPath for path: " + pwd());
-		
-		//hmmm: temporary!!! remove.
-		if ((parent == null) && _logger.isDebugEnabled())
-			_logger.debug("Root RNS created, epr=" + _cachedEPR.toString());
-
+		if (_logger.isTraceEnabled())
+			_logger.trace("++ creating RNSPath for path: " + pwd());
 	}
 
 	/**
@@ -202,8 +197,8 @@ public class RNSPath implements Serializable, Cloneable
 	public void finalize()
 	{
 		// hmmm: super noisy object creation tracing.
-		if (_logger.isDebugEnabled())
-			_logger.debug("-- cleaning RNSPath at path: " + pwd());
+		if (_logger.isTraceEnabled())
+			_logger.trace("-- cleaning RNSPath at path: " + pwd());
 	}
 
 	/**
