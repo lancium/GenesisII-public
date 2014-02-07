@@ -170,7 +170,7 @@ public class ObjectSerializer
 		SOAPElement soapElement = ObjectSerializer.toSOAPElement(obj, name, nillable);
 
 		if (soapElement == null) {
-			_logger.error("caught a null soap element trying to serialize!");
+//			_logger.error("caught a null soap element trying to serialize!");
 		}
 		try {
 			AnyHelper.write(writer, (org.apache.axis.message.MessageElement) soapElement);
