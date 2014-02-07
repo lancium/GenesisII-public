@@ -82,4 +82,6 @@ public interface ICallingContext
 	public void deserializeTransientProperties(ObjectInput in) throws IOException;
 
 	public ContextDescription describe();
+	
+	public String dumpContext();
 }

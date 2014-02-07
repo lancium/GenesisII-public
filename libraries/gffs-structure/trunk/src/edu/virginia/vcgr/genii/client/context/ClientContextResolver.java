@@ -17,6 +17,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 
 public class ClientContextResolver implements IContextResolver
@@ -24,6 +27,8 @@ public class ClientContextResolver implements IContextResolver
 	static final public String USER_CONTEXT_FILENAME = "user-context.xml";
 	static final public String USER_TRANSIENT_FILENAME = "user-transient.dat";
 	static final public String COMBINED_FILENAME = "user-combined.xml";
+
+	static private Log _logger = LogFactory.getLog(ClientContextResolver.class);
 
 	public File getContextFile() throws IOException
 	{
@@ -44,14 +49,21 @@ public class ClientContextResolver implements IContextResolver
 	public ICallingContext load() throws FileNotFoundException, IOException
 	{
 		File contextFile = getContextFile();
+		ICallingContext toReturn = null;
 		if (contextFile == null || !contextFile.exists() || contextFile.length() == 0) {
 			File combinedFile = getCombinedFile();
 			if (combinedFile == null || combinedFile.length() == 0)
 				return null;
 
-			return ContextFileSystem.load(combinedFile);
-		} else
-			return ContextFileSystem.load(contextFile, getContextTransientFile());
+			toReturn = ContextFileSystem.load(combinedFile);
+		} else {
+			toReturn = ContextFileSystem.load(contextFile, getContextTransientFile());
+		}
+
+		// hmmm: remove debuggy
+		_logger.debug("context from client resolver has: " + ((CallingContextImpl) toReturn).dumpContext());
+
+		return toReturn;
 	}
 
 	@Override
@@ -60,6 +72,7 @@ public class ClientContextResolver implements IContextResolver
 		ContextFileSystem.store(getContextFile(), getContextTransientFile(), ctxt);
 	}
 
+	@Override
 	public Object clone()
 	{
 		return new ClientContextResolver();

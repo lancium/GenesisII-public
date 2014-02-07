@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -75,10 +76,12 @@ public class CallingContextImpl implements ICallingContext, Serializable
 			if (pairs != null) {
 				for (ContextNameValuePairType pair : ct.getProperty()) {
 					String name = pair.getName();
+					_logger.debug("found in context: " + name);
 					Collection<Serializable> multiValue = _properties.get(name);
 					if (multiValue == null) {
 						multiValue = new ArrayList<Serializable>();
 						_properties.put(name, multiValue);
+						_logger.debug("adding empty multivalue for null property called: " + name);
 					}
 					multiValue.add(retrieveBase64Decoded(pair.getValue()));
 				}
@@ -88,9 +91,11 @@ public class CallingContextImpl implements ICallingContext, Serializable
 
 	public CallingContextImpl(RNSPath root)
 	{
+		_logger.debug("SETTING CURRENT RNSPATH for ROOT!");
 		setCurrentPath(root);
 	}
 
+	@Override
 	public synchronized Collection<Serializable> getProperty(String name)
 	{
 		Collection<Serializable> multiValue = null;
@@ -100,6 +105,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		return multiValue;
 	}
 
+	@Override
 	public synchronized Serializable getSingleValueProperty(String name)
 	{
 		Collection<Serializable> multiValue = getProperty(name);
@@ -109,21 +115,43 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		return multiValue.iterator().next();
 	}
 
+	@Override
 	public synchronized void setProperty(String name, Collection<Serializable> multiValue)
 	{
 		if ((multiValue != null) && (multiValue.isEmpty())) {
 			throw new IllegalArgumentException("Illegal empty multiValue, use null instead");
 		}
+
+		// hmmm: new check, could be tossed eventually.
+		for (Serializable s : multiValue) {
+			String msg = "";
+			if (s == null) {
+				msg = "setProperty was given a null serializable!";
+			} else if (!(s instanceof Serializable)) {
+				msg = "setProperty was given a non serializable in list!";
+			}
+			if (!msg.equals("")) {
+				_logger.error(msg);
+				throw new RuntimeException(msg);
+			}
+		}
+
 		_properties.put(name, multiValue);
 	}
 
+	@Override
 	public synchronized void setSingleValueProperty(String name, Serializable value)
 	{
+		if (value == null)
+			_logger.error("attempting to store a null Serializable object.");
+		if (!(value instanceof Serializable))
+			_logger.error("the type being stored for " + name + " is not serializable");
 		ArrayList<Serializable> multiValue = new ArrayList<Serializable>();
 		multiValue.add(value);
 		setProperty(name, multiValue);
 	}
 
+	@Override
 	public synchronized void removeProperty(String name)
 	{
 		_properties.remove(name);
@@ -132,6 +160,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 	}
 
+	@Override
 	public synchronized Serializable getTransientProperty(String name)
 	{
 		Serializable obj = _transientProperties.get(name);
@@ -141,11 +170,13 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		return obj;
 	}
 
+	@Override
 	public synchronized void setTransientProperty(String name, Serializable value)
 	{
 		_transientProperties.put(name, value);
 	}
 
+	@Override
 	public synchronized void removeTransientProperty(String name)
 	{
 		_transientProperties.remove(name);
@@ -153,6 +184,30 @@ public class CallingContextImpl implements ICallingContext, Serializable
 			_parent.removeTransientProperty(name);
 	}
 
+	/**
+	 * helper method for debugging; this shows what the context contains, at least as far as key names.
+	 */
+	@Override
+	public String dumpContext()
+	{
+		StringBuilder toReturn = new StringBuilder();
+		toReturn.append("context has " + _properties.size() + " properties and " + _transientProperties.size() + " transient properties.\n");
+		toReturn.append("property names:\n");
+		Set<String> propnames = _properties.keySet();
+		int indy = 0;
+		for (String name : propnames) {
+			toReturn.append("prop#" + indy++ + ": " + name + "\n");
+		}
+		toReturn.append("transient property names:\n");
+		Set<String> tpropnames = _transientProperties.keySet();
+		indy = 0;
+		for (String name : tpropnames) {
+			toReturn.append("tran#" + indy++ + ": " + name + "\n");
+		}
+		return toReturn.toString();
+	}
+
+	@Override
 	public synchronized void setActiveKeyAndCertMaterial(KeyAndCertMaterial clientKeyMaterial) throws GeneralSecurityException
 	{
 		// this transient property always gets put in the top parent context
@@ -163,6 +218,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		setTransientProperty(CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA, clientKeyMaterial);
 	}
 
+	@Override
 	public synchronized KeyAndCertMaterial getActiveKeyAndCertMaterial() throws GeneralSecurityException
 	{
 		KeyAndCertMaterial toReturn = (KeyAndCertMaterial) getTransientProperty(CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA);
@@ -174,24 +230,31 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		return toReturn;
 	}
 
+	@Override
 	public synchronized RNSPath getCurrentPath()
 	{
 		Collection<Serializable> multiValue = _properties.get(CURRENT_PATH_KEY);
 		if (multiValue != null) {
+			_logger.debug("returning current path based on multivalue property.");
 			return (RNSPath) multiValue.iterator().next();
 		}
 
 		if (_parent != null) {
+			_logger.debug("returning current path based on parent.");
 			return _parent.getCurrentPath();
 		}
 		return null;
 	}
 
+	@Override
 	public synchronized void setCurrentPath(RNSPath newPath)
 	{
+		_logger.debug("just to show we got here!");
+		_logger.debug("current path being set to: " + (newPath == null ? "null" : newPath.toString()));
 		setSingleValueProperty(CURRENT_PATH_KEY, newPath);
 	}
 
+	@Override
 	public ContextType getSerialized() throws IOException
 	{
 		ContextType ct = new ContextType();
@@ -205,11 +268,13 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		return ct;
 	}
 
+	@Override
 	public ICallingContext deriveNewContext()
 	{
 		return new CallingContextImpl(this);
 	}
 
+	@Override
 	public ICallingContext deriveNewContext(ContextType serializedInformation) throws IOException
 	{
 		CallingContextImpl retval = new CallingContextImpl(this);
@@ -249,6 +314,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 	}
 
+	@Override
 	public void serializeTransientProperties(ObjectOutput out) throws IOException
 	{
 
@@ -264,6 +330,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public void deserializeTransientProperties(ObjectInput in) throws IOException
 	{
 		try {
@@ -299,26 +366,12 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		OutputStreamWriter writer = null;
 
 		try {
-			/*
-			 * DeflaterOutputStream dos = new DeflaterOutputStream( baos = new
-			 * ByteArrayOutputStream());
-			 */
 			baos = new ByteArrayOutputStream();
-			/*
-			 * writer = new OutputStreamWriter(dos);
-			 */
 			writer = new OutputStreamWriter(baos);
 			ContextStreamUtils.store(writer, this);
-
 			writer.flush();
-
-			/*
-			 * dos.finish();
-			 */
-
 			HashMap<String, Serializable> transientCollapse = new HashMap<String, Serializable>();
 			collapseTransient(transientCollapse);
-
 			return new SerializedContext(baos.toByteArray(), transientCollapse);
 		} catch (IOException ioe) {
 			throw new NotSerializableException("CallingContextImpl");

@@ -38,6 +38,9 @@ source $XSEDE_TEST_ROOT/library/establish_environment.sh
 
 echo -e "** After establishing test environment:\n\tGENII_INSTALL_DIR is $GENII_INSTALL_DIR\n\tGENII_USER_DIR is $GENII_USER_DIR"
 
+# clean up any old logging or logging dbs.
+\rm -rf $HOME/.GenesisII
+
 ##############
 
 containerlog="$(get_container_logfile "$DEPLOYMENT_NAME")"

@@ -82,7 +82,7 @@ define_and_export_variables()
   # calculate the deployments directory if there's an override.
   if [ -e "$GENII_INSTALL_DIR/container.properties" ]; then
     export DEPLOYMENTS_ROOT=$(sed -n -e 's/^edu.virginia.vcgr.genii.container.deployment-directory=\(.*\)/\1/p' < "$GENII_INSTALL_DIR/container.properties")
-    echo "calculated deployments root as: $DEPLOYMENTS_ROOT"
+#    echo "calculated deployments root as: $DEPLOYMENTS_ROOT"
   fi
   if [ -z "$DEPLOYMENTS_ROOT" ]; then
     export DEPLOYMENTS_ROOT=$GENII_INSTALL_DIR/deployments

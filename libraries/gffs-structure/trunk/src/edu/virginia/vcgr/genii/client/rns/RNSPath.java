@@ -84,7 +84,14 @@ public class RNSPath implements Serializable, Cloneable
 	static public RNSPath getCurrent()
 	{
 		try {
-			return ContextManager.getExistingContext().getCurrentPath();
+			RNSPath toReturn = ContextManager.getExistingContext().getCurrentPath();
+			if (toReturn == null) {
+				_logger.error("got a null current path for RNS.");
+			} else {
+				if (_logger.isDebugEnabled())
+					_logger.debug("RNSPath: getCurrent = " + toReturn.toString());
+			}
+			return toReturn;
 		} catch (IOException ioe) {
 			throw new ConfigurationException("Unable to get current path.", ioe);
 		}
@@ -174,6 +181,11 @@ public class RNSPath implements Serializable, Cloneable
 		// hmmm: super noisy object creation tracing.
 		if (_logger.isDebugEnabled())
 			_logger.debug("++ creating RNSPath for path: " + pwd());
+		
+		//hmmm: temporary!!! remove.
+		if ((parent == null) && _logger.isDebugEnabled())
+			_logger.debug("Root RNS created, epr=" + _cachedEPR.toString());
+
 	}
 
 	/**

@@ -57,12 +57,13 @@ import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 public class AxisBasedContextResolver implements IContextResolver
 {
-
 	private static Log _logger = LogFactory.getLog(AxisBasedContextResolver.class);
 
+	/**
+	 * For debugging only
+	 */
 	static private void storeToFile(Element em, String homeDir) throws IOException
 	{
-		/* For debugging only */
 		File dir = new File(homeDir + "/all-contexts");
 		dir.mkdirs();
 		for (int lcv = 0; true; lcv++) {
@@ -80,7 +81,6 @@ public class AxisBasedContextResolver implements IContextResolver
 				return;
 			}
 		}
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -102,11 +102,14 @@ public class AxisBasedContextResolver implements IContextResolver
 				SOAPHeader header = m.getSOAPHeader();
 
 				Iterator<? extends SOAPHeaderElement> iter = header.examineAllHeaderElements();
-				_logger.debug("thread " + Thread.currentThread().getId() + ": LOADING CONTEXT...");
 				while (iter.hasNext()) {
 					SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
 					QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
 					if (heName.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME)) {
+						
+						//hmmm: clean this out.
+						_logger.debug("found the context entry in soap");
+						
 						Element em = ((org.apache.axis.message.MessageElement) he).getRealElement();
 						// debugging call.
 						boolean debuggingMode = false;
@@ -122,7 +125,6 @@ public class AxisBasedContextResolver implements IContextResolver
 						break;
 					}
 				}
-				_logger.debug("thread " + Thread.currentThread().getId() + ": ...GOT THROUGH ALL CONTEXT LOADING.");
 			} catch (SOAPException se) {
 				throw new AxisFault("SOAP Exception loading calling context.", se);
 			} catch (IOException e) {
@@ -170,6 +172,12 @@ public class AxisBasedContextResolver implements IContextResolver
 
 		workingContext.setProperty(WorkingContext.CURRENT_CONTEXT_KEY, retval);
 
+		
+		//hmmm: clean!
+		_logger.debug("container has a context:");
+		_logger.debug(trendy.dumpContext());
+
+		
 		return retval;
 	}
 

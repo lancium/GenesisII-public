@@ -13,20 +13,40 @@ export LINE_COUNT_FOR_START_CHECK=200
 
 # general functions that affect client and container.
 
-# this takes one argument, which is a new directory to use for the
-# user state.  this must always be followed by a restore_userdir without
-# any intervening new call to save_and_switch.
+# this takes one argument, which is a new directory to use for the container
+# state.  this must always be followed by a restore_userdir without any
+# intervening new call to save_and_switch.
 function save_and_switch_userdir()
 {
   local new_dir="$1"; shift
   HOLD_USERDIR="$GENII_USER_DIR"
+  # new kludge; save the logging config for this user dir.
+  cp "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" "$HOLD_USERDIR"
+#echo "sasu: saving log props mentioning: $(cat "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" | grep "LOGFILE.File")"
   export GENII_USER_DIR="$new_dir"
+  if [ ! -d "$GENII_USER_DIR" ]; then
+    # it's handy for this directory to exist before we copy things into it.
+    mkdir "$GENII_USER_DIR"
+  fi
+  if [ -f "$GENII_USER_DIR/genesisII.container.log4j.properties" ]; then
+    cp "$GENII_USER_DIR/genesisII.container.log4j.properties" "$GENII_INSTALL_DIR/lib"
+#echo "sasu: copying in log props from new user dir $GENII_USER_DIR"
+  fi
+#echo "sasu: currently using log props mentioning: $(cat "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" | grep "LOGFILE.File")"
 }
 
 # restores the previous user directory.  handles one level of rollback.
 function restore_userdir()
 {
+  # new kludge; save the logging config for the current user dir.
+  cp "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" "$GENII_USER_DIR"
+#echo "ru: saving log props mentioning: $(cat "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" | grep "LOGFILE.File")"
   export GENII_USER_DIR="$HOLD_USERDIR"
+  if [ -f "$GENII_USER_DIR/genesisII.container.log4j.properties" ]; then
+#echo "ru: copying in log props from restoring user dir $GENII_USER_DIR"
+    cp "$GENII_USER_DIR/genesisII.container.log4j.properties" "$GENII_INSTALL_DIR/lib"
+  fi
+#echo "ru: now using log props mentioning: $(cat "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" | grep "LOGFILE.File")"
 }
 
 ##############
@@ -62,15 +82,31 @@ function get_container_logfile()
   else
     extra="_${DEP_NAME}"
   fi
-  if [ "$DEP_NAME" != "default" ]; then
-    # this is kludgy, but we need to separate logging for mirror containers...
-    # and right now we consider anything we'd launch which is not called
-    # "default" to be a mirror container.
-    echo "$TEST_TEMP/container_$(hostname)_${USER}$extra.log"
-    return 0
+#hmmm: this may not be right to remove yet, but we now have a real log file for mirror.
+#  if [ "$DEP_NAME" != "default" ]; then
+#    # this is kludgy, but we need to separate logging for mirror containers...
+#    # and right now we consider anything we'd launch which is not called
+#    # "default" to be a mirror container.
+#    echo "$TEST_TEMP/container_$(hostname)_${USER}$extra.log"
+#    return 0
+#  fi
+  # log file for normal deployments.
+  local logfile="$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties"
+  if [ "$DEP_NAME" == "$BACKUP_DEPLOYMENT_NAME" ]; then
+    # trying to be somewhat clever and use the state directory if it has log4j properties.
+    if [ -f "$BACKUP_USER_DIR/genesisII.container.log4j.properties" ]; then
+      logfile="$BACKUP_USER_DIR/genesisII.container.log4j.properties"
+    else
+      # if we cannot find the actual log4j props, don't return a name that would be
+      # the same as the main container log.
+      return
+    fi
+  elif [ "$DEP_NAME" == "default" ]; then
+    if [ -f "$GENII_USER_DIR/genesisII.container.log4j.properties" ]; then
+      logfile="$GENII_USER_DIR/genesisII.container.log4j.properties"
+    fi
   fi
-  # log file for normal deployment.
-  to_return="$(grep log4j.appender.LOGFILE.File $GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
+  to_return="$(grep log4j.appender.LOGFILE.File "$logfile" | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
   echo "$to_return"
 }
 
@@ -103,14 +139,14 @@ function launch_container()
 
   pushd "$GENII_INSTALL_DIR" &>/dev/null
 
-  echo "Launching Genesis II container for deployment $DEP_NAME..."
+  echo "Launching Genesis II container for deployment \"$DEP_NAME\"..."
   CONTAINERLOGFILE="$(get_container_logfile "$DEP_NAME")"
-  echo "expecting to write container log at: $CONTAINERLOGFILE"
-  redirection=0
-  if [ "$DEP_NAME" != "default" ]; then
-    # if we're not a default deployment, we need to redirect output to save it.
-    redirection=1
-  fi
+  echo "$DEP_NAME container log stored at: $CONTAINERLOGFILE"
+#  redirection=0
+#  if [ "$DEP_NAME" != "default" ]; then
+#    # if we're not a default deployment, we need to redirect output to save it.
+#    redirection=1
+#  fi
   extra_prefix=
   extra_suffix=
   use_shell=bash
@@ -138,11 +174,11 @@ function launch_container()
   fi
 
 #echo "shell=$use_shell extra_prefix=$extra_prefix runner=$runner extra_suffix=$extra_suffix"
-  if [ $redirection -eq 0 ]; then
+#  if [ $redirection -eq 0 ]; then
     $use_shell $extra_prefix $runner $extra_suffix $DEP_NAME &>/dev/null &
-  else
-    $use_shell $extra_prefix $runner $extra_suffix $DEP_NAME &>$CONTAINERLOGFILE &
-  fi
+#  else
+#    $use_shell $extra_prefix $runner $extra_suffix $DEP_NAME &>$CONTAINERLOGFILE &
+#  fi
 
   # snooze to allow the container to get going.  the counter measures number of 10 second
   # sleeps to allow.
@@ -378,7 +414,7 @@ function check_logs_for_errors()
   if [ -z "$DEP_NAME" ]; then
     DEP_NAME=default
   fi
-  file="$(get_container_logfile "$DEP_NAME")"
+  local file="$(get_container_logfile "$DEP_NAME")"
   if [ -f "$file" ]; then
     echo "Log File: $file"
     for i in grant fail warn error; do

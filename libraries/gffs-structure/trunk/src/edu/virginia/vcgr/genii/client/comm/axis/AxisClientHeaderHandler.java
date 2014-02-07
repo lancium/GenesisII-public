@@ -229,8 +229,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 			walletForResource.getRealCreds().addCredential(trustDelegation);
 			foundAny = true;
 			if (resourceCertChain == null) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("no resource cert chain; using bare credentials.");
+				if (_logger.isTraceEnabled())
+					_logger.trace("no resource cert chain; using bare credentials.");
 			} else {
 				try {
 					walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
@@ -278,7 +278,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 						if (_logger.isTraceEnabled())
 							_logger.trace("made credential for pass-through connection: " + newerTC);
 					} else {
-						_logger.trace("ignoring passThrough credential that doesn't match client's last TLS certificate.");
+						_logger.trace("ignoring pass-through credential that doesn't match client's last TLS certificate.");
 					}
 				}
 
@@ -370,6 +370,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 		} catch (SOAPException se) {
 			throw new AxisFault(se.getLocalizedMessage(), se);
 		}
+		
+		//hmmm: clean!
+		_logger.debug("got past all the checks without exception, now have context:");
+		_logger.debug(callContext.dumpContext());
 	}
 
 	private void setClientID(MessageContext msgContext) throws AxisFault
