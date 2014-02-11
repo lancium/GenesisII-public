@@ -151,7 +151,7 @@ function fix_endings()
   echo Fixing installer filename endings...
   pushd $OUTPUT_DIRECTORY &>/dev/null
   for i in *sh; do
-    mv $i $(basename $i sh)bin
+    mv $i $(basename $i sh)script
   done
   popd &>/dev/null
 }
@@ -167,11 +167,14 @@ function fix_endings()
 
 echo Building 64 bit Genesis...
 
-#pushd $GENII_INSTALL_DIR
+pushd $GENII_INSTALL_DIR
 #ant clean
+#check_if_failed "ant clean failed"
 replace_compiler_variables
+check_if_failed "compiler variable replacement failed"
 #ant -Dbuild.targetArch=64 build
-#popd
+#check_if_failed "ant build failed"
+popd
 
 build_installer 5991 genesis2-gffs-deb
 build_installer 3416 genesis2-gffs-linux64

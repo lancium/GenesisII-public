@@ -16,11 +16,11 @@ MAX_FILES=1000
 COPY_CHUNK=100
 
 # where we hook in the fuse mount.
-MOUNT_POINT=$WORKDIR/mount-largeRNS
+export MOUNT_POINT=$WORKDIR/mount-largeRNS
 # the user's home directory from fuse perspective.
-HOME_DIR=$MOUNT_POINT/$RNSPATH
+export HOME_DIR=$MOUNT_POINT/$RNSPATH
 
-BIGDIRNAME=huge_dir
+export BIGDIRNAME=huge_dir
  
 oneTimeSetUp()
 {
@@ -44,35 +44,22 @@ testMounting()
 
   test_fuse_mount $MOUNT_POINT
   check_if_failed "Mounting grid to local directory"
-
-#old  checkMount="$(mount)"
-#old#echo checkmount is: $checkMount
-#old#echo mount point seeking is: $MOUNT_POINT
-#old  retval=1
-#old  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]; then retval=0; fi
-#old  assertEquals "Mounting to local directory" 0 $retval
-#old  if [ $retval == 0 ]; then
-#old    ls -l $MOUNT_POINT
-#old    assertEquals "Can list the fuse mounted directory" 0 $retval
-#old  else
-#old    rmdir $MOUNT_POINT
-#old    fail "Failed to mount the GFFS mount point, bailing."
-#old    exit 1
-#old  fi
-
 }
 
-# makes all of the files in the rns path.  we want this as a single
-# function so we can time it.
-copyFilesUp()
+# creates all of the files for the test in the rns path.
+function copyFilesUp()
 {
-  local i
+  start_time="$(date +%s)"
   for (( i = 1 ; i <= $MAX_FILES; i++ )); do
     echo blahHumbug$RANDOM$RANDOM >$HOME_DIR/$BIGDIRNAME/file_instance_$i.txt
     if [ $? -ne 0 ]; then
+      echo "error"
       return 1
     fi
   done
+  end_time="$(date +%s)"
+  echo "$(($end_time - $start_time))"
+  return 0
 }
 
 testCreatingLargeDirectory()
@@ -81,12 +68,17 @@ testCreatingLargeDirectory()
 
   echo "Creating files starts at $(date)"
 
+  # clean up any prior version of the test directory.
+  \rm -rf $HOME_DIR/$BIGDIRNAME
+
   # recreate our target directory in the grid.
   mkdir $HOME_DIR/$BIGDIRNAME
   assertEquals "Making test folder $HOME_DIR/$BIGDIRNAME" 0 $?
 
   # make the files in the target directory.
-  copy_time=$(time -p copyFilesUp | awk '{print $2}')
+  copy_time=$(copyFilesUp)
+  assertEquals "Creating test files in $HOME_DIR/$BIGDIRNAME" 0 $?
+  
   echo "Time taken to copy $MAX_FILES to grid is ${copy_time}s"
 
   echo "Creating and copying all files done at $(date)"
@@ -109,12 +101,11 @@ testScanningLargeDirectory()
   real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
   echo "Time taken to list $BIGDIRNAME after cached: $real_time s"
 
-## ls doesn't support patterns??
-#  timed_grid ls $RNSPATH/$BIGDIRNAME/*5*
-#  assertEquals "Run ls on new directory with pattern" 0 $?
-#  real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
-#  echo "Time taken to scan $BIGDIRNAME for files with pattern: $real_time s"
-
+  # try listing the same directory but with a simple pattern as a filter.
+  timed_grid ls $RNSPATH/$BIGDIRNAME/*5*
+  assertEquals "Run ls on new directory with pattern" 0 $?
+  real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
+  echo "Time taken to scan $BIGDIRNAME for files with simple pattern: $real_time s"
 }
 
 testCleaningOutBigDir()
