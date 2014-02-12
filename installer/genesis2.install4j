@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="5.1.6" transformSequenceNumber="4">
+<install4j version="5.1.9" transformSequenceNumber="4">
   <directoryPresets config="./scripts/update_install_location.sh" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
@@ -777,7 +777,30 @@ return true;</string>
                 <condition />
               </action>
             </actions>
-            <formComponents />
+            <formComponents>
+              <formComponent name="" id="8399" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.SpacerComponent" />
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibilityScript />
+              </formComponent>
+              <formComponent name="" id="8398" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
+                      <void property="labelText">
+                        <string>This installer includes GFFS applications and grid deployment for the ${compiler:genii.deployment-name} Grid.</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibilityScript />
+              </formComponent>
+            </formComponents>
           </screen>
           <screen name="" id="3" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
@@ -878,7 +901,7 @@ return true;</string>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
                       <void property="labelText">
-                        <string>Installing grid deployment for ${compiler:genii.deployment-name}</string>
+                        <string>Installing GFFS software and grid deployment for ${compiler:genii.deployment-name} Grid.</string>
                       </void>
                     </object>
                   </java>
@@ -1491,10 +1514,10 @@ return true;</string>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.screens.FormScreen">
                       <void property="subTitle">
-                        <string>Port Number</string>
+                        <string>Configuration of the container's port number and internet address</string>
                       </void>
                       <void property="title">
-                        <string>Container Port Number</string>
+                        <string>Container Network Presence</string>
                       </void>
                     </object>
                   </java>
@@ -1593,19 +1616,9 @@ return true;</string>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
                           <void property="labelText">
-                            <string>By default the container listens for incoming messages on
-TCP port ${compiler:genii.xcg-port}. You can override this behavior here.</string>
+                            <string>By default the container listens for incoming messages on TCP port ${compiler:genii.xcg-port}. You can override the port here; this is highly recommended.</string>
                           </void>
                         </object>
-                      </java>
-                    </serializedBean>
-                    <initScript />
-                    <visibilityScript />
-                  </formComponent>
-                  <formComponent name="" id="1032" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.formcomponents.SpacerComponent" />
                       </java>
                     </serializedBean>
                     <initScript />
@@ -1660,8 +1673,7 @@ return true;</string>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
                           <void property="labelText">
-                            <string>Specify the hostname or IP address where your container will run.
-Hostnames should be globally resolvable via DNS.</string>
+                            <string>Specify the hostname or IP address where your container will run.  Hostnames should be globally resolvable via DNS.</string>
                           </void>
                         </object>
                       </java>
@@ -1707,7 +1719,7 @@ Hostnames should be globally resolvable via DNS.</string>
                         <string>Connecting to the Grid</string>
                       </void>
                       <void property="subTitle">
-                        <string>Connecting to the Grid</string>
+                        <string>Connecting to the ${compiler:genii.deployment-name} Grid</string>
                       </void>
                       <void property="title">
                         <string>Grid Connection</string>
@@ -1957,7 +1969,7 @@ return !ownerCer.exists();</string>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.screens.FormScreen">
                               <void property="subTitle">
-                                <string>Owner Information</string>
+                                <string>Provide an existing grid account that will 'own' the container.</string>
                               </void>
                               <void property="title">
                                 <string>Owner Information</string>
@@ -2038,7 +2050,7 @@ return !ownerCer.exists();</string>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
                                   <void property="labelText">
-                                    <string>Please select a user to manage the container
+                                    <string>Please select an existing grid user to manage the new container.  This user will have full control over the container within the grid.
 </string>
                                   </void>
                                 </object>
@@ -2112,10 +2124,10 @@ return !signer.exists() || !tls.exists();
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.screens.FormScreen">
                               <void property="subTitle">
-                                <string>This service will generate and sign your container keypair with your supplied credentials</string>
+                                <string>The service can generate a new key-pair for secure networking or you can provide your own</string>
                               </void>
                               <void property="title">
-                                <string>Use a grid keypair generating service for your container?</string>
+                                <string>Use the grid's key-pair generating service?</string>
                               </void>
                             </object>
                           </java>
@@ -2223,12 +2235,12 @@ return !signer.exists() || !tls.exists();
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
                                   <void property="checkboxText">
-                                    <string>Use Grid Keypair Generating Service</string>
+                                    <string>Use Grid Key-pair Generating Service</string>
                                   </void>
                                   <void property="selectionScript">
                                     <object class="com.install4j.api.beans.ScriptProperty">
                                       <void property="value">
-                                        <string>context.getCompilerVariable("genii.generate-certs").equals("true");</string>
+                                        <string />
                                       </void>
                                     </object>
                                   </void>
@@ -2238,7 +2250,7 @@ return !signer.exists() || !tls.exists();
                                 </object>
                               </java>
                             </serializedBean>
-                            <initScript />
+                            <initScript>configurationObject.setSelected(context.getCompilerVariable("genii.generate-certs").equals("true"))</initScript>
                             <visibilityScript />
                           </formComponent>
                         </formComponents>
@@ -2248,7 +2260,7 @@ return !signer.exists() || !tls.exists();
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.screens.FormScreen">
                               <void property="subTitle">
-                                <string>Select password for generated TLS certificate</string>
+                                <string>Select a password for the newly generated TLS certificate</string>
                               </void>
                               <void property="title">
                                 <string>Container Keypair Generating Service</string>
@@ -2398,10 +2410,10 @@ return !signer.exists() || !tls.exists();
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.screens.FormScreen">
                               <void property="subTitle">
-                                <string>Select path for container keypair (.pfx) to be used for this container (will be copied)</string>
+                                <string>Specify the container's TLS key-pair file and password</string>
                               </void>
                               <void property="title">
-                                <string>Provide Container Keypair</string>
+                                <string>Provide Container Key-pair</string>
                               </void>
                             </object>
                           </java>
@@ -2457,6 +2469,19 @@ return !signer.exists() || !tls.exists();
                           </action>
                         </actions>
                         <formComponents>
+                          <formComponent name="" id="8400" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
+                                  <void property="labelText">
+                                    <string>The container's TLS key-pair file should be in PKCS#12 format, and is usually a file ending in .pfx.  This file will be copied to the container's grid deployment.</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibilityScript />
+                          </formComponent>
                           <formComponent name="" id="4732" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.FileChooserComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
@@ -2465,7 +2490,7 @@ return !signer.exists() || !tls.exists();
                                     <string>${installer:sys.userHome}</string>
                                   </void>
                                   <void property="labelText">
-                                    <string>Keypair Path</string>
+                                    <string>Key-pair Path</string>
                                   </void>
                                   <void property="variableName">
                                     <string>genii.container-keypair-path</string>
@@ -4096,7 +4121,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </windows>
-    <macosFolder name="mac_gui_64" id="2088" customizedId="" mediaFileName="genesis2-gffs-macosx${compiler:genii.bitSize}-v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
+    <macosFolder name="mac_gui_64" id="2088" customizedId="" mediaFileName="genesis2-gffs-macosx${compiler:genii.bitSize}-v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />

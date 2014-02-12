@@ -47,6 +47,10 @@ USERPATH=/users/userX
 # Used for windows testing; provides the path to the binaries directory of cygwin.
 #CYGWIN_BIN_PATH=c:/cygwin/bin
 
+# The email variable is used for testing EMS stage-out to email.  This will be
+# the recipient of emails from the running job.
+EMAIL=userX@emailsomewhere.com
+
 ##############
 
 #### GFFS settings...
@@ -127,10 +131,6 @@ SCP=("filestaging.xcg.virginia.edu" "/srv/ftp/ftpsecure/upload" ftpsecure OolaMo
 SFTP=("filestaging.xcg.virginia.edu" "/srv/ftp/ftpsecure/upload" ftpsecure OolaMoophutz26)
 #fix this reference for gridftp
 GRIDFTP=("people.virginia.edu" "/~cak0l/stuff" barry SnackyCake)
-
-# The stage-out to email test needs the recipient address.  (It uses SCP
-# parameters for the stage-in portion.)
-EMAIL=userX@emailsomewhere.com
 
 ##############
 
