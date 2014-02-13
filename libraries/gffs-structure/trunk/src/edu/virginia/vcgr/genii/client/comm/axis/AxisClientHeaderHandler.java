@@ -371,9 +371,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 			throw new AxisFault(se.getLocalizedMessage(), se);
 		}
 
-		//hmmm: reduce visibility of this.
-		if (_logger.isDebugEnabled())
-			_logger.debug("context after setting headers:\n" + callContext.dumpContext());
+		if (_logger.isTraceEnabled())
+			_logger.trace("context after setting headers:\n" + callContext.dumpContext());
 	}
 
 	private void setClientID(MessageContext msgContext) throws AxisFault

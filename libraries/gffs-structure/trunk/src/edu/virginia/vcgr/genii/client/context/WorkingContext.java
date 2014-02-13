@@ -102,11 +102,20 @@ public class WorkingContext implements Closeable, Cloneable
 
 	public Object getProperty(String propertyName)
 	{
-		return _properties.get(propertyName);
+		Object obj = _properties.get(propertyName);
+		//hmmm: remove testing code.
+		if (obj != null)
+			_logger.debug(">>getprop " + propertyName + " has object type " + obj.getClass().getCanonicalName());
+		return obj;
 	}
 
 	public void setProperty(String propertyName, Object value)
 	{
+		if (value != null) {
+			_logger.debug("<<setprop " + propertyName + " has object type " + value.getClass().getCanonicalName());
+		} else {
+			_logger.error("failure!  attempt to set property " + propertyName + " with a null object");
+		}
 		Object obj = _properties.get(propertyName);
 		if (obj != null) {
 			try {

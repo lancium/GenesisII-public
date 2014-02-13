@@ -12,6 +12,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.axis.message.MessageElement;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.ReferenceParametersType;
@@ -20,6 +22,8 @@ import edu.virginia.vcgr.genii.algorithm.encryption.Base64;
 
 public class AddressingParameters
 {
+	static private Log _logger = LogFactory.getLog(AddressingParameters.class);
+
 	static public final String GENII_REF_PARAMS_NS = "http://edu.virginia.vcgr.genii/ref-params";
 	static public final String GENII_RESOURCE_KEY_REF_PARAM = "resource-key";
 	static public final String GENII_RESOURCE_FORK_REF_PARAM = "resource-fork";
@@ -82,18 +86,27 @@ public class AddressingParameters
 			if (elements != null) {
 				for (MessageElement element : elements) {
 					QName elementName = element.getQName();
+					//hmmm: clean noisy debugs.
+					_logger.debug("seeing elem name: " + elementName);
 					if (elementName.equals(GENII_RESOURCE_KEY_REF_PARAM_QNAME)
 						|| elementName.equals(OLD_REFERENCE_PARAMETER_QNAME)) {
 						_resourceKey = element.getValue();
+						_logger.debug("found resource key: " + _resourceKey);
 					} else if (elementName.equals(GENII_RESOURCE_FORK_REF_PARAM_QNAME)) {
 						String stringValue = element.getValue();
 						if (stringValue != null) {
 							_resourceForkInfo = toObject(stringValue);
+							_logger.debug("found resource fork info: " + stringValue);
+						} else {
+							_logger.debug("found null resource fork info.");
 						}
 					} else if (elementName.equals(GENII_ADDTIONAL_USER_INFO_REF_PARAM_QNAME)) {
 						String stringValue = element.getValue();
 						if (stringValue != null) {
 							_additionalUserInfo = (Map<String, Serializable>) toObject(stringValue);
+							_logger.debug("found additional user info: " + stringValue);
+						} else {
+							_logger.debug("found null additional user info.");
 						}
 					} else {
 						throw new ResourceException(String.format("Invalid reference parameter %s found.", elementName));

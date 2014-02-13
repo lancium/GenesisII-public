@@ -287,7 +287,7 @@ public class ResourceKey implements Closeable, Rollbackable
 					}
 					CNs.add(serviceName);
 
-					// Add in any additional orgnaizations specified
+					// Add in any additional organizations specified
 					ArrayList<String> orgs = new ArrayList<String>();
 					String[] additionalOrgs = (String[]) consParms.get(IResource.ADDITIONAL_ORGS_CONSTRUCTION_PARAM);
 					if (additionalOrgs != null) {
