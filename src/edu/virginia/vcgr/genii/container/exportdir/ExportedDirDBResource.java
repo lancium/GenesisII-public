@@ -13,16 +13,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
@@ -31,18 +31,15 @@ import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.MessageElementUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.byteio.DefaultRandomByteIOAttributePreFetcher;
+import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
-import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
-import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 
 public class ExportedDirDBResource extends BasicDBResource implements IExportedDirResource
 {
@@ -94,7 +91,8 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 
 	}
 
-	public void initialize(HashMap<QName, Object> constructionParams) throws ResourceException
+	@Override
+	public void initialize(GenesisHashMap constructionParams) throws ResourceException
 	{
 		_myParentIds = (String) constructionParams.get(IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM);
 		_myLocalPath = (String) constructionParams.get(IExportedFileResource.PATH_CONSTRUCTION_PARAM);

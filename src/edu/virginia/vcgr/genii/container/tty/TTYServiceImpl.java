@@ -4,8 +4,6 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.ggf.byteio.CustomFaultType;
@@ -26,6 +24,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.tty.TTYConstants;
@@ -50,6 +49,7 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 		addImplementedPortType(WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE());
 	}
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -126,8 +126,8 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParams);
 	}

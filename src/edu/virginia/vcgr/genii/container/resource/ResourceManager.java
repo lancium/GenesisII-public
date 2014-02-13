@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -38,6 +37,7 @@ import org.ws.addressing.MetadataType;
 import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.container.ContainerConstants;
@@ -56,13 +56,11 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityType;
 import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityTypeMin;
 import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.axis.WSSecurityUtils;
-import java.util.StringTokenizer;
 
 public class ResourceManager
 {
@@ -129,7 +127,7 @@ public class ResourceManager
 		return rKey;
 	}
 
-	static public ResourceKey createServiceResource(String serviceName, HashMap<QName, Object> constructionParameters)
+	static public ResourceKey createServiceResource(String serviceName, GenesisHashMap constructionParameters)
 		throws ResourceException
 	{
 		WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
@@ -141,7 +139,7 @@ public class ResourceManager
 		return rKey;
 	}
 
-	static public ResourceKey createNewResource(String serviceName, HashMap<QName, Object> constructionParameters)
+	static public ResourceKey createNewResource(String serviceName, GenesisHashMap constructionParameters)
 		throws ResourceException
 	{
 		WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();

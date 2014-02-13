@@ -9,7 +9,6 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
-import edu.virginia.vcgr.genii.client.gui.GuiHelpAction;
 import edu.virginia.vcgr.genii.client.rcreate.ResourceCreationContext;
 import edu.virginia.vcgr.genii.client.rcreate.ResourceCreator;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
@@ -74,7 +73,6 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 					// They said yes - go figure 0 is yes
 					path.mkdir();
 				} else {
-					String dirPath = path.toString();
 					String containerPath = null;
 					// Much more complicated. First must get the container they want to use.
 

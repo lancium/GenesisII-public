@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
@@ -16,6 +15,8 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSEntryType;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
@@ -36,15 +37,12 @@ import edu.virginia.vcgr.genii.client.appdesc.ApplicationVersion;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import org.oasis_open.docs.wsrf.rl_2.Destroy;
-
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.EnhancedRNSServiceImpl;
@@ -62,6 +60,7 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 	static final public String APPLICATION_VERSION_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.appdesc.app_vers_property";
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -71,20 +70,20 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
 		BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, myEPR, cParams, creationParameters, resolverCreationParams);
 
 		IResource resource = rKey.dereference();
 
-		MessageElement elem;
+		org.apache.axis.message.MessageElement elem;
 
-		elem = (MessageElement) creationParameters.get(ApplicationDescriptionCreator.APPLICATION_NAME_CREATION_PARAMETER);
+		elem = creationParameters.getAxisMessageElement(ApplicationDescriptionCreator.APPLICATION_NAME_CREATION_PARAMETER);
 		if (elem != null)
 			resource.setProperty(APPLICATION_DESCRIPTION_PROPERTY_NAME, elem.getValue());
 
-		elem = (MessageElement) creationParameters.get(ApplicationDescriptionCreator.APPLICATION_VERSION_CREATION_PARAMETER);
+		elem = creationParameters.getAxisMessageElement(ApplicationDescriptionCreator.APPLICATION_VERSION_CREATION_PARAMETER);
 		if (elem != null) {
 			String value = elem.getValue();
 			if (value != null)

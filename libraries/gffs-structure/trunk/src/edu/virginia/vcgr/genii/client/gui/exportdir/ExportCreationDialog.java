@@ -2,12 +2,10 @@ package edu.virginia.vcgr.genii.client.gui.exportdir;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Desktop;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -20,13 +18,9 @@ import javax.swing.JRadioButton;
 import edu.virginia.vcgr.genii.client.gui.GuiHelpAction;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.gui.HelpLinkConfiguration;
-import edu.virginia.vcgr.genii.client.install.ContainerInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class ExportCreationDialog extends JDialog
 {
@@ -161,36 +155,38 @@ public class ExportCreationDialog extends JDialog
 		}
 	}
 
-	private class HelpAction extends AbstractAction
-	{
-		static final long serialVersionUID = 0L;
-		private String _url;
+	// hmmm: this class does not seem to be used at all; ask andrew.
 
-		public HelpAction(String helpUrl)
-		{
-			super("Help");
-			_url = helpUrl;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			_information = null;
-			setVisible(false);
-			if (Desktop.isDesktopSupported()) {
-				Desktop desktop = Desktop.getDesktop();
-				if (desktop.isSupported(Desktop.Action.OPEN))
-					try {
-						desktop.browse(new URI(_url));
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (URISyntaxException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-			}
-		}
-	}
+	// private class HelpAction extends AbstractAction
+	// {
+	// static final long serialVersionUID = 0L;
+	// private String _url;
+	//
+	// public HelpAction(String helpUrl)
+	// {
+	// super("Help");
+	// _url = helpUrl;
+	// }
+	//
+	// @Override
+	// public void actionPerformed(ActionEvent e)
+	// {
+	// _information = null;
+	// setVisible(false);
+	// if (Desktop.isDesktopSupported()) {
+	// Desktop desktop = Desktop.getDesktop();
+	// if (desktop.isSupported(Desktop.Action.OPEN))
+	// try {
+	// desktop.browse(new URI(_url));
+	// } catch (IOException e1) {
+	// // TODO Auto-generated catch block
+	// e1.printStackTrace();
+	// } catch (URISyntaxException e1) {
+	// // TODO Auto-generated catch block
+	// e1.printStackTrace();
+	// }
+	// }
+	// }
+	// }
 
 }

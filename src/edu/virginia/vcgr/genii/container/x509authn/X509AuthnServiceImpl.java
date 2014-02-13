@@ -23,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
@@ -61,6 +60,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.IResource;
@@ -95,7 +95,6 @@ import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 
 @GeniiServiceConfiguration(resourceProvider = RNSDBResourceProvider.class)
 public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implements X509AuthnPortType
-// , BaggageAggregatable
 {
 	static private Log _logger = LogFactory.getLog(X509AuthnServiceImpl.class);
 
@@ -121,6 +120,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		return WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE();
 	}
 
+	@Override
 	protected Object translateConstructionParameter(MessageElement property) throws Exception
 	{
 		// decodes the base64-encoded delegated assertion construction param
@@ -315,14 +315,15 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	/**
 	 * used by both x509 and kerberos authorization.
 	 */
-	public static void sharedPostCreate(BaseAuthenticationServiceImpl theThis, ResourceKey rKey, EndpointReferenceType newEPR,
-		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters,
-		Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType, RemoteException
+	public static void
+		sharedPostCreate(BaseAuthenticationServiceImpl theThis, ResourceKey rKey, EndpointReferenceType newEPR,
+			ConstructionParameters cParams, GenesisHashMap constructionParameters,
+			Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType, RemoteException
 	{
 		// determine the credential the idp will front.
 		NuCredential credential = null;
-		MessageElement encodedCredential =
-			(MessageElement) constructionParameters.get(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME);
+		org.apache.axis.message.MessageElement encodedCredential =
+			constructionParameters.getAxisMessageElement(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME);
 
 		// get the IDP resource's db resource
 		IResource resource = rKey.dereference();
@@ -357,8 +358,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				if (_logger.isDebugEnabled())
 					_logger.debug("building credential wallet from element.");
 
-				AxisCredentialWallet wallet =
-					new AxisCredentialWallet((org.apache.axis.message.SOAPHeaderElement) encodedCredential);
+				AxisCredentialWallet wallet = new AxisCredentialWallet(encodedCredential);
 
 				if (wallet.getRealCreds().isEmpty()) {
 					_logger.error("found no credentials in encoded chunk.");
@@ -416,9 +416,10 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		}
 	}
 
+	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		if (skipPortTypeSpecificPostProcessing(constructionParameters)) {
 			super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
@@ -496,7 +497,6 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		// assemble the response document
 		RequestSecurityTokenResponseType response = new RequestSecurityTokenResponseType();
 		MessageElement[] elements = new MessageElement[2];
-		response.set_any(elements);
 
 		// Add TokenType element
 		XMLCompatible xup = XMLConverter.upscaleCredential(credential);
@@ -515,6 +515,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
 				new RequestedSecurityTokenType(delegations));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
+
+		response.set_any(elements);
 
 		return response;
 	}

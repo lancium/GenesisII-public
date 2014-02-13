@@ -15,10 +15,6 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.fuse.DirectoryManager;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.security.KeystoreManager;
-import edu.virginia.vcgr.genii.osgi.OSGiSupport;
-import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
-import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 import edu.virginia.vcgr.genii.text.TextHelper;
 
 public class RNSLookupCache extends CommonCache

@@ -15,16 +15,14 @@ package edu.virginia.vcgr.genii.container.byteio;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.HashMap;
 
-import javax.xml.namespace.QName;
-
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public interface IRByteIOResource extends IResource
 {
-	public File chooseFile(HashMap<QName, Object> creationProperties) throws ResourceException;
+	public File chooseFile(GenesisHashMap creationProperties) throws ResourceException;
 
 	public File getCurrentFile() throws ResourceException;
 

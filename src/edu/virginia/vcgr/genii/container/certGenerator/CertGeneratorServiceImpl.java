@@ -20,7 +20,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
@@ -41,6 +40,7 @@ import edu.virginia.vcgr.genii.certGenerator.PublicKeyType;
 import edu.virginia.vcgr.genii.certGenerator.X509NameType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.axis.CertGeneratorUtils;
@@ -147,8 +147,9 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 		return response;
 	}
 
+	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
 		BaseFaultType, RemoteException
 	{
 		if (_logger.isDebugEnabled())
@@ -163,6 +164,7 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 		resource.commit();
 	}
 
+	@Override
 	protected Object translateConstructionParameter(MessageElement parameter) throws Exception
 	{
 		QName messageName = parameter.getQName();

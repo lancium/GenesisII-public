@@ -15,11 +15,12 @@ package edu.virginia.vcgr.genii.container.bes.activity;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.axis.message.MessageElement;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.oasis_open.wsn.base.Subscribe;
@@ -27,6 +28,7 @@ import org.oasis_open.wsn.base.Subscribe;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
@@ -35,6 +37,8 @@ public class BESActivityUtils
 	static private QName JOB_DEF_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "job-definition");
 	static private QName CONTAINER_ID_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "container-id");
 	BESConstants bconsts = new BESConstants();
+
+	static private Log _logger = LogFactory.getLog(BESActivityUtils.class);
 
 	static public class BESActivityInitInfo
 	{
@@ -81,7 +85,7 @@ public class BESActivityUtils
 		return ret.toArray(new MessageElement[0]);
 	}
 
-	static public BESActivityInitInfo extractCreationProperties(HashMap<QName, Object> properties) throws ResourceException
+	static public BESActivityInitInfo extractCreationProperties(GenesisHashMap properties) throws ResourceException
 	{
 		JobDefinition_Type jobDef = null;
 		String containerID = null;
@@ -97,11 +101,23 @@ public class BESActivityUtils
 			throw new IllegalArgumentException("Couldn't find container ID in creation properties.");
 
 		try {
-			MessageElement any = (MessageElement) properties.get(JOB_DEF_QNAME);
-			jobDef = (JobDefinition_Type) ObjectDeserializer.toObject(any, JobDefinition_Type.class);
-			containerID = ((MessageElement) properties.get(CONTAINER_ID_QNAME)).getValue();
+			org.apache.axis.message.MessageElement any = properties.getAxisMessageElement(JOB_DEF_QNAME);
+			if (any == null) {
+				String msg = "failure in decoding properties for any object";
 
-			any = (MessageElement) properties.get(sbconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME);
+				if ((properties.get(JOB_DEF_QNAME) != null)
+					&& !(properties.get(JOB_DEF_QNAME) instanceof org.apache.axis.message.MessageElement)) {
+					// hmmm: fix this.
+					msg = msg.concat("AND IT'S THE WRONG TYPE!!!!  not axis level message elem!!!!");
+				}
+
+				_logger.error(msg);
+				throw new RuntimeException(msg);
+			}
+			jobDef = (JobDefinition_Type) ObjectDeserializer.toObject(any, JobDefinition_Type.class);
+			containerID = properties.getAxisMessageElement(CONTAINER_ID_QNAME).getValue();
+
+			any = properties.getAxisMessageElement(sbconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME);
 			if (any != null)
 				subscribe = (Subscribe) ObjectDeserializer.toObject(any, Subscribe.class);
 		} catch (Exception e) {

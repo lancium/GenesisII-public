@@ -13,7 +13,8 @@ public class GuiHelpAction extends AbstractAction
 {
 	static final long serialVersionUID = 0L;
 	private String _url;
-	private JDialog _d;
+
+	// private JDialog _d;
 
 	public static void DisplayUrlHelp(String url)
 	{
@@ -37,7 +38,7 @@ public class GuiHelpAction extends AbstractAction
 	{
 		super("Help");
 		_url = helpUrl;
-		_d = d;
+		// _d = d;
 	}
 
 	@Override

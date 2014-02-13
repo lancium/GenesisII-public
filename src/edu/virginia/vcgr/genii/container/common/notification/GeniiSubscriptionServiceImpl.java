@@ -3,10 +3,7 @@ package edu.virginia.vcgr.genii.container.common.notification;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -31,6 +28,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
@@ -52,8 +50,8 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements Genii
 {
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParameters)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
 

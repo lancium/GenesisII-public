@@ -14,13 +14,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.message.MessageElement;
 import org.morgan.util.Pair;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -34,6 +33,8 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class WSIteratorDBResource extends BasicDBResource implements WSIteratorResource
 {
+//	static private Log _logger = LogFactory.getLog(WSIteratorDBResource.class);
+
 	static Map<String, InMemoryIteratorWrapper> mapper = new HashMap<String, InMemoryIteratorWrapper>();
 	static Map<String, Boolean> type = new HashMap<String, Boolean>();
 	static Object _lock = new Object();
@@ -49,7 +50,7 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 	}
 
 	@Override
-	public void initialize(HashMap<QName, Object> constructionParams) throws ResourceException
+	public void initialize(GenesisHashMap constructionParams) throws ResourceException
 	{
 		super.initialize(constructionParams);
 		if (isServiceResource())

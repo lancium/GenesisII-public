@@ -8,7 +8,6 @@ import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -66,6 +65,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -152,8 +152,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParameters)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParameters);
 

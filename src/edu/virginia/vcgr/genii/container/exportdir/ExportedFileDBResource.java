@@ -7,23 +7,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-
-import javax.xml.namespace.QName;
-import org.ws.addressing.EndpointReferenceType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
-
-import org.morgan.util.io.StreamUtils;
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
@@ -126,7 +123,8 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 		super(parentKey, connectionPool);
 	}
 
-	public void initialize(HashMap<QName, Object> constructionParams) throws ResourceException
+	@Override
+	public void initialize(GenesisHashMap constructionParams) throws ResourceException
 	{
 		_parentIds = (String) constructionParams.get(IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM);
 		_filePath = (String) constructionParams.get(IExportedFileResource.PATH_CONSTRUCTION_PARAM);
@@ -170,7 +168,7 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 		}
 	}
 
-	public File chooseFile(HashMap<QName, Object> constructionParams) throws ResourceException
+	public File chooseFile(GenesisHashMap constructionParams) throws ResourceException
 	{
 		String path = (String) constructionParams.get(IExportedFileResource.PATH_CONSTRUCTION_PARAM);
 		if (path == null)

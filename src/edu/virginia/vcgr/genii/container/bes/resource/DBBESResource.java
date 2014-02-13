@@ -18,9 +18,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
-
-import javax.xml.namespace.QName;
 
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.morgan.util.io.StreamUtils;
@@ -33,6 +30,7 @@ import edu.virginia.vcgr.genii.client.bes.BESPolicy;
 import edu.virginia.vcgr.genii.client.bes.BESPolicyActions;
 import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
@@ -47,7 +45,7 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 public class DBBESResource extends BasicDBResource implements IBESResource
 {
 	@Override
-	public void initialize(HashMap<QName, Object> constructionParams) throws ResourceException
+	public void initialize(GenesisHashMap constructionParams) throws ResourceException
 	{
 		super.initialize(constructionParams);
 

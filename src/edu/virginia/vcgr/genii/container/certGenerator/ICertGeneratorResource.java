@@ -15,16 +15,14 @@ package edu.virginia.vcgr.genii.container.certGenerator;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
 
-import javax.xml.namespace.QName;
-
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public interface ICertGeneratorResource extends IResource
 {
-	public void setCertificateIssuerInfo(HashMap<QName, Object> creationParameters) throws ResourceException;
+	public void setCertificateIssuerInfo(GenesisHashMap creationParameters) throws ResourceException;
 
 	public Long getDefaultValidity() throws ResourceException;
 

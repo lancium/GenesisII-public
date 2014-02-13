@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,6 +17,7 @@ import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.MissingConstructionParamException;
@@ -80,7 +79,7 @@ public class ResourceKey implements Closeable, Rollbackable
 		try {
 			close();
 		} catch (IOException ioe) {
-			_logger.error(ioe);
+			_logger.error("failure in ResourceKey finalize:", ioe);
 		} finally {
 			super.finalize();
 		}
@@ -96,7 +95,7 @@ public class ResourceKey implements Closeable, Rollbackable
 	 * @throws ResourceException
 	 *             If anything goes wrong.
 	 */
-	ResourceKey(String serviceName, HashMap<QName, Object> constructionParameters) throws ResourceException
+	ResourceKey(String serviceName, GenesisHashMap constructionParameters) throws ResourceException
 	{
 		boolean noExceptions = false;
 		_serviceName = serviceName;
@@ -265,7 +264,7 @@ public class ResourceKey implements Closeable, Rollbackable
 		}
 	}
 
-	private void translateConstructionParameters(String serviceName, HashMap<QName, Object> consParms) throws ResourceException
+	private void translateConstructionParameters(String serviceName, GenesisHashMap consParms) throws ResourceException
 	{
 		URI epi = (URI) consParms.get(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
 		if (epi == null) {

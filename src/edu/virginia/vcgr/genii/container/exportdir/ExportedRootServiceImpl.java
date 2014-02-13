@@ -3,9 +3,6 @@ package edu.virginia.vcgr.genii.container.exportdir;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
-
-import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -13,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSEntryType;
 import org.morgan.inject.MInject;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
@@ -20,6 +18,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
@@ -29,8 +28,6 @@ import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescent;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallback;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallbackResult;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
@@ -64,7 +61,8 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements E
 		addImplementedPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE());
 	}
 
-	protected ResourceKey createResource(HashMap<QName, Object> creationParameters) throws ResourceException, BaseFaultType
+	@Override
+	protected ResourceKey createResource(GenesisHashMap creationParameters) throws ResourceException, BaseFaultType
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new ExportedRoot Resource.");
@@ -109,9 +107,10 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements E
 		return new QuitExportResponse(true);
 	}
 
+	@Override
 	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		// get construction params
 		ExportedDirUtils.ExportedDirInitInfo initInfo = ExportedDirUtils.extractCreationProperties(constructionParameters);

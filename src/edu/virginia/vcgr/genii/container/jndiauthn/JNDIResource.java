@@ -4,12 +4,11 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.types.URI;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -93,7 +92,8 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 		}
 	}
 
-	public void initialize(HashMap<QName, Object> constructionParams) throws ResourceException
+	@Override
+	public void initialize(GenesisHashMap constructionParams) throws ResourceException
 	{
 
 		Boolean isIdpResource = (Boolean) constructionParams.get(IJNDIResource.IS_IDP_RESOURCE_CONSTRUCTION_PARAM);

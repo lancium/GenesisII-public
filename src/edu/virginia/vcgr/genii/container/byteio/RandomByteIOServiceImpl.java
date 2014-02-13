@@ -21,10 +21,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-
-import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -59,6 +56,7 @@ import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFact
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
@@ -80,8 +78,8 @@ import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AclTopics;
-import edu.virginia.vcgr.genii.container.sync.DestroyFlags;
 import edu.virginia.vcgr.genii.container.sync.AclChangeNotificationHandler;
+import edu.virginia.vcgr.genii.container.sync.DestroyFlags;
 import edu.virginia.vcgr.genii.container.sync.MessageFlags;
 import edu.virginia.vcgr.genii.container.sync.ReplicationItem;
 import edu.virginia.vcgr.genii.container.sync.ReplicationThread;
@@ -105,6 +103,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 	@MInject
 	private ResourceLock _resourceLock;
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -129,8 +128,9 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 		return WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE();
 	}
 
+	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
 		BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
@@ -155,6 +155,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 		}
 	}
 
+	@Override
 	protected void preDestroy() throws RemoteException, ResourceException
 	{
 		super.preDestroy();
@@ -482,6 +483,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 		}
 	}
 
+	@Override
 	public ResourceSyncRunner getClassResourceSyncRunner()
 	{
 		return new GeniiFileSyncRunner();

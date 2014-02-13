@@ -2,9 +2,6 @@ package edu.virginia.vcgr.genii.container.exportdir.lightweight;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.HashMap;
-
-import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,6 +10,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -35,7 +33,7 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 	static private Log _logger = LogFactory.getLog(LightWeightExportServiceImpl.class);
 
 	@Override
-	protected ResourceKey createResource(HashMap<QName, Object> creationParameters) throws ResourceException, BaseFaultType
+	protected ResourceKey createResource(GenesisHashMap creationParameters) throws ResourceException, BaseFaultType
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new LightWeightExport Resource.");

@@ -19,10 +19,7 @@ import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Vector;
-
-import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -43,6 +40,7 @@ import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
@@ -106,8 +104,9 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 		return bconsts.GENII_BES_ACTIVITY_PORT_TYPE();
 	}
 
+	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType activityEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
 		BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, activityEPR, cParams, creationParameters, resolverCreationParams);

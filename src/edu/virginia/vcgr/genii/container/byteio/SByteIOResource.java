@@ -2,13 +2,13 @@ package edu.virginia.vcgr.genii.container.byteio;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -23,10 +23,10 @@ public class SByteIOResource extends RByteIOResource implements ISByteIOResource
 		super(parentKey, connectionPool);
 	}
 
-	public File chooseFile(HashMap<QName, Object> creationProperties) throws ResourceException
+	public File chooseFile(GenesisHashMap creationProperties) throws ResourceException
 	{
-		MessageElement fileAny;
-		MessageElement deleteAny;
+		org.apache.axis.message.MessageElement fileAny;
+		org.apache.axis.message.MessageElement deleteAny;
 		// String fileAny;
 		// Boolean deleteAny;
 		File file = null;

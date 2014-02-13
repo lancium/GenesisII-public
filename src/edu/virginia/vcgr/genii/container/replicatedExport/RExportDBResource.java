@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.container.replicatedExport;
 
+import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,10 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.io.File;
-import java.io.IOException;
 
 import javax.xml.namespace.QName;
 
@@ -20,18 +19,21 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.replicatedExport.RExportUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.MessageElementUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.byteio.IRByteIOResource;
@@ -41,8 +43,6 @@ import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolv
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
-import edu.virginia.vcgr.genii.client.replicatedExport.RExportUtils;
-import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 
 public class RExportDBResource extends BasicDBResource implements IRExportResource
 {
@@ -107,7 +107,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		super(parentKey, connectionPool);
 	}
 
-	public void initialize(HashMap<QName, Object> constructionParams) throws ResourceException
+	public void initialize(GenesisHashMap constructionParams) throws ResourceException
 	{
 		_myParentIds = (String) constructionParams.get(IRExportResource.PARENT_IDS_CONSTRUCTION_PARAM);
 		_myLocalPath = (String) constructionParams.get(IRExportResource.LOCALPATH_CONSTRUCTION_PARAM);

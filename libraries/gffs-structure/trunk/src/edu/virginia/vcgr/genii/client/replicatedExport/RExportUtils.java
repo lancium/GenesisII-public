@@ -1,18 +1,18 @@
 package edu.virginia.vcgr.genii.client.replicatedExport;
 
+import java.io.File;
+import java.io.IOException;
+
 import javax.xml.namespace.QName;
 
+import org.apache.axis.types.URI;
 import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-
-import java.io.File;
-import java.io.IOException;
-import org.apache.axis.types.URI;
-import java.util.HashMap;
 
 public class RExportUtils
 {
@@ -61,7 +61,7 @@ public class RExportUtils
 		return creationProperties;
 	}
 
-	static public RExportInitInfo extractCreationProperties(HashMap<QName, Object> properties) throws ResourceException
+	static public RExportInitInfo extractCreationProperties(GenesisHashMap properties) throws ResourceException
 	{
 		URI epi = null;
 		String path = null;
@@ -71,7 +71,8 @@ public class RExportUtils
 			throw new IllegalArgumentException("Null creation properites parameter.");
 
 		// Get common EPI
-		MessageElement epiElement = (MessageElement) properties.get(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
+		org.apache.axis.message.MessageElement epiElement =
+			properties.getAxisMessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
 		try {
 			epi = ClientConstructionParameters.getEndpointIdentifierProperty(epiElement);
 		} catch (URI.MalformedURIException use) {
@@ -81,7 +82,8 @@ public class RExportUtils
 			throw new IllegalArgumentException("Can't find epi in creation properties.");
 
 		// Get local path of export
-		MessageElement pathElement = (MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _PATH_NAME));
+		org.apache.axis.message.MessageElement pathElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_NAME));
 		if (pathElement == null)
 			throw new IllegalArgumentException("Can't find local path in creation properties.");
 		path = pathElement.getValue();
@@ -90,8 +92,8 @@ public class RExportUtils
 			throw new IllegalArgumentException("Couldn't find path in creation properties.");
 
 		// Get list of container names - first name is location of primary
-		MessageElement parentIdsElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS));
+		org.apache.axis.message.MessageElement parentIdsElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS));
 		if (parentIdsElement == null)
 			throw new IllegalArgumentException("Can't find parentIds names in creation properties.");
 		parentIds = parentIdsElement.getValue();

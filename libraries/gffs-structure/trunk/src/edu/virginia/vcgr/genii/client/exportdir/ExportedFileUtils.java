@@ -15,13 +15,13 @@ package edu.virginia.vcgr.genii.client.exportdir;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public class ExportedFileUtils
@@ -71,7 +71,7 @@ public class ExportedFileUtils
 		return ret;
 	}
 
-	static public ExportedFileInitInfo extractCreationProperties(HashMap<QName, Object> properties) throws ResourceException
+	static public ExportedFileInitInfo extractCreationProperties(GenesisHashMap properties) throws ResourceException
 	{
 		String path = null;
 		String parentIds = null;
@@ -80,21 +80,21 @@ public class ExportedFileUtils
 		if (properties == null)
 			throw new IllegalArgumentException("Can't have a null creation properites parameter.");
 
-		MessageElement pathElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME));
+		org.apache.axis.message.MessageElement pathElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME));
 		if (pathElement == null)
 			throw new IllegalArgumentException("Couldn't find path in creation properties.");
 		path = pathElement.getValue();
 
-		MessageElement parentIDSElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
+		org.apache.axis.message.MessageElement parentIDSElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
 		if (parentIDSElement == null)
 			throw new IllegalArgumentException("Couldn't find parentIds in creation properties.");
 		parentIds = parentIDSElement.getValue();
 
 		// get replication state
-		MessageElement replicationElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_));
+		org.apache.axis.message.MessageElement replicationElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_));
 		if (replicationElement == null)
 			throw new IllegalArgumentException("Couldn't find replication indicator in export creation properties.");
 		isReplicated = replicationElement.getValue();

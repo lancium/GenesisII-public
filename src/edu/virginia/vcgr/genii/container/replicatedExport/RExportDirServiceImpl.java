@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.container.replicatedExport;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
@@ -19,10 +18,12 @@ import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSEntryType;
 import org.ggf.rns.WriteNotPermittedFaultType;
 import org.morgan.util.GUID;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -32,9 +33,6 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
@@ -43,8 +41,8 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
-import edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType;
 import edu.virginia.vcgr.genii.replicatedExport.PopulateDirRequestType;
+import edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
@@ -53,6 +51,7 @@ public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPo
 {
 	static private Log _logger = LogFactory.getLog(RExportDirServiceImpl.class);
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -219,6 +218,7 @@ public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPo
 		throw new RemoteException("Remove operation not supported in RExportDir.");
 	}
 
+	@Override
 	protected Object translateConstructionParameter(MessageElement parameter) throws Exception
 	{
 		QName messageName = parameter.getQName();
@@ -228,7 +228,8 @@ public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPo
 			return super.translateConstructionParameter(parameter);
 	}
 
-	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters) throws ResourceException, BaseFaultType
+	@Override
+	protected ResourceKey createResource(GenesisHashMap constructionParameters) throws ResourceException, BaseFaultType
 	{
 		_logger.info("Creating new RExportDir instance.");
 

@@ -15,7 +15,6 @@ package edu.virginia.vcgr.genii.container.kerbauthn;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -40,6 +39,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -91,6 +91,7 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		new KerbAuthnAttributesHandler(getAttributePackage());
 	}
 
+	@Override
 	protected Object translateConstructionParameter(MessageElement property) throws Exception
 	{
 		// decodes the base64-encoded delegated assertion construction param
@@ -109,7 +110,8 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		}
 	}
 
-	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters) throws ResourceException, BaseFaultType
+	@Override
+	protected ResourceKey createResource(GenesisHashMap constructionParameters) throws ResourceException, BaseFaultType
 	{
 		// Specify additional O (org) field for our resource's certificate (viz. realm)
 		String realm = (String) constructionParameters.get(SecurityConstants.NEW_KERB_IDP_REALM_QNAME);
@@ -120,9 +122,10 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		return super.createResource(constructionParameters);
 	}
 
+	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		_logger.debug("entering postCreate");
 		if (skipPortTypeSpecificPostProcessing(constructionParameters)) {

@@ -7,7 +7,6 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
-import edu.virginia.vcgr.genii.client.gui.exportdir.ExportDirDialog;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
@@ -30,12 +29,10 @@ public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
-		Closeable contextToken = null;
-
-		contextToken = null;
 		String ContainerPath = "DEFAULT";
 		String TargetPath = "/";
-		contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+		// hmmm: contextToken is unused; should the context be reset after this call?
+		Closeable contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 		RNSPath path = context.endpointRetriever().getTargetEndpoints().iterator().next();
 		try {
 			EndpointReferenceType epr = path.getEndpoint();
@@ -61,6 +58,9 @@ public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 			e.printStackTrace();
 		}
 
+		if (contextToken == null) {
+			// do nothing to quiet down the warning.
+		}
 	}
 
 	@Override

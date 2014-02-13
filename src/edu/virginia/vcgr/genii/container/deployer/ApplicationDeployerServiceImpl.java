@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.container.deployer;
 import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
@@ -26,6 +25,7 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionUtils;
 import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -57,6 +57,7 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 
 	static private final String _DEPLOYMENT_PROPERTY = "edu.virginia.vcgr.genii.container.deployer.deployment-property";
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -87,12 +88,13 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 		return new CreateDeploymentResponseType(resp.getEndpoint());
 	}
 
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, HashMap<QName, Object> constructionParameters,
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, GenesisHashMap constructionParameters,
 		Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType
 	{
 		IDeployment deployment = null;
 
-		MessageElement eprElem = (MessageElement) constructionParameters.get(DEPLOYMENT_CONSTRUCTION_PARAM);
+		org.apache.axis.message.MessageElement eprElem =
+			constructionParameters.getAxisMessageElement(DEPLOYMENT_CONSTRUCTION_PARAM);
 		if (eprElem == null)
 			throw new ResourceException("Unable to create deployment -- " + "application deployment description EPR not set.");
 		EndpointReferenceType depDescEPR = ObjectDeserializer.toObject(eprElem, EndpointReferenceType.class);

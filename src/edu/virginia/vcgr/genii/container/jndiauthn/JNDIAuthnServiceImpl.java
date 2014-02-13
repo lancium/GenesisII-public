@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -70,6 +69,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
@@ -118,6 +118,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 
 	}
 
+	@Override
 	public String getMasterType(ResourceKey rKey) throws ResourceException, ResourceUnknownFaultType
 	{
 
@@ -144,6 +145,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 	/**
 	 * Return different implemented port types depending on who we are
 	 */
+	@Override
 	public PortType[] getImplementedPortTypes(ResourceKey rKey) throws ResourceException, ResourceUnknownFaultType
 	{
 		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource))) {
@@ -186,6 +188,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 	 * 
 	 * @return false.
 	 */
+	@Override
 	protected boolean allowVcgrCreate() throws ResourceException, ResourceUnknownFaultType
 	{
 		ResourceKey serviceKey = ResourceManager.getCurrentResource();
@@ -199,9 +202,10 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		return true;
 	}
 
+	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 
 		ResourceKey myKey = ResourceManager.getCurrentResource();
@@ -229,6 +233,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 	}
 
+	@Override
 	protected Object translateConstructionParameter(MessageElement property) throws Exception
 	{
 
@@ -249,6 +254,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		}
 	}
 
+	@Override
 	protected CertCreationSpec getChildCertSpec() throws ResourceException, ResourceUnknownFaultType, ConfigurationException
 	{
 
@@ -287,7 +293,6 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 
 		RequestSecurityTokenResponseType response = new RequestSecurityTokenResponseType();
 		MessageElement[] elements = new MessageElement[2];
-		response.set_any(elements);
 
 		// Add TokenType element
 		elements[0] =
@@ -302,6 +307,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 				new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
+		response.set_any(elements);
 		return response;
 	}
 
@@ -345,7 +351,6 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 
 		RequestSecurityTokenResponseType response = new RequestSecurityTokenResponseType();
 		MessageElement[] elements = new MessageElement[2];
-		response.set_any(elements);
 
 		XMLCompatible xup = XMLConverter.upscaleCredential(tc);
 		if (xup == null) {
@@ -359,13 +364,14 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"), xup.getTokenType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
 
-		MessageElement wseTokenRef = creds.convertToSOAPElement();
+		org.apache.axis.message.MessageElement wseTokenRef = creds.convertToSOAPElement();
 
 		elements[1] =
 			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
 				new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
+		response.set_any(elements);
 		return response;
 	}
 
@@ -574,7 +580,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 			throw new RemoteException("\"resolveEPI\" not applicable.");
 		}
 
-		HashMap<QName, Object> creationParameters = new HashMap<QName, Object>();
+		GenesisHashMap creationParameters = new GenesisHashMap();
 		try {
 			creationParameters.put(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, new URI(resolveEPI.toString()));
 

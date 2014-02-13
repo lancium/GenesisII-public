@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.ui.plugins.files;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -10,25 +9,18 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.border.TitledBorder;
 
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.gui.GuiHelpAction;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.gui.HelpLinkConfiguration;
-import edu.virginia.vcgr.genii.client.gui.exportdir.ExportCreationInformation;
-import edu.virginia.vcgr.genii.client.gui.exportdir.ExportManipulator;
 import edu.virginia.vcgr.genii.client.gui.exportdir.IInformationListener;
 import edu.virginia.vcgr.genii.client.gui.exportdir.ResourcePathsWidget;
 import edu.virginia.vcgr.genii.client.rcreate.ResourceCreationContext;
@@ -73,8 +65,6 @@ public class CreateDirDialog extends JDialog
 	public CreateDirDialog(UIPluginContext context, String ContainerPath, String TargetPath) throws FileLockException
 	{
 		Container container;
-		JPanel panel;
-		JButton button;
 		_container_path = ContainerPath;
 		_target_path = TargetPath;
 		_context = context;

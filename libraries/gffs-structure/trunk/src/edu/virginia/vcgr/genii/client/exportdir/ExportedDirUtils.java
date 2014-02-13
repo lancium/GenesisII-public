@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Vector;
 
 import javax.xml.namespace.QName;
@@ -29,6 +28,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public class ExportedDirUtils
@@ -169,7 +169,7 @@ public class ExportedDirUtils
 			initInfo.getResolverFactoryEPR()));
 	}
 
-	static public ExportedDirInitInfo extractCreationProperties(HashMap<QName, Object> properties) throws ResourceException
+	static public ExportedDirInitInfo extractCreationProperties(GenesisHashMap properties) throws ResourceException
 	{
 		String path = null;
 		String parentIds = null;
@@ -184,15 +184,15 @@ public class ExportedDirUtils
 			throw new IllegalArgumentException("Can't have a null export creation properites parameter.");
 
 		// get path
-		MessageElement pathElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME));
+		org.apache.axis.message.MessageElement pathElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME));
 		if (pathElement == null)
 			throw new IllegalArgumentException("Couldn't find path in export creation properties.");
 		path = pathElement.getValue();
 
 		// get parentIds
-		MessageElement parentIDSElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
+		org.apache.axis.message.MessageElement parentIDSElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
 		if (parentIDSElement == null)
 			throw new IllegalArgumentException("Couldn't find parentIds in export creation properties.");
 		parentIds = parentIDSElement.getValue();
@@ -200,20 +200,20 @@ public class ExportedDirUtils
 			parentIds = "";
 
 		// get svn user
-		MessageElement svnUserElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _SVN_USERNAME));
+		org.apache.axis.message.MessageElement svnUserElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_USERNAME));
 		if (svnUserElement != null)
 			svnUser = svnUserElement.getValue();
 
 		// get svn pass
-		MessageElement svnPassElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _SVN_PASSWORD));
+		org.apache.axis.message.MessageElement svnPassElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_PASSWORD));
 		if (svnPassElement != null)
 			svnPass = svnPassElement.getValue();
 
 		// get svn revision
-		MessageElement svnRevisionElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _SVN_REVISION));
+		org.apache.axis.message.MessageElement svnRevisionElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_REVISION));
 		try {
 			if (svnRevisionElement != null && svnRevisionElement.getValue() != null)
 				svnRevision = (Long) svnRevisionElement.getObjectValue(Long.class);
@@ -222,15 +222,15 @@ public class ExportedDirUtils
 		}
 
 		// get replication state
-		MessageElement replicationElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR));
+		org.apache.axis.message.MessageElement replicationElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR));
 		if (replicationElement == null)
 			throw new IllegalArgumentException("Couldn't find replication indicator in export creation properties.");
 		isReplicated = replicationElement.getValue();
 
 		// get resolver service epr
-		MessageElement resolverServiceElement =
-			(MessageElement) properties.get(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR));
+		org.apache.axis.message.MessageElement resolverServiceElement =
+			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR));
 		if (resolverServiceElement == null)
 			throw new IllegalArgumentException("Couldn't find resolver service epr in export creation properties.");
 		try {

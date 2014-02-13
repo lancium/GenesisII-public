@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Calendar;
-import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
@@ -26,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -47,7 +47,7 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		super(parentKey, connectionPool);
 	}
 
-	public File chooseFile(HashMap<QName, Object> creationProperties) throws ResourceException
+	public File chooseFile(GenesisHashMap creationProperties) throws ResourceException
 	{
 		File userDir = Container.getConfigurationManager().getUserDirectory();
 		File file = null;

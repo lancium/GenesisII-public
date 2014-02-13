@@ -10,7 +10,6 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -23,9 +22,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.Rollbackable;
@@ -33,9 +34,6 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionsDatabase;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
@@ -111,7 +109,7 @@ public class BasicDBResource implements IResource
 	}
 
 	@Override
-	public void initialize(HashMap<QName, Object> constructionParams) throws ResourceException
+	public void initialize(GenesisHashMap constructionParams) throws ResourceException
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Initializing resource with construction parameters.");

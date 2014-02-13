@@ -105,6 +105,7 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
@@ -288,7 +289,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		}
 	}
 
-	protected ResourceKey createResource(HashMap<QName, Object> creationParameters) throws ResourceException, BaseFaultType
+	protected ResourceKey createResource(GenesisHashMap creationParameters) throws ResourceException, BaseFaultType
 	{
 		if (!creationParameters.containsKey(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM))
 			creationParameters.put(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, WSName.generateNewEPI());
@@ -309,11 +310,12 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	}
 
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParameters)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
-		_logger.debug("postCreate: " + this.getClass().getName() + constructionParameters.size() + " construct parms, " + resolverCreationParameters.size() + " resolver creation parms");
-		
+		_logger.debug("postCreate: " + this.getClass().getName() + " -- " + constructionParameters.size()
+			+ " construct parms, " + resolverCreationParameters.size() + " resolver creation parms");
+
 		IResource resource = rKey.dereference();
 
 		Long timeToLive = cParams.timeToLive();
@@ -368,6 +370,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		setScheduledTerminationTime(termTime, rKey);
 	}
 
+	/**
+	 * translates the property into an Object we know, if possible. otherwise just returns the axis
+	 * level MessageElement from the property.
+	 */
 	protected Object translateConstructionParameter(MessageElement property) throws Exception
 	{
 		QName name = property.getQName();
@@ -553,6 +559,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return processSubscribeRequest(rKey.getResourceKey(), new SubscribeRequest(arg0));
 	}
 
+	@Override
 	@RWXMapping(RWXCategory.READ)
 	public final String ping(String request)
 	{
@@ -567,6 +574,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return request;
 	}
 
+	@Override
 	@RWXMapping(RWXCategory.READ)
 	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(QName[] getMultipleResourcePropertiesRequest)
 		throws RemoteException, InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
@@ -602,6 +610,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return new GetMultipleResourcePropertiesResponse(ret);
 	}
 
+	@Override
 	@RWXMapping(RWXCategory.READ)
 	public GetResourcePropertyResponse getResourceProperty(QName getResourcePropertyRequest) throws RemoteException,
 		InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
@@ -651,7 +660,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	public EndpointReferenceType CreateEPR(MessageElement[] creationParameters, String targetServiceURL)
 		throws RemoteException, ResourceCreationFaultType, BaseFaultType
 	{
-		HashMap<QName, Object> constructionParameters = new HashMap<QName, Object>();
+		GenesisHashMap constructionParameters = new GenesisHashMap();
 
 		if (creationParameters != null) {
 			for (MessageElement property : creationParameters) {
@@ -724,6 +733,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		}
 	}
 
+	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
 	public final VcgrCreateResponse vcgrCreate(VcgrCreate createRequest) throws RemoteException, ResourceCreationFaultType
 	{
@@ -739,7 +749,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			WorkingContext.getCurrentWorkingContext().setProperty(WorkingContext.EPR_PROPERTY_NAME, myEPR);
 		}
 
-		HashMap<QName, Object> constructionParameters = new HashMap<QName, Object>();
+		GenesisHashMap constructionParameters = new GenesisHashMap();
 
 		MessageElement[] creationParameters = createRequest.get_any();
 		if (creationParameters != null) {
@@ -847,6 +857,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return newEPR;
 	}
 
+	@Override
 	public void cleanupHook()
 	{
 		// By default, nothing needs to be done.
@@ -856,6 +867,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	 * Called by the container to initialize the service. Returns true if the service is being
 	 * *created* for the first time.
 	 */
+	@Override
 	public boolean startup()
 	{
 		boolean serviceCreated = false;
@@ -873,7 +885,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				// need to create the service resource.
 				serviceCreated = true;
 
-				HashMap<QName, Object> constructionParameters = new HashMap<QName, Object>();
+				GenesisHashMap constructionParameters = new GenesisHashMap();
 
 				constructionParameters.put(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, WSName.generateNewEPI());
 
@@ -902,6 +914,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return serviceCreated;
 	}
 
+	@Override
 	public void postStartup()
 	{
 		// Do nothing by default.

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
@@ -39,6 +38,7 @@ import org.ws.addressing.MetadataType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -70,6 +70,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 	@MInject
 	private ResourceLock _resourceLock;
 
+	@Override
 	protected Object translateConstructionParameter(MessageElement property) throws Exception
 	{
 		QName name = property.getQName();
@@ -82,6 +83,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 			return super.translateConstructionParameter(property);
 	}
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -94,8 +96,9 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 		return WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE();
 	}
 
+	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
 		BaseFaultType, RemoteException
 	{
 		if (_logger.isDebugEnabled())
@@ -288,6 +291,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 		return newPosition;
 	}
 
+	@Override
 	protected void preDestroy() throws RemoteException, ResourceException
 	{
 		super.preDestroy();

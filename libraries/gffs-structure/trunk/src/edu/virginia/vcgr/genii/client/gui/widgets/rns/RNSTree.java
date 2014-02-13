@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;

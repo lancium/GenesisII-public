@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.client.dair;
 
-import java.util.HashMap;
 import java.util.Hashtable;
 
 import javax.xml.namespace.QName;
@@ -10,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 
 public class DAIRUtils
 {
@@ -71,7 +71,7 @@ public class DAIRUtils
 	}
 
 	@SuppressWarnings("unchecked")
-	static public SQLAccessCombinedInitInfo extractCreationProperties(HashMap<QName, Object> properties)
+	static public SQLAccessCombinedInitInfo extractCreationProperties(GenesisHashMap properties)
 	{
 
 		String driver = null;

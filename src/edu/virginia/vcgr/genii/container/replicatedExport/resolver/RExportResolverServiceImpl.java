@@ -13,13 +13,12 @@
  */
 package edu.virginia.vcgr.genii.container.replicatedExport.resolver;
 
-import org.apache.axis.types.URI;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.types.URI;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,17 +29,17 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSEntryType;
 import org.ggf.rns.WriteNotPermittedFaultType;
-import org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType;
-import org.ws.addressing.EndpointReferenceType;
-
-import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.oasis_open.wsrf.basefaults.BaseFaultType;
+import org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOOperations;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.IResource;
@@ -53,25 +52,23 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOContentsCha
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
-
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-
-import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverPortType;
-import edu.virginia.vcgr.genii.replicatedExport.resolver.InvalidWSNameFaultType;
-import edu.virginia.vcgr.genii.replicatedExport.resolver.UpdateRequestType;
-import edu.virginia.vcgr.genii.replicatedExport.resolver.UpdateResponseType;
 import edu.virginia.vcgr.genii.container.replicatedExport.RExportUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateReplicaRequest;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateReplicaResponse;
-import edu.virginia.vcgr.genii.replicatedExport.resolver.ResolverQueryRequest;
-import edu.virginia.vcgr.genii.replicatedExport.resolver.ResolverQueryResponse;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateRootReplicaRequest;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateRootReplicaResponse;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.EPRRequestResponse;
+import edu.virginia.vcgr.genii.replicatedExport.resolver.InvalidWSNameFaultType;
+import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverPortType;
+import edu.virginia.vcgr.genii.replicatedExport.resolver.ResolverQueryRequest;
+import edu.virginia.vcgr.genii.replicatedExport.resolver.ResolverQueryResponse;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.ServiceEPRRequest;
+import edu.virginia.vcgr.genii.replicatedExport.resolver.UpdateRequestType;
+import edu.virginia.vcgr.genii.replicatedExport.resolver.UpdateResponseType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
@@ -110,9 +107,10 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 		return WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE();
 	}
 
+	@Override
 	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, myEPR, cParams, constructionParameters, resolverCreationParams);
 
@@ -509,6 +507,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 		throw new RemoteException("setMetadata operation not supported in rexport resolver.");
 	}
 
+	@Override
 	protected Object translateConstructionParameter(MessageElement parameter) throws Exception
 	{
 		QName messageName = parameter.getQName();

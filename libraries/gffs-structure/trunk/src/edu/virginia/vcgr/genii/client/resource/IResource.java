@@ -3,18 +3,17 @@ package edu.virginia.vcgr.genii.client.resource;
 import java.io.Closeable;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
-
 import org.apache.axis.message.MessageElement;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 
 /**
@@ -59,7 +58,7 @@ public interface IResource extends Closeable
 	 * @throws ResourceException
 	 *             If anything goes wrong.
 	 */
-	public void initialize(HashMap<QName, Object> constructionParams) throws ResourceException;
+	public void initialize(GenesisHashMap constructionParams) throws ResourceException;
 
 	/**
 	 * Load a resources state from persistent storage (or do nothing if no loading needs to take

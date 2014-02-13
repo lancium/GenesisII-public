@@ -36,6 +36,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -108,6 +109,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 	@MInject
 	private ResourceLock _resourceLock;
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -139,9 +141,10 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 	/**
 	 * Create a new simple resolver resource. Write the target EPR to the database.
 	 */
+	@Override
 	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, myEPR, cParams, constructionParameters, resolverCreationParams);
 
@@ -169,6 +172,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 		}
 	}
 
+	@Override
 	protected Object translateConstructionParameter(MessageElement parameter) throws Exception
 	{
 		QName messageName = parameter.getQName();
@@ -496,6 +500,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 		throw new RemoteException("setMetadata operation not supported!");
 	}
 
+	@Override
 	public ResourceSyncRunner getClassResourceSyncRunner()
 	{
 		return new GeniiResolverSyncRunner();

@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
-
-import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -22,11 +19,15 @@ import org.ggf.rns.RNSMetadataType;
 import org.ggf.rns.WriteNotPermittedFaultType;
 import org.morgan.inject.MInject;
 import org.morgan.util.GUID;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
+
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
@@ -36,16 +37,11 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.ResourceLock;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import org.oasis_open.docs.wsrf.rl_2.Destroy;
-
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
@@ -59,7 +55,8 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = ExportedDirDBResourceProvider.class)
-public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDirPortType, GeniiNoOutCalls
+public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDirPortType
+//, GeniiNoOutCalls
 {
 	static private Log _logger = LogFactory.getLog(ExportedDirServiceImpl.class);
 
@@ -88,7 +85,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 		return WellKnownPortTypes.EXPORTED_DIR_SERVICE_PORT_TYPE();
 	}
 
-	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters) throws ResourceException, BaseFaultType
+	@Override
+	protected ResourceKey createResource(GenesisHashMap constructionParameters) throws ResourceException, BaseFaultType
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new ExportedDir Resource.");
@@ -114,7 +112,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 
 	/*
 	 * Looks like this is dead code -- mmm2a protected void fillIn(ResourceKey rKey,
-	 * EndpointReferenceType newEPR, ConstructionParameters cParams, HashMap<QName, Object>
+	 * EndpointReferenceType newEPR, ConstructionParameters cParams, GenesisHashMap
 	 * creationParameters, Collection<MessageElement> resolverCreationParams) throws
 	 * ResourceException, BaseFaultType, RemoteException { super.postCreate(rKey, newEPR, cParams,
 	 * creationParameters, resolverCreationParams);

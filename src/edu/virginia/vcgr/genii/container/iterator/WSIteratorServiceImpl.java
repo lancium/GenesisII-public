@@ -3,9 +3,6 @@ package edu.virginia.vcgr.genii.container.iterator;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
-
-import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.UnsignedLong;
@@ -16,6 +13,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.iterator.IteratorConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -39,6 +37,7 @@ public class WSIteratorServiceImpl extends GenesisIIBase implements WSIteratorPo
 	static final public String SERVICE_NAME = "WSIteratorPortType";
 	static final private long lifeTime = 1000L * 60 * 5;
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -80,9 +79,10 @@ public class WSIteratorServiceImpl extends GenesisIIBase implements WSIteratorPo
 		return new IterateResponseType(new UnsignedLong(resource.iteratorSize()), iterableElements);
 	}
 
+	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParameters)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
 		extendLifeTime(rKey);

@@ -28,10 +28,6 @@ import edu.virginia.vcgr.genii.client.cmd.Driver;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.security.KeystoreManager;
-import edu.virginia.vcgr.genii.osgi.OSGiSupport;
-import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
-import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 /**
  * Converts Java DOM Elements and SOAP Elements to Java objects. The objects must be compliant with

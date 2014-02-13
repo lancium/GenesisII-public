@@ -7,7 +7,6 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +39,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
@@ -107,7 +107,6 @@ import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
  */
 public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implements RNSTopics, BaggageAggregatable
 {
-
 	private static Log _logger = LogFactory.getLog(BaseAuthenticationServiceImpl.class);
 
 	protected BaseAuthenticationServiceImpl(String serviceName) throws RemoteException
@@ -151,10 +150,10 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	 * creation phase.
 	 */
 	@Override
-	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters) throws ResourceException, BaseFaultType
+	protected ResourceKey createResource(GenesisHashMap constructionParameters) throws ResourceException, BaseFaultType
 	{
 		// insert construction parameter to affect DN names of the certificate
-		String CN = (String) constructionParameters.get(SecurityConstants.NEW_IDP_NAME_QNAME);
+		String CN = constructionParameters.getString(SecurityConstants.NEW_IDP_NAME_QNAME);
 		if (CN != null) {
 			constructionParameters.put(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM, new String[] { CN });
 		}
@@ -163,8 +162,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		EndpointReferenceType certificateOwnerEPR =
 			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (certificateOwnerEPR == null) {
-			MessageElement certificateOwner =
-				(MessageElement) constructionParameters.get(STSConfigurationProperties.CERTIFICATE_OWNER_EPR);
+			org.apache.axis.message.MessageElement certificateOwner =
+				constructionParameters.getAxisMessageElement(STSConfigurationProperties.CERTIFICATE_OWNER_EPR);
 			if (certificateOwner != null) {
 				try {
 					certificateOwnerEPR = (EndpointReferenceType) certificateOwner.getObjectValue(EndpointReferenceType.class);
@@ -197,12 +196,11 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	 * instances having the same name cannot reside in a single container for a single IDP
 	 * port-type. This apparent restriction simplifies tracking of IDP instances for later use.
 	 */
-	public String addResourceInServiceResourceList(EndpointReferenceType newEPR, HashMap<QName, Object> constructionParameters)
+	public String addResourceInServiceResourceList(EndpointReferenceType newEPR, GenesisHashMap constructionParameters)
 		throws ResourceUnknownFaultType, ResourceException, RNSEntryExistsFaultType
 	{
-
 		// make sure the specific IDP doesn't yet exist
-		String newIdpName = (String) constructionParameters.get(SecurityConstants.NEW_IDP_NAME_QNAME);
+		String newIdpName = constructionParameters.getString(SecurityConstants.NEW_IDP_NAME_QNAME);
 		ResourceKey serviceKey = ResourceManager.getCurrentResource();
 		IRNSResource serviceResource = (IRNSResource) serviceKey.dereference();
 		Collection<String> entries = serviceResource.listEntries(null);
@@ -236,8 +234,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	 */
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParameters)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
@@ -277,7 +275,7 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		MessageElement[] propertyValue = idpNameProperty.get_any();
 		if (propertyValue != null) {
 			String idpName = propertyValue[0].getValue();
-			HashMap<QName, Object> propertyMap = new HashMap<QName, Object>(1);
+			GenesisHashMap propertyMap = new GenesisHashMap(1);
 			propertyMap.put(SecurityConstants.NEW_IDP_NAME_QNAME, idpName);
 			addResourceInServiceResourceList(newEPR, propertyMap);
 		}
@@ -289,13 +287,13 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	 * properties throws exceptions. So this method is used by subclasses as an indicator that post
 	 * processing through postCreate method should be avoided.
 	 */
-	protected boolean skipPortTypeSpecificPostProcessing(HashMap<QName, Object> constructionParameters)
+	protected boolean skipPortTypeSpecificPostProcessing(GenesisHashMap constructionParameters)
 	{
 
 		EndpointReferenceType primaryEPR =
 			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
-		MessageElement isReplica =
-			(MessageElement) constructionParameters.get(STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM);
+		org.apache.axis.message.MessageElement isReplica =
+			constructionParameters.getAxisMessageElement(STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM);
 		boolean skipPostCreateOverride =
 			primaryEPR != null || (isReplica != null && "TRUE".equalsIgnoreCase(isReplica.getValue()));
 		return skipPostCreateOverride;

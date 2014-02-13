@@ -2,11 +2,9 @@ package edu.virginia.vcgr.genii.container.resource;
 
 import org.apache.axis.types.URI;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
 import java.io.IOException;
 
-import javax.xml.namespace.QName;
-
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.IResource;
@@ -17,8 +15,7 @@ import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider
 
 public class RequiredConstructionParamWorker
 {
-	static public void setRequiredConstructionParameters(IResource resource, HashMap<QName, Object> consParms)
-		throws ResourceException
+	static public void setRequiredConstructionParameters(IResource resource, GenesisHashMap consParms) throws ResourceException
 	{
 		URI epi = (URI) consParms.get(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
 		if (epi == null) {

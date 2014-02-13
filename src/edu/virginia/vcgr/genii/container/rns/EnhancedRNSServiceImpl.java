@@ -17,11 +17,8 @@ import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -43,6 +40,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
@@ -114,6 +112,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	@MInject
 	private ResourceLock _resourceLock;
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -141,9 +140,10 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		return WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE();
 	}
 
+	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 
@@ -159,6 +159,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		}
 	}
 
+	@Override
 	protected void preDestroy() throws RemoteException, ResourceException
 	{
 		super.preDestroy();
@@ -580,6 +581,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		return (MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp));
 	}
 
+	@Override
 	public ResourceSyncRunner getClassResourceSyncRunner()
 	{
 		return new GeniiDirSyncRunner();

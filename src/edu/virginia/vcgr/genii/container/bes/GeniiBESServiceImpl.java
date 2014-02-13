@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -65,6 +64,7 @@ import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
+import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
@@ -206,6 +206,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		cleanupBadActivities();
 	}
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -216,8 +217,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		HashMap<QName, Object> constructionParameters, Collection<MessageElement> resolverCreationParameters)
-		throws ResourceException, BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
+		BaseFaultType, RemoteException
 	{
 		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParameters);
 	}
