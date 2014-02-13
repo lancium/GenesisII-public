@@ -53,7 +53,7 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		File file = null;
 		try {
 			if (creationProperties != null) {
-				MessageElement any = (MessageElement) creationProperties.get(FILE_PATH_PROPERTY);
+				org.apache.axis.message.MessageElement any = creationProperties.getAxisMessageElement(FILE_PATH_PROPERTY);
 				if (any != null) {
 					file = new File(userDir, any.getAsString());
 				}

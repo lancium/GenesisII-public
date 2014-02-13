@@ -36,11 +36,11 @@ public class SByteIOResource extends RByteIOResource implements ISByteIOResource
 			if (creationProperties == null)
 				throw new ResourceException("StreamableByteIO Instances MUST have a file path.");
 
-			fileAny = (MessageElement) creationProperties.get(FILE_PATH_PROPERTY);
+			fileAny = creationProperties.getAxisMessageElement(FILE_PATH_PROPERTY);
 			// fileAny = (String)creationProperties.get(FILE_PATH_PROPERTY);
 			if (fileAny == null)
 				throw new ResourceException("StreamableByteIO Instances MUST have a file path " + "element creation property.");
-			deleteAny = (MessageElement) creationProperties.get(MUST_DESTROY_PROPERTY);
+			deleteAny = creationProperties.getAxisMessageElement(MUST_DESTROY_PROPERTY);
 			// deleteAny = (Boolean)creationProperties.get(MUST_DESTROY_PROPERTY);
 			if (deleteAny == null)
 				throw new ResourceException("StreamableByteIO Instances MUST have a must destroy "
