@@ -106,12 +106,8 @@ public class AxisBasedContextResolver implements IContextResolver
 					SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
 					QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
 					if (heName.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME)) {
-						
-						//hmmm: clean this out.
-						_logger.debug("found the context entry in soap");
-						
 						Element em = ((org.apache.axis.message.MessageElement) he).getRealElement();
-						// debugging call.
+						// debugging code that writes the context to a file.
 						boolean debuggingMode = false;
 						if (debuggingMode == true) {
 							storeToFile(em, System.getProperty("user.home"));
@@ -141,16 +137,16 @@ public class AxisBasedContextResolver implements IContextResolver
 		} else {
 			retval = resourceContext.deriveNewContext(ct);
 		}
-		
-		//hmmm: remove this logging.
-		CallingContextImpl trendy = (CallingContextImpl)retval;
+
+		// hmmm: remove this logging.
+		CallingContextImpl trendy = (CallingContextImpl) retval;
 		String currpath = "NULL!  it's NULL!!!!";
 		if (trendy.getCurrentPath() != null)
 			currpath = trendy.getCurrentPath().toString();
-		_logger.debug("thread " + Thread.currentThread().getId() + ": has current RNSPath of " + currpath);
-		
-		
-		
+
+		if (_logger.isTraceEnabled())
+			_logger.trace("thread " + Thread.currentThread().getId() + ": has current RNSPath of " + currpath);
+
 		retval = CallingContextUtilities.setupCallingContextAfterCombinedExtraction(retval);
 
 		// place the resource's key material in the transient calling context
@@ -172,12 +168,9 @@ public class AxisBasedContextResolver implements IContextResolver
 
 		workingContext.setProperty(WorkingContext.CURRENT_CONTEXT_KEY, retval);
 
-		
-		//hmmm: clean!
-		_logger.debug("container has a context:");
-		_logger.debug(trendy.dumpContext());
+		if (_logger.isTraceEnabled())
+			_logger.debug("container received a context:\n" + trendy.dumpContext());
 
-		
 		return retval;
 	}
 

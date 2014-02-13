@@ -370,10 +370,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 		} catch (SOAPException se) {
 			throw new AxisFault(se.getLocalizedMessage(), se);
 		}
-		
-		//hmmm: clean!
-		_logger.debug("got past all the checks without exception, now have context:");
-		_logger.debug(callContext.dumpContext());
+
+		//hmmm: reduce visibility of this.
+		if (_logger.isDebugEnabled())
+			_logger.debug("context after setting headers:\n" + callContext.dumpContext());
 	}
 
 	private void setClientID(MessageContext msgContext) throws AxisFault

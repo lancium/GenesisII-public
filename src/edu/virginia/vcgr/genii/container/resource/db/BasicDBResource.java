@@ -85,6 +85,7 @@ public class BasicDBResource implements IResource
 		return _connection;
 	}
 
+	@Override
 	protected void finalize() throws Throwable
 	{
 		try {
@@ -94,6 +95,7 @@ public class BasicDBResource implements IResource
 		}
 	}
 
+	@Override
 	public String getKey()
 	{
 		if (_resourceKey.startsWith(_SPECIAL_SERVICE_KEY_TEMPLATE))
@@ -102,11 +104,13 @@ public class BasicDBResource implements IResource
 		return _resourceKey;
 	}
 
+	@Override
 	public Object getLockKey()
 	{
 		return _resourceKey;
 	}
 
+	@Override
 	public void initialize(HashMap<QName, Object> constructionParams) throws ResourceException
 	{
 		if (_logger.isDebugEnabled())
@@ -132,6 +136,7 @@ public class BasicDBResource implements IResource
 		}
 	}
 
+	@Override
 	public void load(String resourceKey) throws ResourceUnknownFaultType, ResourceException
 	{
 		_resourceKey = resourceKey;
@@ -143,10 +148,12 @@ public class BasicDBResource implements IResource
 		PreparedStatement stmt = null;
 
 		try {
+			_logger.debug("looking up resource: " + _resourceKey);
 			stmt = _connection.prepareStatement(_VERIFY_STMT);
 			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
 			if (!rs.next()) {
+				_logger.debug("failed to find resource '" + _resourceKey + "'.");
 				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
 					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Resource \"" + _resourceKey
 						+ "\" is unknown.") }, null));
@@ -198,6 +205,7 @@ public class BasicDBResource implements IResource
 		}
 	}
 
+	@Override
 	public void setProperty(String propertyName, Object value) throws ResourceException
 	{
 		try {
@@ -231,6 +239,7 @@ public class BasicDBResource implements IResource
 		}
 	}
 
+	@Override
 	public Object getProperty(String propertyName) throws ResourceException
 	{
 		boolean exceptionOccurred = true;
@@ -256,6 +265,7 @@ public class BasicDBResource implements IResource
 		}
 	}
 
+	@Override
 	public void destroy() throws ResourceException
 	{
 		PreparedStatement stmt = null;
@@ -289,6 +299,7 @@ public class BasicDBResource implements IResource
 		}
 	}
 
+	@Override
 	synchronized public void commit() throws ResourceException
 	{
 		if (_connection == null) {
@@ -304,6 +315,7 @@ public class BasicDBResource implements IResource
 		}
 	}
 
+	@Override
 	public void rollback()
 	{
 		if (_connection == null) {
@@ -318,6 +330,7 @@ public class BasicDBResource implements IResource
 		}
 	}
 
+	@Override
 	synchronized public void close() throws IOException
 	{
 		if (_connection != null && _connectionPool != null) {
@@ -359,6 +372,7 @@ public class BasicDBResource implements IResource
 	/**
 	 * Return whether or not the resource is a service resource
 	 */
+	@Override
 	public boolean isServiceResource()
 	{
 		if (_resourceKey.startsWith(_SPECIAL_SERVICE_KEY_TEMPLATE)) {

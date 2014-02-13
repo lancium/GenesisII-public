@@ -101,11 +101,11 @@ public class ServiceDeployer extends Thread
 	{
 		while (true) {
 			try {
-				Thread.sleep(20);
 				attemptDeployment();
+				Thread.sleep(1);
 			} catch (Throwable t) {
 				if (_logger.isDebugEnabled())
-					_logger.debug(t.getLocalizedMessage(), t);
+					_logger.debug("exception received from attempting deployment of service: " + t.getLocalizedMessage(), t);
 			}
 		}
 	}
@@ -120,8 +120,30 @@ public class ServiceDeployer extends Thread
 		attemptDeployment();
 	}
 
+	// hmmm: move these useful funcs.
+
+	public static long _appStartMillis = millisSinceBoot();
+
+	/**
+	 * returns the number of milliseconds since the computer booted.
+	 */
+	public static long millisSinceBoot()
+	{
+		return System.nanoTime() / 1000000;
+	}
+
+	/**
+	 * returns the number of milliseconds since the program started. this is usually a much nicer
+	 * number than the milliseconds since boot.
+	 */
+	public static long millisSinceAppStart()
+	{
+		return millisSinceBoot() - _appStartMillis;
+	}
+
 	private void attemptDeployment()
 	{
+
 		// First, find the files that are new that we haven't tried to load yet.
 		File[] files = _watchDirectory.listFiles(_FILTER);
 		if (files == null)
@@ -209,7 +231,11 @@ public class ServiceDeployer extends Thread
 						Constructor<?> cons = cl.getConstructor(new Class[0]);
 						_logger.debug("constructing new instance of " + cl.toString());
 						IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons.newInstance(new Object[0]);
+						//hmmm: the individual startup methods are what are super slow!  how odd.
+						long startedAt = millisSinceAppStart();
 						base.startup();
+						long finishedAt = millisSinceAppStart();
+						_logger.debug("deploying " + className + " took " + ((float)(finishedAt - startedAt)) / 1000.0 + " seconds.");
 						_postStartupQueue.enqueue(base);
 					}
 				} catch (NoSuchMethodException nsme) {

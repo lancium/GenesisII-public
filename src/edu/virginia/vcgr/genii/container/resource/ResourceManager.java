@@ -112,6 +112,8 @@ public class ResourceManager
 			if (serviceName == null)
 				throw new ResourceException("Couldn't locate target service name in current working context.");
 
+			_logger.debug("about to make resource key for svc=" + serviceName + " epr=" + epr.getAddress());
+			//hmmm: right here is a crashola.
 			key = new ResourceKey(serviceName, new AddressingParameters(epr.getReferenceParameters()));
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, key);
 		}
@@ -400,7 +402,7 @@ public class ResourceManager
 		any.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.portTypeFactory().translate(
 			portTypes)));
 		if (resourceKey != null) {
-			String porttypeString; // ASG Added
+			String porttypeString = "unknown"; // ASG Added
 
 			if (portTypes.length == 0) {
 				any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(
@@ -422,8 +424,8 @@ public class ResourceManager
 						GenesisIIConstants.GENESISII_NS, porttypeString = masterType)));
 				}
 			}
-			if (_logger.isDebugEnabled()) {
-				_logger.debug("Portname = " + porttypeString);
+			if (_logger.isTraceEnabled()) {
+				_logger.trace("Portname = " + porttypeString);
 			}
 			IResource resource = resourceKey.dereference();
 
