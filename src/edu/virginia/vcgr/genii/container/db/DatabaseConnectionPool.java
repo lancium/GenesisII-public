@@ -26,6 +26,8 @@ import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 public class DatabaseConnectionPool
 {
+	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
+
 	static private final String _DB_CONNECT_STRING_PROPERTY = "edu.virginia.vcgr.genii.container.db.db-connect-string";
 	static private final String _DB_USER_PROPERTY = "edu.virginia.vcgr.genii.container.db.db-user";
 	static private final String _DB_PASSWORD_PROPERTY = "edu.virginia.vcgr.genii.container.db.db-password";
@@ -33,18 +35,15 @@ public class DatabaseConnectionPool
 
 	static private final String _SPECIAL_STRING = "${server-dir}";
 
-	static private final String _DB_POOL_SIZE_DEFAULT = "16";
-
-	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
-
-	static private int _poolInstances = 0;
+	static protected final String _DB_POOL_SIZE_DEFAULT = "16";
 
 	private GReadWriteLock _lock = new UnfairReadWriteLock();
-	private int _poolSize;
 	private LinkedList<Connection> _connPool;
-	private String _connectString;
-	private String _user;
-	private String _password;
+	protected final int _poolSize;
+	protected final String _connectString;
+	protected final String _user;
+	protected final String _password;
+	static private int _poolInstances = 0;
 
 	static private String replaceMacros(String str)
 	{
@@ -73,18 +72,14 @@ public class DatabaseConnectionPool
 			}
 		}
 
-		_poolSize = Integer.parseInt(connectionProperties.getProperty(_DB_POOL_SIZE_PROPERTY, _DB_POOL_SIZE_DEFAULT));
-
 		_connPool = new LinkedList<Connection>();
-
-		_connectString = connectionProperties.getProperty(_DB_CONNECT_STRING_PROPERTY);
-		if (_connectString == null)
-			throw new IllegalArgumentException("Connect string cannot be null for database connection.");
-
-		_connectString = replaceMacros(_connectString);
-
+		_poolSize = Integer.parseInt(connectionProperties.getProperty(_DB_POOL_SIZE_PROPERTY, _DB_POOL_SIZE_DEFAULT));
 		_user = connectionProperties.getProperty(_DB_USER_PROPERTY);
 		_password = connectionProperties.getProperty(_DB_PASSWORD_PROPERTY);
+
+		_connectString = replaceMacros(connectionProperties.getProperty(_DB_CONNECT_STRING_PROPERTY));
+		if (_connectString == null)
+			throw new IllegalArgumentException("Connect string cannot be null for database connection.");
 
 		Connection connection = null;
 		try {

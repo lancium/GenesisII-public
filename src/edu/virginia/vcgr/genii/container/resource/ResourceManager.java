@@ -99,8 +99,13 @@ public class ResourceManager
 		WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
 		ResourceKey key = null;
 
-		if (ctxt != null)
+		if (ctxt != null) {
 			key = (ResourceKey) ctxt.getProperty(WorkingContext.CURRENT_RESOURCE_KEY);
+			if (key != null)
+				_logger.debug("found key in context, key=" + key);
+			else
+				_logger.debug("no key found in context");				
+		}
 		if (key == null) {
 			EndpointReferenceType epr = (EndpointReferenceType) ctxt.getProperty(WorkingContext.EPR_PROPERTY_NAME);
 			if (epr == null)
