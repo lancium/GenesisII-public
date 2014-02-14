@@ -5,8 +5,6 @@ import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis.message.MessageElement;
-
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
