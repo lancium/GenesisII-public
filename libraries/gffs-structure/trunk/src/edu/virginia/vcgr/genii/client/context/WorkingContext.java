@@ -103,7 +103,7 @@ public class WorkingContext implements Closeable, Cloneable
 	public Object getProperty(String propertyName)
 	{
 		Object obj = _properties.get(propertyName);
-		//hmmm: remove testing code.
+		// hmmm: remove testing code.
 		if (obj != null)
 			_logger.debug(">>getprop " + propertyName + " has object type " + obj.getClass().getCanonicalName());
 		return obj;

@@ -136,7 +136,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	{
 		IResource resource;
 		try {
-			//hmmm: clean logging
+			// hmmm: clean logging
 			_logger.debug("about to dereference " + ResourceManager.getCurrentResource().getResourceKey());
 			resource = ResourceManager.getCurrentResource().dereference();
 		} catch (Throwable e) {

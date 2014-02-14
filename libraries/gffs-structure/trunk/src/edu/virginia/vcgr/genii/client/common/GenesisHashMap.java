@@ -15,8 +15,8 @@ public class GenesisHashMap extends HashMap<QName, Object>
 	 * this is intentionally incompatible with hashmap, since we don't want to directly serialize
 	 * these objects as part of ensuring db compatibility.
 	 */
-	//private static final long serialVersionUID = 23L;
-	//hmmm: temp being same as hashmap for debug.
+	// private static final long serialVersionUID = 23L;
+	// hmmm: temp being same as hashmap for debug.
 	private static final long serialVersionUID = 362498820763181265L;
 
 	private static Log _logger = LogFactory.getLog(GenesisHashMap.class);
@@ -52,11 +52,11 @@ public class GenesisHashMap extends HashMap<QName, Object>
 		if (toReturn instanceof org.apache.axis.message.MessageElement) {
 			return (org.apache.axis.message.MessageElement) toReturn;
 			/*
-		} else if (toReturn instanceof MessageElement) {
-			// hmmm: should never hit this now, unless we allow either type to be plopped in.
-			_logger.error("still seeing our message element wrapper in hash map.");
-			return ((MessageElement) toReturn).getReal();
-			*/
+			 * } else if (toReturn instanceof MessageElement) { // hmmm: should never hit this now,
+			 * unless we allow either type to be plopped in.
+			 * _logger.error("still seeing our message element wrapper in hash map."); return
+			 * ((MessageElement) toReturn).getReal();
+			 */
 		} else {
 			String msg = "type is not convertible to axis message element: " + which;
 			_logger.error(msg);
@@ -81,7 +81,7 @@ public class GenesisHashMap extends HashMap<QName, Object>
 	}
 
 	// serialization override functions to catch when this object is being misused.
-	
+
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException
 	{
 		String msg = "into writeObject for GenesisHashMap class; fail!";

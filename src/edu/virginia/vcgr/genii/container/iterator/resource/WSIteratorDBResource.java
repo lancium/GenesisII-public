@@ -33,7 +33,7 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class WSIteratorDBResource extends BasicDBResource implements WSIteratorResource
 {
-//	static private Log _logger = LogFactory.getLog(WSIteratorDBResource.class);
+	// static private Log _logger = LogFactory.getLog(WSIteratorDBResource.class);
 
 	static Map<String, InMemoryIteratorWrapper> mapper = new HashMap<String, InMemoryIteratorWrapper>();
 	static Map<String, Boolean> type = new HashMap<String, Boolean>();

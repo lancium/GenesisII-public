@@ -104,7 +104,7 @@ public class ResourceManager
 			if (key != null)
 				_logger.debug("found key in context, key=" + key);
 			else
-				_logger.debug("no key found in context");				
+				_logger.debug("no key found in context");
 		}
 		if (key == null) {
 			EndpointReferenceType epr = (EndpointReferenceType) ctxt.getProperty(WorkingContext.EPR_PROPERTY_NAME);
@@ -116,7 +116,7 @@ public class ResourceManager
 				throw new ResourceException("Couldn't locate target service name in current working context.");
 
 			_logger.debug("about to make resource key for svc=" + serviceName + " epr=" + epr.getAddress());
-			//hmmm: right here is a crashola.
+			// hmmm: right here is a crashola.
 			key = new ResourceKey(serviceName, new AddressingParameters(epr.getReferenceParameters()));
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, key);
 		}

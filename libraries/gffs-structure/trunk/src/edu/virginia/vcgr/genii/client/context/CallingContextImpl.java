@@ -185,13 +185,15 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	/**
-	 * helper method for debugging; this shows what the context contains, at least as far as key names.
+	 * helper method for debugging; this shows what the context contains, at least as far as key
+	 * names.
 	 */
 	@Override
 	public String dumpContext()
 	{
 		StringBuilder toReturn = new StringBuilder();
-		toReturn.append("context has " + _properties.size() + " properties and " + _transientProperties.size() + " transient properties.\n");
+		toReturn.append("context has " + _properties.size() + " properties and " + _transientProperties.size()
+			+ " transient properties.\n");
 		toReturn.append("property names:\n");
 		Set<String> propnames = _properties.keySet();
 		int indy = 0;

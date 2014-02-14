@@ -86,7 +86,7 @@ public class AddressingParameters
 			if (elements != null) {
 				for (MessageElement element : elements) {
 					QName elementName = element.getQName();
-					//hmmm: clean noisy debugs.
+					// hmmm: clean noisy debugs.
 					_logger.debug("seeing elem name: " + elementName);
 					if (elementName.equals(GENII_RESOURCE_KEY_REF_PARAM_QNAME)
 						|| elementName.equals(OLD_REFERENCE_PARAMETER_QNAME)) {

@@ -56,7 +56,7 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = ExportedDirDBResourceProvider.class)
 public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDirPortType
-//, GeniiNoOutCalls
+// , GeniiNoOutCalls
 {
 	static private Log _logger = LogFactory.getLog(ExportedDirServiceImpl.class);
 
