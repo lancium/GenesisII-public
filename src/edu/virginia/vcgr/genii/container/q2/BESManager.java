@@ -28,7 +28,6 @@ import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationEndpoint;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationListener;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationPortal;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationResult;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESEndpoint;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;

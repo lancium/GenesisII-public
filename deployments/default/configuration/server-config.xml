@@ -25,11 +25,11 @@
 		<mconf:property
 			name="edu.virginia.vcgr.genii.container.bes.worker-dir.allow-override"
 			value="true"/>
-		<!-- not used; this should be set in the derived deployment.
+<!-- not used; this should be set in the derived deployment.
 		<mconf:property
-			name="edu.virginia.vcgr.genii.container.external-hostname-override" 
-			value="fill-in-DNS-resolvable-host"
-		/> -->
+			name="edu.virginia.vcgr.genii.container.external-hostname-override" value="127.0.0.1"
+		/>
+-->
 	</genii:global-properties>
 
 	<genii:configured-instances>
