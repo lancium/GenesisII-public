@@ -71,7 +71,7 @@ function create_bootstrap_trusted_pfx()
   local dirname="$1"; shift
   for certfile in $dirname/*.cer; do
     local output_alias=$(basename "$certfile" .cer)
-    echo -e "Adding '$certfile' to store with alias: $output_alias"
+    echo -e "Adding '$(basename $certfile)' to store with alias: $output_alias"
     run_any_command $CERTO import "-output-keystore='$dirname/trusted.pfx'" -output-keystore-pass=trusted "-base64-cert-file='$certfile'" "-output-alias='$output_alias'"
     check_if_failed "adding certificate for $certfile"
   done
@@ -101,7 +101,7 @@ function create_certificate_using_CA()
 
   # first generate the private and public key into the pkcs12 archive.
   local dn="$(calculate_DN "$CN_GIVEN")"
-  echo "create cert $NEW_PFX with alias $NEW_ALIAS and DN=$dn"
+  echo -e "Creating $(basename $NEW_PFX) with alias $NEW_ALIAS and certificate DN:\n    $dn"
   run_any_command $CERTO gen "'-dn=$dn'" -output-storetype=PKCS12 "-output-entry-pass='$NEW_PASS'" "-output-keystore=$NEW_PFX" "-output-keystore-pass='$NEW_PASS'" "-output-alias='$NEW_ALIAS'" "-input-keystore=$THE_CA_PFX" "-input-keystore-pass='$THE_CA_PASS'" -input-storetype=PKCS12 "-input-entry-pass='$THE_CA_PASS'" "-input-alias='$THE_CA_ALIAS'" -keysize=2048
   check_if_failed "generating $NEW_PFX from $THE_CA_PFX"
   # and create its certificate file.

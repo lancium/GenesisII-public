@@ -51,20 +51,6 @@
 				value="8"/>
 		</mconf:instance>
 		
-		<!--
-		<mconf:instance name="connection-pool"
-			type="edu.virginia.vcgr.genii.container.db.HypersonicDatabaseConnectionPool">
-			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-connect-string"
-				value="jdbc:hsqldb:file:${edu.virginia.vcgr.genii.client.configuration.user-dir}/database"/>
-			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-user"
-				value="sa"/>
-			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-password"
-				value=""/>
-			<mconf:property name="edu.virginia.vcgr.genii.container.db.pool-size"
-				value="8"/>
-		</mconf:instance>
-		-->
-		
 		<!-- ============= AuthZ Provider Instances ============= -->
 
 		<mconf:instance name="acl-authz-provider"
