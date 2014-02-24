@@ -33,8 +33,9 @@ public class DefaultExternalApplication extends AbstractExternalApplication
 
 	protected void readOutput(InputStream stream)
 	{
+		BufferedReader reader = null;
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			reader = new BufferedReader(new InputStreamReader(stream));
 
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -43,6 +44,7 @@ public class DefaultExternalApplication extends AbstractExternalApplication
 		} catch (Throwable cause) {
 			_logger.warn("Error trying to read output/error stream from application.", cause);
 		} finally {
+			StreamUtils.close(reader);
 			StreamUtils.close(stream);
 		}
 	}

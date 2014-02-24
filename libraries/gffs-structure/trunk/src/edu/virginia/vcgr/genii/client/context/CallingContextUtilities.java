@@ -45,8 +45,8 @@ final public class CallingContextUtilities
 				Iterator<TrustCredential> itr = assertions.iterator();
 				while (itr.hasNext()) {
 					NuCredential cred = (NuCredential) itr.next();
-					if (_logger.isDebugEnabled())
-						_logger.debug("found credential in context: " + cred.toString());
+					if (_logger.isTraceEnabled())
+						_logger.trace("found credential in context: " + cred.toString());
 					callerCredentials.add(cred);
 				}
 			} else {

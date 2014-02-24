@@ -27,12 +27,13 @@ public class LoadFileResource
 	{
 		StringWriter writer = new StringWriter();
 		InputStream in = null;
+		InputStreamReader reader = null;
 		char[] buffer = new char[1024 * 4];
 
 		try {
 			in = open();
 			if (in != null) {
-				InputStreamReader reader = new InputStreamReader(in);
+				reader = new InputStreamReader(in);
 				int read;
 
 				while ((read = reader.read(buffer)) > 0)
@@ -43,6 +44,7 @@ public class LoadFileResource
 		} catch (IOException ioe) {
 			throw new RuntimeException("Unable to read resource.", ioe);
 		} finally {
+			StreamUtils.close(reader);
 			StreamUtils.close(in);
 		}
 

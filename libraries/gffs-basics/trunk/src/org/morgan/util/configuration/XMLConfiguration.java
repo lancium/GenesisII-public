@@ -28,6 +28,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -48,6 +50,8 @@ import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
  */
 public class XMLConfiguration
 {
+	static private Log _logger = LogFactory.getLog(XMLConfiguration.class);
+
 	static public final String NAMESPACE = "http://www.mark-morgan.net/org/morgan/util/configuration";
 	static public final String CONFIG_SECTIONS = "config-sections";
 	static public final String CONFIG_SECTION = "config-section";
@@ -145,10 +149,12 @@ public class XMLConfiguration
 	private void handleChild(Node child) throws ConfigurationException
 	{
 		QName nodeQName = XMLConfiguration.getQName(child);
+		if (_logger.isTraceEnabled())
+			_logger.trace("handling node: " + nodeQName);
 
-		if (nodeQName.equals(CONFIG_SECTIONS_QNAME))
+		if (nodeQName.equals(CONFIG_SECTIONS_QNAME)) {
 			handleConfigSections(child);
-		else {
+		} else {
 			ArrayList<Node> list = _unparsedXML.get(nodeQName);
 			if (list == null) {
 				_unparsedXML.put(nodeQName, list = new ArrayList<Node>());

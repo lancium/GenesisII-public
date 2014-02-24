@@ -111,8 +111,6 @@ public class BasicDBResource implements IResource
 	@Override
 	public void initialize(GenesisHashMap constructionParams) throws ResourceException
 	{
-		if (_logger.isDebugEnabled())
-			_logger.debug("Initializing resource with construction parameters.");
 		Boolean b = (Boolean) constructionParams.get(IResource.IS_SERVICE_CONSTRUCTION_PARAM);
 		if (b != null && b.booleanValue())
 			_resourceKey = _SPECIAL_SERVICE_KEY_TEMPLATE + _parentKey.getServiceName();
@@ -146,12 +144,15 @@ public class BasicDBResource implements IResource
 		PreparedStatement stmt = null;
 
 		try {
-			_logger.debug("looking up resource: " + _resourceKey);
+			if (_logger.isTraceEnabled())
+				_logger.trace("looking up resource: " + _resourceKey);
 			stmt = _connection.prepareStatement(_VERIFY_STMT);
 			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
 			if (!rs.next()) {
-				_logger.debug("failed to find resource '" + _resourceKey + "'.");
+				// the special key is not always found as a database resource.
+				if (_logger.isDebugEnabled() && !_resourceKey.contains(_SPECIAL_SERVICE_KEY_TEMPLATE))
+					_logger.debug("did not find resource '" + _resourceKey + "'.");
 				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
 					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Resource \"" + _resourceKey
 						+ "\" is unknown.") }, null));
@@ -184,8 +185,8 @@ public class BasicDBResource implements IResource
 
 			Blob b = DBSerializer.toBlob(value, "properties", "propvalue");
 			if (b != null) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("Serializing " + b.length() + " bytes into property database.");
+				if (_logger.isTraceEnabled())
+					_logger.trace("Serializing " + b.length() + " bytes into property database.");
 				if (b.length() <= 0) {
 					_logger.error("Attempt to serialize property \"" + propertyName
 						+ "\" with 0 bytes into the property database.");

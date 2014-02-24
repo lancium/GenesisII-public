@@ -77,7 +77,7 @@ public class WinCryptoLibTest
 	@Test
 	public void testSomething()
 	{
-		// hmmm: need to fill in this test.
+		// TODO: need to fill in this test.
 	}
 
 	/**

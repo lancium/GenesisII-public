@@ -24,9 +24,9 @@ public class FileHandleTable<FileObjectType>
 	synchronized public int allocate(FileObjectType file)
 	{
 		if (file == null)
-			throw new RuntimeException("Not allowed to allocate a file " + "table entry for a null file object.");
+			throw new RuntimeException("Not allowed to allocate a file table entry for a null file object.");
 		if (file instanceof Integer)
-			throw new RuntimeException("Not allowed to allocate a file " + "table entry for a file object of type Integer");
+			throw new RuntimeException("Not allowed to allocate a file table entry for a file object of type Integer");
 
 		if (_nextFree >= _table.length) {
 			_logger.error("FileHandleTable is full -- error.");

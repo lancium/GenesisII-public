@@ -34,8 +34,8 @@ public class DatabaseTableUtils
 							catchFail = sqe;
 							break;
 						} else {
-							if (_logger.isDebugEnabled())
-								_logger.debug("Received an SQL Exception for a table " + "that already exists.", sqe);
+							if (_logger.isTraceEnabled())
+								_logger.trace("Received an SQL Exception for a table " + "that already exists.", sqe);
 						}
 					} else {
 						catchFail = sqe;
@@ -67,8 +67,8 @@ public class DatabaseTableUtils
 							catchFail = sqe;
 							break;
 						} else {
-							if (_logger.isDebugEnabled())
-								_logger.debug("Received an SQL Exception for a column that already exists.", sqe);
+							if (_logger.isTraceEnabled())
+								_logger.trace("Received an SQL Exception for a column that already exists.", sqe);
 						}
 					} else {
 						sqe = catchFail;

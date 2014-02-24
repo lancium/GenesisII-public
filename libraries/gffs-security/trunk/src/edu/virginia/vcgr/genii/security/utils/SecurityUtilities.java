@@ -191,7 +191,7 @@ public class SecurityUtilities implements CertificateValidator
 		KeyStore ks = store;
 		boolean trustOkay = false;
 		/*
-		 * hmmm: may want to cache both types of trust managers in different caches, indexed by the
+		 * TODO: may want to cache both types of trust managers in different caches, indexed by the
 		 * keystore.
 		 */
 		try {

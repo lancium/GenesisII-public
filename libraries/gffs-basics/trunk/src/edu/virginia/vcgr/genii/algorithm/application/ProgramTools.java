@@ -16,9 +16,8 @@ public class ProgramTools
 	{
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		StringBuilder toReturn = new StringBuilder();
-		// 0 skips getStackTrace, and 1 skips this function.
-		for (int i = 0; i < Math.min(howManyFrames, elements.length); i++) {
-			// /2; i < Math.min(howManyFrames + 2, elements.length); i++) {
+		// we rely on the getStackFrame function to ignore the first couple frames for us.
+		for (int i = 0; i < Math.min(howManyFrames, elements.length - 2); i++) {
 			if (toReturn.length() != 0) {
 				toReturn.append(" <- ");
 			}
@@ -34,6 +33,9 @@ public class ProgramTools
 	public static String getStackFrame(int howManyBack)
 	{
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+		// a little self-protection to avoid accessing missing parts of the array.
+		if (howManyBack + 2 >= elements.length)
+			howManyBack = elements.length - 3;
 		return elements[howManyBack + 2].toString();
 	}
 
