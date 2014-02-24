@@ -24,7 +24,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.iterator.WSIteratorConstructionParameters;
@@ -33,13 +33,11 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class WSIteratorDBResource extends BasicDBResource implements WSIteratorResource
 {
-	// static private Log _logger = LogFactory.getLog(WSIteratorDBResource.class);
-
 	static Map<String, InMemoryIteratorWrapper> mapper = new HashMap<String, InMemoryIteratorWrapper>();
 	static Map<String, Boolean> type = new HashMap<String, Boolean>();
 	static Object _lock = new Object();
 
-	WSIteratorDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	WSIteratorDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}
@@ -88,7 +86,9 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 						MessageElement next = rest.next();
 						stmt.setString(1, getKey());
 						stmt.setLong(2, (long) lcv);
-						stmt.setBlob(3, DBSerializer.toBlob(ObjectSerializer.anyToBytes(new MessageElement[] { next }),
+						// hmmm: use the unitary function here.
+						stmt.setBlob(3, DBSerializer.toBlob(
+							ObjectSerializer.anyToBytes(new MessageElement[] { next }),
 							"iterators", "contents"));
 
 						stmt.addBatch();
@@ -158,7 +158,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 					long index = rs.getLong(1);
 					Blob blob = rs.getBlob(2);
 
-					MessageElement me = ObjectDeserializer.anyFromBytes((byte[]) DBSerializer.fromBlob(blob))[0];
+					MessageElement me =
+						new MessageElement(ObjectDeserializer.anyFromBytes((byte[]) DBSerializer.fromBlob(blob))[0]);
 					ret.add(new Pair<Long, MessageElement>(index, me));
 				}
 
@@ -199,8 +200,13 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 				if (entry != null) {
 
 					try {
-						MessageElement me = (MessageElement) meth.invoke(null, getConnection(), entry, commonObjs);
-						ret.add(new Pair<Long, MessageElement>((long) lcv, me));
+						Object obj = meth.invoke(null, getConnection(), entry, commonObjs);
+						if (obj instanceof org.apache.axis.message.MessageElement) {
+							ret.add(new Pair<Long, MessageElement>((long) lcv, new MessageElement(
+								(org.apache.axis.message.MessageElement) obj)));
+						} else if (obj instanceof MessageElement) {
+							ret.add(new Pair<Long, MessageElement>((long) lcv, (MessageElement) obj));
+						}
 					}
 
 					catch (IllegalArgumentException e) {

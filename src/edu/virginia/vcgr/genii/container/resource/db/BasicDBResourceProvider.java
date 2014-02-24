@@ -7,7 +7,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import edu.virginia.vcgr.genii.client.configuration.Initializable;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
 
@@ -19,14 +19,14 @@ public class BasicDBResourceProvider implements IResourceProvider, Initializable
 	{
 	}
 
-	private DatabaseConnectionPool createConnectionPool()
+	private ServerDatabaseConnectionPool createConnectionPool()
 
 	{
-		DatabaseConnectionPool pool = null;
+		ServerDatabaseConnectionPool pool = null;
 
 		Object obj = NamedInstances.getServerInstances().lookup("connection-pool");
 		if (obj != null) {
-			pool = (DatabaseConnectionPool) obj;
+			pool = (ServerDatabaseConnectionPool) obj;
 			return pool;
 		}
 
@@ -46,7 +46,8 @@ public class BasicDBResourceProvider implements IResourceProvider, Initializable
 		return _factory;
 	}
 
-	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool) throws SQLException, ResourceException
+	protected IResourceFactory instantiateResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException,
+		ResourceException
 	{
 		return new BasicDBResourceFactory(pool);
 	}

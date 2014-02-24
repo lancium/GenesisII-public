@@ -9,7 +9,7 @@ import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 /**
  * This is a worker class which is enqueued into outcall thread pools to actually make the out call
@@ -22,12 +22,12 @@ public class BESUpdateWorker implements OutcallHandler
 	static private Log _logger = LogFactory.getLog(BESUpdateWorker.class);
 
 	private String _besName;
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 	private BESManager _manager;
 	private long _besID;
 	private IBESPortTypeResolver _portTypeResolver;
 
-	public BESUpdateWorker(DatabaseConnectionPool connectionPool, BESManager manager, long besID, String besName,
+	public BESUpdateWorker(ServerDatabaseConnectionPool connectionPool, BESManager manager, long besID, String besName,
 		IBESPortTypeResolver clientStubResolver)
 	{
 		_connectionPool = connectionPool;

@@ -79,7 +79,6 @@ import edu.virginia.vcgr.genii.iterator.WSIteratorPortType;
  */
 public class AttributeCacheHandler2
 {
-
 	private static Log _logger = LogFactory.getLog(AttributeCacheHandler2.class);
 
 	private class FlushListener implements AttributeCacheFlushListener

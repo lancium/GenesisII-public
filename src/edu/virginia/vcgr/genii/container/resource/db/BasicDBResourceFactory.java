@@ -8,8 +8,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
@@ -37,9 +37,9 @@ public class BasicDBResourceFactory implements IResourceFactory
 		+ "propertyvalue VARCHAR(512) NOT NULL," + "CONSTRAINT persistedpropertiesconstraints1 PRIMARY KEY ("
 		+ "resourceid, category, propertyname))";
 
-	protected DatabaseConnectionPool _pool;
+	protected ServerDatabaseConnectionPool _pool;
 
-	public BasicDBResourceFactory(DatabaseConnectionPool pool) throws SQLException
+	public BasicDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		_pool = pool;
 		createTables();
@@ -95,7 +95,7 @@ public class BasicDBResourceFactory implements IResourceFactory
 		}
 	}
 
-	public DatabaseConnectionPool getConnectionPool()
+	public ServerDatabaseConnectionPool getConnectionPool()
 	{
 		return _pool;
 	}

@@ -16,6 +16,8 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.ShellPrompt;
 import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
+import edu.virginia.vcgr.genii.client.logging.DLogDatabase;
+import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
@@ -34,6 +36,8 @@ public class Driver extends ApplicationBase
 
 	static public void loadClientState()
 	{
+		LoggingContext.assumeNewLoggingContext();
+
 		if (!OSGiSupport.setUpFramework()) {
 			System.err.println("Exiting due to OSGi startup failure.");
 			System.exit(1);
@@ -48,6 +52,8 @@ public class Driver extends ApplicationBase
 			System.exit(1);
 		}
 
+		// hmmm: never even knew there was an environment variable override for the deployment name.
+		// this should be unified with other ways of loading things; pretty sure we are not always handling this uniformly.
 		GridEnvironment.loadGridEnvironment();
 		String deploymentName = System.getenv("GENII_DEPLOYMENT_NAME");
 		if (deploymentName != null) {
@@ -55,8 +61,11 @@ public class Driver extends ApplicationBase
 				_logger.debug("Using Deployment \"" + deploymentName + "\".");
 			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deploymentName);
 		} else {
+			deploymentName = System.getProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY);
+			if ((deploymentName == null) || deploymentName.isEmpty())
+				deploymentName = "default";
 			if (_logger.isDebugEnabled())
-				_logger.debug("Using Deployment \"default\".");
+				_logger.debug("Using Deployment \"" + deploymentName + "\".");
 		}
 
 		prepareClientApplication();
@@ -143,6 +152,9 @@ public class Driver extends ApplicationBase
 		int lastExit = 0;
 
 		while (true) {
+			// Acquire a new context for this command
+			LoggingContext.adoptNewContext();
+
 			try {
 				System.out.format("%s ", prompt);
 				System.out.flush();
@@ -156,6 +168,9 @@ public class Driver extends ApplicationBase
 					ExceptionHandlerManager.getExceptionHandler().handleException(ioe, new OutputStreamWriter(System.err));
 					break;
 				}
+
+				if (DLogDatabase.getLocalConnector() != null)
+					DLogDatabase.getLocalConnector().recordCommand(line);
 
 				String[] args = CommandLineFormer.formCommandLine(line);
 				if (args.length == 0)
@@ -207,6 +222,9 @@ public class Driver extends ApplicationBase
 					return toReturn;
 				lastExit = 1; // at least let them know we were displeased, if this is the last
 								// command in the loop.
+			} finally {
+				// Get ready for the next time through
+				LoggingContext.releaseCurrentLoggingContext();
 			}
 		}
 		return lastExit;

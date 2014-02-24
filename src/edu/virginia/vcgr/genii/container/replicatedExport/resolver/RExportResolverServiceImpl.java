@@ -18,8 +18,8 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis.types.URI;
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.LookupResponseType;

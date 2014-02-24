@@ -1,8 +1,9 @@
 package edu.virginia.vcgr.genii.container.resource;
 
-import org.apache.axis.types.URI;
-import java.security.cert.X509Certificate;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
+
+import org.apache.axis.types.URI;
 
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.ContextManager;

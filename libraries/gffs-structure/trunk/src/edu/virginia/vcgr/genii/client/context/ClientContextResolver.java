@@ -24,11 +24,11 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 
 public class ClientContextResolver implements IContextResolver
 {
+	static private Log _logger = LogFactory.getLog(ClientContextResolver.class);
+
 	static final public String USER_CONTEXT_FILENAME = "user-context.xml";
 	static final public String USER_TRANSIENT_FILENAME = "user-transient.dat";
 	static final public String COMBINED_FILENAME = "user-combined.xml";
-
-	static private Log _logger = LogFactory.getLog(ClientContextResolver.class);
 
 	public File getContextFile() throws IOException
 	{
@@ -48,21 +48,20 @@ public class ClientContextResolver implements IContextResolver
 	@Override
 	public ICallingContext load() throws FileNotFoundException, IOException
 	{
+		if (_logger.isTraceEnabled())
+			_logger.trace("<into calling context load>");
 		File contextFile = getContextFile();
 		ICallingContext toReturn = null;
 		if (contextFile == null || !contextFile.exists() || contextFile.length() == 0) {
 			File combinedFile = getCombinedFile();
 			if (combinedFile == null || combinedFile.length() == 0)
 				return null;
-
 			toReturn = ContextFileSystem.load(combinedFile);
 		} else {
 			toReturn = ContextFileSystem.load(contextFile, getContextTransientFile());
 		}
-
-		// hmmm: remove debuggy
-		_logger.debug("context from client resolver has: " + ((CallingContextImpl) toReturn).dumpContext());
-
+		if (_logger.isTraceEnabled())
+			_logger.trace(">out of calling context load<");
 		return toReturn;
 	}
 

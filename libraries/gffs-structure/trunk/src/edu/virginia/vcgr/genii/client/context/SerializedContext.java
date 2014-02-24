@@ -27,23 +27,25 @@ public class SerializedContext implements Serializable
 		_data = data;
 		_transientProperties = transientProperties;
 
-		StringBuilder builder = new StringBuilder();
-		builder.append("SerializedContext created with raw data of size " + data.length
-			+ " bytes and the following transients.\n");
-		for (String key : transientProperties.keySet()) {
-			try {
-				byte[] sData = DBSerializer.serialize(transientProperties.get(key), Long.MAX_VALUE);
-				if (sData != null)
-					builder.append("\t" + key + ": " + sData.length + "\n");
-				else
-					builder.append("\t" + key + ": <null>\n");
-			} catch (Throwable cause) {
-				_logger.error("Error...", cause);
-			}
-		}
+		if (_logger.isTraceEnabled()) {
 
-		if (_logger.isDebugEnabled())
-			_logger.debug(builder);
+			StringBuilder builder = new StringBuilder();
+			builder.append("SerializedContext created with raw data of size " + data.length
+				+ " bytes and the following transients.\n");
+			for (String key : transientProperties.keySet()) {
+				try {
+					byte[] sData = DBSerializer.serialize(transientProperties.get(key), Long.MAX_VALUE);
+					if (sData != null)
+						builder.append("\t" + key + ": " + sData.length + "\n");
+					else
+						builder.append("\t" + key + ": <null>\n");
+				} catch (Throwable cause) {
+					_logger.error("Error...", cause);
+				}
+			}
+
+			_logger.trace(builder);
+		}
 	}
 
 	public SerializedContext()

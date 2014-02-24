@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.resolver;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 
 import java.io.File;
@@ -15,7 +16,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.byteio.WriteNotPermittedFaultType;

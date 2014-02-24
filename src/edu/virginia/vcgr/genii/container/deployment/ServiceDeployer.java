@@ -100,12 +100,13 @@ public class ServiceDeployer extends Thread
 	public void run()
 	{
 		while (true) {
+			boolean deployedOkay = attemptDeployment();
 			try {
-				attemptDeployment();
-				Thread.sleep(1);
-			} catch (Throwable t) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("exception received from attempting deployment of service: " + t.getLocalizedMessage(), t);
+				Thread.sleep(42);
+			} catch (InterruptedException e) {
+			}
+			if (deployedOkay) {
+				// nothing.
 			}
 		}
 	}
@@ -117,7 +118,12 @@ public class ServiceDeployer extends Thread
 		_watchDirectory = watchDir;
 		_deploymentInformation = new HashMap<String, DeploymentInformation>();
 
-		attemptDeployment();
+		boolean okay = attemptDeployment();
+		if (okay) {
+			_logger.debug("deployed successfully from constructor for " + this.getClass().getCanonicalName());
+		} else {
+			_logger.debug("failed to deploy from constructor for " + this.getClass().getCanonicalName());
+		}
 	}
 
 	// hmmm: move these useful funcs.
@@ -141,116 +147,128 @@ public class ServiceDeployer extends Thread
 		return millisSinceBoot() - _appStartMillis;
 	}
 
-	private void attemptDeployment()
+	/**
+	 * returns true if the deployment succeeded and false if it failed. no exceptions are allowed
+	 * out of here.
+	 */
+	private boolean attemptDeployment()
 	{
+		try {
+			// First, find the files that are new that we haven't tried to load yet.
+			File[] files = _watchDirectory.listFiles(_FILTER);
+			if (files == null)
+				return false;
 
-		// First, find the files that are new that we haven't tried to load yet.
-		File[] files = _watchDirectory.listFiles(_FILTER);
-		if (files == null)
-			return;
-
-		for (File file : files) {
-			if (!_deploymentInformation.containsKey(file.getName())) {
-				_deploymentInformation.put(file.getName(), new DeploymentInformation());
-			}
-		}
-
-		// Now, go through the deployment information
-		for (String filename : _deploymentInformation.keySet()) {
-			String className = null;
-			DeploymentInformation info = _deploymentInformation.get(filename);
-			if (info._loader != null)
-				continue;
-
-			File file = _watchDirectory.lookupFile(filename);
-			if (info._attempts == -1) {
-				// We've already given up on this deployment item
-				continue;
+			for (File file : files) {
+				if (!_deploymentInformation.containsKey(file.getName())) {
+					_deploymentInformation.put(file.getName(), new DeploymentInformation());
+				}
 			}
 
-			if (++info._attempts > DeploymentInformation._MAX_ATTEMPTS) {
-				_logger.error("Unable to deploy file \"" + file.getAbsolutePath() + "\".");
-				info._attempts = -1;
-				continue;
-			}
+			// Now, go through the deployment information
+			for (String filename : _deploymentInformation.keySet()) {
+				String className = null;
+				DeploymentInformation info = _deploymentInformation.get(filename);
+				if (info._loader != null)
+					continue;
 
-			if (_DEPLOYMENT_FILE_PATTERN.matcher(file.getName()).matches()) {
-				JarFile jFile = null;
-				try {
-					URLClassLoader loader =
-						new URLClassLoader(new URL[] { file.toURI().toURL() }, Thread.currentThread().getContextClassLoader());
+				File file = _watchDirectory.lookupFile(filename);
+				if (info._attempts == -1) {
+					// We've already given up on this deployment item
+					continue;
+				}
 
-					jFile = new JarFile(file);
-					Enumeration<JarEntry> entries = jFile.entries();
-					info._loader = loader;
-					while (entries.hasMoreElements()) {
-						JarEntry entry = entries.nextElement();
-						if (entry.isDirectory())
-							continue;
-						if (_WSDD_FILE_PATTERN.matcher(entry.getName()).matches()) {
-							className = attemptDeploy(jFile, entry);
-							if (className != null)
-								ClassUtils.setClassLoader(className, loader);
+				if (++info._attempts > DeploymentInformation._MAX_ATTEMPTS) {
+					_logger.error("Unable to deploy file \"" + file.getAbsolutePath() + "\".");
+					info._attempts = -1;
+					continue;
+				}
+
+				if (_DEPLOYMENT_FILE_PATTERN.matcher(file.getName()).matches()) {
+					JarFile jFile = null;
+					try {
+						URLClassLoader loader =
+							new URLClassLoader(new URL[] { file.toURI().toURL() }, Thread.currentThread()
+								.getContextClassLoader());
+
+						jFile = new JarFile(file);
+						Enumeration<JarEntry> entries = jFile.entries();
+						info._loader = loader;
+						while (entries.hasMoreElements()) {
+							JarEntry entry = entries.nextElement();
+							if (entry.isDirectory())
+								continue;
+							if (_WSDD_FILE_PATTERN.matcher(entry.getName()).matches()) {
+								className = attemptDeploy(jFile, entry);
+								if (className != null)
+									ClassUtils.setClassLoader(className, loader);
+							}
 						}
+					} catch (ParserConfigurationException pce) {
+						_logger.warn(pce.getMessage(), pce);
+					} catch (SAXException se) {
+						_logger.warn(se.getMessage(), se);
+					} catch (IOException ioe) {
+						_logger.warn(ioe);
+					} finally {
+						if (jFile != null)
+							try {
+								jFile.close();
+							} catch (Throwable t) {
+							}
 					}
-				} catch (ParserConfigurationException pce) {
-					_logger.warn(pce.getMessage(), pce);
-				} catch (SAXException se) {
-					_logger.warn(se.getMessage(), se);
-				} catch (IOException ioe) {
-					_logger.warn(ioe);
-				} finally {
-					if (jFile != null)
-						try {
-							jFile.close();
-						} catch (Throwable t) {
-						}
+				} else {
+					InputStream in = null;
+					try {
+						in = new FileInputStream(file);
+						Document element = XMLUtils.newDocument(in);
+						info._loader = GenesisClassLoader.classLoaderFactory();
+						className = attemptDeploy(element);
+					} catch (ParserConfigurationException pce) {
+						_logger.warn(pce);
+					} catch (SAXException se) {
+						_logger.warn(se);
+					} catch (IOException ioe) {
+						_logger.warn(ioe);
+					} finally {
+						StreamUtils.close(in);
+					}
 				}
-			} else {
-				InputStream in = null;
-				try {
-					in = new FileInputStream(file);
-					Document element = XMLUtils.newDocument(in);
-					info._loader = GenesisClassLoader.classLoaderFactory();
-					className = attemptDeploy(element);
-				} catch (ParserConfigurationException pce) {
-					_logger.warn(pce);
-				} catch (SAXException se) {
-					_logger.warn(se);
-				} catch (IOException ioe) {
-					_logger.warn(ioe);
-				} finally {
-					StreamUtils.close(in);
-				}
-			}
 
-			if (className != null && info._loader != null) {
-				try {
-					Class<?> cl = info._loader.loadClass(className);
-					if (IServiceWithCleanupHook.class.isAssignableFrom(cl)) {
-						Constructor<?> cons = cl.getConstructor(new Class[0]);
-						_logger.debug("constructing new instance of " + cl.toString());
-						IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons.newInstance(new Object[0]);
-						// hmmm: the individual startup methods are what are super slow! how odd.
-						long startedAt = millisSinceAppStart();
-						base.startup();
-						long finishedAt = millisSinceAppStart();
-						_logger.debug("deploying " + className + " took " + ((float) (finishedAt - startedAt)) / 1000.0
-							+ " seconds.");
-						_postStartupQueue.enqueue(base);
+				if (className != null && info._loader != null) {
+					try {
+						Class<?> cl = info._loader.loadClass(className);
+						if (IServiceWithCleanupHook.class.isAssignableFrom(cl)) {
+							Constructor<?> cons = cl.getConstructor(new Class[0]);
+							_logger.debug("constructing new instance of " + cl.toString());
+							IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons.newInstance(new Object[0]);
+							// hmmm: the individual startup methods are what are super slow! how
+							// odd.
+							long startedAt = millisSinceAppStart();
+							base.startup();
+							long finishedAt = millisSinceAppStart();
+							_logger.debug("deploying " + className + " took " + ((float) (finishedAt - startedAt)) / 1000.0
+								+ " seconds.");
+							_postStartupQueue.enqueue(base);
+						}
+					} catch (NoSuchMethodException nsme) {
+						_logger.error("Unable to deploy service.", nsme);
+					} catch (ClassNotFoundException cnfe) {
+						_logger.error("Unable to deploy service.", cnfe);
+					} catch (InstantiationException ia) {
+						_logger.error("Unable to deploy service.", ia);
+					} catch (IllegalAccessException iae) {
+						_logger.error("Unable to deploy service.", iae);
+					} catch (InvocationTargetException ite) {
+						_logger.error("Unable to deploy service.", ite);
 					}
-				} catch (NoSuchMethodException nsme) {
-					_logger.error("Unable to deploy service.", nsme);
-				} catch (ClassNotFoundException cnfe) {
-					_logger.error("Unable to deploy service.", cnfe);
-				} catch (InstantiationException ia) {
-					_logger.error("Unable to deploy service.", ia);
-				} catch (IllegalAccessException iae) {
-					_logger.error("Unable to deploy service.", iae);
-				} catch (InvocationTargetException ite) {
-					_logger.error("Unable to deploy service.", ite);
 				}
 			}
+			// lots of gauntlet to run to get to this point.
+			return true;
+		} catch (Throwable t) {
+			_logger.debug("deployment barfed exception: " + t.getMessage(), t);
+			return false;
 		}
 	}
 

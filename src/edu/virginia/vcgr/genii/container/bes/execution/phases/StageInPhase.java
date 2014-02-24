@@ -27,13 +27,13 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 	private URI _source;
 	private File _target;
 	private CreationFlagEnumeration _creationFlag;
-	private UsernamePasswordIdentity _credential;
+	private UsernamePasswordIdentity _usernamePassword;
 
-	public StageInPhase(URI source, File target, CreationFlagEnumeration creationFlag, UsernamePasswordIdentity credential)
+	public StageInPhase(URI source, File target, CreationFlagEnumeration creationFlag, UsernamePasswordIdentity usernamePassword)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, STAGING_IN_STATE, false));
 
-		_credential = credential;
+		_usernamePassword = usernamePassword;
 
 		if (source == null)
 			throw new IllegalArgumentException("Parameter \"source\" cannot be null.");
@@ -59,9 +59,9 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 			File target = _target;
 			if (_creationFlag.equals(CreationFlagEnumeration.dontOverwrite)) {
 				DownloadManagerContainerService service = ContainerServices.findService(DownloadManagerContainerService.class);
-				stats = service.download(_source, target, _credential);
+				stats = service.download(_source, target, _usernamePassword);
 			} else
-				stats = URIManager.get(_source, target, _credential);
+				stats = URIManager.get(_source, target, _usernamePassword);
 
 			history.createTraceWriter("%s: %d Bytes Transferred", _target.getName(), stats.bytesTransferred())
 				.format("%d bytes were transferred in %d ms.", stats.bytesTransferred(), stats.transferTime()).close();

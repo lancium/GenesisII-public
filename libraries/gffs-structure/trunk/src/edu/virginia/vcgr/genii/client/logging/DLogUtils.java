@@ -3,7 +3,9 @@ package edu.virginia.vcgr.genii.client.logging;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,11 +13,11 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextException;
+import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool.DBPropertyNames;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 public class DLogUtils
 {
-
 	static private Log _logger = LogFactory.getLog(DLogUtils.class);
 
 	public static DLogDatabase getDBConnector()
@@ -116,4 +118,71 @@ public class DLogUtils
 		}
 		return null;
 	}
+
+	private static final String[] CREATE_STMTS = { "CREATE SCHEMA user", "CREATE TABLE tableName (schemaDetails)", };
+
+	public static void initializeTables(Properties connectionProperties)
+	{
+		DBPropertyNames names = new DBPropertyNames();
+		String connectString = connectionProperties.getProperty(names._DB_CONNECT_STRING_PROPERTY);
+		String user = connectionProperties.getProperty(names._DB_USER_PROPERTY);
+		String password = connectionProperties.getProperty(names._DB_PASSWORD_PROPERTY);
+		String entryTable = connectionProperties.getProperty(DLogConstants._DB_ENTRY_TABLE_PROPERTY);
+		String metadataTable = connectionProperties.getProperty(DLogConstants._DB_METADATA_TABLE_PROPERTY);
+		String hierarchyTable = connectionProperties.getProperty(DLogConstants._DB_HIERARCHY_TABLE_PROPERTY);
+		try {
+			Connection con = DriverManager.getConnection(connectString, user, password);
+			PreparedStatement stmt = null;
+			String str;
+			try {
+				str = CREATE_STMTS[0].replace("user", user);
+				stmt = con.prepareStatement(str);
+				stmt.execute();
+			} catch (SQLException e) {
+			} finally {
+				if (stmt != null && !stmt.isClosed())
+					stmt.close();
+			}
+
+			try {
+				str = CREATE_STMTS[1].replace("tableName", entryTable);
+				str = str.replace("schemaDetails", DLogConstants.DLOG_ENTRY_FIELD_DETAILS);
+				stmt = con.prepareStatement(str);
+				stmt.execute();
+				stmt.close();
+			} catch (SQLException e) {
+			} finally {
+				if (stmt != null && !stmt.isClosed())
+					stmt.close();
+			}
+
+			try {
+				str = CREATE_STMTS[1].replace("tableName", metadataTable);
+				str = str.replace("schemaDetails", DLogConstants.DLOG_METADATA_FIELD_DETAILS);
+				stmt = con.prepareStatement(str);
+				stmt.execute();
+				stmt.close();
+			} catch (SQLException e) {
+			} finally {
+				if (stmt != null && !stmt.isClosed())
+					stmt.close();
+			}
+
+			try {
+				str = CREATE_STMTS[1].replace("tableName", hierarchyTable);
+				str = str.replace("schemaDetails", DLogConstants.DLOG_HIERARCHY_FIELD_DETAILS);
+				stmt = con.prepareStatement(str);
+				stmt.execute();
+				stmt.close();
+			} catch (SQLException e) {
+			} finally {
+				if (stmt != null && !stmt.isClosed())
+					stmt.close();
+			}
+
+		} catch (SQLException e) {
+			_logger.error("caught unexpected exception", e);
+		}
+	}
+
 }

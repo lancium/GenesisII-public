@@ -13,9 +13,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 public class ContainerServicesProperties
 {
@@ -61,7 +61,7 @@ public class ContainerServicesProperties
 		}
 	}
 
-	static private void prepareDatabase(DatabaseConnectionPool connectionPool)
+	static private void prepareDatabase(ServerDatabaseConnectionPool connectionPool)
 	{
 		Connection connection = null;
 
@@ -77,7 +77,7 @@ public class ContainerServicesProperties
 		}
 	}
 
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 	private Collection<ListenerBundle> _listeners = new LinkedList<ListenerBundle>();
 
 	protected void firePropertyChanged(String propertyName, Serializable newValue)
@@ -105,7 +105,7 @@ public class ContainerServicesProperties
 		}
 	}
 
-	public ContainerServicesProperties(DatabaseConnectionPool connectionPool)
+	public ContainerServicesProperties(ServerDatabaseConnectionPool connectionPool)
 	{
 		_connectionPool = connectionPool;
 

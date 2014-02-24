@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.container.replicatedExport;
 
 import java.io.FileInputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,7 +12,6 @@ import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
-
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -30,7 +28,9 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
@@ -87,7 +87,8 @@ public class RExportUtils
 
 		/* create instance of correct (dir or file) replication service */
 		GeniiCommon replicaCommon = ClientUtils.createProxy(GeniiCommon.class, replicaServiceEPR);
-		VcgrCreateResponse replicaResp = replicaCommon.vcgrCreate(new VcgrCreate(replicaCreationProperties));
+		VcgrCreateResponse replicaResp =
+			replicaCommon.vcgrCreate(new VcgrCreate(replicaCreationProperties));
 		// get EPR to created replica
 		replicaEPR = replicaResp.getEndpoint();
 

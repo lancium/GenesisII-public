@@ -64,7 +64,7 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		Map<String, StringOrPath> env = getEnvironment();
 		env.put("GENII_DEPLOYMENT_NAME", new StringOrPath(depName.toString()));
 		env.put("GENII_USER_DIR", new StringOrPath(".genesisII-bes-state"));
-		_logger.info("rewrote GENII_USER_DIR to be: " + env.get("GENII_USER_DIR"));
+		_logger.info("rewrote GENII_USER_DIR to be: " + env.get("GENII_USER_DIR").toString(fsManager));
 
 		Map<String, String> stringEnv = new HashMap<String, String>();
 		for (String key : env.keySet()) {

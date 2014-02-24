@@ -9,7 +9,7 @@ public class CmdLineManipulators
 {
 	static private Log _logger = LogFactory.getLog(CmdLineManipulators.class);
 
-	// hmmm: does this even work properly? some issues with generic types here.
+	// TODO: does this even work properly? some issues with generic types here.
 	@SuppressWarnings("rawtypes")
 	static private ServiceLoader<CmdLineManipulator> loader = ServiceLoader.load(CmdLineManipulator.class);
 

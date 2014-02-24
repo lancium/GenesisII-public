@@ -33,7 +33,7 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 	protected PrintWriter _err;
 	protected BufferedReader _in;
 
-	private char[] _password = null;
+	private String _password = null;
 
 	protected AbstractLoginHandler(PrintWriter out, PrintWriter err, BufferedReader in)
 	{
@@ -53,7 +53,7 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 		}
 
 		if (password != null) {
-			_password = password.toCharArray();
+			_password = password;
 		}
 
 		KeyStore.Builder builder =
@@ -153,11 +153,11 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 			return null;
 
 		if (entry._privateKey == null) {
-			char[] passwordChars = null;
+			String passwordChars = "";
 
 			for (int tryNumber = 0; tryNumber < _PASSWORD_TRIES; tryNumber++) {
 				try {
-					entry._privateKey = (PrivateKey) entry._keyStore.getKey(entry._alias, passwordChars);
+					entry._privateKey = (PrivateKey) entry._keyStore.getKey(entry._alias, passwordChars.toCharArray());
 					break;
 				} catch (UnrecoverableKeyException uke) {
 					if (_password != null) {
@@ -165,8 +165,8 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 						_password = null;
 					} else {
 						passwordChars =
-							getPassword("Key Password", "Enter key password for \""
-								+ entry._certChain[0].getSubjectDN().getName() + "\".");
+							new String(getPassword("Key Password", "Enter key password for \""
+								+ entry._certChain[0].getSubjectDN().getName() + "\"."));
 					}
 				}
 			}
@@ -178,10 +178,12 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 
 	private void handle(PasswordCallback callback)
 	{
-		if (_password != null)
-			callback.setPassword(_password);
-		else
-			callback.setPassword(_password = getPassword("Password Entry", callback.getPrompt() + ": "));
+		if (_password != null) {
+			callback.setPassword(_password.toCharArray());
+		} else {
+			_password = new String(getPassword("Password Entry", callback.getPrompt() + ": "));
+			callback.setPassword(_password.toCharArray());
+		}
 	}
 
 	@Override

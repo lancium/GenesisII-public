@@ -129,8 +129,8 @@ public class NotificationBrokerMessageManager
 			iteration++;
 			messageIndex++;
 		}
-		GetMessagesResponse response =
-			new GetMessagesResponse(holders, attributeList.toArray(new MessageElement[attributeList.size()]));
+		
+		GetMessagesResponse response = new GetMessagesResponse(holders, attributeList.toArray(new MessageElement[attributeList.size()]));
 		return response;
 	}
 

@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.db;
+package edu.virginia.vcgr.genii.client.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;

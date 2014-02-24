@@ -9,15 +9,15 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.utils.Duration;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationEndpoint;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationResolver;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 public class BESInformationResolver implements InformationResolver<BESInformation>
 {
 	static private final long MAX_TIMEOUT = 1000L * 60 * 2;
 
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 
-	public BESInformationResolver(DatabaseConnectionPool connectionPool)
+	public BESInformationResolver(ServerDatabaseConnectionPool connectionPool)
 	{
 		_connectionPool = connectionPool;
 	}

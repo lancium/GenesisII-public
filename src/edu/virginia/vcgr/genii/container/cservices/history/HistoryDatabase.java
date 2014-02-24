@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.history.HistoryEventLevel;
@@ -23,8 +24,7 @@ import edu.virginia.vcgr.genii.client.history.HistoryEventData;
 import edu.virginia.vcgr.genii.client.history.HistoryEventSource;
 import edu.virginia.vcgr.genii.client.history.SequenceNumber;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 public class HistoryDatabase
 {
@@ -43,12 +43,13 @@ public class HistoryDatabase
 	static private class CloseableIteratorImpl implements CloseableIterator<HistoryEvent>
 	{
 		private LinkedList<HistoryEvent> _stagingArea = new LinkedList<HistoryEvent>();
-		private DatabaseConnectionPool _connectionPool;
+		private ServerDatabaseConnectionPool _connectionPool;
 		private Connection _connection;
 		private Statement _stmt;
 		private ResultSet _rs;
 
-		private CloseableIteratorImpl(DatabaseConnectionPool connectionPool, Connection connection, Statement stmt, ResultSet rs)
+		private CloseableIteratorImpl(ServerDatabaseConnectionPool connectionPool, Connection connection, Statement stmt,
+			ResultSet rs)
 		{
 			_connectionPool = connectionPool;
 			_connection = connection;
@@ -254,7 +255,7 @@ public class HistoryDatabase
 		}
 	}
 
-	static CloseableIterator<HistoryEvent> iterateEvents(DatabaseConnectionPool connectionPool, Connection connection,
+	static CloseableIterator<HistoryEvent> iterateEvents(ServerDatabaseConnectionPool connectionPool, Connection connection,
 		String resourceID) throws SQLException
 	{
 		PreparedStatement stmt = null;

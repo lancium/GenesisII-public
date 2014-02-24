@@ -17,7 +17,6 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
-
 import edu.virginia.vcgr.genii.container.sync.ReplicationThread;
 import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
 

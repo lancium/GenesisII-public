@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.axis.CertGeneratorUtils;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -17,7 +17,7 @@ public class CertGeneratorDBResource extends BasicDBResource implements ICertGen
 	static public final String _ISSUER_CERT_CHAIN_PROPERTY_NAME = "cert-generator-issuer-cert-chain";
 	static public final String _ISSUER_PRIVATE_KEY_PROPERTY_NAME = "cert-generator-issuer-private-key";
 
-	public CertGeneratorDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public CertGeneratorDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

@@ -81,22 +81,24 @@ public class ContextFileSystem
 
 			callContext.setActiveKeyAndCertMaterial(keyAndCert);
 
-			// Retrieve and authenticate other accumulated
-			// message-level credentials (e.g., GII delegated assertions, etc.)
+			/*
+			 * Retrieve and authenticate other accumulated message-level credentials (e.g., GII
+			 * delegated assertions, etc.)
+			 */
 			@SuppressWarnings("unchecked")
 			ArrayList<NuCredential> bearerCredentials =
 				(ArrayList<NuCredential>) callContext.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
 
-			// Finally add all of our callerIds to the calling-context's
-			// outgoing credentials
+			/* Finally add all of our callerIds to the calling-context's outgoing credentials. */
 			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 			for (NuCredential cred : bearerCredentials) {
 				transientCredentials.add(cred);
 			}
-
 			return callContext;
 		} catch (GeneralSecurityException e) {
-			throw new IOException("Unable to generate key and cert material!", e);
+			String msg = "Unable to generate key and cert material!";
+			_logger.error(msg);
+			throw new IOException(msg, e);
 		} finally {
 			StreamUtils.close(fin);
 		}
@@ -155,9 +157,7 @@ public class ContextFileSystem
 						+ "Loaded from: (" + pair.filename + ", " + pair.transientFilename + "), expected: (" + filename + ", "
 						+ transientFilename + ").  Please contact VCGR with this error message " + "at genesisII@virginia.edu");
 				}
-
 			}
-
 			return pair.context;
 		}
 	}
@@ -214,7 +214,9 @@ public class ContextFileSystem
 			raf = new RandomAccessFile(filename, "rw");
 			lock = raf.getChannel().lock();
 			InputStream in = new RAFInputStream(raf);
-			return ContextStreamUtils.load(in);
+
+			ICallingContext toReturn = ContextStreamUtils.load(in);
+			return toReturn;
 		} finally {
 			if (lock != null)
 				try {

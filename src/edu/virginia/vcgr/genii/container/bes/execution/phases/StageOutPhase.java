@@ -24,13 +24,13 @@ public class StageOutPhase extends AbstractExecutionPhase implements Serializabl
 
 	private URI _target;
 	private File _source;
-	private UsernamePasswordIdentity _credential;
+	private UsernamePasswordIdentity _usernamePassword;
 
-	public StageOutPhase(File source, URI target, UsernamePasswordIdentity credential)
+	public StageOutPhase(File source, URI target, UsernamePasswordIdentity usernamePassword)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, STAGING_OUT_STATE, false));
 
-		_credential = credential;
+		_usernamePassword = usernamePassword;
 
 		if (source == null)
 			throw new IllegalArgumentException("Parameter \"sourceName\" cannot be null.");
@@ -61,7 +61,7 @@ public class StageOutPhase extends AbstractExecutionPhase implements Serializabl
 		}
 
 		try {
-			stats = URIManager.put(_source, _target, _credential);
+			stats = URIManager.put(_source, _target, _usernamePassword);
 			history.createTraceWriter("%s: %d Bytes Transferred", _source.getName(), stats.bytesTransferred())
 				.format("%d bytes were transferred in %d ms.", stats.bytesTransferred(), stats.transferTime()).close();
 		} catch (Throwable cause) {

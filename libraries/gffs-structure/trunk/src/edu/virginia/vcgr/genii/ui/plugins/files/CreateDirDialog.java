@@ -16,6 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.gui.GuiHelpAction;
@@ -36,6 +38,7 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 public class CreateDirDialog extends JDialog
 {
 	static final long serialVersionUID = 0L;
+	static private Log _logger = LogFactory.getLog(CreateDirDialog.class);
 
 	static final private String _TITLE = "Create Directory Tool";
 	private ResourcePathsWidget _paths;
@@ -188,8 +191,7 @@ public class CreateDirDialog extends JDialog
 						rnsPath = null;
 						return;
 					} catch (RNSPathDoesNotExistException er) {
-						// TODO Auto-generated catch block
-						er.printStackTrace();
+						_logger.error("caught unexpected exception", er);
 						return;
 					}
 				}

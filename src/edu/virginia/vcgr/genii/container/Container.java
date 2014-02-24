@@ -232,9 +232,6 @@ public class Container extends ApplicationBase
 
 		Collection<Class<? extends IServiceWithCleanupHook>> containerServices = initializeServices(webAppCtxt);
 
-		ServiceDeployer.startServiceDeployer(_axisServer, _postStartupWorkQueue,
-			Installation.getDeployment(new DeploymentName()).getServicesDirectory());
-
 		Collection<IServiceWithCleanupHook> containerServiceObjects =
 			new ArrayList<IServiceWithCleanupHook>(containerServices.size());
 		for (Class<? extends IServiceWithCleanupHook> service : containerServices) {
@@ -257,6 +254,8 @@ public class Container extends ApplicationBase
 
 		CacheConfigurer.disableSubscriptionBasedCaching();
 
+		// hmmm: this is doing the startup which the service deployer also does. are we sure we're
+		// not fighting with ourselves?
 		for (IServiceWithCleanupHook service : containerServiceObjects) {
 			try {
 				service.startup();
@@ -265,6 +264,12 @@ public class Container extends ApplicationBase
 				_logger.warn(String.format("Unable to configure service:  %s.", service), cause);
 			}
 		}
+
+		// hmmm: this is way afterwards now; previously it was before the container service obj list
+		// was populated.
+		// hmmm: trying this after all are created.
+		ServiceDeployer.startServiceDeployer(_axisServer, _postStartupWorkQueue,
+			Installation.getDeployment(new DeploymentName()).getServicesDirectory());
 
 		ServerWSDoAllReceiver.beginNormalRuntime();
 	}
@@ -522,8 +527,10 @@ public class Container extends ApplicationBase
 				PersistentContainerProperties properties = PersistentContainerProperties.getProperties();
 				try {
 					_containerID = (GUID) properties.getProperty("container-id");
-					if (_containerID == null)
+					if (_containerID == null) {
 						_containerID = new GUID();
+						_logger.info("created new container ID for this container: " + _containerID);
+					}
 					properties.setProperty("container-id", _containerID);
 				} catch (Throwable cause) {
 					throw new org.morgan.util.configuration.ConfigurationException("Unable to get/set container id.", cause);

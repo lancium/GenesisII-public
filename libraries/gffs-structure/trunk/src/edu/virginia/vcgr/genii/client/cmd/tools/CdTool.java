@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -19,6 +22,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 public class CdTool extends BaseGridTool
 {
+	private static Log _logger = LogFactory.getLog(CdTool.class);
+
 	static final private String _DESCRIPTION = "config/tooldocs/description/dcd";
 	static final private String _USAGE = "config/tooldocs/usage/ucd";
 	static final private String _MANPAGE = "config/tooldocs/man/cd";
@@ -61,6 +66,8 @@ public class CdTool extends BaseGridTool
 			throw new RNSException("Path \"" + path.pwd() + "\" is not an RNS directory.");
 
 		ICallingContext ctxt = ContextManager.getExistingContext();
+		if (_logger.isDebugEnabled())
+			_logger.debug("current path set to " + path.pwd());
 		ctxt.setCurrentPath(path);
 		ContextManager.storeCurrentContext(ctxt);
 	}

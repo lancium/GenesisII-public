@@ -88,8 +88,7 @@ public class CommonSTSAttributesHandler extends AbstractAttributeHandler
 		IResource resource = getResourceAfterAccessChecking("Delegated Credentials");
 		NuCredential credential =
 			(NuCredential) resource.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart());
-		return new MessageElement(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME,
-			serializeObjectToString((Serializable) credential));
+		return new MessageElement(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME, serializeObjectToString(credential));
 	}
 
 	public MessageElement getStoredCallingContext() throws IOException

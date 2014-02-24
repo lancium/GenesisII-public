@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.logging.DLogDatabase;
@@ -20,6 +22,7 @@ import edu.virginia.vcgr.genii.common.RPCMetadataType;
 
 public class LogPath
 {
+	static private Log _logger = LogFactory.getLog(LogPath.class);
 
 	private DLogDatabase _db;
 	private String _myID;
@@ -88,8 +91,7 @@ public class LogPath
 				try {
 					return DLogUtils.getLoggerEPR(_db.getEndpoint(id));
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_logger.error("caught unexpected exception", e);
 				}
 			}
 		}
@@ -99,8 +101,7 @@ public class LogPath
 			LogRetrieveResponseType child = dpt.getChildLogIDs(new String[] { id });
 			return child.getChildRPCs(0).getParent().getMetadata().getTargetEPR();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			_logger.error("caught unexpected exception", e);
 		}
 
 		return null;

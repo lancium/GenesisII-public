@@ -2,11 +2,11 @@ package edu.virginia.vcgr.genii.container.resolver;
 
 import java.sql.SQLException;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
@@ -17,7 +17,7 @@ public class GeniiResolverDBResourceFactory extends BasicDBResourceFactory imple
 	static private final String _CREATE_TABLE_STMT = "CREATE TABLE resolverentries (resourceid VARCHAR(128), "
 		+ "epi VARCHAR(512), targetid INTEGER, endpoint BLOB(2G), " + "PRIMARY KEY (resourceid, epi, targetid))";
 
-	public GeniiResolverDBResourceFactory(DatabaseConnectionPool pool) throws SQLException
+	public GeniiResolverDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}

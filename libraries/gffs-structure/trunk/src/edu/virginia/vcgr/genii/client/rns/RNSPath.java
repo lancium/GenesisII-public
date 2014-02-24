@@ -88,8 +88,8 @@ public class RNSPath implements Serializable, Cloneable
 			if (toReturn == null) {
 				_logger.error("got a null current path for RNS.");
 			} else {
-				if (_logger.isDebugEnabled())
-					_logger.debug("RNSPath: getCurrent = " + toReturn.toString());
+				if (_logger.isTraceEnabled())
+					_logger.trace("RNSPath: getCurrent = " + toReturn.toString());
 			}
 			return toReturn;
 		} catch (IOException ioe) {
@@ -490,6 +490,8 @@ public class RNSPath implements Serializable, Cloneable
 	{
 		if (path == null)
 			throw new IllegalArgumentException("Cannot lookup a path which is null.");
+
+		// hmmm: this is the awesome place to just blast back an item from the CPFR cache.
 
 		String[] pathElements = PathUtils.normalizePath(pwd(), path);
 		ArrayList<RNSPath> arrayRep = new ArrayList<RNSPath>();

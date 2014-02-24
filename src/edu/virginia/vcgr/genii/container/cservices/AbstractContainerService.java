@@ -5,14 +5,14 @@ import java.util.concurrent.ExecutorService;
 
 import org.morgan.util.configuration.ConfigurationException;
 
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 public abstract class AbstractContainerService implements ContainerService
 {
 	private boolean _started = false;
 	private String _serviceName;
 	private ExecutorService _executor = null;
-	private DatabaseConnectionPool _connectionPool = null;
+	private ServerDatabaseConnectionPool _connectionPool = null;
 	private ContainerServicesProperties _cservicesProperties = null;
 
 	protected AbstractContainerService(String serviceName)
@@ -25,7 +25,7 @@ public abstract class AbstractContainerService implements ContainerService
 		return _executor;
 	}
 
-	protected DatabaseConnectionPool getConnectionPool()
+	protected ServerDatabaseConnectionPool getConnectionPool()
 	{
 		return _connectionPool;
 	}
@@ -35,7 +35,7 @@ public abstract class AbstractContainerService implements ContainerService
 	protected abstract void loadService() throws Throwable;
 
 	@Override
-	final synchronized public void load(ExecutorService executor, DatabaseConnectionPool connectionPool,
+	final synchronized public void load(ExecutorService executor, ServerDatabaseConnectionPool connectionPool,
 		ContainerServicesProperties cservicesProperties) throws Throwable
 	{
 		_executor = executor;

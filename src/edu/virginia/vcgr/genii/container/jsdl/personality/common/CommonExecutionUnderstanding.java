@@ -170,7 +170,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		for (DataStagingUnderstanding stage : _stageIns) {
 			File stageFile = _fsManager.lookup(stage.getFilePath());
 
-			ret.add(new StageInPhase(stage.getSourceURI(), stageFile, stage.getCreationFlag(), stage.getCredential()));
+			ret.add(new StageInPhase(stage.getSourceURI(), stageFile, stage.getCreationFlag(), stage.getUsernamePassword()));
 
 			if (stage.isDeleteOnTerminate())
 				cleanups.add(new CleanupPhase(stageFile));
@@ -236,7 +236,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		for (DataStagingUnderstanding stage : _stageOuts) {
 			File stageFile = _fsManager.lookup(stage.getFilePath());
 
-			ret.add(new StageOutPhase(stageFile, stage.getTargetURI(), stage.getCredential()));
+			ret.add(new StageOutPhase(stageFile, stage.getTargetURI(), stage.getUsernamePassword()));
 
 			if (stage.isDeleteOnTerminate())
 				cleanups.add(new CleanupPhase(stageFile));

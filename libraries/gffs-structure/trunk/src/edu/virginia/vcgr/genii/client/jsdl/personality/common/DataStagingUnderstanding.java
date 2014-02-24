@@ -15,7 +15,7 @@ public class DataStagingUnderstanding
 	private String _filename = null;
 	private URI _sourceURI = null;
 	private URI _targetURI = null;
-	private UsernamePasswordIdentity _credential;
+	private UsernamePasswordIdentity _usernamePassword;
 
 	public CreationFlagEnumeration getCreationFlag()
 	{
@@ -77,13 +77,13 @@ public class DataStagingUnderstanding
 		_targetURI = _targeturi;
 	}
 
-	public void setCredential(UsernamePasswordIdentity cred)
+	public void setUsernamePassword(UsernamePasswordIdentity upi)
 	{
-		_credential = cred;
+		_usernamePassword = upi;
 	}
 
-	public UsernamePasswordIdentity getCredential()
+	public UsernamePasswordIdentity getUsernamePassword()
 	{
-		return _credential;
+		return _usernamePassword;
 	}
 }

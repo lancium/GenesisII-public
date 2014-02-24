@@ -3,19 +3,19 @@ package edu.virginia.vcgr.genii.container.rns;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class RNSDBResourceFactory extends BasicDBResourceFactory implements IResourceFactory
 {
-	static private final String _CREATE_ENTRY_TABLE_STMT = "CREATE TABLE entries (" + "resourceid 		VARCHAR(128), "
-		+ "name 				VARCHAR(256), " + "endpoint 			BLOB (2G), " + "endpoint_id 		VARCHAR(128), " + "id 				VARCHAR(40), "
-		+ "attrs 				VARCHAR (8192) FOR BIT DATA, " + "CONSTRAINT contextsconstraint1 PRIMARY KEY (resourceid, name))";
+	static private final String _CREATE_ENTRY_TABLE_STMT = "CREATE TABLE entries (" + "resourceid VARCHAR(128), "
+		+ "name VARCHAR(256), " + "endpoint BLOB (2G), " + "endpoint_id VARCHAR(128), " + "id VARCHAR(40), "
+		+ "attrs VARCHAR (8192) FOR BIT DATA, " + "CONSTRAINT contextsconstraint1 PRIMARY KEY (resourceid, name))";
 
 	static private String _CREATE_ENTRY_INDEX_STMT = "CREATE INDEX idx ON entries (id)";
 
@@ -26,7 +26,7 @@ public class RNSDBResourceFactory extends BasicDBResourceFactory implements IRes
 	// update.
 	static private final String _ADD_ENDPOINT_ID_COLUMN_STMT = "ALTER TABLE entries ADD COLUMN endpoint_id VARCHAR(128)";
 
-	public RNSDBResourceFactory(DatabaseConnectionPool pool) throws SQLException
+	public RNSDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}

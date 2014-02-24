@@ -1133,7 +1133,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		// Form document
 		try {
 			MessageElement doc = new MessageElement(new QName("http://tempuri.org", "ResourcePropertiesDocument"));
-			for (MessageElement elem : getResourcePropertyDocument(new GetResourcePropertyDocument()).get_any()) {
+			for (MessageElement elem : getResourcePropertyDocument(
+				new GetResourcePropertyDocument()).get_any()) {
 				doc.addChild(elem);
 			}
 
@@ -1379,14 +1380,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 					batchElements = new IterableElementType[firstBlock.length];
 					for (int lcv = 0; lcv < firstBlock.length; lcv++)
 						batchElements[lcv] =
-							new IterableElementType(new MessageElement[] { firstBlock[lcv] }, new UnsignedLong(lcv));
+							new IterableElementType(new MessageElement[] { firstBlock[lcv] },
+								new UnsignedLong(lcv));
 				}
 
 				Object tempObj = new Object();
 
 				if (consParms.remainingContents(tempObj))
 					iteratorEndpoint =
-						new WSIteratorServiceImpl().CreateEPR(new MessageElement[] { consParms.serializeToMessageElement() },
+						new WSIteratorServiceImpl().CreateEPR(
+								new MessageElement[] { consParms.serializeToMessageElement() },
 							Container.getServiceURL("WSIteratorPortType"));
 
 				return new IteratorInitializationType(iteratorEndpoint, batchElements);

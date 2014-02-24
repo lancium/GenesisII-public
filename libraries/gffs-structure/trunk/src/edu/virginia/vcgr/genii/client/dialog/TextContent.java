@@ -31,6 +31,7 @@ public class TextContent
 	{
 		String line;
 		InputStream in = null;
+		BufferedReader reader = null;
 
 		_content = new LinkedList<String>();
 
@@ -38,13 +39,14 @@ public class TextContent
 			in = resource.open();
 			if (in == null)
 				throw new IllegalArgumentException("Unable to open indicated file resource \"" + resource + "\".");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			reader = new BufferedReader(new InputStreamReader(in));
 			while ((line = reader.readLine()) != null) {
 				_content.add(line);
 			}
 		} catch (IOException ioe) {
 			throw new IllegalArgumentException("Can't read file resource.", ioe);
 		} finally {
+			StreamUtils.close(reader);
 			StreamUtils.close(in);
 		}
 	}

@@ -21,7 +21,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.iterator.FileOrDir;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -46,7 +46,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 	static private final String _ENTRY_ID_UPDATE_STMT = "UPDATE entries SET endpoint_id = ? "
 		+ "WHERE resourceid = ? AND name = ?";
 
-	public RNSDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public RNSDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}
@@ -227,7 +227,9 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		}
 	}
 
-	// This method gives the number of entries within this RNS resource
+	/**
+	 * This method gives the number of entries within this RNS resource.
+	 */
 	@Override
 	public int retrieveOccurrenceCount() throws ResourceException
 	{

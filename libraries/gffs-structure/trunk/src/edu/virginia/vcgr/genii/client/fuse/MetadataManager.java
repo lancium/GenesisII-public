@@ -75,7 +75,6 @@ public class MetadataManager
 
 	public static void updateAttributesAfterWrite(EndpointReferenceType EPR)
 	{
-
 		String nameSpaceForAttributes = CacheUtils.getNamespaceForByteIOAttributes(EPR);
 		if (nameSpaceForAttributes != null) {
 			CacheManager.removeItemFromCache(EPR, new QName(nameSpaceForAttributes, ByteIOConstants.SIZE_ATTR_NAME),

@@ -14,12 +14,12 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.cloud.ec2.EC2Manager;
 import edu.virginia.vcgr.genii.cloud.ec2.EC2TypicaController;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 public class CloudMonitor
 {
 
-	static private DatabaseConnectionPool _connectionPool;
+	static private ServerDatabaseConnectionPool _connectionPool;
 	static private HashMap<String, CloudManager> _cloudManagers = new HashMap<String, CloudManager>();
 	static private HashMap<String, String> _activities = new HashMap<String, String>();
 
@@ -33,7 +33,7 @@ public class CloudMonitor
 		return _activities.get(activityID);
 	}
 
-	public static void setConnectionPool(DatabaseConnectionPool connectionPool) throws SQLException, IOException
+	public static void setConnectionPool(ServerDatabaseConnectionPool connectionPool) throws SQLException, IOException
 	{
 
 		if (connectionPool == null)

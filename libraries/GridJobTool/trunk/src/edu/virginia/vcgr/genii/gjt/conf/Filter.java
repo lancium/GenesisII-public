@@ -53,12 +53,13 @@ public class Filter<E extends Enum<E>>
 		IOSource source =
 			new OverridenIOSource(new FileIOSource(new File(configurationDirectory, filename)), new ClassRelativeIOSource(
 				Filter.class, filename));
-		InputStream in = null;
 		String line;
 
+		InputStream in = null;
+		BufferedReader reader = null;
 		try {
 			in = source.open();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			reader = new BufferedReader(new InputStreamReader(in));
 			filterSet = EnumSet.noneOf(filterClass);
 
 			while ((line = reader.readLine()) != null) {
@@ -70,6 +71,7 @@ public class Filter<E extends Enum<E>>
 		} catch (FileNotFoundException fnfe) {
 			filterSet = EnumSet.allOf(filterClass);
 		} finally {
+			IOUtils.close(reader);
 			IOUtils.close(in);
 		}
 

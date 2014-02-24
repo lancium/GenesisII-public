@@ -20,7 +20,7 @@ import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.container.cservices.conf.ContainerServiceConfiguration;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 public class ContainerServices
 {
@@ -54,9 +54,10 @@ public class ContainerServices
 		return ret;
 	}
 
-	static private DatabaseConnectionPool findConnectionPool()
+	static private ServerDatabaseConnectionPool findConnectionPool()
 	{
-		DatabaseConnectionPool ret = (DatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
+		ServerDatabaseConnectionPool ret =
+			(ServerDatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
 		if (ret == null)
 			throw new ConfigurationException("Unable to find database connection pool.");
 
@@ -83,7 +84,7 @@ public class ContainerServices
 			throw new ConfigurationException("Container Services already loaded.");
 
 		ExecutorService executor = Executors.newFixedThreadPool(8);
-		DatabaseConnectionPool connectionPool = findConnectionPool();
+		ServerDatabaseConnectionPool connectionPool = findConnectionPool();
 		ContainerServicesProperties properties = new ContainerServicesProperties(connectionPool);
 
 		_services = new HashMap<Class<? extends ContainerService>, ContainerService>();

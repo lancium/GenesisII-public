@@ -71,9 +71,7 @@ public class WSSecurityUtils
 			MessageElement token = new MessageElement(UsernameToken.TOKEN);
 			token.addChild(userElem);
 			token.addChild(passElem);
-
 			return token;
-
 		} catch (Exception e) {
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
@@ -144,7 +142,6 @@ public class WSSecurityUtils
 			wseTokenRef.addChild(embedded);
 
 			return wseTokenRef;
-
 		} catch (GenesisIISecurityException e) {
 			throw new GeneralSecurityException(e.getMessage(), e);
 		} catch (WSSecurityException e) {

@@ -20,7 +20,7 @@ import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -41,7 +41,7 @@ public class Scheduler implements Closeable
 	private String _queueID;
 
 	private SchedulingEvent _schedulingEvent;
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 
 	private volatile Boolean _isSchedulingJobs;
 
@@ -61,7 +61,7 @@ public class Scheduler implements Closeable
 		}
 	}
 
-	public Scheduler(String queueID, SchedulingEvent schedulingEvent, DatabaseConnectionPool connectionPool,
+	public Scheduler(String queueID, SchedulingEvent schedulingEvent, ServerDatabaseConnectionPool connectionPool,
 		JobManager jobManager, BESManager besManager) throws SQLException
 	{
 		_schedulingEvent = schedulingEvent;

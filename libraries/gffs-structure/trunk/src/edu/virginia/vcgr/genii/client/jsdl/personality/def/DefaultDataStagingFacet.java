@@ -43,7 +43,7 @@ public class DefaultDataStagingFacet extends DefaultPersonalityFacet implements 
 	}
 
 	@Override
-	public void consumeCredential(Object currentUnderstanding, UsernamePasswordIdentity upi) throws JSDLException
+	public void consumeUsernamePassword(Object currentUnderstanding, UsernamePasswordIdentity upi) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(HPCConstants.HPCP_CREDENTIAL_QNAME);
 	}

@@ -11,7 +11,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResource;
@@ -23,7 +23,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 	// transient properties for the resource
 	transient protected HashMap<String, Object> _properties = new HashMap<String, Object>();
 
-	public JNDIResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public JNDIResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 
 		super(parentKey, connectionPool);

@@ -25,13 +25,13 @@ import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 public class AlarmManager
 {
@@ -53,7 +53,7 @@ public class AlarmManager
 		return _manager;
 	}
 
-	private DatabaseConnectionPool _connectionPool = null;
+	private ServerDatabaseConnectionPool _connectionPool = null;
 
 	private AlarmTable _alarms = new AlarmTable();
 
@@ -112,7 +112,7 @@ public class AlarmManager
 
 	private AlarmManager() throws SQLException
 	{
-		_connectionPool = (DatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
+		_connectionPool = (ServerDatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
 		if (_connectionPool == null)
 			throw new RuntimeException("Unable to find named instance \"connection-pool\".");
 

@@ -6,8 +6,6 @@ import java.util.Properties;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
-import org.apache.axis.message.MessageElement;
-
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
 /**
@@ -29,10 +27,10 @@ public class CreationProperties
 	static public final String CREATION_PROPERTY_NAME_ATTR = "name";
 	static public final String CREATION_PROPERTY_VALUE_ATTR = "value";
 
-	static public MessageElement translate(Properties properties)
+	static public org.apache.axis.message.MessageElement translate(Properties properties)
 	{
 		try {
-			MessageElement ret = new MessageElement(CREATION_PROPERTIES_QNAME);
+			org.apache.axis.message.MessageElement ret = new org.apache.axis.message.MessageElement(CREATION_PROPERTIES_QNAME);
 
 			for (Object key : properties.keySet()) {
 				String sKey = key.toString();
@@ -46,13 +44,13 @@ public class CreationProperties
 		}
 	}
 
-	static public Properties translate(MessageElement element) throws SOAPException
+	static public Properties translate(org.apache.axis.message.MessageElement element) throws SOAPException
 	{
 		Properties properties = new Properties();
 
 		Iterator<?> iter = element.getChildElements();
 		while (iter.hasNext()) {
-			MessageElement child = (MessageElement) iter.next();
+			org.apache.axis.message.MessageElement child = (org.apache.axis.message.MessageElement) iter.next();
 			if (!child.getQName().equals(CREATION_PROPERTY_QNAME))
 				throw new RuntimeException("Error parsing creation property.");
 
@@ -62,16 +60,16 @@ public class CreationProperties
 		return properties;
 	}
 
-	static private MessageElement translate(String key, String value)
+	static private org.apache.axis.message.MessageElement translate(String key, String value)
 	{
-		MessageElement ret = new MessageElement(CREATION_PROPERTY_QNAME);
+		org.apache.axis.message.MessageElement ret = new org.apache.axis.message.MessageElement(CREATION_PROPERTY_QNAME);
 		ret.setAttribute(CREATION_PROPERTY_NAME_ATTR, key);
 		ret.setAttribute(CREATION_PROPERTY_VALUE_ATTR, value);
 
 		return ret;
 	}
 
-	static private void add(Properties props, MessageElement child)
+	static private void add(Properties props, org.apache.axis.message.MessageElement child)
 	{
 		String key = child.getAttribute(CREATION_PROPERTY_NAME_ATTR);
 		String value = child.getAttribute(CREATION_PROPERTY_VALUE_ATTR);

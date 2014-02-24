@@ -21,6 +21,8 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.axis.message.MessageElement;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -31,6 +33,8 @@ import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 
 public class DefaultAttributeManipulator implements IAttributeManipulator
 {
+	static private Log _logger = LogFactory.getLog(DefaultAttributeManipulator.class);
+
 	private Object _target;
 	private QName _attrQName;
 	private Method _getMethod;
@@ -141,8 +145,13 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 		if (target instanceof Class) {
 			clazz = (Class<? extends Object>) target;
 			target = null;
-		} else
+		} else {
 			clazz = target.getClass();
+		}
+//		if (clazz == MessageElement.class)
+//			clazz = org.apache.axis.message.MessageElement.class;
+		if (_logger.isTraceEnabled())
+			_logger.trace("target class found: " + clazz.getCanonicalName());
 
 		if (attributeName == null)
 			throw new IllegalArgumentException("Parameter \"attributeName\" cannot be null.");
@@ -151,6 +160,9 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 
 		Method getter = clazz.getMethod(getMethodName, new Class[0]);
 		Class<? extends Object> returnType = getter.getReturnType();
+		if (_logger.isTraceEnabled())
+			_logger.trace("return type decided on: " + returnType.getCanonicalName());
+
 		if (!((MessageElement.class.isAssignableFrom(returnType)) || (Collection.class.isAssignableFrom(returnType))))
 			throw new IllegalArgumentException("Method \"" + getMethodName + "\" does not appear to return the correct type.");
 

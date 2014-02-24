@@ -6,9 +6,9 @@ import java.sql.SQLException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
@@ -22,7 +22,7 @@ public class WSIteratorDBResourceFactory extends BasicDBResourceFactory
 		+ "elementindex BIGINT NOT NULL, " + "contents BLOB(2G) NOT NULL, "
 		+ "CONSTRAINT iteratorsuniqueconstraint UNIQUE (iteratorid, elementindex))" };
 
-	public WSIteratorDBResourceFactory(DatabaseConnectionPool pool) throws SQLException
+	public WSIteratorDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}
@@ -51,7 +51,7 @@ public class WSIteratorDBResourceFactory extends BasicDBResourceFactory
 		}
 	}
 
-	public DatabaseConnectionPool getConnectionPool()
+	public ServerDatabaseConnectionPool getConnectionPool()
 	{
 		return _pool;
 	}

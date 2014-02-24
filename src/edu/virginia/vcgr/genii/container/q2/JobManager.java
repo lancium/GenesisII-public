@@ -72,7 +72,7 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventWriter;
 import edu.virginia.vcgr.genii.container.cservices.history.InMemoryHistoryEventSink;
 import edu.virginia.vcgr.genii.container.cservices.history.NullHistoryContext;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.iterator.QueueInMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
@@ -115,7 +115,7 @@ public class JobManager implements Closeable
 	private QueueDatabase _database;
 	private SchedulingEvent _schedulingEvent;
 	private JobStatusChecker _statusChecker;
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 	private BESManager _besManager;
 	private String _lastUserScheduled;
 
@@ -155,7 +155,7 @@ public class JobManager implements Closeable
 	private HashMap<Long, JobData> _runningJobs = new HashMap<Long, JobData>();
 
 	public JobManager(ThreadPool outcallThreadPool, QueueDatabase database, SchedulingEvent schedulingEvent,
-		BESManager manager, Connection connection, DatabaseConnectionPool connectionPool) throws SQLException,
+		BESManager manager, Connection connection, ServerDatabaseConnectionPool connectionPool) throws SQLException,
 		ResourceException, GenesisIISecurityException
 	{
 		_connectionPool = connectionPool;
@@ -1704,9 +1704,9 @@ public class JobManager implements Closeable
 
 		int newCount = _outcallThreadPool.size();
 
-		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Just finished enqueing a bunch of jobs into the thread pool "
-				+ "and the thread pool size grew from %d jobs to %d jobs.", originalCount, newCount));
+		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
+			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+		}
 
 		LoggingContext.releaseCurrentLoggingContext();
 	}
@@ -1819,9 +1819,9 @@ public class JobManager implements Closeable
 
 		int newCount = _outcallThreadPool.size();
 
-		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Just finished enqueing a bunch of jobs into the thread pool "
-				+ "and the thread pool size grew from %d jobs to %d jobs.", originalCount, newCount));
+		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
+			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+		}
 	}
 
 	/**

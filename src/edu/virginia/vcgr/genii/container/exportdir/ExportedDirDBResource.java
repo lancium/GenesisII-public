@@ -35,7 +35,7 @@ import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.byteio.DefaultRandomByteIOAttributePreFetcher;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -85,7 +85,7 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 	protected static EndpointReferenceType _fileServiceEPR;
 	protected static EndpointReferenceType _dirServiceEPR;
 
-	public ExportedDirDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public ExportedDirDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 

@@ -44,7 +44,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
@@ -55,7 +55,7 @@ public class BESActivity implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(BESActivity.class);
 
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 
 	private boolean _finishCaseHandled = false;
 	private BES _bes;
@@ -71,7 +71,7 @@ public class BESActivity implements Closeable
 	private String _jobName;
 	private ActivityRunner _runner;
 
-	public BESActivity(DatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
+	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
 		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName,
 		String jobName, boolean suspendRequested, boolean terminateRequested)
 	{

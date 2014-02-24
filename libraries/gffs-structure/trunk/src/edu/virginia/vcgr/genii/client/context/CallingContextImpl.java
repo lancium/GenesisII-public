@@ -76,12 +76,14 @@ public class CallingContextImpl implements ICallingContext, Serializable
 			if (pairs != null) {
 				for (ContextNameValuePairType pair : ct.getProperty()) {
 					String name = pair.getName();
-					_logger.debug("found in context: " + name);
+					if (_logger.isTraceEnabled())
+						_logger.trace("adding context entry for: " + name);
 					Collection<Serializable> multiValue = _properties.get(name);
 					if (multiValue == null) {
 						multiValue = new ArrayList<Serializable>();
 						_properties.put(name, multiValue);
-						_logger.debug("adding empty multivalue for null property called: " + name);
+						if (_logger.isTraceEnabled())
+							_logger.trace("adding empty multivalue for null property called: " + name);
 					}
 					multiValue.add(retrieveBase64Decoded(pair.getValue()));
 				}
@@ -91,7 +93,6 @@ public class CallingContextImpl implements ICallingContext, Serializable
 
 	public CallingContextImpl(RNSPath root)
 	{
-		_logger.debug("SETTING CURRENT RNSPATH for ROOT!");
 		setCurrentPath(root);
 	}
 
@@ -121,21 +122,6 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		if ((multiValue != null) && (multiValue.isEmpty())) {
 			throw new IllegalArgumentException("Illegal empty multiValue, use null instead");
 		}
-
-		// hmmm: new check, could be tossed eventually.
-		for (Serializable s : multiValue) {
-			String msg = "";
-			if (s == null) {
-				msg = "setProperty was given a null serializable!";
-			} else if (!(s instanceof Serializable)) {
-				msg = "setProperty was given a non serializable in list!";
-			}
-			if (!msg.equals("")) {
-				_logger.error(msg);
-				throw new RuntimeException(msg);
-			}
-		}
-
 		_properties.put(name, multiValue);
 	}
 
@@ -144,8 +130,6 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	{
 		if (value == null)
 			_logger.error("attempting to store a null Serializable object.");
-		if (!(value instanceof Serializable))
-			_logger.error("the type being stored for " + name + " is not serializable");
 		ArrayList<Serializable> multiValue = new ArrayList<Serializable>();
 		multiValue.add(value);
 		setProperty(name, multiValue);
@@ -192,9 +176,9 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	public String dumpContext()
 	{
 		StringBuilder toReturn = new StringBuilder();
-		toReturn.append("context has " + _properties.size() + " properties and " + _transientProperties.size()
+		toReturn.append("====\ncontext has " + _properties.size() + " normal properties and " + _transientProperties.size()
 			+ " transient properties.\n");
-		toReturn.append("property names:\n");
+		toReturn.append("normal property names:\n");
 		Set<String> propnames = _properties.keySet();
 		int indy = 0;
 		for (String name : propnames) {
@@ -206,6 +190,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		for (String name : tpropnames) {
 			toReturn.append("tran#" + indy++ + ": " + name + "\n");
 		}
+		toReturn.append("====\n");
 		return toReturn.toString();
 	}
 
@@ -237,12 +222,10 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	{
 		Collection<Serializable> multiValue = _properties.get(CURRENT_PATH_KEY);
 		if (multiValue != null) {
-			_logger.debug("returning current path based on multivalue property.");
 			return (RNSPath) multiValue.iterator().next();
 		}
 
 		if (_parent != null) {
-			_logger.debug("returning current path based on parent.");
 			return _parent.getCurrentPath();
 		}
 		return null;
@@ -251,7 +234,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	@Override
 	public synchronized void setCurrentPath(RNSPath newPath)
 	{
-		_logger.debug("just to show we got here!");
+		// hmmm: this is never EVER invoked. how does the path ever get set in the context?
+
 		_logger.debug("current path being set to: " + (newPath == null ? "null" : newPath.toString()));
 		setSingleValueProperty(CURRENT_PATH_KEY, newPath);
 	}

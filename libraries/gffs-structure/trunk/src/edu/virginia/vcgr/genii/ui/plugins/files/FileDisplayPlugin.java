@@ -86,9 +86,10 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 			int read;
 
 			InputStream in = null;
+			Reader reader = null;
 			try {
 				in = ByteIOStreamFactory.createInputStream(_path);
-				Reader reader = new InputStreamReader(in);
+				reader = new InputStreamReader(in);
 				// hmmm: this disappeared during recent update; is it still needed? ask andrew.
 				// SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.PLAIN_STYLE, "",
 				// _widget));
@@ -112,6 +113,7 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 				SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.ERROR_STYLE, "Unable to read file contents:  "
 					+ e, _widget));
 			} finally {
+				StreamUtils.close(reader);
 				StreamUtils.close(in);
 			}
 		}

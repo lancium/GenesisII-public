@@ -214,8 +214,7 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_logger.error("caught unexpected exception", e);
 				}
 			} while (found == 1);
 

@@ -152,8 +152,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 
 				entryReference =
 					new ExportedFileServiceImpl().vcgrCreate(
-						new VcgrCreate(ExportedFileUtils.createCreationProperties(fullPath, parentIds,
-							_resource.getReplicationState()))).getEndpoint();
+						new VcgrCreate(ExportedFileUtils.createCreationProperties(fullPath,
+							parentIds, _resource.getReplicationState()))).getEndpoint();
 
 				String newEntryId = (new GUID()).toString();
 				ExportedDirEntry newEntry =
@@ -226,8 +226,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			String isReplicated = _resource.getReplicationState();
 			newRef =
 				vcgrCreate(
-					new VcgrCreate(ExportedDirUtils.createCreationProperties(null, fullPath, null, null, null, parentIds,
-						isReplicated))).getEndpoint();
+					new VcgrCreate(ExportedDirUtils.createCreationProperties(null, fullPath, null,
+						null, null, parentIds, isReplicated))).getEndpoint();
 
 			String newEntryId = (new GUID()).toString();
 			ExportedDirEntry newEntry =

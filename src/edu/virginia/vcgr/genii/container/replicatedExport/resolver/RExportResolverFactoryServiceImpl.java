@@ -94,7 +94,8 @@ public class RExportResolverFactoryServiceImpl extends GenesisIIBase implements 
 
 		// collect creation params for resolver
 		MessageElement[] resolverCreationProperties =
-			RExportResolverUtils.createResolverCreationParams(createResolver.get_any(), primaryEPR);
+			RExportResolverUtils.createResolverCreationParams(createResolver.get_any(),
+				primaryEPR);
 
 		try {
 			// create proxy to resolver specifed by creation param
@@ -104,7 +105,8 @@ public class RExportResolverFactoryServiceImpl extends GenesisIIBase implements 
 			// previously: EPRUtils.makeEPR(getResolverServiceURL()
 
 			// create resolver instance with params
-			VcgrCreateResponse resp = resolverService.vcgrCreate(new VcgrCreate(resolverCreationProperties));
+			VcgrCreateResponse resp =
+				resolverService.vcgrCreate(new VcgrCreate(resolverCreationProperties));
 
 			// get resolver epr
 			resolverReference = resp.getEndpoint();

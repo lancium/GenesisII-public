@@ -244,7 +244,6 @@ public abstract class BaseGridTool implements ITool
 
 	static private String readResource(LoadFileResource resource)
 	{
-
 		if (resource == null) {
 			return "";
 		}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="5.1.9" transformSequenceNumber="4">
-  <directoryPresets config="./scripts/update_install_location.sh" />
+<install4j version="5.1.6" transformSequenceNumber="4">
+  <directoryPresets config="/usr/lib/jvm/java-7-oracle/jre" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -93,7 +93,6 @@
           <entry location="tests" fileType="regular" />
           <entry location="cert-tool" fileType="regular" />
           <entry location="readme.txt" fileType="regular" />
-          <entry location="bin" fileType="regular" />
           <entry location="linux-cmd-wrapper" fileType="regular" />
           <entry location="build.properties" fileType="regular" />
           <entry location="container.properties.example" fileType="regular" />
@@ -108,6 +107,7 @@
           <entry location="ext/genii-container-application.properties" fileType="regular" />
           <entry location="ext/genii-client-application.properties" fileType="regular" />
           <entry location="JavaServiceWrapper" fileType="regular" />
+          <entry location="xsede_tools/inputfile.txt" fileType="regular" />
           <entry location="unit-test-reports" fileType="regular" />
           <entry location="scripts" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
@@ -4121,7 +4121,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </windows>
-    <macosFolder name="mac_gui_64" id="2088" customizedId="" mediaFileName="genesis2-gffs-macosx${compiler:genii.bitSize}-v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
+    <macosFolder name="mac_gui_64" id="2088" customizedId="" mediaFileName="genesis2-gffs-macosx${compiler:genii.bitSize}-v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_17" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />

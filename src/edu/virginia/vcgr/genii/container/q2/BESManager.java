@@ -28,7 +28,7 @@ import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationEndpoint;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationListener;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationPortal;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationResult;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESEndpoint;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
@@ -103,7 +103,7 @@ public class BESManager implements Closeable
 	private BESResourceUpdater _updater;
 
 	public BESManager(QueueDatabase database, SchedulingEvent schedulingEvent, Connection connection,
-		InformationPortal<BESInformation> informationPortal, DatabaseConnectionPool connectionPool) throws SQLException,
+		InformationPortal<BESInformation> informationPortal, ServerDatabaseConnectionPool connectionPool) throws SQLException,
 		ResourceException, GenesisIISecurityException
 	{
 		_besInformation = new HashMap<Long, BESInformation>();

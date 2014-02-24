@@ -13,7 +13,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -29,7 +29,7 @@ public class RExportResolverDBResource extends BasicDBResource implements IRExpo
 	static public final String _LOCAL_PATH_PROPERTY_NAME = "rexport-local-path";
 	static public final String _RESOLVER_SERVICE_EPR_PROPERTY_NAME = "rexport-resolver-service-epr";
 
-	public RExportResolverDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public RExportResolverDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

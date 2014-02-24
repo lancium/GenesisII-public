@@ -40,7 +40,7 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.bes.resource.DBBESResource;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
@@ -50,7 +50,7 @@ public class BES implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(BES.class);
 
-	static private DatabaseConnectionPool _connectionPool;
+	static private ServerDatabaseConnectionPool _connectionPool;
 
 	static private HashMap<String, BES> _knownInstances = new HashMap<String, BES>();
 	static private HashMap<String, BES> _activityToBESMap = new HashMap<String, BES>();
@@ -112,7 +112,8 @@ public class BES implements Closeable
 		}
 	}
 
-	synchronized static public void loadAllInstances(DatabaseConnectionPool connectionPool) throws SQLException, IOException
+	synchronized static public void loadAllInstances(ServerDatabaseConnectionPool connectionPool) throws SQLException,
+		IOException
 	{
 		Connection connection = null;
 		Statement stmt = null;

@@ -68,7 +68,7 @@ public class ExecutionDataStagingFacet extends DefaultDataStagingFacet
 	}
 
 	@Override
-	public void consumeCredential(Object currentUnderstanding, UsernamePasswordIdentity credential)
+	public void consumeUsernamePassword(Object currentUnderstanding, UsernamePasswordIdentity credential)
 	{
 		_credential = credential;
 	}

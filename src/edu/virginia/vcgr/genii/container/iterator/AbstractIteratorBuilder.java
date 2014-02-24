@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.axis.message.MessageElement;
 
+
 public abstract class AbstractIteratorBuilder<SourceType> implements IteratorBuilder<SourceType>, Iterable<MessageElement>
 {
 	private int _preferredBatchSize = DEFAULT_PREFERRED_BATCH_SIZE;

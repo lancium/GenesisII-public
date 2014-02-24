@@ -179,11 +179,9 @@ public class ExportCreationDialog extends JDialog
 	// try {
 	// desktop.browse(new URI(_url));
 	// } catch (IOException e1) {
-	// // TODO Auto-generated catch block
-	// e1.printStackTrace();
+	//_logger.error("caught unexpected exception", e1);
 	// } catch (URISyntaxException e1) {
-	// // TODO Auto-generated catch block
-	// e1.printStackTrace();
+	//_logger.error("caught unexpected exception", e1);
 	// }
 	// }
 	// }

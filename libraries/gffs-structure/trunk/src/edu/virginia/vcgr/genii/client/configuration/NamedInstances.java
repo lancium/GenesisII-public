@@ -26,6 +26,8 @@ public class NamedInstances
 		for (Object obj : configuration.retrieveSections(_instancesSectionName)) {
 			Map<String, Object> instances = (Map<String, Object>) obj;
 			for (String name : instances.keySet()) {
+				if (_logger.isTraceEnabled())
+					_logger.trace("adding named instance for " + name);
 				_instances.put(name, instances.get(name));
 			}
 		}

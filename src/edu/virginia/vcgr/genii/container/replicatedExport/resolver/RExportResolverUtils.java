@@ -39,7 +39,6 @@ import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverFactoryP
 import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverPortType;
 import edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType;
 import edu.virginia.vcgr.genii.exportdir.ExportedFilePortType;
-
 import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateReplicaRequest;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.ResolverQueryRequest;
 import edu.virginia.vcgr.genii.replicatedExport.PopulateDirRequestType;
@@ -89,30 +88,28 @@ public class RExportResolverUtils
 	static public EndpointReferenceType
 		createResolutionEPR(EndpointReferenceType primaryEPR, EndpointReferenceType resolverEPR)
 	{
-		// disect components of primaryEPR
+		// dissect components of primaryEPR
 		org.ws.addressing.AttributedURIType origAddress = primaryEPR.getAddress();
 		org.ws.addressing.ReferenceParametersType origRefParams = primaryEPR.getReferenceParameters();
 		org.ws.addressing.MetadataType origMetadata = primaryEPR.getMetadata();
-		org.apache.axis.message.MessageElement[] origMessageElements = primaryEPR.get_any();
+		MessageElement[] origMessageElements = primaryEPR.get_any();
 
 		// create new metadata element containing resolver epr
 		org.ws.addressing.MetadataType newMetadata = null;
-		org.apache.axis.message.MessageElement newResolverElement =
-			new org.apache.axis.message.MessageElement(WSName.REFERENCE_RESOLVER_QNAME, resolverEPR);
+		MessageElement newResolverElement = new MessageElement(WSName.REFERENCE_RESOLVER_QNAME, resolverEPR);
 
 		// preserve any existing metadata elements
 		if (origMetadata == null) {
 			origMetadata = new org.ws.addressing.MetadataType();
 		}
 		int numMetadataElements = 0;
-		org.apache.axis.message.MessageElement[] origMetadataElements = origMetadata.get_any();
+		MessageElement[] origMetadataElements = origMetadata.get_any();
 		if (origMetadataElements != null) {
 			numMetadataElements = origMetadataElements.length;
 		}
 
 		// setup new metadata elements with old elements and new resolver addition
-		org.apache.axis.message.MessageElement[] newMetadataElements =
-			new org.apache.axis.message.MessageElement[numMetadataElements + 1];
+		MessageElement[] newMetadataElements = new MessageElement[numMetadataElements + 1];
 
 		for (int i = 0; i < numMetadataElements; i++) {
 			newMetadataElements[i] = origMetadataElements[i];
@@ -121,7 +118,8 @@ public class RExportResolverUtils
 		newMetadata = new org.ws.addressing.MetadataType(newMetadataElements);
 
 		// create new resolution epr that contains resolver
-		EndpointReferenceType newEPR = new EndpointReferenceType(origAddress, origRefParams, newMetadata, origMessageElements);
+		EndpointReferenceType newEPR =
+			new EndpointReferenceType(origAddress, origRefParams, newMetadata, origMessageElements);
 
 		return newEPR;
 	}

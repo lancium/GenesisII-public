@@ -28,7 +28,7 @@ import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 /**
  * The asynchronous worker that actually makes the outcall to the bes container to see if a job has
@@ -43,14 +43,14 @@ public class JobUpdateWorker implements OutcallHandler
 	private IBESPortTypeResolver _clientStubResolver;
 	private JobCommunicationInfo _jobInfo;
 	private JobManager _jobManager;
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 	private IJobEndpointResolver _jobEndpointResolver;
 	private JobData _data;
 
 	private LoggingContext _context;
 
 	public JobUpdateWorker(JobManager jobManager, IBESPortTypeResolver clientStubResolver,
-		IJobEndpointResolver jobEndpointResolver, DatabaseConnectionPool connectionPool, JobCommunicationInfo jobInfo,
+		IJobEndpointResolver jobEndpointResolver, ServerDatabaseConnectionPool connectionPool, JobCommunicationInfo jobInfo,
 		JobData data)
 	{
 		_jobManager = jobManager;

@@ -9,13 +9,17 @@ import java.net.URISyntaxException;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class GuiHelpAction extends AbstractAction
 {
 	static final long serialVersionUID = 0L;
+	
+	static private Log _logger = LogFactory.getLog(GuiHelpAction.class);
+	
 	private String _url;
-
-	// private JDialog _d;
-
+	
 	public static void DisplayUrlHelp(String url)
 	{
 		if (Desktop.isDesktopSupported()) {
@@ -24,11 +28,9 @@ public class GuiHelpAction extends AbstractAction
 				try {
 					desktop.browse(new URI(url));
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					_logger.error("caught unexpected exception", e1);
 				} catch (URISyntaxException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					_logger.error("caught unexpected exception", e1);
 				}
 		}
 

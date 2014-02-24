@@ -11,16 +11,16 @@ import org.morgan.dpage.InjectObject;
 import org.morgan.dpage.InjectionException;
 import org.morgan.dpage.ObjectInjectionHandler;
 
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 class GenesisIIInjectionHandler implements ObjectInjectionHandler, Closeable
 {
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 	private Connection _connection = null;
 
 	private Object getInjectionValue(Class<?> type, InjectObject annotation) throws InjectionException
 	{
-		if (type.equals(DatabaseConnectionPool.class))
+		if (type.equals(ServerDatabaseConnectionPool.class))
 			return _connectionPool;
 		else if (type.equals(Connection.class)) {
 			if (_connection == null) {
@@ -36,7 +36,7 @@ class GenesisIIInjectionHandler implements ObjectInjectionHandler, Closeable
 			throw new InjectionException(String.format("Don't know how to inject into type \"%s\".", type.getName()));
 	}
 
-	GenesisIIInjectionHandler(DatabaseConnectionPool connectionPool)
+	GenesisIIInjectionHandler(ServerDatabaseConnectionPool connectionPool)
 	{
 		_connectionPool = connectionPool;
 	}

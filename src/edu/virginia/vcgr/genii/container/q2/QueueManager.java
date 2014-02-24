@@ -41,7 +41,7 @@ import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InMemoryPersister;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationContainerService;
 import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationPortal;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformationResolver;
 import edu.virginia.vcgr.genii.container.q2.iterator.QueueInMemoryIteratorEntry;
@@ -81,7 +81,7 @@ public class QueueManager implements Closeable
 	/**
 	 * The database connection pool from whence to acquire temporary connections to the database.
 	 */
-	static private DatabaseConnectionPool _connectionPool = null;
+	static private ServerDatabaseConnectionPool _connectionPool = null;
 
 	/**
 	 * A map of queue key to queue manager for all instances running on this container.
@@ -116,7 +116,7 @@ public class QueueManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	static public void startAllManagers(DatabaseConnectionPool connectionPool) throws SQLException, ResourceException
+	static public void startAllManagers(ServerDatabaseConnectionPool connectionPool) throws SQLException, ResourceException
 	{
 		Connection connection = null;
 		Statement stmt = null;
@@ -130,12 +130,8 @@ public class QueueManager implements Closeable
 		}
 
 		try {
-			if (_logger.isDebugEnabled())
-				_logger.debug("acquiring connection from pool...");
 			/* Acquire a new connection to access the database with. */
 			connection = _connectionPool.acquire(true);
-			if (_logger.isDebugEnabled())
-				_logger.debug("acquired connection from pool.");
 
 			/*
 			 * We look through the resources table to find all queueid's indicated. We could equally
@@ -145,12 +141,8 @@ public class QueueManager implements Closeable
 			 * a brand new system (bootstraps) but doesn't clean up the DB from the old one, we may
 			 * have unnecessary queues running, but that is a very unlikely case.
 			 */
-			if (_logger.isDebugEnabled())
-				_logger.debug("running db query for managers...");
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery("SELECT queueid FROM q2resources");
-			if (_logger.isDebugEnabled())
-				_logger.debug("ran db query for managers.");
 
 			while (rs.next()) {
 				/*
@@ -158,20 +150,12 @@ public class QueueManager implements Closeable
 				 * it isn't already.
 				 */
 				String rsName = rs.getString(1);
-				if (_logger.isDebugEnabled())
-					_logger.debug("starting manager called " + rsName + "...");
 				getManager(rsName);
-				if (_logger.isDebugEnabled())
-					_logger.debug("started manager called " + rsName + ".");
 			}
 		} finally {
-			if (_logger.isDebugEnabled())
-				_logger.debug("cleaning up after starting all managers...");
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 			_connectionPool.release(connection);
-			if (_logger.isDebugEnabled())
-				_logger.debug("done cleaning up after starting all managers.");
 		}
 	}
 

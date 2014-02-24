@@ -3,8 +3,8 @@ package edu.virginia.vcgr.genii.container.exportdir;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class SharedExportDirBaseFactory extends BasicDBResourceFactory
@@ -20,7 +20,7 @@ public class SharedExportDirBaseFactory extends BasicDBResourceFactory
 	static private final String _CREATE_EXPORTED_DIR_ATTR_TABLE_STMT = "CREATE TABLE exportedentryattr "
 		+ "(entryid VARCHAR(40) PRIMARY KEY, attr VARCHAR (8192) FOR BIT DATA)";
 
-	protected SharedExportDirBaseFactory(DatabaseConnectionPool pool) throws SQLException
+	protected SharedExportDirBaseFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}

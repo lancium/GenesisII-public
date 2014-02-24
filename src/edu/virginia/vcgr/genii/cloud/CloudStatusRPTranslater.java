@@ -9,7 +9,6 @@ import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 
 public class CloudStatusRPTranslater implements SingleResourcePropertyTranslator
 {
-
 	@Override
 	public <Type> Type deserialize(Class<Type> clazz, MessageElement element) throws ResourcePropertyException
 	{

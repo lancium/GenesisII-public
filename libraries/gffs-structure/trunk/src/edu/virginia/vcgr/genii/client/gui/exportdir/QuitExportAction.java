@@ -11,12 +11,16 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
 public class QuitExportAction extends AbstractAction implements ListSelectionListener
 {
 	static final long serialVersionUID = 0L;
+	static private Log _logger = LogFactory.getLog(QuitExportAction.class);
 
 	static final private String _QUIT_EXPORT_BUTTON = "Stop Exporting";
 
@@ -68,11 +72,9 @@ public class QuitExportAction extends AbstractAction implements ListSelectionLis
 			try {
 				ExportDirState.removeExport(info);
 			} catch (FileLockException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				_logger.error("caught unexpected exception", e1);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				_logger.error("caught unexpected exception", e1);
 			}
 			fireExportsChanged();
 		}

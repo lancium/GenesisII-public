@@ -799,7 +799,7 @@ public class JSDLInterpreter
 							QName childName = elem.getQName();
 							if (childName.equals(HPCConstants.USERNAME_TOKEN_QNAME)) {
 								try {
-									facet.consumeCredential(understanding, new UsernamePasswordIdentity(elem));
+									facet.consumeUsernamePassword(understanding, new UsernamePasswordIdentity(elem));
 								} catch (GeneralSecurityException cause) {
 									throw new InvalidJSDLException("Unable to understand credential element.", cause);
 								}

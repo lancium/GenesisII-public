@@ -90,7 +90,7 @@ import edu.virginia.vcgr.genii.common.IterateHistoryEventsRequestType;
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
 import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.iterator.FileOrDir;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
@@ -382,7 +382,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			/*
 			 * Now we get the database connection pool configured with this service
 			 */
-			DatabaseConnectionPool connectionPool =
+			ServerDatabaseConnectionPool connectionPool =
 				((QueueDBResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory())
 					.getConnectionPool();
 

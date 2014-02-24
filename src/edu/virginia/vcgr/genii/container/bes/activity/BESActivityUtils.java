@@ -101,16 +101,9 @@ public class BESActivityUtils
 			throw new IllegalArgumentException("Couldn't find container ID in creation properties.");
 
 		try {
-			org.apache.axis.message.MessageElement any = properties.getAxisMessageElement(JOB_DEF_QNAME);
+			MessageElement any = properties.getAxisMessageElement(JOB_DEF_QNAME);
 			if (any == null) {
-				String msg = "failure in decoding properties for any object";
-
-				if ((properties.get(JOB_DEF_QNAME) != null)
-					&& !(properties.get(JOB_DEF_QNAME) instanceof org.apache.axis.message.MessageElement)) {
-					// hmmm: fix this.
-					msg = msg.concat("AND IT'S THE WRONG TYPE!!!!  not axis level message elem!!!!");
-				}
-
+				String msg = "failure in decoding properties for 'any' object";
 				_logger.error(msg);
 				throw new RuntimeException(msg);
 			}

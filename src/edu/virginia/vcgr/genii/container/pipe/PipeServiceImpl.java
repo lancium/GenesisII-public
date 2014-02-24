@@ -91,6 +91,7 @@ public class PipeServiceImpl extends GenesisIIBase implements PipePortType
 		super.preDestroy();
 	}
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();

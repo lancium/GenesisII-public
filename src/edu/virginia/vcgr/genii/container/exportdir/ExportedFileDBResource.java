@@ -22,7 +22,7 @@ import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
@@ -118,7 +118,7 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 		}
 	}
 
-	public ExportedFileDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public ExportedFileDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

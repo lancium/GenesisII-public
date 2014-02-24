@@ -321,5 +321,4 @@ public class CopyMachine
 			return PathOutcome.OUTCOME_SUCCESS;
 		}
 	}
-
 }

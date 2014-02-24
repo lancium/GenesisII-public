@@ -10,12 +10,11 @@ import org.junit.Test;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-
-public class TestingHypersonic
+// hmmm: this test class needs to move into gffs-structure to follow database connection pool.
+public class TestingDBConnectionPool
 {
 	static private final int _NUM_ROWS = 1000;
-	static private DatabaseConnectionPool _pool;
+	static private ServerDatabaseConnectionPool _pool;
 
 	@Test
 	public void testNothing()
@@ -56,30 +55,30 @@ public class TestingHypersonic
 		}
 	}
 
-	/* This is for hypersonic */
+	/* This is for hypersonic, which is no longer used. */
 	/*
 	 * static void createConnectionPool() throws Throwable { Properties props = new Properties();
-	 * props.setProperty("edu.virginia.vcgr.genii.container.db.db-class-name",
+	 * props.setProperty("edu.virginia.vcgr.genii.client.db.db-class-name",
 	 * "org.hsqldb.jdbcDriver");
-	 * props.setProperty("edu.virginia.vcgr.genii.container.db.db-connect-string",
+	 * props.setProperty("edu.virginia.vcgr.genii.client.db.db-connect-string",
 	 * "jdbc:hsqldb:file:/home/mmm2a/marks-database/database");
-	 * props.setProperty("edu.virginia.vcgr.genii.container.db.db-user", "sa");
-	 * props.setProperty("edu.virginia.vcgr.genii.container.db.db-password", "");
-	 * props.setProperty("edu.virginia.vcgr.genii.container.db.pool-size", "8");
+	 * props.setProperty("edu.virginia.vcgr.genii.client.db.db-user", "sa");
+	 * props.setProperty("edu.virginia.vcgr.genii.client.db.db-password", "");
+	 * props.setProperty("edu.virginia.vcgr.genii.client.db.pool-size", "8");
 	 * 
 	 * _pool = new HypersonicDatabaseConnectionPool(props); }
 	 */
 	static void createConnectionPool() throws Throwable
 	{
 		Properties props = new Properties();
-		props.setProperty("edu.virginia.vcgr.genii.container.db.db-class-name", "org.apache.derby.jdbc.EmbeddedDriver");
-		props.setProperty("edu.virginia.vcgr.genii.container.db.db-connect-string",
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-class-name", "org.apache.derby.jdbc.EmbeddedDriver");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-connect-string",
 			"jdbc:derby:C:\\marks-database\\database;create=true");
-		props.setProperty("edu.virginia.vcgr.genii.container.db.db-user", "sa");
-		props.setProperty("edu.virginia.vcgr.genii.container.db.db-password", "");
-		props.setProperty("edu.virginia.vcgr.genii.container.db.pool-size", "8");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-user", "sa");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-password", "");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.pool-size", "8");
 
-		_pool = new DatabaseConnectionPool(props);
+		_pool = new ServerDatabaseConnectionPool(props);
 	}
 
 	static public void createTables() throws Throwable

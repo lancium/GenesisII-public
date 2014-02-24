@@ -11,10 +11,10 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 public class PersistentContainerProperties
 {
@@ -28,11 +28,11 @@ public class PersistentContainerProperties
 		return _properties;
 	}
 
-	private DatabaseConnectionPool _pool;
+	private ServerDatabaseConnectionPool _pool;
 
 	private PersistentContainerProperties()
 	{
-		_pool = (DatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
+		_pool = (ServerDatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
 		if (_pool == null)
 			throw new ConfigurationException("Unable to find database connection pool.");
 
@@ -68,7 +68,7 @@ public class PersistentContainerProperties
 				if (blob == null)
 					return null;
 
-				return DBSerializer.fromBlob(rs.getBlob(1));
+				return DBSerializer.fromBlob(blob);
 			} catch (NullPointerException npe) {
 				if (lcv < 4) {
 					// Make another attempt

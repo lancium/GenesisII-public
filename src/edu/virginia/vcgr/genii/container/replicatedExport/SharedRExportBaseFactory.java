@@ -3,8 +3,8 @@ package edu.virginia.vcgr.genii.container.replicatedExport;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class SharedRExportBaseFactory extends BasicDBResourceFactory
@@ -20,7 +20,7 @@ public class SharedRExportBaseFactory extends BasicDBResourceFactory
 	static private final String _CREATE_RESOURCE_TO_RESOLVER_MAPPING_TABLE_STMT = "CREATE TABLE resolvermapping "
 		+ "(resourceEPI VARCHAR(60) PRIMARY KEY, resolverEPI VARCHAR(60), " + "resolverEPR BLOB(2G))";
 
-	protected SharedRExportBaseFactory(DatabaseConnectionPool pool) throws SQLException
+	protected SharedRExportBaseFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}

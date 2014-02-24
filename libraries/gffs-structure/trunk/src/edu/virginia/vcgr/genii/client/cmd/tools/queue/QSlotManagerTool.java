@@ -253,6 +253,7 @@ public class QSlotManagerTool extends BaseGridTool
 	{
 		InputStream in = null;
 		Integer slotCount = null;
+		BufferedReader br = null;
 
 		try {
 			String line;
@@ -260,7 +261,7 @@ public class QSlotManagerTool extends BaseGridTool
 			// open a reader for the pseudo-file for this bes
 			GeniiPath path = new GeniiPath(entry.pwd());
 			in = path.openInputStream();
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			br = new BufferedReader(new InputStreamReader(in));
 
 			// read each line in the file
 			while ((line = br.readLine()) != null) {
@@ -275,6 +276,7 @@ public class QSlotManagerTool extends BaseGridTool
 				}
 			}
 		} finally {
+			StreamUtils.close(br);
 			StreamUtils.close(in);
 		}
 		return slotCount;

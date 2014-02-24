@@ -32,8 +32,8 @@ public class DBSerializer
 
 		try {
 			blob = new SerialBlob(serialize(obj, maxLength));
-			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Created a blob of length %d bytes for %s.%s which has a "
+			if (_logger.isTraceEnabled())
+				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a "
 					+ "max length of %d bytes.", blob.length(), tableName, columnName, maxLength));
 			if (blob.length() > maxLength) {
 				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "
@@ -89,8 +89,8 @@ public class DBSerializer
 
 		byte[] data = baos.toByteArray();
 		if ((maxLength > 0) && (data.length > maxLength)) {
-			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("The blob was too large (%d), we no longer attempt to compress it.", data.length));
+			if (_logger.isTraceEnabled())
+				_logger.trace(String.format("The blob was too large (%d), we no longer attempt to compress it.", data.length));
 		}
 
 		return data;
@@ -158,8 +158,8 @@ public class DBSerializer
 		try {
 			byte[] data = xmlSerialize(obj);
 
-			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Created a blob of length %d bytes for %s.%s which has a "
+			if (_logger.isTraceEnabled())
+				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a "
 					+ "max length of %d bytes.", data.length, tableName, columnName, maxLength));
 			if (data.length > maxLength) {
 				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "

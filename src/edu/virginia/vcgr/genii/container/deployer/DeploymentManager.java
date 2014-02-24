@@ -27,9 +27,9 @@ public class DeploymentManager
 		if (!_baseDirectory.exists())
 			_baseDirectory.mkdirs();
 		if (!_baseDirectory.exists())
-			throw new RuntimeException("Unable to create deploy directory " + _baseDirectory);
+			throw new RuntimeException("Unable to create deployment directory: " + _baseDirectory);
 		if (!_baseDirectory.isDirectory())
-			throw new RuntimeException("Deploy path " + _baseDirectory + " does not seem to be a directory.");
+			throw new RuntimeException("Deployment path '" + _baseDirectory + "' does not seem to be a directory.");
 
 		DeployDatabase database = null;
 		try {
@@ -38,7 +38,7 @@ public class DeploymentManager
 			_knownDeployments = database.getKnownDeployments();
 			database.commit();
 		} catch (Throwable t) {
-			_logger.error("Unable to create deploy database.", t);
+			_logger.error("Unable to create deployment database.", t);
 		} finally {
 			StreamUtils.close(database);
 		}

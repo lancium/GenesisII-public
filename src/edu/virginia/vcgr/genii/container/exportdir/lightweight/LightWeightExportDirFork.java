@@ -18,7 +18,6 @@ import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
-import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.disk.DiskExportEntry;
 import edu.virginia.vcgr.genii.container.iterator.FileOrDir;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
@@ -37,8 +36,8 @@ import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class LightWeightExportDirFork extends AbstractRNSResourceFork implements RNSResourceFork, InMemoryIterableFork,
-	GeniiNoOutCalls
+public class LightWeightExportDirFork extends AbstractRNSResourceFork implements RNSResourceFork, InMemoryIterableFork
+// , GeniiNoOutCalls
 {
 
 	final private VExportDir getTarget() throws IOException

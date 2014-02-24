@@ -71,6 +71,9 @@ public class LogDisplay extends JDialog
 			} catch (Throwable cause) {
 				printer.println("Unable to acquire job's log!\n\n");
 				cause.printStackTrace(printer);
+			} finally {
+				StreamUtils.close(reader);
+				StreamUtils.close(in);
 			}
 
 			printer.close();

@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.context;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,9 +29,10 @@ public class GridUserEnvironment
 		}
 
 		if (ret == null) {
-			ret = new HashMap<String, String>();
+			HashMap<String, String> realRet = new HashMap<String, String>();
 			if (ctxt != null)
-				ctxt.setSingleValueProperty(CALLING_CONTEXT_PROPERTY, (Serializable) ret);
+				ctxt.setSingleValueProperty(CALLING_CONTEXT_PROPERTY, realRet);
+			ret = realRet;
 		}
 
 		return ret;

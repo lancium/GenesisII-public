@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -20,6 +22,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSSpace;
 
 public class CreateRNSRootTool extends BaseGridTool
 {
+	static private Log _logger = LogFactory.getLog(CreateRNSRootTool.class);
+
 	static private final String _DESCRIPTION = "config/tooldocs/description/dcreate-root-rns";
 	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/ucreate-rns-root";
 
@@ -83,7 +87,10 @@ public class CreateRNSRootTool extends BaseGridTool
 		ICallingContext ctxt = ContextManager.bootstrap(root);
 		DeploymentName deploymentName = new DeploymentName();
 		ConnectTool.connect(ctxt, deploymentName);
-		stdout.println("Storing configuration to \"" + filename + "\".");
+		String msg = "Storing configuration to \"" + filename + "\".";
+		stdout.println(msg);
+		_logger.info(msg);
+
 		ContextFileSystem.store(new File(filename), null, ctxt);
 	}
 }

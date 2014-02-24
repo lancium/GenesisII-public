@@ -162,7 +162,7 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		EndpointReferenceType certificateOwnerEPR =
 			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (certificateOwnerEPR == null) {
-			org.apache.axis.message.MessageElement certificateOwner =
+			MessageElement certificateOwner =
 				constructionParameters.getAxisMessageElement(STSConfigurationProperties.CERTIFICATE_OWNER_EPR);
 			if (certificateOwner != null) {
 				try {
@@ -178,7 +178,7 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, certificateOwnerEPR);
 			try {
 				GetResourcePropertyResponse response = common.getResourceProperty(SecurityConstants.CERTIFICATE_CHAIN_QNAME);
-				MessageElement property = response.get_any()[0];
+				MessageElement property = new MessageElement(response.get_any()[0]);
 				X509Certificate[] certificate =
 					(X509Certificate[]) CommonSTSAttributesHandler.deserializeObjectFromString(property.getValue());
 				constructionParameters.put(IResource.DUPLICATED_CERTIFICATE_PARAM, certificate);
@@ -292,7 +292,7 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 
 		EndpointReferenceType primaryEPR =
 			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
-		org.apache.axis.message.MessageElement isReplica =
+		MessageElement isReplica =
 			constructionParameters.getAxisMessageElement(STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM);
 		boolean skipPostCreateOverride =
 			primaryEPR != null || (isReplica != null && "TRUE".equalsIgnoreCase(isReplica.getValue()));
@@ -379,8 +379,7 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				filteredPropertyList.add(property);
 			}
 		}
-		return new GetResourcePropertyDocumentResponse(filteredPropertyList.toArray(new MessageElement[filteredPropertyList
-			.size()]));
+		return new GetResourcePropertyDocumentResponse(filteredPropertyList.toArray(new MessageElement[filteredPropertyList.size()]));
 	}
 
 	public static class CommonSTSPropertiesRetriever implements STSResourcePropertiesRetriever

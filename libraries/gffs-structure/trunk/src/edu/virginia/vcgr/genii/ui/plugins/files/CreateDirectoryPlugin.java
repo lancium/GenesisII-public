@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.ui.plugins.files;
 import java.io.Closeable;
 import java.util.Collection;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -26,6 +28,8 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 
 public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 {
+	static private Log _logger = LogFactory.getLog(CreateDirectoryPlugin.class);
+
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
@@ -54,8 +58,7 @@ public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 		} catch (RNSPathDoesNotExistException e) {
 			e.printStackTrace();
 		} catch (FileLockException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			_logger.error("caught unexpected exception", e);
 		}
 
 		if (contextToken == null) {

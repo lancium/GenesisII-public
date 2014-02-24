@@ -10,7 +10,7 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -19,7 +19,7 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 	static final public String IS_ACCEPTING_NEW_ACTIVITIES_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.q2.resource.is-accepting-new-activities";
 
-	public QueueDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public QueueDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

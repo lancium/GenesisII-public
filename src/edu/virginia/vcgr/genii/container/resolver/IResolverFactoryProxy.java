@@ -16,8 +16,9 @@ package edu.virginia.vcgr.genii.container.resolver;
 
 import java.rmi.RemoteException;
 import java.util.Properties;
-import org.ws.addressing.EndpointReferenceType;
+
 import org.apache.axis.message.MessageElement;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.resolver.InvalidWSNameFaultType;

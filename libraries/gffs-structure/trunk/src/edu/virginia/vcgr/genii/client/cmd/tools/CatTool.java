@@ -54,6 +54,7 @@ public class CatTool extends BaseGridTool
 				stdout.flush();
 			}
 		} finally {
+			StreamUtils.close(reader);
 			StreamUtils.close(in);
 		}
 	}

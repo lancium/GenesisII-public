@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.logging;
 
 import java.sql.Blob;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.xml.soap.SOAPException;
@@ -20,7 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.logging.DLogConstants;
+import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.client.db.LogDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.common.LogEntryType;
@@ -29,13 +30,14 @@ import edu.virginia.vcgr.genii.common.RPCMetadataType;
 
 public class DLogDatabase
 {
-	@SuppressWarnings("unused")
-	static private Log _logger = LogFactory.getLog(DLogDatabase.class);
+	private static Log _logger = LogFactory.getLog(DLogDatabase.class);
 
 	private static final int MAX_IDLE_CONNECTIONS = 3;
 
 	protected ArrayList<Connection> connections = new ArrayList<Connection>();
 	protected static ArrayList<DLogDatabase> connectors = new ArrayList<DLogDatabase>();
+
+	protected LogDatabaseConnectionPool pool;
 
 	protected String dbUrl;
 	protected String dbUser;
@@ -63,10 +65,11 @@ public class DLogDatabase
 
 	public static DLogDatabase getLocalConnector()
 	{
-		if (!connectors.isEmpty())
+		if (!connectors.isEmpty()) {
 			return connectors.get(0);
-		else
+		} else {
 			return null;
+		}
 	}
 
 	public DLogDatabase()
@@ -83,8 +86,31 @@ public class DLogDatabase
 		metadataTable = _metadataTable;
 		hierarchyTable = _hierarchyTable;
 
+		initDatabase();
 		initQueries();
 		connectors.add(this);
+	}
+
+	protected void initDatabase()
+	{
+		try {
+			Properties props = new Properties();
+			DatabaseConnectionPool.DBPropertyNames names = new DatabaseConnectionPool.DBPropertyNames();
+			props.setProperty(names._DB_CONNECT_STRING_PROPERTY, dbUrl);
+			props.setProperty(names._DB_USER_PROPERTY, dbUser);
+			props.setProperty(names._DB_PASSWORD_PROPERTY, dbPass);
+			props.setProperty(DLogConstants._DB_ENTRY_TABLE_PROPERTY, entryTable);
+			props.setProperty(DLogConstants._DB_METADATA_TABLE_PROPERTY, metadataTable);
+			props.setProperty(DLogConstants._DB_HIERARCHY_TABLE_PROPERTY, hierarchyTable);
+			pool = new LogDatabaseConnectionPool(props);
+
+		} catch (IllegalAccessException e) {
+			_logger.error("caught unexpected exception (a)", e);
+		} catch (ClassNotFoundException e) {
+			_logger.error("caught unexpected exception (b)", e);
+		} catch (InstantiationException e) {
+			_logger.error("caught unexpected exception (c)", e);
+		}
 	}
 
 	protected void initQueries()
@@ -92,18 +118,18 @@ public class DLogDatabase
 		hierarchySql =
 			"INSERT INTO " + hierarchyTable + " (" + DLogConstants.DLOG_HIERARCHY_CHILD + ", "
 				+ DLogConstants.DLOG_HIERARCHY_PARENT + ", " + DLogConstants.DLOG_HIERARCHY_DATE + ") "
-				+ "VALUES (?, ?, NOW());";
+				+ "VALUES (?, ?, CURRENT_TIMESTAMP)";
 
 		metadataSql1 =
 			"INSERT INTO " + metadataTable + " (" + DLogConstants.DLOG_METADATA_RPCID + ", "
 				+ DLogConstants.DLOG_METADATA_DATE_SENT + ", " + DLogConstants.DLOG_METADATA_EPR + ", "
 				+ DLogConstants.DLOG_METADATA_REQUEST + ", " + DLogConstants.DLOG_METADATA_OP_NAME + ") "
-				+ "VALUES (?, NOW(), ?, ?, ?);";
+				+ "VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)";
 
 		metadataSql2 =
 			"UPDATE " + metadataTable + " SET " + DLogConstants.DLOG_METADATA_RPCID + " = ?, "
-				+ DLogConstants.DLOG_METADATA_DATE_RCVD + " = NOW(), " + DLogConstants.DLOG_METADATA_RESPONSE + " = ? "
-				+ "WHERE " + DLogConstants.DLOG_METADATA_RPCID + " = ?";
+				+ DLogConstants.DLOG_METADATA_DATE_RCVD + " = CURRENT_TIMESTAMP, " + DLogConstants.DLOG_METADATA_RESPONSE
+				+ " = ? " + "WHERE " + DLogConstants.DLOG_METADATA_RPCID + " = ?";
 
 		selectEPR =
 			"SELECT " + DLogConstants.DLOG_METADATA_EPR + " FROM " + metadataTable + " WHERE "
@@ -130,15 +156,18 @@ public class DLogDatabase
 		insertCmd =
 			"INSERT INTO " + metadataTable + " ( " + DLogConstants.DLOG_METADATA_RPCID + ", "
 				+ DLogConstants.DLOG_METADATA_OP_NAME + ", " + DLogConstants.DLOG_METADATA_DATE_SENT + " ) "
-				+ " VALUES (?, ?, NOW())";
+				+ " VALUES (?, ?, CURRENT_TIMESTAMP)";
 	}
 
 	public Connection getConnection() throws SQLException
 	{
-		if (connections.isEmpty())
-			return DriverManager.getConnection(dbUrl, dbUser, dbPass);
-		else
-			return connections.remove(0);
+		synchronized (connections) {
+			if (connections.isEmpty()) {
+				return pool.acquire(true);
+			} else {
+				return connections.remove(0);
+			}
+		}
 	}
 
 	public Collection<LogEntryType> selectLogs(String rpcID) throws SQLException
@@ -269,7 +298,6 @@ public class DLogDatabase
 			closeConnection(con);
 		}
 		return ret;
-
 	}
 
 	public Map<String, Collection<RPCCallerType>> selectChildren(String rpcID) throws SQLException, ResourceException
@@ -409,16 +437,22 @@ public class DLogDatabase
 
 	protected void closeConnection(Connection con)
 	{
+		if (con == null)
+			return;
+
 		try {
 			// just in case
 			con.commit();
 		} catch (SQLException e) {
+			// don't really care
 		}
 
-		if (connections.size() >= MAX_IDLE_CONNECTIONS) {
-			StreamUtils.close(con);
-		} else {
-			connections.add(con);
+		synchronized (connections) {
+			if (connections.size() >= MAX_IDLE_CONNECTIONS) {
+				StreamUtils.close(con);
+			} else {
+				connections.add(con);
+			}
 		}
 	}
 

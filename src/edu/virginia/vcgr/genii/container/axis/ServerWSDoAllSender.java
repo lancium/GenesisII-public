@@ -31,7 +31,6 @@ import java.security.cert.Certificate;
 import java.security.PrivateKey;
 import java.util.Vector;
 import java.util.Iterator;
-
 import java.io.IOException;
 
 import javax.security.auth.callback.Callback;

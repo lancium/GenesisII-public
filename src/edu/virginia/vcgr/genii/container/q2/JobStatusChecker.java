@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.logging.LoggingContext;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 /**
  * This is the asynchronous worker class that periodically checks the status of running jobs on a
@@ -22,7 +22,7 @@ public class JobStatusChecker
 	static private Log _logger = LogFactory.getLog(JobStatusChecker.class);
 
 	volatile private boolean _closed = false;
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 	private JobManager _manager;
 	private long _updateFrequency; // provided by caller for the slower status checking interval.
 	private int STATUS_THREAD_PERIOD = 5 * 1000; // notified status update checking interval, in
@@ -30,7 +30,7 @@ public class JobStatusChecker
 	// tracks when the next long running status check should occur.
 	private volatile Calendar _nextSlowCheck;
 
-	public JobStatusChecker(DatabaseConnectionPool connectionPool, JobManager manager, long updateFrequency)
+	public JobStatusChecker(ServerDatabaseConnectionPool connectionPool, JobManager manager, long updateFrequency)
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("creating JobStatusChecker object.");

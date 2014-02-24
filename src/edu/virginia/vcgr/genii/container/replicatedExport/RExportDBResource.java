@@ -38,7 +38,7 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.byteio.IRByteIOResource;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -102,7 +102,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	/* clear rexport given parentIds */
 	static private final String _DESTROY_ALL_DIRS_FOR_PARENT_STMT = "DELETE FROM rexport WHERE parentIds LIKE ?";
 
-	public RExportDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public RExportDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

@@ -1,7 +1,5 @@
 package edu.virginia.vcgr.genii.client.common;
 
-import java.io.IOException;
-import java.io.ObjectStreamException;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
@@ -15,9 +13,7 @@ public class GenesisHashMap extends HashMap<QName, Object>
 	 * this is intentionally incompatible with hashmap, since we don't want to directly serialize
 	 * these objects as part of ensuring db compatibility.
 	 */
-	// private static final long serialVersionUID = 23L;
-	// hmmm: temp being same as hashmap for debug.
-	private static final long serialVersionUID = 362498820763181265L;
+	private static final long serialVersionUID = 23L;
 
 	private static Log _logger = LogFactory.getLog(GenesisHashMap.class);
 
@@ -78,29 +74,5 @@ public class GenesisHashMap extends HashMap<QName, Object>
 			_logger.error(msg);
 			throw new RuntimeException(msg);
 		}
-	}
-
-	// serialization override functions to catch when this object is being misused.
-
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
-	{
-		String msg = "into writeObject for GenesisHashMap class; fail!";
-		_logger.error(msg);
-		throw new RuntimeException(msg);
-	}
-
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
-	{
-		String msg = "into readObject for GenesisHashMap class; fail!";
-		_logger.error(msg);
-		throw new RuntimeException(msg);
-	}
-
-	// hmmm: public only to shut warnings up.
-	public void readObjectNoData() throws ObjectStreamException
-	{
-		String msg = "into readObjectNoData for GenesisHashMap class; fail!";
-		_logger.error(msg);
-		throw new RuntimeException(msg);
 	}
 }

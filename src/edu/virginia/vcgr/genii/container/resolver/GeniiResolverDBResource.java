@@ -15,7 +15,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -34,7 +34,7 @@ public class GeniiResolverDBResource extends BasicDBResource implements IGeniiRe
 	static private final String _GET_ALL_ENTRIES_STMT = "SELECT epi, targetid, endpoint from resolverentries "
 		+ "WHERE resourceid = ?";
 
-	public GeniiResolverDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public GeniiResolverDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

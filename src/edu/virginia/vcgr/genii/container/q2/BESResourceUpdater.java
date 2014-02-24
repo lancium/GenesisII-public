@@ -7,7 +7,7 @@ import java.sql.Connection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 /**
  * This class is a worker class that is used by the BESResourceManager to automatically update the
@@ -20,11 +20,11 @@ public class BESResourceUpdater implements Closeable
 	static private Log _logger = LogFactory.getLog(BESResourceUpdater.class);
 
 	volatile private boolean _closed = false;
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 	private BESManager _manager;
 	private long _updateFrequency;
 
-	public BESResourceUpdater(DatabaseConnectionPool connectionPool, BESManager manager, long updateFrequency)
+	public BESResourceUpdater(ServerDatabaseConnectionPool connectionPool, BESManager manager, long updateFrequency)
 	{
 		_connectionPool = connectionPool;
 		_manager = manager;

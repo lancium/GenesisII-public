@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -17,7 +17,7 @@ public class DBSubscriptionResource extends BasicDBResource
 		super(key, connection);
 	}
 
-	public DBSubscriptionResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public DBSubscriptionResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

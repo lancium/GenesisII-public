@@ -25,12 +25,12 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.byteio.ByteIOFileCreator;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 
 class PersistentOutcallDatabase
 {

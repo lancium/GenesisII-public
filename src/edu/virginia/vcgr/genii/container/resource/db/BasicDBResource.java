@@ -38,7 +38,7 @@ import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionsDatabase;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 
@@ -58,7 +58,7 @@ public class BasicDBResource implements IResource
 
 	static private Log _logger = LogFactory.getLog(BasicDBResource.class);
 
-	protected DatabaseConnectionPool _connectionPool;
+	protected ServerDatabaseConnectionPool _connectionPool;
 	protected Connection _connection;
 	protected String _resourceKey;
 	protected ResourceKey _parentKey;
@@ -71,7 +71,7 @@ public class BasicDBResource implements IResource
 		_connectionPool = null;
 	}
 
-	public BasicDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public BasicDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		_parentKey = parentKey;
 		_connectionPool = connectionPool;

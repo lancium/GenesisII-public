@@ -15,7 +15,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.apache.axis.Constants;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.w3c.dom.Element;
 
@@ -24,6 +25,8 @@ import javax.xml.soap.SOAPElement;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
+//hmmm: fix extra loggings that got added here.
+
 /**
  * Converts Java Objects to DOM Elements and SOAP Elements. The objects must be compliant with the
  * Axis Bean model, i.e. generated using the WSDL2Java tool from an XML Schema definition or must be
@@ -31,6 +34,8 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
  */
 public class ObjectSerializer
 {
+	static private Log _logger = LogFactory.getLog(ObjectSerializer.class);
+
 	public static SOAPElement toSOAPElement(Object obj) throws ResourceException
 	{
 		return toSOAPElement(obj, null, false);
@@ -56,6 +61,8 @@ public class ObjectSerializer
 	public static SOAPElement toSOAPElement(Object obj, QName name, boolean nillable) throws ResourceException
 	{
 		if (obj instanceof org.apache.axis.message.MessageElement) {
+			_logger.debug("seeing axis message element for soap.");
+
 			org.apache.axis.message.MessageElement element = (org.apache.axis.message.MessageElement) obj;
 			if (name == null || name.equals(element.getQName())) {
 				return element;
@@ -63,6 +70,8 @@ public class ObjectSerializer
 				throw new ResourceException("Not Implemented.");
 			}
 		} else if (obj instanceof Element) {
+			_logger.debug("seeing basic element for soap.");
+
 			Element element = (Element) obj;
 			if (name == null
 				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(
@@ -86,6 +95,8 @@ public class ObjectSerializer
 		}
 		if (obj == null && nillable) {
 			try {
+				_logger.debug("seeing null object for soap!");
+
 				messageElement.addAttribute(Constants.NS_PREFIX_SCHEMA_XSI, Constants.URI_DEFAULT_SCHEMA_XSI, "nil", "true");
 			} catch (Exception e) {
 				throw new ResourceException("Generic Serialization Error.", e);
@@ -112,6 +123,9 @@ public class ObjectSerializer
 				Element element = null;
 				try {
 					element = AnyHelper.toElement(messageElement);
+
+					_logger.debug("created from axis msg element for toElem.");
+
 				} catch (Exception e) {
 					throw new ResourceException("Generic Serialization Error.", e);
 				}
@@ -124,6 +138,9 @@ public class ObjectSerializer
 			if (name == null
 				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(
 					element.getNamespaceURI()))) {
+
+				_logger.debug("created from basic element for toElem.");
+
 				return element;
 			} else {
 				throw new ResourceException("Not Implemented.");
@@ -170,7 +187,7 @@ public class ObjectSerializer
 		SOAPElement soapElement = ObjectSerializer.toSOAPElement(obj, name, nillable);
 
 		if (soapElement == null) {
-			// _logger.error("caught a null soap element trying to serialize!");
+			_logger.error("caught a null soap element trying to serialize!");
 		}
 		try {
 			AnyHelper.write(writer, (org.apache.axis.message.MessageElement) soapElement);

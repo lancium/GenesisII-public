@@ -24,11 +24,11 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
@@ -40,7 +40,7 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 		+ "besid VARCHAR(256) NOT NULL PRIMARY KEY," + "userloggedinaction VARCHAR(64) NOT NULL,"
 		+ "screensaverinactiveaction VARCHAR(64) NOT NULL)" };
 
-	public DBBESResourceFactory(DatabaseConnectionPool pool) throws SQLException
+	public DBBESResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}

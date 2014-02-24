@@ -136,8 +136,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	{
 		IResource resource;
 		try {
-			// hmmm: clean logging
-			_logger.debug("about to dereference " + ResourceManager.getCurrentResource().getResourceKey());
 			resource = ResourceManager.getCurrentResource().dereference();
 		} catch (Throwable e) {
 			String msg = "failure to dereference resource: " + e.getMessage();
@@ -206,17 +204,24 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			performAuthz();
 
 		} catch (AxisFault e) {
-			// re-throw and also hit the finally clause to decrement concurrency counter.
-			String msg = "An AxisFault occurred during authorization: " + e.getMessage();
-			_logger.error(msg);
-			if (_logger.isDebugEnabled()) {
-				_logger.error("AxisFault full trace: ", e);
+			if (e instanceof PermissionDeniedException) {
+				// print a much calmer report of this fault, since we know exactly what happened.
+				PermissionDeniedException pde = (PermissionDeniedException) e;
+				_logger.error("access denied for method '" + PermissionDeniedException.extractMethodName(pde.getMessage())
+					+ "' on asset: " + PermissionDeniedException.extractAssetDenied(pde.getMessage()));
+			} else {
+				// re-throw and also hit the finally clause to decrement concurrency counter.
+				String msg = "An AxisFault occurred during authorization: " + e.getMessage();
+				_logger.error(msg);
+				if (_logger.isDebugEnabled()) {
+					_logger.error("AxisFault full trace: ", e);
+				}
+				throw e;
 			}
-			throw e;
 		} catch (Throwable e) {
 			// wrap this exception and re-throw.
 			String msg = "An exception occurred during authorization: " + e.getMessage();
-			_logger.error(msg);
+			_logger.error(msg, e);
 			throw new AxisFault(msg, e);
 		} finally {
 			synchronized (_concurrentCalls) {
@@ -484,6 +489,10 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	@SuppressWarnings("unchecked")
 	protected void performAuthz() throws AxisFault
 	{
+		boolean accessOkay = false;  // assume access is disallowed until proven otherwise.
+		IResource resource = null;  // the resource in question.
+		Method operation = null;  // the method being called on the resource.
+		
 		try {
 			// Grab working and message contexts
 			WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
@@ -587,27 +596,22 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			ServiceDesc serviceDescription = desc.getParent();
 			if (serviceDescription != null && (serviceDescription instanceof JavaServiceDesc))
 				jDesc = (JavaServiceDesc) serviceDescription;
-			Method operation = desc.getMethod();
+			operation = desc.getMethod();
 			if (_logger.isDebugEnabled())
 				_logger.debug("client invokes " + operation.getDeclaringClass().getName() + "." + operation.getName() + "()");
 
 			// Get the resource's authz handler
-			IResource resource = ResourceManager.getCurrentResource().dereference();
+			resource = ResourceManager.getCurrentResource().dereference();
 			IAuthZProvider authZHandler =
 				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 
 			// Let the authZ handler make the decision.
-			boolean accessOkay =
+			accessOkay =
 				authZHandler.checkAccess(authenticatedCallerCreds, resource, (jDesc == null) ? operation.getDeclaringClass()
 					: jDesc.getImplClass(), operation);
 
 			if (accessOkay) {
 				resource.commit();
-			} else {
-				PermissionDeniedException temp =
-					new PermissionDeniedException(operation.getName(), ResourceManager.getResourceName(resource));
-				_logger.error("failed to check access: " + temp.getMessage());
-				throw new AxisFault(temp.getMessage());
 			}
 		} catch (IOException e) {
 			_logger.error("failing request due to: " + e.getMessage());
@@ -615,6 +619,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		} catch (GeneralSecurityException e) {
 			_logger.error("failing request due to: " + e.getMessage());
 			throw new AxisFault(e.getMessage(), e);
+		}
+		if (!accessOkay) {
+			PermissionDeniedException fault =
+				new PermissionDeniedException(operation.getName(), ResourceManager.getResourceName(resource));
+			_logger.error("failed to check access: " + fault.getMessage());
+			throw fault;
 		}
 	}
 

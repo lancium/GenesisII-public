@@ -12,7 +12,7 @@ import org.morgan.util.io.StreamUtils;
 
 public class TestDerbyTimestamps
 {
-	static private DatabaseConnectionPool _pool;
+	static private ServerDatabaseConnectionPool _pool;
 
 	static public void setUp() throws Throwable
 	{
@@ -68,14 +68,14 @@ public class TestDerbyTimestamps
 	static void createConnectionPool() throws Throwable
 	{
 		Properties props = new Properties();
-		props.setProperty("edu.virginia.vcgr.genii.container.db.db-class-name", "org.apache.derby.jdbc.EmbeddedDriver");
-		props.setProperty("edu.virginia.vcgr.genii.container.db.db-connect-string",
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-class-name", "org.apache.derby.jdbc.EmbeddedDriver");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-connect-string",
 			"jdbc:derby:/Users/morgan/test-database;create=true");
-		props.setProperty("edu.virginia.vcgr.genii.container.db.db-user", "sa");
-		props.setProperty("edu.virginia.vcgr.genii.container.db.db-password", "");
-		props.setProperty("edu.virginia.vcgr.genii.container.db.pool-size", "8");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-user", "sa");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-password", "");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.pool-size", "8");
 
-		_pool = new DatabaseConnectionPool(props);
+		_pool = new ServerDatabaseConnectionPool(props);
 	}
 
 	static public void createTables() throws Throwable

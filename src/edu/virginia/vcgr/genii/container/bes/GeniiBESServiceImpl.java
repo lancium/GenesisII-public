@@ -92,7 +92,7 @@ import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 import edu.virginia.vcgr.genii.container.cservices.history.InMemoryHistoryEventSink;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
@@ -186,7 +186,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			/*
 			 * Now we get the database connection pool configured with this service
 			 */
-			DatabaseConnectionPool connectionPool =
+			ServerDatabaseConnectionPool connectionPool =
 				((DBBESResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory())
 					.getConnectionPool();
 

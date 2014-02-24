@@ -48,9 +48,9 @@ public class CommonDataStagingFacet extends DefaultDataStagingFacet
 	}
 
 	@Override
-	public void consumeCredential(Object currentUnderstanding, UsernamePasswordIdentity upi) throws JSDLException
+	public void consumeUsernamePassword(Object currentUnderstanding, UsernamePasswordIdentity upi) throws JSDLException
 	{
-		((DataStagingUnderstanding) currentUnderstanding).setCredential(upi);
+		((DataStagingUnderstanding) currentUnderstanding).setUsernamePassword(upi);
 	}
 
 	@Override

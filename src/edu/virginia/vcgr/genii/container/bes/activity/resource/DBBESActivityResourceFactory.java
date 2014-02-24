@@ -19,10 +19,10 @@ import java.sql.SQLException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
@@ -46,7 +46,7 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 		"CREATE INDEX besactivityfaultsindex ON besactivityfaultstable(besactivityid)",
 		"CREATE INDEX besactivitiestableindex ON besactivitiestable(besid)" };
 
-	public DBBESActivityResourceFactory(DatabaseConnectionPool pool) throws SQLException
+	public DBBESActivityResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}

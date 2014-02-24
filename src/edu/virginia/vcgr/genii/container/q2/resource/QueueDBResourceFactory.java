@@ -6,8 +6,8 @@ import java.sql.SQLException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -47,7 +47,7 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 	// a command that will add newer rpcid field to the queue jobs table structure.
 	static private final String _ADD_RPC_ID_COLUMN = "ALTER TABLE q2jobs ADD COLUMN rpcid VARCHAR(256)";
 
-	public QueueDBResourceFactory(DatabaseConnectionPool pool) throws SQLException
+	public QueueDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		super(pool);
 	}
@@ -76,7 +76,7 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 		}
 	}
 
-	public DatabaseConnectionPool getConnectionPool()
+	public ServerDatabaseConnectionPool getConnectionPool()
 	{
 		return _pool;
 	}

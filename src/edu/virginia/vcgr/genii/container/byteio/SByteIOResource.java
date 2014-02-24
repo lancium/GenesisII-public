@@ -8,7 +8,7 @@ import javax.xml.namespace.QName;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public class SByteIOResource extends RByteIOResource implements ISByteIOResource
@@ -16,7 +16,7 @@ public class SByteIOResource extends RByteIOResource implements ISByteIOResource
 	static public QName MUST_DESTROY_PROPERTY = new QName(GenesisIIConstants.GENESISII_NS, "must-destroy");
 	static private final String _INTERNAL_MUST_DESTROY_PROPERTY = "edu.virginia.vcgr.genii.byteio.sbyteio.must-destroy";
 
-	public SByteIOResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public SByteIOResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}

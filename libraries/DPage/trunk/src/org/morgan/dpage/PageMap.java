@@ -32,10 +32,13 @@ public class PageMap
 		_baseResourcePath = baseResourcePath;
 
 		InputStream in = null;
+		BufferedReader reader = null;
+		String failureLine = "";
+
 		try {
 			in = _loader.getResourceAsStream(String.format("%s/%s", _baseResourcePath, PAGE_MAP_FILENAME));
 			if (in != null) {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+				reader = new BufferedReader(new InputStreamReader(in));
 				String line;
 
 				while ((line = reader.readLine()) != null) {
@@ -48,8 +51,8 @@ public class PageMap
 
 					Matcher matcher = LINE_PATTERN.matcher(line);
 					if (!matcher.matches()) {
-						reader.close();
-						throw new IOException(String.format("Unable to parse page map line \"%s\".", line));
+						failureLine = line;
+						break;
 					}
 
 					String pageName = matcher.group(1);
@@ -65,8 +68,14 @@ public class PageMap
 		} catch (ClassNotFoundException cnfe) {
 			throw new IOException("Unable to find dynamic page class.", cnfe);
 		} finally {
+			StreamUtils.close(reader);
 			StreamUtils.close(in);
 		}
+
+		if (!failureLine.equals("")) {
+			throw new IOException(String.format("Unable to parse page map line \"%s\".", failureLine));
+		}
+
 	}
 
 	public DynamicPage loadPage(String pageName) throws IOException

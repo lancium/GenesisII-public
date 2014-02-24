@@ -23,8 +23,8 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 
 public class DeployDatabase implements Closeable
 {
@@ -60,7 +60,7 @@ public class DeployDatabase implements Closeable
 		+ "USE_COUNT = (" + "(SELECT USE_COUNT FROM DEPLOYMENTS WHERE INSTANCE_ID = ?)" + " + ?) WHERE INSTANCE_ID = ?";
 	static private final String _GET_DIRECTORY_TEXT = "SELECT DIRECTORY_NAME FROM DEPLOYMENTS WHERE INSTANCE_ID = ?";
 
-	static private DatabaseConnectionPool _pool = null;
+	static private ServerDatabaseConnectionPool _pool = null;
 
 	private Connection _connection = null;
 
@@ -275,7 +275,7 @@ public class DeployDatabase implements Closeable
 		}
 	}
 
-	static private DatabaseConnectionPool getConnectionPool()
+	static private ServerDatabaseConnectionPool getConnectionPool()
 	{
 		XMLConfiguration xmlConf = ConfigurationManager.getCurrentConfiguration().getContainerConfiguration();
 		Properties properties = (Properties) xmlConf.retrieveSection(_CONFIGURATION_SECTION);
@@ -283,12 +283,12 @@ public class DeployDatabase implements Closeable
 		return getConnectionPool(instanceName);
 	}
 
-	static private DatabaseConnectionPool getConnectionPool(String poolName)
+	static private ServerDatabaseConnectionPool getConnectionPool(String poolName)
 	{
-		DatabaseConnectionPool pool = null;
+		ServerDatabaseConnectionPool pool = null;
 		Object obj = NamedInstances.getServerInstances().lookup(poolName);
 		if (obj != null) {
-			pool = (DatabaseConnectionPool) obj;
+			pool = (ServerDatabaseConnectionPool) obj;
 			return pool;
 		}
 

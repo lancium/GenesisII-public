@@ -64,18 +64,18 @@ public class DLogContextCreator extends WSDoAllReceiver
 			LoggingContext.adoptNewContext();
 			String rpcid = DLogUtils.getRPCID();
 
-			_logger.debug("Received a request. RPCID is " + rpcid);
+			_logger.trace("Received a request. RPCID is " + rpcid);
 		} else {
 			try {
 				String rpcid = DLogUtils.getRPCID();
 
-				_logger.debug("Sending a response for " + rpcid);
+				_logger.trace("Sending a response for " + rpcid);
 
 				SOAPHeaderElement rpcidElement = new SOAPHeaderElement(GenesisIIConstants.RPC_ID_QNAME, rpcid);
 
 				msgContext.getMessage().getSOAPHeader().addChildElement(rpcidElement);
 			} catch (SOAPException e) {
-				e.printStackTrace();
+				_logger.debug("Problem getting rpcid from SOAP header", e);
 			} finally {
 				// Discard the context for the RPC
 				LoggingContext.releaseCurrentLoggingContext();

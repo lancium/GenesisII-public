@@ -18,7 +18,6 @@ import java.rmi.RemoteException;
 import java.util.Properties;
 
 import org.apache.axis.message.MessageElement;
-
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;

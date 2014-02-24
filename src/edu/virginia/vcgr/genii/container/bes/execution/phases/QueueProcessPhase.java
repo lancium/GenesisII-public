@@ -265,7 +265,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		try {
 			NativeQueueConfiguration conf = _constructionParameters.getNativeQueueConfiguration();
 			if (conf == null)
-				throw new RuntimeException("Unable to acquire connection to native queue -- no queue defined.");
+				throw new RuntimeException("Unable to acquire connection to native queue; no queue defined.");
 
 			return conf.connect(_constructionParameters.getResourceOverrides(),
 				_constructionParameters.getCmdLineManipulatorConfiguration(), workingDirectory);

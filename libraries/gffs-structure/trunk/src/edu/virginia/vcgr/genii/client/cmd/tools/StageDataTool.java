@@ -117,18 +117,18 @@ public class StageDataTool extends BaseGridTool
 		return 0;
 	}
 
-	private void stageIN(String target, URI source, UsernamePasswordIdentity credential)
+	private void stageIN(String target, URI source, UsernamePasswordIdentity upi)
 	{
 		File fTarget = new File(target);
 		try {
-			URIManager.get(source, fTarget, credential);
+			URIManager.get(source, fTarget, upi);
 		} catch (IOException e) {
 			stdout.println("Unable to stage in file");
 			return;
 		}
 	}
 
-	private void stageOUT(String source, URI target, UsernamePasswordIdentity credential)
+	private void stageOUT(String source, URI target, UsernamePasswordIdentity upi)
 	{
 		File fSource = new File(source);
 
@@ -138,7 +138,7 @@ public class StageDataTool extends BaseGridTool
 		}
 
 		try {
-			URIManager.put(fSource, target, credential);
+			URIManager.put(fSource, target, upi);
 		} catch (Throwable cause) {
 			stdout.println("Unable to stage out data");
 			return;

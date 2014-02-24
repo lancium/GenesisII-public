@@ -55,12 +55,6 @@ public class XSEDELoginTool extends BaseLoginTool
 		BaseLoginTool.copyCreds(this, mpTool);
 		mpTool.run(stdout, stderr, stdin);
 
-		// need to disconnect.
-		// mpTool.
-
-		// update calling context since we just replaced our TLS certificate.
-		// didn't help callContext = ContextManager.getCurrentContext();
-
 		// Do a normal login
 		LoginTool lTool = new LoginTool();
 		// trying to use the myproxy creds! which is what we need!

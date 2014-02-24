@@ -17,5 +17,5 @@ public interface DataStagingFacet extends PersonalityFacet
 
 	public void consumeDeleteOnTerminateFlag(Object currentUnderstanding, boolean deleteOnTerminate) throws JSDLException;
 
-	public void consumeCredential(Object currentUnderstanding, UsernamePasswordIdentity upi) throws JSDLException;
+	public void consumeUsernamePassword(Object currentUnderstanding, UsernamePasswordIdentity upi) throws JSDLException;
 }

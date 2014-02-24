@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.replicatedExport;
 
 import java.rmi.RemoteException;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
@@ -41,6 +42,7 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl implements R
 {
 	static private Log _logger = LogFactory.getLog(RExportFileServiceImpl.class);
 
+	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
@@ -135,6 +137,7 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl implements R
 		throw new RemoteException("lookup operation not supported in replicated export");
 	}
 
+	@Override
 	protected Object translateConstructionParameter(MessageElement parameter) throws Exception
 	{
 		QName messageName = parameter.getQName();

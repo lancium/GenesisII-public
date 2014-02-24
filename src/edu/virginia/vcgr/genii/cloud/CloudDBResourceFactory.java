@@ -3,13 +3,13 @@ package edu.virginia.vcgr.genii.cloud;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 public class CloudDBResourceFactory
 {
 
-	private DatabaseConnectionPool _pool;
+	private ServerDatabaseConnectionPool _pool;
 
 	static private final String[] _CREATE_STMTS = new String[] {
 		"CREATE TABLE cloudResources (" + "resourceid VARCHAR(256) NOT NULL PRIMARY KEY, " + "host VARCHAR(4096) NOT NULL, "
@@ -18,7 +18,7 @@ public class CloudDBResourceFactory
 		"CREATE TABLE cloudActivities (" + "activityid VARCHAR(256) NOT NULL PRIMARY KEY, "
 			+ "resourceid VARCHAR(256) NOT NULL)" };
 
-	public CloudDBResourceFactory(DatabaseConnectionPool pool) throws SQLException
+	public CloudDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		_pool = pool;
 		createTables();
@@ -37,7 +37,7 @@ public class CloudDBResourceFactory
 		}
 	}
 
-	public DatabaseConnectionPool getConnectionPool()
+	public ServerDatabaseConnectionPool getConnectionPool()
 	{
 		return _pool;
 	}

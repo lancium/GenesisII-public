@@ -257,8 +257,11 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			for (MessageElement element : propertyValues) {
 				QName name = element.getQName();
 				String value = element.getValue();
-				if (value == null)
-					throw new RuntimeException("A required Kerberos attribute is missing.");
+				if (value == null) {
+					String msg = "A required Kerberos attribute is missing: " + name;
+					_logger.error(msg);
+					throw new RuntimeException(msg);
+				}
 				if (SecurityConstants.NEW_KERB_IDP_REALM_QNAME.equals(name)) {
 					resource.setProperty(SecurityConstants.NEW_KERB_IDP_REALM_QNAME.getLocalPart(), value);
 				} else if (SecurityConstants.NEW_KERB_IDP_KDC_QNAME.equals(name)) {

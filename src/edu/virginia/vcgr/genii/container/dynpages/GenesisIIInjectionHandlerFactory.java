@@ -8,15 +8,15 @@ import org.morgan.dpage.ObjectInjectionHandlerFactory;
 import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 public class GenesisIIInjectionHandlerFactory implements ObjectInjectionHandlerFactory
 {
-	private DatabaseConnectionPool _connectionPool;
+	private ServerDatabaseConnectionPool _connectionPool;
 
 	public GenesisIIInjectionHandlerFactory()
 	{
-		_connectionPool = (DatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
+		_connectionPool = (ServerDatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
 		if (_connectionPool == null)
 			throw new ConfigurationException("Unable to find named instance \"connection-pool\".");
 	}

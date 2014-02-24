@@ -39,7 +39,7 @@ import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.percall.ExponentialBackoffScheduler;
 import edu.virginia.vcgr.genii.container.cservices.percall.PersistentOutcallContainerService;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.notification.EnhancedNotificationBrokerServiceImpl;
 import edu.virginia.vcgr.genii.container.notification.NotificationBrokerDBResource;
 import edu.virginia.vcgr.genii.container.notification.NotificationBrokerDatabase;
@@ -93,7 +93,7 @@ public class WSNotificationContainerService extends AbstractContainerService
 	public <Type extends NotificationMessageContents> void publishNotification(String publisherKey,
 		EndpointReferenceType publisherEPR, TopicPath topic, Type contents, GeniiAttachment attachment)
 	{
-		DatabaseConnectionPool pool = getConnectionPool();
+		ServerDatabaseConnectionPool pool = getConnectionPool();
 		Connection conn = null;
 
 		try {
@@ -156,7 +156,7 @@ public class WSNotificationContainerService extends AbstractContainerService
 	public Integer getMessageIndexOfBroker(String clientId)
 	{
 
-		DatabaseConnectionPool pool = getConnectionPool();
+		ServerDatabaseConnectionPool pool = getConnectionPool();
 		Connection conn = null;
 		try {
 			try {

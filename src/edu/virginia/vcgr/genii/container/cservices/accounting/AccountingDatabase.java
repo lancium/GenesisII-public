@@ -19,10 +19,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.pwrapper.ElapsedTime;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.AccountingRecordType;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;

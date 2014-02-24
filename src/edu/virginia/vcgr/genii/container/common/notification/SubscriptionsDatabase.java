@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -26,7 +27,6 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPoli
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPolicyTypes;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
-import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 
 public class SubscriptionsDatabase
 {

@@ -646,7 +646,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				calledMethod.getName(), Thread.currentThread().getId(), Thread.currentThread(), System.currentTimeMillis()
 					- start));
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Outcall for %s duration %d ms.", calledMethod.getName(), System.currentTimeMillis()
+			_logger.debug(String.format("Outcall for '%s' took %d ms.", calledMethod.getName(), System.currentTimeMillis()
 				- start));
 
 		Object[] inAttachments = stubInstance.getAttachments();

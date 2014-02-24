@@ -10,7 +10,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -23,7 +23,7 @@ public class NotificationBrokerDBResource extends BasicDBResource
 	private boolean mode;
 	private int messageIndex;
 
-	public NotificationBrokerDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool) throws SQLException
+	public NotificationBrokerDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}
