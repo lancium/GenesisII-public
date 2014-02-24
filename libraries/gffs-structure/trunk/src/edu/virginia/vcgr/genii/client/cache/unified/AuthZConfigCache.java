@@ -6,6 +6,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
@@ -23,6 +25,7 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 
 public class AuthZConfigCache extends CommonAttributeCache
 {
+	static protected Log _logger = LogFactory.getLog(AuthZConfigCache.class);
 
 	private SingleResourcePropertyTranslator authZTranslator;
 	private SingleResourcePropertyTranslator permissionTranslator;

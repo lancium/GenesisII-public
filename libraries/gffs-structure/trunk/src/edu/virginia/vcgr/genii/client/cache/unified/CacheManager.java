@@ -122,8 +122,7 @@ public class CacheManager
 					putItemInCache(targetObject, cacheKey, value);
 				}
 			} catch (Exception ex) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("Cache: failed to process information", ex);
+				_logger.error("exception occurred while caching items: " + ex.getMessage(), ex);
 			}
 		}
 	}
@@ -135,6 +134,12 @@ public class CacheManager
 
 	public static void putItemInCache(Object target, Object cacheKey, Object value)
 	{
+		if (value == null) {
+			String msg = "logic problem in putItemInCache: value to cache is null.";
+			_logger.error(msg);
+			throw new RuntimeException(msg);
+		}
+
 		if (CacheConfigurer.isCachingEnabled()) {
 			try {
 				CommonCache cache = findCacheForObject(target, cacheKey, value);
@@ -270,6 +275,7 @@ public class CacheManager
 				}
 			}
 		}
+		_logger.warn("could not find an appropriate cache for type: " + typeOfItem.getCanonicalName());
 		return null;
 	}
 }
