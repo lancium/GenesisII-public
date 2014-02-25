@@ -48,6 +48,12 @@
     <gsh:param>+rwx</gsh:param>
     <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
   </geniix:chmod>
+  <gsh:echo message="Adding r for everyone on /resources/${EXT_GRID}"/>
+  <geniix:chmod>
+    <gsh:param>/resources/${EXT_GRID}</gsh:param>
+    <gsh:param>+r</gsh:param>
+    <gsh:param>--everyone</gsh:param>
+  </geniix:chmod>
   <gsh:echo message="Adding replication on /resources/${EXT_GRID}"/>
   <geniix:resolver>
     <gsh:param>-p</gsh:param>
