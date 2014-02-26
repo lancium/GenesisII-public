@@ -120,15 +120,6 @@ function build_installer()
   # clean out the media folder.
   \rm -f $INSTALLER_DIR/Media/[a-zA-Z0-9]*
 
-#these deletes shouldn't be needed; the installer should ignore these files.
-  # clean up any certificates that exist in the default deployment.
-#  pushd $DEPLOYMENTS_ROOT/default/security &>/dev/null
-#  \rm -f *.pfx *.cer
-#  pushd default-owners &>/dev/null
-#  \rm -f *.pfx *.cer
-#  popd &>/dev/null
-#  popd &>/dev/null
-
   pushd $INSTALLER_DIR &>/dev/null
   install4jc -b "$media_num" "$generated_installer_name"
   check_if_failed "building installer for $name_piece"
@@ -150,8 +141,12 @@ function fix_endings()
 {
   echo Fixing installer filename endings...
   pushd $OUTPUT_DIRECTORY &>/dev/null
+  local i
   for i in *sh; do
     mv $i $(basename $i sh)script
+  done
+  for i in md5sums.*; do
+    replace_phrase_in_file "$i" "\.sh$" "\.script"
   done
   popd &>/dev/null
 }
