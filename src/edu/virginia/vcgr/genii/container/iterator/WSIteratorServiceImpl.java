@@ -73,8 +73,7 @@ public class WSIteratorServiceImpl extends GenesisIIBase implements WSIteratorPo
 		int lcv = 0;
 		for (Pair<Long, MessageElement> entry : entries) {
 			iterableElements[lcv++] =
-				new IterableElementType(new MessageElement[] { entry.second() }, new UnsignedLong(
-					entry.first()));
+				new IterableElementType(new MessageElement[] { entry.second() }, new UnsignedLong(entry.first()));
 		}
 
 		return new IterateResponseType(new UnsignedLong(resource.iteratorSize()), iterableElements);
