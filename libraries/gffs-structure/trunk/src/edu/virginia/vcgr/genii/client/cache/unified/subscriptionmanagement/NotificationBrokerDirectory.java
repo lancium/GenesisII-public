@@ -233,8 +233,7 @@ public class NotificationBrokerDirectory
 				GetResourcePropertyResponse resp =
 					common.getResourceProperty(GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS);
 				if (resp != null && resp.get_any() != null) {
-					MessageElement element = resp.get_any()[0];
-					factoryUrl = element.getValue();
+					factoryUrl = new MessageElement(resp.get_any()[0]).getValue();
 					factoryUrls.add(factoryUrl);
 					containerIdToBrokerFactoryMapping.put(containerId, factoryUrl);
 				}

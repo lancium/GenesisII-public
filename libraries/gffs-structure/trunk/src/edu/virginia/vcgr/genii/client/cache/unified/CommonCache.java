@@ -2,9 +2,6 @@ package edu.virginia.vcgr.genii.client.cache.unified;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /*
  * This is the common abstraction for all client-side caches. For an external user of cache,
  * everything looks like a CommonCache. Because of being generic, its methods some-times have more
@@ -13,9 +10,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class CommonCache implements Comparable<CommonCache>
 {
-
-	static protected Log _logger = LogFactory.getLog(CommonCache.class);
-
 	// priority levels are used to make distinctions when there exists a default cache for
 	// a particular type of information. For example, when caching RP interface attributes
 	// that are not stored by the AuthZConfig and ByteIORP caches are stored in

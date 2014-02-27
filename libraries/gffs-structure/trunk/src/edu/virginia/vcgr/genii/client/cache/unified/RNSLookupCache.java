@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
@@ -19,6 +21,8 @@ import edu.virginia.vcgr.genii.text.TextHelper;
 
 public class RNSLookupCache extends CommonCache
 {
+	static protected Log _logger = LogFactory.getLog(RNSLookupCache.class);
+	
 	private TimedOutLRUCache<String, EndpointReferenceType> fileLookupCache;
 	private TimedOutLRUCache<String, EndpointReferenceType> directoryLookupCache;
 

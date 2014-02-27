@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSMetadataType;
 import org.ws.addressing.EndpointReferenceType;
@@ -17,6 +19,7 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
  */
 public class RNSEntryResponseTranslator implements CacheableItemsGenerator
 {
+	static private Log _logger = LogFactory.getLog(RNSEntryResponseTranslator.class);
 
 	@Override
 	public boolean isSupported(Class<?>... argumentTypes)
@@ -32,7 +35,6 @@ public class RNSEntryResponseTranslator implements CacheableItemsGenerator
 	@Override
 	public Collection<CacheableItem> generateItems(Object... originalItems)
 	{
-
 		List<CacheableItem> itemList = new ArrayList<CacheableItem>();
 		RNSEntryResponseType rnsEntry;
 		EndpointReferenceType entryEPR;
@@ -44,6 +46,7 @@ public class RNSEntryResponseTranslator implements CacheableItemsGenerator
 		} else {
 			rnsEntry = (RNSEntryResponseType) originalItems[1];
 			entryEPR = rnsEntry.getEndpoint();
+//hmmm:we have seen this can be null.  why and how?  happens for STS a lot.
 		}
 
 		WSName wsName = new WSName(entryEPR);
@@ -60,9 +63,14 @@ public class RNSEntryResponseTranslator implements CacheableItemsGenerator
 					CacheableItem eprItem = new CacheableItem();
 					eprItem.setKey(childRNSPath);
 					eprItem.setValue(entryEPR);
-					itemList.add(eprItem);
-					if (entryConfig != null)
+					if (entryEPR != null) {
+						itemList.add(eprItem);
+					} else {
+						_logger.warn("ignoring RNSEntryResponse with null EPR, has path: " + childRNSPath);
+					}
+					if (entryConfig != null) {
 						entryConfig.addRNSPath(childRNSPath);
+					}
 				}
 			}
 		}

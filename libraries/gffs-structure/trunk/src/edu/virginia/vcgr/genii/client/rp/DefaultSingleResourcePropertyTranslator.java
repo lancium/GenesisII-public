@@ -34,7 +34,9 @@ public class DefaultSingleResourcePropertyTranslator implements SingleResourcePr
 		}
 		_logger.debug("deserializing type " + clazz.getCanonicalName() + " from elem real type " + element.getClass().getCanonicalName());
 		try {
-			Type toReturn = clazz.cast(ObjectDeserializer.toObject(element, clazz));
+			Object ob = ObjectDeserializer.toObject(element, clazz);
+			_logger.debug("object type deserialized: " + ob.getClass().getCanonicalName());
+			Type toReturn = clazz.cast(ob);
 			_logger.debug("...now returning type " + toReturn.getClass().getCanonicalName());
 			return toReturn;
 		} catch (ResourceException re) {

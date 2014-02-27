@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.cache.unified;
 
 public class CacheableItem
 {
-
 	private Object Key;
 	private Object target;
 	private Object value;

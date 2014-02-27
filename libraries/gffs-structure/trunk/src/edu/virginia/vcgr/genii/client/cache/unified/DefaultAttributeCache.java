@@ -9,6 +9,8 @@ import java.util.Iterator;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
@@ -17,6 +19,7 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 
 public class DefaultAttributeCache extends CommonCache
 {
+	static protected Log _logger = LogFactory.getLog(DefaultAttributeCache.class);
 
 	private TimedOutLRUCache<String, Collection<MessageElement>> cache;
 

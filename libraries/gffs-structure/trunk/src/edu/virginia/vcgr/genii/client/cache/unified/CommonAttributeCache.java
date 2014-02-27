@@ -7,18 +7,21 @@ import java.util.Map;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierType;
 import edu.virginia.vcgr.genii.client.fuse.DirectoryManager;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 
-/*
+/**
  * This class is used to extract common behavior of all caches that saves attributes in a single
  * location.
  */
 public abstract class CommonAttributeCache extends CommonCache
 {
+	static protected Log _logger = LogFactory.getLog(CommonAttributeCache.class);
 
 	public CommonAttributeCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
 	{

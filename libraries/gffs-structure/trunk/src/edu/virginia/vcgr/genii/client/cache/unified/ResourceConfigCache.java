@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.axis.types.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierType;
@@ -19,7 +21,8 @@ import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierT
  */
 public class ResourceConfigCache extends CommonCache
 {
-
+	static protected Log _logger = LogFactory.getLog(ResourceConfigCache.class);
+	
 	/*
 	 * Directory and file resource configuration caches are kept separate as we don't want to loose
 	 * valuable directory configurations if the system tries to flood the cache with resource
@@ -28,9 +31,9 @@ public class ResourceConfigCache extends CommonCache
 	private TimedOutLRUCache<String, WSResourceConfig> fileConfigCache;
 	private TimedOutLRUCache<String, WSResourceConfig> directoryConfigCache;
 
-	public ResourceConfigCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
+	public ResourceConfigCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoringEnabled)
 	{
-		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
+		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
 		int directoryLookupCacheCapacity = capacity / 10;
 		directoryConfigCache = new TimedOutLRUCache<String, WSResourceConfig>(directoryLookupCacheCapacity, cacheLifeTime);
 		int fileLookupCacheCapacity = capacity - directoryLookupCacheCapacity;
@@ -72,14 +75,18 @@ public class ResourceConfigCache extends CommonCache
 	@Override
 	public void putItem(Object cacheKey, Object target, Object value) throws Exception
 	{
-
+		if (value == null) {
+			String msg = "failure in putItem: cached value cannot be null";
+			_logger.error(msg);
+			throw new RuntimeException(msg);
+		}
+		_logger.debug("caching object of type " + value.getClass().getCanonicalName());
 		WSResourceConfig newResourceConfig = (WSResourceConfig) value;
 		long lifetime = Math.max(cacheLifeTime, newResourceConfig.getMillisecondTimeLeftToCallbackExpiry());
 		TimedOutLRUCache<String, WSResourceConfig> cache =
 			(newResourceConfig.isDirectory()) ? directoryConfigCache : fileConfigCache;
 
 		if (cacheKey instanceof URI) {
-
 			String primaryIdentifer = cacheKey.toString();
 
 			// only try to put if it is not already in the cache. Otherwise,

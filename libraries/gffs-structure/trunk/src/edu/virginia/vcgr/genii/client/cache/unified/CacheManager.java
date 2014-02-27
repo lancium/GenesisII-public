@@ -20,7 +20,6 @@ import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Subsc
  */
 public class CacheManager
 {
-
 	static private Log _logger = LogFactory.getLog(CacheManager.class);
 
 	public static Object getItemFromCache(Object cacheKey, Class<?> itemType)
@@ -32,13 +31,12 @@ public class CacheManager
 	{
 
 		if (CacheConfigurer.isCachingEnabled()) {
-
-			// Before accessing the cache, this tries to assess the freshness of cached information
-			// by
-			// investigating the target, whenever possible. This helps to reduce load on cache
-			// management
-			// module and to ensure freshness of information when nothing can be inferred from the
-			// retrieved cached item.
+			/*
+			 * Before accessing the cache, this tries to assess the freshness of cached information
+			 * by investigating the target, whenever possible. This helps to reduce load on cache
+			 * management module and to ensure freshness of information when nothing can be inferred
+			 * from the retrieved cached item.
+			 */
 			if (ResourceAccessMonitor.isMonitoredObject(target)
 				&& !ResourceAccessMonitor.isCachedContentGuaranteedToBeFresh(target))
 				return null;
@@ -53,7 +51,9 @@ public class CacheManager
 				} else {
 					if (_logger.isTraceEnabled())
 						_logger.trace("not in cache: " + cacheKey);
+					return null;
 				}
+
 				if (cache.isMonitoringEnabled()) {
 					ResourceAccessMonitor.reportResourceUsage(cachedItem);
 				}
@@ -119,7 +119,12 @@ public class CacheManager
 					Object cacheKey = item.getKey();
 					Object targetObject = item.getTarget();
 					Object value = item.getValue();
-					putItemInCache(targetObject, cacheKey, value);
+					// hmmm: remove all logic error debugs when bug is fixed.
+					if (value == null) {
+						_logger.error("logic error cached value is null!!!  this is from a cacheable item!");
+					} else {
+						putItemInCache(targetObject, cacheKey, value);
+					}
 				}
 			} catch (Exception ex) {
 				_logger.error("exception occurred while caching items: " + ex.getMessage(), ex);
@@ -267,10 +272,14 @@ public class CacheManager
 		for (CommonCache cache : cacheList) {
 			if (target == null && cache.supportRetrievalWithoutTarget()) {
 				if (cache.isRelevent(cacheKey, typeOfItem)) {
+					if (_logger.isTraceEnabled())
+						_logger.trace("null target found good cache...  " + cache.getClass().getCanonicalName());
 					return cache;
 				}
 			} else if (target != null && !cache.supportRetrievalWithoutTarget()) {
 				if (cache.isRelevent(cacheKey, target, typeOfItem)) {
+					if (_logger.isTraceEnabled())
+						_logger.trace("non-null target found good cache...  " + cache.getClass().getCanonicalName());
 					return cache;
 				}
 			}

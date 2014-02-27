@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.cache.unified;
 
 import org.apache.axis.types.URI;
+import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -21,7 +22,10 @@ public class CacheUtils
 	public static String getContainerId(EndpointReferenceType epr)
 	{
 		try {
-			return EPRUtils.getGeniiContainerID(epr).toString();
+			GUID id = EPRUtils.getGeniiContainerID(epr);
+			if (id == null)
+				return null;
+			return id.toString();
 		} catch (Exception ex) {
 			// not a GenesisII resource
 			return null;

@@ -27,7 +27,6 @@ import edu.virginia.vcgr.genii.common.security.AuthZConfig;
  */
 public class AttributesUpdateNotificationsHandler
 {
-
 	private static Log _logger = LogFactory.getLog(AttributesUpdateNotificationsHandler.class);
 
 	public static void handleByteIOAttributesUpdate(ByteIOAttributesUpdateNotification notification,

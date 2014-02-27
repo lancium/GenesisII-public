@@ -12,7 +12,6 @@ import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 
 public class RNSElementCountCache extends CommonAttributeCache
 {
-
 	private SingleResourcePropertyTranslator translator;
 	private TimedOutLRUCache<String, Integer> cache;
 

@@ -11,6 +11,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -19,6 +21,7 @@ import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 
 public class ByteIORPCache extends CommonAttributeCache
 {
+	static protected Log _logger = LogFactory.getLog(ByteIORPCache.class);
 
 	/*
 	 * When a byteIO is blocked because of rapid write/append operations, we don't want to client to
@@ -40,7 +43,6 @@ public class ByteIORPCache extends CommonAttributeCache
 
 	public ByteIORPCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
 	{
-
 		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
 
 		sizeAttributeCache = new TimedOutLRUCache<String, Long>(capacity, cacheLifeTime);
@@ -81,7 +83,6 @@ public class ByteIORPCache extends CommonAttributeCache
 	@Override
 	public void putItem(Object cacheKey, Object target, Object value) throws Exception
 	{
-
 		URI wsEndpointIdenfierURI = getEndpointIdentifierURI(target);
 		String EPI = wsEndpointIdenfierURI.toString();
 		long lifetime = getCacheLifeTime(wsEndpointIdenfierURI);
