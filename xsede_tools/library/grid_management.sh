@@ -389,7 +389,7 @@ function find_genesis_javas()
   addon=".*$pattern"
   local patterns=""
   # build a list of the true patterns we want.
-  for i in "java.*genesis" "java.*genii-" "JavaServiceWrapper" "JavaSe.*wrapper.*windows" "Genesi.*java"; do
+  for i in "java.*genesis[^2][^-][^g][^f]" "java.*genii-" "JavaServiceWrapper" "JavaSe.*wrapper.*windows" "Genesi.*java"; do
     patterns+="${i}${addon} "
   done
   # find all the processes matching those patterns.
