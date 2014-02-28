@@ -46,7 +46,7 @@ public class RNSEntryResponseTranslator implements CacheableItemsGenerator
 		} else {
 			rnsEntry = (RNSEntryResponseType) originalItems[1];
 			entryEPR = rnsEntry.getEndpoint();
-//hmmm:we have seen this can be null.  why and how?  happens for STS a lot.
+			// hmmm:we have seen this can be null. why and how? happens for STS a lot.
 		}
 
 		WSName wsName = new WSName(entryEPR);

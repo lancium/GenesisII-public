@@ -22,7 +22,7 @@ import edu.virginia.vcgr.genii.text.TextHelper;
 public class RNSLookupCache extends CommonCache
 {
 	static protected Log _logger = LogFactory.getLog(RNSLookupCache.class);
-	
+
 	private TimedOutLRUCache<String, EndpointReferenceType> fileLookupCache;
 	private TimedOutLRUCache<String, EndpointReferenceType> directoryLookupCache;
 

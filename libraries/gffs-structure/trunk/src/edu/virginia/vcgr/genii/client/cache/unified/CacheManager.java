@@ -45,14 +45,18 @@ public class CacheManager
 				if (cache == null)
 					return null;
 				Object cachedItem = cache.getItem(cacheKey, target);
-				if (cachedItem != null) {
-					if (_logger.isTraceEnabled())
-						_logger.trace("request is satisfied from the cache: " + cacheKey);
-				} else {
-					if (_logger.isTraceEnabled())
-						_logger.trace("not in cache: " + cacheKey);
-					return null;
+				
+				//hmmm: reduce logging visibility here.
+				if (_logger.isDebugEnabled()) {
+					String result = "cache miss";
+					if (cachedItem != null) {
+						result = "cache hit";
+					}
+					_logger.debug(result + " for " + cacheKey + " of type " + itemType.getCanonicalName());
 				}
+
+				if (cachedItem == null)
+					return null;
 
 				if (cache.isMonitoringEnabled()) {
 					ResourceAccessMonitor.reportResourceUsage(cachedItem);
@@ -284,7 +288,7 @@ public class CacheManager
 				}
 			}
 		}
-		_logger.warn("could not find an appropriate cache for type: " + typeOfItem.getCanonicalName());
+		_logger.trace("could not find an appropriate cache for type: " + typeOfItem.getCanonicalName());
 		return null;
 	}
 }
