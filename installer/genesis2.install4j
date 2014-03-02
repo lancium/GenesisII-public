@@ -1464,7 +1464,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="" id="8585" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.RegexTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="" id="8585" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.RegexTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="failed to replace conn prop">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.RegexTextFileAction">

@@ -10,6 +10,7 @@ import org.morgan.inject.MInjector;
 import org.morgan.inject.MNamingInjectionResolver;
 import org.morgan.mnaming.InitialMNamingContext;
 
+@SuppressWarnings("deprecation")
 public class TestInjection
 {
 	private InitialMNamingContext _context = new InitialMNamingContext();

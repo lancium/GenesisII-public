@@ -16,8 +16,10 @@ public class ProgramTools
 	{
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		StringBuilder toReturn = new StringBuilder();
-		// we rely on the getStackFrame function to ignore the first couple frames for us.
-		for (int i = 0; i < Math.min(howManyFrames, elements.length - 2); i++) {
+		int startFrame = 3; // we don't start at the very first one or we show ourselves in the
+							// camera.
+		int endFrame = Math.min(howManyFrames + 3, elements.length - 1);
+		for (int i = startFrame; i < endFrame; i++) {
 			if (toReturn.length() != 0) {
 				toReturn.append(" <- ");
 			}
@@ -27,16 +29,16 @@ public class ProgramTools
 	}
 
 	/**
-	 * returns the n-th frame back from this function. 1 will be the caller of this function, 2 will
-	 * be the caller of that caller, etc.
+	 * returns the Nth frame backwards starting from this function. 0 is this method, 1 is the
+	 * invoker, 2 is the invoker's invoker, etc.
 	 */
-	public static String getStackFrame(int howManyBack)
+	public static String getStackFrame(int which)
 	{
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		// a little self-protection to avoid accessing missing parts of the array.
-		if (howManyBack + 2 >= elements.length)
-			howManyBack = elements.length - 3;
-		return elements[howManyBack + 2].toString();
+		if (which >= elements.length)
+			which = elements.length - 1;
+		return elements[which].toString();
 	}
 
 }

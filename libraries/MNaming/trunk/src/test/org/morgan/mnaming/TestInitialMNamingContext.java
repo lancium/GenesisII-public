@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.morgan.mnaming.InitialMNamingContext;
 import org.morgan.mnaming.MNamingException;
 
+@SuppressWarnings("deprecation")
 public class TestInitialMNamingContext
 {
 	@Before
