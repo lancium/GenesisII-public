@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.cmd.ToolException;
+
 public abstract class AbstractExternalApplication implements ExternalApplication
 {
 	static private Log _logger = LogFactory.getLog(AbstractExternalApplication.class);
@@ -88,16 +90,20 @@ public abstract class AbstractExternalApplication implements ExternalApplication
 		}
 
 		@Override
-		public File getResult() throws Throwable
+		public File getResult() throws ToolException
 		{
 			synchronized (_lockObject) {
 				while (!_done) {
-					_lockObject.wait();
+					try {
+						_lockObject.wait();
+					} catch (InterruptedException e) {
+						// nothing.
+					}
 				}
 			}
 
 			if (_exception != null)
-				throw _exception;
+				throw new ToolException(_exception.getLocalizedMessage(), _exception);
 
 			return _fileContent;
 		}

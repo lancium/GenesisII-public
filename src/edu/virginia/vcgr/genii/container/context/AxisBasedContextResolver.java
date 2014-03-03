@@ -55,15 +55,15 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
-public class AxisBasedContextResolver implements IContextResolver
-{
-	private static Log _logger = LogFactory.getLog(AxisBasedContextResolver.class);
+public class AxisBasedContextResolver implements IContextResolver {
+	private static Log _logger = LogFactory
+			.getLog(AxisBasedContextResolver.class);
 
 	/**
 	 * For debugging only
 	 */
-	static private void storeToFile(Element em, String homeDir) throws IOException
-	{
+	static private void storeToFile(Element em, String homeDir)
+			throws IOException {
 		File dir = new File(homeDir + "/all-contexts");
 		dir.mkdirs();
 		for (int lcv = 0; true; lcv++) {
@@ -84,16 +84,19 @@ public class AxisBasedContextResolver implements IContextResolver
 	}
 
 	@SuppressWarnings("unchecked")
-	public ICallingContext load() throws ResourceException, IOException, FileNotFoundException
-	{
-		WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
+	public ICallingContext load() throws ResourceException, IOException,
+			FileNotFoundException {
+		WorkingContext workingContext = WorkingContext
+				.getCurrentWorkingContext();
 
 		ICallingContext retval;
-		if ((retval = (ICallingContext) workingContext.getProperty(WorkingContext.CURRENT_CONTEXT_KEY)) != null) {
+		if ((retval = (ICallingContext) workingContext
+				.getProperty(WorkingContext.CURRENT_CONTEXT_KEY)) != null) {
 			return retval;
 		}
 
-		MessageContext messageContext = (MessageContext) workingContext.getProperty(WorkingContext.MESSAGE_CONTEXT_KEY);
+		MessageContext messageContext = (MessageContext) workingContext
+				.getProperty(WorkingContext.MESSAGE_CONTEXT_KEY);
 		ContextType ct = null;
 
 		if (messageContext != null) {
@@ -101,12 +104,16 @@ public class AxisBasedContextResolver implements IContextResolver
 				SOAPMessage m = messageContext.getMessage();
 				SOAPHeader header = m.getSOAPHeader();
 
-				Iterator<? extends SOAPHeaderElement> iter = header.examineAllHeaderElements();
+				Iterator<? extends SOAPHeaderElement> iter = header
+						.examineAllHeaderElements();
 				while (iter.hasNext()) {
 					SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
-					QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
-					if (heName.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME)) {
-						Element em = ((org.apache.axis.message.MessageElement) he).getRealElement();
+					QName heName = new QName(he.getNamespaceURI(),
+							he.getLocalName());
+					if (heName
+							.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME)) {
+						Element em = ((org.apache.axis.message.MessageElement) he)
+								.getRealElement();
 						// debugging code that writes the context to a file.
 						boolean debuggingMode = false;
 						if (debuggingMode == true) {
@@ -116,21 +123,25 @@ public class AxisBasedContextResolver implements IContextResolver
 						PrintStream ps = new PrintStream(baos);
 						ps.println(em);
 						ps.close();
-						ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-						ct = (ContextType) ObjectDeserializer.deserialize(new InputSource(bais), ContextType.class);
+						ByteArrayInputStream bais = new ByteArrayInputStream(
+								baos.toByteArray());
+						ct = (ContextType) ObjectDeserializer.deserialize(
+								new InputSource(bais), ContextType.class);
 						break;
 					}
 				}
 			} catch (SOAPException se) {
-				throw new AxisFault("SOAP Exception loading calling context.", se);
+				throw new AxisFault("SOAP Exception loading calling context.",
+						se);
 			} catch (IOException e) {
-				throw new AuthZSecurityException("Unknown exception loading calling context.", e);
+				throw new AuthZSecurityException(
+						"Unknown exception loading calling context.", e);
 			}
 		}
 
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		CallingContextImpl resourceContext =
-			(CallingContextImpl) resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+		CallingContextImpl resourceContext = (CallingContextImpl) resource
+				.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
 
 		if (resourceContext == null) {
 			retval = new CallingContextImpl(ct);
@@ -145,42 +156,54 @@ public class AxisBasedContextResolver implements IContextResolver
 			currpath = trendy.getCurrentPath().toString();
 
 		if (_logger.isTraceEnabled())
-			_logger.trace("thread " + Thread.currentThread().getId() + ": has current RNSPath of " + currpath);
+			_logger.trace("thread " + Thread.currentThread().getId()
+					+ ": has current RNSPath of " + currpath);
 
-		retval = CallingContextUtilities.setupCallingContextAfterCombinedExtraction(retval);
+		retval = CallingContextUtilities
+				.setupCallingContextAfterCombinedExtraction(retval);
 
 		// place the resource's key material in the transient calling context
 		// so that it may be properly used for outgoing messages
 		try {
-			PrivateKey privateKey = (PrivateKey) resource.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
+			PrivateKey privateKey = (PrivateKey) resource
+					.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
 			if (privateKey != null) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("Using resource's own private key: " + ResourceManager.getCurrentResource().getServiceName());
+					_logger.debug("Using resource's own private key: "
+							+ ResourceManager.getCurrentResource()
+									.getServiceName());
 			}
-			Certificate[] targetCertChain = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+			Certificate[] targetCertChain = (Certificate[]) resource
+					.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			if ((targetCertChain != null) && (targetCertChain.length > 0)) {
-				retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) targetCertChain,
-					(privateKey != null) ? privateKey : Container.getContainerPrivateKey()));
+				retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial(
+						(X509Certificate[]) targetCertChain,
+						(privateKey != null) ? privateKey : Container
+								.getContainerPrivateKey()));
 			}
 		} catch (GeneralSecurityException e) {
-			throw new AuthZSecurityException(e.getMessage(), e);
+			throw new ResourceException(e.getMessage(), e);
 		}
 
 		workingContext.setProperty(WorkingContext.CURRENT_CONTEXT_KEY, retval);
 
 		if (_logger.isTraceEnabled())
-			_logger.debug("container received a context:\n" + trendy.dumpContext());
+			_logger.debug("container received a context:\n"
+					+ trendy.dumpContext());
 
 		return retval;
 	}
 
-	public void store(ICallingContext ctxt) throws ResourceException, IOException
-	{
-		ResourceManager.getCurrentResource().dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, ctxt);
+	public void store(ICallingContext ctxt) throws ResourceException,
+			IOException {
+		ResourceManager
+				.getCurrentResource()
+				.dereference()
+				.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME,
+						ctxt);
 	}
 
-	public Object clone()
-	{
+	public Object clone() {
 		return new AxisBasedContextResolver();
 	}
 }

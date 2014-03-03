@@ -63,6 +63,7 @@ import org.junit.Test;
  * extension or add a key usage extension depending on your application, but you should get the
  * idea! As always this is just an example...
  */
+@SuppressWarnings("deprecation")
 public class TestPKCS12
 {
 	static private Log _logger = LogFactory.getLog(TestPKCS12.class);

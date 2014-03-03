@@ -40,6 +40,7 @@ import eu.emi.security.authn.x509.impl.InMemoryKeystoreCertChainValidator;
  * 
  * @author dgm4d
  */
+@SuppressWarnings("deprecation")
 public class X509PatternAclEntry implements AclEntry
 {
 	static public final long serialVersionUID = 0L;

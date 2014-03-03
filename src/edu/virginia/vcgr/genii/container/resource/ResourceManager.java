@@ -53,6 +53,7 @@ import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityType;
 import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityTypeMin;
 import edu.virginia.vcgr.genii.container.Container;
@@ -101,22 +102,24 @@ public class ResourceManager
 
 		if (ctxt != null) {
 			key = (ResourceKey) ctxt.getProperty(WorkingContext.CURRENT_RESOURCE_KEY);
-			if (key != null)
-				_logger.debug("found key in context, key=" + key);
-			else
-				_logger.debug("no key found in context");
+			if (_logger.isTraceEnabled()) {
+				if (key != null)
+					_logger.trace("found key in context, key=" + key);
+				else
+					_logger.trace("no key found in context for field: " + WorkingContext.CURRENT_RESOURCE_KEY);
+			}
 		}
 		if (key == null) {
 			EndpointReferenceType epr = (EndpointReferenceType) ctxt.getProperty(WorkingContext.EPR_PROPERTY_NAME);
 			if (epr == null)
-				throw new ResourceException("Couldn't locate target EPR in current working context.");
+				throw new ResourceException("Couldn't locate target EPR in current working context for key=" + key);
 
 			String serviceName = (String) ctxt.getProperty(WorkingContext.TARGETED_SERVICE_NAME);
 			if (serviceName == null)
-				throw new ResourceException("Couldn't locate target service name in current working context.");
+				throw new ResourceException("Couldn't locate target service name in current working context for key=" + key);
 
-			_logger.debug("about to make resource key for svc=" + serviceName + " epr=" + epr.getAddress());
-			// hmmm: right here is a crashola.
+			if (_logger.isTraceEnabled())
+				_logger.trace("about to make resource key for svc=" + serviceName + " epr=" + epr.getAddress());
 			key = new ResourceKey(serviceName, new AddressingParameters(epr.getReferenceParameters()));
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, key);
 		}
@@ -170,19 +173,13 @@ public class ResourceManager
 	}
 
 	/**
-	 * @param metaDataAny
-	 * @param resource
-	 * @throws ResourceException
-	 */
-	static private void MetaDataSecurityToken(ArrayList<MessageElement> metaDataAny, IResource resource)
-		throws ResourceException
-	/*
 	 * Added 2014-01-09 by ASG to allow us to selectively not put X.509 SecurityTokens in EPR's. It
 	 * would be great if we could use "if ((this instanceof GeniiNoOutCalls))" instead of the kludge
 	 * with class names, but we don't have a reference to the class For now we must explicitly list
 	 * every type we want to avoid. The list should come out of a configuration file.
 	 */
-
+	static private void MetaDataSecurityToken(ArrayList<MessageElement> metaDataAny, IResource resource)
+		throws ResourceException
 	{
 		String serviceName = ((ResourceKey) resource.getParentResourceKey()).getServiceName();
 		// ASG 2014-01-11

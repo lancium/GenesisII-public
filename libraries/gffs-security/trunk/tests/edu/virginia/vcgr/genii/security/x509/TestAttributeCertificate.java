@@ -39,6 +39,7 @@ import org.junit.Test;
 /**
  * A simple example that generates an attribute certificate.
  */
+@SuppressWarnings("deprecation")
 public class TestAttributeCertificate
 {
 	static private Log _logger = LogFactory.getLog(TestAttributeCertificate.class);

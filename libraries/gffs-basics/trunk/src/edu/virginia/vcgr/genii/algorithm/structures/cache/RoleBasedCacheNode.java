@@ -46,6 +46,11 @@ class RoleBasedCacheNode<KeyType, DataType>
 		return _invalidationDate;
 	}
 
+	public void setInvalidationDate(long millisecondsFromNow)
+	{
+		_invalidationDate = new Date(System.currentTimeMillis() + millisecondsFromNow);
+	}
+
 	@SuppressWarnings("unchecked")
 	public RoleBasedCacheNode<KeyType, DataType> getPrevious(int role)
 	{

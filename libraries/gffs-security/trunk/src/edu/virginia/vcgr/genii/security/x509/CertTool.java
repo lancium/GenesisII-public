@@ -61,6 +61,7 @@ import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 /**
  * A simple example that generates an attribute certificate.
  */
+@SuppressWarnings("deprecation")
 public class CertTool
 {
 	static private Log _logger = LogFactory.getLog(CertTool.class);

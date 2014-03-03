@@ -90,10 +90,13 @@ public class TimedOutLRUCache<KeyType, DataType>
 		put(key, data, _defaultTimeoutMS);
 	}
 
+	public int getMaximumElements()
+	{
+		return _maxElements;
+	}
+
 	public DataType get(KeyType key)
 	{
-		Date now = new Date();
-
 		synchronized (_map) {
 			RoleBasedCacheNode<KeyType, DataType> node = _map.get(key);
 			if (node == null)
@@ -101,12 +104,9 @@ public class TimedOutLRUCache<KeyType, DataType>
 
 			_lruList.remove(node);
 
-			if (node.getInvalidationDate().before(now)) {
-				// stale
-				_map.remove(key);
-				_timeoutList.remove(node);
-				return null;
-			}
+			// reset the node's lifespan, since it's just been hit.
+			node.setInvalidationDate(_defaultTimeoutMS);
+			// hmmm: add notion of max lifespan to enforce some rollover.
 
 			_lruList.insert(node);
 

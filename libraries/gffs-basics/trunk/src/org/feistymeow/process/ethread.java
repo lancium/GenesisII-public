@@ -88,8 +88,8 @@ public abstract class ethread implements Runnable
 	}
 }
 
-/* hmmm: still in progress...
-missing the timed features of ethread.
-missing cancel, exempt_stop, sleep_time, should_stop,
-*/
+/*
+ * hmmm: still in progress... missing the timed features of ethread. missing cancel, exempt_stop,
+ * sleep_time, should_stop,
+ */
 

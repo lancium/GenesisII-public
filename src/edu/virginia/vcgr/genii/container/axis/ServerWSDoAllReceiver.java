@@ -86,6 +86,7 @@ import edu.virginia.vcgr.genii.security.credentials.X509Identity;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
 
+@SuppressWarnings("deprecation")
 public class ServerWSDoAllReceiver extends WSDoAllReceiver
 {
 	static final long serialVersionUID = 0L;
@@ -202,12 +203,11 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			super.invoke(msgContext);
 			// check authorization.
 			performAuthz();
-
 		} catch (AxisFault e) {
 			if (e instanceof PermissionDeniedException) {
 				// print a much calmer report of this fault, since we know exactly what happened.
 				PermissionDeniedException pde = (PermissionDeniedException) e;
-				_logger.error("access denied for method '" + PermissionDeniedException.extractMethodName(pde.getMessage())
+				_logger.info("access denied for method '" + PermissionDeniedException.extractMethodName(pde.getMessage())
 					+ "' on asset: " + PermissionDeniedException.extractAssetDenied(pde.getMessage()));
 			} else {
 				// re-throw and also hit the finally clause to decrement concurrency counter.
@@ -216,8 +216,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				if (_logger.isDebugEnabled()) {
 					_logger.error("AxisFault full trace: ", e);
 				}
-				throw e;
 			}
+			throw e;
 		} catch (Throwable e) {
 			// wrap this exception and re-throw.
 			String msg = "An exception occurred during authorization: " + e.getMessage();
@@ -489,10 +489,10 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	@SuppressWarnings("unchecked")
 	protected void performAuthz() throws AxisFault
 	{
-		boolean accessOkay = false;  // assume access is disallowed until proven otherwise.
-		IResource resource = null;  // the resource in question.
-		Method operation = null;  // the method being called on the resource.
-		
+		boolean accessOkay = false; // assume access is disallowed until proven otherwise.
+		IResource resource = null; // the resource in question.
+		Method operation = null; // the method being called on the resource.
+
 		try {
 			// Grab working and message contexts
 			WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
@@ -621,10 +621,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			throw new AxisFault(e.getMessage(), e);
 		}
 		if (!accessOkay) {
-			PermissionDeniedException fault =
-				new PermissionDeniedException(operation.getName(), ResourceManager.getResourceName(resource));
-			_logger.error("failed to check access: " + fault.getMessage());
-			throw fault;
+			throw new PermissionDeniedException(operation.getName(), ResourceManager.getResourceName(resource));
 		}
 	}
 
