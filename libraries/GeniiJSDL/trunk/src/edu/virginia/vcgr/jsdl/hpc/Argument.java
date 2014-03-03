@@ -26,13 +26,12 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.namespace.QName;
 
 /**
- * The argument class represents a single application argument as described by the HPC Profile
- * Application extension.
+ * The argument class represents a single application argument as described by
+ * the HPC Profile Application extension.
  * 
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class Argument implements Serializable
-{
+public class Argument implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -41,28 +40,23 @@ public class Argument implements Serializable
 	@XmlValue
 	private String _value;
 
-	public Argument(String value)
-	{
+	public Argument(String value) {
 		_value = value;
 	}
 
-	public Argument()
-	{
+	public Argument() {
 		this(null);
 	}
 
-	final public void value(String value)
-	{
+	final public void value(String value) {
 		_value = value;
 	}
 
-	final public String value()
-	{
+	final public String value() {
 		return _value;
 	}
 
-	final public Map<QName, String> anyAttributes()
-	{
+	final public Map<QName, String> anyAttributes() {
 		return _anyAttributes;
 	}
 }

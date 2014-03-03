@@ -55,48 +55,51 @@ import edu.virginia.vcgr.genii.security.x509.SingleSSLX509KeyManager;
 /**
  * Wrapper for the generic SSLSocketFactory.
  * 
- * Selects the identity in the current calling context's client cert/key for use during SSL
- * handshake. For containers, the TLS certificate is chosen instead of resource certificates.
+ * Selects the identity in the current calling context's client cert/key for use
+ * during SSL handshake. For containers, the TLS certificate is chosen instead
+ * of resource certificates.
  * 
- * Allows us to re-read trust-stores when we detect changes in the client/server configuration.
+ * Allows us to re-read trust-stores when we detect changes in the client/server
+ * configuration.
  * 
  * @author dgm4d
  */
-public class VcgrSslSocketFactory extends SSLSocketFactory implements ConfigurationUnloadedListener
-{
+public class VcgrSslSocketFactory extends SSLSocketFactory implements
+		ConfigurationUnloadedListener {
 	static private Log _logger = LogFactory.getLog(VcgrSslSocketFactory.class);
 
-	static final private String CACHE_SIZE_PROPERTY_NAME =
-		"edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory.max-cache-size";
+	static final private String CACHE_SIZE_PROPERTY_NAME = "edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory.max-cache-size";
 
-	static final private int DEFAULT_MAX_CACHE_ELEMENTS = 64; // cak: reduced from 1024.
+	static final private int DEFAULT_MAX_CACHE_ELEMENTS = 64; // cak: reduced
+																// from 1024.
 
-	static final private int SESSION_CACHE_SIZE_MAX = 256; // cak: reduced from 1000.
+	static final private int SESSION_CACHE_SIZE_MAX = 256; // cak: reduced from
+															// 1000.
 
-	// holds the maximum elements for the socket cache, rather than reading it from file every time.
+	// holds the maximum elements for the socket cache, rather than reading it
+	// from file every time.
 	static private Integer _maxCacheElements = -1;
 
 	static public InheritableThreadLocal<ICallingContext> threadCallingContext = new InheritableThreadLocal<ICallingContext>();
 
-	static private LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory> _sslSessionCache =
-		new LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory>(getMaxCacheElements());
+	static private LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory> _sslSessionCache = new LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory>(
+			getMaxCacheElements());
 
 	protected TrustManager[] _trustManagers;
-	protected SocketConfigurer _clientSocketConfigurer = Installation.getDeployment(new DeploymentName())
-		.clientSocketConfigurer();
+	protected SocketConfigurer _clientSocketConfigurer = Installation
+			.getDeployment(new DeploymentName()).clientSocketConfigurer();
 
-	public VcgrSslSocketFactory()
-	{
+	public VcgrSslSocketFactory() {
 		// reset cached key/trust stores
 		notifyUnloaded();
 		// add a hook for notifications in the future.
 		ConfigurationManager.addConfigurationUnloadListener(this);
 	}
 
-	public void notifyUnloaded()
-	{
+	public void notifyUnloaded() {
 		try {
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+			TrustManagerFactory tmf = TrustManagerFactory
+					.getInstance("SunX509");
 			KeyStore trustStore = KeystoreManager.getTlsTrustStore();
 			if (trustStore != null) {
 				tmf.init(trustStore);
@@ -109,16 +112,16 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		}
 	}
 
-	static public int getMaxCacheElements()
-	{
+	static public int getMaxCacheElements() {
 		InputStream in = null;
 		synchronized (_maxCacheElements) {
 			if (_maxCacheElements > -1)
 				return _maxCacheElements;
 			_maxCacheElements = DEFAULT_MAX_CACHE_ELEMENTS;
 			try {
-				File sslCachePropertiesFile =
-					Installation.getDeployment(new DeploymentName()).getConfigurationDirectory()
+				File sslCachePropertiesFile = Installation
+						.getDeployment(new DeploymentName())
+						.getConfigurationDirectory()
 						.lookupFile("ssl-cache.properties");
 				in = new FileInputStream(sslCachePropertiesFile);
 				Properties props = new Properties();
@@ -130,7 +133,9 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 						_maxCacheElements = 0;
 				}
 			} catch (Throwable cause) {
-				_logger.warn("Unable to lookup ssl-cache.properties configuration file.  Using default values!", cause);
+				_logger.warn(
+						"Unable to lookup ssl-cache.properties configuration file.  Using default values!",
+						cause);
 			} finally {
 				StreamUtils.close(in);
 			}
@@ -139,8 +144,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		return _maxCacheElements;
 	}
 
-	protected SSLSocketFactory getSSLSocketFactory() throws IOException
-	{
+	protected SSLSocketFactory getSSLSocketFactory() throws IOException {
 		// Use the current calling context's X.509 identity for SSL handshake
 		SSLSocketFactory factory = null;
 		KeyAndCertMaterialCacheKey cacheKey = null;
@@ -148,24 +152,29 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		try {
 			ICallingContext callingContext = threadCallingContext.get();
 			if (callingContext == null)
-				throw new RuntimeException("We got a null calling context which " + "means that client invocation handler "
-					+ "didn't set it up correctly.");
+				throw new RuntimeException(
+						"We got a null calling context which "
+								+ "means that client invocation handler "
+								+ "didn't set it up correctly.");
 
-			KeyAndCertMaterial clientKeyMaterial =
-				ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(),
-					new SecurityUpdateResults());
+			KeyAndCertMaterial clientKeyMaterial = ClientUtils
+					.checkAndRenewCredentials(callingContext,
+							BaseGridTool.credsValidUntil(),
+							new SecurityUpdateResults());
 
 			/*
-			 * use only the container TLS cert rather than resource cert, unless we are acting as a
-			 * client.
+			 * use only the container TLS cert rather than resource cert, unless
+			 * we are acting as a client.
 			 */
 			if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
 				CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
 				if (tlsKey != null) {
 					// now tell the connection to use our tls cert also.
-					clientKeyMaterial = new KeyAndCertMaterial(tlsKey._certChain, tlsKey._privateKey);
+					clientKeyMaterial = new KeyAndCertMaterial(
+							tlsKey._certChain, tlsKey._privateKey);
 					if (_logger.isDebugEnabled())
-						_logger.debug("container outgoing TLS cert is: " + tlsKey._certChain[0].getSubjectDN());
+						_logger.debug("container outgoing TLS cert is: "
+								+ tlsKey._certChain[0].getSubjectDN());
 				}
 			}
 
@@ -182,7 +191,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 
 			SSLContext sslcontext = SSLContext.getInstance("TLS");
 
-			SSLSessionContext sessionContext = sslcontext.getServerSessionContext();
+			SSLSessionContext sessionContext = sslcontext
+					.getServerSessionContext();
 			if (sessionContext == null) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("Couldn't get a session context on which to set the cache size.");
@@ -224,44 +234,43 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		}
 	}
 
-	final private Socket configureSocket(Socket socket)
-	{
+	final private Socket configureSocket(Socket socket) {
 		_clientSocketConfigurer.configureSocket(socket);
 		return socket;
 	}
 
 	@Override
-	public Socket createSocket(Socket socket, String s, int i, boolean flag) throws IOException
-	{
-		return configureSocket(getSSLSocketFactory().createSocket(socket, s, i, flag));
+	public Socket createSocket(Socket socket, String s, int i, boolean flag)
+			throws IOException {
+		return configureSocket(getSSLSocketFactory().createSocket(socket, s, i,
+				flag));
 	}
 
 	@Override
-	public Socket createSocket(InetAddress inaddr, int i, InetAddress inaddr1, int j) throws IOException
-	{
-		return configureSocket(getSSLSocketFactory().createSocket(inaddr, i, inaddr1, j));
+	public Socket createSocket(InetAddress inaddr, int i, InetAddress inaddr1,
+			int j) throws IOException {
+		return configureSocket(getSSLSocketFactory().createSocket(inaddr, i,
+				inaddr1, j));
 	}
 
 	@Override
-	public Socket createSocket(InetAddress inaddr, int i) throws IOException
-	{
+	public Socket createSocket(InetAddress inaddr, int i) throws IOException {
 		return configureSocket(getSSLSocketFactory().createSocket(inaddr, i));
 	}
 
 	@Override
-	public Socket createSocket(String s, int i, InetAddress inaddr, int j) throws IOException
-	{
-		return configureSocket(getSSLSocketFactory().createSocket(s, i, inaddr, j));
+	public Socket createSocket(String s, int i, InetAddress inaddr, int j)
+			throws IOException {
+		return configureSocket(getSSLSocketFactory().createSocket(s, i, inaddr,
+				j));
 	}
 
 	@Override
-	public Socket createSocket(String s, int i) throws IOException
-	{
+	public Socket createSocket(String s, int i) throws IOException {
 		return configureSocket(getSSLSocketFactory().createSocket(s, i));
 	}
 
-	public String[] getDefaultCipherSuites()
-	{
+	public String[] getDefaultCipherSuites() {
 		try {
 			return getSSLSocketFactory().getSupportedCipherSuites();
 		} catch (Exception e) {
@@ -270,8 +279,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		}
 	}
 
-	public String[] getSupportedCipherSuites()
-	{
+	public String[] getSupportedCipherSuites() {
 		try {
 			return getSSLSocketFactory().getSupportedCipherSuites();
 		} catch (Exception e) {
@@ -280,32 +288,28 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		}
 	}
 
-	static public class KeyAndCertMaterialCacheKey
-	{
+	static public class KeyAndCertMaterialCacheKey {
 		private X509Certificate _cert;
 
-		public KeyAndCertMaterialCacheKey(KeyAndCertMaterial material)
-		{
-			if (material._clientCertChain == null || material._clientCertChain.length == 0)
+		public KeyAndCertMaterialCacheKey(KeyAndCertMaterial material) {
+			if (material._clientCertChain == null
+					|| material._clientCertChain.length == 0)
 				_cert = null;
 			else
 				_cert = material._clientCertChain[0];
 		}
 
-		public KeyAndCertMaterialCacheKey(X509Certificate cert)
-		{
+		public KeyAndCertMaterialCacheKey(X509Certificate cert) {
 			_cert = cert;
 		}
 
 		@Override
-		final public int hashCode()
-		{
+		final public int hashCode() {
 			return (_cert == null) ? 0 : _cert.hashCode();
 		}
 
 		@Override
-		final public boolean equals(Object tmpOther)
-		{
+		final public boolean equals(Object tmpOther) {
 			if (tmpOther instanceof KeyAndCertMaterialCacheKey) {
 				KeyAndCertMaterialCacheKey other = (KeyAndCertMaterialCacheKey) tmpOther;
 				if (_cert == null) {

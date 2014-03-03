@@ -23,14 +23,12 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
 import edu.virginia.vcgr.genii.container.byteio.SByteIOResource;
 
-public class SByteIOFactory implements Closeable
-{
+public class SByteIOFactory implements Closeable {
 	private OutputStream _stream = null;
 	private String _serviceURL = null;
 	private File _file;
 
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		try {
 			StreamUtils.close(this);
 		} finally {
@@ -38,27 +36,25 @@ public class SByteIOFactory implements Closeable
 		}
 	}
 
-	static protected File chooseFile() throws IOException
-	{
-		File userDir = ConfigurationManager.getCurrentConfiguration().getUserDirectory();
-		GuaranteedDirectory sbyteiodir = new GuaranteedDirectory(userDir, "sbyteio");
+	static protected File chooseFile() throws IOException {
+		File userDir = ConfigurationManager.getCurrentConfiguration()
+				.getUserDirectory();
+		GuaranteedDirectory sbyteiodir = new GuaranteedDirectory(userDir,
+				"sbyteio");
 		return File.createTempFile("sbyteio", ".dat", sbyteiodir);
 	}
 
-	SByteIOFactory(String serviceURL) throws IOException
-	{
+	SByteIOFactory(String serviceURL) throws IOException {
 		_file = chooseFile();
 		_serviceURL = serviceURL;
 		_stream = new FileOutputStream(_file);
 	}
 
-	public OutputStream getCreationStream()
-	{
+	public OutputStream getCreationStream() {
 		return _stream;
 	}
 
-	synchronized public void close() throws IOException
-	{
+	synchronized public void close() throws IOException {
 		if (_stream != null) {
 			_stream.close();
 			_stream = null;
@@ -66,23 +62,26 @@ public class SByteIOFactory implements Closeable
 		}
 	}
 
-	public EndpointReferenceType create() throws ResourceCreationFaultType, GenesisIISecurityException, ResourceException,
-		RemoteException, IOException
-	{
+	public EndpointReferenceType create() throws ResourceCreationFaultType,
+			GenesisIISecurityException, ResourceException, RemoteException,
+			IOException {
 		synchronized (this) {
 			_stream.flush();
 			StreamUtils.close(_stream);
 			_stream = null;
 		}
 
-		StreamableByteIOPortType sbyteio =
-			ClientUtils.createProxy(StreamableByteIOPortType.class, EPRUtils.makeEPR(_serviceURL));
+		StreamableByteIOPortType sbyteio = ClientUtils.createProxy(
+				StreamableByteIOPortType.class, EPRUtils.makeEPR(_serviceURL));
 
 		MessageElement[] createRequest = new MessageElement[2];
-		createRequest[0] = new MessageElement(RByteIOResource.FILE_PATH_PROPERTY, _file.getAbsolutePath());
-		createRequest[1] = new MessageElement(SByteIOResource.MUST_DESTROY_PROPERTY, Boolean.TRUE.toString());
+		createRequest[0] = new MessageElement(
+				RByteIOResource.FILE_PATH_PROPERTY, _file.getAbsolutePath());
+		createRequest[1] = new MessageElement(
+				SByteIOResource.MUST_DESTROY_PROPERTY, Boolean.TRUE.toString());
 
-		EndpointReferenceType epr = sbyteio.vcgrCreate(new VcgrCreate(createRequest)).getEndpoint();
+		EndpointReferenceType epr = sbyteio.vcgrCreate(
+				new VcgrCreate(createRequest)).getEndpoint();
 
 		return epr;
 	}

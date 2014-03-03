@@ -23,21 +23,21 @@ import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class ServicesRNSFork extends ReadOnlyRNSResourceFork
-{
-	private String shortenedURL() throws ResourceException
-	{
-		EndpointReferenceType myEPR =
-			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
+public class ServicesRNSFork extends ReadOnlyRNSResourceFork {
+	private String shortenedURL() throws ResourceException {
+		EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext
+				.getCurrentWorkingContext().getProperty(
+						WorkingContext.EPR_PROPERTY_NAME);
 		String ret = myEPR.getAddress().get_value().toString();
 		int last = ret.lastIndexOf('/');
 		if (last <= 0)
-			throw new ResourceException(String.format("Couldn't parse target container URL \"%s\".", ret));
+			throw new ResourceException(String.format(
+					"Couldn't parse target container URL \"%s\".", ret));
 		return ret.substring(0, last + 1);
 	}
 
-	private PortType[] findImplementedPortTypes(Class<?> jClass) throws ResourceException
-	{
+	private PortType[] findImplementedPortTypes(Class<?> jClass)
+			throws ResourceException {
 		try {
 			Constructor<?> cons = jClass.getConstructor();
 			Object obj = cons.newInstance();
@@ -46,48 +46,50 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 		} catch (ResourceException re) {
 			throw re;
 		} catch (Throwable cause) {
-			throw new ResourceException("Unable to get target services' port types.", cause);
+			throw new ResourceException(
+					"Unable to get target services' port types.", cause);
 		}
 	}
 
-	public ServicesRNSFork(ResourceForkService service, String forkPath)
-	{
+	public ServicesRNSFork(ResourceForkService service, String forkPath) {
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR, String entryName) throws IOException
-	{
+	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR,
+			String entryName) throws IOException {
 		LinkedList<InternalEntry> ret = new LinkedList<InternalEntry>();
 
 		for (JavaServiceDesc desc : Container.getInstalledServices()) {
 			String serviceName = desc.getName();
 
 			/*
-			 * example of making certain port types disappear. this needs to be done with a list
-			 * instead. there are several port types that are deprecated and should no longer be
-			 * shown in the list of services.
+			 * example of making certain port types disappear. this needs to be
+			 * done with a list instead. there are several port types that are
+			 * deprecated and should no longer be shown in the list of services.
 			 */
 			/*
 			 * if (serviceName.equals("JNDIAuthnPortType")) continue;
 			 */
 
 			if (entryName == null || entryName.equals(serviceName)) {
-				ResourceKey targetKey = ResourceManager.getServiceResource(serviceName);
+				ResourceKey targetKey = ResourceManager
+						.getServiceResource(serviceName);
 
-				EndpointReferenceType targetEPR =
-					ResourceManager.createEPR(targetKey, String.format("%s%s?%s=%s", shortenedURL(), serviceName,
-						EPRUtils.GENII_CONTAINER_ID_PARAMETER, Container.getContainerID()), findImplementedPortTypes(desc
-						.getImplClass()), serviceName);
+				EndpointReferenceType targetEPR = ResourceManager.createEPR(
+						targetKey, String.format("%s%s?%s=%s", shortenedURL(),
+								serviceName,
+								EPRUtils.GENII_CONTAINER_ID_PARAMETER,
+								Container.getContainerID()),
+						findImplementedPortTypes(desc.getImplClass()),
+						serviceName);
 				ret.add(new InternalEntry(serviceName, targetEPR));
 			}
 		}
 
-		Comparator<InternalEntry> comparator = new Comparator<InternalEntry>()
-		{
-			public int compare(InternalEntry c1, InternalEntry c2)
-			{
+		Comparator<InternalEntry> comparator = new Comparator<InternalEntry>() {
+			public int compare(InternalEntry c1, InternalEntry c2) {
 				return c1.getName().compareTo(c2.getName());
 			}
 		};

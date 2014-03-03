@@ -20,15 +20,15 @@ import java.lang.reflect.Method;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class Launcher
-{
+public class Launcher {
 	static private Log _logger = LogFactory.getLog(Launcher.class);
 
-	static public void main(String[] args) throws IOException, ClassNotFoundException, NoSuchMethodException,
-		IllegalAccessException
-	{
+	static public void main(String[] args) throws IOException,
+			ClassNotFoundException, NoSuchMethodException,
+			IllegalAccessException {
 		if (args.length < 2) {
-			System.err.println("USAGE:  Launcher <jar-desc> <class> [ <args > ]");
+			System.err
+					.println("USAGE:  Launcher <jar-desc> <class> [ <args > ]");
 			System.exit(1);
 		}
 

@@ -4,8 +4,7 @@ import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.client.resource.PortType;
 
-public class WSRFConstants
-{
+public class WSRFConstants {
 	static public final String WSRF_RP_NS = "http://docs.oasis-open.org/wsrf/rp-2";
 	static public final String WSRF_RL_NS = "http://docs.oasis-open.org/wsrf/rl-2";
 
@@ -22,88 +21,84 @@ public class WSRFConstants
 	static public final String WSRF_IMMEDIATE_TERMINATE_PORT_NAME = "ImmediateResourceTermination";
 	static public final String WSRF_SCHEDULED_TERMINATE_PORT_NAME = "ScheduledResourceTermination";
 
-	static public final PortType WSRF_RPW_GET_RP_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSRF_RPW_NS, WSRF_RPW_GET_RP_PORT_NAME));
+	static public final PortType WSRF_RPW_GET_RP_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSRF_RPW_NS, WSRF_RPW_GET_RP_PORT_NAME));
 	}
 
-	static public final PortType WSRF_RPW_GET_MULTIPLE_RP_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSRF_RPW_NS, WSRF_RPW_GET_MULTIPLE_RP_PORT_NAME));
+	static public final PortType WSRF_RPW_GET_MULTIPLE_RP_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSRF_RPW_NS, WSRF_RPW_GET_MULTIPLE_RP_PORT_NAME));
 	}
 
-	static public final PortType WSRF_RLW_IMMEDIATE_TERMINATE_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSRF_RLW_NS, WSRF_IMMEDIATE_TERMINATE_PORT_NAME));
+	static public final PortType WSRF_RLW_IMMEDIATE_TERMINATE_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSRF_RLW_NS, WSRF_IMMEDIATE_TERMINATE_PORT_NAME));
 	}
 
-	static public final PortType WSRF_RLW_SCHEDULED_TERMINATE_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSRF_RLW_NS, WSRF_SCHEDULED_TERMINATE_PORT_NAME));
+	static public final PortType WSRF_RLW_SCHEDULED_TERMINATE_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSRF_RLW_NS, WSRF_SCHEDULED_TERMINATE_PORT_NAME));
 	}
 
-	static public final PortType WSN_NOTIFICATION_CONSUMER_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSN_BASE_NOT_NS, "NotificationConsumer"));
+	static public final PortType WSN_NOTIFICATION_CONSUMER_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSN_BASE_NOT_NS, "NotificationConsumer"));
 	}
 
-	static public final PortType WSN_NOTIFICATION_PRODUCER_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSN_BASE_NOT_NS, "NotificationProducer"));
+	static public final PortType WSN_NOTIFICATION_PRODUCER_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSN_BASE_NOT_NS, "NotificationProducer"));
 	}
 
-	static public final PortType WSN_PULL_POINT_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSN_BASE_NOT_NS, "PullPoint"));
+	static public final PortType WSN_PULL_POINT_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSN_BASE_NOT_NS, "PullPoint"));
 	}
 
-	static public final PortType WSN_CREATE_PULL_POINT_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSN_BASE_NOT_NS, "CreatePullPoint"));
+	static public final PortType WSN_CREATE_PULL_POINT_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSN_BASE_NOT_NS, "CreatePullPoint"));
 	}
 
-	static public final PortType WSN_SUBSCRIPTION_MANAGER_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSN_BASE_NOT_NS, "SubscriptionManager"));
+	static public final PortType WSN_SUBSCRIPTION_MANAGER_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSN_BASE_NOT_NS, "SubscriptionManager"));
 	}
 
-	static public final PortType WSN_PAUSABLE_SUBSCRIPTION_MANAGER_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSN_BASE_NOT_NS, "PausableSubscriptionManager"));
+	static public final PortType WSN_PAUSABLE_SUBSCRIPTION_MANAGER_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSN_BASE_NOT_NS, "PausableSubscriptionManager"));
 	}
 
-	static public final PortType WSN_REGISTER_PUBLISHER_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSN_BROKERED_NOT_NS, "RegisterPublisher"));
+	static public final PortType WSN_REGISTER_PUBLISHER_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSN_BROKERED_NOT_NS, "RegisterPublisher"));
 	}
 
-	static public final PortType WSN_BROKERED_NOTIFICATION_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSN_BROKERED_NOT_NS, "NotificationBroker"));
+	static public final PortType WSN_BROKERED_NOTIFICATION_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSN_BROKERED_NOT_NS, "NotificationBroker"));
 	}
 
-	static public final PortType WSN_PUBLISHER_REGISTRATION_MANAGER_PORT()
-	{
-		return PortType.portTypeFactory().get(new QName(WSN_BROKERED_NOT_NS, "PublisherRegistrationManager"));
+	static public final PortType WSN_PUBLISHER_REGISTRATION_MANAGER_PORT() {
+		return PortType.portTypeFactory().get(
+				new QName(WSN_BROKERED_NOT_NS, "PublisherRegistrationManager"));
 	}
 
-	static public final QName FIXED_TOPIC_SET_QNAME()
-	{
+	static public final QName FIXED_TOPIC_SET_QNAME() {
 		return new QName(WSN_BASE_NOT_XSD_NS, "FixedTopicSet");
 	}
 
-	static public final QName TOPIC_EXPRESSION_DIALECT_RP()
-	{
+	static public final QName TOPIC_EXPRESSION_DIALECT_RP() {
 		return new QName(WSN_BASE_NOT_XSD_NS, "TopicExpressionDialect");
 	}
 
-	static public final QName TOPIC_EXPRESSION_RP()
-	{
+	static public final QName TOPIC_EXPRESSION_RP() {
 		return new QName(WSN_BASE_NOT_XSD_NS, "TopicExpression");
 	}
 
-	static public final QName TOPIC_SET_RP()
-	{
+	static public final QName TOPIC_SET_RP() {
 		return new QName(WSN_BASE_NOT_XSD_NS, "TopicSet");
 	}
 

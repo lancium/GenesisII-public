@@ -3,12 +3,12 @@ package edu.virginia.vcgr.genii.security;
 import java.util.EnumSet;
 
 /**
- * Base interface for all decisions based on RWXCategory (Read, Write and Execute) accessibility.
+ * Base interface for all decisions based on RWXCategory (Read, Write and
+ * Execute) accessibility.
  * 
  * @author ckoeritz
  */
-public interface RWXAccessible
-{
+public interface RWXAccessible {
 	/**
 	 * Retrieves the mask for the object.
 	 */

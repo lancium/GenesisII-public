@@ -15,26 +15,26 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
-public abstract class AbstractURIHandler implements IURIHandler
-{
+public abstract class AbstractURIHandler implements IURIHandler {
 	static public final int NUM_RETRIES = 5;
 	static public final long BACKOFF = 8000L;
 
 	static private Random GENERATOR = new Random();
 
-	public abstract InputStream openInputStream(URI source, UsernamePasswordIdentity credential) throws IOException;
+	public abstract InputStream openInputStream(URI source,
+			UsernamePasswordIdentity credential) throws IOException;
 
-	public abstract OutputStream openOutputStream(URI target, UsernamePasswordIdentity credential) throws IOException;
+	public abstract OutputStream openOutputStream(URI target,
+			UsernamePasswordIdentity credential) throws IOException;
 
-	static private long generateBackoff(int attempt)
-	{
+	static private long generateBackoff(int attempt) {
 		long twitter = (long) ((GENERATOR.nextFloat() - 0.5) * (BACKOFF << attempt));
 		return (BACKOFF << attempt) + twitter;
 	}
 
 	@Override
-	final public DataTransferStatistics get(URI source, File target, UsernamePasswordIdentity credential) throws IOException
-	{
+	final public DataTransferStatistics get(URI source, File target,
+			UsernamePasswordIdentity credential) throws IOException {
 		IOException lastException = null;
 
 		int attempt = 0;
@@ -59,8 +59,8 @@ public abstract class AbstractURIHandler implements IURIHandler
 	}
 
 	@Override
-	final public DataTransferStatistics put(File source, URI target, UsernamePasswordIdentity credential) throws IOException
-	{
+	final public DataTransferStatistics put(File source, URI target,
+			UsernamePasswordIdentity credential) throws IOException {
 		IOException lastException = null;
 
 		int attempt = 0;
@@ -81,9 +81,8 @@ public abstract class AbstractURIHandler implements IURIHandler
 		throw lastException;
 	}
 
-	protected DataTransferStatistics getInternal(URI source, File target, UsernamePasswordIdentity credential)
-		throws IOException
-	{
+	protected DataTransferStatistics getInternal(URI source, File target,
+			UsernamePasswordIdentity credential) throws IOException {
 		FileOutputStream fos = null;
 		InputStream in = null;
 
@@ -97,9 +96,8 @@ public abstract class AbstractURIHandler implements IURIHandler
 		}
 	}
 
-	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential)
-		throws IOException
-	{
+	protected DataTransferStatistics putInternal(File source, URI target,
+			UsernamePasswordIdentity credential) throws IOException {
 		FileInputStream fin = null;
 		OutputStream out = null;
 

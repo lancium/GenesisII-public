@@ -5,8 +5,7 @@ import java.io.Writer;
 
 import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
 
-public interface ITool
-{
+public interface ITool {
 	public String usage();
 
 	public String description();

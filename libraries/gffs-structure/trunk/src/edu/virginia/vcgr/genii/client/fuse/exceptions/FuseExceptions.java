@@ -17,10 +17,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import fuse.FuseException;
 
-public class FuseExceptions
-{
-	static public FuseException translate(String message, Throwable cause)
-	{
+public class FuseExceptions {
+	static public FuseException translate(String message, Throwable cause) {
 		if (cause instanceof FuseException)
 			return (FuseException) cause;
 		else if (cause instanceof RNSPathAlreadyExistsException)

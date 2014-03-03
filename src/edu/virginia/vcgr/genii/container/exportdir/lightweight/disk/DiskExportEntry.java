@@ -18,31 +18,29 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportDir;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportEntry;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportFile;
 
-public class DiskExportEntry extends AbstractVExportEntry implements VExportDir, VExportFile
-{
+public class DiskExportEntry extends AbstractVExportEntry implements
+		VExportDir, VExportFile {
 	static private FSLockManager _lockManager = new FSLockManager();
 
 	private File _target;
 
-	public DiskExportEntry(File target) throws IOException
-	{
+	public DiskExportEntry(File target) throws IOException {
 		super(target.getName(), target.isDirectory());
 
 		_target = target;
 
 		if (!_target.exists())
-			throw new FileNotFoundException(String.format("Unable to locate file system entry \"%s\".", _target));
+			throw new FileNotFoundException(String.format(
+					"Unable to locate file system entry \"%s\".", _target));
 	}
 
 	@Override
-	public boolean createFile(String newFileName) throws IOException
-	{
+	public boolean createFile(String newFileName) throws IOException {
 		return new File(_target, newFileName).createNewFile();
 	}
 
 	@Override
-	public Collection<VExportEntry> list(String name) throws IOException
-	{
+	public Collection<VExportEntry> list(String name) throws IOException {
 		Collection<VExportEntry> entries = new LinkedList<VExportEntry>();
 
 		for (File entry : _target.listFiles()) {
@@ -55,52 +53,44 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 	}
 
 	@Override
-	public boolean mkdir(String newDirName) throws IOException
-	{
+	public boolean mkdir(String newDirName) throws IOException {
 		return new File(_target, newDirName).mkdir();
 	}
 
 	@Override
-	public boolean remove(String entryName) throws IOException
-	{
+	public boolean remove(String entryName) throws IOException {
 		return new File(_target, entryName).delete();
 	}
 
 	@Override
-	public Calendar accessTime() throws IOException
-	{
+	public Calendar accessTime() throws IOException {
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public void accessTime(Calendar c) throws IOException
-	{
+	public void accessTime(Calendar c) throws IOException {
 		// Do nothing
 	}
 
 	@Override
-	public Calendar createTime() throws IOException
-	{
+	public Calendar createTime() throws IOException {
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public Calendar modificationTime() throws IOException
-	{
+	public Calendar modificationTime() throws IOException {
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(_target.lastModified());
 		return c;
 	}
 
 	@Override
-	public void modificationTime(Calendar c) throws IOException
-	{
+	public void modificationTime(Calendar c) throws IOException {
 		// Do nothing
 	}
 
 	@Override
-	public void read(long offset, ByteBuffer target) throws IOException
-	{
+	public void read(long offset, ByteBuffer target) throws IOException {
 		RandomAccessFile raf = null;
 		FSLock lock = null;
 
@@ -118,14 +108,12 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 	}
 
 	@Override
-	public boolean readable() throws IOException
-	{
+	public boolean readable() throws IOException {
 		return _target.canRead();
 	}
 
 	@Override
-	public long size() throws IOException
-	{
+	public long size() throws IOException {
 		FSLock lock = null;
 
 		try {
@@ -138,8 +126,7 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 	}
 
 	@Override
-	public void truncAppend(long offset, ByteBuffer source) throws IOException
-	{
+	public void truncAppend(long offset, ByteBuffer source) throws IOException {
 		FSLock lock = null;
 		RandomAccessFile raf = null;
 
@@ -158,14 +145,12 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 	}
 
 	@Override
-	public boolean writable() throws IOException
-	{
+	public boolean writable() throws IOException {
 		return _target.canWrite();
 	}
 
 	@Override
-	public void write(long offset, ByteBuffer source) throws IOException
-	{
+	public void write(long offset, ByteBuffer source) throws IOException {
 		FSLock lock = null;
 		RandomAccessFile raf = null;
 
@@ -181,8 +166,7 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 		}
 	}
 
-	public static boolean isLink(File target) throws IOException
-	{
+	public static boolean isLink(File target) throws IOException {
 		if (target == null)
 			throw new NullPointerException("File must not be null");
 		File canon;
@@ -195,8 +179,7 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 		return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
 	}
 
-	public int getTotalSize(String name) throws IOException
-	{
+	public int getTotalSize(String name) throws IOException {
 
 		int numEntries = 0;
 		for (File entry : _target.listFiles()) {
@@ -207,14 +190,12 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 		return numEntries;
 	}
 
-	public Collection<String> getListing() throws IOException
-	{
+	public Collection<String> getListing() throws IOException {
 		return null;
 	}
 
 	@Override
-	public Collection<VExportEntry> list() throws IOException
-	{
+	public Collection<VExportEntry> list() throws IOException {
 		Collection<VExportEntry> entries = new LinkedList<VExportEntry>();
 
 		for (File entry : _target.listFiles()) {

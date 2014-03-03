@@ -12,36 +12,31 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
 import edu.virginia.vcgr.ogrsh.server.packing.DefaultOGRSHReadBuffer;
 
-public class InvocationMatcher
-{
+public class InvocationMatcher {
 	static private Log _logger = LogFactory.getLog(InvocationMatcher.class);
 
-	static private class HandlerInformation
-	{
+	static private class HandlerInformation {
 		private Object _invocationObject;
 		private Method _invocationMethod;
 
-		public HandlerInformation(String invocationName, Object invocationObject, Method invocationMethod)
-		{
+		public HandlerInformation(String invocationName,
+				Object invocationObject, Method invocationMethod) {
 			_invocationObject = invocationObject;
 			_invocationMethod = invocationMethod;
 		}
 
-		public Object getInvocationObject()
-		{
+		public Object getInvocationObject() {
 			return _invocationObject;
 		}
 
-		public Method getInvocationMethod()
-		{
+		public Method getInvocationMethod() {
 			return _invocationMethod;
 		}
 	}
 
 	private HashMap<String, HandlerInformation> _handlers = new HashMap<String, HandlerInformation>();
 
-	public void addHandlerInstance(Object obj)
-	{
+	public void addHandlerInstance(Object obj) {
 		Class<?> cl = obj.getClass();
 		for (Method m : cl.getMethods()) {
 			OGRSHOperation oper = m.getAnnotation(OGRSHOperation.class);
@@ -51,19 +46,21 @@ public class InvocationMatcher
 					invocationName = m.getName();
 
 				if (_logger.isTraceEnabled())
-					_logger.trace("Adding method \"" + cl.getName() + "." + m.getName() + "\" as handler for function \""
-						+ invocationName + "\".");
+					_logger.trace("Adding method \"" + cl.getName() + "."
+							+ m.getName() + "\" as handler for function \""
+							+ invocationName + "\".");
 
-				_handlers.put(invocationName, new HandlerInformation(invocationName, obj, m));
+				_handlers.put(invocationName, new HandlerInformation(
+						invocationName, obj, m));
 			}
 		}
 	}
 
 	private long _lastEndTime = 0;
 
-	public Object invoke(ByteBuffer request) throws OGRSHException
-	{
-		DefaultOGRSHReadBuffer requestReader = new DefaultOGRSHReadBuffer(request);
+	public Object invoke(ByteBuffer request) throws OGRSHException {
+		DefaultOGRSHReadBuffer requestReader = new DefaultOGRSHReadBuffer(
+				request);
 		String invocationName = null;
 		long startTime = 0L;
 
@@ -77,8 +74,9 @@ public class InvocationMatcher
 
 			HandlerInformation hInfo = _handlers.get(invocationName);
 			if (hInfo == null)
-				throw new OGRSHException("Requested function \"" + invocationName + "\" is unknown.",
-					OGRSHException.EXCEPTION_UNKNOWN_FUNCTION);
+				throw new OGRSHException("Requested function \""
+						+ invocationName + "\" is unknown.",
+						OGRSHException.EXCEPTION_UNKNOWN_FUNCTION);
 
 			Method m = hInfo.getInvocationMethod();
 			Class<?>[] paramTypes = m.getParameterTypes();
@@ -94,18 +92,22 @@ public class InvocationMatcher
 					throw (OGRSHException) cause;
 
 				_logger.error("Unknown exception occurred.", cause);
-				throw new OGRSHException("Unknown exception occured.", OGRSHException.EXCEPTION_UNKNOWN);
+				throw new OGRSHException("Unknown exception occured.",
+						OGRSHException.EXCEPTION_UNKNOWN);
 			}
 		} catch (IOException ioe) {
 			_logger.warn("Corrupted request data found.", ioe);
-			throw new OGRSHException("Corrupted request data found.", OGRSHException.EXCEPTION_CORRUPTED_REQUEST);
+			throw new OGRSHException("Corrupted request data found.",
+					OGRSHException.EXCEPTION_CORRUPTED_REQUEST);
 		} catch (IllegalAccessException iae) {
 			_logger.error("Invalid handler found.", iae);
-			throw new OGRSHException("Invalid handler found.", OGRSHException.EXCEPTION_UNKNOWN);
+			throw new OGRSHException("Invalid handler found.",
+					OGRSHException.EXCEPTION_UNKNOWN);
 		} finally {
 			_lastEndTime = System.currentTimeMillis();
 			if (_logger.isDebugEnabled())
-				_logger.debug(invocationName + ":\t" + (_lastEndTime - startTime) + " ms.");
+				_logger.debug(invocationName + ":\t"
+						+ (_lastEndTime - startTime) + " ms.");
 		}
 	}
 }

@@ -13,12 +13,10 @@ import edu.virginia.vcgr.genii.gjt.gui.fs.FilesystemCellRenderer;
 import edu.virginia.vcgr.genii.gjt.gui.fs.FilesystemCombo;
 import edu.virginia.vcgr.genii.gjt.gui.util.DefaultGrayedEmptyCellRenderer;
 
-class EnvironmentTable extends JTable
-{
+class EnvironmentTable extends JTable {
 	static final long serialVersionUID = 0L;
 
-	EnvironmentTable(FilesystemMap filesystemMap, EnvironmentList environment)
-	{
+	EnvironmentTable(FilesystemMap filesystemMap, EnvironmentList environment) {
 		super(new EnvironmentTableModel(environment));
 
 		setShowHorizontalLines(true);
@@ -34,14 +32,17 @@ class EnvironmentTable extends JTable
 		TableColumn fsColumn = cModel.getColumn(2);
 
 		keyColumn.setHeaderValue("Variable");
-		keyColumn.setCellRenderer(new DefaultGrayedEmptyCellRenderer("Variable"));
+		keyColumn
+				.setCellRenderer(new DefaultGrayedEmptyCellRenderer("Variable"));
 
 		valueColumn.setHeaderValue("Value");
-		valueColumn.setCellRenderer(new DefaultGrayedEmptyCellRenderer("Value"));
+		valueColumn
+				.setCellRenderer(new DefaultGrayedEmptyCellRenderer("Value"));
 
 		fsColumn.setHeaderValue("Filesystem");
 		fsColumn.setCellRenderer(new FilesystemCellRenderer());
-		fsColumn.setCellEditor(new DefaultCellEditor(new FilesystemCombo(filesystemMap)));
+		fsColumn.setCellEditor(new DefaultCellEditor(new FilesystemCombo(
+				filesystemMap)));
 
 		putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 	}

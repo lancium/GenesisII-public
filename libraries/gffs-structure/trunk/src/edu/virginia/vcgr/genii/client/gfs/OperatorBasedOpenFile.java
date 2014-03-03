@@ -6,21 +6,18 @@ import java.nio.ByteBuffer;
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 import edu.virginia.vcgr.genii.client.byteio.buffer.BasicFileOperator;
 
-class OperatorBasedOpenFile extends GeniiOpenFile
-{
+class OperatorBasedOpenFile extends GeniiOpenFile {
 	private BasicFileOperator _operator;
 
-	protected OperatorBasedOpenFile(String[] path, BasicFileOperator operator, boolean canRead, boolean canWrite,
-		boolean isAppend)
-	{
+	protected OperatorBasedOpenFile(String[] path, BasicFileOperator operator,
+			boolean canRead, boolean canWrite, boolean isAppend) {
 		super(path, canRead, canWrite, isAppend);
 
 		_operator = operator;
 	}
 
 	@Override
-	protected void appendImpl(ByteBuffer source) throws FSException
-	{
+	protected void appendImpl(ByteBuffer source) throws FSException {
 		try {
 			synchronized (_operator) {
 				_operator.append(source);
@@ -31,8 +28,7 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	}
 
 	@Override
-	protected void flush() throws FSException
-	{
+	protected void flush() throws FSException {
 		try {
 			synchronized (_operator) {
 				_operator.flush();
@@ -43,8 +39,7 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	}
 
 	@Override
-	protected void closeImpl() throws IOException
-	{
+	protected void closeImpl() throws IOException {
 		synchronized (_operator) {
 			_operator.flush();
 			_operator.close();
@@ -52,8 +47,7 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	}
 
 	@Override
-	protected void readImpl(long offset, ByteBuffer target) throws FSException
-	{
+	protected void readImpl(long offset, ByteBuffer target) throws FSException {
 		try {
 			while (target.hasRemaining()) {
 				int start = target.position();
@@ -71,8 +65,7 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	}
 
 	@Override
-	protected void writeImpl(long offset, ByteBuffer source) throws FSException
-	{
+	protected void writeImpl(long offset, ByteBuffer source) throws FSException {
 		try {
 			synchronized (_operator) {
 				_operator.write(offset, source);

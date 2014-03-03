@@ -14,7 +14,5 @@
 package edu.virginia.vcgr.genii.client.rns;
 
 public enum RNSPathQueryFlags {
-	DONT_CARE,
-	MUST_EXIST,
-	MUST_NOT_EXIST
+	DONT_CARE, MUST_EXIST, MUST_NOT_EXIST
 }

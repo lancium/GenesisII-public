@@ -20,29 +20,27 @@ import java.security.cert.*;
 import java.util.*;
 
 /**
- * Responsible for managing the trust material that is used when making trust decisions, and for
- * deciding whether credentials presented by a peer should be accepted.
+ * Responsible for managing the trust material that is used when making trust
+ * decisions, and for deciding whether credentials presented by a peer should be
+ * accepted.
  * 
  * @author dmerrill
  */
-public class WinX509TrustManager implements X509TrustManager
-{
+public class WinX509TrustManager implements X509TrustManager {
 
 	static WinCryptoLib cryptoLib = new WinCryptoLib();
 
 	/**
 	 * Constructor
 	 */
-	WinX509TrustManager()
-	{
+	WinX509TrustManager() {
 	}
 
 	/**
-	 * Return an array of certificate authority certificates which are trusted for authenticating
-	 * peers.
+	 * Return an array of certificate authority certificates which are trusted
+	 * for authenticating peers.
 	 */
-	public X509Certificate[] getAcceptedIssuers()
-	{
+	public X509Certificate[] getAcceptedIssuers() {
 
 		ArrayList<X509Certificate> validIssuers = new ArrayList<X509Certificate>();
 		String[] issuerStores = { "CA", "Root" };
@@ -65,7 +63,8 @@ public class WinX509TrustManager implements X509TrustManager
 					// get the zero'th element of the alias's certchain: getting
 					// the certchain validates the cert
 					String alias = itr.next();
-					X509Certificate[] chain = cryptoLib.getCertificateChain(issuerStores[i], alias);
+					X509Certificate[] chain = cryptoLib.getCertificateChain(
+							issuerStores[i], alias);
 					validIssuers.add(chain[0]);
 				} catch (WinCryptoException e) {
 					continue;
@@ -80,12 +79,13 @@ public class WinX509TrustManager implements X509TrustManager
 	}
 
 	/**
-	 * Given the partial or complete certificate chain provided by the peer, build a certificate
-	 * path to a trusted root and return if it can be validated and is trusted for client SSL
-	 * authentication based on the authentication type.
+	 * Given the partial or complete certificate chain provided by the peer,
+	 * build a certificate path to a trusted root and return if it can be
+	 * validated and is trusted for client SSL authentication based on the
+	 * authentication type.
 	 */
-	public void checkClientTrusted(X509Certificate chain[], String authType) throws CertificateException
-	{
+	public void checkClientTrusted(X509Certificate chain[], String authType)
+			throws CertificateException {
 
 		// iterate through the chain, making sure that each certificate is
 		// trusted
@@ -99,12 +99,13 @@ public class WinX509TrustManager implements X509TrustManager
 	}
 
 	/**
-	 * Given the partial or complete certificate chain provided by the peer, build a certificate
-	 * path to a trusted root and return if it can be validated and is trusted for server SSL
-	 * authentication based on the authentication type
+	 * Given the partial or complete certificate chain provided by the peer,
+	 * build a certificate path to a trusted root and return if it can be
+	 * validated and is trusted for server SSL authentication based on the
+	 * authentication type
 	 */
-	public void checkServerTrusted(X509Certificate chain[], String authType) throws CertificateException
-	{
+	public void checkServerTrusted(X509Certificate chain[], String authType)
+			throws CertificateException {
 
 		// iterate through the chain, making sure that each certificate is
 		// trusted

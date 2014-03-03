@@ -13,13 +13,12 @@ import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 /**
- * A class that allows strings to be encrypted and decrypted using a certificate and the
- * corresponding private key.
+ * A class that allows strings to be encrypted and decrypted using a certificate
+ * and the corresponding private key.
  * 
  * @author Chris Koeritz
  */
-public class SimpleStringEncryptor
-{
+public class SimpleStringEncryptor {
 	static private Log _logger = LogFactory.getLog(SimpleStringEncryptor.class);
 
 	private PrivateKey privKey;
@@ -28,8 +27,8 @@ public class SimpleStringEncryptor
 	private BASE64Encoder encoder;
 	private Cipher cipher;
 
-	public SimpleStringEncryptor(X509Certificate certificate, PrivateKey privateKey)
-	{
+	public SimpleStringEncryptor(X509Certificate certificate,
+			PrivateKey privateKey) {
 		try {
 			cipher = Cipher.getInstance("RSA");
 		} catch (Throwable e) {
@@ -44,8 +43,7 @@ public class SimpleStringEncryptor
 		encoder = new BASE64Encoder();
 	}
 
-	public String encrypt(String data)
-	{
+	public String encrypt(String data) {
 		if (cipher == null) {
 			_logger.error("failed to create RSA cipher; cannot encrypt");
 			return "";
@@ -60,8 +58,7 @@ public class SimpleStringEncryptor
 		}
 	}
 
-	public String decrypt(String data)
-	{
+	public String decrypt(String data) {
 		if (cipher == null) {
 			_logger.error("failed to create RSA cipher; cannot decrypt");
 			return "";

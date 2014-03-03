@@ -12,8 +12,7 @@ import org.morgan.util.macro.MacroUtils;
 import edu.virginia.vcgr.genii.container.cservices.ContainerService;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-class Version1ContainerService
-{
+class Version1ContainerService {
 	@XmlAttribute(name = "class", required = true)
 	private String _className = null;
 
@@ -21,32 +20,30 @@ class Version1ContainerService
 	private Collection<Version1Property> _properties = new LinkedList<Version1Property>();
 
 	@SuppressWarnings("unchecked")
-	final Class<? extends ContainerService> serviceClass(Properties macros) throws ClassNotFoundException
-	{
+	final Class<? extends ContainerService> serviceClass(Properties macros)
+			throws ClassNotFoundException {
 		String className = MacroUtils.replaceMacros(macros, _className);
 
 		if (className.endsWith(".GridLoggerContainerService"))
 			return null;
 
-		Class<? extends ContainerService> serviceClass =
-			(Class<? extends ContainerService>) GenesisClassLoader.classLoaderFactory().loadClass(className);
+		Class<? extends ContainerService> serviceClass = (Class<? extends ContainerService>) GenesisClassLoader
+				.classLoaderFactory().loadClass(className);
 
 		return serviceClass;
 	}
 
-	final Properties properties(Properties macros)
-	{
+	final Properties properties(Properties macros) {
 		Properties ret = new Properties();
 		for (Version1Property property : _properties)
 			ret.setProperty(MacroUtils.replaceMacros(macros, property.name()),
-				MacroUtils.replaceMacros(macros, property.value()));
+					MacroUtils.replaceMacros(macros, property.value()));
 
 		return ret;
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		return String.format("Class = %s", _className);
 	}
 }

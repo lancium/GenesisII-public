@@ -36,38 +36,39 @@ import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class LightWeightExportDirFork extends AbstractRNSResourceFork implements RNSResourceFork, InMemoryIterableFork
+public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
+		RNSResourceFork, InMemoryIterableFork
 // , GeniiNoOutCalls
 {
 
-	final private VExportDir getTarget() throws IOException
-	{
+	final private VExportDir getTarget() throws IOException {
 		return LightWeightExportUtils.getDirectory(getForkPath());
 	}
 
-	public LightWeightExportDirFork(ResourceForkService service, String forkPath)
-	{
+	public LightWeightExportDirFork(ResourceForkService service, String forkPath) {
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry)
-		throws IOException
-	{
-		throw new IOException("Not allowed to add arbitrary endpoints to a " + "light-weight export.");
+	public EndpointReferenceType add(EndpointReferenceType exemplarEPR,
+			String entryName, EndpointReferenceType entry) throws IOException {
+		throw new IOException("Not allowed to add arbitrary endpoints to a "
+				+ "light-weight export.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR, String newFileName) throws IOException
-	{
+	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR,
+			String newFileName) throws IOException {
 		VExportDir dir = getTarget();
 		if (dir.createFile(newFileName)) {
 			String forkPath = formForkPath(newFileName);
 			ResourceForkService service = getService();
 
-			return service.createForkEPR(forkPath, new LightWeightExportFileFork(service, forkPath).describe());
+			return service
+					.createForkEPR(forkPath, new LightWeightExportFileFork(
+							service, forkPath).describe());
 		}
 
 		throw new IOException("Unable to create new file.");
@@ -75,8 +76,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR, String entryName) throws IOException
-	{
+	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR,
+			String entryName) throws IOException {
 		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
 		VExportDir dir = getTarget();
 
@@ -87,9 +88,11 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				ResourceForkInformation info;
 
 				if (dirEntry.isDirectory())
-					info = new LightWeightExportDirFork(getService(), formForkPath(dName)).describe();
+					info = new LightWeightExportDirFork(getService(),
+							formForkPath(dName)).describe();
 				else
-					info = new LightWeightExportFileFork(getService(), formForkPath(dName)).describe();
+					info = new LightWeightExportFileFork(getService(),
+							formForkPath(dName)).describe();
 
 				entries.add(createInternalEntry(exemplarEPR, dName, info));
 			}
@@ -102,14 +105,15 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR, String newDirectoryName) throws IOException
-	{
+	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR,
+			String newDirectoryName) throws IOException {
 		VExportDir dir = getTarget();
 		if (dir.mkdir(newDirectoryName)) {
 			String forkPath = formForkPath(newDirectoryName);
 			ResourceForkService service = getService();
 
-			return service.createForkEPR(forkPath, new LightWeightExportDirFork(service, forkPath).describe());
+			return service.createForkEPR(forkPath,
+					new LightWeightExportDirFork(service, forkPath).describe());
 		}
 
 		throw new IOException("Unable to create new directory.");
@@ -117,15 +121,13 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public boolean remove(String entryName) throws IOException
-	{
+	public boolean remove(String entryName) throws IOException {
 		VExportDir dir = getTarget();
 		return dir.remove(entryName);
 	}
 
 	@Override
-	public boolean isInMemoryIterable() throws IOException
-	{
+	public boolean isInMemoryIterable() throws IOException {
 		if (getTarget() instanceof DiskExportEntry)
 			return true;
 
@@ -133,8 +135,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 	}
 
 	@Override
-	public InMemoryIterableFork getInMemoryIterableFork() throws IOException
-	{
+	public InMemoryIterableFork getInMemoryIterableFork() throws IOException {
 		if (!isInMemoryIterable())
 			return null;
 
@@ -143,8 +144,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 	}
 
 	@Override
-	public IterableSnapshot splitAndList(EndpointReferenceType exemplarEPR, ResourceKey myKey) throws IOException
-	{
+	public IterableSnapshot splitAndList(EndpointReferenceType exemplarEPR,
+			ResourceKey myKey) throws IOException {
 
 		if (!isInMemoryIterable())
 			throw new IOException("Cannot support in-memory iteration!");
@@ -164,9 +165,11 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				ResourceForkInformation info;
 
 				if (dirEntry.isDirectory())
-					info = new LightWeightExportDirFork(getService(), formForkPath(dName)).describe();
+					info = new LightWeightExportDirFork(getService(),
+							formForkPath(dName)).describe();
 				else
-					info = new LightWeightExportFileFork(getService(), formForkPath(dName)).describe();
+					info = new LightWeightExportFileFork(getService(),
+							formForkPath(dName)).describe();
 
 				entries.add(createInternalEntry(exemplarEPR, dName, info));
 
@@ -175,10 +178,12 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 			else {
 				InMemoryIteratorEntry imie;
 				if (dirEntry.isDirectory())
-					imie = new InMemoryIteratorEntry(dName, getForkPath(), true, FileOrDir.DIRECTORY);
+					imie = new InMemoryIteratorEntry(dName, getForkPath(),
+							true, FileOrDir.DIRECTORY);
 
 				else
-					imie = new InMemoryIteratorEntry(dName, getForkPath(), true, FileOrDir.FILE);
+					imie = new InMemoryIteratorEntry(dName, getForkPath(),
+							true, FileOrDir.FILE);
 
 				imieList.add(imie);
 			}
@@ -189,17 +194,16 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		InMemoryIteratorWrapper imiw = null;
 
 		if (imieList.size() > 0) {
-			imiw =
-				new InMemoryIteratorWrapper(this.getClass().getName(), imieList, new Object[] { exemplarEPR, getService(),
-					myKey });
+			imiw = new InMemoryIteratorWrapper(this.getClass().getName(),
+					imieList, new Object[] { exemplarEPR, getService(), myKey });
 		}
 
 		return new IterableSnapshot(entries, imiw);
 	}
 
-	public static MessageElement getIndexedContent(Connection connection, InMemoryIteratorEntry entry, Object[] EprAndService)
-		throws ResourceException
-	{
+	public static MessageElement getIndexedContent(Connection connection,
+			InMemoryIteratorEntry entry, Object[] EprAndService)
+			throws ResourceException {
 		if (EprAndService == null)
 			throw new ResourceException("Unable to list directory contents");
 
@@ -234,26 +238,41 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 			try {
 				FileOrDir stat = statify(dName, forkPath, rKey);
 				if (stat == FileOrDir.DIRECTORY) {
-					LightWeightExportDirFork lwedf =
-						new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
+					LightWeightExportDirFork lwedf = new LightWeightExportDirFork(
+							service, RForkUtils.formForkPathFromPath(forkPath,
+									dName));
 					info = lwedf.describe();
 				}
 
 				else if (stat == FileOrDir.FILE) {
-					LightWeightExportFileFork lweff =
-						new LightWeightExportFileFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
+					LightWeightExportFileFork lweff = new LightWeightExportFileFork(
+							service, RForkUtils.formForkPathFromPath(forkPath,
+									dName));
 
 					info = lweff.describe();
 				}
 
 				else {
 
-					resp =
-						new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(
-							null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String
-								.format("Entry" + " %s does not exist!", dName)) }, null, dName)), dName);
+					resp = new RNSEntryResponseType(
+							null,
+							null,
+							FaultManipulator
+									.fillInFault(new RNSEntryDoesNotExistFaultType(
+											null,
+											null,
+											null,
+											null,
+											new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+													String.format(
+															"Entry"
+																	+ " %s does not exist!",
+															dName)) }, null,
+											dName)), dName);
 
-					return (MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp));
+					return (MessageElementSerializer.serialize(
+							RNSEntryResponseType.getTypeDesc().getXmlType(),
+							resp));
 				}
 			}
 
@@ -263,21 +282,23 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		}
 
 		else if (fd == FileOrDir.DIRECTORY) {
-			LightWeightExportDirFork lwedf =
-				new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
+			LightWeightExportDirFork lwedf = new LightWeightExportDirFork(
+					service, RForkUtils.formForkPathFromPath(forkPath, dName));
 			info = lwedf.describe();
 
 		}
 
 		else if (fd == FileOrDir.FILE) {
-			LightWeightExportFileFork lweff =
-				new LightWeightExportFileFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
+			LightWeightExportFileFork lweff = new LightWeightExportFileFork(
+					service, RForkUtils.formForkPathFromPath(forkPath, dName));
 
 			info = lweff.describe();
 		}
 
 		try {
-			ie = new InternalEntry(dName, service.createForkEPR(RForkUtils.formForkPathFromPath(forkPath, dName), info), null);
+			ie = new InternalEntry(dName, service.createForkEPR(
+					RForkUtils.formForkPathFromPath(forkPath, dName), info),
+					null);
 
 		} catch (ResourceUnknownFaultType e) {
 			throw new ResourceException("Unable to list directory contents");
@@ -286,16 +307,17 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		EndpointReferenceType epr = ie.getEntryReference();
 		AttributesPreFetcherFactory factory = new LightWeightExportAttributePrefetcherFactoryImpl();
 
-		resp =
-			new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
-				Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey, service)), null, ie.getName());
+		resp = new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
+				Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey,
+						service)), null, ie.getName());
 
-		return (MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp));
+		return (MessageElementSerializer.serialize(RNSEntryResponseType
+				.getTypeDesc().getXmlType(), resp));
 
 	}
 
-	private static FileOrDir statify(String entryName, String forkPath, ResourceKey rKey) throws IOException
-	{
+	private static FileOrDir statify(String entryName, String forkPath,
+			ResourceKey rKey) throws IOException {
 
 		VExportDir dir = LightWeightExportUtils.getDirectory(forkPath, rKey);
 
@@ -314,9 +336,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 	}
 
 	@Override
-	public IterableSnapshot splitAndList(String[] lookupRequest, EndpointReferenceType exemplarEPR, ResourceKey resourceKey)
-		throws IOException
-	{
+	public IterableSnapshot splitAndList(String[] lookupRequest,
+			EndpointReferenceType exemplarEPR, ResourceKey resourceKey)
+			throws IOException {
 
 		if (!isInMemoryIterable())
 			throw new IOException("Cannot support in-memory iteration!");
@@ -327,8 +349,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
 		List<InMemoryIteratorEntry> imieList = new LinkedList<InMemoryIteratorEntry>();
 
-		int min =
-			(lookupRequest.length > RNSConstants.PREFERRED_BATCH_SIZE) ? RNSConstants.PREFERRED_BATCH_SIZE
+		int min = (lookupRequest.length > RNSConstants.PREFERRED_BATCH_SIZE) ? RNSConstants.PREFERRED_BATCH_SIZE
 				: lookupRequest.length;
 
 		for (int lcv = 0; lcv < min; lcv++) {
@@ -349,17 +370,18 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				String request = lookupRequest[lcv];
 
 				/*
-				 * We put a true for exists! It does not matter if it is a false. We will identify
-				 * and throw a fault during iteration!
+				 * We put a true for exists! It does not matter if it is a
+				 * false. We will identify and throw a fault during iteration!
 				 */
 
-				InMemoryIteratorEntry imie = new InMemoryIteratorEntry(request, getForkPath(), true, FileOrDir.UNKNOWN);
+				InMemoryIteratorEntry imie = new InMemoryIteratorEntry(request,
+						getForkPath(), true, FileOrDir.UNKNOWN);
 				imieList.add(imie);
 			}
 
-			imiw =
-				new InMemoryIteratorWrapper(this.getClass().getName(), imieList, new Object[] { exemplarEPR, getService(),
-					resourceKey });
+			imiw = new InMemoryIteratorWrapper(this.getClass().getName(),
+					imieList, new Object[] { exemplarEPR, getService(),
+							resourceKey });
 
 			return new IterableSnapshot(entries, imiw);
 		}

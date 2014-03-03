@@ -15,8 +15,9 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-@XmlSchema(namespace = JSDLConstants.JSDL_POSIX_NS, xmlns = { @XmlNs(prefix = "jsdl", namespaceURI = JSDLConstants.JSDL_NS),
-	@XmlNs(prefix = "jsdl-posix", namespaceURI = JSDLConstants.JSDL_POSIX_NS) })
+@XmlSchema(namespace = JSDLConstants.JSDL_POSIX_NS, xmlns = {
+		@XmlNs(prefix = "jsdl", namespaceURI = JSDLConstants.JSDL_NS),
+		@XmlNs(prefix = "jsdl-posix", namespaceURI = JSDLConstants.JSDL_POSIX_NS) })
 package edu.virginia.vcgr.jsdl.posix;
 
 import edu.virginia.vcgr.jsdl.JSDLConstants;

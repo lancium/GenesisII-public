@@ -23,32 +23,22 @@ import edu.virginia.vcgr.jsdl.mapping.Mappings;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 public enum ProcessorArchitecture {
-	sparc("SPARC"),
-	powerpc("Power PC"),
-	x86("X86"),
-	x86_32("X86 32-bit"),
-	x86_64("X86 64-bit"),
-	parisc("PaRISC"),
-	mips("MIPS"),
-	ia64("Itanium 64-bit"),
-	arm("ARM"),
-	other("Other");
+	sparc("SPARC"), powerpc("Power PC"), x86("X86"), x86_32("X86 32-bit"), x86_64(
+			"X86 64-bit"), parisc("PaRISC"), mips("MIPS"), ia64(
+			"Itanium 64-bit"), arm("ARM"), other("Other");
 
 	private String _label;
 
-	private ProcessorArchitecture(String label)
-	{
+	private ProcessorArchitecture(String label) {
 		_label = label;
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return _label;
 	}
 
-	static public ProcessorArchitecture getCurrentArchitecture()
-	{
+	static public ProcessorArchitecture getCurrentArchitecture() {
 		String osArch = System.getProperty("os.arch");
 		if (osArch == null)
 			return null;

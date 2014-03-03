@@ -68,14 +68,14 @@ import edu.virginia.vcgr.jsdl.sweep.parameters.DocumentNodeSweepParameter;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class JSDLEventGenerator
-{
-	static private void handleAnys(XMLDocumentPathImpl path, List<Element> anyElements, Map<QName, String> anyAttributes,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+public class JSDLEventGenerator {
+	static private void handleAnys(XMLDocumentPathImpl path,
+			List<Element> anyElements, Map<QName, String> anyAttributes,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
 		if (anyAttributes != null) {
 			for (Map.Entry<QName, String> attribute : anyAttributes.entrySet()) {
-				receiver.handleAnyAttribute(path, attribute.getKey(), attribute.getValue());
+				receiver.handleAnyAttribute(path, attribute.getKey(),
+						attribute.getValue());
 			}
 		}
 
@@ -83,9 +83,10 @@ public class JSDLEventGenerator
 			for (Element any : anyElements) {
 				String ns = any.getNamespaceURI();
 				String prefix = any.getPrefix();
-				QName name =
-					new QName(ns == null ? XMLConstants.NULL_NS_URI : ns, any.getLocalName(),
-						prefix == null ? XMLConstants.DEFAULT_NS_PREFIX : prefix);
+				QName name = new QName(ns == null ? XMLConstants.NULL_NS_URI
+						: ns, any.getLocalName(),
+						prefix == null ? XMLConstants.DEFAULT_NS_PREFIX
+								: prefix);
 				path.push(name);
 
 				receiver.handleAnyElement(path, any);
@@ -95,42 +96,49 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateJobIdentificationEvents(XMLDocumentPathImpl path, JobIdentification jobIdentification,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateJobIdentificationEvents(
+			XMLDocumentPathImpl path, JobIdentification jobIdentification,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
 		if (jobIdentification != null) {
 			path.push(path.formQNameFromPrevious("JobIdentification"));
-			receiver.startJobIdentification(path, jobIdentification.jobName(), jobIdentification.description(),
-				jobIdentification.annotations(), jobIdentification.projects());
-			handleAnys(path, jobIdentification.any(), jobIdentification.anyAttributes(), receiver);
+			receiver.startJobIdentification(path, jobIdentification.jobName(),
+					jobIdentification.description(),
+					jobIdentification.annotations(),
+					jobIdentification.projects());
+			handleAnys(path, jobIdentification.any(),
+					jobIdentification.anyAttributes(), receiver);
 
 			receiver.endJobIdentification(path);
 			path.pop();
 		}
 	}
 
-	static private void generateFilesystemEvents(XMLDocumentPathImpl path, List<FileSystem> filesystems,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateFilesystemEvents(XMLDocumentPathImpl path,
+			List<FileSystem> filesystems, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (filesystems != null) {
 			for (FileSystem filesystem : filesystems) {
 				path.push(path.formQNameFromPrevious("FileSystem"));
-				receiver.startFilesystem(path, filesystem.name(), filesystem.fsType(), filesystem.description(),
-					filesystem.mountPoint(), filesystem.diskSpace());
-				handleAnys(path, filesystem.any(), filesystem.anyAttributes(), receiver);
+				receiver.startFilesystem(path, filesystem.name(),
+						filesystem.fsType(), filesystem.description(),
+						filesystem.mountPoint(), filesystem.diskSpace());
+				handleAnys(path, filesystem.any(), filesystem.anyAttributes(),
+						receiver);
 				receiver.endFilesystem(path);
 				path.pop();
 			}
 		}
 	}
 
-	static private void generateOperatingSystemEvents(XMLDocumentPathImpl path, OperatingSystem operatingSystem,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateOperatingSystemEvents(XMLDocumentPathImpl path,
+			OperatingSystem operatingSystem, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (operatingSystem != null) {
 			path.push(path.formQNameFromPrevious("OperatingSystem"));
-			receiver.startOperatingSystem(path, operatingSystem.osVersion(), operatingSystem.description());
-			handleAnys(path, operatingSystem.any(), operatingSystem.anyAttributes(), receiver);
+			receiver.startOperatingSystem(path, operatingSystem.osVersion(),
+					operatingSystem.description());
+			handleAnys(path, operatingSystem.any(),
+					operatingSystem.anyAttributes(), receiver);
 
 			OperatingSystemType osType = operatingSystem.osType();
 			if (osType != null) {
@@ -146,9 +154,9 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateCPUArchitectureEvents(XMLDocumentPathImpl path, CPUArchitecture cpuArch,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateCPUArchitectureEvents(XMLDocumentPathImpl path,
+			CPUArchitecture cpuArch, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (cpuArch != null) {
 			path.push(path.formQNameFromPrevious("CPUArchitecture"));
 			receiver.startCPUArchitecture(path, cpuArch.processorArchitecture());
@@ -158,13 +166,14 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateResourcesEvents(XMLDocumentPathImpl path, Resources resources, JSDLEventReceiver receiver)
-		throws JSDLValidationException
-	{
+	static private void generateResourcesEvents(XMLDocumentPathImpl path,
+			Resources resources, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (resources != null) {
 			path.push(path.formQNameFromPrevious("Resources"));
 			receiver.startResources(path);
-			handleAnys(path, resources.any(), resources.anyAttributes(), receiver);
+			handleAnys(path, resources.any(), resources.anyAttributes(),
+					receiver);
 
 			List<String> candidateHosts = resources.candidateHosts();
 			if (candidateHosts != null) {
@@ -184,28 +193,37 @@ public class JSDLEventGenerator
 			Boolean exclusiveExecution = resources.exclusiveExecution();
 			if (exclusiveExecution != null) {
 				path.push(path.formQNameFromPrevious("ExclusiveExecution"));
-				receiver.handleExclusiveExecution(path, exclusiveExecution.booleanValue());
+				receiver.handleExclusiveExecution(path,
+						exclusiveExecution.booleanValue());
 				path.pop();
 			}
 
-			generateOperatingSystemEvents(path, resources.operatingSystem(), receiver);
-			generateCPUArchitectureEvents(path, resources.cpuArchitecture(), receiver);
+			generateOperatingSystemEvents(path, resources.operatingSystem(),
+					receiver);
+			generateCPUArchitectureEvents(path, resources.cpuArchitecture(),
+					receiver);
 
-			receiver.handleIndividualResourceRanges(path, resources.individualCPUSpeed(), resources.individualCPUTime(),
-				resources.individualCPUCount(), resources.individualNetworkBandwidth(), resources.individualPhysicalMemory(),
-				resources.individualVirtualMemory(), resources.individualDiskSpace());
-			receiver.handleTotalResourceRanges(path, resources.totalCPUTime(), resources.totalCPUCount(),
-				resources.totalPhysicalMemory(), resources.totalVirtualMemory(), resources.totalDiskSpace(),
-				resources.totalResourceCount());
+			receiver.handleIndividualResourceRanges(path,
+					resources.individualCPUSpeed(),
+					resources.individualCPUTime(),
+					resources.individualCPUCount(),
+					resources.individualNetworkBandwidth(),
+					resources.individualPhysicalMemory(),
+					resources.individualVirtualMemory(),
+					resources.individualDiskSpace());
+			receiver.handleTotalResourceRanges(path, resources.totalCPUTime(),
+					resources.totalCPUCount(), resources.totalPhysicalMemory(),
+					resources.totalVirtualMemory(), resources.totalDiskSpace(),
+					resources.totalResourceCount());
 
 			receiver.endResources(path);
 			path.pop();
 		}
 	}
 
-	static private void generateLimitEvents(XMLDocumentPathImpl path, POSIXLimitType limitType, Limits limit,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateLimitEvents(XMLDocumentPathImpl path,
+			POSIXLimitType limitType, Limits limit, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (limit != null) {
 			path.push(path.formQNameFromPrevious(limitType.toString()));
 			receiver.startLimit(path, limitType, limit.value());
@@ -215,9 +233,9 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateUserNameEvents(XMLDocumentPathImpl path, UserName userName, JSDLEventReceiver receiver)
-		throws JSDLValidationException
-	{
+	static private void generateUserNameEvents(XMLDocumentPathImpl path,
+			UserName userName, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (userName != null) {
 			path.push(path.formQNameFromPrevious("UserName"));
 			receiver.startUserName(path, userName.value());
@@ -227,9 +245,9 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateGroupNameEvents(XMLDocumentPathImpl path, GroupName groupName, JSDLEventReceiver receiver)
-		throws JSDLValidationException
-	{
+	static private void generateGroupNameEvents(XMLDocumentPathImpl path,
+			GroupName groupName, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (groupName != null) {
 			path.push(path.formQNameFromPrevious("GroupName"));
 			receiver.startGroupName(path, groupName.value());
@@ -239,55 +257,77 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generatePOSIXApplicationEvents(XMLDocumentPathImpl path, POSIXApplication posixApplication,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
-		path.push(new QName(JSDLConstants.JSDL_POSIX_NS, "POSIXApplication", "jsdl-posix"));
+	static private void generatePOSIXApplicationEvents(
+			XMLDocumentPathImpl path, POSIXApplication posixApplication,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
+		path.push(new QName(JSDLConstants.JSDL_POSIX_NS, "POSIXApplication",
+				"jsdl-posix"));
 		receiver.startPOSIXApplication(path, posixApplication.name());
 		handleAnys(path, null, posixApplication.anyAttributes(), receiver);
 
 		FileName executable = posixApplication.executable();
 		if (executable != null)
-			receiver.handleExecutable(path, executable.get(), executable.filesystemName(), executable.anyAttributes());
+			receiver.handleExecutable(path, executable.get(),
+					executable.filesystemName(), executable.anyAttributes());
 		List<Argument> args = posixApplication.arguments();
 		if (args != null) {
 			for (Argument arg : args)
-				receiver.handleArgument(path, arg.get(), arg.filesystemName(), arg.anyAttributes());
+				receiver.handleArgument(path, arg.get(), arg.filesystemName(),
+						arg.anyAttributes());
 		}
 
 		FileName stream = posixApplication.input();
 		if (stream != null)
-			receiver.handleInput(path, stream.get(), stream.filesystemName(), stream.anyAttributes());
+			receiver.handleInput(path, stream.get(), stream.filesystemName(),
+					stream.anyAttributes());
 		stream = posixApplication.output();
 		if (stream != null)
-			receiver.handleOutput(path, stream.get(), stream.filesystemName(), stream.anyAttributes());
+			receiver.handleOutput(path, stream.get(), stream.filesystemName(),
+					stream.anyAttributes());
 		stream = posixApplication.error();
 		if (stream != null)
-			receiver.handleError(path, stream.get(), stream.filesystemName(), stream.anyAttributes());
+			receiver.handleError(path, stream.get(), stream.filesystemName(),
+					stream.anyAttributes());
 
 		DirectoryName workingDir = posixApplication.workingDirectory();
 		if (workingDir != null)
-			receiver.handleWorkingDirectory(path, workingDir.get(), workingDir.filesystemName(), workingDir.anyAttributes());
+			receiver.handleWorkingDirectory(path, workingDir.get(),
+					workingDir.filesystemName(), workingDir.anyAttributes());
 
-		List<Environment> environmentVariables = posixApplication.environmentVariables();
+		List<Environment> environmentVariables = posixApplication
+				.environmentVariables();
 		if (environmentVariables != null) {
 			for (Environment env : environmentVariables)
-				receiver.handleEnvironmentVariable(path, env.name(), env.get(), env.filesystemName(), env.anyAttributes());
+				receiver.handleEnvironmentVariable(path, env.name(), env.get(),
+						env.filesystemName(), env.anyAttributes());
 		}
 
-		generateLimitEvents(path, POSIXLimitType.WallTimeLimit, posixApplication.wallTimeLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.FileSizeLimit, posixApplication.fileSizeLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.CoreDumpLimit, posixApplication.coreDumpLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.DataSegmentLimit, posixApplication.dataSegmentLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.LockedMemoryLimit, posixApplication.lockedMemoryLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.MemoryLimit, posixApplication.memoryLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.OpenDescriptorsLimit, posixApplication.openDescriptorsLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.PipeSizeLimit, posixApplication.pipeSizeLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.StackSizeLimit, posixApplication.stackSizeLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.CPUTimeLimit, posixApplication.cpuTimeLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.ProcessCountLimit, posixApplication.processCountLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.VirtualMemoryLimit, posixApplication.virtualMemoryLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.ThreadCountLimit, posixApplication.threadCountLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.WallTimeLimit,
+				posixApplication.wallTimeLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.FileSizeLimit,
+				posixApplication.fileSizeLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.CoreDumpLimit,
+				posixApplication.coreDumpLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.DataSegmentLimit,
+				posixApplication.dataSegmentLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.LockedMemoryLimit,
+				posixApplication.lockedMemoryLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.MemoryLimit,
+				posixApplication.memoryLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.OpenDescriptorsLimit,
+				posixApplication.openDescriptorsLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.PipeSizeLimit,
+				posixApplication.pipeSizeLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.StackSizeLimit,
+				posixApplication.stackSizeLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.CPUTimeLimit,
+				posixApplication.cpuTimeLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.ProcessCountLimit,
+				posixApplication.processCountLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.VirtualMemoryLimit,
+				posixApplication.virtualMemoryLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.ThreadCountLimit,
+				posixApplication.threadCountLimit(), receiver);
 
 		generateUserNameEvents(path, posixApplication.userName(), receiver);
 		generateGroupNameEvents(path, posixApplication.groupName(), receiver);
@@ -296,9 +336,9 @@ public class JSDLEventGenerator
 		path.pop();
 	}
 
-	static private void generateUserNameEvents(XMLDocumentPathImpl path, edu.virginia.vcgr.jsdl.hpc.UserName userName,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateUserNameEvents(XMLDocumentPathImpl path,
+			edu.virginia.vcgr.jsdl.hpc.UserName userName,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
 		if (userName != null) {
 			path.push(path.formQNameFromPrevious("UserName"));
 			receiver.startUserName(path, userName.value());
@@ -308,40 +348,52 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateHPCProfileApplicationEvents(XMLDocumentPathImpl path, HPCProfileApplication hpcApplication,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
-		path.push(new QName(HPCConstants.HPCPA_NS, "HPCProfileApplication", "hpcp"));
+	static private void generateHPCProfileApplicationEvents(
+			XMLDocumentPathImpl path, HPCProfileApplication hpcApplication,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
+		path.push(new QName(HPCConstants.HPCPA_NS, "HPCProfileApplication",
+				"hpcp"));
 		receiver.startHPCProfileApplication(path, hpcApplication.name());
 		handleAnys(path, null, hpcApplication.anyAttributes(), receiver);
 
-		edu.virginia.vcgr.jsdl.hpc.FileName executable = hpcApplication.executable();
+		edu.virginia.vcgr.jsdl.hpc.FileName executable = hpcApplication
+				.executable();
 		if (executable != null)
-			receiver.handleExecutable(path, executable.value(), null, executable.anyAttributes());
-		List<edu.virginia.vcgr.jsdl.hpc.Argument> args = hpcApplication.arguments();
+			receiver.handleExecutable(path, executable.value(), null,
+					executable.anyAttributes());
+		List<edu.virginia.vcgr.jsdl.hpc.Argument> args = hpcApplication
+				.arguments();
 		if (args != null) {
 			for (edu.virginia.vcgr.jsdl.hpc.Argument arg : args)
-				receiver.handleArgument(path, arg.value(), null, arg.anyAttributes());
+				receiver.handleArgument(path, arg.value(), null,
+						arg.anyAttributes());
 		}
 
 		edu.virginia.vcgr.jsdl.hpc.FileName stream = hpcApplication.input();
 		if (stream != null)
-			receiver.handleInput(path, stream.value(), null, stream.anyAttributes());
+			receiver.handleInput(path, stream.value(), null,
+					stream.anyAttributes());
 		stream = hpcApplication.output();
 		if (stream != null)
-			receiver.handleOutput(path, stream.value(), null, stream.anyAttributes());
+			receiver.handleOutput(path, stream.value(), null,
+					stream.anyAttributes());
 		stream = hpcApplication.error();
 		if (stream != null)
-			receiver.handleError(path, stream.value(), null, stream.anyAttributes());
+			receiver.handleError(path, stream.value(), null,
+					stream.anyAttributes());
 
-		edu.virginia.vcgr.jsdl.hpc.DirectoryName workingDir = hpcApplication.workingDirectory();
+		edu.virginia.vcgr.jsdl.hpc.DirectoryName workingDir = hpcApplication
+				.workingDirectory();
 		if (workingDir != null)
-			receiver.handleWorkingDirectory(path, workingDir.value(), null, workingDir.anyAttributes());
+			receiver.handleWorkingDirectory(path, workingDir.value(), null,
+					workingDir.anyAttributes());
 
-		List<edu.virginia.vcgr.jsdl.hpc.Environment> environmentVariables = hpcApplication.environmentVariables();
+		List<edu.virginia.vcgr.jsdl.hpc.Environment> environmentVariables = hpcApplication
+				.environmentVariables();
 		if (environmentVariables != null) {
 			for (edu.virginia.vcgr.jsdl.hpc.Environment env : environmentVariables)
-				receiver.handleEnvironmentVariable(path, env.name(), env.value(), null, env.anyAttributes());
+				receiver.handleEnvironmentVariable(path, env.name(),
+						env.value(), null, env.anyAttributes());
 		}
 
 		generateUserNameEvents(path, hpcApplication.userName(), receiver);
@@ -350,21 +402,23 @@ public class JSDLEventGenerator
 		path.pop();
 	}
 
-	static private void generateNumberOfProcessesEvents(XMLDocumentPathImpl path, NumberOfProcesses numberOfProcesses,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateNumberOfProcessesEvents(
+			XMLDocumentPathImpl path, NumberOfProcesses numberOfProcesses,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
 		if (numberOfProcesses != null) {
 			path.push(path.formQNameFromPrevious("NumberOfProcesses"));
-			receiver.startNumberOfProcesses(path, numberOfProcesses.actualTotalCPUCount(), numberOfProcesses.value());
+			receiver.startNumberOfProcesses(path,
+					numberOfProcesses.actualTotalCPUCount(),
+					numberOfProcesses.value());
 			handleAnys(path, null, numberOfProcesses.anyAttributes(), receiver);
 			receiver.endNumberOfProcesses(path);
 			path.pop();
 		}
 	}
 
-	static private void generateProcessesPerHostEvents(XMLDocumentPathImpl path, ProcessesPerHost processesPerHost,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateProcessesPerHostEvents(
+			XMLDocumentPathImpl path, ProcessesPerHost processesPerHost,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
 		if (processesPerHost != null) {
 			path.push(path.formQNameFromPrevious("ProcessesPerHost"));
 			receiver.startProcessesPerHost(path, processesPerHost.value());
@@ -374,85 +428,104 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateThreadsPerProcessEvents(XMLDocumentPathImpl path, ThreadsPerProcess threadsPerProcess,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateThreadsPerProcessEvents(
+			XMLDocumentPathImpl path, ThreadsPerProcess threadsPerProcess,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
 		if (threadsPerProcess != null) {
 			path.push(path.formQNameFromPrevious("ThreadsPerProcess"));
-			receiver.startThreadsPerProcess(path, threadsPerProcess.actualIndividualCPUCount(), threadsPerProcess.value());
+			receiver.startThreadsPerProcess(path,
+					threadsPerProcess.actualIndividualCPUCount(),
+					threadsPerProcess.value());
 			handleAnys(path, null, threadsPerProcess.anyAttributes(), receiver);
 			receiver.endThreadsPerProcess(path);
 			path.pop();
 		}
 	}
 
-	static private void generateSPMDApplicationEvents(XMLDocumentPathImpl path, SPMDApplication spmdApplication,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
-		path.push(new QName(SPMDConstants.JSDL_SPMD_NS, "SPMDApplication", "jsdl-spmd"));
+	static private void generateSPMDApplicationEvents(XMLDocumentPathImpl path,
+			SPMDApplication spmdApplication, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
+		path.push(new QName(SPMDConstants.JSDL_SPMD_NS, "SPMDApplication",
+				"jsdl-spmd"));
 		receiver.startSPMDApplication(path, spmdApplication.name());
 		handleAnys(path, null, spmdApplication.anyAttributes(), receiver);
 
 		FileName executable = spmdApplication.executable();
 		if (executable != null)
-			receiver.handleExecutable(path, executable.get(), executable.filesystemName(), executable.anyAttributes());
+			receiver.handleExecutable(path, executable.get(),
+					executable.filesystemName(), executable.anyAttributes());
 		List<Argument> args = spmdApplication.arguments();
 		if (args != null) {
 			for (Argument arg : args)
-				receiver.handleArgument(path, arg.get(), arg.filesystemName(), arg.anyAttributes());
+				receiver.handleArgument(path, arg.get(), arg.filesystemName(),
+						arg.anyAttributes());
 		}
 
 		FileName stream = spmdApplication.input();
 		if (stream != null)
-			receiver.handleInput(path, stream.get(), stream.filesystemName(), stream.anyAttributes());
+			receiver.handleInput(path, stream.get(), stream.filesystemName(),
+					stream.anyAttributes());
 		stream = spmdApplication.output();
 		if (stream != null)
-			receiver.handleOutput(path, stream.get(), stream.filesystemName(), stream.anyAttributes());
+			receiver.handleOutput(path, stream.get(), stream.filesystemName(),
+					stream.anyAttributes());
 		stream = spmdApplication.error();
 		if (stream != null)
-			receiver.handleError(path, stream.get(), stream.filesystemName(), stream.anyAttributes());
+			receiver.handleError(path, stream.get(), stream.filesystemName(),
+					stream.anyAttributes());
 
 		DirectoryName workingDir = spmdApplication.workingDirectory();
 		if (workingDir != null)
-			receiver.handleWorkingDirectory(path, workingDir.get(), workingDir.filesystemName(), workingDir.anyAttributes());
+			receiver.handleWorkingDirectory(path, workingDir.get(),
+					workingDir.filesystemName(), workingDir.anyAttributes());
 
-		List<Environment> environmentVariables = spmdApplication.environmentVariables();
+		List<Environment> environmentVariables = spmdApplication
+				.environmentVariables();
 		if (environmentVariables != null) {
 			for (Environment env : environmentVariables)
-				receiver.handleEnvironmentVariable(path, env.name(), env.get(), env.filesystemName(), env.anyAttributes());
+				receiver.handleEnvironmentVariable(path, env.name(), env.get(),
+						env.filesystemName(), env.anyAttributes());
 		}
 
 		generateUserNameEvents(path, spmdApplication.userName(), receiver);
 
-		generateNumberOfProcessesEvents(path, spmdApplication.numberOfProcesses(), receiver);
-		generateProcessesPerHostEvents(path, spmdApplication.processesPerHost(), receiver);
-		generateThreadsPerProcessEvents(path, spmdApplication.threadsPerProcess(), receiver);
+		generateNumberOfProcessesEvents(path,
+				spmdApplication.numberOfProcesses(), receiver);
+		generateProcessesPerHostEvents(path,
+				spmdApplication.processesPerHost(), receiver);
+		generateThreadsPerProcessEvents(path,
+				spmdApplication.threadsPerProcess(), receiver);
 
 		receiver.endSPMDApplication(path);
 		path.pop();
 	}
 
-	static private void
-		generateApplicationEvents(XMLDocumentPathImpl path, Application application, JSDLEventReceiver receiver)
-			throws JSDLValidationException
-	{
+	static private void generateApplicationEvents(XMLDocumentPathImpl path,
+			Application application, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (application != null) {
 			path.push(path.formQNameFromPrevious("Application"));
-			receiver.startApplication(path, application.applicationName(), application.applicationVersion(),
-				application.description());
-			handleAnys(path, application.any(), application.anyAttributes(), receiver);
+			receiver.startApplication(path, application.applicationName(),
+					application.applicationVersion(), application.description());
+			handleAnys(path, application.any(), application.anyAttributes(),
+					receiver);
 
 			ApplicationBase base = application.application();
 			if (base != null) {
 				if (base instanceof POSIXApplication)
-					generatePOSIXApplicationEvents(path, (POSIXApplication) base, receiver);
+					generatePOSIXApplicationEvents(path,
+							(POSIXApplication) base, receiver);
 				else if (base instanceof HPCProfileApplication)
-					generateHPCProfileApplicationEvents(path, (HPCProfileApplication) base, receiver);
+					generateHPCProfileApplicationEvents(path,
+							(HPCProfileApplication) base, receiver);
 				else if (base instanceof SPMDApplication)
-					generateSPMDApplicationEvents(path, (SPMDApplication) base, receiver);
+					generateSPMDApplicationEvents(path, (SPMDApplication) base,
+							receiver);
 				else
-					throw new JSDLValidationException(String.format("Unexpected application type %s while validating JSDL.",
-						base.getClass()));
+					throw new JSDLValidationException(
+							String.format(
+									"Unexpected application type %s while validating JSDL.",
+									base.getClass()));
 			}
 
 			receiver.endApplication(path);
@@ -460,9 +533,9 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateSourceEvents(XMLDocumentPathImpl path, SourceTarget source, JSDLEventReceiver receiver)
-		throws JSDLValidationException
-	{
+	static private void generateSourceEvents(XMLDocumentPathImpl path,
+			SourceTarget source, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (source != null) {
 			path.push(path.formQNameFromPrevious("Source"));
 			receiver.startSource(path, source.uri());
@@ -472,9 +545,9 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateTargetEvents(XMLDocumentPathImpl path, SourceTarget target, JSDLEventReceiver receiver)
-		throws JSDLValidationException
-	{
+	static private void generateTargetEvents(XMLDocumentPathImpl path,
+			SourceTarget target, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (target != null) {
 			path.push(path.formQNameFromPrevious("Source"));
 			receiver.startTarget(path, target.uri());
@@ -484,11 +557,12 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateCredentialsEvents(XMLDocumentPathImpl path, Credential credentials, JSDLEventReceiver receiver)
-		throws JSDLValidationException
-	{
+	static private void generateCredentialsEvents(XMLDocumentPathImpl path,
+			Credential credentials, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (credentials != null) {
-			path.push(new QName(HPCFSEConstants.HPCFSE_NS, "Credential", "hpc-fse"));
+			path.push(new QName(HPCFSEConstants.HPCFSE_NS, "Credential",
+					"hpc-fse"));
 			receiver.startCredential(path, credentials.tokens());
 			handleAnys(path, credentials.any(), null, receiver);
 			receiver.endCredential(path);
@@ -496,15 +570,15 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void
-		generateDataStagingEvents(XMLDocumentPathImpl path, List<DataStaging> stages, JSDLEventReceiver receiver)
-			throws JSDLValidationException
-	{
+	static private void generateDataStagingEvents(XMLDocumentPathImpl path,
+			List<DataStaging> stages, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (stages != null) {
 			for (DataStaging stage : stages) {
 				path.push(path.formQNameFromPrevious("DataStaging"));
-				receiver.startDataStaging(path, stage.name(), stage.filename(), stage.filesystemName(), stage.creationFlag(),
-					stage.deleteOnTermionation());
+				receiver.startDataStaging(path, stage.name(), stage.filename(),
+						stage.filesystemName(), stage.creationFlag(),
+						stage.deleteOnTermionation());
 				handleAnys(path, stage.any(), stage.anyAttributes(), receiver);
 
 				generateSourceEvents(path, stage.source(), receiver);
@@ -517,87 +591,102 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateDocumentNodeSweepParameterEvents(XMLDocumentPathImpl path,
-		DocumentNodeSweepParameter parameter, JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateDocumentNodeSweepParameterEvents(
+			XMLDocumentPathImpl path, DocumentNodeSweepParameter parameter,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
 		path.push(new QName(SweepConstants.SWEEP_NS, "DocumentNode", "spmd"));
 
-		receiver.handleDocumentNodeSweepParameter(path, parameter.bindings(), parameter.matchExpression());
+		receiver.handleDocumentNodeSweepParameter(path, parameter.bindings(),
+				parameter.matchExpression());
 
 		path.pop();
 	}
 
-	static private void generateSweepParameterEvents(XMLDocumentPathImpl path, List<SweepParameter> parameters,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateSweepParameterEvents(XMLDocumentPathImpl path,
+			List<SweepParameter> parameters, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (parameters != null) {
 			for (SweepParameter parameter : parameters) {
 				if (parameter instanceof DocumentNodeSweepParameter) {
-					generateDocumentNodeSweepParameterEvents(path, (DocumentNodeSweepParameter) parameter, receiver);
+					generateDocumentNodeSweepParameterEvents(path,
+							(DocumentNodeSweepParameter) parameter, receiver);
 				} else
-					throw new JSDLValidationException(String.format(
-						"Unexpected sweep parameter type %s while validating JSDL.", parameter.getClass()));
+					throw new JSDLValidationException(
+							String.format(
+									"Unexpected sweep parameter type %s while validating JSDL.",
+									parameter.getClass()));
 			}
 		}
 	}
 
-	static private void generateValuesSweepFunctionEvents(XMLDocumentPathImpl path, ValuesSweepFunction function,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
-		path.push(new QName(SweepConstants.SWEEP_FUNC_NS, "Values", "sweep-func"));
+	static private void generateValuesSweepFunctionEvents(
+			XMLDocumentPathImpl path, ValuesSweepFunction function,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
+		path.push(new QName(SweepConstants.SWEEP_FUNC_NS, "Values",
+				"sweep-func"));
 
 		receiver.handleValuesSweepFunction(path, function.values());
 
 		path.pop();
 	}
 
-	static private void generateLoopIntegerSweepFunctionEvents(XMLDocumentPathImpl path, LoopIntegerSweepFunction function,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
-		path.push(new QName(SweepConstants.SWEEP_FUNC_NS, "LoopInteger", "sweep-func"));
+	static private void generateLoopIntegerSweepFunctionEvents(
+			XMLDocumentPathImpl path, LoopIntegerSweepFunction function,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
+		path.push(new QName(SweepConstants.SWEEP_FUNC_NS, "LoopInteger",
+				"sweep-func"));
 
-		receiver.handleLoopIntegerSweepFunction(path, function.start(), function.end(), function.step(), function.exceptions());
-
-		path.pop();
-	}
-
-	static private void generateLoopDoubleSweepFunctionEvents(XMLDocumentPathImpl path, LoopDoubleSweepFunction function,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
-		path.push(new QName(SweepConstants.SWEEP_FUNC_NS, "LoopDouble", "sweep-func"));
-
-		receiver.handleLoopDoubleSweepFunction(path, function.start(), function.end(), function.step(), function.exceptions());
+		receiver.handleLoopIntegerSweepFunction(path, function.start(),
+				function.end(), function.step(), function.exceptions());
 
 		path.pop();
 	}
 
-	static private void
-		generateSweepFunctionEvents(XMLDocumentPathImpl path, SweepFunction function, JSDLEventReceiver receiver)
-			throws JSDLValidationException
-	{
+	static private void generateLoopDoubleSweepFunctionEvents(
+			XMLDocumentPathImpl path, LoopDoubleSweepFunction function,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
+		path.push(new QName(SweepConstants.SWEEP_FUNC_NS, "LoopDouble",
+				"sweep-func"));
+
+		receiver.handleLoopDoubleSweepFunction(path, function.start(),
+				function.end(), function.step(), function.exceptions());
+
+		path.pop();
+	}
+
+	static private void generateSweepFunctionEvents(XMLDocumentPathImpl path,
+			SweepFunction function, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (function != null) {
 			if (function instanceof ValuesSweepFunction) {
-				generateValuesSweepFunctionEvents(path, (ValuesSweepFunction) function, receiver);
+				generateValuesSweepFunctionEvents(path,
+						(ValuesSweepFunction) function, receiver);
 			} else if (function instanceof LoopIntegerSweepFunction) {
-				generateLoopIntegerSweepFunctionEvents(path, (LoopIntegerSweepFunction) function, receiver);
+				generateLoopIntegerSweepFunctionEvents(path,
+						(LoopIntegerSweepFunction) function, receiver);
 			} else if (function instanceof LoopDoubleSweepFunction) {
-				generateLoopDoubleSweepFunctionEvents(path, (LoopDoubleSweepFunction) function, receiver);
+				generateLoopDoubleSweepFunctionEvents(path,
+						(LoopDoubleSweepFunction) function, receiver);
 			} else
-				throw new JSDLValidationException(String.format("Unexpected sweep function type %s while validating JSDL.",
-					function.getClass()));
+				throw new JSDLValidationException(
+						String.format(
+								"Unexpected sweep function type %s while validating JSDL.",
+								function.getClass()));
 		}
 	}
 
-	static private void generateSweepAssignmentEvents(XMLDocumentPathImpl path, List<SweepAssignment> assignments,
-		JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static private void generateSweepAssignmentEvents(XMLDocumentPathImpl path,
+			List<SweepAssignment> assignments, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (assignments != null) {
 			for (SweepAssignment assignment : assignments) {
 				path.push(path.formQNameFromPrevious("Assignment"));
 				receiver.startSweepAssignment(path);
 
-				generateSweepParameterEvents(path, assignment.sweepParameters(), receiver);
-				generateSweepFunctionEvents(path, assignment.sweepFunction(), receiver);
+				generateSweepParameterEvents(path,
+						assignment.sweepParameters(), receiver);
+				generateSweepFunctionEvents(path, assignment.sweepFunction(),
+						receiver);
 
 				receiver.endSweepAssignment(path);
 				path.pop();
@@ -605,15 +694,17 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateSweepEvents(XMLDocumentPathImpl path, List<Sweep> sweeps, JSDLEventReceiver receiver)
-		throws JSDLValidationException
-	{
+	static private void generateSweepEvents(XMLDocumentPathImpl path,
+			List<Sweep> sweeps, JSDLEventReceiver receiver)
+			throws JSDLValidationException {
 		if (sweeps != null) {
 			for (Sweep sweep : sweeps) {
-				path.push(new QName(SweepConstants.SWEEP_NS, SweepConstants.SWEEP_NAME, "sweep"));
+				path.push(new QName(SweepConstants.SWEEP_NS,
+						SweepConstants.SWEEP_NAME, "sweep"));
 				receiver.startParameterSweep(path);
 
-				generateSweepAssignmentEvents(path, sweep.assignments(), receiver);
+				generateSweepAssignmentEvents(path, sweep.assignments(),
+						receiver);
 				generateSweepEvents(path, sweep.subSweeps(), receiver);
 
 				receiver.endParameterSweep(path);
@@ -622,12 +713,13 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static public void generateJSDLEvents(JobDefinition jobDef, JSDLEventReceiver receiver) throws JSDLValidationException
-	{
+	static public void generateJSDLEvents(JobDefinition jobDef,
+			JSDLEventReceiver receiver) throws JSDLValidationException {
 		XMLDocumentPathImpl xmlPath = new XMLDocumentPathImpl();
 
 		if (jobDef != null) {
-			xmlPath.push(new QName(JSDLConstants.JSDL_NS, "JobDefinition", "jsdl"));
+			xmlPath.push(new QName(JSDLConstants.JSDL_NS, "JobDefinition",
+					"jsdl"));
 			receiver.startJobDefinition(xmlPath, jobDef.id());
 			handleAnys(xmlPath, jobDef.any(), jobDef.anyAttributes(), receiver);
 
@@ -635,11 +727,14 @@ public class JSDLEventGenerator
 			if (jobDesc != null) {
 				xmlPath.push(xmlPath.formQNameFromPrevious("JobDescription"));
 				receiver.startJobDescription(xmlPath);
-				handleAnys(xmlPath, jobDesc.any(), jobDesc.anyAttributes(), receiver);
+				handleAnys(xmlPath, jobDesc.any(), jobDesc.anyAttributes(),
+						receiver);
 
-				generateJobIdentificationEvents(xmlPath, jobDesc.jobIdentification(), receiver);
+				generateJobIdentificationEvents(xmlPath,
+						jobDesc.jobIdentification(), receiver);
 				generateResourcesEvents(xmlPath, jobDesc.resources(), receiver);
-				generateApplicationEvents(xmlPath, jobDesc.application(), receiver);
+				generateApplicationEvents(xmlPath, jobDesc.application(),
+						receiver);
 				generateDataStagingEvents(xmlPath, jobDesc.staging(), receiver);
 
 				receiver.endJobDescription(xmlPath);

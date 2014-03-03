@@ -16,12 +16,11 @@ import java.util.prefs.Preferences;
 
 import org.apache.log4j.Logger;
 
-public class ToolPreferences
-{
+public class ToolPreferences {
 	static private Logger _logger = Logger.getLogger(ToolPreferences.class);
 
-	static private Object fromBytes(byte[] bytes, Object defaultValue) throws IOException, ClassNotFoundException
-	{
+	static private Object fromBytes(byte[] bytes, Object defaultValue)
+			throws IOException, ClassNotFoundException {
 		if (bytes == null)
 			return defaultValue;
 
@@ -30,8 +29,7 @@ public class ToolPreferences
 		return ois.readObject();
 	}
 
-	static private byte[] toByteArray(Object value) throws IOException
-	{
+	static private byte[] toByteArray(Object value) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		oos.writeObject(value);
@@ -39,15 +37,14 @@ public class ToolPreferences
 		return baos.toByteArray();
 	}
 
-	private Map<ToolPreference, Collection<ToolPreferenceListener>> _listeners =
-		new EnumMap<ToolPreference, Collection<ToolPreferenceListener>>(ToolPreference.class);
+	private Map<ToolPreference, Collection<ToolPreferenceListener>> _listeners = new EnumMap<ToolPreference, Collection<ToolPreferenceListener>>(
+			ToolPreference.class);
 
 	private Preferences _preferenceNode;
 
 	private EnumMap<ToolPreference, Object> _preferences;
 
-	protected void firePreferenceChanged(ToolPreference preference)
-	{
+	protected void firePreferenceChanged(ToolPreference preference) {
 		Collection<ToolPreferenceListener> listeners;
 		Collection<ToolPreferenceListener> tmpListeners;
 
@@ -60,13 +57,14 @@ public class ToolPreferences
 		}
 
 		for (ToolPreferenceListener listener : listeners)
-			listener.preferenceChanged(this, preference, _preferences.get(preference));
+			listener.preferenceChanged(this, preference,
+					_preferences.get(preference));
 	}
 
-	public ToolPreferences()
-	{
+	public ToolPreferences() {
 		for (ToolPreference preference : ToolPreference.values())
-			_listeners.put(preference, new LinkedList<ToolPreferenceListener>());
+			_listeners
+					.put(preference, new LinkedList<ToolPreferenceListener>());
 
 		_preferenceNode = Preferences.userNodeForPackage(ToolPreferences.class);
 
@@ -76,24 +74,32 @@ public class ToolPreferences
 			Class<?> defaultType = preference.defaultValue().getClass();
 
 			if (defaultType.equals(Boolean.class)) {
-				_preferences.put(preference,
-					_preferenceNode.getBoolean(preference.name(), ((Boolean) preference.defaultValue()).booleanValue()));
+				_preferences.put(preference, _preferenceNode.getBoolean(
+						preference.name(),
+						((Boolean) preference.defaultValue()).booleanValue()));
 			} else if (defaultType.equals(Integer.class)) {
-				_preferences.put(preference,
-					_preferenceNode.getInt(preference.name(), ((Integer) preference.defaultValue()).intValue()));
+				_preferences.put(preference, _preferenceNode.getInt(
+						preference.name(),
+						((Integer) preference.defaultValue()).intValue()));
 			} else {
 				try {
-					_preferences.put(preference,
-						fromBytes(_preferenceNode.getByteArray(preference.name(), null), preference.defaultValue()));
+					_preferences.put(
+							preference,
+							fromBytes(
+									_preferenceNode.getByteArray(
+											preference.name(), null),
+									preference.defaultValue()));
 				} catch (Throwable cause) {
-					_logger.error(String.format("Unable to read preference \"%s\".", preference), cause);
+					_logger.error(String.format(
+							"Unable to read preference \"%s\".", preference),
+							cause);
 				}
 			}
 		}
 	}
 
-	public void addPreferenceListener(ToolPreferenceListener listener, ToolPreference... interestSet)
-	{
+	public void addPreferenceListener(ToolPreferenceListener listener,
+			ToolPreference... interestSet) {
 		if (interestSet == null || interestSet.length == 0)
 			interestSet = ToolPreference.values();
 
@@ -110,8 +116,8 @@ public class ToolPreferences
 		}
 	}
 
-	public void removePreferenceListener(ToolPreferenceListener listener, ToolPreference... interestSet)
-	{
+	public void removePreferenceListener(ToolPreferenceListener listener,
+			ToolPreference... interestSet) {
 		if (interestSet == null || interestSet.length == 0)
 			interestSet = ToolPreference.values();
 
@@ -128,22 +134,19 @@ public class ToolPreferences
 		}
 	}
 
-	public Object preference(ToolPreference preferenceType)
-	{
+	public Object preference(ToolPreference preferenceType) {
 		synchronized (_preferences) {
 			return _preferences.get(preferenceType);
 		}
 	}
 
-	public Map<ToolPreference, Object> preferences()
-	{
+	public Map<ToolPreference, Object> preferences() {
 		synchronized (_preferences) {
 			return _preferences.clone();
 		}
 	}
 
-	public void commit(Map<ToolPreference, Object> preferences)
-	{
+	public void commit(Map<ToolPreference, Object> preferences) {
 		Set<ToolPreference> changeSet = EnumSet.noneOf(ToolPreference.class);
 
 		synchronized (_preferences) {
@@ -154,14 +157,19 @@ public class ToolPreferences
 						Class<?> preferenceType = value.getClass();
 
 						if (preferenceType.equals(Boolean.class)) {
-							_preferenceNode.putBoolean(preference.name(), ((Boolean) value).booleanValue());
+							_preferenceNode.putBoolean(preference.name(),
+									((Boolean) value).booleanValue());
 						} else if (preferenceType.equals(Integer.class)) {
-							_preferenceNode.putInt(preference.name(), ((Integer) value).intValue());
+							_preferenceNode.putInt(preference.name(),
+									((Integer) value).intValue());
 						} else {
 							try {
-								_preferenceNode.putByteArray(preference.name(), toByteArray(value));
+								_preferenceNode.putByteArray(preference.name(),
+										toByteArray(value));
 							} catch (Throwable cause) {
-								_logger.error(String.format("Unable to write preference \"%s\".", preference), cause);
+								_logger.error(String.format(
+										"Unable to write preference \"%s\".",
+										preference), cause);
 							}
 						}
 
@@ -178,7 +186,8 @@ public class ToolPreferences
 					firePreferenceChanged(preference);
 				}
 			} catch (Throwable cause) {
-				_logger.warn("Unable to flush preferences to backing store.", cause);
+				_logger.warn("Unable to flush preferences to backing store.",
+						cause);
 			}
 		}
 	}

@@ -8,17 +8,17 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Vector;
 
-public class HierarchicalDirectory
-{
+public class HierarchicalDirectory {
 	private String _dirName;
 	private Vector<File> _dependentEntries;
 
-	public HierarchicalDirectory(String dirName, Collection<File> dependentEntries)
-	{
+	public HierarchicalDirectory(String dirName,
+			Collection<File> dependentEntries) {
 		_dirName = dirName;
 
 		if (dependentEntries == null)
-			throw new IllegalArgumentException("Dependent directories cannot be null.");
+			throw new IllegalArgumentException(
+					"Dependent directories cannot be null.");
 
 		_dependentEntries = new Vector<File>(dependentEntries.size());
 		for (File entry : dependentEntries) {
@@ -27,13 +27,11 @@ public class HierarchicalDirectory
 		}
 	}
 
-	final public boolean exists()
-	{
+	final public boolean exists() {
 		return _dependentEntries.size() > 0;
 	}
 
-	final public File lookupFile(String filename)
-	{
+	final public File lookupFile(String filename) {
 		File file;
 
 		for (File dir : _dependentEntries) {
@@ -45,8 +43,7 @@ public class HierarchicalDirectory
 		return new File(_dependentEntries.firstElement(), filename);
 	}
 
-	final public HierarchicalDirectory lookupDirectory(String directoryName)
-	{
+	final public HierarchicalDirectory lookupDirectory(String directoryName) {
 		Collection<File> dirs = new Vector<File>(_dependentEntries.size());
 		for (File dir : _dependentEntries)
 			dirs.add(new File(dir, directoryName));
@@ -54,8 +51,7 @@ public class HierarchicalDirectory
 		return new HierarchicalDirectory(directoryName, dirs);
 	}
 
-	final public File[] listFiles(FileFilter filter)
-	{
+	final public File[] listFiles(FileFilter filter) {
 		Map<String, File> fileMap = new HashMap<String, File>();
 
 		for (File dir : _dependentEntries) {
@@ -70,18 +66,16 @@ public class HierarchicalDirectory
 		return fileMap.values().toArray(new File[fileMap.size()]);
 	}
 
-	final public File[] listFiles()
-	{
+	final public File[] listFiles() {
 		return listFiles(null);
 	}
 
-	final public String getName()
-	{
+	final public String getName() {
 		return _dirName;
 	}
 
-	static public HierarchicalDirectory openRootHierarchicalDirectory(File originalDirectory)
-	{
+	static public HierarchicalDirectory openRootHierarchicalDirectory(
+			File originalDirectory) {
 		String name = originalDirectory.getName();
 		Collection<File> dirs = new LinkedList<File>();
 		dirs.add(originalDirectory);

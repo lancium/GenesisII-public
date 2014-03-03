@@ -33,34 +33,28 @@ import org.w3c.dom.Element;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlRootElement(namespace = HPCFSEConstants.HPCFSE_NS, name = "Credential")
-public class Credential implements Serializable
-{
+public class Credential implements Serializable {
 	static final long serialVersionUID = 0L;
 
-	@XmlElements({ @XmlElement(namespace = HPCFSEConstants.WSSEC_SECEXT_NS, name = "UsernameToken", required = false,
-		type = UsernameToken.class) })
+	@XmlElements({ @XmlElement(namespace = HPCFSEConstants.WSSEC_SECEXT_NS, name = "UsernameToken", required = false, type = UsernameToken.class) })
 	private List<SecurityToken> _tokens = new Vector<SecurityToken>();
 
 	@XmlAnyElement
 	private List<Element> _any = new LinkedList<Element>();
 
-	public Credential(SecurityToken... tokens)
-	{
+	public Credential(SecurityToken... tokens) {
 		for (SecurityToken token : tokens)
 			_tokens.add(token);
 	}
 
-	public Credential()
-	{
+	public Credential() {
 	}
 
-	final public List<SecurityToken> tokens()
-	{
+	final public List<SecurityToken> tokens() {
 		return _tokens;
 	}
 
-	final public List<Element> any()
-	{
+	final public List<Element> any() {
 		return _any;
 	}
 }

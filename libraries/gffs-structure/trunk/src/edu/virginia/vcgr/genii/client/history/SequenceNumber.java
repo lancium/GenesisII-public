@@ -2,29 +2,25 @@ package edu.virginia.vcgr.genii.client.history;
 
 import java.io.Serializable;
 
-final public class SequenceNumber implements Serializable, Comparable<SequenceNumber>
-{
+final public class SequenceNumber implements Serializable,
+		Comparable<SequenceNumber> {
 	static final long serialVersionUID = 0L;
 
 	private int[] _value;
 
-	private SequenceNumber(int[] value)
-	{
+	private SequenceNumber(int[] value) {
 		_value = value;
 	}
 
-	public SequenceNumber()
-	{
+	public SequenceNumber() {
 		this(new int[] { 1 });
 	}
 
-	final public boolean isRootLevel()
-	{
+	final public boolean isRootLevel() {
 		return _value.length == 1;
 	}
 
-	final public SequenceNumber parent()
-	{
+	final public SequenceNumber parent() {
 		if (isRootLevel())
 			return null;
 
@@ -33,25 +29,23 @@ final public class SequenceNumber implements Serializable, Comparable<SequenceNu
 		return new SequenceNumber(parentValue);
 	}
 
-	final public SequenceNumber next()
-	{
+	final public SequenceNumber next() {
 		int[] newValue = new int[_value.length];
 		System.arraycopy(_value, 0, newValue, 0, _value.length);
 		newValue[newValue.length - 1]++;
 		return new SequenceNumber(newValue);
 	}
 
-	final public SequenceNumber wrapWith(SequenceNumber parent)
-	{
+	final public SequenceNumber wrapWith(SequenceNumber parent) {
 		int[] newValue = new int[_value.length + parent._value.length];
 		System.arraycopy(parent._value, 0, newValue, 0, parent._value.length);
-		System.arraycopy(_value, 0, newValue, parent._value.length, _value.length);
+		System.arraycopy(_value, 0, newValue, parent._value.length,
+				_value.length);
 		return new SequenceNumber(newValue);
 	}
 
 	@Override
-	final public boolean equals(Object other)
-	{
+	final public boolean equals(Object other) {
 		if (other instanceof SequenceNumber)
 			return compareTo((SequenceNumber) other) == 0;
 
@@ -59,8 +53,7 @@ final public class SequenceNumber implements Serializable, Comparable<SequenceNu
 	}
 
 	@Override
-	final public int hashCode()
-	{
+	final public int hashCode() {
 		int ret = 0x0;
 		for (int value : _value)
 			ret ^= (new Integer(value)).hashCode();
@@ -69,8 +62,7 @@ final public class SequenceNumber implements Serializable, Comparable<SequenceNu
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		StringBuilder builder = new StringBuilder();
 		for (int value : _value) {
 			if (builder.length() > 0)
@@ -82,8 +74,7 @@ final public class SequenceNumber implements Serializable, Comparable<SequenceNu
 	}
 
 	@Override
-	final public int compareTo(SequenceNumber other)
-	{
+	final public int compareTo(SequenceNumber other) {
 		int lcv = 0;
 		while (true) {
 			if (lcv >= _value.length) {
@@ -105,13 +96,11 @@ final public class SequenceNumber implements Serializable, Comparable<SequenceNu
 		}
 	}
 
-	final public boolean isFirstOfLevel()
-	{
+	final public boolean isFirstOfLevel() {
 		return _value[_value.length - 1] == 1;
 	}
 
-	static public SequenceNumber valueOf(String representation)
-	{
+	static public SequenceNumber valueOf(String representation) {
 		String[] values = representation.split("\\.");
 		int[] array = new int[values.length];
 		for (int lcv = 0; lcv < values.length; lcv++)

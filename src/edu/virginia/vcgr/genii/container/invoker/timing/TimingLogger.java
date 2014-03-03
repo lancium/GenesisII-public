@@ -12,15 +12,14 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 
-class TimingLogger
-{
+class TimingLogger {
 	static private Log _logger = LogFactory.getLog(TimingLogger.class);
 
 	private PrintStream _stream = null;
 
-	TimingLogger(String logFileName)
-	{
-		File userDir = ConfigurationManager.getCurrentConfiguration().getUserDirectory();
+	TimingLogger(String logFileName) {
+		File userDir = ConfigurationManager.getCurrentConfiguration()
+				.getUserDirectory();
 		File logFile = new File(userDir, logFileName);
 
 		try {
@@ -30,8 +29,8 @@ class TimingLogger
 		}
 	}
 
-	synchronized void log(Class<?> serviceClass, Method targetMethod, Map<String, List<Long>> events)
-	{
+	synchronized void log(Class<?> serviceClass, Method targetMethod,
+			Map<String, List<Long>> events) {
 		if (_stream == null)
 			return;
 
@@ -39,7 +38,8 @@ class TimingLogger
 			if (events.size() <= 0)
 				return;
 
-			_stream.format("%s::%s:\n", serviceClass.getName(), targetMethod.getName());
+			_stream.format("%s::%s:\n", serviceClass.getName(),
+					targetMethod.getName());
 
 			for (String eventName : events.keySet()) {
 				_stream.format("\t%s {", eventName);

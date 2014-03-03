@@ -4,15 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-final class RandomFileEntryInputStream extends InputStream
-{
+final class RandomFileEntryInputStream extends InputStream {
 	private FSViewRandomAccessFileEntry _entry;
 	private long _offset;
 
 	private Long _mark = null;
 
-	private ByteBuffer read(int size) throws IOException
-	{
+	private ByteBuffer read(int size) throws IOException {
 		ByteBuffer buffer = ByteBuffer.allocate(size);
 		_entry.read(_offset, buffer);
 		buffer.flip();
@@ -20,15 +18,13 @@ final class RandomFileEntryInputStream extends InputStream
 		return buffer;
 	}
 
-	RandomFileEntryInputStream(FSViewRandomAccessFileEntry entry)
-	{
+	RandomFileEntryInputStream(FSViewRandomAccessFileEntry entry) {
 		_entry = entry;
 		_offset = 0L;
 	}
 
 	@Override
-	final public int read() throws IOException
-	{
+	final public int read() throws IOException {
 		ByteBuffer buffer = read(1);
 		if (buffer.hasRemaining())
 			return buffer.get();
@@ -37,14 +33,12 @@ final class RandomFileEntryInputStream extends InputStream
 	}
 
 	@Override
-	final public int read(byte[] b) throws IOException
-	{
+	final public int read(byte[] b) throws IOException {
 		return read(b, 0, b.length);
 	}
 
 	@Override
-	final public int read(byte[] b, int off, int len) throws IOException
-	{
+	final public int read(byte[] b, int off, int len) throws IOException {
 		ByteBuffer buffer = read(len);
 		int read = buffer.remaining();
 		buffer.get(b, off, read);
@@ -52,27 +46,23 @@ final class RandomFileEntryInputStream extends InputStream
 	}
 
 	@Override
-	final public long skip(long n) throws IOException
-	{
+	final public long skip(long n) throws IOException {
 		_offset += n;
 		return _offset;
 	}
 
 	@Override
-	final public synchronized void mark(int readlimit)
-	{
+	final public synchronized void mark(int readlimit) {
 		_mark = _offset;
 	}
 
 	@Override
-	final public synchronized void reset() throws IOException
-	{
+	final public synchronized void reset() throws IOException {
 		_offset = _mark;
 	}
 
 	@Override
-	final public boolean markSupported()
-	{
+	final public boolean markSupported() {
 		return true;
 	}
 }

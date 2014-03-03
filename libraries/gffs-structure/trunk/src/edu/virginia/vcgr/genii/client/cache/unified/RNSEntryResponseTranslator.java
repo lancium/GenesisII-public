@@ -17,24 +17,23 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 /*
  * This class gets an RNSEntryResponse and extracts from it all cache-able attributes.
  */
-public class RNSEntryResponseTranslator implements CacheableItemsGenerator
-{
-	static private Log _logger = LogFactory.getLog(RNSEntryResponseTranslator.class);
+public class RNSEntryResponseTranslator implements CacheableItemsGenerator {
+	static private Log _logger = LogFactory
+			.getLog(RNSEntryResponseTranslator.class);
 
 	@Override
-	public boolean isSupported(Class<?>... argumentTypes)
-	{
+	public boolean isSupported(Class<?>... argumentTypes) {
 		if (argumentTypes.length == 1) {
 			return RNSEntryResponseType.class.equals(argumentTypes[0]);
 		} else if (argumentTypes.length == 2) {
-			return (WSResourceConfig.class.equals(argumentTypes[0]) && RNSEntryResponseType.class.equals(argumentTypes[1]));
+			return (WSResourceConfig.class.equals(argumentTypes[0]) && RNSEntryResponseType.class
+					.equals(argumentTypes[1]));
 		}
 		return false;
 	}
 
 	@Override
-	public Collection<CacheableItem> generateItems(Object... originalItems)
-	{
+	public Collection<CacheableItem> generateItems(Object... originalItems) {
 		List<CacheableItem> itemList = new ArrayList<CacheableItem>();
 		RNSEntryResponseType rnsEntry;
 		EndpointReferenceType entryEPR;
@@ -46,7 +45,8 @@ public class RNSEntryResponseTranslator implements CacheableItemsGenerator
 		} else {
 			rnsEntry = (RNSEntryResponseType) originalItems[1];
 			entryEPR = rnsEntry.getEndpoint();
-			// hmmm:we have seen this can be null. why and how? happens for STS a lot.
+			// hmmm:we have seen this can be null. why and how? happens for STS
+			// a lot.
 		}
 
 		WSName wsName = new WSName(entryEPR);
@@ -59,14 +59,16 @@ public class RNSEntryResponseTranslator implements CacheableItemsGenerator
 			if (parentDirectoryConfig.isMappedToRNSPaths()) {
 				String entryName = rnsEntry.getEntryName();
 				for (String parentRnsPath : parentDirectoryConfig.getRnsPaths()) {
-					String childRNSPath = DirectoryManager.getPathForDirectoryEntry(parentRnsPath, entryName);
+					String childRNSPath = DirectoryManager
+							.getPathForDirectoryEntry(parentRnsPath, entryName);
 					CacheableItem eprItem = new CacheableItem();
 					eprItem.setKey(childRNSPath);
 					eprItem.setValue(entryEPR);
 					if (entryEPR != null) {
 						itemList.add(eprItem);
 					} else {
-						_logger.warn("ignoring RNSEntryResponse with null EPR, has path: " + childRNSPath);
+						_logger.warn("ignoring RNSEntryResponse with null EPR, has path: "
+								+ childRNSPath);
 					}
 					if (entryConfig != null) {
 						entryConfig.addRNSPath(childRNSPath);

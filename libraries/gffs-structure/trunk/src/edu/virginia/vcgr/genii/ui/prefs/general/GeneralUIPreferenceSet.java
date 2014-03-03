@@ -13,8 +13,7 @@ import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.ui.prefs.AbstractUIPreferenceSet;
 
-public class GeneralUIPreferenceSet extends AbstractUIPreferenceSet
-{
+public class GeneralUIPreferenceSet extends AbstractUIPreferenceSet {
 	static final private String PREFERENCE_SET_TITLE = "General";
 
 	static final private String PREFERENCE_NODE_NAME = "general";
@@ -26,35 +25,31 @@ public class GeneralUIPreferenceSet extends AbstractUIPreferenceSet
 	private String _localContainerName;
 
 	@Override
-	final protected Preferences preferenceNode(Preferences uiPreferencesRoot)
-	{
+	final protected Preferences preferenceNode(Preferences uiPreferencesRoot) {
 		return uiPreferencesRoot.node(PREFERENCE_NODE_NAME);
 	}
 
 	@Override
-	protected void loadImpl(Preferences prefNode)
-	{
+	protected void loadImpl(Preferences prefNode) {
 		_localContainerName = prefNode.get(LOCAL_CONTAINER_KEY, null);
 	}
 
 	@Override
-	protected void storeImpl(Preferences prefNode)
-	{
+	protected void storeImpl(Preferences prefNode) {
 		prefNode.put(LOCAL_CONTAINER_KEY, _localContainerName);
 	}
 
-	public GeneralUIPreferenceSet()
-	{
+	public GeneralUIPreferenceSet() {
 		super(PREFERENCE_SET_TITLE);
 	}
 
-	final public String localContainerName()
-	{
+	final public String localContainerName() {
 		synchronized (_localCheckedLock) {
 			if (!_localChecked) {
 				_localChecked = true;
 				try {
-					HashMap<String, ContainerInformation> info = InstallationState.getRunningContainers();
+					HashMap<String, ContainerInformation> info = InstallationState
+							.getRunningContainers();
 					if (info != null) {
 						if (_localContainerName != null) {
 							if (!info.containsKey(_localContainerName))
@@ -62,7 +57,8 @@ public class GeneralUIPreferenceSet extends AbstractUIPreferenceSet
 						}
 
 						if (_localContainerName == null) {
-							List<String> list = new Vector<String>(info.keySet());
+							List<String> list = new Vector<String>(
+									info.keySet());
 							if (list.size() > 0) {
 								Collections.sort(list);
 								_localContainerName = list.get(0);
@@ -79,14 +75,13 @@ public class GeneralUIPreferenceSet extends AbstractUIPreferenceSet
 	}
 
 	@Override
-	final public JPanel createEditor()
-	{
+	final public JPanel createEditor() {
 		return new GeneralUIPreferenceSetEditor(this);
 	}
 
 	@Override
-	final public void load(JPanel editor)
-	{
-		_localContainerName = ((GeneralUIPreferenceSetEditor) editor).selectedContainer();
+	final public void load(JPanel editor) {
+		_localContainerName = ((GeneralUIPreferenceSetEditor) editor)
+				.selectedContainer();
 	}
 }

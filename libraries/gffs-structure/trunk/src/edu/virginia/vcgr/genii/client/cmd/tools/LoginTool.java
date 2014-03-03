@@ -32,8 +32,7 @@ import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
-public class LoginTool extends BaseLoginTool
-{
+public class LoginTool extends BaseLoginTool {
 	static private Log _logger = LogFactory.getLog(LoginTool.class);
 
 	private static final String USER_NAME_TERMINATOR = "@";
@@ -44,24 +43,22 @@ public class LoginTool extends BaseLoginTool
 	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/ulogin";
 	static final private String _MANPAGE = "config/tooldocs/man/login";
 
-	protected LoginTool(String description, String usage, boolean isHidden)
-	{
+	protected LoginTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);
 		overrideCategory(ToolCategory.SECURITY);
 	}
 
-	public LoginTool()
-	{
+	public LoginTool() {
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		overrideCategory(ToolCategory.SECURITY);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
-	private static Collection<String> getDefaultIDPPaths(String username)
-	{
+	private static Collection<String> getDefaultIDPPaths(String username) {
 		LinkedList<String> idpList = new LinkedList<String>();
 
-		NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
+		NamespaceDefinitions nsd = Installation.getDeployment(
+				new DeploymentName()).namespace();
 
 		String constructedPath = constructPathFromLoginName(null, username);
 		if (constructedPath != null) {
@@ -77,8 +74,7 @@ public class LoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();
@@ -94,7 +90,8 @@ public class LoginTool extends BaseLoginTool
 			_authnUri = getArgument(0);
 			URI authnSource = PathUtils.pathToURI(_authnUri);
 
-			if (!callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists())
+			if (!callContext.getCurrentPath()
+					.lookup(authnSource.getSchemeSpecificPart()).exists())
 				throw new ToolException("Invalid IDP path specified.");
 
 		} else {
@@ -103,7 +100,8 @@ public class LoginTool extends BaseLoginTool
 
 			for (String authURI : getDefaultIDPPaths(_username)) {
 				URI authnSource = PathUtils.pathToURI(authURI);
-				if (callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists()) {
+				if (callContext.getCurrentPath()
+						.lookup(authnSource.getSchemeSpecificPart()).exists()) {
 					_authnUri = authURI;
 					break;
 				}
@@ -111,15 +109,17 @@ public class LoginTool extends BaseLoginTool
 
 			if (_authnUri == null)
 				throw new ToolException(
-					"Could not authenticate to login service, ensure your username is correct or manually specify IDP path");
+						"Could not authenticate to login service, ensure your username is correct or manually specify IDP path");
 		}
 
 		// Do password Login
-		UsernamePasswordIdentity utCredential = new PasswordLoginTool().doPasswordLogin(_username, _password);
+		UsernamePasswordIdentity utCredential = new PasswordLoginTool()
+				.doPasswordLogin(_username, _password);
 
 		if (utCredential != null) {
 
-			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
+			TransientCredentials transientCredentials = TransientCredentials
+					.getTransientCredentials(callContext);
 			transientCredentials.add(utCredential);
 
 			ContextManager.storeCurrentContext(callContext);
@@ -127,18 +127,22 @@ public class LoginTool extends BaseLoginTool
 			// we're going to use the WS-TRUST token-issue operation
 			// to log in to a security tokens service
 			URI authnSource = PathUtils.pathToURI(_authnUri);
-			KeyAndCertMaterial clientKeyMaterial =
-				ClientUtils.checkAndRenewCredentials(callContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+			KeyAndCertMaterial clientKeyMaterial = ClientUtils
+					.checkAndRenewCredentials(callContext,
+							BaseGridTool.credsValidUntil(),
+							new SecurityUpdateResults());
 
-			RNSPath authnPath =
-				callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
+			RNSPath authnPath = callContext.getCurrentPath().lookup(
+					authnSource.getSchemeSpecificPart(),
+					RNSPathQueryFlags.MUST_EXIST);
 			EndpointReferenceType epr = authnPath.getEndpoint();
 
 			try {
 
 				// Do IDP login
-				ArrayList<NuCredential> creds =
-					IDPLoginTool.doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
+				ArrayList<NuCredential> creds = IDPLoginTool.doIdpLogin(epr,
+						_credentialValidMillis,
+						clientKeyMaterial._clientCertChain);
 
 				if (creds == null) {
 					return 0;
@@ -148,13 +152,15 @@ public class LoginTool extends BaseLoginTool
 					}
 				}
 
-				// insert the assertion into the calling context's transient creds
+				// insert the assertion into the calling context's transient
+				// creds
 				transientCredentials.addAll(creds);
 
 			} finally {
 
 				if (utCredential != null) {
-					// the UT credential was used only to log into the IDP, remove it
+					// the UT credential was used only to log into the IDP,
+					// remove it
 					transientCredentials.remove(utCredential);
 					_logger.debug("Removing temporary username-token credential from current calling context credentials.");
 				}
@@ -169,15 +175,15 @@ public class LoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		int numArgs = numArguments();
 		if (numArgs > 1)
 			throw new InvalidToolUsageException();
 
 		if (_durationString != null) {
 			try {
-				_credentialValidMillis = (long) new Duration(_durationString).as(DurationUnits.Milliseconds);
+				_credentialValidMillis = (long) new Duration(_durationString)
+						.as(DurationUnits.Milliseconds);
 			} catch (IllegalArgumentException pe) {
 				throw new ToolException("Invalid duration string given.", pe);
 			}
@@ -185,20 +191,23 @@ public class LoginTool extends BaseLoginTool
 
 	}
 
-	public static void jumpToUserHomeIfExists(String loginName)
-	{
+	public static void jumpToUserHomeIfExists(String loginName) {
 
 		if (loginName == null)
 			return;
 
 		List<String> candidateHomeDirs = new ArrayList<String>();
-		String constructedPathToHome = constructPathFromLoginName(null, loginName);
+		String constructedPathToHome = constructPathFromLoginName(null,
+				loginName);
 
-		NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
+		NamespaceDefinitions nsd = Installation.getDeployment(
+				new DeploymentName()).namespace();
 
 		if (constructedPathToHome != null) {
-			candidateHomeDirs.add(nsd.getHomesDirectory() + "/" + constructedPathToHome);
-			candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" + constructedPathToHome);
+			candidateHomeDirs.add(nsd.getHomesDirectory() + "/"
+					+ constructedPathToHome);
+			candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/"
+					+ constructedPathToHome);
 		}
 		candidateHomeDirs.add(nsd.getHomesDirectory() + "/" + loginName);
 		candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" + loginName);
@@ -213,8 +222,8 @@ public class LoginTool extends BaseLoginTool
 		}
 	}
 
-	public static String constructPathFromLoginName(String pathPrefix, String loginName)
-	{
+	public static String constructPathFromLoginName(String pathPrefix,
+			String loginName) {
 
 		if (loginName == null)
 			return null;
@@ -238,7 +247,8 @@ public class LoginTool extends BaseLoginTool
 				}
 				int domainLength = domainParts.length;
 				for (int i = domainLength - 1; i >= 0; i--) {
-					buffer.append(domainParts[i]).append(PATH_COMPONENT_SEPARATOR);
+					buffer.append(domainParts[i]).append(
+							PATH_COMPONENT_SEPARATOR);
 				}
 				buffer.append(user);
 

@@ -10,8 +10,7 @@ import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 // import edu.virginia.vcgr.appmgr.update.Updater;
 
-public class ApplicationLauncher
-{
+public class ApplicationLauncher {
 	static private Log _logger = LogFactory.getLog(ApplicationLauncher.class);
 
 	static private final String APPLICATION_DESCRIPTION_PROPERTY = "edu.virginia.vcgr.appwatch.application-description";
@@ -20,23 +19,22 @@ public class ApplicationLauncher
 	static private String _appNameFound = null;
 	static private Version _appVersionFound = null;
 
-	static private InheritableThreadLocal<ApplicationLauncherConsole> _console =
-		new InheritableThreadLocal<ApplicationLauncherConsole>();
+	static private InheritableThreadLocal<ApplicationLauncherConsole> _console = new InheritableThreadLocal<ApplicationLauncherConsole>();
 
-	static public ApplicationLauncherConsole getConsole()
-	{
+	static public ApplicationLauncherConsole getConsole() {
 		return _console.get();
 	}
 
-	static private void usage(int exitCode)
-	{
-		System.err.format("USAGE:  ApplicationLauncher [%sapplication-class]\n"
-			+ "	[-Dedu.virginia.vcgr.appwatch.application-description=]<application-description> " + "[application-args]\n",
-			APPLICATION_CLASS_FLAG_PREFIX);
+	static private void usage(int exitCode) {
+		System.err
+				.format("USAGE:  ApplicationLauncher [%sapplication-class]\n"
+						+ "	[-Dedu.virginia.vcgr.appwatch.application-description=]<application-description> "
+						+ "[application-args]\n", APPLICATION_CLASS_FLAG_PREFIX);
 		System.exit(exitCode);
 	}
 
-	// static private void doUpdates(PrintStream log, ApplicationDescription appDesc)
+	// static private void doUpdates(PrintStream log, ApplicationDescription
+	// appDesc)
 	// {
 	// boolean updatesEnabled = false;
 	// if (!updatesEnabled) {
@@ -51,10 +49,11 @@ public class ApplicationLauncher
 	// }
 	// }
 
-	static private int runApplication(ApplicationDescription appDesc, String[] appArgs)
-	{
+	static private int runApplication(ApplicationDescription appDesc,
+			String[] appArgs) {
 		try {
-			JarDescription description = new JarDescription(appDesc.getJarDescriptionFile());
+			JarDescription description = new JarDescription(
+					appDesc.getJarDescriptionFile());
 			ClassLoader loader = description.createClassLoader();
 			Thread.currentThread().setContextClassLoader(loader);
 			GenesisClassLoader.classLoaderFactory().addLoader(loader);
@@ -69,29 +68,29 @@ public class ApplicationLauncher
 		return 0;
 	}
 
-	static public String getAppName()
-	{
+	static public String getAppName() {
 		return _appNameFound;
 	}
 
-	static public Version getAppVersion()
-	{
+	static public Version getAppVersion() {
 		return _appVersionFound;
 	}
 
-	static public void main(String[] args)
-	{
+	static public void main(String[] args) {
 		_logger.trace("entry => into main for ApplicationLauncher...");
 		String appClass = null;
 		int next = 0;
 
 		try {
-			if (args.length > 0 && args[0].startsWith(APPLICATION_CLASS_FLAG_PREFIX)) {
-				appClass = args[0].substring(APPLICATION_CLASS_FLAG_PREFIX.length());
+			if (args.length > 0
+					&& args[0].startsWith(APPLICATION_CLASS_FLAG_PREFIX)) {
+				appClass = args[0].substring(APPLICATION_CLASS_FLAG_PREFIX
+						.length());
 				next = 1;
 			}
 
-			String appDescFile = System.getProperty(APPLICATION_DESCRIPTION_PROPERTY);
+			String appDescFile = System
+					.getProperty(APPLICATION_DESCRIPTION_PROPERTY);
 			if (appDescFile == null) {
 				if (next > args.length)
 					usage(1);
@@ -101,24 +100,30 @@ public class ApplicationLauncher
 			String[] appArgs = new String[args.length - next];
 			System.arraycopy(args, next, appArgs, 0, appArgs.length);
 
-			ApplicationDescription appDesc = new ApplicationDescription(appClass, appDescFile);
+			ApplicationDescription appDesc = new ApplicationDescription(
+					appClass, appDescFile);
 			_appNameFound = appDesc.getApplicationName();
-			ApplicationLauncherConsole console = new ApplicationLauncherConsoleImpl(appDesc);
+			ApplicationLauncherConsole console = new ApplicationLauncherConsoleImpl(
+					appDesc);
 			_console.set(console);
 
 			// if (appDesc.updateDisabled())
 			// _logger.debug("Updates Disabled");
 			// else {
-			// long updateFrequency = Long.parseLong(System.getProperty(UPDATE_FREQUENCY_PROPERTY,
+			// long updateFrequency =
+			// Long.parseLong(System.getProperty(UPDATE_FREQUENCY_PROPERTY,
 			// "-1"));
 			// Version v = appDesc.getVersionManager().getCurrentVersion();
 			// _appVersionFound = v;
-			// if (!Version.EMPTY_VERSION.equals(v) || appDesc.isUpdateRequest()) {
+			// if (!Version.EMPTY_VERSION.equals(v) ||
+			// appDesc.isUpdateRequest()) {
 			// _logger.info(String.format("Current version is %s.", v));
 			// Calendar now = Calendar.getInstance();
-			// Calendar lastUpdated = appDesc.getVersionManager().getLastUpdated();
+			// Calendar lastUpdated =
+			// appDesc.getVersionManager().getLastUpdated();
 			// if (updateFrequency < 0 || appDesc.isUpdateRequest()
-			// || (now.getTimeInMillis() - lastUpdated.getTimeInMillis()) > updateFrequency) {
+			// || (now.getTimeInMillis() - lastUpdated.getTimeInMillis()) >
+			// updateFrequency) {
 			// _logger.debug("Checking to see if updates exist.");
 			// doUpdates(System.out, appDesc);
 			// }
@@ -136,12 +141,11 @@ public class ApplicationLauncher
 		}
 	}
 
-	static private class ApplicationLauncherConsoleImpl implements ApplicationLauncherConsole
-	{
+	static private class ApplicationLauncherConsoleImpl implements
+			ApplicationLauncherConsole {
 		private ApplicationDescription _appDesc;
 
-		private ApplicationLauncherConsoleImpl(ApplicationDescription appDesc)
-		{
+		private ApplicationLauncherConsoleImpl(ApplicationDescription appDesc) {
 			_appDesc = appDesc;
 		}
 
@@ -176,8 +180,7 @@ public class ApplicationLauncher
 		// }
 
 		@Override
-		public Version currentVersion()
-		{
+		public Version currentVersion() {
 			try {
 				return _appDesc.getVersionManager().getCurrentVersion();
 			} catch (Throwable cause) {

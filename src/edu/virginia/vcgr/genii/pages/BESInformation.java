@@ -9,25 +9,23 @@ import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.dynpages.templates.GenesisIIStyledPage;
 
-public class BESInformation extends GenesisIIStyledPage
-{
+public class BESInformation extends GenesisIIStyledPage {
 	static final private String PAGE_TITLE = "BES Information";
 
 	@InjectParameter("besID")
 	private String _besID;
 
-	private void generateAllBESPage(PrintStream ps) throws IOException
-	{
+	private void generateAllBESPage(PrintStream ps) throws IOException {
 		ps.println("<H2>BES Containers Available</H2>");
 		ps.println("<UL>");
 		for (String besID : BES.listBESs()) {
-			ps.format("<LI><A HREF=\"bes-info.html?besID=%s\">BES %s</A></LI>", besID, besID);
+			ps.format("<LI><A HREF=\"bes-info.html?besID=%s\">BES %s</A></LI>",
+					besID, besID);
 		}
 		ps.println("</UL>");
 	}
 
-	private int getFaultCount(BESActivity activity)
-	{
+	private int getFaultCount(BESActivity activity) {
 		try {
 			return activity.getFaults().size();
 		} catch (Throwable cause) {
@@ -35,8 +33,8 @@ public class BESInformation extends GenesisIIStyledPage
 		}
 	}
 
-	private void generateBESPage(PrintStream ps, String besID) throws IOException
-	{
+	private void generateBESPage(PrintStream ps, String besID)
+			throws IOException {
 		ps.format("<H2>Information for BES Container %s</H2>", besID);
 
 		BES bes = BES.getBES(besID);
@@ -49,23 +47,22 @@ public class BESInformation extends GenesisIIStyledPage
 		ps.println("<CAPTION>BES Activities</CAPTION>");
 		ps.println("<TR bgcolor=\"#7FFFD4\"><TH>Activity Name</TH><TH>Activity CWD</TH><TH>State</TH><TH>Num. Faults</TH></TR>");
 		for (BESActivity activity : bes.getContainedActivities()) {
-			ps.format("<TR><TD>%s</TD><TD>%s</TD><TD>%s</TD><TD>%s</TD></TR>", activity.getJobName(),
-				activity.getActivityCWD(), activity.getState(), getFaultCount(activity));
+			ps.format("<TR><TD>%s</TD><TD>%s</TD><TD>%s</TD><TD>%s</TD></TR>",
+					activity.getJobName(), activity.getActivityCWD(),
+					activity.getState(), getFaultCount(activity));
 		}
 		ps.println("</TABLE>");
 	}
 
 	@Override
-	protected void generateContent(PrintStream ps) throws IOException
-	{
+	protected void generateContent(PrintStream ps) throws IOException {
 		if (_besID == null)
 			generateAllBESPage(ps);
 		else
 			generateBESPage(ps, _besID);
 	}
 
-	public BESInformation()
-	{
+	public BESInformation() {
 		super("images/grid_logo_medium.jpg", PAGE_TITLE);
 	}
 }

@@ -23,24 +23,23 @@ import org.w3c.dom.NodeList;
 
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-public class LocatorRegistrySectionHandler implements IXMLConfigurationSectionHandler
-{
+public class LocatorRegistrySectionHandler implements
+		IXMLConfigurationSectionHandler {
 	static public final String INTERFACE_TYPE_NAME = "interface";
 	static public final String LOCATOR_TYPE_NAME = "locator-type";
 
-	static private Class<?> findClass(String className)
-	{
+	static private Class<?> findClass(String className) {
 		ClassLoader loader = GenesisClassLoader.classLoaderFactory();
 
 		try {
 			return Class.forName(className, true, loader);
 		} catch (ClassNotFoundException cnfe) {
-			throw new ConfigurationException("Couldn't locate class \"" + className + "\".");
+			throw new ConfigurationException("Couldn't locate class \""
+					+ className + "\".");
 		}
 	}
 
-	public Object parse(Node n)
-	{
+	public Object parse(Node n) {
 		HashMap<String, Class<?>> locators = new HashMap<String, Class<?>>();
 
 		NodeList children = n.getChildNodes();
@@ -53,13 +52,16 @@ public class LocatorRegistrySectionHandler implements IXMLConfigurationSectionHa
 
 				Node interfaceNode = attrs.getNamedItem(INTERFACE_TYPE_NAME);
 				if (interfaceNode == null)
-					throw new ConfigurationException("Couldn't find interface attribute.");
+					throw new ConfigurationException(
+							"Couldn't find interface attribute.");
 
 				Node nameNode = attrs.getNamedItem(LOCATOR_TYPE_NAME);
 				if (nameNode == null)
-					throw new ConfigurationException("Couldn't find locator-type attribute.");
+					throw new ConfigurationException(
+							"Couldn't find locator-type attribute.");
 
-				locators.put(interfaceNode.getTextContent(), findClass(nameNode.getTextContent()));
+				locators.put(interfaceNode.getTextContent(),
+						findClass(nameNode.getTextContent()));
 			}
 		}
 

@@ -23,13 +23,12 @@ import javax.swing.JTextArea;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 
 /**
- * The ErrorDialog class implements a simple error display dialog box that can display both an error
- * message and an exception.
+ * The ErrorDialog class implements a simple error display dialog box that can
+ * display both an error message and an exception.
  * 
  * @author mmm2a
  */
-public class ErrorDialog extends JDialog
-{
+public class ErrorDialog extends JDialog {
 	static final long serialVersionUID = 0L;
 
 	/**
@@ -42,23 +41,25 @@ public class ErrorDialog extends JDialog
 	 * @param cause
 	 *            The exception that caused the error condition (or null).
 	 */
-	private ErrorDialog(Frame owner, String msg, Throwable cause)
-	{
+	private ErrorDialog(Frame owner, String msg, Throwable cause) {
 		super(owner);
 		setTitle("Browser Error");
 
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
 
-		contentPane.add(new JLabel(msg), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		contentPane.add(createDetails(cause), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(new JLabel(msg), new GridBagConstraints(0, 0, 1, 1,
+				1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(createDetails(cause), new GridBagConstraints(0, 1, 1,
+				1, 1.0, 1.0, GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		JButton ok = new JButton("OK");
 		ok.addActionListener(new OKHandler());
-		contentPane.add(ok, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(ok, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+						5, 5, 5, 5), 5, 5));
 	}
 
 	/**
@@ -66,25 +67,24 @@ public class ErrorDialog extends JDialog
 	 * 
 	 * @author mmm2a
 	 */
-	private class OKHandler implements ActionListener
-	{
-		public void actionPerformed(ActionEvent evt)
-		{
+	private class OKHandler implements ActionListener {
+		public void actionPerformed(ActionEvent evt) {
 			dispose();
 			setVisible(false);
 		}
 	}
 
 	/**
-	 * This helper method is called to generate the component that shows the stack trace (if any).
+	 * This helper method is called to generate the component that shows the
+	 * stack trace (if any).
 	 * 
 	 * @param cause
 	 *            The exception that caused an error (or null).
 	 * 
-	 * @return A component that can be displayed in the dialog to give information about the error.
+	 * @return A component that can be displayed in the dialog to give
+	 *         information about the error.
 	 */
-	private Component createDetails(Throwable cause)
-	{
+	private Component createDetails(Throwable cause) {
 		StringWriter writer = new StringWriter();
 		PrintWriter printer = new PrintWriter(writer);
 
@@ -103,7 +103,9 @@ public class ErrorDialog extends JDialog
 		pane.setPreferredSize(size);
 
 		pane.setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), "Details"), pane.getBorder()));
+				BorderFactory.createTitledBorder(
+						BorderFactory.createLineBorder(Color.BLACK), "Details"),
+				pane.getBorder()));
 		return pane;
 	}
 
@@ -117,8 +119,7 @@ public class ErrorDialog extends JDialog
 	 * @param cause
 	 *            An exception that caused the error to happen (or null).
 	 */
-	static public void showErrorDialog(Frame owner, String msg, Throwable cause)
-	{
+	static public void showErrorDialog(Frame owner, String msg, Throwable cause) {
 		ErrorDialog dialog = new ErrorDialog(owner, msg, cause);
 		dialog.setModalityType(ModalityType.APPLICATION_MODAL);
 		dialog.pack();
@@ -134,8 +135,7 @@ public class ErrorDialog extends JDialog
 	 * @param msg
 	 *            The error message to display.
 	 */
-	static public void showErrorDialog(Frame owner, String msg)
-	{
+	static public void showErrorDialog(Frame owner, String msg) {
 		showErrorDialog(owner, msg, null);
 	}
 }

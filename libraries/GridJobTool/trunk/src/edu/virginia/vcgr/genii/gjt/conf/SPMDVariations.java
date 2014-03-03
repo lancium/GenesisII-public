@@ -21,16 +21,15 @@ import edu.virginia.vcgr.genii.gjt.util.IOUtils;
 import edu.virginia.vcgr.genii.gjt.util.OverridenIOSource;
 
 @XmlRootElement(name = "SPMDVariations")
-class SPMDVariations
-{
+class SPMDVariations {
 	static final private String FILENAME = "spmd-variations.xml";
 
 	@XmlElement(name = "variation")
 	private List<SPMDVariation> _variations = new Vector<SPMDVariation>();
 
-	Map<String, SPMDVariation> variations()
-	{
-		Map<String, SPMDVariation> ret = new HashMap<String, SPMDVariation>(_variations.size());
+	Map<String, SPMDVariation> variations() {
+		Map<String, SPMDVariation> ret = new HashMap<String, SPMDVariation>(
+				_variations.size());
 
 		for (SPMDVariation variation : _variations)
 			ret.put(variation.name(), variation);
@@ -38,10 +37,10 @@ class SPMDVariations
 		return ret;
 	}
 
-	static SPMDVariations readVariations(File configuraitonDirectory) throws IOException, JAXBException
-	{
-		IOSource source =
-			new OverridenIOSource(new FileIOSource(new File(configuraitonDirectory, FILENAME)), new ClassRelativeIOSource(
+	static SPMDVariations readVariations(File configuraitonDirectory)
+			throws IOException, JAXBException {
+		IOSource source = new OverridenIOSource(new FileIOSource(new File(
+				configuraitonDirectory, FILENAME)), new ClassRelativeIOSource(
 				SPMDVariations.class, FILENAME));
 		InputStream in = null;
 

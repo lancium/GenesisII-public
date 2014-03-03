@@ -1,15 +1,12 @@
 package org.morgan.util.macro;
 
-class PossibleMacroStartMacroConsumer extends AbstractMacroConsumer
-{
-	PossibleMacroStartMacroConsumer(MacroResolver resolver)
-	{
+class PossibleMacroStartMacroConsumer extends AbstractMacroConsumer {
+	PossibleMacroStartMacroConsumer(MacroResolver resolver) {
 		super(resolver);
 	}
 
 	@Override
-	final public MacroConsumer consume(StringBuilder builder, Character c)
-	{
+	final public MacroConsumer consume(StringBuilder builder, Character c) {
 		if (c == null) {
 			builder.append('$');
 			return null;

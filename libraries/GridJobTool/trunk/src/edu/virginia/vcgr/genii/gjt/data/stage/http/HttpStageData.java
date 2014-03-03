@@ -6,8 +6,7 @@ import edu.virginia.vcgr.genii.gjt.data.analyze.Analysis;
 import edu.virginia.vcgr.genii.gjt.data.stage.AbstractStageData;
 import edu.virginia.vcgr.genii.gjt.data.stage.StageProtocol;
 
-public class HttpStageData extends AbstractStageData
-{
+public class HttpStageData extends AbstractStageData {
 	static final public int DEFAULT_HTTP_PORT = 80;
 
 	@XmlAttribute(name = "hostname")
@@ -20,57 +19,48 @@ public class HttpStageData extends AbstractStageData
 	private String _path = null;
 
 	@Override
-	protected void activateImpl()
-	{
+	protected void activateImpl() {
 		fireParameterizableStringModified("", _hostname);
 		fireParameterizableStringModified("", _path);
 		fireJobDescriptionModified();
 	}
 
 	@Override
-	protected void deactivateImpl()
-	{
+	protected void deactivateImpl() {
 		fireParameterizableStringModified(_hostname, "");
 		fireParameterizableStringModified(_path, "");
 		fireJobDescriptionModified();
 	}
 
-	HttpStageData()
-	{
+	HttpStageData() {
 		super(StageProtocol.http);
 	}
 
-	final String hostname()
-	{
+	final String hostname() {
 		return _hostname;
 	}
 
-	final void hostname(String hostname)
-	{
+	final void hostname(String hostname) {
 		String old = _hostname;
 		_hostname = hostname;
 		fireParameterizableStringModified(old, hostname);
 		fireJobDescriptionModified();
 	}
 
-	final int port()
-	{
+	final int port() {
 		return _port;
 	}
 
-	final void port(int port)
-	{
+	final void port(int port) {
 		_port = port;
 		fireJobDescriptionModified();
 	}
 
-	final String path()
-	{
+	final String path() {
 		return _path;
 	}
 
-	final void path(String path)
-	{
+	final void path(String path) {
 		String old = _path;
 		_path = path;
 
@@ -79,8 +69,7 @@ public class HttpStageData extends AbstractStageData
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		String hostname = _hostname;
 		if (hostname == null || hostname.equals(""))
 			hostname = "<unknown>";
@@ -96,20 +85,21 @@ public class HttpStageData extends AbstractStageData
 	}
 
 	@Override
-	public void analyze(String filename, Analysis analysis)
-	{
+	public void analyze(String filename, Analysis analysis) {
 		if (_hostname == null || _hostname.equals(""))
-			analysis.addError("Data stage for file \"%s\" uses the " + "http protocol without a hostname.", filename);
+			analysis.addError("Data stage for file \"%s\" uses the "
+					+ "http protocol without a hostname.", filename);
 
 		if (_path == null || _path.equals(""))
-			analysis.addError("Data stage for file \"%s\" uses the " + "http protocol without a path.", filename);
+			analysis.addError("Data stage for file \"%s\" uses the "
+					+ "http protocol without a path.", filename);
 		else if (_path.startsWith("/"))
-			analysis.addError("Path for data stage \"%s\" cannot start with /.", filename);
+			analysis.addError(
+					"Path for data stage \"%s\" cannot start with /.", filename);
 	}
 
 	@Override
-	public String getJSDLURI()
-	{
+	public String getJSDLURI() {
 		return String.format("http://%s:%d/%s", _hostname, _port, _path);
 	}
 }

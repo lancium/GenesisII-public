@@ -30,19 +30,20 @@ import eu.emi.security.authn.x509.CommonX509TrustManager;
 import eu.emi.security.authn.x509.impl.InMemoryKeystoreCertChainValidator;
 
 /**
- * This ACL rule provides a chain of trust that callers must chain to, and, optionally, a pattern
- * that the caller's principal name must match.
+ * This ACL rule provides a chain of trust that callers must chain to, and,
+ * optionally, a pattern that the caller's principal name must match.
  * 
- * The pattern allows for a spectrum of principal-grouping possibilities, e.g.: - A null pattern
- * allows for grouping of X.509 principals by the specified certification authority - A partial
- * pattern allows for grouping of logically-equivalent principals (i.e., to allow for certificates
- * in which the distinguished name may vary slightly between versions, e.g., proxy certificates)
+ * The pattern allows for a spectrum of principal-grouping possibilities, e.g.:
+ * - A null pattern allows for grouping of X.509 principals by the specified
+ * certification authority - A partial pattern allows for grouping of
+ * logically-equivalent principals (i.e., to allow for certificates in which the
+ * distinguished name may vary slightly between versions, e.g., proxy
+ * certificates)
  * 
  * @author dgm4d
  */
 @SuppressWarnings("deprecation")
-public class X509PatternAclEntry implements AclEntry
-{
+public class X509PatternAclEntry implements AclEntry {
 	static public final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(X509PatternAclEntry.class);
@@ -57,14 +58,12 @@ public class X509PatternAclEntry implements AclEntry
 	// cache an X509 pattern upon first use.
 	transient protected X509Principal _bcPattern;
 
-	public X509PatternAclEntry(X509Identity trustRoot, X500Principal userPattern)
-	{
+	public X509PatternAclEntry(X509Identity trustRoot, X500Principal userPattern) {
 		_userPattern = userPattern;
 		_trustRoot = trustRoot;
 	}
 
-	synchronized void initPattern() throws GeneralSecurityException
-	{
+	synchronized void initPattern() throws GeneralSecurityException {
 		if (_bcPattern == null) {
 			try {
 				_bcPattern = new X509Principal(_userPattern.getEncoded());
@@ -74,8 +73,8 @@ public class X509PatternAclEntry implements AclEntry
 		}
 	}
 
-	synchronized void initTrustManager() throws GeneralSecurityException, IOException
-	{
+	synchronized void initTrustManager() throws GeneralSecurityException,
+			IOException {
 		if (_trustManagerJdk == null) {
 			// create an in-memory cert keystore for the trusted certs.
 			KeyStore ks = KeyStore.getInstance("JKS");
@@ -83,12 +82,15 @@ public class X509PatternAclEntry implements AclEntry
 
 			// add the trusted cert into the memory-keystore.
 			X509Certificate trustedCert = _trustRoot.getOriginalAsserter()[0];
-			ks.setCertificateEntry(trustedCert.getSubjectX500Principal().getName(), trustedCert);
+			ks.setCertificateEntry(trustedCert.getSubjectX500Principal()
+					.getName(), trustedCert);
 
 			// create a trust manager from the key store.
-			PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(ks, new X509CertSelector());
+			PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(ks,
+					new X509CertSelector());
 			pkixParams.setRevocationEnabled(false);
-			ManagerFactoryParameters trustParams = new CertPathTrustManagerParameters(pkixParams);
+			ManagerFactoryParameters trustParams = new CertPathTrustManagerParameters(
+					pkixParams);
 
 			TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
 			tmf.init(trustParams);
@@ -101,57 +103,73 @@ public class X509PatternAclEntry implements AclEntry
 
 			// add the trusted cert into the memory-keystore.
 			X509Certificate trustedCert = _trustRoot.getOriginalAsserter()[0];
-			ks.setCertificateEntry(trustedCert.getSubjectX500Principal().getName(), trustedCert);
+			ks.setCertificateEntry(trustedCert.getSubjectX500Principal()
+					.getName(), trustedCert);
 
-			InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(ks);
+			InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(
+					ks);
 			_trustManagerCanl = new CommonX509TrustManager(validater);
 		}
 	}
 
-	protected boolean validateTrust(X509Identity user)
-	{
+	protected boolean validateTrust(X509Identity user) {
 		try {
 			initTrustManager();
 		} catch (Throwable e) {
-			_logger.error("exception when initializing trust manager: " + e.getMessage(), e);
+			_logger.error(
+					"exception when initializing trust manager: "
+							+ e.getMessage(), e);
 			return false;
 		}
 		boolean trustOkay = false;
 		X509Certificate[] userCertChain = user.getOriginalAsserter();
 		try {
-			_trustManagerCanl.checkClientTrusted(userCertChain, userCertChain[0].getPublicKey().getAlgorithm());
+			_trustManagerCanl.checkClientTrusted(userCertChain,
+					userCertChain[0].getPublicKey().getAlgorithm());
 			trustOkay = true;
 		} catch (Throwable e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("problem checking cert with canl: " + e.getMessage());
+				_logger.debug("problem checking cert with canl: "
+						+ e.getMessage());
 		}
 		try {
 			if (!trustOkay) {
-				_trustManagerJdk.checkClientTrusted(userCertChain, userCertChain[0].getPublicKey().getAlgorithm());
+				_trustManagerJdk.checkClientTrusted(userCertChain,
+						userCertChain[0].getPublicKey().getAlgorithm());
 				trustOkay = true;
 			}
 		} catch (Throwable e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("problem checking cert with jdk: " + e.getMessage());
+				_logger.debug("problem checking cert with jdk: "
+						+ e.getMessage());
 		}
 
 		if (!trustOkay) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("client not trusted by pattern acl, user[1 of " + userCertChain.length + "] chksum="
-					+ SecurityUtilities.getChecksum(userCertChain[0]) + " pubkey chksum="
-					+ SecurityUtilities.getChecksum(userCertChain[0].getPublicKey()) + " is " + userCertChain[0].toString());
+				_logger.debug("client not trusted by pattern acl, user[1 of "
+						+ userCertChain.length
+						+ "] chksum="
+						+ SecurityUtilities.getChecksum(userCertChain[0])
+						+ " pubkey chksum="
+						+ SecurityUtilities.getChecksum(userCertChain[0]
+								.getPublicKey()) + " is "
+						+ userCertChain[0].toString());
 		} else {
 			if (_logger.isDebugEnabled())
-				_logger.debug("trust established by pattern acl for user[1 of " + userCertChain.length + "] chksum="
-					+ SecurityUtilities.getChecksum(userCertChain[0]) + " pubkey chksum="
-					+ SecurityUtilities.getChecksum(userCertChain[0].getPublicKey()) + " is " + userCertChain[0].toString());
+				_logger.debug("trust established by pattern acl for user[1 of "
+						+ userCertChain.length
+						+ "] chksum="
+						+ SecurityUtilities.getChecksum(userCertChain[0])
+						+ " pubkey chksum="
+						+ SecurityUtilities.getChecksum(userCertChain[0]
+								.getPublicKey()) + " is "
+						+ userCertChain[0].toString());
 		}
 		return trustOkay;
 	}
 
 	@SuppressWarnings("unchecked")
-	protected boolean matches(X509Identity user)
-	{
+	protected boolean matches(X509Identity user) {
 		if (_userPattern == null) {
 			return true;
 		}
@@ -162,7 +180,9 @@ public class X509PatternAclEntry implements AclEntry
 			userPrincipal = PrincipalUtil.getSubjectX509Principal(userCert);
 		} catch (CertificateEncodingException t) {
 			_logger.debug(
-				"cert encoding problem for: " + userCert.getSubjectX500Principal().getName() + " -- " + t.getMessage(), t);
+					"cert encoding problem for: "
+							+ userCert.getSubjectX500Principal().getName()
+							+ " -- " + t.getMessage(), t);
 			return false;
 		}
 
@@ -170,19 +190,21 @@ public class X509PatternAclEntry implements AclEntry
 		try {
 			initPattern();
 		} catch (GeneralSecurityException t) {
-			_logger
-				.debug(
-					"pattern initialization problem for: " + userCert.getSubjectX500Principal().getName() + " -- "
-						+ t.getMessage(), t);
+			_logger.debug(
+					"pattern initialization problem for: "
+							+ userCert.getSubjectX500Principal().getName()
+							+ " -- " + t.getMessage(), t);
 			return false;
 		}
 		Vector<ASN1ObjectIdentifier> oids = _bcPattern.getOIDs();
 		for (ASN1ObjectIdentifier oid : oids) {
 			Vector<String> patternValues = _bcPattern.getValues(oid);
 			Vector<String> userValues = userPrincipal.getValues(oid);
-			if ((userValues == null) || (!userValues.containsAll(patternValues))) {
+			if ((userValues == null)
+					|| (!userValues.containsAll(patternValues))) {
 				if (_logger.isTraceEnabled())
-					_logger.trace("failed to match object identifiers for: " + userCert.getSubjectX500Principal().getName());
+					_logger.trace("failed to match object identifiers for: "
+							+ userCert.getSubjectX500Principal().getName());
 				return false;
 			}
 		}
@@ -191,29 +213,31 @@ public class X509PatternAclEntry implements AclEntry
 	}
 
 	@Override
-	public boolean isPermitted(Identity identity) throws GeneralSecurityException
-	{
+	public boolean isPermitted(Identity identity)
+			throws GeneralSecurityException {
 		// type check
 		if (!(identity instanceof X509Identity)) {
 			return false;
 		}
 		X509Identity user = (X509Identity) identity;
-		String userDN = user.getOriginalAsserter()[0].getSubjectX500Principal().getName().toString();
+		String userDN = user.getOriginalAsserter()[0].getSubjectX500Principal()
+				.getName().toString();
 
 		// pattern check
 		if (!matches(user)) {
 			if (_logger.isTraceEnabled())
-				_logger.trace("user " + userDN + " does not match pattern: " + _userPattern);
+				_logger.trace("user " + userDN + " does not match pattern: "
+						+ _userPattern);
 			return false;
 		}
 		if (_logger.isTraceEnabled())
-			_logger.trace("user " + userDN + " matches pattern: " + _userPattern);
+			_logger.trace("user " + userDN + " matches pattern: "
+					+ _userPattern);
 		return validateTrust(user);
 	}
 
 	@Override
-	public boolean equals(Object other)
-	{
+	public boolean equals(Object other) {
 		if (other == null) {
 			return false;
 		}
@@ -233,25 +257,26 @@ public class X509PatternAclEntry implements AclEntry
 		return true;
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		return describe(VerbosityLevel.HIGH);
 	}
 
 	@Override
-	public String describe(VerbosityLevel verbosity)
-	{
+	public String describe(VerbosityLevel verbosity) {
 		if (verbosity.compareTo(VerbosityLevel.HIGH) >= 0)
-			return String.format("(X509PatternAclEntry) trustRoot: [%s] userPattern: [%s]", _trustRoot.describe(verbosity),
-				X500PrincipalUtilities.describe(_userPattern, verbosity));
+			return String.format(
+					"(X509PatternAclEntry) trustRoot: [%s] userPattern: [%s]",
+					_trustRoot.describe(verbosity),
+					X500PrincipalUtilities.describe(_userPattern, verbosity));
 		else
-			return X500PrincipalUtilities.describe(_userPattern, VerbosityLevel.HIGH) + " signed by "
-				+ _trustRoot.describe(verbosity);
+			return X500PrincipalUtilities.describe(_userPattern,
+					VerbosityLevel.HIGH)
+					+ " signed by "
+					+ _trustRoot.describe(verbosity);
 	}
 
 	@Override
-	public AclEntry sanitize()
-	{
+	public AclEntry sanitize() {
 		return this;
 	}
 }

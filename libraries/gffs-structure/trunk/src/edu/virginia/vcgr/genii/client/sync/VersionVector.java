@@ -4,38 +4,33 @@ import java.io.Serializable;
 
 import edu.virginia.vcgr.genii.client.sync.VersionItem;
 
-public class VersionVector implements Serializable
-{
+public class VersionVector implements Serializable {
 	private static final long serialVersionUID = 1035761061083900662L;
 
 	/**
-	 * Version vectors are very short (usually one to four items) so we use a linear search. They
-	 * are made to be sent across a network, so we use a compact data structure.
+	 * Version vectors are very short (usually one to four items) so we use a
+	 * linear search. They are made to be sent across a network, so we use a
+	 * compact data structure.
 	 */
 	public VersionItem[] vector;
 
-	public VersionVector()
-	{
+	public VersionVector() {
 		this.vector = new VersionItem[0];
 	}
 
-	public VersionVector(VersionItem[] vectorIn)
-	{
+	public VersionVector(VersionItem[] vectorIn) {
 		this.vector = vectorIn;
 	}
 
-	public int getLocalID()
-	{
+	public int getLocalID() {
 		return vector[0].uid;
 	}
 
-	public int getLocalVersion()
-	{
+	public int getLocalVersion() {
 		return vector[0].version;
 	}
 
-	public int getVersion(int uid)
-	{
+	public int getVersion(int uid) {
 		for (VersionItem item : vector) {
 			if (item.uid == uid)
 				return item.version;
@@ -43,8 +38,7 @@ public class VersionVector implements Serializable
 		return 0;
 	}
 
-	public void setVersion(int uid, int version)
-	{
+	public void setVersion(int uid, int version) {
 		VersionItem[] newVector = new VersionItem[vector.length + 1];
 		int idx;
 		for (idx = 0; idx < vector.length; idx++) {
@@ -61,15 +55,13 @@ public class VersionVector implements Serializable
 		}
 	}
 
-	public void copy(VersionVector that)
-	{
+	public void copy(VersionVector that) {
 		for (VersionItem item : that.vector) {
 			this.setVersion(item.uid, item.version);
 		}
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		String result = "";
 		for (VersionItem item : vector) {
 			if (result.length() > 0)
@@ -79,8 +71,7 @@ public class VersionVector implements Serializable
 		return result;
 	}
 
-	public static VersionVector fromString(String text)
-	{
+	public static VersionVector fromString(String text) {
 		VersionVector vector = new VersionVector();
 		String[] tokenList = text.split(",");
 		for (String token : tokenList) {

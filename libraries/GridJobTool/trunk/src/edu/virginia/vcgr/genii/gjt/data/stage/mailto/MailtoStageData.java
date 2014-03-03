@@ -6,8 +6,7 @@ import edu.virginia.vcgr.genii.gjt.data.analyze.Analysis;
 import edu.virginia.vcgr.genii.gjt.data.stage.AbstractStageData;
 import edu.virginia.vcgr.genii.gjt.data.stage.StageProtocol;
 
-public class MailtoStageData extends AbstractStageData
-{
+public class MailtoStageData extends AbstractStageData {
 	@XmlAttribute(name = "email-address")
 	private String _emailAddress = null;
 
@@ -18,8 +17,7 @@ public class MailtoStageData extends AbstractStageData
 	private String _attachmentName = null;
 
 	@Override
-	protected void activateImpl()
-	{
+	protected void activateImpl() {
 		fireParameterizableStringModified("", _emailAddress);
 		fireParameterizableStringModified("", _subject);
 		fireParameterizableStringModified("", _attachmentName);
@@ -27,26 +25,22 @@ public class MailtoStageData extends AbstractStageData
 	}
 
 	@Override
-	protected void deactivateImpl()
-	{
+	protected void deactivateImpl() {
 		fireParameterizableStringModified(_emailAddress, "");
 		fireParameterizableStringModified(_subject, "");
 		fireParameterizableStringModified(_attachmentName, "");
 		fireJobDescriptionModified();
 	}
 
-	MailtoStageData()
-	{
+	MailtoStageData() {
 		super(StageProtocol.mailto);
 	}
 
-	final String emailAddress()
-	{
+	final String emailAddress() {
 		return _emailAddress;
 	}
 
-	final void emailAddress(String emailAddress)
-	{
+	final void emailAddress(String emailAddress) {
 		String old = _emailAddress;
 		_emailAddress = emailAddress;
 
@@ -54,13 +48,11 @@ public class MailtoStageData extends AbstractStageData
 		fireJobDescriptionModified();
 	}
 
-	final String subject()
-	{
+	final String subject() {
 		return _subject;
 	}
 
-	final void subject(String subject)
-	{
+	final void subject(String subject) {
 		String old = _subject;
 		_subject = subject;
 
@@ -68,13 +60,11 @@ public class MailtoStageData extends AbstractStageData
 		fireJobDescriptionModified();
 	}
 
-	final String attachmentName()
-	{
+	final String attachmentName() {
 		return _attachmentName;
 	}
 
-	final void attachmentName(String attachmentName)
-	{
+	final void attachmentName(String attachmentName) {
 		String old = _attachmentName;
 		_attachmentName = attachmentName;
 
@@ -83,8 +73,7 @@ public class MailtoStageData extends AbstractStageData
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		boolean sawQuestionMark = false;
 
 		StringBuilder builder = new StringBuilder("mailto:");
@@ -108,26 +97,34 @@ public class MailtoStageData extends AbstractStageData
 	}
 
 	@Override
-	public void analyze(String filename, Analysis analysis)
-	{
+	public void analyze(String filename, Analysis analysis) {
 		if (_emailAddress == null || _emailAddress.length() == 0) {
-			analysis.addError("Data stage for file \"%s\" needs an email address!", filename);
+			analysis.addError(
+					"Data stage for file \"%s\" needs an email address!",
+					filename);
 		}
 
 		if (_subject == null || _subject.length() == 0)
-			analysis.addWarning("Data stage for file \"%s\" should have a subject.", filename);
+			analysis.addWarning(
+					"Data stage for file \"%s\" should have a subject.",
+					filename);
 
 		if (_attachmentName == null || _attachmentName.length() == 0)
-			analysis.addWarning("It is recommended that you include an attachment name for data stage \"%s\".", filename);
+			analysis.addWarning(
+					"It is recommended that you include an attachment name for data stage \"%s\".",
+					filename);
 		else if (_attachmentName.contains("/"))
-			analysis.addError("Attachment filename for data stage file \"%s\" cannot " + "contain the / character.", filename);
+			analysis.addError(
+					"Attachment filename for data stage file \"%s\" cannot "
+							+ "contain the / character.", filename);
 		else if (_attachmentName.contains("\\"))
-			analysis.addError("Attachment filename for data stage file \"%s\" cannot " + "contain the \\ character.", filename);
+			analysis.addError(
+					"Attachment filename for data stage file \"%s\" cannot "
+							+ "contain the \\ character.", filename);
 	}
 
 	@Override
-	public String getJSDLURI()
-	{
+	public String getJSDLURI() {
 		return toString();
 	}
 }

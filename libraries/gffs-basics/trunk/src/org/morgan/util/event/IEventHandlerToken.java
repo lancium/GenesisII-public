@@ -16,8 +16,7 @@ package org.morgan.util.event;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public interface IEventHandlerToken
-{
+public interface IEventHandlerToken {
 	public IEventHandler getHandler();
 
 	public int getPriority();

@@ -27,8 +27,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author mmm2a
  */
-public class ByteIOConstants
-{
+public class ByteIOConstants {
 	static private Log _logger = LogFactory.getLog(ByteIOConstants.class);
 
 	static final public String BYTEIO_NS = "http://schemas.ggf.org/byteio/2005/10";
@@ -37,10 +36,8 @@ public class ByteIOConstants
 	static public final String TRANSFER_TYPE_DIME = "http://schemas.ggf.org/byteio/2005/10/transfer-mechanisms/dime";
 	static public final String TRANSFER_TYPE_MTOM = "http://schemas.ggf.org/byteio/2005/10/transfer-mechanisms/mtom";
 
-	static public final String SEEK_ORIGIN_CURRENT =
-		"http://schemas.ggf.org/byteio/2005/10/streamable-access/seek-origins/current";
-	static public final String SEEK_ORIGIN_BEGINNING =
-		"http://schemas.ggf.org/byteio/2005/10/streamable-access/seek-origins/beginning";
+	static public final String SEEK_ORIGIN_CURRENT = "http://schemas.ggf.org/byteio/2005/10/streamable-access/seek-origins/current";
+	static public final String SEEK_ORIGIN_BEGINNING = "http://schemas.ggf.org/byteio/2005/10/streamable-access/seek-origins/beginning";
 	static public final String SEEK_ORIGIN_END = "http://schemas.ggf.org/byteio/2005/10/streamable-access/seek-origins/end";
 
 	static public final String SHARED_BYTEIO_NS = "http://schemas.ggf.org/byteio/2005/10/byteio";
@@ -60,13 +57,18 @@ public class ByteIOConstants
 	static public final String MODTIME_ATTR_NAME = "ModificationTime";
 
 	// Streamable Attr
-	static public QName POSITION_ATTR_NAME = new QName(STREAMABLE_BYTEIO_NS, "Position");
-	static public QName SEEKABLE_ATTR_NAME = new QName(STREAMABLE_BYTEIO_NS, "Seekable");
-	static public QName END_OF_STREAM_ATTR_NAME = new QName(STREAMABLE_BYTEIO_NS, "EndOfStream");
+	static public QName POSITION_ATTR_NAME = new QName(STREAMABLE_BYTEIO_NS,
+			"Position");
+	static public QName SEEKABLE_ATTR_NAME = new QName(STREAMABLE_BYTEIO_NS,
+			"Seekable");
+	static public QName END_OF_STREAM_ATTR_NAME = new QName(
+			STREAMABLE_BYTEIO_NS, "EndOfStream");
 
-	static public QName FILE_CHECKSUM_ATTR_NAME = new QName(GenesisIIConstants.GENESISII_NS, "Checksum");
+	static public QName FILE_CHECKSUM_ATTR_NAME = new QName(
+			GenesisIIConstants.GENESISII_NS, "Checksum");
 
-	static public QName SIMPLE_XFER_DATA_QNAME = new QName("http://schemas.ggf.org/byteio/2005/10/byte-io", "data");
+	static public QName SIMPLE_XFER_DATA_QNAME = new QName(
+			"http://schemas.ggf.org/byteio/2005/10/byte-io", "data");
 
 	static public URI TRANSFER_TYPE_SIMPLE_URI;
 	static public URI TRANSFER_TYPE_DIME_URI;
@@ -90,25 +92,44 @@ public class ByteIOConstants
 		}
 	}
 
-	static public QName SBYTEIO_SUBSCRIBE_CONSTRUCTION_PARAMETER = new QName(GenesisIIConstants.GENESISII_NS,
-		"sbyteio-subscribe");
-	static public QName MUST_DESTROY_PROPERTY = new QName(GenesisIIConstants.GENESISII_NS, "must-destroy");
+	static public QName SBYTEIO_SUBSCRIBE_CONSTRUCTION_PARAMETER = new QName(
+			GenesisIIConstants.GENESISII_NS, "sbyteio-subscribe");
+	static public QName MUST_DESTROY_PROPERTY = new QName(
+			GenesisIIConstants.GENESISII_NS, "must-destroy");
 
 	static public int PREFERRED_SIMPLE_XFER_BLOCK_SIZE = 1024 * 512;
 
-	static public QName SBYTEIO_DESTROY_ON_CLOSE_FLAG = new QName(STREAMABLE_BYTEIO_NS, "DestroyOnClose");
+	static public QName SBYTEIO_DESTROY_ON_CLOSE_FLAG = new QName(
+			STREAMABLE_BYTEIO_NS, "DestroyOnClose");
 
 	static public int numThreads = 4;
 
-	static public QName rxferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
-	static public QName rsize = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
-	static public QName raccessTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
-	static public QName rmodTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
-	static public QName rcreatTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
+	static public QName rxferMechs = new QName(
+			ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.XFER_MECHS_ATTR_NAME);
+	static public QName rsize = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.SIZE_ATTR_NAME);
+	static public QName raccessTime = new QName(
+			ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static public QName rmodTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.MODTIME_ATTR_NAME);
+	static public QName rcreatTime = new QName(
+			ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.CREATTIME_ATTR_NAME);
 
-	static public QName sxferMechs = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
-	static public QName ssize = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
-	static public QName saccessTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
-	static public QName smodTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
-	static public QName screatTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
+	static public QName sxferMechs = new QName(
+			ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.XFER_MECHS_ATTR_NAME);
+	static public QName ssize = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.SIZE_ATTR_NAME);
+	static public QName saccessTime = new QName(
+			ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static public QName smodTime = new QName(
+			ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.MODTIME_ATTR_NAME);
+	static public QName screatTime = new QName(
+			ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.CREATTIME_ATTR_NAME);
 }

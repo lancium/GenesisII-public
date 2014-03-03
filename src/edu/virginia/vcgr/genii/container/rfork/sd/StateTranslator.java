@@ -5,14 +5,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * This interface is implemented by classes that will translate state variables from some
- * input/output form. It is used for the SimpleStateResourceFork when new state is "copied" in or
- * out.
+ * This interface is implemented by classes that will translate state variables
+ * from some input/output form. It is used for the SimpleStateResourceFork when
+ * new state is "copied" in or out.
  * 
  * @author mmm2a
  */
-public interface StateTranslator
-{
+public interface StateTranslator {
 	/**
 	 * Read a new state from the target input stream.
 	 * 
@@ -28,8 +27,9 @@ public interface StateTranslator
 	 * 
 	 * @throws IOException
 	 */
-	public <StateType> StateType read(SimpleStateResourceFork<StateType> originatingFork, Class<StateType> targetType,
-		InputStream input) throws IOException;
+	public <StateType> StateType read(
+			SimpleStateResourceFork<StateType> originatingFork,
+			Class<StateType> targetType, InputStream input) throws IOException;
 
 	/**
 	 * Write out the current state to an output stream.
@@ -45,6 +45,7 @@ public interface StateTranslator
 	 * 
 	 * @throws IOException
 	 */
-	public <StateType> void write(SimpleStateResourceFork<StateType> originatingFork, StateType state, OutputStream output)
-		throws IOException;
+	public <StateType> void write(
+			SimpleStateResourceFork<StateType> originatingFork,
+			StateType state, OutputStream output) throws IOException;
 }

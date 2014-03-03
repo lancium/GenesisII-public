@@ -22,17 +22,16 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 
-abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
-{
+abstract class AbstractRunProcessPhase extends AbstractExecutionPhase {
 	static final long serialVersionUID = 0L;
 
-	static private Log _logger = LogFactory.getLog(AbstractRunProcessPhase.class);
+	static private Log _logger = LogFactory
+			.getLog(AbstractRunProcessPhase.class);
 	static final private int STDERR_SIZE_CAP = 1024;
 
 	protected BESConstructionParameters _constructionParameters;
 
-	protected void preDelay() throws InterruptedException
-	{
+	protected void preDelay() throws InterruptedException {
 		if (_constructionParameters != null) {
 			Duration preDelay = _constructionParameters.preExecutionDelay();
 			if (preDelay != null) {
@@ -41,8 +40,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		}
 	}
 
-	protected void postDelay() throws InterruptedException
-	{
+	protected void postDelay() throws InterruptedException {
 		if (_constructionParameters != null) {
 			Duration postDelay = _constructionParameters.postExecutionDelay();
 			if (postDelay != null) {
@@ -51,15 +49,17 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		}
 	}
 
-	final protected void setExportedEnvironment(Map<String, String> environmentMap)
-	{
+	final protected void setExportedEnvironment(
+			Map<String, String> environmentMap) {
 		try {
-			EnvironmentExport exp = EnvironmentExport.besExport(_constructionParameters);
+			EnvironmentExport exp = EnvironmentExport
+					.besExport(_constructionParameters);
 			for (String key : exp.keySet()) {
 				try {
 					environmentMap.put(key, exp.value(key));
 				} catch (Throwable t2) {
-					_logger.warn(String.format("Unable to set environment variable %s.", key), t2);
+					_logger.warn(String.format(
+							"Unable to set environment variable %s.", key), t2);
 				}
 			}
 		} catch (Throwable t1) {
@@ -67,15 +67,15 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		}
 	}
 
-	public AbstractRunProcessPhase(ActivityState phaseState, BESConstructionParameters constructionParameters)
-	{
+	public AbstractRunProcessPhase(ActivityState phaseState,
+			BESConstructionParameters constructionParameters) {
 		super(phaseState);
 
 		_constructionParameters = constructionParameters;
 	}
 
-	static protected Map<String, String> overloadEnvironment(Map<String, String> overload)
-	{
+	static protected Map<String, String> overloadEnvironment(
+			Map<String, String> overload) {
 		Map<String, String> ret = new HashMap<String, String>();
 
 		if (overload == null || overload.size() == 0)
@@ -91,19 +91,20 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		return ret;
 	}
 
-	static private void overloadLinuxEnvironment(Map<String, String> processEnvironment, Map<String, String> overload)
-	{
+	static private void overloadLinuxEnvironment(
+			Map<String, String> processEnvironment, Map<String, String> overload) {
 		for (String variable : overload.keySet()) {
 			String value = overload.get(variable);
 			if (variable.equals("PATH") || variable.equals("LD_LIBRARY_PATH"))
-				processEnvironment.put(variable, mergePaths(processEnvironment.get(variable), value));
+				processEnvironment.put(variable,
+						mergePaths(processEnvironment.get(variable), value));
 			else
 				processEnvironment.put(variable, value);
 		}
 	}
 
-	static private void overloadWindowsEnvironment(Map<String, String> processEnvironment, Map<String, String> overload)
-	{
+	static private void overloadWindowsEnvironment(
+			Map<String, String> processEnvironment, Map<String, String> overload) {
 		for (String variable : overload.keySet()) {
 			String value = overload.get(variable);
 			if (variable.equalsIgnoreCase("PATH")) {
@@ -111,14 +112,14 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 				if (trueKey == null)
 					processEnvironment.put(variable, value);
 				else
-					processEnvironment.put(trueKey, mergePaths(processEnvironment.get(trueKey), value));
+					processEnvironment.put(trueKey,
+							mergePaths(processEnvironment.get(trueKey), value));
 			} else
 				processEnvironment.put(variable, value);
 		}
 	}
 
-	static private String mergePaths(String original, String newValue)
-	{
+	static private String mergePaths(String original, String newValue) {
 		if (original == null || original.length() == 0)
 			return newValue;
 		if (newValue == null || newValue.length() == 0)
@@ -127,8 +128,8 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		return original + File.pathSeparator + newValue;
 	}
 
-	static private String findWindowsVariable(Map<String, String> env, String searchKey)
-	{
+	static private String findWindowsVariable(Map<String, String> env,
+			String searchKey) {
 		for (String trueKey : env.keySet()) {
 			if (searchKey.equalsIgnoreCase(trueKey))
 				return trueKey;
@@ -137,10 +138,10 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		return null;
 	}
 
-	static protected List<String>
-		resetCommand(List<String> commandLine, File workingDirectory, Map<String, String> environment)
-	{
-		ArrayList<String> newCommandLine = new ArrayList<String>(commandLine.size());
+	static protected List<String> resetCommand(List<String> commandLine,
+			File workingDirectory, Map<String, String> environment) {
+		ArrayList<String> newCommandLine = new ArrayList<String>(
+				commandLine.size());
 
 		String command = findCommand(commandLine.get(0), environment);
 		if (command == null) {
@@ -157,8 +158,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		return newCommandLine;
 	}
 
-	static private String findCommand(String command, Map<String, String> env)
-	{
+	static private String findCommand(String command, Map<String, String> env) {
 		String path;
 
 		if (command.contains(File.separator))
@@ -184,32 +184,37 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		return null;
 	}
 
-	static protected String fileToPath(File file, File workingDirectory)
-	{
+	static protected String fileToPath(File file, File workingDirectory) {
 		if (file == null) {
 			if (workingDirectory == null)
 				return null;
 
-			return new File(workingDirectory, String.format("%s.stder", new GUID())).getAbsolutePath();
+			return new File(workingDirectory, String.format("%s.stder",
+					new GUID())).getAbsolutePath();
 		}
 
 		return file.getAbsolutePath();
 	}
 
-	static protected void appendStandardError(HistoryContext history, File stderr)
-	{
+	static protected void appendStandardError(HistoryContext history,
+			File stderr) {
 		if (stderr != null) {
 			if (!stderr.exists()) {
-				history.createDebugWriter("No Standard Error").format("Standard error path %s does not exist", stderr).close();
+				history.createDebugWriter("No Standard Error")
+						.format("Standard error path %s does not exist", stderr)
+						.close();
 			} else if (stderr.length() == 0) {
-				history.createDebugWriter("Standard Error Empty").format("Standard error file %s appears empty.", stderr)
-					.close();
+				history.createDebugWriter("Standard Error Empty")
+						.format("Standard error file %s appears empty.", stderr)
+						.close();
 			} else {
 				if (stderr.length() > STDERR_SIZE_CAP)
 					history.createDebugWriter("Standard Error Truncated")
-						.format("Standard error file %s is too big -- truncating for log.", stderr).close();
+							.format("Standard error file %s is too big -- truncating for log.",
+									stderr).close();
 
-				PrintWriter writer = history.createDebugWriter("Standard Error for Job");
+				PrintWriter writer = history
+						.createDebugWriter("Standard Error for Job");
 				FileReader reader = null;
 
 				try {
@@ -218,12 +223,14 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 					int toRead = STDERR_SIZE_CAP;
 					int read;
 
-					while (toRead > 0 && (read = reader.read(data, 0, toRead)) > 0) {
+					while (toRead > 0
+							&& (read = reader.read(data, 0, toRead)) > 0) {
 						writer.write(data, 0, read);
 						toRead -= read;
 					}
 				} catch (IOException ioe) {
-					writer.format("\nError reading from standard error:  %s.", ioe);
+					writer.format("\nError reading from standard error:  %s.",
+							ioe);
 				} finally {
 					StreamUtils.close(reader);
 					StreamUtils.close(writer);
@@ -232,8 +239,8 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		}
 	}
 
-	static protected void appendStandardError(HistoryContext history, String stderrPath)
-	{
+	static protected void appendStandardError(HistoryContext history,
+			String stderrPath) {
 		if (stderrPath != null)
 			appendStandardError(history, new File(stderrPath));
 	}

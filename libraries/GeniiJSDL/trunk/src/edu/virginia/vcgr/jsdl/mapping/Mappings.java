@@ -33,27 +33,29 @@ import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class Mappings
-{
+public class Mappings {
 	static private Logger _logger = Logger.getLogger(Mappings.class);
 
 	static private Map<String, ProcessorArchitecture> _archMapping;
 	static private Map<String, OperatingSystemNames> _osMapping;
 
-	static private Object loadMapping(JAXBContext context, String resourceName)
-	{
+	static private Object loadMapping(JAXBContext context, String resourceName) {
 		InputStream in = null;
 
 		try {
 			in = Mappings.class.getResourceAsStream(resourceName);
 			if (in == null)
-				throw new FileNotFoundException(String.format("Couldn't find mapping resource \"%s\".", resourceName));
+				throw new FileNotFoundException(String.format(
+						"Couldn't find mapping resource \"%s\".", resourceName));
 
 			return context.createUnmarshaller().unmarshal(in);
 		} catch (JAXBException e) {
-			_logger.error(String.format("Unable to parse mapping file %s.", resourceName), e);
+			_logger.error(String.format("Unable to parse mapping file %s.",
+					resourceName), e);
 		} catch (FileNotFoundException fnfe) {
-			_logger.error(String.format("Unable to find resource %s.", resourceName), fnfe);
+			_logger.error(
+					String.format("Unable to find resource %s.", resourceName),
+					fnfe);
 		} finally {
 			if (in != null) {
 				try {
@@ -66,19 +68,19 @@ public class Mappings
 		return null;
 	}
 
-	static private ArchitectureMapping loadArchitectureMapping(JAXBContext context)
-	{
+	static private ArchitectureMapping loadArchitectureMapping(
+			JAXBContext context) {
 		return (ArchitectureMapping) loadMapping(context, "arch-map.xml");
 	}
 
-	static private OSMapping loadOSMapping(JAXBContext context)
-	{
+	static private OSMapping loadOSMapping(JAXBContext context) {
 		return (OSMapping) loadMapping(context, "os-map.xml");
 	}
 
 	static {
 		try {
-			JAXBContext context = JAXBContext.newInstance(ArchitectureMapping.class, OSMapping.class);
+			JAXBContext context = JAXBContext.newInstance(
+					ArchitectureMapping.class, OSMapping.class);
 
 			ArchitectureMapping aMapping = loadArchitectureMapping(context);
 			OSMapping oMapping = loadOSMapping(context);
@@ -97,13 +99,11 @@ public class Mappings
 		}
 	}
 
-	static public Map<String, OperatingSystemNames> osMap()
-	{
+	static public Map<String, OperatingSystemNames> osMap() {
 		return _osMapping;
 	}
 
-	static public Map<String, ProcessorArchitecture> architectureMap()
-	{
+	static public Map<String, ProcessorArchitecture> architectureMap() {
 		return _archMapping;
 	}
 }

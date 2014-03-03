@@ -36,78 +36,66 @@ import edu.virginia.vcgr.jsdl.sweep.parameters.DocumentNodeSweepParameter;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class SweepAssignment implements Serializable, Countable, Iterable<Evaluable>
-{
+public class SweepAssignment implements Serializable, Countable,
+		Iterable<Evaluable> {
 	static final long serialVersionUID = 0L;
 
-	@XmlElements({ @XmlElement(namespace = SweepConstants.SWEEP_NS, name = "DocumentNode", required = true, nillable = false,
-		type = DocumentNodeSweepParameter.class) })
+	@XmlElements({ @XmlElement(namespace = SweepConstants.SWEEP_NS, name = "DocumentNode", required = true, nillable = false, type = DocumentNodeSweepParameter.class) })
 	private List<SweepParameter> _parameters;
 
 	@XmlElements({
-		@XmlElement(namespace = SweepConstants.SWEEP_FUNC_NS, name = "Values", required = true, nillable = false,
-			type = ValuesSweepFunction.class),
-		@XmlElement(namespace = SweepConstants.SWEEP_FUNC_NS, name = "LoopInteger", required = true, nillable = false,
-			type = LoopIntegerSweepFunction.class),
-		@XmlElement(namespace = SweepConstants.SWEEP_FUNC_NS, name = "LoopDouble", required = true, nillable = false,
-			type = LoopDoubleSweepFunction.class) })
+			@XmlElement(namespace = SweepConstants.SWEEP_FUNC_NS, name = "Values", required = true, nillable = false, type = ValuesSweepFunction.class),
+			@XmlElement(namespace = SweepConstants.SWEEP_FUNC_NS, name = "LoopInteger", required = true, nillable = false, type = LoopIntegerSweepFunction.class),
+			@XmlElement(namespace = SweepConstants.SWEEP_FUNC_NS, name = "LoopDouble", required = true, nillable = false, type = LoopDoubleSweepFunction.class) })
 	private SweepFunction _function;
 
 	/**
 	 * For use by XML unmarshalling only.
 	 */
 	@SuppressWarnings("unused")
-	private SweepAssignment()
-	{
+	private SweepAssignment() {
 		this(null);
 	}
 
-	public SweepAssignment(SweepFunction function, SweepParameter... parameters)
-	{
+	public SweepAssignment(SweepFunction function, SweepParameter... parameters) {
 		_function = function;
 		_parameters = new Vector<SweepParameter>(parameters.length);
 		for (SweepParameter parameter : parameters)
 			_parameters.add(parameter);
 	}
 
-	final public void addParameter(SweepParameter parameter)
-	{
+	final public void addParameter(SweepParameter parameter) {
 		_parameters.add(parameter);
 	}
 
-	final public List<SweepParameter> sweepParameters()
-	{
+	final public List<SweepParameter> sweepParameters() {
 		return _parameters;
 	}
 
-	final public SweepFunction sweepFunction()
-	{
+	final public SweepFunction sweepFunction() {
 		return _function;
 	}
 
 	@Override
-	final public int size()
-	{
+	final public int size() {
 		return _function.size();
 	}
 
 	@Override
-	final public Iterator<Evaluable> iterator()
-	{
+	final public Iterator<Evaluable> iterator() {
 		try {
 			return new EvaluationIterator();
 		} catch (SweepException e) {
-			throw new RuntimeException("Unable to create evaluation iterator.", e);
+			throw new RuntimeException("Unable to create evaluation iterator.",
+					e);
 		}
 	}
 
-	private class EvaluationIterator implements Iterator<Evaluable>
-	{
+	private class EvaluationIterator implements Iterator<Evaluable> {
 		private Iterator<Object> _values;
 		private List<SweepTargetIdentifier> _targets;
 
-		private EvaluationIterator() throws SweepException
-		{
+		private EvaluationIterator() throws SweepException {
 			if (_function == null)
 				_values = null;
 			else
@@ -122,8 +110,7 @@ public class SweepAssignment implements Serializable, Countable, Iterable<Evalua
 		}
 
 		@Override
-		final public boolean hasNext()
-		{
+		final public boolean hasNext() {
 			if (_values == null)
 				return false;
 
@@ -131,15 +118,14 @@ public class SweepAssignment implements Serializable, Countable, Iterable<Evalua
 		}
 
 		@Override
-		final public Evaluable next()
-		{
+		final public Evaluable next() {
 			return new EvaluationStep(_targets, _values.next());
 		}
 
 		@Override
-		final public void remove()
-		{
-			throw new UnsupportedOperationException("Not allowed to remove elements from this iterator.");
+		final public void remove() {
+			throw new UnsupportedOperationException(
+					"Not allowed to remove elements from this iterator.");
 		}
 	}
 }

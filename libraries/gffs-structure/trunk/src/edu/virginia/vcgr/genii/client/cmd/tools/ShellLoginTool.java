@@ -11,39 +11,39 @@ import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 import edu.virginia.vcgr.genii.client.gpath.*;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class ShellLoginTool extends BaseGridTool
-{
+public class ShellLoginTool extends BaseGridTool {
 	static private final String DESCRIPTION = "config/tooldocs/description/dshell-login";
 	static private final String USAGE = "config/tooldocs/usage/ushell-login";
 	static final private String _MANPAGE = "config/tooldocs/man/shell-login";
 
-	public ShellLoginTool()
-	{
-		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), false, ToolCategory.SECURITY);
+	public ShellLoginTool() {
+		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE),
+				false, ToolCategory.SECURITY);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
-	static private Pattern LOGIN_FILENAME_PATTERN = Pattern.compile("^\\.glogin\\.[a-zA-Z0-9]+$");
+	static private Pattern LOGIN_FILENAME_PATTERN = Pattern
+			.compile("^\\.glogin\\.[a-zA-Z0-9]+$");
 
-	private Collection<RNSPath> getLoginScripts(String homeDirString) throws Throwable
-	{
-		RNSPath homeDir = RNSPath.getCurrent().lookup(homeDirString, RNSPathQueryFlags.MUST_EXIST);
-		return homeDir.listContents(new RNSFilter()
-		{
+	private Collection<RNSPath> getLoginScripts(String homeDirString)
+			throws Throwable {
+		RNSPath homeDir = RNSPath.getCurrent().lookup(homeDirString,
+				RNSPathQueryFlags.MUST_EXIST);
+		return homeDir.listContents(new RNSFilter() {
 			@Override
-			public boolean matches(RNSPath testEntry)
-			{
-				return LOGIN_FILENAME_PATTERN.matcher(testEntry.getName()).matches();
+			public boolean matches(RNSPath testEntry) {
+				return LOGIN_FILENAME_PATTERN.matcher(testEntry.getName())
+						.matches();
 			}
 		});
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid) {
-			throw new InvalidToolUsageException("<home-dir> must be a grid path. ");
+			throw new InvalidToolUsageException(
+					"<home-dir> must be a grid path. ");
 		}
 		for (RNSPath path : getLoginScripts(gPath.path())) {
 			ScriptTool tool = new ScriptTool();
@@ -55,8 +55,7 @@ public class ShellLoginTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() != 1)
 			throw new InvalidToolUsageException();
 	}

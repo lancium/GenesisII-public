@@ -8,26 +8,24 @@ import org.morgan.data.RelativeTimeRangeLabelDelegate;
 import org.morgan.data.TimeBasedHistogramSet;
 import org.morgan.data.TimeRange;
 
-public class DatabaseHistogramStatistics
-{
+public class DatabaseHistogramStatistics {
 	private int _activeConnections = 0;
-	private TimeBasedHistogramSet _histoData = new TimeBasedHistogramSet(1, TimeUnit.MINUTES);
+	private TimeBasedHistogramSet _histoData = new TimeBasedHistogramSet(1,
+			TimeUnit.MINUTES);
 
-	synchronized public void addActiveConnection()
-	{
+	synchronized public void addActiveConnection() {
 		_activeConnections++;
 		_histoData.addValue(_activeConnections);
 	}
 
-	synchronized public void removeActiveConncetion()
-	{
+	synchronized public void removeActiveConncetion() {
 		_activeConnections--;
 		_histoData.addValue(_activeConnections);
 	}
 
-	public Histogram<TimeRange> histogram()
-	{
-		return _histoData.histogram(5, TimeUnit.SECONDS, HistogramDataCombiners.MaximumCombiner,
-			new RelativeTimeRangeLabelDelegate(TimeUnit.SECONDS));
+	public Histogram<TimeRange> histogram() {
+		return _histoData.histogram(5, TimeUnit.SECONDS,
+				HistogramDataCombiners.MaximumCombiner,
+				new RelativeTimeRangeLabelDelegate(TimeUnit.SECONDS));
 	}
 }

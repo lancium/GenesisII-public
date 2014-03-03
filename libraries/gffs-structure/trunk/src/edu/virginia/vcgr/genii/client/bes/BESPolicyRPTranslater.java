@@ -8,23 +8,25 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 import edu.virginia.vcgr.genii.client.bes.BESPolicy;
 
-public class BESPolicyRPTranslater implements SingleResourcePropertyTranslator
-{
+public class BESPolicyRPTranslater implements SingleResourcePropertyTranslator {
 	@Override
-	public <Type> Type deserialize(Class<Type> clazz, MessageElement element) throws ResourcePropertyException
-	{
+	public <Type> Type deserialize(Class<Type> clazz, MessageElement element)
+			throws ResourcePropertyException {
 		if (!BESPolicy.class.isAssignableFrom(clazz))
-			throw new ResourcePropertyException("Unable to translate from type \"" + clazz.getName() + "\" to BESPolicy.");
+			throw new ResourcePropertyException(
+					"Unable to translate from type \"" + clazz.getName()
+							+ "\" to BESPolicy.");
 
 		return clazz.cast(BESPolicy.fromMessageElement(element));
 	}
 
 	@Override
-	public MessageElement serialize(QName name, Object obj) throws ResourcePropertyException
-	{
+	public MessageElement serialize(QName name, Object obj)
+			throws ResourcePropertyException {
 		if (!(obj instanceof BESPolicy))
-			throw new ResourcePropertyException("Unable to translate from type \"" + obj.getClass().getName()
-				+ "\" to BESPolicy.");
+			throw new ResourcePropertyException(
+					"Unable to translate from type \""
+							+ obj.getClass().getName() + "\" to BESPolicy.");
 
 		return ((BESPolicy) obj).toMessageElement(name);
 	}

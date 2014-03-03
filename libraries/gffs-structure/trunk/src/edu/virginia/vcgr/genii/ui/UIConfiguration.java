@@ -10,8 +10,7 @@ import org.morgan.utils.io.IOUtils;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 
-public class UIConfiguration
-{
+public class UIConfiguration {
 	static final private String UI_PROPERTIES_FILENAME = "ui.properties";
 
 	static final private String ERROR_REPORT_TARGET_PROPERTY = "edu.virginia.vcgr.genii.ui.error.report-target";
@@ -19,23 +18,23 @@ public class UIConfiguration
 
 	private Properties _uiProperties = null;
 
-	public UIConfiguration(DeploymentName deploymentName)
-	{
+	public UIConfiguration(DeploymentName deploymentName) {
 		try {
-			File propertiesFile = Installation.getDeployment(deploymentName).getConfigurationFile(UI_PROPERTIES_FILENAME);
+			File propertiesFile = Installation.getDeployment(deploymentName)
+					.getConfigurationFile(UI_PROPERTIES_FILENAME);
 			_uiProperties = IOUtils.loadProperties(propertiesFile);
 		} catch (Throwable cause) {
-			throw new ConfigurationException("Unable to load UI properties file.", cause);
+			throw new ConfigurationException(
+					"Unable to load UI properties file.", cause);
 		}
 	}
 
-	public UIConfiguration()
-	{
+	public UIConfiguration() {
 		this(new DeploymentName());
 	}
 
-	public URI errorReportTarget()
-	{
-		return URI.create(_uiProperties.getProperty(ERROR_REPORT_TARGET_PROPERTY, DEFAULT_ERROR_REPORT_TARGET));
+	public URI errorReportTarget() {
+		return URI.create(_uiProperties.getProperty(
+				ERROR_REPORT_TARGET_PROPERTY, DEFAULT_ERROR_REPORT_TARGET));
 	}
 }

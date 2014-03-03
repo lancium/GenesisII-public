@@ -9,12 +9,10 @@ import javax.swing.table.TableColumnModel;
 
 import edu.virginia.vcgr.genii.gjt.JobDocumentContext;
 
-public class VariableTable extends JTable
-{
+public class VariableTable extends JTable {
 	static final long serialVersionUID = 0L;
 
-	public VariableTable(JobDocumentContext context)
-	{
+	public VariableTable(JobDocumentContext context) {
 		super(new VariableTableModel(context));
 
 		VariableTableModel model = (VariableTableModel) getModel();
@@ -32,7 +30,8 @@ public class VariableTable extends JTable
 
 		typeColumn.setHeaderValue("Variable Type");
 		typeColumn.setCellRenderer(new VariableDefinitionTypeRenderer());
-		typeColumn.setCellEditor(new DefaultCellEditor(new VariableDefinitionTypeCombo()));
+		typeColumn.setCellEditor(new DefaultCellEditor(
+				new VariableDefinitionTypeCombo()));
 
 		valueColumn.setHeaderValue("Values");
 		valueColumn.setCellRenderer(new VariableDefinitionRenderer());

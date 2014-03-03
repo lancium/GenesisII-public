@@ -12,21 +12,21 @@ import edu.virginia.vcgr.xscript.ParseStatement;
 import edu.virginia.vcgr.xscript.ReturnFromFunctionException;
 import edu.virginia.vcgr.xscript.XScriptContext;
 
-public class TryStatement implements ParseStatement
-{
-	static private class CatchStructure
-	{
+public class TryStatement implements ParseStatement {
+	static private class CatchStructure {
 		private Class<? extends Throwable> _catchClass;
 		private ParseStatement _statement;
 
 		@SuppressWarnings("unchecked")
-		public CatchStructure(String className, ParseStatement statement) throws ScriptException, ClassNotFoundException
-		{
+		public CatchStructure(String className, ParseStatement statement)
+				throws ScriptException, ClassNotFoundException {
 			_statement = statement;
 			Class<?> clazz;
-			clazz = GenesisClassLoader.classLoaderFactory().loadClass(className);
+			clazz = GenesisClassLoader.classLoaderFactory()
+					.loadClass(className);
 			if (!Throwable.class.isAssignableFrom(clazz))
-				throw new ScriptException(String.format("Class \"%s\" is not a Throwable.", className));
+				throw new ScriptException(String.format(
+						"Class \"%s\" is not a Throwable.", className));
 			_catchClass = (Class<? extends Throwable>) clazz;
 		}
 	}
@@ -35,16 +35,17 @@ public class TryStatement implements ParseStatement
 	private ParseStatement _finallyBlock;
 	private Collection<CatchStructure> _catches;
 
-	public TryStatement(ParseStatement tryBlock, Map<String, ParseStatement> catches, ParseStatement finallyBlock)
-		throws ScriptException
-	{
+	public TryStatement(ParseStatement tryBlock,
+			Map<String, ParseStatement> catches, ParseStatement finallyBlock)
+			throws ScriptException {
 		_tryBlock = tryBlock;
 		_finallyBlock = finallyBlock;
 
 		_catches = new LinkedList<CatchStructure>();
 		for (String className : catches.keySet()) {
 			try {
-				_catches.add(new CatchStructure(className, catches.get(className)));
+				_catches.add(new CatchStructure(className, catches
+						.get(className)));
 			} catch (ClassNotFoundException cnfe) {
 				// Do nothing, let it go quietly.
 			}
@@ -52,8 +53,8 @@ public class TryStatement implements ParseStatement
 	}
 
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
-	{
+	public Object evaluate(XScriptContext context) throws ScriptException,
+			EarlyExitException, ReturnFromFunctionException {
 		Object ret = null;
 
 		if (_tryBlock != null) {
@@ -67,7 +68,8 @@ public class TryStatement implements ParseStatement
 
 				boolean handled = false;
 				for (CatchStructure structure : _catches) {
-					if (structure._catchClass.isAssignableFrom(cause.getClass())) {
+					if (structure._catchClass
+							.isAssignableFrom(cause.getClass())) {
 						handled = true;
 						context.setException(cause);
 						ret = structure._statement.evaluate(context);

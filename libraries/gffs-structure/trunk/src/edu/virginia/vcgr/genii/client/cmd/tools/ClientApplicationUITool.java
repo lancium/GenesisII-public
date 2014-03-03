@@ -7,16 +7,16 @@ import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.ui.ClientApplication;
 
-public class ClientApplicationUITool extends BaseGridTool
-{
+public class ClientApplicationUITool extends BaseGridTool {
 	static private final String DESCRIPTION = "config/tooldocs/description/dclient-ui";
 	static private final String USAGE = "config/tooldocs/usage/uclient-ui";
 	static private final String _MANPAGE = "config/tooldocs/man/client-ui";
 
-	static private void setupMacOSProperties()
-	{
-		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Genesis II Application");
-		System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
+	static private void setupMacOSProperties() {
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+				"Genesis II Application");
+		System.setProperty("com.apple.mrj.application.growbox.intrudes",
+				"false");
 		System.setProperty("com.apple.mrj.application.live-resize", "true");
 		System.setProperty("com.apple.macos.smallTabs", "true");
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -25,20 +25,18 @@ public class ClientApplicationUITool extends BaseGridTool
 	private boolean _launchShell = false;
 
 	@Option("shell")
-	public void setShell()
-	{
+	public void setShell() {
 		_launchShell = true;
 	}
 
-	public ClientApplicationUITool()
-	{
-		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), false, ToolCategory.GENERAL);
+	public ClientApplicationUITool() {
+		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE),
+				false, ToolCategory.GENERAL);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		if (OperatingSystemType.getCurrent() == OperatingSystemType.MACOS)
 			setupMacOSProperties();
 
@@ -56,8 +54,7 @@ public class ClientApplicationUITool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() > 0)
 			throw new InvalidToolUsageException();
 	}

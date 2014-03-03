@@ -13,17 +13,16 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import edu.virginia.vcgr.genii.gjt.data.JobDocumentConstants;
 
-public class FilesystemMap
-{
+public class FilesystemMap {
 	@XmlTransient
 	private Collection<FilesystemListener> _listeners = new LinkedList<FilesystemListener>();
 
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "filesystems")
 	@XmlJavaTypeAdapter(FilesystemMapAdapter.class)
-	private Map<FilesystemType, Filesystem> _filesystemMap = new EnumMap<FilesystemType, Filesystem>(FilesystemType.class);
+	private Map<FilesystemType, Filesystem> _filesystemMap = new EnumMap<FilesystemType, Filesystem>(
+			FilesystemType.class);
 
-	protected void fireFilesystemDefined(Filesystem newFilesystem)
-	{
+	protected void fireFilesystemDefined(Filesystem newFilesystem) {
 		Collection<FilesystemListener> listeners;
 
 		synchronized (_listeners) {
@@ -34,39 +33,34 @@ public class FilesystemMap
 			listener.filesystemDefined(this, newFilesystem);
 	}
 
-	public FilesystemMap()
-	{
+	public FilesystemMap() {
 		get(null, FilesystemType.Default);
 	}
 
-	public void addFilesystemListener(FilesystemListener listener)
-	{
+	public void addFilesystemListener(FilesystemListener listener) {
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	public void removeFilesystemListener(FilesystemListener listener)
-	{
+	public void removeFilesystemListener(FilesystemListener listener) {
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	public Filesystem set(Filesystem filesystem)
-	{
-		Filesystem ret = _filesystemMap.put(filesystem.filesystemType(), filesystem);
+	public Filesystem set(Filesystem filesystem) {
+		Filesystem ret = _filesystemMap.put(filesystem.filesystemType(),
+				filesystem);
 		fireFilesystemDefined(filesystem);
 		return ret;
 	}
 
-	public Filesystem get(FilesystemType type)
-	{
+	public Filesystem get(FilesystemType type) {
 		return _filesystemMap.get(type);
 	}
 
-	public Filesystem get(Window owner, FilesystemType type)
-	{
+	public Filesystem get(Window owner, FilesystemType type) {
 		Filesystem ret = _filesystemMap.get(type);
 		if (ret == null) {
 			ret = type.factory().instantiate(owner);

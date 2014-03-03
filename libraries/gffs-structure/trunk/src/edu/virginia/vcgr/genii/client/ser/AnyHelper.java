@@ -32,15 +32,15 @@ import org.w3c.dom.Document;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
 /**
- * The <code>AnyHelper</code> is a utility that provides common functions for working with
- * <code>MessageElement</code> and beans with <code>AnyContentType</code> class. <b>Do not used this
- * class for serialization or deserialization of objects.</b> Use
- * {@link edu.virginia.vcgr.genii.client.ser.ObjectSerializer ObjectSerializer} and
- * {@link edu.virginia.vcgr.genii.client.ser.ObjectDeserializer ObjectDeserializer} for that
- * purposes instead.
+ * The <code>AnyHelper</code> is a utility that provides common functions for
+ * working with <code>MessageElement</code> and beans with
+ * <code>AnyContentType</code> class. <b>Do not used this class for
+ * serialization or deserialization of objects.</b> Use
+ * {@link edu.virginia.vcgr.genii.client.ser.ObjectSerializer ObjectSerializer}
+ * and {@link edu.virginia.vcgr.genii.client.ser.ObjectDeserializer
+ * ObjectDeserializer} for that purposes instead.
  */
-public class AnyHelper
-{
+public class AnyHelper {
 	static Log _logger = LogFactory.getLog(AnyHelper.class.getName());
 
 	/**
@@ -50,8 +50,7 @@ public class AnyHelper
 	 *            object to be serialized as a text node
 	 * @return content of any element as a SOAP MessageElement array
 	 */
-	public static MessageElement[] toText(Object obj)
-	{
+	public static MessageElement[] toText(Object obj) {
 		MessageElement[] result = new MessageElement[1];
 		result[0] = new MessageElement(new Text(obj.toString()));
 		return result;
@@ -66,8 +65,7 @@ public class AnyHelper
 	 *            array of objects to be serialized in the any element
 	 * @return content of any element as a SOAP MessageElement array
 	 */
-	public static MessageElement[] toAnyArray(Object[] obj)
-	{
+	public static MessageElement[] toAnyArray(Object[] obj) {
 		MessageElement[] result = new MessageElement[obj.length];
 		for (int i = 0; i < obj.length; i++) {
 			result[i] = toAny(obj[i]);
@@ -82,8 +80,7 @@ public class AnyHelper
 	 *            object to be serialized in the any element
 	 * @return content of any element as a SOAP MessageElement array
 	 */
-	public static MessageElement[] toAnyArray(Object obj)
-	{
+	public static MessageElement[] toAnyArray(Object obj) {
 		MessageElement[] result = new MessageElement[1];
 		result[0] = toAny(obj);
 		return result;
@@ -96,24 +93,23 @@ public class AnyHelper
 	 *            element to be inserted in the any element
 	 * @return content of any element as a SOAP MessageElement array
 	 */
-	public static MessageElement[] toAnyArray(Element element)
-	{
+	public static MessageElement[] toAnyArray(Element element) {
 		MessageElement[] result = { new MessageElement(element) };
 		return result;
 	}
 
 	/**
-	 * Populates a SOAP MessageElement with an arbitrary object, and wraps it inside of a value
-	 * element with an xsi:type attribute. This is similar to using the xsd:any in the same way you
-	 * would use xsd:anyType objects.
+	 * Populates a SOAP MessageElement with an arbitrary object, and wraps it
+	 * inside of a value element with an xsi:type attribute. This is similar to
+	 * using the xsd:any in the same way you would use xsd:anyType objects.
 	 * 
 	 * @param obj
 	 *            object to be serialized in the any element
 	 * @return content of any element as a SOAP MessageElement
 	 */
-	public static MessageElement toAnyTypeElement(Object obj)
-	{
-		MessageElement messageElement = new MessageElement(GenesisIIConstants.GENESISII_NS, "value", obj);
+	public static MessageElement toAnyTypeElement(Object obj) {
+		MessageElement messageElement = new MessageElement(
+				GenesisIIConstants.GENESISII_NS, "value", obj);
 		messageElement.setType(org.apache.axis.Constants.XSD_ANYTYPE);
 		return messageElement;
 	}
@@ -126,8 +122,7 @@ public class AnyHelper
 	 *            object to be serialized in the any element.
 	 * @return content of any element as a SOAP MessageElement
 	 */
-	public static MessageElement toAny(Object obj)
-	{
+	public static MessageElement toAny(Object obj) {
 		if (obj == null) {
 			return null;
 		}
@@ -143,23 +138,21 @@ public class AnyHelper
 
 	// ------------------------
 
-	public static MessageElement getParent(MessageElement element)
-	{
-		return (element == null) ? null : (MessageElement) element.getParentElement();
+	public static MessageElement getParent(MessageElement element) {
+		return (element == null) ? null : (MessageElement) element
+				.getParentElement();
 	}
 
-	public static MessageElement getParent(MessageElement[] elements)
-	{
-		return (elements != null && elements.length > 0) ? getParent(elements[0]) : null;
+	public static MessageElement getParent(MessageElement[] elements) {
+		return (elements != null && elements.length > 0) ? getParent(elements[0])
+				: null;
 	}
 
-	public static MessageElement getParent(AnyContentType any)
-	{
+	public static MessageElement getParent(AnyContentType any) {
 		return (any != null) ? getParent(any.get_any()) : null;
 	}
 
-	public static void setAny(AnyContentType object, SOAPElement value)
-	{
+	public static void setAny(AnyContentType object, SOAPElement value) {
 		if (value == null || object == null) {
 			return;
 		}
@@ -169,8 +162,7 @@ public class AnyHelper
 		object.set_any(new MessageElement[] { (MessageElement) value });
 	}
 
-	public static void setAny(AnyContentType object, SOAPElement[] values)
-	{
+	public static void setAny(AnyContentType object, SOAPElement[] values) {
 		if (values == null || object == null) {
 			return;
 		}
@@ -190,8 +182,7 @@ public class AnyHelper
 		object.set_any(me);
 	}
 
-	public static void setAny(AnyContentType object, List<?> values)
-	{
+	public static void setAny(AnyContentType object, List<?> values) {
 		if (values == null) {
 			return;
 		}
@@ -208,10 +199,11 @@ public class AnyHelper
 		object.set_any(v);
 	}
 
-	public static void write(Writer writer, MessageElement element) throws Exception
-	{
+	public static void write(Writer writer, MessageElement element)
+			throws Exception {
 		MessageContext messageContext = Config.getContext();
-		SerializationContext context = new SerializationContext(writer, messageContext);
+		SerializationContext context = new SerializationContext(writer,
+				messageContext);
 		context.setPretty(true);
 		element.output(context);
 		writer.write('\n');
@@ -226,8 +218,7 @@ public class AnyHelper
 	 *            SOAP MessageElement to be converted
 	 * @return String in XML format representing the input
 	 */
-	public static String toString(MessageElement element) throws Exception
-	{
+	public static String toString(MessageElement element) throws Exception {
 		if (element == null) {
 			return null;
 		}
@@ -240,8 +231,7 @@ public class AnyHelper
 	/**
 	 * Array version of {@link #toString(MessageElement element) toString}
 	 */
-	public static String[] toString(MessageElement[] elements) throws Exception
-	{
+	public static String[] toString(MessageElement[] elements) throws Exception {
 		if (elements == null) {
 			return null;
 		}
@@ -255,14 +245,15 @@ public class AnyHelper
 	/**
      *
      */
-	public static String toSingleString(MessageElement[] elements) throws Exception
-	{
+	public static String toSingleString(MessageElement[] elements)
+			throws Exception {
 		if (elements == null) {
 			return null;
 		}
 		MessageContext messageContext = Config.getContext();
 		StringWriter writer = new StringWriter();
-		SerializationContext context = new SerializationContext(writer, messageContext);
+		SerializationContext context = new SerializationContext(writer,
+				messageContext);
 		context.setPretty(true);
 		for (int i = 0; i < elements.length; i++) {
 			elements[i].output(context);
@@ -274,18 +265,18 @@ public class AnyHelper
 	/**
      *
      */
-	public static String toSingleString(AnyContentType any) throws Exception
-	{
+	public static String toSingleString(AnyContentType any) throws Exception {
 		return (any == null) ? null : toSingleString(any.get_any());
 	}
 
 	/**
-	 * Converts type containing any element to a String, representing the parent MessageElement.
+	 * Converts type containing any element to a String, representing the parent
+	 * MessageElement.
 	 * 
 	 * @see #toString(MessageElement element)
 	 */
-	public static String getFirstParentAsString(AnyContentType any) throws Exception
-	{
+	public static String getFirstParentAsString(AnyContentType any)
+			throws Exception {
 		return toString(getParent(any));
 	}
 
@@ -300,8 +291,7 @@ public class AnyHelper
 	 * @throws Exception
 	 *             if the DOM Element could not be created
 	 */
-	public static Element toElement(MessageElement element) throws Exception
-	{
+	public static Element toElement(MessageElement element) throws Exception {
 		String str = toString(element);
 		if (str == null) {
 			return null;
@@ -314,8 +304,8 @@ public class AnyHelper
 	/**
 	 * Array version of {@link #toElement(MessageElement element) toElement}
 	 */
-	public static Element[] toElement(MessageElement[] elements) throws Exception
-	{
+	public static Element[] toElement(MessageElement[] elements)
+			throws Exception {
 		if (elements == null) {
 			return null;
 		}
@@ -331,8 +321,7 @@ public class AnyHelper
 	 * 
 	 * @see #toElement(MessageElement element)
 	 */
-	public static Element[] toElement(AnyContentType any) throws Exception
-	{
+	public static Element[] toElement(AnyContentType any) throws Exception {
 		if (any == null) {
 			return null;
 		}
@@ -340,13 +329,13 @@ public class AnyHelper
 	}
 
 	/**
-	 * Converts type containing any element to a single DOM Element, representing the parent
-	 * MessageElement.
+	 * Converts type containing any element to a single DOM Element,
+	 * representing the parent MessageElement.
 	 * 
 	 * @see #toElement(MessageElement element)
 	 */
-	public static Element getFirstParentAsElement(AnyContentType any) throws Exception
-	{
+	public static Element getFirstParentAsElement(AnyContentType any)
+			throws Exception {
 		return toElement(getParent(any));
 	}
 
@@ -355,8 +344,8 @@ public class AnyHelper
 	 * 
 	 * @see #toElement(MessageElement element)
 	 */
-	public static Element getFirstAsElement(AnyContentType any) throws Exception
-	{
+	public static Element getFirstAsElement(AnyContentType any)
+			throws Exception {
 		Element[] values = toElement(any);
 		return (values != null && values.length > 0) ? values[0] : null;
 	}

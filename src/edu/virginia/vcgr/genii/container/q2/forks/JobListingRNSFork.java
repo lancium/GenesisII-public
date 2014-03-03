@@ -21,49 +21,53 @@ import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class JobListingRNSFork extends AbstractRNSResourceFork
-{
+public class JobListingRNSFork extends AbstractRNSResourceFork {
 	static private Log _logger = LogFactory.getLog(JobListingRNSFork.class);
 
-	public JobListingRNSFork(ResourceForkService service, String forkPath)
-	{
+	public JobListingRNSFork(ResourceForkService service, String forkPath) {
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry)
-		throws IOException
-	{
+	public EndpointReferenceType add(EndpointReferenceType exemplarEPR,
+			String entryName, EndpointReferenceType entry) throws IOException {
 		throw new IOException("Cannot add new jobs using this RNS directory.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR, String newFileName) throws IOException
-	{
+	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR,
+			String newFileName) throws IOException {
 		throw new IOException("Cannot create new files in this directory.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR, String entryName) throws IOException
-	{
+	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR,
+			String entryName) throws IOException {
 		boolean mineOnly = false;
 		String forkPath = getForkPath();
 		String[] acceptableStatuses = null;
 
 		if (forkPath.endsWith("/all"))
-			acceptableStatuses =
-				new String[] { JobStateEnumerationType._ERROR, JobStateEnumerationType._FINISHED,
-					JobStateEnumerationType._QUEUED, JobStateEnumerationType._REQUEUED, JobStateEnumerationType._RUNNING,
+			acceptableStatuses = new String[] { JobStateEnumerationType._ERROR,
+					JobStateEnumerationType._FINISHED,
+					JobStateEnumerationType._QUEUED,
+					JobStateEnumerationType._REQUEUED,
+					JobStateEnumerationType._RUNNING,
 					JobStateEnumerationType._STARTING };
 		else if (forkPath.endsWith("/queued"))
-			acceptableStatuses = new String[] { JobStateEnumerationType._QUEUED, JobStateEnumerationType._REQUEUED };
+			acceptableStatuses = new String[] {
+					JobStateEnumerationType._QUEUED,
+					JobStateEnumerationType._REQUEUED };
 		else if (forkPath.endsWith("/running")) {
-			acceptableStatuses = new String[] { JobStateEnumerationType._RUNNING, JobStateEnumerationType._STARTING };
+			acceptableStatuses = new String[] {
+					JobStateEnumerationType._RUNNING,
+					JobStateEnumerationType._STARTING };
 		} else if (forkPath.endsWith("/finished"))
-			acceptableStatuses = new String[] { JobStateEnumerationType._ERROR, JobStateEnumerationType._FINISHED };
+			acceptableStatuses = new String[] { JobStateEnumerationType._ERROR,
+					JobStateEnumerationType._FINISHED };
 
 		if (forkPath.startsWith("/jobs/mine/"))
 			mineOnly = true;
@@ -80,8 +84,9 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 				jobs = mgr.getJobStatus(null);
 
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("JobListingRNSFork:  Getting the total listed of jobs.  Entry Name is \"%s\".",
-					entryName));
+				_logger.debug(String
+						.format("JobListingRNSFork:  Getting the total listed of jobs.  Entry Name is \"%s\".",
+								entryName));
 			for (ReducedJobInformationType job : jobs) {
 				if (entryName != null && !entryName.equals(job.getJobTicket()))
 					continue;
@@ -100,11 +105,16 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 					continue;
 
 				if (mineOnly) {
-					ret.add(createInternalEntry(exemplarEPR, job.getJobTicket(),
-						new JobFork(getService(), formForkPath(job.getJobTicket())).describe()));
+					ret.add(createInternalEntry(exemplarEPR,
+							job.getJobTicket(), new JobFork(getService(),
+									formForkPath(job.getJobTicket()))
+									.describe()));
 				} else {
-					ret.add(createInternalEntry(exemplarEPR, job.getJobTicket(), new JobInformationFork(getService(),
-						formForkPath(job.getJobTicket())).describe()));
+					ret.add(createInternalEntry(exemplarEPR,
+							job.getJobTicket(),
+							new JobInformationFork(getService(),
+									formForkPath(job.getJobTicket()))
+									.describe()));
 				}
 			}
 
@@ -116,19 +126,20 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR, String newDirectoryName) throws IOException
-	{
-		throw new IOException("Not allowed to make new directories inside of this directory.");
+	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR,
+			String newDirectoryName) throws IOException {
+		throw new IOException(
+				"Not allowed to make new directories inside of this directory.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public boolean remove(String entryName) throws IOException
-	{
+	public boolean remove(String entryName) throws IOException {
 		String forkPath = getForkPath();
 
 		if (!forkPath.startsWith("/jobs/mine"))
-			throw new IOException("Jobs can only be removed from the \"mine\" fork.");
+			throw new IOException(
+					"Jobs can only be removed from the \"mine\" fork.");
 
 		String ticket = entryName;
 		ResourceKey rKey = getService().getResourceKey();
@@ -142,7 +153,8 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 					mgr.completeJobs(new String[] { ticket });
 					return true;
 				} catch (ResourceException re) {
-					if (re.getLocalizedMessage().contains("is not in a final state")) {
+					if (re.getLocalizedMessage().contains(
+							"is not in a final state")) {
 						try {
 							Thread.sleep(1000L << attempt);
 						} catch (InterruptedException ie) {

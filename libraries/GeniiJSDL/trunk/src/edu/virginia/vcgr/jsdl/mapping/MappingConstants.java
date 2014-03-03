@@ -20,7 +20,6 @@ package edu.virginia.vcgr.jsdl.mapping;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-interface MappingConstants
-{
+interface MappingConstants {
 	static final public String GENII_NS = "http://vcgr.cs.virginia.edu/genii";
 }

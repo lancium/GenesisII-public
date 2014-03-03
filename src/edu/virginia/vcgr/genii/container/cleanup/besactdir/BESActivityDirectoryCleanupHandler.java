@@ -24,18 +24,18 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityServiceImpl;
 import edu.virginia.vcgr.genii.container.cleanup.CleanupHandler;
 
-final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
-{
-	static private Log _logger = LogFactory.getLog(BESActivityDirectoryCleanupHandler.class);
+final public class BESActivityDirectoryCleanupHandler implements CleanupHandler {
+	static private Log _logger = LogFactory
+			.getLog(BESActivityDirectoryCleanupHandler.class);
 
 	static final private long KEEP_WINDOW = 31l;
 	static final private TimeUnit KEEP_WINDOW_UNITS = TimeUnit.DAYS;
 
 	static final private Pattern GUID_PATTERN = Pattern
-		.compile("^\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}$");
+			.compile("^\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}$");
 
-	static private Set<File> findBESDirectories(Connection connection) throws Throwable
-	{
+	static private Set<File> findBESDirectories(Connection connection)
+			throws Throwable {
 		_logger.info("Finding BES Parent Directories for cleanup.");
 		Set<File> ret = new HashSet<File>();
 
@@ -43,15 +43,18 @@ final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				connection
+			stmt = connection
 					.prepareStatement("SELECT b.propvalue FROM bespolicytable AS a, properties AS b WHERE a.besid = b.resourceid AND b.propname = ?");
-			stmt.setString(1, ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString());
+			stmt.setString(1,
+					ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME
+							.toString());
 			rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				BESConstructionParameters consParms = (BESConstructionParameters) DBSerializer.fromBlob(rs.getBlob(1));
-				ret.add(BESActivityServiceImpl.getCommonDirectory(consParms).getAbsoluteFile());
+				BESConstructionParameters consParms = (BESConstructionParameters) DBSerializer
+						.fromBlob(rs.getBlob(1));
+				ret.add(BESActivityServiceImpl.getCommonDirectory(consParms)
+						.getAbsoluteFile());
 			}
 		} finally {
 			StreamUtils.close(rs);
@@ -61,8 +64,8 @@ final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
 		return ret;
 	}
 
-	static private Map<File, Set<String>> createPotentialSet(Set<File> parentDirectories)
-	{
+	static private Map<File, Set<String>> createPotentialSet(
+			Set<File> parentDirectories) {
 		_logger.info("Iterating through directories for activity working dirs.");
 
 		Map<File, Set<String>> dir2dirNameMap = new HashMap<File, Set<String>>();
@@ -83,8 +86,8 @@ final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
 		return dir2dirNameMap;
 	}
 
-	static private void removeRecentDirectoryEntries(Map<File, Set<String>> dir2dirNameMap) throws SQLException
-	{
+	static private void removeRecentDirectoryEntries(
+			Map<File, Set<String>> dir2dirNameMap) throws SQLException {
 		long now = System.currentTimeMillis();
 		Set<String> childrenToRemove = new HashSet<String>();
 
@@ -93,7 +96,8 @@ final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
 			Set<String> children = entry.getValue();
 			for (String child : children) {
 				File childDir = new File(parentDir, child);
-				if ((now - childDir.lastModified()) <= KEEP_WINDOW_UNITS.toMillis(KEEP_WINDOW))
+				if ((now - childDir.lastModified()) <= KEEP_WINDOW_UNITS
+						.toMillis(KEEP_WINDOW))
 					childrenToRemove.add(child);
 			}
 
@@ -102,8 +106,7 @@ final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
 	}
 
 	@Override
-	final public void doCleanup(Connection connection, boolean enactCleanup)
-	{
+	final public void doCleanup(Connection connection, boolean enactCleanup) {
 		try {
 			Set<File> besDirectories = findBESDirectories(connection);
 			Map<File, Set<String>> dir2dirNameMap = createPotentialSet(besDirectories);
@@ -116,12 +119,14 @@ final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
 				for (String child : children) {
 					File childFile = new File(parent, child);
 					if (enactCleanup) {
-						_logger.info(String.format("Cleaning up old activity directory %s [%tc]\n", childFile,
-							childFile.lastModified()));
+						_logger.info(String
+								.format("Cleaning up old activity directory %s [%tc]\n",
+										childFile, childFile.lastModified()));
 						FileSystemUtils.recursiveDelete(childFile, false);
 					} else {
-						_logger.info(String.format("Not cleaning up old activity directory %s [%tc]\n", childFile,
-							childFile.lastModified()));
+						_logger.info(String
+								.format("Not cleaning up old activity directory %s [%tc]\n",
+										childFile, childFile.lastModified()));
 					}
 				}
 			}

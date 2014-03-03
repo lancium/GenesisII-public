@@ -15,40 +15,39 @@ import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
-public class PasswordLoginTool extends BaseLoginTool
-{
+public class PasswordLoginTool extends BaseLoginTool {
 
 	static private final String _DESCRIPTION = "config/tooldocs/description/dpasswordLogin";
 	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/upasswordLogin";
 	static final private String _MANPAGE = "config/tooldocs/man/passwordLogin";
 
-	protected PasswordLoginTool(String description, String usage, boolean isHidden)
-	{
+	protected PasswordLoginTool(String description, String usage,
+			boolean isHidden) {
 		super(description, usage, isHidden);
 		overrideCategory(ToolCategory.SECURITY);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
-	public PasswordLoginTool()
-	{
+	public PasswordLoginTool() {
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		overrideCategory(ToolCategory.SECURITY);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
-	public UsernamePasswordIdentity doPasswordLogin(String uname, String pass)
-	{
+	public UsernamePasswordIdentity doPasswordLogin(String uname, String pass) {
 		// handle username/token login
 		UsernamePasswordIdentity utCredential = null;
 		if (uname != null) {
 			if (pass == null) {
 				AbstractLoginHandler handler = null;
-				if (!useGui() || !GuiUtils.supportsGraphics() || !UserPreferences.preferences().preferGUI()) {
+				if (!useGui() || !GuiUtils.supportsGraphics()
+						|| !UserPreferences.preferences().preferGUI()) {
 					handler = new TextLoginHandler(stdout, stderr, stdin);
 				} else {
 					handler = new GuiLoginHandler(stdout, stderr, stdin);
 				}
-				char[] pword = handler.getPassword("Username/Password Login", String.format("Password for %s:  ", uname));
+				char[] pword = handler.getPassword("Username/Password Login",
+						String.format("Password for %s:  ", uname));
 				if (pword == null)
 					return null;
 				pass = new String(pword);
@@ -62,8 +61,7 @@ public class PasswordLoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();
 		if (callContext == null) {
@@ -71,11 +69,13 @@ public class PasswordLoginTool extends BaseLoginTool
 		}
 
 		// handle username/token login
-		UsernamePasswordIdentity utCredential = doPasswordLogin(_username, _password);
+		UsernamePasswordIdentity utCredential = doPasswordLogin(_username,
+				_password);
 
 		if (utCredential != null) {
 
-			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
+			TransientCredentials transientCredentials = TransientCredentials
+					.getTransientCredentials(callContext);
 			transientCredentials.add(utCredential);
 		}
 
@@ -85,8 +85,7 @@ public class PasswordLoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		int numArgs = numArguments();
 		if (numArgs > 1 || _username == null)
 			throw new InvalidToolUsageException();

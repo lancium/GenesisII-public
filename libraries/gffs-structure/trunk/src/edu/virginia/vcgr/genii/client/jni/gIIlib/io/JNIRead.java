@@ -9,14 +9,13 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FileHandle;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
-public class JNIRead extends JNILibraryBase
-{
+public class JNIRead extends JNILibraryBase {
 	static private Log _logger = LogFactory.getLog(JNIRead.class);
 
-	public static byte[] read(Integer fileHandle, Long offset, Integer length)
-	{
+	public static byte[] read(Integer fileHandle, Long offset, Integer length) {
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("JNIRead::read(%d, %d, %d)", fileHandle, offset, length));
+			_logger.trace(String.format("JNIRead::read(%d, %d, %d)",
+					fileHandle, offset, length));
 
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 

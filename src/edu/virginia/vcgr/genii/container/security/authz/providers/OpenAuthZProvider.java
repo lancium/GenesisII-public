@@ -32,75 +32,74 @@ import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 
 /**
- * AuthZ provider implementation that returns true for all access-control decisions
+ * AuthZ provider implementation that returns true for all access-control
+ * decisions
  * 
  * @author dmerrill
  * 
  */
-public class OpenAuthZProvider implements IAuthZProvider
-{
+public class OpenAuthZProvider implements IAuthZProvider {
 	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec = new MessageLevelSecurityRequirements(
-		MessageLevelSecurityRequirements.NONE);
+			MessageLevelSecurityRequirements.NONE);
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(OpenAuthZProvider.class);
 
-	public OpenAuthZProvider()
-	{
+	public OpenAuthZProvider() {
 	}
 
 	/**
-	 * Presently configures the specified resource to have default access allowed for every
-	 * credential in the bag of credentials. We may want to look at restricting this in the future
-	 * to special credentials.
+	 * Presently configures the specified resource to have default access
+	 * allowed for every credential in the bag of credentials. We may want to
+	 * look at restricting this in the future to special credentials.
 	 */
-	public void setDefaultAccess(ICallingContext callingContext, IResource resource, X509Certificate[] serviceCertChain)
-		throws AuthZSecurityException, ResourceException
-	{
+	public void setDefaultAccess(ICallingContext callingContext,
+			IResource resource, X509Certificate[] serviceCertChain)
+			throws AuthZSecurityException, ResourceException {
 	}
 
 	@Override
-	public boolean
-		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
-	{
+	public boolean checkAccess(
+			Collection<NuCredential> authenticatedCallerCredentials,
+			IResource resource, RWXCategory category) {
 		return true;
 	}
 
 	@Override
-	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation)
-	{
+	public boolean checkAccess(
+			Collection<NuCredential> authenticatedCallerCredentials,
+			IResource resource, Class<?> serviceClass, Method operation) {
 		return true; // all is allowed.
 	}
 
-	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource) throws AuthZSecurityException,
-		ResourceException
-	{
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(
+			IResource resource) throws AuthZSecurityException,
+			ResourceException {
 		return _defaultMinMsgSec;
 	}
 
-	public AuthZConfig getAuthZConfig(IResource resource) throws AuthZSecurityException, ResourceException
-	{
+	public AuthZConfig getAuthZConfig(IResource resource)
+			throws AuthZSecurityException, ResourceException {
 
 		return new AuthZConfig(null);
 	}
 
-	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize) throws AuthZSecurityException, ResourceException
-	{
+	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize)
+			throws AuthZSecurityException, ResourceException {
 		return getAuthZConfig(resource);
 	}
 
-	public void setAuthZConfig(AuthZConfig config, IResource resource) throws AuthZSecurityException, ResourceException
-	{
+	public void setAuthZConfig(AuthZConfig config, IResource resource)
+			throws AuthZSecurityException, ResourceException {
 	}
 
-	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource)
-		throws AuthZSecurityException, ResourceException
-	{
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig,
+			IResource resource) throws AuthZSecurityException,
+			ResourceException {
 	}
 
-	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource) throws ResourceException,
-		AuthZSecurityException
-	{
+	public void receiveAuthZConfig(NotificationMessageContents message,
+			IResource resource) throws ResourceException,
+			AuthZSecurityException {
 	}
 }

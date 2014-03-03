@@ -20,10 +20,8 @@ import junit.framework.TestCase;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class RationalNumberTest extends TestCase
-{
-	public void testRationalNumber() throws Exception
-	{
+public class RationalNumberTest extends TestCase {
+	public void testRationalNumber() throws Exception {
 		RationalNumber alpha = new RationalNumber(5);
 		RationalNumber negAlpha = new RationalNumber(-5);
 		RationalNumber beta = new RationalNumber(1, 2);

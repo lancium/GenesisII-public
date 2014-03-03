@@ -29,8 +29,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 
-public abstract class BaseGridTool implements ITool
-{
+public abstract class BaseGridTool implements ITool {
 	static private Log _logger = LogFactory.getLog(BaseGridTool.class);
 
 	protected OptionSetter _setter = null;
@@ -45,12 +44,14 @@ public abstract class BaseGridTool implements ITool
 	private boolean _useGui = true;
 	protected List<String> _arguments = new ArrayList<String>();
 
-	// tool credential validity; used when recreating a TLS certificate for the tool.
+	// tool credential validity; used when recreating a TLS certificate for the
+	// tool.
 	protected static long _credentialValidMillis = SecurityConstants.defaultCredentialExpirationMillis;
 
 	/*
-	 * tracks the last command's exit value. this is managed per-program instance. zero implies
-	 * success of last operation; any other value implies a failure.
+	 * tracks the last command's exit value. this is managed per-program
+	 * instance. zero implies success of last operation; any other value implies
+	 * a failure.
 	 */
 	private static int _lastExit = 0;
 
@@ -58,85 +59,84 @@ public abstract class BaseGridTool implements ITool
 	protected PrintWriter stderr;
 	protected BufferedReader stdin;
 
-	private BaseGridTool(String description, String usage, boolean isHidden)
-	{
+	private BaseGridTool(String description, String usage, boolean isHidden) {
 		_description = description;
 		_usage = usage;
 		_isHidden = isHidden;
 	}
 
-	protected BaseGridTool(LoadFileResource descriptionResource, LoadFileResource usageResource, boolean isHidden,
-		ToolCategory cat)
-	{
-		this(readResource(descriptionResource), readResource(usageResource), isHidden);
+	protected BaseGridTool(LoadFileResource descriptionResource,
+			LoadFileResource usageResource, boolean isHidden, ToolCategory cat) {
+		this(readResource(descriptionResource), readResource(usageResource),
+				isHidden);
 		_category = cat;
 	}
 
-	protected BaseGridTool(LoadFileResource descriptionResource, LoadFileResource usageResource, boolean isHidden)
-	{
-		this(readResource(descriptionResource), readResource(usageResource), isHidden);
+	protected BaseGridTool(LoadFileResource descriptionResource,
+			LoadFileResource usageResource, boolean isHidden) {
+		this(readResource(descriptionResource), readResource(usageResource),
+				isHidden);
 	}
 
-	protected boolean useGui()
-	{
+	protected boolean useGui() {
 		return _useGui;
 	}
 
-	protected void overrideCategory(ToolCategory cat)
-	{
+	protected void overrideCategory(ToolCategory cat) {
 		_category = cat;
 	}
 
-	static protected RNSPath lookup(RNSPath parent, GeniiPath path) throws InvalidToolUsageException
-	{
+	static protected RNSPath lookup(RNSPath parent, GeniiPath path)
+			throws InvalidToolUsageException {
 		if (path.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException(String.format("%s is not a grid path!", path));
+			throw new InvalidToolUsageException(String.format(
+					"%s is not a grid path!", path));
 
 		return parent.lookup(path.path());
 	}
 
-	static protected RNSPath lookup(GeniiPath path) throws InvalidToolUsageException
-	{
+	static protected RNSPath lookup(GeniiPath path)
+			throws InvalidToolUsageException {
 		return lookup(RNSPath.getCurrent(), path);
 	}
 
-	static protected RNSPath lookup(RNSPath parent, GeniiPath path, RNSPathQueryFlags queryFlags)
-		throws InvalidToolUsageException, RNSPathDoesNotExistException, RNSPathAlreadyExistsException
-	{
+	static protected RNSPath lookup(RNSPath parent, GeniiPath path,
+			RNSPathQueryFlags queryFlags) throws InvalidToolUsageException,
+			RNSPathDoesNotExistException, RNSPathAlreadyExistsException {
 		if (path.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException(String.format("%s is not a grid path!", path));
+			throw new InvalidToolUsageException(String.format(
+					"%s is not a grid path!", path));
 
 		return parent.lookup(path.path(), queryFlags);
 	}
 
-	static protected RNSPath lookup(GeniiPath path, RNSPathQueryFlags queryFlags) throws InvalidToolUsageException,
-		RNSPathDoesNotExistException, RNSPathAlreadyExistsException
-	{
+	static protected RNSPath lookup(GeniiPath path, RNSPathQueryFlags queryFlags)
+			throws InvalidToolUsageException, RNSPathDoesNotExistException,
+			RNSPathAlreadyExistsException {
 		return lookup(RNSPath.getCurrent(), path, queryFlags);
 	}
 
-	protected void addManPage(LoadFileResource manPage)
-	{
+	protected void addManPage(LoadFileResource manPage) {
 		_manPage = readResource(manPage);
 	}
 
-	public int getLastExit()
-	{
+	public int getLastExit() {
 		return _lastExit;
 	}
 
-	public void setLastExit(int newExitValue)
-	{
+	public void setLastExit(int newExitValue) {
 		_lastExit = newExitValue;
 	}
 
-	public final int run(Writer out, Writer err, Reader in) throws Throwable
-	{
+	public final int run(Writer out, Writer err, Reader in) throws Throwable {
 		_logger.trace("entering into base grid tool run method...");
 		try {
-			stdout = (out instanceof PrintWriter) ? (PrintWriter) out : new PrintWriter(out, true);
-			stderr = (err instanceof PrintWriter) ? (PrintWriter) err : new PrintWriter(err, true);
-			stdin = (in instanceof BufferedReader) ? (BufferedReader) in : new BufferedReader(in);
+			stdout = (out instanceof PrintWriter) ? (PrintWriter) out
+					: new PrintWriter(out, true);
+			stderr = (err instanceof PrintWriter) ? (PrintWriter) err
+					: new PrintWriter(err, true);
+			stdin = (in instanceof BufferedReader) ? (BufferedReader) in
+					: new BufferedReader(in);
 			try {
 				verify();
 				// set the last exit value based on actual return value.
@@ -169,18 +169,15 @@ public abstract class BaseGridTool implements ITool
 		}
 	}
 
-	protected List<String> getArguments()
-	{
+	protected List<String> getArguments() {
 		return _arguments;
 	}
 
-	protected int numArguments()
-	{
+	protected int numArguments() {
 		return _arguments.size();
 	}
 
-	protected String getArgument(int argNumber)
-	{
+	protected String getArgument(int argNumber) {
 		if (argNumber >= _arguments.size())
 			return null;
 
@@ -188,30 +185,28 @@ public abstract class BaseGridTool implements ITool
 	}
 
 	@Option({ "no-gui" })
-	public void setNo_gui()
-	{
+	public void setNo_gui() {
 		_useGui = false;
 	}
 
 	/**
-	 * returns the duration in milliseconds of a newly created self-signed TLS credential lifetime.
+	 * returns the duration in milliseconds of a newly created self-signed TLS
+	 * credential lifetime.
 	 */
-	static public long getValidMillis()
-	{
+	static public long getValidMillis() {
 		return _credentialValidMillis;
 	}
 
 	/**
-	 * returns a Date object representing when our self-signed credentials should expire, if they
-	 * are not created yet.
+	 * returns a Date object representing when our self-signed credentials
+	 * should expire, if they are not created yet.
 	 */
-	static public Date credsValidUntil()
-	{
-		return new Date(System.currentTimeMillis() + _credentialValidMillis + 10000);
+	static public Date credsValidUntil() {
+		return new Date(System.currentTimeMillis() + _credentialValidMillis
+				+ 10000);
 	}
 
-	public void addArgument(String argument) throws ToolException
-	{
+	public void addArgument(String argument) throws ToolException {
 		if (_setter == null)
 			_setter = new OptionSetter(this);
 		Class<? extends ITool> toolClass = getClass();
@@ -223,18 +218,15 @@ public abstract class BaseGridTool implements ITool
 			_arguments.add(argument);
 	}
 
-	public String description()
-	{
+	public String description() {
 		return _description;
 	}
 
-	public boolean isHidden()
-	{
+	public boolean isHidden() {
 		return _isHidden;
 	}
 
-	public String usage()
-	{
+	public String usage() {
 		return "\nUsage:\n" + _usage;
 	}
 
@@ -242,8 +234,7 @@ public abstract class BaseGridTool implements ITool
 
 	protected abstract int runCommand() throws Throwable;
 
-	static private String readResource(LoadFileResource resource)
-	{
+	static private String readResource(LoadFileResource resource) {
 		if (resource == null) {
 			return "";
 		}
@@ -261,25 +252,28 @@ public abstract class BaseGridTool implements ITool
 
 			return builder.toString();
 		} catch (IOException ioe) {
-			throw new RuntimeException("Unable to read resource \"" + resource.toString() + "\".", ioe);
+			throw new RuntimeException("Unable to read resource \""
+					+ resource.toString() + "\".", ioe);
 		} catch (Exception e) {
-			throw new RuntimeException("Unable to read resource \"" + resource.toString() + "\".", e);
+			throw new RuntimeException("Unable to read resource \""
+					+ resource.toString() + "\".", e);
 		} finally {
 			StreamUtils.close(reader);
 		}
 	}
 
-	protected void handleLongOptionFlag(Class<? extends ITool> toolClass, String optionFlag) throws ToolException
-	{
+	protected void handleLongOptionFlag(Class<? extends ITool> toolClass,
+			String optionFlag) throws ToolException {
 		int index = optionFlag.indexOf('=');
 		if (index > 0) {
-			handleOption(toolClass, optionFlag.substring(0, index), optionFlag.substring(index + 1));
+			handleOption(toolClass, optionFlag.substring(0, index),
+					optionFlag.substring(index + 1));
 		} else
 			handleFlag(toolClass, optionFlag);
 	}
 
-	protected void handleShortOptionFlag(Class<? extends ITool> toolClass, String optionFlags) throws ToolException
-	{
+	protected void handleShortOptionFlag(Class<? extends ITool> toolClass,
+			String optionFlags) throws ToolException {
 		int len = optionFlags.length();
 		for (int lcv = 0; lcv < len; lcv++) {
 			char c = optionFlags.charAt(lcv);
@@ -290,51 +284,50 @@ public abstract class BaseGridTool implements ITool
 				if (next != '=')
 					handleFlag(toolClass, Character.toString(c));
 				else
-					handleOption(toolClass, Character.toString(c), optionFlags.substring(lcv + 2));
+					handleOption(toolClass, Character.toString(c),
+							optionFlags.substring(lcv + 2));
 			}
 		}
 	}
 
-	private void handleOption(Class<? extends ITool> toolClass, String option, String value) throws ToolException
-	{
+	private void handleOption(Class<? extends ITool> toolClass, String option,
+			String value) throws ToolException {
 		_setter.set(option, value);
 	}
 
-	private void handleFlag(Class<? extends ITool> toolClass, String flag) throws ToolException
-	{
+	private void handleFlag(Class<? extends ITool> toolClass, String flag)
+			throws ToolException {
 		_setter.set(flag);
 	}
 
-	protected RNSPath expandSingleton(String pathExpression) throws InvalidToolUsageException
-	{
+	protected RNSPath expandSingleton(String pathExpression)
+			throws InvalidToolUsageException {
 		return expandSingleton(null, pathExpression);
 	}
 
-	protected RNSPath expandSingleton(RNSPath current, String pathExpression) throws InvalidToolUsageException
-	{
+	protected RNSPath expandSingleton(RNSPath current, String pathExpression)
+			throws InvalidToolUsageException {
 		return expandSingleton(current, pathExpression, null);
 	}
 
-	protected RNSPath expandSingleton(RNSPath current, String pathExpression, FilterFactory factoryType)
-		throws InvalidToolUsageException
-	{
+	protected RNSPath expandSingleton(RNSPath current, String pathExpression,
+			FilterFactory factoryType) throws InvalidToolUsageException {
 		if (current == null)
 			current = RNSPath.getCurrent();
 
 		try {
 			return current.expandSingleton(pathExpression, factoryType);
 		} catch (RNSMultiLookupResultException rmlre) {
-			throw new InvalidToolUsageException("Path expanded to too many entries.");
+			throw new InvalidToolUsageException(
+					"Path expanded to too many entries.");
 		}
 	}
 
-	public ToolCategory getCategory()
-	{
+	public ToolCategory getCategory() {
 		return _category;
 	}
 
-	public String getManPage()
-	{
+	public String getManPage() {
 		if (_manPage == null)
 			return null;
 		else

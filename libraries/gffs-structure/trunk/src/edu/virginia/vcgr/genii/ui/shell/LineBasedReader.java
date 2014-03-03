@@ -5,14 +5,12 @@ import java.io.InterruptedIOException;
 import java.io.Reader;
 import java.util.LinkedList;
 
-public class LineBasedReader extends Reader
-{
+public class LineBasedReader extends Reader {
 	private boolean _closed = false;
 	private LinkedList<String> _lines = new LinkedList<String>();
 
 	@Override
-	public void close() throws IOException
-	{
+	public void close() throws IOException {
 		synchronized (_lines) {
 			_closed = true;
 			_lines.notifyAll();
@@ -20,8 +18,7 @@ public class LineBasedReader extends Reader
 	}
 
 	@Override
-	public int read(char[] cbuf, int off, int len) throws IOException
-	{
+	public int read(char[] cbuf, int off, int len) throws IOException {
 		int ret = 0;
 
 		try {
@@ -55,8 +52,7 @@ public class LineBasedReader extends Reader
 		}
 	}
 
-	public void addLine(String line)
-	{
+	public void addLine(String line) {
 		synchronized (_lines) {
 			_lines.addLast(line + "\n");
 			_lines.notifyAll();

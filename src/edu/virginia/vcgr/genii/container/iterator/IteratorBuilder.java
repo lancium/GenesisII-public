@@ -5,8 +5,7 @@ import java.util.Iterator;
 
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 
-public interface IteratorBuilder<SourceType>
-{
+public interface IteratorBuilder<SourceType> {
 	static final public int DEFAULT_PREFERRED_BATCH_SIZE = 20;
 
 	public int preferredBatchSize();
@@ -19,5 +18,6 @@ public interface IteratorBuilder<SourceType>
 
 	public IteratorInitializationType create() throws RemoteException;
 
-	public IteratorInitializationType create(InMemoryIteratorWrapper imiw) throws RemoteException;
+	public IteratorInitializationType create(InMemoryIteratorWrapper imiw)
+			throws RemoteException;
 }

@@ -6,15 +6,17 @@ import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
-interface IRExportResolverResource extends IResource
-{
-	public void update(RExportResolverEntry entry) throws ResourceException, ResourceUnknownFaultType;
+interface IRExportResolverResource extends IResource {
+	public void update(RExportResolverEntry entry) throws ResourceException,
+			ResourceUnknownFaultType;
 
 	public RExportResolverEntry getEntry() throws ResourceException;
 
-	public void updateResolverResourceInfo(String resourceEPI, String resolverEPI, EndpointReferenceType resolverEPR,
-		boolean isResolverTermination) throws ResourceException;
+	public void updateResolverResourceInfo(String resourceEPI,
+			String resolverEPI, EndpointReferenceType resolverEPR,
+			boolean isResolverTermination) throws ResourceException;
 
-	public EndpointReferenceType queryForResourceResolver(String resourceEPI) throws ResourceException;
+	public EndpointReferenceType queryForResourceResolver(String resourceEPI)
+			throws ResourceException;
 
 }

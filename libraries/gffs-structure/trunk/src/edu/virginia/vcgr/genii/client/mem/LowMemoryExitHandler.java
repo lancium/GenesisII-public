@@ -3,21 +3,20 @@ package edu.virginia.vcgr.genii.client.mem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class LowMemoryExitHandler implements LowMemoryHandler
-{
+public class LowMemoryExitHandler implements LowMemoryHandler {
 	static private Log _logger = LogFactory.getLog(LowMemoryExitHandler.class);
 
 	private int _exitCode;
 
-	public LowMemoryExitHandler(int exitCode)
-	{
+	public LowMemoryExitHandler(int exitCode) {
 		_exitCode = exitCode;
 	}
 
 	@Override
-	public void lowMemoryWarning(long usedMemory, long maxMemory)
-	{
-		_logger.warn(String.format("!!OUT OF MEMORY!! for java process--exiting with code %d.", _exitCode));
+	public void lowMemoryWarning(long usedMemory, long maxMemory) {
+		_logger.warn(String.format(
+				"!!OUT OF MEMORY!! for java process--exiting with code %d.",
+				_exitCode));
 		System.exit(_exitCode);
 	}
 }

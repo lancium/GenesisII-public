@@ -51,8 +51,7 @@ import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class BESActivity implements Closeable
-{
+public class BESActivity implements Closeable {
 	static private Log _logger = LogFactory.getLog(BESActivity.class);
 
 	private ServerDatabaseConnectionPool _connectionPool;
@@ -71,10 +70,12 @@ public class BESActivity implements Closeable
 	private String _jobName;
 	private ActivityRunner _runner;
 
-	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
-		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName,
-		String jobName, boolean suspendRequested, boolean terminateRequested)
-	{
+	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes,
+			String activityid, ActivityState state,
+			BESWorkingDirectory activityCWD,
+			Vector<ExecutionPhase> executionPlan, int nextPhase,
+			String activityServiceName, String jobName,
+			boolean suspendRequested, boolean terminateRequested) {
 		_connectionPool = connectionPool;
 
 		_bes = bes;
@@ -99,21 +100,22 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	public boolean isGood() throws SQLException
-	{
+	public boolean isGood() throws SQLException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection.prepareStatement("SELECT callingcontext " + "FROM besactivitiestable " + "WHERE activityid = ?");
+			stmt = connection.prepareStatement("SELECT callingcontext "
+					+ "FROM besactivitiestable " + "WHERE activityid = ?");
 			stmt.setString(1, _activityid);
 			rs = stmt.executeQuery();
 			if (!rs.next())
 				return false;
 
-			ICallingContext cctxt = (ICallingContext) DBSerializer.fromBlob(rs.getBlob(1));
+			ICallingContext cctxt = (ICallingContext) DBSerializer.fromBlob(rs
+					.getBlob(1));
 
 			return ContextManager.isGood(cctxt);
 		} finally {
@@ -123,34 +125,39 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	public String getActivityID()
-	{
+	public String getActivityID() {
 		return _activityid;
 	}
 
-	public BESWorkingDirectory getActivityCWD()
-	{
+	public BESWorkingDirectory getActivityCWD() {
 		return _activityCWD;
 	}
 
 	@SuppressWarnings("unchecked")
-	synchronized public void verifyOwner() throws GenesisIISecurityException, SQLException
-	{
+	synchronized public void verifyOwner() throws GenesisIISecurityException,
+			SQLException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection.prepareStatement("SELECT owners FROM besactivitiestable " + "WHERE activityid = ?");
+			stmt = connection
+					.prepareStatement("SELECT owners FROM besactivitiestable "
+							+ "WHERE activityid = ?");
 			stmt.setString(1, _activityid);
 			rs = stmt.executeQuery();
 			if (!rs.next())
-				throw new SQLException("Unable to load owner information from database " + "for bes activity.");
+				throw new SQLException(
+						"Unable to load owner information from database "
+								+ "for bes activity.");
 
-			if (!QueueSecurity.isOwner((Collection<Identity>) DBSerializer.fromBlob(rs.getBlob(1))))
-				throw new GenesisIISecurityException("Caller does not have permission to get "
-					+ "activity status for activity \"" + _activityid + "\".");
+			if (!QueueSecurity.isOwner((Collection<Identity>) DBSerializer
+					.fromBlob(rs.getBlob(1))))
+				throw new GenesisIISecurityException(
+						"Caller does not have permission to get "
+								+ "activity status for activity \""
+								+ _activityid + "\".");
 		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
@@ -158,15 +165,17 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	synchronized public EndpointReferenceType getActivityEPR() throws SQLException, ResourceException, NoSuchActivityFault
-	{
+	synchronized public EndpointReferenceType getActivityEPR()
+			throws SQLException, ResourceException, NoSuchActivityFault {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection.prepareStatement("SELECT activityepr FROM besactivitiestable " + "WHERE activityid = ?");
+			stmt = connection
+					.prepareStatement("SELECT activityepr FROM besactivitiestable "
+							+ "WHERE activityid = ?");
 			stmt.setString(1, _activityid);
 			rs = stmt.executeQuery();
 			if (!rs.next())
@@ -179,20 +188,23 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	synchronized public JobDefinition_Type getJobDefinition() throws SQLException, IOException, ClassNotFoundException
-	{
+	synchronized public JobDefinition_Type getJobDefinition()
+			throws SQLException, IOException, ClassNotFoundException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection.prepareStatement("SELECT jsdl FROM besactivitiestable " + "WHERE activityid = ?");
+			stmt = connection
+					.prepareStatement("SELECT jsdl FROM besactivitiestable "
+							+ "WHERE activityid = ?");
 			stmt.setString(1, _activityid);
 			rs = stmt.executeQuery();
 			if (!rs.next())
 				throw new SQLException("Unable to find activity in database.");
-			return DBSerializer.xmlFromBlob(JobDefinition_Type.class, rs.getBlob(1));
+			return DBSerializer.xmlFromBlob(JobDefinition_Type.class,
+					rs.getBlob(1));
 		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
@@ -200,8 +212,7 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	synchronized public Collection<Throwable> getFaults() throws SQLException
-	{
+	synchronized public Collection<Throwable> getFaults() throws SQLException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -210,7 +221,9 @@ public class BESActivity implements Closeable
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection.prepareStatement("SELECT fault FROM besactivityfaultstable " + "WHERE besactivityid = ?");
+			stmt = connection
+					.prepareStatement("SELECT fault FROM besactivityfaultstable "
+							+ "WHERE besactivityid = ?");
 			stmt.setString(1, _activityid);
 			rs = stmt.executeQuery();
 			while (rs.next()) {
@@ -225,13 +238,11 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		close();
 	}
 
-	synchronized public void close() throws IOException
-	{
+	synchronized public void close() throws IOException {
 		if (_policyListener != null) {
 			_bes.getPolicyEnactor().removeBESPolicyListener(_policyListener);
 			_policyListener = null;
@@ -244,13 +255,11 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	public String getJobName()
-	{
+	public String getJobName() {
 		return _jobName;
 	}
 
-	synchronized public void suspend() throws ExecutionException, SQLException
-	{
+	synchronized public void suspend() throws ExecutionException, SQLException {
 		if (_suspendRequested)
 			return;
 
@@ -259,8 +268,8 @@ public class BESActivity implements Closeable
 			_runner.requestSuspend();
 	}
 
-	synchronized public void terminate() throws ExecutionException, SQLException
-	{
+	synchronized public void terminate() throws ExecutionException,
+			SQLException {
 		if (_terminateRequested)
 			return;
 
@@ -269,8 +278,7 @@ public class BESActivity implements Closeable
 			_runner.requestTerminate(false);
 	}
 
-	synchronized public void resume() throws ExecutionException, SQLException
-	{
+	synchronized public void resume() throws ExecutionException, SQLException {
 		if (!_suspendRequested)
 			return;
 
@@ -279,8 +287,7 @@ public class BESActivity implements Closeable
 			_runner.requestResume();
 	}
 
-	synchronized public ActivityState getState()
-	{
+	synchronized public ActivityState getState() {
 		ActivityState retState = (ActivityState) _state.clone();
 		if (_runner != null && _runner.isSuspended())
 			retState.suspend(true);
@@ -288,15 +295,15 @@ public class BESActivity implements Closeable
 		return retState;
 	}
 
-	synchronized private void updateState(boolean suspendRequested, boolean terminateRequested) throws SQLException
-	{
+	synchronized private void updateState(boolean suspendRequested,
+			boolean terminateRequested) throws SQLException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt =
-				connection.prepareStatement("UPDATE besactivitiestable " + "SET suspendrequested = ?, terminaterequested = ? "
+			stmt = connection.prepareStatement("UPDATE besactivitiestable "
+					+ "SET suspendrequested = ?, terminaterequested = ? "
 					+ "WHERE activityid = ?");
 			stmt.setShort(1, suspendRequested ? (short) 1 : (short) 0);
 			stmt.setShort(2, terminateRequested ? (short) 1 : (short) 0);
@@ -313,17 +320,19 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	synchronized private void updateState(int nextPhase, ActivityState state) throws SQLException
-	{
+	synchronized private void updateState(int nextPhase, ActivityState state)
+			throws SQLException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt =
-				connection.prepareStatement("UPDATE besactivitiestable SET nextphase = ?, state = ? " + "WHERE activityid = ?");
+			stmt = connection
+					.prepareStatement("UPDATE besactivitiestable SET nextphase = ?, state = ? "
+							+ "WHERE activityid = ?");
 			stmt.setInt(1, nextPhase);
-			stmt.setBlob(2, DBSerializer.toBlob(state, "besactivitiestable", "state"));
+			stmt.setBlob(2,
+					DBSerializer.toBlob(state, "besactivitiestable", "state"));
 			stmt.setString(3, _activityid);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database.");
@@ -343,27 +352,30 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	private WorkingContext createWorkingContext() throws SQLException
-	{
+	private WorkingContext createWorkingContext() throws SQLException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt =
-				connection.prepareStatement("SELECT callingcontext, activityepr " + "FROM besactivitiestable "
-					+ "WHERE activityid = ?");
+			stmt = connection
+					.prepareStatement("SELECT callingcontext, activityepr "
+							+ "FROM besactivitiestable "
+							+ "WHERE activityid = ?");
 			stmt.setString(1, _activityid);
 			rs = stmt.executeQuery();
 			if (!rs.next())
-				throw new SQLException("Activity \"" + _activityid + "\" does not exist.");
-			ICallingContext cctxt = (ICallingContext) DBSerializer.fromBlob(rs.getBlob(1));
+				throw new SQLException("Activity \"" + _activityid
+						+ "\" does not exist.");
+			ICallingContext cctxt = (ICallingContext) DBSerializer.fromBlob(rs
+					.getBlob(1));
 			EndpointReferenceType epr = EPRUtils.fromBlob(rs.getBlob(2));
 
 			WorkingContext ret = new WorkingContext();
 			ret.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
-			ret.setProperty(WorkingContext.TARGETED_SERVICE_NAME, _activityServiceName);
+			ret.setProperty(WorkingContext.TARGETED_SERVICE_NAME,
+					_activityServiceName);
 			ret.setProperty(WorkingContext.CURRENT_CONTEXT_KEY, cctxt);
 			return ret;
 		} catch (ResourceException re) {
@@ -375,13 +387,13 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	private void execute(ExecutionPhase phase) throws Throwable
-	{
+	private void execute(ExecutionPhase phase) throws Throwable {
 		WorkingContext ctxt = createWorkingContext();
 
 		try {
-			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, new ResourceKey(_activityServiceName,
-				new AddressingParameters(_activityid, null, null)));
+			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
+					new ResourceKey(_activityServiceName,
+							new AddressingParameters(_activityid, null, null)));
 			WorkingContext.setCurrentWorkingContext(ctxt);
 			phase.execute(getExecutionContext());
 		} finally {
@@ -389,14 +401,15 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	private void notifyStateChange() throws ResourceException, ResourceUnknownFaultType, SQLException
-	{
+	private void notifyStateChange() throws ResourceException,
+			ResourceUnknownFaultType, SQLException {
 		WorkingContext ctxt = createWorkingContext();
 		ActivityState state = getState();
 
 		try {
 			WorkingContext.setCurrentWorkingContext(ctxt);
-			TopicSet space = TopicSet.forPublisher(BESActivityServiceImpl.class);
+			TopicSet space = TopicSet
+					.forPublisher(BESActivityServiceImpl.class);
 			TopicPath topicPath;
 
 			if (state.isFinalState())
@@ -411,34 +424,36 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	private ExecutionContext getExecutionContext()
-	{
-		return new ExecutionContext()
-		{
+	private ExecutionContext getExecutionContext() {
+		return new ExecutionContext() {
 			@Override
-			public void updateState(ActivityState newState)
-			{
+			public void updateState(ActivityState newState) {
 				_state = (ActivityState) newState.clone();
 			}
 
 			@Override
-			public ICallingContext getCallingContext() throws ExecutionException
-			{
+			public ICallingContext getCallingContext()
+					throws ExecutionException {
 				Connection connection = null;
 				PreparedStatement stmt = null;
 				ResultSet rs = null;
 
 				try {
 					connection = _connectionPool.acquire(true);
-					stmt =
-						connection.prepareStatement("SELECT callingcontext FROM besactivitiestable " + "WHERE activityid = ?");
+					stmt = connection
+							.prepareStatement("SELECT callingcontext FROM besactivitiestable "
+									+ "WHERE activityid = ?");
 					stmt.setString(1, _activityid);
 					rs = stmt.executeQuery();
 					if (!rs.next())
-						throw new SQLException("Unable to find activity in database.");
-					return (ICallingContext) DBSerializer.fromBlob(rs.getBlob(1));
+						throw new SQLException(
+								"Unable to find activity in database.");
+					return (ICallingContext) DBSerializer.fromBlob(rs
+							.getBlob(1));
 				} catch (SQLException sqe) {
-					throw new ExecutionException("Database error trying to get calling context.", sqe);
+					throw new ExecutionException(
+							"Database error trying to get calling context.",
+							sqe);
 				} finally {
 					StreamUtils.close(rs);
 					StreamUtils.close(stmt);
@@ -446,29 +461,28 @@ public class BESActivity implements Closeable
 				}
 			}
 
-			public String getBESEPI()
-			{
+			public String getBESEPI() {
 				return _bes.getBESEPI();
 			}
 
 			@Override
-			public BESWorkingDirectory getCurrentWorkingDirectory() throws ExecutionException
-			{
+			public BESWorkingDirectory getCurrentWorkingDirectory()
+					throws ExecutionException {
 				return _activityCWD;
 			}
 
 			@Override
-			public Serializable getProperty(String name) throws ExecutionException
-			{
+			public Serializable getProperty(String name)
+					throws ExecutionException {
 				Connection connection = null;
 				PreparedStatement stmt = null;
 				ResultSet rs = null;
 
 				try {
 					connection = _connectionPool.acquire(true);
-					stmt =
-						connection.prepareStatement("SELECT propertyvalue FROM besactivitypropertiestable "
-							+ "WHERE activityid = ? AND propertyname = ?");
+					stmt = connection
+							.prepareStatement("SELECT propertyvalue FROM besactivitypropertiestable "
+									+ "WHERE activityid = ? AND propertyname = ?");
 					stmt.setString(1, _activityid);
 					stmt.setString(2, name);
 
@@ -478,7 +492,9 @@ public class BESActivity implements Closeable
 
 					return (Serializable) DBSerializer.fromBlob(rs.getBlob(1));
 				} catch (SQLException sqe) {
-					throw new ExecutionException("Database error trying to get activity property.", sqe);
+					throw new ExecutionException(
+							"Database error trying to get activity property.",
+							sqe);
 				} finally {
 					StreamUtils.close(rs);
 					StreamUtils.close(stmt);
@@ -487,33 +503,38 @@ public class BESActivity implements Closeable
 			}
 
 			@Override
-			public void setProperty(String name, Serializable value) throws ExecutionException
-			{
+			public void setProperty(String name, Serializable value)
+					throws ExecutionException {
 				Connection connection = null;
 				PreparedStatement stmt = null;
 
 				try {
 					connection = _connectionPool.acquire(false);
-					stmt =
-						connection.prepareStatement("DELETE FROM besactivitypropertiestable "
-							+ "WHERE activityid = ? AND propertyname = ?");
+					stmt = connection
+							.prepareStatement("DELETE FROM besactivitypropertiestable "
+									+ "WHERE activityid = ? AND propertyname = ?");
 					stmt.setString(1, _activityid);
 					stmt.setString(2, name);
 					stmt.executeUpdate();
 					stmt.close();
 					stmt = null;
 					if (value != null) {
-						stmt = connection.prepareStatement("INSERT INTO besactivitypropertiestable " + "VALUES (?, ?, ?)");
+						stmt = connection
+								.prepareStatement("INSERT INTO besactivitypropertiestable "
+										+ "VALUES (?, ?, ?)");
 
 						stmt.setString(1, _activityid);
 						stmt.setString(2, name);
-						stmt.setBlob(3, DBSerializer.toBlob(value, "besactivitypropertiestable", "propertyvalue"));
+						stmt.setBlob(3, DBSerializer.toBlob(value,
+								"besactivitypropertiestable", "propertyvalue"));
 						stmt.executeUpdate();
 					}
 
 					connection.commit();
 				} catch (SQLException sqe) {
-					throw new ExecutionException("Database error trying to get activity property.", sqe);
+					throw new ExecutionException(
+							"Database error trying to get activity property.",
+							sqe);
 				} finally {
 					StreamUtils.close(stmt);
 					_connectionPool.release(connection);
@@ -522,8 +543,7 @@ public class BESActivity implements Closeable
 		};
 	}
 
-	private void addFault(Throwable cause, int attemptsLeft)
-	{
+	private void addFault(Throwable cause, int attemptsLeft) {
 		if (attemptsLeft <= 0)
 			return;
 
@@ -535,37 +555,44 @@ public class BESActivity implements Closeable
 			connection = _connectionPool.acquire(true);
 
 			try {
-				blob = DBSerializer.toBlob(cause, "besactivityfaultstable", "fault");
+				blob = DBSerializer.toBlob(cause, "besactivityfaultstable",
+						"fault");
 			} catch (SQLException sqe) {
-				_logger.error("Attempt to serialize an unserializable " + "exception into the database.", cause);
-				addFault(new Exception("Unserializable fault occurred in BES activity (" + cause.getLocalizedMessage()
-					+ ") -- no further information available."), attemptsLeft - 1);
+				_logger.error("Attempt to serialize an unserializable "
+						+ "exception into the database.", cause);
+				addFault(new Exception(
+						"Unserializable fault occurred in BES activity ("
+								+ cause.getLocalizedMessage()
+								+ ") -- no further information available."),
+						attemptsLeft - 1);
 				return;
 			}
 
-			stmt =
-				connection.prepareStatement("INSERT INTO besactivityfaultstable " + "(besactivityid, fault) " + "VALUES(?, ?)");
+			stmt = connection
+					.prepareStatement("INSERT INTO besactivityfaultstable "
+							+ "(besactivityid, fault) " + "VALUES(?, ?)");
 			stmt.setString(1, _activityid);
 			stmt.setBlob(2, blob);
 			stmt.executeUpdate();
 			connection.commit();
 		} catch (Throwable cause2) {
-			_logger.error("Unexpected error while adding fault " + "to bes activity fault database.", cause2);
+			_logger.error("Unexpected error while adding fault "
+					+ "to bes activity fault database.", cause2);
 		} finally {
 			StreamUtils.close(stmt);
 			_connectionPool.release(connection);
 		}
 	}
 
-	private void cleanupUnnecessaryMemory()
-	{
+	private void cleanupUnnecessaryMemory() {
 		// Now that we are done running, we should free up any memory that
 		// we no longer need to use.
 
 		/*
-		 * These either can't be free'd (they aren't objects), or they are merely references to
-		 * objects that are held in other places: _connectionPool; _suspendRequested;
-		 * _terminateRequested; _nextPhase; _bes
+		 * These either can't be free'd (they aren't objects), or they are
+		 * merely references to objects that are held in other places:
+		 * _connectionPool; _suspendRequested; _terminateRequested; _nextPhase;
+		 * _bes
 		 */
 
 		if (_policyListener != null) {
@@ -579,17 +606,16 @@ public class BESActivity implements Closeable
 		_activityServiceName = null;
 
 		/*
-		 * And these we may need later: _activityid _state _jobName; _activityCWD = null;
+		 * And these we may need later: _activityid _state _jobName;
+		 * _activityCWD = null;
 		 */
 	}
 
-	final private boolean finishedExecution()
-	{
+	final private boolean finishedExecution() {
 		return _nextPhase >= _executionPlan.size();
 	}
 
-	private boolean containsIgnoreableFault(Collection<Throwable> faults)
-	{
+	private boolean containsIgnoreableFault(Collection<Throwable> faults) {
 		for (Throwable fault : faults) {
 			if (fault instanceof IgnoreableFault)
 				return true;
@@ -598,8 +624,7 @@ public class BESActivity implements Closeable
 		return false;
 	}
 
-	private boolean handleFinishedCase()
-	{
+	private boolean handleFinishedCase() {
 		if (finishedExecution()) {
 			synchronized (this) {
 				if (_finishCaseHandled)
@@ -611,20 +636,26 @@ public class BESActivity implements Closeable
 				Collection<Throwable> faults = getFaults();
 				if (getFaults().size() > 0) {
 					if (!containsIgnoreableFault(faults)) {
-						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, null, false));
+						updateState(_executionPlan.size(), new ActivityState(
+								ActivityStateEnumeration.Failed, null, false));
 					} else {
-						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, "Ignoreable",
-							false));
+						updateState(_executionPlan.size(), new ActivityState(
+								ActivityStateEnumeration.Failed, "Ignoreable",
+								false));
 					}
 				} else
-					updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Finished, null, false));
+					updateState(_executionPlan.size(), new ActivityState(
+							ActivityStateEnumeration.Finished, null, false));
 			} catch (SQLException cause) {
 				_logger.error("BES Activity Unrecoverably Faulted.", cause);
 				addFault(cause, 3);
 				try {
-					updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, null, false));
+					updateState(_executionPlan.size(), new ActivityState(
+							ActivityStateEnumeration.Failed, null, false));
 				} catch (Throwable cause2) {
-					_logger.error("Unexpected exception occured in bes activity.", cause2);
+					_logger.error(
+							"Unexpected exception occured in bes activity.",
+							cause2);
 					return true;
 				}
 			} finally {
@@ -636,8 +667,7 @@ public class BESActivity implements Closeable
 			return false;
 	}
 
-	private class ActivityRunner implements Runnable
-	{
+	private class ActivityRunner implements Runnable {
 		private boolean _terminateRequested = false;
 		private boolean _suspendRequested = false;
 
@@ -647,27 +677,27 @@ public class BESActivity implements Closeable
 		private ExecutionPhase _currentPhase = null;
 		private LoggingContext context;
 
-		public ActivityRunner(boolean suspendRequested, boolean terminateRequested)
-		{
+		public ActivityRunner(boolean suspendRequested,
+				boolean terminateRequested) {
 			_phaseLock = BESActivity.this;
 			_terminateRequested = terminateRequested;
 			_suspendRequested = suspendRequested;
 			try {
-				context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+				context = (LoggingContext) LoggingContext
+						.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				context = new LoggingContext();
 			}
 		}
 
-		final public boolean isSuspended()
-		{
+		final public boolean isSuspended() {
 			synchronized (_phaseLock) {
-				return _suspended || (_currentPhase != null && _currentPhase instanceof SuspendableExecutionPhase);
+				return _suspended
+						|| (_currentPhase != null && _currentPhase instanceof SuspendableExecutionPhase);
 			}
 		}
 
-		public boolean requestSuspend() throws ExecutionException
-		{
+		public boolean requestSuspend() throws ExecutionException {
 			synchronized (_phaseLock) {
 				if (_suspendRequested || _terminateRequested)
 					return true;
@@ -685,8 +715,8 @@ public class BESActivity implements Closeable
 			return true;
 		}
 
-		public void requestTerminate(boolean countAsFailedAttempt) throws ExecutionException
-		{
+		public void requestTerminate(boolean countAsFailedAttempt)
+				throws ExecutionException {
 			synchronized (_phaseLock) {
 				if (_terminateRequested)
 					return;
@@ -696,15 +726,15 @@ public class BESActivity implements Closeable
 
 				if (_currentPhase != null) {
 					if (_currentPhase instanceof TerminateableExecutionPhase)
-						((TerminateableExecutionPhase) _currentPhase).terminate(countAsFailedAttempt);
+						((TerminateableExecutionPhase) _currentPhase)
+								.terminate(countAsFailedAttempt);
 				} else {
 					_phaseLock.notify();
 				}
 			}
 		}
 
-		public void requestResume() throws ExecutionException
-		{
+		public void requestResume() throws ExecutionException {
 			synchronized (_phaseLock) {
 				if (!_suspendRequested && !_suspended)
 					return;
@@ -720,8 +750,7 @@ public class BESActivity implements Closeable
 			}
 		}
 
-		public void run()
-		{
+		public void run() {
 			LoggingContext.assumeLoggingContext(context);
 			while (true) {
 				try {
@@ -730,11 +759,14 @@ public class BESActivity implements Closeable
 							break;
 
 						if (_terminateRequested) {
-							updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Cancelled, null,
-								false));
+							updateState(_executionPlan.size(),
+									new ActivityState(
+											ActivityStateEnumeration.Cancelled,
+											null, false));
 
 							// Ensure Cloud Resources Cleaned up
-							CloudMonitor.freeActivity(_activityid, _bes.getBESID());
+							CloudMonitor.freeActivity(_activityid,
+									_bes.getBESID());
 							break;
 						}
 
@@ -749,11 +781,14 @@ public class BESActivity implements Closeable
 						_suspended = false;
 
 						if (_terminateRequested) {
-							updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Cancelled, null,
-								false));
+							updateState(_executionPlan.size(),
+									new ActivityState(
+											ActivityStateEnumeration.Cancelled,
+											null, false));
 
 							// Ensure Cloud Resource cleaned up
-							CloudMonitor.freeActivity(_activityid, _bes.getBESID());
+							CloudMonitor.freeActivity(_activityid,
+									_bes.getBESID());
 							break;
 						}
 
@@ -784,9 +819,12 @@ public class BESActivity implements Closeable
 						// Ensure Cloud Resource cleaned up
 						CloudMonitor.freeActivity(_activityid, _bes.getBESID());
 
-						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, null, false));
+						updateState(_executionPlan.size(), new ActivityState(
+								ActivityStateEnumeration.Failed, null, false));
 					} catch (Throwable cause2) {
-						_logger.error("Unexpected exception occured in bes activity.", cause2);
+						_logger.error(
+								"Unexpected exception occured in bes activity.",
+								cause2);
 						return;
 					}
 				}
@@ -794,29 +832,24 @@ public class BESActivity implements Closeable
 		}
 	}
 
-	private class PolicyListener implements BESPolicyListener
-	{
+	private class PolicyListener implements BESPolicyListener {
 		@Override
-		public void kill() throws ExecutionException
-		{
+		public void kill() throws ExecutionException {
 			_runner.requestTerminate(true);
 		}
 
 		@Override
-		public void resume() throws ExecutionException
-		{
+		public void resume() throws ExecutionException {
 			_runner.requestResume();
 		}
 
 		@Override
-		public void suspend() throws ExecutionException
-		{
+		public void suspend() throws ExecutionException {
 			_runner.requestSuspend();
 		}
 
 		@Override
-		public void suspendOrKill() throws ExecutionException
-		{
+		public void suspendOrKill() throws ExecutionException {
 			if (!_runner.requestSuspend())
 				kill();
 		}

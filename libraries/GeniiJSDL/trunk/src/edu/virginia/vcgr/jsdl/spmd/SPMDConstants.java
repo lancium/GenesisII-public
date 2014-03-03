@@ -20,7 +20,6 @@ package edu.virginia.vcgr.jsdl.spmd;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface SPMDConstants
-{
+public interface SPMDConstants {
 	static final public String JSDL_SPMD_NS = "http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd";
 }

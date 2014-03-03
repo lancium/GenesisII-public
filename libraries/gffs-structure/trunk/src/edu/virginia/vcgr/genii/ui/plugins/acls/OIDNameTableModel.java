@@ -5,15 +5,14 @@ import java.util.EnumMap;
 import javax.security.auth.x500.X500Principal;
 import javax.swing.table.AbstractTableModel;
 
-class OIDNameTableModel extends AbstractTableModel
-{
+class OIDNameTableModel extends AbstractTableModel {
 	static final long serialVersionUID = 0L;
 
-	private EnumMap<OIDNames, String> _values = new EnumMap<OIDNames, String>(OIDNames.class);
+	private EnumMap<OIDNames, String> _values = new EnumMap<OIDNames, String>(
+			OIDNames.class);
 	private OIDNames[] _keyArray;
 
-	OIDNameTableModel()
-	{
+	OIDNameTableModel() {
 		for (OIDNames name : OIDNames.values()) {
 			if (name.toString() != null)
 				_values.put(name, "");
@@ -23,8 +22,7 @@ class OIDNameTableModel extends AbstractTableModel
 		_keyArray = _values.keySet().toArray(_keyArray);
 	}
 
-	X500Principal formPrincipal()
-	{
+	X500Principal formPrincipal() {
 		StringBuilder builder = new StringBuilder();
 
 		for (OIDNames name : _keyArray) {
@@ -44,20 +42,17 @@ class OIDNameTableModel extends AbstractTableModel
 	}
 
 	@Override
-	public int getColumnCount()
-	{
+	public int getColumnCount() {
 		return 2;
 	}
 
 	@Override
-	public int getRowCount()
-	{
+	public int getRowCount() {
 		return _values.keySet().size();
 	}
 
 	@Override
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex)
-	{
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		if (columnIndex == 0)
 			return;
 
@@ -70,27 +65,23 @@ class OIDNameTableModel extends AbstractTableModel
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex)
-	{
+	public Object getValueAt(int rowIndex, int columnIndex) {
 		OIDNames name = _keyArray[rowIndex];
 		return (columnIndex == 0) ? name : _values.get(name);
 	}
 
 	@Override
-	public Class<?> getColumnClass(int columnIndex)
-	{
+	public Class<?> getColumnClass(int columnIndex) {
 		return (columnIndex == 0) ? OIDNames.class : String.class;
 	}
 
 	@Override
-	public String getColumnName(int column)
-	{
+	public String getColumnName(int column) {
 		return (column == 0) ? "OID Category" : "Value";
 	}
 
 	@Override
-	public boolean isCellEditable(int rowIndex, int columnIndex)
-	{
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		return columnIndex == 1;
 	}
 }

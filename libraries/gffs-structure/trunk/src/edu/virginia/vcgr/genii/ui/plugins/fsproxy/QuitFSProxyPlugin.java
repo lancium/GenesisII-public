@@ -20,31 +20,35 @@ import edu.virginia.vcgr.genii.ui.plugins.MenuType;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 
-public class QuitFSProxyPlugin extends AbstractCombinedUIMenusPlugin
-{
+public class QuitFSProxyPlugin extends AbstractCombinedUIMenusPlugin {
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
-	{
-		Collection<RNSPath> targets = context.endpointRetriever().getTargetEndpoints();
+	protected void performMenuAction(UIPluginContext context, MenuType menuType)
+			throws UIPluginException {
+		Collection<RNSPath> targets = context.endpointRetriever()
+				.getTargetEndpoints();
 		Closeable token = null;
 
 		try {
-			token = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+			token = ContextManager.temporarilyAssumeContext(context.uiContext()
+					.callingContext());
 
 			for (RNSPath target : targets) {
 				try {
 					EndpointReferenceType targetAddress = target.getEndpoint();
-					TypeInformation typeInfo = new TypeInformation(targetAddress);
+					TypeInformation typeInfo = new TypeInformation(
+							targetAddress);
 					if (typeInfo.isExport() || typeInfo.isLightweightExport())
 						ExportTool.quitExportedRoot(targetAddress, false);
 					else {
-						GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, targetAddress);
+						GeniiCommon common = ClientUtils.createProxy(
+								GeniiCommon.class, targetAddress);
 						common.destroy(new Destroy());
 					}
 
 					target.unlink();
 				} catch (Throwable cause) {
-					ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
+					ErrorHandler.handleError(context.uiContext(),
+							context.ownerComponent(), cause);
 				}
 			}
 
@@ -55,14 +59,15 @@ public class QuitFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 	}
 
 	@Override
-	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
-	{
+	public boolean isEnabled(
+			Collection<EndpointDescription> selectedDescriptions) {
 		if (selectedDescriptions == null || selectedDescriptions.size() == 0)
 			return false;
 
 		for (EndpointDescription ed : selectedDescriptions) {
 			TypeInformation typeInfo = ed.typeInformation();
-			if (!(typeInfo.isExport() || typeInfo.isLightweightExport() || typeInfo.isFSProxy()))
+			if (!(typeInfo.isExport() || typeInfo.isLightweightExport() || typeInfo
+					.isFSProxy()))
 				return false;
 		}
 

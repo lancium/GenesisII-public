@@ -35,37 +35,35 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPoli
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects;
 
-public class SubscribeRequest
-{
+public class SubscribeRequest {
 	static private Log _logger = LogFactory.getLog(SubscribeRequest.class);
 
-	static final private QName TOPIC_EXPRESSION_QNAME = new QName(WSRFConstants.WSN_BASE_NOT_NS, "TopicExpression", "wsnt");
+	static final private QName TOPIC_EXPRESSION_QNAME = new QName(
+			WSRFConstants.WSN_BASE_NOT_NS, "TopicExpression", "wsnt");
 	static final private String TOPIC_NS_PREFIX_PATTERN = "ts%d";
 
 	private EndpointReferenceType _consumerReference = null;
 	private TopicQueryExpression _topicFilter = null;
 	private TerminationTimeType _terminationTime = null;
-	private Map<SubscriptionPolicyTypes, SubscriptionPolicy> _policies =
-		new EnumMap<SubscriptionPolicyTypes, SubscriptionPolicy>(SubscriptionPolicyTypes.class);
+	private Map<SubscriptionPolicyTypes, SubscriptionPolicy> _policies = new EnumMap<SubscriptionPolicyTypes, SubscriptionPolicy>(
+			SubscriptionPolicyTypes.class);
 	private AdditionalUserData _additionalUserData = null;
 
-	private TopicQueryExpression topicExpressionFromFilterElement(Element e) throws InvalidFilterFaultType,
-		TopicNotSupportedFaultType
-	{
+	private TopicQueryExpression topicExpressionFromFilterElement(Element e)
+			throws InvalidFilterFaultType, TopicNotSupportedFaultType {
 		return TopicQueryDialects.createFromElement(e);
 	}
 
-	private FilterType createFilter() throws SOAPException
-	{
+	private FilterType createFilter() throws SOAPException {
 		if (_topicFilter == null)
 			return null;
 
-		return new FilterType(new MessageElement[] { _topicFilter.toTopicExpressionElement(TOPIC_EXPRESSION_QNAME,
-			TOPIC_NS_PREFIX_PATTERN) });
+		return new FilterType(
+				new MessageElement[] { _topicFilter.toTopicExpressionElement(
+						TOPIC_EXPRESSION_QNAME, TOPIC_NS_PREFIX_PATTERN) });
 	}
 
-	private SubscriptionPolicyType createPolicy() throws JAXBException
-	{
+	private SubscriptionPolicyType createPolicy() throws JAXBException {
 		if (_policies.size() == 0)
 			return null;
 
@@ -78,15 +76,18 @@ public class SubscribeRequest
 		for (SubscriptionPolicy policy : _policies.values()) {
 			DOMResult result = new DOMResult();
 			m.marshal(policy, result);
-			any[lcv++] = new MessageElement(((Document) result.getNode()).getDocumentElement());
+			any[lcv++] = new MessageElement(
+					((Document) result.getNode()).getDocumentElement());
 		}
 
 		return new SubscriptionPolicyType(any);
 	}
 
-	public SubscribeRequest(EndpointReferenceType consumerReference, TopicQueryExpression topicFilter,
-		TerminationTimeType terminationTime, AdditionalUserData additionalUserData, SubscriptionPolicy... policies)
-	{
+	public SubscribeRequest(EndpointReferenceType consumerReference,
+			TopicQueryExpression topicFilter,
+			TerminationTimeType terminationTime,
+			AdditionalUserData additionalUserData,
+			SubscriptionPolicy... policies) {
 		_consumerReference = consumerReference;
 		_topicFilter = topicFilter;
 		_terminationTime = terminationTime;
@@ -95,8 +96,7 @@ public class SubscribeRequest
 			_policies.put(policy.policyType(), policy);
 	}
 
-	public SubscribeRequest(Subscribe request) throws RemoteException
-	{
+	public SubscribeRequest(Subscribe request) throws RemoteException {
 		_consumerReference = request.getConsumerReference();
 
 		FilterType filter = request.getFilter();
@@ -106,14 +106,16 @@ public class SubscribeRequest
 				for (MessageElement e : any) {
 					QName eName = e.getQName();
 					if (!eName.equals(TOPIC_EXPRESSION_QNAME))
-						throw FaultManipulator.fillInFault(new InvalidFilterFaultType());
+						throw FaultManipulator
+								.fillInFault(new InvalidFilterFaultType());
 
 					_topicFilter = topicExpressionFromFilterElement(e);
 				}
 			}
 		}
 
-		_terminationTime = TerminationTimeType.newInstance(request.getInitialTerminationTime());
+		_terminationTime = TerminationTimeType.newInstance(request
+				.getInitialTerminationTime());
 
 		SubscriptionPolicyType policy = request.getSubscriptionPolicy();
 		if (policy != null) {
@@ -125,16 +127,22 @@ public class SubscribeRequest
 
 					for (MessageElement e : any) {
 						try {
-							SubscriptionPolicy policyInstance = (SubscriptionPolicy) u.unmarshal(e);
-							_policies.put(policyInstance.policyType(), policyInstance);
+							SubscriptionPolicy policyInstance = (SubscriptionPolicy) u
+									.unmarshal(e);
+							_policies.put(policyInstance.policyType(),
+									policyInstance);
 						} catch (JAXBException exception) {
-							_logger.warn("Error attempting to create subscription type.", exception);
+							_logger.warn(
+									"Error attempting to create subscription type.",
+									exception);
 
-							throw FaultManipulator.fillInFault(new UnrecognizedPolicyRequestFaultType());
+							throw FaultManipulator
+									.fillInFault(new UnrecognizedPolicyRequestFaultType());
 						}
 					}
 				} catch (JAXBException e) {
-					throw new ConfigurationException("Unable to set up policy deserializer.", e);
+					throw new ConfigurationException(
+							"Unable to set up policy deserializer.", e);
 				}
 			}
 		}
@@ -145,55 +153,55 @@ public class SubscribeRequest
 				QName name = me.getQName();
 				if (name.equals(AdditionalUserDataConstants.ELEMENT_QNAME)) {
 					try {
-						_additionalUserData = AdditionalUserData.fromElement(AdditionalUserData.class, me);
+						_additionalUserData = AdditionalUserData.fromElement(
+								AdditionalUserData.class, me);
 					} catch (JAXBException e) {
-						throw new RemoteException("Unable to deserialize user data.", e);
+						throw new RemoteException(
+								"Unable to deserialize user data.", e);
 					}
 				}
 			}
 		}
 	}
 
-	final public EndpointReferenceType consumerReference()
-	{
+	final public EndpointReferenceType consumerReference() {
 		return _consumerReference;
 	}
 
-	final public TopicQueryExpression topicFilter()
-	{
+	final public TopicQueryExpression topicFilter() {
 		return _topicFilter;
 	}
 
-	final public TerminationTimeType terminationTime()
-	{
+	final public TerminationTimeType terminationTime() {
 		return _terminationTime;
 	}
 
-	final public SubscriptionPolicy policy(SubscriptionPolicyTypes policyType)
-	{
+	final public SubscriptionPolicy policy(SubscriptionPolicyTypes policyType) {
 		return _policies.get(policyType);
 	}
 
-	final public Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies()
-	{
+	final public Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies() {
 		return _policies;
 	}
 
-	final public AdditionalUserData additionalUserData()
-	{
+	final public AdditionalUserData additionalUserData() {
 		return _additionalUserData;
 	}
 
-	final public Subscribe asRequestType()
-	{
+	final public Subscribe asRequestType() {
 		try {
-			return new Subscribe(_consumerReference, createFilter(), (_terminationTime == null) ? null
-				: _terminationTime.toAxisType(), createPolicy(), (_additionalUserData == null) ? null
-				: new MessageElement[] { AdditionalUserData.toMessageElement(_additionalUserData) });
+			return new Subscribe(_consumerReference, createFilter(),
+					(_terminationTime == null) ? null : _terminationTime
+							.toAxisType(), createPolicy(),
+					(_additionalUserData == null) ? null
+							: new MessageElement[] { AdditionalUserData
+									.toMessageElement(_additionalUserData) });
 		} catch (SOAPException e) {
-			throw new ConfigurationException("Unable to create topic expression.", e);
+			throw new ConfigurationException(
+					"Unable to create topic expression.", e);
 		} catch (JAXBException e) {
-			throw new ConfigurationException("Unable to serialize subscription policy.", e);
+			throw new ConfigurationException(
+					"Unable to serialize subscription policy.", e);
 		}
 	}
 }

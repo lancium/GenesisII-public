@@ -20,18 +20,19 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.container.sync.ReplicationThread;
 import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
 
-public class GeniiResolverSyncRunner implements ResourceSyncRunner
-{
-	static private Log _logger = LogFactory.getLog(GeniiResolverSyncRunner.class);
+public class GeniiResolverSyncRunner implements ResourceSyncRunner {
+	static private Log _logger = LogFactory
+			.getLog(GeniiResolverSyncRunner.class);
 
-	public void doSync(IResource vResource, EndpointReferenceType primaryEPR, EndpointReferenceType myEPR,
-		ReplicationThread replicator) throws Throwable
-	{
+	public void doSync(IResource vResource, EndpointReferenceType primaryEPR,
+			EndpointReferenceType myEPR, ReplicationThread replicator)
+			throws Throwable {
 		// Synchronize the attributes -- resolver and replication policies.
 		IGeniiResolverResource resource = (IGeniiResolverResource) vResource;
 		ObjectInputStream objstream = null;
 		try {
-			InputStream istream = ByteIOStreamFactory.createInputStream(primaryEPR);
+			InputStream istream = ByteIOStreamFactory
+					.createInputStream(primaryEPR);
 			objstream = new ObjectInputStream(istream);
 			while (true) {
 				Object object = null;
@@ -47,7 +48,8 @@ public class GeniiResolverSyncRunner implements ResourceSyncRunner
 				if (_logger.isDebugEnabled())
 					_logger.debug("resolver: " + targetEPR.getAddress());
 				resource.addTargetEPR(targetEPI, targetID, targetEPR);
-				GeniiResolverUtils.createTerminateSubscription(targetID, targetEPR, myEPR, resource);
+				GeniiResolverUtils.createTerminateSubscription(targetID,
+						targetEPR, myEPR, resource);
 			}
 		} finally {
 			StreamUtils.close(objstream);
@@ -55,14 +57,13 @@ public class GeniiResolverSyncRunner implements ResourceSyncRunner
 		GeniiResolverUtils.initializeNextTargetIDinReplica(resource);
 	}
 
-	public TopicPath getSyncTopic()
-	{
+	public TopicPath getSyncTopic() {
 		return ResolverTopics.RESOLVER_UPDATE_TOPIC;
 	}
 
 	@Override
-	public Collection<MessageElement> getDefaultAttributes(EndpointReferenceType primaryEPR)
-	{
+	public Collection<MessageElement> getDefaultAttributes(
+			EndpointReferenceType primaryEPR) {
 		return Collections.emptyList();
 	}
 }

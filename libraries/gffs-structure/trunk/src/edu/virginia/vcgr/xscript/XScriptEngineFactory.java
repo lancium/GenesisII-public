@@ -8,16 +8,15 @@ import java.util.Map;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 
-public class XScriptEngineFactory implements ScriptEngineFactory, XScriptConstants
-{
+public class XScriptEngineFactory implements ScriptEngineFactory,
+		XScriptConstants {
 	private List<String> _extensions;
 	private List<String> _mimeTypes;
 	private List<String> _shortNames;
 
 	private Map<String, Object> _factoryParameters;
 
-	public XScriptEngineFactory()
-	{
+	public XScriptEngineFactory() {
 		_extensions = new ArrayList<String>(FILE_EXTENSIONS.length);
 		for (String extension : FILE_EXTENSIONS)
 			_extensions.add(extension);
@@ -39,78 +38,71 @@ public class XScriptEngineFactory implements ScriptEngineFactory, XScriptConstan
 	}
 
 	@Override
-	public String getEngineName()
-	{
+	public String getEngineName() {
 		return ENGINE_NAME;
 	}
 
 	@Override
-	public String getEngineVersion()
-	{
+	public String getEngineVersion() {
 		return ENGINE_VERSION;
 	}
 
 	@Override
-	public List<String> getExtensions()
-	{
+	public List<String> getExtensions() {
 		return _extensions;
 	}
 
 	@Override
-	public String getLanguageName()
-	{
+	public String getLanguageName() {
 		return LANGUAGE_NAME;
 	}
 
 	@Override
-	public String getLanguageVersion()
-	{
+	public String getLanguageVersion() {
 		return LANGUAGE_VERSION;
 	}
 
 	@Override
-	public String getMethodCallSyntax(String obj, String m, String... args)
-	{
+	public String getMethodCallSyntax(String obj, String m, String... args) {
 		StringBuilder builder = new StringBuilder();
 
-		builder.append(String.format("<gsh:call xmlns:gsh=\"%s\" function=\"%s\">\n", XSCRIPT_NS, m));
+		builder.append(String.format(
+				"<gsh:call xmlns:gsh=\"%s\" function=\"%s\">\n", XSCRIPT_NS, m));
 		for (String arg : args)
-			builder.append(String.format("\t<gsh:parameter>%s</gsh:parameter>\n", arg));
+			builder.append(String.format(
+					"\t<gsh:parameter>%s</gsh:parameter>\n", arg));
 		builder.append("</gsh:call>");
 
 		return builder.toString();
 	}
 
 	@Override
-	public List<String> getMimeTypes()
-	{
+	public List<String> getMimeTypes() {
 		return _mimeTypes;
 	}
 
 	@Override
-	public List<String> getNames()
-	{
+	public List<String> getNames() {
 		return _shortNames;
 	}
 
 	@Override
-	public String getOutputStatement(String toDisplay)
-	{
-		return String.format("<gsh:echo xmlns:gsh=\"%s\" message=\"%s\"/>", XSCRIPT_NS, toDisplay);
+	public String getOutputStatement(String toDisplay) {
+		return String.format("<gsh:echo xmlns:gsh=\"%s\" message=\"%s\"/>",
+				XSCRIPT_NS, toDisplay);
 	}
 
 	@Override
-	public Object getParameter(String key)
-	{
+	public Object getParameter(String key) {
 		return _factoryParameters.get(key);
 	}
 
 	@Override
-	public String getProgram(String... statements)
-	{
+	public String getProgram(String... statements) {
 		StringBuilder builder = new StringBuilder();
 
-		builder.append(String.format("<gsh:script xmlns:gsh=\"%s\">\n", XSCRIPT_NS));
+		builder.append(String.format("<gsh:script xmlns:gsh=\"%s\">\n",
+				XSCRIPT_NS));
 
 		for (String statement : statements)
 			builder.append(statement);
@@ -121,8 +113,7 @@ public class XScriptEngineFactory implements ScriptEngineFactory, XScriptConstan
 	}
 
 	@Override
-	public ScriptEngine getScriptEngine()
-	{
+	public ScriptEngine getScriptEngine() {
 		return new XScriptEngine(this);
 	}
 }

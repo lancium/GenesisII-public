@@ -7,8 +7,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class HistoryTool extends BaseGridTool
-{
+public class HistoryTool extends BaseGridTool {
 	static private final String _DESCRIPTION = "config/tooldocs/description/dhistory";
 	static private final String _USAGE = "config/tooldocs/usage/uhistory";
 	static private final String _MANPAGE = "config/tooldocs/man/history";
@@ -17,27 +16,24 @@ public class HistoryTool extends BaseGridTool
 	private int _max = 500;
 
 	@Option({ "clear", "c" })
-	public void setClear()
-	{
+	public void setClear() {
 		_clear = true;
 	}
 
-	public HistoryTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.GENERAL);
+	public HistoryTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.GENERAL);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() > 1)
 			throw new InvalidToolUsageException();
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		if (_clear)
 			if (getArguments().size() != 0)
 				throw new InvalidToolUsageException("Too many arguments");
@@ -50,10 +46,12 @@ public class HistoryTool extends BaseGridTool
 			try {
 				_max = Integer.parseInt(getArgument(0));
 			} catch (NumberFormatException e) {
-				throw new InvalidToolUsageException("Argument must be a non-negative integer.");
+				throw new InvalidToolUsageException(
+						"Argument must be a non-negative integer.");
 			}
 			if (_max < 0)
-				throw new InvalidToolUsageException("Argument cannot be negative.");
+				throw new InvalidToolUsageException(
+						"Argument cannot be negative.");
 		}
 
 		ArrayList<String[]> history = CommandLineRunner.history();

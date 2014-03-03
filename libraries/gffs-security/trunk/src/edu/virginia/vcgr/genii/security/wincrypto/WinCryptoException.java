@@ -14,21 +14,17 @@
 
 package edu.virginia.vcgr.genii.security.wincrypto;
 
-public class WinCryptoException extends Exception
-{
+public class WinCryptoException extends Exception {
 	static final long serialVersionUID = 0L;
 
-	public WinCryptoException()
-	{
+	public WinCryptoException() {
 	}
 
-	public WinCryptoException(String message)
-	{
+	public WinCryptoException(String message) {
 		super(message);
 	}
 
-	public WinCryptoException(String message, Throwable cause)
-	{
+	public WinCryptoException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

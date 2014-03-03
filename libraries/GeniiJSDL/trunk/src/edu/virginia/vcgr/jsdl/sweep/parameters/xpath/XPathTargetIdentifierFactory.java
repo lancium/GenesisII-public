@@ -33,12 +33,11 @@ import edu.virginia.vcgr.jsdl.sweep.eval.SweepTargetIdentifier;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class XPathTargetIdentifierFactory
-{
-	static private final Pattern XPATH_FUNCTION_PATTERN = Pattern.compile("^\\s*([^\\(]+)\\(([^\\)]+)\\)\\s*$");
+public class XPathTargetIdentifierFactory {
+	static private final Pattern XPATH_FUNCTION_PATTERN = Pattern
+			.compile("^\\s*([^\\(]+)\\(([^\\)]+)\\)\\s*$");
 
-	static private List<String> formArgumentList(String argListString)
-	{
+	static private List<String> formArgumentList(String argListString) {
 		if (!argListString.contains(","))
 			return new Vector<String>(0);
 
@@ -54,9 +53,9 @@ public class XPathTargetIdentifierFactory
 		return argList;
 	}
 
-	static public SweepTargetIdentifier createIdentifier(NamespaceContext nsContext, String xpathExpression)
-		throws SweepException
-	{
+	static public SweepTargetIdentifier createIdentifier(
+			NamespaceContext nsContext, String xpathExpression)
+			throws SweepException {
 		try {
 			XPathFactory factory = XPathFactory.newInstance();
 			XPath path = factory.newXPath();
@@ -64,10 +63,12 @@ public class XPathTargetIdentifierFactory
 
 			Matcher matcher = XPATH_FUNCTION_PATTERN.matcher(xpathExpression);
 			if (matcher.matches()) {
-				return XPathFunctionalTargetIdentifierFactory.createIdentifier(path, matcher.group(1),
-					formArgumentList(matcher.group(2)));
+				return XPathFunctionalTargetIdentifierFactory.createIdentifier(
+						path, matcher.group(1),
+						formArgumentList(matcher.group(2)));
 			} else
-				return new WholeNodeSweepTargetIdentifier(xpathExpression, path.compile(xpathExpression));
+				return new WholeNodeSweepTargetIdentifier(xpathExpression,
+						path.compile(xpathExpression));
 		} catch (XPathExpressionException e) {
 			throw new SweepException("Unable to compile XPath expression.", e);
 		}

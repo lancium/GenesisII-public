@@ -9,21 +9,18 @@ import javax.swing.ListCellRenderer;
 import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemType;
 
 @SuppressWarnings("rawtypes")
-class FilesystemBoxRenderer extends JLabel implements ListCellRenderer
-{
+class FilesystemBoxRenderer extends JLabel implements ListCellRenderer {
 	static final long serialVersionUID = 0L;
 
-	FilesystemBoxRenderer()
-	{
+	FilesystemBoxRenderer() {
 		setOpaque(true);
 		setHorizontalAlignment(LEFT);
 		setVerticalAlignment(CENTER);
 	}
 
 	@Override
-	public Component
-		getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
-	{
+	public Component getListCellRendererComponent(JList list, Object value,
+			int index, boolean isSelected, boolean cellHasFocus) {
 		if (value == null)
 			value = FilesystemType.Default;
 

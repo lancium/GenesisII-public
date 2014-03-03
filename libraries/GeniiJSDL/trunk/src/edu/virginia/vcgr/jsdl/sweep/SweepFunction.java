@@ -26,6 +26,7 @@ import edu.virginia.vcgr.jsdl.sweep.functions.ValuesSweepFunction;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlSeeAlso({ ValuesSweepFunction.class, LoopIntegerSweepFunction.class, LoopDoubleSweepFunction.class })
-public interface SweepFunction extends Countable, Iterable<Object>
-{}
+@XmlSeeAlso({ ValuesSweepFunction.class, LoopIntegerSweepFunction.class,
+		LoopDoubleSweepFunction.class })
+public interface SweepFunction extends Countable, Iterable<Object> {
+}

@@ -10,17 +10,16 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JNICdTool extends JNILibraryBase
-{
+public class JNICdTool extends JNILibraryBase {
 	static private Log _logger = LogFactory.getLog(JNICdTool.class);
 
-	public static Boolean changeDirectory(String targetDirectory)
-	{
+	public static Boolean changeDirectory(String targetDirectory) {
 		tryToInitialize();
 
 		try {
 			ICallingContext ctxt = ContextManager.getExistingContext();
-			RNSPath path = ctxt.getCurrentPath().lookup(targetDirectory, RNSPathQueryFlags.MUST_EXIST);
+			RNSPath path = ctxt.getCurrentPath().lookup(targetDirectory,
+					RNSPathQueryFlags.MUST_EXIST);
 			if (!(new TypeInformation(path.getEndpoint()).isRNS()))
 				return false;
 

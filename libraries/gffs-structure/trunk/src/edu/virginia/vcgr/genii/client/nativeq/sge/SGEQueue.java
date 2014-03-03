@@ -12,22 +12,21 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 
-public class SGEQueue extends AbstractNativeQueue<SGEQueueConfiguration>
-{
+public class SGEQueue extends AbstractNativeQueue<SGEQueueConfiguration> {
 	static final public String PROVIDER_NAME = "sge";
 
 	private JobStateCache _statusCache = new JobStateCache();
 
-	public SGEQueue()
-	{
+	public SGEQueue() {
 		super(PROVIDER_NAME, SGEQueueConfiguration.class);
 	}
 
 	@Override
 	public NativeQueueConnection connect(ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorConf, File workingDirectory,
-		NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException
-	{
+			CmdLineManipulatorConfiguration cmdLineManipulatorConf,
+			File workingDirectory,
+			NativeQueueConfiguration nativeQueueConfiguration,
+			Object providerConfiguration) throws NativeQueueException {
 		SGEQueueConfiguration sgeConfig = (SGEQueueConfiguration) providerConfiguration;
 
 		if (nativeQueueConfiguration == null)
@@ -42,17 +41,19 @@ public class SGEQueue extends AbstractNativeQueue<SGEQueueConfiguration>
 		String qname = sgeConfig.queueName();
 
 		try {
-			return new SGEQueueConnection(resourceOverrides, cmdLineManipulatorConf, workingDirectory,
-				nativeQueueConfiguration, sgeConfig, qname, sgeConfig.startQSub(), sgeConfig.startQStat(),
-				sgeConfig.startQDel(), _statusCache);
+			return new SGEQueueConnection(resourceOverrides,
+					cmdLineManipulatorConf, workingDirectory,
+					nativeQueueConfiguration, sgeConfig, qname,
+					sgeConfig.startQSub(), sgeConfig.startQStat(),
+					sgeConfig.startQDel(), _statusCache);
 		} catch (FileNotFoundException fnfe) {
-			throw new NativeQueueException("Unable to find queue binaries.", fnfe);
+			throw new NativeQueueException("Unable to find queue binaries.",
+					fnfe);
 		}
 	}
 
 	@Override
-	final public ResourceManagerType resourceManagerType()
-	{
+	final public ResourceManagerType resourceManagerType() {
 		return ResourceManagerType.SGE;
 	}
 }

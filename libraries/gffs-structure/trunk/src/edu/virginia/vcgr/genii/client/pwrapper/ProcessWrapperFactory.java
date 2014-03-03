@@ -17,15 +17,12 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
-public class ProcessWrapperFactory
-{
+public class ProcessWrapperFactory {
 	static private Log _logger = LogFactory.getLog(ProcessWrapperFactory.class);
 
-	static private class ProcessThreadFactory implements ThreadFactory
-	{
+	static private class ProcessThreadFactory implements ThreadFactory {
 		@Override
-		public Thread newThread(Runnable r)
-		{
+		public Thread newThread(Runnable r) {
 			Thread th = new Thread(r, "Process Wrapper Worker");
 			th.setDaemon(false);
 
@@ -33,17 +30,21 @@ public class ProcessWrapperFactory
 		}
 	}
 
-	synchronized static private File findCommonPWrapper(File originalPath, File targetDirectory) throws IOException
-	{
+	synchronized static private File findCommonPWrapper(File originalPath,
+			File targetDirectory) throws IOException {
 		if (!targetDirectory.exists())
 			targetDirectory.mkdirs();
 
 		if (!targetDirectory.exists() || !targetDirectory.isDirectory())
-			throw new FileNotFoundException(String.format("Unable to locate target directory \"%s\".", targetDirectory));
+			throw new FileNotFoundException(String.format(
+					"Unable to locate target directory \"%s\".",
+					targetDirectory));
 
 		File targetPath = new File(targetDirectory, originalPath.getName());
-		if (!targetPath.exists() || targetPath.lastModified() < originalPath.lastModified()) {
-			File tmp = new File(targetPath.getParentFile(), targetPath.getName() + ".tmp");
+		if (!targetPath.exists()
+				|| targetPath.lastModified() < originalPath.lastModified()) {
+			File tmp = new File(targetPath.getParentFile(),
+					targetPath.getName() + ".tmp");
 			FileOutputStream fos = null;
 			FileInputStream fin = null;
 
@@ -68,13 +69,15 @@ public class ProcessWrapperFactory
 		return targetPath;
 	}
 
-	static private ExecutorService _processThreadPool = Executors.newCachedThreadPool(new ProcessThreadFactory());
+	static private ExecutorService _processThreadPool = Executors
+			.newCachedThreadPool(new ProcessThreadFactory());
 
-	static public ProcessWrapper createWrapper(File commonDirectory, OperatingSystemNames desiredOSName,
-		ProcessorArchitecture desiredArch) throws ProcessWrapperException
-	{
+	static public ProcessWrapper createWrapper(File commonDirectory,
+			OperatingSystemNames desiredOSName,
+			ProcessorArchitecture desiredArch) throws ProcessWrapperException {
 		if (commonDirectory == null)
-			throw new IllegalArgumentException("Common Directory cannot be null.");
+			throw new IllegalArgumentException(
+					"Common Directory cannot be null.");
 
 		if (desiredOSName == null)
 			desiredOSName = OperatingSystemNames.getCurrentOperatingSystem();
@@ -85,20 +88,24 @@ public class ProcessWrapperFactory
 		File binDir = Installation.getProcessWrapperBinPath();
 		File pwrapperPath = null;
 
-		_logger.info("ProcessWrapperFactory: arch is " + desiredArch + ", OS is " + desiredOSName);
+		_logger.info("ProcessWrapperFactory: arch is " + desiredArch
+				+ ", OS is " + desiredOSName);
 
 		if (desiredOSName.isWindows()) {
-			if (desiredArch == null || desiredArch == ProcessorArchitecture.x86 || desiredArch == ProcessorArchitecture.x86_32
-				|| desiredArch == ProcessorArchitecture.x86_64)
+			if (desiredArch == null || desiredArch == ProcessorArchitecture.x86
+					|| desiredArch == ProcessorArchitecture.x86_32
+					|| desiredArch == ProcessorArchitecture.x86_64)
 				pwrapperPath = new File(binDir, "pwrapper-winxp.exe");
 		} else if (desiredOSName == OperatingSystemNames.LINUX) {
-			if (desiredArch == null || desiredArch == ProcessorArchitecture.x86 || desiredArch == ProcessorArchitecture.x86_32)
+			if (desiredArch == null || desiredArch == ProcessorArchitecture.x86
+					|| desiredArch == ProcessorArchitecture.x86_32)
 				pwrapperPath = new File(binDir, "pwrapper-linux-32");
 			else if (desiredArch == ProcessorArchitecture.x86_64)
 				pwrapperPath = new File(binDir, "pwrapper-linux-64");
 		} else if (desiredOSName == OperatingSystemNames.MACOS) {
-			if (desiredArch == null || desiredArch == ProcessorArchitecture.x86 || desiredArch == ProcessorArchitecture.x86_32
-				|| desiredArch == ProcessorArchitecture.x86_64)
+			if (desiredArch == null || desiredArch == ProcessorArchitecture.x86
+					|| desiredArch == ProcessorArchitecture.x86_32
+					|| desiredArch == ProcessorArchitecture.x86_64)
 				pwrapperPath = new File(binDir, "pwrapper-macosx");
 		}
 
@@ -108,14 +115,15 @@ public class ProcessWrapperFactory
 		try {
 			pwrapperPath = findCommonPWrapper(pwrapperPath, commonDirectory);
 		} catch (IOException e) {
-			throw new ProcessWrapperException("Unable to find common pwrapper.", e);
+			throw new ProcessWrapperException(
+					"Unable to find common pwrapper.", e);
 		}
 
 		return new ProcessWrapper(_processThreadPool, pwrapperPath);
 	}
 
-	static public ProcessWrapper createWrapper(File commonDirectory) throws ProcessWrapperException
-	{
+	static public ProcessWrapper createWrapper(File commonDirectory)
+			throws ProcessWrapperException {
 		return createWrapper(commonDirectory, null, null);
 	}
 }

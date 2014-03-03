@@ -16,48 +16,45 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 
-final public class RNSIterable implements Iterable<RNSEntryResponseType>
-{
+final public class RNSIterable implements Iterable<RNSEntryResponseType> {
 	private String _path;
 	private WSIterable<RNSEntryResponseType> _iterable;
 
-	public RNSIterable(LookupResponseType lookupResponse, ICallingContext callContext, int blockSize) throws ResourceException,
-		GenesisIISecurityException
-	{
+	public RNSIterable(LookupResponseType lookupResponse,
+			ICallingContext callContext, int blockSize)
+			throws ResourceException, GenesisIISecurityException {
 		this(null, lookupResponse, callContext, blockSize);
 	}
 
-	public RNSIterable(String path, LookupResponseType lookupResponse, ICallingContext callContext, int blockSize)
-		throws ResourceException, GenesisIISecurityException
-	{
+	public RNSIterable(String path, LookupResponseType lookupResponse,
+			ICallingContext callContext, int blockSize)
+			throws ResourceException, GenesisIISecurityException {
 		_path = path;
 
 		RNSEntryResponseType[] tmp = lookupResponse.getEntryResponse();
 
-		_iterable =
-			WSIterable.axisIterable(RNSEntryResponseType.class, tmp,
-				new IteratorInitializationType(lookupResponse.getIterator(), null), callContext, blockSize);
+		_iterable = WSIterable.axisIterable(RNSEntryResponseType.class, tmp,
+				new IteratorInitializationType(lookupResponse.getIterator(),
+						null), callContext, blockSize);
 	}
 
-	final public RNSEntryResponseType[] toArray()
-	{
+	final public RNSEntryResponseType[] toArray() {
 		Collection<RNSEntryResponseType> tmp = new LinkedList<RNSEntryResponseType>();
 
 		for (RNSEntryResponseType resp : this)
 			tmp.add(resp);
 
-		RNSEntryResponseType[] respArray = tmp.toArray(new RNSEntryResponseType[tmp.size()]);
+		RNSEntryResponseType[] respArray = tmp
+				.toArray(new RNSEntryResponseType[tmp.size()]);
 		StreamUtils.close(_iterable);
 		return respArray;
 	}
 
-	final public WSIterable<RNSEntryResponseType> getIterable()
-	{
+	final public WSIterable<RNSEntryResponseType> getIterable() {
 		return _iterable;
 	}
 
-	final public Map<String, RNSEntryResponseType> toMap()
-	{
+	final public Map<String, RNSEntryResponseType> toMap() {
 		Map<String, RNSEntryResponseType> ret = new HashMap<String, RNSEntryResponseType>();
 
 		for (RNSEntryResponseType resp : this)
@@ -67,35 +64,29 @@ final public class RNSIterable implements Iterable<RNSEntryResponseType>
 	}
 
 	@Override
-	final public Iterator<RNSEntryResponseType> iterator()
-	{
+	final public Iterator<RNSEntryResponseType> iterator() {
 		return new RNSIterator(_path, _iterable.iterator());
 	}
 
-	static private class RNSIterator implements Iterator<RNSEntryResponseType>
-	{
+	static private class RNSIterator implements Iterator<RNSEntryResponseType> {
 		private Iterator<RNSEntryResponseType> _iter;
 
-		private RNSIterator(String path, Iterator<RNSEntryResponseType> iter)
-		{
+		private RNSIterator(String path, Iterator<RNSEntryResponseType> iter) {
 			_iter = iter;
 		}
 
 		@Override
-		final public boolean hasNext()
-		{
+		final public boolean hasNext() {
 			return _iter.hasNext();
 		}
 
 		@Override
-		final public RNSEntryResponseType next()
-		{
+		final public RNSEntryResponseType next() {
 			return _iter.next();
 		}
 
 		@Override
-		final public void remove()
-		{
+		final public void remove() {
 			_iter.remove();
 		}
 	}

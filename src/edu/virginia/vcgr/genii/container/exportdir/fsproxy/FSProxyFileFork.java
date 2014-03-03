@@ -25,34 +25,32 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class FSProxyFileFork extends AbstractRandomByteIOResourceFork implements RandomByteIOResourceFork
-{
+public class FSProxyFileFork extends AbstractRandomByteIOResourceFork implements
+		RandomByteIOResourceFork {
 	static private Log _logger = LogFactory.getLog(FSProxyFileFork.class);
 
-	private FSViewSession session() throws IOException
-	{
+	private FSViewSession session() throws IOException {
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		FSProxyConstructionParameters consParms =
-			(FSProxyConstructionParameters) resource.constructionParameters(FSProxyServiceImpl.class);
+		FSProxyConstructionParameters consParms = (FSProxyConstructionParameters) resource
+				.constructionParameters(FSProxyServiceImpl.class);
 
 		return consParms.connectionInformation().openSession();
 	}
 
-	public FSProxyFileFork(ResourceForkService service, String forkPath)
-	{
+	public FSProxyFileFork(ResourceForkService service, String forkPath) {
 		super(service, forkPath);
 	}
 
 	@Override
-	public long size()
-	{
+	public long size() {
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.File)
-				throw new IOException(String.format("FSViewEntry %s is not a file!", entry));
+				throw new IOException(String.format(
+						"FSViewEntry %s is not a file!", entry));
 			FSViewFileEntry fileEntry = ((FSViewFileEntry) entry);
 			Long size = fileEntry.size();
 			if (size == null)
@@ -67,15 +65,15 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork implements
 	}
 
 	@Override
-	public Calendar createTime()
-	{
+	public Calendar createTime() {
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.File)
-				throw new IOException(String.format("FSViewEntry %s is not a file!", entry));
+				throw new IOException(String.format(
+						"FSViewEntry %s is not a file!", entry));
 			FSViewFileEntry fileEntry = ((FSViewFileEntry) entry);
 			return fileEntry.createTime();
 		} catch (Throwable cause) {
@@ -87,15 +85,15 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork implements
 	}
 
 	@Override
-	public Calendar modificationTime()
-	{
+	public Calendar modificationTime() {
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.File)
-				throw new IOException(String.format("FSViewEntry %s is not a file!", entry));
+				throw new IOException(String.format(
+						"FSViewEntry %s is not a file!", entry));
 			FSViewFileEntry fileEntry = ((FSViewFileEntry) entry);
 			return fileEntry.lastModified();
 		} catch (Throwable cause) {
@@ -107,20 +105,19 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork implements
 	}
 
 	@Override
-	public void modificationTime(Calendar newTime)
-	{
+	public void modificationTime(Calendar newTime) {
 	}
 
 	@Override
-	public Calendar accessTime()
-	{
+	public Calendar accessTime() {
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.File)
-				throw new IOException(String.format("FSViewEntry %s is not a file!", entry));
+				throw new IOException(String.format(
+						"FSViewEntry %s is not a file!", entry));
 			FSViewFileEntry fileEntry = ((FSViewFileEntry) entry);
 			return fileEntry.lastAccessed();
 		} catch (Throwable cause) {
@@ -132,20 +129,19 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork implements
 	}
 
 	@Override
-	public void accessTime(Calendar newTime)
-	{
+	public void accessTime(Calendar newTime) {
 	}
 
 	@Override
-	public boolean readable()
-	{
+	public boolean readable() {
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.File)
-				throw new IOException(String.format("FSViewEntry %s is not a file!", entry));
+				throw new IOException(String.format(
+						"FSViewEntry %s is not a file!", entry));
 			FSViewFileEntry fileEntry = ((FSViewFileEntry) entry);
 			return fileEntry.canRead();
 		} catch (Throwable cause) {
@@ -157,15 +153,15 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork implements
 	}
 
 	@Override
-	public boolean writable()
-	{
+	public boolean writable() {
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.File)
-				throw new IOException(String.format("FSViewEntry %s is not a file!", entry));
+				throw new IOException(String.format(
+						"FSViewEntry %s is not a file!", entry));
 			FSViewFileEntry fileEntry = ((FSViewFileEntry) entry);
 			return fileEntry.canWrite();
 		} catch (Throwable cause) {
@@ -178,61 +174,36 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork implements
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void read(long offset, ByteBuffer dest) throws IOException
-	{
+	public void read(long offset, ByteBuffer dest) throws IOException {
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.File)
-				throw new IOException(String.format("FSViewEntry %s is not a file!", entry));
+				throw new IOException(String.format(
+						"FSViewEntry %s is not a file!", entry));
 			FSViewFileEntry fileEntry = ((FSViewFileEntry) entry);
 
 			switch (fileEntry.fileType()) {
-				case RandomAccessFile:
-					((FSViewRandomAccessFileEntry) fileEntry).read(offset, dest);
-					break;
+			case RandomAccessFile:
+				((FSViewRandomAccessFileEntry) fileEntry).read(offset, dest);
+				break;
 
-				case StreamableAccessFile: {
-					InputStream in = null;
-					try {
-						in = ((FSViewStreamableAccessFileEntry) fileEntry).openInputStream();
-						in.skip(offset);
-						byte[] data = new byte[dest.remaining()];
-						int read = in.read(data);
-						if (read > 0)
-							dest.put(data, 0, read);
-					} finally {
-						StreamUtils.close(in);
-					}
+			case StreamableAccessFile: {
+				InputStream in = null;
+				try {
+					in = ((FSViewStreamableAccessFileEntry) fileEntry)
+							.openInputStream();
+					in.skip(offset);
+					byte[] data = new byte[dest.remaining()];
+					int read = in.read(data);
+					if (read > 0)
+						dest.put(data, 0, read);
+				} finally {
+					StreamUtils.close(in);
 				}
 			}
-		} finally {
-			StreamUtils.close(session);
-		}
-	}
-
-	@Override
-	@RWXMapping(RWXCategory.WRITE)
-	public void write(long offset, ByteBuffer source) throws IOException
-	{
-		FSViewSession session = null;
-
-		try {
-			session = session();
-			FSViewEntry entry = session.lookup(getForkPath());
-			if (entry.entryType() != FSViewEntryType.File)
-				throw new IOException(String.format("FSViewEntry %s is not a file!", entry));
-			FSViewFileEntry fileEntry = ((FSViewFileEntry) entry);
-
-			switch (fileEntry.fileType()) {
-				case RandomAccessFile:
-					((FSViewRandomAccessFileEntry) fileEntry).write(offset, source);
-					break;
-
-				case StreamableAccessFile:
-					throw new IOException("Cannot write to a FSView of this type.");
 			}
 		} finally {
 			StreamUtils.close(session);
@@ -241,37 +212,65 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork implements
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void truncAppend(long offset, ByteBuffer source) throws IOException
-	{
+	public void write(long offset, ByteBuffer source) throws IOException {
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.File)
-				throw new IOException(String.format("FSViewEntry %s is not a file!", entry));
+				throw new IOException(String.format(
+						"FSViewEntry %s is not a file!", entry));
 			FSViewFileEntry fileEntry = ((FSViewFileEntry) entry);
 
 			switch (fileEntry.fileType()) {
-				case RandomAccessFile:
-					((FSViewRandomAccessFileEntry) fileEntry).truncate(offset);
-					((FSViewRandomAccessFileEntry) fileEntry).append(source);
-					break;
+			case RandomAccessFile:
+				((FSViewRandomAccessFileEntry) fileEntry).write(offset, source);
+				break;
 
-				case StreamableAccessFile:
-					if (offset == 0L) {
-						OutputStream out = null;
+			case StreamableAccessFile:
+				throw new IOException("Cannot write to a FSView of this type.");
+			}
+		} finally {
+			StreamUtils.close(session);
+		}
+	}
 
-						try {
-							out = ((FSViewStreamableAccessFileEntry) fileEntry).openOutputStream();
-							byte[] data = new byte[source.remaining()];
-							source.get(data);
-							out.write(data);
-						} finally {
-							StreamUtils.close(out);
-						}
-					} else
-						throw new IOException("Cannot write to a FSView of this type.");
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public void truncAppend(long offset, ByteBuffer source) throws IOException {
+		FSViewSession session = null;
+
+		try {
+			session = session();
+			FSViewEntry entry = session.lookup(getForkPath());
+			if (entry.entryType() != FSViewEntryType.File)
+				throw new IOException(String.format(
+						"FSViewEntry %s is not a file!", entry));
+			FSViewFileEntry fileEntry = ((FSViewFileEntry) entry);
+
+			switch (fileEntry.fileType()) {
+			case RandomAccessFile:
+				((FSViewRandomAccessFileEntry) fileEntry).truncate(offset);
+				((FSViewRandomAccessFileEntry) fileEntry).append(source);
+				break;
+
+			case StreamableAccessFile:
+				if (offset == 0L) {
+					OutputStream out = null;
+
+					try {
+						out = ((FSViewStreamableAccessFileEntry) fileEntry)
+								.openOutputStream();
+						byte[] data = new byte[source.remaining()];
+						source.get(data);
+						out.write(data);
+					} finally {
+						StreamUtils.close(out);
+					}
+				} else
+					throw new IOException(
+							"Cannot write to a FSView of this type.");
 			}
 		} finally {
 			StreamUtils.close(session);

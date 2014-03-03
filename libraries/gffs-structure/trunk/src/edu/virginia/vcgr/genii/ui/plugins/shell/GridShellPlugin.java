@@ -17,11 +17,10 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 import edu.virginia.vcgr.genii.ui.shell.CommandPanel;
 
-public class GridShellPlugin extends AbstractUITopMenuPlugin
-{
+public class GridShellPlugin extends AbstractUITopMenuPlugin {
 	@Override
-	public void performTopMenuAction(UIPluginContext context) throws UIPluginException
-	{
+	public void performTopMenuAction(UIPluginContext context)
+			throws UIPluginException {
 		UIContext newContext = (UIContext) context.uiContext().clone();
 
 		JFrame frame = new JFrame("Grid Shell");
@@ -31,8 +30,9 @@ public class GridShellPlugin extends AbstractUITopMenuPlugin
 		Container container = frame.getContentPane();
 		container.setLayout(new GridBagLayout());
 
-		container.add(cPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		container.add(cPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						5, 5, 5, 5), 5, 5));
 
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.pack();
@@ -42,8 +42,8 @@ public class GridShellPlugin extends AbstractUITopMenuPlugin
 	}
 
 	@Override
-	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
-	{
+	public boolean isEnabled(
+			Collection<EndpointDescription> selectedDescriptions) {
 		return true;
 	}
 }

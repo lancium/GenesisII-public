@@ -9,12 +9,10 @@ import java.util.Vector;
 
 import org.morgan.util.Pair;
 
-public class TimeValueSet<Type> implements Iterable<Pair<Calendar, Type>>
-{
+public class TimeValueSet<Type> implements Iterable<Pair<Calendar, Type>> {
 	protected Deque<Pair<Calendar, Type>> _values = new LinkedList<Pair<Calendar, Type>>();
 
-	public Pair<Calendar, Type> addValue(Type value)
-	{
+	public Pair<Calendar, Type> addValue(Type value) {
 		Calendar now;
 
 		synchronized (_values) {
@@ -26,8 +24,7 @@ public class TimeValueSet<Type> implements Iterable<Pair<Calendar, Type>>
 	}
 
 	@Override
-	public Iterator<Pair<Calendar, Type>> iterator()
-	{
+	public Iterator<Pair<Calendar, Type>> iterator() {
 		Collection<Pair<Calendar, Type>> values;
 
 		synchronized (_values) {

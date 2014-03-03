@@ -10,17 +10,14 @@ import org.ggf.jsdl.Range_Type;
 
 import edu.virginia.vcgr.genii.client.jsdl.range.RangeDescription;
 
-abstract class CompositeRangeExpression implements RangeExpression
-{
+abstract class CompositeRangeExpression implements RangeExpression {
 	protected Collection<RangeExpression> _expressions = new LinkedList<RangeExpression>();
 
-	public void addExpression(RangeExpression expr)
-	{
+	public void addExpression(RangeExpression expr) {
 		_expressions.add(expr);
 	}
 
-	public RangeDescription describe()
-	{
+	public RangeDescription describe() {
 		RangeDescription description = new RangeDescription();
 
 		for (RangeExpression expr : _expressions) {
@@ -31,10 +28,8 @@ abstract class CompositeRangeExpression implements RangeExpression
 	}
 }
 
-class CompositeAndRangeExpression extends CompositeRangeExpression
-{
-	public boolean matches(double testValue)
-	{
+class CompositeAndRangeExpression extends CompositeRangeExpression {
+	public boolean matches(double testValue) {
 		for (RangeExpression expr : _expressions) {
 			if (!expr.matches(testValue))
 				return false;
@@ -45,10 +40,8 @@ class CompositeAndRangeExpression extends CompositeRangeExpression
 
 }
 
-class CompositeOrRangeExpression extends CompositeRangeExpression
-{
-	public boolean matches(double testValue)
-	{
+class CompositeOrRangeExpression extends CompositeRangeExpression {
+	public boolean matches(double testValue) {
 		for (RangeExpression expr : _expressions) {
 			if (expr.matches(testValue))
 				return true;
@@ -59,38 +52,32 @@ class CompositeOrRangeExpression extends CompositeRangeExpression
 
 }
 
-class ExactValueRangeExpression implements RangeExpression
-{
+class ExactValueRangeExpression implements RangeExpression {
 	private double _value;
 	private Double _epsilon;
 
-	public ExactValueRangeExpression(Exact_Type exact)
-	{
+	public ExactValueRangeExpression(Exact_Type exact) {
 		_value = exact.get_value();
 		_epsilon = exact.getEpsilon();
 	}
 
-	public boolean matches(double testValue)
-	{
+	public boolean matches(double testValue) {
 		if (_epsilon != null)
 			return Math.abs(testValue - _value) <= _epsilon;
 
 		return testValue == _value;
 	}
 
-	public RangeDescription describe()
-	{
+	public RangeDescription describe() {
 		return new RangeDescription((_value - _epsilon), (_value + _epsilon));
 	}
 }
 
-abstract class BoundRangeExpression implements RangeExpression
-{
+abstract class BoundRangeExpression implements RangeExpression {
 	protected double _bound;
 	protected boolean _exclusive;
 
-	public BoundRangeExpression(Boundary_Type boundary)
-	{
+	public BoundRangeExpression(Boundary_Type boundary) {
 		_bound = boundary.get_value();
 		Boolean exclusive = boundary.getExclusiveBound();
 		_exclusive = (exclusive == null) ? false : true;
@@ -98,61 +85,49 @@ abstract class BoundRangeExpression implements RangeExpression
 
 }
 
-class LowerBoundRangeExpression extends BoundRangeExpression
-{
-	public LowerBoundRangeExpression(Boundary_Type boundary)
-	{
+class LowerBoundRangeExpression extends BoundRangeExpression {
+	public LowerBoundRangeExpression(Boundary_Type boundary) {
 		super(boundary);
 	}
 
-	public boolean matches(double testValue)
-	{
+	public boolean matches(double testValue) {
 		if (_exclusive)
 			return testValue > _bound;
 
 		return testValue >= _bound;
 	}
 
-	public RangeDescription describe()
-	{
+	public RangeDescription describe() {
 		return new RangeDescription(_bound, Double.NaN);
 	}
 }
 
-class UpperBoundRangeExpression extends BoundRangeExpression
-{
-	public UpperBoundRangeExpression(Boundary_Type boundary)
-	{
+class UpperBoundRangeExpression extends BoundRangeExpression {
+	public UpperBoundRangeExpression(Boundary_Type boundary) {
 		super(boundary);
 	}
 
-	public boolean matches(double testValue)
-	{
+	public boolean matches(double testValue) {
 		if (_exclusive)
 			return testValue < _bound;
 
 		return testValue <= _bound;
 	}
 
-	public RangeDescription describe()
-	{
+	public RangeDescription describe() {
 		return new RangeDescription(Double.NaN, _bound);
 	}
 }
 
-class FullyBoundedRangeExpression extends CompositeAndRangeExpression
-{
-	public FullyBoundedRangeExpression(Range_Type range)
-	{
+class FullyBoundedRangeExpression extends CompositeAndRangeExpression {
+	public FullyBoundedRangeExpression(Range_Type range) {
 		addExpression(new LowerBoundRangeExpression(range.getLowerBound()));
 		addExpression(new UpperBoundRangeExpression(range.getUpperBound()));
 	}
 }
 
-public class RangeFactory
-{
-	static public RangeExpression parse(RangeValue_Type rvt)
-	{
+public class RangeFactory {
+	static public RangeExpression parse(RangeValue_Type rvt) {
 		if (rvt == null)
 			return null;
 

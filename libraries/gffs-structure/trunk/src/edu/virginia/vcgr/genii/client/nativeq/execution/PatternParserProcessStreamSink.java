@@ -6,18 +6,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class PatternParserProcessStreamSink implements ProcessStreamSink
-{
+class PatternParserProcessStreamSink implements ProcessStreamSink {
 	private Map<Pattern, List<Matcher>> _patternMap;
 
-	PatternParserProcessStreamSink(Map<Pattern, List<Matcher>> patternMap)
-	{
+	PatternParserProcessStreamSink(Map<Pattern, List<Matcher>> patternMap) {
 		_patternMap = patternMap;
 	}
 
 	@Override
-	final public void addOutputLine(String outputLine) throws IOException
-	{
+	final public void addOutputLine(String outputLine) throws IOException {
 		for (Pattern pattern : _patternMap.keySet()) {
 			Matcher matcher = pattern.matcher(outputLine);
 			if (matcher.matches())

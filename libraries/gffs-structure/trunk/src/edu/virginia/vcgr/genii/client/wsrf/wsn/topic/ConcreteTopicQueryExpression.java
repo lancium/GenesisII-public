@@ -4,15 +4,13 @@ import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects;
 
-public class ConcreteTopicQueryExpression extends AbstractTopicQueryExpression
-{
+public class ConcreteTopicQueryExpression extends AbstractTopicQueryExpression {
 	static final long serialVersionUID = 0L;
 
 	private TopicPath _path;
 
 	@Override
-	protected String toString(NamespaceFactory prefixFactory)
-	{
+	protected String toString(NamespaceFactory prefixFactory) {
 		String lastNamespaceURI = null;
 		String lastPrefix = null;
 		StringBuilder builder = new StringBuilder();
@@ -20,7 +18,8 @@ public class ConcreteTopicQueryExpression extends AbstractTopicQueryExpression
 		for (QName e : _path.pathComponents()) {
 			if (builder.length() != 0)
 				builder.append('/');
-			if (lastNamespaceURI == null || !lastNamespaceURI.equals(e.getNamespaceURI())) {
+			if (lastNamespaceURI == null
+					|| !lastNamespaceURI.equals(e.getNamespaceURI())) {
 				lastPrefix = prefixFactory.getPrefix(e.getNamespaceURI());
 				builder.append(lastPrefix + ":");
 			}
@@ -31,22 +30,19 @@ public class ConcreteTopicQueryExpression extends AbstractTopicQueryExpression
 		return builder.toString();
 	}
 
-	public ConcreteTopicQueryExpression(TopicPath path)
-	{
+	public ConcreteTopicQueryExpression(TopicPath path) {
 		super(TopicQueryDialects.Concrete);
 
 		_path = path;
 	}
 
 	@Override
-	final public boolean matches(TopicPath topic)
-	{
+	final public boolean matches(TopicPath topic) {
 		return _path.contains(topic);
 	}
 
 	@Override
-	final public TopicPath toTopicPath()
-	{
+	final public TopicPath toTopicPath() {
 		return _path;
 	}
 }

@@ -21,14 +21,13 @@ import java.security.KeyStoreException;
 import java.security.KeyStore;
 
 /**
- * This class defines the Service Provider Interface (SPI) for the WinX509KM KeyManagerFactory
- * class.
+ * This class defines the Service Provider Interface (SPI) for the WinX509KM
+ * KeyManagerFactory class.
  * 
  * @author Duane Merrill
  * 
  */
-public final class WinX509KeyManagerFactorySpi extends KeyManagerFactorySpi
-{
+public final class WinX509KeyManagerFactorySpi extends KeyManagerFactorySpi {
 
 	/** Wrapped X509KeyManager */
 	private X509KeyManager _keyManager;
@@ -36,8 +35,8 @@ public final class WinX509KeyManagerFactorySpi extends KeyManagerFactorySpi
 	/**
 	 * Initializes this factory with a source of key material
 	 */
-	protected synchronized void engineInit(KeyStore ks, char[] passphrase) throws KeyStoreException
-	{
+	protected synchronized void engineInit(KeyStore ks, char[] passphrase)
+			throws KeyStoreException {
 		if (_keyManager == null) {
 			_keyManager = new WinX509KeyManager();
 		}
@@ -46,8 +45,7 @@ public final class WinX509KeyManagerFactorySpi extends KeyManagerFactorySpi
 	/**
 	 * Initializes this factory with a source of key material.
 	 */
-	protected synchronized void engineInit(ManagerFactoryParameters spec)
-	{
+	protected synchronized void engineInit(ManagerFactoryParameters spec) {
 		if (_keyManager == null) {
 			_keyManager = new WinX509KeyManager();
 		}
@@ -56,8 +54,7 @@ public final class WinX509KeyManagerFactorySpi extends KeyManagerFactorySpi
 	/**
 	 * Returns one key manager for each type of key material.
 	 */
-	protected KeyManager[] engineGetKeyManagers()
-	{
+	protected KeyManager[] engineGetKeyManagers() {
 		return new KeyManager[] { _keyManager };
 	}
 }

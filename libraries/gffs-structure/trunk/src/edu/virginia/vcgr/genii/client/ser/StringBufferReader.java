@@ -14,8 +14,7 @@ import java.io.Reader;
 /**
  * StringBufferReader based on StringReader (Sun's code) code in Java.
  */
-public class StringBufferReader extends Reader
-{
+public class StringBufferReader extends Reader {
 
 	private StringBuffer str;
 	private int length;
@@ -28,15 +27,13 @@ public class StringBufferReader extends Reader
 	 * @param s
 	 *            StringBuffer providing the character stream.
 	 */
-	public StringBufferReader(StringBuffer s)
-	{
+	public StringBufferReader(StringBuffer s) {
 		this.str = s;
 		this.length = s.length();
 	}
 
 	/** Check to make sure that the stream has not been closed */
-	private void ensureOpen() throws IOException
-	{
+	private void ensureOpen() throws IOException {
 		if (str == null) {
 			throw new IOException("Stream closed");
 		}
@@ -45,13 +42,13 @@ public class StringBufferReader extends Reader
 	/**
 	 * Read a single character.
 	 * 
-	 * @return The character read, or -1 if the end of the stream has been reached
+	 * @return The character read, or -1 if the end of the stream has been
+	 *         reached
 	 * 
 	 * @exception IOException
 	 *                If an I/O error occurs
 	 */
-	public int read() throws IOException
-	{
+	public int read() throws IOException {
 		synchronized (lock) {
 			ensureOpen();
 			if (next >= length) {
@@ -71,16 +68,17 @@ public class StringBufferReader extends Reader
 	 * @param len
 	 *            Maximum number of characters to read
 	 * 
-	 * @return The number of characters read, or -1 if the end of the stream has been reached
+	 * @return The number of characters read, or -1 if the end of the stream has
+	 *         been reached
 	 * 
 	 * @exception IOException
 	 *                If an I/O error occurs
 	 */
-	public int read(char cbuf[], int off, int len) throws IOException
-	{
+	public int read(char cbuf[], int off, int len) throws IOException {
 		synchronized (lock) {
 			ensureOpen();
-			if ((off < 0) || (off > cbuf.length) || (len < 0) || ((off + len) > cbuf.length) || ((off + len) < 0)) {
+			if ((off < 0) || (off > cbuf.length) || (len < 0)
+					|| ((off + len) > cbuf.length) || ((off + len) < 0)) {
 				throw new IndexOutOfBoundsException();
 			} else if (len == 0) {
 				return 0;
@@ -101,8 +99,7 @@ public class StringBufferReader extends Reader
 	 * @exception IOException
 	 *                If an I/O error occurs
 	 */
-	public long skip(long ns) throws IOException
-	{
+	public long skip(long ns) throws IOException {
 		synchronized (lock) {
 			ensureOpen();
 			if (next >= length) {
@@ -122,8 +119,7 @@ public class StringBufferReader extends Reader
 	 * @exception IOException
 	 *                If the stream is closed
 	 */
-	public boolean ready() throws IOException
-	{
+	public boolean ready() throws IOException {
 		synchronized (lock) {
 			ensureOpen();
 			return true;
@@ -133,27 +129,26 @@ public class StringBufferReader extends Reader
 	/**
 	 * Tell whether this stream supports the mark() operation, which it does.
 	 */
-	public boolean markSupported()
-	{
+	public boolean markSupported() {
 		return true;
 	}
 
 	/**
-	 * Mark the present position in the stream. Subsequent calls to reset() will reposition the
-	 * stream to this point.
+	 * Mark the present position in the stream. Subsequent calls to reset() will
+	 * reposition the stream to this point.
 	 * 
 	 * @param readAheadLimit
-	 *            Limit on the number of characters that may be read while still preserving the
-	 *            mark. Because the stream's input comes from a string, there is no actual limit, so
-	 *            this argument must not be negative, but is otherwise ignored.
+	 *            Limit on the number of characters that may be read while still
+	 *            preserving the mark. Because the stream's input comes from a
+	 *            string, there is no actual limit, so this argument must not be
+	 *            negative, but is otherwise ignored.
 	 * 
 	 * @exception IllegalArgumentException
 	 *                If readAheadLimit is < 0
 	 * @exception IOException
 	 *                If an I/O error occurs
 	 */
-	public void mark(int readAheadLimit) throws IOException
-	{
+	public void mark(int readAheadLimit) throws IOException {
 		if (readAheadLimit < 0) {
 			throw new IllegalArgumentException("Read-ahead limit < 0");
 		}
@@ -164,14 +159,13 @@ public class StringBufferReader extends Reader
 	}
 
 	/**
-	 * Reset the stream to the most recent mark, or to the beginning of the string if it has never
-	 * been marked.
+	 * Reset the stream to the most recent mark, or to the beginning of the
+	 * string if it has never been marked.
 	 * 
 	 * @exception IOException
 	 *                If an I/O error occurs
 	 */
-	public void reset() throws IOException
-	{
+	public void reset() throws IOException {
 		synchronized (lock) {
 			ensureOpen();
 			next = mark;
@@ -181,8 +175,7 @@ public class StringBufferReader extends Reader
 	/**
 	 * Close the stream.
 	 */
-	public void close()
-	{
+	public void close() {
 		str = null;
 	}
 

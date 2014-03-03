@@ -16,44 +16,45 @@ import edu.virginia.vcgr.genii.cloud.ec2.EC2Manager;
 import edu.virginia.vcgr.genii.cloud.ec2.EC2TypicaController;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
-public class CloudMonitor
-{
+public class CloudMonitor {
 
 	static private ServerDatabaseConnectionPool _connectionPool;
 	static private HashMap<String, CloudManager> _cloudManagers = new HashMap<String, CloudManager>();
 	static private HashMap<String, String> _activities = new HashMap<String, String>();
 
-	public static CloudManager getManager(String besid)
-	{
+	public static CloudManager getManager(String besid) {
 		return _cloudManagers.get(besid);
 	}
 
-	public static String getResourceID(String activityID)
-	{
+	public static String getResourceID(String activityID) {
 		return _activities.get(activityID);
 	}
 
-	public static void setConnectionPool(ServerDatabaseConnectionPool connectionPool) throws SQLException, IOException
-	{
+	public static void setConnectionPool(
+			ServerDatabaseConnectionPool connectionPool) throws SQLException,
+			IOException {
 
 		if (connectionPool == null)
-			throw new IllegalArgumentException("connectionPool argument cannot be null.");
+			throw new IllegalArgumentException(
+					"connectionPool argument cannot be null.");
 
 		if (_connectionPool != null)
-			throw new IllegalStateException("Cloud connection pool already loaded.");
+			throw new IllegalStateException(
+					"Cloud connection pool already loaded.");
 
 		_connectionPool = connectionPool;
 
 	}
 
-	synchronized static public void loadCloudInstance(String besid, CloudConfiguration config) throws Exception
-	{
+	synchronized static public void loadCloudInstance(String besid,
+			CloudConfiguration config) throws Exception {
 
 		EC2Manager tManager = new EC2Manager(config, 30, besid);
 
-		EC2TypicaController tController =
-			new EC2TypicaController(config.getPublicKey(), config.getSecretKey(), config.getEndPoint(), config.getPort(),
-				!config.isEucalyptus(), config.isEucalyptus(), config.getKeyPair());
+		EC2TypicaController tController = new EC2TypicaController(
+				config.getPublicKey(), config.getSecretKey(),
+				config.getEndPoint(), config.getPort(), !config.isEucalyptus(),
+				config.isEucalyptus(), config.getKeyPair());
 
 		tController.set_imageID(config.getImageID());
 		tManager.setController(tController);
@@ -63,8 +64,8 @@ public class CloudMonitor
 
 	}
 
-	synchronized static private void loadCloudResources(String besid, EC2Manager manager) throws Exception
-	{
+	synchronized static private void loadCloudResources(String besid,
+			EC2Manager manager) throws Exception {
 
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -74,9 +75,9 @@ public class CloudMonitor
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt =
-				connection.prepareStatement("SELECT resourceid, host, load, port, setup "
-					+ "FROM cloudResources WHERE besid = ?");
+			stmt = connection
+					.prepareStatement("SELECT resourceid, host, load, port, setup "
+							+ "FROM cloudResources WHERE besid = ?");
 			stmt.setString(1, besid);
 			rs = stmt.executeQuery();
 
@@ -100,8 +101,8 @@ public class CloudMonitor
 		manager.addVMS(tList);
 	}
 
-	synchronized static public void loadCloudActivities() throws SQLException, IOException
-	{
+	synchronized static public void loadCloudActivities() throws SQLException,
+			IOException {
 
 		Connection connection = null;
 		Statement stmt = null;
@@ -110,7 +111,8 @@ public class CloudMonitor
 		try {
 			connection = _connectionPool.acquire(false);
 			stmt = connection.createStatement();
-			rs = stmt.executeQuery("SELECT activityid, resourceid FROM cloudActivities");
+			rs = stmt
+					.executeQuery("SELECT activityid, resourceid FROM cloudActivities");
 			while (rs.next()) {
 				String activityid = rs.getString(1);
 				String resourceid = rs.getString(2);
@@ -126,8 +128,9 @@ public class CloudMonitor
 		}
 	}
 
-	synchronized static public void createResource(String besid, String resourceID, String host, int port, int load, int setup)
-		throws SQLException
+	synchronized static public void createResource(String besid,
+			String resourceID, String host, int port, int load, int setup)
+			throws SQLException
 
 	{
 		Connection connection = null;
@@ -135,8 +138,8 @@ public class CloudMonitor
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt =
-				connection.prepareStatement("INSERT INTO cloudResources " + "(resourceid, host, port, load, besid, setup) "
+			stmt = connection.prepareStatement("INSERT INTO cloudResources "
+					+ "(resourceid, host, port, load, besid, setup) "
 					+ "VALUES (?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, resourceID);
 			stmt.setString(2, host);
@@ -146,7 +149,8 @@ public class CloudMonitor
 			stmt.setInt(6, setup);
 
 			if (stmt.executeUpdate() != 1)
-				throw new SQLException("Unable to update database table for cloud resource creation.");
+				throw new SQLException(
+						"Unable to update database table for cloud resource creation.");
 			connection.commit();
 
 		} finally {
@@ -155,15 +159,15 @@ public class CloudMonitor
 		}
 	}
 
-	synchronized static public void updateResource(String besid, String resourceID, int load, int setup) throws SQLException
-	{
+	synchronized static public void updateResource(String besid,
+			String resourceID, int load, int setup) throws SQLException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt =
-				connection.prepareStatement("UPDATE cloudResources SET " + "load = ?, setup = ? "
+			stmt = connection.prepareStatement("UPDATE cloudResources SET "
+					+ "load = ?, setup = ? "
 					+ "WHERE besid = ? AND resourceID = ?");
 			stmt.setInt(1, load);
 			stmt.setInt(2, setup);
@@ -171,7 +175,8 @@ public class CloudMonitor
 			stmt.setString(4, resourceID);
 
 			if (stmt.executeUpdate() != 1)
-				throw new SQLException("Unable to update database table for cloud resource update.");
+				throw new SQLException(
+						"Unable to update database table for cloud resource update.");
 			connection.commit();
 
 		} finally {
@@ -180,19 +185,21 @@ public class CloudMonitor
 		}
 	}
 
-	synchronized static public void deleteResource(String resourceID, String besid) throws SQLException
-	{
+	synchronized static public void deleteResource(String resourceID,
+			String besid) throws SQLException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt = connection.prepareStatement("DELETE FROM cloudResources WHERE besid = ? AND resourceid = ?");
+			stmt = connection
+					.prepareStatement("DELETE FROM cloudResources WHERE besid = ? AND resourceid = ?");
 			stmt.setString(1, besid);
 			stmt.setString(2, resourceID);
 
 			if (stmt.executeUpdate() != 1)
-				throw new SQLException("Unable to update database table for cloudResource deletion.");
+				throw new SQLException(
+						"Unable to update database table for cloudResource deletion.");
 			connection.commit();
 
 		} finally {
@@ -201,19 +208,21 @@ public class CloudMonitor
 		}
 	}
 
-	synchronized static public void addActivity(String activityID, String resourceID) throws SQLException
-	{
+	synchronized static public void addActivity(String activityID,
+			String resourceID) throws SQLException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt = connection.prepareStatement("INSERT INTO cloudActivities" + " (activityid, resourceid) VALUES (?, ?)");
+			stmt = connection.prepareStatement("INSERT INTO cloudActivities"
+					+ " (activityid, resourceid) VALUES (?, ?)");
 			stmt.setString(1, activityID);
 			stmt.setString(2, resourceID);
 
 			if (stmt.executeUpdate() != 1)
-				throw new SQLException("Unable to update database table for cloud activity creation.");
+				throw new SQLException(
+						"Unable to update database table for cloud activity creation.");
 			connection.commit();
 
 			_activities.put(activityID, resourceID);
@@ -223,18 +232,20 @@ public class CloudMonitor
 		}
 	}
 
-	synchronized static public void removeActivity(String activityID) throws SQLException
-	{
+	synchronized static public void removeActivity(String activityID)
+			throws SQLException {
 		Connection connection = null;
 		PreparedStatement stmt = null;
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt = connection.prepareStatement("DELETE FROM cloudActivities WHERE activityid = ?");
+			stmt = connection
+					.prepareStatement("DELETE FROM cloudActivities WHERE activityid = ?");
 			stmt.setString(1, activityID);
 
 			if (stmt.executeUpdate() != 1)
-				throw new SQLException("Unable to update database table for cloudResource deletion.");
+				throw new SQLException(
+						"Unable to update database table for cloudResource deletion.");
 			connection.commit();
 			_activities.remove(activityID);
 
@@ -246,8 +257,8 @@ public class CloudMonitor
 
 	// Determines if cloud activity, if it is free it
 	// Does not fail or block if not cloud Activity
-	synchronized static public void freeActivity(String activityID, String besid) throws SQLException
-	{
+	synchronized static public void freeActivity(String activityID, String besid)
+			throws SQLException {
 		if (_activities.containsKey(activityID)) {
 			CloudManager tManage = getManager(besid);
 
@@ -259,8 +270,8 @@ public class CloudMonitor
 		}
 	}
 
-	synchronized static public void deleteCloudBES(String besid) throws Exception
-	{
+	synchronized static public void deleteCloudBES(String besid)
+			throws Exception {
 		// Kill all vms (Activities already killed by BES)
 		CloudManager tManage = getManager(besid);
 
@@ -272,8 +283,7 @@ public class CloudMonitor
 
 	}
 
-	static public boolean isCloudBES(String besid)
-	{
+	static public boolean isCloudBES(String besid) {
 
 		CloudManager tManage = getManager(besid);
 

@@ -14,29 +14,31 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.rfork.iterator.InMemoryIterableFork;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 
-public abstract class AbstractRNSByteIOResourceFork extends AbstractResourceFork implements RNSResourceFork,
-	StreamableByteIOFactoryResourceFork
-{
-	protected AbstractRNSByteIOResourceFork(ResourceForkService service, String forkPath)
-	{
+public abstract class AbstractRNSByteIOResourceFork extends
+		AbstractResourceFork implements RNSResourceFork,
+		StreamableByteIOFactoryResourceFork {
+	protected AbstractRNSByteIOResourceFork(ResourceForkService service,
+			String forkPath) {
 		super(service, forkPath);
 	}
 
-	protected InternalEntry createInternalEntry(EndpointReferenceType exemplarEPR, String entryName,
-		ResourceForkInformation rif, boolean isExistent) throws ResourceUnknownFaultType, ResourceException
-	{
-		return new InternalEntry(entryName, getService().createForkEPR(formForkPath(entryName), rif), null, isExistent);
+	protected InternalEntry createInternalEntry(
+			EndpointReferenceType exemplarEPR, String entryName,
+			ResourceForkInformation rif, boolean isExistent)
+			throws ResourceUnknownFaultType, ResourceException {
+		return new InternalEntry(entryName, getService().createForkEPR(
+				formForkPath(entryName), rif), null, isExistent);
 	}
 
-	protected InternalEntry
-		createInternalEntry(EndpointReferenceType exemplarEPR, String entryName, ResourceForkInformation rif)
-			throws ResourceUnknownFaultType, ResourceException
-	{
-		return new InternalEntry(entryName, getService().createForkEPR(formForkPath(entryName), rif), null);
+	protected InternalEntry createInternalEntry(
+			EndpointReferenceType exemplarEPR, String entryName,
+			ResourceForkInformation rif) throws ResourceUnknownFaultType,
+			ResourceException {
+		return new InternalEntry(entryName, getService().createForkEPR(
+				formForkPath(entryName), rif), null);
 	}
 
-	protected String formForkPath(String entryName)
-	{
+	protected String formForkPath(String entryName) {
 		String path = getForkPath();
 		if (path.endsWith("/"))
 			return path + entryName;
@@ -44,47 +46,39 @@ public abstract class AbstractRNSByteIOResourceFork extends AbstractResourceFork
 	}
 
 	@Override
-	public boolean isInMemoryIterable() throws IOException
-	{
+	public boolean isInMemoryIterable() throws IOException {
 		return false;
 	}
 
 	@Override
-	public InMemoryIterableFork getInMemoryIterableFork() throws IOException
-	{
+	public InMemoryIterableFork getInMemoryIterableFork() throws IOException {
 		return null;
 	}
 
-	static private class SimpleCountingStream extends OutputStream
-	{
+	static private class SimpleCountingStream extends OutputStream {
 		private long _count = 0;
 
-		public long getCount()
-		{
+		public long getCount() {
 			return _count;
 		}
 
 		@Override
-		public void write(byte[] b)
-		{
+		public void write(byte[] b) {
 			_count += b.length;
 		}
 
 		@Override
-		public void write(byte[] b, int off, int len)
-		{
+		public void write(byte[] b, int off, int len) {
 			_count += len;
 		}
 
 		@Override
-		public void write(int b) throws IOException
-		{
+		public void write(int b) throws IOException {
 			_count++;
 		}
 	}
 
-	static private AdvertisedSize discoverAdvertisedSize(Class<?> cl)
-	{
+	static private AdvertisedSize discoverAdvertisedSize(Class<?> cl) {
 		if (cl == null || cl.equals(Object.class))
 			return null;
 
@@ -106,8 +100,7 @@ public abstract class AbstractRNSByteIOResourceFork extends AbstractResourceFork
 
 	static private Map<Class<?>, AdvertisedSize> _sizeMap = new HashMap<Class<?>, AdvertisedSize>();
 
-	static private AdvertisedSize getAdvertisedSize(Class<?> cl)
-	{
+	static private AdvertisedSize getAdvertisedSize(Class<?> cl) {
 		AdvertisedSize aSize = null;
 
 		synchronized (_sizeMap) {
@@ -122,50 +115,42 @@ public abstract class AbstractRNSByteIOResourceFork extends AbstractResourceFork
 	}
 
 	@Override
-	public Calendar accessTime()
-	{
+	public Calendar accessTime() {
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public void accessTime(Calendar newTime)
-	{
+	public void accessTime(Calendar newTime) {
 		// do nothing
 	}
 
 	@Override
-	public Calendar createTime()
-	{
+	public Calendar createTime() {
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public Calendar modificationTime()
-	{
+	public Calendar modificationTime() {
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public void modificationTime(Calendar newTime)
-	{
+	public void modificationTime(Calendar newTime) {
 		// do nothing
 	}
 
 	@Override
-	public boolean readable()
-	{
+	public boolean readable() {
 		return true;
 	}
 
 	@Override
-	public boolean writable()
-	{
+	public boolean writable() {
 		return true;
 	}
 
 	@Override
-	public long size()
-	{
+	public long size() {
 		AdvertisedSize aSize = getAdvertisedSize(getClass());
 
 		if (aSize != null && aSize.value() >= 0L)

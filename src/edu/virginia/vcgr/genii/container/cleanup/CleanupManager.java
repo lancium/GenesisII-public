@@ -15,17 +15,16 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 
-public class CleanupManager
-{
+public class CleanupManager {
 	static private Log _logger = LogFactory.getLog(CleanupManager.class);
 
 	static final private String CLEANUP_PROPERTIES_FILENAME = "cleanup.properties";
 	static final private String PROPERTY_SUFFIX = "enact-cleanup";
 
-	static private Properties loadProperties()
-	{
-		File cleanupProperties =
-			Installation.getDeployment(new DeploymentName()).getConfigurationFile(CLEANUP_PROPERTIES_FILENAME);
+	static private Properties loadProperties() {
+		File cleanupProperties = Installation.getDeployment(
+				new DeploymentName()).getConfigurationFile(
+				CLEANUP_PROPERTIES_FILENAME);
 
 		FileInputStream fin = null;
 		try {
@@ -34,20 +33,19 @@ public class CleanupManager
 			ret.load(fin);
 			return ret;
 		} catch (Throwable cause) {
-			_logger.warn("Unable to read the cleanup properties.  " + "We're not going to enact anything.", cause);
+			_logger.warn("Unable to read the cleanup properties.  "
+					+ "We're not going to enact anything.", cause);
 			return new Properties();
 		} finally {
 			StreamUtils.close(fin);
 		}
 	}
 
-	static private boolean enactCleanup(String value)
-	{
+	static private boolean enactCleanup(String value) {
 		return (value != null) && (value.equals("true"));
 	}
 
-	static private boolean firstTimeStartup(Connection connection)
-	{
+	static private boolean firstTimeStartup(Connection connection) {
 		ResultSet rs = null;
 		Statement stmt = null;
 
@@ -67,12 +65,12 @@ public class CleanupManager
 		}
 	}
 
-	static public void doCleanups(Connection connection)
-	{
+	static public void doCleanups(Connection connection) {
 		boolean enactCleanup = false;
 		Properties properties = loadProperties();
 
-		String value = properties.getProperty(String.format("%s.%s", CleanupManager.class.getName(), PROPERTY_SUFFIX));
+		String value = properties.getProperty(String.format("%s.%s",
+				CleanupManager.class.getName(), PROPERTY_SUFFIX));
 		enactCleanup = enactCleanup(value);
 
 		if (firstTimeStartup(connection))
@@ -82,10 +80,10 @@ public class CleanupManager
 			boolean succeeded = false;
 
 			try {
-				boolean doEnact =
-					enactCleanup
-						&& enactCleanup(properties.getProperty(
-							String.format("%s.%s", handler.getClass().getName(), PROPERTY_SUFFIX), "true"));
+				boolean doEnact = enactCleanup
+						&& enactCleanup(properties.getProperty(String.format(
+								"%s.%s", handler.getClass().getName(),
+								PROPERTY_SUFFIX), "true"));
 				handler.doCleanup(connection, doEnact);
 
 				if (doEnact)
@@ -95,7 +93,9 @@ public class CleanupManager
 
 				succeeded = true;
 			} catch (Throwable cause) {
-				_logger.error(String.format("Unable to run and commit cleanup handler %s.", handler), cause);
+				_logger.error(String
+						.format("Unable to run and commit cleanup handler %s.",
+								handler), cause);
 			} finally {
 				try {
 					if (!succeeded)

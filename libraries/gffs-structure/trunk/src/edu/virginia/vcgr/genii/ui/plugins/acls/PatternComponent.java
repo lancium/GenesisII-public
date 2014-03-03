@@ -40,8 +40,7 @@ import edu.virginia.vcgr.genii.ui.rns.RNSTreeNode;
 import edu.virginia.vcgr.genii.ui.rns.dnd.RNSListTransferData;
 import edu.virginia.vcgr.genii.ui.rns.dnd.RNSListTransferable;
 
-public class PatternComponent extends DraggableImageComponent
-{
+public class PatternComponent extends DraggableImageComponent {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(PatternComponent.class);
@@ -49,31 +48,31 @@ public class PatternComponent extends DraggableImageComponent
 	private UIContext _context;
 	private ACLEntryWrapper _wrapper = null;
 
-	PatternComponent(UIContext context)
-	{
+	PatternComponent(UIContext context) {
 		super(ACLImages.emptyPattern());
 
 		_context = context;
 
-		setToolTipText("Drag an X.509 certificate onto this " + "icon to create a pattern-based ACL.");
+		setToolTipText("Drag an X.509 certificate onto this "
+				+ "icon to create a pattern-based ACL.");
 
 		setTransferHandler(new PatternComponentTransferHandler());
 
 		addMouseListener(new MouseClickListener());
 	}
 
-	private void clear()
-	{
-		int answer = JOptionPane.showConfirmDialog(this, "Clear pattern?", "Clear Confirm", JOptionPane.YES_NO_OPTION);
+	private void clear() {
+		int answer = JOptionPane.showConfirmDialog(this, "Clear pattern?",
+				"Clear Confirm", JOptionPane.YES_NO_OPTION);
 		if (answer == JOptionPane.YES_OPTION) {
 			_wrapper = null;
-			setToolTipText("Drag an X.509 certificate onto this " + "icon to create a pattern-based ACL.");
+			setToolTipText("Drag an X.509 certificate onto this "
+					+ "icon to create a pattern-based ACL.");
 			setImage(ACLImages.emptyPattern());
 		}
 	}
 
-	private void setPattern(X509Identity identity, X500Principal principal)
-	{
+	private void setPattern(X509Identity identity, X500Principal principal) {
 		AclEntry entry;
 
 		entry = new X509PatternAclEntry(identity, principal);
@@ -83,19 +82,18 @@ public class PatternComponent extends DraggableImageComponent
 		setImage(ACLImages.filledPattern());
 	}
 
-	private void doImport(Pair<RNSTreeNode, RNSPath> remotePath)
-	{
+	private void doImport(Pair<RNSTreeNode, RNSPath> remotePath) {
 		Collection<RNSPath> targets = new Vector<RNSPath>(1);
 		targets.add(remotePath.second());
 
-		_context
-			.progressMonitorFactory()
-			.createMonitor(this, "Reading Grid Identity", "Reading grid identity", 1000L,
-				new RemoteIdentityLookupTask(targets), new RemoteLookupCompletionListener()).start();
+		_context.progressMonitorFactory()
+				.createMonitor(this, "Reading Grid Identity",
+						"Reading grid identity", 1000L,
+						new RemoteIdentityLookupTask(targets),
+						new RemoteLookupCompletionListener()).start();
 	}
 
-	private void doImport(File file)
-	{
+	private void doImport(File file) {
 		InputStream in = null;
 
 		try {
@@ -105,68 +103,65 @@ public class PatternComponent extends DraggableImageComponent
 			X509Certificate[] chain = { cert };
 			doImport(new X509Identity(chain));
 		} catch (IOException ioe) {
-			JOptionPane.showMessageDialog(this, "Unable to read certificate file.", "Certificate Read Error",
-				JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,
+					"Unable to read certificate file.",
+					"Certificate Read Error", JOptionPane.ERROR_MESSAGE);
 		} catch (CertificateException e) {
-			JOptionPane.showMessageDialog(this, "Unable to read certificate from file.", "Certificate Read Error",
-				JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,
+					"Unable to read certificate from file.",
+					"Certificate Read Error", JOptionPane.ERROR_MESSAGE);
 		} finally {
 			StreamUtils.close(in);
 		}
 	}
 
-	private void doImport(X509Identity identity)
-	{
-		X500Principal principal = PatternDialog.getPattern(_context, identity, this);
+	private void doImport(X509Identity identity) {
+		X500Principal principal = PatternDialog.getPattern(_context, identity,
+				this);
 		if (principal != null)
 			setPattern(identity, principal);
 	}
 
-	private class RemoteLookupCompletionListener implements TaskCompletionListener<X509Identity[]>
-	{
+	private class RemoteLookupCompletionListener implements
+			TaskCompletionListener<X509Identity[]> {
 
 		@Override
-		public void taskCancelled(Task<X509Identity[]> task)
-		{
+		public void taskCancelled(Task<X509Identity[]> task) {
 			// Do nothing
 		}
 
 		@Override
-		public void taskCompleted(Task<X509Identity[]> task, X509Identity[] result)
-		{
+		public void taskCompleted(Task<X509Identity[]> task,
+				X509Identity[] result) {
 			for (X509Identity identity : result)
 				doImport(identity);
 		}
 
 		@Override
-		public void taskExcepted(Task<X509Identity[]> task, Throwable cause)
-		{
+		public void taskExcepted(Task<X509Identity[]> task, Throwable cause) {
 			ErrorHandler.handleError(_context, PatternComponent.this, cause);
 		}
 	}
 
-	private class PatternComponentTransferHandler extends TransferHandler
-	{
+	private class PatternComponentTransferHandler extends TransferHandler {
 		static final long serialVersionUID = 0L;
 
 		@Override
-		protected Transferable createTransferable(JComponent c)
-		{
+		protected Transferable createTransferable(JComponent c) {
 			if (_wrapper == null)
 				return null;
 
-			return new ACLTransferable(new ACLEntryWrapperTransferData(null, _wrapper));
+			return new ACLTransferable(new ACLEntryWrapperTransferData(null,
+					_wrapper));
 		}
 
 		@Override
-		public int getSourceActions(JComponent c)
-		{
+		public int getSourceActions(JComponent c) {
 			return LINK;
 		}
 
 		@Override
-		public boolean canImport(TransferSupport support)
-		{
+		public boolean canImport(TransferSupport support) {
 			try {
 				if (!support.isDrop())
 					return false;
@@ -182,8 +177,9 @@ public class PatternComponent extends DraggableImageComponent
 					return false;
 
 				if (support.isDataFlavorSupported(ACLTransferable.DATA_FLAVOR)) {
-					ACLEntryWrapperTransferData data =
-						(ACLEntryWrapperTransferData) support.getTransferable().getTransferData(ACLTransferable.DATA_FLAVOR);
+					ACLEntryWrapperTransferData data = (ACLEntryWrapperTransferData) support
+							.getTransferable().getTransferData(
+									ACLTransferable.DATA_FLAVOR);
 
 					Collection<ACLEntryWrapper> wrappers = data.wrappers();
 					if (wrappers.size() != 1)
@@ -194,16 +190,18 @@ public class PatternComponent extends DraggableImageComponent
 						return false;
 
 					return true;
-				} else if (support.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR)) {
-					RNSListTransferData data =
-						(RNSListTransferData) support.getTransferable().getTransferData(
-							RNSListTransferable.RNS_PATH_LIST_FLAVOR);
+				} else if (support
+						.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR)) {
+					RNSListTransferData data = (RNSListTransferData) support
+							.getTransferable().getTransferData(
+									RNSListTransferable.RNS_PATH_LIST_FLAVOR);
 
 					if (data.paths().size() != 1)
 						return false;
 
 					return true;
-				} else if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+				} else if (support
+						.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 					return true;
 				}
 			} catch (Throwable cause) {
@@ -215,15 +213,15 @@ public class PatternComponent extends DraggableImageComponent
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public boolean importData(TransferSupport support)
-		{
+		public boolean importData(TransferSupport support) {
 			try {
 				if ((support.getDropAction() & (LINK | COPY)) == 0x0)
 					return false;
 
 				if (support.isDataFlavorSupported(ACLTransferable.DATA_FLAVOR)) {
-					ACLEntryWrapperTransferData data =
-						(ACLEntryWrapperTransferData) support.getTransferable().getTransferData(ACLTransferable.DATA_FLAVOR);
+					ACLEntryWrapperTransferData data = (ACLEntryWrapperTransferData) support
+							.getTransferable().getTransferData(
+									ACLTransferable.DATA_FLAVOR);
 
 					Collection<ACLEntryWrapper> wrappers = data.wrappers();
 					if (wrappers.size() != 1)
@@ -236,10 +234,11 @@ public class PatternComponent extends DraggableImageComponent
 					// Do the import
 					doImport((X509Identity) entry);
 					return true;
-				} else if (support.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR)) {
-					RNSListTransferData data =
-						(RNSListTransferData) support.getTransferable().getTransferData(
-							RNSListTransferable.RNS_PATH_LIST_FLAVOR);
+				} else if (support
+						.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR)) {
+					RNSListTransferData data = (RNSListTransferData) support
+							.getTransferable().getTransferData(
+									RNSListTransferable.RNS_PATH_LIST_FLAVOR);
 
 					if (data.paths().size() != 1)
 						return false;
@@ -247,8 +246,10 @@ public class PatternComponent extends DraggableImageComponent
 					// Do the import
 					doImport(data.paths().iterator().next());
 					return true;
-				} else if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-					List<File> files = (List<File>) support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+				} else if (support
+						.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+					List<File> files = (List<File>) support.getTransferable()
+							.getTransferData(DataFlavor.javaFileListFlavor);
 					if (files == null || files.size() != 1)
 						return false;
 
@@ -268,18 +269,14 @@ public class PatternComponent extends DraggableImageComponent
 		}
 	}
 
-	private class MouseClickListener extends MouseAdapter
-	{
-		private void popup(MouseEvent e)
-		{
+	private class MouseClickListener extends MouseAdapter {
+		private void popup(MouseEvent e) {
 			JPopupMenu menu = new JPopupMenu("Popup Menu");
-			menu.add(new AbstractAction("Clear Pattern")
-			{
+			menu.add(new AbstractAction("Clear Pattern") {
 				static final long serialVersionUID = 0L;
 
 				@Override
-				public void actionPerformed(ActionEvent e)
-				{
+				public void actionPerformed(ActionEvent e) {
 					clear();
 				}
 			});
@@ -287,8 +284,7 @@ public class PatternComponent extends DraggableImageComponent
 		}
 
 		@Override
-		public void mouseClicked(MouseEvent e)
-		{
+		public void mouseClicked(MouseEvent e) {
 			if (e.isPopupTrigger())
 				popup(e);
 			else if (e.getClickCount() == 2)
@@ -296,15 +292,13 @@ public class PatternComponent extends DraggableImageComponent
 		}
 
 		@Override
-		public void mousePressed(MouseEvent e)
-		{
+		public void mousePressed(MouseEvent e) {
 			if (e.isPopupTrigger())
 				popup(e);
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e)
-		{
+		public void mouseReleased(MouseEvent e) {
 			if (e.isPopupTrigger())
 				popup(e);
 		}

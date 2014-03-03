@@ -26,18 +26,20 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
  * dialog.setVisible(true);
  */
 
-public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
-{
+public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin {
 	static private Log _logger = LogFactory.getLog(CreateDirectoryPlugin.class);
 
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
-	{
+	protected void performMenuAction(UIPluginContext context, MenuType menuType)
+			throws UIPluginException {
 		String ContainerPath = "DEFAULT";
 		String TargetPath = "/";
-		// hmmm: contextToken is unused; should the context be reset after this call?
-		Closeable contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
-		RNSPath path = context.endpointRetriever().getTargetEndpoints().iterator().next();
+		// hmmm: contextToken is unused; should the context be reset after this
+		// call?
+		Closeable contextToken = ContextManager
+				.temporarilyAssumeContext(context.uiContext().callingContext());
+		RNSPath path = context.endpointRetriever().getTargetEndpoints()
+				.iterator().next();
 		try {
 			EndpointReferenceType epr = path.getEndpoint();
 			EndpointDescription ep = new EndpointDescription(epr);
@@ -50,7 +52,8 @@ public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 				TargetPath = path.toString() + "/";
 			}
 
-			CreateDirDialog dialog = new CreateDirDialog(context, ContainerPath, TargetPath);
+			CreateDirDialog dialog = new CreateDirDialog(context,
+					ContainerPath, TargetPath);
 			dialog.pack();
 			GuiUtils.centerComponent(dialog);
 			dialog.setVisible(true);
@@ -67,15 +70,19 @@ public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 	}
 
 	@Override
-	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
-	{
+	public boolean isEnabled(
+			Collection<EndpointDescription> selectedDescriptions) {
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS
+		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS,
+		// but is it an RNS
 		// and NOT (isContainer, isBES ...
 		// Perhaps should be even more selective,
-		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
-		return ((tp.isRNS() || tp.isContainer()) && !(tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
-		// return selectedDescriptions.iterator().next().typeInformation().isRNS();
+		TypeInformation tp = selectedDescriptions.iterator().next()
+				.typeInformation();
+		return ((tp.isRNS() || tp.isContainer()) && !(tp.isBESContainer()
+				|| tp.isQueue() || tp.isIDP()));
+		// return
+		// selectedDescriptions.iterator().next().typeInformation().isRNS();
 	}
 }

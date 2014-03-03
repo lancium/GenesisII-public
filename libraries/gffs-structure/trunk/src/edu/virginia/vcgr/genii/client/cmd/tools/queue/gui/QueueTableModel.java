@@ -21,33 +21,27 @@ import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class QueueTableModel extends AbstractTableModel
-{
+public class QueueTableModel extends AbstractTableModel {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(QueueTableModel.class);
 
-	private class ResetListRunnable implements Runnable
-	{
+	private class ResetListRunnable implements Runnable {
 		private List<JobInformation> _jobInfo;
 
-		private ResetListRunnable(List<JobInformation> jobInfo)
-		{
+		private ResetListRunnable(List<JobInformation> jobInfo) {
 			_jobInfo = jobInfo;
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			resetList(_jobInfo);
 		}
 	}
 
-	private class UpdateWorker implements Runnable
-	{
+	private class UpdateWorker implements Runnable {
 		@Override
-		public void run()
-		{
+		public void run() {
 			List<JobInformation> info;
 
 			try {
@@ -61,8 +55,9 @@ public class QueueTableModel extends AbstractTableModel
 				resetList(info);
 			} catch (Throwable cause) {
 				_logger.warn("Unable to update queue contents.", cause);
-				JOptionPane.showMessageDialog(null, "Unable to update queue contents.", "Queue Update Failed",
-					JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,
+						"Unable to update queue contents.",
+						"Queue Update Failed", JOptionPane.ERROR_MESSAGE);
 			} finally {
 				_amRefreshing = false;
 				fireRefreshState(false);
@@ -75,8 +70,7 @@ public class QueueTableModel extends AbstractTableModel
 	private EndpointReferenceType _queue;
 	private List<JobInformation> _lastStat;
 
-	protected void fireRefreshState(boolean isStarted)
-	{
+	protected void fireRefreshState(boolean isStarted) {
 		Collection<RefreshListener> listeners;
 
 		synchronized (_listeners) {
@@ -91,15 +85,13 @@ public class QueueTableModel extends AbstractTableModel
 		}
 	}
 
-	public void addRefreshListener(RefreshListener listener)
-	{
+	public void addRefreshListener(RefreshListener listener) {
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	public void refresh()
-	{
+	public void refresh() {
 		synchronized (_queue) {
 			if (_amRefreshing)
 				return;
@@ -114,8 +106,7 @@ public class QueueTableModel extends AbstractTableModel
 		th.start();
 	}
 
-	private void resetList(List<JobInformation> newList)
-	{
+	private void resetList(List<JobInformation> newList) {
 		if (!SwingUtilities.isEventDispatchThread())
 			SwingUtilities.invokeLater(new ResetListRunnable(newList));
 		else {
@@ -124,8 +115,7 @@ public class QueueTableModel extends AbstractTableModel
 		}
 	}
 
-	public QueueTableModel(EndpointReferenceType queue) throws RemoteException
-	{
+	public QueueTableModel(EndpointReferenceType queue) throws RemoteException {
 		_queue = queue;
 		_lastStat = new ArrayList<JobInformation>();
 
@@ -133,52 +123,49 @@ public class QueueTableModel extends AbstractTableModel
 	}
 
 	@Override
-	public int getColumnCount()
-	{
+	public int getColumnCount() {
 		return 5;
 	}
 
 	@Override
-	public int getRowCount()
-	{
+	public int getRowCount() {
 		return _lastStat.size();
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex)
-	{
+	public Object getValueAt(int rowIndex, int columnIndex) {
 		JobInformation info = _lastStat.get(rowIndex);
 		switch (columnIndex) {
-			case 0:
-				return info.getTicket().toString();
+		case 0:
+			return info.getTicket().toString();
 
-			case 1:
-				TimeZone tz = TimeZone.getDefault();
-				Calendar submitTime = info.getSubmitTime();
-				submitTime.setTimeZone(tz);
-				return submitTime;
+		case 1:
+			TimeZone tz = TimeZone.getDefault();
+			Calendar submitTime = info.getSubmitTime();
+			submitTime.setTimeZone(tz);
+			return submitTime;
 
-			case 2:
-				StringBuilder builder = new StringBuilder();
-				boolean first = true;
-				for (Identity id : info.getOwners()) {
-					if (!first)
-						builder.append("\n");
-					builder.append(id.describe(VerbosityLevel.LOW));
-				}
+		case 2:
+			StringBuilder builder = new StringBuilder();
+			boolean first = true;
+			for (Identity id : info.getOwners()) {
+				if (!first)
+					builder.append("\n");
+				builder.append(id.describe(VerbosityLevel.LOW));
+			}
 
-				return builder.toString();
+			return builder.toString();
 
-			case 3:
-				return info.getFailedAttempts();
+		case 3:
+			return info.getFailedAttempts();
 
-			default:
-				String stateString = info.getScheduledOn();
-				if (stateString != null)
-					stateString = String.format("On %s", stateString);
-				else
-					stateString = String.format("%s", info.getJobState());
-				return stateString;
+		default:
+			String stateString = info.getScheduledOn();
+			if (stateString != null)
+				stateString = String.format("On %s", stateString);
+			else
+				stateString = String.format("%s", info.getJobState());
+			return stateString;
 		}
 	}
 }

@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.client.dialog;
 
-public interface InputDialog extends Dialog
-{
+public interface InputDialog extends Dialog {
 	public void setDefaultAnswer(String defaultAnswer);
 
 	public String getDefaultAnswer();

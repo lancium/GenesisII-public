@@ -18,41 +18,43 @@ import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Subsc
  * information, instead of directly invoking one another's methods, they invoke methods in
  * CacheManager interface. This is done because each cache is oblivious of the others.
  */
-public class CacheManager
-{
+public class CacheManager {
 	static private Log _logger = LogFactory.getLog(CacheManager.class);
 
-	public static Object getItemFromCache(Object cacheKey, Class<?> itemType)
-	{
+	public static Object getItemFromCache(Object cacheKey, Class<?> itemType) {
 		return getItemFromCache(null, cacheKey, itemType);
 	}
 
-	public static Object getItemFromCache(Object target, Object cacheKey, Class<?> itemType)
-	{
+	public static Object getItemFromCache(Object target, Object cacheKey,
+			Class<?> itemType) {
 
 		if (CacheConfigurer.isCachingEnabled()) {
 			/*
-			 * Before accessing the cache, this tries to assess the freshness of cached information
-			 * by investigating the target, whenever possible. This helps to reduce load on cache
-			 * management module and to ensure freshness of information when nothing can be inferred
-			 * from the retrieved cached item.
+			 * Before accessing the cache, this tries to assess the freshness of
+			 * cached information by investigating the target, whenever
+			 * possible. This helps to reduce load on cache management module
+			 * and to ensure freshness of information when nothing can be
+			 * inferred from the retrieved cached item.
 			 */
 			if (ResourceAccessMonitor.isMonitoredObject(target)
-				&& !ResourceAccessMonitor.isCachedContentGuaranteedToBeFresh(target))
+					&& !ResourceAccessMonitor
+							.isCachedContentGuaranteedToBeFresh(target))
 				return null;
 			try {
-				CommonCache cache = findCacheForObject(target, cacheKey, itemType);
+				CommonCache cache = findCacheForObject(target, cacheKey,
+						itemType);
 				if (cache == null)
 					return null;
 				Object cachedItem = cache.getItem(cacheKey, target);
-				
-				//hmmm: reduce logging visibility here.
+
+				// hmmm: reduce logging visibility here.
 				if (_logger.isDebugEnabled()) {
 					String result = "cache miss";
 					if (cachedItem != null) {
 						result = "cache hit";
 					}
-					_logger.debug(result + " for " + cacheKey + " of type " + itemType.getCanonicalName());
+					_logger.debug(result + " for " + cacheKey + " of type "
+							+ itemType.getCanonicalName());
 				}
 
 				if (cachedItem == null)
@@ -62,8 +64,10 @@ public class CacheManager
 					ResourceAccessMonitor.reportResourceUsage(cachedItem);
 				}
 
-				// Returns item from cache only when the system is satisfied about its freshness.
-				if (ResourceAccessMonitor.isCachedContentGuaranteedToBeFresh(cachedItem)) {
+				// Returns item from cache only when the system is satisfied
+				// about its freshness.
+				if (ResourceAccessMonitor
+						.isCachedContentGuaranteedToBeFresh(cachedItem)) {
 					return cachedItem;
 				} else {
 					if (_logger.isDebugEnabled())
@@ -71,24 +75,26 @@ public class CacheManager
 					return null;
 				}
 			} catch (Exception ex) {
-				_logger.info("problem while retrieving objects from the cache", ex);
+				_logger.info("problem while retrieving objects from the cache",
+						ex);
 			}
 		}
 		return null;
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static Map getMatchingItemsWithKeys(Object cacheKeyWithWildCard, Class<?> itemType)
-	{
+	public static Map getMatchingItemsWithKeys(Object cacheKeyWithWildCard,
+			Class<?> itemType) {
 		return getMatchingItemsWithKeys(null, cacheKeyWithWildCard, itemType);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static Map getMatchingItemsWithKeys(Object target, Object cacheKeyWithWildCard, Class<?> itemType)
-	{
+	public static Map getMatchingItemsWithKeys(Object target,
+			Object cacheKeyWithWildCard, Class<?> itemType) {
 		if (CacheConfigurer.isCachingEnabled()) {
 			try {
-				CommonCache cache = findCacheForObject(target, cacheKeyWithWildCard, itemType);
+				CommonCache cache = findCacheForObject(target,
+						cacheKeyWithWildCard, itemType);
 				if (cache == null)
 					return null;
 				if (!cache.supportRetrievalByWildCard())
@@ -96,17 +102,19 @@ public class CacheManager
 				return cache.getWildCardMatches(target, cacheKeyWithWildCard);
 			} catch (Exception ex) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("problem while retrieving objects from the cache", ex);
+					_logger.debug(
+							"problem while retrieving objects from the cache",
+							ex);
 			}
 		}
 		return null;
 	}
 
-	public static void cacheReleventInformation(Object... targets)
-	{
+	public static void cacheReleventInformation(Object... targets) {
 		if (CacheConfigurer.isCachingEnabled()) {
 			try {
-				Collection<CacheableItemsGenerator> generators = CacheConfigurer.getGenerators();
+				Collection<CacheableItemsGenerator> generators = CacheConfigurer
+						.getGenerators();
 				Collection<CacheableItem> items = new ArrayList<CacheableItem>();
 
 				Class<?>[] targetTypes = new Class<?>[targets.length];
@@ -131,18 +139,19 @@ public class CacheManager
 					}
 				}
 			} catch (Exception ex) {
-				_logger.error("exception occurred while caching items: " + ex.getMessage(), ex);
+				_logger.error(
+						"exception occurred while caching items: "
+								+ ex.getMessage(), ex);
 			}
 		}
 	}
 
-	public static void putItemInCache(Object cacheKey, Object value)
-	{
+	public static void putItemInCache(Object cacheKey, Object value) {
 		putItemInCache(null, cacheKey, value);
 	}
 
-	public static void putItemInCache(Object target, Object cacheKey, Object value)
-	{
+	public static void putItemInCache(Object target, Object cacheKey,
+			Object value) {
 		if (value == null) {
 			String msg = "logic problem in putItemInCache: value to cache is null.";
 			_logger.error(msg);
@@ -165,18 +174,17 @@ public class CacheManager
 		}
 	}
 
-	public static void removeAllRelevantInfoFromCache(Object target, Class<?> typeOfItem)
-	{
+	public static void removeAllRelevantInfoFromCache(Object target,
+			Class<?> typeOfItem) {
 		removeItemFromCache(target, null, typeOfItem);
 	}
 
-	public static void removeItemFromCache(Object cacheKey, Class<?> typeOfItem)
-	{
+	public static void removeItemFromCache(Object cacheKey, Class<?> typeOfItem) {
 		removeItemFromCache(null, cacheKey, typeOfItem);
 	}
 
-	public static void removeItemFromCache(Object target, Object cacheKey, Class<?> typeOfItem)
-	{
+	public static void removeItemFromCache(Object target, Object cacheKey,
+			Class<?> typeOfItem) {
 		if (CacheConfigurer.isCachingEnabled()) {
 			try {
 				Collection<CommonCache> cacheList = CacheConfigurer.getCaches();
@@ -187,7 +195,8 @@ public class CacheManager
 						if (cache.cacheKeyMatches(cacheKey)) {
 							cache.invalidateCachedItem(cacheKey, null);
 						}
-					} else if (target != null && !cache.supportRetrievalWithoutTarget()) {
+					} else if (target != null
+							&& !cache.supportRetrievalWithoutTarget()) {
 						if (cache.targetTypeMatches(target)) {
 							if (cacheKey != null) {
 								if (cache.cacheKeyMatches(cacheKey)) {
@@ -206,38 +215,46 @@ public class CacheManager
 		}
 	}
 
-	public static void updateCacheLifeTimeOfRelevantStoredItems(WSResourceConfig resourceConfig)
-	{
+	public static void updateCacheLifeTimeOfRelevantStoredItems(
+			WSResourceConfig resourceConfig) {
 		if (CacheConfigurer.isCachingEnabled()) {
-			long lifetimeOfCachedItems = resourceConfig.getMillisecondTimeLeftToCallbackExpiry();
+			long lifetimeOfCachedItems = resourceConfig
+					.getMillisecondTimeLeftToCallbackExpiry();
 			if (lifetimeOfCachedItems <= 0)
 				return;
 			try {
 				Collection<CommonCache> cacheList = CacheConfigurer.getCaches();
 				for (CommonCache cache : cacheList) {
-					IdentifierType cachedItemIdentifier = cache.getCachedItemIdentifier();
+					IdentifierType cachedItemIdentifier = cache
+							.getCachedItemIdentifier();
 					if (cachedItemIdentifier == null)
 						continue;
 					if (cachedItemIdentifier == WSResourceConfig.IdentifierType.WS_ENDPOINT_IDENTIFIER) {
-						cache.updateCacheLifeTimeOfItems(resourceConfig.getWsIdentifier(), lifetimeOfCachedItems);
+						cache.updateCacheLifeTimeOfItems(
+								resourceConfig.getWsIdentifier(),
+								lifetimeOfCachedItems);
 					} else if (resourceConfig.getInodeNumber() != null
-						&& cachedItemIdentifier == WSResourceConfig.IdentifierType.INODE_NUMBER_IDENTIFIER) {
-						cache.updateCacheLifeTimeOfItems(resourceConfig.getInodeNumber(), lifetimeOfCachedItems);
+							&& cachedItemIdentifier == WSResourceConfig.IdentifierType.INODE_NUMBER_IDENTIFIER) {
+						cache.updateCacheLifeTimeOfItems(
+								resourceConfig.getInodeNumber(),
+								lifetimeOfCachedItems);
 					} else {
 						for (String rnsPath : resourceConfig.getRnsPaths()) {
-							cache.updateCacheLifeTimeOfItems(rnsPath, lifetimeOfCachedItems);
+							cache.updateCacheLifeTimeOfItems(rnsPath,
+									lifetimeOfCachedItems);
 						}
 					}
 				}
 			} catch (Exception ex) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("Could not update the lifetime of some cached items", ex);
+					_logger.debug(
+							"Could not update the lifetime of some cached items",
+							ex);
 			}
 		}
 	}
 
-	public static void clearCache(Class<?> typeOfItem)
-	{
+	public static void clearCache(Class<?> typeOfItem) {
 		if (CacheConfigurer.isCachingEnabled()) {
 			try {
 				Collection<CommonCache> cacheList = CacheConfigurer.getCaches();
@@ -253,42 +270,45 @@ public class CacheManager
 		}
 	}
 
-	public static void resetCachingSystem()
-	{
+	public static void resetCachingSystem() {
 		try {
 			CacheConfigurer.resetCaches();
 			NotificationBrokerDirectory.clearDirectory();
 			SubscriptionDirectory.clearDirectory();
 		} catch (Exception ex) {
 			_logger.info("Alarm: couldn't reset the caching system after a failure. "
-				+ "To avoid seeing, possibly, stale contents, " + "restart the grid client: " + ex.getMessage());
+					+ "To avoid seeing, possibly, stale contents, "
+					+ "restart the grid client: " + ex.getMessage());
 		}
 	}
 
-	private static CommonCache findCacheForObject(Object target, Object cacheKey, Object value)
-	{
+	private static CommonCache findCacheForObject(Object target,
+			Object cacheKey, Object value) {
 		return findCacheForObject(target, cacheKey, value.getClass());
 	}
 
-	private static CommonCache findCacheForObject(Object target, Object cacheKey, Class<?> typeOfItem)
-	{
+	private static CommonCache findCacheForObject(Object target,
+			Object cacheKey, Class<?> typeOfItem) {
 		Collection<CommonCache> cacheList = CacheConfigurer.getCaches();
 		for (CommonCache cache : cacheList) {
 			if (target == null && cache.supportRetrievalWithoutTarget()) {
 				if (cache.isRelevent(cacheKey, typeOfItem)) {
 					if (_logger.isTraceEnabled())
-						_logger.trace("null target found good cache...  " + cache.getClass().getCanonicalName());
+						_logger.trace("null target found good cache...  "
+								+ cache.getClass().getCanonicalName());
 					return cache;
 				}
 			} else if (target != null && !cache.supportRetrievalWithoutTarget()) {
 				if (cache.isRelevent(cacheKey, target, typeOfItem)) {
 					if (_logger.isTraceEnabled())
-						_logger.trace("non-null target found good cache...  " + cache.getClass().getCanonicalName());
+						_logger.trace("non-null target found good cache...  "
+								+ cache.getClass().getCanonicalName());
 					return cache;
 				}
 			}
 		}
-		_logger.trace("could not find an appropriate cache for type: " + typeOfItem.getCanonicalName());
+		_logger.trace("could not find an appropriate cache for type: "
+				+ typeOfItem.getCanonicalName());
 		return null;
 	}
 }

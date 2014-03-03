@@ -16,8 +16,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 
-public class PasswordDialog extends JDialog implements ActionListener
-{
+public class PasswordDialog extends JDialog implements ActionListener {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(PasswordDialog.class);
@@ -32,8 +31,7 @@ public class PasswordDialog extends JDialog implements ActionListener
 
 	private static SynchronousQueue<String> waitingQueue = new SynchronousQueue<String>();
 
-	private PasswordDialog(String title, String prompt)
-	{
+	private PasswordDialog(String title, String prompt) {
 		super();
 
 		setTitle(title);
@@ -41,28 +39,32 @@ public class PasswordDialog extends JDialog implements ActionListener
 
 		container.setLayout(new GridBagLayout());
 
-		container.add(new JLabel(prompt), new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		container.add((_password = new JPasswordField()), new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JLabel(prompt), new GridBagConstraints(0, 0, 2, 1,
+				1.0, 1.0, GridBagConstraints.WEST,
+				GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		container.add((_password = new JPasswordField()),
+				new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0,
+						GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+						new Insets(5, 5, 5, 5), 5, 5));
 		_password.setActionCommand(_OK_ACTION);
 		_password.addActionListener(this);
 
 		JButton button = new JButton("OK");
 		button.setActionCommand(_OK_ACTION);
 		button.addActionListener(this);
-		container.add(button, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(10, 10, 10, 10), 10, 10));
+		container.add(button, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+						10, 10, 10, 10), 10, 10));
 
 		button = new JButton("Cancel");
 		button.setActionCommand(_CANCEL_ACTION);
 		button.addActionListener(this);
-		container.add(button, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(10, 10, 10, 10), 10, 10));
+		container.add(button, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+						10, 10, 10, 10), 10, 10));
 	}
 
-	public void actionPerformed(ActionEvent arg0)
-	{
+	public void actionPerformed(ActionEvent arg0) {
 		try {
 			if (arg0.getActionCommand().equals(_CANCEL_ACTION)) {
 				waitingQueue.put(new String("cancel"));
@@ -76,17 +78,14 @@ public class PasswordDialog extends JDialog implements ActionListener
 		}
 	}
 
-	public static char[] getPassword(String t, String p)
-	{
+	public static char[] getPassword(String t, String p) {
 		PasswordDialog.title = t;
 		PasswordDialog.prompt = p;
 
 		// Swing thread-safe initializer
-		javax.swing.SwingUtilities.invokeLater(new Runnable()
-		{
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
-			public void run()
-			{
+			public void run() {
 				PasswordDialog pDialog = new PasswordDialog(title, prompt);
 				pDialog.pack();
 				GuiUtils.centerComponent(pDialog);
@@ -98,7 +97,8 @@ public class PasswordDialog extends JDialog implements ActionListener
 		});
 		try {
 			Object toReturn = waitingQueue.take();
-			if (toReturn instanceof String && ((String) toReturn).equals("cancel")) {
+			if (toReturn instanceof String
+					&& ((String) toReturn).equals("cancel")) {
 				return null;
 			} else {
 				return ((String) toReturn).toCharArray();

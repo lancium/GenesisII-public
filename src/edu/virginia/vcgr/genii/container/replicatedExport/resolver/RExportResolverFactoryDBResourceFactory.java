@@ -9,19 +9,20 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class RExportResolverFactoryDBResourceFactory extends BasicDBResourceFactory implements IResourceFactory
-{
-	public RExportResolverFactoryDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
-	{
+public class RExportResolverFactoryDBResourceFactory extends
+		BasicDBResourceFactory implements IResourceFactory {
+	public RExportResolverFactoryDBResourceFactory(
+			ServerDatabaseConnectionPool pool) throws SQLException {
 		super(pool);
 	}
 
-	public IResource instantiate(ResourceKey parentKey) throws ResourceException
-	{
+	public IResource instantiate(ResourceKey parentKey)
+			throws ResourceException {
 		try {
 			return new RExportResolverFactoryDBResource(parentKey, _pool);
 		} catch (SQLException sqe) {
-			throw new ResourceException("Could not create RExportResolverFactory resource.", sqe);
+			throw new ResourceException(
+					"Could not create RExportResolverFactory resource.", sqe);
 		}
 	}
 }

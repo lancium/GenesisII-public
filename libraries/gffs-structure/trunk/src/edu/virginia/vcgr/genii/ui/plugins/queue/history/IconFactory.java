@@ -11,10 +11,8 @@ import java.awt.Stroke;
 
 import javax.swing.Icon;
 
-public class IconFactory
-{
-	static private abstract class BaseIcon implements Icon
-	{
+public class IconFactory {
+	static private abstract class BaseIcon implements Icon {
 		static final protected float STROKE_DIVISOR = 6.0f;
 		static final private int SCALE_DIVISOR = 4;
 		static final private int NEGATIVE_SCALE_DIVISOR = SCALE_DIVISOR - 1;
@@ -24,8 +22,7 @@ public class IconFactory
 
 		protected int _size;
 
-		private BaseIcon(int size)
-		{
+		private BaseIcon(int size) {
 			_size = size;
 
 			_short = size / SCALE_DIVISOR;
@@ -33,30 +30,26 @@ public class IconFactory
 		}
 
 		@Override
-		final public int getIconWidth()
-		{
+		final public int getIconWidth() {
 			return _size;
 		}
 
 		@Override
-		final public int getIconHeight()
-		{
+		final public int getIconHeight() {
 			return _size;
 		}
 	}
 
-	static private class ErrorIcon extends BaseIcon
-	{
-		private ErrorIcon(int size)
-		{
+	static private class ErrorIcon extends BaseIcon {
+		private ErrorIcon(int size) {
 			super(size);
 		}
 
 		@Override
-		final public void paintIcon(Component c, Graphics g, int x, int y)
-		{
+		final public void paintIcon(Component c, Graphics g, int x, int y) {
 			Graphics2D g2 = (Graphics2D) g.create();
-			Stroke stroke = new BasicStroke(Math.max(_size / STROKE_DIVISOR, 1.0f));
+			Stroke stroke = new BasicStroke(Math.max(_size / STROKE_DIVISOR,
+					1.0f));
 			g2.setStroke(stroke);
 			g2.setColor(Color.red);
 
@@ -67,20 +60,18 @@ public class IconFactory
 		}
 	}
 
-	static private class WarningIcon extends BaseIcon
-	{
+	static private class WarningIcon extends BaseIcon {
 		private Shape _shape;
 
-		private WarningIcon(int size)
-		{
+		private WarningIcon(int size) {
 			super(size);
 
-			_shape = new Polygon(new int[] { size / 2, _long, _short }, new int[] { _short, _long, _long }, 3);
+			_shape = new Polygon(new int[] { size / 2, _long, _short },
+					new int[] { _short, _long, _long }, 3);
 		}
 
 		@Override
-		final public void paintIcon(Component c, Graphics g, int x, int y)
-		{
+		final public void paintIcon(Component c, Graphics g, int x, int y) {
 			Graphics2D g2 = (Graphics2D) g.create();
 
 			if (x != 0 || y != 0)
@@ -90,38 +81,33 @@ public class IconFactory
 			g2.fill(_shape);
 
 			g2.setColor(Color.black);
-			g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND,
+					BasicStroke.JOIN_ROUND));
 			g2.draw(_shape);
 
 			g2.dispose();
 		}
 	}
 
-	static private class EmptyIcon extends BaseIcon
-	{
-		private EmptyIcon(int size)
-		{
+	static private class EmptyIcon extends BaseIcon {
+		private EmptyIcon(int size) {
 			super(size);
 		}
 
 		@Override
-		final public void paintIcon(Component c, Graphics g, int x, int y)
-		{
+		final public void paintIcon(Component c, Graphics g, int x, int y) {
 		}
 	}
 
-	static public Icon createErrorIcon(int size)
-	{
+	static public Icon createErrorIcon(int size) {
 		return new ErrorIcon(size);
 	}
 
-	static public Icon createWarningIcon(int size)
-	{
+	static public Icon createWarningIcon(int size) {
 		return new WarningIcon(size);
 	}
 
-	static public Icon createEmptyIcon(int size)
-	{
+	static public Icon createEmptyIcon(int size) {
 		return new EmptyIcon(size);
 	}
 }

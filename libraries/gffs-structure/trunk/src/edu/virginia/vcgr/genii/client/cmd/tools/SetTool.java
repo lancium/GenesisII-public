@@ -8,25 +8,24 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class SetTool extends BaseGridTool
-{
+public class SetTool extends BaseGridTool {
 	static private final String DESCRIPTION = "config/tooldocs/description/dset";
 	static private final String USAGE = "config/tooldocs/usage/uset";
 	static private final String MANPAGE = "config/tooldocs/man/set";
 
-	public SetTool()
-	{
-		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), false, ToolCategory.GENERAL);
+	public SetTool() {
+		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE),
+				false, ToolCategory.GENERAL);
 		addManPage(new LoadFileResource(MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		String arg = getArgument(0);
 		int index = arg.indexOf('=');
 		if (index <= 0)
-			throw new InvalidToolUsageException("Argument not in correct format.");
+			throw new InvalidToolUsageException(
+					"Argument not in correct format.");
 
 		Map<String, String> env = GridUserEnvironment.getGridUserEnvironment();
 		String key = arg.substring(0, index);
@@ -42,8 +41,7 @@ public class SetTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() != 1)
 			throw new InvalidToolUsageException("Set requires 1 argument.");
 	}

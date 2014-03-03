@@ -10,14 +10,12 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class ButtonPanel extends JPanel
-{
+public class ButtonPanel extends JPanel {
 	static final long serialVersionUID = 0L;
 
 	private Vector<JButton> _buttons;
 
-	private ButtonPanel(boolean horizontal, Object[] buttonInformation)
-	{
+	private ButtonPanel(boolean horizontal, Object[] buttonInformation) {
 		super(new GridBagLayout());
 
 		boolean containsNulls = false;
@@ -48,29 +46,32 @@ public class ButtonPanel extends JPanel
 				_buttons.add(button);
 
 			if (horizontal) {
-				add(button == null ? new JLabel() : button, new GridBagConstraints(lcv, 0, 1, 1,
-					(!containsNulls || button == null) ? 1.0 : 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-					new Insets(0, 0, 0, 0), 0, 0));
+				add(button == null ? new JLabel() : button,
+						new GridBagConstraints(lcv, 0, 1, 1,
+								(!containsNulls || button == null) ? 1.0 : 0.0,
+								1.0, GridBagConstraints.CENTER,
+								GridBagConstraints.NONE,
+								new Insets(0, 0, 0, 0), 0, 0));
 			} else {
-				add(button == null ? new JLabel() : button, new GridBagConstraints(0, lcv, 1, 1, 1.0,
-					(!containsNulls || button == null) ? 1.0 : 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-					new Insets(0, 0, 0, 0), 0, 0));
+				add(button == null ? new JLabel() : button,
+						new GridBagConstraints(0, lcv, 1, 1, 1.0,
+								(!containsNulls || button == null) ? 1.0 : 0.0,
+								GridBagConstraints.CENTER,
+								GridBagConstraints.NONE,
+								new Insets(0, 0, 0, 0), 0, 0));
 			}
 		}
 	}
 
-	final public JButton button(int index)
-	{
+	final public JButton button(int index) {
 		return _buttons.get(index);
 	}
 
-	static public ButtonPanel createHorizontalPanel(Object... buttonInformation)
-	{
+	static public ButtonPanel createHorizontalPanel(Object... buttonInformation) {
 		return new ButtonPanel(true, buttonInformation);
 	}
 
-	static public ButtonPanel createVerticalPanel(Object... buttonInformation)
-	{
+	static public ButtonPanel createVerticalPanel(Object... buttonInformation) {
 		return new ButtonPanel(false, buttonInformation);
 	}
 }

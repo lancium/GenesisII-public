@@ -7,27 +7,26 @@ import java.util.regex.Pattern;
 
 import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 
-class VMStatRunner
-{
-	static private final Pattern FREE_PATTERN = Pattern.compile("^.*Pages free:[^\\d]*(\\d+)[^\\d]*$");
-	static private final Pattern PAGE_SIZE_PATTERN = Pattern.compile("^.*page size of (\\d+) bytes.*$");
+class VMStatRunner {
+	static private final Pattern FREE_PATTERN = Pattern
+			.compile("^.*Pages free:[^\\d]*(\\d+)[^\\d]*$");
+	static private final Pattern PAGE_SIZE_PATTERN = Pattern
+			.compile("^.*page size of (\\d+) bytes.*$");
 
 	private long _memoryFree;
 
-	private VMStatRunner(long memoryFree)
-	{
+	private VMStatRunner(long memoryFree) {
 		_memoryFree = memoryFree;
 	}
 
-	long memoryFree()
-	{
+	long memoryFree() {
 		return _memoryFree;
 	}
 
-	static VMStatRunner run() throws IOException
-	{
+	static VMStatRunner run() throws IOException {
 		Matcher matcher;
-		List<String> results = ExecutionEngine.simpleMultilineExecute("vm_stat");
+		List<String> results = ExecutionEngine
+				.simpleMultilineExecute("vm_stat");
 
 		long pageSize = -1l;
 		long pagesFree = -1l;

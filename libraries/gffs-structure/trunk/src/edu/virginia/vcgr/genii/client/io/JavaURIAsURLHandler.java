@@ -22,30 +22,28 @@ import java.net.URL;
 
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
-public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandler
-{
-	static private final String[] _HANDLED_PROTOCOLS = new String[] { "http", "https", "ftp" };
+public class JavaURIAsURLHandler extends AbstractURIHandler implements
+		IURIHandler {
+	static private final String[] _HANDLED_PROTOCOLS = new String[] { "http",
+			"https", "ftp" };
 
-	public String[] getHandledProtocols()
-	{
+	public String[] getHandledProtocols() {
 		return _HANDLED_PROTOCOLS;
 	}
 
-	public boolean canRead(String protocol)
-	{
+	public boolean canRead(String protocol) {
 		return (protocol != null) && isHandledProtocol(protocol);
 	}
 
-	public boolean canWrite(String protocol)
-	{
+	public boolean canWrite(String protocol) {
 		if ((protocol != null) && protocol.equals("ftp"))
 			return true;
 
 		return false;
 	}
 
-	static private URI swizzleURICredentials(URI uri, UsernamePasswordIdentity credentials) throws URISyntaxException
-	{
+	static private URI swizzleURICredentials(URI uri,
+			UsernamePasswordIdentity credentials) throws URISyntaxException {
 		if (credentials == null)
 			return uri;
 
@@ -56,12 +54,14 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 		else
 			portString = "";
 
-		return new URI(uri.getScheme(), String.format("%s:%s@%s%s", credentials.getUserName(), credentials.getPassword(),
-			uri.getHost(), portString), uri.getPath(), uri.getQuery(), uri.getFragment());
+		return new URI(uri.getScheme(), String.format("%s:%s@%s%s",
+				credentials.getUserName(), credentials.getPassword(),
+				uri.getHost(), portString), uri.getPath(), uri.getQuery(),
+				uri.getFragment());
 	}
 
-	public InputStream openInputStream(URI uri, UsernamePasswordIdentity credential) throws IOException
-	{
+	public InputStream openInputStream(URI uri,
+			UsernamePasswordIdentity credential) throws IOException {
 		try {
 			URL url = swizzleURICredentials(uri, credential).toURL();
 			return url.openConnection().getInputStream();
@@ -70,8 +70,8 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 		}
 	}
 
-	public OutputStream openOutputStream(URI uri, UsernamePasswordIdentity credential) throws IOException
-	{
+	public OutputStream openOutputStream(URI uri,
+			UsernamePasswordIdentity credential) throws IOException {
 		try {
 			URL url = swizzleURICredentials(uri, credential).toURL();
 			return url.openConnection().getOutputStream();
@@ -80,8 +80,7 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 		}
 	}
 
-	static private boolean isHandledProtocol(String protocol)
-	{
+	static private boolean isHandledProtocol(String protocol) {
 		for (String proto : _HANDLED_PROTOCOLS) {
 			if (proto.equals(protocol))
 				return true;

@@ -7,20 +7,17 @@ import java.io.OutputStream;
 
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 
-public class FileRedirectionSink implements StreamRedirectionSink
-{
+public class FileRedirectionSink implements StreamRedirectionSink {
 	static final long serialVersionUID = 0L;
 
 	private File _file;
 
-	public FileRedirectionSink(File file)
-	{
+	public FileRedirectionSink(File file) {
 		_file = file;
 	}
 
 	@Override
-	public OutputStream openSink(ExecutionContext context) throws IOException
-	{
+	public OutputStream openSink(ExecutionContext context) throws IOException {
 		return new FileOutputStream(_file);
 	}
 }

@@ -47,29 +47,25 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 import eu.emi.security.authn.x509.CommonX509TrustManager;
 import eu.emi.security.authn.x509.impl.InMemoryKeystoreCertChainValidator;
 
-public class SecurityUtilities implements CertificateValidator
-{
+public class SecurityUtilities implements CertificateValidator {
 	static private Log _logger = LogFactory.getLog(SecurityUtilities.class);
 
 	private KeyStore _localResourceTrustStore = null;
 	private static Boolean loadedSecurity = false;
 
-	public SecurityUtilities(KeyStore localResourceTrustStore)
-	{
+	public SecurityUtilities(KeyStore localResourceTrustStore) {
 		_localResourceTrustStore = localResourceTrustStore;
 	}
 
 	@Override
-	public KeyStore getResourceTrustStore()
-	{
+	public KeyStore getResourceTrustStore() {
 		return _localResourceTrustStore;
 	}
 
 	/**
 	 * Set up our cryptography provider.
 	 */
-	public static void initializeSecurity()
-	{
+	public static void initializeSecurity() {
 		synchronized (loadedSecurity) {
 			if (!loadedSecurity) {
 				Security.addProvider(new BouncyCastleProvider());
@@ -82,35 +78,36 @@ public class SecurityUtilities implements CertificateValidator
 	 * Verifies that the certificate chain is internally consistent.
 	 */
 	@Override
-	public boolean validateCertificateConsistency(X509Certificate[] certChain)
-	{
+	public boolean validateCertificateConsistency(X509Certificate[] certChain) {
 		return simpleCertificateValidation(certChain);
 	}
 
 	/**
-	 * Verifies that the certificate is found rooted in our local resource trust store.
+	 * Verifies that the certificate is found rooted in our local resource trust
+	 * store.
 	 */
 	@Override
-	public boolean validateIsTrustedResource(X509Certificate[] certChain)
-	{
+	public boolean validateIsTrustedResource(X509Certificate[] certChain) {
 		return validateTrustedByKeystore(certChain, _localResourceTrustStore);
 	}
 
 	/**
-	 * Verifies that the certificate is found rooted in the specified trust store.
+	 * Verifies that the certificate is found rooted in the specified trust
+	 * store.
 	 */
 	@Override
-	public boolean validateTrustedByKeystore(X509Certificate[] certChain, KeyStore store)
-	{
-		return simpleCertificateValidation(certChain) && creatorInStore(certChain, store)
-			&& isAnchoredInKeystore(certChain, store);
+	public boolean validateTrustedByKeystore(X509Certificate[] certChain,
+			KeyStore store) {
+		return simpleCertificateValidation(certChain)
+				&& creatorInStore(certChain, store)
+				&& isAnchoredInKeystore(certChain, store);
 	}
 
 	/**
-	 * utility method that prints out all of the aliases and DNs in the key store.
+	 * utility method that prints out all of the aliases and DNs in the key
+	 * store.
 	 */
-	static public String showTrustStore(KeyStore toShow)
-	{
+	static public String showTrustStore(KeyStore toShow) {
 		StringBuilder toReturn = new StringBuilder();
 		try {
 			Enumeration<String> aliases = toShow.aliases();
@@ -137,14 +134,16 @@ public class SecurityUtilities implements CertificateValidator
 	/**
 	 * Simply verify each certificate with its predecessor.
 	 */
-	public static boolean simpleCertificateValidation(X509Certificate[] certChain)
-	{
+	public static boolean simpleCertificateValidation(
+			X509Certificate[] certChain) {
 		for (int i = 0; i < certChain.length - 2; i++) {
 			try {
 				certChain[i].verify(certChain[i + 1].getPublicKey());
 			} catch (Throwable e) {
-				_logger.error("failure to validate internal consistency of this cert " + certChain[i].getSubjectDN()
-					+ " error is: " + e.getMessage(), e);
+				_logger.error(
+						"failure to validate internal consistency of this cert "
+								+ certChain[i].getSubjectDN() + " error is: "
+								+ e.getMessage(), e);
 				return false;
 			}
 		}
@@ -154,8 +153,8 @@ public class SecurityUtilities implements CertificateValidator
 	/*
 	 * Returns true if the creator of a certChain is located in the trust store.
 	 */
-	static public boolean creatorInStore(X509Certificate[] certChain, KeyStore store)
-	{
+	static public boolean creatorInStore(X509Certificate[] certChain,
+			KeyStore store) {
 		try {
 			Enumeration<String> aliases = store.aliases();
 			if (aliases != null) {
@@ -165,17 +164,21 @@ public class SecurityUtilities implements CertificateValidator
 					if (c instanceof X509Certificate) {
 						if (c.equals(certChain[0])) {
 							if (_logger.isDebugEnabled())
-								_logger.debug("found identical certificate in trust store under alias '" + alias + "'");
+								_logger.debug("found identical certificate in trust store under alias '"
+										+ alias + "'");
 							return true;
 						}
 						try {
 							certChain[0].verify(c.getPublicKey());
 							if (_logger.isDebugEnabled())
-								_logger.debug("found creator for " + certChain[0].getSubjectDN() + " in store under alias '"
-									+ alias + "'");
+								_logger.debug("found creator for "
+										+ certChain[0].getSubjectDN()
+										+ " in store under alias '" + alias
+										+ "'");
 							return true;
 						} catch (Throwable e) {
-							// stomp the exception since that wasn't the creator.
+							// stomp the exception since that wasn't the
+							// creator.
 						}
 					}
 				}
@@ -186,49 +189,61 @@ public class SecurityUtilities implements CertificateValidator
 		return false;
 	}
 
-	public static boolean isAnchoredInKeystore(X509Certificate[] certChain, KeyStore store)
-	{
+	public static boolean isAnchoredInKeystore(X509Certificate[] certChain,
+			KeyStore store) {
 		KeyStore ks = store;
 		boolean trustOkay = false;
 		/*
-		 * TODO: may want to cache both types of trust managers in different caches, indexed by the
-		 * keystore.
+		 * TODO: may want to cache both types of trust managers in different
+		 * caches, indexed by the keystore.
 		 */
 		try {
-			// create a trust manager from the trust store by trying jdk ssl support first.
-			PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(ks, new X509CertSelector());
+			// create a trust manager from the trust store by trying jdk ssl
+			// support first.
+			PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(ks,
+					new X509CertSelector());
 			pkixParams.setRevocationEnabled(false);
-			ManagerFactoryParameters trustParams = new CertPathTrustManagerParameters(pkixParams);
+			ManagerFactoryParameters trustParams = new CertPathTrustManagerParameters(
+					pkixParams);
 			TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
 			tmf.init(trustParams);
-			X509TrustManager trustManager = (X509TrustManager) tmf.getTrustManagers()[0];
-			trustManager.checkClientTrusted(certChain, certChain[0].getPublicKey().getAlgorithm());
+			X509TrustManager trustManager = (X509TrustManager) tmf
+					.getTrustManagers()[0];
+			trustManager.checkClientTrusted(certChain, certChain[0]
+					.getPublicKey().getAlgorithm());
 			if (_logger.isDebugEnabled())
-				_logger.debug("validated cert with jdk ssl: " + certChain[0].getSubjectDN());
+				_logger.debug("validated cert with jdk ssl: "
+						+ certChain[0].getSubjectDN());
 			trustOkay = true;
 		} catch (Throwable e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("could not validate this cert with jdk ssl against trust store: " + certChain[0].getSubjectDN()
-					+ e.getMessage());
+				_logger.debug("could not validate this cert with jdk ssl against trust store: "
+						+ certChain[0].getSubjectDN() + e.getMessage());
 		}
 		try {
 			if (!trustOkay) {
-				InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(ks);
-				CommonX509TrustManager trustManager = new CommonX509TrustManager(validater);
-				trustManager.checkClientTrusted(certChain, certChain[0].getPublicKey().getAlgorithm());
+				InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(
+						ks);
+				CommonX509TrustManager trustManager = new CommonX509TrustManager(
+						validater);
+				trustManager.checkClientTrusted(certChain, certChain[0]
+						.getPublicKey().getAlgorithm());
 				if (_logger.isDebugEnabled())
-					_logger.debug("validated cert: " + certChain[0].getSubjectDN());
+					_logger.debug("validated cert: "
+							+ certChain[0].getSubjectDN());
 				trustOkay = true;
 			}
 		} catch (Throwable e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("could not validate this cert with CANL against trust store: " + certChain[0].getSubjectDN(), e);
+				_logger.debug(
+						"could not validate this cert with CANL against trust store: "
+								+ certChain[0].getSubjectDN(), e);
 		}
 		return trustOkay;
 	}
 
-	static public final byte[] serializePublicKey(PublicKey pk) throws IOException
-	{
+	static public final byte[] serializePublicKey(PublicKey pk)
+			throws IOException {
 		ByteArrayOutputStream baos = null;
 		ObjectOutputStream oos = null;
 
@@ -243,8 +258,8 @@ public class SecurityUtilities implements CertificateValidator
 		}
 	}
 
-	static public final PublicKey deserializePublicKey(byte[] data) throws IOException, ClassNotFoundException
-	{
+	static public final PublicKey deserializePublicKey(byte[] data)
+			throws IOException, ClassNotFoundException {
 		ByteArrayInputStream bais = null;
 		ObjectInputStream ois = null;
 
@@ -265,8 +280,8 @@ public class SecurityUtilities implements CertificateValidator
 	 * @return
 	 * @throws IOException
 	 */
-	static public final byte[] serializeX509Certificate(X509Certificate cert) throws IOException
-	{
+	static public final byte[] serializeX509Certificate(X509Certificate cert)
+			throws IOException {
 		ByteArrayOutputStream baos = null;
 		ObjectOutputStream oos = null;
 
@@ -281,8 +296,8 @@ public class SecurityUtilities implements CertificateValidator
 		}
 	}
 
-	static public final X509Certificate deserializeX509Certificate(byte[] data) throws IOException, ClassNotFoundException
-	{
+	static public final X509Certificate deserializeX509Certificate(byte[] data)
+			throws IOException, ClassNotFoundException {
 		ByteArrayInputStream bais = null;
 		ObjectInputStream ois = null;
 
@@ -303,8 +318,8 @@ public class SecurityUtilities implements CertificateValidator
 	 * @return
 	 * @throws IOException
 	 */
-	static public final byte[][] serializeX509CertificateChain(X509Certificate[] certs) throws IOException
-	{
+	static public final byte[][] serializeX509CertificateChain(
+			X509Certificate[] certs) throws IOException {
 		byte[][] ret = new byte[certs.length][];
 		int lcv = 0;
 		for (X509Certificate cert : certs) {
@@ -314,9 +329,8 @@ public class SecurityUtilities implements CertificateValidator
 		return ret;
 	}
 
-	static public final X509Certificate[] deserializeX509CertificateChain(byte[][] data) throws IOException,
-		ClassNotFoundException
-	{
+	static public final X509Certificate[] deserializeX509CertificateChain(
+			byte[][] data) throws IOException, ClassNotFoundException {
 		X509Certificate[] ret = new X509Certificate[data.length];
 
 		for (int i = 0; i < data.length; i++) {
@@ -326,13 +340,12 @@ public class SecurityUtilities implements CertificateValidator
 		return ret;
 	}
 
-	static final public Pattern GROUP_TOKEN_PATTERN = Pattern
-		.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
-	static final public Pattern CLIENT_IDENTITY_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*Client.*$",
-		Pattern.CASE_INSENSITIVE);
+	static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile(
+			"^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
+	static final public Pattern CLIENT_IDENTITY_PATTERN = Pattern.compile(
+			"^.*(?<![a-z])cn=[^,]*Client.*$", Pattern.CASE_INSENSITIVE);
 
-	static private boolean matches(Identity identity, Pattern[] patterns)
-	{
+	static private boolean matches(Identity identity, Pattern[] patterns) {
 		for (Pattern pattern : patterns) {
 			Matcher matcher = pattern.matcher(identity.toString());
 			if (matcher.matches())
@@ -342,8 +355,8 @@ public class SecurityUtilities implements CertificateValidator
 		return false;
 	}
 
-	static public Collection<Identity> filterCredentials(Collection<Identity> in, Pattern... patterns)
-	{
+	static public Collection<Identity> filterCredentials(
+			Collection<Identity> in, Pattern... patterns) {
 		Collection<Identity> ret = new ArrayList<Identity>(in.size());
 
 		for (Identity test : in) {
@@ -354,8 +367,7 @@ public class SecurityUtilities implements CertificateValidator
 		return ret;
 	}
 
-	static public List<Certificate> loadCertificatesFromDirectory(File directory)
-	{
+	static public List<Certificate> loadCertificatesFromDirectory(File directory) {
 		if (directory == null || !directory.isDirectory())
 			return Collections.emptyList();
 
@@ -377,23 +389,27 @@ public class SecurityUtilities implements CertificateValidator
 				}
 				fis.close();
 				if (_logger.isDebugEnabled())
-					_logger.debug("Loaded trusted certificate(s) from file: " + certificateFile.getName());
+					_logger.debug("Loaded trusted certificate(s) from file: "
+							+ certificateFile.getName());
 			} catch (Exception ex) {
-				_logger.warn("Failed to load certificates from file: " + certificateFile.getName(), ex);
+				_logger.warn("Failed to load certificates from file: "
+						+ certificateFile.getName(), ex);
 			}
 		}
 		if (_logger.isDebugEnabled())
-			_logger.debug("Loaded " + certificateFiles.length + " certificates from trusted directory.");
+			_logger.debug("Loaded " + certificateFiles.length
+					+ " certificates from trusted directory.");
 
 		return certificateList;
 	}
 
-	static public KeyStore createTrustStoreFromCertificates(String proposedTrustStoreType, String password,
-		List<Certificate> certificateList)
-	{
+	static public KeyStore createTrustStoreFromCertificates(
+			String proposedTrustStoreType, String password,
+			List<Certificate> certificateList) {
 
 		KeyStore trustStore = null;
-		char[] trustStorePassword = (password == null) ? "genesisII".toCharArray() : password.toCharArray();
+		char[] trustStorePassword = (password == null) ? "genesisII"
+				.toCharArray() : password.toCharArray();
 
 		Set<String> trustStoreTypes = new HashSet<String>();
 		trustStoreTypes.add(proposedTrustStoreType);
@@ -406,11 +422,13 @@ public class SecurityUtilities implements CertificateValidator
 				trustStore.load(null, trustStorePassword);
 				int certificateIndex = 0;
 				for (Certificate certificate : certificateList) {
-					final String alias = "trusted_certificate_" + certificateIndex;
+					final String alias = "trusted_certificate_"
+							+ certificateIndex;
 					trustStore.setCertificateEntry(alias, certificate);
 					certificateIndex++;
 				}
-				// Successfully loaded all the certificates. Don't have to try the other options.
+				// Successfully loaded all the certificates. Don't have to try
+				// the other options.
 				break;
 			} catch (Exception ex) {
 			}
@@ -421,8 +439,7 @@ public class SecurityUtilities implements CertificateValidator
 	/**
 	 * returns a standard PEM representation for the certificate.
 	 */
-	public static String convertX509ToPem(X509Certificate toConvert)
-	{
+	public static String convertX509ToPem(X509Certificate toConvert) {
 		BASE64Encoder encoder = new BASE64Encoder();
 		StringBuilder s = new StringBuilder();
 		s.append(X509Factory.BEGIN_CERT + "\n");
@@ -438,8 +455,7 @@ public class SecurityUtilities implements CertificateValidator
 	/**
 	 * returns a checksum value across the encoded certificate.
 	 */
-	public static long getChecksum(X509Certificate cert)
-	{
+	public static long getChecksum(X509Certificate cert) {
 		try {
 			byte[] encCert = cert.getEncoded();
 			CRC32 c = new CRC32();
@@ -454,8 +470,7 @@ public class SecurityUtilities implements CertificateValidator
 	/**
 	 * returns a checksum value across the encoded public key.
 	 */
-	public static long getChecksum(PublicKey pk)
-	{
+	public static long getChecksum(PublicKey pk) {
 		try {
 			byte[] encCert = pk.getEncoded();
 			CRC32 c = new CRC32();

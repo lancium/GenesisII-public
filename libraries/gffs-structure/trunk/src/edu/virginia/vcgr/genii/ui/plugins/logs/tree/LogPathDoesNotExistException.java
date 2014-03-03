@@ -1,10 +1,8 @@
 package edu.virginia.vcgr.genii.ui.plugins.logs.tree;
 
-public class LogPathDoesNotExistException extends Exception
-{
+public class LogPathDoesNotExistException extends Exception {
 
-	public LogPathDoesNotExistException(String string)
-	{
+	public LogPathDoesNotExistException(String string) {
 		super(string);
 	}
 

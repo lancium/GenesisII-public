@@ -12,8 +12,7 @@ import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
 
-public class ConfigurationManager
-{
+public class ConfigurationManager {
 	static public final String _USER_DIR_PROPERTY = "edu.virginia.vcgr.genii.client.configuration.user-dir";
 
 	static private final String _CLIENT_CONF_FILENAME = "client-config.xml";
@@ -24,7 +23,8 @@ public class ConfigurationManager
 
 	static private ArrayList<ConfigurationUnloadedListener> _unloadListeners = new ArrayList<ConfigurationUnloadedListener>();
 
-	// Place to remember the user directory for holding things like session state
+	// Place to remember the user directory for holding things like session
+	// state
 	private File _userDir;
 
 	// Client and Container configuration files
@@ -37,8 +37,12 @@ public class ConfigurationManager
 	private FilesystemManager _filesystemManager = null;
 
 	static {
-		FileSystem_Type.getTypeDesc().getFieldByName("uniqueId")
-			.setXmlName(new QName("http://vcgr.cs.virginia.edu/genesisII/jsdl", "unique-id"));
+		FileSystem_Type
+				.getTypeDesc()
+				.getFieldByName("uniqueId")
+				.setXmlName(
+						new QName("http://vcgr.cs.virginia.edu/genesisII/jsdl",
+								"unique-id"));
 	}
 
 	/**
@@ -46,28 +50,28 @@ public class ConfigurationManager
 	 * 
 	 * @param listener
 	 */
-	static synchronized public void addConfigurationUnloadListener(ConfigurationUnloadedListener listener)
-	{
+	static synchronized public void addConfigurationUnloadListener(
+			ConfigurationUnloadedListener listener) {
 		_unloadListeners.add(listener);
 	}
 
 	/**
-	 * Gets the default configuration directory, which is one directory below wherever directory is
-	 * indicated by the install-dir system property.
+	 * Gets the default configuration directory, which is one directory below
+	 * wherever directory is indicated by the install-dir system property.
 	 * 
 	 * @return
 	 */
 	/*
-	 * jfk3w - 10/4/07. Looks wrong and could not find a reference to it. Commented out to test if
-	 * really needed... static protected String getDefaultConfigDir() { return getInstallDir() +
-	 * "/configuration"; }
+	 * jfk3w - 10/4/07. Looks wrong and could not find a reference to it.
+	 * Commented out to test if really needed... static protected String
+	 * getDefaultConfigDir() { return getInstallDir() + "/configuration"; }
 	 */
 
-	static public ConfigurationManager getCurrentConfiguration()
-	{
+	static public ConfigurationManager getCurrentConfiguration() {
 		synchronized (ConfigurationManager.class) {
 			if (_manager == null) {
-				throw new RuntimeException("No configuration manager has been initialized");
+				throw new RuntimeException(
+						"No configuration manager has been initialized");
 			}
 
 			return _manager;
@@ -78,18 +82,20 @@ public class ConfigurationManager
 	 * Creates a configuration manager. Can only be called once.
 	 * 
 	 * @param configurationDir
-	 *            Place to where client/container config files are located. If null, will be filled
-	 *            in using the well-known spot from the installation directory (as per the
-	 *            installation directory system property)
+	 *            Place to where client/container config files are located. If
+	 *            null, will be filled in using the well-known spot from the
+	 *            installation directory (as per the installation directory
+	 *            system property)
 	 * @param userDir
-	 *            Place to remember the user directory for holding things like session state
+	 *            Place to remember the user directory for holding things like
+	 *            session state
 	 * @return
 	 */
-	static public ConfigurationManager initializeConfiguration(String userDir)
-	{
+	static public ConfigurationManager initializeConfiguration(String userDir) {
 		synchronized (ConfigurationManager.class) {
 			if (_manager != null) {
-				throw new RuntimeException("A configuration manager has already been initialized");
+				throw new RuntimeException(
+						"A configuration manager has already been initialized");
 			}
 
 			_manager = new ConfigurationManager(userDir);
@@ -99,16 +105,16 @@ public class ConfigurationManager
 	}
 
 	/**
-	 * Creates new configuration manager and sets it as new _manager using the role and user
-	 * directory from the current manager
+	 * Creates new configuration manager and sets it as new _manager using the
+	 * role and user directory from the current manager
 	 * 
 	 * @return
 	 */
-	static public ConfigurationManager reloadConfiguration()
-	{
+	static public ConfigurationManager reloadConfiguration() {
 		synchronized (ConfigurationManager.class) {
 			if (_manager == null)
-				throw new RuntimeException("Cannot call reloadConfiguration() before initializing configuration manager first.");
+				throw new RuntimeException(
+						"Cannot call reloadConfiguration() before initializing configuration manager first.");
 
 			// notify interested parties that they might want to unload
 			// any cached items from the configuration(s)
@@ -127,16 +133,18 @@ public class ConfigurationManager
 		}
 	}
 
-	protected ConfigurationManager(String userDir)
-	{
+	protected ConfigurationManager(String userDir) {
 		_userDir = new File(userDir);
 
 		System.setProperty(_USER_DIR_PROPERTY, _userDir.getAbsolutePath());
 
-		Deployment deployment = Installation.getDeployment(new DeploymentName());
+		Deployment deployment = Installation
+				.getDeployment(new DeploymentName());
 		try {
-			_clientConf = new XMLConfiguration(deployment.getConfigurationFile(_CLIENT_CONF_FILENAME));
-			_serverConf = new XMLConfiguration(deployment.getConfigurationFile(_SERVER_CONF_FILENAME));
+			_clientConf = new XMLConfiguration(
+					deployment.getConfigurationFile(_CLIENT_CONF_FILENAME));
+			_serverConf = new XMLConfiguration(
+					deployment.getConfigurationFile(_SERVER_CONF_FILENAME));
 
 			File fsConf = deployment.getConfigurationFile("filesystems.xml");
 			if (fsConf.exists())
@@ -148,51 +156,45 @@ public class ConfigurationManager
 		}
 	}
 
-	public XMLConfiguration getContainerConfiguration()
-	{
+	public XMLConfiguration getContainerConfiguration() {
 		return _serverConf;
 	}
 
-	public XMLConfiguration getClientConfiguration()
-	{
+	public XMLConfiguration getClientConfiguration() {
 		return _clientConf;
 	}
 
-	public File getUserDirectory()
-	{
+	public File getUserDirectory() {
 		return _userDir;
 	}
 
-	final public FilesystemManager filesystemManager()
-	{
+	final public FilesystemManager filesystemManager() {
 		return _filesystemManager;
 	}
 
-	synchronized private void setRole(Boolean isClient)
-	{
+	synchronized private void setRole(Boolean isClient) {
 		/*
-		 * if (_isClient != null) throw new RuntimeException("Role already set -- can't reset.");
+		 * if (_isClient != null) throw new
+		 * RuntimeException("Role already set -- can't reset.");
 		 */
 
 		_isClient = isClient;
 	}
 
-	public void setRoleClient()
-	{
+	public void setRoleClient() {
 		setRole(Boolean.TRUE);
 	}
 
-	public void setRoleServer()
-	{
+	public void setRoleServer() {
 		setRole(Boolean.FALSE);
 
-		Thread th = new Thread(new FilesystemPoller(_filesystemManager), "Filesystem Polling Thread");
+		Thread th = new Thread(new FilesystemPoller(_filesystemManager),
+				"Filesystem Polling Thread");
 		th.setDaemon(true);
 		th.start();
 	}
 
-	synchronized public XMLConfiguration getRoleSpecificConfiguration()
-	{
+	synchronized public XMLConfiguration getRoleSpecificConfiguration() {
 		if (_isClient == null)
 			throw new RuntimeException("Role not set.");
 
@@ -202,8 +204,7 @@ public class ConfigurationManager
 			return _serverConf;
 	}
 
-	synchronized public boolean isClientRole()
-	{
+	synchronized public boolean isClientRole() {
 		if (_isClient == null)
 			throw new RuntimeException("Role not set.");
 
@@ -213,8 +214,7 @@ public class ConfigurationManager
 			return false;
 	}
 
-	synchronized public boolean isServerRole()
-	{
+	synchronized public boolean isServerRole() {
 		if (_isClient == null)
 			throw new RuntimeException("Role not set.");
 
@@ -224,18 +224,15 @@ public class ConfigurationManager
 			return true;
 	}
 
-	static private class FilesystemPoller implements Runnable
-	{
+	static private class FilesystemPoller implements Runnable {
 		private FilesystemManager _manager;
 
-		private FilesystemPoller(FilesystemManager manager)
-		{
+		private FilesystemPoller(FilesystemManager manager) {
 			_manager = manager;
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			while (true) {
 				try {
 					_manager.enterPollingLoop();

@@ -12,27 +12,27 @@ import javax.swing.JScrollPane;
 
 import org.morgan.utils.gui.GUIUtils;
 
-public class PictureViewer extends JDialog
-{
+public class PictureViewer extends JDialog {
 	static final long serialVersionUID = 0L;
 
-	private PictureViewer(Window owner, String imageName, Image image)
-	{
-		super(owner, (imageName == null) ? "Image Viewer" : String.format("Image Viewer (%s)", imageName));
+	private PictureViewer(Window owner, String imageName, Image image) {
+		super(owner, (imageName == null) ? "Image Viewer" : String.format(
+				"Image Viewer (%s)", imageName));
 
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
 		JScrollPane scroller = new JScrollPane(new ImageComponent(image));
 
-		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						5, 5, 5, 5), 5, 5));
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 
-	static public void displayPicture(Window owner, Image image, String imageName)
-	{
+	static public void displayPicture(Window owner, Image image,
+			String imageName) {
 		PictureViewer viewer = new PictureViewer(owner, imageName, image);
 		viewer.pack();
 		viewer.setModalityType(ModalityType.MODELESS);
@@ -40,18 +40,15 @@ public class PictureViewer extends JDialog
 		viewer.setVisible(true);
 	}
 
-	static public void displayPicture(Window owner, Image image)
-	{
+	static public void displayPicture(Window owner, Image image) {
 		displayPicture(owner, image, null);
 	}
 
-	static public void displayPicture(Image image, String imageName)
-	{
+	static public void displayPicture(Image image, String imageName) {
 		displayPicture(null, image, imageName);
 	}
 
-	static public void displayPicture(Image image)
-	{
+	static public void displayPicture(Image image) {
 		displayPicture(null, image, null);
 	}
 }

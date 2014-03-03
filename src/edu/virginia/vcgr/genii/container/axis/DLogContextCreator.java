@@ -13,8 +13,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.logging.DLogUtils;
 import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 
-public class DLogContextCreator extends WSDoAllReceiver
-{
+public class DLogContextCreator extends WSDoAllReceiver {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(DLogContextCreator.class);
@@ -24,8 +23,7 @@ public class DLogContextCreator extends WSDoAllReceiver
 
 	private Boolean _isRequest = null;
 
-	private boolean isRequest() throws AxisFault
-	{
+	private boolean isRequest() throws AxisFault {
 		synchronized (this) {
 			if (_isRequest == null) {
 				AxisFault fault = null;
@@ -37,11 +35,13 @@ public class DLogContextCreator extends WSDoAllReceiver
 					else if (value.equals(_FLOW_SIDE_RESPONSE_VALUE))
 						_isRequest = Boolean.FALSE;
 					else
-						fault =
-							new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected " + _FLOW_SIDE_REQUEST_VALUE
-								+ " or " + _FLOW_SIDE_RESPONSE_VALUE);
+						fault = new AxisFault(_FLOW_SIDE_KEY
+								+ " property not recognized.  Expected "
+								+ _FLOW_SIDE_REQUEST_VALUE + " or "
+								+ _FLOW_SIDE_RESPONSE_VALUE);
 				} else {
-					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY + " parameter.");
+					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY
+							+ " parameter.");
 				}
 
 				if (fault != null)
@@ -52,13 +52,11 @@ public class DLogContextCreator extends WSDoAllReceiver
 		return _isRequest.booleanValue();
 	}
 
-	public DLogContextCreator()
-	{
+	public DLogContextCreator() {
 
 	}
 
-	public void invoke(MessageContext msgContext) throws AxisFault
-	{
+	public void invoke(MessageContext msgContext) throws AxisFault {
 		if (isRequest()) {
 			// Setup the context for the RPC
 			LoggingContext.adoptNewContext();
@@ -71,9 +69,11 @@ public class DLogContextCreator extends WSDoAllReceiver
 
 				_logger.trace("Sending a response for " + rpcid);
 
-				SOAPHeaderElement rpcidElement = new SOAPHeaderElement(GenesisIIConstants.RPC_ID_QNAME, rpcid);
+				SOAPHeaderElement rpcidElement = new SOAPHeaderElement(
+						GenesisIIConstants.RPC_ID_QNAME, rpcid);
 
-				msgContext.getMessage().getSOAPHeader().addChildElement(rpcidElement);
+				msgContext.getMessage().getSOAPHeader()
+						.addChildElement(rpcidElement);
 			} catch (SOAPException e) {
 				_logger.debug("Problem getting rpcid from SOAP header", e);
 			} finally {

@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public abstract class AbstractFontModel implements FontModel
-{
+public abstract class AbstractFontModel implements FontModel {
 	private Collection<FontListener> _listeners = new LinkedList<FontListener>();
 
-	final protected void fireFontChanged(Font newFont)
-	{
+	final protected void fireFontChanged(Font newFont) {
 		Collection<FontListener> listeners;
 
 		synchronized (_listeners) {
@@ -21,21 +19,18 @@ public abstract class AbstractFontModel implements FontModel
 			listener.fontChanged(newFont);
 	}
 
-	protected AbstractFontModel()
-	{
+	protected AbstractFontModel() {
 	}
 
 	@Override
-	final public void addFontListener(FontListener listener)
-	{
+	final public void addFontListener(FontListener listener) {
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
 	@Override
-	final public void removeFontListener(FontListener listener)
-	{
+	final public void removeFontListener(FontListener listener) {
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}

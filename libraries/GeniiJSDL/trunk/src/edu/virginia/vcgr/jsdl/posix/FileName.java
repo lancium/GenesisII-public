@@ -20,17 +20,14 @@ package edu.virginia.vcgr.jsdl.posix;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class FileName extends FilesystemRelativeValue
-{
+public class FileName extends FilesystemRelativeValue {
 	static final long serialVersionUID = 0L;
 
-	public FileName(String value)
-	{
+	public FileName(String value) {
 		super(value);
 	}
 
-	public FileName()
-	{
+	public FileName() {
 		super();
 	}
 }

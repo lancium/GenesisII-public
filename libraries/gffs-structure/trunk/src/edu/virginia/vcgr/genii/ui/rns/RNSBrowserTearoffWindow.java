@@ -20,12 +20,11 @@ import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPlugins;
 
-class RNSBrowserTearoffWindow extends UIFrame
-{
+class RNSBrowserTearoffWindow extends UIFrame {
 	static final long serialVersionUID = 0L;
 
-	RNSBrowserTearoffWindow(ApplicationContext applicationContext, UIContext uiContext, RNSTree tree)
-	{
+	RNSBrowserTearoffWindow(ApplicationContext applicationContext,
+			UIContext uiContext, RNSTree tree) {
 		super(uiContext, "Browser");
 
 		Container content = getContentPane();
@@ -35,10 +34,12 @@ class RNSBrowserTearoffWindow extends UIFrame
 		scroller.setMinimumSize(RNSTree.DESIRED_BROWSER_SIZE);
 		scroller.setPreferredSize(RNSTree.DESIRED_BROWSER_SIZE);
 
-		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						5, 5, 5, 5), 5, 5));
 
-		UIPlugins plugins = new UIPlugins(new UIPluginContext(_uiContext, tree, tree));
+		UIPlugins plugins = new UIPlugins(new UIPluginContext(_uiContext, tree,
+				tree));
 		plugins.addTopLevelMenus(getJMenuBar());
 		tree.addTreeSelectionListener(new RNSSelectionListener(plugins, tree));
 
@@ -47,29 +48,29 @@ class RNSBrowserTearoffWindow extends UIFrame
 		tree.addMouseListener(new RNSTreePopupListener(plugins));
 	}
 
-	private class RNSSelectionListener implements TreeSelectionListener
-	{
+	private class RNSSelectionListener implements TreeSelectionListener {
 		private UIPlugins _plugins;
 		private RNSTree _tree;
 
-		private RNSSelectionListener(UIPlugins plugins, RNSTree tree)
-		{
+		private RNSSelectionListener(UIPlugins plugins, RNSTree tree) {
 			_plugins = plugins;
 			_tree = tree;
 		}
 
 		@Override
-		public void valueChanged(TreeSelectionEvent e)
-		{
+		public void valueChanged(TreeSelectionEvent e) {
 			Collection<EndpointDescription> descriptions = new LinkedList<EndpointDescription>();
 			TreePath[] paths = _tree.getSelectionPaths();
 			if (paths != null) {
 				for (TreePath path : paths) {
-					RNSTreeNode node = (RNSTreeNode) path.getLastPathComponent();
+					RNSTreeNode node = (RNSTreeNode) path
+							.getLastPathComponent();
 					RNSTreeObject obj = (RNSTreeObject) node.getUserObject();
 					if (obj.objectType() == RNSTreeObjectType.ENDPOINT_OBJECT) {
 						RNSFilledInTreeObject fObj = (RNSFilledInTreeObject) obj;
-						descriptions.add(new EndpointDescription(fObj.typeInformation(), fObj.endpointType(), fObj.isLocal()));
+						descriptions.add(new EndpointDescription(fObj
+								.typeInformation(), fObj.endpointType(), fObj
+								.isLocal()));
 					}
 				}
 			}

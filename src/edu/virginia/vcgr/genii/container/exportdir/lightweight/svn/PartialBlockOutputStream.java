@@ -4,27 +4,23 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-class PartialBlockOutputStream extends OutputStream
-{
+class PartialBlockOutputStream extends OutputStream {
 	private long _bytesToSkip;
 	private ByteBuffer _buffer;
 
-	PartialBlockOutputStream(ByteBuffer buffer, long bytesToSkip)
-	{
+	PartialBlockOutputStream(ByteBuffer buffer, long bytesToSkip) {
 		_buffer = buffer;
 		_bytesToSkip = bytesToSkip;
 	}
 
 	@Override
-	public void write(int b) throws IOException
-	{
+	public void write(int b) throws IOException {
 		byte[] data = new byte[] { (byte) b };
 		write(data);
 	}
 
 	@Override
-	public void write(byte[] b, int off, int len) throws IOException
-	{
+	public void write(byte[] b, int off, int len) throws IOException {
 		if (_buffer.remaining() <= 0)
 			return;
 		if (_bytesToSkip > 0) {
@@ -45,8 +41,7 @@ class PartialBlockOutputStream extends OutputStream
 	}
 
 	@Override
-	public void write(byte[] b) throws IOException
-	{
+	public void write(byte[] b) throws IOException {
 		write(b, 0, b.length);
 	}
 }

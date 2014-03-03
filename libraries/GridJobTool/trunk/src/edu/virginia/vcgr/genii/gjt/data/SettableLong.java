@@ -5,13 +5,13 @@ import javax.xml.bind.annotation.XmlAttribute;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 
-public class SettableLong extends DefaultDataItem implements PostUnmarshallListener
-{
+public class SettableLong extends DefaultDataItem implements
+		PostUnmarshallListener {
 	@XmlAttribute(name = "value")
 	private Long _value;
 
-	public SettableLong(Long value, ParameterizableBroker pBroker, ModificationBroker mBroker)
-	{
+	public SettableLong(Long value, ParameterizableBroker pBroker,
+			ModificationBroker mBroker) {
 		_value = value;
 
 		if (pBroker != null)
@@ -20,28 +20,24 @@ public class SettableLong extends DefaultDataItem implements PostUnmarshallListe
 			addModificationListener(mBroker);
 	}
 
-	public SettableLong(ParameterizableBroker pBroker, ModificationBroker mBroker)
-	{
+	public SettableLong(ParameterizableBroker pBroker,
+			ModificationBroker mBroker) {
 		this(null, pBroker, mBroker);
 	}
 
-	public SettableLong(Long value)
-	{
+	public SettableLong(Long value) {
 		this(value, null, null);
 	}
 
-	public SettableLong()
-	{
+	public SettableLong() {
 		this(null);
 	}
 
-	final public Long value()
-	{
+	final public Long value() {
 		return _value;
 	}
 
-	final public void value(Long value)
-	{
+	final public void value(Long value) {
 		if (_value == null) {
 			if (value != null) {
 				_value = value;
@@ -55,8 +51,7 @@ public class SettableLong extends DefaultDataItem implements PostUnmarshallListe
 		}
 	}
 
-	final public boolean equals(SettableLong other)
-	{
+	final public boolean equals(SettableLong other) {
 		if (_value == null) {
 			if (other._value == null)
 				return true;
@@ -71,8 +66,7 @@ public class SettableLong extends DefaultDataItem implements PostUnmarshallListe
 	}
 
 	@Override
-	final public boolean equals(Object other)
-	{
+	final public boolean equals(Object other) {
 		if (other instanceof SettableLong)
 			return equals((SettableLong) other);
 
@@ -80,14 +74,13 @@ public class SettableLong extends DefaultDataItem implements PostUnmarshallListe
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return (_value == null) ? "" : _value.toString();
 	}
 
 	@Override
-	public void postUnmarshall(ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
-	{
+	public void postUnmarshall(ParameterizableBroker parameterBroker,
+			ModificationBroker modificationBroker) {
 		fireJobDescriptionModified();
 	}
 }

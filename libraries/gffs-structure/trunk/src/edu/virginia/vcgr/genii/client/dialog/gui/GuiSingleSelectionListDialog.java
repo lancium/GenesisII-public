@@ -18,14 +18,14 @@ import edu.virginia.vcgr.genii.client.dialog.ComboBoxDialog;
 import edu.virginia.vcgr.genii.client.dialog.MenuItem;
 
 @SuppressWarnings("rawtypes")
-public class GuiSingleSelectionListDialog extends AbstractGuiDialog implements ComboBoxDialog
-{
+public class GuiSingleSelectionListDialog extends AbstractGuiDialog implements
+		ComboBoxDialog {
 	static final long serialVersionUID = 0L;
 
 	private JList _list;
 
-	public GuiSingleSelectionListDialog(String title, String prompt, MenuItem defaultItem, MenuItem... items)
-	{
+	public GuiSingleSelectionListDialog(String title, String prompt,
+			MenuItem defaultItem, MenuItem... items) {
 		super(title, prompt, defaultItem, items);
 
 		if (_list.isSelectionEmpty())
@@ -36,8 +36,7 @@ public class GuiSingleSelectionListDialog extends AbstractGuiDialog implements C
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected JComponent createBody(Object[] parameters)
-	{
+	protected JComponent createBody(Object[] parameters) {
 		String prompt = (String) parameters[0];
 		MenuItem defaultItem = (MenuItem) parameters[1];
 		MenuItem[] items = (MenuItem[]) parameters[2];
@@ -50,10 +49,12 @@ public class GuiSingleSelectionListDialog extends AbstractGuiDialog implements C
 		JScrollPane scroller = new JScrollPane(_list);
 
 		JPanel panel = new JPanel(new GridBagLayout());
-		panel.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(new JLabel(prompt), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						5, 5, 5, 5), 5, 5));
+		panel.add(new JLabel(prompt), new GridBagConstraints(0, 1, 1, 1, 1.0,
+				0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
 
 		if (defaultItem != null)
 			_list.setSelectedValue(defaultItem, true);
@@ -61,21 +62,17 @@ public class GuiSingleSelectionListDialog extends AbstractGuiDialog implements C
 		return panel;
 	}
 
-	private class SelectionListener implements ListSelectionListener
-	{
+	private class SelectionListener implements ListSelectionListener {
 		@Override
-		public void valueChanged(ListSelectionEvent e)
-		{
+		public void valueChanged(ListSelectionEvent e) {
 			if (_okAction != null)
 				_okAction.setEnabled(!_list.isSelectionEmpty());
 		}
 	}
 
-	private class MouseClickListener extends MouseAdapter
-	{
+	private class MouseClickListener extends MouseAdapter {
 		@Override
-		public void mouseClicked(MouseEvent e)
-		{
+		public void mouseClicked(MouseEvent e) {
 			if (e.getClickCount() == 2) {
 				if (!_list.isSelectionEmpty()) {
 					_cancelled = false;
@@ -87,8 +84,7 @@ public class GuiSingleSelectionListDialog extends AbstractGuiDialog implements C
 	}
 
 	@Override
-	public MenuItem getSelectedItem()
-	{
+	public MenuItem getSelectedItem() {
 		return (MenuItem) _list.getSelectedValue();
 	}
 }

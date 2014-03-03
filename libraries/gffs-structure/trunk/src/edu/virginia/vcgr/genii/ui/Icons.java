@@ -7,8 +7,7 @@ import javax.swing.ImageIcon;
 
 import org.morgan.util.configuration.ConfigurationException;
 
-public class Icons extends Images
-{
+public class Icons extends Images {
 	static private Icon _tearoff;
 
 	static {
@@ -19,13 +18,11 @@ public class Icons extends Images
 		}
 	}
 
-	static protected ImageIcon loadIcon(String resourceName) throws IOException
-	{
+	static protected ImageIcon loadIcon(String resourceName) throws IOException {
 		return new ImageIcon(loadImage(resourceName));
 	}
 
-	static public Icon tearoffIcon()
-	{
+	static public Icon tearoffIcon() {
 		return _tearoff;
 	}
 }

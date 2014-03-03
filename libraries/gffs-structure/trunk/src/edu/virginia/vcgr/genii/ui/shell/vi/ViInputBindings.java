@@ -5,15 +5,14 @@ import java.awt.event.KeyEvent;
 import edu.virginia.vcgr.genii.ui.shell.BaseInputBindings;
 import edu.virginia.vcgr.genii.ui.shell.KeySet;
 
-public class ViInputBindings extends BaseInputBindings
-{
-	static final private KeySet SYMBOLS = new KeySet(" \t`~!@#$%^&*()_-+={}|[]\\:\";'<>?,./");
+public class ViInputBindings extends BaseInputBindings {
+	static final private KeySet SYMBOLS = new KeySet(
+			" \t`~!@#$%^&*()_-+={}|[]\\:\";'<>?,./");
 
 	private ViMode _mode = ViMode.INPUT_MODE;
 
 	@Override
-	protected void keyPressed(int keyCode, KeyEvent e)
-	{
+	protected void keyPressed(int keyCode, KeyEvent e) {
 		boolean toConsume = false;
 		if (e.isControlDown() || e.isMetaDown()) {
 			if (keyCode == 72)
@@ -61,14 +60,14 @@ public class ViInputBindings extends BaseInputBindings
 	}
 
 	@Override
-	protected void keyTyped(char keyChar, KeyEvent e)
-	{
+	protected void keyTyped(char keyChar, KeyEvent e) {
 		boolean toConsume = true;
 		if (!e.isControlDown() || e.isMetaDown())
 			if (_mode == ViMode.INPUT_MODE) {
 				if (keyChar == KeyEvent.VK_TAB)
 					fireComplete();
-				else if (Character.isLetterOrDigit(keyChar) || SYMBOLS.inSet(keyChar))
+				else if (Character.isLetterOrDigit(keyChar)
+						|| SYMBOLS.inSet(keyChar))
 					toConsume = false;
 				else if (keyChar == KeyEvent.VK_ENTER) {
 					fireEnter();
@@ -80,41 +79,41 @@ public class ViInputBindings extends BaseInputBindings
 					fireEnter();
 				else {
 					switch (keyChar) {
-						case 'x':
-							fireDelete();
-							break;
-						case 'X':
-							fireBackspace();
-							break;
-						case 'h':
-							fireLeft();
-							break;
-						case 'l':
-							fireRight();
-							break;
-						case 'A':
-							fireEnd();
-							_mode = ViMode.INPUT_MODE;
-							break;
-						case 'a':
-							fireRight();
-							_mode = ViMode.INPUT_MODE;
-							break;
-						case 'I':
-							fireHome();
-							_mode = ViMode.INPUT_MODE;
-							break;
-						case 'i':
-							_mode = ViMode.INPUT_MODE;
-							break;
-						case 'k':
-							fireBackwardHistory();
-							break;
-						case 'j':
-							fireForwardHistory();
-							break;
-						default:
-							toConsume = true;
+					case 'x':
+						fireDelete();
+						break;
+					case 'X':
+						fireBackspace();
+						break;
+					case 'h':
+						fireLeft();
+						break;
+					case 'l':
+						fireRight();
+						break;
+					case 'A':
+						fireEnd();
+						_mode = ViMode.INPUT_MODE;
+						break;
+					case 'a':
+						fireRight();
+						_mode = ViMode.INPUT_MODE;
+						break;
+					case 'I':
+						fireHome();
+						_mode = ViMode.INPUT_MODE;
+						break;
+					case 'i':
+						_mode = ViMode.INPUT_MODE;
+						break;
+					case 'k':
+						fireBackwardHistory();
+						break;
+					case 'j':
+						fireForwardHistory();
+						break;
+					default:
+						toConsume = true;
 					}
 				}
 			} else

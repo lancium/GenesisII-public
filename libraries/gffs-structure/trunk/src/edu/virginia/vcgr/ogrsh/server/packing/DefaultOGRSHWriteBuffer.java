@@ -9,9 +9,9 @@ import java.util.LinkedList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DefaultOGRSHWriteBuffer implements IOGRSHWriteBuffer
-{
-	static private Log _logger = LogFactory.getLog(DefaultOGRSHWriteBuffer.class);
+public class DefaultOGRSHWriteBuffer implements IOGRSHWriteBuffer {
+	static private Log _logger = LogFactory
+			.getLog(DefaultOGRSHWriteBuffer.class);
 
 	static private final int _CAPACITY = 1024;
 
@@ -19,16 +19,15 @@ public class DefaultOGRSHWriteBuffer implements IOGRSHWriteBuffer
 	private ByteBuffer _current;
 	private ByteOrder _order;
 
-	private void ensure(int size)
-	{
+	private void ensure(int size) {
 		if (_current.remaining() < size) {
-			_buffers.add(_current = ByteBuffer.allocate((size < _CAPACITY) ? _CAPACITY : size));
+			_buffers.add(_current = ByteBuffer
+					.allocate((size < _CAPACITY) ? _CAPACITY : size));
 			_current.order(_order);
 		}
 	}
 
-	private void writeUTF(String str)
-	{
+	private void writeUTF(String str) {
 		try {
 			byte[] data = str.getBytes("UTF-8");
 			ensure(4);
@@ -51,15 +50,13 @@ public class DefaultOGRSHWriteBuffer implements IOGRSHWriteBuffer
 		}
 	}
 
-	public DefaultOGRSHWriteBuffer(ByteOrder order)
-	{
+	public DefaultOGRSHWriteBuffer(ByteOrder order) {
 		_order = order;
 		_buffers.add(_current = ByteBuffer.allocate(_CAPACITY));
 		_current.order(_order);
 	}
 
-	public ByteBuffer compact()
-	{
+	public ByteBuffer compact() {
 		int totalSize = 0;
 		for (ByteBuffer bb : _buffers) {
 			totalSize += bb.position();
@@ -68,21 +65,21 @@ public class DefaultOGRSHWriteBuffer implements IOGRSHWriteBuffer
 		ByteBuffer ret = ByteBuffer.allocate(totalSize);
 		ret.order(_order);
 		for (ByteBuffer bb : _buffers) {
-			ByteBuffer tmp = ByteBuffer.class.cast(bb.asReadOnlyBuffer().flip());
+			ByteBuffer tmp = ByteBuffer.class
+					.cast(bb.asReadOnlyBuffer().flip());
 			ret.put(tmp);
 		}
 
 		return ret;
 	}
 
-	public void writeRaw(byte[] data, int offset, int length) throws IOException
-	{
+	public void writeRaw(byte[] data, int offset, int length)
+			throws IOException {
 		ensure(length);
 		_current.put(data, offset, length);
 	}
 
-	public void writeObject(Object object) throws IOException
-	{
+	public void writeObject(Object object) throws IOException {
 		if (object == null)
 			writeUTF("null");
 		else {
@@ -119,7 +116,8 @@ public class DefaultOGRSHWriteBuffer implements IOGRSHWriteBuffer
 			writeUTF(cl.getName());
 			if (cl.equals(Boolean.class)) {
 				ensure(1);
-				_current.put(Boolean.class.cast(object).booleanValue() ? (byte) 1 : (byte) 0);
+				_current.put(Boolean.class.cast(object).booleanValue() ? (byte) 1
+						: (byte) 0);
 			} else if (cl.equals(Byte.class)) {
 				ensure(1);
 				_current.put(Byte.class.cast(object).byteValue());
@@ -146,8 +144,10 @@ public class DefaultOGRSHWriteBuffer implements IOGRSHWriteBuffer
 			} else if (IPackable.class.isAssignableFrom(cl)) {
 				IPackable.class.cast(object).pack(this);
 			} else {
-				_logger.error("Don't know how to pack type \"" + cl.getName() + "\".");
-				throw new IOException("Don't know how to pack type \"" + cl.getName() + "\".");
+				_logger.error("Don't know how to pack type \"" + cl.getName()
+						+ "\".");
+				throw new IOException("Don't know how to pack type \""
+						+ cl.getName() + "\".");
 			}
 		}
 	}

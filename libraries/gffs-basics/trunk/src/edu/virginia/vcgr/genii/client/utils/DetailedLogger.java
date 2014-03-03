@@ -17,16 +17,14 @@ import org.apache.log4j.Logger;
 // the main log4j configuration dictates whether any of those are visible or not.
 // note that the log entries will always specify DetailedLogger as the logging class, so it
 // may be wise to include additional information about the true caller.
-public class DetailedLogger
-{
-	private static final Logger _logger = Logger.getLogger(DetailedLogger.class);
+public class DetailedLogger {
+	private static final Logger _logger = Logger
+			.getLogger(DetailedLogger.class);
 
-	public DetailedLogger()
-	{
+	public DetailedLogger() {
 	}
 
-	public Logger detailed()
-	{
+	public Logger detailed() {
 		return _logger;
 	}
 }

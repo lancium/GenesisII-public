@@ -4,8 +4,7 @@ import java.util.Calendar;
 
 import org.ws.addressing.EndpointReferenceType;
 
-public interface Subscription
-{
+public interface Subscription {
 	public void cancel();
 
 	public EndpointReferenceType subscriptionReference();

@@ -13,8 +13,7 @@
  */
 package edu.virginia.vcgr.genii.client.sysinfo;
 
-public interface ISystemInfoProvider
-{
+public interface ISystemInfoProvider {
 	public long getIndividualCPUSpeed();
 
 	public long getPhysicalMemory();

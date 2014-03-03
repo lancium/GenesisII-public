@@ -21,8 +21,7 @@ import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 
-final public class LoginDialog extends JDialog
-{
+final public class LoginDialog extends JDialog {
 	static final long serialVersionUID = 0L;
 
 	private UIContext _context;
@@ -30,8 +29,7 @@ final public class LoginDialog extends JDialog
 	private JTabbedPane _tabbedPane = new JTabbedPane();
 	private LoginAction _loginAction = new LoginAction();
 
-	private LoginDialog(Window owner, UIContext uiContext)
-	{
+	private LoginDialog(Window owner, UIContext uiContext) {
 		super(owner);
 
 		_context = uiContext;
@@ -45,25 +43,25 @@ final public class LoginDialog extends JDialog
 		_tabbedPane.add(new KeystoreLoginPanel());
 		_tabbedPane.add(new UsernamePasswordLoginPanel());
 
-		content.add(_tabbedPane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(_tabbedPane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						5, 5, 5, 5), 5, 5));
 
-		content.add(ButtonPanel.createHorizontalButtonPanel(_loginAction, new CancelAction()), new GridBagConstraints(0, 1, 1,
-			1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalButtonPanel(_loginAction,
+				new CancelAction()), new GridBagConstraints(0, 1, 1, 1, 1.0,
+				0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(5, 5, 5, 5), 5, 5));
 	}
 
-	private class LoginAction extends AbstractAction
-	{
+	private class LoginAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private LoginAction()
-		{
+		private LoginAction() {
 			super("Login");
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e)
-		{
+		final public void actionPerformed(ActionEvent e) {
 			LoginPanel panel = (LoginPanel) _tabbedPane.getSelectedComponent();
 
 			try {
@@ -76,25 +74,23 @@ final public class LoginDialog extends JDialog
 		}
 	}
 
-	private class CancelAction extends AbstractAction
-	{
+	private class CancelAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private CancelAction()
-		{
+		private CancelAction() {
 			super("Cancel");
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e)
-		{
+		final public void actionPerformed(ActionEvent e) {
 			dispose();
 		}
 	}
 
-	static public Collection<NuCredential> doLogin(Component responsibleComponent, UIContext context)
-	{
-		LoginDialog dialog = new LoginDialog(SwingUtilities.getWindowAncestor(responsibleComponent), context);
+	static public Collection<NuCredential> doLogin(
+			Component responsibleComponent, UIContext context) {
+		LoginDialog dialog = new LoginDialog(
+				SwingUtilities.getWindowAncestor(responsibleComponent), context);
 		dialog.setModalityType(ModalityType.DOCUMENT_MODAL);
 		dialog.pack();
 

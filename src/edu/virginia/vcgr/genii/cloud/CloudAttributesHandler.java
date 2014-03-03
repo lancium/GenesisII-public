@@ -11,19 +11,19 @@ import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-public class CloudAttributesHandler extends AbstractAttributeHandler implements CloudConstants
-{
+public class CloudAttributesHandler extends AbstractAttributeHandler implements
+		CloudConstants {
 
-	static private Log _logger = LogFactory.getLog(CloudAttributesHandler.class);
+	static private Log _logger = LogFactory
+			.getLog(CloudAttributesHandler.class);
 
-	public CloudAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
-	{
+	public CloudAttributesHandler(AttributePackage pkg)
+			throws NoSuchMethodException {
 		super(pkg);
 	}
 
 	@Override
-	protected void registerHandlers() throws NoSuchMethodException
-	{
+	protected void registerHandlers() throws NoSuchMethodException {
 		addHandler(SPAWN_RESOURCES_ATTR, "getStatus", "spawnResources");
 		addHandler(SHRINK_RESOURCES_ATTR, "getStatus", "shrinkResources");
 		addHandler(RESOURCE_KILL_ATTR, "getStatus", "killResource");
@@ -31,10 +31,11 @@ public class CloudAttributesHandler extends AbstractAttributeHandler implements 
 		addHandler(VM_INFO_ATTR, "getVMInfo");
 	}
 
-	public void spawnResources(MessageElement element) throws ResourceException, ResourceUnknownFaultType
-	{
+	public void spawnResources(MessageElement element)
+			throws ResourceException, ResourceUnknownFaultType {
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource()
+				.dereference();
 		String besid = resource.getKey();
 		CloudManager tManage = CloudMonitor.getManager(besid);
 
@@ -48,10 +49,11 @@ public class CloudAttributesHandler extends AbstractAttributeHandler implements 
 		}
 	}
 
-	public void killResource(MessageElement element) throws ResourceException, ResourceUnknownFaultType
-	{
+	public void killResource(MessageElement element) throws ResourceException,
+			ResourceUnknownFaultType {
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource()
+				.dereference();
 		String besid = resource.getKey();
 		CloudManager tManage = CloudMonitor.getManager(besid);
 
@@ -64,11 +66,12 @@ public class CloudAttributesHandler extends AbstractAttributeHandler implements 
 		}
 	}
 
-	public void shrinkResources(MessageElement element) throws ResourceException, ResourceUnknownFaultType
-	{
+	public void shrinkResources(MessageElement element)
+			throws ResourceException, ResourceUnknownFaultType {
 		IBESResource resource = null;
 
-		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource()
+				.dereference();
 
 		String besid = resource.getKey();
 		CloudManager tManage = CloudMonitor.getManager(besid);
@@ -82,11 +85,11 @@ public class CloudAttributesHandler extends AbstractAttributeHandler implements 
 		}
 	}
 
-	public MessageElement getVMInfo() throws Exception
-	{
+	public MessageElement getVMInfo() throws Exception {
 
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource()
+				.dereference();
 		String besid = resource.getKey();
 		CloudManager tManage = CloudMonitor.getManager(besid);
 		if (tManage != null) {
@@ -97,11 +100,11 @@ public class CloudAttributesHandler extends AbstractAttributeHandler implements 
 
 	}
 
-	public MessageElement getStatus() throws Exception
-	{
+	public MessageElement getStatus() throws Exception {
 
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource()
+				.dereference();
 		String besid = resource.getKey();
 		CloudManager tManage = CloudMonitor.getManager(besid);
 		if (tManage != null)

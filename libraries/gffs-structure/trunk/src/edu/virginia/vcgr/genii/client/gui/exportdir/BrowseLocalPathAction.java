@@ -7,15 +7,14 @@ import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 
-public class BrowseLocalPathAction extends AbstractAction
-{
+public class BrowseLocalPathAction extends AbstractAction {
 	static final long serialVersionUID = 0L;
 
 	private Component _parent;
 	private JTextField _target;
 
-	public BrowseLocalPathAction(Component parent, String label, JTextField target)
-	{
+	public BrowseLocalPathAction(Component parent, String label,
+			JTextField target) {
 		super(label);
 
 		_parent = parent;
@@ -23,8 +22,7 @@ public class BrowseLocalPathAction extends AbstractAction
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e)
-	{
+	public void actionPerformed(ActionEvent e) {
 		JFileChooser chooser = new JFileChooser();
 
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

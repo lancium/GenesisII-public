@@ -8,19 +8,16 @@ import org.morgan.ftp.FTPSessionState;
 import org.morgan.ftp.ICommand;
 import org.morgan.ftp.PathDoesNotExistException;
 
-public class RenameFromCommandHandler extends AbstractCommandHandler
-{
+public class RenameFromCommandHandler extends AbstractCommandHandler {
 	private String _renameFrom;
 
-	public RenameFromCommandHandler(ICommand command)
-	{
+	public RenameFromCommandHandler(ICommand command) {
 		super(command);
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
-	{
+	public void handleCommand(FTPSessionState sessionState, String verb,
+			String parameters, PrintStream out) throws FTPException {
 		_renameFrom = parameters;
 
 		if (sessionState.getBackend().exists(parameters))
@@ -29,8 +26,7 @@ public class RenameFromCommandHandler extends AbstractCommandHandler
 			throw new PathDoesNotExistException(parameters);
 	}
 
-	public String getFrom()
-	{
+	public String getFrom() {
 		return _renameFrom;
 	}
 }

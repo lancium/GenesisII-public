@@ -41,26 +41,43 @@ import edu.virginia.vcgr.genii.iterator.IterateRequestType;
 import edu.virginia.vcgr.genii.iterator.IterateResponseType;
 import edu.virginia.vcgr.genii.iterator.WSIteratorPortType;
 
-public class AttributeCacheHandler
-{
+public class AttributeCacheHandler {
 	static private Log _logger = LogFactory.getLog(AttributeCacheHandler.class);
 
 	static private final int _MAX_CACHE_ELEMENTS = 1024;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 45;
 
 	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache = new TimedOutLRUCache<WSName, CachedAttributeData>(
-		_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS);
+			_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS);
 
-	static private QName rxferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
-	static private QName rsize = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
-	static private QName raccessTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
-	static private QName rmodTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
-	static private QName rcreatTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
-	static private QName sxferMechs = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
-	static private QName ssize = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
-	static private QName saccessTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
-	static private QName smodTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
-	static private QName screatTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
+	static private QName rxferMechs = new QName(
+			ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.XFER_MECHS_ATTR_NAME);
+	static private QName rsize = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.SIZE_ATTR_NAME);
+	static private QName raccessTime = new QName(
+			ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static private QName rmodTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.MODTIME_ATTR_NAME);
+	static private QName rcreatTime = new QName(
+			ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.CREATTIME_ATTR_NAME);
+	static private QName sxferMechs = new QName(
+			ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.XFER_MECHS_ATTR_NAME);
+	static private QName ssize = new QName(
+			ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.SIZE_ATTR_NAME);
+	static private QName saccessTime = new QName(
+			ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static private QName smodTime = new QName(
+			ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.MODTIME_ATTR_NAME);
+	static private QName screatTime = new QName(
+			ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.CREATTIME_ATTR_NAME);
 
 	// static private QName authz = AuthZConfig.getTypeDesc().getXmlType();
 
@@ -68,11 +85,9 @@ public class AttributeCacheHandler
 	 * static private QName authz = new QName("http://tempuri.org", "Mark");
 	 */
 
-	private class FlushListener implements AttributeCacheFlushListener
-	{
+	private class FlushListener implements AttributeCacheFlushListener {
 		@Override
-		public void flush(WSName endpoint, QName... attributes)
-		{
+		public void flush(WSName endpoint, QName... attributes) {
 			synchronized (_attrCache) {
 				if (endpoint == null) {
 					if ((attributes == null) || (attributes.length == 0)) {
@@ -96,14 +111,13 @@ public class AttributeCacheHandler
 		}
 	}
 
-	public AttributeCacheHandler()
-	{
+	public AttributeCacheHandler() {
 		AttributeCache.addFlushListener(new FlushListener());
 		_attrCache.activelyTimeoutElements(true);
 	}
 
-	private Collection<MessageElement> findAttributes(QName[] attrs, CachedAttributeData data)
-	{
+	private Collection<MessageElement> findAttributes(QName[] attrs,
+			CachedAttributeData data) {
 		Collection<MessageElement> ret = new ArrayList<MessageElement>();
 		for (QName attr : attrs) {
 			Collection<MessageElement> partial = data.getAttributes(attr);
@@ -119,9 +133,9 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(InvocationContext ctxt,
-		GetResourcePropertyDocument request) throws Throwable
-	{
+	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(
+			InvocationContext ctxt, GetResourcePropertyDocument request)
+			throws Throwable {
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
 
@@ -139,7 +153,8 @@ public class AttributeCacheHandler
 		}
 
 		if (data == null || !data.isFull()) {
-			GetResourcePropertyDocumentResponse resp = (GetResourcePropertyDocumentResponse) ctxt.proceed();
+			GetResourcePropertyDocumentResponse resp = (GetResourcePropertyDocumentResponse) ctxt
+					.proceed();
 			data = new CachedAttributeData(resp);
 			synchronized (_attrCache) {
 				_attrCache.put(name, data);
@@ -150,9 +165,9 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public UpdateResourcePropertiesResponse updateResourceProperties(InvocationContext ctxt,
-		UpdateResourceProperties updateRequest) throws Throwable
-	{
+	public UpdateResourcePropertiesResponse updateResourceProperties(
+			InvocationContext ctxt, UpdateResourceProperties updateRequest)
+			throws Throwable {
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
 
@@ -172,9 +187,9 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public DeleteResourcePropertiesResponse deleteResourceProperties(InvocationContext ctxt,
-		DeleteResourceProperties deleteRequest) throws Throwable
-	{
+	public DeleteResourcePropertiesResponse deleteResourceProperties(
+			InvocationContext ctxt, DeleteResourceProperties deleteRequest)
+			throws Throwable {
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
 
@@ -194,9 +209,9 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public InsertResourcePropertiesResponse insertResourceProperties(InvocationContext ctxt,
-		InsertResourceProperties insertRequest) throws Throwable
-	{
+	public InsertResourcePropertiesResponse insertResourceProperties(
+			InvocationContext ctxt, InsertResourceProperties insertRequest)
+			throws Throwable {
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
 
@@ -216,9 +231,9 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public SetResourcePropertiesResponse setResourceProperties(InvocationContext ctxt, SetResourceProperties setRequest)
-		throws Throwable
-	{
+	public SetResourcePropertiesResponse setResourceProperties(
+			InvocationContext ctxt, SetResourceProperties setRequest)
+			throws Throwable {
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
 
@@ -238,9 +253,9 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(InvocationContext ctxt,
-		QName[] getMultipleResourcePropertiesRequest) throws Throwable
-	{
+	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(
+			InvocationContext ctxt, QName[] getMultipleResourcePropertiesRequest)
+			throws Throwable {
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
 
@@ -263,7 +278,8 @@ public class AttributeCacheHandler
 		if (ret == null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Couldn't find attribute data...making outcall.");
-			GetMultipleResourcePropertiesResponse resp = (GetMultipleResourcePropertiesResponse) ctxt.proceed();
+			GetMultipleResourcePropertiesResponse resp = (GetMultipleResourcePropertiesResponse) ctxt
+					.proceed();
 			data = new CachedAttributeData(resp.get_any());
 			synchronized (_attrCache) {
 				_attrCache.put(name, data);
@@ -273,15 +289,17 @@ public class AttributeCacheHandler
 		}
 
 		if (ret == null)
-			return new GetMultipleResourcePropertiesResponse(new MessageElement[0]);
+			return new GetMultipleResourcePropertiesResponse(
+					new MessageElement[0]);
 
-		return new GetMultipleResourcePropertiesResponse(ret.toArray(new MessageElement[0]));
+		return new GetMultipleResourcePropertiesResponse(
+				ret.toArray(new MessageElement[0]));
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetResourcePropertyResponse getResourceProperty(InvocationContext ctxt, QName getResourcePropertyRequest)
-		throws Throwable
-	{
+	public GetResourcePropertyResponse getResourceProperty(
+			InvocationContext ctxt, QName getResourcePropertyRequest)
+			throws Throwable {
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
 
@@ -300,25 +318,28 @@ public class AttributeCacheHandler
 
 		Collection<MessageElement> ret = null;
 		if (data != null)
-			ret = findAttributes(new QName[] { getResourcePropertyRequest }, data);
+			ret = findAttributes(new QName[] { getResourcePropertyRequest },
+					data);
 		if (ret == null) {
-			GetResourcePropertyResponse resp = (GetResourcePropertyResponse) ctxt.proceed();
+			GetResourcePropertyResponse resp = (GetResourcePropertyResponse) ctxt
+					.proceed();
 			data = new CachedAttributeData(resp.get_any());
 			synchronized (_attrCache) {
 				_attrCache.put(name, data);
 			}
 
-			ret = findAttributes(new QName[] { getResourcePropertyRequest }, data);
+			ret = findAttributes(new QName[] { getResourcePropertyRequest },
+					data);
 		}
 
 		if (ret == null)
 			return new GetResourcePropertyResponse(new MessageElement[0]);
 
-		return new GetResourcePropertyResponse(ret.toArray(new MessageElement[0]));
+		return new GetResourcePropertyResponse(
+				ret.toArray(new MessageElement[0]));
 	}
 
-	private void cacheResponse(RNSEntryResponseType member)
-	{
+	private void cacheResponse(RNSEntryResponseType member) {
 		RNSMetadataType mdt = member.getMetadata();
 		MessageElement[] any = (mdt == null) ? null : mdt.get_any();
 		if (any != null) {
@@ -329,21 +350,31 @@ public class AttributeCacheHandler
 					ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
 					for (MessageElement elem : any) {
 						QName elemName = elem.getQName();
-						if (elemName.equals(rxferMechs) || elemName.equals(rsize) || elemName.equals(raccessTime)
-							|| elemName.equals(rmodTime) || elemName.equals(rcreatTime)
-							|| elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) || elemName.equals(sxferMechs)
-							|| elemName.equals(ssize) || elemName.equals(saccessTime) || elemName.equals(smodTime)
-							|| elemName.equals(screatTime)) {
+						if (elemName.equals(rxferMechs)
+								|| elemName.equals(rsize)
+								|| elemName.equals(raccessTime)
+								|| elemName.equals(rmodTime)
+								|| elemName.equals(rcreatTime)
+								|| elemName
+										.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME)
+								|| elemName.equals(sxferMechs)
+								|| elemName.equals(ssize)
+								|| elemName.equals(saccessTime)
+								|| elemName.equals(smodTime)
+								|| elemName.equals(screatTime)) {
 							if (_logger.isDebugEnabled())
-								_logger.debug("Adding " + elemName + " to " + name);
+								_logger.debug("Adding " + elemName + " to "
+										+ name);
 							cachedAttrs.add(elem);
 						} else {
 							if (_logger.isDebugEnabled())
-								_logger.debug("NOT Adding " + elemName + " to " + name);
+								_logger.debug("NOT Adding " + elemName + " to "
+										+ name);
 						}
 					}
 
-					CachedAttributeData data = new CachedAttributeData(cachedAttrs);
+					CachedAttributeData data = new CachedAttributeData(
+							cachedAttrs);
 					synchronized (_attrCache) {
 						_attrCache.put(name, data);
 					}
@@ -353,12 +384,13 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = EnhancedRNSPortType.class)
-	public LookupResponseType lookup(InvocationContext ctxt, String[] names) throws Throwable
-	{
+	public LookupResponseType lookup(InvocationContext ctxt, String[] names)
+			throws Throwable {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Doing an RNS iterator listing so we can cache attribute data.");
 
-		// We're going to let the list proceed, and then see if any meta data came back with it.
+		// We're going to let the list proceed, and then see if any meta data
+		// came back with it.
 		LookupResponseType resp = (LookupResponseType) ctxt.proceed();
 		RNSEntryResponseType[] initMembers = resp.getEntryResponse();
 
@@ -373,20 +405,24 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = WSIteratorPortType.class)
-	public IterateResponseType iterate(InvocationContext ctxt, IterateRequestType iterateRequest) throws Throwable
-	{
+	public IterateResponseType iterate(InvocationContext ctxt,
+			IterateRequestType iterateRequest) throws Throwable {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Doing an iterator iterate so we can cache attribute data.");
 
-		// We're going to let the iterate proceed, and then see if any meta data came back with it.
+		// We're going to let the iterate proceed, and then see if any meta data
+		// came back with it.
 		IterateResponseType resp = (IterateResponseType) ctxt.proceed();
 		if (resp.getIterableElement() != null) {
 			for (IterableElementType member : resp.getIterableElement()) {
 				MessageElement[] any = member.get_any();
 				if (any != null && any.length == 1) {
 					QName type = any[0].getQName();
-					if (type != null && type.equals(RNSEntryResponseType.getTypeDesc().getXmlType())) {
-						RNSEntryResponseType entry = ObjectDeserializer.toObject(any[0], RNSEntryResponseType.class);
+					if (type != null
+							&& type.equals(RNSEntryResponseType.getTypeDesc()
+									.getXmlType())) {
+						RNSEntryResponseType entry = ObjectDeserializer
+								.toObject(any[0], RNSEntryResponseType.class);
 						// Fill metadata cache
 						cacheResponse(entry);
 

@@ -5,15 +5,15 @@ import javax.swing.Icon;
 import edu.virginia.vcgr.genii.client.utils.icon.IconProvider;
 import edu.virginia.vcgr.genii.client.utils.icon.StandardIconProvider;
 
-public class DefaultHistoryCategoryInformation implements HistoryCategoryInformation
-{
+public class DefaultHistoryCategoryInformation implements
+		HistoryCategoryInformation {
 	private IconProvider _iconProvider;
 	private Icon _icon = null;
 	private String _description;
 	private String _name;
 
-	public DefaultHistoryCategoryInformation(String name, String description, IconProvider iconProvider)
-	{
+	public DefaultHistoryCategoryInformation(String name, String description,
+			IconProvider iconProvider) {
 		if (name == null)
 			throw new IllegalArgumentException("Name cannot be null.");
 
@@ -26,24 +26,20 @@ public class DefaultHistoryCategoryInformation implements HistoryCategoryInforma
 		_iconProvider = iconProvider;
 	}
 
-	public DefaultHistoryCategoryInformation(String name, String description)
-	{
+	public DefaultHistoryCategoryInformation(String name, String description) {
 		this(name, description, null);
 	}
 
-	public DefaultHistoryCategoryInformation(String name, IconProvider icon)
-	{
+	public DefaultHistoryCategoryInformation(String name, IconProvider icon) {
 		this(name, null, icon);
 	}
 
-	public DefaultHistoryCategoryInformation(String name)
-	{
+	public DefaultHistoryCategoryInformation(String name) {
 		this(name, null, null);
 	}
 
 	@Override
-	synchronized public Icon categoryIcon()
-	{
+	synchronized public Icon categoryIcon() {
 		if (_icon == null)
 			_icon = _iconProvider.createIcon();
 
@@ -51,14 +47,12 @@ public class DefaultHistoryCategoryInformation implements HistoryCategoryInforma
 	}
 
 	@Override
-	public String description()
-	{
+	public String description() {
 		return _description;
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return _name;
 	}
 }

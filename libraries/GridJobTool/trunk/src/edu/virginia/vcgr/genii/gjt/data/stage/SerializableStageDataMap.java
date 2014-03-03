@@ -6,23 +6,19 @@ import javax.xml.bind.annotation.XmlElement;
 
 import edu.virginia.vcgr.genii.gjt.data.JobDocumentConstants;
 
-public class SerializableStageDataMap
-{
+public class SerializableStageDataMap {
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "stage-data")
 	private Vector<SerializableStageData> _stageData;
 
-	public SerializableStageDataMap()
-	{
+	public SerializableStageDataMap() {
 		_stageData = new Vector<SerializableStageData>();
 	}
 
-	public void add(SerializableStageData var)
-	{
+	public void add(SerializableStageData var) {
 		_stageData.add(var);
 	}
 
-	public Vector<SerializableStageData> stageData()
-	{
+	public Vector<SerializableStageData> stageData() {
 		return _stageData;
 	}
 }

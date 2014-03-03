@@ -16,19 +16,17 @@ import javax.swing.event.CaretListener;
 import edu.virginia.g3.fsview.gui.AbstractFSViewInformationModel;
 import edu.virginia.g3.fsview.gui.AcceptabilityState;
 
-final class FileFSViewInformationModel extends AbstractFSViewInformationModel<URI>
-{
+final class FileFSViewInformationModel extends
+		AbstractFSViewInformationModel<URI> {
 	private String _filesystemPath;
 
-	FileFSViewInformationModel()
-	{
+	FileFSViewInformationModel() {
 		super("Filesystem");
 
 		filesystemPath("");
 	}
 
-	void filesystemPath(String filesystemPath)
-	{
+	void filesystemPath(String filesystemPath) {
 		if (filesystemPath == null)
 			filesystemPath = "";
 
@@ -38,36 +36,34 @@ final class FileFSViewInformationModel extends AbstractFSViewInformationModel<UR
 	}
 
 	@Override
-	final public AcceptabilityState isAcceptable()
-	{
+	final public AcceptabilityState isAcceptable() {
 		if (_filesystemPath.length() > 0)
 			return AcceptabilityState.accept(FileFSViewInformationModel.class);
 
-		return AcceptabilityState.deny(FileFSViewInformationModel.class, "Filesystem path cannot be empty");
+		return AcceptabilityState.deny(FileFSViewInformationModel.class,
+				"Filesystem path cannot be empty");
 	}
 
 	@Override
-	final public URI wrap()
-	{
+	final public URI wrap() {
 		File file = new File(_filesystemPath);
 		return file.toURI();
 	}
 
 	@Override
-	final public Component createGuiComponent()
-	{
+	final public Component createGuiComponent() {
 		JPanel panel = new JPanel(new GridBagLayout());
 
-		panel.add(new JLabel("Filesystem Path"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JLabel("Filesystem Path"), new GridBagConstraints(0, 0,
+				1, 1, 0.0, 1.0, GridBagConstraints.WEST,
+				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		JTextField field = new JTextField(32);
-		panel.add(field, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-			new Insets(5, 5, 5, 5), 5, 5));
-		field.addCaretListener(new CaretListener()
-		{
+		panel.add(field, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(5, 5, 5, 5), 5, 5));
+		field.addCaretListener(new CaretListener() {
 			@Override
-			final public void caretUpdate(CaretEvent e)
-			{
+			final public void caretUpdate(CaretEvent e) {
 				JTextField field = (JTextField) e.getSource();
 				filesystemPath(field.getText());
 			}

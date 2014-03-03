@@ -48,10 +48,11 @@ import edu.virginia.vcgr.jsdl.posix.UserName;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlRootElement(namespace = SPMDConstants.JSDL_SPMD_NS, name = "SPMDApplication")
-@XmlType(propOrder = { "_executable", "_arguments", "_input", "_output", "_error", "_workingDirectory",
-	"_environmentVariables", "_userName", "_numberOfProcesses", "_processesPerHost", "_threadsPerProcess", "_spmdVariation" })
-public class SPMDApplication implements ApplicationBase, Serializable
-{
+@XmlType(propOrder = { "_executable", "_arguments", "_input", "_output",
+		"_error", "_workingDirectory", "_environmentVariables", "_userName",
+		"_numberOfProcesses", "_processesPerHost", "_threadsPerProcess",
+		"_spmdVariation" })
+public class SPMDApplication implements ApplicationBase, Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -99,133 +100,107 @@ public class SPMDApplication implements ApplicationBase, Serializable
 
 	private List<Element> _any = new LinkedList<Element>();
 
-	final public void name(String value)
-	{
+	final public void name(String value) {
 		_name = value;
 	}
 
-	final public String name()
-	{
+	final public String name() {
 		return _name;
 	}
 
-	final public void executable(FileName value)
-	{
+	final public void executable(FileName value) {
 		_executable = value;
 	}
 
-	final public FileName executable()
-	{
+	final public FileName executable() {
 		return _executable;
 	}
 
-	final public List<Argument> arguments()
-	{
+	final public List<Argument> arguments() {
 		return _arguments;
 	}
 
-	final public void input(FileName value)
-	{
+	final public void input(FileName value) {
 		_input = value;
 	}
 
-	final public FileName input()
-	{
+	final public FileName input() {
 		return _input;
 	}
 
-	final public void output(FileName value)
-	{
+	final public void output(FileName value) {
 		_output = value;
 	}
 
-	final public FileName output()
-	{
+	final public FileName output() {
 		return _output;
 	}
 
-	final public void error(FileName value)
-	{
+	final public void error(FileName value) {
 		_error = value;
 	}
 
-	final public FileName error()
-	{
+	final public FileName error() {
 		return _error;
 	}
 
-	final public void workingDirectory(DirectoryName value)
-	{
+	final public void workingDirectory(DirectoryName value) {
 		_workingDirectory = value;
 	}
 
-	final public DirectoryName workingDirectory()
-	{
+	final public DirectoryName workingDirectory() {
 		return _workingDirectory;
 	}
 
-	final public List<Environment> environmentVariables()
-	{
+	final public List<Environment> environmentVariables() {
 		return _environmentVariables;
 	}
 
-	final public void userName(UserName value)
-	{
+	final public void userName(UserName value) {
 		_userName = value;
 	}
 
-	final public UserName userName()
-	{
+	final public UserName userName() {
 		return _userName;
 	}
 
-	final public void numberOfProcesses(NumberOfProcesses numberOfProcesses)
-	{
+	final public void numberOfProcesses(NumberOfProcesses numberOfProcesses) {
 		_numberOfProcesses = numberOfProcesses;
 	}
 
-	final public NumberOfProcesses numberOfProcesses()
-	{
+	final public NumberOfProcesses numberOfProcesses() {
 		return _numberOfProcesses;
 	}
 
-	final public void processesPerHost(ProcessesPerHost processesPerHost)
-	{
+	final public void processesPerHost(ProcessesPerHost processesPerHost) {
 		_processesPerHost = processesPerHost;
 	}
 
-	final public ProcessesPerHost processesPerHost()
-	{
+	final public ProcessesPerHost processesPerHost() {
 		return _processesPerHost;
 	}
 
-	final public void threadsPerProcess(ThreadsPerProcess threadsPerProcess)
-	{
+	final public void threadsPerProcess(ThreadsPerProcess threadsPerProcess) {
 		_threadsPerProcess = threadsPerProcess;
 	}
 
-	final public ThreadsPerProcess threadsPerProcess()
-	{
+	final public ThreadsPerProcess threadsPerProcess() {
 		return _threadsPerProcess;
 	}
 
-	final public void spmdVariation(URI variation)
-	{
+	final public void spmdVariation(URI variation) {
 		_spmdVariation = variation;
 	}
 
-	final public URI spmdVariation()
-	{
+	final public URI spmdVariation() {
 		return _spmdVariation;
 	}
 
-	final public List<Element> any()
-	{
+	final public List<Element> any() {
 		return _any;
 	}
 
-	final public Map<QName, String> anyAttributes()
-	{
+	final public Map<QName, String> anyAttributes() {
 		return _anyAttributes;
 	}
 }

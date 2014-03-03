@@ -6,21 +6,19 @@ import java.net.URI;
 import edu.virginia.g3.fsview.gui.AbstractFSViewInformationModel;
 import edu.virginia.g3.fsview.gui.AcceptabilityState;
 
-final class CifsFSViewInformationModel extends AbstractFSViewInformationModel<URI>
-{
+final class CifsFSViewInformationModel extends
+		AbstractFSViewInformationModel<URI> {
 	private String _hostname;
 	private String _shareName;
 
-	CifsFSViewInformationModel()
-	{
+	CifsFSViewInformationModel() {
 		super("Windows Share");
 
 		hostname(null);
 		shareName(null);
 	}
 
-	final void hostname(String hostname)
-	{
+	final void hostname(String hostname) {
 		if (hostname == null)
 			hostname = "";
 
@@ -29,8 +27,7 @@ final class CifsFSViewInformationModel extends AbstractFSViewInformationModel<UR
 		fireContentsChanged();
 	}
 
-	final void shareName(String name)
-	{
+	final void shareName(String name) {
 		if (name == null)
 			name = "";
 
@@ -40,26 +37,25 @@ final class CifsFSViewInformationModel extends AbstractFSViewInformationModel<UR
 	}
 
 	@Override
-	final public AcceptabilityState isAcceptable()
-	{
+	final public AcceptabilityState isAcceptable() {
 		if (_hostname.length() == 0)
-			return AcceptabilityState.deny(CifsFSViewInformationModel.class, "Hostname cannot be empty");
+			return AcceptabilityState.deny(CifsFSViewInformationModel.class,
+					"Hostname cannot be empty");
 
 		if (_shareName.length() == 0)
-			return AcceptabilityState.deny(CifsFSViewInformationModel.class, "Share name cannot be empty");
+			return AcceptabilityState.deny(CifsFSViewInformationModel.class,
+					"Share name cannot be empty");
 
 		return AcceptabilityState.accept(CifsFSViewInformationModel.class);
 	}
 
 	@Override
-	final public URI wrap()
-	{
+	final public URI wrap() {
 		return URI.create(String.format("smb://%s/%s", _hostname, _shareName));
 	}
 
 	@Override
-	final public Component createGuiComponent()
-	{
+	final public Component createGuiComponent() {
 		return new CifsFSViewInformationPanel(this);
 	}
 }

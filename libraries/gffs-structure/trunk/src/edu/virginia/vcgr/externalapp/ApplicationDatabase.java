@@ -21,29 +21,29 @@ import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
-public class ApplicationDatabase
-{
+public class ApplicationDatabase {
 	static private Log _logger = LogFactory.getLog(ApplicationDatabase.class);
 
 	private ApplicationRegistry _defaultRegistry;
 	private ApplicationRegistry _gridOverrideRegistry;
 	private ApplicationRegistry _localOverrideRegistry;
 
-	protected ApplicationRegistry load(InputStream in) throws JAXBException
-	{
-		JAXBContext context = JAXBContext.newInstance(ApplicationRegistry.class);
+	protected ApplicationRegistry load(InputStream in) throws JAXBException {
+		JAXBContext context = JAXBContext
+				.newInstance(ApplicationRegistry.class);
 
 		Unmarshaller u = context.createUnmarshaller();
 		return (ApplicationRegistry) u.unmarshal(in);
 	}
 
-	protected ApplicationRegistry loadDefaultRegistry()
-	{
+	protected ApplicationRegistry loadDefaultRegistry() {
 		InputStream in = null;
 		try {
-			in = ApplicationDatabase.class.getResourceAsStream("config/appdb-default-config.xml");
+			in = ApplicationDatabase.class
+					.getResourceAsStream("config/appdb-default-config.xml");
 			if (in == null)
-				throw new FileNotFoundException("Unable to find default application configuration resource.");
+				throw new FileNotFoundException(
+						"Unable to find default application configuration resource.");
 			return load(in);
 		} catch (Throwable cause) {
 			_logger.warn("Unable to load default application registry.", cause);
@@ -53,29 +53,40 @@ public class ApplicationDatabase
 		}
 	}
 
-	protected ApplicationRegistry loadGridOverrideRegistry()
-	{
+	protected ApplicationRegistry loadGridOverrideRegistry() {
 		InputStream in = null;
 
 		try {
-			Map<String, String> env = GridUserEnvironment.getGridUserEnvironment();
+			Map<String, String> env = GridUserEnvironment
+					.getGridUserEnvironment();
 			String path = env.get("HOME");
 			if (path != null) {
 				RNSPath current = RNSPath.getCurrent();
-				in = ByteIOStreamFactory.createInputStream(current.lookup(path));
+				in = ByteIOStreamFactory
+						.createInputStream(current.lookup(path));
 				return load(in);
 			}
 		} catch (FileNotFoundException e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Unable to locate grid external application override file.", e);
+				_logger.debug(
+						"Unable to locate grid external application override file.",
+						e);
 		} catch (RemoteException e) {
-			_logger.warn("Unable to load grid external application override file.", e);
+			_logger.warn(
+					"Unable to load grid external application override file.",
+					e);
 		} catch (RNSException e) {
-			_logger.warn("Unable to load grid external application override file.", e);
+			_logger.warn(
+					"Unable to load grid external application override file.",
+					e);
 		} catch (IOException e) {
-			_logger.warn("Unable to load grid external application override file.", e);
+			_logger.warn(
+					"Unable to load grid external application override file.",
+					e);
 		} catch (JAXBException e) {
-			_logger.warn("Unable to load grid external application override file.", e);
+			_logger.warn(
+					"Unable to load grid external application override file.",
+					e);
 		} finally {
 			StreamUtils.close(in);
 		}
@@ -83,8 +94,7 @@ public class ApplicationDatabase
 		return new ApplicationRegistry();
 	}
 
-	protected ApplicationRegistry loadLocalOverrideRegistry()
-	{
+	protected ApplicationRegistry loadLocalOverrideRegistry() {
 		String localHome = System.getProperty("user.home");
 		if (localHome != null) {
 			File path = new File(localHome);
@@ -95,9 +105,13 @@ public class ApplicationDatabase
 				return load(in);
 			} catch (FileNotFoundException e) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("Unable to locate local external application override.", e);
+					_logger.debug(
+							"Unable to locate local external application override.",
+							e);
 			} catch (JAXBException e) {
-				_logger.warn("Unable to load local external application override.", e);
+				_logger.warn(
+						"Unable to load local external application override.",
+						e);
 			} finally {
 				StreamUtils.close(in);
 
@@ -107,15 +121,14 @@ public class ApplicationDatabase
 		return new ApplicationRegistry();
 	}
 
-	private ApplicationDatabase()
-	{
+	private ApplicationDatabase() {
 		_defaultRegistry = loadDefaultRegistry();
 		_gridOverrideRegistry = loadGridOverrideRegistry();
 		_localOverrideRegistry = loadLocalOverrideRegistry();
 	}
 
-	private ExternalApplication getExternalApplication(String mimeType, boolean allowDefault)
-	{
+	private ExternalApplication getExternalApplication(String mimeType,
+			boolean allowDefault) {
 		ExternalApplication app;
 
 		app = _localOverrideRegistry.getApplication(mimeType, allowDefault);
@@ -128,8 +141,7 @@ public class ApplicationDatabase
 		return app;
 	}
 
-	public ExternalApplication getExternalApplication(String mimeType)
-	{
+	public ExternalApplication getExternalApplication(String mimeType) {
 		ExternalApplication app = getExternalApplication(mimeType, false);
 		if (app != null)
 			return app;
@@ -139,8 +151,7 @@ public class ApplicationDatabase
 
 	static private ApplicationDatabase _database = null;
 
-	synchronized static public ApplicationDatabase database()
-	{
+	synchronized static public ApplicationDatabase database() {
 		if (_database == null)
 			_database = new ApplicationDatabase();
 

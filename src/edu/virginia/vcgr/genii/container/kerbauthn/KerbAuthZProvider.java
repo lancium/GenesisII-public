@@ -55,8 +55,7 @@ import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIde
  * @author dmerrill
  * 
  */
-public class KerbAuthZProvider extends AclAuthZProvider
-{
+public class KerbAuthZProvider extends AclAuthZProvider {
 	static private Log _logger = LogFactory.getLog(KerbAuthZProvider.class);
 
 	/**
@@ -64,30 +63,31 @@ public class KerbAuthZProvider extends AclAuthZProvider
 	 */
 	static private ReentrantReadWriteLock kdc_lock = new ReentrantReadWriteLock();
 
-	public KerbAuthZProvider() throws GeneralSecurityException, IOException
-	{
+	public KerbAuthZProvider() throws GeneralSecurityException, IOException {
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation)
-	{
+	public boolean checkAccess(
+			Collection<NuCredential> authenticatedCallerCredentials,
+			IResource resource, Class<?> serviceClass, Method operation) {
 		// Try regular ACLs for administrative access.
 		try {
 			/*
-			 * we cannot let the credentials be used intact, because the myproxy identity could be
-			 * in here, which would lead us to think we authenticated already when we have not yet.
-			 * thus we strip out that credential if we see it and force the user/password
+			 * we cannot let the credentials be used intact, because the myproxy
+			 * identity could be in here, which would lead us to think we
+			 * authenticated already when we have not yet. thus we strip out
+			 * that credential if we see it and force the user/password
 			 * authentication process to occur.
 			 */
 			ArrayList<NuCredential> prunedCredentials = new ArrayList<NuCredential>();
 			X509Certificate[] resourceCertChain = null;
 			try {
-				resourceCertChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+				resourceCertChain = (X509Certificate[]) resource
+						.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			} catch (ResourceException e) {
 				_logger.error("failed to load resource certificate chain for kerberos auth.  resource is: "
-					+ resource.toString());
+						+ resource.toString());
 				// this seems really pretty bad. the resource is bogus.
 				return false;
 			}
@@ -100,20 +100,24 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			}
 
 			/*
-			 * we must check that the resource is writable if we're going to skip authentication.
-			 * this must only be true for the admin of the STS.
+			 * we must check that the resource is writable if we're going to
+			 * skip authentication. this must only be true for the admin of the
+			 * STS.
 			 */
-			boolean accessOkay = checkAccess(prunedCredentials, resource, RWXCategory.WRITE);
+			boolean accessOkay = checkAccess(prunedCredentials, resource,
+					RWXCategory.WRITE);
 			if (accessOkay) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("skipping kerberos authentication due to administrative access to resource.");
-				blurtCredentials("credentials that enabled kerberos authz skip are: ", prunedCredentials);
+				blurtCredentials(
+						"credentials that enabled kerberos authz skip are: ",
+						prunedCredentials);
 				return true;
 			}
 		} catch (Exception AclException) {
 			/*
-			 * we assume we will need the sequel of the function now, since regular ACLs didn't
-			 * work.
+			 * we assume we will need the sequel of the function now, since
+			 * regular ACLs didn't work.
 			 */
 		}
 
@@ -122,11 +126,18 @@ public class KerbAuthZProvider extends AclAuthZProvider
 		String realm = "";
 		String kdc = "";
 		try {
-			username = (String) resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart());
-			realm = (String) resource.getProperty(SecurityConstants.NEW_KERB_IDP_REALM_QNAME.getLocalPart());
-			kdc = (String) resource.getProperty(SecurityConstants.NEW_KERB_IDP_KDC_QNAME.getLocalPart());
+			username = (String) resource
+					.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME
+							.getLocalPart());
+			realm = (String) resource
+					.getProperty(SecurityConstants.NEW_KERB_IDP_REALM_QNAME
+							.getLocalPart());
+			kdc = (String) resource
+					.getProperty(SecurityConstants.NEW_KERB_IDP_KDC_QNAME
+							.getLocalPart());
 		} catch (ResourceException e) {
-			_logger.error("failed to retrieve kerberos properties: " + e.getMessage());
+			_logger.error("failed to retrieve kerberos properties: "
+					+ e.getMessage());
 			return false;
 		}
 
@@ -136,21 +147,23 @@ public class KerbAuthZProvider extends AclAuthZProvider
 		}
 
 		// load the keytable and principal from our file based properties.
-		SslInformation sslinfo = ContainerConfiguration.getTheContainerConfig().getSslInformation();
+		SslInformation sslinfo = ContainerConfiguration.getTheContainerConfig()
+				.getSslInformation();
 		KerberosKeytabAndPrincipal keypr = sslinfo.loadKerberosKeytable(realm);
 
 		if (keypr == null) {
-			_logger.warn("INSECURE Kerberos authentication in realm " + realm + " due to missing keytab or principal!");
+			_logger.warn("INSECURE Kerberos authentication in realm " + realm
+					+ " due to missing keytab or principal!");
 			if (realm.equals("TERAGRID.ORG")) {
-				String msg =
-					"TERAGRID.ORG realm requires authorization to a service principal.  Please ensure "
+				String msg = "TERAGRID.ORG realm requires authorization to a service principal.  Please ensure "
 						+ "keytab and principal are defined in deployment's configuration/security.properties file.";
 				_logger.error(msg);
 				throw new SecurityException(msg);
 			}
 		}
 
-		_logger.info("kerberos STS will authenticate against: realm=" + realm + " kdc=" + kdc);
+		_logger.info("kerberos STS will authenticate against: realm=" + realm
+				+ " kdc=" + kdc);
 
 		ICallingContext callingContext;
 		try {
@@ -161,11 +174,12 @@ public class KerbAuthZProvider extends AclAuthZProvider
 		}
 
 		// try each identity in the caller's credentials
-		ArrayList<NuCredential> callerCredentials =
-			(ArrayList<NuCredential>) callingContext.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
+		ArrayList<NuCredential> callerCredentials = (ArrayList<NuCredential>) callingContext
+				.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
 		for (NuCredential cred : callerCredentials) {
 			if (cred instanceof UsernamePasswordIdentity) {
-				// Grab password from usernametoken (but use the username that is our resource name)
+				// Grab password from usernametoken (but use the username that
+				// is our resource name)
 				UsernamePasswordIdentity utIdentity = (UsernamePasswordIdentity) cred;
 				String password = utIdentity.getPassword();
 
@@ -181,28 +195,37 @@ public class KerbAuthZProvider extends AclAuthZProvider
 
 					// fill in the keytab and principal if we have them.
 					if (keypr != null) {
-						_logger.info("Kerberos: authorizing against service principal '" + keypr._principal + "' for realm '"
-							+ realm + "'");
+						_logger.info("Kerberos: authorizing against service principal '"
+								+ keypr._principal
+								+ "' for realm '"
+								+ realm
+								+ "'");
 						options.put("useKeyTab", "true");
-						File fullKeytabPath =
-							Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keypr._keytab);
+						File fullKeytabPath = Installation
+								.getDeployment(new DeploymentName()).security()
+								.getSecurityFile(keypr._keytab);
 						if (_logger.isDebugEnabled())
-							_logger.debug("Kerberos keytab for realm " + realm + " is at path: "
-								+ fullKeytabPath.getAbsolutePath());
+							_logger.debug("Kerberos keytab for realm " + realm
+									+ " is at path: "
+									+ fullKeytabPath.getAbsolutePath());
 						options.put("keyTab", fullKeytabPath.getAbsolutePath());
 						options.put("principal", keypr._principal);
 						options.put("doNotPrompt", "true");
 					}
 
-					if (!realm.equals(System.getProperty("java.security.krb5.realm"))
-						|| !kdc.equals(System.getProperty("java.security.krb5.kdc"))) {
+					if (!realm.equals(System
+							.getProperty("java.security.krb5.realm"))
+							|| !kdc.equals(System
+									.getProperty("java.security.krb5.kdc"))) {
 						_logger.debug("switching kerberos realm for auth attempt");
 						// Wants different KDC/realm. Upgrade lock
 						kdc_lock.readLock().unlock();
 						kdc_lock.writeLock().lock();
 
-						// The only way to set realm/KDC is through these system properties
-						// (or the krb5.ini/conf global config file). Shame on you, Sun.
+						// The only way to set realm/KDC is through these system
+						// properties
+						// (or the krb5.ini/conf global config file). Shame on
+						// you, Sun.
 						System.setProperty("java.security.krb5.realm", realm);
 						System.setProperty("java.security.krb5.kdc", kdc);
 
@@ -214,12 +237,15 @@ public class KerbAuthZProvider extends AclAuthZProvider
 					Krb5LoginModule loginCtx = new Krb5LoginModule();
 
 					Subject subject = new Subject();
-					loginCtx.initialize(subject, new LoginCallbackHandler(username, password), state, options);
+					loginCtx.initialize(subject, new LoginCallbackHandler(
+							username, password), state, options);
 					loginCtx.login();
-					_logger.info("Success logging kerberos user " + username + " into realm " + realm);
+					_logger.info("Success logging kerberos user " + username
+							+ " into realm " + realm);
 					return true;
 				} catch (LoginException e) {
-					_logger.error("failure authenticating to Kerberos domain", e);
+					_logger.error("failure authenticating to Kerberos domain",
+							e);
 					return false;
 				} finally {
 					// Release read lock
@@ -229,7 +255,8 @@ public class KerbAuthZProvider extends AclAuthZProvider
 		}
 
 		// just try a traditional access check now.
-		boolean accessOkay = super.checkAccess(authenticatedCallerCredentials, resource, serviceClass, operation);
+		boolean accessOkay = super.checkAccess(authenticatedCallerCredentials,
+				resource, serviceClass, operation);
 		if (accessOkay) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("allowing kerberos auth due to base class permission.");
@@ -239,13 +266,16 @@ public class KerbAuthZProvider extends AclAuthZProvider
 		// Nobody appreciates us.
 		String assetName = resource.toString();
 		try {
-			String addIn = (String) resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart());
+			String addIn = (String) resource
+					.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME
+							.getLocalPart());
 			if (addIn != null)
 				assetName.concat(" -- " + addIn);
 		} catch (ResourceException e) {
 			// ignore.
 		}
-		_logger.error("failure to authorize " + operation.getName() + " for " + assetName);
+		_logger.error("failure to authorize " + operation.getName() + " for "
+				+ assetName);
 		return false;
 	}
 }

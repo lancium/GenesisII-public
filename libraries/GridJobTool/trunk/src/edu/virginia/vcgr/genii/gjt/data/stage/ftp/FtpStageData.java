@@ -6,8 +6,7 @@ import edu.virginia.vcgr.genii.gjt.data.analyze.Analysis;
 import edu.virginia.vcgr.genii.gjt.data.stage.AbstractUsernamePasswordStageData;
 import edu.virginia.vcgr.genii.gjt.data.stage.StageProtocol;
 
-public class FtpStageData extends AbstractUsernamePasswordStageData
-{
+public class FtpStageData extends AbstractUsernamePasswordStageData {
 	static final public int DEFAULT_FTP_PORT = 21;
 
 	@XmlAttribute(name = "host")
@@ -20,8 +19,7 @@ public class FtpStageData extends AbstractUsernamePasswordStageData
 	private int _port = DEFAULT_FTP_PORT;
 
 	@Override
-	protected void activateImpl()
-	{
+	protected void activateImpl() {
 		fireParameterizableStringModified("", _host);
 		fireParameterizableStringModified("", _path);
 
@@ -29,26 +27,22 @@ public class FtpStageData extends AbstractUsernamePasswordStageData
 	}
 
 	@Override
-	protected void deactivateImpl()
-	{
+	protected void deactivateImpl() {
 		fireParameterizableStringModified("", _host);
 		fireParameterizableStringModified("", _path);
 
 		fireJobDescriptionModified();
 	}
 
-	FtpStageData()
-	{
+	FtpStageData() {
 		super(StageProtocol.ftp);
 	}
 
-	final String host()
-	{
+	final String host() {
 		return _host;
 	}
 
-	final void host(String host)
-	{
+	final void host(String host) {
 		String old = _host;
 		_host = host;
 
@@ -56,13 +50,11 @@ public class FtpStageData extends AbstractUsernamePasswordStageData
 		fireJobDescriptionModified();
 	}
 
-	final String path()
-	{
+	final String path() {
 		return _path;
 	}
 
-	final void path(String path)
-	{
+	final void path(String path) {
 		String old = _path;
 		_path = path;
 
@@ -70,21 +62,18 @@ public class FtpStageData extends AbstractUsernamePasswordStageData
 		fireJobDescriptionModified();
 	}
 
-	final int port()
-	{
+	final int port() {
 		return _port;
 	}
 
-	final void port(int port)
-	{
+	final void port(int port) {
 		_port = port;
 
 		fireJobDescriptionModified();
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		StringBuilder builder = new StringBuilder("ftp://");
 
 		if (_host == null || _host.length() == 0)
@@ -104,20 +93,21 @@ public class FtpStageData extends AbstractUsernamePasswordStageData
 	}
 
 	@Override
-	public void analyze(String filename, Analysis analysis)
-	{
+	public void analyze(String filename, Analysis analysis) {
 		super.analyze(filename, analysis);
 
 		if (_host == null || _host.length() == 0)
-			analysis.addError("Hostname for data stage \"%s\" must be specified.", filename);
+			analysis.addError(
+					"Hostname for data stage \"%s\" must be specified.",
+					filename);
 
 		if (_path == null || _path.length() == 0)
-			analysis.addError("Path for data stage \"%s\" must be specified.", filename);
+			analysis.addError("Path for data stage \"%s\" must be specified.",
+					filename);
 	}
 
 	@Override
-	public String getJSDLURI()
-	{
+	public String getJSDLURI() {
 		return toString();
 	}
 }

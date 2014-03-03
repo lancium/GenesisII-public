@@ -17,14 +17,12 @@ import edu.virginia.vcgr.genii.ui.plugins.acls.ACLPanel.DeleteAction;
 import edu.virginia.vcgr.genii.ui.utils.CommonKeyStrokes;
 
 @SuppressWarnings("rawtypes")
-class ACLList extends JList
-{
+class ACLList extends JList {
 	static final long serialVersionUID = 0L;
 
 	private Action _delete;
 
-	private void setupInputMap(InputMap iMap)
-	{
+	private void setupInputMap(InputMap iMap) {
 		Action cut = TransferHandler.getCutAction();
 		Action copy = TransferHandler.getCopyAction();
 		Action paste = TransferHandler.getPasteAction();
@@ -33,12 +31,12 @@ class ACLList extends JList
 		iMap.put(CommonKeyStrokes.COPY, copy.getValue(Action.NAME));
 		iMap.put(CommonKeyStrokes.PASTE, paste.getValue(Action.NAME));
 		iMap.put(CommonKeyStrokes.DELETE, _delete.getValue(Action.NAME));
-		// TODO: remap to "go up a level" --> iMap.put(CommonKeyStrokes.BACKSPACE,
+		// TODO: remap to "go up a level" -->
+		// iMap.put(CommonKeyStrokes.BACKSPACE,
 		// _delete.getValue(Action.NAME));
 	}
 
-	private void setupActionMap(ActionMap aMap)
-	{
+	private void setupActionMap(ActionMap aMap) {
 		Action cut = TransferHandler.getCutAction();
 		Action copy = TransferHandler.getCopyAction();
 		Action paste = TransferHandler.getPasteAction();
@@ -51,8 +49,7 @@ class ACLList extends JList
 	}
 
 	@SuppressWarnings("unchecked")
-	ACLList(DeleteAction deleteAction)
-	{
+	ACLList(DeleteAction deleteAction) {
 		super(new DefaultListModel());
 		deleteAction.setACLList(this);
 
@@ -68,29 +65,25 @@ class ACLList extends JList
 	}
 
 	@SuppressWarnings("unchecked")
-	void cancel()
-	{
+	void cancel() {
 		DefaultListModel model = (DefaultListModel) getModel();
 		model.removeAllElements();
 		model.addElement("Cancelled!");
 	}
 
 	@SuppressWarnings("unchecked")
-	void error()
-	{
+	void error() {
 		DefaultListModel model = (DefaultListModel) getModel();
 		model.removeAllElements();
 		model.addElement("Error!");
 	}
 
-	void updating()
-	{
+	void updating() {
 		setEnabled(false);
 	}
 
 	@SuppressWarnings("unchecked")
-	void set(UIContext context, Collection<AclEntry> entries)
-	{
+	void set(UIContext context, Collection<AclEntry> entries) {
 		DefaultListModel model = (DefaultListModel) getModel();
 		model.removeAllElements();
 		for (AclEntry entry : entries)
@@ -101,8 +94,7 @@ class ACLList extends JList
 		setEnabled(true);
 	}
 
-	boolean contains(ACLEntryWrapper wrapper)
-	{
+	boolean contains(ACLEntryWrapper wrapper) {
 		DefaultListModel model = (DefaultListModel) getModel();
 		for (int lcv = 0; lcv < model.getSize(); lcv++)
 			if (model.elementAt(lcv).equals(wrapper))
@@ -111,17 +103,18 @@ class ACLList extends JList
 		return false;
 	}
 
-	Transferable createTransferable()
-	{
+	Transferable createTransferable() {
 		@SuppressWarnings("deprecation")
 		Object[] values = getSelectedValues();
 		if (values == null || values.length == 0)
 			return null;
 
-		Collection<ACLEntryWrapper> wrappers = new Vector<ACLEntryWrapper>(values.length);
+		Collection<ACLEntryWrapper> wrappers = new Vector<ACLEntryWrapper>(
+				values.length);
 		for (Object value : values)
 			wrappers.add((ACLEntryWrapper) value);
 
-		return new ACLTransferable(new ACLEntryWrapperTransferData(ACLList.this, wrappers));
+		return new ACLTransferable(new ACLEntryWrapperTransferData(
+				ACLList.this, wrappers));
 	}
 }

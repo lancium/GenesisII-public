@@ -2,12 +2,11 @@ package edu.virginia.vcgr.genii.wsdl;
 
 import java.io.File;
 
-public class GWsdlTranslater
-{
-	static public void main(String[] args) throws Throwable
-	{
+public class GWsdlTranslater {
+	static public void main(String[] args) throws Throwable {
 		if (args.length != 2) {
-			System.err.println("USAGE:  GWsdlTranslater <input.gwsdl> <output.wsdl>");
+			System.err
+					.println("USAGE:  GWsdlTranslater <input.gwsdl> <output.wsdl>");
 			System.exit(1);
 		}
 

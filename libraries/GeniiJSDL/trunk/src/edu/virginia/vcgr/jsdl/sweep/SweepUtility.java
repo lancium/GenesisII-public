@@ -29,27 +29,26 @@ import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.sweep.eval.EvaluationContext;
 
 /**
- * The SweepUtility class encapsulates common methods for dealing with parameter sweeps. In
- * particular, it has a public method for determining the cardinality of a parameter sweep (that is,
- * how many jobs a parameter sweep JSDL document represents). It also has methods for performing the
- * sweep (creating individual singleton jobs from a jsdl sweep definition).
+ * The SweepUtility class encapsulates common methods for dealing with parameter
+ * sweeps. In particular, it has a public method for determining the cardinality
+ * of a parameter sweep (that is, how many jobs a parameter sweep JSDL document
+ * represents). It also has methods for performing the sweep (creating
+ * individual singleton jobs from a jsdl sweep definition).
  * 
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class SweepUtility
-{
+public class SweepUtility {
 	/**
-	 * Retrieves the cardinality (number of singleton jobs) represented by a single JSDL Parameter
-	 * Sweep document. If the JobDefinition given does not represent a parameter sweep, the
-	 * cardinality is 1.
+	 * Retrieves the cardinality (number of singleton jobs) represented by a
+	 * single JSDL Parameter Sweep document. If the JobDefinition given does not
+	 * represent a parameter sweep, the cardinality is 1.
 	 * 
 	 * @param jobDef
 	 *            The job definition document to determine the cardinality of.
 	 * 
 	 * @return The cardinality of the represented job definition.
 	 */
-	static public int sweepSize(JobDefinition jobDef)
-	{
+	static public int sweepSize(JobDefinition jobDef) {
 		if (jobDef == null)
 			return 0;
 
@@ -66,27 +65,29 @@ public class SweepUtility
 	}
 
 	/**
-	 * Performs the parameter sweep described by the given Job Definition. This method iterates
-	 * through all of the parameters represented by the given parameter sweep document and, for each
-	 * single job that it produces, calls an "emit" method on a provided callback handler. If the
-	 * job definition that is given does not represent a parameter sweep, then the emit method is
-	 * called exactly once for the original job definition document.
+	 * Performs the parameter sweep described by the given Job Definition. This
+	 * method iterates through all of the parameters represented by the given
+	 * parameter sweep document and, for each single job that it produces, calls
+	 * an "emit" method on a provided callback handler. If the job definition
+	 * that is given does not represent a parameter sweep, then the emit method
+	 * is called exactly once for the original job definition document.
 	 * 
 	 * @param context
-	 *            The JAXBContext that will be used to marshall and unmarshall the XML jsdl
-	 *            document. If this parameter is null, then the default JAXBContext for marshalling
-	 *            and unmarshalling JSDL will be used.
+	 *            The JAXBContext that will be used to marshall and unmarshall
+	 *            the XML jsdl document. If this parameter is null, then the
+	 *            default JAXBContext for marshalling and unmarshalling JSDL
+	 *            will be used.
 	 * @param jobDef
 	 *            The job definition document to "sweep" over.
 	 * @param listener
-	 *            The callback listener that will receive singleton jobs produced by the parameter
-	 *            sweep.
-	 * @return A sweep token that can be used to "block" for the sweep to finish.
+	 *            The callback listener that will receive singleton jobs
+	 *            produced by the parameter sweep.
+	 * @return A sweep token that can be used to "block" for the sweep to
+	 *         finish.
 	 * @throws SweepException
 	 */
-	static public SweepToken performSweep(JAXBContext context, JobDefinition jobDef, SweepListener listener)
-		throws SweepException
-	{
+	static public SweepToken performSweep(JAXBContext context,
+			JobDefinition jobDef, SweepListener listener) throws SweepException {
 		if (context == null)
 			context = JSDLUtility.JSDLContext;
 
@@ -98,7 +99,8 @@ public class SweepUtility
 		}
 
 		List<Sweep> parameterSweeps = jobDef.parameterSweeps();
-		Thread th = new Thread(new SweepCreator(token, jobDef, parameterSweeps, listener, context));
+		Thread th = new Thread(new SweepCreator(token, jobDef, parameterSweeps,
+				listener, context));
 		th.setDaemon(false);
 		th.start();
 
@@ -106,44 +108,43 @@ public class SweepUtility
 	}
 
 	/**
-	 * This method is identical to the more specific performSweep operation defined above except
-	 * that it assumes that you will be using the default JAXBContext provided with this library.
+	 * This method is identical to the more specific performSweep operation
+	 * defined above except that it assumes that you will be using the default
+	 * JAXBContext provided with this library.
 	 * 
 	 * @param jobDef
 	 *            The job definition document to "sweep" over.
 	 * @param listener
-	 *            The callback listener that will receive singleton jobs produced by the parameter
-	 *            sweep.
-	 * @return A sweep token that can be used to "block" for the sweep to finish.
+	 *            The callback listener that will receive singleton jobs
+	 *            produced by the parameter sweep.
+	 * @return A sweep token that can be used to "block" for the sweep to
+	 *         finish.
 	 * @throws SweepException
 	 */
-	static public SweepToken performSweep(JobDefinition jobDef, SweepListener listener) throws SweepException
-	{
+	static public SweepToken performSweep(JobDefinition jobDef,
+			SweepListener listener) throws SweepException {
 		return performSweep(JSDLUtility.JSDLContext, jobDef, listener);
 	}
 
-	static private class SweepTokenImpl implements SweepToken
-	{
+	static private class SweepTokenImpl implements SweepToken {
 		private boolean _done;
 		private SweepException _exception;
 
-		synchronized private void completeSweep(SweepException exception)
-		{
+		synchronized private void completeSweep(SweepException exception) {
 			_done = true;
 			_exception = exception;
 			notifyAll();
 		}
 
-		private SweepTokenImpl()
-		{
+		private SweepTokenImpl() {
 			_done = false;
 
 			_exception = null;
 		}
 
 		@Override
-		synchronized public void join() throws SweepException, InterruptedException
-		{
+		synchronized public void join() throws SweepException,
+				InterruptedException {
 			while (!_done) {
 				wait();
 			}
@@ -153,17 +154,16 @@ public class SweepUtility
 		}
 	}
 
-	static private class SweepCreator implements Runnable
-	{
+	static private class SweepCreator implements Runnable {
 		private SweepTokenImpl _token;
 		private List<Sweep> _parameterSweeps;
 		private SweepListener _listener;
 		private JobDefinition _jobDefinition;
 		private JAXBContext _context;
 
-		private SweepCreator(SweepTokenImpl token, JobDefinition jobDefinition, List<Sweep> parameterSweeps,
-			SweepListener listener, JAXBContext context)
-		{
+		private SweepCreator(SweepTokenImpl token, JobDefinition jobDefinition,
+				List<Sweep> parameterSweeps, SweepListener listener,
+				JAXBContext context) {
 			_token = token;
 			_parameterSweeps = parameterSweeps;
 			_listener = listener;
@@ -172,8 +172,7 @@ public class SweepUtility
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			try {
 				if (_parameterSweeps == null || _parameterSweeps.size() == 0)
 					_listener.emitSweepInstance(_jobDefinition);
@@ -183,13 +182,17 @@ public class SweepUtility
 
 					try {
 						DOMResult domResult = new DOMResult();
-						_context.createMarshaller().marshal(_jobDefinition, domResult);
-						EvaluationContext evaluationContext =
-							new EvaluationContext(_listener, _context.createUnmarshaller(), domResult.getNode());
+						_context.createMarshaller().marshal(_jobDefinition,
+								domResult);
+						EvaluationContext evaluationContext = new EvaluationContext(
+								_listener, _context.createUnmarshaller(),
+								domResult.getNode());
 						for (Sweep sweep : copy)
 							sweep.evaluate(evaluationContext);
 					} catch (JAXBException e) {
-						throw new SweepException("Unable to marshall Job Definition document.", e);
+						throw new SweepException(
+								"Unable to marshall Job Definition document.",
+								e);
 					}
 				}
 

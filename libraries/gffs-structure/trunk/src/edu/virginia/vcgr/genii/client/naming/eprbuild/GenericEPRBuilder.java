@@ -12,10 +12,8 @@ import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 import org.ws.addressing.ReferenceParametersType;
 
-public class GenericEPRBuilder implements EPRBuilder
-{
-	static private MessageElement[] convert(Collection<Element> list)
-	{
+public class GenericEPRBuilder implements EPRBuilder {
+	static private MessageElement[] convert(Collection<Element> list) {
 		int lcv = 0;
 		if (list == null || list.size() == 0)
 			return null;
@@ -38,20 +36,17 @@ public class GenericEPRBuilder implements EPRBuilder
 	private Collection<Element> _referenceParameters = new LinkedList<Element>();
 	private Collection<Element> _metadata = new LinkedList<Element>();
 
-	public GenericEPRBuilder(URI address)
-	{
+	public GenericEPRBuilder(URI address) {
 		address(address);
 	}
 
 	@Override
-	final public URI address()
-	{
+	final public URI address() {
 		return _address;
 	}
 
 	@Override
-	final public void address(URI address)
-	{
+	final public void address(URI address) {
 		if (address == null)
 			throw new IllegalArgumentException("Address cannot be null!");
 
@@ -59,38 +54,35 @@ public class GenericEPRBuilder implements EPRBuilder
 	}
 
 	@Override
-	final public void addReferenceParameters(Element... referenceParameters)
-	{
+	final public void addReferenceParameters(Element... referenceParameters) {
 		for (Element rp : referenceParameters)
 			_referenceParameters.add(rp);
 	}
 
 	@Override
-	public Collection<Element> referenceParameters()
-	{
+	public Collection<Element> referenceParameters() {
 		return Collections.unmodifiableCollection(_referenceParameters);
 	}
 
 	@Override
-	final public void addMetadata(Element... metadata)
-	{
+	final public void addMetadata(Element... metadata) {
 		for (Element m : metadata)
 			_metadata.add(m);
 	}
 
 	@Override
-	public Collection<Element> metadata()
-	{
+	public Collection<Element> metadata() {
 		return Collections.unmodifiableCollection(_metadata);
 	}
 
 	@Override
-	final public EndpointReferenceType mint()
-	{
+	final public EndpointReferenceType mint() {
 		MessageElement[] rp = convert(referenceParameters());
 		MessageElement[] m = convert(metadata());
 
-		return new EndpointReferenceType(new AttributedURIType(_address.toString()), (rp == null) ? null
-			: new ReferenceParametersType(rp), (m == null) ? null : new MetadataType(m), null);
+		return new EndpointReferenceType(new AttributedURIType(
+				_address.toString()), (rp == null) ? null
+				: new ReferenceParametersType(rp), (m == null) ? null
+				: new MetadataType(m), null);
 	}
 }

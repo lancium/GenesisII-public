@@ -7,15 +7,12 @@ import java.util.Collection;
 import edu.virginia.vcgr.genii.gjt.BlockingJobToolListener;
 import edu.virginia.vcgr.genii.gjt.JobTool;
 
-public class GridJobToolApplication extends AbstractExternalApplication
-{
-	public GridJobToolApplication()
-	{
+public class GridJobToolApplication extends AbstractExternalApplication {
+	public GridJobToolApplication() {
 	}
 
 	@Override
-	protected void doRun(File content) throws Throwable
-	{
+	protected void doRun(File content) throws Throwable {
 		Collection<File> initialFiles = new ArrayList<File>(1);
 		initialFiles.add(content);
 		BlockingJobToolListener waiter = new BlockingJobToolListener();
@@ -24,8 +21,7 @@ public class GridJobToolApplication extends AbstractExternalApplication
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "Grid Job Tool";
 	}
 }

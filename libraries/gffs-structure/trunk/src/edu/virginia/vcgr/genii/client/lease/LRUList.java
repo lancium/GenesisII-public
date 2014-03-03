@@ -3,22 +3,21 @@ package edu.virginia.vcgr.genii.client.lease;
 import java.util.NoSuchElementException;
 
 /**
- * This special LRU list is designed to make maintaining an LRU relationship constant time. Other
- * than that, it is a relatively straight forward doubly-linked list.
+ * This special LRU list is designed to make maintaining an LRU relationship
+ * constant time. Other than that, it is a relatively straight forward
+ * doubly-linked list.
  * 
  * @author mmm2a
  * 
  * @param <Type>
  */
-public class LRUList<Type extends LRUList.LRUNode>
-{
+public class LRUList<Type extends LRUList.LRUNode> {
 	/**
 	 * The node type of the linked list.
 	 * 
 	 * @author mmm2a
 	 */
-	static public class LRUNode
-	{
+	static public class LRUNode {
 		protected LRUNode _next = null;
 		protected LRUNode _previous = null;
 	}
@@ -33,8 +32,7 @@ public class LRUList<Type extends LRUList.LRUNode>
 	 * @param d
 	 *            The element to add.
 	 */
-	public void add(Type d)
-	{
+	public void add(Type d) {
 		if (_tail == null) {
 			_head = _tail = d;
 			d._next = d._previous = null;
@@ -54,8 +52,7 @@ public class LRUList<Type extends LRUList.LRUNode>
 	 * @param d
 	 *            The element to remove.
 	 */
-	public void remove(Type d)
-	{
+	public void remove(Type d) {
 		if (d._next == null)
 			_tail = d._previous;
 		else
@@ -72,14 +69,13 @@ public class LRUList<Type extends LRUList.LRUNode>
 	}
 
 	/**
-	 * Note the use of some element in the list (moving that element to the tail so that it is the
-	 * most recently used).
+	 * Note the use of some element in the list (moving that element to the tail
+	 * so that it is the most recently used).
 	 * 
 	 * @param d
 	 *            The element to "use".
 	 */
-	public void noteUse(Type d)
-	{
+	public void noteUse(Type d) {
 		remove(d);
 		add(d);
 	}
@@ -89,8 +85,7 @@ public class LRUList<Type extends LRUList.LRUNode>
 	 * 
 	 * @return True if the list is empty, false otherwise.
 	 */
-	public boolean isEmpty()
-	{
+	public boolean isEmpty() {
 		return _head == null;
 	}
 
@@ -99,8 +94,7 @@ public class LRUList<Type extends LRUList.LRUNode>
 	 * 
 	 * @return The number of elements currently in the list.
 	 */
-	public int size()
-	{
+	public int size() {
 		return _size;
 	}
 
@@ -110,8 +104,7 @@ public class LRUList<Type extends LRUList.LRUNode>
 	 * @return The removed (least recently used) item from the list.
 	 */
 	@SuppressWarnings("unchecked")
-	public Type pop()
-	{
+	public Type pop() {
 		if (_head == null)
 			throw new NoSuchElementException("LRUList is empty.");
 

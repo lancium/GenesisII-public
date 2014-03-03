@@ -23,17 +23,17 @@ import org.morgan.util.io.StreamUtils;
  * @author Chris Koeritz
  * 
  *         information about apache ivy thanks to the example at:
- *         http://www.java-forums.org/networking/15527-fetch-files-over-web-server.html
+ *         http://www.java
+ *         -forums.org/networking/15527-fetch-files-over-web-server.html
  */
-public class HttpFileGrabber
-{
+public class HttpFileGrabber {
 	static private Log _logger = LogFactory.getLog(HttpFileGrabber.class);
 
 	/**
-	 * retrieves the set of files found at a URL, if any, and returns them as a list of URLs.
+	 * retrieves the set of files found at a URL, if any, and returns them as a
+	 * list of URLs.
 	 */
-	static public Collection<URL> listRemoteFiles(String directoryURL)
-	{
+	static public Collection<URL> listRemoteFiles(String directoryURL) {
 		URL url;
 		try {
 			url = new URL(directoryURL);
@@ -46,16 +46,18 @@ public class HttpFileGrabber
 			}
 			return toReturn;
 		} catch (Exception e) {
-			_logger.error("caught exception while retrieving file list: " + e.getMessage());
+			_logger.error("caught exception while retrieving file list: "
+					+ e.getMessage());
 		}
 		return null;
 	}
 
 	/**
-	 * downloads the file specified by the URL and stores it in the destination folder.
+	 * downloads the file specified by the URL and stores it in the destination
+	 * folder.
 	 */
-	public static void downloadRemoteFile(URL url, File destination) throws Exception
-	{
+	public static void downloadRemoteFile(URL url, File destination)
+			throws Exception {
 		File remote = new File(url.getFile());
 		File target = new File(destination, remote.getName());
 		target.getParentFile().mkdirs();
@@ -64,29 +66,31 @@ public class HttpFileGrabber
 		try {
 			URLConnection urlc = url.openConnection();
 			bis = new BufferedInputStream(urlc.getInputStream());
-			bos = new BufferedOutputStream(new FileOutputStream(target.getPath()));
+			bos = new BufferedOutputStream(new FileOutputStream(
+					target.getPath()));
 			StreamUtils.copyStream(bis, bos);
 		} finally {
 			if (bis != null) {
 				try {
 					bis.close();
 				} catch (IOException ioe) {
-					_logger.error("exception while closing input stream: " + ioe.getMessage());
+					_logger.error("exception while closing input stream: "
+							+ ioe.getMessage());
 				}
 			}
 			if (bos != null) {
 				try {
 					bos.close();
 				} catch (IOException ioe) {
-					_logger.error("exception while closing output stream: " + ioe.getMessage());
+					_logger.error("exception while closing output stream: "
+							+ ioe.getMessage());
 				}
 			}
 		}
 	}
 
 	/* test app. */
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		String target = "http://gruntose.com/pics";
 		Collection<URL> files = listRemoteFiles(target);
 		_logger.info("found these files at " + target + ":" + files);
@@ -100,7 +104,8 @@ public class HttpFileGrabber
 			try {
 				downloadRemoteFile(url, destination);
 			} catch (Exception e) {
-				_logger.error("There was an exception while downloading files: " + e.getMessage());
+				_logger.error("There was an exception while downloading files: "
+						+ e.getMessage());
 			}
 		}
 		System.out.println("files were downloaded.");

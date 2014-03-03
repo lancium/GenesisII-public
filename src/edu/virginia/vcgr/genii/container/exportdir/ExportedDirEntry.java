@@ -16,8 +16,7 @@ package edu.virginia.vcgr.genii.container.exportdir;
 import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
-class ExportedDirEntry
-{
+class ExportedDirEntry {
 	private String _dirId;
 	private String _name;
 	private EndpointReferenceType _entryReference;
@@ -29,9 +28,9 @@ class ExportedDirEntry
 	static public String _FILE_TYPE = "F";
 	static public String _DIR_TYPE = "D";
 
-	ExportedDirEntry(String dirId, String name, EndpointReferenceType entryReference, String id, String type,
-		MessageElement[] attributes)
-	{
+	ExportedDirEntry(String dirId, String name,
+			EndpointReferenceType entryReference, String id, String type,
+			MessageElement[] attributes) {
 		_dirId = dirId;
 		_name = name;
 
@@ -42,48 +41,40 @@ class ExportedDirEntry
 		_attributes = attributes;
 	}
 
-	ExportedDirEntry(String dirId, String name, EndpointReferenceType entryReference, String id, String type)
-	{
+	ExportedDirEntry(String dirId, String name,
+			EndpointReferenceType entryReference, String id, String type) {
 		this(dirId, name, entryReference, id, type, null);
 	}
 
-	public String getDirId()
-	{
+	public String getDirId() {
 		return _dirId;
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 
-	public EndpointReferenceType getEntryReference()
-	{
+	public EndpointReferenceType getEntryReference() {
 		return _entryReference;
 	}
 
-	public String getId()
-	{
+	public String getId() {
 		return _id;
 	}
 
-	public String getType()
-	{
+	public String getType() {
 		return _type;
 	}
 
-	public MessageElement[] getAttributes()
-	{
+	public MessageElement[] getAttributes() {
 		return _attributes;
 	}
 
-	public void setAttributes(MessageElement[] attributes)
-	{
+	public void setAttributes(MessageElement[] attributes) {
 		_attributes = attributes;
 	}
 
-	public void addAttribute(MessageElement attribute)
-	{
+	public void addAttribute(MessageElement attribute) {
 		int origSize = 0;
 		if (_attributes != null)
 			origSize = _attributes.length;
@@ -95,15 +86,13 @@ class ExportedDirEntry
 		_attributes = newAttributes;
 	}
 
-	public boolean isDirectory()
-	{
+	public boolean isDirectory() {
 		if (_type != null && _type.equals(_DIR_TYPE))
 			return true;
 		return false;
 	}
 
-	public boolean isFile()
-	{
+	public boolean isFile() {
 		if (_type != null && _type.equals(_FILE_TYPE))
 			return true;
 		return false;

@@ -39,443 +39,435 @@ import edu.virginia.vcgr.jsdl.sweep.parameters.NamespaceBinding;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class CollectorJSDLEventReceiver implements JSDLEventReceiver
-{
+public class CollectorJSDLEventReceiver implements JSDLEventReceiver {
 	private Collection<XMLDocumentPath> _collection = new LinkedList<XMLDocumentPath>();
 	private Map<XMLDocumentPath, QName> _attributeCollection = new HashMap<XMLDocumentPath, QName>();
 
-	private void add(XMLDocumentPath path)
-	{
+	private void add(XMLDocumentPath path) {
 		_collection.add((XMLDocumentPath) path.clone());
 	}
 
-	private void add(XMLDocumentPath path, QName attribute)
-	{
+	private void add(XMLDocumentPath path, QName attribute) {
 		_attributeCollection.put(path, attribute);
 	}
 
 	@Override
-	public void handleAnyElement(XMLDocumentPath path, Element anyElement) throws JSDLValidationException
-	{
+	public void handleAnyElement(XMLDocumentPath path, Element anyElement)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void handleAnyAttribute(XMLDocumentPath path, QName attributeName, String attributeValue)
-		throws JSDLValidationException
-	{
+	public void handleAnyAttribute(XMLDocumentPath path, QName attributeName,
+			String attributeValue) throws JSDLValidationException {
 		add(path, attributeName);
 	}
 
 	@Override
-	public void startJobDefinition(XMLDocumentPath path, String id) throws JSDLValidationException
-	{
+	public void startJobDefinition(XMLDocumentPath path, String id)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endJobDefinition(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endJobDefinition(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startJobDescription(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void startJobDescription(XMLDocumentPath path)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endJobDescription(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endJobDescription(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startJobIdentification(XMLDocumentPath path, String jobName, String jobDescription,
-		List<String> jobAnnotations, List<String> jobProjects) throws JSDLValidationException
-	{
+	public void startJobIdentification(XMLDocumentPath path, String jobName,
+			String jobDescription, List<String> jobAnnotations,
+			List<String> jobProjects) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endJobIdentification(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endJobIdentification(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startParameterSweep(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void startParameterSweep(XMLDocumentPath path)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endParameterSweep(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endParameterSweep(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startResources(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void startResources(XMLDocumentPath path)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endResources(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endResources(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startApplication(XMLDocumentPath path, String applicationName, String applicationVersion,
-		String applicationDescription) throws JSDLValidationException
-	{
+	public void startApplication(XMLDocumentPath path, String applicationName,
+			String applicationVersion, String applicationDescription)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endApplication(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endApplication(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startDataStaging(XMLDocumentPath path, String stageName, String filename, String filesystemName,
-		CreationFlag creationFlag, Boolean deleteOnTermination) throws JSDLValidationException
-	{
+	public void startDataStaging(XMLDocumentPath path, String stageName,
+			String filename, String filesystemName, CreationFlag creationFlag,
+			Boolean deleteOnTermination) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endDataStaging(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endDataStaging(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void handleCandidateHost(XMLDocumentPath path, String candidateHost) throws JSDLValidationException
-	{
+	public void handleCandidateHost(XMLDocumentPath path, String candidateHost)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void startFilesystem(XMLDocumentPath path, String filesystemName, FileSystemType fsType, String description,
-		String mountPoint, RangeValue diskSpace) throws JSDLValidationException
-	{
+	public void startFilesystem(XMLDocumentPath path, String filesystemName,
+			FileSystemType fsType, String description, String mountPoint,
+			RangeValue diskSpace) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endFilesystem(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endFilesystem(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void handleExclusiveExecution(XMLDocumentPath path, boolean exclusiveExecution) throws JSDLValidationException
-	{
+	public void handleExclusiveExecution(XMLDocumentPath path,
+			boolean exclusiveExecution) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void startOperatingSystem(XMLDocumentPath path, String osVersion, String description) throws JSDLValidationException
-	{
+	public void startOperatingSystem(XMLDocumentPath path, String osVersion,
+			String description) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endOperatingSystem(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endOperatingSystem(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startOperatingSystemType(XMLDocumentPath path, OperatingSystemNames osName) throws JSDLValidationException
-	{
+	public void startOperatingSystemType(XMLDocumentPath path,
+			OperatingSystemNames osName) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endOperatingSystemType(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endOperatingSystemType(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startCPUArchitecture(XMLDocumentPath path, ProcessorArchitecture processorArchitecture)
-		throws JSDLValidationException
-	{
+	public void startCPUArchitecture(XMLDocumentPath path,
+			ProcessorArchitecture processorArchitecture)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endCPUArchitecture(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endCPUArchitecture(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void handleIndividualResourceRanges(XMLDocumentPath path, RangeValue individualCPUSpeed,
-		RangeValue individualCPUTime, RangeValue individualCPUCount, RangeValue individualNetworkBandwidth,
-		RangeValue individualPhysicalMemory, RangeValue individualVirtualMemory, RangeValue individualDiskSpace)
-		throws JSDLValidationException
-	{
+	public void handleIndividualResourceRanges(XMLDocumentPath path,
+			RangeValue individualCPUSpeed, RangeValue individualCPUTime,
+			RangeValue individualCPUCount,
+			RangeValue individualNetworkBandwidth,
+			RangeValue individualPhysicalMemory,
+			RangeValue individualVirtualMemory, RangeValue individualDiskSpace)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void
-		handleTotalResourceRanges(XMLDocumentPath path, RangeValue totalCPUTime, RangeValue totalCPUCount,
-			RangeValue totalPhysicalMemory, RangeValue totalVirtualMemory, RangeValue totalDiskSpace,
-			RangeValue totalResourceCount) throws JSDLValidationException
-	{
+	public void handleTotalResourceRanges(XMLDocumentPath path,
+			RangeValue totalCPUTime, RangeValue totalCPUCount,
+			RangeValue totalPhysicalMemory, RangeValue totalVirtualMemory,
+			RangeValue totalDiskSpace, RangeValue totalResourceCount)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void startSource(XMLDocumentPath path, String uri) throws JSDLValidationException
-	{
+	public void startSource(XMLDocumentPath path, String uri)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endSource(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endSource(XMLDocumentPath path) throws JSDLValidationException {
 		// We allow all "end..." methods.
 	}
 
 	@Override
-	public void startTarget(XMLDocumentPath path, String uri) throws JSDLValidationException
-	{
+	public void startTarget(XMLDocumentPath path, String uri)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endTarget(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endTarget(XMLDocumentPath path) throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startCredential(XMLDocumentPath path, List<SecurityToken> tokens) throws JSDLValidationException
-	{
+	public void startCredential(XMLDocumentPath path, List<SecurityToken> tokens)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endCredential(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endCredential(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startPOSIXApplication(XMLDocumentPath path, String name) throws JSDLValidationException
-	{
+	public void startPOSIXApplication(XMLDocumentPath path, String name)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endPOSIXApplication(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endPOSIXApplication(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void
-		handleExecutable(XMLDocumentPath path, String filename, String filesystemName, Map<QName, String> anyAttributes)
-			throws JSDLValidationException
-	{
+	public void handleExecutable(XMLDocumentPath path, String filename,
+			String filesystemName, Map<QName, String> anyAttributes)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void handleArgument(XMLDocumentPath path, String argument, String filesystemName, Map<QName, String> anyAttributes)
-		throws JSDLValidationException
-	{
+	public void handleArgument(XMLDocumentPath path, String argument,
+			String filesystemName, Map<QName, String> anyAttributes)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void handleInput(XMLDocumentPath path, String filename, String filesystemName, Map<QName, String> anyAttributes)
-		throws JSDLValidationException
-	{
+	public void handleInput(XMLDocumentPath path, String filename,
+			String filesystemName, Map<QName, String> anyAttributes)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void handleOutput(XMLDocumentPath path, String filename, String filesystemName, Map<QName, String> anyAttributes)
-		throws JSDLValidationException
-	{
+	public void handleOutput(XMLDocumentPath path, String filename,
+			String filesystemName, Map<QName, String> anyAttributes)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void handleError(XMLDocumentPath path, String filename, String filesystemName, Map<QName, String> anyAttributes)
-		throws JSDLValidationException
-	{
+	public void handleError(XMLDocumentPath path, String filename,
+			String filesystemName, Map<QName, String> anyAttributes)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void handleWorkingDirectory(XMLDocumentPath path, String directoryName, String filesystemName,
-		Map<QName, String> anyAttributes) throws JSDLValidationException
-	{
+	public void handleWorkingDirectory(XMLDocumentPath path,
+			String directoryName, String filesystemName,
+			Map<QName, String> anyAttributes) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void handleEnvironmentVariable(XMLDocumentPath path, String variableName, String variableValue,
-		String filesystemName, Map<QName, String> anyAttributes) throws JSDLValidationException
-	{
+	public void handleEnvironmentVariable(XMLDocumentPath path,
+			String variableName, String variableValue, String filesystemName,
+			Map<QName, String> anyAttributes) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void startLimit(XMLDocumentPath path, POSIXLimitType limitType, long value) throws JSDLValidationException
-	{
+	public void startLimit(XMLDocumentPath path, POSIXLimitType limitType,
+			long value) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endLimit(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endLimit(XMLDocumentPath path) throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startUserName(XMLDocumentPath path, String userName) throws JSDLValidationException
-	{
+	public void startUserName(XMLDocumentPath path, String userName)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endUserName(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endUserName(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startGroupName(XMLDocumentPath path, String groupName) throws JSDLValidationException
-	{
+	public void startGroupName(XMLDocumentPath path, String groupName)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endGroupName(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endGroupName(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startHPCProfileApplication(XMLDocumentPath path, String name) throws JSDLValidationException
-	{
+	public void startHPCProfileApplication(XMLDocumentPath path, String name)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endHPCProfileApplication(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endHPCProfileApplication(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startSPMDApplication(XMLDocumentPath path, String name) throws JSDLValidationException
-	{
+	public void startSPMDApplication(XMLDocumentPath path, String name)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endSPMDApplication(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endSPMDApplication(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startNumberOfProcesses(XMLDocumentPath path, boolean actualTotalCPUCount, Long numberOfProcesses)
-		throws JSDLValidationException
-	{
+	public void startNumberOfProcesses(XMLDocumentPath path,
+			boolean actualTotalCPUCount, Long numberOfProcesses)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endNumberOfProcesses(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endNumberOfProcesses(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startProcessesPerHost(XMLDocumentPath path, long processesPerHost) throws JSDLValidationException
-	{
+	public void startProcessesPerHost(XMLDocumentPath path,
+			long processesPerHost) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endProcessesPerHost(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endProcessesPerHost(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startThreadsPerProcess(XMLDocumentPath path, boolean actualIndividualCPUCount, Long threadsPerProces)
-		throws JSDLValidationException
-	{
+	public void startThreadsPerProcess(XMLDocumentPath path,
+			boolean actualIndividualCPUCount, Long threadsPerProces)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endThreadsPerProcess(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endThreadsPerProcess(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void startSweepAssignment(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void startSweepAssignment(XMLDocumentPath path)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void endSweepAssignment(XMLDocumentPath path) throws JSDLValidationException
-	{
+	public void endSweepAssignment(XMLDocumentPath path)
+			throws JSDLValidationException {
 		// We allow all "end..." methods
 	}
 
 	@Override
-	public void handleDocumentNodeSweepParameter(XMLDocumentPath path, List<NamespaceBinding> namespaceBindings,
-		String matchExpression) throws JSDLValidationException
-	{
+	public void handleDocumentNodeSweepParameter(XMLDocumentPath path,
+			List<NamespaceBinding> namespaceBindings, String matchExpression)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void handleValuesSweepFunction(XMLDocumentPath path, List<Object> values) throws JSDLValidationException
-	{
+	public void handleValuesSweepFunction(XMLDocumentPath path,
+			List<Object> values) throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void handleLoopIntegerSweepFunction(XMLDocumentPath path, int start, int end, int step, Set<Integer> exceptions)
-		throws JSDLValidationException
-	{
+	public void handleLoopIntegerSweepFunction(XMLDocumentPath path, int start,
+			int end, int step, Set<Integer> exceptions)
+			throws JSDLValidationException {
 		add(path);
 	}
 
 	@Override
-	public void handleLoopDoubleSweepFunction(XMLDocumentPath path, double start, double end, double step,
-		Set<Double> exceptions) throws JSDLValidationException
-	{
+	public void handleLoopDoubleSweepFunction(XMLDocumentPath path,
+			double start, double end, double step, Set<Double> exceptions)
+			throws JSDLValidationException {
 		add(path);
 	}
 
-	final public Collection<XMLDocumentPath> collectedPaths()
-	{
+	final public Collection<XMLDocumentPath> collectedPaths() {
 		return _collection;
 	}
 
-	final public Map<XMLDocumentPath, QName> collectedAttributes()
-	{
+	final public Map<XMLDocumentPath, QName> collectedAttributes() {
 		return _attributeCollection;
 	}
 }

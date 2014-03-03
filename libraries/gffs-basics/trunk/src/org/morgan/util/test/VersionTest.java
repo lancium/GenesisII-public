@@ -20,10 +20,8 @@ import junit.framework.TestCase;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class VersionTest extends TestCase
-{
-	public void testSimpleVersion()
-	{
+public class VersionTest extends TestCase {
+	public void testSimpleVersion() {
 		Version a = new Version(1);
 		Version b = new Version(1, 0);
 		Version c = new Version(1, 0, 0);

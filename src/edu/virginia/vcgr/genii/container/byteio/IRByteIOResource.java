@@ -20,9 +20,9 @@ import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
-public interface IRByteIOResource extends IResource
-{
-	public File chooseFile(GenesisHashMap creationProperties) throws ResourceException;
+public interface IRByteIOResource extends IResource {
+	public File chooseFile(GenesisHashMap creationProperties)
+			throws ResourceException;
 
 	public File getCurrentFile() throws ResourceException;
 

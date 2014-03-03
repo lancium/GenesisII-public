@@ -76,8 +76,7 @@ import edu.virginia.vcgr.jsdl.sweep.SweepFunction;
 import edu.virginia.vcgr.jsdl.sweep.SweepParameter;
 
 @XmlRootElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "job-project")
-public class JobDocument implements PostUnmarshallListener
-{
+public class JobDocument implements PostUnmarshallListener {
 	@XmlTransient
 	private ModificationBroker _mBroker;
 
@@ -151,13 +150,14 @@ public class JobDocument implements PostUnmarshallListener
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "stage-out")
 	private StageList _stageOuts;
 
-	private JobIdentification generateJobIdentification(XPathBuilder builder, Map<String, List<SweepParameter>> variables)
-	{
+	private JobIdentification generateJobIdentification(XPathBuilder builder,
+			Map<String, List<SweepParameter>> variables) {
 		String value;
 		List<String> values;
 		boolean modified = false;
 
-		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "JobIdentification"));
+		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+				"JobIdentification"));
 		JobIdentification jobIdent = new JobIdentification();
 
 		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "JobName"));
@@ -168,7 +168,8 @@ public class JobDocument implements PostUnmarshallListener
 		}
 		builder.pop();
 
-		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_NS, "JobAnnotation"));
+		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_NS,
+				"JobAnnotation"));
 		values = JSDLGenerator.generate(_jobAnnotations, builder, variables);
 		if (values != null) {
 			jobIdent.annotations().addAll(values);
@@ -176,7 +177,8 @@ public class JobDocument implements PostUnmarshallListener
 		}
 		builder.pop();
 
-		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_NS, "JobProject"));
+		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_NS,
+				"JobProject"));
 		values = JSDLGenerator.generate(_jobProjects, builder, variables);
 		if (values != null) {
 			jobIdent.projects().addAll(values);
@@ -184,7 +186,8 @@ public class JobDocument implements PostUnmarshallListener
 		}
 		builder.pop();
 
-		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "JobDescription"));
+		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+				"JobDescription"));
 		value = JSDLGenerator.generate(_jobDescription, builder, variables);
 		if (value != null) {
 			jobIdent.description(value);
@@ -199,9 +202,9 @@ public class JobDocument implements PostUnmarshallListener
 		return null;
 	}
 
-	private Application generateApplication(XPathBuilder builder, Map<String, List<SweepParameter>> variables,
-		Set<FilesystemType> filesystemSet)
-	{
+	private Application generateApplication(XPathBuilder builder,
+			Map<String, List<SweepParameter>> variables,
+			Set<FilesystemType> filesystemSet) {
 		ApplicationBase app = null;
 
 		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "Application"));
@@ -219,9 +222,9 @@ public class JobDocument implements PostUnmarshallListener
 		return null;
 	}
 
-	private Resources generateResources(XPathBuilder builder, Map<String, List<SweepParameter>> variables,
-		Set<FilesystemType> filesystemSet)
-	{
+	private Resources generateResources(XPathBuilder builder,
+			Map<String, List<SweepParameter>> variables,
+			Set<FilesystemType> filesystemSet) {
 		Resources resources = null;
 
 		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "Resources"));
@@ -242,20 +245,25 @@ public class JobDocument implements PostUnmarshallListener
 
 			OperatingSystem os = new OperatingSystem();
 
-			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "OperatingSystem"));
+			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+					"OperatingSystem"));
 
 			if (_operatingSystem != null) {
-				builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "OperatingSystemType"));
-				builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "OperatingSystemName"));
+				builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+						"OperatingSystemType"));
+				builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+						"OperatingSystemName"));
 				os.osType(new OperatingSystemType(_operatingSystem));
 				builder.pop();
 				builder.pop();
 			}
 
 			if (_operatingSystemVersion != null) {
-				builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "OperatingSystemVersion"));
+				builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+						"OperatingSystemVersion"));
 
-				String value = JSDLGenerator.generate(_operatingSystemVersion, builder, variables);
+				String value = JSDLGenerator.generate(_operatingSystemVersion,
+						builder, variables);
 				if (value != null)
 					os.osVersion(value);
 
@@ -270,9 +278,12 @@ public class JobDocument implements PostUnmarshallListener
 			if (resources == null)
 				resources = new Resources();
 
-			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "CPUArchitecture"));
-			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "CPUArchitectureName"));
-			resources.cpuArchitecture(new CPUArchitecture(_processorArchitecture));
+			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+					"CPUArchitecture"));
+			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+					"CPUArchitectureName"));
+			resources.cpuArchitecture(new CPUArchitecture(
+					_processorArchitecture));
 			builder.pop();
 			builder.pop();
 		}
@@ -281,11 +292,14 @@ public class JobDocument implements PostUnmarshallListener
 			if (resources == null)
 				resources = new Resources();
 
-			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "TotalPhysicalMemory"));
-			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "UpperBoundedRange"));
+			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+					"TotalPhysicalMemory"));
+			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+					"UpperBoundedRange"));
 
 			RangeValue rv = new RangeValue();
-			rv.upperBoundedRange(new Boundary(_memoryUpperBound.units().toBytes(_memoryUpperBound.value())));
+			rv.upperBoundedRange(new Boundary(_memoryUpperBound.units()
+					.toBytes(_memoryUpperBound.value())));
 			resources.totalPhysicalMemory(rv);
 
 			builder.pop();
@@ -296,11 +310,14 @@ public class JobDocument implements PostUnmarshallListener
 			if (resources == null)
 				resources = new Resources();
 
-			builder.push(new DefaultXPathNode("http://vcgr.cs.virginia.edu/jsdl/genii", "WallclockTime"));
-			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "UpperBoundedRange"));
+			builder.push(new DefaultXPathNode(
+					"http://vcgr.cs.virginia.edu/jsdl/genii", "WallclockTime"));
+			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+					"UpperBoundedRange"));
 
 			RangeValue rv = new RangeValue();
-			rv.upperBoundedRange(new Boundary(_wallClockUpperBound.units().toSeconds(_wallClockUpperBound.value())));
+			rv.upperBoundedRange(new Boundary(_wallClockUpperBound.units()
+					.toSeconds(_wallClockUpperBound.value())));
 			resources.wallclockTime(rv);
 
 			builder.pop();
@@ -310,8 +327,10 @@ public class JobDocument implements PostUnmarshallListener
 		if (_numberOfProcesses.value() != null) {
 			if (resources == null)
 				resources = new Resources();
-			builder.push(new DefaultXPathNode("http://vcgr.cs.virginia.edu/jsdl/genii", "TotalCPUCount"));
-			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "UpperBoundedRange"));
+			builder.push(new DefaultXPathNode(
+					"http://vcgr.cs.virginia.edu/jsdl/genii", "TotalCPUCount"));
+			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+					"UpperBoundedRange"));
 
 			RangeValue rv = new RangeValue();
 			rv.upperBoundedRange(new Boundary(_numberOfProcesses.value()));
@@ -324,8 +343,11 @@ public class JobDocument implements PostUnmarshallListener
 		if (_processesPerHost.value() != null) {
 			if (resources == null)
 				resources = new Resources();
-			builder.push(new DefaultXPathNode("http://vcgr.cs.virginia.edu/jsdl/genii", "IndividualCPUCount"));
-			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "UpperBoundedRange"));
+			builder.push(new DefaultXPathNode(
+					"http://vcgr.cs.virginia.edu/jsdl/genii",
+					"IndividualCPUCount"));
+			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+					"UpperBoundedRange"));
 
 			RangeValue rv = new RangeValue();
 
@@ -340,37 +362,48 @@ public class JobDocument implements PostUnmarshallListener
 			if (resources == null)
 				resources = new Resources();
 
-			builder.push(new DefaultXPathIterableNode("http://vcgr.cs.virginia.edu/jsdl/genii", "property"));
+			builder.push(new DefaultXPathIterableNode(
+					"http://vcgr.cs.virginia.edu/jsdl/genii", "property"));
 
 			for (StringStringPair parameter : _matchingParameters) {
 				String name;
 				String value;
 
 				builder.setAttribute(new DefaultXPathAttributeNode(null, "name"));
-				Duple<String, List<VariableInformation>> keyResults = VariableManager.findVariables(parameter.name());
+				Duple<String, List<VariableInformation>> keyResults = VariableManager
+						.findVariables(parameter.name());
 				for (VariableInformation info : keyResults.second()) {
-					List<SweepParameter> parameters = variables.get(info.variable());
+					List<SweepParameter> parameters = variables.get(info
+							.variable());
 					if (parameters == null)
-						variables.put(info.variable(), parameters = new Vector<SweepParameter>());
+						variables.put(info.variable(),
+								parameters = new Vector<SweepParameter>());
 
-					parameters.add(builder.toSubstringParameter(info.offset() + 1, info.variable().length()));
+					parameters.add(builder.toSubstringParameter(
+							info.offset() + 1, info.variable().length()));
 				}
 				name = keyResults.first();
 				builder.clearAttribute();
 
-				builder.setAttribute(new DefaultXPathAttributeNode(null, "value"));
-				Duple<String, List<VariableInformation>> valueResults = VariableManager.findVariables(parameter.value());
+				builder.setAttribute(new DefaultXPathAttributeNode(null,
+						"value"));
+				Duple<String, List<VariableInformation>> valueResults = VariableManager
+						.findVariables(parameter.value());
 				for (VariableInformation info : valueResults.second()) {
-					List<SweepParameter> parameters = variables.get(info.variable());
+					List<SweepParameter> parameters = variables.get(info
+							.variable());
 					if (parameters == null)
-						variables.put(info.variable(), parameters = new Vector<SweepParameter>());
+						variables.put(info.variable(),
+								parameters = new Vector<SweepParameter>());
 
-					parameters.add(builder.toSubstringParameter(info.offset() + 1, info.variable().length()));
+					parameters.add(builder.toSubstringParameter(
+							info.offset() + 1, info.variable().length()));
 				}
 				value = valueResults.first();
 				builder.clearAttribute();
 
-				resources.matchingParameters().add(new MatchingParameter(name, value));
+				resources.matchingParameters().add(
+						new MatchingParameter(name, value));
 
 				builder.iterate();
 			}
@@ -383,14 +416,13 @@ public class JobDocument implements PostUnmarshallListener
 		return resources;
 	}
 
-	private boolean isSequentialApplication()
-	{
+	private boolean isSequentialApplication() {
 		return _spmdVariation == null;
 	}
 
-	private POSIXApplication generatePOSIXApplication(XPathBuilder builder, Map<String, List<SweepParameter>> variables,
-		Set<FilesystemType> filesystemSet)
-	{
+	private POSIXApplication generatePOSIXApplication(XPathBuilder builder,
+			Map<String, List<SweepParameter>> variables,
+			Set<FilesystemType> filesystemSet) {
 		Duple<String, FilesystemType> value;
 		List<Duple<String, FilesystemType>> values;
 		List<Triple<String, String, FilesystemType>> tValues;
@@ -398,9 +430,11 @@ public class JobDocument implements PostUnmarshallListener
 
 		POSIXApplication application = new POSIXApplication();
 
-		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_POSIX_NS, "POSIXApplication"));
+		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_POSIX_NS,
+				"POSIXApplication"));
 
-		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_POSIX_NS, "Executable"));
+		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_POSIX_NS,
+				"Executable"));
 		value = JSDLGenerator.generate(_executable, builder, variables);
 		if (value != null) {
 			FileName name = new FileName(value.first());
@@ -456,7 +490,8 @@ public class JobDocument implements PostUnmarshallListener
 		}
 		builder.pop();
 
-		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_POSIX_NS, "Argument"));
+		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_POSIX_NS,
+				"Argument"));
 		values = JSDLGenerator.generate(_arguments, builder, variables);
 		if (values != null) {
 			for (Duple<String, FilesystemType> item : values) {
@@ -472,7 +507,8 @@ public class JobDocument implements PostUnmarshallListener
 		}
 		builder.pop();
 
-		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_POSIX_NS, "Environment"));
+		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_POSIX_NS,
+				"Environment"));
 		tValues = JSDLGenerator.generate(_environment, builder, variables);
 		if (tValues != null) {
 			for (Triple<String, String, FilesystemType> item : tValues) {
@@ -501,9 +537,9 @@ public class JobDocument implements PostUnmarshallListener
 		return null;
 	}
 
-	private SPMDApplication generateSPMDApplication(XPathBuilder builder, Map<String, List<SweepParameter>> variables,
-		Set<FilesystemType> filesystemSet)
-	{
+	private SPMDApplication generateSPMDApplication(XPathBuilder builder,
+			Map<String, List<SweepParameter>> variables,
+			Set<FilesystemType> filesystemSet) {
 		Duple<String, FilesystemType> value;
 		List<Duple<String, FilesystemType>> values;
 		List<Triple<String, String, FilesystemType>> tValues;
@@ -511,9 +547,11 @@ public class JobDocument implements PostUnmarshallListener
 
 		SPMDApplication application = new SPMDApplication();
 
-		builder.push(new DefaultXPathNode(SPMDConstants.JSDL_SPMD_NS, "SPMDApplication"));
+		builder.push(new DefaultXPathNode(SPMDConstants.JSDL_SPMD_NS,
+				"SPMDApplication"));
 
-		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_POSIX_NS, "Executable"));
+		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_POSIX_NS,
+				"Executable"));
 		value = JSDLGenerator.generate(_executable, builder, variables);
 		if (value != null) {
 			FileName name = new FileName(value.first());
@@ -569,7 +607,8 @@ public class JobDocument implements PostUnmarshallListener
 		}
 		builder.pop();
 
-		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_POSIX_NS, "Argument"));
+		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_POSIX_NS,
+				"Argument"));
 		values = JSDLGenerator.generate(_arguments, builder, variables);
 		if (values != null) {
 			for (Duple<String, FilesystemType> item : values) {
@@ -585,7 +624,8 @@ public class JobDocument implements PostUnmarshallListener
 		}
 		builder.pop();
 
-		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_POSIX_NS, "Environment"));
+		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_POSIX_NS,
+				"Environment"));
 		tValues = JSDLGenerator.generate(_environment, builder, variables);
 		if (tValues != null) {
 			for (Triple<String, String, FilesystemType> item : tValues) {
@@ -607,13 +647,15 @@ public class JobDocument implements PostUnmarshallListener
 		builder.pop();
 
 		/*
-		 * We don't actually have to deal with the builder or variables for these elements as they
-		 * can't have variables inside of them
+		 * We don't actually have to deal with the builder or variables for
+		 * these elements as they can't have variables inside of them
 		 */
 		application.spmdVariation(_spmdVariation.variationURI());
-		application.numberOfProcesses(NumberOfProcesses.numberOfProccesses(_numberOfProcesses.value()));
+		application.numberOfProcesses(NumberOfProcesses
+				.numberOfProccesses(_numberOfProcesses.value()));
 		if (_processesPerHost.value() != null)
-			application.processesPerHost(new ProcessesPerHost(_processesPerHost.value()));
+			application.processesPerHost(new ProcessesPerHost(_processesPerHost
+					.value()));
 		builder.pop();
 
 		if (modified)
@@ -622,19 +664,23 @@ public class JobDocument implements PostUnmarshallListener
 		return null;
 	}
 
-	private SourceTarget generateSourceTarget(DataStage dataStage, boolean isStageIn, XPathBuilder builder,
-		Map<String, List<SweepParameter>> variables)
-	{
-		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, isStageIn ? "Source" : "Target"));
+	private SourceTarget generateSourceTarget(DataStage dataStage,
+			boolean isStageIn, XPathBuilder builder,
+			Map<String, List<SweepParameter>> variables) {
+		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+				isStageIn ? "Source" : "Target"));
 		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "URI"));
 
-		Duple<String, List<VariableInformation>> results = VariableManager.findVariables(dataStage.current().getJSDLURI());
+		Duple<String, List<VariableInformation>> results = VariableManager
+				.findVariables(dataStage.current().getJSDLURI());
 		for (VariableInformation info : results.second()) {
 			List<SweepParameter> parameters = variables.get(info.variable());
 			if (parameters == null)
-				variables.put(info.variable(), parameters = new Vector<SweepParameter>());
+				variables.put(info.variable(),
+						parameters = new Vector<SweepParameter>());
 
-			parameters.add(builder.toSubstringParameter(info.offset() + 1, info.variable().length()));
+			parameters.add(builder.toSubstringParameter(info.offset() + 1, info
+					.variable().length()));
 		}
 
 		builder.pop();
@@ -643,25 +689,29 @@ public class JobDocument implements PostUnmarshallListener
 		return new SourceTarget(results.first());
 	}
 
-	private DataStaging generateSingleDataStage(DataStage dataStage, XPathBuilder builder,
-		Map<String, List<SweepParameter>> variables, Set<FilesystemType> filesystemSet, boolean isStageIn)
-	{
+	private DataStaging generateSingleDataStage(DataStage dataStage,
+			XPathBuilder builder, Map<String, List<SweepParameter>> variables,
+			Set<FilesystemType> filesystemSet, boolean isStageIn) {
 		String filename = dataStage.filename();
 
 		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "FileName"));
 
-		Duple<String, List<VariableInformation>> results = VariableManager.findVariables(filename);
+		Duple<String, List<VariableInformation>> results = VariableManager
+				.findVariables(filename);
 		for (VariableInformation info : results.second()) {
 			List<SweepParameter> parameters = variables.get(info.variable());
 			if (parameters == null)
-				variables.put(info.variable(), parameters = new Vector<SweepParameter>());
+				variables.put(info.variable(),
+						parameters = new Vector<SweepParameter>());
 
-			parameters.add(builder.toSubstringParameter(info.offset() + 1, info.variable().length()));
+			parameters.add(builder.toSubstringParameter(info.offset() + 1, info
+					.variable().length()));
 		}
 
 		builder.pop();
 
-		DataStaging staging = new DataStaging(results.first(), dataStage.creationFlag(), dataStage.deleteOnTerminate());
+		DataStaging staging = new DataStaging(results.first(),
+				dataStage.creationFlag(), dataStage.deleteOnTerminate());
 
 		FilesystemType fsType = dataStage.filesystemType();
 		if (JSDLGenerator.indicatesFilesystem(fsType)) {
@@ -669,7 +719,8 @@ public class JobDocument implements PostUnmarshallListener
 			staging.filesystemName(fsType.jsdlName());
 		}
 
-		SourceTarget sourceTarget = generateSourceTarget(dataStage, isStageIn, builder, variables);
+		SourceTarget sourceTarget = generateSourceTarget(dataStage, isStageIn,
+				builder, variables);
 		if (isStageIn)
 			staging.source(sourceTarget);
 		else
@@ -680,21 +731,24 @@ public class JobDocument implements PostUnmarshallListener
 		return staging;
 	}
 
-	private Collection<DataStaging> generateDataStaging(XPathBuilder builder, Map<String, List<SweepParameter>> variables,
-		Set<FilesystemType> filesystemSet)
-	{
+	private Collection<DataStaging> generateDataStaging(XPathBuilder builder,
+			Map<String, List<SweepParameter>> variables,
+			Set<FilesystemType> filesystemSet) {
 		Collection<DataStaging> ret = new LinkedList<DataStaging>();
 
-		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_NS, "DataStaging"));
+		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_NS,
+				"DataStaging"));
 
 		for (DataStage dataStage : _stageIns) {
-			ret.add(generateSingleDataStage(dataStage, builder, variables, filesystemSet, true));
+			ret.add(generateSingleDataStage(dataStage, builder, variables,
+					filesystemSet, true));
 
 			builder.iterate();
 		}
 
 		for (DataStage dataStage : _stageOuts) {
-			ret.add(generateSingleDataStage(dataStage, builder, variables, filesystemSet, false));
+			ret.add(generateSingleDataStage(dataStage, builder, variables,
+					filesystemSet, false));
 
 			builder.iterate();
 		}
@@ -704,8 +758,8 @@ public class JobDocument implements PostUnmarshallListener
 	}
 
 	@Override
-	public void postUnmarshall(ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
-	{
+	public void postUnmarshall(ParameterizableBroker parameterBroker,
+			ModificationBroker modificationBroker) {
 		_mBroker = modificationBroker;
 
 		if (_variables == null)
@@ -716,52 +770,68 @@ public class JobDocument implements PostUnmarshallListener
 		_filesystemMap.addFilesystemListener(new NewFilesystemListener());
 
 		if (_jobName == null)
-			_jobName = new ParameterizableString(parameterBroker, modificationBroker);
+			_jobName = new ParameterizableString(parameterBroker,
+					modificationBroker);
 
 		if (_jobAnnotations == null)
-			_jobAnnotations = new ParameterizableStringList(parameterBroker, modificationBroker);
+			_jobAnnotations = new ParameterizableStringList(parameterBroker,
+					modificationBroker);
 
 		if (_jobProjects == null)
-			_jobProjects = new ParameterizableStringList(parameterBroker, modificationBroker);
+			_jobProjects = new ParameterizableStringList(parameterBroker,
+					modificationBroker);
 
 		if (_jobDescription == null)
-			_jobDescription = new ParameterizableString(parameterBroker, modificationBroker);
+			_jobDescription = new ParameterizableString(parameterBroker,
+					modificationBroker);
 
 		if (_executable == null)
-			_executable = new FilesystemAssociatedString(parameterBroker, modificationBroker);
+			_executable = new FilesystemAssociatedString(parameterBroker,
+					modificationBroker);
 
 		if (_arguments == null)
-			_arguments = new FilesystemAssociatedStringList(parameterBroker, modificationBroker);
+			_arguments = new FilesystemAssociatedStringList(parameterBroker,
+					modificationBroker);
 
 		if (_environment == null)
-			_environment = new EnvironmentList(parameterBroker, modificationBroker);
+			_environment = new EnvironmentList(parameterBroker,
+					modificationBroker);
 
 		if (_standardInput == null)
-			_standardInput = new FilesystemAssociatedString(parameterBroker, modificationBroker);
+			_standardInput = new FilesystemAssociatedString(parameterBroker,
+					modificationBroker);
 
 		if (_standardOutput == null)
-			_standardOutput = new FilesystemAssociatedString(parameterBroker, modificationBroker);
+			_standardOutput = new FilesystemAssociatedString(parameterBroker,
+					modificationBroker);
 
 		if (_standardError == null)
-			_standardError = new FilesystemAssociatedString(parameterBroker, modificationBroker);
+			_standardError = new FilesystemAssociatedString(parameterBroker,
+					modificationBroker);
 
 		if (_operatingSystemVersion == null)
-			_operatingSystemVersion = new ParameterizableString(parameterBroker, modificationBroker);
+			_operatingSystemVersion = new ParameterizableString(
+					parameterBroker, modificationBroker);
 
 		if (_memoryUpperBound == null)
-			_memoryUpperBound = new SizeValue(parameterBroker, modificationBroker);
+			_memoryUpperBound = new SizeValue(parameterBroker,
+					modificationBroker);
 
 		if (_wallClockUpperBound == null)
-			_wallClockUpperBound = new TimeValue(parameterBroker, modificationBroker);
+			_wallClockUpperBound = new TimeValue(parameterBroker,
+					modificationBroker);
 
 		if (_matchingParameters == null)
-			_matchingParameters = new MatchingParameterList(parameterBroker, modificationBroker);
+			_matchingParameters = new MatchingParameterList(parameterBroker,
+					modificationBroker);
 
 		if (_numberOfProcesses == null)
-			_numberOfProcesses = new SettableLong(parameterBroker, modificationBroker);
+			_numberOfProcesses = new SettableLong(parameterBroker,
+					modificationBroker);
 
 		if (_processesPerHost == null)
-			_processesPerHost = new SettableLong(parameterBroker, modificationBroker);
+			_processesPerHost = new SettableLong(parameterBroker,
+					modificationBroker);
 
 		if (_stageIns == null)
 			_stageIns = new StageList(parameterBroker, modificationBroker);
@@ -770,147 +840,120 @@ public class JobDocument implements PostUnmarshallListener
 			_stageOuts = new StageList(parameterBroker, modificationBroker);
 	}
 
-	public Map<String, VariableDefinition> variables()
-	{
+	public Map<String, VariableDefinition> variables() {
 		return _variables;
 	}
 
-	public FilesystemMap filesystemMap()
-	{
+	public FilesystemMap filesystemMap() {
 		return _filesystemMap;
 	}
 
-	public ParameterizableString jobName()
-	{
+	public ParameterizableString jobName() {
 		return _jobName;
 	}
 
-	public ParameterizableStringList jobProjects()
-	{
+	public ParameterizableStringList jobProjects() {
 		return _jobProjects;
 	}
 
-	public ParameterizableStringList jobAnnotations()
-	{
+	public ParameterizableStringList jobAnnotations() {
 		return _jobAnnotations;
 	}
 
-	public ParameterizableString jobDescription()
-	{
+	public ParameterizableString jobDescription() {
 		return _jobDescription;
 	}
 
-	public FilesystemAssociatedString executable()
-	{
+	public FilesystemAssociatedString executable() {
 		return _executable;
 	}
 
-	public FilesystemAssociatedStringList arguments()
-	{
+	public FilesystemAssociatedStringList arguments() {
 		return _arguments;
 	}
 
-	public EnvironmentList environment()
-	{
+	public EnvironmentList environment() {
 		return _environment;
 	}
 
-	public FilesystemAssociatedString standardInput()
-	{
+	public FilesystemAssociatedString standardInput() {
 		return _standardInput;
 	}
 
-	public FilesystemAssociatedString standardOutput()
-	{
+	public FilesystemAssociatedString standardOutput() {
 		return _standardOutput;
 	}
 
-	public FilesystemAssociatedString standardError()
-	{
+	public FilesystemAssociatedString standardError() {
 		return _standardError;
 	}
 
-	public OperatingSystemNames operatingSystem()
-	{
+	public OperatingSystemNames operatingSystem() {
 		return _operatingSystem;
 	}
 
-	public void operatingSystem(OperatingSystemNames operatingSystem)
-	{
+	public void operatingSystem(OperatingSystemNames operatingSystem) {
 		if (_operatingSystem != operatingSystem) {
 			_operatingSystem = operatingSystem;
 			_mBroker.jobDescriptionModified();
 		}
 	}
 
-	public ParameterizableString operatingSystemVersion()
-	{
+	public ParameterizableString operatingSystemVersion() {
 		return _operatingSystemVersion;
 	}
 
-	public ProcessorArchitecture processorArchitecture()
-	{
+	public ProcessorArchitecture processorArchitecture() {
 		return _processorArchitecture;
 	}
 
-	public void processorArchitecture(ProcessorArchitecture arch)
-	{
+	public void processorArchitecture(ProcessorArchitecture arch) {
 		if (arch != _processorArchitecture) {
 			_processorArchitecture = arch;
 			_mBroker.fireJobDescriptionModified();
 		}
 	}
 
-	public SizeValue memoryUpperBound()
-	{
+	public SizeValue memoryUpperBound() {
 		return _memoryUpperBound;
 	}
 
-	public TimeValue wallclockUpperBound()
-	{
+	public TimeValue wallclockUpperBound() {
 		return _wallClockUpperBound;
 	}
 
-	public MatchingParameterList matchingParameters()
-	{
+	public MatchingParameterList matchingParameters() {
 		return _matchingParameters;
 	}
 
-	public SPMDVariation spmdVariation()
-	{
+	public SPMDVariation spmdVariation() {
 		return _spmdVariation;
 	}
 
-	public void spmdVariation(SPMDVariation variation)
-	{
+	public void spmdVariation(SPMDVariation variation) {
 		if (variation != _spmdVariation) {
 			_spmdVariation = variation;
 			_mBroker.fireJobDescriptionModified();
 		}
 	}
 
-	public SettableLong numberOfProcesses()
-	{
+	public SettableLong numberOfProcesses() {
 		return _numberOfProcesses;
 	}
 
-	public SettableLong processesPerHost()
-	{
+	public SettableLong processesPerHost() {
 		return _processesPerHost;
 	}
 
-	public StageList stageIns()
-	{
+	public StageList stageIns() {
 		return _stageIns;
 	}
 
-	public StageList stageOuts()
-	{
+	public StageList stageOuts() {
 		return _stageOuts;
 	}
 
-	public Analysis analyze()
-	{
+	public Analysis analyze() {
 		Analysis analysis = new Analysis();
 
 		if (_executable.isEmpty())
@@ -932,13 +975,16 @@ public class JobDocument implements PostUnmarshallListener
 			}
 
 			if (value == null || value.length() == 0) {
-				analysis.addError("Value for matching parameter \"%s\" cannot be left empty.", name);
+				analysis.addError(
+						"Value for matching parameter \"%s\" cannot be left empty.",
+						name);
 			}
 		}
 
 		if (_spmdVariation != null) {
 			if (_numberOfProcesses.value() == null) {
-				analysis.addError("SPMD Variation chosen without the " + "number of processes indicated.");
+				analysis.addError("SPMD Variation chosen without the "
+						+ "number of processes indicated.");
 			}
 		}
 
@@ -955,51 +1001,65 @@ public class JobDocument implements PostUnmarshallListener
 			stageOutFilenames.add(stage.filename());
 		}
 
-		if (!_standardInput.isEmpty() && !stageInFilenames.contains(_standardInput.get())) {
+		if (!_standardInput.isEmpty()
+				&& !stageInFilenames.contains(_standardInput.get())) {
 			analysis.addWarning("No input data stage defined that matches the "
-				+ "standard input redirection.  Is this intentional?");
+					+ "standard input redirection.  Is this intentional?");
 		}
 
-		if (!_standardOutput.isEmpty() && !stageOutFilenames.contains(_standardOutput.get())) {
+		if (!_standardOutput.isEmpty()
+				&& !stageOutFilenames.contains(_standardOutput.get())) {
 			analysis.addWarning("No output data stage defined that matches the "
-				+ "standard output redirection.  Is this intentional?");
+					+ "standard output redirection.  Is this intentional?");
 		}
 
-		if (!_standardError.isEmpty() && !stageOutFilenames.contains(_standardError.get())) {
+		if (!_standardError.isEmpty()
+				&& !stageOutFilenames.contains(_standardError.get())) {
 			analysis.addWarning("No output data stage defined that matches the "
-				+ "standard error redirection.  Is this intentional?");
+					+ "standard error redirection.  Is this intentional?");
 		}
 
 		if (!_operatingSystemVersion.isEmpty()) {
-			analysis.addWarning("It is recommended that you leave the" + " operating system version empty.");
+			analysis.addWarning("It is recommended that you leave the"
+					+ " operating system version empty.");
 		}
 
-		for (Map.Entry<String, VariableDefinition> variable : _variables.entrySet()) {
+		for (Map.Entry<String, VariableDefinition> variable : _variables
+				.entrySet()) {
 			VariableDefinition def = variable.getValue();
-			if (def == null || def.type() == VariableDefinitionType.UndefinedVariable)
-				analysis.addError("Variable \"%s\" is undefined!", variable.getKey());
+			if (def == null
+					|| def.type() == VariableDefinitionType.UndefinedVariable)
+				analysis.addError("Variable \"%s\" is undefined!",
+						variable.getKey());
 		}
 
 		return analysis;
 	}
 
-	public JobDefinition generate()
-	{
+	public JobDefinition generate() {
 		Map<String, List<SweepParameter>> variables = new HashMap<String, List<SweepParameter>>();
-		EnumSet<FilesystemType> filesystemSet = EnumSet.noneOf(FilesystemType.class);
+		EnumSet<FilesystemType> filesystemSet = EnumSet
+				.noneOf(FilesystemType.class);
 
 		XPathBuilder builder = new XPathBuilder();
 
-		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "JobDefinition"));
-		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "JobDescription"));
+		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+				"JobDefinition"));
+		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS,
+				"JobDescription"));
 
-		JobIdentification jobIdent = generateJobIdentification(builder, variables);
-		Application application = generateApplication(builder, variables, filesystemSet);
-		Resources resources = generateResources(builder, variables, filesystemSet);
+		JobIdentification jobIdent = generateJobIdentification(builder,
+				variables);
+		Application application = generateApplication(builder, variables,
+				filesystemSet);
+		Resources resources = generateResources(builder, variables,
+				filesystemSet);
 
-		JobDescription jobDesc = new JobDescription(jobIdent, application, resources);
+		JobDescription jobDesc = new JobDescription(jobIdent, application,
+				resources);
 
-		jobDesc.staging().addAll(generateDataStaging(builder, variables, filesystemSet));
+		jobDesc.staging().addAll(
+				generateDataStaging(builder, variables, filesystemSet));
 
 		builder.pop();
 
@@ -1010,7 +1070,8 @@ public class JobDocument implements PostUnmarshallListener
 
 		if (!variables.isEmpty()) {
 			Sweep sweep = null;
-			for (Map.Entry<String, List<SweepParameter>> variable : variables.entrySet()) {
+			for (Map.Entry<String, List<SweepParameter>> variable : variables
+					.entrySet()) {
 				Sweep newSweep = new Sweep();
 				if (root == null)
 					root = newSweep;
@@ -1018,7 +1079,8 @@ public class JobDocument implements PostUnmarshallListener
 					sweep.addSubSweep(newSweep);
 				sweep = newSweep;
 
-				SweepFunction function = _variables.get(variable.getKey()).generateFunction();
+				SweepFunction function = _variables.get(variable.getKey())
+						.generateFunction();
 				SweepAssignment assignment = new SweepAssignment(function);
 				for (SweepParameter parameter : variable.getValue())
 					assignment.addParameter(parameter);
@@ -1031,40 +1093,42 @@ public class JobDocument implements PostUnmarshallListener
 		return jobDef;
 	}
 
-	static public JobDocument load(File source, ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
-		throws IOException
-	{
+	static public JobDocument load(File source,
+			ParameterizableBroker parameterBroker,
+			ModificationBroker modificationBroker) throws IOException {
 		JobDocument result;
 
 		try {
 			JAXBContext context = JAXBContext.newInstance(JobDocument.class);
 			Unmarshaller unmarshaller = context.createUnmarshaller();
-			unmarshaller.setListener(new UnmarshallListener(parameterBroker, modificationBroker));
+			unmarshaller.setListener(new UnmarshallListener(parameterBroker,
+					modificationBroker));
 			result = (JobDocument) unmarshaller.unmarshal(source);
 			Recents.instance.addRecent(source);
 			return result;
 		} catch (JAXBException e) {
-			throw new IOException(String.format("Unable to load project from file \"%s\".", source), e);
+			throw new IOException(String.format(
+					"Unable to load project from file \"%s\".", source), e);
 		}
 	}
 
-	static public void store(JobDocument document, File target) throws IOException
-	{
+	static public void store(JobDocument document, File target)
+			throws IOException {
 		try {
 			JAXBContext context = JAXBContext.newInstance(JobDocument.class);
 			Marshaller marshaller = context.createMarshaller();
 			marshaller.marshal(document, target);
 			Recents.instance.addRecent(target);
 		} catch (JAXBException e) {
-			throw new IOException(String.format("Unable to save project to file \"%s\".", target), e);
+			throw new IOException(String.format(
+					"Unable to save project to file \"%s\".", target), e);
 		}
 	}
 
-	static private class NewFilesystemListener implements FilesystemListener
-	{
+	static private class NewFilesystemListener implements FilesystemListener {
 		@Override
-		public void filesystemDefined(FilesystemMap filesystemMap, Filesystem newFilesystem)
-		{
+		public void filesystemDefined(FilesystemMap filesystemMap,
+				Filesystem newFilesystem) {
 			FilesystemType filesystemType = newFilesystem.filesystemType();
 
 			if (filesystemType.canEdit())

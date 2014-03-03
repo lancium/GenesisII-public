@@ -5,16 +5,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class DatabaseStatistics
-{
-	static private final long WINDOW_SIZE = TimeInterval.FIVE_MINUTES.durationMS();
+public class DatabaseStatistics {
+	static private final long WINDOW_SIZE = TimeInterval.FIVE_MINUTES
+			.durationMS();
 
 	private long _databaseStartTime;
 
 	private LinkedList<DBConnectionDataPoint> _dataPoints = new LinkedList<DBConnectionDataPoint>();
 
-	private void trim()
-	{
+	private void trim() {
 		long now = System.currentTimeMillis();
 		Iterator<DBConnectionDataPoint> iter = _dataPoints.iterator();
 		while (iter.hasNext()) {
@@ -25,13 +24,11 @@ public class DatabaseStatistics
 		}
 	}
 
-	public DatabaseStatistics()
-	{
+	public DatabaseStatistics() {
 		resetDatabase();
 	}
 
-	public DBConnectionDataPoint openConnection()
-	{
+	public DBConnectionDataPoint openConnection() {
 		DBConnectionDataPoint dp = new DBConnectionDataPoint();
 
 		synchronized (_dataPoints) {
@@ -43,20 +40,17 @@ public class DatabaseStatistics
 		return dp;
 	}
 
-	public void resetDatabase()
-	{
+	public void resetDatabase() {
 		_databaseStartTime = System.currentTimeMillis();
 	}
 
-	public long databaseStartTime()
-	{
+	public long databaseStartTime() {
 		return _databaseStartTime;
 	}
 
-	public Map<TimeInterval, DatabaseStatisticsReport> report()
-	{
-		Map<TimeInterval, DatabaseStatisticsReport> report =
-			new EnumMap<TimeInterval, DatabaseStatisticsReport>(TimeInterval.class);
+	public Map<TimeInterval, DatabaseStatisticsReport> report() {
+		Map<TimeInterval, DatabaseStatisticsReport> report = new EnumMap<TimeInterval, DatabaseStatisticsReport>(
+				TimeInterval.class);
 
 		for (TimeInterval ti : TimeInterval.values())
 			report.put(ti, new DatabaseStatisticsReport());

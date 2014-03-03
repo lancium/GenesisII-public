@@ -12,19 +12,17 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.ui.persist.Persistable;
 import edu.virginia.vcgr.genii.ui.persist.PersistenceKey;
 
-class TrashCanEntry implements Persistable
-{
+class TrashCanEntry implements Persistable {
 	private RNSPath _path;
 	private ICallingContext _context;
 
-	TrashCanEntry(ICallingContext context, RNSPath path)
-	{
+	TrashCanEntry(ICallingContext context, RNSPath path) {
 		_context = context;
 		_path = path;
 	}
 
-	TrashCanEntry(PersistenceKey key) throws IOException, ClassNotFoundException
-	{
+	TrashCanEntry(PersistenceKey key) throws IOException,
+			ClassNotFoundException {
 		InputStream in = null;
 
 		try {
@@ -38,27 +36,23 @@ class TrashCanEntry implements Persistable
 		}
 	}
 
-	final RNSPath path()
-	{
+	final RNSPath path() {
 		return _path;
 	}
 
-	final ICallingContext callingContext()
-	{
+	final ICallingContext callingContext() {
 		return _context;
 	}
 
 	@Override
-	public boolean persist(ObjectOutputStream oos) throws IOException
-	{
+	public boolean persist(ObjectOutputStream oos) throws IOException {
 		oos.writeUTF(_path.pwd());
 		oos.writeObject(_path);
 		oos.writeObject(_context);
 		return true;
 	}
 
-	static public String readPath(PersistenceKey key) throws IOException
-	{
+	static public String readPath(PersistenceKey key) throws IOException {
 		InputStream in = null;
 
 		try {

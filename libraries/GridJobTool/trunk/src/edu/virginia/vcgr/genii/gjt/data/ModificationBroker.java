@@ -1,10 +1,9 @@
 package edu.virginia.vcgr.genii.gjt.data;
 
-public class ModificationBroker extends BasicModifyable implements ModificationListener, Modifyable
-{
+public class ModificationBroker extends BasicModifyable implements
+		ModificationListener, Modifyable {
 	@Override
-	public void jobDescriptionModified()
-	{
+	public void jobDescriptionModified() {
 		fireJobDescriptionModified();
 	}
 }

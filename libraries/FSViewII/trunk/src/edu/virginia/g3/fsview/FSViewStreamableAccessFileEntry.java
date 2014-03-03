@@ -1,4 +1,4 @@
 package edu.virginia.g3.fsview;
 
-public interface FSViewStreamableAccessFileEntry extends FSViewFileEntry
-{}
+public interface FSViewStreamableAccessFileEntry extends FSViewFileEntry {
+}

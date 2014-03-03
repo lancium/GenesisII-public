@@ -4,15 +4,14 @@ import java.util.Collection;
 
 import javax.swing.AbstractAction;
 
-public abstract class UIMenuPluginAction<Type extends UIMenuPlugin> extends AbstractAction
-{
+public abstract class UIMenuPluginAction<Type extends UIMenuPlugin> extends
+		AbstractAction {
 	static final long serialVersionUID = 0l;
 
 	protected UIPluginContext _context;
 	protected Type _plugin;
 
-	UIMenuPluginAction(Type plugin, String name, UIPluginContext context)
-	{
+	UIMenuPluginAction(Type plugin, String name, UIPluginContext context) {
 		super(name);
 
 		_plugin = plugin;
@@ -20,13 +19,11 @@ public abstract class UIMenuPluginAction<Type extends UIMenuPlugin> extends Abst
 	}
 
 	@SuppressWarnings("unchecked")
-	final Class<Type> pluginClass()
-	{
+	final Class<Type> pluginClass() {
 		return (Class<Type>) _plugin.getClass();
 	}
 
-	final public void updateStatus(Collection<EndpointDescription> descriptions)
-	{
+	final public void updateStatus(Collection<EndpointDescription> descriptions) {
 		setEnabled(_plugin.isEnabled(descriptions));
 	}
 }

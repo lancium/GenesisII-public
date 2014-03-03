@@ -20,17 +20,14 @@ package edu.virginia.vcgr.jsdlval;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class JSDLValidationException extends Exception
-{
+public class JSDLValidationException extends Exception {
 	static final long serialVersionUID = 0L;
 
-	public JSDLValidationException(String msg)
-	{
+	public JSDLValidationException(String msg) {
 		super(msg);
 	}
 
-	public JSDLValidationException(String msg, Throwable cause)
-	{
+	public JSDLValidationException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 }

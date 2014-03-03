@@ -23,8 +23,7 @@ import edu.virginia.vcgr.genii.gjt.data.ParameterizableStringList;
 import edu.virginia.vcgr.genii.gjt.gui.icons.ShapeIcons;
 
 @SuppressWarnings("rawtypes")
-class ParameterizableStringListEditorDialog extends JDialog
-{
+class ParameterizableStringListEditorDialog extends JDialog {
 	static final long serialVersionUID = 0L;
 
 	private boolean _cancelled = true;
@@ -35,8 +34,8 @@ class ParameterizableStringListEditorDialog extends JDialog
 	private String _prompt;
 
 	@SuppressWarnings("unchecked")
-	ParameterizableStringListEditorDialog(Window owner, String title, String prompt, ParameterizableStringList stringList)
-	{
+	ParameterizableStringListEditorDialog(Window owner, String title,
+			String prompt, ParameterizableStringList stringList) {
 		super(owner, title);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
@@ -54,17 +53,21 @@ class ParameterizableStringListEditorDialog extends JDialog
 
 		_list.addListSelectionListener(new ListSelectionListenerImpl());
 
-		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 0, 5), 5, 5));
-		content.add(ButtonPanel.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Plus, new PlusAction()),
-			new SimpleIconButton(ShapeIcons.Minus, _minus)), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 5, 5), 5, 5));
-		content.add(ButtonPanel.createHorizontalPanel(new OKAction(), new CancelAction()), new GridBagConstraints(0, 2, 1, 1,
-			1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						5, 5, 0, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalPanel(new SimpleIconButton(
+				ShapeIcons.Plus, new PlusAction()), new SimpleIconButton(
+				ShapeIcons.Minus, _minus)), new GridBagConstraints(0, 1, 1, 1,
+				1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(0, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalPanel(new OKAction(),
+				new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0,
+				0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(5, 5, 5, 5), 5, 5));
 	}
 
-	Set<String> getResults()
-	{
+	Set<String> getResults() {
 		if (_cancelled)
 			return null;
 
@@ -75,77 +78,64 @@ class ParameterizableStringListEditorDialog extends JDialog
 		return ret;
 	}
 
-	private class OKAction extends AbstractAction
-	{
+	private class OKAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private OKAction()
-		{
+		private OKAction() {
 			super("OK");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e)
-		{
+		public void actionPerformed(ActionEvent e) {
 			_cancelled = false;
 			dispose();
 		}
 	}
 
-	private class CancelAction extends AbstractAction
-	{
+	private class CancelAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private CancelAction()
-		{
+		private CancelAction() {
 			super("Cancel");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e)
-		{
+		public void actionPerformed(ActionEvent e) {
 			_cancelled = true;
 			dispose();
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private class PlusAction extends AbstractAction
-	{
+	private class PlusAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
 		@Override
-		public void actionPerformed(ActionEvent e)
-		{
+		public void actionPerformed(ActionEvent e) {
 			String answer = JOptionPane.showInputDialog(_list, _prompt);
 			if (answer != null)
 				_listModel.addElement(answer);
 		}
 	}
 
-	private class MinusAction extends AbstractAction
-	{
+	private class MinusAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private MinusAction()
-		{
+		private MinusAction() {
 			setEnabled(false);
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e)
-		{
+		public void actionPerformed(ActionEvent e) {
 			int[] indices = _list.getSelectedIndices();
 			for (int lcv = indices.length - 1; lcv >= 0; lcv--)
 				_listModel.removeElementAt(indices[lcv]);
 		}
 	}
 
-	private class ListSelectionListenerImpl implements ListSelectionListener
-	{
+	private class ListSelectionListenerImpl implements ListSelectionListener {
 		@Override
-		public void valueChanged(ListSelectionEvent e)
-		{
+		public void valueChanged(ListSelectionEvent e) {
 			_minus.setEnabled(_list.getSelectedIndices().length > 0);
 		}
 	}

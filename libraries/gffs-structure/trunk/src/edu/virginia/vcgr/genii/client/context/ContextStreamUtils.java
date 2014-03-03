@@ -30,12 +30,11 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.context.ContextType;
 
-public class ContextStreamUtils
-{
-	static public QName CONTEXT_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "context-information");
+public class ContextStreamUtils {
+	static public QName CONTEXT_QNAME = new QName(
+			GenesisIIConstants.GENESISII_NS, "context-information");
 
-	static public ICallingContext load(URL url) throws IOException
-	{
+	static public ICallingContext load(URL url) throws IOException {
 		InputStream in = null;
 
 		try {
@@ -46,28 +45,26 @@ public class ContextStreamUtils
 		}
 	}
 
-	static public ICallingContext load(InputStream in) throws IOException
-	{
+	static public ICallingContext load(InputStream in) throws IOException {
 		return load(new InputSource(in));
 	}
 
-	static public ICallingContext load(Reader in) throws IOException
-	{
+	static public ICallingContext load(Reader in) throws IOException {
 		return load(new InputSource(in));
 	}
 
-	static public ICallingContext load(InputSource in) throws IOException
-	{
+	static public ICallingContext load(InputSource in) throws IOException {
 		try {
-			ContextType ct = (ContextType) ObjectDeserializer.deserialize(in, ContextType.class);
+			ContextType ct = (ContextType) ObjectDeserializer.deserialize(in,
+					ContextType.class);
 			return new CallingContextImpl(ct);
 		} catch (ResourceException re) {
 			throw new IOException(re.getMessage());
 		}
 	}
 
-	static public void store(Writer out, ICallingContext context) throws IOException
-	{
+	static public void store(Writer out, ICallingContext context)
+			throws IOException {
 		try {
 			ContextType ct = context.getSerialized();
 			ObjectSerializer.serialize(out, ct, CONTEXT_QNAME);

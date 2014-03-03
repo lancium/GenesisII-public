@@ -19,18 +19,17 @@ import org.apache.log4j.Logger;
 import edu.virginia.vcgr.genii.gjt.util.Duple;
 import edu.virginia.vcgr.genii.gjt.util.IOUtils;
 
-public class FilesystemRecents
-{
+public class FilesystemRecents {
 	static private Logger _logger = Logger.getLogger(FilesystemRecents.class);
 
 	static private final String KEY_FORMAT = "recent-filesystem.%d";
 	static private final int MAX_RECENTS = 8;
 
 	static private Map<FilesystemType, FilesystemRecents> _recents = new EnumMap<FilesystemType, FilesystemRecents>(
-		FilesystemType.class);
+			FilesystemType.class);
 
-	static private byte[] toBytes(Duple<Calendar, Filesystem> entry) throws IOException
-	{
+	static private byte[] toBytes(Duple<Calendar, Filesystem> entry)
+			throws IOException {
 		ObjectOutputStream oos = null;
 
 		if (entry == null)
@@ -48,8 +47,8 @@ public class FilesystemRecents
 		}
 	}
 
-	static private Duple<Calendar, Filesystem> fromBytes(byte[] bytes) throws IOException, ClassNotFoundException
-	{
+	static private Duple<Calendar, Filesystem> fromBytes(byte[] bytes)
+			throws IOException, ClassNotFoundException {
 		if (bytes == null)
 			return null;
 
@@ -59,20 +58,21 @@ public class FilesystemRecents
 			ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
 			Calendar cal = Calendar.getInstance();
 			cal.setTimeInMillis(ois.readLong());
-			return new Duple<Calendar, Filesystem>(cal, (Filesystem) ois.readObject());
+			return new Duple<Calendar, Filesystem>(cal,
+					(Filesystem) ois.readObject());
 		} finally {
 			IOUtils.close(ois);
 		}
 	}
 
-	static public FilesystemRecents instance(FilesystemType filesystemType)
-	{
+	static public FilesystemRecents instance(FilesystemType filesystemType) {
 		FilesystemRecents recents;
 
 		synchronized (_recents) {
 			recents = _recents.get(filesystemType);
 			if (recents == null)
-				_recents.put(filesystemType, recents = new FilesystemRecents(filesystemType));
+				_recents.put(filesystemType, recents = new FilesystemRecents(
+						filesystemType));
 		}
 
 		return recents;
@@ -81,34 +81,35 @@ public class FilesystemRecents
 	private Preferences _preferenceNode;
 	private Vector<Duple<Calendar, Filesystem>> _recentEntries = new Vector<Duple<Calendar, Filesystem>>();
 
-	private FilesystemRecents(FilesystemType filesystemType)
-	{
-		Preferences root = Preferences.userNodeForPackage(FilesystemRecents.class);
+	private FilesystemRecents(FilesystemType filesystemType) {
+		Preferences root = Preferences
+				.userNodeForPackage(FilesystemRecents.class);
 		_preferenceNode = root.node(filesystemType.name());
 
 		for (int lcv = 0; lcv < MAX_RECENTS; lcv++) {
 			try {
-				Duple<Calendar, Filesystem> entry =
-					fromBytes(_preferenceNode.getByteArray(String.format(KEY_FORMAT, lcv), null));
+				Duple<Calendar, Filesystem> entry = fromBytes(_preferenceNode
+						.getByteArray(String.format(KEY_FORMAT, lcv), null));
 				if (entry == null)
 					break;
 
 				_recentEntries.add(entry);
 			} catch (Throwable cause) {
-				_logger.warn("Error attempting to read recent filesystem entry.", cause);
+				_logger.warn(
+						"Error attempting to read recent filesystem entry.",
+						cause);
 			}
 		}
 	}
 
-	synchronized public List<Duple<Calendar, Filesystem>> recents()
-	{
+	synchronized public List<Duple<Calendar, Filesystem>> recents() {
 		return new Vector<Duple<Calendar, Filesystem>>(_recentEntries);
 	}
 
-	synchronized public void add(Filesystem entry)
-	{
+	synchronized public void add(Filesystem entry) {
 		entry = (Filesystem) entry.clone();
-		LinkedList<Duple<Calendar, Filesystem>> tmp = new LinkedList<Duple<Calendar, Filesystem>>(_recentEntries);
+		LinkedList<Duple<Calendar, Filesystem>> tmp = new LinkedList<Duple<Calendar, Filesystem>>(
+				_recentEntries);
 		Iterator<Duple<Calendar, Filesystem>> iter = tmp.iterator();
 		while (iter.hasNext()) {
 			if (iter.next().second().equals(entry)) {
@@ -128,15 +129,15 @@ public class FilesystemRecents
 		int lcv = 0;
 		for (Duple<Calendar, Filesystem> recent : _recentEntries) {
 			try {
-				_preferenceNode.putByteArray(String.format(KEY_FORMAT, lcv++), toBytes(recent));
+				_preferenceNode.putByteArray(String.format(KEY_FORMAT, lcv++),
+						toBytes(recent));
 			} catch (Throwable cause) {
 				_logger.warn("Unable to store recent filesystem entry.", cause);
 			}
 		}
 	}
 
-	synchronized public void clear()
-	{
+	synchronized public void clear() {
 		for (int lcv = 0; lcv < MAX_RECENTS; lcv++)
 			_preferenceNode.remove(String.format(KEY_FORMAT, lcv));
 		_recentEntries.clear();

@@ -26,25 +26,21 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-class XMLDocumentPathImpl implements XMLDocumentPath
-{
+class XMLDocumentPathImpl implements XMLDocumentPath {
 	private Deque<QName> _path;
 
-	private XMLDocumentPathImpl(Deque<QName> path)
-	{
+	private XMLDocumentPathImpl(Deque<QName> path) {
 		if (path != null)
 			_path = new LinkedList<QName>(path);
 		else
 			_path = new LinkedList<QName>();
 	}
 
-	XMLDocumentPathImpl()
-	{
+	XMLDocumentPathImpl() {
 		this(null);
 	}
 
-	final QName formQNameFromPrevious(String localName)
-	{
+	final QName formQNameFromPrevious(String localName) {
 		if (_path.isEmpty())
 			return new QName(localName);
 
@@ -52,50 +48,42 @@ class XMLDocumentPathImpl implements XMLDocumentPath
 		String ns = previous.getNamespaceURI();
 		String prefix = previous.getPrefix();
 
-		return new QName(ns == null ? XMLConstants.NULL_NS_URI : ns, localName, prefix == null ? XMLConstants.DEFAULT_NS_PREFIX
-			: prefix);
+		return new QName(ns == null ? XMLConstants.NULL_NS_URI : ns, localName,
+				prefix == null ? XMLConstants.DEFAULT_NS_PREFIX : prefix);
 	}
 
-	final void push(QName pathElement)
-	{
+	final void push(QName pathElement) {
 		_path.push(pathElement);
 	}
 
-	final void push(String localName)
-	{
+	final void push(String localName) {
 		push(new QName(localName));
 	}
 
-	final void push(String ns, String localName)
-	{
+	final void push(String ns, String localName) {
 		push(new QName(ns, localName));
 	}
 
-	final void push(String ns, String localName, String prefix)
-	{
+	final void push(String ns, String localName, String prefix) {
 		push(new QName(ns, localName, prefix));
 	}
 
-	final void pop()
-	{
+	final void pop() {
 		_path.pop();
 	}
 
 	@Override
-	final public QName currentElement()
-	{
+	final public QName currentElement() {
 		return _path.peek();
 	}
 
 	@Override
-	final public QName[] currentPath()
-	{
+	final public QName[] currentPath() {
 		return _path.toArray(new QName[_path.size()]);
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		StringBuilder builder = new StringBuilder();
 		for (QName element : _path) {
 			if (builder.length() != 0)
@@ -108,8 +96,7 @@ class XMLDocumentPathImpl implements XMLDocumentPath
 	}
 
 	@Override
-	final public Object clone()
-	{
+	final public Object clone() {
 		return new XMLDocumentPathImpl(_path);
 	}
 }

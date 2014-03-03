@@ -20,8 +20,7 @@ import java.util.Date;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class DateDialogModel
-{
+public class DateDialogModel {
 	private ArrayList<IDateDialogModelListener> _listeners = new ArrayList<IDateDialogModelListener>();
 
 	private Calendar _todaysDate;
@@ -29,33 +28,27 @@ public class DateDialogModel
 	private Calendar _currentViewedMonth;
 	private Calendar _calendar;
 
-	public DateDialogModel()
-	{
+	public DateDialogModel() {
 		this(new Date());
 	}
 
-	public DateDialogModel(Date todaysDate)
-	{
+	public DateDialogModel(Date todaysDate) {
 		this(todaysDate, todaysDate);
 	}
 
-	public DateDialogModel(Date todaysDate, Date selectedDate)
-	{
+	public DateDialogModel(Date todaysDate, Date selectedDate) {
 		this(Calendar.getInstance(), todaysDate, selectedDate);
 	}
 
-	public DateDialogModel(Calendar calendar)
-	{
+	public DateDialogModel(Calendar calendar) {
 		this(calendar, new Date());
 	}
 
-	public DateDialogModel(Calendar calendar, Date todaysDate)
-	{
+	public DateDialogModel(Calendar calendar, Date todaysDate) {
 		this(calendar, todaysDate, todaysDate);
 	}
 
-	public DateDialogModel(Calendar calendar, Date todaysDate, Date selectedDate)
-	{
+	public DateDialogModel(Calendar calendar, Date todaysDate, Date selectedDate) {
 		_calendar = calendar;
 
 		_todaysDate = (Calendar) _calendar.clone();
@@ -68,22 +61,19 @@ public class DateDialogModel
 		_currentViewedMonth.setTime(selectedDate);
 	}
 
-	public void addDateModelListener(IDateDialogModelListener listener)
-	{
+	public void addDateModelListener(IDateDialogModelListener listener) {
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	public void removeDateModelListener(IDateDialogModelListener listener)
-	{
+	public void removeDateModelListener(IDateDialogModelListener listener) {
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	private IDateDialogModelListener[] getListeners()
-	{
+	private IDateDialogModelListener[] getListeners() {
 		IDateDialogModelListener[] listeners;
 
 		synchronized (_listeners) {
@@ -94,52 +84,46 @@ public class DateDialogModel
 		return listeners;
 	}
 
-	public void fireSelectedDateChange()
-	{
+	public void fireSelectedDateChange() {
 		for (IDateDialogModelListener listener : getListeners()) {
 			listener.selectedDateChange(_currentSelectedDate);
 		}
 	}
 
-	public void fireSelectedMonthChange()
-	{
+	public void fireSelectedMonthChange() {
 		for (IDateDialogModelListener listener : getListeners()) {
 			listener.selectedMonthChange(_currentViewedMonth);
 		}
 	}
 
-	public Calendar getTodaysDate()
-	{
+	public Calendar getTodaysDate() {
 		return _todaysDate;
 	}
 
-	public Calendar getSelectedDate()
-	{
+	public Calendar getSelectedDate() {
 		return _currentSelectedDate;
 	}
 
-	public Calendar getSelectedMonth()
-	{
+	public Calendar getSelectedMonth() {
 		return _currentViewedMonth;
 	}
 
-	public void rollMonth(boolean forward)
-	{
+	public void rollMonth(boolean forward) {
 		int currentMonth = _currentViewedMonth.get(Calendar.MONTH);
 
 		_currentViewedMonth.roll(Calendar.MONTH, forward);
 
 		if (forward && (_currentViewedMonth.get(Calendar.MONTH) < currentMonth)) {
 			_currentViewedMonth.roll(Calendar.YEAR, true);
-		} else if (!forward && (_currentViewedMonth.get(Calendar.MONTH) > currentMonth)) {
+		} else if (!forward
+				&& (_currentViewedMonth.get(Calendar.MONTH) > currentMonth)) {
 			_currentViewedMonth.roll(Calendar.YEAR, false);
 		}
 
 		fireSelectedMonthChange();
 	}
 
-	public void selectDate(Date newDate)
-	{
+	public void selectDate(Date newDate) {
 		_currentSelectedDate.setTime(newDate);
 		fireSelectedDateChange();
 	}

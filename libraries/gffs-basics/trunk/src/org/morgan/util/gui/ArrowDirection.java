@@ -17,8 +17,5 @@ package org.morgan.util.gui;
  * @author Mark Morgan (mark@mark-morgan.org)
  */
 public enum ArrowDirection {
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN
+	LEFT, RIGHT, UP, DOWN
 }

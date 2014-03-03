@@ -38,13 +38,15 @@ import edu.virginia.vcgr.jsdl.JSDLConstants;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_executable", "_arguments", "_input", "_output", "_error", "_workingDirectory",
-	"_environmentVariables", "_wallTimeLimit", "_fileSizeLimit", "_coreDumpLimit", "_dataSegmentLimit", "_lockedMemoryLimit",
-	"_memoryLimit", "_openDescriptorsLimit", "_pipeSizeLimit", "_stackSizeLimit", "_cpuTimeLimit", "_processCountLimit",
-	"_virtualMemoryLimit", "_threadCountLimit", "_userName", "_groupName" })
+@XmlType(propOrder = { "_executable", "_arguments", "_input", "_output",
+		"_error", "_workingDirectory", "_environmentVariables",
+		"_wallTimeLimit", "_fileSizeLimit", "_coreDumpLimit",
+		"_dataSegmentLimit", "_lockedMemoryLimit", "_memoryLimit",
+		"_openDescriptorsLimit", "_pipeSizeLimit", "_stackSizeLimit",
+		"_cpuTimeLimit", "_processCountLimit", "_virtualMemoryLimit",
+		"_threadCountLimit", "_userName", "_groupName" })
 @XmlRootElement(namespace = JSDLConstants.JSDL_POSIX_NS, name = "POSIXApplication")
-public class POSIXApplication implements ApplicationBase, Serializable
-{
+public class POSIXApplication implements ApplicationBase, Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -120,239 +122,192 @@ public class POSIXApplication implements ApplicationBase, Serializable
 	@XmlElement(namespace = JSDLConstants.JSDL_POSIX_NS, name = "GroupName", required = false)
 	private GroupName _groupName = null;
 
-	public POSIXApplication(String executable, String... arguments)
-	{
+	public POSIXApplication(String executable, String... arguments) {
 		_executable = new FileName(executable);
 		for (String arg : arguments)
 			_arguments.add(new Argument(arg));
 	}
 
-	public POSIXApplication()
-	{
+	public POSIXApplication() {
 	}
 
-	final public void name(String value)
-	{
+	final public void name(String value) {
 		_name = value;
 	}
 
-	final public String name()
-	{
+	final public String name() {
 		return _name;
 	}
 
-	final public void executable(FileName value)
-	{
+	final public void executable(FileName value) {
 		_executable = value;
 	}
 
-	final public FileName executable()
-	{
+	final public FileName executable() {
 		return _executable;
 	}
 
-	final public List<Argument> arguments()
-	{
+	final public List<Argument> arguments() {
 		return _arguments;
 	}
 
-	final public void input(FileName value)
-	{
+	final public void input(FileName value) {
 		_input = value;
 	}
 
-	final public FileName input()
-	{
+	final public FileName input() {
 		return _input;
 	}
 
-	final public void output(FileName value)
-	{
+	final public void output(FileName value) {
 		_output = value;
 	}
 
-	final public FileName output()
-	{
+	final public FileName output() {
 		return _output;
 	}
 
-	final public void error(FileName value)
-	{
+	final public void error(FileName value) {
 		_error = value;
 	}
 
-	final public FileName error()
-	{
+	final public FileName error() {
 		return _error;
 	}
 
-	final public void workingDirectory(DirectoryName value)
-	{
+	final public void workingDirectory(DirectoryName value) {
 		_workingDirectory = value;
 	}
 
-	final public DirectoryName workingDirectory()
-	{
+	final public DirectoryName workingDirectory() {
 		return _workingDirectory;
 	}
 
-	final public List<Environment> environmentVariables()
-	{
+	final public List<Environment> environmentVariables() {
 		return _environmentVariables;
 	}
 
-	final public void wallTimeLimit(Limits value)
-	{
+	final public void wallTimeLimit(Limits value) {
 		_wallTimeLimit = value;
 	}
 
-	final public Limits wallTimeLimit()
-	{
+	final public Limits wallTimeLimit() {
 		return _wallTimeLimit;
 	}
 
-	final public void fileSizeLimit(Limits value)
-	{
+	final public void fileSizeLimit(Limits value) {
 		_fileSizeLimit = value;
 	}
 
-	final public Limits fileSizeLimit()
-	{
+	final public Limits fileSizeLimit() {
 		return _fileSizeLimit;
 	}
 
-	final public void coreDumpLimit(Limits value)
-	{
+	final public void coreDumpLimit(Limits value) {
 		_coreDumpLimit = value;
 	}
 
-	final public Limits coreDumpLimit()
-	{
+	final public Limits coreDumpLimit() {
 		return _coreDumpLimit;
 	}
 
-	final public void dataSegmentLimit(Limits value)
-	{
+	final public void dataSegmentLimit(Limits value) {
 		_dataSegmentLimit = value;
 	}
 
-	final public Limits dataSegmentLimit()
-	{
+	final public Limits dataSegmentLimit() {
 		return _dataSegmentLimit;
 	}
 
-	final public void lockedMemoryLimit(Limits value)
-	{
+	final public void lockedMemoryLimit(Limits value) {
 		_lockedMemoryLimit = value;
 	}
 
-	final public Limits lockedMemoryLimit()
-	{
+	final public Limits lockedMemoryLimit() {
 		return _lockedMemoryLimit;
 	}
 
-	final public void memoryLimit(Limits value)
-	{
+	final public void memoryLimit(Limits value) {
 		_memoryLimit = value;
 	}
 
-	final public Limits memoryLimit()
-	{
+	final public Limits memoryLimit() {
 		return _memoryLimit;
 	}
 
-	final public void openDescriptorsLimit(Limits value)
-	{
+	final public void openDescriptorsLimit(Limits value) {
 		_openDescriptorsLimit = value;
 	}
 
-	final public Limits openDescriptorsLimit()
-	{
+	final public Limits openDescriptorsLimit() {
 		return _openDescriptorsLimit;
 	}
 
-	final public void pipeSizeLimit(Limits value)
-	{
+	final public void pipeSizeLimit(Limits value) {
 		_pipeSizeLimit = value;
 	}
 
-	final public Limits pipeSizeLimit()
-	{
+	final public Limits pipeSizeLimit() {
 		return _pipeSizeLimit;
 	}
 
-	final public void stackSizeLimit(Limits value)
-	{
+	final public void stackSizeLimit(Limits value) {
 		_stackSizeLimit = value;
 	}
 
-	final public Limits stackSizeLimit()
-	{
+	final public Limits stackSizeLimit() {
 		return _stackSizeLimit;
 	}
 
-	final public void cpuTimeLimit(Limits value)
-	{
+	final public void cpuTimeLimit(Limits value) {
 		_cpuTimeLimit = value;
 	}
 
-	final public Limits cpuTimeLimit()
-	{
+	final public Limits cpuTimeLimit() {
 		return _cpuTimeLimit;
 	}
 
-	final public void processCountLimit(Limits value)
-	{
+	final public void processCountLimit(Limits value) {
 		_processCountLimit = value;
 	}
 
-	final public Limits processCountLimit()
-	{
+	final public Limits processCountLimit() {
 		return _processCountLimit;
 	}
 
-	final public void virtualMemoryLimit(Limits value)
-	{
+	final public void virtualMemoryLimit(Limits value) {
 		_virtualMemoryLimit = value;
 	}
 
-	final public Limits virtualMemoryLimit()
-	{
+	final public Limits virtualMemoryLimit() {
 		return _virtualMemoryLimit;
 	}
 
-	final public void threadCountLimit(Limits value)
-	{
+	final public void threadCountLimit(Limits value) {
 		_threadCountLimit = value;
 	}
 
-	final public Limits threadCountLimit()
-	{
+	final public Limits threadCountLimit() {
 		return _threadCountLimit;
 	}
 
-	final public void userName(UserName value)
-	{
+	final public void userName(UserName value) {
 		_userName = value;
 	}
 
-	final public UserName userName()
-	{
+	final public UserName userName() {
 		return _userName;
 	}
 
-	final public void groupName(GroupName value)
-	{
+	final public void groupName(GroupName value) {
 		_groupName = value;
 	}
 
-	final public GroupName groupName()
-	{
+	final public GroupName groupName() {
 		return _groupName;
 	}
 
-	final public Map<QName, String> anyAttributes()
-	{
+	final public Map<QName, String> anyAttributes() {
 		return _anyAttributes;
 	}
 }

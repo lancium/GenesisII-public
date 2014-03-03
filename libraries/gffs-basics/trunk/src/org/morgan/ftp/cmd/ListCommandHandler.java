@@ -18,21 +18,19 @@ import org.morgan.ftp.ListEntry;
 import org.morgan.ftp.RollingCommandHistory;
 import org.morgan.util.io.StreamUtils;
 
-public class ListCommandHandler extends AbstractCommandHandler
-{
+public class ListCommandHandler extends AbstractCommandHandler {
 	static private Logger _logger = Logger.getLogger(ListCommandHandler.class);
 
-	public ListCommandHandler(ICommand command)
-	{
+	public ListCommandHandler(ICommand command) {
 		super(command);
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
-	{
+	public void handleCommand(FTPSessionState sessionState, String verb,
+			String parameters, PrintStream out) throws FTPException {
 		RollingCommandHistory history = sessionState.getHistory();
-		FTPAction lastCompletedAction = history.lastCompleted(PASVCommandHandler.class);
+		FTPAction lastCompletedAction = history
+				.lastCompleted(PASVCommandHandler.class);
 
 		ICommandHandler handler = lastCompletedAction.getHandler();
 		if (!(handler instanceof PASVCommandHandler))
@@ -44,7 +42,8 @@ public class ListCommandHandler extends AbstractCommandHandler
 		OutputStream out2 = null;
 
 		try {
-			channel = key.getChannel(sessionState.getConfiguration().getDataConnectionTimeoutSeconds());
+			channel = key.getChannel(sessionState.getConfiguration()
+					.getDataConnectionTimeoutSeconds());
 
 			out.println("150 Beginning Directory Listing.");
 			ListEntry[] entries = sessionState.getBackend().list();

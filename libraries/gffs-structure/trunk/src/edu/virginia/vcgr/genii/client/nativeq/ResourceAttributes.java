@@ -1,10 +1,8 @@
 package edu.virginia.vcgr.genii.client.nativeq;
 
-public abstract class ResourceAttributes
-{
+public abstract class ResourceAttributes {
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		StringBuilder builder = new StringBuilder();
 
 		describe(builder, "");

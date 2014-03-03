@@ -2,15 +2,14 @@ package edu.virginia.vcgr.genii.wsdl;
 
 import org.w3c.dom.Node;
 
-public abstract class AbstractXMLComponent implements IXMLComponent
-{
+public abstract class AbstractXMLComponent implements IXMLComponent {
 	protected WsdlSourcePath _sourcePath;
 	protected IXMLComponent _parent;
 	protected Node _representedNode;
 	protected String _targetNamespace = null;
 
-	protected AbstractXMLComponent(WsdlSourcePath sourcePath, IXMLComponent parent, Node representedNode) throws WsdlException
-	{
+	protected AbstractXMLComponent(WsdlSourcePath sourcePath,
+			IXMLComponent parent, Node representedNode) throws WsdlException {
 		_parent = parent;
 		_representedNode = representedNode;
 		if (sourcePath == null)
@@ -19,20 +18,18 @@ public abstract class AbstractXMLComponent implements IXMLComponent
 			_sourcePath = sourcePath;
 	}
 
-	public IXMLComponent getParent()
-	{
+	public IXMLComponent getParent() {
 		return _parent;
 	}
 
-	public Node getRepresentedNode()
-	{
+	public Node getRepresentedNode() {
 		return _representedNode;
 	}
 
-	public String findTargetNamespace()
-	{
+	public String findTargetNamespace() {
 		if (_targetNamespace == null) {
-			_targetNamespace = WsdlUtils.findHierarchicalAttribute(_representedNode, WsdlConstants.TARGET_NAMESPACE_ATTR);
+			_targetNamespace = WsdlUtils.findHierarchicalAttribute(
+					_representedNode, WsdlConstants.TARGET_NAMESPACE_ATTR);
 		}
 
 		return _targetNamespace;

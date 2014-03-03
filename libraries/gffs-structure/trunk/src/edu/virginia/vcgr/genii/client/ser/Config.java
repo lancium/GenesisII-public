@@ -16,12 +16,10 @@ package edu.virginia.vcgr.genii.client.ser;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.AxisClient;
 
-public class Config
-{
+public class Config {
 	static private AxisClient _client = null;
 
-	static public AxisClient getClientEngine()
-	{
+	static public AxisClient getClientEngine() {
 		if (_client == null) {
 			_client = new AxisClient();
 		}
@@ -31,8 +29,7 @@ public class Config
 
 	static private MessageContext _cached = null;
 
-	static public MessageContext getContext()
-	{
+	static public MessageContext getContext() {
 		synchronized (Config.class) {
 			if (_cached == null) {
 				_cached = new MessageContext(getClientEngine());

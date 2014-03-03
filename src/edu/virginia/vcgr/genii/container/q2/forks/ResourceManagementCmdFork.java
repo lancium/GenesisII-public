@@ -25,24 +25,22 @@ import edu.virginia.vcgr.genii.container.rfork.cmd.CommandParameter;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class ResourceManagementCmdFork extends AbstractStreamableByteIOFactoryResourceFork
-{
-	public ResourceManagementCmdFork(ResourceForkService service, String forkPath)
-	{
+public class ResourceManagementCmdFork extends
+		AbstractStreamableByteIOFactoryResourceFork {
+	public ResourceManagementCmdFork(ResourceForkService service,
+			String forkPath) {
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void modifyState(InputStream source) throws IOException
-	{
+	public void modifyState(InputStream source) throws IOException {
 		CommandChannelManager.handleCommand(this, source);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void snapshotState(OutputStream sink) throws IOException
-	{
+	public void snapshotState(OutputStream sink) throws IOException {
 		PrintStream ps = new PrintStream(sink);
 
 		ResourceKey rKey = getService().getResourceKey();
@@ -61,25 +59,36 @@ public class ResourceManagementCmdFork extends AbstractStreamableByteIOFactoryRe
 		else {
 			BESData data = besMgr.getBESData(getForkName());
 			if (data == null)
-				ps.format("Unable to find BES data for \"%s\".\n", getForkName());
+				ps.format("Unable to find BES data for \"%s\".\n",
+						getForkName());
 			else {
 				BESInformation besInfo = besMgr.getBESInformation(data.getID());
 				if (besInfo == null)
-					ps.format("Unable to find BES Information for \"%s(%d)\".\n", getForkName(), data.getID());
+					ps.format(
+							"Unable to find BES Information for \"%s(%d)\".\n",
+							getForkName(), data.getID());
 				else {
 					ps.format("%s\n", getForkName());
-					ps.format("\tSlots:  %d\n", mgr.getBESConfiguration(getForkName()));
-					ps.format("\tOS:  %s, %s\n", besInfo.getOperatingSystemType(), besInfo.getOperatingSystemVersion());
-					ps.format("\tArch:  %s\n", besInfo.getProcessorArchitecture());
-					ps.format("\tMemory:  %d\n", besInfo.getPhysicalMemory().longValue());
-					MatchingParameters matching = besInfo.getMatchingParameters();
+					ps.format("\tSlots:  %d\n",
+							mgr.getBESConfiguration(getForkName()));
+					ps.format("\tOS:  %s, %s\n",
+							besInfo.getOperatingSystemType(),
+							besInfo.getOperatingSystemVersion());
+					ps.format("\tArch:  %s\n",
+							besInfo.getProcessorArchitecture());
+					ps.format("\tMemory:  %d\n", besInfo.getPhysicalMemory()
+							.longValue());
+					MatchingParameters matching = besInfo
+							.getMatchingParameters();
 					ps.format("\tMatching Parameters:\n");
 
 					ps.println(matching);
 					ps.println();
-					ps.format("Supported Filesystems:  %s\n", besInfo.supportedFilesystems());
+					ps.format("Supported Filesystems:  %s\n",
+							besInfo.supportedFilesystems());
 
-					BESUpdateInformation updateInfo = besMgr.getUpdateInformation(data.getID());
+					BESUpdateInformation updateInfo = besMgr
+							.getUpdateInformation(data.getID());
 					ps.format("BES Update Information:\n");
 					if (updateInfo == null)
 						ps.format("None Available\n");
@@ -99,8 +108,8 @@ public class ResourceManagementCmdFork extends AbstractStreamableByteIOFactoryRe
 	}
 
 	@CommandHandler("SLOTS")
-	public void setSlots(@CommandParameter("slotCount") int slots) throws SQLException, IOException
-	{
+	public void setSlots(@CommandParameter("slotCount") int slots)
+			throws SQLException, IOException {
 		ResourceKey rKey = getService().getResourceKey();
 
 		if (slots < 0)
@@ -111,8 +120,8 @@ public class ResourceManagementCmdFork extends AbstractStreamableByteIOFactoryRe
 	}
 
 	@CommandHandler("UPDATE")
-	public void update() throws ResourceUnknownFaultType, ResourceException, SQLException, GenesisIISecurityException
-	{
+	public void update() throws ResourceUnknownFaultType, ResourceException,
+			SQLException, GenesisIISecurityException {
 		ResourceKey rKey = getService().getResourceKey();
 
 		QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());

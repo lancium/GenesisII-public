@@ -5,11 +5,9 @@ import edu.virginia.g3.fsview.gui.FSViewInformationManager;
 import edu.virginia.g3.fsview.gui.FSViewInformationModel;
 
 final public class AnonymousAuthenticationInformationManager implements
-	FSViewInformationManager<FSViewAuthenticationInformation>
-{
+		FSViewInformationManager<FSViewAuthenticationInformation> {
 	@Override
-	final public FSViewInformationModel<FSViewAuthenticationInformation> createModel()
-	{
+	final public FSViewInformationModel<FSViewAuthenticationInformation> createModel() {
 		return new AnonymousAuthenticationInformationModel();
 	}
 }

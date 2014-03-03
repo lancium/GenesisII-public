@@ -21,17 +21,5 @@ package edu.virginia.vcgr.jsdlval;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 public enum POSIXLimitType {
-	WallTimeLimit(),
-	FileSizeLimit(),
-	CoreDumpLimit(),
-	DataSegmentLimit(),
-	LockedMemoryLimit(),
-	MemoryLimit(),
-	OpenDescriptorsLimit(),
-	PipeSizeLimit(),
-	StackSizeLimit(),
-	CPUTimeLimit(),
-	ProcessCountLimit(),
-	VirtualMemoryLimit(),
-	ThreadCountLimit()
+	WallTimeLimit(), FileSizeLimit(), CoreDumpLimit(), DataSegmentLimit(), LockedMemoryLimit(), MemoryLimit(), OpenDescriptorsLimit(), PipeSizeLimit(), StackSizeLimit(), CPUTimeLimit(), ProcessCountLimit(), VirtualMemoryLimit(), ThreadCountLimit()
 }

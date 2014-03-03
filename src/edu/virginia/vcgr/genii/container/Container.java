@@ -77,8 +77,7 @@ import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 
-public class Container extends ApplicationBase
-{
+public class Container extends ApplicationBase {
 	static private Log _logger = LogFactory.getLog(Container.class);
 
 	static private AxisServer _axisServer = null;
@@ -90,17 +89,16 @@ public class Container extends ApplicationBase
 	static private PrivateKey _containerPrivateKey;
 
 	// Default to 1 year
-	static private long _defaultCertificateLifetime = 1000L * 60L * 60L * 24L * 365L;
+	static private long _defaultCertificateLifetime = 1000L * 60L * 60L * 24L
+			* 365L;
 
-	static public void usage()
-	{
+	static public void usage() {
 		System.out.println("Container [deployment-name]");
 	}
 
 	static private BarrieredWorkQueue _postStartupWorkQueue = new BarrieredWorkQueue();
 
-	static public void main(String[] args)
-	{
+	static public void main(String[] args) {
 		if (args.length > 1) {
 			usage();
 			System.exit(1);
@@ -112,13 +110,17 @@ public class Container extends ApplicationBase
 			prepareServerApplication();
 
 			// Set Trust Store Provider
-			java.security.Security.setProperty("ssl.SocketFactory.provider", VcgrSslSocketFactory.class.getName());
+			java.security.Security.setProperty("ssl.SocketFactory.provider",
+					VcgrSslSocketFactory.class.getName());
 
-			LowMemoryWarning.INSTANCE.addLowMemoryListener(new LowMemoryExitHandler(7));
+			LowMemoryWarning.INSTANCE
+					.addLowMemoryListener(new LowMemoryExitHandler(7));
 
-			_logger.info(String.format("Deployment name is '%s'.\n", new DeploymentName()));
+			_logger.info(String.format("Deployment name is '%s'.\n",
+					new DeploymentName()));
 
-			WSDDProvider.registerProvider(GAroundInvokerFactory.PROVIDER_QNAME, new GAroundInvokerFactory());
+			WSDDProvider.registerProvider(GAroundInvokerFactory.PROVIDER_QNAME,
+					new GAroundInvokerFactory());
 
 			runContainer();
 
@@ -136,25 +138,24 @@ public class Container extends ApplicationBase
 		OSGiSupport.shutDownFramework();
 	}
 
-	static public ConfigurationManager getConfigurationManager()
-	{
+	static public ConfigurationManager getConfigurationManager() {
 		return ConfigurationManager.getCurrentConfiguration();
 	}
 
-	static public ContainerConfiguration getContainerConfiguration()
-	{
+	static public ContainerConfiguration getContainerConfiguration() {
 		return _containerConfiguration;
 	}
 
-	static private org.apache.axis.Handler getHandler(SimpleChain handlerChain, Class<?> handlerClass)
-	{
+	static private org.apache.axis.Handler getHandler(SimpleChain handlerChain,
+			Class<?> handlerClass) {
 
 		if (handlerChain == null) {
 			return null;
 		}
 		for (org.apache.axis.Handler h : handlerChain.getHandlers()) {
 			if (h instanceof SimpleChain) {
-				org.apache.axis.Handler result = getHandler((SimpleChain) h, handlerClass);
+				org.apache.axis.Handler result = getHandler((SimpleChain) h,
+						handlerClass);
 				if (result != null) {
 					return result;
 				}
@@ -165,15 +166,17 @@ public class Container extends ApplicationBase
 		return null;
 	}
 
-	static private void runContainer() throws ConfigurationException, IOException, Exception
-	{
+	static private void runContainer() throws ConfigurationException,
+			IOException, Exception {
 		WebAppContext webAppCtxt;
 		Server server;
 		SocketConnector socketConnector;
 
-		initializeIdentitySecurity(getConfigurationManager().getContainerConfiguration());
+		initializeIdentitySecurity(getConfigurationManager()
+				.getContainerConfiguration());
 
-		_containerConfiguration = new ContainerConfiguration(getConfigurationManager());
+		_containerConfiguration = new ContainerConfiguration(
+				getConfigurationManager());
 		ContainerConfiguration.setTheContainerConfig(_containerConfiguration);
 
 		server = new Server();
@@ -188,37 +191,48 @@ public class Container extends ApplicationBase
 				socketConnector = new SslSocketConnector();
 
 			socketConnector.setPort(_containerConfiguration.getListenPort());
-			_containerConfiguration.getSslInformation().configure(getConfigurationManager(),
-				(SslSocketConnector) socketConnector);
-			_containerURL = Hostname.normalizeURL("https://127.0.0.1:" + _containerConfiguration.getListenPort());
+			_containerConfiguration.getSslInformation().configure(
+					getConfigurationManager(),
+					(SslSocketConnector) socketConnector);
+			_containerURL = Hostname.normalizeURL("https://127.0.0.1:"
+					+ _containerConfiguration.getListenPort());
 		} else {
 			socketConnector = new SocketConnector();
 			socketConnector.setPort(_containerConfiguration.getListenPort());
-			_containerURL = Hostname.normalizeURL("http://127.0.0.1:" + _containerConfiguration.getListenPort());
+			_containerURL = Hostname.normalizeURL("http://127.0.0.1:"
+					+ _containerConfiguration.getListenPort());
 		}
 
-		_logger.info(String.format("Setting max acceptor threads to %d\n", _containerConfiguration.getMaxAcceptorThreads()));
-		socketConnector.setAcceptors(_containerConfiguration.getMaxAcceptorThreads());
+		_logger.info(String.format("Setting max acceptor threads to %d\n",
+				_containerConfiguration.getMaxAcceptorThreads()));
+		socketConnector.setAcceptors(_containerConfiguration
+				.getMaxAcceptorThreads());
 		server.addConnector(socketConnector);
 
 		ContextHandler context1 = new ContextHandler("/axis");
-		webAppCtxt = new WebAppContext(Installation.axisWebApplicationPath().getAbsolutePath(), "/");
+		webAppCtxt = new WebAppContext(Installation.axisWebApplicationPath()
+				.getAbsolutePath(), "/");
 		context1.setHandler(webAppCtxt);
 
-		Server dServer = loadDynamicPages(_containerConfiguration.getDPagesPort());
+		Server dServer = loadDynamicPages(_containerConfiguration
+				.getDPagesPort());
 
 		ContextHandler context2 = new ContextHandler("/");
-		context2.setHandler(new ResourceFileHandler("edu/virginia/vcgr/genii/container"));
+		context2.setHandler(new ResourceFileHandler(
+				"edu/virginia/vcgr/genii/container"));
 
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
 		contexts.setHandlers(new ContextHandler[] { context1, context2 });
 		server.setHandler(contexts);
 
 		try {
-			recordInstallationState(System.getProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, "default"), new URL(
-				_containerURL));
+			recordInstallationState(System.getProperty(
+					DeploymentName.DEPLOYMENT_NAME_PROPERTY, "default"),
+					new URL(_containerURL));
 		} catch (Throwable cause) {
-			_logger.error("Unable to record installation state -- continuing anyways.", cause);
+			_logger.error(
+					"Unable to record installation state -- continuing anyways.",
+					cause);
 		}
 
 		server.start();
@@ -232,59 +246,67 @@ public class Container extends ApplicationBase
 
 		Collection<Class<? extends IServiceWithCleanupHook>> containerServices = initializeServices(webAppCtxt);
 
-		Collection<IServiceWithCleanupHook> containerServiceObjects =
-			new ArrayList<IServiceWithCleanupHook>(containerServices.size());
+		Collection<IServiceWithCleanupHook> containerServiceObjects = new ArrayList<IServiceWithCleanupHook>(
+				containerServices.size());
 		for (Class<? extends IServiceWithCleanupHook> service : containerServices) {
 			try {
 				Constructor<?> cons = service.getConstructor(new Class[0]);
-				IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons.newInstance(new Object[0]);
+				IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons
+						.newInstance(new Object[0]);
 				containerServiceObjects.add(base);
 
 				try {
 					base.cleanupHook();
 				} catch (Throwable cause) {
-					_logger.warn(String.format("Unable to run clean up hook on %s.", service), cause);
+					_logger.warn(String.format(
+							"Unable to run clean up hook on %s.", service),
+							cause);
 				}
 
 				containerServiceObjects.add(base);
 			} catch (Throwable cause) {
-				_logger.warn(String.format("Unable to configure service:  %s.", service), cause);
+				_logger.warn(String.format("Unable to configure service:  %s.",
+						service), cause);
 			}
 		}
 
 		CacheConfigurer.disableSubscriptionBasedCaching();
 
-		// hmmm: this is doing the startup which the service deployer also does. are we sure we're
+		// hmmm: this is doing the startup which the service deployer also does.
+		// are we sure we're
 		// not fighting with ourselves?
 		for (IServiceWithCleanupHook service : containerServiceObjects) {
 			try {
 				service.startup();
 				_postStartupWorkQueue.enqueue(service);
 			} catch (Throwable cause) {
-				_logger.warn(String.format("Unable to configure service:  %s.", service), cause);
+				_logger.warn(String.format("Unable to configure service:  %s.",
+						service), cause);
 			}
 		}
 
-		// hmmm: this is way afterwards now; previously it was before the container service obj list
+		// hmmm: this is way afterwards now; previously it was before the
+		// container service obj list
 		// was populated.
 		// hmmm: trying this after all are created.
-		ServiceDeployer.startServiceDeployer(_axisServer, _postStartupWorkQueue,
-			Installation.getDeployment(new DeploymentName()).getServicesDirectory());
+		ServiceDeployer.startServiceDeployer(_axisServer,
+				_postStartupWorkQueue,
+				Installation.getDeployment(new DeploymentName())
+						.getServicesDirectory());
 
 		ServerWSDoAllReceiver.beginNormalRuntime();
 	}
 
 	@SuppressWarnings("unchecked")
-	static private Collection<Class<? extends IServiceWithCleanupHook>> initializeServices(WebAppContext ctxt)
-		throws ServletException, AxisFault
-	{
-		Collection<Class<? extends IServiceWithCleanupHook>> managedServiceClasses =
-			new LinkedList<Class<? extends IServiceWithCleanupHook>>();
+	static private Collection<Class<? extends IServiceWithCleanupHook>> initializeServices(
+			WebAppContext ctxt) throws ServletException, AxisFault {
+		Collection<Class<? extends IServiceWithCleanupHook>> managedServiceClasses = new LinkedList<Class<? extends IServiceWithCleanupHook>>();
 
 		ServletHolder[] holders = ctxt.getServletHandler().getServlets();
 		for (ServletHolder holder : holders) {
 			if (holder.getName().equals("AxisServlet")) {
-				_axisServer = ((AxisServletBase) holder.getServlet()).getEngine();
+				_axisServer = ((AxisServletBase) holder.getServlet())
+						.getEngine();
 			}
 		}
 
@@ -297,13 +319,15 @@ public class Container extends ApplicationBase
 			EngineConfiguration config = _axisServer.getConfig();
 
 			// configure the listening request security handler
-			ServerWSDoAllReceiver receiver =
-				(ServerWSDoAllReceiver) getHandler((SimpleChain) config.getGlobalRequest(), ServerWSDoAllReceiver.class);
+			ServerWSDoAllReceiver receiver = (ServerWSDoAllReceiver) getHandler(
+					(SimpleChain) config.getGlobalRequest(),
+					ServerWSDoAllReceiver.class);
 			receiver.configure(_containerPrivateKey);
 
 			// configure listening response security handler
-			ServerWSDoAllSender sender =
-				(ServerWSDoAllSender) getHandler((SimpleChain) config.getGlobalResponse(), ServerWSDoAllSender.class);
+			ServerWSDoAllSender sender = (ServerWSDoAllSender) getHandler(
+					(SimpleChain) config.getGlobalResponse(),
+					ServerWSDoAllSender.class);
 			sender.configure(_containerPrivateKey);
 
 			// configure the services individually
@@ -312,8 +336,10 @@ public class Container extends ApplicationBase
 				Object obj = iter.next();
 				if (obj instanceof JavaServiceDesc) {
 					Class<?> implClass = ((JavaServiceDesc) obj).getImplClass();
-					if (IServiceWithCleanupHook.class.isAssignableFrom(implClass))
-						managedServiceClasses.add((Class<? extends IServiceWithCleanupHook>) implClass);
+					if (IServiceWithCleanupHook.class
+							.isAssignableFrom(implClass))
+						managedServiceClasses
+								.add((Class<? extends IServiceWithCleanupHook>) implClass);
 				}
 			}
 
@@ -323,10 +349,11 @@ public class Container extends ApplicationBase
 		}
 	}
 
-	static private void initializeIdentitySecurity(XMLConfiguration serverConf) throws ConfigurationException,
-		KeyStoreException, GeneralSecurityException, IOException
-	{
-		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
+	static private void initializeIdentitySecurity(XMLConfiguration serverConf)
+			throws ConfigurationException, KeyStoreException,
+			GeneralSecurityException, IOException {
+		Security resourceIdSecProps = Installation.getDeployment(
+				new DeploymentName()).security();
 		String keyStoreLoc = resourceIdSecProps.getSigningKeystoreFile();
 		if (keyStoreLoc == null) {
 			String msg = "Key Store Location not specified for message security.";
@@ -336,17 +363,19 @@ public class Container extends ApplicationBase
 		File keystoreLocPath = new File(keyStoreLoc);
 
 		// the rest come from deployment still...
-		String keyStoreType =
-			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP, "PKCS12");
-		String keyPassword =
-			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_PASSWORD_PROP);
-		String keyStorePassword =
-			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PASSWORD_PROP);
-		String containerAlias =
-			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP);
+		String keyStoreType = resourceIdSecProps
+				.getProperty(
+						KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP,
+						"PKCS12");
+		String keyPassword = resourceIdSecProps
+				.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_PASSWORD_PROP);
+		String keyStorePassword = resourceIdSecProps
+				.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PASSWORD_PROP);
+		String containerAlias = resourceIdSecProps
+				.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP);
 
-		String certificateLifetime =
-			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_DEFAULT_CERT_LIFETIME_PROP);
+		String certificateLifetime = resourceIdSecProps
+				.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_DEFAULT_CERT_LIFETIME_PROP);
 		if (certificateLifetime != null)
 			_defaultCertificateLifetime = Long.parseLong(certificateLifetime);
 
@@ -358,9 +387,11 @@ public class Container extends ApplicationBase
 		if (keyPassword != null)
 			keyPassChars = keyPassword.toCharArray();
 
-		KeyStore ks = CertTool.openStoreDirectPath(keystoreLocPath, keyStoreType, keyStorePassChars);
+		KeyStore ks = CertTool.openStoreDirectPath(keystoreLocPath,
+				keyStoreType, keyStorePassChars);
 		// load the container private key and certificate
-		_containerPrivateKey = (PrivateKey) ks.getKey(containerAlias, keyPassChars);
+		_containerPrivateKey = (PrivateKey) ks.getKey(containerAlias,
+				keyPassChars);
 
 		Certificate[] chain = ks.getCertificateChain(containerAlias);
 		_containerCertChain = new X509Certificate[chain.length];
@@ -369,28 +400,27 @@ public class Container extends ApplicationBase
 
 	}
 
-	static public JavaServiceDesc findService(EndpointReferenceType epr) throws AxisFault
-	{
+	static public JavaServiceDesc findService(EndpointReferenceType epr)
+			throws AxisFault {
 		return findService(epr.getAddress());
 	}
 
-	static public JavaServiceDesc findService(AttributedURIType uri) throws AxisFault
-	{
+	static public JavaServiceDesc findService(AttributedURIType uri)
+			throws AxisFault {
 		return findService(uri.get_value());
 	}
 
-	static public JavaServiceDesc findService(URI uri) throws AxisFault
-	{
+	static public JavaServiceDesc findService(URI uri) throws AxisFault {
 		return findService(uri.getPath());
 	}
 
-	static public JavaServiceDesc findService(java.net.URI uri) throws AxisFault
-	{
+	static public JavaServiceDesc findService(java.net.URI uri)
+			throws AxisFault {
 		return findService(uri.getPath());
 	}
 
-	static public JavaServiceDesc findService(String pathOrName) throws AxisFault
-	{
+	static public JavaServiceDesc findService(String pathOrName)
+			throws AxisFault {
 		int index = pathOrName.lastIndexOf('/');
 		if (index >= 0)
 			pathOrName = pathOrName.substring(index + 1);
@@ -402,21 +432,21 @@ public class Container extends ApplicationBase
 		return (JavaServiceDesc) ss.getServiceDescription();
 	}
 
-	static public Class<?> classForService(String serviceName)
-	{
+	static public Class<?> classForService(String serviceName) {
 		try {
 			JavaServiceDesc desc = findService(serviceName);
 			if (desc != null)
 				return desc.getImplClass();
 		} catch (AxisFault fault) {
-			_logger.error(String.format("Error find service description for service %s.", serviceName), fault);
+			_logger.error(String.format(
+					"Error find service description for service %s.",
+					serviceName), fault);
 		}
 
 		return null;
 	}
 
-	static public ArrayList<JavaServiceDesc> getInstalledServices()
-	{
+	static public ArrayList<JavaServiceDesc> getInstalledServices() {
 		ArrayList<JavaServiceDesc> installedServices = new ArrayList<JavaServiceDesc>();
 
 		Iterator<?> iter = null;
@@ -434,19 +464,21 @@ public class Container extends ApplicationBase
 		return installedServices;
 	}
 
-	static final private Pattern SERVICE_NAME_FROM_URL = Pattern.compile("^https?://[^/]*/axis/services/(\\w+).*$",
-		Pattern.CASE_INSENSITIVE);
+	static final private Pattern SERVICE_NAME_FROM_URL = Pattern
+			.compile("^https?://[^/]*/axis/services/(\\w+).*$",
+					Pattern.CASE_INSENSITIVE);
 
-	static public Class<?> getClassForServiceURL(String serviceURL)
-	{
+	static public Class<?> getClassForServiceURL(String serviceURL) {
 		Class<?> ret = null;
 
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Asked to get class for service URL \"%s\".", serviceURL));
+			_logger.debug(String.format(
+					"Asked to get class for service URL \"%s\".", serviceURL));
 
 		Matcher matcher = SERVICE_NAME_FROM_URL.matcher(serviceURL);
 		if (!matcher.matches()) {
-			_logger.warn(String.format("Unable to get service name from URL \"%s\".", serviceURL));
+			_logger.warn(String.format(
+					"Unable to get service name from URL \"%s\".", serviceURL));
 			return null;
 		}
 
@@ -459,27 +491,28 @@ public class Container extends ApplicationBase
 		}
 
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Class for %s is %s.", serviceURL, ret.getName()));
+			_logger.debug(String.format("Class for %s is %s.", serviceURL,
+					ret.getName()));
 		return ret;
 	}
 
-	static public String getServiceURL(String serviceName)
-	{
+	static public String getServiceURL(String serviceName) {
 		MessageContext ctxt = MessageContext.getCurrentContext();
 		if (ctxt != null) {
 			String currentURL = getCurrentServiceURL(ctxt);
 			int index = currentURL.lastIndexOf('/');
 			if (index > 0)
-				return currentURL.substring(0, index + 1) + serviceName + "?" + EPRUtils.GENII_CONTAINER_ID_PARAMETER + "="
-					+ Container.getContainerID();
+				return currentURL.substring(0, index + 1) + serviceName + "?"
+						+ EPRUtils.GENII_CONTAINER_ID_PARAMETER + "="
+						+ Container.getContainerID();
 		}
 
-		return _containerURL + "/axis/services/" + serviceName + "?" + EPRUtils.GENII_CONTAINER_ID_PARAMETER + "="
-			+ Container.getContainerID();
+		return _containerURL + "/axis/services/" + serviceName + "?"
+				+ EPRUtils.GENII_CONTAINER_ID_PARAMETER + "="
+				+ Container.getContainerID();
 	}
 
-	static public boolean onThisServer(EndpointReferenceType target)
-	{
+	static public boolean onThisServer(EndpointReferenceType target) {
 		String urlString = target.getAddress().toString();
 		String containerURL = _containerURL + "/axis/services/";
 
@@ -489,11 +522,12 @@ public class Container extends ApplicationBase
 		return false;
 	}
 
-	static public String getCurrentServiceURL(MessageContext ctxt)
-	{
+	static public String getCurrentServiceURL(MessageContext ctxt) {
 		try {
-			URL url = new URL(ctxt.getProperty(MessageContext.TRANS_URL).toString());
-			URL result = new URL(url.getProtocol(), Hostname.getLocalHostname().toString(), url.getPort(), url.getFile());
+			URL url = new URL(ctxt.getProperty(MessageContext.TRANS_URL)
+					.toString());
+			URL result = new URL(url.getProtocol(), Hostname.getLocalHostname()
+					.toString(), url.getPort(), url.getFile());
 			return result.toString();
 		} catch (MalformedURLException mue) {
 			// Can't happen
@@ -502,38 +536,38 @@ public class Container extends ApplicationBase
 		}
 	}
 
-	static public X509Certificate[] getContainerCertChain()
-	{
+	static public X509Certificate[] getContainerCertChain() {
 		return _containerCertChain;
 	}
 
-	static public PrivateKey getContainerPrivateKey()
-	{
+	static public PrivateKey getContainerPrivateKey() {
 		return _containerPrivateKey;
 	}
 
-	static public long getDefaultCertificateLifetime()
-	{
+	static public long getDefaultCertificateLifetime() {
 		return _defaultCertificateLifetime;
 	}
 
 	static private GUID _containerID = null;
 	static private Object _containerIDLock = new Object();
 
-	static public GUID getContainerID()
-	{
+	static public GUID getContainerID() {
 		synchronized (_containerIDLock) {
 			if (_containerID == null) {
-				PersistentContainerProperties properties = PersistentContainerProperties.getProperties();
+				PersistentContainerProperties properties = PersistentContainerProperties
+						.getProperties();
 				try {
-					_containerID = (GUID) properties.getProperty("container-id");
+					_containerID = (GUID) properties
+							.getProperty("container-id");
 					if (_containerID == null) {
 						_containerID = new GUID();
-						_logger.info("created new container ID for this container: " + _containerID);
+						_logger.info("created new container ID for this container: "
+								+ _containerID);
 					}
 					properties.setProperty("container-id", _containerID);
 				} catch (Throwable cause) {
-					throw new org.morgan.util.configuration.ConfigurationException("Unable to get/set container id.", cause);
+					throw new org.morgan.util.configuration.ConfigurationException(
+							"Unable to get/set container id.", cause);
 				}
 			}
 
@@ -541,8 +575,8 @@ public class Container extends ApplicationBase
 		}
 	}
 
-	static private void recordInstallationState(String deploymentName, URL containerURL) throws IOException, FileLockException
-	{
+	static private void recordInstallationState(String deploymentName,
+			URL containerURL) throws IOException, FileLockException {
 		Thread th = new Thread(new InstallationStateEraser(deploymentName));
 		th.setDaemon(false);
 		th.setName("Installation Eraser Thread");
@@ -550,18 +584,15 @@ public class Container extends ApplicationBase
 		InstallationState.addRunningContainer(deploymentName, containerURL);
 	}
 
-	static private class InstallationStateEraser implements Runnable
-	{
+	static private class InstallationStateEraser implements Runnable {
 		private String _deploymentName;
 
-		public InstallationStateEraser(String deploymentName)
-		{
+		public InstallationStateEraser(String deploymentName) {
 			_deploymentName = deploymentName;
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			try {
 				InstallationState.removeRunningContainer(_deploymentName);
 			} catch (Throwable cause) {
@@ -570,8 +601,7 @@ public class Container extends ApplicationBase
 		}
 	}
 
-	static private Server loadDynamicPages(Integer dPagesPort)
-	{
+	static private Server loadDynamicPages(Integer dPagesPort) {
 		Server server = null;
 
 		if (dPagesPort != null) {
@@ -587,18 +617,19 @@ public class Container extends ApplicationBase
 		return server;
 	}
 
-	static private void loadDynamicPages(Server server)
-	{
-		HierarchicalDirectory dynPagesDir = Installation.getDeployment(new DeploymentName()).getDynamicPagesDirectory();
+	static private void loadDynamicPages(Server server) {
+		HierarchicalDirectory dynPagesDir = Installation.getDeployment(
+				new DeploymentName()).getDynamicPagesDirectory();
 		if (!dynPagesDir.exists())
 			return;
 
 		try {
-			File scratchSpaceDirectory =
-				new GuaranteedDirectory(ConfigurationManager.getCurrentConfiguration().getUserDirectory(),
-					"dynamic-pages-scratch");
+			File scratchSpaceDirectory = new GuaranteedDirectory(
+					ConfigurationManager.getCurrentConfiguration()
+							.getUserDirectory(), "dynamic-pages-scratch");
 
-			ScratchSpaceManager scratchManager = new ScratchSpaceManager(scratchSpaceDirectory);
+			ScratchSpaceManager scratchManager = new ScratchSpaceManager(
+					scratchSpaceDirectory);
 			for (File entry : dynPagesDir.listFiles()) {
 				try {
 					if (entry.getName().endsWith(".dar")) {
@@ -607,10 +638,13 @@ public class Container extends ApplicationBase
 							return;
 						}
 
-						DynamicPageLoader.addDynamicPages(server, scratchManager, entry);
+						DynamicPageLoader.addDynamicPages(server,
+								scratchManager, entry);
 					}
 				} catch (Throwable cause) {
-					_logger.warn(String.format("Unable to load dynamic page package \"%s\".", entry.getName()), cause);
+					_logger.warn(String.format(
+							"Unable to load dynamic page package \"%s\".",
+							entry.getName()), cause);
 				}
 			}
 		} catch (Throwable cause) {

@@ -16,18 +16,15 @@ import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class ResourcesRNSFork extends AbstractRNSResourceFork
-{
-	public ResourcesRNSFork(ResourceForkService service, String forkPath)
-	{
+public class ResourcesRNSFork extends AbstractRNSResourceFork {
+	public ResourcesRNSFork(ResourceForkService service, String forkPath) {
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry)
-		throws IOException
-	{
+	public EndpointReferenceType add(EndpointReferenceType exemplarEPR,
+			String entryName, EndpointReferenceType entry) throws IOException {
 		ResourceKey rKey = getService().getResourceKey();
 
 		try {
@@ -40,15 +37,16 @@ public class ResourcesRNSFork extends AbstractRNSResourceFork
 	}
 
 	@Override
-	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR, String newFileName) throws IOException
-	{
-		throw new IOException("This RNS directory only permits BES containers to be linked in.");
+	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR,
+			String newFileName) throws IOException {
+		throw new IOException(
+				"This RNS directory only permits BES containers to be linked in.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR, String entryName) throws IOException
-	{
+	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR,
+			String entryName) throws IOException {
 		ResourceKey rKey = getService().getResourceKey();
 		Collection<LegacyEntryType> entries;
 		Collection<InternalEntry> ret;
@@ -58,7 +56,8 @@ public class ResourcesRNSFork extends AbstractRNSResourceFork
 			entries = mgr.listBESs(entryName);
 			ret = new ArrayList<InternalEntry>(entries.size());
 			for (LegacyEntryType entry : entries) {
-				ret.add(new InternalEntry(entry.getEntry_name(), entry.getEntry_reference(), entry.get_any()));
+				ret.add(new InternalEntry(entry.getEntry_name(), entry
+						.getEntry_reference(), entry.get_any()));
 			}
 
 			return ret;
@@ -68,15 +67,15 @@ public class ResourcesRNSFork extends AbstractRNSResourceFork
 	}
 
 	@Override
-	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR, String newDirectoryName) throws IOException
-	{
-		throw new IOException("This RNS directory only permits BES containers to be linked in.");
+	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR,
+			String newDirectoryName) throws IOException {
+		throw new IOException(
+				"This RNS directory only permits BES containers to be linked in.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public boolean remove(String entryName) throws IOException
-	{
+	public boolean remove(String entryName) throws IOException {
 		ResourceKey rKey = getService().getResourceKey();
 		Collection<String> entries = new ArrayList<String>();
 

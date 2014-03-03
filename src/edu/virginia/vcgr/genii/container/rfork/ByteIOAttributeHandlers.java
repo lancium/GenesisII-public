@@ -29,118 +29,121 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 
-public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler
-{
+public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
 	protected ByteIOResourceFork _fork;
 
-	public ByteIOAttributeHandlers(ByteIOResourceFork fork, AttributePackage pkg) throws NoSuchMethodException
-	{
+	public ByteIOAttributeHandlers(ByteIOResourceFork fork, AttributePackage pkg)
+			throws NoSuchMethodException {
 		super(pkg);
 
 		_fork = fork;
 	}
 
-	private long getSize() throws ResourceException, ResourceUnknownFaultType
-	{
+	private long getSize() throws ResourceException, ResourceUnknownFaultType {
 		return _fork.size();
 	}
 
-	private boolean getReadable() throws ResourceException, ResourceUnknownFaultType
-	{
+	private boolean getReadable() throws ResourceException,
+			ResourceUnknownFaultType {
 		return _fork.readable();
 	}
 
-	private boolean getWriteable() throws ResourceException, ResourceUnknownFaultType
-	{
+	private boolean getWriteable() throws ResourceException,
+			ResourceUnknownFaultType {
 		return _fork.writable();
 	}
 
-	private Calendar getCreateTime() throws ResourceException, ResourceUnknownFaultType
-	{
+	private Calendar getCreateTime() throws ResourceException,
+			ResourceUnknownFaultType {
 		return _fork.createTime();
 	}
 
-	private Calendar getModificationTime() throws ResourceException, ResourceUnknownFaultType
-	{
+	private Calendar getModificationTime() throws ResourceException,
+			ResourceUnknownFaultType {
 		return _fork.modificationTime();
 	}
 
-	private void setModificationTime(Calendar c) throws ResourceException, ResourceUnknownFaultType
-	{
+	private void setModificationTime(Calendar c) throws ResourceException,
+			ResourceUnknownFaultType {
 		_fork.modificationTime(c);
 	}
 
-	private Calendar getAccessTime() throws ResourceException, ResourceUnknownFaultType
-	{
+	private Calendar getAccessTime() throws ResourceException,
+			ResourceUnknownFaultType {
 		return _fork.accessTime();
 	}
 
-	private void setAccessTime(Calendar c) throws ResourceException, ResourceUnknownFaultType
-	{
+	private void setAccessTime(Calendar c) throws ResourceException,
+			ResourceUnknownFaultType {
 		_fork.accessTime(c);
 	}
 
-	public MessageElement getSizeAttr() throws ResourceUnknownFaultType, ResourceException
-	{
+	public MessageElement getSizeAttr() throws ResourceUnknownFaultType,
+			ResourceException {
 		return new MessageElement(GetSizeNamespace(), getSize());
 	}
 
-	public MessageElement getReadableAttr() throws ResourceUnknownFaultType, ResourceException
-	{
+	public MessageElement getReadableAttr() throws ResourceUnknownFaultType,
+			ResourceException {
 		return new MessageElement(GetReadableNamespace(), getReadable());
 	}
 
-	public MessageElement getWriteableAttr() throws ResourceUnknownFaultType, ResourceException
-	{
+	public MessageElement getWriteableAttr() throws ResourceUnknownFaultType,
+			ResourceException {
 		return new MessageElement(GetWriteableNamespace(), getWriteable());
 	}
 
-	public Collection<MessageElement> getTransferMechsAttr()
-	{
+	public Collection<MessageElement> getTransferMechsAttr() {
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
 
-		ret.add(new MessageElement(GetTransferMechanismNamespace(), ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
-		ret.add(new MessageElement(GetTransferMechanismNamespace(), ByteIOConstants.TRANSFER_TYPE_DIME_URI));
-		ret.add(new MessageElement(GetTransferMechanismNamespace(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+		ret.add(new MessageElement(GetTransferMechanismNamespace(),
+				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
+		ret.add(new MessageElement(GetTransferMechanismNamespace(),
+				ByteIOConstants.TRANSFER_TYPE_DIME_URI));
+		ret.add(new MessageElement(GetTransferMechanismNamespace(),
+				ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
 
 		return ret;
 	}
 
-	public MessageElement getCreateTimeAttr() throws ResourceUnknownFaultType, ResourceException
-	{
+	public MessageElement getCreateTimeAttr() throws ResourceUnknownFaultType,
+			ResourceException {
 		return new MessageElement(GetCreateTimeNamespace(), getCreateTime());
 	}
 
-	public MessageElement getModificationTimeAttr() throws ResourceUnknownFaultType, ResourceException
-	{
-		return new MessageElement(GetModificationTimeNamespace(), getModificationTime());
+	public MessageElement getModificationTimeAttr()
+			throws ResourceUnknownFaultType, ResourceException {
+		return new MessageElement(GetModificationTimeNamespace(),
+				getModificationTime());
 	}
 
-	public void setModificationTimeAttr(MessageElement element) throws ResourceException, ResourceUnknownFaultType
-	{
-		setModificationTime(ObjectDeserializer.toObject(element, Calendar.class));
+	public void setModificationTimeAttr(MessageElement element)
+			throws ResourceException, ResourceUnknownFaultType {
+		setModificationTime(ObjectDeserializer
+				.toObject(element, Calendar.class));
 	}
 
-	public MessageElement getAccessTimeAttr() throws ResourceUnknownFaultType, ResourceException
-	{
+	public MessageElement getAccessTimeAttr() throws ResourceUnknownFaultType,
+			ResourceException {
 		return new MessageElement(GetAccessTimeNamespace(), getAccessTime());
 	}
 
-	public void setAccessTimeAttr(MessageElement element) throws ResourceException, ResourceUnknownFaultType
-	{
+	public void setAccessTimeAttr(MessageElement element)
+			throws ResourceException, ResourceUnknownFaultType {
 		setAccessTime(ObjectDeserializer.toObject(element, Calendar.class));
 	}
 
 	@Override
-	protected void registerHandlers() throws NoSuchMethodException
-	{
+	protected void registerHandlers() throws NoSuchMethodException {
 		addHandler(GetSizeNamespace(), "getSizeAttr");
 		addHandler(GetReadableNamespace(), "getReadableAttr");
 		addHandler(GetWriteableNamespace(), "getWriteableAttr");
 		addHandler(GetTransferMechanismNamespace(), "getTransferMechsAttr");
 		addHandler(GetCreateTimeNamespace(), "getCreateTimeAttr");
-		addHandler(GetModificationTimeNamespace(), "getModificationTimeAttr", "setModificationTimeAttr");
-		addHandler(GetAccessTimeNamespace(), "getAccessTimeAttr", "setAccessTimeAttr");
+		addHandler(GetModificationTimeNamespace(), "getModificationTimeAttr",
+				"setModificationTimeAttr");
+		addHandler(GetAccessTimeNamespace(), "getAccessTimeAttr",
+				"setAccessTimeAttr");
 	}
 
 	protected abstract QName GetSizeNamespace();

@@ -4,28 +4,24 @@ import java.awt.Color;
 
 import javax.swing.table.DefaultTableCellRenderer;
 
-public class DefaultGrayedEmptyCellRenderer extends DefaultTableCellRenderer
-{
+public class DefaultGrayedEmptyCellRenderer extends DefaultTableCellRenderer {
 	static final long serialVersionUID = 0L;
 
 	private Color _normalColor = null;
 	private Color _emptyColor;
 	private String _emptyLabel;
 
-	public DefaultGrayedEmptyCellRenderer(String emptyLabel, Color emptyColor)
-	{
+	public DefaultGrayedEmptyCellRenderer(String emptyLabel, Color emptyColor) {
 		_emptyLabel = emptyLabel;
 		_emptyColor = emptyColor;
 	}
 
-	public DefaultGrayedEmptyCellRenderer(String emptyLabel)
-	{
+	public DefaultGrayedEmptyCellRenderer(String emptyLabel) {
 		this(emptyLabel, Color.lightGray);
 	}
 
 	@Override
-	protected void setValue(Object value)
-	{
+	protected void setValue(Object value) {
 		if (_normalColor == null)
 			_normalColor = getForeground();
 

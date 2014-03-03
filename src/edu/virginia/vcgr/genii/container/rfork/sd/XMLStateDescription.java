@@ -6,8 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used by XMLStateTranslaters. When an XMLStateTranslater is used, the resource
- * fork that implements SimpleStateResourceFork MUST have this annotation on it's class.
+ * This annotation is used by XMLStateTranslaters. When an XMLStateTranslater is
+ * used, the resource fork that implements SimpleStateResourceFork MUST have
+ * this annotation on it's class.
  * 
  * @author mmm2a
  */

@@ -32,8 +32,7 @@ import edu.virginia.vcgr.jsdl.sweep.SweepFunction;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class LoopDoubleSweepFunction implements SweepFunction, Serializable
-{
+public class LoopDoubleSweepFunction implements SweepFunction, Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlTransient
@@ -51,8 +50,7 @@ public class LoopDoubleSweepFunction implements SweepFunction, Serializable
 	@XmlElement(namespace = SweepConstants.SWEEP_FUNC_NS, name = "Exception", required = false, nillable = false)
 	private Set<Double> _exceptions;
 
-	public LoopDoubleSweepFunction(double start, double end, double step)
-	{
+	public LoopDoubleSweepFunction(double start, double end, double step) {
 		_start = start;
 		_end = end;
 		_step = step;
@@ -60,34 +58,28 @@ public class LoopDoubleSweepFunction implements SweepFunction, Serializable
 		_exceptions = new HashSet<Double>();
 	}
 
-	public LoopDoubleSweepFunction()
-	{
+	public LoopDoubleSweepFunction() {
 		this(0.0, 0.0, 0.1);
 	}
 
-	final public double start()
-	{
+	final public double start() {
 		return _start;
 	}
 
-	final public double end()
-	{
+	final public double end() {
 		return _end;
 	}
 
-	final public double step()
-	{
+	final public double step() {
 		return _step;
 	}
 
-	final public Set<Double> exceptions()
-	{
+	final public Set<Double> exceptions() {
 		return _exceptions;
 	}
 
 	@Override
-	final public int size()
-	{
+	final public int size() {
 		if (_size < 0) {
 			int count = 0;
 
@@ -103,39 +95,36 @@ public class LoopDoubleSweepFunction implements SweepFunction, Serializable
 	}
 
 	@Override
-	final public Iterator<Object> iterator()
-	{
+	final public Iterator<Object> iterator() {
 		return new LoopIterator();
 	}
 
-	private class LoopIterator implements Iterator<Object>
-	{
+	private class LoopIterator implements Iterator<Object> {
 		private double _nextValue;
 		private Set<Double> _actualExceptions;
 
-		private LoopIterator()
-		{
+		private LoopIterator() {
 			_nextValue = _start;
-			_actualExceptions = (_exceptions == null) ? new HashSet<Double>() : _exceptions;
+			_actualExceptions = (_exceptions == null) ? new HashSet<Double>()
+					: _exceptions;
 
 			while (_actualExceptions.contains(_nextValue) && _nextValue <= _end)
 				_nextValue += _step;
 		}
 
 		@Override
-		final public boolean hasNext()
-		{
+		final public boolean hasNext() {
 			return _nextValue <= _end;
 		}
 
 		@Override
-		final public Object next()
-		{
+		final public Object next() {
 			Object ret = new Double(_nextValue);
 
 			while (true) {
 				_nextValue += _step;
-				if (_nextValue > _end || !_actualExceptions.contains(new Double(_nextValue)))
+				if (_nextValue > _end
+						|| !_actualExceptions.contains(new Double(_nextValue)))
 					break;
 			}
 
@@ -143,9 +132,9 @@ public class LoopDoubleSweepFunction implements SweepFunction, Serializable
 		}
 
 		@Override
-		final public void remove()
-		{
-			throw new UnsupportedOperationException("Not allowed to remove elements from this iterator.");
+		final public void remove() {
+			throw new UnsupportedOperationException(
+					"Not allowed to remove elements from this iterator.");
 		}
 	}
 }

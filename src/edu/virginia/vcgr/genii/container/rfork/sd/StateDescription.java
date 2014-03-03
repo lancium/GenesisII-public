@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to decorate SimpleStateResourceFork sub-classes. It describes whether or
- * not the piece of state is readable or writable, and which translator to use for state
- * translations.
+ * This annotation is used to decorate SimpleStateResourceFork sub-classes. It
+ * describes whether or not the piece of state is readable or writable, and
+ * which translator to use for state translations.
  * 
  * @author mmm2a
  */

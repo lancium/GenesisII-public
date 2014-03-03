@@ -22,11 +22,11 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface GenesisIIConstants
-{
+public interface GenesisIIConstants {
 	static final public String GENESIS_II_JSDL_NS = "http://vcgr.cs.virginia.edu/genesisII/jsdl";
 
 	static final public String SCRATCH_UNIQUE_ID_ATTRIBUTE_NAME = "unique-id";
 
-	static final public QName SCRATCH_UNIQUE_ID_ATTRIBUTE = new QName(GENESIS_II_JSDL_NS, SCRATCH_UNIQUE_ID_ATTRIBUTE_NAME);
+	static final public QName SCRATCH_UNIQUE_ID_ATTRIBUTE = new QName(
+			GENESIS_II_JSDL_NS, SCRATCH_UNIQUE_ID_ATTRIBUTE_NAME);
 }

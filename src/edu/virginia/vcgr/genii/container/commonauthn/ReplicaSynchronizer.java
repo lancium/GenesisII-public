@@ -21,49 +21,59 @@ import edu.virginia.vcgr.genii.container.rns.IRNSResource;
  * as specialized resource-create operation and resource properties synchronization are controlled
  * by this extension of the GeniiDirSyncRunner class.
  */
-public class ReplicaSynchronizer extends GeniiDirSyncRunner
-{
+public class ReplicaSynchronizer extends GeniiDirSyncRunner {
 
 	private static Log _logger = LogFactory.getLog(ReplicaSynchronizer.class);
 
 	private STSResourcePropertiesRetriever propertyRetriever;
 
-	public ReplicaSynchronizer(STSResourcePropertiesRetriever propertyRetriever)
-	{
+	public ReplicaSynchronizer(STSResourcePropertiesRetriever propertyRetriever) {
 		this.propertyRetriever = propertyRetriever;
 	}
 
 	/*
-	 * This is the method for populating some construction properties that are used to distinguish
-	 * between the creation of a replica resource and a primary resource. Specific STS port-type
-	 * classes use these properties to bypass or augment steps of resource creation procedure.
+	 * This is the method for populating some construction properties that are
+	 * used to distinguish between the creation of a replica resource and a
+	 * primary resource. Specific STS port-type classes use these properties to
+	 * bypass or augment steps of resource creation procedure.
 	 */
 	@Override
-	public Collection<MessageElement> getDefaultAttributes(EndpointReferenceType primaryEPR)
-	{
+	public Collection<MessageElement> getDefaultAttributes(
+			EndpointReferenceType primaryEPR) {
 		List<MessageElement> attributes = new ArrayList<MessageElement>();
-		attributes.add(new MessageElement(STSConfigurationProperties.CERTIFICATE_OWNER_EPR, primaryEPR));
-		attributes.add(new MessageElement(STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM, "TRUE"));
-		attributes.add(new MessageElement(STSConfigurationProperties.LINK_TO_SERVICE_DIR_CONSTRUCTION_PARAM, "FALSE"));
+		attributes.add(new MessageElement(
+				STSConfigurationProperties.CERTIFICATE_OWNER_EPR, primaryEPR));
+		attributes.add(new MessageElement(
+				STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM,
+				"TRUE"));
+		attributes
+				.add(new MessageElement(
+						STSConfigurationProperties.LINK_TO_SERVICE_DIR_CONSTRUCTION_PARAM,
+						"FALSE"));
 		return attributes;
 	}
 
 	/*
-	 * This is a hook that is used by individual STS port-type classes to populate necessary
-	 * resource properties after a replica resource has been created.
+	 * This is a hook that is used by individual STS port-type classes to
+	 * populate necessary resource properties after a replica resource has been
+	 * created.
 	 */
 	@Override
-	protected void retrieveAndStoreResourcePropertiesFromPrimary(GeniiCommon proxyToPrimary, IRNSResource resource)
-	{
+	protected void retrieveAndStoreResourcePropertiesFromPrimary(
+			GeniiCommon proxyToPrimary, IRNSResource resource) {
 		try {
-			propertyRetriever.retrieveAndStoreResourceProperties(proxyToPrimary, resource);
+			propertyRetriever.retrieveAndStoreResourceProperties(
+					proxyToPrimary, resource);
 		} catch (Exception ex) {
-			_logger.error("Exception while trying to retrieve IDP specific resource properties", ex);
+			_logger.error(
+					"Exception while trying to retrieve IDP specific resource properties",
+					ex);
 		}
 	}
 
-	public interface STSResourcePropertiesRetriever
-	{
-		public void retrieveAndStoreResourceProperties(GeniiCommon proxyToPrimary, IRNSResource resource) throws Exception;
+	public interface STSResourcePropertiesRetriever {
+		public void retrieveAndStoreResourceProperties(
+				GeniiCommon proxyToPrimary, IRNSResource resource)
+				throws Exception;
 	}
 }

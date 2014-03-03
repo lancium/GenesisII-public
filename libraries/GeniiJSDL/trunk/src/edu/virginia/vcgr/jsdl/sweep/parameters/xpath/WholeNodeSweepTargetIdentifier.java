@@ -31,19 +31,16 @@ import edu.virginia.vcgr.jsdl.sweep.eval.SweepTargetIdentifier;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-class WholeNodeSweepTarget implements SweepTarget
-{
+class WholeNodeSweepTarget implements SweepTarget {
 	private Node _node;
 
-	static private void removeAllChildren(Node target)
-	{
+	static private void removeAllChildren(Node target) {
 		NodeList list = target.getChildNodes();
 		for (int lcv = 0; lcv < list.getLength(); lcv++)
 			target.removeChild(list.item(lcv));
 	}
 
-	static private void replaceAllChildren(Node target, Node source)
-	{
+	static private void replaceAllChildren(Node target, Node source) {
 		removeAllChildren(target);
 		NodeList list = source.getChildNodes();
 		for (int lcv = 0; lcv < list.getLength(); lcv++) {
@@ -54,42 +51,43 @@ class WholeNodeSweepTarget implements SweepTarget
 		}
 	}
 
-	public WholeNodeSweepTarget(Node node)
-	{
+	public WholeNodeSweepTarget(Node node) {
 		_node = node;
 	}
 
 	@Override
-	public void replace(Object value) throws SweepException
-	{
+	public void replace(Object value) throws SweepException {
 		if (value instanceof Node) {
 			replaceAllChildren(_node, (Node) value);
 		} else if (value instanceof String) {
 			removeAllChildren(_node);
 			_node.setTextContent((String) value);
 		} else
-			throw new SweepException(String.format("Don't know how to replace a %s with a %s.", Node.class, value.getClass()));
+			throw new SweepException(String.format(
+					"Don't know how to replace a %s with a %s.", Node.class,
+					value.getClass()));
 	}
 }
 
-class WholeNodeSweepTargetIdentifier implements SweepTargetIdentifier
-{
+class WholeNodeSweepTargetIdentifier implements SweepTargetIdentifier {
 	private String _expressionString;
 	private XPathExpression _expression;
 
-	WholeNodeSweepTargetIdentifier(String expressionString, XPathExpression expression)
-	{
+	WholeNodeSweepTargetIdentifier(String expressionString,
+			XPathExpression expression) {
 		_expressionString = expressionString;
 		_expression = expression;
 	}
 
 	@Override
-	public SweepTarget identify(Node context) throws SweepException
-	{
+	public SweepTarget identify(Node context) throws SweepException {
 		try {
-			Node evaluationNode = (Node) _expression.evaluate(context, XPathConstants.NODE);
+			Node evaluationNode = (Node) _expression.evaluate(context,
+					XPathConstants.NODE);
 			if (evaluationNode == null)
-				throw new SweepException(String.format("XPath expression %s didn't match any nodes.", _expressionString));
+				throw new SweepException(String.format(
+						"XPath expression %s didn't match any nodes.",
+						_expressionString));
 
 			return new WholeNodeSweepTarget(evaluationNode);
 		} catch (XPathExpressionException e) {

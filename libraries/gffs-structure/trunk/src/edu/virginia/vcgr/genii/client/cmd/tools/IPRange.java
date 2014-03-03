@@ -14,15 +14,15 @@ import java.util.regex.Pattern;
 
 import org.morgan.util.io.StreamUtils;
 
-public class IPRange implements Iterable<String>
-{
+public class IPRange implements Iterable<String> {
 	static final private Pattern MASK_PATTERN = Pattern
-		.compile("^\\s*(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\s*$");
+			.compile("^\\s*(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\s*$");
 
-	static private void generate(Collection<String> values, String[] groups, int start, Set<String> ignoreList)
-	{
+	static private void generate(Collection<String> values, String[] groups,
+			int start, Set<String> ignoreList) {
 		if (start >= groups.length) {
-			String value = String.format("%s.%s.%s.%s", groups[0], groups[1], groups[2], groups[3]);
+			String value = String.format("%s.%s.%s.%s", groups[0], groups[1],
+					groups[2], groups[3]);
 			if (!ignoreList.contains(value))
 				values.add(value);
 		} else {
@@ -37,8 +37,7 @@ public class IPRange implements Iterable<String>
 		}
 	}
 
-	static private Set<String> readIgnoreListFile(File file) throws IOException
-	{
+	static private Set<String> readIgnoreListFile(File file) throws IOException {
 		FileReader reader = null;
 		String line;
 		Set<String> ret = new HashSet<String>();
@@ -47,7 +46,8 @@ public class IPRange implements Iterable<String>
 			return ret;
 
 		try {
-			BufferedReader in = new BufferedReader(reader = new FileReader(file));
+			BufferedReader in = new BufferedReader(
+					reader = new FileReader(file));
 			while ((line = in.readLine()) != null) {
 				int index = line.indexOf('#');
 				if (index >= 0)
@@ -66,26 +66,25 @@ public class IPRange implements Iterable<String>
 	private String _mask;
 	private Set<String> _ignoreList;
 
-	public IPRange(String mask, Set<String> ignoreList)
-	{
+	public IPRange(String mask, Set<String> ignoreList) {
 		_mask = mask;
 		_ignoreList = ignoreList;
 	}
 
-	public IPRange(String mask, File ignoreListFile) throws IOException
-	{
+	public IPRange(String mask, File ignoreListFile) throws IOException {
 		this(mask, readIgnoreListFile(ignoreListFile));
 	}
 
 	@Override
-	public Iterator<String> iterator()
-	{
+	public Iterator<String> iterator() {
 		Matcher matcher = MASK_PATTERN.matcher(_mask);
 		if (!matcher.matches())
-			throw new RuntimeException(String.format("Mask \"%s\" is not valid.\n", _mask));
+			throw new RuntimeException(String.format(
+					"Mask \"%s\" is not valid.\n", _mask));
 
 		Collection<String> values = new LinkedList<String>();
-		String[] groups = new String[] { matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4) };
+		String[] groups = new String[] { matcher.group(1), matcher.group(2),
+				matcher.group(3), matcher.group(4) };
 
 		generate(values, groups, 0, _ignoreList);
 		return values.iterator();

@@ -15,10 +15,8 @@ package org.morgan.util.test;
 
 import junit.framework.TestCase;
 
-public class StupidTest extends TestCase
-{
-	public void testStupid()
-	{
+public class StupidTest extends TestCase {
+	public void testStupid() {
 		TestCase.assertTrue(true);
 	}
 }

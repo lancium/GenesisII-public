@@ -2,8 +2,7 @@ package edu.virginia.vcgr.genii.ui.shell;
 
 import java.io.PrintWriter;
 
-public interface Display
-{
+public interface Display {
 	public void start();
 
 	public PrintWriter output();

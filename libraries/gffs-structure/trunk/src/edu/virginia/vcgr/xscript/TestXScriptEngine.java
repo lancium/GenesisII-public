@@ -7,10 +7,8 @@ import java.io.Reader;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-public class TestXScriptEngine
-{
-	static public void main(String[] args) throws Throwable
-	{
+public class TestXScriptEngine {
+	static public void main(String[] args) throws Throwable {
 		if (args.length != 1) {
 			System.err.println("USAGE:  TestXScriptEngine <input-file>");
 			System.exit(1);

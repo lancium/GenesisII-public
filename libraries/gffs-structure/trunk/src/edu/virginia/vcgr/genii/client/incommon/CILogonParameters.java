@@ -3,8 +3,7 @@ package edu.virginia.vcgr.genii.client.incommon;
 import java.io.PrintWriter;
 import java.security.PrivateKey;
 
-public class CILogonParameters
-{
+public class CILogonParameters {
 	public String IDPUrl;
 	public String username;
 	public String password;
@@ -20,9 +19,8 @@ public class CILogonParameters
 
 	public int lifetime;
 
-	public CILogonParameters(String url, String user, String pass, String csr, PrivateKey key, PrintWriter stdout,
-		PrintWriter stderr)
-	{
+	public CILogonParameters(String url, String user, String pass, String csr,
+			PrivateKey key, PrintWriter stdout, PrintWriter stderr) {
 		this.IDPUrl = url;
 		this.username = user;
 		this.password = pass;
@@ -39,8 +37,7 @@ public class CILogonParameters
 		this.lifetime = 24; // hours
 	}
 
-	public CILogonParameters()
-	{
+	public CILogonParameters() {
 		this.IDPUrl = null;
 		this.username = null;
 		this.password = null;

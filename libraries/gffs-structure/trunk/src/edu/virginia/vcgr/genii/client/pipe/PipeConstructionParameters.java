@@ -9,8 +9,8 @@ import javax.xml.bind.annotation.XmlElement;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public class PipeConstructionParameters extends ConstructionParameters implements Serializable
-{
+public class PipeConstructionParameters extends ConstructionParameters
+		implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	static final private int DEFAULT_PIPE_SIZE = 1024 * 1024;
@@ -20,8 +20,7 @@ public class PipeConstructionParameters extends ConstructionParameters implement
 	@XmlElement(namespace = PIPE_CONS_PARMS_NS, name = "pipe-size", nillable = true, required = false)
 	private Integer _pipeSize = null;
 
-	final public int pipeSize()
-	{
+	final public int pipeSize() {
 		if (_pipeSize == null)
 			return DEFAULT_PIPE_SIZE;
 

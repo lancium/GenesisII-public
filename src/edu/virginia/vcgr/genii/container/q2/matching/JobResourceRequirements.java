@@ -23,12 +23,12 @@ import org.ggf.jsdl.Resources_Type;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 
-public class JobResourceRequirements
-{
-	static private Log _logger = LogFactory.getLog(JobResourceRequirements.class);
+public class JobResourceRequirements {
+	static private Log _logger = LogFactory
+			.getLog(JobResourceRequirements.class);
 
-	static private void appendParameter(StringBuilder parameters, Object parameter)
-	{
+	static private void appendParameter(StringBuilder parameters,
+			Object parameter) {
 		if (parameter == null)
 			return;
 
@@ -37,8 +37,8 @@ public class JobResourceRequirements
 		parameters.append(parameter);
 	}
 
-	static private void appendParameter(StringBuilder parameters, String title, Object value)
-	{
+	static private void appendParameter(StringBuilder parameters, String title,
+			Object value) {
 		if (value != null)
 			appendParameter(parameters, String.format("%s = %s", title, value));
 	}
@@ -51,18 +51,17 @@ public class JobResourceRequirements
 	private MatchingParameters _matchingParameters = null;
 	private Set<String> _requestedFilesystems = new HashSet<String>();
 
-	private void fillInArchInformation(CPUArchitecture_Type arch)
-	{
+	private void fillInArchInformation(CPUArchitecture_Type arch) {
 		ProcessorArchitectureEnumeration pArch = arch.getCPUArchitectureName();
 		if (pArch != null)
 			_arch = pArch;
 	}
 
-	private void fillInOsInformation(OperatingSystem_Type os)
-	{
+	private void fillInOsInformation(OperatingSystem_Type os) {
 		OperatingSystemType_Type osType = os.getOperatingSystemType();
 		if (osType != null) {
-			OperatingSystemTypeEnumeration osTypeName = osType.getOperatingSystemName();
+			OperatingSystemTypeEnumeration osTypeName = osType
+					.getOperatingSystemName();
 			if (osTypeName != null)
 				_osType = osTypeName;
 		}
@@ -72,27 +71,23 @@ public class JobResourceRequirements
 			_osVersion = version;
 	}
 
-	private void fillInMemoryInformation(RangeValue_Type memRange)
-	{
+	private void fillInMemoryInformation(RangeValue_Type memRange) {
 		Boundary_Type memUpperBound = memRange.getUpperBoundedRange();
 		if (memUpperBound != null)
 			_memoryRequirement = new Double(memUpperBound.get_value());
 	}
 
-	private void fillInWallclockInformation(RangeValue_Type wallRange)
-	{
+	private void fillInWallclockInformation(RangeValue_Type wallRange) {
 		Boundary_Type wallUpperBound = wallRange.getUpperBoundedRange();
 		if (wallUpperBound != null)
 			_wallclockTimeLimit = new Double(wallUpperBound.get_value());
 	}
 
-	public JobResourceRequirements()
-	{
+	public JobResourceRequirements() {
 		this(null);
 	}
 
-	public JobResourceRequirements(JobDefinition_Type jsdl)
-	{
+	public JobResourceRequirements(JobDefinition_Type jsdl) {
 		_matchingParameters = new MatchingParameters();
 
 		if (jsdl == null)
@@ -121,18 +116,23 @@ public class JobResourceRequirements
 		MessageElement[] resourcesAny = resources.get_any();
 		if (resourcesAny != null) {
 			for (MessageElement a : resourcesAny) {
-				if (a.getQName().equals(new QName("http://vcgr.cs.virginia.edu/jsdl/genii", "WallclockTime"))) {
+				if (a.getQName().equals(
+						new QName("http://vcgr.cs.virginia.edu/jsdl/genii",
+								"WallclockTime"))) {
 					try {
-						RangeValue_Type rType = ObjectDeserializer.toObject(a, RangeValue_Type.class);
+						RangeValue_Type rType = ObjectDeserializer.toObject(a,
+								RangeValue_Type.class);
 						fillInWallclockInformation(rType);
 					} catch (Throwable cause) {
-						throw new RuntimeException("Unable to parse wallclock time.", cause);
+						throw new RuntimeException(
+								"Unable to parse wallclock time.", cause);
 					}
 				}
 			}
 		}
 
-		_matchingParameters = new MatchingParameters(MatchingParameter.matchingParameters(resources.get_any(), true));
+		_matchingParameters = new MatchingParameters(
+				MatchingParameter.matchingParameters(resources.get_any(), true));
 
 		FileSystem_Type[] fss = resources.getFileSystem();
 		if (fss != null) {
@@ -143,14 +143,14 @@ public class JobResourceRequirements
 	}
 
 	/*
-	 * private ProcessorArchitectureEnumeration _arch = null; private OperatingSystemTypeEnumeration
-	 * _osType = null; private String _osVersion = null; private Double _memoryRequirement = null;
-	 * private MatchingParameter []_matchingParameters = null;
+	 * private ProcessorArchitectureEnumeration _arch = null; private
+	 * OperatingSystemTypeEnumeration _osType = null; private String _osVersion
+	 * = null; private Double _memoryRequirement = null; private
+	 * MatchingParameter []_matchingParameters = null;
 	 */
 
 	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		int ret = 0x0;
 
 		if (_arch != null)
@@ -175,8 +175,7 @@ public class JobResourceRequirements
 		return ret;
 	}
 
-	private boolean equalsWithNulls(Object one, Object two)
-	{
+	private boolean equalsWithNulls(Object one, Object two) {
 		if (one == null && two == null)
 			return true;
 		if (one == null || two == null)
@@ -185,8 +184,7 @@ public class JobResourceRequirements
 		return one.equals(two);
 	}
 
-	public boolean equals(JobResourceRequirements other)
-	{
+	public boolean equals(JobResourceRequirements other) {
 		if (!equalsWithNulls(_arch, other._arch))
 			return false;
 
@@ -220,27 +218,28 @@ public class JobResourceRequirements
 				return false;
 		}
 
-		return equalsWithNulls(_requestedFilesystems, other._requestedFilesystems);
+		return equalsWithNulls(_requestedFilesystems,
+				other._requestedFilesystems);
 	}
 
 	@Override
-	public boolean equals(Object other)
-	{
+	public boolean equals(Object other) {
 		if (other instanceof JobResourceRequirements)
 			return equals((JobResourceRequirements) other);
 
 		return false;
 	}
 
-	public boolean matches(BESInformation besInfo)
-	{
+	public boolean matches(BESInformation besInfo) {
 		if (besInfo == null) {
-			_logger.warn("Cannot match jsdl to bes information -- " + "no bes information available.");
+			_logger.warn("Cannot match jsdl to bes information -- "
+					+ "no bes information available.");
 			return false;
 		}
 
 		if (_arch != null) {
-			ProcessorArchitectureEnumeration bArch = besInfo.getProcessorArchitecture();
+			ProcessorArchitectureEnumeration bArch = besInfo
+					.getProcessorArchitecture();
 			if (bArch == null) {
 				_logger.warn("BES does not have a processor architecture.");
 				return false;
@@ -251,7 +250,8 @@ public class JobResourceRequirements
 		}
 
 		if (_osType != null) {
-			OperatingSystemTypeEnumeration bOsType = besInfo.getOperatingSystemType();
+			OperatingSystemTypeEnumeration bOsType = besInfo
+					.getOperatingSystemType();
 			if (bOsType == null) {
 				_logger.warn("BES does not have an operating system type.");
 				return false;
@@ -291,7 +291,8 @@ public class JobResourceRequirements
 			}
 		}
 
-		if (!MatchingParameter.matches(besInfo.getMatchingParameters(), _matchingParameters))
+		if (!MatchingParameter.matches(besInfo.getMatchingParameters(),
+				_matchingParameters))
 			return false;
 
 		for (String reqFs : _requestedFilesystems) {
@@ -303,19 +304,20 @@ public class JobResourceRequirements
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		StringBuilder parameters = new StringBuilder();
 		appendParameter(parameters, "OS Type", _osType);
 		appendParameter(parameters, "OS Version", _osVersion);
 		appendParameter(parameters, "Processor Arch", _arch);
 		appendParameter(parameters, "Memory Requirement", _memoryRequirement);
 		if (_matchingParameters != null) {
-			for (MatchingParameter parameter : _matchingParameters.getParameters())
+			for (MatchingParameter parameter : _matchingParameters
+					.getParameters())
 				appendParameter(parameters, parameter);
 		}
 
-		appendParameter(parameters, "Requested Filesystems", _requestedFilesystems);
+		appendParameter(parameters, "Requested Filesystems",
+				_requestedFilesystems);
 
 		return String.format("Job Resource Requirements(%s)", parameters);
 	}

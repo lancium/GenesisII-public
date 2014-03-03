@@ -20,8 +20,7 @@ import javax.swing.JTabbedPane;
 import org.morgan.utils.gui.ButtonPanel;
 import org.morgan.utils.gui.GUIUtils;
 
-class UIPreferencesDialog extends JDialog
-{
+class UIPreferencesDialog extends JDialog {
 	static final long serialVersionUID = 0L;
 
 	static private final Dimension MINIMUM_SIZE = new Dimension(600, 350);
@@ -29,8 +28,8 @@ class UIPreferencesDialog extends JDialog
 	private Map<UIPreferenceSet, JPanel> _editors = new HashMap<UIPreferenceSet, JPanel>();
 	private boolean _cancelled = true;
 
-	private UIPreferencesDialog(Window owner, Collection<UIPreferenceSet> preferenceSets)
-	{
+	private UIPreferencesDialog(Window owner,
+			Collection<UIPreferenceSet> preferenceSets) {
 		super(owner);
 		setTitle("Preferences");
 
@@ -46,52 +45,50 @@ class UIPreferencesDialog extends JDialog
 			tabbedPane.addTab(pSet.preferenceSetName(), editor);
 		}
 
-		add(tabbedPane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
-		add(ButtonPanel.createHorizontalButtonPanel(new OKAction(), new CancelAction()), new GridBagConstraints(0, 1, 1, 1,
-			1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		add(tabbedPane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						5, 5, 5, 5), 5, 5));
+		add(ButtonPanel.createHorizontalButtonPanel(new OKAction(),
+				new CancelAction()), new GridBagConstraints(0, 1, 1, 1, 1.0,
+				0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(5, 5, 5, 5), 5, 5));
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setModalityType(ModalityType.APPLICATION_MODAL);
 	}
 
-	private class OKAction extends AbstractAction
-	{
+	private class OKAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private OKAction()
-		{
+		private OKAction() {
 			super("OK");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent ae)
-		{
+		public void actionPerformed(ActionEvent ae) {
 			_cancelled = false;
 			dispose();
 		}
 	}
 
-	private class CancelAction extends AbstractAction
-	{
+	private class CancelAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private CancelAction()
-		{
+		private CancelAction() {
 			super("Cancel");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent ae)
-		{
+		public void actionPerformed(ActionEvent ae) {
 			_cancelled = true;
 			dispose();
 		}
 	}
 
-	static void launchEditor(Window owner, UIPreferences preferences) throws BackingStoreException
-	{
-		UIPreferencesDialog upd = new UIPreferencesDialog(owner, preferences.preferenceSets());
+	static void launchEditor(Window owner, UIPreferences preferences)
+			throws BackingStoreException {
+		UIPreferencesDialog upd = new UIPreferencesDialog(owner,
+				preferences.preferenceSets());
 		upd.setModalityType(ModalityType.APPLICATION_MODAL);
 		upd.pack();
 		GUIUtils.centerWindow(upd);

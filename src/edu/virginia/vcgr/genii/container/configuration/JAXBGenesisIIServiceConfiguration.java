@@ -13,8 +13,8 @@ import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public class JAXBGenesisIIServiceConfiguration implements GenesisIIServiceConfiguration
-{
+public class JAXBGenesisIIServiceConfiguration implements
+		GenesisIIServiceConfiguration {
 	private GenesisIIServiceConfiguration _parent = null;
 
 	private IResourceProvider _resourceProvider = null;
@@ -27,8 +27,8 @@ public class JAXBGenesisIIServiceConfiguration implements GenesisIIServiceConfig
 	@XmlAttribute(name = "default-resource-certificate-lifetime", required = false)
 	private Long _defaultResourceCertificateLifetime = null;
 
-	static private <Type> Type instantiate(Class<Type> typeCast, String className) throws Throwable
-	{
+	static private <Type> Type instantiate(Class<Type> typeCast,
+			String className) throws Throwable {
 		if (className == null)
 			return null;
 
@@ -43,81 +43,79 @@ public class JAXBGenesisIIServiceConfiguration implements GenesisIIServiceConfig
 	}
 
 	@XmlAttribute(name = "resource-provider", required = false)
-	private void setResourceProviderClass(String className) throws Throwable
-	{
+	private void setResourceProviderClass(String className) throws Throwable {
 		_resourceProvider = instantiate(IResourceProvider.class, className);
 	}
 
 	@SuppressWarnings("unused")
-	private String getResourceProviderClass()
-	{
-		return (_resourceProvider == null) ? null : _resourceProvider.getClass().getName();
+	private String getResourceProviderClass() {
+		return (_resourceProvider == null) ? null : _resourceProvider
+				.getClass().getName();
 	}
 
 	@XmlAttribute(name = "default-authz-provider", required = false)
-	private void setDefaultAuthZProviderClass(String className) throws Throwable
-	{
+	private void setDefaultAuthZProviderClass(String className)
+			throws Throwable {
 		_defaultAuthZProvider = instantiate(IAuthZProvider.class, className);
 	}
 
 	@SuppressWarnings("unused")
-	private String getDefaultAuthZProviderClass()
-	{
-		return (_defaultAuthZProvider == null) ? null : _defaultAuthZProvider.getClass().getName();
+	private String getDefaultAuthZProviderClass() {
+		return (_defaultAuthZProvider == null) ? null : _defaultAuthZProvider
+				.getClass().getName();
 	}
 
 	@XmlAttribute(name = "default-resolver-factory-proxy", required = false)
-	private void setDefaultResolverFactoryProxyClass(String className) throws Throwable
-	{
-		_defaultResolverFactoryProxy = instantiate(IResolverFactoryProxy.class, className);
+	private void setDefaultResolverFactoryProxyClass(String className)
+			throws Throwable {
+		_defaultResolverFactoryProxy = instantiate(IResolverFactoryProxy.class,
+				className);
 	}
 
 	@SuppressWarnings("unused")
-	private String getDefaultResolverFactoryProxyClass()
-	{
-		return (_defaultResolverFactoryProxy == null) ? null : _defaultResolverFactoryProxy.getClass().getName();
+	private String getDefaultResolverFactoryProxyClass() {
+		return (_defaultResolverFactoryProxy == null) ? null
+				: _defaultResolverFactoryProxy.getClass().getName();
 	}
 
-	protected void setParent(GenesisIIServiceConfiguration configuration)
-	{
+	protected void setParent(GenesisIIServiceConfiguration configuration) {
 		_parent = configuration;
 	}
 
 	@Override
-	final public IResourceProvider resourceProvider()
-	{
-		return (_resourceProvider == null) ? _parent.resourceProvider() : _resourceProvider;
+	final public IResourceProvider resourceProvider() {
+		return (_resourceProvider == null) ? _parent.resourceProvider()
+				: _resourceProvider;
 	}
 
 	@Override
-	final public IAuthZProvider defaultAuthZProvider()
-	{
-		return (_defaultAuthZProvider == null) ? _parent.defaultAuthZProvider() : _defaultAuthZProvider;
+	final public IAuthZProvider defaultAuthZProvider() {
+		return (_defaultAuthZProvider == null) ? _parent.defaultAuthZProvider()
+				: _defaultAuthZProvider;
 	}
 
 	@Override
-	final public IResolverFactoryProxy defaultResolverFactoryProxy()
-	{
-		return (_defaultResolverFactoryProxy == null) ? _parent.defaultResolverFactoryProxy() : _defaultResolverFactoryProxy;
+	final public IResolverFactoryProxy defaultResolverFactoryProxy() {
+		return (_defaultResolverFactoryProxy == null) ? _parent
+				.defaultResolverFactoryProxy() : _defaultResolverFactoryProxy;
 	}
 
 	@Override
-	final public Long defaultServiceCertificateLifetime()
-	{
-		return (_defaultServiceCertificateLifetime == null) ? _parent.defaultServiceCertificateLifetime()
-			: _defaultServiceCertificateLifetime;
+	final public Long defaultServiceCertificateLifetime() {
+		return (_defaultServiceCertificateLifetime == null) ? _parent
+				.defaultServiceCertificateLifetime()
+				: _defaultServiceCertificateLifetime;
 	}
 
 	@Override
-	final public Long defaultResourceCertificateLifetime()
-	{
-		return (_defaultResourceCertificateLifetime == null) ? _parent.defaultResourceCertificateLifetime()
-			: _defaultResourceCertificateLifetime;
+	final public Long defaultResourceCertificateLifetime() {
+		return (_defaultResourceCertificateLifetime == null) ? _parent
+				.defaultResourceCertificateLifetime()
+				: _defaultResourceCertificateLifetime;
 	}
 
 	@Override
-	final public Class<? extends JAXBGenesisIIServiceConfiguration> jaxbServiceConfigurationClass()
-	{
+	final public Class<? extends JAXBGenesisIIServiceConfiguration> jaxbServiceConfigurationClass() {
 		return _parent.jaxbServiceConfigurationClass();
 	}
 }

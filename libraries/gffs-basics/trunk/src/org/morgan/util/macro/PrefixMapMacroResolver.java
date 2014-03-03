@@ -3,36 +3,31 @@ package org.morgan.util.macro;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PrefixMapMacroResolver implements MacroResolver
-{
+public class PrefixMapMacroResolver implements MacroResolver {
 	private String _defaultPrefix;
 	private Map<String, MacroResolver> _prefixMap;
 
-	public PrefixMapMacroResolver(String defaultPrefix)
-	{
+	public PrefixMapMacroResolver(String defaultPrefix) {
 		_defaultPrefix = defaultPrefix;
 		_prefixMap = new HashMap<String, MacroResolver>();
 	}
 
-	public PrefixMapMacroResolver()
-	{
+	public PrefixMapMacroResolver() {
 		this(null);
 	}
 
-	final public String defaultPrefix()
-	{
+	final public String defaultPrefix() {
 		return _defaultPrefix;
 	}
 
-	final public void defaultPrefix(String defaultPrefix)
-	{
+	final public void defaultPrefix(String defaultPrefix) {
 		_defaultPrefix = defaultPrefix;
 	}
 
-	final public void addResolver(String prefix, MacroResolver resolver)
-	{
+	final public void addResolver(String prefix, MacroResolver resolver) {
 		if (prefix == null || prefix.length() == 0)
-			throw new IllegalArgumentException("Prefix cannot be null or empty.");
+			throw new IllegalArgumentException(
+					"Prefix cannot be null or empty.");
 
 		if (resolver == null)
 			throw new IllegalArgumentException("Resolver cannot be null.");
@@ -41,8 +36,7 @@ public class PrefixMapMacroResolver implements MacroResolver
 	}
 
 	@Override
-	final public String lookup(String key)
-	{
+	final public String lookup(String key) {
 		String prefix = _defaultPrefix;
 
 		int index = key.indexOf(':');

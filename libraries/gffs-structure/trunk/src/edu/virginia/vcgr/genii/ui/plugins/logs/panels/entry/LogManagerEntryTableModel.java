@@ -24,25 +24,24 @@ import edu.virginia.vcgr.genii.ui.progress.Task;
 import edu.virginia.vcgr.genii.ui.progress.TaskCompletionListener;
 import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 
-public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
-{
+public class LogManagerEntryTableModel extends RowTableModel<LogEntryType> {
 	static final long serialVersionUID = 0L;
 
-	static private RowTableColumnDefinition<?, ?>[] COLUMNS = { new RPCIDColumn(), new LoggerColumn(), new TimestampColumn(),
-		new LevelColumn(), new MessageColumn() };
+	static private RowTableColumnDefinition<?, ?>[] COLUMNS = {
+			new RPCIDColumn(), new LoggerColumn(), new TimestampColumn(),
+			new LevelColumn(), new MessageColumn() };
 
-	private class LocalLogEntryListFetcherTask extends AbstractTask<Collection<LogEntryType>>
-	{
+	private class LocalLogEntryListFetcherTask extends
+			AbstractTask<Collection<LogEntryType>> {
 		private LogPath _selection;
 
-		public LocalLogEntryListFetcherTask(LogPath selection)
-		{
+		public LocalLogEntryListFetcherTask(LogPath selection) {
 			_selection = selection;
 		}
 
 		@Override
-		final public Collection<LogEntryType> execute(TaskProgressListener progressListener) throws Exception
-		{
+		final public Collection<LogEntryType> execute(
+				TaskProgressListener progressListener) throws Exception {
 			String id = null;
 			if (_selection != null) {
 				id = _selection.getID();
@@ -56,20 +55,20 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 		}
 	}
 
-	private class RemoteLogEntryListFetcherTask extends AbstractTask<Collection<LogEntryType>>
-	{
+	private class RemoteLogEntryListFetcherTask extends
+			AbstractTask<Collection<LogEntryType>> {
 		private LogPath _selection;
 
-		public RemoteLogEntryListFetcherTask(LogPath selection)
-		{
+		public RemoteLogEntryListFetcherTask(LogPath selection) {
 			_selection = selection;
 		}
 
 		@Override
-		final public Collection<LogEntryType> execute(TaskProgressListener progressListener) throws Exception
-		{
+		final public Collection<LogEntryType> execute(
+				TaskProgressListener progressListener) throws Exception {
 			if (_selection == null) {
-				throw new LogPathDoesNotExistException("Can't retrieve remote logs without a path");
+				throw new LogPathDoesNotExistException(
+						"Can't retrieve remote logs without a path");
 			}
 
 			String id = _selection.getID();
@@ -78,7 +77,8 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 
 			Collection<LogEntryType> jobInfo = new LinkedList<LogEntryType>();
 			if (logger != null) {
-				for (LogEntryType i : logger.getAllLogs(new String[] { id }).getLogEntries()) {
+				for (LogEntryType i : logger.getAllLogs(new String[] { id })
+						.getLogEntries()) {
 					jobInfo.add(i);
 				}
 			}
@@ -86,24 +86,22 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 		}
 	}
 
-	private class LogEntryListCompletionListener implements TaskCompletionListener<Collection<LogEntryType>>
-	{
+	private class LogEntryListCompletionListener implements
+			TaskCompletionListener<Collection<LogEntryType>> {
 		private Component _parentComponent;
 
-		private LogEntryListCompletionListener(Component parentComponent)
-		{
+		private LogEntryListCompletionListener(Component parentComponent) {
 			_parentComponent = parentComponent;
 		}
 
 		@Override
-		public void taskCancelled(Task<Collection<LogEntryType>> task)
-		{
+		public void taskCancelled(Task<Collection<LogEntryType>> task) {
 			// Don't need to do anything.
 		}
 
 		@Override
-		public void taskCompleted(Task<Collection<LogEntryType>> task, Collection<LogEntryType> result)
-		{
+		public void taskCompleted(Task<Collection<LogEntryType>> task,
+				Collection<LogEntryType> result) {
 			_contents.clear();
 			_contents.addAll(result);
 
@@ -111,9 +109,10 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 		}
 
 		@Override
-		public void taskExcepted(Task<Collection<LogEntryType>> task, Throwable cause)
-		{
-			ErrorHandler.handleError(_uiContext.uiContext(), (JComponent) _parentComponent, cause);
+		public void taskExcepted(Task<Collection<LogEntryType>> task,
+				Throwable cause) {
+			ErrorHandler.handleError(_uiContext.uiContext(),
+					(JComponent) _parentComponent, cause);
 		}
 	}
 
@@ -121,8 +120,7 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 	private DLogDatabase _localLogger = null;
 	private ArrayList<LogEntryType> _contents = new ArrayList<LogEntryType>();
 
-	void refresh(Component parentComponent, LogPath selection)
-	{
+	void refresh(Component parentComponent, LogPath selection) {
 		AbstractTask<Collection<LogEntryType>> task = null;
 		try {
 			if (selection != null && selection.getEndpoint() != null) {
@@ -136,14 +134,15 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 		}
 
 		_uiContext
-			.uiContext()
-			.progressMonitorFactory()
-			.createMonitor(parentComponent, "Loading Log Entries", "Fetching log entry list from database", 1000L, task,
-				new LogEntryListCompletionListener(parentComponent)).start();
+				.uiContext()
+				.progressMonitorFactory()
+				.createMonitor(parentComponent, "Loading Log Entries",
+						"Fetching log entry list from database", 1000L, task,
+						new LogEntryListCompletionListener(parentComponent))
+				.start();
 	}
 
-	LogManagerEntryTableModel(UIPluginContext uiContext)
-	{
+	LogManagerEntryTableModel(UIPluginContext uiContext) {
 		_localLogger = DLogUtils.getDBConnector();
 
 		_uiContext = uiContext;
@@ -152,20 +151,17 @@ public class LogManagerEntryTableModel extends RowTableModel<LogEntryType>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	final protected RowTableColumnDefinition<LogEntryType, ?>[] columnDefinitions()
-	{
+	final protected RowTableColumnDefinition<LogEntryType, ?>[] columnDefinitions() {
 		return (RowTableColumnDefinition<LogEntryType, ?>[]) COLUMNS;
 	}
 
 	@Override
-	final protected LogEntryType row(int rowNumber)
-	{
+	final protected LogEntryType row(int rowNumber) {
 		return _contents.get(rowNumber);
 	}
 
 	@Override
-	final public int getRowCount()
-	{
+	final public int getRowCount() {
 		return _contents.size();
 	}
 }

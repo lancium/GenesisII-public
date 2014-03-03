@@ -19,72 +19,87 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.bes.BESPolicy;
 import edu.virginia.vcgr.genii.client.bes.BESPolicyActions;
 
-public class BesPolicyTool extends BaseGridTool
-{
+public class BesPolicyTool extends BaseGridTool {
 	static final private String _DESCRIPTION = "config/tooldocs/description/dbespolicy";
-	static final private LoadFileResource _USAGE = new LoadFileResource("config/tooldocs/usage/ubes-policy");
+	static final private LoadFileResource _USAGE = new LoadFileResource(
+			"config/tooldocs/usage/ubes-policy");
 	static final private String _MANPAGE = "config/tooldocs/man/bes-policy";
 
 	private BESPolicyActions _userLoggedInAction = null;
 	private BESPolicyActions _screenSaverInactiveAction = null;
 	private boolean _query = false;
 
-	public BesPolicyTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), _USAGE, false, ToolCategory.ADMINISTRATION);
+	public BesPolicyTool() {
+		super(new LoadFileResource(_DESCRIPTION), _USAGE, false,
+				ToolCategory.ADMINISTRATION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "set-user-logged-in" })
-	public void setSet_user_logged_in(String action)
-	{
+	public void setSet_user_logged_in(String action) {
 		_userLoggedInAction = BESPolicyActions.valueOf(action);
 	}
 
 	@Option({ "set-screensaver-inactive" })
-	public void setSet_screensaver_inactive(String action)
-	{
+	public void setSet_screensaver_inactive(String action) {
 		_screenSaverInactiveAction = BESPolicyActions.valueOf(action);
 	}
 
 	@Option({ "query" })
-	public void setQuery()
-	{
+	public void setQuery() {
 		_query = true;
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
-		RNSPath bes = lookup(new GeniiPath(getArgument(0)), RNSPathQueryFlags.MUST_EXIST);
+	protected int runCommand() throws Throwable {
+		RNSPath bes = lookup(new GeniiPath(getArgument(0)),
+				RNSPathQueryFlags.MUST_EXIST);
 
 		if (_query)
 			query(bes.getEndpoint());
-		else if (_userLoggedInAction != null && _screenSaverInactiveAction != null)
-			setPolicy(bes.getEndpoint(), _userLoggedInAction, _screenSaverInactiveAction);
+		else if (_userLoggedInAction != null
+				&& _screenSaverInactiveAction != null)
+			setPolicy(bes.getEndpoint(), _userLoggedInAction,
+					_screenSaverInactiveAction);
 		else {
 			try {
-				DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
+				DialogProvider provider = DialogFactory.getProvider(stdout,
+						stderr, stdin, useGui());
 
-				ComboBoxDialog dialog =
-					provider.createComboBoxDialog("User Logged In Action", "User logged in action?", null, new SimpleMenuItem(
-						"N", BESPolicyActions.NOACTION), new SimpleMenuItem("S", BESPolicyActions.SUSPEND), new SimpleMenuItem(
-						"SK", BESPolicyActions.SUSPENDORKILL), new SimpleMenuItem("K", BESPolicyActions.KILL));
-				dialog.setHelp(new TextContent("Please select the action to take when a user logs in to the target computer."));
-				dialog.showDialog();
-				_userLoggedInAction = (BESPolicyActions) dialog.getSelectedItem().getContent();
-
-				dialog =
-					provider.createComboBoxDialog("Screensaver Inactive Action", "Screensaver inactive action?", null,
-						new SimpleMenuItem("N", BESPolicyActions.NOACTION), new SimpleMenuItem("S", BESPolicyActions.SUSPEND),
-						new SimpleMenuItem("SK", BESPolicyActions.SUSPENDORKILL),
-						new SimpleMenuItem("K", BESPolicyActions.KILL));
+				ComboBoxDialog dialog = provider
+						.createComboBoxDialog("User Logged In Action",
+								"User logged in action?", null,
+								new SimpleMenuItem("N",
+										BESPolicyActions.NOACTION),
+								new SimpleMenuItem("S",
+										BESPolicyActions.SUSPEND),
+								new SimpleMenuItem("SK",
+										BESPolicyActions.SUSPENDORKILL),
+								new SimpleMenuItem("K", BESPolicyActions.KILL));
 				dialog.setHelp(new TextContent(
-					"Please select the action to take when the screensaver is de-activated on the target computer."));
+						"Please select the action to take when a user logs in to the target computer."));
 				dialog.showDialog();
-				_screenSaverInactiveAction = (BESPolicyActions) dialog.getSelectedItem().getContent();
+				_userLoggedInAction = (BESPolicyActions) dialog
+						.getSelectedItem().getContent();
 
-				setPolicy(bes.getEndpoint(), _userLoggedInAction, _screenSaverInactiveAction);
+				dialog = provider
+						.createComboBoxDialog("Screensaver Inactive Action",
+								"Screensaver inactive action?", null,
+								new SimpleMenuItem("N",
+										BESPolicyActions.NOACTION),
+								new SimpleMenuItem("S",
+										BESPolicyActions.SUSPEND),
+								new SimpleMenuItem("SK",
+										BESPolicyActions.SUSPENDORKILL),
+								new SimpleMenuItem("K", BESPolicyActions.KILL));
+				dialog.setHelp(new TextContent(
+						"Please select the action to take when the screensaver is de-activated on the target computer."));
+				dialog.showDialog();
+				_screenSaverInactiveAction = (BESPolicyActions) dialog
+						.getSelectedItem().getContent();
+
+				setPolicy(bes.getEndpoint(), _userLoggedInAction,
+						_screenSaverInactiveAction);
 			} catch (UserCancelException uce) {
 				return 0;
 			}
@@ -94,12 +109,12 @@ public class BesPolicyTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() != 1)
 			throw new InvalidToolUsageException();
 
-		if (_query && (_userLoggedInAction != null || _screenSaverInactiveAction != null))
+		if (_query
+				&& (_userLoggedInAction != null || _screenSaverInactiveAction != null))
 			throw new InvalidToolUsageException();
 
 		boolean uL = (_userLoggedInAction == null);
@@ -109,19 +124,21 @@ public class BesPolicyTool extends BaseGridTool
 			throw new InvalidToolUsageException();
 	}
 
-	private void query(EndpointReferenceType bes) throws Throwable
-	{
-		BESRP rp = (BESRP) ResourcePropertyManager.createRPInterface(bes, BESRP.class);
+	private void query(EndpointReferenceType bes) throws Throwable {
+		BESRP rp = (BESRP) ResourcePropertyManager.createRPInterface(bes,
+				BESRP.class);
 
 		BESPolicy policy = rp.getPolicy();
 		stdout.println(policy.toString());
 	}
 
-	private void setPolicy(EndpointReferenceType bes, BESPolicyActions userLoggedInAction,
-		BESPolicyActions screenSaverInactiveAction) throws Throwable
-	{
-		BESRP rp = (BESRP) ResourcePropertyManager.createRPInterface(bes, BESRP.class);
+	private void setPolicy(EndpointReferenceType bes,
+			BESPolicyActions userLoggedInAction,
+			BESPolicyActions screenSaverInactiveAction) throws Throwable {
+		BESRP rp = (BESRP) ResourcePropertyManager.createRPInterface(bes,
+				BESRP.class);
 
-		rp.setPolicy(new BESPolicy(userLoggedInAction, screenSaverInactiveAction));
+		rp.setPolicy(new BESPolicy(userLoggedInAction,
+				screenSaverInactiveAction));
 	}
 }

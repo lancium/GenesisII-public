@@ -17,19 +17,19 @@ import edu.virginia.vcgr.genii.container.deployer.DeploySnapshot;
 import edu.virginia.vcgr.genii.container.deployer.IDeployerProvider;
 import edu.virginia.vcgr.genii.container.deployer.IJSDLReifier;
 
-public class BinDeploymentProvider extends AbstractDeploymentProvider implements IDeployerProvider
-{
+public class BinDeploymentProvider extends AbstractDeploymentProvider implements
+		IDeployerProvider {
 	private BinDeploymentType _deploymentDescription;
 
-	public BinDeploymentProvider(EndpointReferenceType depDescEPR, BinDeploymentType deploymentDescription)
-	{
+	public BinDeploymentProvider(EndpointReferenceType depDescEPR,
+			BinDeploymentType deploymentDescription) {
 		super(depDescEPR);
 
 		_deploymentDescription = deploymentDescription;
 	}
 
-	public void deployApplication(File targetDirectory) throws DeploymentException
-	{
+	public void deployApplication(File targetDirectory)
+			throws DeploymentException {
 		HashMap<String, File> relativeMap = new HashMap<String, File>();
 
 		File binDir = new File(targetDirectory, "bin");
@@ -48,7 +48,8 @@ public class BinDeploymentProvider extends AbstractDeploymentProvider implements
 		}
 
 		if (_deploymentDescription.getSharedLibrary() != null) {
-			for (NamedSourceType source : _deploymentDescription.getSharedLibrary()) {
+			for (NamedSourceType source : _deploymentDescription
+					.getSharedLibrary()) {
 				File target = new File(libDir, source.getName());
 
 				downloadFile(source, target, true, false);
@@ -57,19 +58,24 @@ public class BinDeploymentProvider extends AbstractDeploymentProvider implements
 		}
 
 		if (_deploymentDescription.getStaticFile() != null) {
-			for (RelativeNamedSourceType source : _deploymentDescription.getStaticFile()) {
+			for (RelativeNamedSourceType source : _deploymentDescription
+					.getStaticFile()) {
 				File target;
 
 				Boolean relativeToComponent = source.getRelativeToComponent();
-				if (relativeToComponent != null && relativeToComponent.booleanValue()) {
+				if (relativeToComponent != null
+						&& relativeToComponent.booleanValue()) {
 					String componentName = source.getComponentName();
 					if (componentName == null)
-						throw new DeploymentException("Can't place a component relative to another "
-							+ "without giving the other component's name.");
+						throw new DeploymentException(
+								"Can't place a component relative to another "
+										+ "without giving the other component's name.");
 
 					File other = relativeMap.get(componentName);
 					if (other == null)
-						throw new DeploymentException("Can't find other component \"" + componentName + "\".");
+						throw new DeploymentException(
+								"Can't find other component \"" + componentName
+										+ "\".");
 
 					target = new File(other.getParentFile(), source.getName());
 				} else {
@@ -84,13 +90,12 @@ public class BinDeploymentProvider extends AbstractDeploymentProvider implements
 		}
 	}
 
-	public IJSDLReifier getReifier()
-	{
-		return new BinJSDLReifier(_deploymentDescription.getBinaryName(), _deploymentDescription.getRelativeCwd());
+	public IJSDLReifier getReifier() {
+		return new BinJSDLReifier(_deploymentDescription.getBinaryName(),
+				_deploymentDescription.getRelativeCwd());
 	}
 
-	protected DeploySnapshot figureOutSnapshot() throws DeploymentException
-	{
+	protected DeploySnapshot figureOutSnapshot() throws DeploymentException {
 		EndpointReferenceType depDescEPR = _deploymentDescriptionEPR;
 		BinDeploymentType description = _deploymentDescription;
 

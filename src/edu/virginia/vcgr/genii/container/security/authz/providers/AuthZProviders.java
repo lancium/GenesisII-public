@@ -8,13 +8,12 @@ import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigura
 import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigurationFactory;
 
 /**
- * This class is simply a repository for providers for given services. Each service will have
- * associated with it it's own resource provider. This allows each one to have its authorization
- * provider.
+ * This class is simply a repository for providers for given services. Each
+ * service will have associated with it it's own resource provider. This allows
+ * each one to have its authorization provider.
  * 
  */
-public class AuthZProviders
-{
+public class AuthZProviders {
 	static private HashMap<String, IAuthZProvider> _providerCache = new HashMap<String, IAuthZProvider>();
 
 	/**
@@ -26,8 +25,8 @@ public class AuthZProviders
 	 * @throws ResourceException
 	 *             If anything goes wrong.
 	 */
-	static public IAuthZProvider getProvider(String serviceName) throws ResourceException
-	{
+	static public IAuthZProvider getProvider(String serviceName)
+			throws ResourceException {
 		IAuthZProvider provider = null;
 
 		synchronized (_providerCache) {
@@ -39,15 +38,19 @@ public class AuthZProviders
 
 		Class<?> serviceClass = Container.classForService(serviceName);
 		if (serviceClass == null) {
-			throw new ResourceException(String.format("Unable to find service class for service.", serviceName));
+			throw new ResourceException(String.format(
+					"Unable to find service class for service.", serviceName));
 		}
 
-		GenesisIIServiceConfiguration conf = GenesisIIServiceConfigurationFactory.configurationFor(serviceClass);
+		GenesisIIServiceConfiguration conf = GenesisIIServiceConfigurationFactory
+				.configurationFor(serviceClass);
 		provider = conf.defaultAuthZProvider();
 
 		if (provider == null)
-			throw new ResourceException(String.format("Unable to find resource provider for service %s "
-				+ "(implemented by class %s).", serviceName, serviceClass));
+			throw new ResourceException(String.format(
+					"Unable to find resource provider for service %s "
+							+ "(implemented by class %s).", serviceName,
+					serviceClass));
 
 		synchronized (_providerCache) {
 			_providerCache.put(serviceName, provider);

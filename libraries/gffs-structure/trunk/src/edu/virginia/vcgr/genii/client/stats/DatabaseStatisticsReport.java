@@ -2,23 +2,20 @@ package edu.virginia.vcgr.genii.client.stats;
 
 import java.io.Serializable;
 
-public class DatabaseStatisticsReport implements Serializable
-{
+public class DatabaseStatisticsReport implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	private long _numOpened;
 	private long _numClosed;
 	private long _totalDuration;
 
-	public DatabaseStatisticsReport()
-	{
+	public DatabaseStatisticsReport() {
 		_numOpened = 0L;
 		_numClosed = 0L;
 		_totalDuration = 0L;
 	}
 
-	void add(DBConnectionDataPoint dataPoint)
-	{
+	void add(DBConnectionDataPoint dataPoint) {
 		_numOpened++;
 		if (dataPoint.isClosed()) {
 			_numClosed++;
@@ -26,18 +23,15 @@ public class DatabaseStatisticsReport implements Serializable
 		}
 	}
 
-	public long numOpened()
-	{
+	public long numOpened() {
 		return _numOpened;
 	}
 
-	public long numClosed()
-	{
+	public long numClosed() {
 		return _numClosed;
 	}
 
-	public long averageDuration()
-	{
+	public long averageDuration() {
 		if (_numClosed == 0)
 			return -1L;
 

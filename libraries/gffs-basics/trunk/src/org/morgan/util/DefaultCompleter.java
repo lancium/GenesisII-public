@@ -19,18 +19,15 @@ import java.util.HashSet;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class DefaultCompleter<T> implements ICompleter<T>
-{
-	static private class TrinaryNode<T>
-	{
+public class DefaultCompleter<T> implements ICompleter<T> {
+	static private class TrinaryNode<T> {
 		public char character;
 		public TrinaryNode<T> less;
 		public TrinaryNode<T> equal;
 		public TrinaryNode<T> greater;
 		public T data;
 
-		public TrinaryNode(char c)
-		{
+		public TrinaryNode(char c) {
 			character = c;
 			less = equal = greater = null;
 			data = null;
@@ -39,8 +36,7 @@ public class DefaultCompleter<T> implements ICompleter<T>
 
 	private TrinaryNode<T> _head = null;
 
-	private DefaultCompleter(Iterable<T> primer)
-	{
+	private DefaultCompleter(Iterable<T> primer) {
 		for (T item : primer) {
 			char[] tmp = item.toString().toCharArray();
 			char[] chars = new char[tmp.length + 1];
@@ -84,13 +80,11 @@ public class DefaultCompleter<T> implements ICompleter<T>
 		}
 	}
 
-	static public <T> ICompleter<T> buildCompleter(Iterable<T> primer)
-	{
+	static public <T> ICompleter<T> buildCompleter(Iterable<T> primer) {
 		return new DefaultCompleter<T>(primer);
 	}
 
-	static private <T> TrinaryNode<T> findNode(TrinaryNode<T> node, String str)
-	{
+	static private <T> TrinaryNode<T> findNode(TrinaryNode<T> node, String str) {
 		if (node == null)
 			return null;
 
@@ -106,8 +100,7 @@ public class DefaultCompleter<T> implements ICompleter<T>
 			return findNode(node.equal, str.substring(1));
 	}
 
-	static private <T> T next(TrinaryNode<T> node)
-	{
+	static private <T> T next(TrinaryNode<T> node) {
 		if (node == null)
 			return null;
 
@@ -125,18 +118,15 @@ public class DefaultCompleter<T> implements ICompleter<T>
 		return next(node.greater);
 	}
 
-	public T complete(String partial)
-	{
+	public T complete(String partial) {
 		return next(findNode(_head, partial));
 	}
 
-	public Iterable<T> completeAll(String partial)
-	{
+	public Iterable<T> completeAll(String partial) {
 		return retrieveAll(findNode(_head, partial), new ArrayList<T>());
 	}
 
-	private Iterable<T> retrieveAll(TrinaryNode<T> node, ArrayList<T> all)
-	{
+	private Iterable<T> retrieveAll(TrinaryNode<T> node, ArrayList<T> all) {
 		if (node == null)
 			return all;
 
@@ -150,14 +140,12 @@ public class DefaultCompleter<T> implements ICompleter<T>
 		return all;
 	}
 
-	public Iterable<T> retrieveAll()
-	{
+	public Iterable<T> retrieveAll() {
 		ArrayList<T> all = new ArrayList<T>();
 		return retrieveAll(_head, all);
 	}
 
-	static public void main(String[] args)
-	{
+	static public void main(String[] args) {
 		HashSet<String> names = new HashSet<String>();
 		names.add("Morgan");
 		names.add("Martin");

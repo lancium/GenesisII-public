@@ -21,8 +21,7 @@ import com.jcraft.jsch.SftpException;
 
 import edu.virginia.vcgr.genii.cloud.ResourceController;
 
-public class SSHSession implements ResourceController
-{
+public class SSHSession implements ResourceController {
 
 	private String _user;
 	private String _host;
@@ -34,9 +33,8 @@ public class SSHSession implements ResourceController
 
 	static private Log _logger = LogFactory.getLog(SSHSession.class);
 
-	public SSHSession(String username, int port, String host, String password, Boolean strictHostKeyChecking,
-		String keyStorePath)
-	{
+	public SSHSession(String username, int port, String host, String password,
+			Boolean strictHostKeyChecking, String keyStorePath) {
 
 		_user = username;
 		_port = port;
@@ -46,13 +44,11 @@ public class SSHSession implements ResourceController
 		_keyStore = keyStorePath;
 	}
 
-	public SSHSession(String username, int port, String host, String password)
-	{
+	public SSHSession(String username, int port, String host, String password) {
 		this(username, port, host, password, false, null);
 	}
 
-	private Session setupCon() throws JSchException
-	{
+	private Session setupCon() throws JSchException {
 		JSch jsch = new JSch();
 		Session session = jsch.getSession(_user, _host, _port);
 
@@ -69,13 +65,12 @@ public class SSHSession implements ResourceController
 		return session;
 	}
 
-	public void setPrivateKeyAuth(String privateKeyPath)
-	{
+	public void setPrivateKeyAuth(String privateKeyPath) {
 		_privKey = privateKeyPath;
 	}
 
-	public boolean sendFileTo(String localPath, String remotePath) throws Exception
-	{
+	public boolean sendFileTo(String localPath, String remotePath)
+			throws Exception {
 
 		OutputStream out = null;
 		Session session = null;
@@ -102,7 +97,8 @@ public class SSHSession implements ResourceController
 
 			File _lfile = new File(localPath);
 
-			// send "C0644 filesize filename", where filename should not include '/'
+			// send "C0644 filesize filename", where filename should not include
+			// '/'
 			long filesize = _lfile.length();
 			command = "C0644 " + filesize + " " + trimSlash(localPath) + "\n";
 
@@ -143,8 +139,8 @@ public class SSHSession implements ResourceController
 		}
 	}
 
-	public boolean recieveFileFrom(String localPath, String remotePath) throws Exception
-	{
+	public boolean recieveFileFrom(String localPath, String remotePath)
+			throws Exception {
 
 		OutputStream out = null;
 		Session session = null;
@@ -212,7 +208,8 @@ public class SSHSession implements ResourceController
 					prefix = localPath + File.separator;
 				}
 
-				FileOutputStream fos = new FileOutputStream(prefix == null ? localPath : prefix + file);
+				FileOutputStream fos = new FileOutputStream(
+						prefix == null ? localPath : prefix + file);
 				int foo;
 				while (true) {
 					if (buf.length < filesize)
@@ -254,8 +251,8 @@ public class SSHSession implements ResourceController
 
 	}
 
-	public int sendCommand(String command, OutputStream out, OutputStream err) throws Exception
-	{
+	public int sendCommand(String command, OutputStream out, OutputStream err)
+			throws Exception {
 
 		Channel channel = null;
 		Session session = null;
@@ -311,8 +308,7 @@ public class SSHSession implements ResourceController
 		}
 	}
 
-	static String trimSlash(String path)
-	{
+	static String trimSlash(String path) {
 		if (path.lastIndexOf('/') > 0) {
 			return path.substring(path.lastIndexOf('/') + 1);
 		} else {
@@ -320,8 +316,7 @@ public class SSHSession implements ResourceController
 		}
 	}
 
-	static int checkAck(InputStream in) throws IOException
-	{
+	static int checkAck(InputStream in) throws IOException {
 		int b = in.read();
 		// b may be 0 for success,
 		// 1 for error,
@@ -349,8 +344,7 @@ public class SSHSession implements ResourceController
 		return b;
 	}
 
-	public boolean fileExists(String path) throws JSchException
-	{
+	public boolean fileExists(String path) throws JSchException {
 
 		Channel channel = null;
 		Session session = null;
@@ -385,8 +379,7 @@ public class SSHSession implements ResourceController
 	}
 
 	@Override
-	public void setAuthorizationFile(String path)
-	{
+	public void setAuthorizationFile(String path) {
 		this.setPrivateKeyAuth(path);
 
 	}

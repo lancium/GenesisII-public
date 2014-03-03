@@ -24,17 +24,17 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class InstanceConfigurationSectionHandler extends ClassConfigurationSectionHandler
-{
+public class InstanceConfigurationSectionHandler extends
+		ClassConfigurationSectionHandler {
 	static final public String INSTANCE_ELEMENT_NAME = "instance";
 	static final public String INSTANCE_NAME_NAME = "name";
 	static final public String INSTANCE_TYPE_NAME = "type";
 	static final public String INSTANCE_BASE_CLASS_NAME = "base";
 
-	static public QName INSTANCE_ELEMENT_QNAME = new QName(XMLConfiguration.NAMESPACE, INSTANCE_ELEMENT_NAME);
+	static public QName INSTANCE_ELEMENT_QNAME = new QName(
+			XMLConfiguration.NAMESPACE, INSTANCE_ELEMENT_NAME);
 
-	public Object parse(Node n) throws ConfigurationException
-	{
+	public Object parse(Node n) throws ConfigurationException {
 		HashMap<String, Object> ret = new HashMap<String, Object>();
 
 		NodeList children = n.getChildNodes();
@@ -45,24 +45,32 @@ public class InstanceConfigurationSectionHandler extends ClassConfigurationSecti
 			if (child.getNodeType() == Node.ELEMENT_NODE) {
 				QName childQName = XMLConfiguration.getQName(child);
 				if (!childQName.equals(INSTANCE_ELEMENT_QNAME))
-					throw new ConfigurationException("Found element with unexpected QName of \"" + childQName + "\".");
+					throw new ConfigurationException(
+							"Found element with unexpected QName of \""
+									+ childQName + "\".");
 
 				NamedNodeMap attrs = child.getAttributes();
 				Node nameNode = attrs.getNamedItem(INSTANCE_NAME_NAME);
 				if (nameNode == null)
-					throw new ConfigurationException("Couldn't find name attribute.");
+					throw new ConfigurationException(
+							"Couldn't find name attribute.");
 				Node typeNode = attrs.getNamedItem(INSTANCE_TYPE_NAME);
 				if (typeNode == null)
-					throw new ConfigurationException("Couldn't find type attribute.");
+					throw new ConfigurationException(
+							"Couldn't find type attribute.");
 				Node baseNode = attrs.getNamedItem(INSTANCE_BASE_CLASS_NAME);
 
-				String base = (baseNode != null) ? baseNode.getTextContent() : null;
+				String base = (baseNode != null) ? baseNode.getTextContent()
+						: null;
 
 				PropertiesConfigurationSectionHandler handler = new PropertiesConfigurationSectionHandler();
 				Properties props = (Properties) handler.parse(child);
 
 				try {
-					ret.put(nameNode.getTextContent(), createInstance(findClass(typeNode.getTextContent(), base), props));
+					ret.put(nameNode.getTextContent(),
+							createInstance(
+									findClass(typeNode.getTextContent(), base),
+									props));
 				} catch (Exception e) {
 				}
 			}
@@ -71,9 +79,9 @@ public class InstanceConfigurationSectionHandler extends ClassConfigurationSecti
 		return ret;
 	}
 
-	static protected Object createInstance(Class<?> cl, Properties props) throws IllegalAccessException,
-		InvocationTargetException, InstantiationException, NoSuchMethodException
-	{
+	static protected Object createInstance(Class<?> cl, Properties props)
+			throws IllegalAccessException, InvocationTargetException,
+			InstantiationException, NoSuchMethodException {
 		Constructor<?> cons = null;
 
 		try {

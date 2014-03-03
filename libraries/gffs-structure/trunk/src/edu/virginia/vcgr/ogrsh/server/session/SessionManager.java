@@ -10,40 +10,33 @@ import org.morgan.util.GUID;
 
 import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
 
-public class SessionManager implements Closeable
-{
-	static private class SessionBundle
-	{
+public class SessionManager implements Closeable {
+	static private class SessionBundle {
 		private Session _session;
 		private int _referenceCount;
 		private Date _idleStart;
 
-		public SessionBundle(Session session)
-		{
+		public SessionBundle(Session session) {
 			_session = session;
 			_referenceCount = 0;
 			_idleStart = new Date();
 		}
 
-		public Session getSession()
-		{
+		public Session getSession() {
 			return _session;
 		}
 
-		public void incrementCount()
-		{
+		public void incrementCount() {
 			if (++_referenceCount > 0)
 				_idleStart = null;
 		}
 
-		public void decrementCount()
-		{
+		public void decrementCount() {
 			if (--_referenceCount <= 0)
 				_idleStart = new Date();
 		}
 
-		public boolean isScavengeable(long minIdleTime)
-		{
+		public boolean isScavengeable(long minIdleTime) {
 			if (_idleStart == null)
 				return false;
 
@@ -59,8 +52,7 @@ public class SessionManager implements Closeable
 	private Thread _scavengerThread;
 	private boolean _closed = false;
 
-	public SessionManager(long minIdleTime)
-	{
+	public SessionManager(long minIdleTime) {
 		_minIdleTime = minIdleTime;
 
 		_scavengerThread = new Thread(new SessionScavenger());
@@ -68,18 +60,15 @@ public class SessionManager implements Closeable
 		_scavengerThread.start();
 	}
 
-	public SessionManager()
-	{
+	public SessionManager() {
 		this(_DEFAULT_MIN_IDLE_TIME);
 	}
 
-	protected void finalize()
-	{
+	protected void finalize() {
 		close();
 	}
 
-	public Session createNewSession()
-	{
+	public Session createNewSession() {
 		Session session;
 
 		synchronized (_sessions) {
@@ -99,15 +88,15 @@ public class SessionManager implements Closeable
 		return session;
 	}
 
-	public Session duplicateSession(GUID sessionID) throws OGRSHException
-	{
+	public Session duplicateSession(GUID sessionID) throws OGRSHException {
 		Session session;
 
 		synchronized (_sessions) {
 			SessionBundle bundle = _sessions.get(sessionID);
 			if (bundle == null)
-				throw new OGRSHException(OGRSHException.UNKNOWN_SESSION_EXCEPTION, "Session \"" + sessionID
-					+ "\" is not recognized.");
+				throw new OGRSHException(
+						OGRSHException.UNKNOWN_SESSION_EXCEPTION, "Session \""
+								+ sessionID + "\" is not recognized.");
 			session = bundle.getSession();
 			session = session.duplicate();
 			bundle = new SessionBundle(session);
@@ -118,8 +107,7 @@ public class SessionManager implements Closeable
 		return session;
 	}
 
-	public void releaseSession(Session session)
-	{
+	public void releaseSession(Session session) {
 		synchronized (_sessions) {
 			SessionBundle bundle = _sessions.get(session.getSessionID());
 
@@ -128,8 +116,7 @@ public class SessionManager implements Closeable
 		}
 	}
 
-	public void close()
-	{
+	public void close() {
 		synchronized (this) {
 			if (_closed)
 				return;
@@ -139,10 +126,8 @@ public class SessionManager implements Closeable
 		}
 	}
 
-	private class SessionScavenger implements Runnable
-	{
-		public void run()
-		{
+	private class SessionScavenger implements Runnable {
+		public void run() {
 			SessionBundle[] sessions;
 			Collection<SessionBundle> scavengeList;
 
@@ -150,7 +135,8 @@ public class SessionManager implements Closeable
 				try {
 					Thread.sleep(_minIdleTime);
 					synchronized (_sessions) {
-						sessions = _sessions.values().toArray(new SessionBundle[0]);
+						sessions = _sessions.values().toArray(
+								new SessionBundle[0]);
 					}
 
 					scavengeList = new LinkedList<SessionBundle>();
@@ -163,7 +149,8 @@ public class SessionManager implements Closeable
 					if (scavengeList.size() > 0) {
 						synchronized (_sessions) {
 							for (SessionBundle bundle : scavengeList) {
-								_sessions.remove(bundle.getSession().getSessionID());
+								_sessions.remove(bundle.getSession()
+										.getSessionID());
 							}
 						}
 					}

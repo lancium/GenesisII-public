@@ -2,8 +2,7 @@ package edu.virginia.g3.fsview;
 
 import java.util.Calendar;
 
-public interface FSViewEntry
-{
+public interface FSViewEntry {
 	public FSViewSession session();
 
 	public FSViewEntryType entryType();

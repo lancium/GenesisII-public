@@ -5,20 +5,18 @@ import java.util.regex.Pattern;
 
 import javax.script.ScriptContext;
 
-public class LookupExpression implements MacroExpression
-{
-	static private Pattern ARRAY_PATTERN = Pattern.compile("^([^\\[]+)\\[(\\d+)]$");
+public class LookupExpression implements MacroExpression {
+	static private Pattern ARRAY_PATTERN = Pattern
+			.compile("^([^\\[]+)\\[(\\d+)]$");
 
 	private MacroExpression _subExpression;
 
-	public LookupExpression(MacroExpression subExpression)
-	{
+	public LookupExpression(MacroExpression subExpression) {
 		_subExpression = subExpression;
 	}
 
 	@Override
-	public String toString(ScriptContext variables)
-	{
+	public String toString(ScriptContext variables) {
 		String variable;
 		int index;
 		boolean wasIndexed = false;

@@ -6,20 +6,20 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JobStateCache
-{
+public class JobStateCache {
 	static private Log _logger = LogFactory.getLog(JobStateCache.class);
 
 	private Map<JobToken, NativeQueueState> _cache = new HashMap<JobToken, NativeQueueState>();
 	private long _lastUpdated = -1L;
 
-	public NativeQueueState get(JobToken token, BulkStatusFetcher fetcher, long cacheWindow) throws NativeQueueException
-	{
+	public NativeQueueState get(JobToken token, BulkStatusFetcher fetcher,
+			long cacheWindow) throws NativeQueueException {
 		boolean usedCache = true;
 		NativeQueueState state;
 
 		synchronized (_cache) {
-			if ((_lastUpdated < 0) || (cacheWindow >= 0 && (System.currentTimeMillis() - _lastUpdated) >= cacheWindow)) {
+			if ((_lastUpdated < 0)
+					|| (cacheWindow >= 0 && (System.currentTimeMillis() - _lastUpdated) >= cacheWindow)) {
 				usedCache = false;
 				_cache.clear();
 				_cache.putAll(fetcher.getStateMap());
@@ -36,7 +36,8 @@ public class JobStateCache
 		}
 
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Status of \"%s\" is %s.\n", token, state));
+			_logger.debug(String.format("Status of \"%s\" is %s.\n", token,
+					state));
 		return state;
 	}
 }

@@ -8,74 +8,66 @@ import org.oasis_open.wsn.base.AbsoluteOrRelativeTimeType;
 import edu.virginia.vcgr.genii.client.utils.units.AxisDuration;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 
-public abstract class TerminationTimeType implements Serializable
-{
+public abstract class TerminationTimeType implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	abstract AbsoluteOrRelativeTimeType toAxisType();
 
 	public abstract Calendar terminationTime();
 
-	static private class AbsoluteTermintationTimeType extends TerminationTimeType
-	{
+	static private class AbsoluteTermintationTimeType extends
+			TerminationTimeType {
 		static final long serialVersionUID = 0L;
 
 		private Calendar _terminationTime;
 
-		private AbsoluteTermintationTimeType(Calendar termintationTime)
-		{
+		private AbsoluteTermintationTimeType(Calendar termintationTime) {
 			_terminationTime = termintationTime;
 		}
 
 		@Override
-		final AbsoluteOrRelativeTimeType toAxisType()
-		{
+		final AbsoluteOrRelativeTimeType toAxisType() {
 			return new AbsoluteOrRelativeTimeType(_terminationTime);
 		}
 
 		@Override
-		final public Calendar terminationTime()
-		{
+		final public Calendar terminationTime() {
 			return _terminationTime;
 		}
 	}
 
-	static private class DurationTerminationTimeType extends TerminationTimeType
-	{
+	static private class DurationTerminationTimeType extends
+			TerminationTimeType {
 		static final long serialVersionUID = 0L;
 
 		private Duration _duration;
 
-		private DurationTerminationTimeType(Duration duration)
-		{
+		private DurationTerminationTimeType(Duration duration) {
 			_duration = duration;
 		}
 
 		@Override
-		final AbsoluteOrRelativeTimeType toAxisType()
-		{
-			return new AbsoluteOrRelativeTimeType(AxisDuration.toApacheDuration(_duration));
+		final AbsoluteOrRelativeTimeType toAxisType() {
+			return new AbsoluteOrRelativeTimeType(
+					AxisDuration.toApacheDuration(_duration));
 		}
 
 		@Override
-		final public Calendar terminationTime()
-		{
+		final public Calendar terminationTime() {
 			return _duration.getTime();
 		}
 	}
 
-	static public TerminationTimeType newInstance(Calendar absoluteTime)
-	{
+	static public TerminationTimeType newInstance(Calendar absoluteTime) {
 		return new AbsoluteTermintationTimeType(absoluteTime);
 	}
 
-	static public TerminationTimeType newInstance(Duration relativeDuration)
-	{
+	static public TerminationTimeType newInstance(Duration relativeDuration) {
 		return new DurationTerminationTimeType(relativeDuration);
 	}
 
-	static public TerminationTimeType newInstance(AbsoluteOrRelativeTimeType termTime)
-	{
+	static public TerminationTimeType newInstance(
+			AbsoluteOrRelativeTimeType termTime) {
 		if (termTime == null)
 			return null;
 

@@ -6,8 +6,7 @@ import java.util.Collection;
 import org.w3c.dom.Element;
 import org.ws.addressing.EndpointReferenceType;
 
-public interface EPRBuilder
-{
+public interface EPRBuilder {
 	public URI address();
 
 	public void address(URI address);

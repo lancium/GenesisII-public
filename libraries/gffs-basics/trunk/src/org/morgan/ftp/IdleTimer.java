@@ -1,21 +1,17 @@
 package org.morgan.ftp;
 
-public class IdleTimer
-{
+public class IdleTimer {
 	private long _lastActivity;
 
-	public IdleTimer()
-	{
+	public IdleTimer() {
 		_lastActivity = System.currentTimeMillis();
 	}
 
-	public void noteActivity()
-	{
+	public void noteActivity() {
 		_lastActivity = System.currentTimeMillis();
 	}
 
-	public long idleTime()
-	{
+	public long idleTime() {
 		return System.currentTimeMillis() - _lastActivity;
 	}
 }

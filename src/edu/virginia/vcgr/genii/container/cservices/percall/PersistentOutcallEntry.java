@@ -3,8 +3,7 @@ package edu.virginia.vcgr.genii.container.cservices.percall;
 import java.util.Calendar;
 import java.util.Comparator;
 
-class PersistentOutcallEntry
-{
+class PersistentOutcallEntry {
 	private long _entryID;
 	private int _numAttempts;
 	private Calendar _nextAttempt;
@@ -12,8 +11,8 @@ class PersistentOutcallEntry
 
 	private AttemptScheduler _scheduler;
 
-	PersistentOutcallEntry(long id, int numAttempts, Calendar nextAttempt, Calendar createTime, AttemptScheduler scheduler)
-	{
+	PersistentOutcallEntry(long id, int numAttempts, Calendar nextAttempt,
+			Calendar createTime, AttemptScheduler scheduler) {
 		_entryID = id;
 		_numAttempts = numAttempts;
 		_nextAttempt = nextAttempt;
@@ -22,46 +21,38 @@ class PersistentOutcallEntry
 		_scheduler = scheduler;
 	}
 
-	final long entryID()
-	{
+	final long entryID() {
 		return _entryID;
 	}
 
-	final int numAttempts()
-	{
+	final int numAttempts() {
 		return _numAttempts;
 	}
 
-	final void numAttempts(int numAttempts)
-	{
+	final void numAttempts(int numAttempts) {
 		_numAttempts = numAttempts;
 	}
 
-	final Calendar nextAttempt()
-	{
+	final Calendar nextAttempt() {
 		return _nextAttempt;
 	}
 
-	final void nextAttempt(Calendar nextAttempt)
-	{
+	final void nextAttempt(Calendar nextAttempt) {
 		_nextAttempt = nextAttempt;
 	}
 
-	final Calendar createTime()
-	{
+	final Calendar createTime() {
 		return _createTime;
 	}
 
-	final AttemptScheduler scheduler()
-	{
+	final AttemptScheduler scheduler() {
 		return _scheduler;
 	}
 
-	static private class NextAttemptComparator implements Comparator<PersistentOutcallEntry>
-	{
+	static private class NextAttemptComparator implements
+			Comparator<PersistentOutcallEntry> {
 		@Override
-		public int compare(PersistentOutcallEntry o1, PersistentOutcallEntry o2)
-		{
+		public int compare(PersistentOutcallEntry o1, PersistentOutcallEntry o2) {
 			int ret = o1._nextAttempt.compareTo(o2._nextAttempt);
 			if (ret == 0) {
 				long val = o1.entryID() - o2.entryID();

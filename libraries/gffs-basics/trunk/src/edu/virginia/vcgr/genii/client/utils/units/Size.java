@@ -3,45 +3,37 @@ package edu.virginia.vcgr.genii.client.utils.units;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlJavaTypeAdapter(SizeXmlAdapter.class)
-public class Size extends UnitableValue<SizeUnits>
-{
+public class Size extends UnitableValue<SizeUnits> {
 	static final long serialVersionUID = 0L;
 
 	@Override
-	protected SizeUnits defaultUnits()
-	{
+	protected SizeUnits defaultUnits() {
 		return SizeUnits.Bytes;
 	}
 
 	@Override
-	protected SizeUnits parseUnits(String textRepresentation)
-	{
+	protected SizeUnits parseUnits(String textRepresentation) {
 		return SizeUnits.parse(textRepresentation);
 	}
 
 	@Override
-	public double as(SizeUnits targetUnits)
-	{
+	public double as(SizeUnits targetUnits) {
 		return targetUnits.convert(value(), units());
 	}
 
-	public Size()
-	{
+	public Size() {
 		super();
 	}
 
-	public Size(double value, SizeUnits units)
-	{
+	public Size(double value, SizeUnits units) {
 		super(value, units);
 	}
 
-	public Size(double value)
-	{
+	public Size(double value) {
 		super(value);
 	}
 
-	public Size(String textRepresentation)
-	{
+	public Size(String textRepresentation) {
 		super(textRepresentation);
 	}
 }

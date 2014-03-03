@@ -13,15 +13,13 @@ import edu.virginia.vcgr.genii.gjt.data.variables.VariableDefinitionType;
 import edu.virginia.vcgr.jsdl.sweep.SweepFunction;
 import edu.virginia.vcgr.jsdl.sweep.functions.ValuesSweepFunction;
 
-public class ValueListVariableDefinition extends AbstractVariableDefinition implements VariableDefinition
-{
+public class ValueListVariableDefinition extends AbstractVariableDefinition
+		implements VariableDefinition {
 	static final public String DESCRIPTION = "Value List";
 
-	static private Describer<? extends VariableDefinition> DESCRIBER = new Describer<ValueListVariableDefinition>()
-	{
+	static private Describer<? extends VariableDefinition> DESCRIBER = new Describer<ValueListVariableDefinition>() {
 		@Override
-		public String describe(ValueListVariableDefinition type, int verbosity)
-		{
+		public String describe(ValueListVariableDefinition type, int verbosity) {
 			if (type.size() == 0)
 				return "";
 			if (type.size() == 1)
@@ -30,8 +28,8 @@ public class ValueListVariableDefinition extends AbstractVariableDefinition impl
 			if (verbosity <= 0)
 				return "...";
 			else if (verbosity == 1)
-				return String.format("%s, %s, ... %s", type._values.get(0), type._values.get(1),
-					type._values.get(type.size() - 1));
+				return String.format("%s, %s, ... %s", type._values.get(0),
+						type._values.get(1), type._values.get(type.size() - 1));
 			else {
 				StringBuilder builder = new StringBuilder();
 				for (String value : type._values) {
@@ -45,8 +43,7 @@ public class ValueListVariableDefinition extends AbstractVariableDefinition impl
 		}
 
 		@Override
-		public int maximumVerbosity()
-		{
+		public int maximumVerbosity() {
 			return 2;
 		}
 	};
@@ -56,27 +53,23 @@ public class ValueListVariableDefinition extends AbstractVariableDefinition impl
 
 	/* Used for XML deserialization */
 	@SuppressWarnings("unused")
-	private ValueListVariableDefinition()
-	{
+	private ValueListVariableDefinition() {
 		this(new Vector<String>());
 	}
 
-	public ValueListVariableDefinition(Collection<String> values)
-	{
+	public ValueListVariableDefinition(Collection<String> values) {
 		super(VariableDefinitionType.ValueList, DESCRIBER);
 
 		_values = new Vector<String>(values);
 	}
 
 	@Override
-	final public int size()
-	{
+	final public int size() {
 		return _values.size();
 	}
 
 	@Override
-	public SweepFunction generateFunction()
-	{
+	public SweepFunction generateFunction() {
 		ValuesSweepFunction ret = new ValuesSweepFunction();
 		for (String value : _values)
 			ret.addValue(value);

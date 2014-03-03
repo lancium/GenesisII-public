@@ -8,12 +8,10 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 @SuppressWarnings("rawtypes")
-class FontFamilyListCellRenderer extends JLabel implements ListCellRenderer
-{
+class FontFamilyListCellRenderer extends JLabel implements ListCellRenderer {
 	static final long serialVersionUID = 0L;
 
-	FontFamilyListCellRenderer()
-	{
+	FontFamilyListCellRenderer() {
 		setOpaque(true);
 
 		// setHorizontalAlignment(CENTER);
@@ -21,9 +19,8 @@ class FontFamilyListCellRenderer extends JLabel implements ListCellRenderer
 	}
 
 	@Override
-	public Component
-		getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
-	{
+	public Component getListCellRendererComponent(JList list, Object value,
+			int index, boolean isSelected, boolean cellHasFocus) {
 		if (isSelected) {
 			setBackground(list.getSelectionBackground());
 			setForeground(list.getSelectionForeground());
@@ -35,7 +32,8 @@ class FontFamilyListCellRenderer extends JLabel implements ListCellRenderer
 		setIcon(null);
 		setText(value.toString());
 
-		setFont(new Font(value.toString(), Font.PLAIN, FontConstants.DEFAULT_FONT_SIZE));
+		setFont(new Font(value.toString(), Font.PLAIN,
+				FontConstants.DEFAULT_FONT_SIZE));
 
 		return this;
 	}

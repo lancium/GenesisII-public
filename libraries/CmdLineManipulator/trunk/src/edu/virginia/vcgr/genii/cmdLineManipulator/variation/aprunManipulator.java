@@ -14,28 +14,28 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.config.AprunVariationConfigura
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class aprunManipulator extends AbstractCmdLineManipulator<AprunVariationConfiguration>
-{
+public class aprunManipulator extends
+		AbstractCmdLineManipulator<AprunVariationConfiguration> {
 	static private Log _logger = LogFactory.getLog(aprunManipulator.class);
 	static final public String MANIPULATOR_TYPE = "aprun";
 	static final public String DEFAULT_APRUN_EXECUTABLE = "aprun";
 
-	public aprunManipulator()
-	{
+	public aprunManipulator() {
 		super(MANIPULATOR_TYPE, AprunVariationConfiguration.class);
 	}
 
 	@Override
-	public List<String> transform(Map<String, Object> jobProperties, CmdLineManipulatorConfiguration manipConfig,
-		String variationName) throws CmdLineManipulatorException
-	{
+	public List<String> transform(Map<String, Object> jobProperties,
+			CmdLineManipulatorConfiguration manipConfig, String variationName)
+			throws CmdLineManipulatorException {
 		_logger.debug("**Transforming with Aprun CmdLine Manipulator");
 
 		validateJob(jobProperties);
 
 		Map<String, Object> manipProps = new HashMap<String, Object>();
 
-		processManipulatorConfiguration(jobProperties, manipConfig, variationName, manipProps);
+		processManipulatorConfiguration(jobProperties, manipConfig,
+				variationName, manipProps);
 		tweakCmdLine(jobProperties, manipProps, variationName);
 		return formCommandLine(jobProperties);
 	}
@@ -44,8 +44,8 @@ public class aprunManipulator extends AbstractCmdLineManipulator<AprunVariationC
 	 * Transform commandline for aprun manipulation
 	 */
 	@Override
-	protected void tweakCmdLine(Map<String, Object> jobProperties, Map<String, Object> manipProps, String varName)
-	{
+	protected void tweakCmdLine(Map<String, Object> jobProperties,
+			Map<String, Object> manipProps, String varName) {
 		_logger.debug("**Forming Aprun Specific CmdLine");
 
 		// update executable with aprun call
@@ -95,13 +95,14 @@ public class aprunManipulator extends AbstractCmdLineManipulator<AprunVariationC
 	}
 
 	// Job properties specific to aprun cmdline manipulation
-	private Integer numProcessingElements(Map<String, Object> jobProperties)
-	{
-		return (Integer) jobProperties.get(CmdLineManipulatorConstants.NUMBER_OF_PROCESSES);
+	private Integer numProcessingElements(Map<String, Object> jobProperties) {
+		return (Integer) jobProperties
+				.get(CmdLineManipulatorConstants.NUMBER_OF_PROCESSES);
 	}
 
-	private Integer numProcessingElementsPerNode(Map<String, Object> jobProperties)
-	{
-		return (Integer) jobProperties.get(CmdLineManipulatorConstants.NUMBER_OF_PROCESSES_PER_HOST);
+	private Integer numProcessingElementsPerNode(
+			Map<String, Object> jobProperties) {
+		return (Integer) jobProperties
+				.get(CmdLineManipulatorConstants.NUMBER_OF_PROCESSES_PER_HOST);
 	}
 }

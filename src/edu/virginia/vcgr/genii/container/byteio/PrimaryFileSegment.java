@@ -10,26 +10,26 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 
-public class PrimaryFileSegment
-{
+public class PrimaryFileSegment {
 	static private Log _logger = LogFactory.getLog(PrimaryFileSegment.class);
 
 	public long _firstBlock;
 	public int _blockCount;
 	public byte[] _data;
 
-	public PrimaryFileSegment(long firstBlock, int blockCount)
-	{
+	public PrimaryFileSegment(long firstBlock, int blockCount) {
 		if (_logger.isDebugEnabled())
-			_logger.debug("segment firstBlock=" + firstBlock + " blockCount=" + blockCount);
+			_logger.debug("segment firstBlock=" + firstBlock + " blockCount="
+					+ blockCount);
 		_firstBlock = firstBlock;
 		_blockCount = blockCount;
 	}
 
-	public void download(RandomByteIOTransferer transferer, int blockSize) throws RemoteException
-	{
+	public void download(RandomByteIOTransferer transferer, int blockSize)
+			throws RemoteException {
 		if (_logger.isDebugEnabled())
-			_logger.debug("download firstBlock=" + _firstBlock + " blockCount=" + _blockCount);
+			_logger.debug("download firstBlock=" + _firstBlock + " blockCount="
+					+ _blockCount);
 		_data = null;
 		long firstByte = _firstBlock * blockSize;
 		int byteCount = _blockCount * blockSize;
@@ -51,10 +51,11 @@ public class PrimaryFileSegment
 		}
 	}
 
-	public void write(BitmapFile bitmapFile, RandomAccessFile raf, int blockSize) throws IOException
-	{
+	public void write(BitmapFile bitmapFile, RandomAccessFile raf, int blockSize)
+			throws IOException {
 		if (_logger.isDebugEnabled())
-			_logger.debug("write firstBlock=" + _firstBlock + " blockCount=" + _blockCount);
+			_logger.debug("write firstBlock=" + _firstBlock + " blockCount="
+					+ _blockCount);
 		bitmapFile.seekBit(_firstBlock);
 		int startOfWrite = 0;
 		while (startOfWrite < _blockCount) {

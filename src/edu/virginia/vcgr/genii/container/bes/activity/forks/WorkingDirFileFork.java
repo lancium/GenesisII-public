@@ -17,20 +17,21 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
-{
-	private File getTargetFile() throws IOException
-	{
+public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork {
+	private File getTargetFile() throws IOException {
 		File ret;
 		String relativePath = getForkPath();
 		if (!relativePath.startsWith(WorkingDirectoryFork.FORK_BASE_PATH))
-			throw new FileNotFoundException(String.format("Invalid fork path specified (%s).", relativePath));
-		relativePath = relativePath.substring(WorkingDirectoryFork.FORK_BASE_PATH.length());
+			throw new FileNotFoundException(String.format(
+					"Invalid fork path specified (%s).", relativePath));
+		relativePath = relativePath
+				.substring(WorkingDirectoryFork.FORK_BASE_PATH.length());
 
 		if (relativePath.length() > 0 && relativePath.startsWith("/"))
 			relativePath = relativePath.substring(1);
 
-		IBESActivityResource resource = (IBESActivityResource) getService().getResourceKey().dereference();
+		IBESActivityResource resource = (IBESActivityResource) getService()
+				.getResourceKey().dereference();
 
 		BESActivity activity = resource.findActivity();
 		BESWorkingDirectory workingDir = activity.getActivityCWD();
@@ -40,22 +41,22 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 			ret = new File(workingDir.getWorkingDirectory(), relativePath);
 
 		if (!ret.exists())
-			throw new FileNotFoundException(String.format("Couldn't find path \"%s\".", getForkPath()));
+			throw new FileNotFoundException(String.format(
+					"Couldn't find path \"%s\".", getForkPath()));
 		if (!ret.isFile())
-			throw new IOException(String.format("Target \"%s\" is not a file.", getForkPath()));
+			throw new IOException(String.format("Target \"%s\" is not a file.",
+					getForkPath()));
 
 		return ret;
 	}
 
-	public WorkingDirFileFork(ResourceForkService service, String forkPath)
-	{
+	public WorkingDirFileFork(ResourceForkService service, String forkPath) {
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void read(long offset, ByteBuffer dest) throws IOException
-	{
+	public void read(long offset, ByteBuffer dest) throws IOException {
 		RandomAccessFile raf = null;
 
 		try {
@@ -69,8 +70,7 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void truncAppend(long offset, ByteBuffer source) throws IOException
-	{
+	public void truncAppend(long offset, ByteBuffer source) throws IOException {
 		RandomAccessFile raf = null;
 
 		try {
@@ -85,8 +85,7 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void write(long offset, ByteBuffer source) throws IOException
-	{
+	public void write(long offset, ByteBuffer source) throws IOException {
 		RandomAccessFile raf = null;
 
 		try {
@@ -100,23 +99,20 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Calendar accessTime()
-	{
+	public Calendar accessTime() {
 		Calendar c = Calendar.getInstance();
 		return c;
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void accessTime(Calendar newTime)
-	{
+	public void accessTime(Calendar newTime) {
 		// Do nothing
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Calendar createTime()
-	{
+	public Calendar createTime() {
 
 		Calendar c = Calendar.getInstance();
 		return c;
@@ -124,8 +120,7 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Calendar modificationTime()
-	{
+	public Calendar modificationTime() {
 		Calendar c = Calendar.getInstance();
 		try {
 			File file = getTargetFile();
@@ -139,15 +134,13 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void modificationTime(Calendar newTime)
-	{
+	public void modificationTime(Calendar newTime) {
 		// Do nothing
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public boolean readable()
-	{
+	public boolean readable() {
 		try {
 			return getTargetFile().canRead();
 		} catch (IOException ioe) {
@@ -157,8 +150,7 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public long size()
-	{
+	public long size() {
 		try {
 			return getTargetFile().length();
 		} catch (IOException ioe) {
@@ -168,8 +160,7 @@ public class WorkingDirFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public boolean writable()
-	{
+	public boolean writable() {
 		try {
 			return getTargetFile().canWrite();
 		} catch (IOException ioe) {

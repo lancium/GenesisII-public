@@ -7,14 +7,14 @@ import java.util.Collection;
 
 import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
 
-public class CommandLineFormer
-{
-	static public String[] formCommandLine(String line) throws FileNotFoundException, IOException
-	{
+public class CommandLineFormer {
+	static public String[] formCommandLine(String line)
+			throws FileNotFoundException, IOException {
 		boolean insideQuotes = false;
 		StringBuilder builder = null;
 		Collection<String> ret = new ArrayList<String>();
-		line = GridUserEnvironment.replaceVariables(GridUserEnvironment.getGridUserEnvironment(), line);
+		line = GridUserEnvironment.replaceVariables(
+				GridUserEnvironment.getGridUserEnvironment(), line);
 		for (int begin = 0; begin < line.length(); begin++) {
 			char c = line.charAt(begin);
 			if (c == '"') {

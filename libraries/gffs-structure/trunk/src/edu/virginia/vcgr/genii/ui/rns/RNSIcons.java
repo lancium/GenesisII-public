@@ -16,46 +16,47 @@ import org.morgan.util.configuration.ConfigurationException;
 import edu.virginia.vcgr.genii.ui.EndpointType;
 import edu.virginia.vcgr.genii.ui.Icons;
 
-public class RNSIcons extends Icons
-{
+public class RNSIcons extends Icons {
 	private EnumMap<EndpointType, Pair<Icon, Icon>> _endpointIcons = new EnumMap<EndpointType, Pair<Icon, Icon>>(
-		EndpointType.class);
+			EndpointType.class);
 	private Icon _questionIcon = null;
 	private Icon _errorIcon = null;
 	static private RNSIcons singleton = null;
 
 	// use the factory to get a new instance of the RNSIcons class.
-	public static synchronized RNSIcons RNSIconsFactory()
-	{
+	public static synchronized RNSIcons RNSIconsFactory() {
 		if (singleton == null) {
 			singleton = new RNSIcons();
 		}
 		return singleton;
 	}
 
-	private RNSIcons()
-	{
+	private RNSIcons() {
 		try {
-			_endpointIcons.put(EndpointType.DIRECTORY, loadIconPairs("folder.png"));
+			_endpointIcons.put(EndpointType.DIRECTORY,
+					loadIconPairs("folder.png"));
 			_endpointIcons.put(EndpointType.FILE, loadIconPairs("file.png"));
 			_endpointIcons.put(EndpointType.BES, loadIconPairs("bes.png"));
 			_endpointIcons.put(EndpointType.QUEUE, loadIconPairs("queue.png"));
 			_endpointIcons.put(EndpointType.USER, loadIconPairs("idp.png"));
-			_endpointIcons.put(EndpointType.HEAVY_EXPORT, loadIconPairs("export.png"));
-			_endpointIcons.put(EndpointType.LIGHT_EXPORT, loadIconPairs("light-export.png"));
+			_endpointIcons.put(EndpointType.HEAVY_EXPORT,
+					loadIconPairs("export.png"));
+			_endpointIcons.put(EndpointType.LIGHT_EXPORT,
+					loadIconPairs("light-export.png"));
 			_endpointIcons.put(EndpointType.UNKNOWN, loadIconPairs("file.png"));
 
 			_questionIcon = new ImageIcon(loadImage("question.png"));
 			_errorIcon = new ImageIcon(loadImage("error.png"));
 		} catch (IOException ioe) {
-			throw new ConfigurationException("Unable to load icon resources.", ioe);
+			throw new ConfigurationException("Unable to load icon resources.",
+					ioe);
 		}
 	}
 
-	public BufferedImage createL(int width, int height)
-	{
+	public BufferedImage createL(int width, int height) {
 		Graphics2D g = null;
-		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage ret = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
 		try {
 			g = ret.createGraphics();
 
@@ -71,8 +72,8 @@ public class RNSIcons extends Icons
 		}
 	}
 
-	public Pair<Icon, Icon> loadIconPairs(String resourceName) throws IOException
-	{
+	public Pair<Icon, Icon> loadIconPairs(String resourceName)
+			throws IOException {
 		Graphics2D g = null;
 
 		try {
@@ -83,39 +84,39 @@ public class RNSIcons extends Icons
 
 			width = original.getWidth();
 			height = original.getHeight();
-			BufferedImage local = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			BufferedImage local = new BufferedImage(width, height,
+					BufferedImage.TYPE_INT_ARGB);
 			g = local.createGraphics();
 			g.drawImage(original, 0, 0, null);
-			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+					0.8f));
 
 			BufferedImage lImage = createL(width * 2 / 3, height * 2 / 3);
-			g.drawImage(lImage, width - lImage.getWidth() - 1, 1, lImage.getWidth(), lImage.getHeight(), null);
+			g.drawImage(lImage, width - lImage.getWidth() - 1, 1,
+					lImage.getWidth(), lImage.getHeight(), null);
 
-			return new Pair<Icon, Icon>(new ImageIcon(original), new ImageIcon(local));
+			return new Pair<Icon, Icon>(new ImageIcon(original), new ImageIcon(
+					local));
 		} finally {
 			if (g != null)
 				g.dispose();
 		}
 	}
 
-	public Icon getIcon(EndpointType type, boolean isLocal)
-	{
+	public Icon getIcon(EndpointType type, boolean isLocal) {
 		Pair<Icon, Icon> pair = _endpointIcons.get(type);
 		return (isLocal ? pair.second() : pair.first());
 	}
 
-	public Icon getQuestionIcon()
-	{
+	public Icon getQuestionIcon() {
 		return _questionIcon;
 	}
 
-	public Icon getErrorIcon()
-	{
+	public Icon getErrorIcon() {
 		return _errorIcon;
 	}
 
-	public Icon getSecurityIcon()
-	{
+	public Icon getSecurityIcon() {
 		return _endpointIcons.get(EndpointType.USER).first();
 	}
 }

@@ -2,16 +2,14 @@ package edu.virginia.vcgr.genii.client.stats;
 
 import java.lang.reflect.Method;
 
-public class MethodDataPoint implements DataPoint
-{
+public class MethodDataPoint implements DataPoint {
 	private Class<?> _serviceClass;
 	private Method _serviceMethod;
 	private long _startTime;
 	private long _completeTime;
 	private boolean _successfull;
 
-	public MethodDataPoint(Class<?> serviceClass, Method serviceMethod)
-	{
+	public MethodDataPoint(Class<?> serviceClass, Method serviceMethod) {
 		_serviceClass = serviceClass;
 		_serviceMethod = serviceMethod;
 		_startTime = System.currentTimeMillis();
@@ -19,39 +17,32 @@ public class MethodDataPoint implements DataPoint
 		_successfull = false;
 	}
 
-	public void complete(boolean successfull)
-	{
+	public void complete(boolean successfull) {
 		_completeTime = System.currentTimeMillis();
 		_successfull = successfull;
 	}
 
-	public Class<?> serviceClass()
-	{
+	public Class<?> serviceClass() {
 		return _serviceClass;
 	}
 
-	public Method serviceMethod()
-	{
+	public Method serviceMethod() {
 		return _serviceMethod;
 	}
 
-	public boolean isCompleted()
-	{
+	public boolean isCompleted() {
 		return _completeTime >= 0L;
 	}
 
-	public long duration()
-	{
+	public long duration() {
 		return _completeTime - _startTime;
 	}
 
-	public boolean successfull()
-	{
+	public boolean successfull() {
 		return _successfull;
 	}
 
-	public boolean withinWindow(long currentTime, long windowSize)
-	{
+	public boolean withinWindow(long currentTime, long windowSize) {
 		return _startTime >= (currentTime - windowSize);
 	}
 }

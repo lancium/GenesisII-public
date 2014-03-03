@@ -5,8 +5,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 import org.morgan.util.macro.MacroUtils;
 
-class FilesystemSandboxConfiguration
-{
+class FilesystemSandboxConfiguration {
 	@XmlAttribute(name = "name", required = true)
 	private String _name = null;
 
@@ -17,23 +16,19 @@ class FilesystemSandboxConfiguration
 	private boolean _create = true;
 
 	@SuppressWarnings("unused")
-	private void afterUnmarshal(Unmarshaller u, Object parent)
-	{
+	private void afterUnmarshal(Unmarshaller u, Object parent) {
 		MacroUtils.replaceMacros(System.getProperties(), _relativePath);
 	}
 
-	final String name()
-	{
+	final String name() {
 		return _name;
 	}
 
-	final String relativePath()
-	{
+	final String relativePath() {
 		return _relativePath;
 	}
 
-	final boolean doCreate()
-	{
+	final boolean doCreate() {
 		return _create;
 	}
 }

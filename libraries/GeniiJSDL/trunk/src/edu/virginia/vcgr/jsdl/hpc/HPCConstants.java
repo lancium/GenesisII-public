@@ -20,7 +20,6 @@ package edu.virginia.vcgr.jsdl.hpc;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface HPCConstants
-{
+public interface HPCConstants {
 	static final public String HPCPA_NS = "http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcpa";
 }

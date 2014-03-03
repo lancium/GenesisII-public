@@ -22,8 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class Environment extends FilesystemRelativeValue
-{
+public class Environment extends FilesystemRelativeValue {
 	static final long serialVersionUID = 0L;
 
 	@XmlAttribute(name = "name", required = true)
@@ -33,31 +32,26 @@ public class Environment extends FilesystemRelativeValue
 	 * For use by deserialization only.
 	 */
 	@SuppressWarnings("unused")
-	private Environment()
-	{
+	private Environment() {
 	}
 
-	public Environment(String name, String value)
-	{
+	public Environment(String name, String value) {
 		super(value);
 		name(name);
 	}
 
-	public Environment(String name)
-	{
+	public Environment(String name) {
 		this(name, null);
 	}
 
-	final public void name(String name)
-	{
+	final public void name(String name) {
 		if (name == null)
 			throw new IllegalArgumentException("Name parameter cannot be null.");
 
 		_name = name;
 	}
 
-	final public String name()
-	{
+	final public String name() {
 		return _name;
 	}
 }

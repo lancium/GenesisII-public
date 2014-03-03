@@ -12,8 +12,7 @@ import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 
-public class Installation
-{
+public class Installation {
 	static private Log _logger = LogFactory.getLog(Installation.class);
 
 	// System property to indicate the installation location
@@ -29,85 +28,94 @@ public class Installation
 	static private OGRSH _ogrsh = null;
 
 	static {
-		String installationDirectoryString = System.getProperty(INSTALL_DIR_SYSTEM_PROPERTY);
+		String installationDirectoryString = System
+				.getProperty(INSTALL_DIR_SYSTEM_PROPERTY);
 		if (installationDirectoryString == null)
-			throw new RuntimeException("Installation directory property \"" + INSTALL_DIR_SYSTEM_PROPERTY + "\" not defined.");
+			throw new RuntimeException("Installation directory property \""
+					+ INSTALL_DIR_SYSTEM_PROPERTY + "\" not defined.");
 
-		_installationDirectory = new File(installationDirectoryString).getAbsoluteFile();
+		_installationDirectory = new File(installationDirectoryString)
+				.getAbsoluteFile();
 		if (!_installationDirectory.exists())
-			throw new RuntimeException("Installation directory \"" + _installationDirectory + "\" does not exist.");
+			throw new RuntimeException("Installation directory \""
+					+ _installationDirectory + "\" does not exist.");
 		if (!_installationDirectory.isDirectory())
-			throw new RuntimeException("Installation path \"" + _installationDirectory + "\" is not a directory.");
+			throw new RuntimeException("Installation path \""
+					+ _installationDirectory + "\" is not a directory.");
 
-		_logger.debug("got installation directory of: " + _installationDirectory.toString());
+		_logger.debug("got installation directory of: "
+				+ _installationDirectory.toString());
 
 		// special creation of container properties that's not static...
 		ContainerProperties cp = new ContainerProperties();
 		_deploymentsDirectory = new File(cp.getDeploymentsDirectory());
-		_logger.debug("got deployments directory of: " + _deploymentsDirectory.toString());
+		_logger.debug("got deployments directory of: "
+				+ _deploymentsDirectory.toString());
 
 		_webAppDirectory = new File(_installationDirectory, WEBAPPS_DIR_NAME);
 		if (!_webAppDirectory.exists())
-			throw new RuntimeException("Installation is corrupt -- couldn't find " + WEBAPPS_DIR_NAME + " directory.");
+			throw new RuntimeException(
+					"Installation is corrupt -- couldn't find "
+							+ WEBAPPS_DIR_NAME + " directory.");
 		if (!_webAppDirectory.isDirectory())
-			throw new RuntimeException("Installation is corrupt -- " + WEBAPPS_DIR_NAME + " is not a directory.");
+			throw new RuntimeException("Installation is corrupt -- "
+					+ WEBAPPS_DIR_NAME + " is not a directory.");
 		if (!_webAppDirectory.canWrite()) {
 			// well, that's a pickle. the main webapps root is not writable.
 			File saveOldWA = _webAppDirectory;
-			_webAppDirectory = new File(InstallationProperties.getUserDir(), WEBAPPS_DIR_NAME);
-			_logger.trace("diverting to user directory for webapps location: " + _webAppDirectory);
+			_webAppDirectory = new File(InstallationProperties.getUserDir(),
+					WEBAPPS_DIR_NAME);
+			_logger.trace("diverting to user directory for webapps location: "
+					+ _webAppDirectory);
 			// make the directory if it's not already there.
 			if (!_webAppDirectory.exists()) {
 				// create a copy of the main webapps into our user dir.
-				_logger.debug("creating fresh webapps directory at: " + _webAppDirectory);
+				_logger.debug("creating fresh webapps directory at: "
+						+ _webAppDirectory);
 				try {
 					FileUtils.copyDirectory(saveOldWA, _webAppDirectory);
 				} catch (IOException e) {
-					throw new RuntimeException("Installation has a problem; cannot instantiate new webapps at "
-						+ WEBAPPS_DIR_NAME);
+					throw new RuntimeException(
+							"Installation has a problem; cannot instantiate new webapps at "
+									+ WEBAPPS_DIR_NAME);
 				}
 			}
 		}
 
-		_processWrapperDirectory = new File(_installationDirectory, PROCESS_WRAPPER_DIR_NAME);
+		_processWrapperDirectory = new File(_installationDirectory,
+				PROCESS_WRAPPER_DIR_NAME);
 
 		reload();
 	}
 
-	static public File getInstallDirectory()
-	{
+	static public File getInstallDirectory() {
 		return _installationDirectory;
 	}
 
-	static public Deployment getDeployment(DeploymentName depName)
-	{
+	static public Deployment getDeployment(DeploymentName depName) {
 		return Deployment.getDeployment(_deploymentsDirectory, depName);
 	}
 
-	static public OGRSH getOGRSH()
-	{
+	static public OGRSH getOGRSH() {
 		return _ogrsh;
 	}
 
-	static public File axisWebApplicationPath()
-	{
+	static public File axisWebApplicationPath() {
 		return _webAppDirectory;
 	}
 
-	static public File getProcessWrapperBinPath()
-	{
+	static public File getProcessWrapperBinPath() {
 		return _processWrapperDirectory;
 	}
 
-	static public void reload()
-	{
+	static public void reload() {
 		Deployment.reload();
 
-		_ogrsh = new OGRSH(new File(_installationDirectory, OGRSH_DIRECTORY_NAME));
+		_ogrsh = new OGRSH(new File(_installationDirectory,
+				OGRSH_DIRECTORY_NAME));
 	}
 
-	static public File getGridCommand()
-	{
+	static public File getGridCommand() {
 		File ret;
 		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
 
@@ -119,7 +127,9 @@ public class Installation
 		if (!ret.exists())
 			throw new ConfigurationException("Unable to locate grid command.");
 		if (!ret.canExecute())
-			throw new ConfigurationException(String.format("Grid command \"%s\" is not executable.", ret.getAbsolutePath()));
+			throw new ConfigurationException(String.format(
+					"Grid command \"%s\" is not executable.",
+					ret.getAbsolutePath()));
 
 		return ret;
 	}

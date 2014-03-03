@@ -1,17 +1,15 @@
 package org.morgan.util.macro;
 
-class MacroStartMacroConsumer extends AbstractEscapingMacroConsumer
-{
+class MacroStartMacroConsumer extends AbstractEscapingMacroConsumer {
 	private StringBuilder _macro = new StringBuilder();
 
-	MacroStartMacroConsumer(MacroResolver resolver)
-	{
+	MacroStartMacroConsumer(MacroResolver resolver) {
 		super(resolver);
 	}
 
 	@Override
-	protected MacroConsumer consumeImpl(StringBuilder builder, Character c, boolean escaped)
-	{
+	protected MacroConsumer consumeImpl(StringBuilder builder, Character c,
+			boolean escaped) {
 		if (c == null) {
 			builder.append("${" + _macro);
 			return null;

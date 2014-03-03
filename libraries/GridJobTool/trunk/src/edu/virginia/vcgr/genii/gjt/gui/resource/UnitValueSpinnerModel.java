@@ -4,8 +4,8 @@ import javax.swing.AbstractSpinnerModel;
 
 import edu.virginia.vcgr.genii.gjt.data.UnitValue;
 
-public class UnitValueSpinnerModel<U extends Enum<U>> extends AbstractSpinnerModel
-{
+public class UnitValueSpinnerModel<U extends Enum<U>> extends
+		AbstractSpinnerModel {
 	private static final long serialVersionUID = 1;
 
 	private UnitValue<Long, U> _value;
@@ -14,8 +14,8 @@ public class UnitValueSpinnerModel<U extends Enum<U>> extends AbstractSpinnerMod
 	private long _maximum;
 	private long _step;
 
-	public UnitValueSpinnerModel(UnitValue<Long, U> initialValue, long minimum, long maximum, long step)
-	{
+	public UnitValueSpinnerModel(UnitValue<Long, U> initialValue, long minimum,
+			long maximum, long step) {
 		_value = initialValue;
 		_minimum = minimum;
 		_maximum = maximum;
@@ -23,8 +23,7 @@ public class UnitValueSpinnerModel<U extends Enum<U>> extends AbstractSpinnerMod
 	}
 
 	@Override
-	public Object getNextValue()
-	{
+	public Object getNextValue() {
 		Long nextValue;
 
 		if (_value.value() == null)
@@ -40,8 +39,7 @@ public class UnitValueSpinnerModel<U extends Enum<U>> extends AbstractSpinnerMod
 	}
 
 	@Override
-	public Object getPreviousValue()
-	{
+	public Object getPreviousValue() {
 		Long nextValue;
 
 		if (_value.value() == null)
@@ -57,14 +55,12 @@ public class UnitValueSpinnerModel<U extends Enum<U>> extends AbstractSpinnerMod
 	}
 
 	@Override
-	public Object getValue()
-	{
+	public Object getValue() {
 		return new NullableNumber(_value.value());
 	}
 
 	@Override
-	public void setValue(Object value)
-	{
+	public void setValue(Object value) {
 		NullableNumber newValue = (NullableNumber) value;
 		if (!newValue.equals(new NullableNumber(_value.value()))) {
 			_value.value(newValue.value());

@@ -2,8 +2,8 @@ package edu.virginia.g3.fsview;
 
 import java.util.Calendar;
 
-public abstract class AbstractFSViewEntry<SessionType extends FSViewSession> implements FSViewEntry
-{
+public abstract class AbstractFSViewEntry<SessionType extends FSViewSession>
+		implements FSViewEntry {
 	static private Calendar DEFAULT_CREATE_TIME;
 
 	static {
@@ -20,14 +20,13 @@ public abstract class AbstractFSViewEntry<SessionType extends FSViewSession> imp
 
 	abstract protected boolean canWriteImpl();
 
-	final protected SessionType typedSession()
-	{
+	final protected SessionType typedSession() {
 		return _sessionTypeClass.cast(_session);
 	}
 
-	protected AbstractFSViewEntry(Class<SessionType> sessionTypeClass, SessionType session, FSViewDirectoryEntry parentEntry,
-		String entryName, FSViewEntryType entryType)
-	{
+	protected AbstractFSViewEntry(Class<SessionType> sessionTypeClass,
+			SessionType session, FSViewDirectoryEntry parentEntry,
+			String entryName, FSViewEntryType entryType) {
 		_sessionTypeClass = sessionTypeClass;
 
 		_session = session;
@@ -37,32 +36,27 @@ public abstract class AbstractFSViewEntry<SessionType extends FSViewSession> imp
 	}
 
 	@Override
-	final public FSViewSession session()
-	{
+	final public FSViewSession session() {
 		return _session;
 	}
 
 	@Override
-	final public FSViewEntryType entryType()
-	{
+	final public FSViewEntryType entryType() {
 		return _entryType;
 	}
 
 	@Override
-	final public String entryName()
-	{
+	final public String entryName() {
 		return _entryName;
 	}
 
 	@Override
-	final public FSViewDirectoryEntry parent()
-	{
+	final public FSViewDirectoryEntry parent() {
 		return _parentEntry;
 	}
 
 	@Override
-	final public boolean canWrite()
-	{
+	final public boolean canWrite() {
 		if (session().isReadOnly())
 			return false;
 
@@ -70,8 +64,7 @@ public abstract class AbstractFSViewEntry<SessionType extends FSViewSession> imp
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		if (_parentEntry == null)
 			return "";
 
@@ -83,21 +76,18 @@ public abstract class AbstractFSViewEntry<SessionType extends FSViewSession> imp
 	}
 
 	@Override
-	public Calendar createTime()
-	{
+	public Calendar createTime() {
 		return (Calendar) DEFAULT_CREATE_TIME.clone();
 	}
 
 	@Override
-	public Calendar lastAccessed()
-	{
+	public Calendar lastAccessed() {
 		Calendar ret = Calendar.getInstance();
 		return ret;
 	}
 
 	@Override
-	public Calendar lastModified()
-	{
+	public Calendar lastModified() {
 		Calendar ret = Calendar.getInstance();
 		return ret;
 	}

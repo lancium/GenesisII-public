@@ -17,23 +17,21 @@ import org.morgan.ftp.InternalException;
 import org.morgan.ftp.RollingCommandHistory;
 import org.morgan.util.io.StreamUtils;
 
-public class StoreCommandHandler extends AbstractCommandHandler
-{
+public class StoreCommandHandler extends AbstractCommandHandler {
 	static private final int _BUFFER_CAPACITY = 1024 * 8;
 
 	static private Logger _logger = Logger.getLogger(StoreCommandHandler.class);
 
-	public StoreCommandHandler(ICommand command)
-	{
+	public StoreCommandHandler(ICommand command) {
 		super(command);
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
-	{
+	public void handleCommand(FTPSessionState sessionState, String verb,
+			String parameters, PrintStream out) throws FTPException {
 		RollingCommandHistory history = sessionState.getHistory();
-		FTPAction lastCompletedAction = history.lastCompleted(PASVCommandHandler.class);
+		FTPAction lastCompletedAction = history
+				.lastCompleted(PASVCommandHandler.class);
 
 		ICommandHandler handler = lastCompletedAction.getHandler();
 		if (!(handler instanceof PASVCommandHandler))
@@ -45,7 +43,8 @@ public class StoreCommandHandler extends AbstractCommandHandler
 		OutputStream out2 = null;
 
 		try {
-			channel = key.getChannel(sessionState.getConfiguration().getDataConnectionTimeoutSeconds());
+			channel = key.getChannel(sessionState.getConfiguration()
+					.getDataConnectionTimeoutSeconds());
 
 			out.println("150 Beginning to store file.");
 

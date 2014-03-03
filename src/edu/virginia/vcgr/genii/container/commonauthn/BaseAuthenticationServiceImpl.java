@@ -105,19 +105,20 @@ import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
  * all the interfaces. We avoid the problem of name conflict by asking subclasses to explicitly call
  * this class's method for conflicting methods.
  */
-public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implements RNSTopics, BaggageAggregatable
-{
-	private static Log _logger = LogFactory.getLog(BaseAuthenticationServiceImpl.class);
+public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase
+		implements RNSTopics, BaggageAggregatable {
+	private static Log _logger = LogFactory
+			.getLog(BaseAuthenticationServiceImpl.class);
 
-	protected BaseAuthenticationServiceImpl(String serviceName) throws RemoteException
-	{
+	protected BaseAuthenticationServiceImpl(String serviceName)
+			throws RemoteException {
 		super(serviceName);
 	}
 
 	@Override
-	public ArrayList<RequestSecurityTokenResponseType> aggregateBaggageTokens(IRNSResource resource,
-		RequestSecurityTokenType request) throws java.rmi.RemoteException
-	{
+	public ArrayList<RequestSecurityTokenResponseType> aggregateBaggageTokens(
+			IRNSResource resource, RequestSecurityTokenType request)
+			throws java.rmi.RemoteException {
 		ArrayList<RequestSecurityTokenResponseType> gatheredResponses = new ArrayList<RequestSecurityTokenResponseType>();
 		Collection<InternalEntry> entries = resource.retrieveEntries(null);
 
@@ -125,65 +126,80 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			try {
 				EndpointReferenceType idpEpr = entry.getEntryReference();
 				// create a proxy to the remote idp and invoke it.
-				X509AuthnPortType idp = ClientUtils.createProxy(X509AuthnPortType.class, idpEpr);
-				RequestSecurityTokenResponseType[] responses = idp.requestSecurityToken2(request);
+				X509AuthnPortType idp = ClientUtils.createProxy(
+						X509AuthnPortType.class, idpEpr);
+				RequestSecurityTokenResponseType[] responses = idp
+						.requestSecurityToken2(request);
 				if (responses != null) {
 					for (RequestSecurityTokenResponseType response : responses) {
 						gatheredResponses.add(response);
 					}
 				}
 			} catch (Exception e) {
-				_logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
+				_logger.error(
+						"Could not retrieve token for IDP " + entry.getName()
+								+ ": " + e.getMessage(), e);
 			}
 		}
 		return gatheredResponses;
 	}
 
 	/*
-	 * This override is extremely important for the proper functioning of any replicated IDP
-	 * instance. This duplicates the certificate of the primary resource and use that certificate
-	 * instead of a newly generated certificate during the resource creation process.
+	 * This override is extremely important for the proper functioning of any
+	 * replicated IDP instance. This duplicates the certificate of the primary
+	 * resource and use that certificate instead of a newly generated
+	 * certificate during the resource creation process.
 	 * 
-	 * In addition, we use this override to modify the certificate's DN when creating a primary
-	 * resource. Unlike other resources, a IDP resource's certificate bears its name in the subject
-	 * DN field. To facilitate this we need to pass a construction parameter during the resource
-	 * creation phase.
+	 * In addition, we use this override to modify the certificate's DN when
+	 * creating a primary resource. Unlike other resources, a IDP resource's
+	 * certificate bears its name in the subject DN field. To facilitate this we
+	 * need to pass a construction parameter during the resource creation phase.
 	 */
 	@Override
-	protected ResourceKey createResource(GenesisHashMap constructionParameters) throws ResourceException, BaseFaultType
-	{
+	protected ResourceKey createResource(GenesisHashMap constructionParameters)
+			throws ResourceException, BaseFaultType {
 		// insert construction parameter to affect DN names of the certificate
-		String CN = constructionParameters.getString(SecurityConstants.NEW_IDP_NAME_QNAME);
+		String CN = constructionParameters
+				.getString(SecurityConstants.NEW_IDP_NAME_QNAME);
 		if (CN != null) {
-			constructionParameters.put(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM, new String[] { CN });
+			constructionParameters.put(
+					IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM,
+					new String[] { CN });
 		}
 
 		// retrieve primary resources EPR during replica creation
-		EndpointReferenceType certificateOwnerEPR =
-			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		EndpointReferenceType certificateOwnerEPR = (EndpointReferenceType) constructionParameters
+				.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (certificateOwnerEPR == null) {
-			MessageElement certificateOwner =
-				constructionParameters.getAxisMessageElement(STSConfigurationProperties.CERTIFICATE_OWNER_EPR);
+			MessageElement certificateOwner = constructionParameters
+					.getAxisMessageElement(STSConfigurationProperties.CERTIFICATE_OWNER_EPR);
 			if (certificateOwner != null) {
 				try {
-					certificateOwnerEPR = (EndpointReferenceType) certificateOwner.getObjectValue(EndpointReferenceType.class);
+					certificateOwnerEPR = (EndpointReferenceType) certificateOwner
+							.getObjectValue(EndpointReferenceType.class);
 				} catch (Exception e) {
-					throw new ResourceException("failed reconstruct primary resource's EPR", e);
+					throw new ResourceException(
+							"failed reconstruct primary resource's EPR", e);
 				}
 			}
 		}
 
 		// retrieve primary resource's certificate for duplication
 		if (certificateOwnerEPR != null) {
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, certificateOwnerEPR);
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
+					certificateOwnerEPR);
 			try {
-				GetResourcePropertyResponse response = common.getResourceProperty(SecurityConstants.CERTIFICATE_CHAIN_QNAME);
-				MessageElement property = new MessageElement(response.get_any()[0]);
-				X509Certificate[] certificate =
-					(X509Certificate[]) CommonSTSAttributesHandler.deserializeObjectFromString(property.getValue());
-				constructionParameters.put(IResource.DUPLICATED_CERTIFICATE_PARAM, certificate);
+				GetResourcePropertyResponse response = common
+						.getResourceProperty(SecurityConstants.CERTIFICATE_CHAIN_QNAME);
+				MessageElement property = new MessageElement(
+						response.get_any()[0]);
+				X509Certificate[] certificate = (X509Certificate[]) CommonSTSAttributesHandler
+						.deserializeObjectFromString(property.getValue());
+				constructionParameters.put(
+						IResource.DUPLICATED_CERTIFICATE_PARAM, certificate);
 			} catch (Exception e) {
-				throw new ResourceException("failed to load certificate from the primary", e);
+				throw new ResourceException(
+						"failed to load certificate from the primary", e);
 			}
 		}
 
@@ -191,21 +207,25 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	}
 
 	/*
-	 * By default, the system adds a newly created IDP resource as an RNS entry under the directory
-	 * for the IDP service in a container. As RNS entries are distinguished by their names, two IDP
-	 * instances having the same name cannot reside in a single container for a single IDP
-	 * port-type. This apparent restriction simplifies tracking of IDP instances for later use.
+	 * By default, the system adds a newly created IDP resource as an RNS entry
+	 * under the directory for the IDP service in a container. As RNS entries
+	 * are distinguished by their names, two IDP instances having the same name
+	 * cannot reside in a single container for a single IDP port-type. This
+	 * apparent restriction simplifies tracking of IDP instances for later use.
 	 */
-	public String addResourceInServiceResourceList(EndpointReferenceType newEPR, GenesisHashMap constructionParameters)
-		throws ResourceUnknownFaultType, ResourceException, RNSEntryExistsFaultType
-	{
+	public String addResourceInServiceResourceList(
+			EndpointReferenceType newEPR, GenesisHashMap constructionParameters)
+			throws ResourceUnknownFaultType, ResourceException,
+			RNSEntryExistsFaultType {
 		// make sure the specific IDP doesn't yet exist
-		String newIdpName = constructionParameters.getString(SecurityConstants.NEW_IDP_NAME_QNAME);
+		String newIdpName = constructionParameters
+				.getString(SecurityConstants.NEW_IDP_NAME_QNAME);
 		ResourceKey serviceKey = ResourceManager.getCurrentResource();
 		IRNSResource serviceResource = (IRNSResource) serviceKey.dereference();
 		Collection<String> entries = serviceResource.listEntries(null);
 		if (entries.contains(newIdpName)) {
-			throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(null, null, null, null, null, null, newIdpName));
+			throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(
+					null, null, null, null, null, null, newIdpName));
 		}
 
 		// add the delegated identity to the service's list of IDPs
@@ -214,39 +234,48 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		return newIdpName;
 	}
 
-	public void storeCallingContextAndCertificate(IResource resource, NuCredential credential) throws ResourceException
-	{
-		ICallingContext resourceContext =
-			(ICallingContext) resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
-		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(resourceContext);
+	public void storeCallingContextAndCertificate(IResource resource,
+			NuCredential credential) throws ResourceException {
+		ICallingContext resourceContext = (ICallingContext) resource
+				.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+		TransientCredentials transientCredentials = TransientCredentials
+				.getTransientCredentials(resourceContext);
 		transientCredentials.add(credential);
-		resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, resourceContext);
-		resource.setProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(), credential);
+		resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME,
+				resourceContext);
+		resource.setProperty(
+				SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(),
+				credential);
 	}
 
 	/*
-	 * This override is used to initiate replication of an IDP instance. The presence of the
-	 * primary-epr- construction-parameter indicates that the resource under creation is not a new
-	 * IDP instance, rather a replica of some existing instance in some container. When this
-	 * parameter is present, the system delegates the responsibility of retrieving necessary
-	 * resource properties and linked descendant IDP instances of the primary copy to the
-	 * ReplicaSynchronizer class, which asynchronously synchronizes this replica with the primary.
+	 * This override is used to initiate replication of an IDP instance. The
+	 * presence of the primary-epr- construction-parameter indicates that the
+	 * resource under creation is not a new IDP instance, rather a replica of
+	 * some existing instance in some container. When this parameter is present,
+	 * the system delegates the responsibility of retrieving necessary resource
+	 * properties and linked descendant IDP instances of the primary copy to the
+	 * ReplicaSynchronizer class, which asynchronously synchronizes this replica
+	 * with the primary.
 	 */
 	@Override
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
-		BaseFaultType, RemoteException
-	{
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
+			ConstructionParameters cParams,
+			GenesisHashMap constructionParameters,
+			Collection<MessageElement> resolverCreationParameters)
+			throws ResourceException, BaseFaultType, RemoteException {
 
-		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
-		STSCertificationSpec stsCertificationSpec =
-			(STSCertificationSpec) constructionParameters.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
+		super.postCreate(rKey, newEPR, cParams, constructionParameters,
+				resolverCreationParameters);
+		STSCertificationSpec stsCertificationSpec = (STSCertificationSpec) constructionParameters
+				.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
 
 		IResource resource = rKey.dereference();
-		resource.setProperty(IResource.PRIVATE_KEY_PROPERTY_NAME, stsCertificationSpec.getSubjectPrivateKey());
+		resource.setProperty(IResource.PRIVATE_KEY_PROPERTY_NAME,
+				stsCertificationSpec.getSubjectPrivateKey());
 
-		EndpointReferenceType primaryEPR =
-			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		EndpointReferenceType primaryEPR = (EndpointReferenceType) constructionParameters
+				.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (primaryEPR != null) {
 
 			// storeReplicaInServicesResourceList(newEPR, primaryEPR);
@@ -254,24 +283,30 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			VersionedResourceUtils.initializeReplica(resource, primaryEPR, 0);
 			WorkingContext context = WorkingContext.getCurrentWorkingContext();
 			ReplicationThread thread = new ReplicationThread(context);
-			thread.add(new ReplicationItem(new ReplicaSynchronizer(getResourcePropertyRetriver()), newEPR));
+			thread.add(new ReplicationItem(new ReplicaSynchronizer(
+					getResourcePropertyRetriver()), newEPR));
 			thread.start();
 		}
 	}
 
 	/*
-	 * By default, IDP resources are been added to corresponding service resource's RNS directory.
-	 * For replication, it is not clear whether or not replicas should be similarly added in the RNS
-	 * directory in the container holding the replicas. At this point, we are not adding replicas in
-	 * service's RNS directory. However we keep the method in place in case we want to confirm to
-	 * the default behavior.
+	 * By default, IDP resources are been added to corresponding service
+	 * resource's RNS directory. For replication, it is not clear whether or not
+	 * replicas should be similarly added in the RNS directory in the container
+	 * holding the replicas. At this point, we are not adding replicas in
+	 * service's RNS directory. However we keep the method in place in case we
+	 * want to confirm to the default behavior.
 	 */
-	protected void storeReplicaInServicesResourceList(EndpointReferenceType newEPR, EndpointReferenceType primaryEPR)
-		throws ResourceException, GenesisIISecurityException, RemoteException, InvalidResourcePropertyQNameFaultType,
-		ResourceUnknownFaultType, ResourceUnavailableFaultType, RNSEntryExistsFaultType
-	{
-		GeniiCommon proxy = ClientUtils.createProxy(GeniiCommon.class, primaryEPR);
-		GetResourcePropertyResponse idpNameProperty = proxy.getResourceProperty(SecurityConstants.NEW_IDP_NAME_QNAME);
+	protected void storeReplicaInServicesResourceList(
+			EndpointReferenceType newEPR, EndpointReferenceType primaryEPR)
+			throws ResourceException, GenesisIISecurityException,
+			RemoteException, InvalidResourcePropertyQNameFaultType,
+			ResourceUnknownFaultType, ResourceUnavailableFaultType,
+			RNSEntryExistsFaultType {
+		GeniiCommon proxy = ClientUtils.createProxy(GeniiCommon.class,
+				primaryEPR);
+		GetResourcePropertyResponse idpNameProperty = proxy
+				.getResourceProperty(SecurityConstants.NEW_IDP_NAME_QNAME);
 		MessageElement[] propertyValue = idpNameProperty.get_any();
 		if (propertyValue != null) {
 			String idpName = propertyValue[0].getValue();
@@ -282,92 +317,107 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	}
 
 	/*
-	 * During replica creation we do not have enough information to perform port-type specific post
-	 * processing of resources. The problem is calling postCreate methods without necessary
-	 * properties throws exceptions. So this method is used by subclasses as an indicator that post
-	 * processing through postCreate method should be avoided.
+	 * During replica creation we do not have enough information to perform
+	 * port-type specific post processing of resources. The problem is calling
+	 * postCreate methods without necessary properties throws exceptions. So
+	 * this method is used by subclasses as an indicator that post processing
+	 * through postCreate method should be avoided.
 	 */
-	protected boolean skipPortTypeSpecificPostProcessing(GenesisHashMap constructionParameters)
-	{
+	protected boolean skipPortTypeSpecificPostProcessing(
+			GenesisHashMap constructionParameters) {
 
-		EndpointReferenceType primaryEPR =
-			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
-		MessageElement isReplica =
-			constructionParameters.getAxisMessageElement(STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM);
-		boolean skipPostCreateOverride =
-			primaryEPR != null || (isReplica != null && "TRUE".equalsIgnoreCase(isReplica.getValue()));
+		EndpointReferenceType primaryEPR = (EndpointReferenceType) constructionParameters
+				.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		MessageElement isReplica = constructionParameters
+				.getAxisMessageElement(STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM);
+		boolean skipPostCreateOverride = primaryEPR != null
+				|| (isReplica != null && "TRUE".equalsIgnoreCase(isReplica
+						.getValue()));
 		return skipPostCreateOverride;
 	}
 
 	/*
-	 * Note that the Unlink flag is used to indicate that the invoker is removing a replica from the
-	 * container and the removal should have no cascading effect. On the other hand, destroy means
-	 * all replicas, including the primary copy, should be removed from the GFFS name-space.
+	 * Note that the Unlink flag is used to indicate that the invoker is
+	 * removing a replica from the container and the removal should have no
+	 * cascading effect. On the other hand, destroy means all replicas,
+	 * including the primary copy, should be removed from the GFFS name-space.
 	 */
-	protected void preDestroy(IRNSResource resource) throws RemoteException, ResourceException
-	{
+	protected void preDestroy(IRNSResource resource) throws RemoteException,
+			ResourceException {
 		DestroyFlags flags = VersionedResourceUtils.preDestroy(resource);
 		if (flags != null) {
 			TopicSet space = TopicSet.forPublisher(getClass());
-			PublisherTopic topic = space.createPublisherTopic(RNS_OPERATION_TOPIC);
-			EndpointReferenceType myEPR =
-				(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
-			RNSOperations operation = (flags.isUnlinked ? RNSOperations.Unlink : RNSOperations.Destroy);
-			topic.publish(new RNSOperationContents(operation, ".", myEPR, flags.vvr));
+			PublisherTopic topic = space
+					.createPublisherTopic(RNS_OPERATION_TOPIC);
+			EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext
+					.getCurrentWorkingContext().getProperty(
+							WorkingContext.EPR_PROPERTY_NAME);
+			RNSOperations operation = (flags.isUnlinked ? RNSOperations.Unlink
+					: RNSOperations.Destroy);
+			topic.publish(new RNSOperationContents(operation, ".", myEPR,
+					flags.vvr));
 		}
 	}
 
 	/*
-	 * IDP resources have their own public and private keys. This is a deviation from the standard
-	 * protocol used in Genesis-II that assigns resources certificates but no key pairs. Here we
-	 * have to override the default behavior because to make a replicated IDP resource a valid
-	 * working copy of the primary, we need to replicate the keys from the primary. Otherwise the
-	 * signatures created from different replicas would be different. If individual IDP resources
-	 * did not have their own key pairs, the containers participating in a replication scheme had to
-	 * share the same private-public keys.
+	 * IDP resources have their own public and private keys. This is a deviation
+	 * from the standard protocol used in Genesis-II that assigns resources
+	 * certificates but no key pairs. Here we have to override the default
+	 * behavior because to make a replicated IDP resource a valid working copy
+	 * of the primary, we need to replicate the keys from the primary. Otherwise
+	 * the signatures created from different replicas would be different. If
+	 * individual IDP resources did not have their own key pairs, the containers
+	 * participating in a replication scheme had to share the same
+	 * private-public keys.
 	 */
 	@Override
-	protected CertCreationSpec getChildCertSpec() throws ResourceException, ResourceUnknownFaultType
-	{
+	protected CertCreationSpec getChildCertSpec() throws ResourceException,
+			ResourceUnknownFaultType {
 		try {
-			KeyPair subjectKeypair = CertTool.generateKeyPair(SecurityConstants.IDP_RESOURCE_KEY_LENGTH);
-			X509Certificate[] issuerCertificateChain = Container.getContainerCertChain();
+			KeyPair subjectKeypair = CertTool
+					.generateKeyPair(SecurityConstants.IDP_RESOURCE_KEY_LENGTH);
+			X509Certificate[] issuerCertificateChain = Container
+					.getContainerCertChain();
 			PrivateKey issuerPrivateKey = Container.getContainerPrivateKey();
-			return new STSCertificationSpec(subjectKeypair, issuerCertificateChain, issuerPrivateKey,
-				getServiceCertificateLifetime());
+			return new STSCertificationSpec(subjectKeypair,
+					issuerCertificateChain, issuerPrivateKey,
+					getServiceCertificateLifetime());
 		} catch (GeneralSecurityException e) {
-			throw new ResourceException("could not generate certificate for IDP resource", e);
+			throw new ResourceException(
+					"could not generate certificate for IDP resource", e);
 		}
 	}
 
 	@Override
-	public ResourceSyncRunner getClassResourceSyncRunner()
-	{
+	public ResourceSyncRunner getClassResourceSyncRunner() {
 		return new ReplicaSynchronizer(getResourcePropertyRetriver());
 	}
 
 	@Override
-	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
-	{
+	protected void setAttributeHandlers() throws NoSuchMethodException,
+			ResourceException, ResourceUnknownFaultType {
 		super.setAttributeHandlers();
 		new CommonSTSAttributesHandler(getAttributePackage());
 		new VersionedResourceAttributeHandlers(getAttributePackage());
 	}
 
 	/*
-	 * This override is pivotal for ensuring proper behavior. A IDP resource has several properties
-	 * that are either confidential or bulky. This properties are returned only when being asked for
-	 * explicitly or after a strict authentication checking. However the process for retrieving
-	 * resource property document is quite generic and intricately coupled with individual resource
-	 * property retrieval process. Hence we added this override to remove the sensitive properties
-	 * from a get resource property document response.
+	 * This override is pivotal for ensuring proper behavior. A IDP resource has
+	 * several properties that are either confidential or bulky. This properties
+	 * are returned only when being asked for explicitly or after a strict
+	 * authentication checking. However the process for retrieving resource
+	 * property document is quite generic and intricately coupled with
+	 * individual resource property retrieval process. Hence we added this
+	 * override to remove the sensitive properties from a get resource property
+	 * document response.
 	 */
 	@Override
-	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(GetResourcePropertyDocument request)
-		throws RemoteException, ResourceUnknownFaultType, ResourceUnavailableFaultType
-	{
+	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(
+			GetResourcePropertyDocument request) throws RemoteException,
+			ResourceUnknownFaultType, ResourceUnavailableFaultType {
 
-		GetResourcePropertyDocumentResponse originalResponse = super.getResourcePropertyDocument(request);
+		GetResourcePropertyDocumentResponse originalResponse = super
+				.getResourcePropertyDocument(request);
 		MessageElement[] properties = originalResponse.get_any();
 		if (properties == null)
 			return originalResponse;
@@ -379,15 +429,18 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				filteredPropertyList.add(property);
 			}
 		}
-		return new GetResourcePropertyDocumentResponse(filteredPropertyList.toArray(new MessageElement[filteredPropertyList.size()]));
+		return new GetResourcePropertyDocumentResponse(
+				filteredPropertyList
+						.toArray(new MessageElement[filteredPropertyList.size()]));
 	}
 
-	public static class CommonSTSPropertiesRetriever implements STSResourcePropertiesRetriever
-	{
+	public static class CommonSTSPropertiesRetriever implements
+			STSResourcePropertiesRetriever {
 
 		@Override
-		public void retrieveAndStoreResourceProperties(GeniiCommon proxyToPrimary, IRNSResource resource) throws Exception
-		{
+		public void retrieveAndStoreResourceProperties(
+				GeniiCommon proxyToPrimary, IRNSResource resource)
+				throws Exception {
 
 			QName[] propertyNames = new QName[5];
 			propertyNames[0] = SecurityConstants.NEW_IDP_NAME_QNAME;
@@ -395,18 +448,22 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			propertyNames[2] = SecurityConstants.IDP_STORED_CREDENTIAL_QNAME;
 			propertyNames[3] = SecurityConstants.CERTIFICATE_CHAIN_QNAME;
 			propertyNames[4] = SecurityConstants.IDP_PRIVATE_KEY_QNAME;
-			GetMultipleResourcePropertiesResponse response = proxyToPrimary.getMultipleResourceProperties(propertyNames);
+			GetMultipleResourcePropertiesResponse response = proxyToPrimary
+					.getMultipleResourceProperties(propertyNames);
 
 			MessageElement[] propertyValues = response.get_any();
-			if (propertyValues == null || propertyValues.length < propertyNames.length) {
-				throw new RemoteException("Could not retrieve all necessary resource properties");
+			if (propertyValues == null
+					|| propertyValues.length < propertyNames.length) {
+				throw new RemoteException(
+						"Could not retrieve all necessary resource properties");
 			}
 
 			for (MessageElement element : propertyValues) {
 				try {
 					storeProperty(resource, element);
 				} catch (Exception ex) {
-					_logger.info("failed to store property: " + element.getQName());
+					_logger.info("failed to store property: "
+							+ element.getQName());
 					throw ex;
 				}
 			}
@@ -414,86 +471,110 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			postProcessStoredCallingContext(resource);
 		}
 
-		private void storeProperty(IRNSResource resource, MessageElement property) throws Exception
-		{
+		private void storeProperty(IRNSResource resource,
+				MessageElement property) throws Exception {
 
 			QName propertyName = property.getQName();
 
 			if (SecurityConstants.NEW_IDP_NAME_QNAME.equals(propertyName)) {
-				resource.setProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart(), property.getValue());
+				resource.setProperty(
+						SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart(),
+						property.getValue());
 
-			} else if (SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.equals(propertyName)) {
-				NuCredential delegatedCredential =
-					(NuCredential) CommonSTSAttributesHandler.deserializeObjectFromString(property.getValue());
+			} else if (SecurityConstants.IDP_STORED_CREDENTIAL_QNAME
+					.equals(propertyName)) {
+				NuCredential delegatedCredential = (NuCredential) CommonSTSAttributesHandler
+						.deserializeObjectFromString(property.getValue());
 				if (delegatedCredential == null)
 					_logger.info("Missing delegated credential");
-				resource.setProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(), delegatedCredential);
+				resource.setProperty(
+						SecurityConstants.IDP_STORED_CREDENTIAL_QNAME
+								.getLocalPart(), delegatedCredential);
 
-			} else if (SecurityConstants.STORED_CALLING_CONTEXT_QNAME.equals(propertyName)) {
-				ContextType serializedContextInfo = (ContextType) property.getObjectValue(ContextType.class);
+			} else if (SecurityConstants.STORED_CALLING_CONTEXT_QNAME
+					.equals(propertyName)) {
+				ContextType serializedContextInfo = (ContextType) property
+						.getObjectValue(ContextType.class);
 				if (serializedContextInfo == null)
 					_logger.info("Missing stored calling context");
-				ICallingContext storedContext = new CallingContextImpl(serializedContextInfo);
-				resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, storedContext);
+				ICallingContext storedContext = new CallingContextImpl(
+						serializedContextInfo);
+				resource.setProperty(
+						IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME,
+						storedContext);
 
-			} else if (SecurityConstants.CERTIFICATE_CHAIN_QNAME.equals(propertyName)) {
-				X509Certificate[] certificate =
-					(X509Certificate[]) CommonSTSAttributesHandler.deserializeObjectFromString(property.getValue());
+			} else if (SecurityConstants.CERTIFICATE_CHAIN_QNAME
+					.equals(propertyName)) {
+				X509Certificate[] certificate = (X509Certificate[]) CommonSTSAttributesHandler
+						.deserializeObjectFromString(property.getValue());
 				if (certificate == null)
 					_logger.info("Missing resource certificate");
-				resource.setProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME, certificate);
+				resource.setProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME,
+						certificate);
 
-			} else if (SecurityConstants.IDP_PRIVATE_KEY_QNAME.equals(propertyName)) {
-				PrivateKey privateKey =
-					(PrivateKey) CommonSTSAttributesHandler.deserializeObjectFromString(property.getValue());
+			} else if (SecurityConstants.IDP_PRIVATE_KEY_QNAME
+					.equals(propertyName)) {
+				PrivateKey privateKey = (PrivateKey) CommonSTSAttributesHandler
+						.deserializeObjectFromString(property.getValue());
 				if (privateKey == null)
 					_logger.info("Missing private key");
-				resource.setProperty(IResource.PRIVATE_KEY_PROPERTY_NAME, privateKey);
+				resource.setProperty(IResource.PRIVATE_KEY_PROPERTY_NAME,
+						privateKey);
 			}
 		}
 
 		/*
-		 * Note that it is necessary to augment the retrieved certificate and delegated credentials
-		 * to the stored calling context for the proper functioning of any IDP resource. This is
-		 * because IDP resources make out-calls to other IDP resources nested in them. If the
-		 * stored-calling-context does not have all the necessary authentication information those
-		 * calls may fail.
+		 * Note that it is necessary to augment the retrieved certificate and
+		 * delegated credentials to the stored calling context for the proper
+		 * functioning of any IDP resource. This is because IDP resources make
+		 * out-calls to other IDP resources nested in them. If the
+		 * stored-calling-context does not have all the necessary authentication
+		 * information those calls may fail.
 		 */
-		private void postProcessStoredCallingContext(IRNSResource resource) throws ResourceException, GeneralSecurityException
-		{
+		private void postProcessStoredCallingContext(IRNSResource resource)
+				throws ResourceException, GeneralSecurityException {
 
 			// update key and certificate materials
-			ICallingContext storedContext =
-				(ICallingContext) resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
-			PrivateKey privateKey = (PrivateKey) resource.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
-			X509Certificate[] certificate = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-			storedContext.setActiveKeyAndCertMaterial(new KeyAndCertMaterial(certificate, privateKey));
+			ICallingContext storedContext = (ICallingContext) resource
+					.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+			PrivateKey privateKey = (PrivateKey) resource
+					.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
+			X509Certificate[] certificate = (X509Certificate[]) resource
+					.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+			storedContext.setActiveKeyAndCertMaterial(new KeyAndCertMaterial(
+					certificate, privateKey));
 
 			// update transient credentials list
-			NuCredential delegatedCredential =
-				(NuCredential) resource.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart());
-			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(storedContext);
+			NuCredential delegatedCredential = (NuCredential) resource
+					.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME
+							.getLocalPart());
+			TransientCredentials transientCredentials = TransientCredentials
+					.getTransientCredentials(storedContext);
 			transientCredentials.add(delegatedCredential);
-			resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, storedContext);
+			resource.setProperty(
+					IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME,
+					storedContext);
 		}
 	}
 
 	/*
-	 * The resource properties of a IDP resource pretty much dictate its behavior. For example; for
-	 * a Kerberos port-type instance; its realm, kdc, and user attributes defines the mechanism for
-	 * kerberos authentication. Therefore, to create a working replica of an IDP resource, the
-	 * system has to copy relevant properties from the primary resource instance. As we don't know
-	 * the specifics of individual IDP port-types, subclasses should implement this method to
-	 * register an appropriate property retriever class that would be used during replication.
+	 * The resource properties of a IDP resource pretty much dictate its
+	 * behavior. For example; for a Kerberos port-type instance; its realm, kdc,
+	 * and user attributes defines the mechanism for kerberos authentication.
+	 * Therefore, to create a working replica of an IDP resource, the system has
+	 * to copy relevant properties from the primary resource instance. As we
+	 * don't know the specifics of individual IDP port-types, subclasses should
+	 * implement this method to register an appropriate property retriever class
+	 * that would be used during replication.
 	 */
 	public abstract STSResourcePropertiesRetriever getResourcePropertyRetriver();
 
 	/*
-	 * Subclasses should override this method to include any additional properties that they do not
-	 * want to be visible in a get resource property document response.
+	 * Subclasses should override this method to include any additional
+	 * properties that they do not want to be visible in a get resource property
+	 * document response.
 	 */
-	public Set<QName> getSensitivePropertyNames()
-	{
+	public Set<QName> getSensitivePropertyNames() {
 		Set<QName> propertyNames = new HashSet<QName>();
 		propertyNames.add(SecurityConstants.NEW_IDP_NAME_QNAME);
 		propertyNames.add(SecurityConstants.IDP_PRIVATE_KEY_QNAME);
@@ -505,9 +586,9 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 
 	/********************************** RNS Operations ***********************************************/
 
-	protected RNSEntryResponseType[] addRNSEntries(RNSEntryType[] addRequest, IRNSResource resource) throws RemoteException,
-		RNSEntryExistsFaultType, ResourceUnknownFaultType
-	{
+	protected RNSEntryResponseType[] addRNSEntries(RNSEntryType[] addRequest,
+			IRNSResource resource) throws RemoteException,
+			RNSEntryExistsFaultType, ResourceUnknownFaultType {
 
 		if (addRequest == null || addRequest.length == 0)
 			addRequest = new RNSEntryType[] { null };
@@ -517,21 +598,32 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			try {
 				response[index] = addAnEntry(addRequest[index], resource);
 			} catch (BaseFaultType fault) {
-				response[index] = new RNSEntryResponseType(null, null, fault, addRequest[index].getEntryName());
+				response[index] = new RNSEntryResponseType(null, null, fault,
+						addRequest[index].getEntryName());
 			} catch (Throwable cause) {
 				_logger.error("failure during add request", cause);
-				response[index] =
-					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: "
-							+ cause.getMessage()) }, null)), addRequest[index].getEntryName());
+				response[index] = new RNSEntryResponseType(
+						null,
+						null,
+						FaultManipulator
+								.fillInFault(new BaseFaultType(
+										null,
+										null,
+										null,
+										null,
+										new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+												"Unable to add entry: "
+														+ cause.getMessage()) },
+										null)),
+						addRequest[index].getEntryName());
 			}
 		}
 		return response;
 	}
 
-	protected LookupResponseType lookup(String[] lookupRequest, IRNSResource resource) throws RemoteException,
-		ResourceUnknownFaultType
-	{
+	protected LookupResponseType lookup(String[] lookupRequest,
+			IRNSResource resource) throws RemoteException,
+			ResourceUnknownFaultType {
 
 		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
 
@@ -544,39 +636,46 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 
 		Collection<RNSEntryResponseType> response = new LinkedList<RNSEntryResponseType>();
 		for (InternalEntry entry : entries) {
-			response.add(new RNSEntryResponseType(entry.getEntryReference(), RNSUtilities.createMetadata(
-				entry.getEntryReference(), entry.getAttributes()), null, entry.getName()));
+			response.add(new RNSEntryResponseType(entry.getEntryReference(),
+					RNSUtilities.createMetadata(entry.getEntryReference(),
+							entry.getAttributes()), null, entry.getName()));
 		}
 
-		return RNSContainerUtilities.translate(response, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()));
+		return RNSContainerUtilities
+				.translate(response, iteratorBuilder(RNSEntryResponseType
+						.getTypeDesc().getXmlType()));
 	}
 
-	protected RNSEntryResponseType[] remove(String[] removeRequest, IRNSResource resource) throws RemoteException,
-		WriteNotPermittedFaultType
-	{
+	protected RNSEntryResponseType[] remove(String[] removeRequest,
+			IRNSResource resource) throws RemoteException,
+			WriteNotPermittedFaultType {
 
 		RNSEntryResponseType[] response = new RNSEntryResponseType[removeRequest.length];
 		List<String> removedEntryNames = new ArrayList<String>();
 		for (int index = 0; index < removeRequest.length; index++) {
 			String entryName = removeRequest[index];
 			resource.removeEntries(entryName);
-			response[index] = new RNSEntryResponseType(null, null, null, entryName);
+			response[index] = new RNSEntryResponseType(null, null, null,
+					entryName);
 			removedEntryNames.add(entryName);
 		}
-		VersionVector versionVector = VersionedResourceUtils.incrementResourceVersion(resource);
+		VersionVector versionVector = VersionedResourceUtils
+				.incrementResourceVersion(resource);
 		resource.commit();
 
 		for (String entryName : removedEntryNames) {
 			TopicSet space = TopicSet.forPublisher(getClass());
-			PublisherTopic topic = space.createPublisherTopic(RNS_OPERATION_TOPIC);
-			topic.publish(new RNSOperationContents(RNSOperations.Remove, entryName, null, versionVector));
+			PublisherTopic topic = space
+					.createPublisherTopic(RNS_OPERATION_TOPIC);
+			topic.publish(new RNSOperationContents(RNSOperations.Remove,
+					entryName, null, versionVector));
 		}
 		return response;
 	}
 
-	private RNSEntryResponseType addAnEntry(RNSEntryType addRequest, IRNSResource resource) throws RemoteException,
-		ResourceException, RNSEntryExistsFaultType
-	{
+	private RNSEntryResponseType addAnEntry(RNSEntryType addRequest,
+			IRNSResource resource) throws RemoteException, ResourceException,
+			RNSEntryExistsFaultType {
 
 		EndpointReferenceType entryReference;
 
@@ -599,12 +698,14 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			throw new RemoteException("Cannot add entries to this service.");
 
 		resource.addEntry(new InternalEntry(name, entryReference, attrs));
-		VersionVector versionVector = VersionedResourceUtils.incrementResourceVersion(resource);
+		VersionVector versionVector = VersionedResourceUtils
+				.incrementResourceVersion(resource);
 		resource.commit();
 
 		TopicSet space = TopicSet.forPublisher(getClass());
 		PublisherTopic topic = space.createPublisherTopic(RNS_OPERATION_TOPIC);
-		topic.publish(new RNSOperationContents(RNSOperations.Add, name, entryReference, versionVector));
+		topic.publish(new RNSOperationContents(RNSOperations.Add, name,
+				entryReference, versionVector));
 
 		return new RNSEntryResponseType(entryReference, mdt, null, name);
 	}
@@ -612,38 +713,42 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	/******************************** Notification Handling ****************************************/
 
 	/*
-	 * Synchronization of replicas is done through asynchronous notifications. There are two kind of
-	 * updates that may occur in a IDP resource: add/remove of descendant entries and changes in
-	 * access control. We have two different notification handlers to deal with these two different
-	 * kind of updates.
+	 * Synchronization of replicas is done through asynchronous notifications.
+	 * There are two kind of updates that may occur in a IDP resource:
+	 * add/remove of descendant entries and changes in access control. We have
+	 * two different notification handlers to deal with these two different kind
+	 * of updates.
 	 */
 	@Override
-	protected void registerNotificationHandlers(NotificationMultiplexer multiplexer)
-	{
+	protected void registerNotificationHandlers(
+			NotificationMultiplexer multiplexer) {
 		super.registerNotificationHandlers(multiplexer);
-		multiplexer.registerNotificationHandler(RNSTopics.RNS_OPERATION_TOPIC.asConcreteQueryExpression(),
-			new RNSOperationNotificationHandler());
-		multiplexer.registerNotificationHandler(AclTopics.GENII_ACL_CHANGE_TOPIC.asConcreteQueryExpression(),
-			new AclChangeNotificationHandler());
+		multiplexer.registerNotificationHandler(
+				RNSTopics.RNS_OPERATION_TOPIC.asConcreteQueryExpression(),
+				new RNSOperationNotificationHandler());
+		multiplexer.registerNotificationHandler(
+				AclTopics.GENII_ACL_CHANGE_TOPIC.asConcreteQueryExpression(),
+				new AclChangeNotificationHandler());
 	}
 
-	private class RNSOperationNotificationHandler extends AbstractNotificationHandler<RNSOperationContents>
-	{
+	private class RNSOperationNotificationHandler extends
+			AbstractNotificationHandler<RNSOperationContents> {
 
-		public RNSOperationNotificationHandler()
-		{
+		public RNSOperationNotificationHandler() {
 			super(RNSOperationContents.class);
 		}
 
 		/*
-		 * This handler method is nearly an identical copy of the notification handler that works
-		 * for Enhanced-RNS resources. We have to make few changes regarding how some attributes are
-		 * retrieved due to the difference in IDP and Enhanced-RNS port-types' implementations.
+		 * This handler method is nearly an identical copy of the notification
+		 * handler that works for Enhanced-RNS resources. We have to make few
+		 * changes regarding how some attributes are retrieved due to the
+		 * difference in IDP and Enhanced-RNS port-types' implementations.
 		 */
 		@Override
-		public String handleNotification(TopicPath topicPath, EndpointReferenceType producerReference,
-			EndpointReferenceType subscriptionReference, RNSOperationContents contents) throws Exception
-		{
+		public String handleNotification(TopicPath topicPath,
+				EndpointReferenceType producerReference,
+				EndpointReferenceType subscriptionReference,
+				RNSOperationContents contents) throws Exception {
 
 			_logger.info("processing an IDP update notification for replica synchronization");
 			RNSOperations operation = contents.operation();
@@ -651,28 +756,34 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			EndpointReferenceType entryReference = contents.entryReference();
 
 			if ((operation == null)
-				|| !((operation.equals(RNSOperations.Add) && entryName != null && entryReference != null)
-					|| (operation.equals(RNSOperations.Remove) && entryName != null) || operation.equals(RNSOperations.Destroy) || operation
-						.equals(RNSOperations.Unlink))) {
+					|| !((operation.equals(RNSOperations.Add)
+							&& entryName != null && entryReference != null)
+							|| (operation.equals(RNSOperations.Remove) && entryName != null)
+							|| operation.equals(RNSOperations.Destroy) || operation
+								.equals(RNSOperations.Unlink))) {
 
 				_logger.info("invalid notification message");
 				return NotificationConstants.FAIL;
 			}
 
-			// retrieve the resource and associated lock to do necessary modification
+			// retrieve the resource and associated lock to do necessary
+			// modification
 			ResourceKey resourceKey = ResourceManager.getCurrentResource();
 			IRNSResource resource = (IRNSResource) resourceKey.dereference();
 			ResourceLock resourceLock = resourceKey.getResourceLock();
 
 			/*
-			 * An RNS notification indicates some update in the IDPS linked under the current
-			 * resource that is made by some replica. To keep replicas in sync, the same operation
-			 * should be replayed in receiver of this notification. Here, however, we have to ensure
-			 * that the notification is due to some valid operation, not due to some impostor attack
-			 * in the system. The current way of ensuring that is to validate the authentication
-			 * information that accompany the notification. The notification contains the identity
-			 * of the user who modified the resource. The identity is delegated to the resource that
-			 * sent the notification. Finally, the notification is signed by the resource.
+			 * An RNS notification indicates some update in the IDPS linked
+			 * under the current resource that is made by some replica. To keep
+			 * replicas in sync, the same operation should be replayed in
+			 * receiver of this notification. Here, however, we have to ensure
+			 * that the notification is due to some valid operation, not due to
+			 * some impostor attack in the system. The current way of ensuring
+			 * that is to validate the authentication information that accompany
+			 * the notification. The notification contains the identity of the
+			 * user who modified the resource. The identity is delegated to the
+			 * resource that sent the notification. Finally, the notification is
+			 * signed by the resource.
 			 */
 			if (!ServerWSDoAllReceiver.checkAccess(resource, RWXCategory.WRITE)) {
 				_logger.info("Permission denied while trying to process an RNS notification from a IDP.");
@@ -685,20 +796,26 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				// secure a lock on the resource before doing any modification
 				resourceLock.lock();
 
-				// destroy this replica if the notification indicate a destroy operation is been
+				// destroy this replica if the notification indicate a destroy
+				// operation is been
 				// invoked
 				// to some other replica.
 				if (operation.equals(RNSOperations.Destroy)) {
-					resource.setProperty(SyncProperty.IS_DESTROYED_PROP_NAME, "true");
+					resource.setProperty(SyncProperty.IS_DESTROYED_PROP_NAME,
+							"true");
 					destroy(new Destroy());
 					return NotificationConstants.OK;
 				}
 
 				VersionVector remoteVector = contents.versionVector();
-				VersionVector localVector = (VersionVector) resource.getProperty(SyncProperty.VERSION_VECTOR_PROP_NAME);
-				MessageFlags flags = VersionedResourceUtils.validateNotification(resource, localVector, remoteVector);
+				VersionVector localVector = (VersionVector) resource
+						.getProperty(SyncProperty.VERSION_VECTOR_PROP_NAME);
+				MessageFlags flags = VersionedResourceUtils
+						.validateNotification(resource, localVector,
+								remoteVector);
 
-				// a non-null flag status indicates the modification suggested by the notification
+				// a non-null flag status indicates the modification suggested
+				// by the notification
 				// cannot
 				// applied ever or at the present moment
 				if (flags.status != null)
@@ -706,44 +823,58 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 
 				if (operation.equals(RNSOperations.Add)) {
 
-					// if the added resource is not a IDP then the current notification is invalid
+					// if the added resource is not a IDP then the current
+					// notification is invalid
 					TypeInformation type = new TypeInformation(entryReference);
 					if (!type.isIDP())
 						return NotificationConstants.FAIL;
 
-					// get a new entry-name if there is a name conflict between the local and remote
+					// get a new entry-name if there is a name conflict between
+					// the local and remote
 					// replicas
-					entryName = processAddEntryName(entryName, flags.replay, resource);
+					entryName = processAddEntryName(entryName, flags.replay,
+							resource);
 
 					/*
-					 * Note that even if the local replica update fails we do not reply with a FAIL
-					 * message. This is because if a failure occurs, the local replica can still
-					 * behave like the remote replica as long as it hold a reference of the EPR that
-					 * points to the resource lying in the another container. The two replicas,
-					 * however, are ideologically out-of-sync then. We keep this behavior to emulate
-					 * Enhanced-RNS's replication logic. If it turns out to be undesirable, then
-					 * return a notification failure from the catch block.
+					 * Note that even if the local replica update fails we do
+					 * not reply with a FAIL message. This is because if a
+					 * failure occurs, the local replica can still behave like
+					 * the remote replica as long as it hold a reference of the
+					 * EPR that points to the resource lying in the another
+					 * container. The two replicas, however, are ideologically
+					 * out-of-sync then. We keep this behavior to emulate
+					 * Enhanced-RNS's replication logic. If it turns out to be
+					 * undesirable, then return a notification failure from the
+					 * catch block.
 					 */
 					try {
-						item = AutoReplicate.autoReplicate(resource, entryReference);
+						item = AutoReplicate.autoReplicate(resource,
+								entryReference);
 					} catch (Exception exception) {
-						_logger.warn("failed to create a local IDP replica", exception);
+						_logger.warn("failed to create a local IDP replica",
+								exception);
 					}
-					InternalEntry entry = new InternalEntry(entryName, (item != null ? item.localEPR : entryReference), null);
+					InternalEntry entry = new InternalEntry(entryName,
+							(item != null ? item.localEPR : entryReference),
+							null);
 					resource.addEntry(entry);
 
 				} else if (operation.equals(RNSOperations.Remove)) {
 					resource.removeEntries(entryName);
 				} else if (operation.equals(RNSOperations.Unlink)) {
-					// remote replica stop participating in the replication scheme; so stop sending
+					// remote replica stop participating in the replication
+					// scheme; so stop sending
 					// it notifications
 					// for future updates
-					VersionedResourceUtils.destroySubscription(resource, producerReference);
+					VersionedResourceUtils.destroySubscription(resource,
+							producerReference);
 					return NotificationConstants.OK;
 				}
 
-				// update the version vector once all desired modifications are done
-				VersionedResourceUtils.updateVersionVector(resource, localVector, remoteVector);
+				// update the version vector once all desired modifications are
+				// done
+				VersionedResourceUtils.updateVersionVector(resource,
+						localVector, remoteVector);
 
 				replay = flags.replay;
 
@@ -752,34 +883,39 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			}
 
 			/*
-			 * A non-null synchronizer (runner) indicates an add entry operations and a requirement
-			 * for further synchronization of the added entry. So we start an asynchronous
-			 * replication thread to do any remaining operations.
+			 * A non-null synchronizer (runner) indicates an add entry
+			 * operations and a requirement for further synchronization of the
+			 * added entry. So we start an asynchronous replication thread to do
+			 * any remaining operations.
 			 */
 			if (item != null && item.runner != null) {
-				ReplicationThread thread = new ReplicationThread(WorkingContext.getCurrentWorkingContext());
+				ReplicationThread thread = new ReplicationThread(
+						WorkingContext.getCurrentWorkingContext());
 				thread.add(item);
 				thread.start();
 			}
 
 			/*
-			 * A replay flag indicates that the local copy has some updates that are not present in
-			 * the remote copy that sent the notification message. Hence, the local copy is
-			 * replaying its status to allow any out-of-sync remote copy to catch up.
+			 * A replay flag indicates that the local copy has some updates that
+			 * are not present in the remote copy that sent the notification
+			 * message. Hence, the local copy is replaying its status to allow
+			 * any out-of-sync remote copy to catch up.
 			 */
 			if (replay) {
-				VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(resource);
+				VersionVector vvr = VersionedResourceUtils
+						.incrementResourceVersion(resource);
 				_logger.debug("replaying notification message");
 				TopicSet space = TopicSet.forPublisher(getClass());
 				PublisherTopic topic = space.createPublisherTopic(topicPath);
-				topic.publish(new RNSOperationContents(operation, entryName, entryReference, vvr));
+				topic.publish(new RNSOperationContents(operation, entryName,
+						entryReference, vvr));
 			}
 
 			return NotificationConstants.OK;
 		}
 
-		private String processAddEntryName(String entryName, boolean replay, IRNSResource resource) throws ResourceException
-		{
+		private String processAddEntryName(String entryName, boolean replay,
+				IRNSResource resource) throws ResourceException {
 
 			Collection<String> conflicts = resource.listEntries(entryName);
 			if (conflicts.size() == 0)

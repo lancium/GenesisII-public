@@ -22,43 +22,43 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 
-public class ClientContextResolver implements IContextResolver
-{
+public class ClientContextResolver implements IContextResolver {
 	static private Log _logger = LogFactory.getLog(ClientContextResolver.class);
 
 	static final public String USER_CONTEXT_FILENAME = "user-context.xml";
 	static final public String USER_TRANSIENT_FILENAME = "user-transient.dat";
 	static final public String COMBINED_FILENAME = "user-combined.xml";
 
-	public File getContextFile() throws IOException
-	{
-		return new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(), USER_CONTEXT_FILENAME);
+	public File getContextFile() throws IOException {
+		return new File(ConfigurationManager.getCurrentConfiguration()
+				.getUserDirectory(), USER_CONTEXT_FILENAME);
 	}
 
-	public File getContextTransientFile() throws IOException
-	{
-		return new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(), USER_TRANSIENT_FILENAME);
+	public File getContextTransientFile() throws IOException {
+		return new File(ConfigurationManager.getCurrentConfiguration()
+				.getUserDirectory(), USER_TRANSIENT_FILENAME);
 	}
 
-	public File getCombinedFile() throws IOException
-	{
-		return new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(), COMBINED_FILENAME);
+	public File getCombinedFile() throws IOException {
+		return new File(ConfigurationManager.getCurrentConfiguration()
+				.getUserDirectory(), COMBINED_FILENAME);
 	}
 
 	@Override
-	public ICallingContext load() throws FileNotFoundException, IOException
-	{
+	public ICallingContext load() throws FileNotFoundException, IOException {
 		if (_logger.isTraceEnabled())
 			_logger.trace("<into calling context load>");
 		File contextFile = getContextFile();
 		ICallingContext toReturn = null;
-		if (contextFile == null || !contextFile.exists() || contextFile.length() == 0) {
+		if (contextFile == null || !contextFile.exists()
+				|| contextFile.length() == 0) {
 			File combinedFile = getCombinedFile();
 			if (combinedFile == null || combinedFile.length() == 0)
 				return null;
 			toReturn = ContextFileSystem.load(combinedFile);
 		} else {
-			toReturn = ContextFileSystem.load(contextFile, getContextTransientFile());
+			toReturn = ContextFileSystem.load(contextFile,
+					getContextTransientFile());
 		}
 		if (_logger.isTraceEnabled())
 			_logger.trace(">out of calling context load<");
@@ -66,14 +66,14 @@ public class ClientContextResolver implements IContextResolver
 	}
 
 	@Override
-	public void store(ICallingContext ctxt) throws FileNotFoundException, IOException
-	{
-		ContextFileSystem.store(getContextFile(), getContextTransientFile(), ctxt);
+	public void store(ICallingContext ctxt) throws FileNotFoundException,
+			IOException {
+		ContextFileSystem.store(getContextFile(), getContextTransientFile(),
+				ctxt);
 	}
 
 	@Override
-	public Object clone()
-	{
+	public Object clone() {
 		return new ClientContextResolver();
 	}
 }

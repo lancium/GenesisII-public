@@ -3,21 +3,21 @@ package org.morgan.inject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-abstract class InjectionPoint
-{
+abstract class InjectionPoint {
 	protected MInject _injectionInformation;
 
-	protected InjectionPoint(MInject injectionInformation)
-	{
+	protected InjectionPoint(MInject injectionInformation) {
 		if (injectionInformation == null)
-			throw new IllegalArgumentException("Injection information cannot be null.");
+			throw new IllegalArgumentException(
+					"Injection information cannot be null.");
 
 		_injectionInformation = injectionInformation;
 	}
 
-	protected MInjectFactory getInjectFactory(MInjectResolver resolver) throws InjectionException
-	{
-		Class<? extends MInjectFactory> factoryOverrideType = _injectionInformation.injectionFactory();
+	protected MInjectFactory getInjectFactory(MInjectResolver resolver)
+			throws InjectionException {
+		Class<? extends MInjectFactory> factoryOverrideType = _injectionInformation
+				.injectionFactory();
 
 		if (factoryOverrideType == MInjectFactory.class)
 			return resolver;
@@ -25,13 +25,15 @@ abstract class InjectionPoint
 		Constructor<? extends MInjectFactory> factoryOverrideConstructor = null;
 
 		try {
-			factoryOverrideConstructor = factoryOverrideType.getDeclaredConstructor();
+			factoryOverrideConstructor = factoryOverrideType
+					.getDeclaredConstructor();
 
 			synchronized (factoryOverrideConstructor) {
 				try {
 					factoryOverrideConstructor.setAccessible(true);
 
-					MInjectFactory factoryOverride = factoryOverrideConstructor.newInstance();
+					MInjectFactory factoryOverride = factoryOverrideConstructor
+							.newInstance();
 					MInjector injector = new MInjector(resolver);
 					injector.inject(factoryOverride);
 					return factoryOverride;
@@ -58,10 +60,12 @@ abstract class InjectionPoint
 		}
 	}
 
-	protected Object doResolve(MInjectResolver resolver, Class<?> targetType) throws InjectionException
-	{
-		return getInjectFactory(resolver).resolve(_injectionInformation, targetType);
+	protected Object doResolve(MInjectResolver resolver, Class<?> targetType)
+			throws InjectionException {
+		return getInjectFactory(resolver).resolve(_injectionInformation,
+				targetType);
 	}
 
-	abstract void inject(Object target, MInjectResolver resolver) throws InjectionException;
+	abstract void inject(Object target, MInjectResolver resolver)
+			throws InjectionException;
 }

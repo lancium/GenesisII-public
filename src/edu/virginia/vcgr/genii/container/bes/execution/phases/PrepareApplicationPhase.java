@@ -11,8 +11,8 @@ import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.container.appmgr.ApplicationManager;
 
-public class PrepareApplicationPhase extends AbstractExecutionPhase implements Serializable
-{
+public class PrepareApplicationPhase extends AbstractExecutionPhase implements
+		Serializable {
 	static final long serialVersionUID = 0L;
 
 	static private final String PREPARE_STATE = "preparing-application";
@@ -20,23 +20,24 @@ public class PrepareApplicationPhase extends AbstractExecutionPhase implements S
 	private FilesystemManager _fsManager;
 	private FilesystemRelativePath _executable;
 
-	public PrepareApplicationPhase(FilesystemManager fsManager, FilesystemRelativePath executable)
-	{
-		super(new ActivityState(ActivityStateEnumeration.Running, PREPARE_STATE, false));
+	public PrepareApplicationPhase(FilesystemManager fsManager,
+			FilesystemRelativePath executable) {
+		super(new ActivityState(ActivityStateEnumeration.Running,
+				PREPARE_STATE, false));
 
 		_fsManager = fsManager;
 		_executable = executable;
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
-	{
+	public void execute(ExecutionContext context) throws Throwable {
 		File executable = null;
 
 		if (_executable.getFileSystemName() != null) {
 			executable = _fsManager.lookup(_executable);
 		} else {
-			executable = new File(context.getCurrentWorkingDirectory().getWorkingDirectory(), _executable.getString());
+			executable = new File(context.getCurrentWorkingDirectory()
+					.getWorkingDirectory(), _executable.getString());
 			if (!executable.exists())
 				executable = new File(_executable.getString());
 		}

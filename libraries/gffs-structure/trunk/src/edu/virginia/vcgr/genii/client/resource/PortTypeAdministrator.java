@@ -22,8 +22,7 @@ import edu.virginia.vcgr.genii.client.tty.TTYConstants;
 import edu.virginia.vcgr.genii.client.utils.bvm.BitVectorMap;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-public class PortTypeAdministrator
-{
+public class PortTypeAdministrator {
 	static private Log _logger = LogFactory.getLog(PortTypeAdministrator.class);
 
 	static private BitVectorMap<PortType> _vectorMap = null;
@@ -33,24 +32,26 @@ public class PortTypeAdministrator
 	public static final String KNOWN_PORT_TYPES_RESOURCE = "config/known-porttypes.xml";
 
 	/**
-	 * the constructor that sets up all the static objects. this should only be called from the
-	 * PortType.portTypeFactory method.
+	 * the constructor that sets up all the static objects. this should only be
+	 * called from the PortType.portTypeFactory method.
 	 */
-	public PortTypeAdministrator()
-	{
+	public PortTypeAdministrator() {
 		InputStream in = null;
 		_knownPortTypes = new LinkedHashMap<QName, PortType>();
 
 		try {
 			ClassLoader l = GenesisClassLoader.classLoaderFactory();
-			InputStream inputStr = l.getResourceAsStream(PortTypeAdministrator.KNOWN_PORT_TYPES_RESOURCE);
+			InputStream inputStr = l
+					.getResourceAsStream(PortTypeAdministrator.KNOWN_PORT_TYPES_RESOURCE);
 			if (inputStr == null) {
-				String msg = "could not locate: " + PortTypeAdministrator.KNOWN_PORT_TYPES_RESOURCE;
+				String msg = "could not locate: "
+						+ PortTypeAdministrator.KNOWN_PORT_TYPES_RESOURCE;
 				_logger.info(msg);
 				throw new IOException(msg);
 			}
 			in = inputStr;
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilderFactory factory = DocumentBuilderFactory
+					.newInstance();
 			factory.setNamespaceAware(false);
 			factory.setValidating(false);
 			DocumentBuilder builder = factory.newDocumentBuilder();
@@ -78,8 +79,10 @@ public class PortTypeAdministrator
 			}
 			if (badPortType == true) {
 				StreamUtils.close(in);
-				throw new IOException("Invalid entry found in " + PortTypeAdministrator.KNOWN_PORT_TYPES_RESOURCE
-					+ " file.\nExpected <portType> but saw <" + n.getNodeName() + ">");
+				throw new IOException("Invalid entry found in "
+						+ PortTypeAdministrator.KNOWN_PORT_TYPES_RESOURCE
+						+ " file.\nExpected <portType> but saw <"
+						+ n.getNodeName() + ">");
 			}
 
 			_vectorMap = new BitVectorMap<PortType>(_knownPortTypes.values());
@@ -91,8 +94,7 @@ public class PortTypeAdministrator
 		}
 	}
 
-	private PortType parsePortType(Element e) throws IOException
-	{
+	private PortType parsePortType(Element e) throws IOException {
 		String name = e.getAttribute("name");
 		String description = null;
 		String rankString = null;
@@ -111,25 +113,26 @@ public class PortTypeAdministrator
 				else if (ce.getNodeName().equals("display-rank"))
 					rankString = ce.getTextContent();
 				else
-					throw new IOException("Unexpected node \"" + ce.getNodeName() + "\" found.\n"
-						+ "Expected \"description\" or \"display-rank\".");
+					throw new IOException("Unexpected node \""
+							+ ce.getNodeName() + "\" found.\n"
+							+ "Expected \"description\" or \"display-rank\".");
 			}
 		}
 
 		if (rankString == null)
-			throw new IOException("Error parsing known-porttypes -- couldn't find a " + "display rank for port type \"" + name
-				+ "\".");
+			throw new IOException(
+					"Error parsing known-porttypes -- couldn't find a "
+							+ "display rank for port type \"" + name + "\".");
 
-		return new PortType(QName.valueOf(name), Integer.parseInt(rankString), description);
+		return new PortType(QName.valueOf(name), Integer.parseInt(rankString),
+				description);
 	}
 
-	public int getLargestKnownDescriptionLength()
-	{
+	public int getLargestKnownDescriptionLength() {
 		return get_largestDescription();
 	}
 
-	public PortType getHighestRankedPortType(PortType... portTypes)
-	{
+	public PortType getHighestRankedPortType(PortType... portTypes) {
 		PortType ret = null;
 
 		for (PortType portType : portTypes) {
@@ -144,57 +147,52 @@ public class PortTypeAdministrator
 		return ret;
 	}
 
-	public int get_largestDescription()
-	{
+	public int get_largestDescription() {
 		return _largestDescription;
 	}
 
-	public void set_largestDescription(int _largestDescription)
-	{
+	public void set_largestDescription(int _largestDescription) {
 		PortTypeAdministrator._largestDescription = _largestDescription;
 	}
 
-	public boolean isKnown(QName portType)
-	{
+	public boolean isKnown(QName portType) {
 		PortType pt = _knownPortTypes.get(portType);
 		return pt != null;
 	}
 
-	public PortType get(QName portType)
-	{
+	public PortType get(QName portType) {
 		PortType pt = _knownPortTypes.get(portType);
-		if ((pt == null) && portType.getLocalPart().endsWith("JNDIAuthnPortType")) {
+		if ((pt == null)
+				&& portType.getLocalPart().endsWith("JNDIAuthnPortType")) {
 			/*
-			 * skipping the error message for grids that are missing the jndi auth port type. only
-			 * the sdiact-123 (xsede activity 123) grid had an issue with this, due to when it came
-			 * online. this should never be triggered in any other grid, which is why we have it set
-			 * to log at warning level.
+			 * skipping the error message for grids that are missing the jndi
+			 * auth port type. only the sdiact-123 (xsede activity 123) grid had
+			 * an issue with this, due to when it came online. this should never
+			 * be triggered in any other grid, which is why we have it set to
+			 * log at warning level.
 			 */
 			_logger.warn("unexpectedly providing alternative jndi auth port type return.");
 			return TTYConstants.TTY_PORT_TYPE();
 		}
 		if (pt == null)
-			throw new IllegalArgumentException("Port type \"" + portType + "\" is unknown to the system.");
+			throw new IllegalArgumentException("Port type \"" + portType
+					+ "\" is unknown to the system.");
 		return pt;
 	}
 
-	public String translate(Collection<PortType> portTypes)
-	{
+	public String translate(Collection<PortType> portTypes) {
 		return _vectorMap.translate(portTypes);
 	}
 
-	public String translate(PortType portType)
-	{
+	public String translate(PortType portType) {
 		return _vectorMap.translate(portType);
 	}
 
-	public String translate(PortType[] portTypes)
-	{
+	public String translate(PortType[] portTypes) {
 		return _vectorMap.translate(portTypes);
 	}
 
-	public Collection<PortType> translate(String stringRep)
-	{
+	public Collection<PortType> translate(String stringRep) {
 		return _vectorMap.translate(stringRep);
 	}
 }

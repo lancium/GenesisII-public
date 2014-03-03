@@ -12,8 +12,7 @@ import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.ui.Images;
 
-public class ACLImages extends Images
-{
+public class ACLImages extends Images {
 	static private BufferedImage _everyoneImage;
 	static private BufferedImage _personImage;
 	static private BufferedImage _emptyPatternImage;
@@ -33,8 +32,7 @@ public class ACLImages extends Images
 		}
 	}
 
-	static private Font findFont(Font exemplar, Graphics2D g, String... labels)
-	{
+	static private Font findFont(Font exemplar, Graphics2D g, String... labels) {
 		FontMetrics metrics = g.getFontMetrics(exemplar);
 		double maxWidth = 0.0;
 		Rectangle2D r;
@@ -46,12 +44,13 @@ public class ACLImages extends Images
 		}
 
 		if (maxWidth >= imageWidth)
-			return findFont(exemplar.deriveFont(exemplar.getSize() - 1.0f), g, labels);
+			return findFont(exemplar.deriveFont(exemplar.getSize() - 1.0f), g,
+					labels);
 		return exemplar;
 	}
 
-	static private void addLabels(BufferedImage image, Color fontColor, String... labels)
-	{
+	static private void addLabels(BufferedImage image, Color fontColor,
+			String... labels) {
 		Graphics2D g = null;
 		int gWidth;
 
@@ -69,7 +68,9 @@ public class ACLImages extends Images
 			for (int lcv = labels.length - 1; lcv >= 0; lcv--) {
 				String label = labels[lcv];
 				Rectangle2D r = g.getFontMetrics().getStringBounds(label, g);
-				g.drawString(label, (float) (r.getX() + (gWidth - r.getWidth()) / 2.0), (float) (baseline + r.getY()));
+				g.drawString(label,
+						(float) (r.getX() + (gWidth - r.getWidth()) / 2.0),
+						(float) (baseline + r.getY()));
 				baseline = (int) (baseline - r.getHeight());
 			}
 		} finally {
@@ -78,23 +79,19 @@ public class ACLImages extends Images
 		}
 	}
 
-	static public BufferedImage everyone()
-	{
+	static public BufferedImage everyone() {
 		return _everyoneImage;
 	}
 
-	static public BufferedImage person()
-	{
+	static public BufferedImage person() {
 		return _personImage;
 	}
 
-	static public BufferedImage emptyPattern()
-	{
+	static public BufferedImage emptyPattern() {
 		return _emptyPatternImage;
 	}
 
-	static public BufferedImage filledPattern()
-	{
+	static public BufferedImage filledPattern() {
 		return _filledPatternImage;
 	}
 }

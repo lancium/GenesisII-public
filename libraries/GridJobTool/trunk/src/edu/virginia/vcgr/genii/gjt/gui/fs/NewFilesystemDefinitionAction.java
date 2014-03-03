@@ -10,15 +10,14 @@ import edu.virginia.vcgr.genii.gjt.data.fs.Filesystem;
 import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemMap;
 import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemType;
 
-class NewFilesystemDefinitionAction extends AbstractAction
-{
+class NewFilesystemDefinitionAction extends AbstractAction {
 	static final long serialVersionUID = 0L;
 
 	private FilesystemMap _filesystemMap;
 	private FilesystemType _filesystemType;
 
-	NewFilesystemDefinitionAction(FilesystemMap filesystemMap, FilesystemType filesystemType)
-	{
+	NewFilesystemDefinitionAction(FilesystemMap filesystemMap,
+			FilesystemType filesystemType) {
 		super("New Definition");
 
 		_filesystemMap = filesystemMap;
@@ -26,12 +25,14 @@ class NewFilesystemDefinitionAction extends AbstractAction
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e)
-	{
+	public void actionPerformed(ActionEvent e) {
 		Filesystem fs = _filesystemMap.get(_filesystemType);
 		if (fs == null)
-			_filesystemMap.get(SwingUtilities.getWindowAncestor((Component) e.getSource()), _filesystemType);
-		else if (fs.edit(SwingUtilities.getWindowAncestor((Component) e.getSource()))) {
+			_filesystemMap
+					.get(SwingUtilities.getWindowAncestor((Component) e
+							.getSource()), _filesystemType);
+		else if (fs.edit(SwingUtilities.getWindowAncestor((Component) e
+				.getSource()))) {
 			_filesystemMap.set(fs);
 		}
 	}

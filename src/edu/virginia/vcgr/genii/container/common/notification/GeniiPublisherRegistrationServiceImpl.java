@@ -18,26 +18,25 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = DBPublisherRegistrationResourceProvider.class)
-public class GeniiPublisherRegistrationServiceImpl extends GenesisIIBase implements GeniiPublisherRegistrationPortType
-{
-	public GeniiPublisherRegistrationServiceImpl() throws RemoteException
-	{
+public class GeniiPublisherRegistrationServiceImpl extends GenesisIIBase
+		implements GeniiPublisherRegistrationPortType {
+	public GeniiPublisherRegistrationServiceImpl() throws RemoteException {
 		super("GeniiPublisherRegistrationPortType");
 
-		addImplementedPortType(WSRFConstants.WSN_PUBLISHER_REGISTRATION_MANAGER_PORT());
+		addImplementedPortType(WSRFConstants
+				.WSN_PUBLISHER_REGISTRATION_MANAGER_PORT());
 	}
 
 	@Override
-	public PortType getFinalWSResourceInterface()
-	{
+	public PortType getFinalWSResourceInterface() {
 		return WellKnownPortTypes.GENII_PUB_REG_MGR_PORT_TYPE();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public DestroyRegistrationResponse destroyRegistration(DestroyRegistration arg0) throws RemoteException,
-		ResourceUnknownFaultType, ResourceNotDestroyedFaultType
-	{
+	public DestroyRegistrationResponse destroyRegistration(
+			DestroyRegistration arg0) throws RemoteException,
+			ResourceUnknownFaultType, ResourceNotDestroyedFaultType {
 		destroy(new Destroy());
 		return new DestroyRegistrationResponse();
 	}

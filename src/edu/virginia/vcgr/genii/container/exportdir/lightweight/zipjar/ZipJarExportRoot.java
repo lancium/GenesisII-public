@@ -12,14 +12,12 @@ import java.util.zip.ZipFile;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.AbstractVExportRoot;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportEntry;
 
-public class ZipJarExportRoot extends AbstractVExportRoot
-{
+public class ZipJarExportRoot extends AbstractVExportRoot {
 	private File _zipFileTarget;
 	private ZipFile _zipFile;
 	private Map<String, Map<String, ZipEntry>> _directoryMap;
 
-	static private String formPath(String[] elements, int length)
-	{
+	static private String formPath(String[] elements, int length) {
 		StringBuilder builder = new StringBuilder();
 
 		for (int lcv = 0; lcv < length; lcv++) {
@@ -31,8 +29,9 @@ public class ZipJarExportRoot extends AbstractVExportRoot
 		return builder.toString();
 	}
 
-	static private void addToDirectoryMap(Map<String, Map<String, ZipEntry>> map, String[] path, int length, ZipEntry entry)
-	{
+	static private void addToDirectoryMap(
+			Map<String, Map<String, ZipEntry>> map, String[] path, int length,
+			ZipEntry entry) {
 		if (length == 0)
 			return;
 
@@ -49,8 +48,7 @@ public class ZipJarExportRoot extends AbstractVExportRoot
 		}
 	}
 
-	public ZipJarExportRoot(File zipFile) throws ZipException, IOException
-	{
+	public ZipJarExportRoot(File zipFile) throws ZipException, IOException {
 		_zipFileTarget = zipFile;
 		_zipFile = new ZipFile(zipFile);
 		_directoryMap = new HashMap<String, Map<String, ZipEntry>>();
@@ -68,8 +66,9 @@ public class ZipJarExportRoot extends AbstractVExportRoot
 	}
 
 	@Override
-	protected VExportEntry internalLookup(String normalizedPath) throws IOException
-	{
-		return new ZipJarEntry(_zipFileTarget, _zipFile, _directoryMap, normalizedPath);
+	protected VExportEntry internalLookup(String normalizedPath)
+			throws IOException {
+		return new ZipJarEntry(_zipFileTarget, _zipFile, _directoryMap,
+				normalizedPath);
 	}
 }

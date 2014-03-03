@@ -12,33 +12,28 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.io.gsiftp.GsiFtpUtility;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
-public class GsiFtpURIHandler extends AbstractURIHandler
-{
+public class GsiFtpURIHandler extends AbstractURIHandler {
 	static private final String[] _HANDLED_PROTOCOLS = new String[] { "gsiftp" };
 	static private int DEFAULT_PORT = 2811;
 
 	@Override
-	public boolean canRead(String uriScheme)
-	{
+	public boolean canRead(String uriScheme) {
 		return true;
 	}
 
 	@Override
-	public boolean canWrite(String uriScheme)
-	{
+	public boolean canWrite(String uriScheme) {
 		return true;
 	}
 
 	@Override
-	public String[] getHandledProtocols()
-	{
+	public String[] getHandledProtocols() {
 		return _HANDLED_PROTOCOLS;
 	}
 
 	@Override
-	protected DataTransferStatistics getInternal(URI source, File destination, UsernamePasswordIdentity credential)
-		throws IOException
-	{
+	protected DataTransferStatistics getInternal(URI source, File destination,
+			UsernamePasswordIdentity credential) throws IOException {
 		String host = null;
 		int port;
 		String localPath = null;
@@ -46,8 +41,10 @@ public class GsiFtpURIHandler extends AbstractURIHandler
 		port = source.getPort();
 		localPath = source.getPath();
 
-		if (!new File(destination.getParentFile().getAbsolutePath() + GenesisIIConstants.myproxyFilenameSuffix).exists()) {
-			throw new IOException("No X509 found for the user. Try resubmitting the job after performing an xsedeLogin");
+		if (!new File(destination.getParentFile().getAbsolutePath()
+				+ GenesisIIConstants.myproxyFilenameSuffix).exists()) {
+			throw new IOException(
+					"No X509 found for the user. Try resubmitting the job after performing an xsedeLogin");
 		}
 
 		if (host == null)
@@ -62,9 +59,8 @@ public class GsiFtpURIHandler extends AbstractURIHandler
 	}
 
 	@Override
-	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential)
-		throws IOException
-	{
+	protected DataTransferStatistics putInternal(File source, URI target,
+			UsernamePasswordIdentity credential) throws IOException {
 		String host = null;
 		int port;
 		String remotePath = null;
@@ -72,9 +68,10 @@ public class GsiFtpURIHandler extends AbstractURIHandler
 		port = target.getPort();
 		remotePath = target.getPath();
 
-		if (!new File(source.getParentFile().getAbsolutePath() + GenesisIIConstants.myproxyFilenameSuffix).exists()) {
+		if (!new File(source.getParentFile().getAbsolutePath()
+				+ GenesisIIConstants.myproxyFilenameSuffix).exists()) {
 			throw new IOException(
-				"No X.509 certificate found for the user. Try resubmitting the job after performing xsedeLogin command");
+					"No X.509 certificate found for the user. Try resubmitting the job after performing xsedeLogin command");
 		}
 
 		if (host == null)
@@ -89,14 +86,16 @@ public class GsiFtpURIHandler extends AbstractURIHandler
 	}
 
 	@Override
-	public InputStream openInputStream(URI source, UsernamePasswordIdentity credential) throws IOException
-	{
-		throw new RuntimeException("openInputStream should never be called on a GSIFTPURIHandler.");
+	public InputStream openInputStream(URI source,
+			UsernamePasswordIdentity credential) throws IOException {
+		throw new RuntimeException(
+				"openInputStream should never be called on a GSIFTPURIHandler.");
 	}
 
 	@Override
-	public OutputStream openOutputStream(URI target, UsernamePasswordIdentity credential) throws IOException
-	{
-		throw new RuntimeException("openOutputStream should never be called on a GSIFTPURIHandler.");
+	public OutputStream openOutputStream(URI target,
+			UsernamePasswordIdentity credential) throws IOException {
+		throw new RuntimeException(
+				"openOutputStream should never be called on a GSIFTPURIHandler.");
 	}
 }

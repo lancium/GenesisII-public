@@ -6,32 +6,31 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 
 import org.morgan.util.configuration.ConfigurationException;
 
-public class ACLTransferable implements Transferable
-{
+public class ACLTransferable implements Transferable {
 	static final private String FLAVOR_PATTERN = "%s;class=\"%s\"";
 
 	static public final DataFlavor DATA_FLAVOR;
 
 	static {
 		try {
-			DATA_FLAVOR =
-				new DataFlavor(String.format(FLAVOR_PATTERN, DataFlavor.javaJVMLocalObjectMimeType,
+			DATA_FLAVOR = new DataFlavor(String.format(FLAVOR_PATTERN,
+					DataFlavor.javaJVMLocalObjectMimeType,
 					ACLEntryWrapperTransferData.class.getName()));
 		} catch (ClassNotFoundException e) {
-			throw new ConfigurationException("Unable to create ACL transferable.", e);
+			throw new ConfigurationException(
+					"Unable to create ACL transferable.", e);
 		}
 	}
 
 	private ACLEntryWrapperTransferData _data;
 
-	ACLTransferable(ACLEntryWrapperTransferData data)
-	{
+	ACLTransferable(ACLEntryWrapperTransferData data) {
 		_data = data;
 	}
 
 	@Override
-	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException
-	{
+	public Object getTransferData(DataFlavor flavor)
+			throws UnsupportedFlavorException {
 		if (flavor.equals(DATA_FLAVOR))
 			return _data;
 
@@ -39,14 +38,12 @@ public class ACLTransferable implements Transferable
 	}
 
 	@Override
-	public DataFlavor[] getTransferDataFlavors()
-	{
+	public DataFlavor[] getTransferDataFlavors() {
 		return new DataFlavor[] { DATA_FLAVOR };
 	}
 
 	@Override
-	public boolean isDataFlavorSupported(DataFlavor flavor)
-	{
+	public boolean isDataFlavorSupported(DataFlavor flavor) {
 		return flavor.equals(DATA_FLAVOR);
 	}
 }

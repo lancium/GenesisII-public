@@ -28,8 +28,7 @@ import edu.virginia.vcgr.genii.common.LogEntryType;
 import edu.virginia.vcgr.genii.common.RPCCallerType;
 import edu.virginia.vcgr.genii.common.RPCMetadataType;
 
-public class DLogDatabase
-{
+public class DLogDatabase {
 	private static Log _logger = LogFactory.getLog(DLogDatabase.class);
 
 	private static final int MAX_IDLE_CONNECTIONS = 3;
@@ -63,8 +62,7 @@ public class DLogDatabase
 	private String metadataSql2 = null;
 	private String insertCmd = null;
 
-	public static DLogDatabase getLocalConnector()
-	{
+	public static DLogDatabase getLocalConnector() {
 		if (!connectors.isEmpty()) {
 			return connectors.get(0);
 		} else {
@@ -72,13 +70,11 @@ public class DLogDatabase
 		}
 	}
 
-	public DLogDatabase()
-	{
+	public DLogDatabase() {
 	}
 
-	public DLogDatabase(String _dbUrl, String _dbUser, String _dbPass, String _entryTable, String _metadataTable,
-		String _hierarchyTable)
-	{
+	public DLogDatabase(String _dbUrl, String _dbUser, String _dbPass,
+			String _entryTable, String _metadataTable, String _hierarchyTable) {
 		dbUrl = _dbUrl;
 		dbUser = _dbUser;
 		dbPass = _dbPass;
@@ -91,17 +87,19 @@ public class DLogDatabase
 		connectors.add(this);
 	}
 
-	protected void initDatabase()
-	{
+	protected void initDatabase() {
 		try {
 			Properties props = new Properties();
 			DatabaseConnectionPool.DBPropertyNames names = new DatabaseConnectionPool.DBPropertyNames();
 			props.setProperty(names._DB_CONNECT_STRING_PROPERTY, dbUrl);
 			props.setProperty(names._DB_USER_PROPERTY, dbUser);
 			props.setProperty(names._DB_PASSWORD_PROPERTY, dbPass);
-			props.setProperty(DLogConstants._DB_ENTRY_TABLE_PROPERTY, entryTable);
-			props.setProperty(DLogConstants._DB_METADATA_TABLE_PROPERTY, metadataTable);
-			props.setProperty(DLogConstants._DB_HIERARCHY_TABLE_PROPERTY, hierarchyTable);
+			props.setProperty(DLogConstants._DB_ENTRY_TABLE_PROPERTY,
+					entryTable);
+			props.setProperty(DLogConstants._DB_METADATA_TABLE_PROPERTY,
+					metadataTable);
+			props.setProperty(DLogConstants._DB_HIERARCHY_TABLE_PROPERTY,
+					hierarchyTable);
 			pool = new LogDatabaseConnectionPool(props);
 
 		} catch (IllegalAccessException e) {
@@ -113,33 +111,39 @@ public class DLogDatabase
 		}
 	}
 
-	protected void initQueries()
-	{
-		hierarchySql =
-			"INSERT INTO " + hierarchyTable + " (" + DLogConstants.DLOG_HIERARCHY_CHILD + ", "
-				+ DLogConstants.DLOG_HIERARCHY_PARENT + ", " + DLogConstants.DLOG_HIERARCHY_DATE + ") "
+	protected void initQueries() {
+		hierarchySql = "INSERT INTO " + hierarchyTable + " ("
+				+ DLogConstants.DLOG_HIERARCHY_CHILD + ", "
+				+ DLogConstants.DLOG_HIERARCHY_PARENT + ", "
+				+ DLogConstants.DLOG_HIERARCHY_DATE + ") "
 				+ "VALUES (?, ?, CURRENT_TIMESTAMP)";
 
-		metadataSql1 =
-			"INSERT INTO " + metadataTable + " (" + DLogConstants.DLOG_METADATA_RPCID + ", "
-				+ DLogConstants.DLOG_METADATA_DATE_SENT + ", " + DLogConstants.DLOG_METADATA_EPR + ", "
-				+ DLogConstants.DLOG_METADATA_REQUEST + ", " + DLogConstants.DLOG_METADATA_OP_NAME + ") "
+		metadataSql1 = "INSERT INTO " + metadataTable + " ("
+				+ DLogConstants.DLOG_METADATA_RPCID + ", "
+				+ DLogConstants.DLOG_METADATA_DATE_SENT + ", "
+				+ DLogConstants.DLOG_METADATA_EPR + ", "
+				+ DLogConstants.DLOG_METADATA_REQUEST + ", "
+				+ DLogConstants.DLOG_METADATA_OP_NAME + ") "
 				+ "VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)";
 
-		metadataSql2 =
-			"UPDATE " + metadataTable + " SET " + DLogConstants.DLOG_METADATA_RPCID + " = ?, "
-				+ DLogConstants.DLOG_METADATA_DATE_RCVD + " = CURRENT_TIMESTAMP, " + DLogConstants.DLOG_METADATA_RESPONSE
-				+ " = ? " + "WHERE " + DLogConstants.DLOG_METADATA_RPCID + " = ?";
-
-		selectEPR =
-			"SELECT " + DLogConstants.DLOG_METADATA_EPR + " FROM " + metadataTable + " WHERE "
+		metadataSql2 = "UPDATE " + metadataTable + " SET "
+				+ DLogConstants.DLOG_METADATA_RPCID + " = ?, "
+				+ DLogConstants.DLOG_METADATA_DATE_RCVD
+				+ " = CURRENT_TIMESTAMP, "
+				+ DLogConstants.DLOG_METADATA_RESPONSE + " = ? " + "WHERE "
 				+ DLogConstants.DLOG_METADATA_RPCID + " = ?";
 
+		selectEPR = "SELECT " + DLogConstants.DLOG_METADATA_EPR + " FROM "
+				+ metadataTable + " WHERE " + DLogConstants.DLOG_METADATA_RPCID
+				+ " = ?";
+
 		selectChildIDs = "SELECT * FROM " + hierarchyTable;
-		whereChildIDs = " WHERE " + DLogConstants.DLOG_HIERARCHY_PARENT + " = ?";
+		whereChildIDs = " WHERE " + DLogConstants.DLOG_HIERARCHY_PARENT
+				+ " = ?";
 
 		selectChildren1 = "SELECT * FROM " + hierarchyTable;
-		whereChildren1 = " WHERE " + DLogConstants.DLOG_HIERARCHY_PARENT + " = ?";
+		whereChildren1 = " WHERE " + DLogConstants.DLOG_HIERARCHY_PARENT
+				+ " = ?";
 
 		selectChildren2 = "SELECT * FROM " + metadataTable;
 		whereChildren2 = " WHERE " + DLogConstants.DLOG_METADATA_RPCID + " = ?";
@@ -147,20 +151,21 @@ public class DLogDatabase
 		selectLog = "SELECT * FROM " + entryTable;
 		whereLog = " WHERE " + DLogConstants.DLOG_ENTRY_FIELD_RPCID + " = ?";
 
-		selectParent = "SELECT DISTINCT " + DLogConstants.DLOG_ENTRY_FIELD_RPCID + " FROM " + entryTable;
+		selectParent = "SELECT DISTINCT "
+				+ DLogConstants.DLOG_ENTRY_FIELD_RPCID + " FROM " + entryTable;
 
-		selectParentCmd =
-			"SELECT " + DLogConstants.DLOG_METADATA_OP_NAME + " FROM " + metadataTable + " WHERE "
+		selectParentCmd = "SELECT " + DLogConstants.DLOG_METADATA_OP_NAME
+				+ " FROM " + metadataTable + " WHERE "
 				+ DLogConstants.DLOG_METADATA_RPCID + " = ?";
 
-		insertCmd =
-			"INSERT INTO " + metadataTable + " ( " + DLogConstants.DLOG_METADATA_RPCID + ", "
-				+ DLogConstants.DLOG_METADATA_OP_NAME + ", " + DLogConstants.DLOG_METADATA_DATE_SENT + " ) "
+		insertCmd = "INSERT INTO " + metadataTable + " ( "
+				+ DLogConstants.DLOG_METADATA_RPCID + ", "
+				+ DLogConstants.DLOG_METADATA_OP_NAME + ", "
+				+ DLogConstants.DLOG_METADATA_DATE_SENT + " ) "
 				+ " VALUES (?, ?, CURRENT_TIMESTAMP)";
 	}
 
-	public Connection getConnection() throws SQLException
-	{
+	public Connection getConnection() throws SQLException {
 		synchronized (connections) {
 			if (connections.isEmpty()) {
 				return pool.acquire(true);
@@ -170,8 +175,8 @@ public class DLogDatabase
 		}
 	}
 
-	public Collection<LogEntryType> selectLogs(String rpcID) throws SQLException
-	{
+	public Collection<LogEntryType> selectLogs(String rpcID)
+			throws SQLException {
 		Connection con = null;
 		Collection<LogEntryType> ret = new ArrayList<LogEntryType>();
 		PreparedStatement stmt = null;
@@ -189,11 +194,13 @@ public class DLogDatabase
 			res = stmt.executeQuery();
 			if (res != null) {
 				while (res.next()) {
-					ret.add(new LogEntryType(res.getString(DLogConstants.DLOG_ENTRY_FIELD_DATE), res
-						.getString(DLogConstants.DLOG_ENTRY_FIELD_MESSAGE), res
-						.getString(DLogConstants.DLOG_ENTRY_FIELD_LOGGER), res.getString(DLogConstants.DLOG_ENTRY_FIELD_LEVEL),
-						res.getString(DLogConstants.DLOG_ENTRY_FIELD_RPCID), res
-							.getString(DLogConstants.DLOG_ENTRY_FIELD_STACK_TRACE)));
+					ret.add(new LogEntryType(
+							res.getString(DLogConstants.DLOG_ENTRY_FIELD_DATE),
+							res.getString(DLogConstants.DLOG_ENTRY_FIELD_MESSAGE),
+							res.getString(DLogConstants.DLOG_ENTRY_FIELD_LOGGER),
+							res.getString(DLogConstants.DLOG_ENTRY_FIELD_LEVEL),
+							res.getString(DLogConstants.DLOG_ENTRY_FIELD_RPCID),
+							res.getString(DLogConstants.DLOG_ENTRY_FIELD_STACK_TRACE)));
 				}
 			}
 		} finally {
@@ -204,8 +211,7 @@ public class DLogDatabase
 		return ret;
 	}
 
-	public EndpointReferenceType getEndpoint(String rpcID) throws SQLException
-	{
+	public EndpointReferenceType getEndpoint(String rpcID) throws SQLException {
 		Connection con = null;
 		EndpointReferenceType ret = null;
 		PreparedStatement stmt = null;
@@ -216,7 +222,8 @@ public class DLogDatabase
 			con = getConnection();
 
 			if (rpcID == null) {
-				throw new SQLException("Can't get EPR from database without RPCID");
+				throw new SQLException(
+						"Can't get EPR from database without RPCID");
 			}
 			stmt = con.prepareStatement(selectEPR);
 			stmt.setString(1, rpcID);
@@ -224,7 +231,8 @@ public class DLogDatabase
 			if (res != null) {
 				while (res.next()) {
 					try {
-						ret = EPRUtils.fromBlob(res.getBlob(DLogConstants.DLOG_METADATA_EPR));
+						ret = EPRUtils.fromBlob(res
+								.getBlob(DLogConstants.DLOG_METADATA_EPR));
 					} catch (ResourceException e) {
 						errorThatOccurred = e;
 						break;
@@ -237,13 +245,14 @@ public class DLogDatabase
 			closeConnection(con);
 		}
 		if (errorThatOccurred != null) {
-			throw new SQLException("Problem converting database object into EPR type", errorThatOccurred);
+			throw new SQLException(
+					"Problem converting database object into EPR type",
+					errorThatOccurred);
 		}
 		return ret;
 	}
 
-	public Collection<String> selectParentIDs() throws SQLException
-	{
+	public Collection<String> selectParentIDs() throws SQLException {
 		Connection con = null;
 		Collection<String> ret = new ArrayList<String>();
 		PreparedStatement stmt = null;
@@ -266,8 +275,8 @@ public class DLogDatabase
 		return ret;
 	}
 
-	public Map<String, Collection<String>> selectChildIDs(String rpcID) throws SQLException
-	{
+	public Map<String, Collection<String>> selectChildIDs(String rpcID)
+			throws SQLException {
 		Connection con = null;
 		Map<String, Collection<String>> ret = new HashMap<String, Collection<String>>();
 		PreparedStatement stmt = null;
@@ -285,11 +294,14 @@ public class DLogDatabase
 			res = stmt.executeQuery();
 			if (res != null) {
 				while (res.next()) {
-					if (!ret.containsKey(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT))) {
-						ret.put(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT), new ArrayList<String>());
+					if (!ret.containsKey(res
+							.getString(DLogConstants.DLOG_HIERARCHY_PARENT))) {
+						ret.put(res
+								.getString(DLogConstants.DLOG_HIERARCHY_PARENT),
+								new ArrayList<String>());
 					}
-					ret.get(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT)).add(
-						res.getString(DLogConstants.DLOG_HIERARCHY_CHILD));
+					ret.get(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT))
+							.add(res.getString(DLogConstants.DLOG_HIERARCHY_CHILD));
 				}
 			}
 		} finally {
@@ -300,8 +312,8 @@ public class DLogDatabase
 		return ret;
 	}
 
-	public Map<String, Collection<RPCCallerType>> selectChildren(String rpcID) throws SQLException, ResourceException
-	{
+	public Map<String, Collection<RPCCallerType>> selectChildren(String rpcID)
+			throws SQLException, ResourceException {
 		Connection con = null;
 		Map<String, Collection<RPCCallerType>> ret = new HashMap<String, Collection<RPCCallerType>>();
 		PreparedStatement stmt = null;
@@ -320,12 +332,17 @@ public class DLogDatabase
 			res = stmt.executeQuery();
 			if (res != null) {
 				while (res.next()) {
-					if (!ret.containsKey(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT))) {
-						ret.put(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT), new ArrayList<RPCCallerType>());
+					if (!ret.containsKey(res
+							.getString(DLogConstants.DLOG_HIERARCHY_PARENT))) {
+						ret.put(res
+								.getString(DLogConstants.DLOG_HIERARCHY_PARENT),
+								new ArrayList<RPCCallerType>());
 					}
 					RPCCallerType entry = new RPCCallerType();
-					entry.setRpcid(res.getString(DLogConstants.DLOG_HIERARCHY_CHILD));
-					ret.get(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT)).add(entry);
+					entry.setRpcid(res
+							.getString(DLogConstants.DLOG_HIERARCHY_CHILD));
+					ret.get(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT))
+							.add(entry);
 				}
 			}
 		} finally {
@@ -341,30 +358,40 @@ public class DLogDatabase
 				for (RPCCallerType child : children) {
 					String childID = child.getRpcid();
 
-					RPCMetadataType meta = new RPCMetadataType("unknownMethod", null, null, null, null, null);
+					RPCMetadataType meta = new RPCMetadataType("unknownMethod",
+							null, null, null, null, null);
 
-					stmt = con.prepareStatement(selectChildren2 + whereChildren2);
+					stmt = con.prepareStatement(selectChildren2
+							+ whereChildren2);
 					stmt.setString(1, childID);
 					res = stmt.executeQuery();
 					if (res != null) {
 						if (res.next()) {
-							meta.setIssueDate(res.getString(DLogConstants.DLOG_METADATA_DATE_SENT));
-							meta.setReturnDate(res.getString(DLogConstants.DLOG_METADATA_DATE_RCVD));
-							meta.setTargetEPR(EPRUtils.fromBlob(res.getBlob(DLogConstants.DLOG_METADATA_EPR)));
+							meta.setIssueDate(res
+									.getString(DLogConstants.DLOG_METADATA_DATE_SENT));
+							meta.setReturnDate(res
+									.getString(DLogConstants.DLOG_METADATA_DATE_RCVD));
+							meta.setTargetEPR(EPRUtils.fromBlob(res
+									.getBlob(DLogConstants.DLOG_METADATA_EPR)));
 
-							Blob blob = res.getBlob(DLogConstants.DLOG_METADATA_REQUEST);
+							Blob blob = res
+									.getBlob(DLogConstants.DLOG_METADATA_REQUEST);
 							if (blob != null) {
-								String request = new String(blob.getBytes(1, (int) blob.length()));
+								String request = new String(blob.getBytes(1,
+										(int) blob.length()));
 								meta.setRequestMessage(request);
 							}
 
-							blob = res.getBlob(DLogConstants.DLOG_METADATA_RESPONSE);
+							blob = res
+									.getBlob(DLogConstants.DLOG_METADATA_RESPONSE);
 							if (blob != null) {
-								String response = new String(blob.getBytes(1, (int) blob.length()));
+								String response = new String(blob.getBytes(1,
+										(int) blob.length()));
 								meta.setResponseMessage(response);
 							}
 
-							meta.setMethodName(res.getString(DLogConstants.DLOG_METADATA_OP_NAME));
+							meta.setMethodName(res
+									.getString(DLogConstants.DLOG_METADATA_OP_NAME));
 						}
 					}
 					child.setMetadata(meta);
@@ -379,8 +406,7 @@ public class DLogDatabase
 		return ret;
 	}
 
-	public void recordRPCID(String rpcid) throws SQLException, AxisFault
-	{
+	public void recordRPCID(String rpcid) throws SQLException, AxisFault {
 		Connection con = null;
 		PreparedStatement stmt = null;
 		try {
@@ -400,8 +426,7 @@ public class DLogDatabase
 		}
 	}
 
-	public void recordCommand(String commandLine) throws SQLException
-	{
+	public void recordCommand(String commandLine) throws SQLException {
 		Connection con = null;
 		PreparedStatement stmt = null;
 		try {
@@ -416,16 +441,17 @@ public class DLogDatabase
 		}
 	}
 
-	public void recordMeta1(String tempID, byte[] body, EndpointReferenceType epr, String op) throws SQLException, AxisFault,
-		SOAPException
-	{
+	public void recordMeta1(String tempID, byte[] body,
+			EndpointReferenceType epr, String op) throws SQLException,
+			AxisFault, SOAPException {
 		Connection con = null;
 		PreparedStatement stmt = null;
 		try {
 			con = getConnection();
 			stmt = con.prepareStatement(metadataSql1);
 			stmt.setString(1, tempID);
-			stmt.setBlob(2, EPRUtils.toBlob(epr, metadataTable, DLogConstants.DLOG_METADATA_EPR));
+			stmt.setBlob(2, EPRUtils.toBlob(epr, metadataTable,
+					DLogConstants.DLOG_METADATA_EPR));
 			stmt.setBlob(3, new SerialBlob(body));
 			stmt.setString(4, op);
 			stmt.executeUpdate();
@@ -435,8 +461,7 @@ public class DLogDatabase
 		}
 	}
 
-	protected void closeConnection(Connection con)
-	{
+	protected void closeConnection(Connection con) {
 		if (con == null)
 			return;
 
@@ -456,8 +481,8 @@ public class DLogDatabase
 		}
 	}
 
-	public void recordMeta2(String tempID, byte[] body, String rpcid) throws SQLException, AxisFault, SOAPException
-	{
+	public void recordMeta2(String tempID, byte[] body, String rpcid)
+			throws SQLException, AxisFault, SOAPException {
 		Connection con = null;
 		PreparedStatement stmt = null;
 		try {
@@ -473,8 +498,8 @@ public class DLogDatabase
 		}
 	}
 
-	public String getCommand(String rpcid) throws SQLException, ResourceException
-	{
+	public String getCommand(String rpcid) throws SQLException,
+			ResourceException {
 		Connection con = null;
 		String ret = null;
 		PreparedStatement stmt = null;

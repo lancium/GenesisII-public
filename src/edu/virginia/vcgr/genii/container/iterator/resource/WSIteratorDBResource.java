@@ -31,40 +31,41 @@ import edu.virginia.vcgr.genii.container.iterator.WSIteratorConstructionParamete
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
-public class WSIteratorDBResource extends BasicDBResource implements WSIteratorResource
-{
+public class WSIteratorDBResource extends BasicDBResource implements
+		WSIteratorResource {
 	static Map<String, InMemoryIteratorWrapper> mapper = new HashMap<String, InMemoryIteratorWrapper>();
 	static Map<String, Boolean> type = new HashMap<String, Boolean>();
 	static Object _lock = new Object();
 
-	WSIteratorDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
-	{
+	WSIteratorDBResource(ResourceKey parentKey,
+			ServerDatabaseConnectionPool connectionPool) throws SQLException {
 		super(parentKey, connectionPool);
 	}
 
-	WSIteratorDBResource(String parentKey, Connection connection)
-	{
+	WSIteratorDBResource(String parentKey, Connection connection) {
 		super(parentKey, connection);
 	}
 
 	@Override
-	public void initialize(GenesisHashMap constructionParams) throws ResourceException
-	{
+	public void initialize(GenesisHashMap constructionParams)
+			throws ResourceException {
 		super.initialize(constructionParams);
 		if (isServiceResource())
 			return;
 
-		WSIteratorConstructionParameters consParms =
-			(WSIteratorConstructionParameters) constructionParams.get(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME);
+		WSIteratorConstructionParameters consParms = (WSIteratorConstructionParameters) constructionParams
+				.get(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME);
 		if (consParms == null)
-			throw new ResourceException("Can't create a WS-iterator without construction parameters!");
+			throw new ResourceException(
+					"Can't create a WS-iterator without construction parameters!");
 
 		boolean isIndexedIterator = consParms.isIndexedIterator();
 		Iterator<MessageElement> rest;
 
 		int lcv = 0;
 
-		setProperty(WSIteratorResource.PREFERRED_BATCH_SIZE_PROPERTY, consParms.preferredBatchSize());
+		setProperty(WSIteratorResource.PREFERRED_BATCH_SIZE_PROPERTY,
+				consParms.preferredBatchSize());
 
 		PreparedStatement stmt = null;
 
@@ -77,17 +78,19 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 
 			try {
 
-				stmt =
-					getConnection().prepareStatement(
-						"INSERT INTO iterators(" + "iteratorid, elementindex, contents) " + "VALUES (?, ?, ?)");
+				stmt = getConnection().prepareStatement(
+						"INSERT INTO iterators("
+								+ "iteratorid, elementindex, contents) "
+								+ "VALUES (?, ?, ?)");
 
 				if (rest != null) {
 					while (rest.hasNext()) {
 						MessageElement next = rest.next();
 						stmt.setString(1, getKey());
 						stmt.setLong(2, (long) lcv);
-						stmt.setBlob(3, DBSerializer.toBlob(ObjectSerializer.anyToBytes(new MessageElement[] { next }),
-							"iterators", "contents"));
+						stmt.setBlob(3, DBSerializer.toBlob(ObjectSerializer
+								.anyToBytes(new MessageElement[] { next }),
+								"iterators", "contents"));
 
 						stmt.addBatch();
 						lcv++;
@@ -104,7 +107,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 		else {
 			InMemoryIteratorWrapper imiw = consParms.getWrapper();
 
-			if (imiw == null || imiw.getIndices() == null || imiw.getIndices().size() == 0) {
+			if (imiw == null || imiw.getIndices() == null
+					|| imiw.getIndices().size() == 0) {
 				synchronized (_lock) {
 					type.put(getKey(), false);
 				}
@@ -121,9 +125,10 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 	}
 
 	@Override
-	public Collection<Pair<Long, MessageElement>> retrieveEntries(int firstElement, int numElements) throws ResourceException
-	{
-		Collection<Pair<Long, MessageElement>> ret = new ArrayList<Pair<Long, MessageElement>>(numElements);
+	public Collection<Pair<Long, MessageElement>> retrieveEntries(
+			int firstElement, int numElements) throws ResourceException {
+		Collection<Pair<Long, MessageElement>> ret = new ArrayList<Pair<Long, MessageElement>>(
+				numElements);
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		Boolean isIndexed = false;
@@ -142,10 +147,10 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 		if (isIndexed == false) {
 			try {
 
-				stmt =
-					getConnection().prepareStatement(
-						"SELECT elementindex, contents FROM iterators WHERE "
-							+ "iteratorid = ? AND elementindex >= ? AND elementindex < ?");
+				stmt = getConnection()
+						.prepareStatement(
+								"SELECT elementindex, contents FROM iterators WHERE "
+										+ "iteratorid = ? AND elementindex >= ? AND elementindex < ?");
 
 				stmt.setString(1, getKey());
 				stmt.setLong(2, firstElement);
@@ -156,7 +161,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 					long index = rs.getLong(1);
 					Blob blob = rs.getBlob(2);
 
-					MessageElement me = ObjectDeserializer.anyFromBytes((byte[]) DBSerializer.fromBlob(blob))[0];
+					MessageElement me = ObjectDeserializer
+							.anyFromBytes((byte[]) DBSerializer.fromBlob(blob))[0];
 					ret.add(new Pair<Long, MessageElement>(index, me));
 				}
 
@@ -181,8 +187,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 
 			try {
 				clazz = Class.forName(invokee);
-				meth =
-					clazz.getMethod("getIndexedContent", new Class[] { Connection.class, InMemoryIteratorEntry.class,
+				meth = clazz.getMethod("getIndexedContent", new Class[] {
+						Connection.class, InMemoryIteratorEntry.class,
 						Object[].class });
 			} catch (ClassNotFoundException e) {
 				throw new ResourceException("Unable to retrieve entries!", e);
@@ -190,23 +196,28 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 				throw new ResourceException("Unable to retrieve entries!", e);
 			}
 
-			int lastElement = Math.min(firstElement + numElements - 1, imieList.size() - 1);
+			int lastElement = Math.min(firstElement + numElements - 1,
+					imieList.size() - 1);
 
 			for (int lcv = firstElement; lcv <= lastElement; lcv++) {
 				InMemoryIteratorEntry entry = imieList.get(lcv);
 				if (entry != null) {
 
 					try {
-						MessageElement me = (MessageElement) meth.invoke(null, getConnection(), entry, commonObjs);
+						MessageElement me = (MessageElement) meth.invoke(null,
+								getConnection(), entry, commonObjs);
 						ret.add(new Pair<Long, MessageElement>((long) lcv, me));
 					}
 
 					catch (IllegalArgumentException e) {
-						throw new ResourceException("Unable to retrieve entries!", e);
+						throw new ResourceException(
+								"Unable to retrieve entries!", e);
 					} catch (IllegalAccessException e) {
-						throw new ResourceException("Unable to retrieve entries!", e);
+						throw new ResourceException(
+								"Unable to retrieve entries!", e);
 					} catch (InvocationTargetException e) {
-						throw new ResourceException("Unable to retrieve entries!", e);
+						throw new ResourceException(
+								"Unable to retrieve entries!", e);
 					}
 
 				}
@@ -217,8 +228,7 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 	}
 
 	@Override
-	public long iteratorSize() throws ResourceException
-	{
+	public long iteratorSize() throws ResourceException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
@@ -229,13 +239,15 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 		synchronized (_lock) {
 			isIndexed = type.get(getKey());
 			if (isIndexed == null)
-				throw new ResourceException("Unable to query iterator for it's size!");
+				throw new ResourceException(
+						"Unable to query iterator for it's size!");
 
 			if (isIndexed == true) {
 				imiw = mapper.get(getKey());
 
 				if (imiw == null)
-					throw new ResourceException("Unable to query iterator for it's size!");
+					throw new ResourceException(
+							"Unable to query iterator for it's size!");
 				else
 					return imiw.getIndices().size();
 			}
@@ -243,15 +255,18 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 
 		if (isIndexed == false) {
 			try {
-				stmt = getConnection().prepareStatement("SELECT COUNT(*) FROM iterators WHERE iteratorid = ?");
+				stmt = getConnection().prepareStatement(
+						"SELECT COUNT(*) FROM iterators WHERE iteratorid = ?");
 				stmt.setString(1, getKey());
 				rs = stmt.executeQuery();
 
 				if (!rs.next())
-					throw new ResourceException("Unable to query iterator for it's size!");
+					throw new ResourceException(
+							"Unable to query iterator for it's size!");
 				return rs.getLong(1);
 			} catch (SQLException e) {
-				throw new ResourceException("Unable to query iterator for it's size!", e);
+				throw new ResourceException(
+						"Unable to query iterator for it's size!", e);
 			} finally {
 				StreamUtils.close(rs);
 				StreamUtils.close(stmt);
@@ -261,8 +276,7 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 	}
 
 	@Override
-	public void destroy() throws ResourceException
-	{
+	public void destroy() throws ResourceException {
 		super.destroy();
 
 		PreparedStatement stmt = null;
@@ -271,7 +285,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 		synchronized (_lock) {
 			isIndexed = type.get(getKey());
 
-			if (isIndexed == null) // To handle container restarts, and prevents exception on the
+			if (isIndexed == null) // To handle container restarts, and prevents
+									// exception on the
 									// client due to a bug in our destroy client
 				return;
 
@@ -284,7 +299,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 
 		if (isIndexed == false) {
 			try {
-				stmt = getConnection().prepareStatement("DELETE FROM iterators WHERE iteratorid = ?");
+				stmt = getConnection().prepareStatement(
+						"DELETE FROM iterators WHERE iteratorid = ?");
 				stmt.setString(1, _resourceKey);
 				stmt.executeUpdate();
 			} catch (SQLException e) {

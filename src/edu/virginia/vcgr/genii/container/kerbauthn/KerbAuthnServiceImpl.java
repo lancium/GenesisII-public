@@ -57,7 +57,8 @@ import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = RNSDBResourceProvider.class, defaultAuthZProvider = KerbAuthZProvider.class)
-public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implements KerbAuthnPortType
+public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl
+		implements KerbAuthnPortType
 // , BaggageAggregatable
 {
 	static private Log _logger = LogFactory.getLog(KerbAuthnServiceImpl.class);
@@ -65,45 +66,46 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	@MInject(lazy = true)
 	private IRNSResource _resource;
 
-	public KerbAuthnServiceImpl() throws RemoteException
-	{
-		this(WellKnownPortTypes.KERB_AUTHN_SERVICE_PORT_TYPE().getQName().getLocalPart());
+	public KerbAuthnServiceImpl() throws RemoteException {
+		this(WellKnownPortTypes.KERB_AUTHN_SERVICE_PORT_TYPE().getQName()
+				.getLocalPart());
 	}
 
-	protected KerbAuthnServiceImpl(String serviceName) throws RemoteException
-	{
+	protected KerbAuthnServiceImpl(String serviceName) throws RemoteException {
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.KERB_AUTHN_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes
+				.KERB_AUTHN_SERVICE_PORT_TYPE());
 		addImplementedPortType(WellKnownPortTypes.STS_SERVICE_PORT_TYPE());
 		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE());
 	}
 
-	public PortType getFinalWSResourceInterface()
-	{
+	public PortType getFinalWSResourceInterface() {
 		return WellKnownPortTypes.KERB_AUTHN_SERVICE_PORT_TYPE();
 	}
 
 	@Override
-	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
-	{
+	protected void setAttributeHandlers() throws NoSuchMethodException,
+			ResourceException, ResourceUnknownFaultType {
 		super.setAttributeHandlers();
 		new KerbAuthnAttributesHandler(getAttributePackage());
 	}
 
 	@Override
-	protected Object translateConstructionParameter(MessageElement property) throws Exception
-	{
+	protected Object translateConstructionParameter(MessageElement property)
+			throws Exception {
 		// decodes the base64-encoded delegated assertion construction param
 		QName name = property.getQName();
-		if (name.equals(SecurityConstants.NEW_IDP_NAME_QNAME) || name.equals(SecurityConstants.NEW_KERB_IDP_REALM_QNAME)
-			|| name.equals(SecurityConstants.NEW_KERB_IDP_KDC_QNAME)) {
+		if (name.equals(SecurityConstants.NEW_IDP_NAME_QNAME)
+				|| name.equals(SecurityConstants.NEW_KERB_IDP_REALM_QNAME)
+				|| name.equals(SecurityConstants.NEW_KERB_IDP_KDC_QNAME)) {
 			return property.getValue();
 		} else if (name.equals(SecurityConstants.IDP_VALID_MILLIS_QNAME)) {
 			return Long.decode(property.getValue());
 		} else if (name.equals(SecurityConstants.NEW_IDP_TYPE_QNAME)) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("for name " + name + " got " + property.getValue());
+				_logger.debug("for name " + name + " got "
+						+ property.getValue());
 			return property.getValue();
 		} else {
 			return super.translateConstructionParameter(property);
@@ -111,25 +113,30 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	}
 
 	@Override
-	protected ResourceKey createResource(GenesisHashMap constructionParameters) throws ResourceException, BaseFaultType
-	{
-		// Specify additional O (org) field for our resource's certificate (viz. realm)
-		String realm = (String) constructionParameters.get(SecurityConstants.NEW_KERB_IDP_REALM_QNAME);
+	protected ResourceKey createResource(GenesisHashMap constructionParameters)
+			throws ResourceException, BaseFaultType {
+		// Specify additional O (org) field for our resource's certificate (viz.
+		// realm)
+		String realm = (String) constructionParameters
+				.get(SecurityConstants.NEW_KERB_IDP_REALM_QNAME);
 		if (realm != null) {
 			String[] newOrgs = { realm };
-			constructionParameters.put(IResource.ADDITIONAL_ORGS_CONSTRUCTION_PARAM, newOrgs);
+			constructionParameters.put(
+					IResource.ADDITIONAL_ORGS_CONSTRUCTION_PARAM, newOrgs);
 		}
 		return super.createResource(constructionParameters);
 	}
 
 	@Override
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
-	{
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
+			ConstructionParameters cParams,
+			GenesisHashMap constructionParameters,
+			Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException {
 		_logger.debug("entering postCreate");
 		if (skipPortTypeSpecificPostProcessing(constructionParameters)) {
-			super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
+			super.postCreate(rKey, newEPR, cParams, constructionParameters,
+					resolverCreationParams);
 			return;
 		}
 
@@ -137,135 +144,150 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		IResource resource = rKey.dereference();
 
 		// store the Realm in the idp resource
-		String realm = (String) constructionParameters.get(SecurityConstants.NEW_KERB_IDP_REALM_QNAME);
-		resource.setProperty(SecurityConstants.NEW_KERB_IDP_REALM_QNAME.getLocalPart(), realm);
+		String realm = (String) constructionParameters
+				.get(SecurityConstants.NEW_KERB_IDP_REALM_QNAME);
+		resource.setProperty(
+				SecurityConstants.NEW_KERB_IDP_REALM_QNAME.getLocalPart(),
+				realm);
 
 		// store the KDC in the idp resource
-		String kdc = (String) constructionParameters.get(SecurityConstants.NEW_KERB_IDP_KDC_QNAME);
-		resource.setProperty(SecurityConstants.NEW_KERB_IDP_KDC_QNAME.getLocalPart(), kdc);
+		String kdc = (String) constructionParameters
+				.get(SecurityConstants.NEW_KERB_IDP_KDC_QNAME);
+		resource.setProperty(
+				SecurityConstants.NEW_KERB_IDP_KDC_QNAME.getLocalPart(), kdc);
 
-		X509AuthnServiceImpl.sharedPostCreate(this, rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
+		X509AuthnServiceImpl.sharedPostCreate(this, rKey, newEPR, cParams,
+				constructionParameters, resolverCreationParams);
 
-		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
+		super.postCreate(rKey, newEPR, cParams, constructionParameters,
+				resolverCreationParams);
 	}
 
 	@Override
-	protected void preDestroy() throws RemoteException, ResourceException
-	{
+	protected void preDestroy() throws RemoteException, ResourceException {
 		super.preDestroy();
 		preDestroy(_resource);
 	}
 
 	/*
 	 * @Override public ArrayList<RequestSecurityTokenResponseType>
-	 * aggregateBaggageTokens(RequestSecurityTokenType request) throws java.rmi.RemoteException {
-	 * ArrayList<RequestSecurityTokenResponseType> gatheredResponses = new
-	 * ArrayList<RequestSecurityTokenResponseType>(); Collection<InternalEntry> entries =
-	 * _resource.retrieveEntries(null);
+	 * aggregateBaggageTokens(RequestSecurityTokenType request) throws
+	 * java.rmi.RemoteException { ArrayList<RequestSecurityTokenResponseType>
+	 * gatheredResponses = new ArrayList<RequestSecurityTokenResponseType>();
+	 * Collection<InternalEntry> entries = _resource.retrieveEntries(null);
 	 * 
-	 * for (InternalEntry entry : entries) { try { EndpointReferenceType idpEpr =
-	 * entry.getEntryReference();
+	 * for (InternalEntry entry : entries) { try { EndpointReferenceType idpEpr
+	 * = entry.getEntryReference();
 	 * 
 	 * // create a proxy to the remote idp and invoke it X509AuthnPortType idp =
-	 * ClientUtils.createProxy(X509AuthnPortType.class, idpEpr); RequestSecurityTokenResponseType[]
-	 * responses = idp.requestSecurityToken2(request);
+	 * ClientUtils.createProxy(X509AuthnPortType.class, idpEpr);
+	 * RequestSecurityTokenResponseType[] responses =
+	 * idp.requestSecurityToken2(request);
 	 * 
-	 * if (responses != null) { for (RequestSecurityTokenResponseType response : responses) {
-	 * gatheredResponses.add(response); } } } catch (Exception e) {
-	 * _logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(),
-	 * e); } }
+	 * if (responses != null) { for (RequestSecurityTokenResponseType response :
+	 * responses) { gatheredResponses.add(response); } } } catch (Exception e) {
+	 * _logger.error("Could not retrieve token for IDP " + entry.getName() +
+	 * ": " + e.getMessage(), e); } }
 	 * 
 	 * return gatheredResponses; }
 	 */
 
 	@RWXMapping(RWXCategory.EXECUTE)
-	public RequestSecurityTokenResponseType[] requestSecurityToken2(RequestSecurityTokenType request)
-		throws java.rmi.RemoteException
-	{
-		return X509AuthnServiceImpl.sharedSecurityTokenResponder(this, _resource, request);
+	public RequestSecurityTokenResponseType[] requestSecurityToken2(
+			RequestSecurityTokenType request) throws java.rmi.RemoteException {
+		return X509AuthnServiceImpl.sharedSecurityTokenResponder(this,
+				_resource, request);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, RNSEntryExistsFaultType,
-		ResourceUnknownFaultType
-	{
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
+			throws RemoteException, RNSEntryExistsFaultType,
+			ResourceUnknownFaultType {
 		return addRNSEntries(addRequest, _resource);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public LookupResponseType lookup(String[] lookupRequest) throws RemoteException, ResourceUnknownFaultType
-	{
+	public LookupResponseType lookup(String[] lookupRequest)
+			throws RemoteException, ResourceUnknownFaultType {
 		return lookup(lookupRequest, _resource);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] remove(String[] removeRequest) throws RemoteException, WriteNotPermittedFaultType
-	{
+	public RNSEntryResponseType[] remove(String[] removeRequest)
+			throws RemoteException, WriteNotPermittedFaultType {
 		return remove(removeRequest, _resource);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest) throws RemoteException, WriteNotPermittedFaultType
-	{
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
+			throws RemoteException, WriteNotPermittedFaultType {
 		throw new RemoteException("\"rename\" not applicable.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
-		WriteNotPermittedFaultType
-	{
+	public RNSEntryResponseType[] setMetadata(
+			MetadataMappingType[] setMetadataRequest) throws RemoteException,
+			WriteNotPermittedFaultType {
 		throw new RemoteException("\"setMetadata\" not applicable.");
 	}
 
 	@Override
-	public STSResourcePropertiesRetriever getResourcePropertyRetriver()
-	{
+	public STSResourcePropertiesRetriever getResourcePropertyRetriver() {
 		return new kerberosResourcePropertiesRetriever();
 	}
 
 	@Override
-	public Set<QName> getSensitivePropertyNames()
-	{
+	public Set<QName> getSensitivePropertyNames() {
 		Set<QName> propertyNames = super.getSensitivePropertyNames();
 		propertyNames.add(SecurityConstants.NEW_KERB_IDP_REALM_QNAME);
 		propertyNames.add(SecurityConstants.NEW_KERB_IDP_KDC_QNAME);
 		return propertyNames;
 	}
 
-	public static class kerberosResourcePropertiesRetriever extends CommonSTSPropertiesRetriever
-	{
+	public static class kerberosResourcePropertiesRetriever extends
+			CommonSTSPropertiesRetriever {
 		@Override
-		public void retrieveAndStoreResourceProperties(GeniiCommon proxyToPrimary, IRNSResource resource) throws Exception
-		{
+		public void retrieveAndStoreResourceProperties(
+				GeniiCommon proxyToPrimary, IRNSResource resource)
+				throws Exception {
 			super.retrieveAndStoreResourceProperties(proxyToPrimary, resource);
 
 			QName[] propertyNames = new QName[2];
 			propertyNames[0] = SecurityConstants.NEW_KERB_IDP_REALM_QNAME;
 			propertyNames[1] = SecurityConstants.NEW_KERB_IDP_KDC_QNAME;
-			GetMultipleResourcePropertiesResponse response = proxyToPrimary.getMultipleResourceProperties(propertyNames);
+			GetMultipleResourcePropertiesResponse response = proxyToPrimary
+					.getMultipleResourceProperties(propertyNames);
 
 			MessageElement[] propertyValues = response.get_any();
-			if (propertyValues == null || propertyValues.length < propertyNames.length) {
-				throw new RemoteException("Could not retrieve all necessary resource properties");
+			if (propertyValues == null
+					|| propertyValues.length < propertyNames.length) {
+				throw new RemoteException(
+						"Could not retrieve all necessary resource properties");
 			}
 
 			for (MessageElement element : propertyValues) {
 				QName name = element.getQName();
 				String value = element.getValue();
 				if (value == null) {
-					String msg = "A required Kerberos attribute is missing: " + name;
+					String msg = "A required Kerberos attribute is missing: "
+							+ name;
 					_logger.error(msg);
 					throw new RuntimeException(msg);
 				}
 				if (SecurityConstants.NEW_KERB_IDP_REALM_QNAME.equals(name)) {
-					resource.setProperty(SecurityConstants.NEW_KERB_IDP_REALM_QNAME.getLocalPart(), value);
-				} else if (SecurityConstants.NEW_KERB_IDP_KDC_QNAME.equals(name)) {
-					resource.setProperty(SecurityConstants.NEW_KERB_IDP_KDC_QNAME.getLocalPart(), value);
+					resource.setProperty(
+							SecurityConstants.NEW_KERB_IDP_REALM_QNAME
+									.getLocalPart(), value);
+				} else if (SecurityConstants.NEW_KERB_IDP_KDC_QNAME
+						.equals(name)) {
+					resource.setProperty(
+							SecurityConstants.NEW_KERB_IDP_KDC_QNAME
+									.getLocalPart(), value);
 				}
 			}
 		}

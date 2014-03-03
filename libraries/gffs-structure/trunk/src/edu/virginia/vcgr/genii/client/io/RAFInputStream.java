@@ -17,37 +17,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
-public class RAFInputStream extends InputStream
-{
+public class RAFInputStream extends InputStream {
 	private RandomAccessFile _raf;
 
-	public RAFInputStream(RandomAccessFile raf)
-	{
+	public RAFInputStream(RandomAccessFile raf) {
 		_raf = raf;
 	}
 
-	public void close() throws IOException
-	{
+	public void close() throws IOException {
 		_raf.close();
 	}
 
-	public int read() throws IOException
-	{
+	public int read() throws IOException {
 		return _raf.read();
 	}
 
-	public int read(byte[] b) throws IOException
-	{
+	public int read(byte[] b) throws IOException {
 		return _raf.read(b);
 	}
 
-	public int read(byte[] b, int off, int len) throws IOException
-	{
+	public int read(byte[] b, int off, int len) throws IOException {
 		return _raf.read(b, off, len);
 	}
 
-	public long skip(long n) throws IOException
-	{
+	public long skip(long n) throws IOException {
 		return _raf.skipBytes((int) n);
 	}
 }

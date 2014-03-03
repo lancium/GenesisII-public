@@ -38,43 +38,46 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = DBBrokerResourceProvider.class)
-public class GeniiWSNBrokerServiceImpl extends GenesisIIBase implements GeniiWSNBrokerPortType
-{
+public class GeniiWSNBrokerServiceImpl extends GenesisIIBase implements
+		GeniiWSNBrokerPortType {
 	@SuppressWarnings("unused")
-	static private Log _logger = LogFactory.getLog(GeniiWSNBrokerServiceImpl.class);
+	static private Log _logger = LogFactory
+			.getLog(GeniiWSNBrokerServiceImpl.class);
 
-	private class BrokeredNotificationHandler extends AbstractNotificationHandler<NotificationMessageContents>
-	{
-		private BrokeredNotificationHandler()
-		{
+	private class BrokeredNotificationHandler extends
+			AbstractNotificationHandler<NotificationMessageContents> {
+		private BrokeredNotificationHandler() {
 			super(NotificationMessageContents.class);
 		}
 
 		@Override
-		final public String handleNotification(TopicPath topic, EndpointReferenceType producerReference,
-			EndpointReferenceType subscriptionReference, NotificationMessageContents contents) throws Exception
-		{
+		final public String handleNotification(TopicPath topic,
+				EndpointReferenceType producerReference,
+				EndpointReferenceType subscriptionReference,
+				NotificationMessageContents contents) throws Exception {
 			// Should we broker attachments?
 			GeniiAttachment attachment = null;
 
 			ResourceKey rKey = ResourceManager.getCurrentResource();
-			WSNotificationContainerService wsnService = ContainerServices.findService(WSNotificationContainerService.class);
+			WSNotificationContainerService wsnService = ContainerServices
+					.findService(WSNotificationContainerService.class);
 
-			wsnService.publishNotification(rKey.getResourceKey(), producerReference, topic, contents, attachment);
+			wsnService.publishNotification(rKey.getResourceKey(),
+					producerReference, topic, contents, attachment);
 			return NotificationConstants.OK;
 		}
 	}
 
 	@Override
-	protected void registerNotificationHandlers(NotificationMultiplexer multiplexer)
-	{
+	protected void registerNotificationHandlers(
+			NotificationMultiplexer multiplexer) {
 		super.registerNotificationHandlers(multiplexer);
 
-		multiplexer.registerNotificationHandler(null, new BrokeredNotificationHandler());
+		multiplexer.registerNotificationHandler(null,
+				new BrokeredNotificationHandler());
 	}
 
-	public GeniiWSNBrokerServiceImpl() throws RemoteException
-	{
+	public GeniiWSNBrokerServiceImpl() throws RemoteException {
 		super("GeniiWSNBrokerPortType");
 
 		addImplementedPortType(WSRFConstants.WSN_CREATE_PULL_POINT_PORT());
@@ -83,25 +86,27 @@ public class GeniiWSNBrokerServiceImpl extends GenesisIIBase implements GeniiWSN
 	}
 
 	@Override
-	public PortType getFinalWSResourceInterface()
-	{
+	public PortType getFinalWSResourceInterface() {
 		return WellKnownPortTypes.GENII_WSNBROKER_PORT_TYPE();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreatePullPointResponse createPullPoint(CreatePullPoint_Element arg0) throws RemoteException,
-		UnableToCreatePullPointFaultType
-	{
-		throw FaultManipulator.fillInFault(new UnableToCreatePullPointFaultType());
+	public CreatePullPointResponse createPullPoint(CreatePullPoint_Element arg0)
+			throws RemoteException, UnableToCreatePullPointFaultType {
+		throw FaultManipulator
+				.fillInFault(new UnableToCreatePullPointFaultType());
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public RegisterPublisherResponse registerPublisher(RegisterPublisher arg0) throws RemoteException,
-		PublisherRegistrationRejectedFaultType, TopicNotSupportedFaultType, UnacceptableInitialTerminationTimeFaultType,
-		InvalidTopicExpressionFaultType, ResourceUnknownFaultType, PublisherRegistrationFailedFaultType
-	{
-		throw FaultManipulator.fillInFault(new PublisherRegistrationRejectedFaultType());
+	public RegisterPublisherResponse registerPublisher(RegisterPublisher arg0)
+			throws RemoteException, PublisherRegistrationRejectedFaultType,
+			TopicNotSupportedFaultType,
+			UnacceptableInitialTerminationTimeFaultType,
+			InvalidTopicExpressionFaultType, ResourceUnknownFaultType,
+			PublisherRegistrationFailedFaultType {
+		throw FaultManipulator
+				.fillInFault(new PublisherRegistrationRejectedFaultType());
 	}
 }

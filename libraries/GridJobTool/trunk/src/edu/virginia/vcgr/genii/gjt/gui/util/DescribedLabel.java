@@ -8,8 +8,7 @@ import javax.swing.JLabel;
 
 import edu.virginia.vcgr.genii.gjt.data.Describer;
 
-public class DescribedLabel<Type> extends JLabel
-{
+public class DescribedLabel<Type> extends JLabel {
 	static final long serialVersionUID = 0L;
 
 	static final private int BUFFER = 15;
@@ -18,8 +17,7 @@ public class DescribedLabel<Type> extends JLabel
 	private Describer<Type> _describer;
 
 	@Override
-	protected void paintComponent(Graphics _g)
-	{
+	protected void paintComponent(Graphics _g) {
 		String toDisplay = "...";
 		Graphics2D g = (Graphics2D) _g;
 
@@ -28,7 +26,8 @@ public class DescribedLabel<Type> extends JLabel
 			if (verbosity == 0)
 				break;
 
-			Rectangle2D rectangle = g.getFont().getStringBounds(toDisplay, g.getFontRenderContext());
+			Rectangle2D rectangle = g.getFont().getStringBounds(toDisplay,
+					g.getFontRenderContext());
 			if (rectangle.getWidth() <= (getWidth() - BUFFER))
 				break;
 		}
@@ -37,8 +36,7 @@ public class DescribedLabel<Type> extends JLabel
 		super.paintComponent(g);
 	}
 
-	public DescribedLabel(Type data, Describer<Type> describer)
-	{
+	public DescribedLabel(Type data, Describer<Type> describer) {
 		_data = data;
 		_describer = describer;
 	}

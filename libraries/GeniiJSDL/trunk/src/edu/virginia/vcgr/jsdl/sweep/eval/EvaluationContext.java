@@ -30,36 +30,35 @@ import edu.virginia.vcgr.jsdl.sweep.SweepListener;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class EvaluationContext implements Cloneable
-{
+public class EvaluationContext implements Cloneable {
 	private SweepListener _listener;
 	private Node _document;
 	private Unmarshaller _unmarshaller;
 
-	public EvaluationContext(SweepListener listener, Unmarshaller unmarshaller, Node document)
-	{
+	public EvaluationContext(SweepListener listener, Unmarshaller unmarshaller,
+			Node document) {
 		_listener = listener;
 		_unmarshaller = unmarshaller;
 		_document = document;
 	}
 
 	@Override
-	final public Object clone()
-	{
-		return new EvaluationContext(_listener, _unmarshaller, _document.cloneNode(true));
+	final public Object clone() {
+		return new EvaluationContext(_listener, _unmarshaller,
+				_document.cloneNode(true));
 	}
 
-	final public void emit() throws SweepException
-	{
+	final public void emit() throws SweepException {
 		try {
-			_listener.emitSweepInstance((JobDefinition) _unmarshaller.unmarshal(new DOMSource(_document)));
+			_listener.emitSweepInstance((JobDefinition) _unmarshaller
+					.unmarshal(new DOMSource(_document)));
 		} catch (JAXBException e) {
-			throw new SweepException("Unable to unmarshall sweep result into JSDL document.", e);
+			throw new SweepException(
+					"Unable to unmarshall sweep result into JSDL document.", e);
 		}
 	}
 
-	final public Node document()
-	{
+	final public Node document() {
 		return _document;
 	}
 }

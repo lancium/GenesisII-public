@@ -6,22 +6,20 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-public class MessageNormalizable extends AbstractXMLComponent implements IXMLComponent
-{
+public class MessageNormalizable extends AbstractXMLComponent implements
+		IXMLComponent {
 	protected QName _message;
 
-	public MessageNormalizable(WsdlSourcePath sourcePath, IXMLComponent parent, Node node) throws WsdlException
-	{
+	public MessageNormalizable(WsdlSourcePath sourcePath, IXMLComponent parent,
+			Node node) throws WsdlException {
 		super(sourcePath, parent, node);
 	}
 
-	public QName getMessage()
-	{
+	public QName getMessage() {
 		return _message;
 	}
 
-	protected void normalizeMessage() throws WsdlException
-	{
+	protected void normalizeMessage() throws WsdlException {
 		String newMessagePrefix = null;
 		String newDocumentPrefix = null;
 		String messageNamespace = _message.getNamespaceURI();
@@ -52,16 +50,19 @@ public class MessageNormalizable extends AbstractXMLComponent implements IXMLCom
 
 		Element myElement = (Element) _representedNode;
 		if (newMessagePrefix != null) {
-			myElement.getAttributeNode(WsdlConstants.MESSAGE_ATTR).setNodeValue(newMessagePrefix + ":" + messageName);
+			myElement.getAttributeNode(WsdlConstants.MESSAGE_ATTR)
+					.setNodeValue(newMessagePrefix + ":" + messageName);
 		}
 		if (newDocumentPrefix != null) {
-			myElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:" + newDocumentPrefix, messageNamespace);
+			myElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
+					"xmlns:" + newDocumentPrefix, messageNamespace);
 		}
 	}
 
-	protected String getMessagePrefix() throws WsdlException
-	{
-		String msgString = WsdlUtils.getAttribute(_representedNode.getAttributes(), WsdlConstants.MESSAGE_ATTR, true);
+	protected String getMessagePrefix() throws WsdlException {
+		String msgString = WsdlUtils.getAttribute(
+				_representedNode.getAttributes(), WsdlConstants.MESSAGE_ATTR,
+				true);
 		int index = msgString.indexOf(':');
 		return msgString.substring(0, index);
 	}

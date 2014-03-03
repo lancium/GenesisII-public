@@ -18,21 +18,19 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
 /**
- * This class implements the default tab plugin display which shows the RNS path and EPR of the
- * selected instance.
+ * This class implements the default tab plugin display which shows the RNS path
+ * and EPR of the selected instance.
  * 
  * @author mmm2a
  */
-public class DefaultSelectionDisplayPlugin implements ITabPlugin
-{
+public class DefaultSelectionDisplayPlugin implements ITabPlugin {
 	private JScrollPane _scrollPane;
 	private JTextArea _textArea;
 
 	/**
 	 * Create a new default selection display plugin instance.
 	 */
-	public DefaultSelectionDisplayPlugin()
-	{
+	public DefaultSelectionDisplayPlugin() {
 		_textArea = new JTextArea();
 		_textArea.setEditable(false);
 
@@ -40,14 +38,14 @@ public class DefaultSelectionDisplayPlugin implements ITabPlugin
 	}
 
 	@Override
-	public Component getComponent(RNSPath[] selectedPaths) throws PluginException
-	{
+	public Component getComponent(RNSPath[] selectedPaths)
+			throws PluginException {
 		boolean first = true;
 		StringBuilder builder = new StringBuilder();
 
 		/*
-		 * For each path that we were given, we will create a string document which has the
-		 * appropriate text embedded to be displayed.
+		 * For each path that we were given, we will create a string document
+		 * which has the appropriate text embedded to be displayed.
 		 */
 		for (RNSPath path : selectedPaths) {
 			if (!first)
@@ -59,7 +57,8 @@ public class DefaultSelectionDisplayPlugin implements ITabPlugin
 
 			try {
 				StringWriter writer = new StringWriter();
-				ObjectSerializer.serialize(writer, path.getEndpoint(), new QName("http://tempuri.org", "EPR"));
+				ObjectSerializer.serialize(writer, path.getEndpoint(),
+						new QName("http://tempuri.org", "EPR"));
 				writer.flush();
 				builder.append("\n");
 				builder.append(writer.toString());
@@ -73,8 +72,8 @@ public class DefaultSelectionDisplayPlugin implements ITabPlugin
 
 		try {
 			/*
-			 * Now that we have the text that we want to display, we have to update the tab's
-			 * component display to show that text.
+			 * Now that we have the text that we want to display, we have to
+			 * update the tab's component display to show that text.
 			 */
 			Document doc = _textArea.getDocument();
 			doc.remove(0, doc.getLength());
@@ -84,13 +83,14 @@ public class DefaultSelectionDisplayPlugin implements ITabPlugin
 			return _scrollPane;
 		} catch (BadLocationException ble) {
 			// This really shouldn't happen
-			throw new PluginException("Unexpected exception trying to describe endpoint.", ble);
+			throw new PluginException(
+					"Unexpected exception trying to describe endpoint.", ble);
 		}
 	}
 
 	@Override
-	public PluginStatus getStatus(RNSPath[] selectedResources) throws PluginException
-	{
+	public PluginStatus getStatus(RNSPath[] selectedResources)
+			throws PluginException {
 		return PluginStatus.ACTIVTE;
 	}
 }

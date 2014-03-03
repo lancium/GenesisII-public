@@ -31,16 +31,14 @@ import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class ContextManager
-{
+public class ContextManager {
 	static private final String _CONTEXT_RESOLVER_NAME = "context-resolver";
 	static private Log _logger = LogFactory.getLog(ContextManager.class);
 
-	static private class ResolverThreadLocal extends InheritableThreadLocal<IContextResolver>
-	{
+	static private class ResolverThreadLocal extends
+			InheritableThreadLocal<IContextResolver> {
 		@Override
-		protected IContextResolver childValue(IContextResolver parentValue)
-		{
+		protected IContextResolver childValue(IContextResolver parentValue) {
 			if (parentValue == null)
 				return null;
 
@@ -51,31 +49,33 @@ public class ContextManager
 	static private ResolverThreadLocal _resolver = new ResolverThreadLocal();
 
 	// this function requires that the context has already been established.
-	static public ICallingContext getExistingContext() throws FileNotFoundException, IOException
-	{
+	static public ICallingContext getExistingContext()
+			throws FileNotFoundException, IOException {
 		ICallingContext ctxt = getCurrentContext();
 		if (ctxt == null) {
-			throw new ConfigurationException("Unable to locate calling context information.");
+			throw new ConfigurationException(
+					"Unable to locate calling context information.");
 		}
 		return ctxt;
 	}
 
-	// this function locates the current calling context, which could actually be null.
-	static public ICallingContext getCurrentContext() throws FileNotFoundException, IOException
-	{
+	// this function locates the current calling context, which could actually
+	// be null.
+	static public ICallingContext getCurrentContext()
+			throws FileNotFoundException, IOException {
 		return getResolver().load();
 	}
 
-	static public void storeCurrentContext(ICallingContext context) throws FileNotFoundException, IOException
-	{
+	static public void storeCurrentContext(ICallingContext context)
+			throws FileNotFoundException, IOException {
 		getResolver().store(context);
 	}
 
-	static public ICallingContext bootstrap(RNSPath root) throws IOException
-	{
+	static public ICallingContext bootstrap(RNSPath root) throws IOException {
 		ICallingContext bootContext = new CallingContextImpl(root);
 
-		// we may have a dummy context that contains login information necesary to boot
+		// we may have a dummy context that contains login information necesary
+		// to boot
 		ICallingContext current = getCurrentContext();
 		if (current != null) {
 			ContextType t = bootContext.getSerialized();
@@ -85,15 +85,16 @@ public class ContextManager
 		return bootContext;
 	}
 
-	synchronized static public IContextResolver getResolver()
-	{
+	synchronized static public IContextResolver getResolver() {
 		IContextResolver resolver = _resolver.get();
 		if (resolver == null) {
-			resolver = (IContextResolver) NamedInstances.getRoleBasedInstances().lookup(_CONTEXT_RESOLVER_NAME);
+			resolver = (IContextResolver) NamedInstances
+					.getRoleBasedInstances().lookup(_CONTEXT_RESOLVER_NAME);
 
 			if (_resolver == null)
-				throw new ConfigurationException("Unable to locate a \"" + _CONTEXT_RESOLVER_NAME
-					+ "\" resolver in the config file.");
+				throw new ConfigurationException("Unable to locate a \""
+						+ _CONTEXT_RESOLVER_NAME
+						+ "\" resolver in the config file.");
 
 			_resolver.set(resolver);
 		}
@@ -101,49 +102,47 @@ public class ContextManager
 		return resolver;
 	}
 
-	static public void setResolver(IContextResolver resolver)
-	{
+	static public void setResolver(IContextResolver resolver) {
 		_resolver.set(resolver);
 	}
 
-	static public Closeable temporarilyAssumeContext(ICallingContext context)
-	{
+	static public Closeable temporarilyAssumeContext(ICallingContext context) {
 		IContextResolver oldResolver = ContextManager.getResolver();
 		ContextManager.setResolver(new MemoryBasedContextResolver(context));
 		return new AssumedContextState(oldResolver);
 	}
 
-	static private class AssumedContextState implements Closeable
-	{
+	static private class AssumedContextState implements Closeable {
 		private IContextResolver _oldResolver;
 
-		private AssumedContextState(IContextResolver oldResolver)
-		{
+		private AssumedContextState(IContextResolver oldResolver) {
 
 			_oldResolver = oldResolver;
 		}
 
 		@Override
-		public void close()
-		{
+		public void close() {
 			ContextManager.setResolver(_oldResolver);
 		}
 	}
 
-	static public boolean isGood(ICallingContext ctxt)
-	{
+	static public boolean isGood(ICallingContext ctxt) {
 		try {
 			SecurityUpdateResults secResults = new SecurityUpdateResults();
-			ClientUtils.checkAndRenewCredentials(ctxt, BaseGridTool.credsValidUntil(), secResults);
+			ClientUtils.checkAndRenewCredentials(ctxt,
+					BaseGridTool.credsValidUntil(), secResults);
 			if (secResults.removedCredentials().size() > 0)
 				return false;
-			Collection<Identity> identities = KeystoreManager.getCallerIdentities(ctxt);
+			Collection<Identity> identities = KeystoreManager
+					.getCallerIdentities(ctxt);
 			if (identities == null || identities.size() == 0)
 				return false;
 
 			return true;
 		} catch (Throwable cause) {
-			_logger.warn("Got an exception trying to check validity of calling " + "context -- marking it bad.", cause);
+			_logger.warn(
+					"Got an exception trying to check validity of calling "
+							+ "context -- marking it bad.", cause);
 		}
 
 		return false;

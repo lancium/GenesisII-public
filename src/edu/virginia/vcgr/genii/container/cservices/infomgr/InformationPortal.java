@@ -16,15 +16,15 @@ import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.utils.Duration;
 
 /**
- * An Information Portal is a portal through which "information" can be acquired about endpoints.
- * This portal can cache values and gets updated values on separate threads from a thread pool.
+ * An Information Portal is a portal through which "information" can be acquired
+ * about endpoints. This portal can cache values and gets updated values on
+ * separate threads from a thread pool.
  * 
  * @author mmm2a
  * 
  * @param <InformationType>
  */
-public class InformationPortal<InformationType> implements Closeable
-{
+public class InformationPortal<InformationType> implements Closeable {
 	private Duration _defaultTimeout;
 	private Duration _defaultCacheWindow;
 
@@ -36,22 +36,22 @@ public class InformationPortal<InformationType> implements Closeable
 
 	private Set<InformationEndpoint> _currentlyResolving = new HashSet<InformationEndpoint>();
 
-	private Map<InformationEndpoint, Collection<WaitingListener<InformationType>>> _waitingListeners =
-		new HashMap<InformationEndpoint, Collection<WaitingListener<InformationType>>>();
+	private Map<InformationEndpoint, Collection<WaitingListener<InformationType>>> _waitingListeners = new HashMap<InformationEndpoint, Collection<WaitingListener<InformationType>>>();
 
-	private void handleTimeout(InformationEndpoint endpoint, InformationListener<InformationType> listener)
-	{
+	private void handleTimeout(InformationEndpoint endpoint,
+			InformationListener<InformationType> listener) {
 		InformationResult<InformationType> oldResult;
 		InformationResult<InformationType> newResult;
 
 		synchronized (_persister) {
 			oldResult = _persister.get(endpoint);
 			if (oldResult != null)
-				newResult =
-					new InformationResult<InformationType>(oldResult.information(), Calendar.getInstance(),
+				newResult = new InformationResult<InformationType>(
+						oldResult.information(), Calendar.getInstance(),
 						new TimeoutException());
 			else
-				newResult = new InformationResult<InformationType>(null, Calendar.getInstance(), new TimeoutException());
+				newResult = new InformationResult<InformationType>(null,
+						Calendar.getInstance(), new TimeoutException());
 			_persister.persist(endpoint, newResult);
 		}
 
@@ -59,14 +59,14 @@ public class InformationPortal<InformationType> implements Closeable
 	}
 
 	@Override
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		close();
 	}
 
-	InformationPortal(Executor executor, InformationPersister<InformationType> persister,
-		InformationResolver<InformationType> resolver, Duration defaultTimeout, Duration defaultCacheWindow)
-	{
+	InformationPortal(Executor executor,
+			InformationPersister<InformationType> persister,
+			InformationResolver<InformationType> resolver,
+			Duration defaultTimeout, Duration defaultCacheWindow) {
 		_executor = executor;
 		_persister = persister;
 		_resolver = resolver;
@@ -74,14 +74,15 @@ public class InformationPortal<InformationType> implements Closeable
 		_defaultTimeout = defaultTimeout;
 		_defaultCacheWindow = defaultCacheWindow;
 
-		Thread th = new Thread(new TimeoutWorker(), "Information Portal Timeout Worker");
+		Thread th = new Thread(new TimeoutWorker(),
+				"Information Portal Timeout Worker");
 		th.setDaemon(true);
 		th.start();
 	}
 
-	public void getInformation(InformationEndpoint endpoint, InformationListener<InformationType> listener, Duration timeout,
-		Duration cacheWindow)
-	{
+	public void getInformation(InformationEndpoint endpoint,
+			InformationListener<InformationType> listener, Duration timeout,
+			Duration cacheWindow) {
 		if (timeout == null)
 			timeout = _defaultTimeout;
 		if (cacheWindow == null)
@@ -89,20 +90,27 @@ public class InformationPortal<InformationType> implements Closeable
 
 		Calendar timeoutExpiration = timeout.getExpiration();
 
-		WaitingListener<InformationType> waiter = new WaitingListener<InformationType>(listener, timeoutExpiration);
+		WaitingListener<InformationType> waiter = new WaitingListener<InformationType>(
+				listener, timeoutExpiration);
 
 		synchronized (_waitingListeners) {
 			synchronized (_persister) {
-				InformationResult<InformationType> result = _persister.get(endpoint);
-				if (result != null && cacheWindow.getExpiration(result.lastUpdated()).after(Calendar.getInstance())) {
+				InformationResult<InformationType> result = _persister
+						.get(endpoint);
+				if (result != null
+						&& cacheWindow.getExpiration(result.lastUpdated())
+								.after(Calendar.getInstance())) {
 					listener.informationUpdated(endpoint, result);
 					return;
 				}
 			}
 
-			Collection<WaitingListener<InformationType>> listeners = _waitingListeners.get(endpoint);
+			Collection<WaitingListener<InformationType>> listeners = _waitingListeners
+					.get(endpoint);
 			if (listeners == null)
-				_waitingListeners.put(endpoint, listeners = new LinkedList<WaitingListener<InformationType>>());
+				_waitingListeners
+						.put(endpoint,
+								listeners = new LinkedList<WaitingListener<InformationType>>());
 			listeners.add(waiter);
 
 			_waitingListeners.notifyAll();
@@ -118,35 +126,35 @@ public class InformationPortal<InformationType> implements Closeable
 		_executor.execute(new ResolverWorker(endpoint));
 	}
 
-	public void getInformation(InformationEndpoint endpoint, InformationListener<InformationType> listener)
-	{
+	public void getInformation(InformationEndpoint endpoint,
+			InformationListener<InformationType> listener) {
 		getInformation(endpoint, listener, _defaultTimeout, _defaultCacheWindow);
 	}
 
-	public void getInformation(InformationEndpoint endpoint, InformationListener<InformationType> listener, boolean force)
-	{
+	public void getInformation(InformationEndpoint endpoint,
+			InformationListener<InformationType> listener, boolean force) {
 		if (!force)
-			getInformation(endpoint, listener, _defaultTimeout, _defaultCacheWindow);
+			getInformation(endpoint, listener, _defaultTimeout,
+					_defaultCacheWindow);
 		else
 			getInformation(endpoint, listener, _defaultTimeout, new Duration(1));
 	}
 
-	public InformationResult<InformationType> getInformation(InformationEndpoint endpoint, Duration timeout,
-		Duration cacheWindow) throws InterruptedException
-	{
+	public InformationResult<InformationType> getInformation(
+			InformationEndpoint endpoint, Duration timeout, Duration cacheWindow)
+			throws InterruptedException {
 		BlockingInformationListener<InformationType> listener = new BlockingInformationListener<InformationType>();
 		getInformation(endpoint, listener, timeout, cacheWindow);
 		return listener.get();
 	}
 
-	public InformationResult<InformationType> getInformation(InformationEndpoint endpoint) throws InterruptedException
-	{
+	public InformationResult<InformationType> getInformation(
+			InformationEndpoint endpoint) throws InterruptedException {
 		return getInformation(endpoint, _defaultTimeout, _defaultCacheWindow);
 	}
 
 	@Override
-	public void close() throws IOException
-	{
+	public void close() throws IOException {
 		synchronized (_waitingListeners) {
 			if (!_closed) {
 				_closed = true;
@@ -155,15 +163,14 @@ public class InformationPortal<InformationType> implements Closeable
 		}
 	}
 
-	private class TimeoutWorker implements Runnable
-	{
-		private Calendar doTimeouts()
-		{
+	private class TimeoutWorker implements Runnable {
+		private Calendar doTimeouts() {
 			Calendar now = Calendar.getInstance();
 			Calendar ret = null;
 
 			for (InformationEndpoint endpoint : _waitingListeners.keySet()) {
-				Collection<WaitingListener<InformationType>> listeners = _waitingListeners.get(endpoint);
+				Collection<WaitingListener<InformationType>> listeners = _waitingListeners
+						.get(endpoint);
 				if (listeners != null) {
 					for (WaitingListener<InformationType> listener : listeners) {
 						Calendar tmp = listener.getTimeout();
@@ -188,8 +195,7 @@ public class InformationPortal<InformationType> implements Closeable
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			synchronized (_waitingListeners) {
 				while (!_closed) {
 					Calendar nextTimeout = doTimeouts();
@@ -197,7 +203,8 @@ public class InformationPortal<InformationType> implements Closeable
 					if (nextTimeout == null)
 						timeout = Long.MAX_VALUE;
 					else
-						timeout = nextTimeout.getTimeInMillis() - System.currentTimeMillis();
+						timeout = nextTimeout.getTimeInMillis()
+								- System.currentTimeMillis();
 					if (timeout < 0L) {
 						timeout = 1L;
 					}
@@ -212,13 +219,11 @@ public class InformationPortal<InformationType> implements Closeable
 		}
 	}
 
-	private class ResolverWorker implements Runnable
-	{
+	private class ResolverWorker implements Runnable {
 		private InformationEndpoint _endpoint;
 		private LoggingContext _loggingContext;
 
-		public ResolverWorker(InformationEndpoint endpoint)
-		{
+		public ResolverWorker(InformationEndpoint endpoint) {
 			_endpoint = endpoint;
 			try {
 				_loggingContext = LoggingContext.getCurrentLoggingContext();
@@ -228,8 +233,7 @@ public class InformationPortal<InformationType> implements Closeable
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			try {
 				LoggingContext.adoptExistingContext(_loggingContext);
 			} catch (ContextException e) {
@@ -241,7 +245,8 @@ public class InformationPortal<InformationType> implements Closeable
 
 			try {
 				info = _resolver.acquire(_endpoint, _defaultTimeout);
-				result = new InformationResult<InformationType>(info, Calendar.getInstance(), null);
+				result = new InformationResult<InformationType>(info,
+						Calendar.getInstance(), null);
 			} catch (Throwable cause) {
 				exception = cause;
 			}
@@ -249,21 +254,25 @@ public class InformationPortal<InformationType> implements Closeable
 			synchronized (_waitingListeners) {
 				synchronized (_persister) {
 					if (exception != null) {
-						InformationResult<InformationType> oldResult = _persister.get(_endpoint);
+						InformationResult<InformationType> oldResult = _persister
+								.get(_endpoint);
 						if (oldResult != null)
-							result =
-								new InformationResult<InformationType>(oldResult.information(), Calendar.getInstance(),
-									exception);
+							result = new InformationResult<InformationType>(
+									oldResult.information(),
+									Calendar.getInstance(), exception);
 						else
-							result = new InformationResult<InformationType>(null, Calendar.getInstance(), exception);
+							result = new InformationResult<InformationType>(
+									null, Calendar.getInstance(), exception);
 					}
 
 					_persister.persist(_endpoint, result);
 				}
 
-				Collection<WaitingListener<InformationType>> listeners = _waitingListeners.remove(_endpoint);
+				Collection<WaitingListener<InformationType>> listeners = _waitingListeners
+						.remove(_endpoint);
 				for (WaitingListener<InformationType> listener : listeners)
-					listener.getListener().informationUpdated(_endpoint, result);
+					listener.getListener()
+							.informationUpdated(_endpoint, result);
 			}
 
 			synchronized (_currentlyResolving) {

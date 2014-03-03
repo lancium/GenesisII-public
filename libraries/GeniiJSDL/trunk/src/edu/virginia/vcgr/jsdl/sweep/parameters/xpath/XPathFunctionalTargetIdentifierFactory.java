@@ -27,14 +27,16 @@ import edu.virginia.vcgr.jsdl.sweep.eval.SweepTargetIdentifier;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-class XPathFunctionalTargetIdentifierFactory
-{
-	static SweepTargetIdentifier createIdentifier(XPath xpath, String functionName, List<String> arguments)
-		throws XPathExpressionException
-	{
+class XPathFunctionalTargetIdentifierFactory {
+	static SweepTargetIdentifier createIdentifier(XPath xpath,
+			String functionName, List<String> arguments)
+			throws XPathExpressionException {
 		if (functionName.equals("substring"))
-			return new SubstringFunctionalSweepTargetIdentifier(xpath, arguments);
+			return new SubstringFunctionalSweepTargetIdentifier(xpath,
+					arguments);
 
-		throw new IllegalArgumentException(String.format("Don't know how to evaluate XPath function \"%s\".", functionName));
+		throw new IllegalArgumentException(String.format(
+				"Don't know how to evaluate XPath function \"%s\".",
+				functionName));
 	}
 }

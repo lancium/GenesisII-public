@@ -16,19 +16,16 @@ package edu.virginia.vcgr.genii.client.security.axis;
 
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
-public class AuthZSecurityException extends GenesisIISecurityException
-{
+public class AuthZSecurityException extends GenesisIISecurityException {
 	static final long serialVersionUID = 0;
 
 	protected Throwable _myCause = null;
 
-	public AuthZSecurityException(String msg)
-	{
+	public AuthZSecurityException(String msg) {
 		super(msg);
 	}
 
-	public AuthZSecurityException(String msg, Throwable cause)
-	{
+	public AuthZSecurityException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 

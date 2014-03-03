@@ -8,12 +8,10 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 
-public class IOUtils
-{
+public class IOUtils {
 	static final private int DEFAULT_COPY_BLOCK_SIZE = 1024 * 4;
 
-	static public void close(Closeable closeable)
-	{
+	static public void close(Closeable closeable) {
 		if (closeable != null) {
 			try {
 				closeable.close();
@@ -22,8 +20,8 @@ public class IOUtils
 		}
 	}
 
-	static public void copy(InputStream source, OutputStream sink, int blockSize) throws IOException
-	{
+	static public void copy(InputStream source, OutputStream sink, int blockSize)
+			throws IOException {
 		byte[] data = new byte[blockSize];
 		int read;
 
@@ -31,13 +29,13 @@ public class IOUtils
 			sink.write(data, 0, read);
 	}
 
-	static public void copy(InputStream source, OutputStream sink) throws IOException
-	{
+	static public void copy(InputStream source, OutputStream sink)
+			throws IOException {
 		copy(source, sink, DEFAULT_COPY_BLOCK_SIZE);
 	}
 
-	static public void copy(Reader source, Writer sink, int blockSize) throws IOException
-	{
+	static public void copy(Reader source, Writer sink, int blockSize)
+			throws IOException {
 		char[] data = new char[blockSize];
 		int read;
 
@@ -45,13 +43,12 @@ public class IOUtils
 			sink.write(data, 0, read);
 	}
 
-	static public void copy(Reader source, Writer sink) throws IOException
-	{
+	static public void copy(Reader source, Writer sink) throws IOException {
 		copy(source, sink, DEFAULT_COPY_BLOCK_SIZE);
 	}
 
-	static public void write(OutputStream out, ByteBuffer buffer) throws IOException
-	{
+	static public void write(OutputStream out, ByteBuffer buffer)
+			throws IOException {
 		byte[] data = new byte[buffer.remaining()];
 		int pos = buffer.position();
 		buffer.get(data);
@@ -65,12 +62,13 @@ public class IOUtils
 		}
 	}
 
-	static public void read(InputStream in, ByteBuffer buffer) throws IOException
-	{
+	static public void read(InputStream in, ByteBuffer buffer)
+			throws IOException {
 		byte[] data = new byte[buffer.remaining()];
 		int read;
 
-		while (buffer.hasRemaining() && (read = in.read(data, 0, buffer.remaining())) > 0)
+		while (buffer.hasRemaining()
+				&& (read = in.read(data, 0, buffer.remaining())) > 0)
 			buffer.put(data, 0, read);
 	}
 }

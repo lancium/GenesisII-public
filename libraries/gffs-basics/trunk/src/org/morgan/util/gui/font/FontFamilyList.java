@@ -6,17 +6,15 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 @SuppressWarnings("rawtypes")
-class FontFamilyList extends JList
-{
+class FontFamilyList extends JList {
 	static final long serialVersionUID = 0L;
 
 	private FontModel _model;
 
-	private class InternalListSelectionListener implements ListSelectionListener
-	{
+	private class InternalListSelectionListener implements
+			ListSelectionListener {
 		@Override
-		public void valueChanged(ListSelectionEvent e)
-		{
+		public void valueChanged(ListSelectionEvent e) {
 			Object value = getSelectedValue();
 			if (value != null)
 				_model.setFamily(value.toString());
@@ -24,8 +22,7 @@ class FontFamilyList extends JList
 	}
 
 	@SuppressWarnings("unchecked")
-	FontFamilyList(FontModel model)
-	{
+	FontFamilyList(FontModel model) {
 		super(new FontFamilyListModel());
 
 		_model = model;

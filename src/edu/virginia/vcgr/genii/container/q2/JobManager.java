@@ -82,30 +82,31 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 /**
- * The Job Manager class is the main class to handle adding/removing/managing jobs in the queue. It
- * DOES NOT handle scheduling of jobs (as that is really a matching process between information
- * stored in this manager and information stored in the BES manager) though it does help the
- * Scheduler with pieces of that function.
+ * The Job Manager class is the main class to handle adding/removing/managing
+ * jobs in the queue. It DOES NOT handle scheduling of jobs (as that is really a
+ * matching process between information stored in this manager and information
+ * stored in the BES manager) though it does help the Scheduler with pieces of
+ * that function.
  * 
  * @author mmm2a
  */
-public class JobManager implements Closeable
-{
+public class JobManager implements Closeable {
 	static private Log _logger = LogFactory.getLog(JobManager.class);
 
 	/**
-	 * How often we poll a running job (ms) to see if it is completed/failed or not. It would be
-	 * great if we could avoid polling, but BES doesn't require notification in the spec. so we
-	 * can't count on it.
+	 * How often we poll a running job (ms) to see if it is completed/failed or
+	 * not. It would be great if we could avoid polling, but BES doesn't require
+	 * notification in the spec. so we can't count on it.
 	 */
 	static final private long _STATUS_CHECK_FREQUENCY = 1000L * 60 * 5;
 
 	/** One hour of non-communication */
-	static final private long MAX_COMM_ATTEMPTS = (1000L * 60 * 60 * 1) / _STATUS_CHECK_FREQUENCY;
+	static final private long MAX_COMM_ATTEMPTS = (1000L * 60 * 60 * 1)
+			/ _STATUS_CHECK_FREQUENCY;
 
 	/**
-	 * The maximum number of times that we will allow a job to be started and failed before giving
-	 * up.
+	 * The maximum number of times that we will allow a job to be started and
+	 * failed before giving up.
 	 */
 	static final public short MAX_RUN_ATTEMPTS = 5;
 
@@ -119,45 +120,52 @@ public class JobManager implements Closeable
 	private BESManager _besManager;
 	private String _lastUserScheduled;
 
-	private volatile ArrayList<Long> _pendingChecks; // pending job status checks, performed during
+	private volatile ArrayList<Long> _pendingChecks; // pending job status
+														// checks, performed
+														// during
 														// slack time.
-	private volatile Calendar _whenToProcessNotifications; // the time when we should check all the
-															// pending status notifications.
-	private final int NOTIFICATION_CHECKING_DELAY = 5 * 1000; // how frequently to check for
+	private volatile Calendar _whenToProcessNotifications; // the time when we
+															// should check all
+															// the
+															// pending status
+															// notifications.
+	private final int NOTIFICATION_CHECKING_DELAY = 5 * 1000; // how frequently
+																// to check for
 																// notifications.
 
 	/**
-	 * A map of all jobs in the queue based off of the job's key in the database.
+	 * A map of all jobs in the queue based off of the job's key in the
+	 * database.
 	 */
 	private HashMap<Long, JobData> _jobsByID = new HashMap<Long, JobData>();
 
 	/**
-	 * A map of all jobs in the queue based off of the job's human readable job ticket.
+	 * A map of all jobs in the queue based off of the job's human readable job
+	 * ticket.
 	 */
 	private HashMap<String, JobData> _jobsByTicket = new HashMap<String, JobData>();
 
 	/**
-	 * All jobs in the queue that are waiting to run. This map is sorted by priority, then submit
-	 * time, then job ID.
+	 * All jobs in the queue that are waiting to run. This map is sorted by
+	 * priority, then submit time, then job ID.
 	 */
 	private TreeMap<SortableJobKey, JobData> _queuedJobs = new TreeMap<SortableJobKey, JobData>();
 
 	/**
-	 * All jobs in the queue, separated into lists for each user. Each user map is sorted like the
-	 * full map above.
+	 * All jobs in the queue, separated into lists for each user. Each user map
+	 * is sorted like the full map above.
 	 */
-	private HashMap<String, TreeMap<SortableJobKey, JobData>> _usersWithJobs =
-		new HashMap<String, TreeMap<SortableJobKey, JobData>>();
+	private HashMap<String, TreeMap<SortableJobKey, JobData>> _usersWithJobs = new HashMap<String, TreeMap<SortableJobKey, JobData>>();
 
 	/**
 	 * A map of all jobs currently running (or starting) in the queue.
 	 */
 	private HashMap<Long, JobData> _runningJobs = new HashMap<Long, JobData>();
 
-	public JobManager(ThreadPool outcallThreadPool, QueueDatabase database, SchedulingEvent schedulingEvent,
-		BESManager manager, Connection connection, ServerDatabaseConnectionPool connectionPool) throws SQLException,
-		ResourceException, GenesisIISecurityException
-	{
+	public JobManager(ThreadPool outcallThreadPool, QueueDatabase database,
+			SchedulingEvent schedulingEvent, BESManager manager,
+			Connection connection, ServerDatabaseConnectionPool connectionPool)
+			throws SQLException, ResourceException, GenesisIISecurityException {
 		_connectionPool = connectionPool;
 		_database = database;
 		_schedulingEvent = schedulingEvent;
@@ -166,23 +174,24 @@ public class JobManager implements Closeable
 
 		loadFromDatabase(connection);
 
-		ContainerServices.findService(HistoryContainerService.class).loadQueue(connection);
+		ContainerServices.findService(HistoryContainerService.class).loadQueue(
+				connection);
 
 		_whenToProcessNotifications = Calendar.getInstance();
-		_whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
+		_whenToProcessNotifications.add(Calendar.MILLISECOND,
+				NOTIFICATION_CHECKING_DELAY);
 		_pendingChecks = new ArrayList<Long>();
-		_statusChecker = new JobStatusChecker(connectionPool, this, _STATUS_CHECK_FREQUENCY);
+		_statusChecker = new JobStatusChecker(connectionPool, this,
+				_STATUS_CHECK_FREQUENCY);
 	}
 
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		super.finalize();
 
 		close();
 	}
 
-	synchronized public void close() throws IOException
-	{
+	synchronized public void close() throws IOException {
 		if (_closed)
 			return;
 
@@ -191,21 +200,22 @@ public class JobManager implements Closeable
 	}
 
 	/**
-	 * Load all jobs stored in the database into this manager. This operation should only be called
-	 * once at the beginning of each web server start.
+	 * Load all jobs stored in the database into this manager. This operation
+	 * should only be called once at the beginning of each web server start.
 	 * 
 	 * @param connection
 	 *            The database connection to use.
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized private void loadFromDatabase(Connection connection) throws SQLException, ResourceException
-	{
+	synchronized private void loadFromDatabase(Connection connection)
+			throws SQLException, ResourceException {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Starting to reload jobs from the database.");
 
 		/*
-		 * Ask the database for a list of all jobs stored in the database for this queue.
+		 * Ask the database for a list of all jobs stored in the database for
+		 * this queue.
 		 */
 		Collection<JobData> jobs = _database.loadAllJobs(connection);
 
@@ -213,37 +223,45 @@ public class JobManager implements Closeable
 		LinkedList<JobData> starting = new LinkedList<JobData>();
 		for (JobData job : jobs) {
 			/*
-			 * Put the job into the two identity maps (the two that all jobs go into.
+			 * Put the job into the two identity maps (the two that all jobs go
+			 * into.
 			 */
 			_jobsByID.put(new Long(job.getJobID()), job);
 			_jobsByTicket.put(job.getJobTicket(), job);
 
 			/*
-			 * Now, depending on the loaded job's state, we will perform some startup-load
-			 * operations
+			 * Now, depending on the loaded job's state, we will perform some
+			 * startup-load operations
 			 */
 			QueueStates jobState = job.getJobState();
 			if (!jobState.isFinalState()) {
 				/**
-				 * If the job was in the queue and was listed as queued, or re-queued, then we need
-				 * to put the job back into the "queued" list.
+				 * If the job was in the queue and was listed as queued, or
+				 * re-queued, then we need to put the job back into the "queued"
+				 * list.
 				 */
-				if (jobState.equals(QueueStates.QUEUED) || jobState.equals(QueueStates.REQUEUED)) {
+				if (jobState.equals(QueueStates.QUEUED)
+						|| jobState.equals(QueueStates.REQUEUED)) {
 					// Get owner identities, and extract username of primary
 					Collection<Long> jobID = new ArrayList<Long>();
 					jobID.add(job.getJobID());
 
-					HashMap<Long, PartialJobInfo> jobInfo = _database.getPartialJobInfos(connection, jobID);
+					HashMap<Long, PartialJobInfo> jobInfo = _database
+							.getPartialJobInfos(connection, jobID);
 
-					Collection<Identity> identities =
-						SecurityUtilities.filterCredentials(jobInfo.get(job.getJobID()).getOwners(),
-							SecurityUtilities.GROUP_TOKEN_PATTERN);
+					Collection<Identity> identities = SecurityUtilities
+							.filterCredentials(jobInfo.get(job.getJobID())
+									.getOwners(),
+									SecurityUtilities.GROUP_TOKEN_PATTERN);
 
-					identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
+					identities = SecurityUtilities.filterCredentials(
+							identities,
+							SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 					String username = identities.iterator().next().toString();
 
-					SortableJobKey jobKey = new SortableJobKey(job.getJobID(), job.getPriority(), job.getSubmitTime());
+					SortableJobKey jobKey = new SortableJobKey(job.getJobID(),
+							job.getPriority(), job.getSubmitTime());
 
 					_queuedJobs.put(jobKey, job);
 
@@ -257,15 +275,16 @@ public class JobManager implements Closeable
 						_usersWithJobs.put(username, userJobs);
 					}
 
-				} else if (jobState.equals(QueueStates.RUNNING) || job.getBESID() != null) {
+				} else if (jobState.equals(QueueStates.RUNNING)
+						|| job.getBESID() != null) {
 					if (!jobState.equals(QueueStates.RUNNING)) {
 						if (_logger.isDebugEnabled())
 							_logger.debug("Found a job not marked as running in the database, but with a bes id.");
 						job.setJobState(QueueStates.RUNNING);
 					}
 					/*
-					 * Otherwise, if the job was listed as running, we need to put it into the
-					 * running list.
+					 * Otherwise, if the job was listed as running, we need to
+					 * put it into the running list.
 					 */
 					_runningJobs.put(new Long(job.getJobID()), job);
 				} else {
@@ -284,11 +303,13 @@ public class JobManager implements Closeable
 			_logger.debug("Finished reloading jobs from the database.");
 
 		/*
-		 * Finally, we have to actually fail all of the jobs that were marked as starting.
+		 * Finally, we have to actually fail all of the jobs that were marked as
+		 * starting.
 		 */
 		if (starting.size() > 0)
-			_logger.debug(String.format("Failing %d jobs that were marked as starting when the " + "container went down.",
-				starting.size()));
+			_logger.debug(String.format(
+					"Failing %d jobs that were marked as starting when the "
+							+ "container went down.", starting.size()));
 		for (JobData job : starting)
 			failJob(connection, job.getJobID(), false, false, true);
 	}
@@ -301,21 +322,22 @@ public class JobManager implements Closeable
 	 * @param jobID
 	 *            The ID of the job to fail.
 	 * @param countAsAnAttempt
-	 *            Indicate whether or not this failure should count against the job's maximum
-	 *            attempt count.
+	 *            Indicate whether or not this failure should count against the
+	 *            job's maximum attempt count.
 	 * @return True if the job was requeued, false otherwise.
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public boolean failJob(Connection connection, long jobID, boolean countAsAnAttempt, boolean isPermanent,
-		boolean attemptKill) throws SQLException, ResourceException
-	{
+	synchronized public boolean failJob(Connection connection, long jobID,
+			boolean countAsAnAttempt, boolean isPermanent, boolean attemptKill)
+			throws SQLException, ResourceException {
 		boolean ret = false;
 		/* Find the job's in-memory information */
 		JobData job = _jobsByID.get(new Long(jobID));
 		if (job == null) {
 			// don't know where it went, but it's no longer our responsibility.
-			_logger.warn(String.format("Couldn't find job %d to fail it.", jobID));
+			_logger.warn(String.format("Couldn't find job %d to fail it.",
+					jobID));
 			return ret;
 		}
 
@@ -323,31 +345,37 @@ public class JobManager implements Closeable
 
 		if (_logger.isDebugEnabled())
 			_logger.debug(String.format("Failing job %s(%s, %s, %s)", job,
-				countAsAnAttempt ? "This failure counts against the job" : "This failure does NOT count against the job",
-				isPermanent ? "Failure is permanent" : "Failure is NOT permanent", attemptKill ? "Attempting to kill the job"
-					: "NOT attempting to kill the job"));
+					countAsAnAttempt ? "This failure counts against the job"
+							: "This failure does NOT count against the job",
+					isPermanent ? "Failure is permanent"
+							: "Failure is NOT permanent",
+					attemptKill ? "Attempting to kill the job"
+							: "NOT attempting to kill the job"));
 
 		/* Increment his attempt count if this counts against him. */
 		if (countAsAnAttempt) {
 			if (isPermanent) {
 				job.history(HistoryEventCategory.Terminating)
-					.createErrorWriter("Permanently Failing Job")
-					.format(
-						"We have determined that a job failure is permanent and "
-							+ "are boosting the attempt number up to the max to reflect this.").close();
+						.createErrorWriter("Permanently Failing Job")
+						.format("We have determined that a job failure is permanent and "
+								+ "are boosting the attempt number up to the max to reflect this.")
+						.close();
 
-				job.incrementRunAttempts(MAX_RUN_ATTEMPTS - job.getRunAttempts());
+				job.incrementRunAttempts(MAX_RUN_ATTEMPTS
+						- job.getRunAttempts());
 			} else {
 
-				job.history(HistoryEventCategory.Terminating).createInfoWriter("Attempt %d Failed", job.getRunAttempts())
-					.close();
+				job.history(HistoryEventCategory.Terminating)
+						.createInfoWriter("Attempt %d Failed",
+								job.getRunAttempts()).close();
 
 				job.incrementRunAttempts();
 			}
 
 			job.setNextValidRunTime(new Date());
 		} else {
-			job.history(HistoryEventCategory.ReQueing).info("Retrying Attempt %d", job.getRunAttempts());
+			job.history(HistoryEventCategory.ReQueing).info(
+					"Retrying Attempt %d", job.getRunAttempts());
 		}
 
 		short attempts = job.getRunAttempts();
@@ -355,27 +383,34 @@ public class JobManager implements Closeable
 
 		/* If' he's already been started too many times, we fail him permanently */
 		if (attempts >= MAX_RUN_ATTEMPTS) {
-			job.history(HistoryEventCategory.Terminating).error("Maximum Attempts Reached");
+			job.history(HistoryEventCategory.Terminating).error(
+					"Maximum Attempts Reached");
 
 			// We can't run this job any more.
 			if (_logger.isDebugEnabled())
 				_logger.debug(String
-					.format("Moving job %s to ERROR state because we exceeded the maximum retry attempts.", job));
+						.format("Moving job %s to ERROR state because we exceeded the maximum retry attempts.",
+								job));
 			newState = QueueStates.ERROR;
 		} else {
-			job.history(HistoryEventCategory.ReQueing).createTraceWriter("Re-queuing Job")
-				.format("Re-queuing Job.  The job will " + "be removed from the runnable list until %tc.", job.getNextCanRun())
-				.close();
+			job.history(HistoryEventCategory.ReQueing)
+					.createTraceWriter("Re-queuing Job")
+					.format("Re-queuing Job.  The job will "
+							+ "be removed from the runnable list until %tc.",
+							job.getNextCanRun()).close();
 
 			/* Otherwise, we'll just requeue him */
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Requeueing job %s because we have more attempts left.", job));
+				_logger.debug(String
+						.format("Requeueing job %s because we have more attempts left.",
+								job));
 			newState = QueueStates.REQUEUED;
 			ret = true;
 		}
 
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Job %s's new states is %s", job, newState));
+			_logger.debug(String.format("Job %s's new states is %s", job,
+					newState));
 
 		// This is one of the few times we are going to break our pattern and
 		// modify the in memory state before the database. The reason for this
@@ -390,33 +425,38 @@ public class JobManager implements Closeable
 		}
 
 		/*
-		 * In order to fail a job that was running, we need to make an outcall to this BES
-		 * container. This is because, unless we terminate the activity through the bes container,
-		 * the container will never garbage collect the information. This can lead to a database
-		 * leak in the best case, and a memory leak in the worst.
+		 * In order to fail a job that was running, we need to make an outcall
+		 * to this BES container. This is because, unless we terminate the
+		 * activity through the bes container, the container will never garbage
+		 * collect the information. This can lead to a database leak in the best
+		 * case, and a memory leak in the worst.
 		 * 
-		 * To make the outcall, we create a new worker to enqueue onto the outcall thread queue. The
-		 * major complication here is that because we can't update the database until after the job
-		 * is killed, we will need to come back and upate the database inside the outcall thread.
-		 * This is why we took it out of the memory structures first. Now another thread won't try
-		 * to do anything with it. It will be up to the outcall thread worker to put this guy back
-		 * on the queued list (if that's where he's destined for) when the database has been updated
-		 * and the outcall has been made).
+		 * To make the outcall, we create a new worker to enqueue onto the
+		 * outcall thread queue. The major complication here is that because we
+		 * can't update the database until after the job is killed, we will need
+		 * to come back and upate the database inside the outcall thread. This
+		 * is why we took it out of the memory structures first. Now another
+		 * thread won't try to do anything with it. It will be up to the outcall
+		 * thread worker to put this guy back on the queued list (if that's
+		 * where he's destined for) when the database has been updated and the
+		 * outcall has been made).
 		 */
 		String besName = null;
 		Long besID = job.getBESID();
 		if (besID != null)
 			besName = _besManager.getBESName(besID);
 
-		job.history(HistoryEventCategory.Terminating).debug("Finishing Job with JobKiller");
-		_outcallThreadPool.enqueue(new JobKiller(job, newState, false, attemptKill, besName, null));
+		job.history(HistoryEventCategory.Terminating).debug(
+				"Finishing Job with JobKiller");
+		_outcallThreadPool.enqueue(new JobKiller(job, newState, false,
+				attemptKill, besName, null));
 		LoggingContext.releaseCurrentLoggingContext();
 		return ret;
 	}
 
 	/**
-	 * Similar to failing a job, this operation moves the job into a final state -- this one being a
-	 * completed-successfully state.
+	 * Similar to failing a job, this operation moves the job into a final state
+	 * -- this one being a completed-successfully state.
 	 * 
 	 * @param connection
 	 *            The database connection to use.
@@ -426,14 +466,16 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public void finishJob(long jobID) throws SQLException, ResourceException
-	{
+	synchronized public void finishJob(long jobID) throws SQLException,
+			ResourceException {
 		/* Find the job in the in-memory maps */
 		JobData job = _jobsByID.get(new Long(jobID));
 		if (job == null) {
 			// don't know where it went, but it's no longer our responsibility.
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Couldn't find job for id %d, so I can't finish it.", jobID));
+				_logger.debug(String.format(
+						"Couldn't find job for id %d, so I can't finish it.",
+						jobID));
 			return;
 		}
 
@@ -469,31 +511,36 @@ public class JobManager implements Closeable
 		job.incrementRunAttempts();
 
 		/*
-		 * See failJob for a complete discussion of why we enqueue an outcall worker at this point
-		 * -- the reasons are the same.
+		 * See failJob for a complete discussion of why we enqueue an outcall
+		 * worker at this point -- the reasons are the same.
 		 */
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Creating a JobKiller for finished job %s.", job));
+			_logger.debug(String.format(
+					"Creating a JobKiller for finished job %s.", job));
 
 		String besName = null;
 		Long besID = job.getBESID();
 		if (besID != null)
 			besName = _besManager.getBESName(besID);
 
-		job.history(HistoryEventCategory.Terminating).debug("Finishing Job with JobKiller");
-		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false, true, besName, null));
+		job.history(HistoryEventCategory.Terminating).debug(
+				"Finishing Job with JobKiller");
+		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED,
+				false, true, besName, null));
 
 		LoggingContext.releaseCurrentLoggingContext();
 	}
 
-	synchronized public void killJob(Connection connection, long jobID) throws SQLException, ResourceException
-	{
+	synchronized public void killJob(Connection connection, long jobID)
+			throws SQLException, ResourceException {
 		/* Find the job in the in-memory maps */
 		JobData job = _jobsByID.get(new Long(jobID));
 		if (job == null) {
 			// don't know where it went, but it's no longer our responsibility.
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Couldn't find job for id %d, so I can't kill it.", jobID));
+				_logger.debug(String.format(
+						"Couldn't find job for id %d, so I can't kill it.",
+						jobID));
 			return;
 		}
 
@@ -519,12 +566,14 @@ public class JobManager implements Closeable
 		Long besID = job.getBESID();
 		/* This shouldn't be necessary */
 		/*
-		 * _database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(),
-		 * QueueStates.FINISHED, new Date(), null, null, null); connection.commit();
+		 * _database.modifyJobState(connection, job.getJobID(),
+		 * job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null,
+		 * null); connection.commit();
 		 */
 
 		/*
-		 * Finally, note the new state in memory and clear the old BES information.
+		 * Finally, note the new state in memory and clear the old BES
+		 * information.
 		 */
 		job.setJobState(QueueStates.FINISHED);
 		job.clearBESID();
@@ -533,13 +582,15 @@ public class JobManager implements Closeable
 		 * Otherwise, we assume that he's already in the right list
 		 */
 		if (_logger.isDebugEnabled())
-			_logger.debug("Moving job \"" + job.getJobTicket() + "\" to the " + QueueStates.FINISHED + " state.");
+			_logger.debug("Moving job \"" + job.getJobTicket() + "\" to the "
+					+ QueueStates.FINISHED + " state.");
 
 		String besName = null;
 		if (besID != null)
 			besName = _besManager.getBESName(besID);
 
-		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, true, true, besName, besID));
+		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED,
+				true, true, besName, besID));
 
 		LoggingContext.releaseCurrentLoggingContext();
 
@@ -562,56 +613,67 @@ public class JobManager implements Closeable
 	 * @throws ConfigurationException
 	 * @throws ResourceException
 	 */
-	synchronized public String submitJob(Connection connection, JobDefinition_Type jsdl, short priority) throws SQLException,
-		ResourceException
-	{
-		// bump out the notification checking time, because this is a real queue job that we
+	synchronized public String submitJob(Connection connection,
+			JobDefinition_Type jsdl, short priority) throws SQLException,
+			ResourceException {
+		// bump out the notification checking time, because this is a real queue
+		// job that we
 		// want to give precedence.
 		_whenToProcessNotifications = Calendar.getInstance();
-		_whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
+		_whenToProcessNotifications.add(Calendar.MILLISECOND,
+				NOTIFICATION_CHECKING_DELAY);
 
 		try {
 			/*
-			 * First, generate a new ticket for the job. If we were being paranoid, we'd check to
-			 * see if the ticket already exists, but the chances of that are astronomically slim (a
-			 * fact that we count on for generating EPIs)
+			 * First, generate a new ticket for the job. If we were being
+			 * paranoid, we'd check to see if the ticket already exists, but the
+			 * chances of that are astronomically slim (a fact that we count on
+			 * for generating EPIs)
 			 */
 			String ticket = new GUID().toString();
 
 			/*
-			 * Go ahead and get the current caller's calling context. We store this so that we can
-			 * make outcalls in the future on his/her behalf.
+			 * Go ahead and get the current caller's calling context. We store
+			 * this so that we can make outcalls in the future on his/her
+			 * behalf.
 			 */
-			ICallingContext callingContext = ContextManager.getExistingContext();
+			ICallingContext callingContext = ContextManager
+					.getExistingContext();
 
 			/*
-			 * Similarly, get the current caller's security identity so that we can store that. This
-			 * is used to protect different users of the queue from each other. We use this to check
-			 * against others killing, getting the status of, or completing someone elses jobs.
+			 * Similarly, get the current caller's security identity so that we
+			 * can store that. This is used to protect different users of the
+			 * queue from each other. We use this to check against others
+			 * killing, getting the status of, or completing someone elses jobs.
 			 */
-			Collection<Identity> identities = QueueSecurity.getCallerIdentities(true);
+			Collection<Identity> identities = QueueSecurity
+					.getCallerIdentities(true);
 
 			if (identities.size() <= 0)
-				throw new ResourceException("Cannot submit a job with no non-group credentials.");
+				throw new ResourceException(
+						"Cannot submit a job with no non-group credentials.");
 
 			/*
-			 * The job starts out in the queued state and with the current time as it's submit time.
+			 * The job starts out in the queued state and with the current time
+			 * as it's submit time.
 			 */
 			QueueStates state = QueueStates.QUEUED;
 			Date submitTime = new Date();
 
-			HistoryContext history =
-				HistoryContextFactory.createContext(HistoryEventCategory.Default, _database.historyKey(ticket));
-			String rpcid = LoggingContext.getCurrentLoggingContext().getCurrentID();
+			HistoryContext history = HistoryContextFactory.createContext(
+					HistoryEventCategory.Default, _database.historyKey(ticket));
+			String rpcid = LoggingContext.getCurrentLoggingContext()
+					.getCurrentID();
 
 			/*
-			 * Submit the job information into the queue (and get a new jobID from the database for
-			 * it).
+			 * Submit the job information into the queue (and get a new jobID
+			 * from the database for it).
 			 */
-			long jobID =
-				_database.submitJob(connection, ticket, priority, jsdl, callingContext, identities, state, submitTime, rpcid);
+			long jobID = _database.submitJob(connection, ticket, priority,
+					jsdl, callingContext, identities, state, submitTime, rpcid);
 			if (MyProxyCertificate.isAvailable())
-				_database.setSecurityHeader(connection, jobID, MyProxyCertificate.getPEMString());
+				_database.setSecurityHeader(connection, jobID,
+						MyProxyCertificate.getPEMString());
 
 			connection.commit();
 
@@ -619,26 +681,30 @@ public class JobManager implements Closeable
 				MyProxyCertificate.reset();
 
 			history.createInfoWriter("Queue Accepted Job")
-				.format("Queue accepted job with ticket %s (job-id = %d).", ticket, jobID).close();
+					.format("Queue accepted job with ticket %s (job-id = %d).",
+							ticket, jobID).close();
 
 			/*
-			 * The data has been committed into the database so we can reload to this point from
-			 * here on out.
+			 * The data has been committed into the database so we can reload to
+			 * this point from here on out.
 			 */
 
 			if (_logger.isDebugEnabled())
-				_logger.debug("Submitted job \"" + ticket + "\" as job number " + jobID);
+				_logger.debug("Submitted job \"" + ticket + "\" as job number "
+						+ jobID);
 
-			LoggingContext loggingContext = LoggingContext.getCurrentLoggingContext();
+			LoggingContext loggingContext = LoggingContext
+					.getCurrentLoggingContext();
 			/*
-			 * Create a new data structure for the job's in memory information and put it into the
-			 * in-memory lists.
+			 * Create a new data structure for the job's in memory information
+			 * and put it into the in-memory lists.
 			 */
-			JobData job =
-				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history,
+			JobData job = new JobData(jobID, QueueUtils.getJobName(jsdl),
+					ticket, priority, state, submitTime, (short) 0, history,
 					loggingContext);
 
-			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
+			SortableJobKey jobKey = new SortableJobKey(jobID, priority,
+					submitTime);
 
 			_jobsByID.put(new Long(jobID), job);
 			_jobsByTicket.put(ticket, job);
@@ -646,7 +712,8 @@ public class JobManager implements Closeable
 
 			// As jobs are added to the primary list, they are also added to the
 			// appropriate user list (newly created, if needed)
-			identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
+			identities = SecurityUtilities.filterCredentials(identities,
+					SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 			String username = identities.iterator().next().toString();
 			if (!_usersWithJobs.keySet().contains(username)) {
@@ -660,31 +727,34 @@ public class JobManager implements Closeable
 			}
 
 			/*
-			 * We've just added a new job to the queue, so we have a new scheduling opportunity.
+			 * We've just added a new job to the queue, so we have a new
+			 * scheduling opportunity.
 			 */
 			_schedulingEvent.notifySchedulingEvent();
 
 			return ticket;
 		} catch (IOException ioe) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Failed to submit job from jsdl: " + jsdl.toString());
+				_logger.debug("Failed to submit job from jsdl: "
+						+ jsdl.toString());
 			throw new ResourceException("Unable to submit job.", ioe);
 		}
 	}
 
-	synchronized public EndpointReferenceType getActivityEPR(Connection connection, String jobTicket) throws ResourceException,
-		SQLException
-	{
+	synchronized public EndpointReferenceType getActivityEPR(
+			Connection connection, String jobTicket) throws ResourceException,
+			SQLException {
 		JobData jData = _jobsByTicket.get(jobTicket);
-		JobStatusInformation info = _database.getJobStatusInformation(connection, jData.getJobID());
+		JobStatusInformation info = _database.getJobStatusInformation(
+				connection, jData.getJobID());
 
 		return info.getJobEndpoint();
 	}
 
 	/**
-	 * List all jobs currently in the queue. This operation is considered "safe" from a security
-	 * point of view and is not subject to verifying caller's identity (beyond basic ACL on the
-	 * service operation itself).
+	 * List all jobs currently in the queue. This operation is considered "safe"
+	 * from a security point of view and is not subject to verifying caller's
+	 * identity (beyond basic ACL on the service operation itself).
 	 * 
 	 * @param connection
 	 *            The database connection to use.
@@ -694,14 +764,14 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public Collection<ReducedJobInformationType> listJobs(Connection connection, String ticket)
-		throws SQLException, ResourceException
-	{
+	synchronized public Collection<ReducedJobInformationType> listJobs(
+			Connection connection, String ticket) throws SQLException,
+			ResourceException {
 		Collection<ReducedJobInformationType> ret = new LinkedList<ReducedJobInformationType>();
 
 		/*
-		 * We have to ask the database for some information about the jobs that isn't kept in memory
-		 * (the owner identities for example).
+		 * We have to ask the database for some information about the jobs that
+		 * isn't kept in memory (the owner identities for example).
 		 */
 		Set<Long> keySet = null;
 		if (ticket != null) {
@@ -712,7 +782,8 @@ public class JobManager implements Closeable
 		} else
 			keySet = _jobsByID.keySet();
 
-		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(connection, keySet);
+		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(
+				connection, keySet);
 
 		try {
 			/* For each job in the queue... */
@@ -724,18 +795,21 @@ public class JobManager implements Closeable
 				PartialJobInfo pji = ownerMap.get(jobID);
 
 				/* And add the sum of that too the return list */
-				ret.add(new ReducedJobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-					JobStateEnumerationType.fromString(jobData.getJobState().name())));
+				ret.add(new ReducedJobInformationType(jobData.getJobTicket(),
+						QueueSecurity.convert(pji.getOwners()),
+						JobStateEnumerationType.fromString(jobData
+								.getJobState().name())));
 			}
 
 			return ret;
 		} catch (IOException ioe) {
-			throw new ResourceException("Unable to serialize owner information.", ioe);
+			throw new ResourceException(
+					"Unable to serialize owner information.", ioe);
 		}
 	}
 
-	synchronized public JobDefinition_Type getJSDL(long jobID) throws SQLException, ResourceException
-	{
+	synchronized public JobDefinition_Type getJSDL(long jobID)
+			throws SQLException, ResourceException {
 		Connection connection = null;
 
 		try {
@@ -746,13 +820,13 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public EndpointReferenceType getLogEPR(String jobTicket) throws ResourceException, SQLException
-	{
+	synchronized public EndpointReferenceType getLogEPR(String jobTicket)
+			throws ResourceException, SQLException {
 		return getLogEPR(_jobsByTicket.get(jobTicket).getJobID());
 	}
 
-	synchronized public EndpointReferenceType getLogEPR(long jobID) throws ResourceException, SQLException
-	{
+	synchronized public EndpointReferenceType getLogEPR(long jobID)
+			throws ResourceException, SQLException {
 		Connection connection = null;
 
 		try {
@@ -763,8 +837,8 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public void printLog(long jobID, PrintStream out) throws IOException
-	{
+	synchronized public void printLog(long jobID, PrintStream out)
+			throws IOException {
 		InputStream in = null;
 
 		try {
@@ -778,21 +852,22 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public JobDefinition_Type getJSDL(String ticket) throws ResourceException, SQLException
-	{
+	synchronized public JobDefinition_Type getJSDL(String ticket)
+			throws ResourceException, SQLException {
 		return getJSDL(_jobsByTicket.get(ticket).getJobID());
 	}
 
-	synchronized public void printLog(String ticket, PrintStream out) throws IOException
-	{
+	synchronized public void printLog(String ticket, PrintStream out)
+			throws IOException {
 		printLog(_jobsByTicket.get(ticket).getJobID(), out);
 	}
 
 	/**
-	 * Get the job status for jobs in the queue. This operation IS subject to owner verification.
-	 * This means that only the owner of a job is allowed to get the status of his or her job. This
-	 * particular operation doesn't take a list of jobs to get the status of so it's assumed that
-	 * the user wants status on ALL jobs that HE/SHE owns.
+	 * Get the job status for jobs in the queue. This operation IS subject to
+	 * owner verification. This means that only the owner of a job is allowed to
+	 * get the status of his or her job. This particular operation doesn't take
+	 * a list of jobs to get the status of so it's assumed that the user wants
+	 * status on ALL jobs that HE/SHE owns.
 	 * 
 	 * @param connection
 	 *            The database connection to use.
@@ -804,19 +879,21 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 */
 
-	synchronized public Collection<JobInformationType> getJobStatus(Connection connection) throws SQLException,
-		ResourceException, GenesisIISecurityException
-	{
+	synchronized public Collection<JobInformationType> getJobStatus(
+			Connection connection) throws SQLException, ResourceException,
+			GenesisIISecurityException {
 		Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
 		HashMap<Long, PartialJobInfo> ownerMap;
 
 		/*
-		 * We need to get a few pieces of information that only the database has, such as job owner.
+		 * We need to get a few pieces of information that only the database
+		 * has, such as job owner.
 		 */
 		ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
 
 		/*
-		 * Look through all the jobs managed by this queue looking for the right ones.
+		 * Look through all the jobs managed by this queue looking for the right
+		 * ones.
 		 */
 
 		// Determine administrators of queue
@@ -836,28 +913,41 @@ public class JobManager implements Closeable
 				PartialJobInfo pji = ownerMap.get(jobID);
 
 				if (isAdmin) {
-					ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-						JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-						QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils
-							.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn, jobData
-							.getBESActivityStatus(), jobData.jobName()));
+					ret.add(new JobInformationType(jobData.getJobTicket(),
+							QueueSecurity.convert(pji.getOwners()),
+							JobStateEnumerationType.fromString(jobData
+									.getJobState().name()), (byte) jobData
+									.getPriority(), QueueUtils.convert(jobData
+									.getSubmitTime()), QueueUtils.convert(pji
+									.getStartTime()), QueueUtils.convert(pji
+									.getFinishTime()), new UnsignedShort(
+									jobData.getRunAttempts()), scheduledOn,
+							jobData.getBESActivityStatus(), jobData.jobName()));
 				}
 
 				/*
-				 * If the caller owns this jobs, then add the status information for the job to the
-				 * result list.
+				 * If the caller owns this jobs, then add the status information
+				 * for the job to the result list.
 				 */
 				else {
 					if (QueueSecurity.isOwner(pji.getOwners(), callers)) {
-						ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-							JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-							QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils
-								.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-							jobData.getBESActivityStatus(), jobData.jobName()));
+						ret.add(new JobInformationType(jobData.getJobTicket(),
+								QueueSecurity.convert(pji.getOwners()),
+								JobStateEnumerationType.fromString(jobData
+										.getJobState().name()), (byte) jobData
+										.getPriority(), QueueUtils
+										.convert(jobData.getSubmitTime()),
+								QueueUtils.convert(pji.getStartTime()),
+								QueueUtils.convert(pji.getFinishTime()),
+								new UnsignedShort(jobData.getRunAttempts()),
+								scheduledOn, jobData.getBESActivityStatus(),
+								jobData.jobName()));
 					}
 				}
 			} catch (IOException ioe) {
-				throw new ResourceException("Unable to get job status for job \"" + jobData.getJobTicket() + "\".", ioe);
+				throw new ResourceException(
+						"Unable to get job status for job \""
+								+ jobData.getJobTicket() + "\".", ioe);
 
 			}
 		}
@@ -865,8 +955,7 @@ public class JobManager implements Closeable
 		return ret;
 	}
 
-	public ActivityStatusType getBESActivityStatus(String ticket)
-	{
+	public ActivityStatusType getBESActivityStatus(String ticket) {
 		JobData data = _jobsByTicket.get(ticket);
 		if (data == null)
 			return null;
@@ -875,29 +964,35 @@ public class JobManager implements Closeable
 		if (ret == null) {
 			QueueStates state = data.getJobState();
 			switch (state) {
-				case ERROR:
-					ret = new ActivityStatusType(null, ActivityStateEnumeration.Failed);
-					break;
+			case ERROR:
+				ret = new ActivityStatusType(null,
+						ActivityStateEnumeration.Failed);
+				break;
 
-				case FINISHED:
-					ret = new ActivityStatusType(null, ActivityStateEnumeration.Finished);
-					break;
+			case FINISHED:
+				ret = new ActivityStatusType(null,
+						ActivityStateEnumeration.Finished);
+				break;
 
-				case QUEUED:
-					ret = new ActivityStatusType(null, ActivityStateEnumeration.Pending);
-					break;
+			case QUEUED:
+				ret = new ActivityStatusType(null,
+						ActivityStateEnumeration.Pending);
+				break;
 
-				case REQUEUED:
-					ret = new ActivityStatusType(null, ActivityStateEnumeration.Pending);
-					break;
+			case REQUEUED:
+				ret = new ActivityStatusType(null,
+						ActivityStateEnumeration.Pending);
+				break;
 
-				case RUNNING:
-					ret = new ActivityStatusType(null, ActivityStateEnumeration.Running);
-					break;
+			case RUNNING:
+				ret = new ActivityStatusType(null,
+						ActivityStateEnumeration.Running);
+				break;
 
-				case STARTING:
-					ret = new ActivityStatusType(null, ActivityStateEnumeration.Pending);
-					break;
+			case STARTING:
+				ret = new ActivityStatusType(null,
+						ActivityStateEnumeration.Pending);
+				break;
 
 			}
 		}
@@ -906,13 +1001,14 @@ public class JobManager implements Closeable
 	}
 
 	/**
-	 * Get the job status for jobs in the queue. This operation IS subject to owner verification.
-	 * This means that only the owner of a job is allowed to get the status of his or her job. This
-	 * particular operation takes a list of jobs to get status for. If the list is empty or null,
-	 * then we get the status for all jobs owned by the caller. If the list is not empty, then we
-	 * get status for all jobs listed unless one of them is not owned by the caller, in which case
-	 * we'll throw an exception indicating that the caller doesn't have permission to get the status
-	 * of one of the requested jobs.
+	 * Get the job status for jobs in the queue. This operation IS subject to
+	 * owner verification. This means that only the owner of a job is allowed to
+	 * get the status of his or her job. This particular operation takes a list
+	 * of jobs to get status for. If the list is empty or null, then we get the
+	 * status for all jobs owned by the caller. If the list is not empty, then
+	 * we get status for all jobs listed unless one of them is not owned by the
+	 * caller, in which case we'll throw an exception indicating that the caller
+	 * doesn't have permission to get the status of one of the requested jobs.
 	 * 
 	 * @param connection
 	 *            The database connection to use.
@@ -924,12 +1020,12 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public Collection<JobInformationType> getJobStatus(Connection connection, String[] jobs) throws SQLException,
-		ResourceException, GenesisIISecurityException
-	{
+	synchronized public Collection<JobInformationType> getJobStatus(
+			Connection connection, String[] jobs) throws SQLException,
+			ResourceException, GenesisIISecurityException {
 		/*
-		 * Check to see if any tickets were passed and call the "all jobs owned by me" version if
-		 * none were.
+		 * Check to see if any tickets were passed and call the
+		 * "all jobs owned by me" version if none were.
 		 */
 		if (jobs == null || jobs.length == 0)
 			return getJobStatus(connection);
@@ -943,23 +1039,27 @@ public class JobManager implements Closeable
 		for (String ticket : jobs) {
 			JobData data = _jobsByTicket.get(ticket);
 			if (data == null)
-				throw new ResourceException("Job \"" + ticket + "\" does not exist in queue.");
+				throw new ResourceException("Job \"" + ticket
+						+ "\" does not exist in queue.");
 
 			jobIDs.add(new Long(data.getJobID()));
 		}
 
 		/*
-		 * Now ask the database to fill in information about these jobs that we don't have in memory
-		 * (like owner).
+		 * Now ask the database to fill in information about these jobs that we
+		 * don't have in memory (like owner).
 		 */
-		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(connection, jobIDs);
+		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(
+				connection, jobIDs);
 
 		try {
 			boolean isAdmin = QueueSecurity.isQueueAdmin();
-			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+			Collection<Identity> callers = QueueSecurity
+					.getCallerIdentities(true);
 
 			/*
-			 * Loop through the jobs checking to make sure that they are all owned by the caller.
+			 * Loop through the jobs checking to make sure that they are all
+			 * owned by the caller.
 			 */
 			for (Long jobID : ownerMap.keySet()) {
 				JobData jobData = _jobsByID.get(jobID.longValue());
@@ -971,32 +1071,45 @@ public class JobManager implements Closeable
 				PartialJobInfo pji = ownerMap.get(jobID);
 
 				/*
-				 * If the job is owned by the caller, add the job's status information to the result
-				 * list.
+				 * If the job is owned by the caller, add the job's status
+				 * information to the result list.
 				 */
 
 				if (isAdmin) {
-					ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-						JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-						QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils
-							.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn, jobData
-							.getBESActivityStatus(), jobData.jobName()));
+					ret.add(new JobInformationType(jobData.getJobTicket(),
+							QueueSecurity.convert(pji.getOwners()),
+							JobStateEnumerationType.fromString(jobData
+									.getJobState().name()), (byte) jobData
+									.getPriority(), QueueUtils.convert(jobData
+									.getSubmitTime()), QueueUtils.convert(pji
+									.getStartTime()), QueueUtils.convert(pji
+									.getFinishTime()), new UnsignedShort(
+									jobData.getRunAttempts()), scheduledOn,
+							jobData.getBESActivityStatus(), jobData.jobName()));
 				} else {
 
 					if (QueueSecurity.isOwner(pji.getOwners(), callers)) {
-						ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-							JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-							QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils
-								.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-							jobData.getBESActivityStatus(), jobData.jobName()));
+						ret.add(new JobInformationType(jobData.getJobTicket(),
+								QueueSecurity.convert(pji.getOwners()),
+								JobStateEnumerationType.fromString(jobData
+										.getJobState().name()), (byte) jobData
+										.getPriority(), QueueUtils
+										.convert(jobData.getSubmitTime()),
+								QueueUtils.convert(pji.getStartTime()),
+								QueueUtils.convert(pji.getFinishTime()),
+								new UnsignedShort(jobData.getRunAttempts()),
+								scheduledOn, jobData.getBESActivityStatus(),
+								jobData.jobName()));
 					}
 
 					else {
 						/*
-						 * If the caller did not own a job, then we throw a security exception.
+						 * If the caller did not own a job, then we throw a
+						 * security exception.
 						 */
-						throw new GenesisIISecurityException("Not permitted to get status of job \"" + jobData.getJobTicket()
-							+ "\".");
+						throw new GenesisIISecurityException(
+								"Not permitted to get status of job \""
+										+ jobData.getJobTicket() + "\".");
 					}
 				}
 			}
@@ -1004,13 +1117,14 @@ public class JobManager implements Closeable
 		} catch (GenesisIISecurityException gse) {
 			throw gse;
 		} catch (IOException ioe) {
-			throw new ResourceException("Unable to serialize owner information.", ioe);
+			throw new ResourceException(
+					"Unable to serialize owner information.", ioe);
 		}
 	}
 
-	synchronized public JobInformationType getStatusFromID(Connection conn, Long jobID) throws ResourceException, SQLException,
-		GenesisIISecurityException
-	{
+	synchronized public JobInformationType getStatusFromID(Connection conn,
+			Long jobID) throws ResourceException, SQLException,
+			GenesisIISecurityException {
 
 		if (conn == null || jobID == null)
 			throw new ResourceException("Unable to query job status");
@@ -1018,7 +1132,8 @@ public class JobManager implements Closeable
 		JobData jobData = _jobsByID.get(jobID.longValue());
 
 		if (jobData == null)
-			throw new ResourceException("A queried job has been removed from the queue");
+			throw new ResourceException(
+					"A queried job has been removed from the queue");
 
 		BESData besData = _besManager.findBES(jobData.getBESID());
 		String scheduledOn = null;
@@ -1029,11 +1144,13 @@ public class JobManager implements Closeable
 
 		jobIDs.add(jobID);
 
-		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(conn, jobIDs);
+		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(
+				conn, jobIDs);
 
 		PartialJobInfo pji = ownerMap.get(jobID);
 		if (pji == null)
-			throw new ResourceException("A queried job has been removed from the queue");
+			throw new ResourceException(
+					"A queried job has been removed from the queue");
 
 		boolean isAdmin = QueueSecurity.isQueueAdmin();
 		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
@@ -1041,28 +1158,37 @@ public class JobManager implements Closeable
 		try {
 
 			if (isAdmin || (QueueSecurity.isOwner(pji.getOwners(), callers))) {
-				return (new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-					JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-					QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils.convert(pji
-						.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-					jobData.getBESActivityStatus(), jobData.jobName()));
+				return (new JobInformationType(jobData.getJobTicket(),
+						QueueSecurity.convert(pji.getOwners()),
+						JobStateEnumerationType.fromString(jobData
+								.getJobState().name()),
+						(byte) jobData.getPriority(),
+						QueueUtils.convert(jobData.getSubmitTime()),
+						QueueUtils.convert(pji.getStartTime()),
+						QueueUtils.convert(pji.getFinishTime()),
+						new UnsignedShort(jobData.getRunAttempts()),
+						scheduledOn, jobData.getBESActivityStatus(),
+						jobData.jobName()));
 			}
 
 			else
-				throw new GenesisIISecurityException("Not permitted to get status of job \"" + jobData.getJobTicket() + "\".");
+				throw new GenesisIISecurityException(
+						"Not permitted to get status of job \""
+								+ jobData.getJobTicket() + "\".");
 
 		}
 
 		catch (IOException ioe) {
-			throw new ResourceException("Unable to serialize owner information.", ioe);
+			throw new ResourceException(
+					"Unable to serialize owner information.", ioe);
 
 		}
 
 	}
 
-	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection, String[] jobs)
-		throws GenesisIISecurityException, ResourceException, SQLException
-	{
+	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(
+			Connection connection, String[] jobs)
+			throws GenesisIISecurityException, ResourceException, SQLException {
 		if (connection == null)
 			throw new ResourceException("Unable to query job status");
 
@@ -1082,7 +1208,8 @@ public class JobManager implements Closeable
 		for (String ticket : jobs) {
 			JobData data = _jobsByTicket.get(ticket);
 			if (data == null)
-				throw new ResourceException("Job \"" + ticket + "\" does not exist in queue.");
+				throw new ResourceException("Job \"" + ticket
+						+ "\" does not exist in queue.");
 
 			jobIDs.add(new Long(data.getJobID()));
 		}
@@ -1100,14 +1227,15 @@ public class JobManager implements Closeable
 				}
 
 				/*
-				 * Now ask the database to fill in information about the subset jobs that we don't
-				 * have in memory (like owner).
+				 * Now ask the database to fill in information about the subset
+				 * jobs that we don't have in memory (like owner).
 				 */
-				ownerMap = _database.getPartialJobInfos(connection, batchSubset);
+				ownerMap = _database
+						.getPartialJobInfos(connection, batchSubset);
 			} else {
 				/*
-				 * Now ask the database to fill in information about all jobs that we don't have in
-				 * memory (like owner).
+				 * Now ask the database to fill in information about all jobs
+				 * that we don't have in memory (like owner).
 				 */
 				ownerMap = _database.getPartialJobInfos(connection, jobIDs);
 			}
@@ -1121,13 +1249,19 @@ public class JobManager implements Closeable
 
 				PartialJobInfo pji = ownerMap.get(jobID);
 				try {
-					ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-						JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-						QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils
-							.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn, jobData
-							.getBESActivityStatus(), jobData.jobName()));
+					ret.add(new JobInformationType(jobData.getJobTicket(),
+							QueueSecurity.convert(pji.getOwners()),
+							JobStateEnumerationType.fromString(jobData
+									.getJobState().name()), (byte) jobData
+									.getPriority(), QueueUtils.convert(jobData
+									.getSubmitTime()), QueueUtils.convert(pji
+									.getStartTime()), QueueUtils.convert(pji
+									.getFinishTime()), new UnsignedShort(
+									jobData.getRunAttempts()), scheduledOn,
+							jobData.getBESActivityStatus(), jobData.jobName()));
 				} catch (IOException ioe) {
-					throw new ResourceException("Unable to serialize owner information.", ioe);
+					throw new ResourceException(
+							"Unable to serialize owner information.", ioe);
 				}
 
 			}
@@ -1149,9 +1283,11 @@ public class JobManager implements Closeable
 
 		else // NotAdmin
 		{
-			HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(connection, jobIDs);
+			HashMap<Long, PartialJobInfo> ownerMap = _database
+					.getPartialJobInfos(connection, jobIDs);
 			Iterator<Long> it = ownerMap.keySet().iterator();
-			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+			Collection<Identity> callers = QueueSecurity
+					.getCallerIdentities(true);
 
 			try {
 
@@ -1161,7 +1297,8 @@ public class JobManager implements Closeable
 						Long jobID = it.next();
 
 						JobData jobData = _jobsByID.get(jobID.longValue());
-						BESData besData = _besManager.findBES(jobData.getBESID());
+						BESData besData = _besManager.findBES(jobData
+								.getBESID());
 						String scheduledOn = null;
 						if (besData != null)
 							scheduledOn = besData.getName();
@@ -1169,20 +1306,30 @@ public class JobManager implements Closeable
 						PartialJobInfo pji = ownerMap.get(jobID);
 
 						if (QueueSecurity.isOwner(pji.getOwners(), callers)) {
-							ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-								JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-								QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils
-									.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-								jobData.getBESActivityStatus(), jobData.jobName()));
+							ret.add(new JobInformationType(
+									jobData.getJobTicket(),
+									QueueSecurity.convert(pji.getOwners()),
+									JobStateEnumerationType.fromString(jobData
+											.getJobState().name()),
+									(byte) jobData.getPriority(),
+									QueueUtils.convert(jobData.getSubmitTime()),
+									QueueUtils.convert(pji.getStartTime()),
+									QueueUtils.convert(pji.getFinishTime()),
+									new UnsignedShort(jobData.getRunAttempts()),
+									scheduledOn,
+									jobData.getBESActivityStatus(), jobData
+											.jobName()));
 
 						}
 
 						else {
 							/*
-							 * If the caller did not own a job, then we throw a security exception.
+							 * If the caller did not own a job, then we throw a
+							 * security exception.
 							 */
-							throw new GenesisIISecurityException("Not permitted to get status of job \""
-								+ jobData.getJobTicket() + "\".");
+							throw new GenesisIISecurityException(
+									"Not permitted to get status of job \""
+											+ jobData.getJobTicket() + "\".");
 						}
 
 					}
@@ -1194,7 +1341,8 @@ public class JobManager implements Closeable
 			}
 
 			catch (IOException ioe) {
-				throw new ResourceException("Unable to serialize owner information.", ioe);
+				throw new ResourceException(
+						"Unable to serialize owner information.", ioe);
 			}
 
 			while (it.hasNext()) // we might have to build iterator
@@ -1209,8 +1357,10 @@ public class JobManager implements Closeable
 				}
 
 				else
-					throw new GenesisIISecurityException("Not permitted to get status of job \""
-						+ _jobsByID.get(jobID.longValue()).getJobTicket() + "\".");
+					throw new GenesisIISecurityException(
+							"Not permitted to get status of job \""
+									+ _jobsByID.get(jobID.longValue())
+											.getJobTicket() + "\".");
 
 			}
 
@@ -1224,9 +1374,9 @@ public class JobManager implements Closeable
 
 	}
 
-	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection)
-		throws GenesisIISecurityException, ResourceException, SQLException
-	{
+	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(
+			Connection connection) throws GenesisIISecurityException,
+			ResourceException, SQLException {
 
 		HashMap<Long, PartialJobInfo> ownerMap;
 		Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
@@ -1251,13 +1401,15 @@ public class JobManager implements Closeable
 				}
 
 				// gets database-stored info of these subset jobs
-				ownerMap = _database.getPartialJobInfos(connection, batchSubset);
+				ownerMap = _database
+						.getPartialJobInfos(connection, batchSubset);
 			}
 
 			else // iterator will not be built
 			{
 				// grabs database-stored info of all jobs
-				ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
+				ownerMap = _database.getPartialJobInfos(connection,
+						_jobsByID.keySet());
 			}
 
 			for (Long jobID : ownerMap.keySet()) {
@@ -1272,15 +1424,22 @@ public class JobManager implements Closeable
 					/* Get the database information for this job */
 					PartialJobInfo pji = ownerMap.get(jobID);
 
-					ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-						JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-						QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils
-							.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn, jobData
-							.getBESActivityStatus(), jobData.jobName()));
+					ret.add(new JobInformationType(jobData.getJobTicket(),
+							QueueSecurity.convert(pji.getOwners()),
+							JobStateEnumerationType.fromString(jobData
+									.getJobState().name()), (byte) jobData
+									.getPriority(), QueueUtils.convert(jobData
+									.getSubmitTime()), QueueUtils.convert(pji
+									.getStartTime()), QueueUtils.convert(pji
+									.getFinishTime()), new UnsignedShort(
+									jobData.getRunAttempts()), scheduledOn,
+							jobData.getBESActivityStatus(), jobData.jobName()));
 				}
 
 				catch (IOException ioe) {
-					throw new ResourceException("Unable to get job status for job \"" + jobData.getJobTicket() + "\".", ioe);
+					throw new ResourceException(
+							"Unable to get job status for job \""
+									+ jobData.getJobTicket() + "\".", ioe);
 
 				}
 
@@ -1304,12 +1463,14 @@ public class JobManager implements Closeable
 		else {
 
 			/*
-			 * We need to get a few pieces of information that only the database has, such as job
-			 * owner.
+			 * We need to get a few pieces of information that only the database
+			 * has, such as job owner.
 			 */
-			ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
+			ownerMap = _database.getPartialJobInfos(connection,
+					_jobsByID.keySet());
 
-			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+			Collection<Identity> callers = QueueSecurity
+					.getCallerIdentities(true);
 			Set<Long> jobIDs = ownerMap.keySet();
 			Iterator<Long> it = jobIDs.iterator();
 
@@ -1332,18 +1493,28 @@ public class JobManager implements Closeable
 
 						// is the caller the owner of this job?
 						if (QueueSecurity.isOwner(pji.getOwners(), callers)) {
-							ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-								JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-								QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils
-									.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-								jobData.getBESActivityStatus(), jobData.jobName()));
+							ret.add(new JobInformationType(
+									jobData.getJobTicket(),
+									QueueSecurity.convert(pji.getOwners()),
+									JobStateEnumerationType.fromString(jobData
+											.getJobState().name()),
+									(byte) jobData.getPriority(),
+									QueueUtils.convert(jobData.getSubmitTime()),
+									QueueUtils.convert(pji.getStartTime()),
+									QueueUtils.convert(pji.getFinishTime()),
+									new UnsignedShort(jobData.getRunAttempts()),
+									scheduledOn,
+									jobData.getBESActivityStatus(), jobData
+											.jobName()));
 							lcv++;
 						}
 
 					}
 
 					catch (IOException ioe) {
-						throw new ResourceException("Unable to get job status for job \"" + jobData.getJobTicket() + "\".", ioe);
+						throw new ResourceException(
+								"Unable to get job status for job \""
+										+ jobData.getJobTicket() + "\".", ioe);
 
 					}
 
@@ -1375,41 +1546,49 @@ public class JobManager implements Closeable
 
 	}
 
-	synchronized public JobErrorPacket[] queryErrorInformation(Connection connection, String job) throws SQLException,
-		ResourceException, GenesisIISecurityException
-	{
+	synchronized public JobErrorPacket[] queryErrorInformation(
+			Connection connection, String job) throws SQLException,
+			ResourceException, GenesisIISecurityException {
 		JobData jobData = _jobsByTicket.get(job);
 		if (jobData == null)
-			throw new ResourceException(String.format("Unable to find job %s in queue.", job));
+			throw new ResourceException(String.format(
+					"Unable to find job %s in queue.", job));
 
 		/*
-		 * Now ask the database to fill in information about these jobs that we don't have in memory
-		 * (like owner).
+		 * Now ask the database to fill in information about these jobs that we
+		 * don't have in memory (like owner).
 		 */
 		Collection<Long> jobList = new ArrayList<Long>(1);
 		jobList.add(jobData.getJobID());
-		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(connection, jobList);
+		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(
+				connection, jobList);
 
 		PartialJobInfo pji = ownerMap.get(jobData.getJobID());
 
 		/*
-		 * If the job is owned by the caller, add the job's status information to the result list.
+		 * If the job is owned by the caller, add the job's status information
+		 * to the result list.
 		 */
 		if (!QueueSecurity.isOwner(pji.getOwners())) {
 			/*
-			 * If the caller did not own a job, then we throw a security exception.
+			 * If the caller did not own a job, then we throw a security
+			 * exception.
 			 */
-			throw new GenesisIISecurityException("Not permitted to get status of job \"" + jobData.getJobTicket() + "\".");
+			throw new GenesisIISecurityException(
+					"Not permitted to get status of job \""
+							+ jobData.getJobTicket() + "\".");
 		}
 
-		List<Collection<String>> errors = _database.getAttemptErrors(connection, jobData.getJobID());
+		List<Collection<String>> errors = _database.getAttemptErrors(
+				connection, jobData.getJobID());
 
 		Collection<JobErrorPacket> packets = new LinkedList<JobErrorPacket>();
 
 		for (int lcv = 0; lcv < errors.size(); lcv++) {
 			Collection<String> strings = errors.get(lcv);
 			if (strings != null) {
-				packets.add(new JobErrorPacket(new UnsignedShort(lcv), strings.toArray(new String[0])));
+				packets.add(new JobErrorPacket(new UnsignedShort(lcv), strings
+						.toArray(new String[0])));
 			}
 		}
 
@@ -1417,11 +1596,12 @@ public class JobManager implements Closeable
 	}
 
 	/**
-	 * This method completes (or removes from the queue) all jobs which are owned by the caller and
-	 * which are in a final state. Only jobs in a final state can be completed. To try and complete
-	 * a job which is not in a final state is considered an error and an exception will be thrown.
-	 * This operation is only called internally and it is assumed that the calling method has
-	 * already checked the ownership and the final state.
+	 * This method completes (or removes from the queue) all jobs which are
+	 * owned by the caller and which are in a final state. Only jobs in a final
+	 * state can be completed. To try and complete a job which is not in a final
+	 * state is considered an error and an exception will be thrown. This
+	 * operation is only called internally and it is assumed that the calling
+	 * method has already checked the ownership and the final state.
 	 * 
 	 * @param connection
 	 *            The database connection to use.
@@ -1431,24 +1611,24 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized private void completeJobs(Connection connection, Collection<Long> jobsToComplete) throws SQLException,
-		ResourceException
-	{
+	synchronized private void completeJobs(Connection connection,
+			Collection<Long> jobsToComplete) throws SQLException,
+			ResourceException {
 		/* First, remove the job from the database and commit the changes. */
 		_database.completeJobs(connection, jobsToComplete);
 		connection.commit();
 
 		/*
-		 * Now that it's committed to the database, go through the in memory data structures and
-		 * remove the job from all of those.
+		 * Now that it's committed to the database, go through the in memory
+		 * data structures and remove the job from all of those.
 		 */
 		for (Long jobID : jobsToComplete) {
 			if (_logger.isDebugEnabled())
 				_logger.debug(String.format("Completing job %d.", jobID));
 
 			/*
-			 * Get and remove the job information (which has the ticket needed to remove the job
-			 * from the "byTickets" map).
+			 * Get and remove the job information (which has the ticket needed
+			 * to remove the job from the "byTickets" map).
 			 */
 			JobData data = _jobsByID.remove(jobID);
 			if (data != null) {
@@ -1457,31 +1637,36 @@ public class JobManager implements Closeable
 				_jobsByTicket.remove(data.getJobTicket());
 				_queuedJobs.remove(jobKey);
 				_runningJobs.remove(jobID);
-				for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
+				for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs
+						.values()) {
 					user.remove(jobKey);
 				}
 
-				HistoryContainerService service = ContainerServices.findService(HistoryContainerService.class);
-				service.enqueue(_database.historyKey(data.getJobTicket()), connection);
+				HistoryContainerService service = ContainerServices
+						.findService(HistoryContainerService.class);
+				service.enqueue(_database.historyKey(data.getJobTicket()),
+						connection);
 			}
 		}
 	}
 
-	synchronized private void rescheduleJobs(Connection connection, Collection<Long> jobs)
-	{
+	synchronized private void rescheduleJobs(Connection connection,
+			Collection<Long> jobs) {
 		for (Long jobID : jobs) {
 			try {
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Rescheduling job %d.", jobID));
 				failJob(connection, jobID, false, false, true);
 			} catch (Throwable cause) {
-				_logger.warn(String.format("Unable to \"reschedule\" job %d.", jobID), cause);
+				_logger.warn(String.format("Unable to \"reschedule\" job %d.",
+						jobID), cause);
 			}
 		}
 	}
 
 	/**
-	 * Complete all jobs owned by the current caller which are already in a final state.
+	 * Complete all jobs owned by the current caller which are already in a
+	 * final state.
 	 * 
 	 * @param connection
 	 *            The database connection.
@@ -1490,9 +1675,8 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 * @throws GenesisIISecurityException
 	 */
-	synchronized public void completeJobs(Connection connection) throws SQLException, ResourceException,
-		GenesisIISecurityException
-	{
+	synchronized public void completeJobs(Connection connection)
+			throws SQLException, ResourceException, GenesisIISecurityException {
 		Collection<Long> jobsToComplete = new LinkedList<Long>();
 		HashMap<Long, PartialJobInfo> ownerMap;
 
@@ -1500,7 +1684,8 @@ public class JobManager implements Closeable
 		ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
 
 		/*
-		 * Find all jobs that are owend by the caller and that are in a final state.
+		 * Find all jobs that are owend by the caller and that are in a final
+		 * state.
 		 */
 		boolean isAdmin = QueueSecurity.isQueueAdmin();
 		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
@@ -1513,12 +1698,15 @@ public class JobManager implements Closeable
 				if (jobData.getJobState().isFinalState() && isAdmin) {
 					jobsToComplete.add(jobID);
 				} else {
-					if (jobData.getJobState().isFinalState() && QueueSecurity.isOwner(pji.getOwners(), callers)) {
+					if (jobData.getJobState().isFinalState()
+							&& QueueSecurity.isOwner(pji.getOwners(), callers)) {
 						jobsToComplete.add(jobID);
 					}
 				}
 			} catch (AuthZSecurityException azse) {
-				_logger.warn("Security exception caused us not to complete a job.", azse);
+				_logger.warn(
+						"Security exception caused us not to complete a job.",
+						azse);
 			}
 		}
 
@@ -1527,26 +1715,27 @@ public class JobManager implements Closeable
 	}
 
 	/**
-	 * This method completes (or removes from the queue) all jobs which are owned by the caller and
-	 * which are in a final state. Only jobs in a final state can be completed. To try and complete
-	 * a job which is not in a final state is considered an error and an exception will be thrown.
+	 * This method completes (or removes from the queue) all jobs which are
+	 * owned by the caller and which are in a final state. Only jobs in a final
+	 * state can be completed. To try and complete a job which is not in a final
+	 * state is considered an error and an exception will be thrown.
 	 * 
 	 * @param connection
 	 *            The database connection to use.
 	 * @param jobs
-	 *            The list of jobs to complete. If this is null or empty, then all jobs owned by the
-	 *            caller, and already in a final state, will be completed.
+	 *            The list of jobs to complete. If this is null or empty, then
+	 *            all jobs owned by the caller, and already in a final state,
+	 *            will be completed.
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
 	 * @throws GenesisIISecurityException
 	 */
-	synchronized public void completeJobs(Connection connection, String[] jobs) throws SQLException, ResourceException,
-		GenesisIISecurityException
-	{
+	synchronized public void completeJobs(Connection connection, String[] jobs)
+			throws SQLException, ResourceException, GenesisIISecurityException {
 		/*
-		 * If no jobs were passed to us, then the caller wants us to complete all jobs that are in a
-		 * final state and that are owned by him/her.
+		 * If no jobs were passed to us, then the caller wants us to complete
+		 * all jobs that are in a final state and that are owned by him/her.
 		 */
 		if (jobs == null || jobs.length == 0) {
 			completeJobs(connection);
@@ -1560,7 +1749,8 @@ public class JobManager implements Closeable
 		for (String jobTicket : jobs) {
 			JobData data = _jobsByTicket.get(jobTicket);
 			if (data == null)
-				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+				throw new ResourceException("Job \"" + jobTicket
+						+ "\" does not exist.");
 			jobsToComplete.add(new Long(data.getJobID()));
 		}
 
@@ -1573,7 +1763,8 @@ public class JobManager implements Closeable
 		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
 
 		/*
-		 * Check that every job indicated is owned by the caller and is in a final state.
+		 * Check that every job indicated is owned by the caller and is in a
+		 * final state.
 		 */
 		for (Long jobID : ownerMap.keySet()) {
 			JobData jobData = _jobsByID.get(jobID);
@@ -1581,13 +1772,15 @@ public class JobManager implements Closeable
 
 			/* If the job isn't in a final state, throw an exception. */
 			if (!jobData.getJobState().isFinalState())
-				throw new ResourceException("Job \"" + jobData.getJobTicket() + "\" is not in a final state.");
+				throw new ResourceException("Job \"" + jobData.getJobTicket()
+						+ "\" is not in a final state.");
 
 			/* If the job isn't owned by the caller, throw an exception. */
 			if (!isAdmin) {
 				if (!QueueSecurity.isOwner(pji.getOwners(), callers))
-					throw new GenesisIISecurityException("Don't have permission to complete job \"" + jobData.getJobTicket()
-						+ "\".");
+					throw new GenesisIISecurityException(
+							"Don't have permission to complete job \""
+									+ jobData.getJobTicket() + "\".");
 			}
 		}
 
@@ -1595,9 +1788,8 @@ public class JobManager implements Closeable
 		completeJobs(connection, jobsToComplete);
 	}
 
-	synchronized public void rescheduleJobs(Connection connection, String[] jobs) throws SQLException, ResourceException,
-		GenesisIISecurityException
-	{
+	synchronized public void rescheduleJobs(Connection connection, String[] jobs)
+			throws SQLException, ResourceException, GenesisIISecurityException {
 		if (jobs == null || jobs.length == 0)
 			return;
 
@@ -1608,7 +1800,8 @@ public class JobManager implements Closeable
 		for (String jobTicket : jobs) {
 			JobData data = _jobsByTicket.get(jobTicket);
 			if (data == null)
-				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+				throw new ResourceException("Job \"" + jobTicket
+						+ "\" does not exist.");
 			jobsToReschedule.add(new Long(data.getJobID()));
 		}
 
@@ -1618,7 +1811,8 @@ public class JobManager implements Closeable
 		ownerMap = _database.getPartialJobInfos(connection, jobsToReschedule);
 
 		/*
-		 * Check that every job indicated is owned by the caller and is in a final state.
+		 * Check that every job indicated is owned by the caller and is in a
+		 * final state.
 		 */
 		for (Long jobID : ownerMap.keySet()) {
 			JobData jobData = _jobsByID.get(jobID);
@@ -1632,41 +1826,42 @@ public class JobManager implements Closeable
 
 			/* If the job isn't owned by the caller, throw an exception. */
 			if (!QueueSecurity.isOwner(pji.getOwners()))
-				throw new GenesisIISecurityException("Don't have permission to reschedule job \"" + jobData.getJobTicket()
-					+ "\".");
+				throw new GenesisIISecurityException(
+						"Don't have permission to reschedule job \""
+								+ jobData.getJobTicket() + "\".");
 		}
 
 		// Go ahead and complete them
 		rescheduleJobs(connection, jobsToReschedule);
 	}
 
-	synchronized public void checkJobStatus(long jobID)
-	{
+	synchronized public void checkJobStatus(long jobID) {
 		if (_logger.isDebugEnabled())
 			_logger.debug("adding record to check on job status for: " + jobID);
 		_pendingChecks.add(jobID);
 	}
 
-	// tends to notifications we've already heard about for jobs that may be complete.
-	synchronized public void handlePendingJobStatusChecks()
-	{
+	// tends to notifications we've already heard about for jobs that may be
+	// complete.
+	synchronized public void handlePendingJobStatusChecks() {
 		if (_whenToProcessNotifications.after(Calendar.getInstance()))
 			return; // not time yet.
 		while (_pendingChecks.size() > 0) {
 			long jobId = _pendingChecks.get(0);
 			_pendingChecks.remove(0);
 			if (_logger.isDebugEnabled())
-				_logger.debug("JobManager: scheduling job status check on: " + jobId);
+				_logger.debug("JobManager: scheduling job status check on: "
+						+ jobId);
 			scheduleAJobStatusCheck(jobId);
 		}
 		// reset for the next time to check notified statuses.
 		_whenToProcessNotifications = Calendar.getInstance();
-		_whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
+		_whenToProcessNotifications.add(Calendar.MILLISECOND,
+				NOTIFICATION_CHECKING_DELAY);
 	}
 
 	// adds an item to the queue to later perform a job status check on jobID.
-	synchronized public void scheduleAJobStatusCheck(long jobID)
-	{
+	synchronized public void scheduleAJobStatusCheck(long jobID) {
 		int originalCount = _outcallThreadPool.size();
 
 		JobData job = _jobsByID.get(jobID);
@@ -1682,37 +1877,44 @@ public class JobManager implements Closeable
 		JobCommunicationInfo info = null;
 		try {
 			/*
-			 * For convenience, we bundle together the id's of the job to check, and the bes
-			 * container on which it is running.
+			 * For convenience, we bundle together the id's of the job to check,
+			 * and the bes container on which it is running.
 			 */
-			info = new JobCommunicationInfo(job.getJobID(), job.getBESID().longValue());
+			info = new JobCommunicationInfo(job.getJobID(), job.getBESID()
+					.longValue());
 		} catch (Throwable cause) {
-			_logger.error("Saw unexpected exception when creating job communication info for job: " + jobID, cause);
+			_logger.error(
+					"Saw unexpected exception when creating job communication info for job: "
+							+ jobID, cause);
 			return;
 		}
 		/*
-		 * As in other places, we use a callback mechanism to allow outcall threads to late bind
-		 * "large" information at the last minute. This keeps us from putting too much into memory.
-		 * In this particular case its something of a hack as we already had a type for getting the
-		 * bes information so we just bundled that with a second interface for getting the job's
-		 * endpoint. This could have been done cleaner, but it works fine.
+		 * As in other places, we use a callback mechanism to allow outcall
+		 * threads to late bind "large" information at the last minute. This
+		 * keeps us from putting too much into memory. In this particular case
+		 * its something of a hack as we already had a type for getting the bes
+		 * information so we just bundled that with a second interface for
+		 * getting the job's endpoint. This could have been done cleaner, but it
+		 * works fine.
 		 */
 		Resolver resolver = new Resolver();
 
 		/* Enqueue the worker into the outcall thread pool */
-		_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver, resolver, _connectionPool, info, job));
+		_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver,
+				resolver, _connectionPool, info, job));
 
 		int newCount = _outcallThreadPool.size();
 
 		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
-			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+			_logger.debug(String.format(
+					"%d jobs queued in thread pool (changed from %d).",
+					newCount, originalCount));
 		}
 
 		LoggingContext.releaseCurrentLoggingContext();
 	}
 
-	synchronized public Map<String, Long> summarizeToMap()
-	{
+	synchronized public Map<String, Long> summarizeToMap() {
 		Map<String, Long> ret = new LinkedHashMap<String, Long>();
 
 		long queued = 0;
@@ -1748,15 +1950,15 @@ public class JobManager implements Closeable
 		return ret;
 	}
 
-	public long getJobCount()
-	{
+	public long getJobCount() {
 		return _jobsByID.size();
 	}
 
 	/**
-	 * This method is called periodically by a watcher thread to check on the current statuses of
-	 * all jobs running in the queue (the polling method of checking whether or not a job has run to
-	 * completion or failed or is still running).
+	 * This method is called periodically by a watcher thread to check on the
+	 * current statuses of all jobs running in the queue (the polling method of
+	 * checking whether or not a job has run to completion or failed or is still
+	 * running).
 	 * 
 	 * @param connection
 	 *            The database connection.
@@ -1766,98 +1968,114 @@ public class JobManager implements Closeable
 	 * @throws ConfigurationException
 	 * @throws GenesisIISecurityException
 	 */
-	synchronized public void checkJobStatuses(Connection connection) throws SQLException, ResourceException,
-		GenesisIISecurityException
-	{
+	synchronized public void checkJobStatuses(Connection connection)
+			throws SQLException, ResourceException, GenesisIISecurityException {
 		// reset any stored notifications, since we're checking everything.
 		_pendingChecks = new ArrayList<Long>();
 
 		int originalCount = _outcallThreadPool.size();
 
 		/*
-		 * Iterate through all running jobs and enqueue a worker to check the status of that job.
+		 * Iterate through all running jobs and enqueue a worker to check the
+		 * status of that job.
 		 */
 		for (JobData job : _runningJobs.values()) {
 			if (job == null || job.getBESID() == null) {
 				if (job == null) {
 					if (_logger.isDebugEnabled())
-						_logger.debug(String.format("Can't check a job that is NULL."));
+						_logger.debug(String
+								.format("Can't check a job that is NULL."));
 				} else {
 					if (_logger.isDebugEnabled())
-						_logger.debug(String.format("Last minute decision not to check on job %s "
-							+ "status because it doesn't have a BES associated.", job));
+						_logger.debug(String
+								.format("Last minute decision not to check on job %s "
+										+ "status because it doesn't have a BES associated.",
+										job));
 				}
 				continue;
 			} else {
 				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Starting process of checking status of running job %s", job));
+					_logger.debug(String
+							.format("Starting process of checking status of running job %s",
+									job));
 			}
 
 			HistoryContext history = job.history(HistoryEventCategory.Checking);
 
 			history.createTraceWriter("Checking Running Job Status")
-				.format("Checking job status as the result of a received" + " asynchronous notification.").close();
+					.format("Checking job status as the result of a received"
+							+ " asynchronous notification.").close();
 
 			/*
-			 * For convenience, we bundle together the id's of the job to check, and the bes
-			 * container on which it is running.
+			 * For convenience, we bundle together the id's of the job to check,
+			 * and the bes container on which it is running.
 			 */
-			JobCommunicationInfo info = new JobCommunicationInfo(job.getJobID(), job.getBESID().longValue());
+			JobCommunicationInfo info = new JobCommunicationInfo(
+					job.getJobID(), job.getBESID().longValue());
 
 			/*
-			 * As in other places, we use a callback mechanism to allow outcall threads to late bind
-			 * "large" information at the last minute. This keeps us from putting too much into
-			 * memory. In this particular case its something of a hack as we already had a type for
-			 * getting the bes information so we just bundled that with a second interface for
-			 * getting the job's endpoint. This could have been done cleaner, but it works fine.
+			 * As in other places, we use a callback mechanism to allow outcall
+			 * threads to late bind "large" information at the last minute. This
+			 * keeps us from putting too much into memory. In this particular
+			 * case its something of a hack as we already had a type for getting
+			 * the bes information so we just bundled that with a second
+			 * interface for getting the job's endpoint. This could have been
+			 * done cleaner, but it works fine.
 			 */
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
-			_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver, resolver, _connectionPool, info, job));
+			_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver,
+					resolver, _connectionPool, info, job));
 		}
 
 		int newCount = _outcallThreadPool.size();
 
 		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
-			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+			_logger.debug(String.format(
+					"%d jobs queued in thread pool (changed from %d).",
+					newCount, originalCount));
 		}
 	}
 
 	/**
-	 * Check to see whether or not there are any jobs in the queue waiting to run.
+	 * Check to see whether or not there are any jobs in the queue waiting to
+	 * run.
 	 * 
 	 * @return True if there are any jobs still waiting to run.
 	 */
-	synchronized public boolean hasQueuedJobs()
-	{
+	synchronized public boolean hasQueuedJobs() {
 		return !_queuedJobs.isEmpty();
 	}
 
 	/**
-	 * This method takes a list of slots (assumed to be an indication of total slots allocated to
-	 * BES resources) and subtracts out the slots that are already in use. We could have avoided
-	 * this step by keeping more information about slot use in memory, but doing so exponentially
-	 * increases the complexity of the Job Manager and the BES Manager and since all this work is
-	 * done in memory, it is a relatively fast operation anyways. It's an O(n) algorithm where n is
-	 * equal to the number of jobs actively running at any given time.
+	 * This method takes a list of slots (assumed to be an indication of total
+	 * slots allocated to BES resources) and subtracts out the slots that are
+	 * already in use. We could have avoided this step by keeping more
+	 * information about slot use in memory, but doing so exponentially
+	 * increases the complexity of the Job Manager and the BES Manager and since
+	 * all this work is done in memory, it is a relatively fast operation
+	 * anyways. It's an O(n) algorithm where n is equal to the number of jobs
+	 * actively running at any given time.
 	 * 
 	 * @param slots
-	 *            A map of all of the slots available to the queue at this moment.
+	 *            A map of all of the slots available to the queue at this
+	 *            moment.
 	 * 
 	 * @throws ResourceException
 	 */
-	synchronized public void recordUsedSlots(HashMap<Long, ResourceSlots> slots) throws ResourceException
-	{
+	synchronized public void recordUsedSlots(HashMap<Long, ResourceSlots> slots)
+			throws ResourceException {
 		/*
-		 * Iterate through all running jobs and reduce the slot count from resources that they are
-		 * using.
+		 * Iterate through all running jobs and reduce the slot count from
+		 * resources that they are using.
 		 */
 		for (JobData job : _runningJobs.values()) {
 			/* Get the bes id that the job is running on */
 			Long besID = job.getBESID();
 			if (besID == null) {
-				_logger.warn("A job is marked as running which isn't " + "assigned to a BES container.");
+				_logger.warn("A job is marked as running which isn't "
+						+ "assigned to a BES container.");
 				continue;
 			}
 
@@ -1867,7 +2085,8 @@ public class JobManager implements Closeable
 				rs.reserveSlot();
 
 				/*
-				 * If the resource now has no slots available, remove it complete from the list.
+				 * If the resource now has no slots available, remove it
+				 * complete from the list.
 				 */
 				if (rs.slotsAvailable() <= 0)
 					slots.remove(besID);
@@ -1875,11 +2094,10 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public void recordUsedSlots(Map<Long, SlotSummary> slots)
-	{
+	synchronized public void recordUsedSlots(Map<Long, SlotSummary> slots) {
 		/*
-		 * Iterate through all running jobs and reduce the slot count from resources that they are
-		 * using.
+		 * Iterate through all running jobs and reduce the slot count from
+		 * resources that they are using.
 		 */
 		for (JobData job : _runningJobs.values()) {
 			/* Get the bes id that the job is running on */
@@ -1893,14 +2111,15 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public void
-		addJobErrorInformation(Connection connection, long jobid, short attempt, Collection<String> errors)
-	{
+	synchronized public void addJobErrorInformation(Connection connection,
+			long jobid, short attempt, Collection<String> errors) {
 		try {
 			_database.addError(connection, jobid, attempt, errors);
 			connection.commit();
 		} catch (Throwable cause) {
-			_logger.warn("An error occurred while trying to save error information.", cause);
+			_logger.warn(
+					"An error occurred while trying to save error information.",
+					cause);
 		}
 	}
 
@@ -1909,20 +2128,21 @@ public class JobManager implements Closeable
 	 * 
 	 * @return The list of currently queued jobs.
 	 */
-	synchronized public Collection<JobData> getQueuedJobs()
-	{
+	synchronized public Collection<JobData> getQueuedJobs() {
 		/*
-		 * Note: This method changes the meaning of the "Priority" of a job. Previously, setting a
-		 * higher priority meant a user could push his job to the head of the line. Now, a high
-		 * priority only moves the job to the head of the user's queue, but the user will still be
-		 * scheduled in turn with other user's. This lets a user prioritize his own jobs without
-		 * compromising the fairness of the overall queue scheduling.
+		 * Note: This method changes the meaning of the "Priority" of a job.
+		 * Previously, setting a higher priority meant a user could push his job
+		 * to the head of the line. Now, a high priority only moves the job to
+		 * the head of the user's queue, but the user will still be scheduled in
+		 * turn with other user's. This lets a user prioritize his own jobs
+		 * without compromising the fairness of the overall queue scheduling.
 		 */
 		if (_usersWithJobs.size() > 1) {
 			Collection<JobData> jobs = new ArrayList<JobData>();
 
 			// Make a linked list to cycle through user names
-			LinkedList<String> users = new LinkedList<String>(_usersWithJobs.keySet());
+			LinkedList<String> users = new LinkedList<String>(
+					_usersWithJobs.keySet());
 
 			// Move lastUserScheduled to the front
 			if (users.indexOf(_lastUserScheduled) > 0) {
@@ -1946,7 +2166,8 @@ public class JobManager implements Closeable
 
 				// If the user has more jobs to schedule...
 				if (userJobs.get(thisUser).hasNext()) {
-					// take the first one for this user, then put him back in line
+					// take the first one for this user, then put him back in
+					// line
 					JobData nextJob = userJobs.get(thisUser).next();
 					jobs.add(nextJob);
 					users.addLast(thisUser);
@@ -1963,7 +2184,8 @@ public class JobManager implements Closeable
 	}
 
 	/**
-	 * Given a list of resource matches, start the jobs indicated on the BES containers indicated.
+	 * Given a list of resource matches, start the jobs indicated on the BES
+	 * containers indicated.
 	 * 
 	 * @param connection
 	 *            The database connection to use.
@@ -1973,20 +2195,22 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public void startJobs(Connection connection, Collection<ResourceMatch> matches) throws SQLException,
-		ResourceException
-	{
+	synchronized public void startJobs(Connection connection,
+			Collection<ResourceMatch> matches) throws SQLException,
+			ResourceException {
 		/*
-		 * First, note in the database that we are starting a job. In all honesty, if we restarted
-		 * at this point, it would probably be ok if we didn't know this. If we do restart, we won't
-		 * be able to do anything with the job since we don't have an endpoint, but it is a state
-		 * that we can keep so we do anyways.
+		 * First, note in the database that we are starting a job. In all
+		 * honesty, if we restarted at this point, it would probably be ok if we
+		 * didn't know this. If we do restart, we won't be able to do anything
+		 * with the job since we don't have an endpoint, but it is a state that
+		 * we can keep so we do anyways.
 		 */
 		_database.markStarting(connection, matches);
 		connection.commit();
 
 		/*
-		 * Iterate through the matches and enqueue a worker to start the jobs indicated there.
+		 * Iterate through the matches and enqueue a worker to start the jobs
+		 * indicated there.
 		 */
 		for (ResourceMatch match : matches) {
 			/* Find the job data for the match */
@@ -1994,12 +2218,13 @@ public class JobManager implements Closeable
 
 			LoggingContext.adoptExistingContext(data.getLoggingContext());
 			/*
-			 * Get the job off of the queued list and instead put him on the running list. Also,
-			 * note which bes the jobs is assigned to.
+			 * Get the job off of the queued list and instead put him on the
+			 * running list. Also, note which bes the jobs is assigned to.
 			 */
 			SortableJobKey jobKey = new SortableJobKey(data);
 			_queuedJobs.remove(jobKey);
-			for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
+			for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs
+					.values()) {
 				user.remove(jobKey);
 			}
 			data.setBESID(match.getBESID());
@@ -2007,33 +2232,35 @@ public class JobManager implements Closeable
 			_runningJobs.put(new Long(data.getJobID()), data);
 
 			/*
-			 * Finally, enqueue a worker to make the out call to the BES to start the job. Until
-			 * this worker completes, a restart of the container will cause this attempt at starting
-			 * a job to fail.
+			 * Finally, enqueue a worker to make the out call to the BES to
+			 * start the job. Until this worker completes, a restart of the
+			 * container will cause this attempt at starting a job to fail.
 			 */
-			_outcallThreadPool.enqueue(new JobLauncher(this, match.getJobID(), match.getBESID()));
+			_outcallThreadPool.enqueue(new JobLauncher(this, match.getJobID(),
+					match.getBESID()));
 			LoggingContext.releaseCurrentLoggingContext();
 		}
 	}
 
 	/**
-	 * This is the resolver instance that is used to late bind job EPR, BES EPR, and Job Calling
-	 * Context for outcall workers. This class is implemented with a horrible hack in it. Namely,
-	 * that the call to createClientStub MUST come after a call to getJobEndpoint. The main reason
-	 * for this is that I'm now rushing to get this working and this hack can be managed client
-	 * side. We will at least check the condition though so that we will catch an invalid ordering
-	 * if it ever happens.
+	 * This is the resolver instance that is used to late bind job EPR, BES EPR,
+	 * and Job Calling Context for outcall workers. This class is implemented
+	 * with a horrible hack in it. Namely, that the call to createClientStub
+	 * MUST come after a call to getJobEndpoint. The main reason for this is
+	 * that I'm now rushing to get this working and this hack can be managed
+	 * client side. We will at least check the condition though so that we will
+	 * catch an invalid ordering if it ever happens.
 	 * 
 	 * @author mmm2a
 	 */
-	private class Resolver implements IBESPortTypeResolver, IJobEndpointResolver
-	{
+	private class Resolver implements IBESPortTypeResolver,
+			IJobEndpointResolver {
 		private GeniiBESPortType _portType = null;
 		private EndpointReferenceType _endpoint = null;
 
 		/**
-		 * Resolve the information in this resolver. I.e., get the client stub and the job endpoint
-		 * from the database.
+		 * Resolve the information in this resolver. I.e., get the client stub
+		 * and the job endpoint from the database.
 		 * 
 		 * @param connection
 		 *            The database connection to use.
@@ -2042,32 +2269,34 @@ public class JobManager implements Closeable
 		 * 
 		 * @throws Throwable
 		 */
-		private void resolve(Connection connection, long jobID) throws Throwable
-		{
-			JobStatusInformation info = _database.getJobStatusInformation(connection, jobID);
+		private void resolve(Connection connection, long jobID)
+				throws Throwable {
+			JobStatusInformation info = _database.getJobStatusInformation(
+					connection, jobID);
 
 			_endpoint = info.getJobEndpoint();
-			_portType = ClientUtils.createProxy(GeniiBESPortType.class, info.getBESEndpoint(), info.getCallingContext());
+			_portType = ClientUtils.createProxy(GeniiBESPortType.class,
+					info.getBESEndpoint(), info.getCallingContext());
 		}
 
 		@Override
-		public GeniiBESPortType createClientStub(Connection connection, long besID) throws Throwable
-		{
+		public GeniiBESPortType createClientStub(Connection connection,
+				long besID) throws Throwable {
 			if (_portType == null)
-				throw new IllegalStateException("createClientStub called before getJobEndpoint.");
+				throw new IllegalStateException(
+						"createClientStub called before getJobEndpoint.");
 
 			return _portType;
 		}
 
 		@Override
-		public EndpointReferenceType getJobEndpoint(Connection connection, long jobID) throws Throwable
-		{
+		public EndpointReferenceType getJobEndpoint(Connection connection,
+				long jobID) throws Throwable {
 			resolve(connection, jobID);
 			return _endpoint;
 		}
 
-		public String getBESName(long besID)
-		{
+		public String getBESName(long besID) {
 			BESData data = _besManager.findBES(besID);
 			if (data != null)
 				return data.getName();
@@ -2077,12 +2306,13 @@ public class JobManager implements Closeable
 	}
 
 	/**
-	 * Kill all of the jobs indicated. If the job is queued or requeued, we simply move it to a
-	 * final state. If the job is starting or running, we kill it. If the job is already in a final
-	 * state, we don't do anything. This operation is also a "safe" operation meaning that the
-	 * caller MUST own the job to kill it or it is considered an exception. Also, unlike other
-	 * similar operations, the list of tickets, when NULL, will not imply all jobs owned by the
-	 * caller -- instead we just will return.
+	 * Kill all of the jobs indicated. If the job is queued or requeued, we
+	 * simply move it to a final state. If the job is starting or running, we
+	 * kill it. If the job is already in a final state, we don't do anything.
+	 * This operation is also a "safe" operation meaning that the caller MUST
+	 * own the job to kill it or it is considered an exception. Also, unlike
+	 * other similar operations, the list of tickets, when NULL, will not imply
+	 * all jobs owned by the caller -- instead we just will return.
 	 * 
 	 * @param connection
 	 *            The database connection to use.
@@ -2092,9 +2322,8 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public void killJobs(Connection connection, String[] tickets) throws SQLException, ResourceException,
-		GenesisIISecurityException
-	{
+	synchronized public void killJobs(Connection connection, String[] tickets)
+			throws SQLException, ResourceException, GenesisIISecurityException {
 		/* If we weren't given any tickets, then just ignore */
 		if (tickets == null || tickets.length == 0)
 			return;
@@ -2103,15 +2332,19 @@ public class JobManager implements Closeable
 		HashMap<Long, PartialJobInfo> ownerMap;
 
 		/*
-		 * Iterate through all job tickets and get the associated in-memory job information.
+		 * Iterate through all job tickets and get the associated in-memory job
+		 * information.
 		 */
 		for (String jobTicket : tickets) {
 			JobData data = _jobsByTicket.get(jobTicket);
 			if (data == null)
-				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+				throw new ResourceException("Job \"" + jobTicket
+						+ "\" does not exist.");
 
-			data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested")
-				.format("Request to terminate job from outside the queue").close();
+			data.history(HistoryEventCategory.Terminating)
+					.createInfoWriter("Job Termination Requested")
+					.format("Request to terminate job from outside the queue")
+					.close();
 
 			jobsToKill.add(new Long(data.getJobID()));
 		}
@@ -2130,50 +2363,59 @@ public class JobManager implements Closeable
 			 * If the caller doesn't own the job, it's a security exception
 			 */
 			if (!QueueSecurity.isOwner(pji.getOwners())) {
-				GenesisIISecurityException t =
-					new GenesisIISecurityException("Don't have permission to kill job \"" + jobData.getJobTicket() + "\".");
-				jobData.history(HistoryEventCategory.Terminating).createWarnWriter("Termination Request Denied")
-					.format("Denying termination request.  Caller not authorized.").close();
+				GenesisIISecurityException t = new GenesisIISecurityException(
+						"Don't have permission to kill job \""
+								+ jobData.getJobTicket() + "\".");
+				jobData.history(HistoryEventCategory.Terminating)
+						.createWarnWriter("Termination Request Denied")
+						.format("Denying termination request.  Caller not authorized.")
+						.close();
 				throw t;
 			}
 
 			/*
-			 * If the job is starting, we mark it as being killed. Starting implies that another
-			 * thread is about to try and start the thing up so it will have to check this flag and
-			 * abort (or kill) as necessary.
+			 * If the job is starting, we mark it as being killed. Starting
+			 * implies that another thread is about to try and start the thing
+			 * up so it will have to check this flag and abort (or kill) as
+			 * necessary.
 			 */
 			if (jobData.getJobState().equals(QueueStates.STARTING)) {
 				jobData.kill();
 			} else if (jobData.getJobState().equals(QueueStates.RUNNING)) {
 				/*
-				 * If the job is running, we have to finish the job (which will kill it for us)
+				 * If the job is running, we have to finish the job (which will
+				 * kill it for us)
 				 */
 				killJob(connection, jobID);
 			} else if (!jobData.getJobState().isFinalState()) {
 				/*
-				 * This won't kill the job (it isn't running), but it will move it to the correct
-				 * lists, thus preventing it from ever being run.
+				 * This won't kill the job (it isn't running), but it will move
+				 * it to the correct lists, thus preventing it from ever being
+				 * run.
 				 */
 				finishJob(jobID);
 			}
 		}
 	}
 
-	synchronized public void resetJobCommunicationAttempts(Connection connection, long jobid) throws SQLException
-	{
+	synchronized public void resetJobCommunicationAttempts(
+			Connection connection, long jobid) throws SQLException {
 		_database.setJobCommunicationAttempts(connection, jobid, 0);
 	}
 
-	synchronized public void addJobCommunicationAttempt(Connection connection, long jobid, long besid) throws SQLException,
-		ResourceException
-	{
-		int commAttempts = _database.getJobCommunicationAttempts(connection, jobid);
+	synchronized public void addJobCommunicationAttempt(Connection connection,
+			long jobid, long besid) throws SQLException, ResourceException {
+		int commAttempts = _database.getJobCommunicationAttempts(connection,
+				jobid);
 		if (commAttempts > MAX_COMM_ATTEMPTS) {
-			_logger.error(String.format("Unable to communicate with job for %d attempts.  Re-starting it.", commAttempts));
+			_logger.error(String
+					.format("Unable to communicate with job for %d attempts.  Re-starting it.",
+							commAttempts));
 			failJob(connection, jobid, false, false, false);
 			_besManager.markBESAsMissed(besid, "Couldn't get job status.");
 		} else {
-			_database.setJobCommunicationAttempts(connection, jobid, commAttempts + 1);
+			_database.setJobCommunicationAttempts(connection, jobid,
+					commAttempts + 1);
 		}
 	}
 
@@ -2182,17 +2424,16 @@ public class JobManager implements Closeable
 	 * 
 	 * @author mmm2a
 	 */
-	private class JobLauncher implements OutcallHandler
-	{
+	private class JobLauncher implements OutcallHandler {
 		private long _jobID;
 		private long _besID;
 		private JobManager _manager;
 		private LoggingContext _context;
 
-		public JobLauncher(JobManager manager, long jobID, long besID)
-		{
+		public JobLauncher(JobManager manager, long jobID, long besID) {
 			try {
-				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+				_context = (LoggingContext) LoggingContext
+						.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				_context = new LoggingContext();
 			}
@@ -2201,14 +2442,13 @@ public class JobManager implements Closeable
 			_besID = besID;
 		}
 
-		public boolean equals(JobLauncher other)
-		{
-			return (_jobID == other._jobID) && (_besID == other._besID) && (_manager == other._manager);
+		public boolean equals(JobLauncher other) {
+			return (_jobID == other._jobID) && (_besID == other._besID)
+					&& (_manager == other._manager);
 		}
 
 		@Override
-		public boolean equals(OutcallHandler other)
-		{
+		public boolean equals(OutcallHandler other) {
 			if (other instanceof JobLauncher)
 				return equals((JobLauncher) other);
 
@@ -2216,16 +2456,14 @@ public class JobManager implements Closeable
 		}
 
 		@Override
-		public boolean equals(Object other)
-		{
+		public boolean equals(Object other) {
 			if (other instanceof JobLauncher)
 				return equals((JobLauncher) other);
 
 			return false;
 		}
 
-		public void run()
-		{
+		public void run() {
 			LoggingContext.assumeLoggingContext(_context);
 
 			boolean isPermanent = false;
@@ -2241,16 +2479,19 @@ public class JobManager implements Closeable
 				connection = _connectionPool.acquire(false);
 
 				/*
-				 * Get all of the information from the database required to start the job.
+				 * Get all of the information from the database required to
+				 * start the job.
 				 */
-				JobStartInformation startInfo = _database.getStartInformation(connection, _jobID);
+				JobStartInformation startInfo = _database.getStartInformation(
+						connection, _jobID);
 				connection.commit();
 
 				synchronized (_manager) {
 					/* Get the in-memory information for the job */
 					data = _jobsByID.get(new Long(_jobID));
 					if (data == null) {
-						_logger.warn("Job " + _jobID + " dissappeared before it could be started.");
+						_logger.warn("Job " + _jobID
+								+ " dissappeared before it could be started.");
 						return;
 					}
 				}
@@ -2259,27 +2500,32 @@ public class JobManager implements Closeable
 
 				SecurityUpdateResults checkResults = new SecurityUpdateResults();
 				/*
-				 * hmmm: where does this 10 hour time limit come from? why block it like that with a
-				 * constant? instead, we should grab the current credentials deadline and use that
-				 * directly.
+				 * hmmm: where does this 10 hour time limit come from? why block
+				 * it like that with a constant? instead, we should grab the
+				 * current credentials deadline and use that directly.
 				 */
-				ClientUtils.checkAndRenewCredentials(startInfo.getCallingContext(), new Date(
-					System.currentTimeMillis() + 1000l * 60 * 10), checkResults);
+				ClientUtils.checkAndRenewCredentials(
+						startInfo.getCallingContext(),
+						new Date(System.currentTimeMillis() + 1000l * 60 * 10),
+						checkResults);
 				if (checkResults.removedCredentials().size() > 0) {
-					PrintWriter hWriter = history.createErrorWriter("Job Credentials Expired");
+					PrintWriter hWriter = history
+							.createErrorWriter("Job Credentials Expired");
 					hWriter.println("The following credentials expired:");
 					for (NuCredential cred : checkResults.removedCredentials())
-						hWriter.format("\t%s\n", cred.describe(VerbosityLevel.OFF));
+						hWriter.format("\t%s\n",
+								cred.describe(VerbosityLevel.OFF));
 					hWriter.close();
 
 					isPermanent = true;
-					throw new GeneralSecurityException("A job's credentials expired so we can't make "
-						+ "any further progress on it.  Failing it.");
+					throw new GeneralSecurityException(
+							"A job's credentials expired so we can't make "
+									+ "any further progress on it.  Failing it.");
 				}
 
 				/*
-				 * Use the database's fillInBESEPRs function to get the EPR of the BES container
-				 * that we are going to launch on.
+				 * Use the database's fillInBESEPRs function to get the EPR of
+				 * the BES container that we are going to launch on.
 				 */
 				entries.put(new Long(_besID), entryType = new LegacyEntryType());
 				_database.fillInBESEPRs(connection, entries);
@@ -2288,13 +2534,14 @@ public class JobManager implements Closeable
 					/* Get the in-memory information for the job */
 					data = _jobsByID.get(new Long(_jobID));
 					if (data == null) {
-						_logger.warn("Job " + _jobID + " dissappeared before it could be started.");
+						_logger.warn("Job " + _jobID
+								+ " dissappeared before it could be started.");
 						return;
 					}
 
 					/*
-					 * If the thing was marked as killed, then we simply won't start it. Instead, we
-					 * will finish it early.
+					 * If the thing was marked as killed, then we simply won't
+					 * start it. Instead, we will finish it early.
 					 */
 					if (data.killed()) {
 						history.debug("Job Terminated Before Create");
@@ -2306,8 +2553,9 @@ public class JobManager implements Closeable
 
 				String oldAction = data.setJobAction("Creating");
 				if (oldAction != null) {
-					_logger.error("We're trying to create an activity for a job that " + "is already undergoing some action:  "
-						+ oldAction);
+					_logger.error("We're trying to create an activity for a job that "
+							+ "is already undergoing some action:  "
+							+ oldAction);
 					return;
 				}
 
@@ -2315,18 +2563,23 @@ public class JobManager implements Closeable
 
 				try {
 					/*
-					 * We need to start the job, so go ahead and create a proxy to call the
-					 * container and then call it.
+					 * We need to start the job, so go ahead and create a proxy
+					 * to call the container and then call it.
 					 */
 					startCtxt = startInfo.getCallingContext();
 
-					history
-						.setProperty(QueueConstants.ATTEMPT_NUMBER_HISTORY_PROPERTY, Integer.toString(data.getRunAttempts()));
-					history.setProperty(QueueConstants.QUEUE_STARTED_HISTORY_PROPERTY, "true");
+					history.setProperty(
+							QueueConstants.ATTEMPT_NUMBER_HISTORY_PROPERTY,
+							Integer.toString(data.getRunAttempts()));
+					history.setProperty(
+							QueueConstants.QUEUE_STARTED_HISTORY_PROPERTY,
+							"true");
 
 					history.category(HistoryEventCategory.CreatingJob);
 
-					HistoryEventToken historyToken = history.info("Creating Activity on %s", _besManager.getBESName(_besID));
+					HistoryEventToken historyToken = history.info(
+							"Creating Activity on %s",
+							_besManager.getBESName(_besID));
 
 					data.historyToken(historyToken);
 					_database.historyToken(connection, _jobID, historyToken);
@@ -2334,36 +2587,51 @@ public class JobManager implements Closeable
 
 					startCtxt = history.setContextProperties(startCtxt);
 
-					GeniiBESPortType bes =
-						ClientUtils.createProxy(GeniiBESPortType.class, entryType.getEntry_reference(), startCtxt);
+					GeniiBESPortType bes = ClientUtils.createProxy(
+							GeniiBESPortType.class,
+							entryType.getEntry_reference(), startCtxt);
 
 					ClientUtils.setTimeout(bes, 120 * 1000);
-					ActivityDocumentType adt = new ActivityDocumentType(startInfo.getJSDL(), null);
-					EndpointReferenceType queueEPR = _database.getQueueEPR(connection);
+					ActivityDocumentType adt = new ActivityDocumentType(
+							startInfo.getJSDL(), null);
+					EndpointReferenceType queueEPR = _database
+							.getQueueEPR(connection);
 					if (queueEPR != null)
-						BESUtils.addSubscription(adt, AbstractSubscriptionFactory.createRequest(queueEPR,
-							BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(), null,
-							new JobCompletedAdditionUserData(_jobID)));
+						BESUtils.addSubscription(
+								adt,
+								AbstractSubscriptionFactory
+										.createRequest(
+												queueEPR,
+												BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC
+														.asConcreteQueryExpression(),
+												null,
+												new JobCompletedAdditionUserData(
+														_jobID)));
 
-					HistoryEventWriter hWriter =
-						history.createDebugWriter("Making CreateActivity Outcall on %s", _besManager.getBESName(_besID));
+					HistoryEventWriter hWriter = history.createDebugWriter(
+							"Making CreateActivity Outcall on %s",
+							_besManager.getBESName(_besID));
 
-					hWriter.format("Making outcall to resource %s.", _besManager.getBESName(_besID)).close();
+					hWriter.format("Making outcall to resource %s.",
+							_besManager.getBESName(_besID)).close();
 					historyToken = hWriter.getToken();
 
-					String header = _database.getSecurityHeader(connection, _jobID);
+					String header = _database.getSecurityHeader(connection,
+							_jobID);
 
 					if (header != "")
 						MyProxyCertificate.setPEMFormattedCertificate(header);
 
-					resp = bes.createActivity(new CreateActivityType(adt, null));
+					resp = bes
+							.createActivity(new CreateActivityType(adt, null));
 
 					history.debug("CreateActivity Outcall Succeeded");
 
 					SequenceNumber parentNumber = historyToken.retrieve();
-					historyToken =
-						InMemoryHistoryEventSink.wrapEvents(parentNumber, _besManager.getBESName(_besID), null,
-							_database.historyKey(data.getJobTicket()), resp == null ? null : resp.get_any());
+					historyToken = InMemoryHistoryEventSink.wrapEvents(
+							parentNumber, _besManager.getBESName(_besID), null,
+							_database.historyKey(data.getJobTicket()),
+							resp == null ? null : resp.get_any());
 
 					data.historyToken(historyToken);
 					_database.historyToken(connection, _jobID, historyToken);
@@ -2374,20 +2642,24 @@ public class JobManager implements Closeable
 
 				synchronized (_manager) {
 					/*
-					 * We successfully got back here, so mark the job as started in the database.
+					 * We successfully got back here, so mark the job as started
+					 * in the database.
 					 */
-					_database.markRunning(connection, _jobID, resp.getActivityIdentifier());
+					_database.markRunning(connection, _jobID,
+							resp.getActivityIdentifier());
 					connection.commit();
 
 					/*
-					 * Now it's stored in the database. Note that it's started in memory as well.
+					 * Now it's stored in the database. Note that it's started
+					 * in memory as well.
 					 */
 					data = _jobsByID.get(new Long(_jobID));
 					data.setJobState(QueueStates.RUNNING);
 
 					/*
-					 * Finally, we check one last time to see if it was "killed" while we were
-					 * starting it. If so, then we will immediately kill it and finish it.
+					 * Finally, we check one last time to see if it was "killed"
+					 * while we were starting it. If so, then we will
+					 * immediately kill it and finish it.
 					 */
 					if (data.killed())
 						finishJob(_jobID);
@@ -2395,9 +2667,9 @@ public class JobManager implements Closeable
 			} catch (Throwable cause) {
 				history.error(cause, "Exception Thrown During Create Activity");
 
-				_logger
-					.warn(String.format("Unable to start job %d.  Exception class is %s.", _jobID, cause.getClass().getName()),
-						cause);
+				_logger.warn(String.format(
+						"Unable to start job %d.  Exception class is %s.",
+						_jobID, cause.getClass().getName()), cause);
 
 				boolean countAgainstJob;
 				boolean countAgainstBES;
@@ -2426,30 +2698,29 @@ public class JobManager implements Closeable
 				}
 
 				if (countAgainstBES) {
-					_besManager.markBESAsUnavailable(
-						_besID,
-						String.format("Exception during job start %s(%s)", cause.getClass().getName(),
-							cause.getLocalizedMessage()));
+					_besManager.markBESAsUnavailable(_besID, String.format(
+							"Exception during job start %s(%s)", cause
+									.getClass().getName(), cause
+									.getLocalizedMessage()));
 				}
 
 				if (data != null && countAgainstJob) {
 					data.setNextValidRunTime(new Date());
-					history
-						.createInfoWriter("Job Being Re-queued")
-						.format(
-							"An attempt to run the job failed.  The job will " + "be removed from the runnable list until %ty.",
-							data.getNextCanRun()).close();
+					history.createInfoWriter("Job Being Re-queued")
+							.format("An attempt to run the job failed.  The job will "
+									+ "be removed from the runnable list until %ty.",
+									data.getNextCanRun()).close();
 				} else {
-					history
-						.createInfoWriter("Job Being Re-queued")
-						.format(
-							"The job failed, but it wasn't deemed the job's fault."
-								+ "The job will be availble for immediate re-scheduling.").close();
+					history.createInfoWriter("Job Being Re-queued")
+							.format("The job failed, but it wasn't deemed the job's fault."
+									+ "The job will be availble for immediate re-scheduling.")
+							.close();
 				}
 
 				try {
 					/* We got an exception, so fail the job. */
-					failJob(connection, _jobID, countAgainstJob, isPermanent, true);
+					failJob(connection, _jobID, countAgainstJob, isPermanent,
+							true);
 					_schedulingEvent.notifySchedulingEvent();
 				} catch (Throwable cause2) {
 					_logger.error("Unable to fail a job.", cause2);
@@ -2461,13 +2732,13 @@ public class JobManager implements Closeable
 	}
 
 	/**
-	 * A worker that can go to a bes container and terminate a bes activity. This worker is used to
-	 * both kill jobs prematurely, and to clean up after the complete.
+	 * A worker that can go to a bes container and terminate a bes activity.
+	 * This worker is used to both kill jobs prematurely, and to clean up after
+	 * the complete.
 	 * 
 	 * @author mmm2a
 	 */
-	private class JobKiller implements OutcallHandler
-	{
+	private class JobKiller implements OutcallHandler {
 		private boolean _outcallOnly;
 		private boolean _attemptKill;
 		private JobData _jobData;
@@ -2476,9 +2747,9 @@ public class JobManager implements Closeable
 		private Long _besID;
 		private LoggingContext _context;
 
-		public JobKiller(JobData jobData, QueueStates newState, boolean outcallOnly, boolean attemptKill, String besName,
-			Long besID)
-		{
+		public JobKiller(JobData jobData, QueueStates newState,
+				boolean outcallOnly, boolean attemptKill, String besName,
+				Long besID) {
 			_outcallOnly = outcallOnly;
 			_jobData = jobData;
 			_newState = newState;
@@ -2486,20 +2757,20 @@ public class JobManager implements Closeable
 			_besName = besName;
 			_besID = besID;
 			try {
-				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
+				_context = (LoggingContext) LoggingContext
+						.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				_context = new LoggingContext();
 			}
 		}
 
-		public boolean equals(JobKiller other)
-		{
-			return (_newState == other._newState) && (_jobData.getJobID() == other._jobData.getJobID());
+		public boolean equals(JobKiller other) {
+			return (_newState == other._newState)
+					&& (_jobData.getJobID() == other._jobData.getJobID());
 		}
 
 		@Override
-		public boolean equals(OutcallHandler other)
-		{
+		public boolean equals(OutcallHandler other) {
 			if (other instanceof JobKiller)
 				return equals((JobKiller) other);
 
@@ -2507,8 +2778,7 @@ public class JobManager implements Closeable
 		}
 
 		@Override
-		public boolean equals(Object other)
-		{
+		public boolean equals(Object other) {
 			if (other instanceof JobKiller)
 				return equals((JobKiller) other);
 
@@ -2524,24 +2794,29 @@ public class JobManager implements Closeable
 		 * @throws SQLException
 		 * @throws ResourceException
 		 */
-		private ICallingContext terminateActivity(Connection connection) throws SQLException, ResourceException
-		{
-			HistoryContext history = _jobData.history(HistoryEventCategory.Terminating);
+		private ICallingContext terminateActivity(Connection connection)
+				throws SQLException, ResourceException {
+			HistoryContext history = _jobData
+					.history(HistoryEventCategory.Terminating);
 
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("JobKiller in \"terminateActivity\" for %s.", _jobData));
+				_logger.debug(String.format(
+						"JobKiller in \"terminateActivity\" for %s.", _jobData));
 
 			/*
-			 * Ask the database for all information needed to terminate the activity at the BES
-			 * container.
+			 * Ask the database for all information needed to terminate the
+			 * activity at the BES container.
 			 */
-			KillInformation killInfo = _database.getKillInfo(connection, _jobData.getJobID(), _besID);
+			KillInformation killInfo = _database.getKillInfo(connection,
+					_jobData.getJobID(), _besID);
 			connection.commit();
 
 			String oldAction = _jobData.setJobAction("Terminating");
 			if (oldAction != null) {
-				_logger.error(String.format("Attempted to kill activity %s which was "
-					+ "already undergoing another action:  %s", _jobData, oldAction));
+				_logger.error(String.format(
+						"Attempted to kill activity %s which was "
+								+ "already undergoing another action:  %s",
+						_jobData, oldAction));
 				// we cannot arbitrarily decide to keep going;
 				// that's a violation of trust for the other actors
 				// who check/use the action flag.
@@ -2550,42 +2825,50 @@ public class JobManager implements Closeable
 
 			try {
 				history.category(HistoryEventCategory.Terminating);
-				history.createInfoWriter("Killing BES Activity").format("Making a persistent outcall to kill BES activity.")
-					.close();
+				history.createInfoWriter("Killing BES Activity")
+						.format("Making a persistent outcall to kill BES activity.")
+						.close();
 
 				ICallingContext ctxt = killInfo.getCallingContext();
 
 				if (_attemptKill) {
 					if (_logger.isDebugEnabled())
-						_logger.debug(String.format(
-							"JobKiller::terminateActivity making the kill request for %s a persistent outcall.", _jobData));
+						_logger.debug(String
+								.format("JobKiller::terminateActivity making the kill request for %s a persistent outcall.",
+										_jobData));
 
-					PersistentOutcallJobKiller.killJob(_besName, killInfo.getBESEndpoint(),
-						_database.historyKey(_jobData.getJobTicket()), _jobData.historyToken(), killInfo.getJobEndpoint(),
-						killInfo.getCallingContext());
+					PersistentOutcallJobKiller.killJob(_besName,
+							killInfo.getBESEndpoint(),
+							_database.historyKey(_jobData.getJobTicket()),
+							_jobData.historyToken(), killInfo.getJobEndpoint(),
+							killInfo.getCallingContext());
 
 					_jobData.historyToken(null);
-					_database.historyToken(connection, _jobData.getJobID(), null);
+					_database.historyToken(connection, _jobData.getJobID(),
+							null);
 					connection.commit();
 				}
 
 				return ctxt;
 			} catch (Throwable cause) {
-				_logger.warn(String.format("Exception occurred while killing activity %s.", _jobData), cause);
+				_logger.warn(String.format(
+						"Exception occurred while killing activity %s.",
+						_jobData), cause);
 				return null;
 			} finally {
 				_jobData.clearJobAction();
 			}
 		}
 
-		public void run()
-		{
+		public void run() {
 			LoggingContext.assumeLoggingContext(_context);
 
-			HistoryContext history = _jobData.history(HistoryEventCategory.Terminating);
+			HistoryContext history = _jobData
+					.history(HistoryEventCategory.Terminating);
 
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("JobKiller running for job %s", _jobData));
+				_logger.debug(String.format("JobKiller running for job %s",
+						_jobData));
 
 			Connection connection = null;
 
@@ -2595,66 +2878,84 @@ public class JobManager implements Closeable
 
 				if (_outcallOnly) {
 					if (_logger.isDebugEnabled())
-						_logger.debug(String.format(
-							"JobKiller using terminate on %s because we are flagged as \"outcallOnly\".", _jobData));
+						_logger.debug(String
+								.format("JobKiller using terminate on %s because we are flagged as \"outcallOnly\".",
+										_jobData));
 					terminateActivity(connection);
 
 					/* Ask the database to update the job state */
-					_database.modifyJobState(connection, _jobData.getJobID(), _jobData.getRunAttempts(), _newState, new Date(),
-						null, null, null);
+					_database.modifyJobState(connection, _jobData.getJobID(),
+							_jobData.getRunAttempts(), _newState, new Date(),
+							null, null, null);
 					connection.commit();
 
 					return;
 				} else {
 					if (_logger.isDebugEnabled())
-						_logger.debug(String.format(
-							"JobKiller not using terminate because we are not flagged as \"outcallOnly\".", _jobData));
+						_logger.debug(String
+								.format("JobKiller not using terminate because we are not flagged as \"outcallOnly\".",
+										_jobData));
 				}
 
 				/* If the job is running, then we have to terminate it */
 				if (_jobData.getJobState().equals(QueueStates.RUNNING)) {
 					if (_logger.isDebugEnabled())
-						_logger.debug(String.format("JobKiller has to terminate %s because the job is marked as running.",
-							_jobData));
+						_logger.debug(String
+								.format("JobKiller has to terminate %s because the job is marked as running.",
+										_jobData));
 					terminateActivity(connection);
 				}
 
 				/* Ask the database to update the job state */
-				_database.modifyJobState(connection, _jobData.getJobID(), _jobData.getRunAttempts(), _newState, new Date(),
-					null, null, null);
+				_database.modifyJobState(connection, _jobData.getJobID(),
+						_jobData.getRunAttempts(), _newState, new Date(), null,
+						null, null);
 				connection.commit();
 
 				/*
-				 * Finally, note the new state in memory and clear the old BES information.
+				 * Finally, note the new state in memory and clear the old BES
+				 * information.
 				 */
 				_jobData.setJobState(_newState);
 				_jobData.clearBESID();
 
 				/*
-				 * If we were asked to re-queue the job, then put it back in the queued jobs list.
+				 * If we were asked to re-queue the job, then put it back in the
+				 * queued jobs list.
 				 */
 				if (_newState.equals(QueueStates.REQUEUED)) {
 					history.category(HistoryEventCategory.ReQueing);
 					history.createInfoWriter("Re-queing Job")
-						.format("Next available run time is %tc.", _jobData.getNextCanRun()).close();
+							.format("Next available run time is %tc.",
+									_jobData.getNextCanRun()).close();
 
 					if (_logger.isDebugEnabled())
-						_logger.debug("Re-queing job " + _jobData.getJobTicket());
+						_logger.debug("Re-queing job "
+								+ _jobData.getJobTicket());
 					synchronized (JobManager.this) {
 						if (_logger.isDebugEnabled())
-							_logger.debug(String.format("Re-queuing job %s in the JobKiller.", _jobData));
+							_logger.debug(String.format(
+									"Re-queuing job %s in the JobKiller.",
+									_jobData));
 
-						// Retrieve owner identities and extract primary username
+						// Retrieve owner identities and extract primary
+						// username
 						Collection<Long> jobID = new ArrayList<Long>();
 						jobID.add(_jobData.getJobID());
-						HashMap<Long, PartialJobInfo> jobInfo = _database.getPartialJobInfos(connection, jobID);
+						HashMap<Long, PartialJobInfo> jobInfo = _database
+								.getPartialJobInfos(connection, jobID);
 
-						Collection<Identity> identities =
-							SecurityUtilities.filterCredentials(jobInfo.get(_jobData.getJobID()).getOwners(),
-								SecurityUtilities.GROUP_TOKEN_PATTERN);
-						identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
+						Collection<Identity> identities = SecurityUtilities
+								.filterCredentials(
+										jobInfo.get(_jobData.getJobID())
+												.getOwners(),
+										SecurityUtilities.GROUP_TOKEN_PATTERN);
+						identities = SecurityUtilities.filterCredentials(
+								identities,
+								SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
-						String username = identities.iterator().next().toString();
+						String username = identities.iterator().next()
+								.toString();
 
 						SortableJobKey jobKey = new SortableJobKey(_jobData);
 						_queuedJobs.put(jobKey, _jobData);
@@ -2665,12 +2966,14 @@ public class JobManager implements Closeable
 					 * Otherwise, we assume that he's already in the right list
 					 */
 					if (_logger.isDebugEnabled())
-						_logger.debug("Moving job \"" + _jobData + "\" to the " + _newState + " state.");
+						_logger.debug("Moving job \"" + _jobData + "\" to the "
+								+ _newState + " state.");
 				}
 
 				/*
-				 * Because a job was terminated (whether because it finished or failed or whatnot)
-				 * we have a new opportunity to schedule a new job.
+				 * Because a job was terminated (whether because it finished or
+				 * failed or whatnot) we have a new opportunity to schedule a
+				 * new job.
 				 */
 				_schedulingEvent.notifySchedulingEvent();
 			} catch (Throwable cause) {

@@ -3,12 +3,10 @@ package edu.virginia.vcgr.genii.ui.utils;
 import javax.swing.Action;
 import javax.swing.JButton;
 
-public class SimpleIconButton extends JButton
-{
+public class SimpleIconButton extends JButton {
 	static final long serialVersionUID = 0L;
 
-	private void initialize(ShapeIcons icons)
-	{
+	private void initialize(ShapeIcons icons) {
 		setRolloverEnabled(true);
 
 		setIcon(icons.normalIcon());
@@ -18,15 +16,13 @@ public class SimpleIconButton extends JButton
 		setBorderPainted(false);
 	}
 
-	public SimpleIconButton(ShapeIcons icons)
-	{
+	public SimpleIconButton(ShapeIcons icons) {
 		super();
 
 		initialize(icons);
 	}
 
-	public SimpleIconButton(ShapeIcons icons, Action action)
-	{
+	public SimpleIconButton(ShapeIcons icons, Action action) {
 		super(action);
 
 		initialize(icons);

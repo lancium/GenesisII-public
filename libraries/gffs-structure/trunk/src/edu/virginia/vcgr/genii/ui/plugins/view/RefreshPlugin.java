@@ -16,24 +16,26 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under
+ *          the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
-public class RefreshPlugin extends AbstractCombinedUIMenusPlugin
-{
+public class RefreshPlugin extends AbstractCombinedUIMenusPlugin {
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
-	{
+	protected void performMenuAction(UIPluginContext context, MenuType menuType)
+			throws UIPluginException {
 		Closeable contextToken = null;
 
 		while (true) {
 			contextToken = null;
 			try {
-				contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+				contextToken = ContextManager.temporarilyAssumeContext(context
+						.uiContext().callingContext());
 				context.endpointRetriever().refresh();
 				return;
 			} catch (Throwable cause) {
-				ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
+				ErrorHandler.handleError(context.uiContext(),
+						context.ownerComponent(), cause);
 			} finally {
 				StreamUtils.close(contextToken);
 			}
@@ -41,8 +43,8 @@ public class RefreshPlugin extends AbstractCombinedUIMenusPlugin
 	}
 
 	@Override
-	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
-	{
+	public boolean isEnabled(
+			Collection<EndpointDescription> selectedDescriptions) {
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
 		return selectedDescriptions.iterator().next().typeInformation().isRNS();

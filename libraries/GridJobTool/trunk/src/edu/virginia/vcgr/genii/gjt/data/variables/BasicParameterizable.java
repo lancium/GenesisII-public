@@ -4,12 +4,11 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Vector;
 
-public class BasicParameterizable implements Parameterizable
-{
+public class BasicParameterizable implements Parameterizable {
 	private Collection<ParameterizableListener> _listeners = new LinkedList<ParameterizableListener>();
 
-	public void fireParameterizableStringModified(String oldValue, String newValue)
-	{
+	public void fireParameterizableStringModified(String oldValue,
+			String newValue) {
 		Collection<ParameterizableListener> listeners;
 
 		synchronized (_listeners) {
@@ -21,16 +20,14 @@ public class BasicParameterizable implements Parameterizable
 	}
 
 	@Override
-	public void addParameterizableListener(ParameterizableListener listener)
-	{
+	public void addParameterizableListener(ParameterizableListener listener) {
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
 	@Override
-	public void removeParameterizableListener(ParameterizableListener listener)
-	{
+	public void removeParameterizableListener(ParameterizableListener listener) {
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}

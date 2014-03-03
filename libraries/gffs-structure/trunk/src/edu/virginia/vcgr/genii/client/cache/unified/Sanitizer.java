@@ -19,11 +19,9 @@ import edu.virginia.vcgr.genii.security.acl.Acl;
  * item then the cache will quickly get out of space and bring down the system with
  * OutOfMemoryException.
  */
-public class Sanitizer
-{
+public class Sanitizer {
 
-	public static AuthZConfig getSanitizedAuthZConfig(AuthZConfig authZConfig)
-	{
+	public static AuthZConfig getSanitizedAuthZConfig(AuthZConfig authZConfig) {
 		try {
 			Acl acl = AxisAcl.decodeAcl(authZConfig);
 			return AxisAcl.encodeAcl(acl);
@@ -32,15 +30,18 @@ public class Sanitizer
 		}
 	}
 
-	public static EndpointReferenceType getSanitizedEpr(EndpointReferenceType epr)
-	{
+	public static EndpointReferenceType getSanitizedEpr(
+			EndpointReferenceType epr) {
 		if (epr == null)
 			return null; // nothing's cleaner than nothing.
 		try {
-			byte[] eprBytes = ObjectSerializer.toBytes(epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint"));
-			return ObjectDeserializer.fromBytes(EndpointReferenceType.class, eprBytes);
+			byte[] eprBytes = ObjectSerializer.toBytes(epr, new QName(
+					GenesisIIConstants.GENESISII_NS, "endpoint"));
+			return ObjectDeserializer.fromBytes(EndpointReferenceType.class,
+					eprBytes);
 		} catch (ResourceException e) {
-			throw new RuntimeException("failed to sanitize EndpointReferenceType", e);
+			throw new RuntimeException(
+					"failed to sanitize EndpointReferenceType", e);
 		}
 	}
 }

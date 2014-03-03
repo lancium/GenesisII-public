@@ -20,8 +20,7 @@ import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.algorithm.encryption.Base64;
 
-public class AddressingParameters
-{
+public class AddressingParameters {
 	static private Log _logger = LogFactory.getLog(AddressingParameters.class);
 
 	static public final String GENII_REF_PARAMS_NS = "http://edu.virginia.vcgr.genii/ref-params";
@@ -29,33 +28,38 @@ public class AddressingParameters
 	static public final String GENII_RESOURCE_FORK_REF_PARAM = "resource-fork";
 	static public final String GENII_ADDITIONAL_USER_INFO_REF_PARAM = "additional-user-information";
 
-	static public final QName OLD_REFERENCE_PARAMETER_QNAME = new QName("http://vcgr.cs.virginia.edu/Genesis-II",
-		"simple-string");
+	static public final QName OLD_REFERENCE_PARAMETER_QNAME = new QName(
+			"http://vcgr.cs.virginia.edu/Genesis-II", "simple-string");
 
-	static public final QName GENII_RESOURCE_KEY_REF_PARAM_QNAME = new QName(GENII_REF_PARAMS_NS, GENII_RESOURCE_KEY_REF_PARAM);
-	static public final QName GENII_RESOURCE_FORK_REF_PARAM_QNAME = new QName(GENII_REF_PARAMS_NS,
-		GENII_RESOURCE_FORK_REF_PARAM);
-	static public final QName GENII_ADDTIONAL_USER_INFO_REF_PARAM_QNAME = new QName(GENII_REF_PARAMS_NS,
-		GENII_ADDITIONAL_USER_INFO_REF_PARAM);
+	static public final QName GENII_RESOURCE_KEY_REF_PARAM_QNAME = new QName(
+			GENII_REF_PARAMS_NS, GENII_RESOURCE_KEY_REF_PARAM);
+	static public final QName GENII_RESOURCE_FORK_REF_PARAM_QNAME = new QName(
+			GENII_REF_PARAMS_NS, GENII_RESOURCE_FORK_REF_PARAM);
+	static public final QName GENII_ADDTIONAL_USER_INFO_REF_PARAM_QNAME = new QName(
+			GENII_REF_PARAMS_NS, GENII_ADDITIONAL_USER_INFO_REF_PARAM);
 
-	static private Serializable toObject(String encoded) throws ResourceException
-	{
+	static private Serializable toObject(String encoded)
+			throws ResourceException {
 		ObjectInputStream ois = null;
 
 		try {
-			ois = new ObjectInputStream(new ByteArrayInputStream(Base64.base64ToByteArray(encoded)));
+			ois = new ObjectInputStream(new ByteArrayInputStream(
+					Base64.base64ToByteArray(encoded)));
 			return (Serializable) ois.readObject();
 		} catch (IOException ioe) {
-			throw new ResourceException("Unable to deserialize encoded reference parameter component.", ioe);
+			throw new ResourceException(
+					"Unable to deserialize encoded reference parameter component.",
+					ioe);
 		} catch (ClassNotFoundException cnfe) {
-			throw new ResourceException("Unable to deserialize encoded reference parameter component.", cnfe);
+			throw new ResourceException(
+					"Unable to deserialize encoded reference parameter component.",
+					cnfe);
 		} finally {
 			StreamUtils.close(ois);
 		}
 	}
 
-	static private String toString(Object value) throws ResourceException
-	{
+	static private String toString(Object value) throws ResourceException {
 		ByteArrayOutputStream baos = null;
 		ObjectOutputStream oos = null;
 
@@ -65,7 +69,8 @@ public class AddressingParameters
 			oos.flush();
 			return Base64.byteArrayToBase64(baos.toByteArray());
 		} catch (IOException ioe) {
-			throw new ResourceException("Unable to encode reference parameter component.", ioe);
+			throw new ResourceException(
+					"Unable to encode reference parameter component.", ioe);
 		} finally {
 			StreamUtils.close(oos);
 			StreamUtils.close(baos);
@@ -77,8 +82,8 @@ public class AddressingParameters
 	private Map<String, Serializable> _additionalUserInfo;
 
 	@SuppressWarnings("unchecked")
-	public AddressingParameters(ReferenceParametersType refParams) throws ResourceException
-	{
+	public AddressingParameters(ReferenceParametersType refParams)
+			throws ResourceException {
 		this(null, null, null);
 
 		if (refParams != null) {
@@ -89,93 +94,99 @@ public class AddressingParameters
 					if (_logger.isTraceEnabled())
 						_logger.trace("seeing elem name: " + elementName);
 					if (elementName.equals(GENII_RESOURCE_KEY_REF_PARAM_QNAME)
-						|| elementName.equals(OLD_REFERENCE_PARAMETER_QNAME)) {
+							|| elementName
+									.equals(OLD_REFERENCE_PARAMETER_QNAME)) {
 						_resourceKey = element.getValue();
 						if (_logger.isTraceEnabled())
 							_logger.trace("found resource key: " + _resourceKey);
-					} else if (elementName.equals(GENII_RESOURCE_FORK_REF_PARAM_QNAME)) {
+					} else if (elementName
+							.equals(GENII_RESOURCE_FORK_REF_PARAM_QNAME)) {
 						String stringValue = element.getValue();
 						if (stringValue != null) {
 							_resourceForkInfo = toObject(stringValue);
 							if (_logger.isTraceEnabled())
-								_logger.trace("found resource fork info: " + stringValue);
+								_logger.trace("found resource fork info: "
+										+ stringValue);
 						} else {
 							if (_logger.isTraceEnabled())
 								_logger.trace("found null resource fork info.");
 						}
-					} else if (elementName.equals(GENII_ADDTIONAL_USER_INFO_REF_PARAM_QNAME)) {
+					} else if (elementName
+							.equals(GENII_ADDTIONAL_USER_INFO_REF_PARAM_QNAME)) {
 						String stringValue = element.getValue();
 						if (stringValue != null) {
 							_additionalUserInfo = (Map<String, Serializable>) toObject(stringValue);
 							if (_logger.isTraceEnabled())
-								_logger.trace("found additional user info: " + stringValue);
+								_logger.trace("found additional user info: "
+										+ stringValue);
 						} else {
 							if (_logger.isTraceEnabled())
 								_logger.trace("found null additional user info.");
 						}
 					} else {
-						throw new ResourceException(String.format("Invalid reference parameter %s found.", elementName));
+						throw new ResourceException(String.format(
+								"Invalid reference parameter %s found.",
+								elementName));
 					}
 				}
 			}
 		}
 	}
 
-	public AddressingParameters(String resourceKey, Object resourceForkInfo, Map<String, Serializable> additionalUserInfo)
-	{
+	public AddressingParameters(String resourceKey, Object resourceForkInfo,
+			Map<String, Serializable> additionalUserInfo) {
 		_resourceKey = resourceKey;
 		_resourceForkInfo = resourceForkInfo;
 		_additionalUserInfo = additionalUserInfo;
 	}
 
-	public String getResourceKey()
-	{
+	public String getResourceKey() {
 		return _resourceKey;
 	}
 
-	public void setResourceKey(String resourceKey)
-	{
+	public void setResourceKey(String resourceKey) {
 
 	}
 
-	public Object getResourceForkInformation()
-	{
+	public Object getResourceForkInformation() {
 		return _resourceForkInfo;
 	}
 
-	public void setResourceForkInformation(Object resourceForkInfo)
-	{
+	public void setResourceForkInformation(Object resourceForkInfo) {
 		_resourceForkInfo = resourceForkInfo;
 	}
 
-	public Map<String, Serializable> getAdditionalUserInformation()
-	{
+	public Map<String, Serializable> getAdditionalUserInformation() {
 		return _additionalUserInfo;
 	}
 
-	public void setAdditionalUserInformation(Map<String, Serializable> additionalUserInformation)
-	{
+	public void setAdditionalUserInformation(
+			Map<String, Serializable> additionalUserInformation) {
 		_additionalUserInfo = additionalUserInformation;
 	}
 
-	public ReferenceParametersType toReferenceParameters() throws ResourceException
-	{
+	public ReferenceParametersType toReferenceParameters()
+			throws ResourceException {
 		Collection<MessageElement> tmp = new ArrayList<MessageElement>(3);
 		if (_resourceKey != null)
-			tmp.add(new MessageElement(GENII_RESOURCE_KEY_REF_PARAM_QNAME, _resourceKey));
+			tmp.add(new MessageElement(GENII_RESOURCE_KEY_REF_PARAM_QNAME,
+					_resourceKey));
 		if (_resourceForkInfo != null)
-			tmp.add(new MessageElement(GENII_RESOURCE_FORK_REF_PARAM_QNAME, toString(_resourceForkInfo)));
+			tmp.add(new MessageElement(GENII_RESOURCE_FORK_REF_PARAM_QNAME,
+					toString(_resourceForkInfo)));
 		if (_additionalUserInfo != null)
-			tmp.add(new MessageElement(GENII_ADDTIONAL_USER_INFO_REF_PARAM_QNAME, toString(_additionalUserInfo)));
+			tmp.add(new MessageElement(
+					GENII_ADDTIONAL_USER_INFO_REF_PARAM_QNAME,
+					toString(_additionalUserInfo)));
 
 		if (tmp.isEmpty())
 			return null;
 
-		return new ReferenceParametersType(tmp.toArray(new MessageElement[tmp.size()]));
+		return new ReferenceParametersType(tmp.toArray(new MessageElement[tmp
+				.size()]));
 	}
 
-	public AddressingParameters stripResourceForkInformation()
-	{
+	public AddressingParameters stripResourceForkInformation() {
 		return new AddressingParameters(_resourceKey, null, _additionalUserInfo);
 	}
 }

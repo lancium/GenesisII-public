@@ -27,28 +27,31 @@ import edu.virginia.vcgr.genii.container.sync.ReplicationThread;
 import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
 import edu.virginia.vcgr.genii.container.sync.VersionedResourceUtils;
 
-public class GeniiDirSyncRunner implements ResourceSyncRunner
-{
+public class GeniiDirSyncRunner implements ResourceSyncRunner {
 	static private Log _logger = LogFactory.getLog(GeniiDirSyncRunner.class);
 
-	public void doSync(IResource vResource, EndpointReferenceType primaryEPR, EndpointReferenceType myEPR,
-		ReplicationThread replicator) throws Throwable
-	{
+	public void doSync(IResource vResource, EndpointReferenceType primaryEPR,
+			EndpointReferenceType myEPR, ReplicationThread replicator)
+			throws Throwable {
 		// Synchronize the attributes -- resolver and replication policies.
 		IRNSResource resource = (IRNSResource) vResource;
-		GeniiCommon proxy = ClientUtils.createProxy(GeniiCommon.class, primaryEPR);
+		GeniiCommon proxy = ClientUtils.createProxy(GeniiCommon.class,
+				primaryEPR);
 		MessageElement element;
 
-		element = VersionedResourceUtils.getResourceProperty(proxy, GeniiDirPolicy.RESOLVER_POLICY_QNAME);
+		element = VersionedResourceUtils.getResourceProperty(proxy,
+				GeniiDirPolicy.RESOLVER_POLICY_QNAME);
 		byte[] data = null;
 		if (element != null) {
-			EndpointReferenceType resolverPolicy = (EndpointReferenceType) element.getObjectValue(EndpointReferenceType.class);
+			EndpointReferenceType resolverPolicy = (EndpointReferenceType) element
+					.getObjectValue(EndpointReferenceType.class);
 			if (resolverPolicy != null)
 				data = EPRUtils.toBytes(resolverPolicy);
 		}
 		resource.setProperty(GeniiDirPolicy.RESOLVER_POLICY_PROP_NAME, data);
 
-		element = VersionedResourceUtils.getResourceProperty(proxy, GeniiDirPolicy.REPLICATION_POLICY_QNAME);
+		element = VersionedResourceUtils.getResourceProperty(proxy,
+				GeniiDirPolicy.REPLICATION_POLICY_QNAME);
 		String value = null;
 		if (element != null)
 			value = element.getValue();
@@ -61,10 +64,12 @@ public class GeniiDirSyncRunner implements ResourceSyncRunner
 		RNSPath sourceDir = new RNSPath(primaryEPR);
 		Collection<RNSPath> contents = sourceDir.listContents();
 		if (_logger.isDebugEnabled())
-			_logger.debug("GeniiDirSyncRunner: contents.size=" + contents.size());
+			_logger.debug("GeniiDirSyncRunner: contents.size="
+					+ contents.size());
 		for (RNSPath entry : contents) {
 			EndpointReferenceType entryEPR = entry.getEndpoint();
-			ReplicationItem item = AutoReplicate.autoReplicate(resource, entryEPR);
+			ReplicationItem item = AutoReplicate.autoReplicate(resource,
+					entryEPR);
 			if (item != null) {
 				entryEPR = item.localEPR;
 				if (item.runner != null)
@@ -79,7 +84,8 @@ public class GeniiDirSyncRunner implements ResourceSyncRunner
 			currentMap.put(entry.getName(), entry.getEntryReference());
 		}
 		// Synchronize the data
-		for (Map.Entry<String, EndpointReferenceType> entry : targetMap.entrySet()) {
+		for (Map.Entry<String, EndpointReferenceType> entry : targetMap
+				.entrySet()) {
 			String name = entry.getKey();
 			EndpointReferenceType eprValue = entry.getValue();
 			EndpointReferenceType currentValue = currentMap.remove(name);
@@ -95,23 +101,22 @@ public class GeniiDirSyncRunner implements ResourceSyncRunner
 		}
 	}
 
-	public TopicPath getSyncTopic()
-	{
+	public TopicPath getSyncTopic() {
 		return RNSTopics.RNS_OPERATION_TOPIC;
 	}
 
 	@Override
-	public Collection<MessageElement> getDefaultAttributes(EndpointReferenceType primaryEPR)
-	{
+	public Collection<MessageElement> getDefaultAttributes(
+			EndpointReferenceType primaryEPR) {
 		return Collections.emptyList();
 	}
 
 	/*
-	 * Method that subclasses should override to retrieve and save properties that are usually been
-	 * passed from the client when a primary copy is been created and not directly available during
-	 * the replica creation process.
+	 * Method that subclasses should override to retrieve and save properties
+	 * that are usually been passed from the client when a primary copy is been
+	 * created and not directly available during the replica creation process.
 	 */
-	protected void retrieveAndStoreResourcePropertiesFromPrimary(GeniiCommon proxyToPrimary, IRNSResource resource)
-	{
+	protected void retrieveAndStoreResourcePropertiesFromPrimary(
+			GeniiCommon proxyToPrimary, IRNSResource resource) {
 	}
 }

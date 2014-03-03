@@ -20,8 +20,7 @@ package edu.virginia.vcgr.jsdl;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface JSDLConstants
-{
+public interface JSDLConstants {
 	static public final String JSDL_NS = "http://schemas.ggf.org/jsdl/2005/11/jsdl";
 	static public final String JSDL_POSIX_NS = "http://schemas.ggf.org/jsdl/2005/11/jsdl-posix";
 	static public final String JSDL_ERRATA_NS = "http://schemas.ggf.org/jsdl/2007/03/jsdl-errata";

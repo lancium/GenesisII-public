@@ -22,21 +22,18 @@ import java.util.StringTokenizer;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class CommandLine implements ICommandLine
-{
+public class CommandLine implements ICommandLine {
 	private HashSet<String> _flags = new HashSet<String>();;
 	private HashMap<String, ArrayList<String>> _options = new HashMap<String, ArrayList<String>>();
 	private ArrayList<String> _arguments = new ArrayList<String>();
 
-	private void parseFlags(String flags)
-	{
+	private void parseFlags(String flags) {
 		for (int lcv = 0; lcv < flags.length(); lcv++) {
 			_flags.add(flags.substring(lcv, lcv + 1));
 		}
 	}
 
-	private void parseOptionFlag(String line)
-	{
+	private void parseOptionFlag(String line) {
 		int index = line.indexOf("=");
 		if (index < 0) {
 			_flags.add(line);
@@ -59,18 +56,15 @@ public class CommandLine implements ICommandLine
 		}
 	}
 
-	private void addArgument(String arg)
-	{
+	private void addArgument(String arg) {
 		_arguments.add(arg);
 	}
 
-	public CommandLine(String commandline)
-	{
+	public CommandLine(String commandline) {
 		this(commandline, true);
 	}
 
-	public CommandLine(String commandline, boolean allowSingleDashes)
-	{
+	public CommandLine(String commandline, boolean allowSingleDashes) {
 		if (commandline == null)
 			return;
 
@@ -83,7 +77,8 @@ public class CommandLine implements ICommandLine
 		while (t.hasMoreTokens()) {
 			String token = t.nextToken();
 			if (tokenMode == 0) {
-				if (!token.equals(" ") && !token.equals("\t") && !token.equals("\"") && !token.equals("'")) {
+				if (!token.equals(" ") && !token.equals("\t")
+						&& !token.equals("\"") && !token.equals("'")) {
 					parts.add(token);
 				} else if (token.equals("\"")) {
 					tokenMode = 1;
@@ -119,18 +114,15 @@ public class CommandLine implements ICommandLine
 		}
 	}
 
-	public CommandLine(List<String> args)
-	{
+	public CommandLine(List<String> args) {
 		this(args.toArray(new String[args.size()]));
 	}
 
-	public CommandLine(String[] args)
-	{
+	public CommandLine(String[] args) {
 		this(args, true);
 	}
 
-	public CommandLine(String[] args, boolean allowSingleDashes)
-	{
+	public CommandLine(String[] args, boolean allowSingleDashes) {
 		for (String arg : args) {
 			if (arg.startsWith("--"))
 				parseOptionFlag(arg.substring(2));
@@ -144,55 +136,46 @@ public class CommandLine implements ICommandLine
 	/**
 	 * Returns true if the command line has no arguments, options, or flags
 	 */
-	public boolean isEmpty()
-	{
+	public boolean isEmpty() {
 		return _flags.isEmpty() && _options.isEmpty() && _arguments.isEmpty();
 	}
 
-	public int numArguments()
-	{
+	public int numArguments() {
 		return _arguments.size();
 	}
 
-	public String getArgument(int number)
-	{
+	public String getArgument(int number) {
 		if (number >= _arguments.size())
 			return null;
 
 		return _arguments.get(number);
 	}
 
-	public String[] getArguments()
-	{
+	public String[] getArguments() {
 		String[] args = new String[_arguments.size()];
 		_arguments.toArray(args);
 		return args;
 	}
 
-	public boolean hasFlag(String flagName)
-	{
+	public boolean hasFlag(String flagName) {
 		return _flags.contains(flagName);
 	}
 
-	public String[] getFlags()
-	{
+	public String[] getFlags() {
 		String[] flags = new String[_flags.size()];
 		_flags.toArray(flags);
 		return flags;
 	}
 
-	public boolean hasOption(String optionName)
-	{
+	public boolean hasOption(String optionName) {
 		return _options.containsKey(optionName);
 	}
 
-	public HashMap<String, ArrayList<String>> getOptions()
-	{
+	public HashMap<String, ArrayList<String>> getOptions() {
 		return _options;
 	}
 
-	public String getOptionValue(String optionName)
-	{
+	public String getOptionValue(String optionName) {
 		ArrayList<String> list = _options.get(optionName);
 		if (list == null || list.size() == 0)
 			return null;
@@ -200,8 +183,7 @@ public class CommandLine implements ICommandLine
 		return list.get(0);
 	}
 
-	public String[] getOptionValues(String optionName)
-	{
+	public String[] getOptionValues(String optionName) {
 		ArrayList<String> list = _options.get(optionName);
 		String[] ret;
 

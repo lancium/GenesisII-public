@@ -10,14 +10,14 @@ import edu.virginia.vcgr.xscript.ParseContext;
 import edu.virginia.vcgr.xscript.ParseHandler;
 import edu.virginia.vcgr.xscript.ParseStatement;
 
-public class GridParseHandler implements ParseHandler
-{
+public class GridParseHandler implements ParseHandler {
 	static public String GRID_NS = "http://vcgr.cs.virginia.edu/genii/xsh/grid";
 
 	@Override
-	public ParseStatement parse(ParseContext context, Element element) throws ScriptException
-	{
-		GridCommandStatement stmt = new GridCommandStatement(element.getLocalName());
+	public ParseStatement parse(ParseContext context, Element element)
+			throws ScriptException {
+		GridCommandStatement stmt = new GridCommandStatement(
+				element.getLocalName());
 
 		NodeList children = element.getChildNodes();
 		int length = children.getLength();
@@ -25,7 +25,8 @@ public class GridParseHandler implements ParseHandler
 			Node n = children.item(lcv);
 			if (n.getNodeType() == Node.ELEMENT_NODE) {
 				Element child = (Element) n;
-				stmt.addArgument(context.findHandler(child.getNamespaceURI()).parse(context, child));
+				stmt.addArgument(context.findHandler(child.getNamespaceURI())
+						.parse(context, child));
 			}
 		}
 

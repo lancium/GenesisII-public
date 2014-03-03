@@ -9,8 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
-public class PerformanceLogger implements Closeable
-{
+public class PerformanceLogger implements Closeable {
 	static private Log _logger = LogFactory.getLog(PerformanceLogger.class);
 
 	private PrintStream _ps = null;
@@ -18,13 +17,11 @@ public class PerformanceLogger implements Closeable
 	private Long _stopTime = -1L;
 
 	@Override
-	protected void finalize()
-	{
+	protected void finalize() {
 		close();
 	}
 
-	public PerformanceLogger(File file)
-	{
+	public PerformanceLogger(File file) {
 		try {
 			_ps = new PrintStream(new FileOutputStream(file, true));
 		} catch (Throwable cause) {
@@ -32,24 +29,21 @@ public class PerformanceLogger implements Closeable
 		}
 	}
 
-	final public void start()
-	{
+	final public void start() {
 		_startTime = System.currentTimeMillis();
 	}
 
-	final public void stop()
-	{
+	final public void stop() {
 		_stopTime = System.currentTimeMillis();
 	}
 
-	public void log()
-	{
-		_ps.format("Ellapsed time is %d milliseconds.\n", (_stopTime - _startTime));
+	public void log() {
+		_ps.format("Ellapsed time is %d milliseconds.\n",
+				(_stopTime - _startTime));
 	}
 
 	@Override
-	synchronized public void close()
-	{
+	synchronized public void close() {
 		StreamUtils.close(_ps);
 		_ps = null;
 	}

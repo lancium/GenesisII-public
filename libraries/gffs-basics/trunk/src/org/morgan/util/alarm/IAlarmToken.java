@@ -16,28 +16,30 @@ package org.morgan.util.alarm;
 import java.util.Date;
 
 /**
- * The token created when an alarm is created (giving the programmer access to that alarm instance).
+ * The token created when an alarm is created (giving the programmer access to
+ * that alarm instance).
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public interface IAlarmToken
-{
+public interface IAlarmToken {
 	public boolean completed();
 
 	public int eventCount();
 
 	/**
-	 * Retrieve the next occurance of this alarm. Could be null if there are no more occurances.
+	 * Retrieve the next occurance of this alarm. Could be null if there are no
+	 * more occurances.
 	 * 
-	 * @return The next occurance of this alarm or null if there aren't any more.
+	 * @return The next occurance of this alarm or null if there aren't any
+	 *         more.
 	 */
 	public Date nextOccurance();
 
 	public void cancel();
 
 	/**
-	 * Only blocks until the next alarm is done. If the alarm is a repeater, this method will only
-	 * block until the very next one is over.
+	 * Only blocks until the next alarm is done. If the alarm is a repeater,
+	 * this method will only block until the very next one is over.
 	 */
 	public void block() throws InterruptedException;
 

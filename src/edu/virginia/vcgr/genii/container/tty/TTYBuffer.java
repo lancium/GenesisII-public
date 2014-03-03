@@ -3,21 +3,18 @@ package edu.virginia.vcgr.genii.container.tty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class TTYBuffer
-{
+public class TTYBuffer {
 	static private Log _logger = LogFactory.getLog(TTYBuffer.class);
 
 	private byte[] _buffer;
 	private int _position;
 
-	public TTYBuffer(int bufferSize)
-	{
+	public TTYBuffer(int bufferSize) {
 		_buffer = new byte[bufferSize];
 		_position = 0;
 	}
 
-	synchronized public void write(byte[] data, int offset, int length)
-	{
+	synchronized public void write(byte[] data, int offset, int length) {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Asked to write " + length + " bytes to a TTY.");
 
@@ -38,8 +35,7 @@ public class TTYBuffer
 		_position += length;
 	}
 
-	synchronized public byte[] read(int length)
-	{
+	synchronized public byte[] read(int length) {
 		if (length > _position)
 			length = _position;
 

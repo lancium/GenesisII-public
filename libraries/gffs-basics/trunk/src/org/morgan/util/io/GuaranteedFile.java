@@ -22,21 +22,21 @@ import java.net.URI;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 /**
- * A utility class which acts like a file, but upon successful creation guarantees that the named
- * path is an existing file (creating it with a given resource if necessary).
+ * A utility class which acts like a file, but upon successful creation
+ * guarantees that the named path is an existing file (creating it with a given
+ * resource if necessary).
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class GuaranteedFile extends File
-{
+public class GuaranteedFile extends File {
 	private static final int _BLOCK_SIZE = 1024 * 4;
 	static final long serialVersionUID = 0;
 
-	private void enforceGuarantee(String resourceName) throws IOException
-	{
+	private void enforceGuarantee(String resourceName) throws IOException {
 		if (exists()) {
 			if (!isFile())
-				throw new IOException("Path \"" + getAbsolutePath() + "\" is not a file.");
+				throw new IOException("Path \"" + getAbsolutePath()
+						+ "\" is not a file.");
 		} else {
 			ClassLoader loader;
 			FileOutputStream out = null;
@@ -60,32 +60,32 @@ public class GuaranteedFile extends File
 		}
 	}
 
-	public GuaranteedFile(String path, String defaultResourceName) throws IOException
-	{
+	public GuaranteedFile(String path, String defaultResourceName)
+			throws IOException {
 		super(path);
 		enforceGuarantee(defaultResourceName);
 	}
 
-	public GuaranteedFile(String parent, String child, String defaultResourceName) throws IOException
-	{
+	public GuaranteedFile(String parent, String child,
+			String defaultResourceName) throws IOException {
 		super(parent, child);
 		enforceGuarantee(defaultResourceName);
 	}
 
-	public GuaranteedFile(File dir, String defaultResourceName) throws IOException
-	{
+	public GuaranteedFile(File dir, String defaultResourceName)
+			throws IOException {
 		super(dir.getAbsolutePath());
 		enforceGuarantee(defaultResourceName);
 	}
 
-	public GuaranteedFile(File parent, String child, String defaultResourceName) throws IOException
-	{
+	public GuaranteedFile(File parent, String child, String defaultResourceName)
+			throws IOException {
 		super(parent, child);
 		enforceGuarantee(defaultResourceName);
 	}
 
-	public GuaranteedFile(URI path, String defaultResourceName) throws IOException
-	{
+	public GuaranteedFile(URI path, String defaultResourceName)
+			throws IOException {
 		super(path);
 		enforceGuarantee(defaultResourceName);
 	}

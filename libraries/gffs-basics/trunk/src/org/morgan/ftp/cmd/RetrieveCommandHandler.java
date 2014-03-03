@@ -18,22 +18,21 @@ import org.morgan.ftp.InternalException;
 import org.morgan.ftp.RollingCommandHistory;
 import org.morgan.util.io.StreamUtils;
 
-public class RetrieveCommandHandler extends AbstractCommandHandler
-{
-	static private Logger _logger = Logger.getLogger(RetrieveCommandHandler.class);
+public class RetrieveCommandHandler extends AbstractCommandHandler {
+	static private Logger _logger = Logger
+			.getLogger(RetrieveCommandHandler.class);
 	static private final int _BUFFER_CAPACITY = 1024 * 8;
 
-	public RetrieveCommandHandler(ICommand command)
-	{
+	public RetrieveCommandHandler(ICommand command) {
 		super(command);
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
-	{
+	public void handleCommand(FTPSessionState sessionState, String verb,
+			String parameters, PrintStream out) throws FTPException {
 		RollingCommandHistory history = sessionState.getHistory();
-		FTPAction lastCompletedAction = history.lastCompleted(PASVCommandHandler.class);
+		FTPAction lastCompletedAction = history
+				.lastCompleted(PASVCommandHandler.class);
 
 		ICommandHandler handler = lastCompletedAction.getHandler();
 		if (!(handler instanceof PASVCommandHandler))
@@ -46,7 +45,8 @@ public class RetrieveCommandHandler extends AbstractCommandHandler
 		InputStream in = null;
 
 		try {
-			channel = key.getChannel(sessionState.getConfiguration().getDataConnectionTimeoutSeconds());
+			channel = key.getChannel(sessionState.getConfiguration()
+					.getDataConnectionTimeoutSeconds());
 
 			out.println("150 Beginning to retrieve file.");
 

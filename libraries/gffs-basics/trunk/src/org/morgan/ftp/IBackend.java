@@ -3,10 +3,10 @@ package org.morgan.ftp;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public interface IBackend
-{
+public interface IBackend {
 	// password can be null.
-	public boolean authenticate(String username, String password) throws FTPException;
+	public boolean authenticate(String username, String password)
+			throws FTPException;
 
 	public String getGreeting();
 

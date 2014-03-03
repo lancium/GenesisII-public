@@ -4,8 +4,7 @@ import java.util.LinkedList;
 import java.util.Collection;
 import javax.xml.bind.annotation.XmlElement;
 
-public class AddressInfoConfiguration
-{
+public class AddressInfoConfiguration {
 	@XmlElement(namespace = "http://vcgr.cs.virginia.edu/filesystems/address-info", name = "addressTo", required = true)
 	private Collection<String> _to = new LinkedList<String>();
 
@@ -18,38 +17,33 @@ public class AddressInfoConfiguration
 	@XmlElement(namespace = "http://vcgr.cs.virginia.edu/filesystems/address-info", name = "addressFrom", required = false)
 	private String _from = null;
 
-	LinkedList<String> to()
-	{
+	LinkedList<String> to() {
 		LinkedList<String> list = new LinkedList<String>();
 		for (String addr : _to)
 			list.add(addr);
 		return list;
 	}
 
-	LinkedList<String> cc()
-	{
+	LinkedList<String> cc() {
 		LinkedList<String> list = new LinkedList<String>();
 		for (String addr : _cc)
 			list.add(addr);
 		return list;
 	}
 
-	LinkedList<String> bcc()
-	{
+	LinkedList<String> bcc() {
 		LinkedList<String> list = new LinkedList<String>();
 		for (String addr : _bcc)
 			list.add(addr);
 		return list;
 	}
 
-	String from()
-	{
+	String from() {
 		return _from;
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		String temp = "";
 		temp += "To: \n";
 		for (String addr : _to)

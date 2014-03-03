@@ -16,16 +16,16 @@ import java.util.regex.Pattern;
 
 import org.morgan.util.io.StreamUtils;
 
-public class INIFile
-{
-	static private final Pattern SECTION_PATTERN = Pattern.compile("^\\s*\\[([^\\]]+)\\]\\s*$");
-	static private final Pattern PROPERTY_PATTERN = Pattern.compile("^\\s*([^=\\s]+)\\s*=\\s*(.*)$");
+public class INIFile {
+	static private final Pattern SECTION_PATTERN = Pattern
+			.compile("^\\s*\\[([^\\]]+)\\]\\s*$");
+	static private final Pattern PROPERTY_PATTERN = Pattern
+			.compile("^\\s*([^=\\s]+)\\s*=\\s*(.*)$");
 
 	private Properties _default;
 	private Map<String, Properties> _sections = new HashMap<String, Properties>();
 
-	private void initialize(BufferedReader reader) throws IOException
-	{
+	private void initialize(BufferedReader reader) throws IOException {
 		int lineNo = 0;
 		_default = new Properties();
 		Properties currentSection = _default;
@@ -43,34 +43,32 @@ public class INIFile
 				String sectionName = matcher.group(1);
 				currentSection = _sections.get(sectionName);
 				if (currentSection == null)
-					_sections.put(sectionName, currentSection = new Properties(_default));
+					_sections.put(sectionName, currentSection = new Properties(
+							_default));
 			} else {
 				matcher = PROPERTY_PATTERN.matcher(line);
 				if (matcher.matches()) {
-					currentSection.put(matcher.group(1).trim(), matcher.group(2).trim());
+					currentSection.put(matcher.group(1).trim(), matcher
+							.group(2).trim());
 				} else if (!line.trim().isEmpty())
 					throw new IOException("Unable to parse line " + lineNo);
 			}
 		}
 	}
 
-	public INIFile(BufferedReader reader) throws IOException
-	{
+	public INIFile(BufferedReader reader) throws IOException {
 		initialize(reader);
 	}
 
-	public INIFile(Reader reader) throws IOException
-	{
+	public INIFile(Reader reader) throws IOException {
 		this(new BufferedReader(reader));
 	}
 
-	public INIFile(InputStream in) throws IOException
-	{
+	public INIFile(InputStream in) throws IOException {
 		this(new InputStreamReader(in));
 	}
 
-	public INIFile(File iniFile) throws IOException
-	{
+	public INIFile(File iniFile) throws IOException {
 		Reader in = null;
 
 		try {
@@ -81,20 +79,19 @@ public class INIFile
 		}
 	}
 
-	public INIFile(String iniFileName) throws IOException
-	{
+	public INIFile(String iniFileName) throws IOException {
 		this(new File(iniFileName));
 	}
 
-	static private void append(String tabs, Properties properties, StringBuilder builder)
-	{
+	static private void append(String tabs, Properties properties,
+			StringBuilder builder) {
 		for (Object key : properties.keySet()) {
-			builder.append(String.format("%s%s=%s\n", tabs, key, properties.get(key)));
+			builder.append(String.format("%s%s=%s\n", tabs, key,
+					properties.get(key)));
 		}
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		StringBuilder builder = new StringBuilder();
 
 		append("", _default, builder);
@@ -107,18 +104,15 @@ public class INIFile
 		return builder.toString();
 	}
 
-	public Collection<String> sections()
-	{
+	public Collection<String> sections() {
 		return _sections.keySet();
 	}
 
-	public Properties section(String sectionName)
-	{
+	public Properties section(String sectionName) {
 		return _sections.get(sectionName);
 	}
 
-	public String property(String sectionName, String propertyName)
-	{
+	public String property(String sectionName, String propertyName) {
 		Properties props = section(sectionName);
 		if (props != null)
 			return props.getProperty(propertyName);
@@ -126,8 +120,7 @@ public class INIFile
 		return null;
 	}
 
-	static public void main(String[] args) throws Throwable
-	{
+	static public void main(String[] args) throws Throwable {
 		InputStream in = null;
 
 		try {

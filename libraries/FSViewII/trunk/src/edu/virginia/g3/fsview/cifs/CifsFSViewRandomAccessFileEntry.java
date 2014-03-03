@@ -13,13 +13,12 @@ import edu.virginia.g3.fsview.AbstractFSViewRandomAccessFileEntry;
 import edu.virginia.g3.fsview.FSViewDirectoryEntry;
 import edu.virginia.g3.fsview.utils.IOUtils;
 
-final class CifsFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFileEntry<CifsFSViewSession>
-{
+final class CifsFSViewRandomAccessFileEntry extends
+		AbstractFSViewRandomAccessFileEntry<CifsFSViewSession> {
 	private SmbFile _entry;
 
 	@Override
-	final protected void truncateImpl(long newLength) throws IOException
-	{
+	final protected void truncateImpl(long newLength) throws IOException {
 		SmbRandomAccessFile raf = null;
 
 		try {
@@ -32,8 +31,7 @@ final class CifsFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final protected void appendImpl(ByteBuffer content) throws IOException
-	{
+	final protected void appendImpl(ByteBuffer content) throws IOException {
 		SmbFileOutputStream out = null;
 
 		try {
@@ -45,8 +43,8 @@ final class CifsFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final protected void writeImpl(long offset, ByteBuffer source) throws IOException
-	{
+	final protected void writeImpl(long offset, ByteBuffer source)
+			throws IOException {
 		SmbRandomAccessFile raf = null;
 
 		try {
@@ -62,8 +60,7 @@ final class CifsFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final protected boolean canWriteImpl()
-	{
+	final protected boolean canWriteImpl() {
 		try {
 			return _entry.canWrite();
 		} catch (SmbException e) {
@@ -71,16 +68,15 @@ final class CifsFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 		}
 	}
 
-	CifsFSViewRandomAccessFileEntry(CifsFSViewSession session, FSViewDirectoryEntry parentEntry, String entryName, SmbFile entry)
-	{
+	CifsFSViewRandomAccessFileEntry(CifsFSViewSession session,
+			FSViewDirectoryEntry parentEntry, String entryName, SmbFile entry) {
 		super(CifsFSViewSession.class, session, parentEntry, entryName);
 
 		_entry = entry;
 	}
 
 	@Override
-	final public void read(long offset, ByteBuffer sink) throws IOException
-	{
+	final public void read(long offset, ByteBuffer sink) throws IOException {
 		SmbRandomAccessFile raf = null;
 
 		try {
@@ -88,7 +84,8 @@ final class CifsFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 			raf.seek(offset);
 			byte[] data = new byte[sink.remaining()];
 			int read;
-			while (sink.hasRemaining() && (read = raf.read(data, 0, sink.remaining())) >= 0)
+			while (sink.hasRemaining()
+					&& (read = raf.read(data, 0, sink.remaining())) >= 0)
 				sink.put(data, 0, read);
 		} finally {
 			if (raf != null)
@@ -97,8 +94,7 @@ final class CifsFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final public Long size()
-	{
+	final public Long size() {
 		try {
 			return _entry.length();
 		} catch (SmbException e) {
@@ -107,8 +103,7 @@ final class CifsFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final public boolean canRead()
-	{
+	final public boolean canRead() {
 		try {
 			return _entry.canRead();
 		} catch (SmbException e) {
@@ -117,8 +112,7 @@ final class CifsFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final public Calendar createTime()
-	{
+	final public Calendar createTime() {
 		try {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(_entry.createTime());
@@ -129,8 +123,7 @@ final class CifsFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final public Calendar lastModified()
-	{
+	final public Calendar lastModified() {
 		try {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(_entry.lastModified());

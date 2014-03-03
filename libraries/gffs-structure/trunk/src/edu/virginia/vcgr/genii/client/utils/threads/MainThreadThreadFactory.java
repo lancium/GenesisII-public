@@ -3,46 +3,38 @@ package edu.virginia.vcgr.genii.client.utils.threads;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadFactory;
 
-public class MainThreadThreadFactory implements ThreadFactory
-{
-	private class ThreadRequest
-	{
+public class MainThreadThreadFactory implements ThreadFactory {
+	private class ThreadRequest {
 		private Runnable _runnable;
 		private Thread _thread = null;
 
-		public ThreadRequest(Runnable runnable)
-		{
+		public ThreadRequest(Runnable runnable) {
 			_runnable = runnable;
 		}
 
-		public Runnable getRunnable()
-		{
+		public Runnable getRunnable() {
 			return _runnable;
 		}
 
-		public void setThread(Thread thread)
-		{
+		public void setThread(Thread thread) {
 			_thread = thread;
 		}
 
-		public Thread getThread()
-		{
+		public Thread getThread() {
 			return _thread;
 		}
 	}
 
 	private LinkedList<ThreadRequest> _requests = new LinkedList<ThreadRequest>();
 
-	public MainThreadThreadFactory()
-	{
+	public MainThreadThreadFactory() {
 		Thread th = new Thread(new ThreadFactoryWorker());
 		th.setDaemon(false);
 		th.setName("Thread Factory");
 		th.start();
 	}
 
-	public Thread newThread(Runnable arg0)
-	{
+	public Thread newThread(Runnable arg0) {
 		ThreadRequest request = new ThreadRequest(arg0);
 		synchronized (request) {
 			synchronized (_requests) {
@@ -60,10 +52,8 @@ public class MainThreadThreadFactory implements ThreadFactory
 		}
 	}
 
-	private class ThreadFactoryWorker implements Runnable
-	{
-		public void run()
-		{
+	private class ThreadFactoryWorker implements Runnable {
+		public void run() {
 			ThreadRequest request;
 
 			while (true) {

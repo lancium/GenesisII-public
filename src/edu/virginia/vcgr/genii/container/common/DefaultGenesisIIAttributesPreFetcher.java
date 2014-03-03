@@ -26,64 +26,66 @@ import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 import edu.virginia.vcgr.genii.security.acl.Acl;
 
-public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extends AbstractAttributePreFetcher
-{
-	static private Log _logger = LogFactory.getLog(AbstractAttributePreFetcher.class);
+public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource>
+		extends AbstractAttributePreFetcher {
+	static private Log _logger = LogFactory
+			.getLog(AbstractAttributePreFetcher.class);
 
 	private Type _resource;
 
-	public DefaultGenesisIIAttributesPreFetcher(Type resource)
-	{
+	public DefaultGenesisIIAttributesPreFetcher(Type resource) {
 		_resource = resource;
 	}
 
 	@SuppressWarnings("unchecked")
-	public DefaultGenesisIIAttributesPreFetcher(EndpointReferenceType target) throws ResourceException,
-		ResourceUnknownFaultType
-	{
+	public DefaultGenesisIIAttributesPreFetcher(EndpointReferenceType target)
+			throws ResourceException, ResourceUnknownFaultType {
 		this((Type) ResourceManager.getTargetResource(target).dereference());
 	}
 
-	protected Type getResource()
-	{
+	protected Type getResource() {
 		return _resource;
 	}
 
-	protected Permissions getPermissions() throws Throwable
-	{
+	protected Permissions getPermissions() throws Throwable {
 		IResource resource = getResource();
 
-		IAuthZProvider authZHandler =
-			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders
+				.getProvider(((ResourceKey) resource.getParentResourceKey())
+						.getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
 		Acl acl = AxisAcl.decodeAcl(config);
-		return GenesisIIACLManager.getPermissions(acl, QueueSecurity.getCallerIdentities(false));
+		return GenesisIIACLManager.getPermissions(acl,
+				QueueSecurity.getCallerIdentities(false));
 	}
 
-	protected AuthZConfig getAuthZConfig() throws Throwable
-	{
+	protected AuthZConfig getAuthZConfig() throws Throwable {
 		IResource resource = getResource();
-		IAuthZProvider authZHandler =
-			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders
+				.getProvider(((ResourceKey) resource.getParentResourceKey())
+						.getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
 		return config;
 	}
 
-	protected void fillInAttributes(Collection<MessageElement> attributes)
-	{
+	protected void fillInAttributes(Collection<MessageElement> attributes) {
 		try {
 			Permissions permissions = getPermissions();
 			if (permissions != null) {
-				attributes.add(new MessageElement(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, permissions.toString()));
+				attributes.add(new MessageElement(
+						GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, permissions
+								.toString()));
 			}
 
-			String brokerFactoryUrl = Container.getServiceURL(EnhancedNotificationBrokerFactoryServiceImpl.SERVICE_URL);
-			MessageElement notificationBrokerFactoryElement =
-				new MessageElement(GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS, brokerFactoryUrl);
+			String brokerFactoryUrl = Container
+					.getServiceURL(EnhancedNotificationBrokerFactoryServiceImpl.SERVICE_URL);
+			MessageElement notificationBrokerFactoryElement = new MessageElement(
+					GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS,
+					brokerFactoryUrl);
 			attributes.add(notificationBrokerFactoryElement);
 		} catch (Throwable cause) {
 			_logger.warn("Unable to fill in permissions attribute.", cause);

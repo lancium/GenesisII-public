@@ -7,17 +7,14 @@ import javax.swing.Box;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-public class DefaultJMenuBarFactory implements JMenuBarFactory
-{
+public class DefaultJMenuBarFactory implements JMenuBarFactory {
 	protected ApplicationContext _context;
 
-	public DefaultJMenuBarFactory(ApplicationContext context)
-	{
+	public DefaultJMenuBarFactory(ApplicationContext context) {
 		_context = context;
 	}
 
-	protected JMenu createFileMenu()
-	{
+	protected JMenu createFileMenu() {
 		if (_context.isMacOS())
 			return null;
 
@@ -32,8 +29,7 @@ public class DefaultJMenuBarFactory implements JMenuBarFactory
 		return fileMenu;
 	}
 
-	protected JMenu createHelpMenu()
-	{
+	protected JMenu createHelpMenu() {
 		if (_context.isMacOS())
 			return null;
 
@@ -43,8 +39,7 @@ public class DefaultJMenuBarFactory implements JMenuBarFactory
 	}
 
 	@Override
-	public JMenuBar createMenuBar(UIContext uiContext)
-	{
+	public JMenuBar createMenuBar(UIContext uiContext) {
 		JMenuBar bar = new JMenuBar();
 
 		JMenu fileMenu = createFileMenu();
@@ -55,8 +50,7 @@ public class DefaultJMenuBarFactory implements JMenuBarFactory
 	}
 
 	@Override
-	public void addHelpMenu(UIContext uiContext, JMenuBar bar)
-	{
+	public void addHelpMenu(UIContext uiContext, JMenuBar bar) {
 		JMenu helpMenu = createHelpMenu();
 		if (helpMenu != null) {
 			if (!_context.isMacOS())
@@ -65,50 +59,41 @@ public class DefaultJMenuBarFactory implements JMenuBarFactory
 		}
 	}
 
-	private class PreferencesAction extends AbstractAction
-	{
+	private class PreferencesAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private PreferencesAction()
-		{
+		private PreferencesAction() {
 			super("Preferences");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent evt)
-		{
+		public void actionPerformed(ActionEvent evt) {
 			_context.fireApplicationPreferencesRequested();
 		}
 	}
 
-	private class AboutAction extends AbstractAction
-	{
+	private class AboutAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private AboutAction()
-		{
+		private AboutAction() {
 			super("About the GFFS");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent evt)
-		{
+		public void actionPerformed(ActionEvent evt) {
 			_context.fireApplicationAboutRequested();
 		}
 	}
 
-	private class QuitAction extends AbstractAction
-	{
+	private class QuitAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private QuitAction()
-		{
+		private QuitAction() {
 			super("Quit");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent evt)
-		{
+		public void actionPerformed(ActionEvent evt) {
 			_context.fireApplicationQuitRequested();
 		}
 	}

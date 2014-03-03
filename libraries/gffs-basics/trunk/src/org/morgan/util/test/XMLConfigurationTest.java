@@ -30,17 +30,16 @@ import junit.framework.TestCase;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class XMLConfigurationTest extends TestCase
-{
+public class XMLConfigurationTest extends TestCase {
 	private XMLConfiguration _conf = null;
 
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		InputStream in = null;
 
 		try {
 			ClassLoader loader = GenesisClassLoader.classLoaderFactory();
-			in = loader.getResourceAsStream("org/morgan/util/test/example-configuration.xml");
+			in = loader
+					.getResourceAsStream("org/morgan/util/test/example-configuration.xml");
 			_conf = new XMLConfiguration(in);
 		} finally {
 			if (in != null)
@@ -48,15 +47,14 @@ public class XMLConfigurationTest extends TestCase
 		}
 	}
 
-	public void testParsing()
-	{
+	public void testParsing() {
 		TestCase.assertNotNull(_conf);
 	}
 
-	public void testPropertiesHandler()
-	{
-		Properties props =
-			(Properties) _conf.retrieveSection(new QName("http://www.mark-morgan.net/org/morgan/util/test", "test-properties"));
+	public void testPropertiesHandler() {
+		Properties props = (Properties) _conf.retrieveSection(new QName(
+				"http://www.mark-morgan.net/org/morgan/util/test",
+				"test-properties"));
 
 		TestCase.assertNotNull(props);
 
@@ -73,11 +71,11 @@ public class XMLConfigurationTest extends TestCase
 	}
 
 	@SuppressWarnings("unchecked")
-	public void testClassHandler()
-	{
-		HashMap<String, Class<?>> classes =
-			(HashMap<String, Class<?>>) _conf.retrieveSection(new QName("http://www.mark-morgan.net/org/morgan/util/test",
-				"test-classes"));
+	public void testClassHandler() {
+		HashMap<String, Class<?>> classes = (HashMap<String, Class<?>>) _conf
+				.retrieveSection(new QName(
+						"http://www.mark-morgan.net/org/morgan/util/test",
+						"test-classes"));
 
 		TestCase.assertNotNull(classes);
 

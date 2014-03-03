@@ -32,21 +32,21 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class DBBESResourceFactory extends BasicDBResourceFactory
-{
+public class DBBESResourceFactory extends BasicDBResourceFactory {
 	static private Log _logger = LogFactory.getLog(DBBESResourceFactory.class);
 
 	static private final String[] _CREATE_STMTS = new String[] { "CREATE TABLE bespolicytable ("
-		+ "besid VARCHAR(256) NOT NULL PRIMARY KEY," + "userloggedinaction VARCHAR(64) NOT NULL,"
-		+ "screensaverinactiveaction VARCHAR(64) NOT NULL)" };
+			+ "besid VARCHAR(256) NOT NULL PRIMARY KEY,"
+			+ "userloggedinaction VARCHAR(64) NOT NULL,"
+			+ "screensaverinactiveaction VARCHAR(64) NOT NULL)" };
 
-	public DBBESResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
-	{
+	public DBBESResourceFactory(ServerDatabaseConnectionPool pool)
+			throws SQLException {
 		super(pool);
 	}
 
-	public IResource instantiate(ResourceKey parentKey) throws ResourceException
-	{
+	public IResource instantiate(ResourceKey parentKey)
+			throws ResourceException {
 		try {
 			return new DBBESResource(parentKey, _pool);
 		} catch (SQLException sqe) {
@@ -54,8 +54,7 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 		}
 	}
 
-	protected void createTables() throws SQLException
-	{
+	protected void createTables() throws SQLException {
 		Connection conn = null;
 		super.createTables();
 
@@ -69,8 +68,7 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 	}
 
 	@Override
-	protected void upgradeTables(Connection conn) throws SQLException
-	{
+	protected void upgradeTables(Connection conn) throws SQLException {
 		super.upgradeTables(conn);
 
 		PreparedStatement queryStmt = null;
@@ -79,32 +77,43 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 		ResultSet rs = null;
 
 		try {
-			queryStmt = conn.prepareStatement("SELECT resourceid, propvalue FROM properties " + "WHERE propname = ?");
-			insertStmt =
-				conn.prepareStatement("INSERT INTO persistedproperties "
-					+ "(resourceid, category, propertyname, propertyvalue) " + "VALUES(?, ?, ?, ?)");
-			deleteStmt = conn.prepareStatement("DELETE FROM properties WHERE resourceid = ? AND propname = ?");
+			queryStmt = conn
+					.prepareStatement("SELECT resourceid, propvalue FROM properties "
+							+ "WHERE propname = ?");
+			insertStmt = conn
+					.prepareStatement("INSERT INTO persistedproperties "
+							+ "(resourceid, category, propertyname, propertyvalue) "
+							+ "VALUES(?, ?, ?, ?)");
+			deleteStmt = conn
+					.prepareStatement("DELETE FROM properties WHERE resourceid = ? AND propname = ?");
 			queryStmt.setString(1, GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY);
 			rs = queryStmt.executeQuery();
 
 			while (rs.next()) {
 				String resourceid = rs.getString(1);
-				Properties props = (Properties) DBSerializer.fromBlob(rs.getBlob(2));
+				Properties props = (Properties) DBSerializer.fromBlob(rs
+						.getBlob(2));
 				try {
 					for (Object key : props.keySet()) {
 						insertStmt.setString(1, resourceid);
-						insertStmt.setString(2, GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY);
+						insertStmt.setString(2,
+								GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY);
 						insertStmt.setString(3, key.toString());
-						insertStmt.setString(4, props.getProperty(key.toString()));
+						insertStmt.setString(4,
+								props.getProperty(key.toString()));
 						insertStmt.addBatch();
 					}
 
 					insertStmt.executeBatch();
 					deleteStmt.setString(1, resourceid);
-					deleteStmt.setString(2, GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY);
+					deleteStmt.setString(2,
+							GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY);
 					deleteStmt.executeUpdate();
 				} catch (SQLException sqe) {
-					_logger.error(String.format("Unable to upgrade nativeq properties for resource %s.", resourceid), sqe);
+					_logger.error(
+							String.format(
+									"Unable to upgrade nativeq properties for resource %s.",
+									resourceid), sqe);
 				}
 			}
 		} finally {

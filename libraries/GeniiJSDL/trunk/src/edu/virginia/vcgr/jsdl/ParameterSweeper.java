@@ -30,12 +30,11 @@ import edu.virginia.vcgr.jsdl.sweep.SweepUtility;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class ParameterSweeper
-{
-	static public void main(String[] args)
-	{
+public class ParameterSweeper {
+	static public void main(String[] args) {
 		if (args.length < 1 || args.length > 2) {
-			System.err.println("USAGE:  ParameterSweeper <input-jsdl> <output-directory>");
+			System.err
+					.println("USAGE:  ParameterSweeper <input-jsdl> <output-directory>");
 			System.exit(1);
 		}
 
@@ -58,26 +57,29 @@ public class ParameterSweeper
 		}
 
 		try {
-			Unmarshaller unmarshaller = JSDLUtility.JSDLContext.createUnmarshaller();
-			JobDefinition jobDef = (JobDefinition) unmarshaller.unmarshal(source);
+			Unmarshaller unmarshaller = JSDLUtility.JSDLContext
+					.createUnmarshaller();
+			JobDefinition jobDef = (JobDefinition) unmarshaller
+					.unmarshal(source);
 
-			System.out.format("Generating %d jobs from sweep file %s\n", SweepUtility.sweepSize(jobDef), source);
-			SweepUtility.performSweep(jobDef, new SweepListenerImpl(source, targetDir));
+			System.out.format("Generating %d jobs from sweep file %s\n",
+					SweepUtility.sweepSize(jobDef), source);
+			SweepUtility.performSweep(jobDef, new SweepListenerImpl(source,
+					targetDir));
 		} catch (Throwable e) {
 			System.err.format("Unable to sweep JSDL file:  %s\n", e);
 			System.exit(1);
 		}
 	}
 
-	static private class SweepListenerImpl implements SweepListener
-	{
+	static private class SweepListenerImpl implements SweepListener {
 		private Marshaller _marshaller;
 		private File _source;
 		private File _targetDir;
 		private int _nextInstance;
 
-		private SweepListenerImpl(File source, File targetDir) throws JAXBException
-		{
+		private SweepListenerImpl(File source, File targetDir)
+				throws JAXBException {
 			_marshaller = JSDLUtility.JSDLContext.createMarshaller();
 			_marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
 			_source = source;
@@ -86,13 +88,15 @@ public class ParameterSweeper
 		}
 
 		@Override
-		public void emitSweepInstance(JobDefinition jobDef) throws SweepException
-		{
+		public void emitSweepInstance(JobDefinition jobDef)
+				throws SweepException {
 			try {
-				File output = new File(_targetDir, String.format("%s.%d", _source.getName(), _nextInstance++));
+				File output = new File(_targetDir, String.format("%s.%d",
+						_source.getName(), _nextInstance++));
 				_marshaller.marshal(jobDef, output);
 			} catch (JAXBException e) {
-				throw new SweepException("Unable to marshall Job Definition.", e);
+				throw new SweepException("Unable to marshall Job Definition.",
+						e);
 			}
 		}
 	}

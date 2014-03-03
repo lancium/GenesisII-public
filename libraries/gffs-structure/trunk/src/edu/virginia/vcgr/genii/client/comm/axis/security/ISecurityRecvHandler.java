@@ -23,8 +23,7 @@ import java.security.GeneralSecurityException;
  * @author dgm4d
  * 
  */
-public interface ISecurityRecvHandler extends org.apache.axis.Handler
-{
+public interface ISecurityRecvHandler extends org.apache.axis.Handler {
 
 	/**
 	 * Configures the Receive handler.
@@ -32,5 +31,6 @@ public interface ISecurityRecvHandler extends org.apache.axis.Handler
 	 * @param callContext
 	 * @throws GeneralSecurityException
 	 */
-	public void configure(ICallingContext callContext) throws GeneralSecurityException;
+	public void configure(ICallingContext callContext)
+			throws GeneralSecurityException;
 }

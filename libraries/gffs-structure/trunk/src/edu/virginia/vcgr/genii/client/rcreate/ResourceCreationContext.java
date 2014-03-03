@@ -4,11 +4,10 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamespaceDefinitions;
 
-public class ResourceCreationContext
-{
-	static private String _DEFAULT_CONTAINER_PATH()
-	{
-		NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
+public class ResourceCreationContext {
+	static private String _DEFAULT_CONTAINER_PATH() {
+		NamespaceDefinitions nsd = Installation.getDeployment(
+				new DeploymentName()).namespace();
 		return nsd.getRootContainer();
 	}
 
@@ -17,13 +16,12 @@ public class ResourceCreationContext
 	private String _defaultContainerPath;
 	private String _serviceRelativePath;
 
-	public ResourceCreationContext()
-	{
+	public ResourceCreationContext() {
 		this(null, null);
 	}
 
-	public ResourceCreationContext(String defaultContainerPath, String serviceRelativePath)
-	{
+	public ResourceCreationContext(String defaultContainerPath,
+			String serviceRelativePath) {
 		if (defaultContainerPath == null)
 			defaultContainerPath = _DEFAULT_CONTAINER_PATH();
 
@@ -34,26 +32,22 @@ public class ResourceCreationContext
 		_serviceRelativePath = serviceRelativePath;
 	}
 
-	public String getServiceRelativePath()
-	{
+	public String getServiceRelativePath() {
 		return _serviceRelativePath;
 	}
 
-	public void setServiceRelativePath(String serviceRelativePath)
-	{
+	public void setServiceRelativePath(String serviceRelativePath) {
 		if (serviceRelativePath == null)
 			serviceRelativePath = _DEFAULT_SERVICE_RELATIVE_PATH;
 
 		_serviceRelativePath = serviceRelativePath;
 	}
 
-	public String getDefaultContainerPath()
-	{
+	public String getDefaultContainerPath() {
 		return _defaultContainerPath;
 	}
 
-	public void setDefaultContainerPath(String defaultContainerPath)
-	{
+	public void setDefaultContainerPath(String defaultContainerPath) {
 		if (defaultContainerPath == null)
 			defaultContainerPath = _DEFAULT_CONTAINER_PATH();
 

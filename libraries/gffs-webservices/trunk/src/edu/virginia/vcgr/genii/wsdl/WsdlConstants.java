@@ -2,8 +2,7 @@ package edu.virginia.vcgr.genii.wsdl;
 
 import javax.xml.namespace.QName;
 
-public class WsdlConstants
-{
+public class WsdlConstants {
 	/* Namespaces */
 	static public final String WSDL_NS = "http://schemas.xmlsoap.org/wsdl/";
 	static public final String GENII_EXT_NS = "http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions";

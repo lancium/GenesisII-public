@@ -5,18 +5,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
-public class PathVariable
-{
+public class PathVariable {
 	static public enum FindTypes {
-		FILE,
-		DIRECTORY,
-		ANY
+		FILE, DIRECTORY, ANY
 	}
 
 	private Collection<File> _paths;
 
-	private PathVariable(String pathString)
-	{
+	private PathVariable(String pathString) {
 		String[] elements = pathString.split(":");
 
 		_paths = new ArrayList<File>(elements.length);
@@ -26,13 +22,11 @@ public class PathVariable
 		}
 	}
 
-	public Collection<File> pathElements()
-	{
+	public Collection<File> pathElements() {
 		return _paths;
 	}
 
-	public File find(String filename, FindTypes findType)
-	{
+	public File find(String filename, FindTypes findType) {
 		File f = new File(filename);
 
 		if (f.exists()) {
@@ -69,13 +63,12 @@ public class PathVariable
 		return null;
 	}
 
-	static public PathVariable createVariable(String pathString)
-	{
+	static public PathVariable createVariable(String pathString) {
 		return new PathVariable(pathString);
 	}
 
-	static public PathVariable lookupVariable(Properties properties, String pathVariableName)
-	{
+	static public PathVariable lookupVariable(Properties properties,
+			String pathVariableName) {
 		String value = properties.getProperty(pathVariableName, "");
 		return new PathVariable(value);
 	}

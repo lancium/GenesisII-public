@@ -28,8 +28,7 @@ import edu.virginia.vcgr.appmgr.io.IOUtils;
 import edu.virginia.vcgr.appmgr.util.ElementIterable;
 import edu.virginia.vcgr.appmgr.util.XMLUtilities;
 
-public class JarDescription
-{
+public class JarDescription {
 	static private Log _logger = LogFactory.getLog(JarDescription.class);
 
 	static private final String NAMESPACE = "http://vcgr.cs.virginia.edu";
@@ -40,15 +39,17 @@ public class JarDescription
 	static private final String RECURSIVE_ATTR_DEFAULT = "true";
 
 	static private final QName ROOT_QNAME = new QName(NAMESPACE, "jars");
-	static private final QName JAR_FILES_QNAME = new QName(NAMESPACE, "jar-files");
+	static private final QName JAR_FILES_QNAME = new QName(NAMESPACE,
+			"jar-files");
 	static private final QName JAR_FILE_QNAME = new QName(NAMESPACE, "jar-file");
 	static private final QName JAR_DIR_QNAME = new QName(NAMESPACE, "jar-dir");
 
 	private Collection<URL> _jarFiles = new LinkedList<URL>();
 
-	private void parseJarFiles(Node jarFilesNode) throws IOException, SAXException
-	{
-		File basedir = new File(XMLUtilities.getAttribute(jarFilesNode, BASEDIR_ATTR_NAME, BASEDIR_ATTR_DEFAULT));
+	private void parseJarFiles(Node jarFilesNode) throws IOException,
+			SAXException {
+		File basedir = new File(XMLUtilities.getAttribute(jarFilesNode,
+				BASEDIR_ATTR_NAME, BASEDIR_ATTR_DEFAULT));
 
 		for (Element child : new ElementIterable(jarFilesNode.getChildNodes())) {
 			QName childQName = XMLUtilities.getQName(child);
@@ -58,12 +59,12 @@ public class JarDescription
 					jarFile = new File(basedir, jarFile.getPath());
 				_jarFiles.add(jarFile.toURI().toURL());
 			} else
-				throw new IOException(String.format("Expected:  %s.", JAR_FILE_QNAME));
+				throw new IOException(String.format("Expected:  %s.",
+						JAR_FILE_QNAME));
 		}
 	}
 
-	private void findJars(File jarDir, boolean isRecursive)
-	{
+	private void findJars(File jarDir, boolean isRecursive) {
 		for (File testFile : jarDir.listFiles()) {
 			if (testFile.isDirectory() && isRecursive)
 				findJars(testFile, isRecursive);
@@ -71,25 +72,26 @@ public class JarDescription
 				try {
 					_jarFiles.add(testFile.toURI().toURL());
 				} catch (MalformedURLException mue) {
-					_logger.error("Got an unexpected malformed URL exception.", mue);
+					_logger.error("Got an unexpected malformed URL exception.",
+							mue);
 				}
 			}
 		}
 	}
 
-	private void parseJarDir(Element jarDirNode) throws IOException, SAXException
-	{
-		boolean isRecursive =
-			Boolean.parseBoolean(XMLUtilities.getAttribute(jarDirNode, RECURSIVE_ATTR_NAME, RECURSIVE_ATTR_DEFAULT));
+	private void parseJarDir(Element jarDirNode) throws IOException,
+			SAXException {
+		boolean isRecursive = Boolean.parseBoolean(XMLUtilities.getAttribute(
+				jarDirNode, RECURSIVE_ATTR_NAME, RECURSIVE_ATTR_DEFAULT));
 
 		File jarDir = new File(XMLUtilities.getTextContent(jarDirNode));
 		findJars(jarDir, isRecursive);
 	}
 
-	private void initialize(Node node) throws IOException, SAXException
-	{
+	private void initialize(Node node) throws IOException, SAXException {
 		if (!XMLUtilities.getQName(node).equals(ROOT_QNAME))
-			throw new IOException(String.format("Root element not correct -- expected %s.", ROOT_QNAME));
+			throw new IOException(String.format(
+					"Root element not correct -- expected %s.", ROOT_QNAME));
 
 		for (Element child : new ElementIterable(node.getChildNodes())) {
 			QName childQName = XMLUtilities.getQName(child);
@@ -98,12 +100,13 @@ public class JarDescription
 			else if (childQName.equals(JAR_DIR_QNAME))
 				parseJarDir(child);
 			else
-				throw new IOException(String.format("Unexpected XML element %s.", childQName));
+				throw new IOException(String.format(
+						"Unexpected XML element %s.", childQName));
 		}
 	}
 
-	private void initialize(InputStream in) throws ParserConfigurationException, SAXException, IOException
-	{
+	private void initialize(InputStream in)
+			throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
 		DocumentBuilder builder = factory.newDocumentBuilder();
@@ -111,29 +114,29 @@ public class JarDescription
 		initialize(doc.getDocumentElement());
 	}
 
-	public JarDescription(String filepath) throws FileNotFoundException, IOException
-	{
+	public JarDescription(String filepath) throws FileNotFoundException,
+			IOException {
 		this(new File(filepath));
 	}
 
-	public JarDescription(File file) throws FileNotFoundException, IOException
-	{
+	public JarDescription(File file) throws FileNotFoundException, IOException {
 		FileInputStream fin = null;
 
 		try {
 			fin = new FileInputStream(file);
 			initialize(fin);
 		} catch (SAXException se) {
-			throw new IOException(String.format("Unable to parse jar description file %s.", file), se);
+			throw new IOException(String.format(
+					"Unable to parse jar description file %s.", file), se);
 		} catch (ParserConfigurationException pce) {
-			throw new IOException(String.format("Unable to parse jar description file %s.", file), pce);
+			throw new IOException(String.format(
+					"Unable to parse jar description file %s.", file), pce);
 		} finally {
 			IOUtils.close(fin);
 		}
 	}
 
-	public JarDescription(InputStream in) throws IOException
-	{
+	public JarDescription(InputStream in) throws IOException {
 		try {
 			initialize(in);
 		} catch (SAXException se) {
@@ -143,20 +146,22 @@ public class JarDescription
 		}
 	}
 
-	public ClassLoader createClassLoader() throws IOException
-	{
-		URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+	public ClassLoader createClassLoader() throws IOException {
+		URLClassLoader sysloader = (URLClassLoader) ClassLoader
+				.getSystemClassLoader();
 		Class<URLClassLoader> sysclass = URLClassLoader.class;
 
 		try {
-			Method method = sysclass.getDeclaredMethod("addURL", new Class<?>[] { URL.class });
+			Method method = sysclass.getDeclaredMethod("addURL",
+					new Class<?>[] { URL.class });
 			method.setAccessible(true);
 			for (URL u : _jarFiles)
 				method.invoke(sysloader, new Object[] { u });
 
 			return sysloader;
 		} catch (Throwable cause) {
-			throw new IOException("Unable to modify system class loader.", cause);
+			throw new IOException("Unable to modify system class loader.",
+					cause);
 		}
 	}
 }

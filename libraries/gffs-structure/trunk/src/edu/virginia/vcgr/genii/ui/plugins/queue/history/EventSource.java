@@ -34,8 +34,7 @@ import edu.virginia.vcgr.genii.ui.rns.RNSIcons;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class EventSource extends JLabel
-{
+class EventSource extends JLabel {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(EventSource.class);
@@ -47,8 +46,7 @@ class EventSource extends JLabel
 	private boolean _doHighlight = false;
 	private HistoryEventSource _source = null;
 
-	private WSName getSourceEndpoint()
-	{
+	private WSName getSourceEndpoint() {
 		if (_source != null) {
 			Object identity = _source.identity();
 			if (identity != null && identity instanceof WSName)
@@ -58,14 +56,15 @@ class EventSource extends JLabel
 		return null;
 	}
 
-	private void popupMenu(MouseEvent e)
-	{
+	private void popupMenu(MouseEvent e) {
 		EndpointReferenceType endpoint = getSourceEndpoint().getEndpoint();
 
-		UIPlugins plugins = new UIPlugins(new UIPluginContext(_context, this, new StaticEndpointRetriever(endpoint)));
+		UIPlugins plugins = new UIPlugins(new UIPluginContext(_context, this,
+				new StaticEndpointRetriever(endpoint)));
 
 		EndpointDescription desc = new EndpointDescription(endpoint);
-		ArrayList<EndpointDescription> descriptions = new ArrayList<EndpointDescription>(1);
+		ArrayList<EndpointDescription> descriptions = new ArrayList<EndpointDescription>(
+				1);
 		descriptions.add(desc);
 
 		plugins.updateStatuses(descriptions);
@@ -87,17 +86,18 @@ class EventSource extends JLabel
 	}
 
 	@Override
-	protected void paintComponent(Graphics g)
-	{
+	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
 		if (_doHighlight) {
 			Graphics2D g2 = (Graphics2D) g.create();
 			Shape dot = new Rectangle(getWidth(), getHeight());
 
-			g2.setPaint(new RadialGradientPaint(getWidth() / 2.0f, getHeight() / 2.0f,
-				Math.max(getWidth(), getHeight()) / 2.0f, new float[] { 0.0f, 1.0f }, new Color[] { _highlightColor1,
-					_highlightColor2 }));
+			g2.setPaint(new RadialGradientPaint(getWidth() / 2.0f,
+					getHeight() / 2.0f,
+					Math.max(getWidth(), getHeight()) / 2.0f, new float[] {
+							0.0f, 1.0f }, new Color[] { _highlightColor1,
+							_highlightColor2 }));
 
 			g2.fill(dot);
 
@@ -105,15 +105,13 @@ class EventSource extends JLabel
 		}
 	}
 
-	EventSource(UIContext context)
-	{
+	EventSource(UIContext context) {
 		_context = context;
 		setOpaque(true);
 		addMouseListener(new MouseListenerImpl());
 	}
 
-	void setEventSource(HistoryEventSource source)
-	{
+	void setEventSource(HistoryEventSource source) {
 		_source = source;
 
 		setIcon(null);
@@ -128,7 +126,8 @@ class EventSource extends JLabel
 
 			WSName name = getSourceEndpoint();
 			if (name != null) {
-				EndpointType et = EndpointType.determineType(name.getEndpoint());
+				EndpointType et = EndpointType
+						.determineType(name.getEndpoint());
 				if (et != null) {
 					Icon icon = RNSIcons.RNSIconsFactory().getIcon(et, false);
 					setIcon(icon);
@@ -137,32 +136,27 @@ class EventSource extends JLabel
 		}
 	}
 
-	private class MouseListenerImpl implements MouseListener
-	{
+	private class MouseListenerImpl implements MouseListener {
 		@Override
-		public void mouseClicked(MouseEvent e)
-		{
+		public void mouseClicked(MouseEvent e) {
 			if (e.isPopupTrigger())
 				popupMenu(e);
 		}
 
 		@Override
-		public void mousePressed(MouseEvent e)
-		{
+		public void mousePressed(MouseEvent e) {
 			if (e.isPopupTrigger())
 				popupMenu(e);
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e)
-		{
+		public void mouseReleased(MouseEvent e) {
 			if (e.isPopupTrigger())
 				popupMenu(e);
 		}
 
 		@Override
-		public void mouseEntered(MouseEvent e)
-		{
+		public void mouseEntered(MouseEvent e) {
 			WSName name = getSourceEndpoint();
 
 			if (name != null) {
@@ -172,29 +166,25 @@ class EventSource extends JLabel
 		}
 
 		@Override
-		public void mouseExited(MouseEvent e)
-		{
+		public void mouseExited(MouseEvent e) {
 			_doHighlight = false;
 			repaint();
 		}
 	}
 
-	private class RNSAction extends AbstractAction
-	{
+	private class RNSAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
 		private RNSPath _rnsRoot;
 
-		private RNSAction(RNSPath rnsRoot)
-		{
+		private RNSAction(RNSPath rnsRoot) {
 			super("Browse");
 
 			_rnsRoot = rnsRoot;
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e)
-		{
+		final public void actionPerformed(ActionEvent e) {
 			try {
 				UIContext context = (UIContext) _context.clone();
 				context.callingContext().setCurrentPath(_rnsRoot);

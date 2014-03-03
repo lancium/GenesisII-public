@@ -11,12 +11,10 @@ import edu.virginia.vcgr.genii.client.stats.MethodDataPoint;
 import edu.virginia.vcgr.genii.client.stats.MethodHistogramStatistics;
 import edu.virginia.vcgr.genii.notification.broker.SubscriptionFailedFaultType;
 
-public class DatabaseHandler implements IAroundInvoker
-{
+public class DatabaseHandler implements IAroundInvoker {
 	static private Log _logger = LogFactory.getLog(DatabaseHandler.class);
 
-	public Object invoke(InvocationContext invocationContext) throws Exception
-	{
+	public Object invoke(InvocationContext invocationContext) throws Exception {
 		Object result;
 		boolean succeeded = false;
 
@@ -34,10 +32,13 @@ public class DatabaseHandler implements IAroundInvoker
 			throw new GeneralSecurityException(msg);
 		}
 
-		MethodDataPoint mdp =
-			ContainerStatistics.instance().getMethodStatistics()
-				.startMethod(invocationContext.getTarget().getClass(), invocationContext.getMethod());
-		MethodHistogramStatistics mhs = ContainerStatistics.instance().getMethodHistogramStatistics();
+		MethodDataPoint mdp = ContainerStatistics
+				.instance()
+				.getMethodStatistics()
+				.startMethod(invocationContext.getTarget().getClass(),
+						invocationContext.getMethod());
+		MethodHistogramStatistics mhs = ContainerStatistics.instance()
+				.getMethodHistogramStatistics();
 
 		mhs.addActiveMethod();
 		try {
@@ -46,17 +47,22 @@ public class DatabaseHandler implements IAroundInvoker
 			succeeded = true;
 			return result;
 		} catch (Exception e) {
-			if ((e.getCause() != null) && (e.getCause() instanceof SubscriptionFailedFaultType)) {
-				_logger.info("subscription exception in dbhandler, rethrowing: " + e.getCause().getMessage());
+			if ((e.getCause() != null)
+					&& (e.getCause() instanceof SubscriptionFailedFaultType)) {
+				_logger.info("subscription exception in dbhandler, rethrowing: "
+						+ e.getCause().getMessage());
 			} else {
-				_logger.error("exception occurred in dbhandler invoke: " + e.getMessage(), e);
+				_logger.error(
+						"exception occurred in dbhandler invoke: "
+								+ e.getMessage(), e);
 			}
 			throw e;
 		} finally {
 			mhs.removeActiveMethod();
 
 			if (!succeeded) {
-				_logger.info("Did not succeed at invoking method " + mdp.toString() + ".  Marking context appropriately.");
+				_logger.info("Did not succeed at invoking method "
+						+ mdp.toString() + ".  Marking context appropriately.");
 				mdp.complete(false);
 				try {
 					WorkingContext.getCurrentWorkingContext().setFailed();

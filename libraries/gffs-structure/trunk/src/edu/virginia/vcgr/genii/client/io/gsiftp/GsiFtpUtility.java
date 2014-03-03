@@ -5,16 +5,16 @@ import java.io.IOException;
 
 import org.morgan.util.io.DataTransferStatistics;
 
-public class GsiFtpUtility
-{
-	static public DataTransferStatistics put(File source, String destinationHost, int destinationPort, String destinationPath)
-		throws IOException
-	{
+public class GsiFtpUtility {
+	static public DataTransferStatistics put(File source,
+			String destinationHost, int destinationPort, String destinationPath)
+			throws IOException {
 		DataTransferStatistics stats = DataTransferStatistics.startTransfer();
 
 		GsiFtp copier = new GsiFtp();
 		copier.setSourceFile(source.getAbsolutePath());
-		copier.setDestinationfile("gsiftp://" + destinationHost + ":" + String.valueOf(destinationPort) + destinationPath);
+		copier.setDestinationfile("gsiftp://" + destinationHost + ":"
+				+ String.valueOf(destinationPort) + destinationPath);
 		copier.setWorkingDirectory(source.getParentFile());
 
 		copier.execute();
@@ -22,12 +22,13 @@ public class GsiFtpUtility
 		return stats.finishTransfer();
 	}
 
-	static public DataTransferStatistics get(File destination, String sourceFileHost, int sourcePort, String sourceFilePath)
-		throws IOException
-	{
+	static public DataTransferStatistics get(File destination,
+			String sourceFileHost, int sourcePort, String sourceFilePath)
+			throws IOException {
 		DataTransferStatistics stats = DataTransferStatistics.startTransfer();
 		GsiFtp copier = new GsiFtp();
-		copier.setSourceFile("gsiftp://" + sourceFileHost + ":" + String.valueOf(sourcePort) + sourceFilePath);
+		copier.setSourceFile("gsiftp://" + sourceFileHost + ":"
+				+ String.valueOf(sourcePort) + sourceFilePath);
 		copier.setDestinationfile(destination.getAbsolutePath());
 		copier.setWorkingDirectory(destination.getParentFile());
 		copier.execute();

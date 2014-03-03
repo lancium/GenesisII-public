@@ -23,8 +23,7 @@ import edu.virginia.vcgr.genii.client.security.axis.AxisAcl;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class AuthZConfigCache extends CommonAttributeCache
-{
+public class AuthZConfigCache extends CommonAttributeCache {
 	static protected Log _logger = LogFactory.getLog(AuthZConfigCache.class);
 
 	private SingleResourcePropertyTranslator authZTranslator;
@@ -32,21 +31,22 @@ public class AuthZConfigCache extends CommonAttributeCache
 	private TimedOutLRUCache<String, Permissions> permissionCache;
 	private TimedOutLRUCache<String, AuthZConfig> authZCache;
 
-	public AuthZConfigCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
-	{
+	public AuthZConfigCache(int priorityLevel, int capacity,
+			long cacheLifeTime, boolean monitoingEnabled) {
 
 		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
 
-		authZCache = new TimedOutLRUCache<String, AuthZConfig>(capacity, cacheLifeTime);
-		permissionCache = new TimedOutLRUCache<String, Permissions>(capacity, cacheLifeTime);
+		authZCache = new TimedOutLRUCache<String, AuthZConfig>(capacity,
+				cacheLifeTime);
+		permissionCache = new TimedOutLRUCache<String, Permissions>(capacity,
+				cacheLifeTime);
 
 		authZTranslator = new DefaultSingleResourcePropertyTranslator();
 		permissionTranslator = new PermissionsStringTranslator();
 	}
 
 	@Override
-	public Object getItem(Object cacheKey, Object target)
-	{
+	public Object getItem(Object cacheKey, Object target) {
 		String EPI = getEPI(target);
 		QName qName = (QName) cacheKey;
 		if (qName.equals(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME)) {
@@ -67,8 +67,8 @@ public class AuthZConfigCache extends CommonAttributeCache
 	}
 
 	@Override
-	public void putItem(Object cacheKey, Object target, Object value) throws Exception
-	{
+	public void putItem(Object cacheKey, Object target, Object value)
+			throws Exception {
 
 		URI wsEndpointIdenfierURI = getEndpointIdentifierURI(target);
 		String EPI = wsEndpointIdenfierURI.toString();
@@ -77,42 +77,47 @@ public class AuthZConfigCache extends CommonAttributeCache
 		MessageElement element = (MessageElement) value;
 
 		if (qName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME)) {
-			Permissions permissions = permissionTranslator.deserialize(Permissions.class, element);
+			Permissions permissions = permissionTranslator.deserialize(
+					Permissions.class, element);
 			permissionCache.put(EPI, permissions, lifetime);
 
-			// Removing authZConfig from the cache, as the information may be stale.
+			// Removing authZConfig from the cache, as the information may be
+			// stale.
 			authZCache.remove(EPI);
 
 		} else if (qName.equals(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME)) {
 
-			AuthZConfig authZConfig = authZTranslator.deserialize(AuthZConfig.class, element);
+			AuthZConfig authZConfig = authZTranslator.deserialize(
+					AuthZConfig.class, element);
 
-			// Since an authZConfig holds reference to a set of MessageElements, there are
+			// Since an authZConfig holds reference to a set of MessageElements,
+			// there are
 			// references from
-			// it to the SOAPMessage that has returned this authZConfig. We have to cleanup all such
+			// it to the SOAPMessage that has returned this authZConfig. We have
+			// to cleanup all such
 			// references
 			// before saving the authZConfig.
-			AuthZConfig sanitizedConfigAuthZConfig = Sanitizer.getSanitizedAuthZConfig(authZConfig);
+			AuthZConfig sanitizedConfigAuthZConfig = Sanitizer
+					.getSanitizedAuthZConfig(authZConfig);
 
 			authZCache.put(EPI, sanitizedConfigAuthZConfig, lifetime);
 
-			// We can translate authZConfig into permissions, so there is no need to keep
+			// We can translate authZConfig into permissions, so there is no
+			// need to keep
 			// permissions in the cache for the same cache-key.
 			permissionCache.remove(EPI);
 		}
 	}
 
 	@Override
-	public void invalidateCachedItem(Object target)
-	{
+	public void invalidateCachedItem(Object target) {
 		String EPI = getEPI(target);
 		permissionCache.remove(EPI);
 		authZCache.remove(EPI);
 	}
 
 	@Override
-	public void invalidateCachedItem(Object cacheKey, Object target)
-	{
+	public void invalidateCachedItem(Object cacheKey, Object target) {
 		String EPI = getEPI(target);
 		QName qName = (QName) cacheKey;
 		if (qName.equals(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME)) {
@@ -123,25 +128,23 @@ public class AuthZConfigCache extends CommonAttributeCache
 	}
 
 	@Override
-	public void invalidateEntireCache()
-	{
+	public void invalidateEntireCache() {
 		authZCache.clear();
 		permissionCache.clear();
 	}
 
 	@Override
-	public boolean cacheKeyMatches(Object cacheKey)
-	{
+	public boolean cacheKeyMatches(Object cacheKey) {
 		if (cacheKey instanceof QName) {
 			return (cacheKey.equals(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME) || cacheKey
-				.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME));
+					.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME));
 		}
 		return false;
 	}
 
 	@Override
-	public void updateCacheLifeTimeOfItems(Object commonIdentifierForItems, long newCacheLifeTime)
-	{
+	public void updateCacheLifeTimeOfItems(Object commonIdentifierForItems,
+			long newCacheLifeTime) {
 
 		URI wsIdentifier = (URI) commonIdentifierForItems;
 		Collection<String> epiStrings = getCacheKeysForLifetimeUpdateRequest(wsIdentifier);
@@ -160,14 +163,16 @@ public class AuthZConfigCache extends CommonAttributeCache
 		}
 	}
 
-	private Permissions getPermissions(AuthZConfig authZConfig)
-	{
+	private Permissions getPermissions(AuthZConfig authZConfig) {
 		if (authZConfig == null)
 			return null;
 		try {
-			ICallingContext callingContext = ContextManager.getExistingContext();
-			Collection<Identity> callerIdentities = KeystoreManager.getCallerIdentities(callingContext);
-			return GenesisIIACLManager.getPermissions(AxisAcl.decodeAcl(authZConfig), callerIdentities);
+			ICallingContext callingContext = ContextManager
+					.getExistingContext();
+			Collection<Identity> callerIdentities = KeystoreManager
+					.getCallerIdentities(callingContext);
+			return GenesisIIACLManager.getPermissions(
+					AxisAcl.decodeAcl(authZConfig), callerIdentities);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

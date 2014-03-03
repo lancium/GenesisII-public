@@ -12,13 +12,11 @@ import edu.virginia.vcgr.genii.gjt.data.MatchingParameterList;
 import edu.virginia.vcgr.genii.gjt.gui.util.DefaultGrayedEmptyCellRenderer;
 
 @SuppressWarnings("rawtypes")
-public class MatchingParameterTable extends JTable
-{
+public class MatchingParameterTable extends JTable {
 	static final long serialVersionUID = 0L;
 
 	@SuppressWarnings("unchecked")
-	MatchingParameterTable(MatchingParameterList parameters)
-	{
+	MatchingParameterTable(MatchingParameterList parameters) {
 		super(new MatchingParameterTableModel(parameters));
 
 		setShowHorizontalLines(true);
@@ -34,10 +32,12 @@ public class MatchingParameterTable extends JTable
 		TableColumn typeColumn = cModel.getColumn(2);
 
 		keyColumn.setHeaderValue("Variable");
-		keyColumn.setCellRenderer(new DefaultGrayedEmptyCellRenderer("Variable"));
+		keyColumn
+				.setCellRenderer(new DefaultGrayedEmptyCellRenderer("Variable"));
 
 		valueColumn.setHeaderValue("Value");
-		valueColumn.setCellRenderer(new DefaultGrayedEmptyCellRenderer("Value"));
+		valueColumn
+				.setCellRenderer(new DefaultGrayedEmptyCellRenderer("Value"));
 
 		JComboBox comboBox = new JComboBox();
 		comboBox.addItem("requires");

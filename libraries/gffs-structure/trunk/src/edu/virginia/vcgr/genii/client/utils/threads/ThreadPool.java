@@ -6,8 +6,7 @@ import java.util.LinkedList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ThreadPool
-{
+public class ThreadPool {
 	static private Log _logger = LogFactory.getLog(ThreadPool.class);
 
 	private SimpleAlarmManager _alarm;
@@ -18,8 +17,7 @@ public class ThreadPool
 	private int _idleThreads;
 	private long _idleTimeout;
 
-	public ThreadPool(int coreSize, int maxSize, long idleTimeout)
-	{
+	public ThreadPool(int coreSize, int maxSize, long idleTimeout) {
 		_coreSize = coreSize;
 		_maxSize = maxSize;
 		_activeThreads = 0;
@@ -30,8 +28,7 @@ public class ThreadPool
 		_alarm = new SimpleAlarmManager();
 	}
 
-	public void enqueue(Runnable worker)
-	{
+	public void enqueue(Runnable worker) {
 		synchronized (_workers) {
 			_workers.addLast(worker);
 
@@ -55,35 +52,28 @@ public class ThreadPool
 		}
 	}
 
-	public void schedule(Runnable worker, long delay)
-	{
+	public void schedule(Runnable worker, long delay) {
 		schedule(worker, new Date(System.currentTimeMillis() + delay));
 	}
 
-	public void schedule(Runnable worker, Date time)
-	{
+	public void schedule(Runnable worker, Date time) {
 		_alarm.addAlarm(new ScheduledActivityPlacer(worker), time);
 	}
 
-	private class ScheduledActivityPlacer implements Runnable
-	{
+	private class ScheduledActivityPlacer implements Runnable {
 		private Runnable _worker;
 
-		public ScheduledActivityPlacer(Runnable worker)
-		{
+		public ScheduledActivityPlacer(Runnable worker) {
 			_worker = worker;
 		}
 
-		public void run()
-		{
+		public void run() {
 			enqueue(_worker);
 		}
 	}
 
-	private class WorkerThread implements Runnable
-	{
-		public void run()
-		{
+	private class WorkerThread implements Runnable {
+		public void run() {
 			while (true) {
 				Runnable worker;
 
@@ -111,7 +101,9 @@ public class ThreadPool
 							Thread.interrupted();
 							_logger.warn("Thread in thread pool interrupted.");
 						} catch (Throwable t) {
-							_logger.error("Unknown exception in thread pool thread.", t);
+							_logger.error(
+									"Unknown exception in thread pool thread.",
+									t);
 						}
 						_idleThreads--;
 						_activeThreads++;

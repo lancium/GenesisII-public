@@ -25,28 +25,24 @@ import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 
 @SuppressWarnings("rawtypes")
-class LogoutDialog extends JDialog
-{
+class LogoutDialog extends JDialog {
 	static final long serialVersionUID = 0L;
 
-	static private class CredentialWrapper
-	{
+	static private class CredentialWrapper {
 		private NuCredential _credential;
 
-		private CredentialWrapper(NuCredential credential)
-		{
+		private CredentialWrapper(NuCredential credential) {
 			_credential = credential;
 		}
 
 		@Override
-		final public String toString()
-		{
+		final public String toString() {
 			return _credential.describe(VerbosityLevel.LOW);
 		}
 	}
 
-	static private Object[] createCredentialList(Collection<NuCredential> credList)
-	{
+	static private Object[] createCredentialList(
+			Collection<NuCredential> credList) {
 		Object[] ret = new Object[credList.size()];
 		int lcv = 0;
 		for (NuCredential cred : credList)
@@ -55,17 +51,15 @@ class LogoutDialog extends JDialog
 		return ret;
 	}
 
-	private class LogoutAction extends AbstractAction implements ListSelectionListener
-	{
+	private class LogoutAction extends AbstractAction implements
+			ListSelectionListener {
 		static final long serialVersionUID = 0L;
 
-		private void evaluateStatus()
-		{
+		private void evaluateStatus() {
 			setEnabled(_credentialList.getSelectedIndices().length > 0);
 		}
 
-		private LogoutAction()
-		{
+		private LogoutAction() {
 			super("Logout Selected Credentials");
 
 			evaluateStatus();
@@ -73,10 +67,10 @@ class LogoutDialog extends JDialog
 
 		@SuppressWarnings("deprecation")
 		@Override
-		final public void actionPerformed(ActionEvent e)
-		{
-			int answer =
-				JOptionPane.showConfirmDialog((Component) e.getSource(), "Log out from selected credentials?",
+		final public void actionPerformed(ActionEvent e) {
+			int answer = JOptionPane.showConfirmDialog(
+					(Component) e.getSource(),
+					"Log out from selected credentials?",
 					"Logout Confirmation", JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
 				Object[] values = _credentialList.getSelectedValues();
@@ -92,24 +86,20 @@ class LogoutDialog extends JDialog
 		}
 
 		@Override
-		final public void valueChanged(ListSelectionEvent e)
-		{
+		final public void valueChanged(ListSelectionEvent e) {
 			evaluateStatus();
 		}
 	}
 
-	private class CancelAction extends AbstractAction
-	{
+	private class CancelAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private CancelAction()
-		{
+		private CancelAction() {
 			super("Cancel");
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e)
-		{
+		final public void actionPerformed(ActionEvent e) {
 			dispose();
 		}
 	}
@@ -119,8 +109,7 @@ class LogoutDialog extends JDialog
 	private JList _credentialList;
 
 	@SuppressWarnings("unchecked")
-	LogoutDialog(Window owner, CredentialManagementContext context)
-	{
+	LogoutDialog(Window owner, CredentialManagementContext context) {
 		super(owner, "Logout Dialog", ModalityType.DOCUMENT_MODAL);
 		_context = context;
 
@@ -133,10 +122,14 @@ class LogoutDialog extends JDialog
 
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
-		content.add(new JScrollPane(_credentialList), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(ButtonPanel.createHorizontalButtonPanel(logout, cancel), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JScrollPane(_credentialList), new GridBagConstraints(0,
+				0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalButtonPanel(logout, cancel),
+				new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+						GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5),
+						5, 5));
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		pack();
@@ -144,8 +137,7 @@ class LogoutDialog extends JDialog
 		setVisible(true);
 	}
 
-	LogoutDialog(Component owner, CredentialManagementContext context)
-	{
+	LogoutDialog(Component owner, CredentialManagementContext context) {
 		this(SwingUtilities.getWindowAncestor(owner), context);
 	}
 }

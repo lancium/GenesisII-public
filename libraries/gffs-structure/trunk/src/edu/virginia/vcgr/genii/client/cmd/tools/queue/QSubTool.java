@@ -12,33 +12,32 @@ import edu.virginia.vcgr.genii.client.gpath.*;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.cmd.tools.Option;
 
-public class QSubTool extends BaseGridTool
-{
+public class QSubTool extends BaseGridTool {
 	static private final String _DESCRIPTION = "config/tooldocs/description/dqsub";
 	static private final String _USAGE = "config/tooldocs/usage/uqsub";
 	static final private String _MANPAGE = "config/tooldocs/man/qsub";
 	private int _priority = 0;
 
-	public QSubTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.EXECUTION);
+	public QSubTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.EXECUTION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "priority" })
-	public void setPriority(String priority) throws ToolException
-	{
+	public void setPriority(String priority) throws ToolException {
 		_priority = Integer.parseInt(priority);
 		if (_priority < -10 || _priority > 10)
-			throw new InvalidToolUsageException("Priority must be between -10 and 10.");
+			throw new InvalidToolUsageException(
+					"Priority must be between -10 and 10.");
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException("<queue-path> must be a grid path");
+			throw new InvalidToolUsageException(
+					"<queue-path> must be a grid path");
 		String queuePath = gPath.path();
 		QueueManipulator manipulator = new QueueManipulator(queuePath);
 		gPath = new GeniiPath(getArgument(1));
@@ -55,8 +54,7 @@ public class QSubTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException();
 	}

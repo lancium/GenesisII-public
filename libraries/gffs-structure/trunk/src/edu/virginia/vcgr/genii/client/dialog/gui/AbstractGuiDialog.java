@@ -24,8 +24,7 @@ import edu.virginia.vcgr.genii.client.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.dialog.TextContent;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 
-abstract class AbstractGuiDialog extends JDialog implements Dialog
-{
+abstract class AbstractGuiDialog extends JDialog implements Dialog {
 	static final long serialVersionUID = 0L;
 
 	private TextContent _help;
@@ -37,8 +36,7 @@ abstract class AbstractGuiDialog extends JDialog implements Dialog
 	protected Action _okAction;
 	protected Action _cancelAction;
 
-	protected AbstractGuiDialog(String title, Object... bodyParameters)
-	{
+	protected AbstractGuiDialog(String title, Object... bodyParameters) {
 		setTitle(title);
 
 		Container container = getContentPane();
@@ -48,12 +46,16 @@ abstract class AbstractGuiDialog extends JDialog implements Dialog
 		_helpButton.setEnabled(false);
 		_helpButton.addActionListener(new HelpButtonActionListener());
 
-		container.add(_body = createBody(bodyParameters), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(createButtonBar(), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(_helpButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 0, 0, 0), 0, 0));
+		container.add(_body = createBody(bodyParameters),
+				new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(5, 5, 5, 5), 5, 5));
+		container.add(createButtonBar(), new GridBagConstraints(0, 2, 1, 1,
+				1.0, 0.0, GridBagConstraints.CENTER,
+				GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_helpButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+				GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5,
+						0, 0, 0), 0, 0));
 
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -61,40 +63,33 @@ abstract class AbstractGuiDialog extends JDialog implements Dialog
 
 	protected abstract JComponent createBody(Object[] parameters);
 
-	protected BottomButtonBar createButtonBar()
-	{
-		return new BottomButtonBar(_okAction = new OKAction(), _cancelAction = new CancelAction());
+	protected BottomButtonBar createButtonBar() {
+		return new BottomButtonBar(_okAction = new OKAction(),
+				_cancelAction = new CancelAction());
 	}
 
-	protected void okCalled()
-	{
+	protected void okCalled() {
 	}
 
-	protected void cancelCalled()
-	{
+	protected void cancelCalled() {
 	}
 
 	@Override
-	public TextContent getHelp()
-	{
+	public TextContent getHelp() {
 		return _help;
 	}
 
 	@Override
-	public void setHelp(TextContent helpContent)
-	{
+	public void setHelp(TextContent helpContent) {
 		_help = helpContent;
 		toggleHelpButton();
 	}
 
-	private void toggleHelpButton()
-	{
+	private void toggleHelpButton() {
 		try {
 			if (!SwingUtilities.isEventDispatchThread()) {
-				SwingUtilities.invokeAndWait(new Runnable()
-				{
-					public void run()
-					{
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
 						toggleHelpButton();
 					}
 				});
@@ -108,50 +103,42 @@ abstract class AbstractGuiDialog extends JDialog implements Dialog
 		}
 	}
 
-	protected void displayHelp()
-	{
-		JOptionPane.showMessageDialog(_helpButton, _help, "Help", JOptionPane.INFORMATION_MESSAGE, HelpButton.getHelpIcon());
+	protected void displayHelp() {
+		JOptionPane.showMessageDialog(_helpButton, _help, "Help",
+				JOptionPane.INFORMATION_MESSAGE, HelpButton.getHelpIcon());
 	}
 
-	private class HelpButtonActionListener implements ActionListener
-	{
+	private class HelpButtonActionListener implements ActionListener {
 		@Override
-		public void actionPerformed(ActionEvent event)
-		{
+		public void actionPerformed(ActionEvent event) {
 			displayHelp();
 		}
 	}
 
-	protected class OKAction extends AbstractAction
-	{
+	protected class OKAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		public OKAction()
-		{
+		public OKAction() {
 			super("OK");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent event)
-		{
+		public void actionPerformed(ActionEvent event) {
 			_cancelled = false;
 			okCalled();
 			dispose();
 		}
 	}
 
-	protected class CancelAction extends AbstractAction
-	{
+	protected class CancelAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		public CancelAction()
-		{
+		public CancelAction() {
 			super("Cancel");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent event)
-		{
+		public void actionPerformed(ActionEvent event) {
 			_cancelled = true;
 			cancelCalled();
 			dispose();
@@ -159,8 +146,7 @@ abstract class AbstractGuiDialog extends JDialog implements Dialog
 	}
 
 	@Override
-	public void showDialog() throws DialogException, UserCancelException
-	{
+	public void showDialog() throws DialogException, UserCancelException {
 		pack();
 		GraphicsUtils.centerWindow(this);
 		setVisible(true);

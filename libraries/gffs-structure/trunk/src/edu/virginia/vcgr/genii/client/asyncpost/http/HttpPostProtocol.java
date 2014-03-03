@@ -12,23 +12,22 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.asyncpost.AbstractPostProtocol;
 import edu.virginia.vcgr.genii.client.asyncpost.PostProtocol;
 
-public class HttpPostProtocol extends AbstractPostProtocol implements PostProtocol
-{
+public class HttpPostProtocol extends AbstractPostProtocol implements
+		PostProtocol {
 	static private final String[] HANDLED_PROTOCOLS = new String[] { "http" };
 
-	static private String convert(byte[] content) throws UnsupportedEncodingException
-	{
-		return String.format("%s=%s", URLEncoder.encode("content", "UTF-8"), URLEncoder.encode(new String(content), "UTF-8"));
+	static private String convert(byte[] content)
+			throws UnsupportedEncodingException {
+		return String.format("%s=%s", URLEncoder.encode("content", "UTF-8"),
+				URLEncoder.encode(new String(content), "UTF-8"));
 	}
 
-	public HttpPostProtocol()
-	{
+	public HttpPostProtocol() {
 		super(HANDLED_PROTOCOLS);
 	}
 
 	@Override
-	protected void doPost(URI target, byte[] content) throws Throwable
-	{
+	protected void doPost(URI target, byte[] content) throws Throwable {
 		HttpURLConnection connection = null;
 		OutputStream out = null;
 		InputStream in = null;
@@ -38,7 +37,8 @@ public class HttpPostProtocol extends AbstractPostProtocol implements PostProtoc
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
 			connection.setUseCaches(false);
-			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			connection.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
 			connection.setRequestMethod("POST");
 			connection.connect();
 			out = null;

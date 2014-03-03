@@ -12,37 +12,36 @@ import edu.virginia.vcgr.genii.client.gpath.*;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.cmd.tools.Option;
 
-public class QCompleteTool extends BaseGridTool
-{
+public class QCompleteTool extends BaseGridTool {
 	static final private String _DESCRIPTION = "config/tooldocs/description/dqcomplete";
 	static final private String _USAGE = "config/tooldocs/usage/uqcomplete";
 	static final private String _MANPAGE = "config/tooldocs/man/qcomplete";
 	private boolean _all = false;
 
-	public QCompleteTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.EXECUTION);
+	public QCompleteTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.EXECUTION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "all" })
-	public void setAll()
-	{
+	public void setAll() {
 		_all = true;
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException("<queue-path must be a grid path. ");
+			throw new InvalidToolUsageException(
+					"<queue-path must be a grid path. ");
 		QueueManipulator manipulator = new QueueManipulator(gPath.path());
 
 		if (_all) {
 			manipulator.completeAll();
 		} else {
-			ArrayList<JobTicket> tickets = new ArrayList<JobTicket>(numArguments() - 1);
+			ArrayList<JobTicket> tickets = new ArrayList<JobTicket>(
+					numArguments() - 1);
 
 			for (String arg : getArguments().subList(1, numArguments())) {
 				tickets.add(new JobTicket(arg));
@@ -55,11 +54,11 @@ public class QCompleteTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		int numArgs = numArguments();
 		if (numArgs <= 1 && !_all)
-			throw new InvalidToolUsageException("Must indicate 1 or more tickets, or the --all flag.");
+			throw new InvalidToolUsageException(
+					"Must indicate 1 or more tickets, or the --all flag.");
 		if (numArgs != 1 && _all)
 			throw new InvalidToolUsageException();
 	}

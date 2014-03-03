@@ -18,15 +18,15 @@
 package edu.virginia.vcgr.jsdl.sweep;
 
 /**
- * The SweepToken interface is returned to callers who use the SweepUtility.performSweep operation
- * to perform parameter sweeps. This token is used because the SweepUtility performs parameter
- * sweeps on a separate worker thread and this token allows the caller to block until all of the
+ * The SweepToken interface is returned to callers who use the
+ * SweepUtility.performSweep operation to perform parameter sweeps. This token
+ * is used because the SweepUtility performs parameter sweeps on a separate
+ * worker thread and this token allows the caller to block until all of the
  * sweeps have finished being emitted.
  * 
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface SweepToken
-{
+public interface SweepToken {
 	/**
 	 * "Join" a parameter sweep operation and wait for that sweep to complete.
 	 * 

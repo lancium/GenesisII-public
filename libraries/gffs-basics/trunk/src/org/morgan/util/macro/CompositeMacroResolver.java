@@ -1,17 +1,14 @@
 package org.morgan.util.macro;
 
-public class CompositeMacroResolver implements MacroResolver
-{
+public class CompositeMacroResolver implements MacroResolver {
 	private MacroResolver[] _resolvers;
 
-	public CompositeMacroResolver(MacroResolver... resolvers)
-	{
+	public CompositeMacroResolver(MacroResolver... resolvers) {
 		_resolvers = resolvers;
 	}
 
 	@Override
-	final public String lookup(String key)
-	{
+	final public String lookup(String key) {
 		String ret = null;
 
 		for (MacroResolver resolver : _resolvers) {

@@ -2,43 +2,41 @@ package edu.virginia.vcgr.genii.client.configuration;
 
 import edu.virginia.vcgr.genii.client.ContainerProperties;
 
-public class DeploymentName
-{
+public class DeploymentName {
 	static public final String DEPLOYMENT_NAME_PROPERTY = "edu.virginia.vcgr.genii.client.deployment-name";
 	static public final String DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE = "GENII_DEPLOYMENT_NAME";
 	static private final String DEFAULT_DEPLOYMENT_NAME = "default";
 
 	private String _deploymentName;
 
-	public DeploymentName(String deploymentName)
-	{
+	public DeploymentName(String deploymentName) {
 		if (deploymentName == null) {
 			_deploymentName = figureOutDefaultDeploymentName();
 		} else {
 			if (deploymentName.contains("/") || deploymentName.contains("\\"))
-				throw new IllegalArgumentException("Deployment name cannot contain path slashes.");
+				throw new IllegalArgumentException(
+						"Deployment name cannot contain path slashes.");
 
 			_deploymentName = deploymentName;
 		}
 	}
 
-	public DeploymentName()
-	{
+	public DeploymentName() {
 		this(null);
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		return _deploymentName;
 	}
 
-	static private String figureOutDefaultDeploymentName()
-	{
+	static private String figureOutDefaultDeploymentName() {
 		String deploymentName = System.getProperty(DEPLOYMENT_NAME_PROPERTY);
 
-		// jfk3w - added user config information - including user's deployment path
+		// jfk3w - added user config information - including user's deployment
+		// path
 		if (deploymentName == null)
-			deploymentName = System.getenv(DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE);
+			deploymentName = System
+					.getenv(DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE);
 
 		if (deploymentName != null)
 			return deploymentName;
@@ -52,7 +50,8 @@ public class DeploymentName
 		} catch (Throwable t) {
 		}
 
-		deploymentName = ContainerProperties.getContainerProperties().getDeploymentName();
+		deploymentName = ContainerProperties.getContainerProperties()
+				.getDeploymentName();
 
 		// if all else fails, try "default"
 		if (deploymentName == null)

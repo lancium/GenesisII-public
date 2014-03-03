@@ -33,22 +33,19 @@ import edu.virginia.vcgr.jsdl.sweep.eval.SweepTargetIdentifier;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-class SubstringNodeSweepTarget implements SweepTarget
-{
+class SubstringNodeSweepTarget implements SweepTarget {
 	private Node _node;
 	private int _start;
 	private int _length;
 
-	public SubstringNodeSweepTarget(Node node, int start, int length)
-	{
+	public SubstringNodeSweepTarget(Node node, int start, int length) {
 		_node = node;
 		_start = start;
 		_length = length;
 	}
 
 	@Override
-	public void replace(Object value) throws SweepException
-	{
+	public void replace(Object value) throws SweepException {
 		String stringValue;
 
 		if (value instanceof Node)
@@ -59,27 +56,29 @@ class SubstringNodeSweepTarget implements SweepTarget
 		String original = _node.getTextContent();
 		String newValue;
 
-		DeltaInformation dInfo = (DeltaInformation) _node.getUserData(DeltaInformation.USER_HANDLER_KEY);
+		DeltaInformation dInfo = (DeltaInformation) _node
+				.getUserData(DeltaInformation.USER_HANDLER_KEY);
 		if (dInfo == null)
-			_node.setUserData(DeltaInformation.USER_HANDLER_KEY, dInfo = new DeltaInformation(),
-				DeltaInformation.USER_DATA_HANDLER);
+			_node.setUserData(DeltaInformation.USER_HANDLER_KEY,
+					dInfo = new DeltaInformation(),
+					DeltaInformation.USER_DATA_HANDLER);
 
 		newValue = dInfo.replace(original, stringValue, _start, _length);
 		_node.setTextContent(newValue);
 	}
 }
 
-class SubstringFunctionalSweepTargetIdentifier implements SweepTargetIdentifier
-{
+class SubstringFunctionalSweepTargetIdentifier implements SweepTargetIdentifier {
 	private String _stringExpression;
 	private XPathExpression _nodePath;
 	private int _startIndex;
 	private int _length;
 
-	SubstringFunctionalSweepTargetIdentifier(XPath path, List<String> arguments) throws XPathExpressionException
-	{
+	SubstringFunctionalSweepTargetIdentifier(XPath path, List<String> arguments)
+			throws XPathExpressionException {
 		if (arguments.size() < 2 || arguments.size() > 3)
-			throw new IllegalArgumentException("Must have two or three arguments.");
+			throw new IllegalArgumentException(
+					"Must have two or three arguments.");
 
 		_stringExpression = arguments.get(0);
 		_nodePath = path.compile(_stringExpression);
@@ -93,15 +92,18 @@ class SubstringFunctionalSweepTargetIdentifier implements SweepTargetIdentifier
 	}
 
 	@Override
-	public SweepTarget identify(Node context) throws SweepException
-	{
+	public SweepTarget identify(Node context) throws SweepException {
 		try {
-			Node evaluationNode = (Node) _nodePath.evaluate(context, XPathConstants.NODE);
+			Node evaluationNode = (Node) _nodePath.evaluate(context,
+					XPathConstants.NODE);
 
 			if (evaluationNode == null)
-				throw new SweepException(String.format("XPath expression %s didn't match any nodes.", _stringExpression));
+				throw new SweepException(String.format(
+						"XPath expression %s didn't match any nodes.",
+						_stringExpression));
 
-			return new SubstringNodeSweepTarget(evaluationNode, _startIndex, _length);
+			return new SubstringNodeSweepTarget(evaluationNode, _startIndex,
+					_length);
 		} catch (XPathExpressionException e) {
 			throw new SweepException("Unable to evaluate XPath expression.", e);
 		}

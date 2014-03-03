@@ -31,12 +31,15 @@ import edu.virginia.vcgr.jsdl.rangevalue.RangeValue;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_candidateHosts", "_filesystems", "_exclusiveExecution", "_os", "_arch", "_individualCPUSpeed",
-	"_individualCPUTime", "_individualCPUCount", "_individualNetworkBandwidth", "_individualPhysicalMemory",
-	"_individualVirtualMemory", "_individualDiskSpace", "_totalCPUTime", "_totalCPUCount", "_totalPhysicalMemory",
-	"_totalVirtualMemory", "_totalDiskSpace", "_totalResourceCount", "_wallclockTime", "_matchingParameters" })
-public class Resources extends CommonJSDLElement implements Serializable
-{
+@XmlType(propOrder = { "_candidateHosts", "_filesystems",
+		"_exclusiveExecution", "_os", "_arch", "_individualCPUSpeed",
+		"_individualCPUTime", "_individualCPUCount",
+		"_individualNetworkBandwidth", "_individualPhysicalMemory",
+		"_individualVirtualMemory", "_individualDiskSpace", "_totalCPUTime",
+		"_totalCPUCount", "_totalPhysicalMemory", "_totalVirtualMemory",
+		"_totalDiskSpace", "_totalResourceCount", "_wallclockTime",
+		"_matchingParameters" })
+public class Resources extends CommonJSDLElement implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlElementWrapper(namespace = JSDLConstants.JSDL_NS, name = "CandidateHosts")
@@ -100,197 +103,158 @@ public class Resources extends CommonJSDLElement implements Serializable
 	@XmlElement(namespace = "http://vcgr.cs.virginia.edu/jsdl/genii", name = "property")
 	private List<MatchingParameter> _matchingParameters = new Vector<MatchingParameter>();
 
-	public Resources()
-	{
+	public Resources() {
 	}
 
-	final public void candidateHosts(List<String> candidateHosts)
-	{
+	final public void candidateHosts(List<String> candidateHosts) {
 		_candidateHosts = candidateHosts;
 	}
 
-	final public List<String> candidateHosts()
-	{
+	final public List<String> candidateHosts() {
 		return _candidateHosts;
 	}
 
-	final public List<FileSystem> filesystems()
-	{
+	final public List<FileSystem> filesystems() {
 		return _filesystems;
 	}
 
-	final public void exclusiveExecution(boolean value)
-	{
+	final public void exclusiveExecution(boolean value) {
 		_exclusiveExecution = value;
 	}
 
-	final public boolean exclusiveExecution()
-	{
+	final public boolean exclusiveExecution() {
 		return (_exclusiveExecution == null) ? false : _exclusiveExecution;
 	}
 
-	final public void operatingSystem(OperatingSystem os)
-	{
+	final public void operatingSystem(OperatingSystem os) {
 		_os = os;
 	}
 
-	final public OperatingSystem operatingSystem()
-	{
+	final public OperatingSystem operatingSystem() {
 		return _os;
 	}
 
-	final public void cpuArchitecture(CPUArchitecture arch)
-	{
+	final public void cpuArchitecture(CPUArchitecture arch) {
 		_arch = arch;
 	}
 
-	final public CPUArchitecture cpuArchitecture()
-	{
+	final public CPUArchitecture cpuArchitecture() {
 		return _arch;
 	}
 
-	final public void individualCPUSpeed(RangeValue rangeValue)
-	{
+	final public void individualCPUSpeed(RangeValue rangeValue) {
 		_individualCPUSpeed = rangeValue;
 	}
 
-	final public RangeValue individualCPUSpeed()
-	{
+	final public RangeValue individualCPUSpeed() {
 		return _individualCPUSpeed;
 	}
 
-	final public void individualCPUTime(RangeValue rangeValue)
-	{
+	final public void individualCPUTime(RangeValue rangeValue) {
 		_individualCPUTime = rangeValue;
 	}
 
-	final public RangeValue individualCPUTime()
-	{
+	final public RangeValue individualCPUTime() {
 		return _individualCPUTime;
 	}
 
-	final public void individualCPUCount(RangeValue rangeValue)
-	{
+	final public void individualCPUCount(RangeValue rangeValue) {
 		_individualCPUCount = rangeValue;
 	}
 
-	final public RangeValue individualCPUCount()
-	{
+	final public RangeValue individualCPUCount() {
 		return _individualCPUCount;
 	}
 
-	final public void individualNetworkBandwidth(RangeValue rangeValue)
-	{
+	final public void individualNetworkBandwidth(RangeValue rangeValue) {
 		_individualNetworkBandwidth = rangeValue;
 	}
 
-	final public RangeValue individualNetworkBandwidth()
-	{
+	final public RangeValue individualNetworkBandwidth() {
 		return _individualNetworkBandwidth;
 	}
 
-	final public void individualPhysicalMemory(RangeValue rangeValue)
-	{
+	final public void individualPhysicalMemory(RangeValue rangeValue) {
 		_individualPhysicalMemory = rangeValue;
 	}
 
-	final public RangeValue individualPhysicalMemory()
-	{
+	final public RangeValue individualPhysicalMemory() {
 		return _individualPhysicalMemory;
 	}
 
-	final public void individualVirtualMemory(RangeValue rangeValue)
-	{
+	final public void individualVirtualMemory(RangeValue rangeValue) {
 		_individualVirtualMemory = rangeValue;
 	}
 
-	final public RangeValue individualVirtualMemory()
-	{
+	final public RangeValue individualVirtualMemory() {
 		return _individualVirtualMemory;
 	}
 
-	final public void individualDiskSpace(RangeValue rangeValue)
-	{
+	final public void individualDiskSpace(RangeValue rangeValue) {
 		_individualDiskSpace = rangeValue;
 	}
 
-	final public RangeValue individualDiskSpace()
-	{
+	final public RangeValue individualDiskSpace() {
 		return _individualDiskSpace;
 	}
 
-	final public void totalCPUTime(RangeValue rangeValue)
-	{
+	final public void totalCPUTime(RangeValue rangeValue) {
 		_totalCPUTime = rangeValue;
 	}
 
-	final public RangeValue totalCPUTime()
-	{
+	final public RangeValue totalCPUTime() {
 		return _totalCPUTime;
 	}
 
-	final public void totalCPUCount(RangeValue rangeValue)
-	{
+	final public void totalCPUCount(RangeValue rangeValue) {
 		_totalCPUCount = rangeValue;
 	}
 
-	final public RangeValue totalCPUCount()
-	{
+	final public RangeValue totalCPUCount() {
 		return _totalCPUCount;
 	}
 
-	final public void totalPhysicalMemory(RangeValue rangeValue)
-	{
+	final public void totalPhysicalMemory(RangeValue rangeValue) {
 		_totalPhysicalMemory = rangeValue;
 	}
 
-	final public RangeValue totalPhysicalMemory()
-	{
+	final public RangeValue totalPhysicalMemory() {
 		return _totalPhysicalMemory;
 	}
 
-	final public void totalVirtualMemory(RangeValue rangeValue)
-	{
+	final public void totalVirtualMemory(RangeValue rangeValue) {
 		_totalVirtualMemory = rangeValue;
 	}
 
-	final public RangeValue totalVirtualMemory()
-	{
+	final public RangeValue totalVirtualMemory() {
 		return _totalVirtualMemory;
 	}
 
-	final public void totalDiskSpace(RangeValue rangeValue)
-	{
+	final public void totalDiskSpace(RangeValue rangeValue) {
 		_totalDiskSpace = rangeValue;
 	}
 
-	final public RangeValue totalDiskSpace()
-	{
+	final public RangeValue totalDiskSpace() {
 		return _totalDiskSpace;
 	}
 
-	final public void totalResourceCount(RangeValue rangeValue)
-	{
+	final public void totalResourceCount(RangeValue rangeValue) {
 		_totalResourceCount = rangeValue;
 	}
 
-	final public RangeValue totalResourceCount()
-	{
+	final public RangeValue totalResourceCount() {
 		return _totalResourceCount;
 	}
 
-	final public void wallclockTime(RangeValue rangeValue)
-	{
+	final public void wallclockTime(RangeValue rangeValue) {
 		_wallclockTime = rangeValue;
 	}
 
-	final public RangeValue wallclockTime()
-	{
+	final public RangeValue wallclockTime() {
 		return _wallclockTime;
 	}
 
-	final public List<MatchingParameter> matchingParameters()
-	{
+	final public List<MatchingParameter> matchingParameters() {
 		return _matchingParameters;
 	}
 }

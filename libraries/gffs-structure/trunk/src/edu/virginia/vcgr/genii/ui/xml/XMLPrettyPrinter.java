@@ -21,12 +21,10 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
-public class XMLPrettyPrinter
-{
+public class XMLPrettyPrinter {
 	private XMLFormatHandler _handler;
 
-	static private String formDocument(MessageElement me) throws IOException
-	{
+	static private String formDocument(MessageElement me) throws IOException {
 		StringWriter writer = null;
 
 		try {
@@ -42,8 +40,8 @@ public class XMLPrettyPrinter
 		}
 	}
 
-	static private String formDocument(QName name, Object obj) throws IOException
-	{
+	static private String formDocument(QName name, Object obj)
+			throws IOException {
 		StringWriter writer = null;
 
 		try {
@@ -55,8 +53,8 @@ public class XMLPrettyPrinter
 		}
 	}
 
-	private void appendAttributes(NamespaceContext nsContext, Iterator<?> attrs, String tabs) throws IOException
-	{
+	private void appendAttributes(NamespaceContext nsContext,
+			Iterator<?> attrs, String tabs) throws IOException {
 		while (attrs.hasNext()) {
 			Attribute attribute = (Attribute) attrs.next();
 			QName name = attribute.getName();
@@ -65,38 +63,44 @@ public class XMLPrettyPrinter
 			if (nsURI == null || nsURI.length() == 0)
 				formattedName = name.getLocalPart();
 			else
-				formattedName = String.format("%s:%s", nsContext.getPrefix(nsURI), name.getLocalPart());
+				formattedName = String.format("%s:%s",
+						nsContext.getPrefix(nsURI), name.getLocalPart());
 
 			_handler.appendText(String.format("\n%s", tabs));
 			_handler.startAttribute();
-			_handler.appendText(String.format("%s=\"%s\"", formattedName, attribute.getValue()));
+			_handler.appendText(String.format("%s=\"%s\"", formattedName,
+					attribute.getValue()));
 			_handler.endAttribute();
 		}
 	}
 
-	private void appendNamespaces(NamespaceContext nsContext, Iterator<?> namespaces, String tabs) throws IOException
-	{
+	private void appendNamespaces(NamespaceContext nsContext,
+			Iterator<?> namespaces, String tabs) throws IOException {
 		while (namespaces.hasNext()) {
 			Namespace ns = (Namespace) namespaces.next();
 			_handler.appendText(String.format("\n%s", tabs));
 			_handler.startAttribute();
-			_handler.appendText(String.format("xmlns:%s=\"%s\"", ns.getPrefix(), ns.getNamespaceURI()));
+			_handler.appendText(String.format("xmlns:%s=\"%s\"",
+					ns.getPrefix(), ns.getNamespaceURI()));
 			_handler.endAttribute();
 		}
 	}
 
-	private void appendElement(XMLEventFilter reader, StartElement event, String tabs) throws IOException, XMLStreamException
-	{
+	private void appendElement(XMLEventFilter reader, StartElement event,
+			String tabs) throws IOException, XMLStreamException {
 		QName name = event.getName();
-		String formattedName =
-			String.format("%s:%s", event.getNamespaceContext().getPrefix(name.getNamespaceURI()), name.getLocalPart());
+		String formattedName = String.format("%s:%s", event
+				.getNamespaceContext().getPrefix(name.getNamespaceURI()), name
+				.getLocalPart());
 
 		// Write the start element
 		_handler.appendText(tabs);
 		_handler.startElement();
 		_handler.appendText(String.format("<%s", formattedName));
-		appendAttributes(event.getNamespaceContext(), event.getAttributes(), tabs + "    ");
-		appendNamespaces(event.getNamespaceContext(), event.getNamespaces(), tabs + "    ");
+		appendAttributes(event.getNamespaceContext(), event.getAttributes(),
+				tabs + "    ");
+		appendNamespaces(event.getNamespaceContext(), event.getNamespaces(),
+				tabs + "    ");
 
 		// Check if it is an empty element
 		XMLEvent next = reader.next();
@@ -138,8 +142,8 @@ public class XMLPrettyPrinter
 		}
 	}
 
-	private void formatDocument(XMLEventFilter reader, String tabs) throws IOException
-	{
+	private void formatDocument(XMLEventFilter reader, String tabs)
+			throws IOException {
 		try {
 			XMLEvent event = reader.next();
 			if (event == null)
@@ -153,22 +157,21 @@ public class XMLPrettyPrinter
 		}
 	}
 
-	public XMLPrettyPrinter(XMLFormatHandler handler)
-	{
+	public XMLPrettyPrinter(XMLFormatHandler handler) {
 		_handler = handler;
 	}
 
-	public void formatDocument(XMLEventReader reader) throws IOException
-	{
+	public void formatDocument(XMLEventReader reader) throws IOException {
 		try {
 			formatDocument(new XMLEventFilter(reader), "");
 		} catch (XMLStreamException e) {
-			throw new IOException("Unable to create filter for XML event stream.", e);
+			throw new IOException(
+					"Unable to create filter for XML event stream.", e);
 		}
 	}
 
-	public void formatDocument(QName objectName, Object object) throws IOException
-	{
+	public void formatDocument(QName objectName, Object object)
+			throws IOException {
 		XMLEventReader reader = null;
 		StringReader sReader = null;
 
@@ -181,7 +184,8 @@ public class XMLPrettyPrinter
 			reader = factory.createXMLEventReader(sReader);
 			formatDocument(reader);
 		} catch (XMLStreamException e) {
-			throw new IOException("Unable to create XML event reader for document.", e);
+			throw new IOException(
+					"Unable to create XML event reader for document.", e);
 		} finally {
 			if (reader != null)
 				try {
@@ -192,8 +196,7 @@ public class XMLPrettyPrinter
 		}
 	}
 
-	public void formatDocument(MessageElement me) throws IOException
-	{
+	public void formatDocument(MessageElement me) throws IOException {
 		XMLEventReader reader = null;
 		StringReader sReader = null;
 
@@ -206,7 +209,8 @@ public class XMLPrettyPrinter
 			reader = factory.createXMLEventReader(sReader);
 			formatDocument(reader);
 		} catch (XMLStreamException e) {
-			throw new IOException("Unable to create XML event reader for document.", e);
+			throw new IOException(
+					"Unable to create XML event reader for document.", e);
 		} finally {
 			if (reader != null)
 				try {

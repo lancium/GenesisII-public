@@ -9,10 +9,9 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
 
-public class SimpleExceptionHandler implements IExceptionHandler
-{
-	public static int performBaseExceptionHandling(Throwable cause, Writer eStream)
-	{
+public class SimpleExceptionHandler implements IExceptionHandler {
+	public static int performBaseExceptionHandling(Throwable cause,
+			Writer eStream) {
 		PrintWriter errorStream = new PrintWriter(eStream);
 
 		String tab = "";
@@ -22,30 +21,39 @@ public class SimpleExceptionHandler implements IExceptionHandler
 
 		while (cause != null) {
 			if (cause instanceof java.lang.OutOfMemoryError) {
-				builder.append(tab + "The client has run out of memory.  This could be fixed by increasing\n"
-					+ "the maximum memory allowed for the JVM.  On Linux, try changing -Xmx512M\n"
-					+ "to -Xmx1G or more.  On Windows, pass the memory to the grid launcher with a\n"
-					+ "-J flag first, e.g. grid.exe -J-Xmx1G\n");
+				builder.append(tab
+						+ "The client has run out of memory.  This could be fixed by increasing\n"
+						+ "the maximum memory allowed for the JVM.  On Linux, try changing -Xmx512M\n"
+						+ "to -Xmx1G or more.  On Windows, pass the memory to the grid launcher with a\n"
+						+ "-J flag first, e.g. grid.exe -J-Xmx1G\n");
 				errorStream.print(builder);
 				errorStream.flush();
 				// re-throw to cause the grid client to exit.
 				throw new java.lang.OutOfMemoryError();
 			} else if (cause instanceof NullPointerException) {
-				builder.append(tab + "Internal Genesis II Error -- Null Pointer Exception\n");
+				builder.append(tab
+						+ "Internal Genesis II Error -- Null Pointer Exception\n");
 			} else if (cause instanceof FileNotFoundException) {
-				builder.append(tab + "File Not Found:  " + cause.getLocalizedMessage() + "\n");
+				builder.append(tab + "File Not Found:  "
+						+ cause.getLocalizedMessage() + "\n");
 			} else if (cause instanceof BaseFaultType) {
-				builder.append(tab + ((BaseFaultType) cause).getDescription(0).get_value() + "\n");
+				builder.append(tab
+						+ ((BaseFaultType) cause).getDescription(0).get_value()
+						+ "\n");
 			} else if (cause instanceof AxisFault) {
 				String message = cause.getLocalizedMessage();
 
 				/* Check to see if it's a permission denied exception */
 				String operation = null;
 				String failedAsset = null;
-				operation = PermissionDeniedException.extractMethodName(cause.getMessage());
-				failedAsset = PermissionDeniedException.extractAssetDenied(cause.getMessage());
+				operation = PermissionDeniedException.extractMethodName(cause
+						.getMessage());
+				failedAsset = PermissionDeniedException
+						.extractAssetDenied(cause.getMessage());
 				if ((operation != null) && (failedAsset != null)) {
-					builder.append(tab + "Permission denied on \"" + failedAsset + "\" (in method \"" + operation + "\").\n");
+					builder.append(tab + "Permission denied on \""
+							+ failedAsset + "\" (in method \"" + operation
+							+ "\").\n");
 				} else {
 					builder.append(tab + "fault: " + message + "\n");
 				}
@@ -63,8 +71,7 @@ public class SimpleExceptionHandler implements IExceptionHandler
 		return toReturn;
 	}
 
-	public int handleException(Throwable cause, Writer eStream)
-	{
+	public int handleException(Throwable cause, Writer eStream) {
 		return performBaseExceptionHandling(cause, eStream);
 	}
 }

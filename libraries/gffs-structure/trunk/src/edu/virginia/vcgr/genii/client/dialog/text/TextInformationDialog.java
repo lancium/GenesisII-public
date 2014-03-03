@@ -8,15 +8,15 @@ import edu.virginia.vcgr.genii.client.dialog.InformationDialog;
 import edu.virginia.vcgr.genii.client.dialog.InputValidator;
 import edu.virginia.vcgr.genii.client.dialog.TextContent;
 
-public class TextInformationDialog extends TextInputDialog implements InformationDialog
-{
+public class TextInformationDialog extends TextInputDialog implements
+		InformationDialog {
 	static final private String PROMPT = "Please hit <enter> to continue:";
 
 	private TextContent _content;
 	private boolean _isError;
 
-	public TextInformationDialog(String title, ConsolePackage pkg, TextContent content, boolean isError)
-	{
+	public TextInformationDialog(String title, ConsolePackage pkg,
+			TextContent content, boolean isError) {
 		super(title, pkg, PROMPT);
 
 		_content = content;
@@ -26,8 +26,7 @@ public class TextInformationDialog extends TextInputDialog implements Informatio
 	}
 
 	@Override
-	protected void showContent()
-	{
+	protected void showContent() {
 		PrintWriter stream = (_isError ? _package.stderr() : _package.stdout());
 
 		stream.println();
@@ -37,11 +36,9 @@ public class TextInformationDialog extends TextInputDialog implements Informatio
 		super.showContent();
 	}
 
-	static private class InternalInputValidator implements InputValidator
-	{
+	static private class InternalInputValidator implements InputValidator {
 		@Override
-		public String validateInput(String input)
-		{
+		public String validateInput(String input) {
 			if (input.length() == 0)
 				return null;
 

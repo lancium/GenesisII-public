@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is the annotation type used to indicate that a method or "property" in another Java
- * interface relates to a resource property.
+ * This is the annotation type used to indicate that a method or "property" in
+ * another Java interface relates to a resource property.
  * 
  * @author mmm2a
  */
@@ -29,32 +29,35 @@ public @interface ResourceProperty {
 	String localname();
 
 	/**
-	 * The minimum number of elements that the target resource can have (this loosely corresponds to
-	 * whether the target resource property is a single valued, or multi-valued property). Note that
-	 * this property is a String (and not an integer) because the WSRF-RP specification allows for
-	 * the string constant "unbounded" to be used.
+	 * The minimum number of elements that the target resource can have (this
+	 * loosely corresponds to whether the target resource property is a single
+	 * valued, or multi-valued property). Note that this property is a String
+	 * (and not an integer) because the WSRF-RP specification allows for the
+	 * string constant "unbounded" to be used.
 	 * 
 	 * @return The minimum cardinality of the target resource property.
 	 */
 	String min() default "0";
 
 	/**
-	 * The maximum number of elements that the target resource can have (this loosely corresponds to
-	 * whether the target resource property is a single valued, or multi-valued property). Note that
-	 * this property is a String (and not an integer) because the WSRF-RP specification allows for
-	 * the string constant "unbounded" to be used.
+	 * The maximum number of elements that the target resource can have (this
+	 * loosely corresponds to whether the target resource property is a single
+	 * valued, or multi-valued property). Note that this property is a String
+	 * (and not an integer) because the WSRF-RP specification allows for the
+	 * string constant "unbounded" to be used.
 	 * 
 	 * @return The minimum cardinality of the target resource property.
 	 */
 	String max() default "1";
 
 	/**
-	 * A class that is used to translate the resource property to/from XML. By default, the default
-	 * XML serialization/deserialization provided by Apache AXIS will be used. However, users can
-	 * plug in their own serializers for non-default behavior.
+	 * A class that is used to translate the resource property to/from XML. By
+	 * default, the default XML serialization/deserialization provided by Apache
+	 * AXIS will be used. However, users can plug in their own serializers for
+	 * non-default behavior.
 	 * 
-	 * @return The resource property translator class to use. This class MUST have a default
-	 *         constructor.
+	 * @return The resource property translator class to use. This class MUST
+	 *         have a default constructor.
 	 */
 	Class<? extends ResourcePropertyTranslator> translator() default ResourcePropertyTranslator.class;
 }

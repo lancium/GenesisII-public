@@ -26,7 +26,6 @@ import edu.virginia.vcgr.jsdl.sweep.parameters.DocumentNodeSweepParameter;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlSeeAlso({ DocumentNodeSweepParameter.class })
-public interface SweepParameter
-{
+public interface SweepParameter {
 	public SweepTargetIdentifier targetIdentifier() throws SweepException;
 }

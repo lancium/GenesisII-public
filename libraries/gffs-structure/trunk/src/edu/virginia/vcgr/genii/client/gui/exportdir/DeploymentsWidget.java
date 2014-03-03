@@ -18,8 +18,7 @@ import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
 @SuppressWarnings("rawtypes")
-public class DeploymentsWidget extends JComponent
-{
+public class DeploymentsWidget extends JComponent {
 	static final long serialVersionUID = 0L;
 
 	static final private String _DEPLOYMENTS = "Deployment";
@@ -28,17 +27,18 @@ public class DeploymentsWidget extends JComponent
 	private Collection<IInformationListener> _listeners = new ArrayList<IInformationListener>();
 
 	@SuppressWarnings("unchecked")
-	public DeploymentsWidget() throws FileLockException, NoContainersException
-	{
+	public DeploymentsWidget() throws FileLockException, NoContainersException {
 		super();
 
 		setLayout(new GridBagLayout());
-		add(new JLabel(_DEPLOYMENTS), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JLabel(_DEPLOYMENTS), new GridBagConstraints(0, 0, 1, 1, 0.0,
+				1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
 
 		Vector<ContainerInformation> containers = new Vector<ContainerInformation>();
 
-		for (ContainerInformation containerInfo : InstallationState.getRunningContainers().values()) {
+		for (ContainerInformation containerInfo : InstallationState
+				.getRunningContainers().values()) {
 			containers.add(containerInfo);
 		}
 
@@ -47,38 +47,33 @@ public class DeploymentsWidget extends JComponent
 		}
 
 		_comboBox = new JComboBox(containers);
-		add(_comboBox, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(_comboBox, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(5, 5, 5, 5), 5, 5));
 
-		_comboBox.addItemListener(new ItemListener()
-		{
+		_comboBox.addItemListener(new ItemListener() {
 			@Override
-			public void itemStateChanged(ItemEvent e)
-			{
+			public void itemStateChanged(ItemEvent e) {
 				fireInformationUpdated();
 			}
 		});
 	}
 
-	public void addInformationListener(IInformationListener listener)
-	{
+	public void addInformationListener(IInformationListener listener) {
 		_listeners.add(listener);
 	}
 
-	public void removeInformationListener(IInformationListener listener)
-	{
+	public void removeInformationListener(IInformationListener listener) {
 		_listeners.remove(listener);
 	}
 
-	protected void fireInformationUpdated()
-	{
+	protected void fireInformationUpdated() {
 		for (IInformationListener listener : _listeners) {
 			listener.updateInformation();
 		}
 	}
 
-	public ContainerInformation getSelectedDeployment()
-	{
+	public ContainerInformation getSelectedDeployment() {
 		return (ContainerInformation) _comboBox.getSelectedItem();
 	}
 }

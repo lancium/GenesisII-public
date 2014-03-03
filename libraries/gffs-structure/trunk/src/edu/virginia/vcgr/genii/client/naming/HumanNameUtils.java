@@ -5,13 +5,13 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HumanNameUtils
-{
-	static public String generateUniqueName(String desiredName, Collection<String> takenNames)
-	{
+public class HumanNameUtils {
+	static public String generateUniqueName(String desiredName,
+			Collection<String> takenNames) {
 		int nextNumber = 0;
 
-		Pattern regex = Pattern.compile("^" + Pattern.quote(desiredName) + "(?: \\(((?:0)|(?:[1-9][0-9]*))\\))?$");
+		Pattern regex = Pattern.compile("^" + Pattern.quote(desiredName)
+				+ "(?: \\(((?:0)|(?:[1-9][0-9]*))\\))?$");
 
 		for (String taken : takenNames) {
 			Matcher matcher = regex.matcher(taken);
@@ -33,15 +33,15 @@ public class HumanNameUtils
 		return desiredName;
 	}
 
-	static public void main(String[] args)
-	{
+	static public void main(String[] args) {
 		ArrayList<String> taken = new ArrayList<String>();
 
 		/*
-		 * taken.add("Mark Morgan"); taken.add("Mark Morgan 1"); taken.add("Mark Morgan (1)");
-		 * taken.add("Mark Morgan (3)");
+		 * taken.add("Mark Morgan"); taken.add("Mark Morgan 1");
+		 * taken.add("Mark Morgan (1)"); taken.add("Mark Morgan (3)");
 		 */
 
-		System.err.println("Unique name is \"" + generateUniqueName("Mark Morgan", taken) + "\".");
+		System.err.println("Unique name is \""
+				+ generateUniqueName("Mark Morgan", taken) + "\".");
 	}
 }

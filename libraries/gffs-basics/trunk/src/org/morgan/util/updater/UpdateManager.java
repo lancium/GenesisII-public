@@ -33,8 +33,7 @@ import org.morgan.util.io.StreamUtils;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class UpdateManager extends UpdateListenerHandler
-{
+public class UpdateManager extends UpdateListenerHandler {
 	static private final String _VERSION_FILE = "version-information.ver";
 	private File _installationPath;
 	private String _downloadBase;
@@ -42,15 +41,15 @@ public class UpdateManager extends UpdateListenerHandler
 	private VersionList _currentVersion = null;
 	private VersionList _latestVersion = null;
 
-	public UpdateManager(File installationPath, String downloadSite, String projectName, String instanceName)
-		throws MalformedURLException
-	{
+	public UpdateManager(File installationPath, String downloadSite,
+			String projectName, String instanceName)
+			throws MalformedURLException {
 		_installationPath = installationPath;
 		_downloadBase = downloadSite + "/" + projectName + "/" + instanceName;
 	}
 
-	public VersionList getLatestVersionList() throws MalformedURLException, IOException
-	{
+	public VersionList getLatestVersionList() throws MalformedURLException,
+			IOException {
 		URLConnection connection = null;
 		InputStream in = null;
 
@@ -69,13 +68,13 @@ public class UpdateManager extends UpdateListenerHandler
 		return _latestVersion;
 	}
 
-	public VersionList getCurrentVersionList()
-	{
+	public VersionList getCurrentVersionList() {
 		FileReader freader = null;
 
 		if (_currentVersion == null) {
 			try {
-				freader = new FileReader(new File(_installationPath, _VERSION_FILE));
+				freader = new FileReader(new File(_installationPath,
+						_VERSION_FILE));
 				_currentVersion = new VersionList(freader);
 			} catch (IOException ioe) {
 				return new VersionList();
@@ -87,8 +86,7 @@ public class UpdateManager extends UpdateListenerHandler
 		return _currentVersion;
 	}
 
-	public boolean update() throws IOException
-	{
+	public boolean update() throws IOException {
 		try {
 			UpdateWorker worker = new UpdateWorker();
 			worker.start();
@@ -101,30 +99,26 @@ public class UpdateManager extends UpdateListenerHandler
 		}
 	}
 
-	private class UpdateWorker extends Thread
-	{
+	private class UpdateWorker extends Thread {
 		private boolean _changesMade = false;
 		static final private int _DEFAULT_BUFFER_SIZE = 1024 * 8;
 		private File _tmpDir;
 		private IOException _ioe = null;
 
-		public UpdateWorker() throws IOException
-		{
+		public UpdateWorker() throws IOException {
 			_tmpDir = new GuaranteedDirectory(_installationPath, "updates");
 		}
 
-		public IOException getException()
-		{
+		public IOException getException() {
 			return _ioe;
 		}
 
-		public boolean getChangesMade()
-		{
+		public boolean getChangesMade() {
 			return _changesMade;
 		}
 
-		private void downloadFile(String relativeName, File target) throws MalformedURLException, IOException
-		{
+		private void downloadFile(String relativeName, File target)
+				throws MalformedURLException, IOException {
 			int bytesRead;
 			byte[] data = new byte[_DEFAULT_BUFFER_SIZE];
 			URL downloadLocation = new URL(_downloadBase + "/" + relativeName);
@@ -145,8 +139,8 @@ public class UpdateManager extends UpdateListenerHandler
 			}
 		}
 
-		private OutOfDateRecord[] findOutOfDates(VersionList current, VersionList latest) throws IOException
-		{
+		private OutOfDateRecord[] findOutOfDates(VersionList current,
+				VersionList latest) throws IOException {
 			int ci = 0;
 			int li = 0;
 
@@ -160,13 +154,15 @@ public class UpdateManager extends UpdateListenerHandler
 
 			while ((ci < currentNames.length) || (li < latestNames.length)) {
 				if (ci >= currentNames.length) {
-					records.add(new OutOfDateRecord(latestNames[li], _tmpDir, null, latest.getVersion(latestNames[li])));
+					records.add(new OutOfDateRecord(latestNames[li], _tmpDir,
+							null, latest.getVersion(latestNames[li])));
 					li++;
 					continue;
 				}
 
 				if (li >= latestNames.length) {
-					File realFile = new File(_installationPath, currentNames[ci]);
+					File realFile = new File(_installationPath,
+							currentNames[ci]);
 					realFile.delete();
 					ci++;
 					continue;
@@ -175,7 +171,8 @@ public class UpdateManager extends UpdateListenerHandler
 				int cmp = currentNames[ci].compareTo(latestNames[li]);
 				if (cmp < 0) {
 					// current exists, latest doesn't
-					File realFile = new File(_installationPath, currentNames[ci]);
+					File realFile = new File(_installationPath,
+							currentNames[ci]);
 					realFile.delete();
 					ci++;
 					continue;
@@ -183,7 +180,8 @@ public class UpdateManager extends UpdateListenerHandler
 
 				if (cmp > 0) {
 					// latest exists, current doesn't
-					records.add(new OutOfDateRecord(latestNames[li], _tmpDir, null, latest.getVersion(latestNames[li])));
+					records.add(new OutOfDateRecord(latestNames[li], _tmpDir,
+							null, latest.getVersion(latestNames[li])));
 					li++;
 					continue;
 				}
@@ -193,9 +191,11 @@ public class UpdateManager extends UpdateListenerHandler
 
 				cmp = latestV.compareTo(currentV);
 				if (cmp < 0)
-					throw new IOException("Latest version is older then newest version.");
+					throw new IOException(
+							"Latest version is older then newest version.");
 				if (cmp > 0)
-					records.add(new OutOfDateRecord(latestNames[li], _tmpDir, currentV, latestV));
+					records.add(new OutOfDateRecord(latestNames[li], _tmpDir,
+							currentV, latestV));
 
 				ci++;
 				li++;
@@ -206,8 +206,7 @@ public class UpdateManager extends UpdateListenerHandler
 			return ret;
 		}
 
-		private void commitFile(File source, File target) throws IOException
-		{
+		private void commitFile(File source, File target) throws IOException {
 			if (!source.renameTo(target)) {
 				byte[] data = new byte[_DEFAULT_BUFFER_SIZE];
 				int bytesRead;
@@ -230,8 +229,7 @@ public class UpdateManager extends UpdateListenerHandler
 			}
 		}
 
-		public void run()
-		{
+		public void run() {
 			try {
 				VersionList current = getCurrentVersionList();
 				VersionList latest = getLatestVersionList();
@@ -245,17 +243,20 @@ public class UpdateManager extends UpdateListenerHandler
 				_changesMade = true;
 
 				for (OutOfDateRecord record : outOfDates) {
-					fireStartingFileUpdate(record.getRelativeName(), record.getOldVersion(), record.getNewVersion());
+					fireStartingFileUpdate(record.getRelativeName(),
+							record.getOldVersion(), record.getNewVersion());
 					downloadFile(record.getRelativeName(), record.getTmpFile());
 					fireFinishedFileUpdate(record.getRelativeName());
 				}
 
 				fireStartingCommit();
 				for (OutOfDateRecord record : outOfDates) {
-					File realFile = new File(_installationPath, record.getRelativeName());
+					File realFile = new File(_installationPath,
+							record.getRelativeName());
 					commitFile(record.getTmpFile(), realFile);
 				}
-				OutOfDateRecord record = new OutOfDateRecord(_VERSION_FILE, _tmpDir, null, null);
+				OutOfDateRecord record = new OutOfDateRecord(_VERSION_FILE,
+						_tmpDir, null, null);
 				latest.store(record.getTmpFile());
 				File realFile = new File(_installationPath, _VERSION_FILE);
 				commitFile(record.getTmpFile(), realFile);

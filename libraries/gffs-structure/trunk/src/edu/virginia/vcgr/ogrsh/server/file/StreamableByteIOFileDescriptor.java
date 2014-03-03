@@ -20,30 +20,32 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.ogrsh.server.dir.StatBuffer;
 import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
 
-public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor implements IFileDescriptor
-{
-	static private Log _logger = LogFactory.getLog(StreamableByteIOFileDescriptor.class);
+public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor
+		implements IFileDescriptor {
+	static private Log _logger = LogFactory
+			.getLog(StreamableByteIOFileDescriptor.class);
 
 	private EndpointReferenceType _epr;
 	private StreamableByteIOTransferer _transferer;
 
-	public StreamableByteIOFileDescriptor(EndpointReferenceType epr, boolean isReadable, boolean isWriteable, boolean isAppend)
-		throws OGRSHException
-	{
+	public StreamableByteIOFileDescriptor(EndpointReferenceType epr,
+			boolean isReadable, boolean isWriteable, boolean isAppend)
+			throws OGRSHException {
 		super(isReadable, isWriteable, isAppend);
 
 		_epr = epr;
 		try {
-			StreamableByteIOPortType stub = ClientUtils.createProxy(StreamableByteIOPortType.class, epr);
-			_transferer = StreamableByteIOTransfererFactory.createStreamableByteIOTransferer(stub);
+			StreamableByteIOPortType stub = ClientUtils.createProxy(
+					StreamableByteIOPortType.class, epr);
+			_transferer = StreamableByteIOTransfererFactory
+					.createStreamableByteIOTransferer(stub);
 		} catch (Throwable cause) {
 			throw new OGRSHException(cause);
 		}
 	}
 
 	@Override
-	protected byte[] doRead(int length) throws OGRSHException
-	{
+	protected byte[] doRead(int length) throws OGRSHException {
 		try {
 			return _transferer.seekRead(SeekOrigin.SEEK_CURRENT, 0, length);
 		} catch (RemoteException re) {
@@ -52,8 +54,7 @@ public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor imple
 	}
 
 	@Override
-	protected int doWrite(byte[] data) throws OGRSHException
-	{
+	protected int doWrite(byte[] data) throws OGRSHException {
 		try {
 			_transferer.seekWrite(SeekOrigin.SEEK_CURRENT, 0, data);
 			return data.length;
@@ -63,8 +64,7 @@ public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor imple
 	}
 
 	@Override
-	public StatBuffer fxstat() throws OGRSHException
-	{
+	public StatBuffer fxstat() throws OGRSHException {
 		if (_logger.isDebugEnabled())
 			_logger.debug("fxstat'ing file descriptor.");
 
@@ -76,20 +76,19 @@ public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor imple
 		}
 	}
 
-	public long lseek64(long offset, int whence) throws OGRSHException
-	{
+	public long lseek64(long offset, int whence) throws OGRSHException {
 		SeekOrigin origin = null;
 
 		switch (whence) {
-			case IFileDescriptor.SEEK_CUR:
-				origin = SeekOrigin.SEEK_CURRENT;
-				break;
-			case IFileDescriptor.SEEK_END:
-				origin = SeekOrigin.SEEK_END;
-				break;
-			case IFileDescriptor.SEEK_SET:
-				origin = SeekOrigin.SEEK_BEGINNING;
-				break;
+		case IFileDescriptor.SEEK_CUR:
+			origin = SeekOrigin.SEEK_CURRENT;
+			break;
+		case IFileDescriptor.SEEK_END:
+			origin = SeekOrigin.SEEK_END;
+			break;
+		case IFileDescriptor.SEEK_SET:
+			origin = SeekOrigin.SEEK_BEGINNING;
+			break;
 		}
 
 		try {
@@ -100,26 +99,25 @@ public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor imple
 		}
 	}
 
-	private long getPosition() throws RemoteException, OGRSHException
-	{
+	private long getPosition() throws RemoteException, OGRSHException {
 		try {
-			StreamableByteIORP rp =
-				(StreamableByteIORP) ResourcePropertyManager.createRPInterface(_epr, StreamableByteIORP.class);
+			StreamableByteIORP rp = (StreamableByteIORP) ResourcePropertyManager
+					.createRPInterface(_epr, StreamableByteIORP.class);
 			return rp.getPosition();
 		} catch (ResourcePropertyException re) {
 			throw new OGRSHException(re);
 		}
 	}
 
-	public void close() throws IOException
-	{
-		StreamableByteIOPortType stub = ClientUtils.createProxy(StreamableByteIOPortType.class, _epr);
+	public void close() throws IOException {
+		StreamableByteIOPortType stub = ClientUtils.createProxy(
+				StreamableByteIOPortType.class, _epr);
 
 		stub.destroy(new Destroy());
 	}
 
-	public void truncate(long offset) throws OGRSHException
-	{
-		throw new OGRSHException("Operation not supported.", OGRSHException.EROFS);
+	public void truncate(long offset) throws OGRSHException {
+		throw new OGRSHException("Operation not supported.",
+				OGRSHException.EROFS);
 	}
 }

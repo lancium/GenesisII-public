@@ -12,9 +12,9 @@ import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.stats.DBConnectionDataPoint;
 import edu.virginia.vcgr.genii.client.stats.DatabaseHistogramStatistics;
 
-public class DatabaseConnectionInterceptor implements InvocationHandler
-{
-	static private Log _logger = LogFactory.getLog(DatabaseConnectionInterceptor.class);
+public class DatabaseConnectionInterceptor implements InvocationHandler {
+	static private Log _logger = LogFactory
+			.getLog(DatabaseConnectionInterceptor.class);
 
 	private Method _CLOSE_METHOD;
 	private Method _COMMIT_METHOD;
@@ -24,32 +24,33 @@ public class DatabaseConnectionInterceptor implements InvocationHandler
 	private Object _instance;
 	private DatabaseHistogramStatistics _histo = null;
 
-	public DatabaseConnectionInterceptor(Object instance)
-	{
+	public DatabaseConnectionInterceptor(Object instance) {
 		try {
-			_CLOSE_METHOD = Connection.class.getDeclaredMethod("close", new Class[0]);
-			_COMMIT_METHOD = Connection.class.getDeclaredMethod("commit", new Class[0]);
-			_ROLLBACK_METHOD = Connection.class.getDeclaredMethod("rollback", new Class[0]);
+			_CLOSE_METHOD = Connection.class.getDeclaredMethod("close",
+					new Class[0]);
+			_COMMIT_METHOD = Connection.class.getDeclaredMethod("commit",
+					new Class[0]);
+			_ROLLBACK_METHOD = Connection.class.getDeclaredMethod("rollback",
+					new Class[0]);
 		} catch (Throwable t) {
 			_logger.error("Couldn't load the close/commit/rollback methods.", t);
 		}
 		_instance = instance;
 	}
 
-	public Connection getConnection()
-	{
+	public Connection getConnection() {
 		return (Connection) _instance;
 	}
 
-	public void setAcquired()
-	{
-		_stat = ContainerStatistics.instance().getDatabaseStatistics().openConnection();
-		_histo = ContainerStatistics.instance().getDatabaseHistogramStatistics();
+	public void setAcquired() {
+		_stat = ContainerStatistics.instance().getDatabaseStatistics()
+				.openConnection();
+		_histo = ContainerStatistics.instance()
+				.getDatabaseHistogramStatistics();
 		_histo.addActiveConnection();
 	}
 
-	public void setReleased()
-	{
+	public void setReleased() {
 		if (_stat != null) {
 			_stat.markClosed();
 			_histo.removeActiveConncetion();
@@ -59,11 +60,12 @@ public class DatabaseConnectionInterceptor implements InvocationHandler
 		_histo = null;
 	}
 
-	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-	{
+	public Object invoke(Object proxy, Method method, Object[] args)
+			throws Throwable {
 		if (method.equals(_CLOSE_METHOD)) {
 			_logger.error("Someone tried to close a pooled connection.");
-			throw new RuntimeException("Someone tried to close a pooled connection.");
+			throw new RuntimeException(
+					"Someone tried to close a pooled connection.");
 		} else if (method.equals(_COMMIT_METHOD)) {
 			if (!((Connection) _instance).getAutoCommit())
 				return method.invoke(_instance, args);

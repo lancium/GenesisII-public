@@ -24,8 +24,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class NamespaceBinding implements Serializable
-{
+public class NamespaceBinding implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlAttribute(name = "ns", required = true)
@@ -34,24 +33,20 @@ public class NamespaceBinding implements Serializable
 	@XmlAttribute(name = "prefix", required = true)
 	private String _prefix;
 
-	public NamespaceBinding(String namespaceURI, String prefix)
-	{
+	public NamespaceBinding(String namespaceURI, String prefix) {
 		_namespaceURI = namespaceURI;
 		_prefix = prefix;
 	}
 
-	public NamespaceBinding()
-	{
+	public NamespaceBinding() {
 		this(null, null);
 	}
 
-	final public String namespaceURI()
-	{
+	final public String namespaceURI() {
 		return _namespaceURI;
 	}
 
-	final public String prefix()
-	{
+	final public String prefix() {
 		return _prefix;
 	}
 }

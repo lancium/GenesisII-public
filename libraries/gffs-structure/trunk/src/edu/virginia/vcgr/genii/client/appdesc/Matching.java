@@ -10,11 +10,11 @@ import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import edu.virginia.vcgr.genii.appdesc.PlatformDescriptionType;
 import edu.virginia.vcgr.genii.appdesc.SupportDocumentType;
 
-public class Matching
-{
-	static private boolean matches(ProcessorArchitectureEnumeration osname, SupportDocumentType potential)
-	{
-		PlatformDescriptionType[] platforms = potential.getPlatformDescription();
+public class Matching {
+	static private boolean matches(ProcessorArchitectureEnumeration osname,
+			SupportDocumentType potential) {
+		PlatformDescriptionType[] platforms = potential
+				.getPlatformDescription();
 		if (platforms == null || platforms.length == 0)
 			return true;
 
@@ -24,7 +24,8 @@ public class Matching
 				return true;
 
 			for (CPUArchitecture_Type arch : arches) {
-				ProcessorArchitectureEnumeration targetName = arch.getCPUArchitectureName();
+				ProcessorArchitectureEnumeration targetName = arch
+						.getCPUArchitectureName();
 				if (targetName == osname)
 					return true;
 			}
@@ -33,13 +34,14 @@ public class Matching
 		return false;
 	}
 
-	static private boolean matches(CPUArchitecture_Type[] desired, SupportDocumentType potential)
-	{
+	static private boolean matches(CPUArchitecture_Type[] desired,
+			SupportDocumentType potential) {
 		if (desired == null || desired.length == 0)
 			return true;
 
 		for (CPUArchitecture_Type desiredArch : desired) {
-			ProcessorArchitectureEnumeration osname = desiredArch.getCPUArchitectureName();
+			ProcessorArchitectureEnumeration osname = desiredArch
+					.getCPUArchitectureName();
 
 			if (matches(osname, potential))
 				return true;
@@ -48,13 +50,15 @@ public class Matching
 		return false;
 	}
 
-	static private boolean matches(OperatingSystemType_Type desired, SupportDocumentType potential)
-	{
-		OperatingSystemTypeEnumeration osname = desired.getOperatingSystemName();
+	static private boolean matches(OperatingSystemType_Type desired,
+			SupportDocumentType potential) {
+		OperatingSystemTypeEnumeration osname = desired
+				.getOperatingSystemName();
 		if (osname == null)
 			return true;
 
-		PlatformDescriptionType[] targetPlatforms = potential.getPlatformDescription();
+		PlatformDescriptionType[] targetPlatforms = potential
+				.getPlatformDescription();
 		if (targetPlatforms == null || targetPlatforms.length == 0)
 			return true;
 
@@ -64,11 +68,13 @@ public class Matching
 				return true;
 
 			for (OperatingSystem_Type osType : osTypes) {
-				OperatingSystemType_Type osTypeType = osType.getOperatingSystemType();
+				OperatingSystemType_Type osTypeType = osType
+						.getOperatingSystemType();
 				if (osTypeType == null)
 					return true;
 
-				if (osTypeType.getOperatingSystemName().equals(desired.getOperatingSystemName()))
+				if (osTypeType.getOperatingSystemName().equals(
+						desired.getOperatingSystemName()))
 					return true;
 			}
 		}
@@ -76,12 +82,13 @@ public class Matching
 		return false;
 	}
 
-	static private boolean versionMatches(String desired, SupportDocumentType potential)
-	{
+	static private boolean versionMatches(String desired,
+			SupportDocumentType potential) {
 		if (desired == null)
 			return true;
 
-		PlatformDescriptionType[] targetPlatforms = potential.getPlatformDescription();
+		PlatformDescriptionType[] targetPlatforms = potential
+				.getPlatformDescription();
 		if (targetPlatforms == null || targetPlatforms.length == 0)
 			return true;
 
@@ -103,13 +110,14 @@ public class Matching
 		return false;
 	}
 
-	static private boolean matches(OperatingSystem_Type[] desired, SupportDocumentType potential)
-	{
+	static private boolean matches(OperatingSystem_Type[] desired,
+			SupportDocumentType potential) {
 		if (desired == null || desired.length == 0)
 			return true;
 
 		for (OperatingSystem_Type desiredOS : desired) {
-			OperatingSystemType_Type osType = desiredOS.getOperatingSystemType();
+			OperatingSystemType_Type osType = desiredOS
+					.getOperatingSystemType();
 			if (osType != null) {
 				if (!matches(osType, potential))
 					continue;
@@ -127,10 +135,11 @@ public class Matching
 		return false;
 	}
 
-	static public boolean matches(SupportDocumentType want, SupportDocumentType[] have)
-	{
+	static public boolean matches(SupportDocumentType want,
+			SupportDocumentType[] have) {
 		URI desiredDeploymentType = want.getDeploymentType();
-		PlatformDescriptionType[] desiredPlatforms = want.getPlatformDescription();
+		PlatformDescriptionType[] desiredPlatforms = want
+				.getPlatformDescription();
 
 		for (SupportDocumentType potential : have) {
 			if (!potential.getDeploymentType().equals(desiredDeploymentType))

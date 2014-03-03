@@ -2,8 +2,7 @@ package edu.virginia.vcgr.genii.procmgmt;
 
 import java.io.IOException;
 
-public class ProcessManager
-{
+public class ProcessManager {
 	static {
 		System.err.println("Loading library.");
 		System.loadLibrary("GeniiProcessMgmt");

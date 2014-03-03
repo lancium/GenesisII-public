@@ -2,15 +2,13 @@ package edu.virginia.vcgr.genii.client.jsdl;
 
 import java.io.Serializable;
 
-public class SPMDInformation implements Serializable
-{
+public class SPMDInformation implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	private String _spmdVariation;
 	private int _numberOfProcesses;
 
-	public SPMDInformation(String spmdVariation, int numberOfProcesses)
-	{
+	public SPMDInformation(String spmdVariation, int numberOfProcesses) {
 		if (spmdVariation == null)
 			throw new IllegalArgumentException("SPMDVariation cannot be null.");
 
@@ -18,19 +16,16 @@ public class SPMDInformation implements Serializable
 		_numberOfProcesses = numberOfProcesses;
 	}
 
-	final public String getSPMDVariation()
-	{
+	final public String getSPMDVariation() {
 		return _spmdVariation;
 	}
 
-	final public int getNumberOfProcesses()
-	{
+	final public int getNumberOfProcesses() {
 		return _numberOfProcesses;
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return String.format("[%d] %s", _numberOfProcesses, _spmdVariation);
 	}
 }

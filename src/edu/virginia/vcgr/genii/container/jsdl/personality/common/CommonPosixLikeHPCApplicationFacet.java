@@ -12,11 +12,11 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.common.StringOrPath;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultHPCApplicationFacet;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 
-public class CommonPosixLikeHPCApplicationFacet extends DefaultHPCApplicationFacet
-{
+public class CommonPosixLikeHPCApplicationFacet extends
+		DefaultHPCApplicationFacet {
 	@Override
-	public void completeFacet(Object parentUnderstanding, Object currentUnderstanding) throws JSDLException
-	{
+	public void completeFacet(Object parentUnderstanding,
+			Object currentUnderstanding) throws JSDLException {
 		CommonExecutionUnderstanding parent = ((CommonExecutionUnderstanding) parentUnderstanding);
 		PosixLikeApplicationUnderstanding child = ((PosixLikeApplicationUnderstanding) currentUnderstanding);
 
@@ -25,47 +25,55 @@ public class CommonPosixLikeHPCApplicationFacet extends DefaultHPCApplicationFac
 	}
 
 	@Override
-	public void consumeWorkingDirectory(Object currentUnderstanding, String workingDirectory) throws JSDLException
-	{
+	public void consumeWorkingDirectory(Object currentUnderstanding,
+			String workingDirectory) throws JSDLException {
 		if (!BESUtilities.canOverrideBESWorkerDir())
-			throw new UnsupportedJSDLElement(new QName(HPCConstants.HPC_NS, "WorkingDirectory"));
+			throw new UnsupportedJSDLElement(new QName(HPCConstants.HPC_NS,
+					"WorkingDirectory"));
 
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).setWorkingDirectory(new File(workingDirectory));
+		((PosixLikeApplicationUnderstanding) currentUnderstanding)
+				.setWorkingDirectory(new File(workingDirectory));
 	}
 
 	@Override
-	public void consumeArgument(Object currentUnderstanding, String argument) throws JSDLException
-	{
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).addArgument(new StringOrPath(argument));
+	public void consumeArgument(Object currentUnderstanding, String argument)
+			throws JSDLException {
+		((PosixLikeApplicationUnderstanding) currentUnderstanding)
+				.addArgument(new StringOrPath(argument));
 	}
 
 	@Override
-	public void consumeEnvironment(Object currentUnderstanding, String name, String environment) throws JSDLException
-	{
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).addEnvironment(name, new StringOrPath(environment));
+	public void consumeEnvironment(Object currentUnderstanding, String name,
+			String environment) throws JSDLException {
+		((PosixLikeApplicationUnderstanding) currentUnderstanding)
+				.addEnvironment(name, new StringOrPath(environment));
 	}
 
 	@Override
-	public void consumeInput(Object currentUnderstanding, String input) throws JSDLException
-	{
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).setStdinRedirect(new FilesystemRelativePath(null, input));
+	public void consumeInput(Object currentUnderstanding, String input)
+			throws JSDLException {
+		((PosixLikeApplicationUnderstanding) currentUnderstanding)
+				.setStdinRedirect(new FilesystemRelativePath(null, input));
 	}
 
 	@Override
-	public void consumeOutput(Object currentUnderstanding, String output) throws JSDLException
-	{
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).setStdoutRedirect(new FilesystemRelativePath(null, output));
+	public void consumeOutput(Object currentUnderstanding, String output)
+			throws JSDLException {
+		((PosixLikeApplicationUnderstanding) currentUnderstanding)
+				.setStdoutRedirect(new FilesystemRelativePath(null, output));
 	}
 
 	@Override
-	public void consumeError(Object currentUnderstanding, String error) throws JSDLException
-	{
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).setStderrRedirect(new FilesystemRelativePath(null, error));
+	public void consumeError(Object currentUnderstanding, String error)
+			throws JSDLException {
+		((PosixLikeApplicationUnderstanding) currentUnderstanding)
+				.setStderrRedirect(new FilesystemRelativePath(null, error));
 	}
 
 	@Override
-	public void consumeExecutable(Object currentUnderstanding, String executable) throws JSDLException
-	{
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).setExecutable(new FilesystemRelativePath(null, executable));
+	public void consumeExecutable(Object currentUnderstanding, String executable)
+			throws JSDLException {
+		((PosixLikeApplicationUnderstanding) currentUnderstanding)
+				.setExecutable(new FilesystemRelativePath(null, executable));
 	}
 }

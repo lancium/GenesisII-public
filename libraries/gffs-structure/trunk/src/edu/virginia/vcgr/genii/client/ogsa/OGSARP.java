@@ -11,8 +11,7 @@ import edu.virginia.vcgr.genii.client.rp.ResourceProperty;
  * 
  * @author mmm2a
  */
-public interface OGSARP extends OGSAWSRFBPConstants
-{
+public interface OGSARP extends OGSAWSRFBPConstants {
 	@ResourceProperty(namespace = WSRF_RL_NS, localname = CURRENT_TIME_ATTR)
 	public Calendar getCurrentTime();
 
@@ -22,11 +21,9 @@ public interface OGSARP extends OGSAWSRFBPConstants
 	@ResourceProperty(namespace = WSRF_RL_NS, localname = TERMINATION_TIME_ATTR)
 	public Calendar getTerminationTime();
 
-	@ResourceProperty(namespace = OGSA_WSRF_BP_NS, localname = WS_RESOURCE_INTERFACES_ATTR,
-		translator = QNameListTranslator.class)
+	@ResourceProperty(namespace = OGSA_WSRF_BP_NS, localname = WS_RESOURCE_INTERFACES_ATTR, translator = QNameListTranslator.class)
 	public OGSAQNameList getWSResourceInterfaces();
 
-	@ResourceProperty(namespace = OGSA_WSRF_BP_NS, localname = RESOURCE_PROPERTY_NAMES_ATTR,
-		translator = QNameListTranslator.class)
+	@ResourceProperty(namespace = OGSA_WSRF_BP_NS, localname = RESOURCE_PROPERTY_NAMES_ATTR, translator = QNameListTranslator.class)
 	public OGSAQNameList getResourcePropertyNames();
 }

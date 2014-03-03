@@ -27,9 +27,9 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_jobIdentification", "_application", "_resources", "_staging" })
-public class JobDescription extends CommonJSDLElement implements Serializable
-{
+@XmlType(propOrder = { "_jobIdentification", "_application", "_resources",
+		"_staging" })
+public class JobDescription extends CommonJSDLElement implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "JobIdentification")
@@ -48,50 +48,42 @@ public class JobDescription extends CommonJSDLElement implements Serializable
 	 * For use only by XML unmarshalling.
 	 */
 	@SuppressWarnings("unused")
-	private JobDescription()
-	{
+	private JobDescription() {
 		this(null, null, null);
 	}
 
-	public JobDescription(JobIdentification jobIdentification, Application application, Resources resources)
-	{
+	public JobDescription(JobIdentification jobIdentification,
+			Application application, Resources resources) {
 		_jobIdentification = jobIdentification;
 		_application = application;
 		_resources = resources;
 	}
 
-	final public void jobIdentification(JobIdentification jobIdentification)
-	{
+	final public void jobIdentification(JobIdentification jobIdentification) {
 		_jobIdentification = jobIdentification;
 	}
 
-	final public JobIdentification jobIdentification()
-	{
+	final public JobIdentification jobIdentification() {
 		return _jobIdentification;
 	}
 
-	final public void application(Application application)
-	{
+	final public void application(Application application) {
 		_application = application;
 	}
 
-	final public Application application()
-	{
+	final public Application application() {
 		return _application;
 	}
 
-	final public void resources(Resources resources)
-	{
+	final public void resources(Resources resources) {
 		_resources = resources;
 	}
 
-	final public Resources resources()
-	{
+	final public Resources resources() {
 		return _resources;
 	}
 
-	final public List<DataStaging> staging()
-	{
+	final public List<DataStaging> staging() {
 		return _staging;
 	}
 }

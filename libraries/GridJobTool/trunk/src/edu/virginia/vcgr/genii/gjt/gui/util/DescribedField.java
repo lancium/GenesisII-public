@@ -10,8 +10,7 @@ import javax.swing.JTextField;
 
 import edu.virginia.vcgr.genii.gjt.data.Describer;
 
-public class DescribedField<Type> extends JTextField
-{
+public class DescribedField<Type> extends JTextField {
 	static final long serialVersionUID = 0L;
 
 	static final private int BUFFER = 15;
@@ -21,8 +20,7 @@ public class DescribedField<Type> extends JTextField
 	private DescribedFieldEditor<Type> _editor;
 
 	@Override
-	protected void paintComponent(Graphics _g)
-	{
+	protected void paintComponent(Graphics _g) {
 		String toDisplay = "...";
 		Graphics2D g = (Graphics2D) _g;
 
@@ -31,7 +29,8 @@ public class DescribedField<Type> extends JTextField
 			if (verbosity == 0)
 				break;
 
-			Rectangle2D rectangle = g.getFont().getStringBounds(toDisplay, g.getFontRenderContext());
+			Rectangle2D rectangle = g.getFont().getStringBounds(toDisplay,
+					g.getFontRenderContext());
 			if (rectangle.getWidth() <= (getWidth() - BUFFER))
 				break;
 		}
@@ -40,8 +39,8 @@ public class DescribedField<Type> extends JTextField
 		super.paintComponent(g);
 	}
 
-	public DescribedField(Type data, Describer<Type> describer, DescribedFieldEditor<Type> editor, int columns)
-	{
+	public DescribedField(Type data, Describer<Type> describer,
+			DescribedFieldEditor<Type> editor, int columns) {
 		super(columns);
 		setEditable(false);
 
@@ -52,11 +51,9 @@ public class DescribedField<Type> extends JTextField
 		addMouseListener(new MouseListenerImpl());
 	}
 
-	private class MouseListenerImpl extends MouseAdapter
-	{
+	private class MouseListenerImpl extends MouseAdapter {
 		@Override
-		public void mouseClicked(MouseEvent e)
-		{
+		public void mouseClicked(MouseEvent e) {
 			if (_editor != null) {
 				_editor.edit(DescribedField.this, _data);
 				repaint();

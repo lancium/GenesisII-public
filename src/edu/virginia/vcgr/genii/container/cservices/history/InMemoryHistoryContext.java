@@ -7,14 +7,13 @@ import edu.virginia.vcgr.genii.client.history.HistoryEventData;
 import edu.virginia.vcgr.genii.client.history.HistoryEventLevel;
 import edu.virginia.vcgr.genii.client.history.HistoryEventSource;
 
-class InMemoryHistoryContext extends AbstractHistoryContext
-{
+class InMemoryHistoryContext extends AbstractHistoryContext {
 	private HistoryEventSource _source;
 	private InMemoryHistoryEventSink _sink;
 
-	InMemoryHistoryContext(InMemoryHistoryEventSink sink, HistoryEventSource source, Map<String, String> properties,
-		HistoryEventCategory category)
-	{
+	InMemoryHistoryContext(InMemoryHistoryEventSink sink,
+			HistoryEventSource source, Map<String, String> properties,
+			HistoryEventCategory category) {
 		super(properties, category);
 
 		_source = source;
@@ -22,14 +21,14 @@ class InMemoryHistoryContext extends AbstractHistoryContext
 	}
 
 	@Override
-	final public HistoryEventToken logEvent(HistoryEventLevel level, HistoryEventData data)
-	{
+	final public HistoryEventToken logEvent(HistoryEventLevel level,
+			HistoryEventData data) {
 		return _sink.add(category(), level, properties(), _source, data);
 	}
 
 	@Override
-	final public Object clone()
-	{
-		return new InMemoryHistoryContext(_sink, _source, properties(), category());
+	final public Object clone() {
+		return new InMemoryHistoryContext(_sink, _source, properties(),
+				category());
 	}
 }

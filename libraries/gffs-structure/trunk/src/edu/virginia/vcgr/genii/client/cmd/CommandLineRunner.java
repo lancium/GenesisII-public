@@ -25,13 +25,12 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 
-public class CommandLineRunner
-{
+public class CommandLineRunner {
 	private Map<String, ToolDescription> _tools;
 	private static ArrayList<String[]> _history = new ArrayList<String[]>();
 
-	static private String[] editCommandLine(String[] commandLine) throws FileNotFoundException, IOException
-	{
+	static private String[] editCommandLine(String[] commandLine)
+			throws FileNotFoundException, IOException {
 		StringBuilder builder = new StringBuilder();
 		for (String arg : commandLine) {
 			if (builder.length() > 0)
@@ -43,25 +42,27 @@ public class CommandLineRunner
 				builder.append(arg);
 		}
 
-		String value = JOptionPane.showInputDialog("Edit command", builder.toString());
+		String value = JOptionPane.showInputDialog("Edit command",
+				builder.toString());
 		if (value == null)
 			return null;
 
 		return CommandLineFormer.formCommandLine(value);
 	}
 
-	public CommandLineRunner()
-	{
-		_tools = getToolList(ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
+	public CommandLineRunner() {
+		_tools = getToolList(ConfigurationManager.getCurrentConfiguration()
+				.getClientConfiguration());
 	}
 
-	static private Writer openRedirect(String redirectTarget) throws IOException, RNSException
-	{
-		return new OutputStreamWriter(new GeniiPath(redirectTarget).openOutputStream());
+	static private Writer openRedirect(String redirectTarget)
+			throws IOException, RNSException {
+		return new OutputStreamWriter(
+				new GeniiPath(redirectTarget).openOutputStream());
 	}
 
-	public int runCommand(String[] cLine, Writer out, Writer err, Reader in) throws Throwable
-	{
+	public int runCommand(String[] cLine, Writer out, Writer err, Reader in)
+			throws Throwable {
 		Writer target = out;
 		int resultSoFar = 0;
 
@@ -113,10 +114,12 @@ public class CommandLineRunner
 				String argument = cLine[lcv];
 				if (argument.equals(">")) {
 					if (++lcv >= cLine.length)
-						throw new ToolException("Unexpected end of command line.");
+						throw new ToolException(
+								"Unexpected end of command line.");
 					String redirectTarget = cLine[lcv++];
 					if (lcv < cLine.length)
-						throw new ToolException("Additional arguments found after file redirect.");
+						throw new ToolException(
+								"Additional arguments found after file redirect.");
 					target = openRedirect(redirectTarget);
 					break;
 				}
@@ -131,20 +134,19 @@ public class CommandLineRunner
 		}
 	}
 
-	final public Map<String, ToolDescription> getToolList()
-	{
+	final public Map<String, ToolDescription> getToolList() {
 		return Collections.unmodifiableMap(_tools);
 	}
 
 	@SuppressWarnings("unchecked")
-	static public Map<String, ToolDescription> getToolList(XMLConfiguration conf)
-	{
+	static public Map<String, ToolDescription> getToolList(XMLConfiguration conf) {
 		HashMap<String, ToolDescription> ret;
 
 		ArrayList<Object> tools;
 
 		synchronized (conf) {
-			tools = conf.retrieveSections(new QName(GenesisIIConstants.GENESISII_NS, "tools"));
+			tools = conf.retrieveSections(new QName(
+					GenesisIIConstants.GENESISII_NS, "tools"));
 		}
 
 		ret = new HashMap<String, ToolDescription>(tools.size());
@@ -152,7 +154,8 @@ public class CommandLineRunner
 		for (Object oToolMap : tools) {
 			HashMap<String, Class<?>> toolMap = (HashMap<String, Class<?>>) oToolMap;
 			for (String toolName : toolMap.keySet()) {
-				Class<? extends ITool> toolClass = (Class<? extends ITool>) toolMap.get(toolName);
+				Class<? extends ITool> toolClass = (Class<? extends ITool>) toolMap
+						.get(toolName);
 				ret.put(toolName, new ToolDescription(toolClass, toolName));
 			}
 		}
@@ -163,20 +166,18 @@ public class CommandLineRunner
 		return ret;
 	}
 
-	static public ToolDescription getToolDescription(String tool)
-	{
-		Map<String, ToolDescription> _tools =
-			CommandLineRunner.getToolList(ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
+	static public ToolDescription getToolDescription(String tool) {
+		Map<String, ToolDescription> _tools = CommandLineRunner
+				.getToolList(ConfigurationManager.getCurrentConfiguration()
+						.getClientConfiguration());
 		return _tools.get(tool);
 	}
 
-	public static ArrayList<String[]> history()
-	{
+	public static ArrayList<String[]> history() {
 		return _history;
 	}
 
-	public static void clearHistory()
-	{
+	public static void clearHistory() {
 		_history.clear();
 	}
 }

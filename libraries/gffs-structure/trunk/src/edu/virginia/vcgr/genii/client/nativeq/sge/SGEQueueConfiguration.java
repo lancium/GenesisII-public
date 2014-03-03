@@ -6,7 +6,6 @@ import edu.virginia.vcgr.genii.client.nativeq.CommonScriptBasedQueueConfiguratio
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 
 @XmlRootElement(namespace = NativeQueueConfiguration.NS, name = "sge-configuration")
-public class SGEQueueConfiguration extends CommonScriptBasedQueueConfiguration
-{
+public class SGEQueueConfiguration extends CommonScriptBasedQueueConfiguration {
 	static final long serialVersionUID = 0L;
 }

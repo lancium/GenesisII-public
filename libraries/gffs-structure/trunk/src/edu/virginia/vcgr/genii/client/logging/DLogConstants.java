@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.client.logging;
 
-public class DLogConstants
-{
+public class DLogConstants {
 
 	static final public String DLOG_CONS_PARMS_NS = "http://vcgr.cs.virginia.edu/construction-parameters/dlog";
 
@@ -22,8 +21,7 @@ public class DLogConstants
 	static final public String DLOG_ENTRY_FIELD_LOGGER = "logger";
 	static final public String DLOG_ENTRY_FIELD_MESSAGE = "message";
 	static final public String DLOG_ENTRY_FIELD_STACK_TRACE = "stacktrace";
-	static final public String DLOG_ENTRY_FIELD_DETAILS =
-		"dated TIMESTAMP, level VARCHAR(8), rpcid VARCHAR(256), logger VARCHAR(128), message VARCHAR(4096), stacktrace VARCHAR(32672)";
+	static final public String DLOG_ENTRY_FIELD_DETAILS = "dated TIMESTAMP, level VARCHAR(8), rpcid VARCHAR(256), logger VARCHAR(128), message VARCHAR(4096), stacktrace VARCHAR(32672)";
 
 	// Hierarchy table fields
 	static final public String DLOG_HIERARCHY_TABLE_NAME = "hierarchy";
@@ -41,8 +39,7 @@ public class DLogConstants
 	static final public String DLOG_METADATA_DATE_SENT = "issuedate";
 	static final public String DLOG_METADATA_DATE_RCVD = "returndate";
 	static final public String DLOG_METADATA_OP_NAME = "operation";
-	static final public String DLOG_METADATA_FIELD_DETAILS =
-		"targetepr BLOB(12M), rpcid VARCHAR(256), request BLOB(12M), response BLOB(12M), issuedate TIMESTAMP, returndate TIMESTAMP, operation VARCHAR(1024)";
+	static final public String DLOG_METADATA_FIELD_DETAILS = "targetepr BLOB(12M), rpcid VARCHAR(256), request BLOB(12M), response BLOB(12M), issuedate TIMESTAMP, returndate TIMESTAMP, operation VARCHAR(1024)";
 
 	public static final String _DB_ENTRY_TABLE_PROPERTY = "entry_table";
 

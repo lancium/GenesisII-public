@@ -26,6 +26,7 @@ import edu.virginia.vcgr.jsdl.spmd.SPMDApplication;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlSeeAlso({ POSIXApplication.class, HPCProfileApplication.class, SPMDApplication.class })
-public interface ApplicationBase
-{}
+@XmlSeeAlso({ POSIXApplication.class, HPCProfileApplication.class,
+		SPMDApplication.class })
+public interface ApplicationBase {
+}

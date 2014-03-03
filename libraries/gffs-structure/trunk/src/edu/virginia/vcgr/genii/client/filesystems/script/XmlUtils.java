@@ -8,10 +8,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-class XmlUtils
-{
-	static Element[] getChildren(Element parent)
-	{
+class XmlUtils {
+	static Element[] getChildren(Element parent) {
 		NodeList list = parent.getChildNodes();
 		ArrayList<Element> ret = new ArrayList<Element>(list.getLength());
 
@@ -26,17 +24,17 @@ class XmlUtils
 		return array;
 	}
 
-	static QName qname(Node node)
-	{
+	static QName qname(Node node) {
 		return new QName(node.getNamespaceURI(), node.getLocalName());
 	}
 
-	static String requiredAttribute(Element node, String attributeName) throws FilterScriptException
-	{
+	static String requiredAttribute(Element node, String attributeName)
+			throws FilterScriptException {
 		String value = node.getAttribute(attributeName);
 		if (value == null || value.length() == 0)
-			throw new FilterScriptException(String.format("Element %s is missing required attribute %s.", qname(node),
-				attributeName));
+			throw new FilterScriptException(String.format(
+					"Element %s is missing required attribute %s.",
+					qname(node), attributeName));
 
 		return value;
 	}

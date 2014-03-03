@@ -21,20 +21,16 @@ package edu.virginia.vcgr.jsdl;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 public enum CreationFlag {
-	overwrite("Overwrite"),
-	append("Append"),
-	dontOverwrite("Don't Overwrite");
+	overwrite("Overwrite"), append("Append"), dontOverwrite("Don't Overwrite");
 
 	private String _label;
 
-	private CreationFlag(String label)
-	{
+	private CreationFlag(String label) {
 		_label = label;
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		return _label;
 	}
 }

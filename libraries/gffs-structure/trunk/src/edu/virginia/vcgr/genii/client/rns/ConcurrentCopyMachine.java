@@ -30,8 +30,7 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 /**
  * thread to copy files
  */
-public class ConcurrentCopyMachine implements Runnable
-{
+public class ConcurrentCopyMachine implements Runnable {
 	static private Log _logger = LogFactory.getLog(ConcurrentCopyMachine.class);
 
 	Semaphore semaphore;
@@ -40,8 +39,8 @@ public class ConcurrentCopyMachine implements Runnable
 	String targetIn;
 	RNSPath logLocation;
 
-	public ConcurrentCopyMachine(String sourceIn, String targetIn, RNSPath logLocation, Semaphore semaphore, Mutex mutex)
-	{
+	public ConcurrentCopyMachine(String sourceIn, String targetIn,
+			RNSPath logLocation, Semaphore semaphore, Mutex mutex) {
 		this.semaphore = semaphore;
 		this.mutex = mutex;
 		this.sourceIn = sourceIn;
@@ -50,8 +49,7 @@ public class ConcurrentCopyMachine implements Runnable
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		int fileSize = 0;
 		int maxTries = 7;
 		RNSPath current = RNSPath.getCurrent();
@@ -62,22 +60,28 @@ public class ConcurrentCopyMachine implements Runnable
 		boolean success = false;
 		for (int tries = 1; success == false; tries++) {
 			try {
-				rnsPath = current.lookup(new GeniiPath(sourceIn).path(), RNSPathQueryFlags.DONT_CARE);
-				fileSize = Integer.parseInt((new TypeInformation(rnsPath.getEndpoint())).getTypeDescription());
+				rnsPath = current.lookup(new GeniiPath(sourceIn).path(),
+						RNSPathQueryFlags.DONT_CARE);
+				fileSize = Integer.parseInt((new TypeInformation(rnsPath
+						.getEndpoint())).getTypeDescription());
 				EndpointReferenceType fileEPR = rnsPath.getEndpoint();
-				RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, fileEPR);
-				RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
+				RandomByteIOPortType clientStub = ClientUtils.createProxy(
+						RandomByteIOPortType.class, fileEPR);
+				RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(
+						clientStub);
 				reader = factory.createRandomByteIOTransferer();
 
 				GeniiPath geniiPath = new GeniiPath(targetIn);
-				rnsPath = current.lookup(geniiPath.path(), RNSPathQueryFlags.DONT_CARE);
+				rnsPath = current.lookup(geniiPath.path(),
+						RNSPathQueryFlags.DONT_CARE);
 				rnsPath.mkdirs();
 				if (rnsPath.exists()) {
 					rnsPath.delete();
 				}
 				rnsPath.createNewFile();
 				fileEPR = rnsPath.getEndpoint();
-				clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, fileEPR);
+				clientStub = ClientUtils.createProxy(
+						RandomByteIOPortType.class, fileEPR);
 				factory = new RandomByteIOTransfererFactory(clientStub);
 				writer = factory.createRandomByteIOTransferer();
 				success = true;
@@ -94,8 +98,10 @@ public class ConcurrentCopyMachine implements Runnable
 		NodeList nl = null;
 		try {
 			mutex.acquire();
-			dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			doc = dBuilder.parse(new RandomByteIOInputStream(logLocation.getEndpoint()));
+			dBuilder = DocumentBuilderFactory.newInstance()
+					.newDocumentBuilder();
+			doc = dBuilder.parse(new RandomByteIOInputStream(logLocation
+					.getEndpoint()));
 			doc.getDocumentElement().normalize();
 			nl = doc.getElementsByTagName(sanitizedKey);
 		} catch (Throwable e) {
@@ -109,10 +115,12 @@ public class ConcurrentCopyMachine implements Runnable
 			doc.getDocumentElement().appendChild(record);
 
 			try {
-				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				TransformerFactory transformerFactory = TransformerFactory
+						.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();
 				DOMSource source = new DOMSource(doc);
-				StreamResult result = new StreamResult(new RandomByteIOOutputStream(logLocation.getEndpoint()));
+				StreamResult result = new StreamResult(
+						new RandomByteIOOutputStream(logLocation.getEndpoint()));
 				transformer.transform(source, result);
 			} catch (Exception e) {
 				_logger.error("caught exception while writing log", e);
@@ -155,7 +163,8 @@ public class ConcurrentCopyMachine implements Runnable
 			transferred += data.length;
 			try {
 				mutex.acquire();
-				doc = dBuilder.parse(new RandomByteIOInputStream(logLocation.getEndpoint()));
+				doc = dBuilder.parse(new RandomByteIOInputStream(logLocation
+						.getEndpoint()));
 				nl = doc.getElementsByTagName(sanitizedKey);
 			} catch (Throwable e) {
 				_logger.error("caught exception while finding tag", e);
@@ -164,10 +173,12 @@ public class ConcurrentCopyMachine implements Runnable
 			n.setAttribute("bytes", "" + transferred);
 
 			try {
-				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				TransformerFactory transformerFactory = TransformerFactory
+						.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();
 				DOMSource source = new DOMSource(doc);
-				StreamResult result = new StreamResult(new RandomByteIOOutputStream(logLocation.getEndpoint()));
+				StreamResult result = new StreamResult(
+						new RandomByteIOOutputStream(logLocation.getEndpoint()));
 				transformer.transform(source, result);
 			} catch (Exception e) {
 				_logger.error("caught exception while writing log", e);

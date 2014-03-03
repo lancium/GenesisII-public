@@ -35,8 +35,7 @@ import org.morgan.util.gui.BasicTriangleArrowIcon;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class DateDialog extends JDialog
-{
+public class DateDialog extends JDialog {
 	static final long serialVersionUID = 0;
 
 	private DateDialogModel _model;
@@ -47,13 +46,11 @@ public class DateDialog extends JDialog
 	private JLabel _monthLabel;
 	private JButton _todayButton;
 
-	public DateDialog()
-	{
+	public DateDialog() {
 		this(new DateDialogModel());
 	}
 
-	public DateDialog(DateDialogModel model)
-	{
+	public DateDialog(DateDialogModel model) {
 		_model = model;
 
 		setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
@@ -61,10 +58,13 @@ public class DateDialog extends JDialog
 		Controller controller = new Controller();
 		model.addDateModelListener(controller);
 
-		_leftMonthArrow = new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, 10));
+		_leftMonthArrow = new JButton(new BasicTriangleArrowIcon(
+				ArrowDirection.LEFT, 10));
 		_monthLabel = new JLabel("");
-		_rightMonthArrow = new JButton(new BasicTriangleArrowIcon(ArrowDirection.RIGHT, 10));
-		_month = new MonthComponent(_model.getTodaysDate(), _model.getSelectedDate(), _model.getSelectedMonth());
+		_rightMonthArrow = new JButton(new BasicTriangleArrowIcon(
+				ArrowDirection.RIGHT, 10));
+		_month = new MonthComponent(_model.getTodaysDate(),
+				_model.getSelectedDate(), _model.getSelectedMonth());
 		_todayButton = new JButton("Today");
 
 		Dimension d = new Dimension(120, 10);
@@ -74,16 +74,21 @@ public class DateDialog extends JDialog
 
 		getContentPane().setLayout(new GridBagLayout());
 
-		add(_leftMonthArrow, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		add(_monthLabel, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		add(_rightMonthArrow, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		add(_month, new GridBagConstraints(0, 1, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
-		add(_todayButton, new GridBagConstraints(0, 2, 3, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(_leftMonthArrow, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+						5, 5, 5, 5), 5, 5));
+		add(_monthLabel, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+						5, 5, 5, 5), 5, 5));
+		add(_rightMonthArrow, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+						5, 5, 5, 5), 5, 5));
+		add(_month, new GridBagConstraints(0, 1, 3, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						5, 5, 5, 5), 5, 5));
+		add(_todayButton, new GridBagConstraints(0, 2, 3, 1, 1.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+						5, 5, 5, 5), 5, 5));
 
 		_leftMonthArrow.addActionListener(controller);
 		_rightMonthArrow.addActionListener(controller);
@@ -93,28 +98,24 @@ public class DateDialog extends JDialog
 		setMonthLabel();
 	}
 
-	public Date getSelectedDate()
-	{
+	public Date getSelectedDate() {
 		return _model.getSelectedDate().getTime();
 	}
 
-	public DateDialogModel getModel()
-	{
+	public DateDialogModel getModel() {
 		return _model;
 	}
 
-	private void setMonthLabel()
-	{
+	private void setMonthLabel() {
 		Calendar month = _model.getSelectedMonth();
 		SimpleDateFormat formatter = new SimpleDateFormat("MMMMMMMMMM yyyy");
 
 		_monthLabel.setText(formatter.format(month.getTime()));
 	}
 
-	private class Controller extends MouseAdapter implements IDateDialogModelListener, ActionListener
-	{
-		public void actionPerformed(ActionEvent event)
-		{
+	private class Controller extends MouseAdapter implements
+			IDateDialogModelListener, ActionListener {
+		public void actionPerformed(ActionEvent event) {
 			Object source = event.getSource();
 
 			if (source == _leftMonthArrow)
@@ -127,19 +128,16 @@ public class DateDialog extends JDialog
 			}
 		}
 
-		public void selectedDateChange(Calendar newDate)
-		{
+		public void selectedDateChange(Calendar newDate) {
 			_month.selectDate(newDate);
 		}
 
-		public void selectedMonthChange(Calendar newMonth)
-		{
+		public void selectedMonthChange(Calendar newMonth) {
 			setMonthLabel();
 			_month.showMonth(newMonth);
 		}
 
-		public void mouseClicked(MouseEvent me)
-		{
+		public void mouseClicked(MouseEvent me) {
 			if (me.getButton() == MouseEvent.BUTTON1) {
 				Calendar d = _month.getDate(me.getX(), me.getY());
 				if (d != null) {
@@ -150,8 +148,7 @@ public class DateDialog extends JDialog
 		}
 	}
 
-	static public Date selectDate(Date initiallySelected)
-	{
+	static public Date selectDate(Date initiallySelected) {
 		DateDialog d = new DateDialog();
 		if (initiallySelected != null)
 			d.getModel().selectDate(initiallySelected);
@@ -161,8 +158,9 @@ public class DateDialog extends JDialog
 		return d.getSelectedDate();
 	}
 
-	static public void main(String[] args)
-	{
-		System.err.println("Value:  " + selectDate(new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 5))));
+	static public void main(String[] args) {
+		System.err.println("Value:  "
+				+ selectDate(new Date(new Date().getTime()
+						- (1000 * 60 * 60 * 24 * 5))));
 	}
 }

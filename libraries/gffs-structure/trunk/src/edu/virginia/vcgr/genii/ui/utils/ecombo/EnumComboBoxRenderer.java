@@ -9,14 +9,13 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 @SuppressWarnings("rawtypes")
-class EnumComboBoxRenderer<Type extends Enum<Type>> extends JLabel implements ListCellRenderer
-{
+class EnumComboBoxRenderer<Type extends Enum<Type>> extends JLabel implements
+		ListCellRenderer {
 	static final long serialVersionUID = 0L;
 
 	private Map<Type, Icon> _iconMap;
 
-	EnumComboBoxRenderer(Map<Type, Icon> iconMap)
-	{
+	EnumComboBoxRenderer(Map<Type, Icon> iconMap) {
 		_iconMap = iconMap;
 
 		setOpaque(true);
@@ -24,9 +23,8 @@ class EnumComboBoxRenderer<Type extends Enum<Type>> extends JLabel implements Li
 		setVerticalAlignment(CENTER);
 	}
 
-	public Component
-		getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
-	{
+	public Component getListCellRendererComponent(JList list, Object value,
+			int index, boolean isSelected, boolean cellHasFocus) {
 		if (isSelected) {
 			setBackground(list.getSelectionBackground());
 			setForeground(list.getSelectionForeground());

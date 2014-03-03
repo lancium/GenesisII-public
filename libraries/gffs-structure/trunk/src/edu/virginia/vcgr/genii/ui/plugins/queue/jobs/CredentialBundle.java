@@ -18,15 +18,14 @@ import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIde
 import edu.virginia.vcgr.genii.security.identity.Identity;
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
-class CredentialBundle implements Comparable<CredentialBundle>
-{
+class CredentialBundle implements Comparable<CredentialBundle> {
 	private String _value;
 	private String _tooltip;
 
-	static final private Pattern CN_PATTERN = Pattern.compile("CN\\s*=\\s*([^\\s,]+)[\\s,]");
+	static final private Pattern CN_PATTERN = Pattern
+			.compile("CN\\s*=\\s*([^\\s,]+)[\\s,]");
 
-	static private String toToolTip(Collection<Identity> owners)
-	{
+	static private String toToolTip(Collection<Identity> owners) {
 		StringWriter writer = new StringWriter();
 		PrintWriter pw = new PrintWriter(writer);
 		boolean first = true;
@@ -47,8 +46,7 @@ class CredentialBundle implements Comparable<CredentialBundle>
 		return writer.toString();
 	}
 
-	static private String getUsefulCN(String text)
-	{
+	static private String getUsefulCN(String text) {
 		List<String> badMatches = new LinkedList<String>();
 		List<String> goodMatches = new LinkedList<String>();
 		String[] toRet;
@@ -80,20 +78,19 @@ class CredentialBundle implements Comparable<CredentialBundle>
 		return builder.toString();
 	}
 
-	static private String toOwnerString(Identity owner)
-	{
+	static private String toOwnerString(Identity owner) {
 		if (owner instanceof UsernamePasswordIdentity) {
-			return String.format("%s/*****", ((UsernamePasswordIdentity) owner).getUserName());
+			return String.format("%s/*****",
+					((UsernamePasswordIdentity) owner).getUserName());
 		} else {
 			String text = owner.describe(VerbosityLevel.HIGH);
 			return getUsefulCN(text);
 		}
 	}
 
-	CredentialBundle(Collection<Identity> identities)
-	{
-		Collection<Identity> owners =
-			SecurityUtilities.filterCredentials(identities, SecurityUtilities.GROUP_TOKEN_PATTERN,
+	CredentialBundle(Collection<Identity> identities) {
+		Collection<Identity> owners = SecurityUtilities.filterCredentials(
+				identities, SecurityUtilities.GROUP_TOKEN_PATTERN,
 				SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 		Set<String> ownerSet = new HashSet<String>();
 
@@ -114,20 +111,17 @@ class CredentialBundle implements Comparable<CredentialBundle>
 		_tooltip = toToolTip(owners);
 	}
 
-	final String tooltipText()
-	{
+	final String tooltipText() {
 		return _tooltip;
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		return _value;
 	}
 
 	@Override
-	final public int compareTo(CredentialBundle o)
-	{
+	final public int compareTo(CredentialBundle o) {
 		return toString().compareTo(o.toString());
 	}
 }

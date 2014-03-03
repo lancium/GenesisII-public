@@ -21,19 +21,19 @@ import org.apache.axis.types.URI;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 
 /**
- * Data-structure and utility methods for handling the details of GII message-level security.
+ * Data-structure and utility methods for handling the details of GII
+ * message-level security.
  * 
  * @author dgm4d
  * 
  */
-public class MessageSecurity
-{
+public class MessageSecurity {
 	public MessageLevelSecurityRequirements _neededMsgSec;
 	public X509Certificate[] _resourceCertChain;
 	public URI _resourceEpi;
 
-	public MessageSecurity(MessageLevelSecurityRequirements neededMsgSec, X509Certificate[] resourceCertChain, URI resourceEpi)
-	{
+	public MessageSecurity(MessageLevelSecurityRequirements neededMsgSec,
+			X509Certificate[] resourceCertChain, URI resourceEpi) {
 		_resourceCertChain = resourceCertChain;
 		_neededMsgSec = neededMsgSec;
 		_resourceEpi = resourceEpi;

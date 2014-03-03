@@ -22,30 +22,25 @@ import javax.xml.bind.annotation.XmlElement;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class SourceTarget extends CommonJSDLElement
-{
+public class SourceTarget extends CommonJSDLElement {
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "URI")
 	private String _uri;
 
-	public SourceTarget(String uri)
-	{
+	public SourceTarget(String uri) {
 		_uri = uri;
 	}
 
-	public SourceTarget()
-	{
+	public SourceTarget() {
 		this(null);
 	}
 
-	final public void uri(String uri)
-	{
+	final public void uri(String uri) {
 		_uri = uri;
 	}
 
-	final public String uri()
-	{
+	final public String uri() {
 		return _uri;
 	}
 }

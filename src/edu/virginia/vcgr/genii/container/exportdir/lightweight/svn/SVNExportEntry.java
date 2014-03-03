@@ -17,8 +17,8 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportDir;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportEntry;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportFile;
 
-class SVNExportEntry extends AbstractVExportEntry implements VExportFile, VExportDir
-{
+class SVNExportEntry extends AbstractVExportEntry implements VExportFile,
+		VExportDir {
 	private SVNExportEntryCache _entryCache;
 
 	private String _svnURL;
@@ -27,14 +27,13 @@ class SVNExportEntry extends AbstractVExportEntry implements VExportFile, VExpor
 	private long _revision;
 	private SVNDirEntry _entry;
 
-	private String getRelativePath()
-	{
+	private String getRelativePath() {
 		return _relativePath;
 	}
 
-	SVNExportEntry(SVNRepository repository, String svnURL, long revision, SVNDirEntry entry, String relativePath,
-		SVNExportEntryCache entryCache)
-	{
+	SVNExportEntry(SVNRepository repository, String svnURL, long revision,
+			SVNDirEntry entry, String relativePath,
+			SVNExportEntryCache entryCache) {
 		super(entry.getName(), entry.getKind() == SVNNodeKind.DIR);
 
 		_svnURL = svnURL;
@@ -47,45 +46,40 @@ class SVNExportEntry extends AbstractVExportEntry implements VExportFile, VExpor
 	}
 
 	@Override
-	public Calendar accessTime() throws IOException
-	{
+	public Calendar accessTime() throws IOException {
 		Calendar c = Calendar.getInstance();
 		c.setTime(_entry.getDate());
 		return c;
 	}
 
 	@Override
-	public void accessTime(Calendar c) throws IOException
-	{
+	public void accessTime(Calendar c) throws IOException {
 		throw new IOException("SVN Exports are read-only.");
 	}
 
 	@Override
-	public Calendar createTime() throws IOException
-	{
+	public Calendar createTime() throws IOException {
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(0L);
 		return c;
 	}
 
 	@Override
-	public Calendar modificationTime() throws IOException
-	{
+	public Calendar modificationTime() throws IOException {
 		Calendar c = Calendar.getInstance();
 		c.setTime(_entry.getDate());
 		return c;
 	}
 
 	@Override
-	public void modificationTime(Calendar c) throws IOException
-	{
+	public void modificationTime(Calendar c) throws IOException {
 		throw new IOException("SVN Exports are read-only.");
 	}
 
 	@Override
-	public void read(long offset, ByteBuffer target) throws IOException
-	{
-		PartialBlockOutputStream out = new PartialBlockOutputStream(target, offset);
+	public void read(long offset, ByteBuffer target) throws IOException {
+		PartialBlockOutputStream out = new PartialBlockOutputStream(target,
+				offset);
 
 		try {
 			_repository.getFile(getRelativePath(), _revision, null, out);
@@ -95,55 +89,52 @@ class SVNExportEntry extends AbstractVExportEntry implements VExportFile, VExpor
 	}
 
 	@Override
-	public boolean readable() throws IOException
-	{
+	public boolean readable() throws IOException {
 		return true;
 	}
 
 	@Override
-	public long size() throws IOException
-	{
+	public long size() throws IOException {
 		return _entry.getSize();
 	}
 
 	@Override
-	public void truncAppend(long offset, ByteBuffer source) throws IOException
-	{
+	public void truncAppend(long offset, ByteBuffer source) throws IOException {
 		throw new IOException("SVN Exports are read-only.");
 	}
 
 	@Override
-	public boolean writable() throws IOException
-	{
+	public boolean writable() throws IOException {
 		return false;
 	}
 
 	@Override
-	public void write(long offset, ByteBuffer source) throws IOException
-	{
+	public void write(long offset, ByteBuffer source) throws IOException {
 		throw new IOException("SVN Exports are read-only.");
 	}
 
 	@Override
-	public boolean createFile(String newFileName) throws IOException
-	{
+	public boolean createFile(String newFileName) throws IOException {
 		throw new IOException("SVN Exports are read-only.");
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<VExportEntry> list(String name) throws IOException
-	{
+	public Collection<VExportEntry> list(String name) throws IOException {
 		Collection<VExportEntry> ret = new LinkedList<VExportEntry>();
 
 		try {
-			Collection<SVNDirEntry> contents =
-				_repository.getDir(getRelativePath(), _revision, (SVNProperties) null, (Collection<?>) null);
+			Collection<SVNDirEntry> contents = _repository.getDir(
+					getRelativePath(), _revision, (SVNProperties) null,
+					(Collection<?>) null);
 			for (SVNDirEntry entry : contents) {
 				String myPath = getRelativePath();
 				if (name == null || name.equals(entry.getName()))
-					ret.add(_entryCache.lookup(new SVNPathIdentifier(_repository, _svnURL, (myPath.length() == 0) ? entry
-						.getName() : String.format("%s/%s", getRelativePath(), entry.getName()), _revision)));
+					ret.add(_entryCache.lookup(new SVNPathIdentifier(
+							_repository, _svnURL,
+							(myPath.length() == 0) ? entry.getName() : String
+									.format("%s/%s", getRelativePath(),
+											entry.getName()), _revision)));
 			}
 
 			return ret;
@@ -153,20 +144,17 @@ class SVNExportEntry extends AbstractVExportEntry implements VExportFile, VExpor
 	}
 
 	@Override
-	public boolean mkdir(String newDirName) throws IOException
-	{
+	public boolean mkdir(String newDirName) throws IOException {
 		throw new IOException("SVN Exports are read-only.");
 	}
 
 	@Override
-	public boolean remove(String entryName) throws IOException
-	{
+	public boolean remove(String entryName) throws IOException {
 		throw new IOException("SVN Exports are read-only.");
 	}
 
 	@Override
-	public Collection<VExportEntry> list() throws IOException
-	{
+	public Collection<VExportEntry> list() throws IOException {
 		return list(null);
 	}
 

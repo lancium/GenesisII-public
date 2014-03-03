@@ -11,12 +11,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
-public class IOUtils
-{
+public class IOUtils {
 	static private final int COPY_SIZE = 1024 * 8;
 
-	static public void recursiveDelete(File target)
-	{
+	static public void recursiveDelete(File target) {
 		if (!target.exists())
 			return;
 
@@ -27,8 +25,7 @@ public class IOUtils
 		target.delete();
 	}
 
-	static public void close(Closeable closeable)
-	{
+	static public void close(Closeable closeable) {
 		if (closeable != null) {
 			try {
 				closeable.close();
@@ -37,8 +34,8 @@ public class IOUtils
 		}
 	}
 
-	static public void copy(InputStream in, OutputStream out) throws IOException
-	{
+	static public void copy(InputStream in, OutputStream out)
+			throws IOException {
 		byte[] data = new byte[COPY_SIZE];
 		int read;
 
@@ -46,8 +43,7 @@ public class IOUtils
 			out.write(data, 0, read);
 	}
 
-	static public void copy(File source, File target) throws IOException
-	{
+	static public void copy(File source, File target) throws IOException {
 		InputStream in = null;
 		OutputStream out = null;
 
@@ -61,13 +57,12 @@ public class IOUtils
 		}
 	}
 
-	static public void serialize(String filePath, Object obj) throws IOException
-	{
+	static public void serialize(String filePath, Object obj)
+			throws IOException {
 		serialize(new File(filePath), obj);
 	}
 
-	static public void serialize(File target, Object obj) throws IOException
-	{
+	static public void serialize(File target, Object obj) throws IOException {
 		FileOutputStream fos = null;
 
 		try {
@@ -80,13 +75,13 @@ public class IOUtils
 		}
 	}
 
-	static public <Type> Type deserialize(Class<Type> cl, String sourcePath) throws FileNotFoundException, IOException
-	{
+	static public <Type> Type deserialize(Class<Type> cl, String sourcePath)
+			throws FileNotFoundException, IOException {
 		return deserialize(cl, new File(sourcePath));
 	}
 
-	static public <Type> Type deserialize(Class<Type> cl, File source) throws FileNotFoundException, IOException
-	{
+	static public <Type> Type deserialize(Class<Type> cl, File source)
+			throws FileNotFoundException, IOException {
 		FileInputStream fin = null;
 
 		try {

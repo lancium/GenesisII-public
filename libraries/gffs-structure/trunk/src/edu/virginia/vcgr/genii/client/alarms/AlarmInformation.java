@@ -5,8 +5,7 @@ import java.util.Calendar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class AlarmInformation implements AlarmToken, Comparable<AlarmInformation>
-{
+class AlarmInformation implements AlarmToken, Comparable<AlarmInformation> {
 	static private Log _logger = LogFactory.getLog(AlarmInformation.class);
 
 	private AlarmHandler _handler = null;
@@ -14,8 +13,8 @@ class AlarmInformation implements AlarmToken, Comparable<AlarmInformation>
 	private Calendar _nextOccurance;
 	private Long _repeatInterval = null;
 
-	AlarmInformation(AlarmHandler handler, Object userData, Calendar nextOccurance, Long repeatInterval)
-	{
+	AlarmInformation(AlarmHandler handler, Object userData,
+			Calendar nextOccurance, Long repeatInterval) {
 		if (handler == null)
 			throw new IllegalArgumentException("Alarm handler cannot be null.");
 
@@ -28,8 +27,7 @@ class AlarmInformation implements AlarmToken, Comparable<AlarmInformation>
 		_repeatInterval = repeatInterval;
 	}
 
-	final Calendar handleAlarm()
-	{
+	final Calendar handleAlarm() {
 		if (_nextOccurance == null)
 			return null;
 
@@ -42,7 +40,8 @@ class AlarmInformation implements AlarmToken, Comparable<AlarmInformation>
 		synchronized (this) {
 			if ((_nextOccurance != null) && (_repeatInterval != null)) {
 				_nextOccurance = Calendar.getInstance();
-				_nextOccurance.setTimeInMillis(_nextOccurance.getTimeInMillis() + _repeatInterval);
+				_nextOccurance.setTimeInMillis(_nextOccurance.getTimeInMillis()
+						+ _repeatInterval);
 			} else
 				_nextOccurance = null;
 		}
@@ -51,26 +50,22 @@ class AlarmInformation implements AlarmToken, Comparable<AlarmInformation>
 	}
 
 	@Override
-	synchronized final public void cancel()
-	{
+	synchronized final public void cancel() {
 		_nextOccurance = null;
 	}
 
 	@Override
-	synchronized final public Calendar nextOccurance()
-	{
+	synchronized final public Calendar nextOccurance() {
 		return _nextOccurance;
 	}
 
 	@Override
-	final public boolean isRepeating()
-	{
+	final public boolean isRepeating() {
 		return _repeatInterval != null;
 	}
 
 	@Override
-	final public int compareTo(AlarmInformation o)
-	{
+	final public int compareTo(AlarmInformation o) {
 		Calendar a = nextOccurance();
 		Calendar b = o.nextOccurance();
 

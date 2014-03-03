@@ -20,25 +20,25 @@ import java.util.regex.Pattern;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class GUID extends RandomToken implements Serializable
-{
+public class GUID extends RandomToken implements Serializable {
 	static private Pattern _GUID_PATTERN = Pattern
-		.compile("([0-9a-fA-F]{8})-([0-9a-fA-F]{4})-([0-9a-fA-F]{4})-([0-9a-fA-F]{4})-([0-9a-fA-F]{12})");
+			.compile("([0-9a-fA-F]{8})-([0-9a-fA-F]{4})-([0-9a-fA-F]{4})-([0-9a-fA-F]{4})-([0-9a-fA-F]{12})");
 
 	static final long serialVersionUID = 0;
 
 	static final private int _NUM_BYTES = 16;
 
-	static public GUID fromString(String str)
-	{
+	static public GUID fromString(String str) {
 		byte[] bytes = new byte[_NUM_BYTES];
 		byte b;
 		Matcher m = _GUID_PATTERN.matcher(str);
 		if (!m.matches())
-			throw new IllegalArgumentException("String \"" + str + "\" does not look like a GUID.");
+			throw new IllegalArgumentException("String \"" + str
+					+ "\" does not look like a GUID.");
 
 		int byteIndex = 0;
-		String simplified = m.group(1) + m.group(2) + m.group(3) + m.group(4) + m.group(5);
+		String simplified = m.group(1) + m.group(2) + m.group(3) + m.group(4)
+				+ m.group(5);
 		simplified = simplified.toUpperCase();
 
 		for (int lcv = 0; lcv < simplified.length(); lcv += 2) {
@@ -65,30 +65,26 @@ public class GUID extends RandomToken implements Serializable
 		return new GUID(bytes);
 	}
 
-	public GUID()
-	{
+	public GUID() {
 		super(_NUM_BYTES);
 	}
 
-	private GUID(byte[] bytes)
-	{
+	private GUID(byte[] bytes) {
 		super(bytes);
 	}
 
-	public String toString(boolean useCapitals)
-	{
+	public String toString(boolean useCapitals) {
 		String simple = super.toString(useCapitals);
-		return simple.substring(0, 8) + "-" + simple.substring(8, 12) + "-" + simple.substring(12, 16) + "-"
-			+ simple.substring(16, 20) + "-" + simple.substring(20);
+		return simple.substring(0, 8) + "-" + simple.substring(8, 12) + "-"
+				+ simple.substring(12, 16) + "-" + simple.substring(16, 20)
+				+ "-" + simple.substring(20);
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		return toString(true);
 	}
 
-	static public GUID fromRandomBytes(byte[] data)
-	{
+	static public GUID fromRandomBytes(byte[] data) {
 		byte[] seed = new byte[_NUM_BYTES];
 		for (int lcv = 0; lcv < _NUM_BYTES; lcv++)
 			seed[lcv] = 0;

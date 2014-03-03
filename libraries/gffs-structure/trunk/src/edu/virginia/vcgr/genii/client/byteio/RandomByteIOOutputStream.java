@@ -27,13 +27,12 @@ import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFact
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 
 /**
- * An implementation of the standard Java Output stream that writes to remote Random ByteIO
- * resources.
+ * An implementation of the standard Java Output stream that writes to remote
+ * Random ByteIO resources.
  * 
  * @author mmm2a
  */
-public class RandomByteIOOutputStream extends OutputStream
-{
+public class RandomByteIOOutputStream extends OutputStream {
 	/* The transferer being used by this stream. */
 	private RandomByteIOTransferer _transferer;
 
@@ -41,7 +40,8 @@ public class RandomByteIOOutputStream extends OutputStream
 	private long _offset = 0L;
 
 	/**
-	 * Create a new RandomByteIO output stream for a given endpoint and transfer protocol.
+	 * Create a new RandomByteIO output stream for a given endpoint and transfer
+	 * protocol.
 	 * 
 	 * @param target
 	 *            The target ByteIO to write bytes to.
@@ -51,10 +51,12 @@ public class RandomByteIOOutputStream extends OutputStream
 	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
-	public RandomByteIOOutputStream(EndpointReferenceType target, URI desiredTransferType) throws IOException, RemoteException
-	{
-		RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, target);
-		RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
+	public RandomByteIOOutputStream(EndpointReferenceType target,
+			URI desiredTransferType) throws IOException, RemoteException {
+		RandomByteIOPortType clientStub = ClientUtils.createProxy(
+				RandomByteIOPortType.class, target);
+		RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(
+				clientStub);
 		_transferer = factory.createRandomByteIOTransferer(desiredTransferType);
 		_transferer.truncAppend(0, new byte[0]);
 	}
@@ -68,8 +70,8 @@ public class RandomByteIOOutputStream extends OutputStream
 	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
-	public RandomByteIOOutputStream(EndpointReferenceType target) throws IOException, RemoteException
-	{
+	public RandomByteIOOutputStream(EndpointReferenceType target)
+			throws IOException, RemoteException {
 		this(target, null);
 	}
 
@@ -77,8 +79,7 @@ public class RandomByteIOOutputStream extends OutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void write(byte[] data) throws IOException
-	{
+	public void write(byte[] data) throws IOException {
 		_transferer.write(_offset, data.length, 0, data);
 		_offset += data.length;
 	}
@@ -87,8 +88,7 @@ public class RandomByteIOOutputStream extends OutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void write(byte[] data, int offset, int length) throws IOException
-	{
+	public void write(byte[] data, int offset, int length) throws IOException {
 		byte[] newData = new byte[length];
 		System.arraycopy(data, offset, newData, 0, length);
 		write(newData);
@@ -98,19 +98,18 @@ public class RandomByteIOOutputStream extends OutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void write(int b) throws IOException
-	{
+	public void write(int b) throws IOException {
 		write(new byte[] { (byte) b });
 	}
 
 	/**
-	 * A convenience method for creating a buffered stream (using the current transferer's preferred
-	 * buffering size) from this output stream.
+	 * A convenience method for creating a buffered stream (using the current
+	 * transferer's preferred buffering size) from this output stream.
 	 * 
 	 * @return The newly created buffered output stream.
 	 */
-	public BufferedOutputStream createPreferredBufferedStream()
-	{
-		return new BufferedOutputStream(this, _transferer.getPreferredWriteSize());
+	public BufferedOutputStream createPreferredBufferedStream() {
+		return new BufferedOutputStream(this,
+				_transferer.getPreferredWriteSize());
 	}
 }

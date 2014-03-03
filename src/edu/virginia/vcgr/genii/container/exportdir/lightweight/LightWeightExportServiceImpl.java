@@ -28,31 +28,45 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @ForkRoot(LightWeightExportDirFork.class)
-public class LightWeightExportServiceImpl extends ResourceForkBaseService implements LightWeightExportPortType
-{
-	static private Log _logger = LogFactory.getLog(LightWeightExportServiceImpl.class);
+public class LightWeightExportServiceImpl extends ResourceForkBaseService
+		implements LightWeightExportPortType {
+	static private Log _logger = LogFactory
+			.getLog(LightWeightExportServiceImpl.class);
 
 	@Override
-	protected ResourceKey createResource(GenesisHashMap creationParameters) throws ResourceException, BaseFaultType
-	{
+	protected ResourceKey createResource(GenesisHashMap creationParameters)
+			throws ResourceException, BaseFaultType {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new LightWeightExport Resource.");
 
-		ExportedDirUtils.ExportedDirInitInfo initInfo = ExportedDirUtils.extractCreationProperties(creationParameters);
+		ExportedDirUtils.ExportedDirInitInfo initInfo = ExportedDirUtils
+				.extractCreationProperties(creationParameters);
 
 		ResourceKey key = super.createResource(creationParameters);
-		key.dereference().setProperty(LightWeightExportConstants.ROOT_DIRECTORY_PROPERTY_NAME, initInfo.getPath());
+		key.dereference().setProperty(
+				LightWeightExportConstants.ROOT_DIRECTORY_PROPERTY_NAME,
+				initInfo.getPath());
 		// ensure that local dir to be exported is readable
 		// if so, proceed with export creation
 		try {
 			// check if directory exists
 			if (!ExportedDirUtils.dirReadable(initInfo.getPath())) {
-				throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
-						+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
+				throw FaultManipulator
+						.fillInFault(new ResourceCreationFaultType(
+								null,
+								null,
+								null,
+								null,
+								new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+										"Target directory "
+												+ initInfo.getPath()
+												+ " does not exist or is not readable.  "
+												+ "Cannot create export from this path.") },
+								null));
 			}
 		} catch (IOException ioe) {
-			throw new ResourceException("Could not determine if export localpath is readable.", ioe);
+			throw new ResourceException(
+					"Could not determine if export localpath is readable.", ioe);
 		}
 
 		String svnUser = initInfo.svnUser();
@@ -60,35 +74,39 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 		Long svnRevision = initInfo.svnRevision();
 
 		if (svnUser != null)
-			key.dereference().setProperty(LightWeightExportConstants.SVN_USER_PROPERTY_NAME, svnUser);
+			key.dereference().setProperty(
+					LightWeightExportConstants.SVN_USER_PROPERTY_NAME, svnUser);
 
 		if (svnPass != null)
-			key.dereference().setProperty(LightWeightExportConstants.SVN_PASS_PROPERTY_NAME, svnPass);
+			key.dereference().setProperty(
+					LightWeightExportConstants.SVN_PASS_PROPERTY_NAME, svnPass);
 
 		if (svnRevision != null)
-			key.dereference().setProperty(LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME, svnRevision);
+			key.dereference().setProperty(
+					LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME,
+					svnRevision);
 
 		return key;
 	}
 
-	public LightWeightExportServiceImpl() throws RemoteException
-	{
+	public LightWeightExportServiceImpl() throws RemoteException {
 		super("LightWeightExportPortType");
 
-		addImplementedPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE());
-		addImplementedPortType(WellKnownPortTypes.EXPORTED_LIGHTWEIGHT_ROOT_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes
+				.EXPORTED_ROOT_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes
+				.EXPORTED_LIGHTWEIGHT_ROOT_SERVICE_PORT_TYPE());
 	}
 
 	@Override
-	public PortType getFinalWSResourceInterface()
-	{
+	public PortType getFinalWSResourceInterface() {
 		return WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public QuitExportResponse quitExport(QuitExport arg0) throws RemoteException, ResourceUnknownFaultType
-	{
+	public QuitExportResponse quitExport(QuitExport arg0)
+			throws RemoteException, ResourceUnknownFaultType {
 		IResource resource = ResourceManager.getCurrentResource().dereference();
 		resource.destroy();
 

@@ -2,8 +2,7 @@ package edu.virginia.vcgr.genii.cloud;
 
 import edu.virginia.vcgr.genii.client.rp.ResourceProperty;
 
-public interface CloudRP extends CloudConstants
-{
+public interface CloudRP extends CloudConstants {
 
 	@ResourceProperty(namespace = GENII_CLOUDBES_NS, localname = SPAWN_RESOURCES_NAME)
 	public void spawnResources(int count);

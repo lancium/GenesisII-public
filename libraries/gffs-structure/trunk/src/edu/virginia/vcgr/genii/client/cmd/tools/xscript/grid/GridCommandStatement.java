@@ -12,25 +12,22 @@ import edu.virginia.vcgr.xscript.ParseStatement;
 import edu.virginia.vcgr.xscript.ReturnFromFunctionException;
 import edu.virginia.vcgr.xscript.XScriptContext;
 
-public class GridCommandStatement implements ParseStatement
-{
+public class GridCommandStatement implements ParseStatement {
 	private String _commandName;
 	private Collection<ParseStatement> _arguments;
 
-	public GridCommandStatement(String commandName)
-	{
+	public GridCommandStatement(String commandName) {
 		_commandName = commandName;
 		_arguments = new LinkedList<ParseStatement>();
 	}
 
-	public void addArgument(ParseStatement argument)
-	{
+	public void addArgument(ParseStatement argument) {
 		_arguments.add(argument);
 	}
 
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
-	{
+	public Object evaluate(XScriptContext context) throws ScriptException,
+			EarlyExitException, ReturnFromFunctionException {
 		String[] cLine = new String[_arguments.size() + 1];
 		cLine[0] = _commandName;
 		int lcv = 1;
@@ -38,8 +35,9 @@ public class GridCommandStatement implements ParseStatement
 			cLine[lcv++] = stmt.evaluate(context).toString();
 
 		try {
-			return new CommandLineRunner()
-				.runCommand(cLine, context.getWriter(), context.getErrorWriter(), context.getReader());
+			return new CommandLineRunner().runCommand(cLine,
+					context.getWriter(), context.getErrorWriter(),
+					context.getReader());
 		} catch (ScriptException se) {
 			throw se;
 		} catch (EarlyExitException eee) {

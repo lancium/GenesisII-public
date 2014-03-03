@@ -1,31 +1,25 @@
 package edu.virginia.vcgr.genii.gjt.gui.resource;
 
-public class NullableNumber
-{
+public class NullableNumber {
 	private Long _value;
 
-	public NullableNumber(Long value)
-	{
+	public NullableNumber(Long value) {
 		_value = value;
 	}
 
-	public NullableNumber()
-	{
+	public NullableNumber() {
 		this(null);
 	}
 
-	final public Long value()
-	{
+	final public Long value() {
 		return _value;
 	}
 
-	final public void value(Long value)
-	{
+	final public void value(Long value) {
 		_value = value;
 	}
 
-	final public boolean equals(NullableNumber other)
-	{
+	final public boolean equals(NullableNumber other) {
 		if (_value == null) {
 			if (other._value == null)
 				return true;
@@ -40,8 +34,7 @@ public class NullableNumber
 	}
 
 	@Override
-	final public boolean equals(Object other)
-	{
+	final public boolean equals(Object other) {
 		if (other instanceof NullableNumber)
 			return equals((NullableNumber) other);
 
@@ -49,8 +42,7 @@ public class NullableNumber
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		if (_value == null)
 			return "";
 

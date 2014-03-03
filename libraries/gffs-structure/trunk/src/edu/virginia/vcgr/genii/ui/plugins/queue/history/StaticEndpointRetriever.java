@@ -8,18 +8,15 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointRetriever;
 
-class StaticEndpointRetriever implements EndpointRetriever
-{
+class StaticEndpointRetriever implements EndpointRetriever {
 	private EndpointReferenceType _endpoint;
 
-	StaticEndpointRetriever(EndpointReferenceType endpoint)
-	{
+	StaticEndpointRetriever(EndpointReferenceType endpoint) {
 		_endpoint = endpoint;
 	}
 
 	@Override
-	final public Collection<RNSPath> getTargetEndpoints()
-	{
+	final public Collection<RNSPath> getTargetEndpoints() {
 		ArrayList<RNSPath> ret = new ArrayList<RNSPath>(1);
 		ret.add(new RNSPath(_endpoint));
 
@@ -27,14 +24,12 @@ class StaticEndpointRetriever implements EndpointRetriever
 	}
 
 	@Override
-	final public void refresh()
-	{
+	final public void refresh() {
 		// Do nothing
 	}
 
 	@Override
-	final public void refreshParent()
-	{
+	final public void refreshParent() {
 		// Do nothing
 	}
 }

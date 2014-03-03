@@ -7,11 +7,11 @@ import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpressionFactory;
 
-public class UnsupportedTopicQueryExpressionFactory implements TopicQueryExpressionFactory
-{
+public class UnsupportedTopicQueryExpressionFactory implements
+		TopicQueryExpressionFactory {
 	@Override
-	public TopicQueryExpression createFromElement(Element e) throws TopicNotSupportedFaultType
-	{
+	public TopicQueryExpression createFromElement(Element e)
+			throws TopicNotSupportedFaultType {
 		throw FaultManipulator.fillInFault(new TopicNotSupportedFaultType());
 	}
 }

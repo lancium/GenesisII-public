@@ -23,55 +23,56 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 
-public class FilesystemManager
-{
+public class FilesystemManager {
 	static private Log _logger = LogFactory.getLog(FilesystemManager.class);
 
-	static private class FilesystemWatcherComparator implements Comparator<FilesystemWatcher>
-	{
+	static private class FilesystemWatcherComparator implements
+			Comparator<FilesystemWatcher> {
 		@Override
-		final public int compare(FilesystemWatcher o1, FilesystemWatcher o2)
-		{
+		final public int compare(FilesystemWatcher o1, FilesystemWatcher o2) {
 			return o1.nextCheck().compareTo(o2.nextCheck());
 		}
 	}
 
-	static private FilesystemsConfiguration readConfiguration(File configurationSource) throws IOException
-	{
+	static private FilesystemsConfiguration readConfiguration(
+			File configurationSource) throws IOException {
 		try {
-			JAXBContext context = JAXBContext.newInstance(FilesystemsConfiguration.class);
+			JAXBContext context = JAXBContext
+					.newInstance(FilesystemsConfiguration.class);
 			Unmarshaller u = context.createUnmarshaller();
 			return (FilesystemsConfiguration) u.unmarshal(configurationSource);
 		} catch (JAXBException e) {
-			throw new IOException("Unable to parse Filesystems configuration file.", e);
+			throw new IOException(
+					"Unable to parse Filesystems configuration file.", e);
 		}
 	}
 
-	static private FilesystemsConfiguration readConfiguration(InputStream configurationSource) throws IOException
-	{
+	static private FilesystemsConfiguration readConfiguration(
+			InputStream configurationSource) throws IOException {
 		try {
-			JAXBContext context = JAXBContext.newInstance(FilesystemsConfiguration.class);
+			JAXBContext context = JAXBContext
+					.newInstance(FilesystemsConfiguration.class);
 			Unmarshaller u = context.createUnmarshaller();
 			return (FilesystemsConfiguration) u.unmarshal(configurationSource);
 		} catch (JAXBException e) {
-			throw new IOException("Unable to parse Filesystems configuration file.", e);
+			throw new IOException(
+					"Unable to parse Filesystems configuration file.", e);
 		}
 	}
 
-	private class FilesystemWatchRegistrationImpl implements FilesystemWatchRegistration
-	{
+	private class FilesystemWatchRegistrationImpl implements
+			FilesystemWatchRegistration {
 		private FilesystemWatchCallback _callback;
 		private FilesystemWatcher _watcher;
 
-		private FilesystemWatchRegistrationImpl(FilesystemWatchCallback callback, FilesystemWatcher watcher)
-		{
+		private FilesystemWatchRegistrationImpl(
+				FilesystemWatchCallback callback, FilesystemWatcher watcher) {
 			_callback = callback;
 			_watcher = watcher;
 		}
 
 		@Override
-		public void cancel()
-		{
+		public void cancel() {
 			synchronized (_watchers) {
 				_watchers.remove(_watcher);
 				_watcher.cancel();
@@ -79,74 +80,86 @@ public class FilesystemManager
 		}
 
 		@Override
-		final public void resetCallCount()
-		{
+		final public void resetCallCount() {
 			_callback.resetCallCount();
 		}
 	}
 
-	private Map<String, Filesystem> _filesystems = new HashMap<String, Filesystem>(4);
-	private PriorityQueue<FilesystemWatcher> _watchers = new PriorityQueue<FilesystemWatcher>(8,
-		new FilesystemWatcherComparator());
+	private Map<String, Filesystem> _filesystems = new HashMap<String, Filesystem>(
+			4);
+	private PriorityQueue<FilesystemWatcher> _watchers = new PriorityQueue<FilesystemWatcher>(
+			8, new FilesystemWatcherComparator());
 
-	private FilesystemManager(FilesystemsConfiguration conf) throws FileNotFoundException
-	{
+	private FilesystemManager(FilesystemsConfiguration conf)
+			throws FileNotFoundException {
 		for (FilesystemConfiguration fsConf : conf.filesystems()) {
 			Filesystem fs = new FilesystemImpl(this, fsConf.name(), fsConf);
-			_logger.info(String.format("adding filesystem at: " + fsConf.path() + " (%.2f%% used)", fs.currentUsage()
-				.percentUsed()));
+			_logger.info(String.format("adding filesystem at: " + fsConf.path()
+					+ " (%.2f%% used)", fs.currentUsage().percentUsed()));
 			_filesystems.put(fsConf.name(), fs);
 		}
 
 		for (FilesystemAliasConfiguration aliasConf : conf.aliases()) {
-			Filesystem fs = new FilesystemAliasImpl(this, aliasConf.name(), aliasConf);
-			_logger.info("adding alias named \"" + aliasConf.name() + "\" for path " + fs.filesystemRoot());
+			Filesystem fs = new FilesystemAliasImpl(this, aliasConf.name(),
+					aliasConf);
+			_logger.info("adding alias named \"" + aliasConf.name()
+					+ "\" for path " + fs.filesystemRoot());
 			_filesystems.put(aliasConf.name(), fs);
 		}
 
 		for (FilesystemWatcherConfiguration watcherConfig : conf.watchers()) {
 			String filesystemName = watcherConfig.filesystemName();
 			Filesystem filesystem = lookup(filesystemName);
-			Collection<WatchCallbackConfiguration> callbackConfigs = watcherConfig.watchCallback();
+			Collection<WatchCallbackConfiguration> callbackConfigs = watcherConfig
+					.watchCallback();
 
 			if (callbackConfigs == null || callbackConfigs.size() == 0)
 				continue;
 
-			Collection<FilesystemWatchCallback> callbacks = new ArrayList<FilesystemWatchCallback>(callbackConfigs.size());
+			Collection<FilesystemWatchCallback> callbacks = new ArrayList<FilesystemWatchCallback>(
+					callbackConfigs.size());
 
 			try {
 				for (WatchCallbackConfiguration config : callbackConfigs) {
-					callbacks.add(new FilesystemWatchCallback(config.callLimit(), config.registerAntiCallback(), config
-						.handlerClass(), config.configurationContent()));
+					callbacks.add(new FilesystemWatchCallback(config
+							.callLimit(), config.registerAntiCallback(), config
+							.handlerClass(), config.configurationContent()));
 				}
 
 				if (_logger.isDebugEnabled())
-					_logger.debug("constructor watching filesystem \"" + filesystemName + "\" with path "
-						+ filesystem.filesystemRoot().getPath());
-				FilesystemWatcher watcher =
-					new FilesystemWatcher((long) watcherConfig.checkPeriod().as(DurationUnits.Milliseconds), filesystemName,
+					_logger.debug("constructor watching filesystem \""
+							+ filesystemName + "\" with path "
+							+ filesystem.filesystemRoot().getPath());
+				FilesystemWatcher watcher = new FilesystemWatcher(
+						(long) watcherConfig.checkPeriod().as(
+								DurationUnits.Milliseconds), filesystemName,
 						filesystem, watcherConfig.filter(), callbacks);
 				_watchers.add(watcher);
 			} catch (Throwable cause) {
-				_logger.error(
-					String.format("Unable to load filesystem watcher for filesystem %s.", watcherConfig.filesystemName()),
-					cause);
+				_logger.error(String.format(
+						"Unable to load filesystem watcher for filesystem %s.",
+						watcherConfig.filesystemName()), cause);
 				continue;
 			}
 		}
 	}
 
-	FilesystemWatchRegistration addWatch(String filesystemName, Filesystem filesystem, Integer callLimit, long checkPeriod,
-		TimeUnit checkPeriodUnits, FilesystemWatchFilter filter, FilesystemWatchHandler handler)
-	{
-		Collection<FilesystemWatchCallback> callbacks = new ArrayList<FilesystemWatchCallback>(1);
-		FilesystemWatchCallback callback = new FilesystemWatchCallback(callLimit, handler);
+	FilesystemWatchRegistration addWatch(String filesystemName,
+			Filesystem filesystem, Integer callLimit, long checkPeriod,
+			TimeUnit checkPeriodUnits, FilesystemWatchFilter filter,
+			FilesystemWatchHandler handler) {
+		Collection<FilesystemWatchCallback> callbacks = new ArrayList<FilesystemWatchCallback>(
+				1);
+		FilesystemWatchCallback callback = new FilesystemWatchCallback(
+				callLimit, handler);
 		callbacks.add(callback);
 		if (_logger.isDebugEnabled())
-			_logger.debug("addWatch on filesystem " + filesystemName + " with object " + filesystem.toString());
+			_logger.debug("addWatch on filesystem " + filesystemName
+					+ " with object " + filesystem.toString());
 
-		FilesystemWatcher watcher =
-			new FilesystemWatcher(checkPeriodUnits.toMillis(checkPeriod), filesystemName, filesystem, filter, callbacks);
+		FilesystemWatcher watcher = new FilesystemWatcher(
+				checkPeriodUnits.toMillis(checkPeriod), filesystemName,
+				filesystem, filter, callbacks);
 		synchronized (_watchers) {
 			_watchers.add(watcher);
 			_watchers.notifyAll();
@@ -154,37 +167,34 @@ public class FilesystemManager
 		return new FilesystemWatchRegistrationImpl(callback, watcher);
 	}
 
-	public FilesystemManager(File configurationSource) throws IOException
-	{
+	public FilesystemManager(File configurationSource) throws IOException {
 		this(readConfiguration(configurationSource));
 	}
 
-	public FilesystemManager(InputStream configurationSource) throws IOException
-	{
+	public FilesystemManager(InputStream configurationSource)
+			throws IOException {
 		this(readConfiguration(configurationSource));
 	}
 
-	public FilesystemManager() throws FileNotFoundException
-	{
+	public FilesystemManager() throws FileNotFoundException {
 		this(new FilesystemsConfiguration());
 	}
 
-	final public Filesystem lookup(String filesystemName) throws FileNotFoundException
-	{
+	final public Filesystem lookup(String filesystemName)
+			throws FileNotFoundException {
 		Filesystem fs = _filesystems.get(filesystemName);
 		if (fs == null)
-			throw new FileNotFoundException(String.format("Filesystem %s not found!", filesystemName));
+			throw new FileNotFoundException(String.format(
+					"Filesystem %s not found!", filesystemName));
 
 		return fs;
 	}
 
-	final public Iterable<String> filesystems()
-	{
+	final public Iterable<String> filesystems() {
 		return _filesystems.keySet();
 	}
 
-	final public void enterPollingLoop() throws InterruptedException
-	{
+	final public void enterPollingLoop() throws InterruptedException {
 		Collection<FilesystemWatcher> toHandle = new LinkedList<FilesystemWatcher>();
 		long toSleep;
 		Calendar now;
@@ -214,7 +224,8 @@ public class FilesystemManager
 				}
 
 				if (!_watchers.isEmpty()) {
-					toSleep = _watchers.peek().nextCheck().getTimeInMillis() - now.getTimeInMillis();
+					toSleep = _watchers.peek().nextCheck().getTimeInMillis()
+							- now.getTimeInMillis();
 				}
 
 				if (toSleep <= 0)
@@ -225,9 +236,9 @@ public class FilesystemManager
 		}
 	}
 
-	static public void testingMain(String[] args) throws Throwable
-	{
-		InputStream in = FilesystemManager.class.getResourceAsStream("config/test-FilesystemManager.xml");
+	static public void testingMain(String[] args) throws Throwable {
+		InputStream in = FilesystemManager.class
+				.getResourceAsStream("config/test-FilesystemManager.xml");
 		FilesystemManager mgr = new FilesystemManager(in);
 		in.close();
 

@@ -9,8 +9,8 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorConstants;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(namespace = CmdLineManipulatorConstants.NAMESPACE, name = "sudo-pwrapper-configuration")
-public class SudoPwrapperVariationConfiguration extends CommonVariationConfiguration
-{
+public class SudoPwrapperVariationConfiguration extends
+		CommonVariationConfiguration {
 
 	private static final long serialVersionUID = 0;
 
@@ -20,23 +20,19 @@ public class SudoPwrapperVariationConfiguration extends CommonVariationConfigura
 	@XmlElement(namespace = NAMESPACE, name = "sudo-bin-path", required = true, nillable = false)
 	private String _sudoBinPath = null;
 
-	public String getTargetUser()
-	{
+	public String getTargetUser() {
 		return _targetUser;
 	}
 
-	public void setTargetUser(String _targetUser)
-	{
+	public void setTargetUser(String _targetUser) {
 		this._targetUser = _targetUser;
 	}
 
-	public String getSudoBinPath()
-	{
+	public String getSudoBinPath() {
 		return _sudoBinPath;
 	}
 
-	public void setSudoBinPath(String _sudoBinPath)
-	{
+	public void setSudoBinPath(String _sudoBinPath) {
 		this._sudoBinPath = _sudoBinPath;
 	}
 }

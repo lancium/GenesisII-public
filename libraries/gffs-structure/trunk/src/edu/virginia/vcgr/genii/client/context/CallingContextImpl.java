@@ -43,14 +43,12 @@ import edu.virginia.vcgr.genii.context.ContextNameValuePairType;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
-public class CallingContextImpl implements ICallingContext, Serializable
-{
+public class CallingContextImpl implements ICallingContext, Serializable {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(CallingContextImpl.class);
 
-	protected static final String CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA =
-		"edu.virginia.vcgr.genii.client.security.client-key-material-call-context-data";
+	protected static final String CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA = "edu.virginia.vcgr.genii.client.security.client-key-material-call-context-data";
 
 	protected static final String CURRENT_PATH_KEY = "__$$Current Path$$";
 
@@ -63,13 +61,11 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	// outgoing message properties
 	private HashMap<String, Serializable> _transientProperties = new HashMap<String, Serializable>();
 
-	public CallingContextImpl(CallingContextImpl parent)
-	{
+	public CallingContextImpl(CallingContextImpl parent) {
 		_parent = parent;
 	}
 
-	public CallingContextImpl(ContextType ct) throws IOException
-	{
+	public CallingContextImpl(ContextType ct) throws IOException {
 		if (ct != null) {
 			// load the properties from the ContextType
 			ContextNameValuePairType[] pairs = ct.getProperty();
@@ -83,7 +79,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 						multiValue = new ArrayList<Serializable>();
 						_properties.put(name, multiValue);
 						if (_logger.isTraceEnabled())
-							_logger.trace("adding empty multivalue for null property called: " + name);
+							_logger.trace("adding empty multivalue for null property called: "
+									+ name);
 					}
 					multiValue.add(retrieveBase64Decoded(pair.getValue()));
 				}
@@ -91,14 +88,12 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 	}
 
-	public CallingContextImpl(RNSPath root)
-	{
+	public CallingContextImpl(RNSPath root) {
 		setCurrentPath(root);
 	}
 
 	@Override
-	public synchronized Collection<Serializable> getProperty(String name)
-	{
+	public synchronized Collection<Serializable> getProperty(String name) {
 		Collection<Serializable> multiValue = null;
 		multiValue = _properties.get(name);
 		if (multiValue == null && _parent != null)
@@ -107,8 +102,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public synchronized Serializable getSingleValueProperty(String name)
-	{
+	public synchronized Serializable getSingleValueProperty(String name) {
 		Collection<Serializable> multiValue = getProperty(name);
 		if (multiValue == null) {
 			return null;
@@ -117,17 +111,18 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public synchronized void setProperty(String name, Collection<Serializable> multiValue)
-	{
+	public synchronized void setProperty(String name,
+			Collection<Serializable> multiValue) {
 		if ((multiValue != null) && (multiValue.isEmpty())) {
-			throw new IllegalArgumentException("Illegal empty multiValue, use null instead");
+			throw new IllegalArgumentException(
+					"Illegal empty multiValue, use null instead");
 		}
 		_properties.put(name, multiValue);
 	}
 
 	@Override
-	public synchronized void setSingleValueProperty(String name, Serializable value)
-	{
+	public synchronized void setSingleValueProperty(String name,
+			Serializable value) {
 		if (value == null)
 			_logger.error("attempting to store a null Serializable object.");
 		ArrayList<Serializable> multiValue = new ArrayList<Serializable>();
@@ -136,8 +131,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public synchronized void removeProperty(String name)
-	{
+	public synchronized void removeProperty(String name) {
 		_properties.remove(name);
 		if (_parent != null) {
 			_parent.removeProperty(name);
@@ -145,8 +139,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public synchronized Serializable getTransientProperty(String name)
-	{
+	public synchronized Serializable getTransientProperty(String name) {
 		Serializable obj = _transientProperties.get(name);
 		if (obj == null && _parent != null)
 			obj = _parent.getTransientProperty(name);
@@ -155,29 +148,28 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public synchronized void setTransientProperty(String name, Serializable value)
-	{
+	public synchronized void setTransientProperty(String name,
+			Serializable value) {
 		_transientProperties.put(name, value);
 	}
 
 	@Override
-	public synchronized void removeTransientProperty(String name)
-	{
+	public synchronized void removeTransientProperty(String name) {
 		_transientProperties.remove(name);
 		if (_parent != null)
 			_parent.removeTransientProperty(name);
 	}
 
 	/**
-	 * helper method for debugging; this shows what the context contains, at least as far as key
-	 * names.
+	 * helper method for debugging; this shows what the context contains, at
+	 * least as far as key names.
 	 */
 	@Override
-	public String dumpContext()
-	{
+	public String dumpContext() {
 		StringBuilder toReturn = new StringBuilder();
-		toReturn.append("====\ncontext has " + _properties.size() + " normal properties and " + _transientProperties.size()
-			+ " transient properties.\n");
+		toReturn.append("====\ncontext has " + _properties.size()
+				+ " normal properties and " + _transientProperties.size()
+				+ " transient properties.\n");
 		toReturn.append("normal property names:\n");
 		Set<String> propnames = _properties.keySet();
 		int indy = 0;
@@ -195,19 +187,21 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public synchronized void setActiveKeyAndCertMaterial(KeyAndCertMaterial clientKeyMaterial) throws GeneralSecurityException
-	{
+	public synchronized void setActiveKeyAndCertMaterial(
+			KeyAndCertMaterial clientKeyMaterial)
+			throws GeneralSecurityException {
 		// this transient property always gets put in the top parent context
 		if (_parent != null) {
 			_parent.setActiveKeyAndCertMaterial(clientKeyMaterial);
 			return;
 		}
-		setTransientProperty(CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA, clientKeyMaterial);
+		setTransientProperty(CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA,
+				clientKeyMaterial);
 	}
 
 	@Override
-	public synchronized KeyAndCertMaterial getActiveKeyAndCertMaterial() throws GeneralSecurityException
-	{
+	public synchronized KeyAndCertMaterial getActiveKeyAndCertMaterial()
+			throws GeneralSecurityException {
 		KeyAndCertMaterial toReturn = (KeyAndCertMaterial) getTransientProperty(CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA);
 		if (toReturn == null) {
 			if (!ConfigurationManager.getCurrentConfiguration().isClientRole()) {
@@ -218,8 +212,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public synchronized RNSPath getCurrentPath()
-	{
+	public synchronized RNSPath getCurrentPath() {
 		Collection<Serializable> multiValue = _properties.get(CURRENT_PATH_KEY);
 		if (multiValue != null) {
 			return (RNSPath) multiValue.iterator().next();
@@ -232,22 +225,23 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public synchronized void setCurrentPath(RNSPath newPath)
-	{
-		// hmmm: this is never EVER invoked. how does the path ever get set in the context?
+	public synchronized void setCurrentPath(RNSPath newPath) {
+		// hmmm: this is never EVER invoked. how does the path ever get set in
+		// the context?
 
-		_logger.debug("current path being set to: " + (newPath == null ? "null" : newPath.toString()));
+		_logger.debug("current path being set to: "
+				+ (newPath == null ? "null" : newPath.toString()));
 		setSingleValueProperty(CURRENT_PATH_KEY, newPath);
 	}
 
 	@Override
-	public ContextType getSerialized() throws IOException
-	{
+	public ContextType getSerialized() throws IOException {
 		ContextType ct = new ContextType();
 
 		LinkedList<ContextNameValuePairType> pairs = new LinkedList<ContextNameValuePairType>();
 		accumulateProperties(pairs);
-		ContextNameValuePairType[] pairsArray = new ContextNameValuePairType[pairs.size()];
+		ContextNameValuePairType[] pairsArray = new ContextNameValuePairType[pairs
+				.size()];
 		pairs.toArray(pairsArray);
 		ct.setProperty(pairsArray);
 
@@ -255,23 +249,24 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public ICallingContext deriveNewContext()
-	{
+	public ICallingContext deriveNewContext() {
 		return new CallingContextImpl(this);
 	}
 
 	@Override
-	public ICallingContext deriveNewContext(ContextType serializedInformation) throws IOException
-	{
+	public ICallingContext deriveNewContext(ContextType serializedInformation)
+			throws IOException {
 		CallingContextImpl retval = new CallingContextImpl(this);
 
 		// load the properties from the ContextType
 		if (serializedInformation != null) {
-			ContextNameValuePairType[] pairs = serializedInformation.getProperty();
+			ContextNameValuePairType[] pairs = serializedInformation
+					.getProperty();
 			if (pairs != null) {
 				for (ContextNameValuePairType pair : pairs) {
 					String name = pair.getName();
-					Collection<Serializable> multiValue = retval._properties.get(name);
+					Collection<Serializable> multiValue = retval._properties
+							.get(name);
 					if (multiValue == null) {
 						multiValue = new ArrayList<Serializable>();
 						retval._properties.put(name, multiValue);
@@ -285,8 +280,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		return retval;
 	}
 
-	private synchronized void accumulateProperties(List<ContextNameValuePairType> pairs) throws IOException
-	{
+	private synchronized void accumulateProperties(
+			List<ContextNameValuePairType> pairs) throws IOException {
 		if (_parent != null) {
 			_parent.accumulateProperties(pairs);
 		}
@@ -301,8 +296,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public void serializeTransientProperties(ObjectOutput out) throws IOException
-	{
+	public void serializeTransientProperties(ObjectOutput out)
+			throws IOException {
 
 		out.writeObject(_transientProperties);
 
@@ -317,10 +312,11 @@ public class CallingContextImpl implements ICallingContext, Serializable
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void deserializeTransientProperties(ObjectInput in) throws IOException
-	{
+	public void deserializeTransientProperties(ObjectInput in)
+			throws IOException {
 		try {
-			_transientProperties.putAll((HashMap<String, Serializable>) in.readObject());
+			_transientProperties.putAll((HashMap<String, Serializable>) in
+					.readObject());
 
 			if (in.readBoolean()) {
 				// read in another set from the parent
@@ -331,13 +327,11 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 	}
 
-	void setTransientProperties(HashMap<String, Serializable> transientProps)
-	{
+	void setTransientProperties(HashMap<String, Serializable> transientProps) {
 		_transientProperties = transientProps;
 	}
 
-	private void collapseTransient(HashMap<String, Serializable> target)
-	{
+	private void collapseTransient(HashMap<String, Serializable> target) {
 		if (_parent != null)
 			_parent.collapseTransient(target);
 
@@ -346,8 +340,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 	}
 
-	public Object writeReplace() throws ObjectStreamException
-	{
+	public Object writeReplace() throws ObjectStreamException {
 		ByteArrayOutputStream baos = null;
 		OutputStreamWriter writer = null;
 
@@ -366,28 +359,28 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 	}
 
-	private ContextDescription describe(ContextDescription desc)
-	{
+	private ContextDescription describe(ContextDescription desc) {
 		if (_parent != null)
 			desc = _parent.describe(desc);
 
 		for (String property : _properties.keySet())
 			desc.setProperty(property, _properties.get(property));
 		for (String property : _transientProperties.keySet())
-			desc.setTransientProperty(property, _transientProperties.get(property));
+			desc.setTransientProperty(property,
+					_transientProperties.get(property));
 
 		return desc;
 	}
 
 	@Override
-	public ContextDescription describe()
-	{
+	public ContextDescription describe() {
 		return describe(new ContextDescription());
 	}
 
-	static private Serializable retrieveBase64Decoded(String encoded) throws IOException
-	{
-		ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(Base64.base64ToByteArray(encoded)));
+	static private Serializable retrieveBase64Decoded(String encoded)
+			throws IOException {
+		ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(
+				Base64.base64ToByteArray(encoded)));
 		try {
 			return (Serializable) ois.readObject();
 		} catch (ClassNotFoundException e) {
@@ -395,8 +388,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 	}
 
-	static private String retrieveBase64Encoded(Serializable obj) throws IOException
-	{
+	static private String retrieveBase64Encoded(Serializable obj)
+			throws IOException {
 		String retval = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);

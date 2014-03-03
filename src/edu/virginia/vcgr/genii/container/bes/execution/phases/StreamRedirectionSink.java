@@ -6,7 +6,6 @@ import java.io.Serializable;
 
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 
-public interface StreamRedirectionSink extends Serializable
-{
+public interface StreamRedirectionSink extends Serializable {
 	public OutputStream openSink(ExecutionContext context) throws IOException;
 }

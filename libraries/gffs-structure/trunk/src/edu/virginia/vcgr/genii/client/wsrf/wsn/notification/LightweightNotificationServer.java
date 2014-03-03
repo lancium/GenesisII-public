@@ -44,17 +44,14 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPoli
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
-public class LightweightNotificationServer
-{
+public class LightweightNotificationServer {
 	static private enum Protocols {
-		http,
-		https;
+		http, https;
 	}
 
 	static final private String URL_PATTERN = "%1$s://%2$s:%3$d/";
 
-	static private SocketConnector createSocketConnector(Integer port)
-	{
+	static private SocketConnector createSocketConnector(Integer port) {
 		SocketConnector listener = new SocketConnector();
 
 		if (port != null)
@@ -63,9 +60,9 @@ public class LightweightNotificationServer
 		return listener;
 	}
 
-	static private SocketConnector createSslSocketConnector(Integer port, String keystore, String keystoreType,
-		String password, String keyPassword)
-	{
+	static private SocketConnector createSslSocketConnector(Integer port,
+			String keystore, String keystoreType, String password,
+			String keyPassword) {
 		SslSocketConnector listener = new SslSocketConnector();
 
 		if (port != null)
@@ -79,41 +76,42 @@ public class LightweightNotificationServer
 		return listener;
 	}
 
-	private class NotificationJettyHandler extends AbstractHandler
-	{
+	private class NotificationJettyHandler extends AbstractHandler {
 		@Override
-		public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)
-			throws IOException, ServletException
-		{
+		public void handle(String target, HttpServletRequest request,
+				HttpServletResponse response, int dispatch) throws IOException,
+				ServletException {
 			InputStream in = null;
 
 			try {
 				in = request.getInputStream();
-				SOAPMessage msg = MessageFactory.newInstance().createMessage(null, in);
+				SOAPMessage msg = MessageFactory.newInstance().createMessage(
+						null, in);
 				SOAPBody body = msg.getSOAPBody();
 				Element notifyElement = (Element) body.getFirstChild();
-				Notify notify = (Notify) ObjectDeserializer.toObject(notifyElement, Notify.class);
+				Notify notify = (Notify) ObjectDeserializer.toObject(
+						notifyElement, Notify.class);
 				NotificationHelper.notify(notify, _multiplexer);
 			} catch (SOAPException e) {
-				throw new IOException("Unable to parse notification message.", e);
+				throw new IOException("Unable to parse notification message.",
+						e);
 			} finally {
 				StreamUtils.close(in);
 			}
 		}
 	}
 
-	private class LightweightSubscriptionImpl extends AbstractSubscription implements LightweightSubscription
-	{
+	private class LightweightSubscriptionImpl extends AbstractSubscription
+			implements LightweightSubscription {
 		private TopicQueryExpression _queryExpression;
 
-		LightweightSubscriptionImpl(TopicQueryExpression queryExpression, SubscribeResponse response)
-		{
+		LightweightSubscriptionImpl(TopicQueryExpression queryExpression,
+				SubscribeResponse response) {
 			super(response);
 		}
 
 		@Override
-		public void cancel()
-		{
+		public void cancel() {
 			synchronized (_subscriptions) {
 				_subscriptions.remove(this);
 			}
@@ -123,9 +121,9 @@ public class LightweightNotificationServer
 
 		@Override
 		final public <ContentsType extends NotificationMessageContents> NotificationRegistration registerNotificationHandler(
-			NotificationHandler<ContentsType> handler)
-		{
-			return _multiplexer.registerNotificationHandler(_queryExpression, handler);
+				NotificationHandler<ContentsType> handler) {
+			return _multiplexer.registerNotificationHandler(_queryExpression,
+					handler);
 		}
 	}
 
@@ -136,31 +134,30 @@ public class LightweightNotificationServer
 
 	private Set<LightweightSubscription> _subscriptions = new HashSet<LightweightSubscription>();
 
-	public void setMultiplexer(NotificationMultiplexer multiplexer)
-	{
+	public void setMultiplexer(NotificationMultiplexer multiplexer) {
 		this._multiplexer = multiplexer;
 	}
 
-	public EndpointReferenceType getEPR() throws IOException
-	{
+	public EndpointReferenceType getEPR() throws IOException {
 		if (!_httpServer.isStarted())
 			throw new IOException("Server not started!");
 
-		return new EndpointReferenceType(new AttributedURIType(String.format(URL_PATTERN, _protocol, Hostname.getMostGlobal()
-			.getCanonicalHostName(), _httpServer.getConnectors()[0].getLocalPort())), null, null, null);
+		return new EndpointReferenceType(new AttributedURIType(String.format(
+				URL_PATTERN, _protocol, Hostname.getMostGlobal()
+						.getCanonicalHostName(), _httpServer.getConnectors()[0]
+						.getLocalPort())), null, null, null);
 	}
 
-	private ContextHandler createContext()
-	{
+	private ContextHandler createContext() {
 		ContextHandler handler = new ContextHandler();
 		handler.setContextPath("/");
 		handler.setHandler(new NotificationJettyHandler());
 		return handler;
 	}
 
-	private LightweightNotificationServer(SocketConnector listener)
-	{
-		_protocol = (listener instanceof SslSocketConnector) ? Protocols.https : Protocols.http;
+	private LightweightNotificationServer(SocketConnector listener) {
+		_protocol = (listener instanceof SslSocketConnector) ? Protocols.https
+				: Protocols.http;
 
 		_httpServer = new Server();
 
@@ -168,30 +165,26 @@ public class LightweightNotificationServer
 		_httpServer.setHandler(createContext());
 	}
 
-	private LightweightNotificationServer(Integer port)
-	{
+	private LightweightNotificationServer(Integer port) {
 		this(createSocketConnector(port));
 	}
 
-	private LightweightNotificationServer(Integer port, String keystore, String keystoreType, String password,
-		String keyPassword)
-	{
-		this(createSslSocketConnector(port, keystore, keystoreType, password, keyPassword));
+	private LightweightNotificationServer(Integer port, String keystore,
+			String keystoreType, String password, String keyPassword) {
+		this(createSslSocketConnector(port, keystore, keystoreType, password,
+				keyPassword));
 	}
 
 	@Override
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		stop();
 	}
 
-	final public void start() throws Exception
-	{
+	final public void start() throws Exception {
 		_httpServer.start();
 	}
 
-	final public void stop() throws Exception
-	{
+	final public void stop() throws Exception {
 		if (_httpServer.isStarted()) {
 			_httpServer.stop();
 			synchronized (_subscriptions) {
@@ -201,50 +194,58 @@ public class LightweightNotificationServer
 		}
 	}
 
-	final public SubscribeRequest createSubscribeRequest(TopicQueryExpression topicFilter, TerminationTimeType terminationTime,
-		AdditionalUserData additionalUserData, SubscriptionPolicy... policies) throws IOException
-	{
-		return AbstractSubscriptionFactory.createRequest(getEPR(), topicFilter, terminationTime, additionalUserData, policies);
+	final public SubscribeRequest createSubscribeRequest(
+			TopicQueryExpression topicFilter,
+			TerminationTimeType terminationTime,
+			AdditionalUserData additionalUserData,
+			SubscriptionPolicy... policies) throws IOException {
+		return AbstractSubscriptionFactory.createRequest(getEPR(), topicFilter,
+				terminationTime, additionalUserData, policies);
 	}
 
-	final public LightweightSubscription subscribe(EndpointReferenceType publisher, TopicQueryExpression topicFilter,
-		TerminationTimeType terminationTime, AdditionalUserData additionalUserData, SubscriptionPolicy... policies)
-		throws SubscribeException
-	{
+	final public LightweightSubscription subscribe(
+			EndpointReferenceType publisher, TopicQueryExpression topicFilter,
+			TerminationTimeType terminationTime,
+			AdditionalUserData additionalUserData,
+			SubscriptionPolicy... policies) throws SubscribeException {
 		try {
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, publisher);
-			return new LightweightSubscriptionImpl(topicFilter, common.subscribe(createSubscribeRequest(topicFilter,
-				terminationTime, additionalUserData, policies).asRequestType()));
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
+					publisher);
+			return new LightweightSubscriptionImpl(topicFilter,
+					common.subscribe(createSubscribeRequest(topicFilter,
+							terminationTime, additionalUserData, policies)
+							.asRequestType()));
 		} catch (IOException e) {
-			throw new SubscribeException("Unable to subscribe consumer to publisher!", e);
+			throw new SubscribeException(
+					"Unable to subscribe consumer to publisher!", e);
 		}
 	}
 
 	final public <ContentsType extends NotificationMessageContents> NotificationRegistration registerNotificationHandler(
-		TopicQueryExpression topicFilter, NotificationHandler<ContentsType> handler)
-	{
+			TopicQueryExpression topicFilter,
+			NotificationHandler<ContentsType> handler) {
 		return _multiplexer.registerNotificationHandler(topicFilter, handler);
 	}
 
-	static public LightweightNotificationServer createStandardServer()
-	{
+	static public LightweightNotificationServer createStandardServer() {
 		return new LightweightNotificationServer((Integer) null);
 	}
 
-	static public LightweightNotificationServer createStandardServer(int port)
-	{
+	static public LightweightNotificationServer createStandardServer(int port) {
 		return new LightweightNotificationServer(port);
 	}
 
-	static public LightweightNotificationServer createSslServer(String keystoreLocation, String keystoreType,
-		String keystorePassword, String keyPassword)
-	{
-		return new LightweightNotificationServer(null, keystoreLocation, keystoreType, keystorePassword, keyPassword);
+	static public LightweightNotificationServer createSslServer(
+			String keystoreLocation, String keystoreType,
+			String keystorePassword, String keyPassword) {
+		return new LightweightNotificationServer(null, keystoreLocation,
+				keystoreType, keystorePassword, keyPassword);
 	}
 
-	static public LightweightNotificationServer createSslServer(int port, String keystoreLocation, String keystoreType,
-		String keystorePassword, String keyPassword)
-	{
-		return new LightweightNotificationServer(port, keystoreLocation, keystoreType, keystorePassword, keyPassword);
+	static public LightweightNotificationServer createSslServer(int port,
+			String keystoreLocation, String keystoreType,
+			String keystorePassword, String keyPassword) {
+		return new LightweightNotificationServer(port, keystoreLocation,
+				keystoreType, keystorePassword, keyPassword);
 	}
 }

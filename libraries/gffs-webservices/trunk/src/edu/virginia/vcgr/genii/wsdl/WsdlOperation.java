@@ -8,18 +8,19 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class WsdlOperation extends AbstractXMLComponent implements IXMLComponent
-{
+public class WsdlOperation extends AbstractXMLComponent implements
+		IXMLComponent {
 	private String _name;
 	private WsdlInputOutput _input = null;
 	private WsdlInputOutput _output = null;
 	private HashMap<String, WsdlFault> _faults = new HashMap<String, WsdlFault>();
 
-	public WsdlOperation(WsdlSourcePath sourcePath, IXMLComponent parent, Node wsdlOperationNode) throws WsdlException
-	{
+	public WsdlOperation(WsdlSourcePath sourcePath, IXMLComponent parent,
+			Node wsdlOperationNode) throws WsdlException {
 		super(sourcePath, parent, wsdlOperationNode);
 
-		_name = WsdlUtils.getAttribute(wsdlOperationNode.getAttributes(), WsdlConstants.NAME_ATTR, true);
+		_name = WsdlUtils.getAttribute(wsdlOperationNode.getAttributes(),
+				WsdlConstants.NAME_ATTR, true);
 
 		NodeList children = _representedNode.getChildNodes();
 		for (int lcv = 0; lcv < children.getLength(); lcv++) {
@@ -39,23 +40,19 @@ public class WsdlOperation extends AbstractXMLComponent implements IXMLComponent
 		}
 	}
 
-	public String getOperationName()
-	{
+	public String getOperationName() {
 		return _name;
 	}
 
-	public WsdlInputOutput getInput()
-	{
+	public WsdlInputOutput getInput() {
 		return _input;
 	}
 
-	public WsdlInputOutput getOutput()
-	{
+	public WsdlInputOutput getOutput() {
 		return _output;
 	}
 
-	public Collection<WsdlFault> getFaults()
-	{
+	public Collection<WsdlFault> getFaults() {
 		return _faults.values();
 	}
 }

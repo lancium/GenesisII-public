@@ -4,18 +4,18 @@ import java.io.File;
 
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 
-public class VMSetup
-{
+public class VMSetup {
 
-	public static void setupVM(String script, String archive, String remoteDirectory, String resourceID, CloudManager tManage)
-		throws Exception
-	{
+	public static void setupVM(String script, String archive,
+			String remoteDirectory, String resourceID, CloudManager tManage)
+			throws Exception {
 		// send two files and execute script
 		if (tManage != null) {
 
 			// Fix after installer created (so path independent)
 			// (not needed after create image)
-			tManage.sendCommand(resourceID, "sudo chmod 777 /mnt", System.out, System.err);
+			tManage.sendCommand(resourceID, "sudo chmod 777 /mnt", System.out,
+					System.err);
 
 			if (archive != null)
 				tManage.sendFileTo(resourceID, archive, remoteDirectory);
@@ -27,7 +27,8 @@ public class VMSetup
 				String command = "chmod +x " + remoteScript;
 				tManage.sendCommand(resourceID, command, System.out, System.err);
 				// Execute script
-				tManage.sendCommand(resourceID, remoteScript, System.out, System.err);
+				tManage.sendCommand(resourceID, remoteScript, System.out,
+						System.err);
 			}
 		}
 	}

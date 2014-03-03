@@ -1,4 +1,4 @@
 package edu.virginia.vcgr.genii.client.dialog;
 
-public interface InformationDialog extends Dialog
-{}
+public interface InformationDialog extends Dialog {
+}

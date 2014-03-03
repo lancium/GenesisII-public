@@ -5,11 +5,11 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class SerializableStageDataAdapter extends XmlAdapter<SerializableStageDataMap, Map<StageProtocol, StageData>>
-{
+public class SerializableStageDataAdapter extends
+		XmlAdapter<SerializableStageDataMap, Map<StageProtocol, StageData>> {
 	@Override
-	public SerializableStageDataMap marshal(Map<StageProtocol, StageData> v) throws Exception
-	{
+	public SerializableStageDataMap marshal(Map<StageProtocol, StageData> v)
+			throws Exception {
 		SerializableStageDataMap ret = new SerializableStageDataMap();
 
 		for (StageData sd : v.values()) {
@@ -21,9 +21,10 @@ public class SerializableStageDataAdapter extends XmlAdapter<SerializableStageDa
 	}
 
 	@Override
-	public Map<StageProtocol, StageData> unmarshal(SerializableStageDataMap v) throws Exception
-	{
-		Map<StageProtocol, StageData> ret = new EnumMap<StageProtocol, StageData>(StageProtocol.class);
+	public Map<StageProtocol, StageData> unmarshal(SerializableStageDataMap v)
+			throws Exception {
+		Map<StageProtocol, StageData> ret = new EnumMap<StageProtocol, StageData>(
+				StageProtocol.class);
 
 		for (SerializableStageData ssd : v.stageData()) {
 			StageData sd = ssd.stageData();

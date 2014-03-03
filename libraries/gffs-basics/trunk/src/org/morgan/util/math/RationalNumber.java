@@ -20,24 +20,24 @@ import java.util.regex.Pattern;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class RationalNumber implements Serializable, Comparable<RationalNumber>
-{
-	static private Pattern _intFormat = Pattern.compile("^\\s*(-)?\\s*([0-9]+)\\s*$");
-	static private Pattern _fractionalFormat = Pattern.compile("^\\s*(-)?\\s*([0-9]+)/([0-9]+)\\s*$");
-	static private Pattern _complexFormat = Pattern.compile("^\\s*(-)?\\s*([0-9]+)\\s+([0-9]+)/([0-9]+)\\s*$");
+public class RationalNumber implements Serializable, Comparable<RationalNumber> {
+	static private Pattern _intFormat = Pattern
+			.compile("^\\s*(-)?\\s*([0-9]+)\\s*$");
+	static private Pattern _fractionalFormat = Pattern
+			.compile("^\\s*(-)?\\s*([0-9]+)/([0-9]+)\\s*$");
+	static private Pattern _complexFormat = Pattern
+			.compile("^\\s*(-)?\\s*([0-9]+)\\s+([0-9]+)/([0-9]+)\\s*$");
 
 	static final long serialVersionUID = 0;
 
 	private int _denominator;
 	private int _numerator;
 
-	public RationalNumber(int whole, int numerator, int denominator)
-	{
+	public RationalNumber(int whole, int numerator, int denominator) {
 		this(denominator * whole + numerator, denominator);
 	}
 
-	public RationalNumber(int numerator, int denominator)
-	{
+	public RationalNumber(int numerator, int denominator) {
 		if (denominator == 0)
 			throw new IllegalArgumentException("Denominator cannot be 0.");
 
@@ -51,13 +51,11 @@ public class RationalNumber implements Serializable, Comparable<RationalNumber>
 		}
 	}
 
-	public RationalNumber(int whole)
-	{
+	public RationalNumber(int whole) {
 		this(whole, 1);
 	}
 
-	static private int euclidsAlgorithm(int num, int den)
-	{
+	static private int euclidsAlgorithm(int num, int den) {
 		int remainder;
 
 		while (true) {
@@ -71,9 +69,9 @@ public class RationalNumber implements Serializable, Comparable<RationalNumber>
 		return den;
 	}
 
-	public int compareTo(RationalNumber other)
-	{
-		if (_numerator == other._numerator && _denominator == other._denominator)
+	public int compareTo(RationalNumber other) {
+		if (_numerator == other._numerator
+				&& _denominator == other._denominator)
 			return 0;
 
 		if (toDouble() < other.toDouble())
@@ -82,43 +80,36 @@ public class RationalNumber implements Serializable, Comparable<RationalNumber>
 		return 1;
 	}
 
-	public boolean equals(RationalNumber other)
-	{
-		return _numerator == other._numerator && _denominator == other._denominator;
+	public boolean equals(RationalNumber other) {
+		return _numerator == other._numerator
+				&& _denominator == other._denominator;
 	}
 
-	public boolean equals(Object other)
-	{
+	public boolean equals(Object other) {
 		return equals((RationalNumber) other);
 	}
 
-	public int hashCode()
-	{
+	public int hashCode() {
 		return _numerator ^ _denominator;
 	}
 
-	public double toDouble()
-	{
+	public double toDouble() {
 		return (double) _numerator / (double) _denominator;
 	}
 
-	public int getWholePart()
-	{
+	public int getWholePart() {
 		return _numerator / _denominator;
 	}
 
-	public int getNumeratorPart()
-	{
+	public int getNumeratorPart() {
 		return Math.abs(_numerator - (getWholePart() * _denominator));
 	}
 
-	public int getDenominatorPart()
-	{
+	public int getDenominatorPart() {
 		return _denominator;
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		int whole = getWholePart();
 		int num = getNumeratorPart();
 		int den = getDenominatorPart();
@@ -139,8 +130,7 @@ public class RationalNumber implements Serializable, Comparable<RationalNumber>
 		return buf.toString();
 	}
 
-	static public RationalNumber add(RationalNumber one, RationalNumber two)
-	{
+	static public RationalNumber add(RationalNumber one, RationalNumber two) {
 		int num1 = one._numerator;
 		int num2 = two._numerator;
 		int den1 = one._denominator;
@@ -155,8 +145,7 @@ public class RationalNumber implements Serializable, Comparable<RationalNumber>
 		return new RationalNumber(num1 + num2, den1);
 	}
 
-	static public RationalNumber subtract(RationalNumber one, RationalNumber two)
-	{
+	static public RationalNumber subtract(RationalNumber one, RationalNumber two) {
 		int num1 = one._numerator;
 		int num2 = two._numerator;
 		int den1 = one._denominator;
@@ -171,18 +160,17 @@ public class RationalNumber implements Serializable, Comparable<RationalNumber>
 		return new RationalNumber(num1 - num2, den1);
 	}
 
-	static public RationalNumber multiply(RationalNumber one, RationalNumber two)
-	{
-		return new RationalNumber(one._numerator * two._numerator, one._denominator * two._denominator);
+	static public RationalNumber multiply(RationalNumber one, RationalNumber two) {
+		return new RationalNumber(one._numerator * two._numerator,
+				one._denominator * two._denominator);
 	}
 
-	static public RationalNumber divide(RationalNumber one, RationalNumber two)
-	{
-		return new RationalNumber(one._numerator * two._denominator, one._denominator * two._numerator);
+	static public RationalNumber divide(RationalNumber one, RationalNumber two) {
+		return new RationalNumber(one._numerator * two._denominator,
+				one._denominator * two._numerator);
 	}
 
-	static public RationalNumber fromString(String str)
-	{
+	static public RationalNumber fromString(String str) {
 		Matcher m;
 
 		str = str.trim();
@@ -219,7 +207,8 @@ public class RationalNumber implements Serializable, Comparable<RationalNumber>
 					else
 						return new RationalNumber(whole, num, denom);
 				} else {
-					throw new NumberFormatException("Number \"" + str + "\" is not valid.");
+					throw new NumberFormatException("Number \"" + str
+							+ "\" is not valid.");
 				}
 			}
 		}

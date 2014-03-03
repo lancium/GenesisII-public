@@ -13,17 +13,14 @@
  */
 package edu.virginia.vcgr.genii.client.jsdl;
 
-public class JSDLException extends Exception
-{
+public class JSDLException extends Exception {
 	static final long serialVersionUID = 0;
 
-	public JSDLException(String msg)
-	{
+	public JSDLException(String msg) {
 		super(msg);
 	}
 
-	public JSDLException(String msg, Throwable cause)
-	{
+	public JSDLException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 }

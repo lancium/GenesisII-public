@@ -26,14 +26,13 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.namespace.QName;
 
 /**
- * The DirectoryName class represents an HPC Profile Application extension element that indicates
- * the name of a directory (used inside the application element when overriding the working
- * directory element).
+ * The DirectoryName class represents an HPC Profile Application extension
+ * element that indicates the name of a directory (used inside the application
+ * element when overriding the working directory element).
  * 
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class DirectoryName implements Serializable
-{
+public class DirectoryName implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -42,28 +41,23 @@ public class DirectoryName implements Serializable
 	@XmlValue
 	private String _value;
 
-	public DirectoryName(String value)
-	{
+	public DirectoryName(String value) {
 		_value = value;
 	}
 
-	public DirectoryName()
-	{
+	public DirectoryName() {
 		this(null);
 	}
 
-	final public void value(String value)
-	{
+	final public void value(String value) {
 		_value = value;
 	}
 
-	final public String value()
-	{
+	final public String value() {
 		return _value;
 	}
 
-	final public Map<QName, String> anyAttributes()
-	{
+	final public Map<QName, String> anyAttributes() {
 		return _anyAttributes;
 	}
 }

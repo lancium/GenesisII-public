@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An access-control policy data-structure comprised of policy-sets. Conveys sets of policies for
- * three types of access: "read", write", and "execute".
+ * An access-control policy data-structure comprised of policy-sets. Conveys
+ * sets of policies for three types of access: "read", write", and "execute".
  * 
- * Additionally conveys a flag indicating a confidentiality requirement for secure communication.
+ * Additionally conveys a flag indicating a confidentiality requirement for
+ * secure communication.
  * 
  * @author dgm4d
  * 
  */
-public class Acl implements Serializable
-{
+public class Acl implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	public boolean requireEncryption = false;
@@ -22,13 +22,11 @@ public class Acl implements Serializable
 	public List<AclEntry> writeAcl = new ArrayList<AclEntry>();
 	public List<AclEntry> executeAcl = new ArrayList<AclEntry>();
 
-	public Acl()
-	{
+	public Acl() {
 	}
 
 	@Override
-	public Object clone()
-	{
+	public Object clone() {
 		Acl ret = new Acl();
 
 		ret.requireEncryption = requireEncryption;

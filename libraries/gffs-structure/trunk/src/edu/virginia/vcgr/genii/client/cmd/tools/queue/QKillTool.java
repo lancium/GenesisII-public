@@ -11,25 +11,25 @@ import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.gpath.*;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class QKillTool extends BaseGridTool
-{
+public class QKillTool extends BaseGridTool {
 	static final private String _DESCRIPTION = "config/tooldocs/description/dqkill";
 	static final private String _USAGE = "config/tooldocs/usage/uqkill";
 	static final private String _MANPAGE = "config/tooldocs/man/qkill";
 
-	public QKillTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.EXECUTION);
+	public QKillTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.EXECUTION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException("<queue-path> must be a grid path. ");
-		ArrayList<JobTicket> tickets = new ArrayList<JobTicket>(numArguments() - 1);
+			throw new InvalidToolUsageException(
+					"<queue-path> must be a grid path. ");
+		ArrayList<JobTicket> tickets = new ArrayList<JobTicket>(
+				numArguments() - 1);
 		QueueManipulator manipulator = new QueueManipulator(gPath.path());
 
 		for (String arg : getArguments().subList(1, numArguments())) {
@@ -42,9 +42,9 @@ public class QKillTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() < 2)
-			throw new InvalidToolUsageException("Must supply a queue path and at least 1 job ticket.");
+			throw new InvalidToolUsageException(
+					"Must supply a queue path and at least 1 job ticket.");
 	}
 }

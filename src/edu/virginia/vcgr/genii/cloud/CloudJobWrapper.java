@@ -37,14 +37,14 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudStageOu
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelative;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 
-public class CloudJobWrapper
-{
+public class CloudJobWrapper {
 
 	static private Log _logger = LogFactory.getLog(CloudJobWrapper.class);
 
-	public static void generateWrapperScript(OutputStream tStream, File workingDir, File resourceUsage, JobRequest job,
-		File tmpDir, CmdLineManipulatorConfiguration manipulatorConfiguration) throws Exception
-	{
+	public static void generateWrapperScript(OutputStream tStream,
+			File workingDir, File resourceUsage, JobRequest job, File tmpDir,
+			CmdLineManipulatorConfiguration manipulatorConfiguration)
+			throws Exception {
 		try {
 
 			PrintStream ps = new PrintStream(tStream);
@@ -57,8 +57,9 @@ public class CloudJobWrapper
 
 			ResourceOverrides overrides = new ResourceOverrides();
 
-			ProcessWrapper wrapper =
-				ProcessWrapperFactory.createWrapper(tmpDir, overrides.operatingSystemName(), overrides.cpuArchitecture());
+			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(
+					tmpDir, overrides.operatingSystemName(),
+					overrides.cpuArchitecture());
 			boolean first = true;
 
 			String execName = job.getExecutable().getTarget();
@@ -67,11 +68,17 @@ public class CloudJobWrapper
 
 			// assemble job properties for cmdLineManipulators
 			Map<String, Object> jobProperties = new HashMap<String, Object>();
-			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, execName,
-				getArguments(getArguments(new String[job.getArguments().size()], job.getArguments())));
-			CmdLineManipulatorUtils.addEnvProperties(jobProperties, null, null, workingDir,
-				getRedirect(job.getStdinRedirect(), workingDir), getRedirect(job.getStdoutRedirect(), workingDir),
-				getRedirect(job.getStderrRedirect(), workingDir), resourceUsage, wrapper.getPathToWrapper());
+			CmdLineManipulatorUtils.addBasicJobProperties(
+					jobProperties,
+					execName,
+					getArguments(getArguments(new String[job.getArguments()
+							.size()], job.getArguments())));
+			CmdLineManipulatorUtils.addEnvProperties(jobProperties, null, null,
+					workingDir,
+					getRedirect(job.getStdinRedirect(), workingDir),
+					getRedirect(job.getStdoutRedirect(), workingDir),
+					getRedirect(job.getStderrRedirect(), workingDir),
+					resourceUsage, wrapper.getPathToWrapper());
 			/*
 			 * //Add for MPI, taken from JSDL
 			 * CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties,
@@ -83,9 +90,12 @@ public class CloudJobWrapper
 			if (_logger.isDebugEnabled())
 				_logger.debug("Trying to call cmdLine manipulators.");
 			try {
-				newCmdLine = CmdLineManipulatorUtils.callCmdLineManipulators(jobProperties, manipulatorConfiguration);
+				newCmdLine = CmdLineManipulatorUtils.callCmdLineManipulators(
+						jobProperties, manipulatorConfiguration);
 			} catch (CmdLineManipulatorException execption) {
-				throw new NativeQueueException(String.format("CmdLine Manipulators failed: %s", execption.getMessage()));
+				throw new NativeQueueException(String.format(
+						"CmdLine Manipulators failed: %s",
+						execption.getMessage()));
 			}
 
 			for (String element : newCmdLine) {
@@ -93,7 +103,8 @@ public class CloudJobWrapper
 					ps.format(" ");
 				first = false;
 				if (element.contains(tmpDir.getAbsolutePath())) {
-					element = workingDir.getAbsolutePath() + element.substring(element.lastIndexOf("/"));
+					element = workingDir.getAbsolutePath()
+							+ element.substring(element.lastIndexOf("/"));
 				}
 				ps.format("\"%s\"", element);
 			}
@@ -108,21 +119,22 @@ public class CloudJobWrapper
 		}
 	}
 
-	private static File getRedirect(FilesystemRelative<String> tPath, File workingDir)
-	{
+	private static File getRedirect(FilesystemRelative<String> tPath,
+			File workingDir) {
 		if (tPath == null)
 			return null;
 		return new File(workingDir.toString() + "/" + tPath.getTarget());
 	}
 
-	public static Vector<ExecutionPhase> createExecutionPlan(String activityID, String besid, JobRequest job,
-		BESConstructionParameters constructionParameters)
-	{
+	public static Vector<ExecutionPhase> createExecutionPlan(String activityID,
+			String besid, JobRequest job,
+			BESConstructionParameters constructionParameters) {
 
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();
 
-		CloudConfiguration cConfig = constructionParameters.getCloudConfiguration();
+		CloudConfiguration cConfig = constructionParameters
+				.getCloudConfiguration();
 
 		// Config
 		String scratchDir = cConfig.getLocalScratchDir() + activityID + "/";
@@ -144,11 +156,14 @@ public class CloudJobWrapper
 		ret.add(new CloudGetResourcePhase(activityID, besid));
 
 		// Generate runScript
-		ret.add(new CloudGenerateRunScriptPhase(scratchDir, runScript, remoteDir, resourceFile, job, stageInFile, stageOutFile,
-			genState, jobFile, cConfig.getRemoteClientDir(), constructionParameters.getCmdLineManipulatorConfiguration()));
+		ret.add(new CloudGenerateRunScriptPhase(scratchDir, runScript,
+				remoteDir, resourceFile, job, stageInFile, stageOutFile,
+				genState, jobFile, cConfig.getRemoteClientDir(),
+				constructionParameters.getCmdLineManipulatorConfiguration()));
 
 		// Move local scratch to remote scratch
-		ret.add(new CloudCopyDirectoryPhase(scratchDir, remoteDir, activityID, besid));
+		ret.add(new CloudCopyDirectoryPhase(scratchDir, remoteDir, activityID,
+				besid));
 
 		// Create List of files to be set to executable
 		ArrayList<String> permList = new ArrayList<String>();
@@ -162,7 +177,8 @@ public class CloudJobWrapper
 		ret.add(new CloudStageInPhase(activityID, besid, remoteDir, stageInFile));
 
 		// Stage In phase Poller
-		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir, "stageInPhase.complete", "stage-in"));
+		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir,
+				"stageInPhase.complete", "stage-in"));
 
 		// Create List of files to be set to executable
 		permList = new ArrayList<String>();
@@ -177,18 +193,22 @@ public class CloudJobWrapper
 		ret.add(new CloudExecutePhase(activityID, besid, remoteDir, runScript));
 
 		// Execution phase Poller
-		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir, "executePhase.complete", "execution"));
+		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir,
+				"executePhase.complete", "execution"));
 
 		// Stage Out Phase
-		ret.add(new CloudStageOutPhase(activityID, besid, remoteDir, "stageOut.sh"));
+		ret.add(new CloudStageOutPhase(activityID, besid, remoteDir,
+				"stageOut.sh"));
 
 		// Stage Out phase Poller
-		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir, "stageOutPhase.complete", "stage-out"));
+		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir,
+				"stageOutPhase.complete", "stage-out"));
 
 		// Get Accounting Back (Phase 5)
 		ArrayList<String> commandLine = new ArrayList<String>();
-		ret.add(new CloudProcessAccountingPhase(activityID, besid, remoteDir + resourceFile, scratchDir + resourceFile,
-			commandLine, constructionParameters));
+		ret.add(new CloudProcessAccountingPhase(activityID, besid, remoteDir
+				+ resourceFile, scratchDir + resourceFile, commandLine,
+				constructionParameters));
 
 		// Release Resource
 		ret.add(new CloudReleaseResourcePhase(activityID, besid));
@@ -197,8 +217,8 @@ public class CloudJobWrapper
 		return ret;
 	}
 
-	private static String[] getArguments(String[] args, List<FilesystemRelative<String>> tArgs)
-	{
+	private static String[] getArguments(String[] args,
+			List<FilesystemRelative<String>> tArgs) {
 		int i = 0;
 		for (FilesystemRelative<String> tArg : tArgs) {
 			args[i] = tArg.getTarget();
@@ -207,8 +227,7 @@ public class CloudJobWrapper
 		return args;
 	}
 
-	private static Collection<String> getArguments(String[] tArgs)
-	{
+	private static Collection<String> getArguments(String[] tArgs) {
 		Collection<String> tStrings = new ArrayList<String>();
 		for (String tArg : tArgs) {
 			tStrings.add(tArg);

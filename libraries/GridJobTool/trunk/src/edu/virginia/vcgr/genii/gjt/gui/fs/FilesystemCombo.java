@@ -13,13 +13,11 @@ import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemMap;
 import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemType;
 
 @SuppressWarnings("rawtypes")
-public class FilesystemCombo extends JComboBox
-{
+public class FilesystemCombo extends JComboBox {
 	static final long serialVersionUID = 0L;
 
 	@SuppressWarnings("unchecked")
-	public FilesystemCombo(FilesystemMap filesystemMap)
-	{
+	public FilesystemCombo(FilesystemMap filesystemMap) {
 		super(new FilesystemComboBoxModel(filesystemMap));
 
 		setEditable(false);
@@ -28,8 +26,8 @@ public class FilesystemCombo extends JComboBox
 		addItemListener(new FilesystemInstantiater(filesystemMap));
 	}
 
-	public FilesystemCombo(FilesystemMap filesystemMap, FilesystemAssociatedItem fsItem)
-	{
+	public FilesystemCombo(FilesystemMap filesystemMap,
+			FilesystemAssociatedItem fsItem) {
 		this(filesystemMap);
 
 		FilesystemType fs = fsItem.getFilesystemType();
@@ -38,18 +36,15 @@ public class FilesystemCombo extends JComboBox
 		addItemListener(new ItemListenerImpl(fsItem));
 	}
 
-	private class ItemListenerImpl implements ItemListener
-	{
+	private class ItemListenerImpl implements ItemListener {
 		private FilesystemAssociatedItem _item;
 
-		private ItemListenerImpl(FilesystemAssociatedItem item)
-		{
+		private ItemListenerImpl(FilesystemAssociatedItem item) {
 			_item = item;
 		}
 
 		@Override
-		public void itemStateChanged(ItemEvent e)
-		{
+		public void itemStateChanged(ItemEvent e) {
 			FilesystemType selected = (FilesystemType) getSelectedItem();
 			if (selected == null)
 				return;
@@ -58,19 +53,16 @@ public class FilesystemCombo extends JComboBox
 		}
 	}
 
-	private class FilesystemInstantiater implements ItemListener
-	{
+	private class FilesystemInstantiater implements ItemListener {
 		private FilesystemMap _filesystemMap;
 		private FilesystemType _lastValue = FilesystemType.Default;
 
-		private FilesystemInstantiater(FilesystemMap filesystemMap)
-		{
+		private FilesystemInstantiater(FilesystemMap filesystemMap) {
 			_filesystemMap = filesystemMap;
 		}
 
 		@Override
-		public void itemStateChanged(ItemEvent e)
-		{
+		public void itemStateChanged(ItemEvent e) {
 			if (e.getStateChange() != ItemEvent.SELECTED)
 				return;
 
@@ -80,7 +72,9 @@ public class FilesystemCombo extends JComboBox
 
 			Filesystem filesystem = _filesystemMap.get(selected);
 			if (filesystem == null) {
-				filesystem = _filesystemMap.get(SwingUtilities.getWindowAncestor((Component) e.getSource()), selected);
+				filesystem = _filesystemMap
+						.get(SwingUtilities.getWindowAncestor((Component) e
+								.getSource()), selected);
 				if (filesystem == null) {
 					((JComboBox) e.getSource()).setSelectedItem(_lastValue);
 					return;

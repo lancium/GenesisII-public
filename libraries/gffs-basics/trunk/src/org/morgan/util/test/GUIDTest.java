@@ -20,10 +20,8 @@ import junit.framework.TestCase;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class GUIDTest extends TestCase
-{
-	public void testGeneration()
-	{
+public class GUIDTest extends TestCase {
+	public void testGeneration() {
 		GUID g1 = new GUID();
 		GUID g2 = new GUID();
 
@@ -32,8 +30,7 @@ public class GUIDTest extends TestCase
 		TestCase.assertEquals(g1, g1);
 	}
 
-	public void testStrings()
-	{
+	public void testStrings() {
 		GUID g1 = new GUID();
 		String str = g1.toString();
 		GUID g2 = GUID.fromString(str);

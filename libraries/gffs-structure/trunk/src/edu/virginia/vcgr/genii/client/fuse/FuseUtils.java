@@ -4,10 +4,8 @@ import java.io.File;
 
 import edu.virginia.vcgr.genii.client.utils.SystemExec;
 
-public class FuseUtils
-{
-	static public String checkForFuserMount()
-	{
+public class FuseUtils {
+	static public String checkForFuserMount() {
 		File f = SystemExec.findExecutableInPath("fusermount");
 		if (f == null)
 			return "Unable to locate fusermount binary.";
@@ -15,8 +13,7 @@ public class FuseUtils
 		return null;
 	}
 
-	static private String checkForFuseDevice()
-	{
+	static private String checkForFuseDevice() {
 		File f = new File("/dev/fuse");
 		if (!f.exists())
 			return "Couldn't locate /dev/fuse.";
@@ -28,8 +25,7 @@ public class FuseUtils
 		return null;
 	}
 
-	static public String supportsFuse()
-	{
+	static public String supportsFuse() {
 		String msg = checkForFuserMount();
 		if (msg != null)
 			return msg;
@@ -41,8 +37,7 @@ public class FuseUtils
 		return null;
 	}
 
-	static public void main(String[] args)
-	{
+	static public void main(String[] args) {
 		System.err.println(supportsFuse());
 	}
 }

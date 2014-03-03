@@ -13,16 +13,14 @@ import edu.virginia.vcgr.genii.gjt.data.ModificationListener;
 import edu.virginia.vcgr.genii.gjt.data.analyze.Analysis;
 import edu.virginia.vcgr.genii.gjt.gui.util.TitledPanel;
 
-class ErrorPanel extends TitledPanel implements ModificationListener
-{
+class ErrorPanel extends TitledPanel implements ModificationListener {
 	static final long serialVersionUID = 0L;
 
 	private JobDocument _document;
 	private AbstractAction _generateAction;
 	private JLabel _label = new JLabel();
 
-	private void analyze()
-	{
+	private void analyze() {
 		Analysis analysis = _document.analyze();
 
 		if (analysis.hasErrors()) {
@@ -40,22 +38,21 @@ class ErrorPanel extends TitledPanel implements ModificationListener
 		}
 	}
 
-	ErrorPanel(AbstractAction generateAction, JobDocument document)
-	{
+	ErrorPanel(AbstractAction generateAction, JobDocument document) {
 		super("Warnings & Errors", new GridBagLayout());
 
 		_generateAction = generateAction;
 		_document = document;
 
-		add(_label, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(
-			5, 5, 5, 5), 5, 5));
+		add(_label, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
+						5, 5, 5), 5, 5));
 
 		analyze();
 	}
 
 	@Override
-	public void jobDescriptionModified()
-	{
+	public void jobDescriptionModified() {
 		analyze();
 	}
 }

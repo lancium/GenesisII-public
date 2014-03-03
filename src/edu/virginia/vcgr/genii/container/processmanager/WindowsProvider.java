@@ -15,8 +15,8 @@ package edu.virginia.vcgr.genii.container.processmanager;
 
 import edu.virginia.vcgr.genii.system.jni.JNIContainerBaseClass;
 
-public class WindowsProvider extends JNIContainerBaseClass implements IProcessManagerProvider
-{
+public class WindowsProvider extends JNIContainerBaseClass implements
+		IProcessManagerProvider {
 	public native boolean kill(double thePid);
 
 	public native boolean resume(double thePid);

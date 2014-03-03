@@ -4,9 +4,9 @@ import org.ggf.jsdl.JobDefinition_Type;
 
 import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
 
-public interface IDeployment
-{
+public interface IDeployment {
 	public void terminate() throws DeploymentException;
 
-	public JobDefinition_Type reifyJSDL(JobDefinition_Type jsdl) throws DeploymentException;
+	public JobDefinition_Type reifyJSDL(JobDefinition_Type jsdl)
+			throws DeploymentException;
 }

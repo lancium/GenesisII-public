@@ -11,34 +11,29 @@ import edu.virginia.vcgr.genii.context.ContextType;
  * Command to automate logging in to XSEDE infrastructure this is the equivalent of the following
  * multistep login: myproxyLogin passwordLogin IDPLogin logout (username-password token)
  */
-public class XSEDELoginTool extends BaseLoginTool
-{
+public class XSEDELoginTool extends BaseLoginTool {
 
 	static private final String _DESCRIPTION = "config/tooldocs/description/dlogin";
 	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/ulogin";
 	static final private String _MANPAGE = "config/tooldocs/man/login";
 
-	protected XSEDELoginTool(String description, String usage, boolean isHidden)
-	{
+	protected XSEDELoginTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);
 		overrideCategory(ToolCategory.SECURITY);
 	}
 
-	public XSEDELoginTool()
-	{
+	public XSEDELoginTool() {
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		overrideCategory(ToolCategory.SECURITY);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();

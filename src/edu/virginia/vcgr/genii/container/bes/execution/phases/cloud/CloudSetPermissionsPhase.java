@@ -13,31 +13,31 @@ import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 
-public class CloudSetPermissionsPhase extends AbstractCloudExecutionPhase implements Serializable
-{
+public class CloudSetPermissionsPhase extends AbstractCloudExecutionPhase
+		implements Serializable {
 
 	static final long serialVersionUID = 0L;
 
 	private ArrayList<String> _files = new ArrayList<String>();
 
-	static private Log _logger = LogFactory.getLog(CloudSetPermissionsPhase.class);
+	static private Log _logger = LogFactory
+			.getLog(CloudSetPermissionsPhase.class);
 
-	public CloudSetPermissionsPhase(String besid, String activityID, Collection<String> files)
-	{
+	public CloudSetPermissionsPhase(String besid, String activityID,
+			Collection<String> files) {
 		_besid = besid;
 		_activityID = activityID;
 		_files.addAll(files);
 	}
 
 	@Override
-	public ActivityState getPhaseState()
-	{
-		return new ActivityState(ActivityStateEnumeration.Running, "setting-permissions", false);
+	public ActivityState getPhaseState() {
+		return new ActivityState(ActivityStateEnumeration.Running,
+				"setting-permissions", false);
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
-	{
+	public void execute(ExecutionContext context) throws Throwable {
 
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID = tManage.aquireResource(_activityID);
@@ -49,19 +49,18 @@ public class CloudSetPermissionsPhase extends AbstractCloudExecutionPhase implem
 		}
 
 		tryExecuteCommand(resourceID, command, System.out, System.err, tManage);
-		_logger.info("CloudBES: Activity " + _activityID + " Set Permissions in VM");
+		_logger.info("CloudBES: Activity " + _activityID
+				+ " Set Permissions in VM");
 
 	}
 
 	@Override
-	protected Log getLog()
-	{
+	protected Log getLog() {
 		return _logger;
 	}
 
 	@Override
-	protected String getPhase()
-	{
+	protected String getPhase() {
 		return "Setting Permissions";
 	}
 

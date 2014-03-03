@@ -15,5 +15,5 @@ package edu.virginia.vcgr.genii.container.bes.activity.resource;
 
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 
-public interface IBESActivityResourceFactory extends IResourceFactory
-{}
+public interface IBESActivityResourceFactory extends IResourceFactory {
+}

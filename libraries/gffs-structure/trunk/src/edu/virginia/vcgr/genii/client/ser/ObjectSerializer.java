@@ -28,27 +28,26 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 //hmmm: fix extra loggings that got added here.
 
 /**
- * Converts Java Objects to DOM Elements and SOAP Elements. The objects must be compliant with the
- * Axis Bean model, i.e. generated using the WSDL2Java tool from an XML Schema definition or must be
- * of simple type.
+ * Converts Java Objects to DOM Elements and SOAP Elements. The objects must be
+ * compliant with the Axis Bean model, i.e. generated using the WSDL2Java tool
+ * from an XML Schema definition or must be of simple type.
  */
-public class ObjectSerializer
-{
+public class ObjectSerializer {
 	static private Log _logger = LogFactory.getLog(ObjectSerializer.class);
 
-	public static SOAPElement toSOAPElement(Object obj) throws ResourceException
-	{
+	public static SOAPElement toSOAPElement(Object obj)
+			throws ResourceException {
 		return toSOAPElement(obj, null, false);
 	}
 
-	public static SOAPElement toSOAPElement(Object obj, QName name) throws ResourceException
-	{
+	public static SOAPElement toSOAPElement(Object obj, QName name)
+			throws ResourceException {
 		return toSOAPElement(obj, name, false);
 	}
 
 	/**
-	 * Populates a SOAPElement with an arbitrary object. The object will get wrapped inside of an
-	 * element named after the qname parameter.
+	 * Populates a SOAPElement with an arbitrary object. The object will get
+	 * wrapped inside of an element named after the qname parameter.
 	 * 
 	 * @param obj
 	 *            object to be serialized in the any element
@@ -58,8 +57,8 @@ public class ObjectSerializer
 	 * @throws ResourceException
 	 *             if the object cannot be put in a MessageElement
 	 */
-	public static SOAPElement toSOAPElement(Object obj, QName name, boolean nillable) throws ResourceException
-	{
+	public static SOAPElement toSOAPElement(Object obj, QName name,
+			boolean nillable) throws ResourceException {
 		if (obj instanceof org.apache.axis.message.MessageElement) {
 			_logger.debug("seeing axis message element for soap.");
 
@@ -74,8 +73,9 @@ public class ObjectSerializer
 
 			Element element = (Element) obj;
 			if (name == null
-				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(
-					element.getNamespaceURI()))) {
+					|| (name.getLocalPart().equals(element.getLocalName()) && name
+							.getNamespaceURI()
+							.equals(element.getNamespaceURI()))) {
 				return new org.apache.axis.message.MessageElement((Element) obj);
 			} else {
 				throw new ResourceException("Not Implemented.");
@@ -83,7 +83,8 @@ public class ObjectSerializer
 		}
 
 		if (name == null) {
-			throw new IllegalArgumentException("Null argument for name parameter.");
+			throw new IllegalArgumentException(
+					"Null argument for name parameter.");
 		}
 
 		org.apache.axis.message.MessageElement messageElement = new org.apache.axis.message.MessageElement();
@@ -97,7 +98,8 @@ public class ObjectSerializer
 			try {
 				_logger.debug("seeing null object for soap!");
 
-				messageElement.addAttribute(Constants.NS_PREFIX_SCHEMA_XSI, Constants.URI_DEFAULT_SCHEMA_XSI, "nil", "true");
+				messageElement.addAttribute(Constants.NS_PREFIX_SCHEMA_XSI,
+						Constants.URI_DEFAULT_SCHEMA_XSI, "nil", "true");
 			} catch (Exception e) {
 				throw new ResourceException("Generic Serialization Error.", e);
 			}
@@ -105,18 +107,17 @@ public class ObjectSerializer
 		return messageElement;
 	}
 
-	public static Element toElement(Object obj) throws ResourceException
-	{
+	public static Element toElement(Object obj) throws ResourceException {
 		return toElement(obj, null, false);
 	}
 
-	public static Element toElement(Object obj, QName name) throws ResourceException
-	{
+	public static Element toElement(Object obj, QName name)
+			throws ResourceException {
 		return toElement(obj, name, false);
 	}
 
-	public static Element toElement(Object obj, QName name, boolean nillable) throws ResourceException
-	{
+	public static Element toElement(Object obj, QName name, boolean nillable)
+			throws ResourceException {
 		if (obj instanceof org.apache.axis.message.MessageElement) {
 			org.apache.axis.message.MessageElement messageElement = (org.apache.axis.message.MessageElement) obj;
 			if (name == null || name.equals(messageElement.getQName())) {
@@ -127,7 +128,8 @@ public class ObjectSerializer
 					_logger.debug("created from axis msg element for toElem.");
 
 				} catch (Exception e) {
-					throw new ResourceException("Generic Serialization Error.", e);
+					throw new ResourceException("Generic Serialization Error.",
+							e);
 				}
 				return element;
 			} else {
@@ -136,8 +138,9 @@ public class ObjectSerializer
 		} else if (obj instanceof Element) {
 			Element element = (Element) obj;
 			if (name == null
-				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(
-					element.getNamespaceURI()))) {
+					|| (name.getLocalPart().equals(element.getLocalName()) && name
+							.getNamespaceURI()
+							.equals(element.getNamespaceURI()))) {
 
 				_logger.debug("created from basic element for toElem.");
 
@@ -147,8 +150,8 @@ public class ObjectSerializer
 			}
 		}
 
-		org.apache.axis.message.MessageElement messageElement =
-			(org.apache.axis.message.MessageElement) toSOAPElement(obj, name, nillable);
+		org.apache.axis.message.MessageElement messageElement = (org.apache.axis.message.MessageElement) toSOAPElement(
+				obj, name, nillable);
 		try {
 			return AnyHelper.toElement(messageElement);
 		} catch (Exception e) {
@@ -156,20 +159,19 @@ public class ObjectSerializer
 		}
 	}
 
-	public static String toString(Object obj) throws ResourceException
-	{
+	public static String toString(Object obj) throws ResourceException {
 		return toString(obj, null, false);
 	}
 
-	public static String toString(Object obj, QName name) throws ResourceException
-	{
+	public static String toString(Object obj, QName name)
+			throws ResourceException {
 		return toString(obj, name, false);
 	}
 
-	public static String toString(Object obj, QName name, boolean nillable) throws ResourceException
-	{
-		org.apache.axis.message.MessageElement messageElement =
-			(org.apache.axis.message.MessageElement) toSOAPElement(obj, name, nillable);
+	public static String toString(Object obj, QName name, boolean nillable)
+			throws ResourceException {
+		org.apache.axis.message.MessageElement messageElement = (org.apache.axis.message.MessageElement) toSOAPElement(
+				obj, name, nillable);
 		try {
 			return AnyHelper.toString(messageElement);
 		} catch (Exception e) {
@@ -177,27 +179,29 @@ public class ObjectSerializer
 		}
 	}
 
-	public static void serialize(Writer writer, Object obj, QName name) throws ResourceException
-	{
+	public static void serialize(Writer writer, Object obj, QName name)
+			throws ResourceException {
 		serialize(writer, obj, name, false);
 	}
 
-	public static void serialize(Writer writer, Object obj, QName name, boolean nillable) throws ResourceException
-	{
-		SOAPElement soapElement = ObjectSerializer.toSOAPElement(obj, name, nillable);
+	public static void serialize(Writer writer, Object obj, QName name,
+			boolean nillable) throws ResourceException {
+		SOAPElement soapElement = ObjectSerializer.toSOAPElement(obj, name,
+				nillable);
 
 		if (soapElement == null) {
 			_logger.error("caught a null soap element trying to serialize!");
 		}
 		try {
-			AnyHelper.write(writer, (org.apache.axis.message.MessageElement) soapElement);
+			AnyHelper.write(writer,
+					(org.apache.axis.message.MessageElement) soapElement);
 		} catch (Exception e) {
 			throw new ResourceException("Generic Serialization Error.", e);
 		}
 	}
 
-	static public <Type> byte[] toBytes(Type obj, QName name) throws ResourceException
-	{
+	static public <Type> byte[] toBytes(Type obj, QName name)
+			throws ResourceException {
 		ByteArrayOutputStream baos = null;
 
 		if (obj == null)
@@ -218,8 +222,8 @@ public class ObjectSerializer
 		}
 	}
 
-	static public byte[] anyToBytes(org.apache.axis.message.MessageElement[] any) throws ResourceException
-	{
+	static public byte[] anyToBytes(org.apache.axis.message.MessageElement[] any)
+			throws ResourceException {
 		if (any == null)
 			return null;
 

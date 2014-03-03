@@ -6,26 +6,22 @@ import java.util.Vector;
 
 import javax.swing.SwingUtilities;
 
-public class DirectoryChangeNexus
-{
+public class DirectoryChangeNexus {
 	private Collection<DirectoryChangeListener> _listeners = new LinkedList<DirectoryChangeListener>();
 
-	public void addDirectoryChangeListener(DirectoryChangeListener listener)
-	{
+	public void addDirectoryChangeListener(DirectoryChangeListener listener) {
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	public void removeDirectoryChangeListener(DirectoryChangeListener listener)
-	{
+	public void removeDirectoryChangeListener(DirectoryChangeListener listener) {
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	public void fireDirectoryChanged(String parentPath)
-	{
+	public void fireDirectoryChanged(String parentPath) {
 		Collection<DirectoryChangeListener> listeners;
 
 		synchronized (_listeners) {
@@ -35,20 +31,18 @@ public class DirectoryChangeNexus
 		new NotificationRunner(parentPath, listeners).run();
 	}
 
-	static private class NotificationRunner implements Runnable
-	{
+	static private class NotificationRunner implements Runnable {
 		private String _parentDirectory;
 		private Collection<DirectoryChangeListener> _listeners;
 
-		private NotificationRunner(String parentDirectory, Collection<DirectoryChangeListener> listeners)
-		{
+		private NotificationRunner(String parentDirectory,
+				Collection<DirectoryChangeListener> listeners) {
 			_parentDirectory = parentDirectory;
 			_listeners = listeners;
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			if (!SwingUtilities.isEventDispatchThread()) {
 				SwingUtilities.invokeLater(this);
 				return;

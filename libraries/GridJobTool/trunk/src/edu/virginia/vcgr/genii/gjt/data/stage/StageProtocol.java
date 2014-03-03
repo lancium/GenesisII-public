@@ -9,38 +9,36 @@ import edu.virginia.vcgr.genii.gjt.data.stage.scp.ScpStageFactory;
 import edu.virginia.vcgr.genii.gjt.data.stage.undef.UndefinedStageFactory;
 
 public enum StageProtocol {
-	undefined("undefined", new UndefinedStageFactory(), StageDirection.readAndWrite),
-	http("http", new HttpStageFactory(), StageDirection.read),
-	grid("grid", new GridStageFactory(), StageDirection.readAndWrite),
-	ftp("ftp", new FtpStageFactory(), StageDirection.readAndWrite),
-	scp("scp/sftp", new ScpStageFactory(), StageDirection.readAndWrite),
-	mailto("mailto", new MailtoStageFactory(), StageDirection.write),
-	gsiftp("gsiftp", new GsiFtpStageFactory(), StageDirection.readAndWrite);
+	undefined("undefined", new UndefinedStageFactory(),
+			StageDirection.readAndWrite), http("http", new HttpStageFactory(),
+			StageDirection.read), grid("grid", new GridStageFactory(),
+			StageDirection.readAndWrite), ftp("ftp", new FtpStageFactory(),
+			StageDirection.readAndWrite), scp("scp/sftp",
+			new ScpStageFactory(), StageDirection.readAndWrite), mailto(
+			"mailto", new MailtoStageFactory(), StageDirection.write), gsiftp(
+			"gsiftp", new GsiFtpStageFactory(), StageDirection.readAndWrite);
 
 	private StageDirection _stageDirection;
 	private String _label;
 	private StageFactory _factory;
 
-	private StageProtocol(String label, StageFactory factory, StageDirection stageDirection)
-	{
+	private StageProtocol(String label, StageFactory factory,
+			StageDirection stageDirection) {
 		_label = label;
 		_factory = factory;
 		_stageDirection = stageDirection;
 	}
 
-	final public StageFactory factory()
-	{
+	final public StageFactory factory() {
 		return _factory;
 	}
 
-	final public StageDirection stageDirection()
-	{
+	final public StageDirection stageDirection() {
 		return _stageDirection;
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return _label;
 	}
 }

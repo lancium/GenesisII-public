@@ -11,32 +11,31 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 
-class LinuxMachineInterrogator extends CommonMachineInterrogator
-{
-	static private Log _logger = LogFactory.getLog(LinuxMachineInterrogator.class);
+class LinuxMachineInterrogator extends CommonMachineInterrogator {
+	static private Log _logger = LogFactory
+			.getLog(LinuxMachineInterrogator.class);
 
 	@Override
-	public boolean canDetermineUserLoggedIn()
-	{
+	public boolean canDetermineUserLoggedIn() {
 		return true;
 	}
 
 	@Override
-	public boolean isUserLoggedIn()
-	{
+	public boolean isUserLoggedIn() {
 		try {
 			return getWhoLoggedIn().size() > 0;
 		} catch (IOException ioe) {
-			_logger.error("Exception thrown while trying to " + "determine whether or not a user is logged in.", ioe);
+			_logger.error("Exception thrown while trying to "
+					+ "determine whether or not a user is logged in.", ioe);
 
 			return false;
 		}
 	}
 
-	static private final Pattern _WHO_PATTERN = Pattern.compile("^(\\S+)\\s+.*$");
+	static private final Pattern _WHO_PATTERN = Pattern
+			.compile("^(\\S+)\\s+.*$");
 
-	static public Collection<String> getWhoLoggedIn() throws IOException
-	{
+	static public Collection<String> getWhoLoggedIn() throws IOException {
 		TreeSet<String> ret = new TreeSet<String>();
 
 		for (String line : ExecutionEngine.simpleMultilineExecute("who")) {

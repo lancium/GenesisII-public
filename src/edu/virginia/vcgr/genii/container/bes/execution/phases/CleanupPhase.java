@@ -14,8 +14,8 @@ import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionExcep
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
-public class CleanupPhase extends AbstractExecutionPhase implements Serializable
-{
+public class CleanupPhase extends AbstractExecutionPhase implements
+		Serializable {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(CleanupPhase.class);
@@ -24,15 +24,14 @@ public class CleanupPhase extends AbstractExecutionPhase implements Serializable
 
 	private File _fileToCleanup;
 
-	public CleanupPhase(File fileToCleanup)
-	{
-		super(new ActivityState(ActivityStateEnumeration.Running, CLEANUP_STAGE, false));
+	public CleanupPhase(File fileToCleanup) {
+		super(new ActivityState(ActivityStateEnumeration.Running,
+				CLEANUP_STAGE, false));
 
 		_fileToCleanup = fileToCleanup;
 	}
 
-	private void removeFile(File f)
-	{
+	private void removeFile(File f) {
 		if (f.exists()) {
 			if (f.isDirectory()) {
 				for (File ff : f.listFiles())
@@ -44,21 +43,27 @@ public class CleanupPhase extends AbstractExecutionPhase implements Serializable
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
-	{
-		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Cleanup);
+	public void execute(ExecutionContext context) throws Throwable {
+		HistoryContext history = HistoryContextFactory
+				.createContext(HistoryEventCategory.Cleanup);
 
 		try {
-			history.createTraceWriter("Cleaning Up %s", _fileToCleanup.getName())
-				.format("Attempting to clean-up activity by removing %s", _fileToCleanup).close();
+			history.createTraceWriter("Cleaning Up %s",
+					_fileToCleanup.getName())
+					.format("Attempting to clean-up activity by removing %s",
+							_fileToCleanup).close();
 
-			_logger.info(String.format("Attempting to clean-up activity by removing file \"%s\".", _fileToCleanup.getName()));
+			_logger.info(String.format(
+					"Attempting to clean-up activity by removing file \"%s\".",
+					_fileToCleanup.getName()));
 			removeFile(_fileToCleanup);
 		} catch (Throwable cause) {
-			history.error(cause, "Unable to Cleanup %s", _fileToCleanup.getName());
+			history.error(cause, "Unable to Cleanup %s",
+					_fileToCleanup.getName());
 			_logger.error("Unable to clean up file.", cause);
-			throw new ContinuableExecutionException("A continuable exception has occurred while " + "running a BES activity.",
-				cause);
+			throw new ContinuableExecutionException(
+					"A continuable exception has occurred while "
+							+ "running a BES activity.", cause);
 		}
 	}
 }

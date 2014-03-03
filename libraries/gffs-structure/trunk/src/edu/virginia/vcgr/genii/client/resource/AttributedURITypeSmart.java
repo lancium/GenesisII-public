@@ -21,19 +21,17 @@ import org.ws.addressing.AttributedURIType;
 
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 
-public class AttributedURITypeSmart extends AttributedURIType
-{
-	static private Log _logger = LogFactory.getLog(AttributedURITypeSmart.class);
+public class AttributedURITypeSmart extends AttributedURIType {
+	static private Log _logger = LogFactory
+			.getLog(AttributedURITypeSmart.class);
 
 	static final long serialVersionUID = 0;
 
-	public AttributedURITypeSmart(String url)
-	{
+	public AttributedURITypeSmart(String url) {
 		super(smartifyURL(url));
 	}
 
-	static private String smartifyURL(String url)
-	{
+	static private String smartifyURL(String url) {
 		try {
 			return Hostname.normalizeURL(url);
 		} catch (UnknownHostException uhe) {

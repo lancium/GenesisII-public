@@ -23,5 +23,5 @@ import javax.xml.bind.annotation.XmlSeeAlso;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlSeeAlso({ UsernameToken.class })
-public interface SecurityToken
-{}
+public interface SecurityToken {
+}

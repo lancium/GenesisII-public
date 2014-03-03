@@ -26,8 +26,7 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-public class WorkingContextHandler extends BasicHandler
-{
+public class WorkingContextHandler extends BasicHandler {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(WorkingContextHandler.class);
@@ -38,13 +37,11 @@ public class WorkingContextHandler extends BasicHandler
 
 	private Boolean _isRequest = null;
 
-	public void init()
-	{
+	public void init() {
 		super.init();
 	}
 
-	private boolean isRequest() throws AxisFault
-	{
+	private boolean isRequest() throws AxisFault {
 		synchronized (this) {
 			if (_isRequest == null) {
 				AxisFault fault = null;
@@ -56,11 +53,13 @@ public class WorkingContextHandler extends BasicHandler
 					else if (value.equals(_FLOW_SIDE_RESPONSE_VALUE))
 						_isRequest = Boolean.FALSE;
 					else
-						fault =
-							new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected " + _FLOW_SIDE_REQUEST_VALUE
-								+ " or " + _FLOW_SIDE_RESPONSE_VALUE);
+						fault = new AxisFault(_FLOW_SIDE_KEY
+								+ " property not recognized.  Expected "
+								+ _FLOW_SIDE_REQUEST_VALUE + " or "
+								+ _FLOW_SIDE_RESPONSE_VALUE);
 				} else {
-					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY + " parameter.");
+					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY
+							+ " parameter.");
 				}
 
 				if (fault != null)
@@ -71,31 +70,31 @@ public class WorkingContextHandler extends BasicHandler
 		return _isRequest.booleanValue();
 	}
 
-	public void invoke(MessageContext ctxt) throws AxisFault
-	{
+	public void invoke(MessageContext ctxt) throws AxisFault {
 		if (isRequest())
 			handleRequest(ctxt);
 		else
 			handleResponse(ctxt);
 	}
 
-	protected void handleRequest(MessageContext ctxt) throws AxisFault
-	{
+	protected void handleRequest(MessageContext ctxt) throws AxisFault {
 		if (_logger.isTraceEnabled())
 			_logger.trace("Setting the working context for an incoming message.");
 
 		WorkingContext newContext = new WorkingContext();
 		WorkingContext.setCurrentWorkingContext(newContext);
 
-		EndpointReferenceType epr =
-			(EndpointReferenceType) ctxt.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
+		EndpointReferenceType epr = (EndpointReferenceType) ctxt
+				.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
 		if (epr == null) {
-			throw new AxisFault("Couldn't find \"" + WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY
-				+ "\" property in message context.");
+			throw new AxisFault("Couldn't find \""
+					+ WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY
+					+ "\" property in message context.");
 		}
 		newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
 
-		newContext.setProperty(WorkingContext.TARGETED_SERVICE_NAME, EPRUtils.extractServiceName(epr));
+		newContext.setProperty(WorkingContext.TARGETED_SERVICE_NAME,
+				EPRUtils.extractServiceName(epr));
 
 		newContext.setProperty(WorkingContext.MESSAGE_CONTEXT_KEY, ctxt);
 
@@ -111,8 +110,8 @@ public class WorkingContextHandler extends BasicHandler
 		// from the message context's operation).
 		try {
 			ResourceKey rKey = ResourceManager.getCurrentResource();
-			epr =
-				ResourceManager.createEPR(rKey, epr.getAddress().get_value().toString(), EPRUtils.getImplementedPortTypes(epr),
+			epr = ResourceManager.createEPR(rKey, epr.getAddress().get_value()
+					.toString(), EPRUtils.getImplementedPortTypes(epr),
 					EPRUtils.getMasterPortType(epr));
 			newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
 		} catch (Throwable t) {
@@ -120,21 +119,18 @@ public class WorkingContextHandler extends BasicHandler
 
 	}
 
-	protected void handleResponse(MessageContext ctxt)
-	{
+	protected void handleResponse(MessageContext ctxt) {
 		if (_logger.isTraceEnabled())
 			_logger.trace("Clearing the working context for a message.");
 
 		cleanupWorkingContext(ctxt);
 	}
 
-	protected void cleanupWorkingContext(MessageContext ctxt)
-	{
+	protected void cleanupWorkingContext(MessageContext ctxt) {
 		WorkingContext.setCurrentWorkingContext(null);
 	}
 
-	public void onFault(MessageContext ctxt)
-	{
+	public void onFault(MessageContext ctxt) {
 		if (_logger.isDebugEnabled())
 			_logger.debug("On fault called.");
 

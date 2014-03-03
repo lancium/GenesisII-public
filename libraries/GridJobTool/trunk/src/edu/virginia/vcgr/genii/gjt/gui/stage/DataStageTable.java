@@ -17,14 +17,13 @@ import edu.virginia.vcgr.genii.gjt.gui.fs.FilesystemCombo;
 import edu.virginia.vcgr.jsdl.CreationFlag;
 
 @SuppressWarnings("rawtypes")
-public class DataStageTable extends JTable
-{
+public class DataStageTable extends JTable {
 	static final long serialVersionUID = 0L;
 
 	@SuppressWarnings("unchecked")
-	static private JComboBox createStageProtocolComboBox(boolean isStageIn)
-	{
-		Vector<StageProtocol> protocols = new Vector<StageProtocol>(StageProtocol.values().length);
+	static private JComboBox createStageProtocolComboBox(boolean isStageIn) {
+		Vector<StageProtocol> protocols = new Vector<StageProtocol>(
+				StageProtocol.values().length);
 
 		for (StageProtocol protocol : StageProtocol.values()) {
 			if (isStageIn) {
@@ -40,8 +39,8 @@ public class DataStageTable extends JTable
 	}
 
 	@SuppressWarnings("unchecked")
-	DataStageTable(FilesystemMap filesystemMap, StageList stageList, boolean isStageIn)
-	{
+	DataStageTable(FilesystemMap filesystemMap, StageList stageList,
+			boolean isStageIn) {
 		super(new DataStageTableModel(stageList));
 		DataStageTableModel model = (DataStageTableModel) getModel();
 		model.setOwner(this);
@@ -64,7 +63,8 @@ public class DataStageTable extends JTable
 		filenameColumn.setHeaderValue("Filename");
 
 		stageProtocolColumn.setHeaderValue("Transfer Protocol");
-		stageProtocolColumn.setCellEditor(new DefaultCellEditor(createStageProtocolComboBox(isStageIn)));
+		stageProtocolColumn.setCellEditor(new DefaultCellEditor(
+				createStageProtocolComboBox(isStageIn)));
 
 		stageURIColumn.setHeaderValue("Stage URI");
 		stageURIColumn.setCellRenderer(new DataStageCellRenderer());
@@ -72,13 +72,15 @@ public class DataStageTable extends JTable
 		stageURIColumn.setMinWidth(200);
 
 		creationFlagColumn.setHeaderValue("Creation Mode");
-		creationFlagColumn.setCellEditor(new DefaultCellEditor(new JComboBox(CreationFlag.values())));
+		creationFlagColumn.setCellEditor(new DefaultCellEditor(new JComboBox(
+				CreationFlag.values())));
 
 		deleteOnTerminateColumn.setHeaderValue("Delete on Terminate?");
 
 		fsColumn.setHeaderValue("Filesystem");
 		fsColumn.setCellRenderer(new FilesystemCellRenderer());
-		fsColumn.setCellEditor(new DefaultCellEditor(new FilesystemCombo(filesystemMap)));
+		fsColumn.setCellEditor(new DefaultCellEditor(new FilesystemCombo(
+				filesystemMap)));
 
 		putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 	}

@@ -31,15 +31,13 @@ import org.xml.sax.SAXException;
 
 import org.apache.axis.utils.XMLUtils;
 
-public class XmlUtils
-{
+public class XmlUtils {
 
 	private static Log log = LogFactory.getLog(XmlUtils.class.getName());
 
 	private static DocumentBuilderFactory dbf = getDOMFactory();
 
-	private static DocumentBuilderFactory getDOMFactory()
-	{
+	private static DocumentBuilderFactory getDOMFactory() {
 		DocumentBuilderFactory dbf;
 
 		try {
@@ -60,15 +58,14 @@ public class XmlUtils
 	 * @throws ParserConfigurationException
 	 *             if construction problems occur
 	 */
-	public static Document newDocument() throws ParserConfigurationException
-	{
+	public static Document newDocument() throws ParserConfigurationException {
 		synchronized (dbf) {
 			return dbf.newDocumentBuilder().newDocument();
 		}
 	}
 
-	public static Document newDocument(InputSource inp) throws ParserConfigurationException, SAXException, IOException
-	{
+	public static Document newDocument(InputSource inp)
+			throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilder db;
 
 		synchronized (dbf) {
@@ -79,25 +76,25 @@ public class XmlUtils
 		return db.parse(inp);
 	}
 
-	public static Document newDocument(InputStream inp) throws ParserConfigurationException, SAXException, IOException
-	{
+	public static Document newDocument(InputStream inp)
+			throws ParserConfigurationException, SAXException, IOException {
 		return newDocument(new InputSource(inp));
 	}
 
-	public static Document newDocument(String uri) throws ParserConfigurationException, SAXException, IOException
-	{
+	public static Document newDocument(String uri)
+			throws ParserConfigurationException, SAXException, IOException {
 		// call the authenticated version as there might be
 		// username/password info embeded in the uri.
 		return newDocument(uri, null, null);
 	}
 
 	/**
-	 * Create a new document from the given URI, use the username and password if the URI requires
-	 * authentication.
+	 * Create a new document from the given URI, use the username and password
+	 * if the URI requires authentication.
 	 */
-	public static Document newDocument(String uri, String username, String password) throws ParserConfigurationException,
-		SAXException, IOException
-	{
+	public static Document newDocument(String uri, String username,
+			String password) throws ParserConfigurationException, SAXException,
+			IOException {
 		InputSource ins = getInputSourceFromURI(uri, username, password);
 
 		Document doc = null;
@@ -118,11 +115,12 @@ public class XmlUtils
 	/**
 	 * Utility to get the bytes at a protected uri
 	 * 
-	 * This will retrieve the URL if a username and password are provided. The java.net.URL class
-	 * does not do Basic Authentication, so we have to do it manually in this routine.
+	 * This will retrieve the URL if a username and password are provided. The
+	 * java.net.URL class does not do Basic Authentication, so we have to do it
+	 * manually in this routine.
 	 * 
-	 * If no username is provided, we create an InputSource from the uri and let the InputSource go
-	 * fetch the contents.
+	 * If no username is provided, we create an InputSource from the uri and let
+	 * the InputSource go fetch the contents.
 	 * 
 	 * @param uri
 	 *            the resource to get
@@ -131,8 +129,8 @@ public class XmlUtils
 	 * @param password
 	 *            basic auth password
 	 */
-	private static InputSource getInputSourceFromURI(String uri, String username, String password) throws IOException
-	{
+	private static InputSource getInputSourceFromURI(String uri,
+			String username, String password) throws IOException {
 		URL wsdlurl = null;
 
 		try {
@@ -181,7 +179,11 @@ public class XmlUtils
 		}
 
 		if (auth != null) {
-			uconn.setRequestProperty("Authorization", "Basic " + XMLUtils.base64encode(auth.getBytes(XMLUtils.getEncoding())));
+			uconn.setRequestProperty(
+					"Authorization",
+					"Basic "
+							+ XMLUtils.base64encode(auth.getBytes(XMLUtils
+									.getEncoding())));
 		}
 
 		uconn.connect();
@@ -189,13 +191,11 @@ public class XmlUtils
 		return new InputSource(uconn.getInputStream());
 	}
 
-	public static String toString(Document doc)
-	{
+	public static String toString(Document doc) {
 		return XMLUtils.DocumentToString(doc);
 	}
 
-	public static String toString(Element element)
-	{
+	public static String toString(Element element) {
 		return XMLUtils.ElementToString(element);
 	}
 
@@ -207,9 +207,9 @@ public class XmlUtils
 	 *            The parent element
 	 * @return The first child element if one was found, null otherwise
 	 */
-	public static Element getFirstChildElement(Element element)
-	{
-		for (Node currentChild = element.getFirstChild(); currentChild != null; currentChild = currentChild.getNextSibling()) {
+	public static Element getFirstChildElement(Element element) {
+		for (Node currentChild = element.getFirstChild(); currentChild != null; currentChild = currentChild
+				.getNextSibling()) {
 			if (currentChild.getNodeType() == Node.ELEMENT_NODE) {
 				return (Element) currentChild;
 			}

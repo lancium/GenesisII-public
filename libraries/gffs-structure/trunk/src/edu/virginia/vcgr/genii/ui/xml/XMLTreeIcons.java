@@ -9,8 +9,7 @@ import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.ui.Icons;
 
-public class XMLTreeIcons extends Icons
-{
+public class XMLTreeIcons extends Icons {
 	static private Icon _elementIcon;
 	static private Icon _attributeIcon;
 	static private Icon _errorIcon;
@@ -21,22 +20,20 @@ public class XMLTreeIcons extends Icons
 			_attributeIcon = new ImageIcon(loadImage("attribute.png"));
 			_errorIcon = new ImageIcon(loadImage("error.png"));
 		} catch (IOException ioe) {
-			throw new ConfigurationException("Unable to load icon resources.", ioe);
+			throw new ConfigurationException("Unable to load icon resources.",
+					ioe);
 		}
 	}
 
-	static public Icon errorIcon()
-	{
+	static public Icon errorIcon() {
 		return _errorIcon;
 	}
 
-	static public Icon elementIcon()
-	{
+	static public Icon elementIcon() {
 		return _elementIcon;
 	}
 
-	static public Icon attributeIcon()
-	{
+	static public Icon attributeIcon() {
 		return _attributeIcon;
 	}
 }

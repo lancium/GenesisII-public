@@ -27,14 +27,14 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
 
 /**
- * This is a rather complicated tool that acts as a front end to the idp tool. It's purpose is to
- * make the job of creating a new user from whole cloth easier for the user. It does this by making
- * calls out to other tools like the idp tool and the chmod tool.
+ * This is a rather complicated tool that acts as a front end to the idp tool.
+ * It's purpose is to make the job of creating a new user from whole cloth
+ * easier for the user. It does this by making calls out to other tools like the
+ * idp tool and the chmod tool.
  * 
  * @author mmm2a
  */
-public class CreateUserTool extends BaseGridTool
-{
+public class CreateUserTool extends BaseGridTool {
 	protected String _loginName = null;
 	protected String _password = null;
 	protected String _durationString = null;
@@ -46,9 +46,9 @@ public class CreateUserTool extends BaseGridTool
 	/**
 	 * Construct a new create-user tool
 	 */
-	public CreateUserTool()
-	{
-		this(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false);
+	public CreateUserTool() {
+		this(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false);
 	}
 
 	/**
@@ -61,8 +61,8 @@ public class CreateUserTool extends BaseGridTool
 	 * @param isHidden
 	 *            Whether or not this tool should be hidden from users.
 	 */
-	protected CreateUserTool(LoadFileResource description, LoadFileResource usageResource, boolean isHidden)
-	{
+	protected CreateUserTool(LoadFileResource description,
+			LoadFileResource usageResource, boolean isHidden) {
 		super(description, usageResource, isHidden, ToolCategory.SECURITY);
 	}
 
@@ -73,8 +73,7 @@ public class CreateUserTool extends BaseGridTool
 	 *            The new login name.
 	 */
 	@Option({ "login-name" })
-	public void setLogin_name(String loginName)
-	{
+	public void setLogin_name(String loginName) {
 		_loginName = loginName;
 	}
 
@@ -85,8 +84,7 @@ public class CreateUserTool extends BaseGridTool
 	 *            The new password
 	 */
 	@Option({ "login-password" })
-	public void setLogin_password(String password)
-	{
+	public void setLogin_password(String password) {
 		_password = password;
 	}
 
@@ -94,19 +92,18 @@ public class CreateUserTool extends BaseGridTool
 	 * Set the valid duration of the certificate for the new IDP instance.
 	 * 
 	 * @param validDuration
-	 *            The valid duration for this tool. This string is a formatted duration string. See
-	 *            Genesis II wiki page for a description.
+	 *            The valid duration for this tool. This string is a formatted
+	 *            duration string. See Genesis II wiki page for a description.
 	 */
 	@Option({ "validDuration" })
-	public void setValidDuration(String validDuration)
-	{
+	public void setValidDuration(String validDuration) {
 		_durationString = validDuration;
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
-		DialogProvider twp = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
+	protected int runCommand() throws Throwable {
+		DialogProvider twp = DialogFactory.getProvider(stdout, stderr, stdin,
+				useGui());
 
 		String idpServicePath = getArgument(0);
 		String idpName = getArgument(1);
@@ -118,7 +115,8 @@ public class CreateUserTool extends BaseGridTool
 			if (idpServiceRNS == null)
 				return 0;
 		} else
-			idpServiceRNS = RNSPath.getCurrent().lookup(idpServicePath, RNSPathQueryFlags.MUST_EXIST);
+			idpServiceRNS = RNSPath.getCurrent().lookup(idpServicePath,
+					RNSPathQueryFlags.MUST_EXIST);
 		if (idpName == null) {
 			idpName = getIDPNameFromUser(twp, idpServiceRNS);
 			if (idpName == null)
@@ -149,8 +147,7 @@ public class CreateUserTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		int numArgs = numArguments();
 		if (numArgs > 2)
 			throw new InvalidToolUsageException("Too many arguments.");
@@ -178,8 +175,8 @@ public class CreateUserTool extends BaseGridTool
 	 * 
 	 * @throws Throwable
 	 */
-	protected void enactCreation(String storeType, String sourcePath, String idpServicePath, String idpName) throws Throwable
-	{
+	protected void enactCreation(String storeType, String sourcePath,
+			String idpServicePath, String idpName) throws Throwable {
 		IdpTool idpTool = new IdpTool();
 		if (storeType != null)
 			idpTool.setStoretype(storeType);
@@ -196,7 +193,8 @@ public class CreateUserTool extends BaseGridTool
 		idpTool.run(stdout, stderr, stdin);
 
 		stdout.println(String.format("\tLifetime:     %.2f days / %.2f years.",
-			TimeHelpers.millisToDays(BaseGridTool.getValidMillis()), TimeHelpers.millisToYears(BaseGridTool.getValidMillis())));
+				TimeHelpers.millisToDays(BaseGridTool.getValidMillis()),
+				TimeHelpers.millisToYears(BaseGridTool.getValidMillis())));
 
 		String fullPath = idpServicePath + "/" + idpName;
 
@@ -210,7 +208,8 @@ public class CreateUserTool extends BaseGridTool
 			chmodTool.run(stdout, stderr, stdin);
 		} catch (Throwable cause) {
 			// Couldn't chmod the object, try to clean up
-			stderr.println("Unable to set permissions on newly created idp " + "instance.  Attempting to clean up.");
+			stderr.println("Unable to set permissions on newly created idp "
+					+ "instance.  Attempting to clean up.");
 
 			RmTool rm = new RmTool();
 			rm.setForce();
@@ -231,20 +230,24 @@ public class CreateUserTool extends BaseGridTool
 	 * @throws DialogException
 	 * @throws IOException
 	 */
-	protected RNSPath getIDPServicePathFromUser(DialogProvider wp) throws DialogException, IOException, UserCancelException
-	{
-		InputDialog input = wp.createInputDialog("IDP Service Path", "IDP service to use?");
+	protected RNSPath getIDPServicePathFromUser(DialogProvider wp)
+			throws DialogException, IOException, UserCancelException {
+		InputDialog input = wp.createInputDialog("IDP Service Path",
+				"IDP service to use?");
 		input.setDefaultAnswer("");
-		input.setHelp(new TextContent(new LoadFileResource("config/tooldocs/usage/ucreate-user-idp-path-help")));
+		input.setHelp(new TextContent(new LoadFileResource(
+				"config/tooldocs/usage/ucreate-user-idp-path-help")));
 
 		while (true) {
 			try {
 				input.showDialog();
 				String answer = input.getAnswer();
-				NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
-				RNSPath idpService =
-					RNSUtilities.findService(nsd.getRootContainer(), "X509AuthnPortType",
-						new PortType[] { WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE() }, answer);
+				NamespaceDefinitions nsd = Installation.getDeployment(
+						new DeploymentName()).namespace();
+				RNSPath idpService = RNSUtilities.findService(nsd
+						.getRootContainer(), "X509AuthnPortType",
+						new PortType[] { WellKnownPortTypes
+								.X509_AUTHN_SERVICE_PORT_TYPE() }, answer);
 				return idpService;
 			} catch (UserCancelException uce) {
 				// they cancelled the entry.
@@ -252,9 +255,11 @@ public class CreateUserTool extends BaseGridTool
 			} catch (DialogException de) {
 				throw de;
 			} catch (Throwable cause) {
-				wp.createErrorDialog("Unable to Locate IDP Service",
-					new TextContent("Unable to locate IDP service.", "Please try again or type \"Cancel\" to quit."))
-					.showDialog();
+				wp.createErrorDialog(
+						"Unable to Locate IDP Service",
+						new TextContent("Unable to locate IDP service.",
+								"Please try again or type \"Cancel\" to quit."))
+						.showDialog();
 			}
 		}
 	}
@@ -265,20 +270,25 @@ public class CreateUserTool extends BaseGridTool
 	 * @param wp
 	 *            The widget provider from which to create dialog widgets.
 	 * @param idpServicePath
-	 *            The path to the IDP service that the instance will be created inside of.
+	 *            The path to the IDP service that the instance will be created
+	 *            inside of.
 	 * 
 	 * @return The new IDP name.
 	 * 
 	 * @throws DialogException
 	 */
-	protected String getIDPNameFromUser(DialogProvider wp, RNSPath idpServicePath) throws DialogException, UserCancelException
-	{
-		InputDialog input = wp.createInputDialog("New Instance IDP Name", "New IDP instance name?");
-		input.setHelp(new TextContent("The IDP name is the new name inside the IDP service by",
-			"which this instance will be known."));
-		input.setInputValidator(new ChainedInputValidator(new NonEmptyValidator(
-			"You must supply a non-empty IDP instance name."), ContainsTextValidator.mustNotContainText("/",
-			"IDP instance names cannot contain the '/' character.")));
+	protected String getIDPNameFromUser(DialogProvider wp,
+			RNSPath idpServicePath) throws DialogException, UserCancelException {
+		InputDialog input = wp.createInputDialog("New Instance IDP Name",
+				"New IDP instance name?");
+		input.setHelp(new TextContent(
+				"The IDP name is the new name inside the IDP service by",
+				"which this instance will be known."));
+		input.setInputValidator(new ChainedInputValidator(
+				new NonEmptyValidator(
+						"You must supply a non-empty IDP instance name."),
+				ContainsTextValidator.mustNotContainText("/",
+						"IDP instance names cannot contain the '/' character.")));
 
 		while (true) {
 			try {
@@ -287,8 +297,11 @@ public class CreateUserTool extends BaseGridTool
 
 				RNSPath namePath = idpServicePath.lookup(answer);
 				if (namePath.exists()) {
-					wp.createErrorDialog("Bad IDP Instance Name",
-						new TextContent("Name \"" + answer + "\" already exists in the IDP service.")).showDialog();
+					wp.createErrorDialog(
+							"Bad IDP Instance Name",
+							new TextContent("Name \"" + answer
+									+ "\" already exists in the IDP service."))
+							.showDialog();
 					continue;
 				}
 
@@ -298,8 +311,10 @@ public class CreateUserTool extends BaseGridTool
 			} catch (UserCancelException uce) {
 				throw uce;
 			} catch (Throwable cause) {
-				wp.createErrorDialog("Bad IDP Service", new TextContent("Unable to locate IDP service.", "Please try again."))
-					.showDialog();
+				wp.createErrorDialog(
+						"Bad IDP Service",
+						new TextContent("Unable to locate IDP service.",
+								"Please try again.")).showDialog();
 			}
 		}
 	}
@@ -313,12 +328,15 @@ public class CreateUserTool extends BaseGridTool
 	 * 
 	 * @throws DialogException
 	 */
-	protected String getLoginNameFromUser(DialogProvider wp) throws DialogException, UserCancelException
-	{
-		InputDialog input = wp.createInputDialog("Login User Name", "Login user name?");
-		input.setHelp(new TextContent("The login user name is the user name used when authenticating to",
-			"the new IDP service to log in to it."));
-		input.setInputValidator(new NonEmptyValidator("You must supply a non-empty login name."));
+	protected String getLoginNameFromUser(DialogProvider wp)
+			throws DialogException, UserCancelException {
+		InputDialog input = wp.createInputDialog("Login User Name",
+				"Login user name?");
+		input.setHelp(new TextContent(
+				"The login user name is the user name used when authenticating to",
+				"the new IDP service to log in to it."));
+		input.setInputValidator(new NonEmptyValidator(
+				"You must supply a non-empty login name."));
 
 		while (true) {
 			input.showDialog();
@@ -337,12 +355,15 @@ public class CreateUserTool extends BaseGridTool
 	 * 
 	 * @throws DialogException
 	 */
-	protected String getLoginPasswordFromUser(DialogProvider wp) throws DialogException, UserCancelException
-	{
-		InputDialog input = wp.createHiddenInputDialog("Login Password", "Login password?");
-		input.setHelp(new TextContent("The login password is the password used when authenticating to",
-			"the new IDP service to log in to it."));
-		input.setInputValidator(new NonEmptyValidator("You must supply a non-empty password."));
+	protected String getLoginPasswordFromUser(DialogProvider wp)
+			throws DialogException, UserCancelException {
+		InputDialog input = wp.createHiddenInputDialog("Login Password",
+				"Login password?");
+		input.setHelp(new TextContent(
+				"The login password is the password used when authenticating to",
+				"the new IDP service to log in to it."));
+		input.setInputValidator(new NonEmptyValidator(
+				"You must supply a non-empty password."));
 
 		while (true) {
 			input.showDialog();

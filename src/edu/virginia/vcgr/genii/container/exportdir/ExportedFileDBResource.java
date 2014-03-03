@@ -26,20 +26,20 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
-public class ExportedFileDBResource extends RByteIOResource implements IExportedFileResource
-{
-	static private Log _logger = LogFactory.getLog(ExportedFileDBResource.class);
+public class ExportedFileDBResource extends RByteIOResource implements
+		IExportedFileResource {
+	static private Log _logger = LogFactory
+			.getLog(ExportedFileDBResource.class);
 
 	static private final String _CREATE_FILE_INFO = "INSERT INTO exportedfile VALUES (?, ?, ?, ?)";
 	static private final String _RETRIEVE_FILE_INFO = "SELECT path, parentIds, isReplicated FROM exportedfile WHERE fileid = ?";
 	static private final String _DELETE_EXPORTED_FILE_STMT = "DELETE FROM exportedfile WHERE fileid = ?";
 
-	static private final String _RETRIEVE_ALL_FILE_IDS_FOR_PARENT_STMT =
-		"SELECT fileid FROM exportedfile WHERE parentIds LIKE ?";
+	static private final String _RETRIEVE_ALL_FILE_IDS_FOR_PARENT_STMT = "SELECT fileid FROM exportedfile WHERE parentIds LIKE ?";
 	static private final String _DESTROY_ALL_FILES_FOR_PARENT_STMT = "DELETE FROM exportedfile WHERE parentIds LIKE ?";
 
-	static private final String _RETRIEVE_ALL_EPRS_FOR_PARENT_STMT = "SELECT endpoint " + "FROM exporteddirentry "
-		+ "WHERE dirid = ?";
+	static private final String _RETRIEVE_ALL_EPRS_FOR_PARENT_STMT = "SELECT endpoint "
+			+ "FROM exporteddirentry " + "WHERE dirid = ?";
 
 	private String _parentIds = null;
 	private String _filePath = null;
@@ -47,18 +47,23 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 
 	private String _REPLICATION_URL_ = "https://localhost:18080";
 
-	static void fileDestroyAllForParentDir(Connection connection, String parentId, boolean hardDestroy, String isReplicated)
-		throws ResourceException
-	{
-		String parentIdSearch =
-			"%" + ExportedFileUtils._PARENT_ID_BEGIN_DELIMITER + parentId + ExportedFileUtils._PARENT_ID_END_DELIMITER + "%";
+	static void fileDestroyAllForParentDir(Connection connection,
+			String parentId, boolean hardDestroy, String isReplicated)
+			throws ResourceException {
+		String parentIdSearch = "%"
+				+ ExportedFileUtils._PARENT_ID_BEGIN_DELIMITER + parentId
+				+ ExportedFileUtils._PARENT_ID_END_DELIMITER + "%";
 
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			/* Retrieve list of ids to be deleted (used to destroy base DBResource tables) */
-			stmt = connection.prepareStatement(_RETRIEVE_ALL_FILE_IDS_FOR_PARENT_STMT);
+			/*
+			 * Retrieve list of ids to be deleted (used to destroy base
+			 * DBResource tables)
+			 */
+			stmt = connection
+					.prepareStatement(_RETRIEVE_ALL_FILE_IDS_FOR_PARENT_STMT);
 			stmt.setString(1, parentIdSearch);
 			rs = stmt.executeQuery();
 			Collection<String> fileids = new ArrayList<String>();
@@ -73,8 +78,10 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 			// if replicated, perform required actions
 			if (isReplicated.equals("true")) {
 
-				// retrieve all EPRs associated with files and call terminate on each
-				stmt = connection.prepareStatement(_RETRIEVE_ALL_EPRS_FOR_PARENT_STMT);
+				// retrieve all EPRs associated with files and call terminate on
+				// each
+				stmt = connection
+						.prepareStatement(_RETRIEVE_ALL_EPRS_FOR_PARENT_STMT);
 				stmt.setString(1, parentId);
 				rs = stmt.executeQuery();
 				Collection<EndpointReferenceType> fileEPRs = new ArrayList<EndpointReferenceType>();
@@ -95,14 +102,17 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 
 						RExportResolverUtils.destroyResolverByEPR(exportEPR);
 					} catch (Exception ce) {
-						_logger.error("Could not notify resolver of exportFile termination.", ce);
+						_logger.error(
+								"Could not notify resolver of exportFile termination.",
+								ce);
 					}
 
 				}
 			}
 
 			/* delete entries from exportedfile table */
-			stmt = connection.prepareStatement(_DESTROY_ALL_FILES_FOR_PARENT_STMT);
+			stmt = connection
+					.prepareStatement(_DESTROY_ALL_FILES_FOR_PARENT_STMT);
 			stmt.setString(1, parentIdSearch);
 			stmt.executeUpdate();
 
@@ -111,36 +121,44 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 
 			RByteIOResource.destroyAll(connection, fileids);
 		} catch (SQLException sqe) {
-			throw new ResourceException("Could not destroy file export table entries.", sqe);
+			throw new ResourceException(
+					"Could not destroy file export table entries.", sqe);
 		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}
 
-	public ExportedFileDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
-	{
+	public ExportedFileDBResource(ResourceKey parentKey,
+			ServerDatabaseConnectionPool connectionPool) throws SQLException {
 		super(parentKey, connectionPool);
 	}
 
 	@Override
-	public void initialize(GenesisHashMap constructionParams) throws ResourceException
-	{
-		_parentIds = (String) constructionParams.get(IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM);
-		_filePath = (String) constructionParams.get(IExportedFileResource.PATH_CONSTRUCTION_PARAM);
-		_isReplicated = (String) constructionParams.get(IExportedFileResource.REPLICATION_INDICATOR);
-		Boolean isServiceResource = (Boolean) constructionParams.get(IResource.IS_SERVICE_CONSTRUCTION_PARAM);
+	public void initialize(GenesisHashMap constructionParams)
+			throws ResourceException {
+		_parentIds = (String) constructionParams
+				.get(IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM);
+		_filePath = (String) constructionParams
+				.get(IExportedFileResource.PATH_CONSTRUCTION_PARAM);
+		_isReplicated = (String) constructionParams
+				.get(IExportedFileResource.REPLICATION_INDICATOR);
+		Boolean isServiceResource = (Boolean) constructionParams
+				.get(IResource.IS_SERVICE_CONSTRUCTION_PARAM);
 
 		if ((isServiceResource == null) || !isServiceResource) {
 			if (_parentIds == null)
-				throw new ResourceException("\"" + IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM
-					+ "\" construction parameter MUST be set.");
+				throw new ResourceException("\""
+						+ IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM
+						+ "\" construction parameter MUST be set.");
 			if (_filePath == null)
-				throw new ResourceException("\"" + IExportedFileResource.PATH_CONSTRUCTION_PARAM
-					+ "\" construction parameter MUST be set.");
+				throw new ResourceException("\""
+						+ IExportedFileResource.PATH_CONSTRUCTION_PARAM
+						+ "\" construction parameter MUST be set.");
 			if (_isReplicated == null)
-				throw new ResourceException("\"" + IExportedFileResource.REPLICATION_INDICATOR
-					+ "\" construction parameter MUST be set.");
+				throw new ResourceException("\""
+						+ IExportedFileResource.REPLICATION_INDICATOR
+						+ "\" construction parameter MUST be set.");
 		}
 
 		super.initialize(constructionParams);
@@ -151,8 +169,8 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 	}
 
 	@Override
-	public void load(String resourceKey) throws ResourceUnknownFaultType, ResourceException
-	{
+	public void load(String resourceKey) throws ResourceUnknownFaultType,
+			ResourceException {
 		super.load(resourceKey);
 
 		if (isServiceResource()) {
@@ -168,37 +186,38 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 		}
 	}
 
-	public File chooseFile(GenesisHashMap constructionParams) throws ResourceException
-	{
-		String path = (String) constructionParams.get(IExportedFileResource.PATH_CONSTRUCTION_PARAM);
+	public File chooseFile(GenesisHashMap constructionParams)
+			throws ResourceException {
+		String path = (String) constructionParams
+				.get(IExportedFileResource.PATH_CONSTRUCTION_PARAM);
 		if (path == null)
-			throw new ResourceException("Couldn't find \"" + IExportedFileResource.PATH_CONSTRUCTION_PARAM
-				+ "\" construction parameter.");
+			throw new ResourceException("Couldn't find \""
+					+ IExportedFileResource.PATH_CONSTRUCTION_PARAM
+					+ "\" construction parameter.");
 
 		return new File(path);
 	}
 
-	public File getCurrentFile() throws ResourceException
-	{
+	public File getCurrentFile() throws ResourceException {
 		String file = getFilePath();
 		if (file == null)
-			throw new ResourceException("No file name set for ExportedFileResource.");
+			throw new ResourceException(
+					"No file name set for ExportedFileResource.");
 
 		return new File(file);
 	}
 
-	public void destroy() throws ResourceException
-	{
+	public void destroy() throws ResourceException {
 		destroy(_connection, true);
 	}
 
-	public void destroy(boolean hardDestroy) throws ResourceException, ResourceUnknownFaultType
-	{
+	public void destroy(boolean hardDestroy) throws ResourceException,
+			ResourceUnknownFaultType {
 		destroy(_connection, hardDestroy);
 	}
 
-	public void destroy(Connection connection, boolean hardDestroy) throws ResourceException
-	{
+	public void destroy(Connection connection, boolean hardDestroy)
+			throws ResourceException {
 		PreparedStatement stmt = null;
 		try {
 			stmt = connection.prepareStatement(_DELETE_EXPORTED_FILE_STMT);
@@ -217,9 +236,11 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 		// if replicated, notify resolver
 		if (getReplicationState().equals("true")) {
 			try {
-				RExportResolverUtils.destroyResolverByEPI(getResourceEPIasString(), _REPLICATION_URL_);
+				RExportResolverUtils.destroyResolverByEPI(
+						getResourceEPIasString(), _REPLICATION_URL_);
 			} catch (Exception e) {
-				_logger.error("No resolver for exportedFile could be found to destory: " + e);
+				_logger.error("No resolver for exportedFile could be found to destory: "
+						+ e);
 			}
 		}
 	}
@@ -227,43 +248,39 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 	/*
 	 * returns current resource's EPI as String from working context
 	 */
-	protected String getResourceEPIasString() throws RuntimeException, ResourceException, ResourceUnknownFaultType
-	{
+	protected String getResourceEPIasString() throws RuntimeException,
+			ResourceException, ResourceUnknownFaultType {
 		// get current resource
 		String resourceEPI = null;
 
-		resourceEPI = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPI_KEY);
+		resourceEPI = (String) WorkingContext.getCurrentWorkingContext()
+				.getProperty(WorkingContext.EPI_KEY);
 
 		return resourceEPI;
 	}
 
-	public String getId() throws ResourceException
-	{
+	public String getId() throws ResourceException {
 		return _resourceKey;
 	}
 
-	public String getParentIds() throws ResourceException
-	{
+	public String getParentIds() throws ResourceException {
 		return _parentIds;
 	}
 
-	public String getReplicationState() throws ResourceException
-	{
+	public String getReplicationState() throws ResourceException {
 		return _isReplicated;
 	}
 
-	public String getLocalPath() throws ResourceException
-	{
+	public String getLocalPath() throws ResourceException {
 		return getFilePath();
 	}
 
-	public String getFilePath() throws ResourceException
-	{
+	public String getFilePath() throws ResourceException {
 		return _filePath;
 	}
 
-	protected void insertFileInfo(String parentIDs, String filePath, String replicationStatus) throws ResourceException
-	{
+	protected void insertFileInfo(String parentIDs, String filePath,
+			String replicationStatus) throws ResourceException {
 		PreparedStatement stmt = null;
 
 		try {
@@ -273,7 +290,8 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 			stmt.setString(3, parentIDs);
 			stmt.setString(4, replicationStatus);
 			if (stmt.executeUpdate() != 1)
-				throw new ResourceException("Unable to insert ExportedFile resource information.");
+				throw new ResourceException(
+						"Unable to insert ExportedFile resource information.");
 		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		} finally {
@@ -281,8 +299,7 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 		}
 	}
 
-	protected void loadFileInfo() throws ResourceException
-	{
+	protected void loadFileInfo() throws ResourceException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
@@ -308,8 +325,7 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 		}
 	}
 
-	protected boolean fileExists() throws ResourceException
-	{
+	protected boolean fileExists() throws ResourceException {
 		File myFile = getCurrentFile();
 		if (myFile.exists() && myFile.isFile())
 			return true;
@@ -317,8 +333,7 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 		return false;
 	}
 
-	protected void destroyFile(File file)
-	{
+	protected void destroyFile(File file) {
 		if (file == null || !file.exists() || !file.isFile())
 			return;
 		try {
@@ -326,13 +341,12 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 		} catch (Exception e) {
 			if (_logger.isDebugEnabled())
 				_logger.debug(
-					"Exception occurred while deleting file in ExportFileResource.destroyFile(" + file.getAbsolutePath() + ")",
-					e);
+						"Exception occurred while deleting file in ExportFileResource.destroyFile("
+								+ file.getAbsolutePath() + ")", e);
 		}
 	}
 
-	protected void destroyFile(String filePath)
-	{
+	protected void destroyFile(String filePath) {
 		destroyFile(new File(filePath));
 	}
 }

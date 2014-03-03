@@ -20,9 +20,9 @@ import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
-public interface ICertGeneratorResource extends IResource
-{
-	public void setCertificateIssuerInfo(GenesisHashMap creationParameters) throws ResourceException;
+public interface ICertGeneratorResource extends IResource {
+	public void setCertificateIssuerInfo(GenesisHashMap creationParameters)
+			throws ResourceException;
 
 	public Long getDefaultValidity() throws ResourceException;
 

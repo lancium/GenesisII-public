@@ -4,12 +4,11 @@ import edu.virginia.vcgr.genii.client.dialog.InputValidator;
 import edu.virginia.vcgr.genii.client.dialog.YesNoDialog;
 import edu.virginia.vcgr.genii.client.dialog.YesNoSelection;
 
-public class TextYesNoDialog extends TextInputDialog implements YesNoDialog
-{
+public class TextYesNoDialog extends TextInputDialog implements YesNoDialog {
 	private boolean _isYes;
 
-	public TextYesNoDialog(String title, ConsolePackage pkg, String prompt, YesNoSelection defaultAnswer)
-	{
+	public TextYesNoDialog(String title, ConsolePackage pkg, String prompt,
+			YesNoSelection defaultAnswer) {
 		super(title, pkg, prompt);
 
 		if (defaultAnswer != null)
@@ -19,22 +18,18 @@ public class TextYesNoDialog extends TextInputDialog implements YesNoDialog
 	}
 
 	@Override
-	public boolean isNo()
-	{
+	public boolean isNo() {
 		return !_isYes;
 	}
 
 	@Override
-	public boolean isYes()
-	{
+	public boolean isYes() {
 		return _isYes;
 	}
 
-	private class InternalInputValidator implements InputValidator
-	{
+	private class InternalInputValidator implements InputValidator {
 		@Override
-		public String validateInput(String input)
-		{
+		public String validateInput(String input) {
 			if (input.equalsIgnoreCase(YesNoSelection.YES.name())) {
 				_isYes = true;
 				return null;
@@ -43,7 +38,8 @@ public class TextYesNoDialog extends TextInputDialog implements YesNoDialog
 				return null;
 			}
 
-			return String.format("Please select either %s, or %s!", YesNoSelection.YES.name(), YesNoSelection.NO.name());
+			return String.format("Please select either %s, or %s!",
+					YesNoSelection.YES.name(), YesNoSelection.NO.name());
 		}
 	}
 }

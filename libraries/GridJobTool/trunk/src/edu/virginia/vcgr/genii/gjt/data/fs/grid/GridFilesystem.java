@@ -10,8 +10,8 @@ import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemType;
 import edu.virginia.vcgr.jsdl.FileSystem;
 import edu.virginia.vcgr.jsdl.FileSystemType;
 
-public class GridFilesystem extends AbstractFilesystem implements Externalizable
-{
+public class GridFilesystem extends AbstractFilesystem implements
+		Externalizable {
 	static public final String COMMON_NAME = "Grid Mount";
 
 	static public final String JSDL_NAME = "GRID";
@@ -19,20 +19,17 @@ public class GridFilesystem extends AbstractFilesystem implements Externalizable
 
 	static public final boolean CAN_EDIT = false;
 
-	public GridFilesystem()
-	{
+	public GridFilesystem() {
 		super(FilesystemType.Grid);
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return String.format("%s", filesystemType().toString());
 	}
 
 	@Override
-	public boolean equals(Object other)
-	{
+	public boolean equals(Object other) {
 		if (other instanceof GridFilesystem)
 			return true;
 
@@ -40,24 +37,21 @@ public class GridFilesystem extends AbstractFilesystem implements Externalizable
 	}
 
 	@Override
-	public Object clone()
-	{
+	public Object clone() {
 		return new GridFilesystem();
 	}
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
-	{
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException
-	{
+	public void writeExternal(ObjectOutput out) throws IOException {
 	}
 
 	@Override
-	public FileSystem toJSDLFilesystem()
-	{
+	public FileSystem toJSDLFilesystem() {
 		FileSystem ret = new FileSystem("GRID", FileSystemType.normal);
 
 		return ret;

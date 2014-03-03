@@ -16,23 +16,27 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.prefs.history.HistoryUIPreferenceSet;
 
-class HistoryTreePanel extends JPanel
-{
+class HistoryTreePanel extends JPanel {
 	static final long serialVersionUID = 0L;
 
-	HistoryTreePanel(UIContext context, RNSPath queue, String ticketNumber, Collection<HistoryEvent> events)
-	{
+	HistoryTreePanel(UIContext context, RNSPath queue, String ticketNumber,
+			Collection<HistoryEvent> events) {
 		super(new GridBagLayout());
 
-		HistoryUIPreferenceSet pref = context.preferences().preferenceSet(HistoryUIPreferenceSet.class);
+		HistoryUIPreferenceSet pref = context.preferences().preferenceSet(
+				HistoryUIPreferenceSet.class);
 
-		HistoryEventFilter filter = new HistoryEventFilter(pref.preferredLevel(), EnumSet.allOf(HistoryEventCategory.class));
+		HistoryEventFilter filter = new HistoryEventFilter(
+				pref.preferredLevel(),
+				EnumSet.allOf(HistoryEventCategory.class));
 
 		JTree tree = new HistoryEventTree(context, events, filter);
 
-		add(new FilterPanel(filter), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		add(new JScrollPane(tree), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(new FilterPanel(filter), new GridBagConstraints(0, 0, 1, 1, 1.0,
+				0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+				new Insets(5, 5, 5, 5), 5, 5));
+		add(new JScrollPane(tree), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						5, 5, 5, 5), 5, 5));
 	}
 }

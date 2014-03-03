@@ -40,135 +40,121 @@ import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
-{
+public class ResourcesPanel extends JPanel implements LazyLoadTabHandler {
 	static final long serialVersionUID = 0L;
 
 	static final private Dimension TABLE_SIZE = new Dimension(1400, 600);
 
 	static private Log _logger = LogFactory.getLog(ResourcesPanel.class);
 
-	private class BESUpdaterCompletionListener implements TaskCompletionListener<Boolean>
-	{
+	private class BESUpdaterCompletionListener implements
+			TaskCompletionListener<Boolean> {
 		@Override
-		public void taskCompleted(Task<Boolean> task, Boolean result)
-		{
-			JOptionPane.showMessageDialog(_table, "Update Complete.  Note that updates may not show up right away.",
-				"Update Complete", JOptionPane.INFORMATION_MESSAGE);
+		public void taskCompleted(Task<Boolean> task, Boolean result) {
+			JOptionPane
+					.showMessageDialog(
+							_table,
+							"Update Complete.  Note that updates may not show up right away.",
+							"Update Complete", JOptionPane.INFORMATION_MESSAGE);
 
 			_model.refresh(_table);
 		}
 
 		@Override
-		public void taskCancelled(Task<Boolean> task)
-		{
+		public void taskCancelled(Task<Boolean> task) {
 			// Do nothing
 		}
 
 		@Override
-		public void taskExcepted(Task<Boolean> task, Throwable cause)
-		{
+		public void taskExcepted(Task<Boolean> task, Throwable cause) {
 			ErrorHandler.handleError(_context.uiContext(), _table, cause);
 		}
 	}
 
-	private class BESUpdaterTask extends AbstractTask<Boolean>
-	{
+	private class BESUpdaterTask extends AbstractTask<Boolean> {
 		private Collection<String> _updateList;
 
-		private BESUpdaterTask(Collection<String> updateList)
-		{
+		private BESUpdaterTask(Collection<String> updateList) {
 			_updateList = updateList;
 		}
 
 		@Override
-		public Boolean execute(TaskProgressListener progressListener) throws Exception
-		{
+		public Boolean execute(TaskProgressListener progressListener)
+				throws Exception {
 			_model.forceUpdate(_updateList);
 			return Boolean.TRUE;
 		}
 	}
 
-	private class RefreshAction extends AbstractAction
-	{
+	private class RefreshAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private RefreshAction()
-		{
+		private RefreshAction() {
 			super("Refresh");
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e)
-		{
+		final public void actionPerformed(ActionEvent e) {
 			_model.refresh(_table);
 		}
 	}
 
-	private class PopupListener extends MouseAdapter
-	{
+	private class PopupListener extends MouseAdapter {
 		@Override
-		final public void mouseClicked(MouseEvent e)
-		{
+		final public void mouseClicked(MouseEvent e) {
 			if (e.isPopupTrigger())
 				popup(e);
 		}
 
 		@Override
-		final public void mousePressed(MouseEvent e)
-		{
+		final public void mousePressed(MouseEvent e) {
 			if (e.isPopupTrigger())
 				popup(e);
 		}
 
 		@Override
-		final public void mouseReleased(MouseEvent e)
-		{
+		final public void mouseReleased(MouseEvent e) {
 			if (e.isPopupTrigger())
 				popup(e);
 		}
 	}
 
-	private class ResourceUpdateAction extends AbstractAction
-	{
+	private class ResourceUpdateAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private ResourceUpdateAction(int[] selectedRows)
-		{
-			super((selectedRows.length > 1) ? "Update Selected Resources" : "Update Selected Resource");
+		private ResourceUpdateAction(int[] selectedRows) {
+			super((selectedRows.length > 1) ? "Update Selected Resources"
+					: "Update Selected Resource");
 
 			setEnabled(selectedRows.length > 0);
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e)
-		{
+		final public void actionPerformed(ActionEvent e) {
 			Collection<String> besNames = new LinkedList<String>();
 			for (int row : _table.getSelectedRows())
 				besNames.add(_model.row(row).name());
 
-			_context
-				.uiContext()
-				.progressMonitorFactory()
-				.createMonitor(_table, "Forcing Resource Update", "Forcing BES Resource Update", 1000L,
-					new BESUpdaterTask(besNames), new BESUpdaterCompletionListener()).start();
+			_context.uiContext()
+					.progressMonitorFactory()
+					.createMonitor(_table, "Forcing Resource Update",
+							"Forcing BES Resource Update", 1000L,
+							new BESUpdaterTask(besNames),
+							new BESUpdaterCompletionListener()).start();
 		}
 	}
 
-	private class BrowseAction extends AbstractAction
-	{
+	private class BrowseAction extends AbstractAction {
 		static final long serialVersionUID = 0L;
 
-		private BrowseAction(int[] selectedRows)
-		{
+		private BrowseAction(int[] selectedRows) {
 			super("Browse BES");
 
 			setEnabled(selectedRows.length == 1);
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e)
-		{
+		final public void actionPerformed(ActionEvent e) {
 			RowSorter<? extends TableModel> sorter = _table.getRowSorter();
 
 			try {
@@ -177,7 +163,8 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 				if (sorter != null)
 					row = sorter.convertRowIndexToModel(row);
 
-				context.callingContext().setCurrentPath(new RNSPath(_model.row(row).endpoint()));
+				context.callingContext().setCurrentPath(
+						new RNSPath(_model.row(row).endpoint()));
 				ClientApplication app = new ClientApplication(context, false);
 				app.pack();
 				GUIUtils.centerComponent(app);
@@ -194,8 +181,7 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 	private ResourcesTableModel _model;
 	private JTable _table;
 
-	private void popup(MouseEvent e)
-	{
+	private void popup(MouseEvent e) {
 		int[] rows = _table.getSelectedRows();
 
 		JPopupMenu popup = new JPopupMenu("Queue Manager Popup");
@@ -208,9 +194,8 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 		popup.show(_table, e.getX(), e.getY());
 	}
 
-	public ResourcesPanel(UIPluginContext context) throws ResourceException, GenesisIISecurityException,
-		RNSPathDoesNotExistException
-	{
+	public ResourcesPanel(UIPluginContext context) throws ResourceException,
+			GenesisIISecurityException, RNSPathDoesNotExistException {
 		super(new GridBagLayout());
 
 		setName("Resource Management");
@@ -224,21 +209,23 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 		_table.addMouseListener(new PopupListener());
 
 		_table.getActionMap().put("Refresh", new RefreshAction());
-		_table.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0x0), "Refresh");
+		_table.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0x0),
+				"Refresh");
 
 		JScrollPane pane = new JScrollPane(_table);
 
-		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-			5, 5, 5, 5), 5, 5));
-		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						5, 5, 5, 5), 5, 5));
+		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1,
+				1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
 
 		setPreferredSize(TABLE_SIZE);
 	}
 
 	@Override
-	final public void load()
-	{
+	final public void load() {
 		_model.refresh(_table);
 	}
 }

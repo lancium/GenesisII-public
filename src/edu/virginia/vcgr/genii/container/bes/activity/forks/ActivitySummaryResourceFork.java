@@ -18,28 +18,28 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ActivitySummaryResourceFork extends AbstractStreamableByteIOFactoryResourceFork
-{
-	static private Log _logger = LogFactory.getLog(ActivitySummaryResourceFork.class);
+public class ActivitySummaryResourceFork extends
+		AbstractStreamableByteIOFactoryResourceFork {
+	static private Log _logger = LogFactory
+			.getLog(ActivitySummaryResourceFork.class);
 
-	public ActivitySummaryResourceFork(ResourceForkService service, String forkPath)
-	{
+	public ActivitySummaryResourceFork(ResourceForkService service,
+			String forkPath) {
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void modifyState(InputStream source) throws IOException
-	{
+	public void modifyState(InputStream source) throws IOException {
 		throw new IOException("Not allowed to modify the the queue summary.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void snapshotState(OutputStream sink) throws IOException
-	{
+	public void snapshotState(OutputStream sink) throws IOException {
 		ResourceKey rKey = getService().getResourceKey();
-		IBESActivityResource resource = (IBESActivityResource) rKey.dereference();
+		IBESActivityResource resource = (IBESActivityResource) rKey
+				.dereference();
 		PrintStream ps = new PrintStream(sink);
 
 		BESActivity activity = resource.findActivity();

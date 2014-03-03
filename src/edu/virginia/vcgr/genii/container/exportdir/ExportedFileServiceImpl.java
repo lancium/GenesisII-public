@@ -29,59 +29,74 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = ExportedFileDBResourceProvider.class)
-public class ExportedFileServiceImpl extends RandomByteIOServiceImpl implements ExportedFilePortType
+public class ExportedFileServiceImpl extends RandomByteIOServiceImpl implements
+		ExportedFilePortType
 // , GeniiNoOutCalls
 {
-	static private Log _logger = LogFactory.getLog(ExportedFileServiceImpl.class);
+	static private Log _logger = LogFactory
+			.getLog(ExportedFileServiceImpl.class);
 
-	public ExportedFileServiceImpl() throws RemoteException
-	{
+	public ExportedFileServiceImpl() throws RemoteException {
 		super("ExportedFilePortType");
 
-		addImplementedPortType(WellKnownPortTypes.EXPORTED_FILE_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes
+				.EXPORTED_FILE_SERVICE_PORT_TYPE());
 	}
 
 	@Override
-	protected ResourceKey createResource(GenesisHashMap constructionParameters) throws ResourceException, BaseFaultType
-	{
+	protected ResourceKey createResource(GenesisHashMap constructionParameters)
+			throws ResourceException, BaseFaultType {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new ExportedFile Resource.");
 
 		if (constructionParameters == null) {
-			ResourceCreationFaultType rcft =
-				new ResourceCreationFaultType(null, null, null, null,
+			ResourceCreationFaultType rcft = new ResourceCreationFaultType(
+					null,
+					null,
+					null,
+					null,
 					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-						"Could not create ExportedFile resource without cerationProperties") }, null);
+							"Could not create ExportedFile resource without cerationProperties") },
+					null);
 			throw FaultManipulator.fillInFault(rcft);
 		}
 
 		ExportedFileUtils.ExportedFileInitInfo initInfo = null;
-		initInfo = ExportedFileUtils.extractCreationProperties(constructionParameters);
+		initInfo = ExportedFileUtils
+				.extractCreationProperties(constructionParameters);
 
-		constructionParameters.put(IExportedFileResource.PATH_CONSTRUCTION_PARAM, initInfo.getPath());
-		constructionParameters.put(IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM, initInfo.getParentIds());
-		constructionParameters.put(IExportedDirResource.REPLICATION_INDICATOR, initInfo.getReplicationState());
+		constructionParameters.put(
+				IExportedFileResource.PATH_CONSTRUCTION_PARAM,
+				initInfo.getPath());
+		constructionParameters.put(
+				IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM,
+				initInfo.getParentIds());
+		constructionParameters.put(IExportedDirResource.REPLICATION_INDICATOR,
+				initInfo.getReplicationState());
 
 		return super.createResource(constructionParameters);
 	}
 
 	/*
-	 * I think that this is now dead code -- mmm2a protected void fillIn(ResourceKey rKey,
-	 * EndpointReferenceType newEPR, ConstructionParameters cParams, GenesisHashMap
-	 * creationParameters, Collection<MessageElement> resolverCreationParams) throws
-	 * ResourceException, BaseFaultType, RemoteException { super.postCreate(rKey, newEPR, cParams,
-	 * creationParameters, resolverCreationParams);
+	 * I think that this is now dead code -- mmm2a protected void
+	 * fillIn(ResourceKey rKey, EndpointReferenceType newEPR,
+	 * ConstructionParameters cParams, GenesisHashMap creationParameters,
+	 * Collection<MessageElement> resolverCreationParams) throws
+	 * ResourceException, BaseFaultType, RemoteException {
+	 * super.postCreate(rKey, newEPR, cParams, creationParameters,
+	 * resolverCreationParams);
 	 * 
 	 * Date d = new Date(); Calendar c = Calendar.getInstance(); c.setTime(d);
 	 * 
-	 * IExportedFileResource resource = (IExportedFileResource)rKey.dereference();
-	 * resource.setCreateTime(c); resource.setModTime(c); resource.setAccessTime(c); }
+	 * IExportedFileResource resource =
+	 * (IExportedFileResource)rKey.dereference(); resource.setCreateTime(c);
+	 * resource.setModTime(c); resource.setAccessTime(c); }
 	 */
 
 	@RWXMapping(RWXCategory.READ)
-	public OpenStreamResponse openStream(Object openStreamRequest) throws RemoteException, ResourceCreationFaultType,
-		ResourceUnknownFaultType
-	{
+	public OpenStreamResponse openStream(Object openStreamRequest)
+			throws RemoteException, ResourceCreationFaultType,
+			ResourceUnknownFaultType {
 		SByteIOFactory factory = null;
 		InputStream inLocal = null;
 		String primaryLocalPath = (String) openStreamRequest;
@@ -97,8 +112,14 @@ public class ExportedFileServiceImpl extends RandomByteIOServiceImpl implements 
 
 			return new OpenStreamResponse(factory.create());
 		} catch (IOException ioe) {
-			throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(ioe.getLocalizedMessage()) }, null));
+			throw FaultManipulator
+					.fillInFault(new ResourceCreationFaultType(
+							null,
+							null,
+							null,
+							null,
+							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+									ioe.getLocalizedMessage()) }, null));
 		} finally {
 			StreamUtils.close(factory);
 		}

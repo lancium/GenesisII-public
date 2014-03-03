@@ -23,8 +23,9 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.resolver.InvalidWSNameFaultType;
 
-public interface IResolverFactoryProxy
-{
-	public EndpointReferenceType createResolver(EndpointReferenceType targetEPR, Properties properties,
-		MessageElement[] creationProperties) throws RemoteException, ResourceException, InvalidWSNameFaultType;
+public interface IResolverFactoryProxy {
+	public EndpointReferenceType createResolver(
+			EndpointReferenceType targetEPR, Properties properties,
+			MessageElement[] creationProperties) throws RemoteException,
+			ResourceException, InvalidWSNameFaultType;
 }

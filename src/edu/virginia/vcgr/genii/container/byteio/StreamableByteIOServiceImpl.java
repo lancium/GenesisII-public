@@ -57,12 +57,13 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = SByteIOResourceProvider.class)
-public class StreamableByteIOServiceImpl extends GenesisIIBase implements StreamableByteIOPortType, ByteIOTopics, SByteIOTopics
-{
+public class StreamableByteIOServiceImpl extends GenesisIIBase implements
+		StreamableByteIOPortType, ByteIOTopics, SByteIOTopics {
 	/* One Hour Lifetime */
 	static private final long SBYTEIO_LIFETIME = 1000L * 60 * 60;
 
-	static private Log _logger = LogFactory.getLog(StreamableByteIOServiceImpl.class);
+	static private Log _logger = LogFactory
+			.getLog(StreamableByteIOServiceImpl.class);
 
 	@MInject(lazy = true)
 	private ISByteIOResource _resource;
@@ -71,8 +72,8 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 	private ResourceLock _resourceLock;
 
 	@Override
-	protected Object translateConstructionParameter(MessageElement property) throws Exception
-	{
+	protected Object translateConstructionParameter(MessageElement property)
+			throws Exception {
 		QName name = property.getQName();
 
 		if (name.equals(ByteIOConstants.SBYTEIO_SUBSCRIBE_CONSTRUCTION_PARAMETER)) {
@@ -84,26 +85,26 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 	}
 
 	@Override
-	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
-	{
+	protected void setAttributeHandlers() throws NoSuchMethodException,
+			ResourceException, ResourceUnknownFaultType {
 		super.setAttributeHandlers();
 
 		new StreamableByteIOAttributeHandlers(getAttributePackage());
 	}
 
-	public PortType getFinalWSResourceInterface()
-	{
+	public PortType getFinalWSResourceInterface() {
 		return WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE();
 	}
 
 	@Override
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
-	{
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
+			ConstructionParameters cParams, GenesisHashMap creationParameters,
+			Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new StreamableByteIO Resource.");
-		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
+		super.postCreate(rKey, newEPR, cParams, creationParameters,
+				resolverCreationParams);
 
 		ISByteIOResource resource = null;
 
@@ -112,20 +113,25 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 
 		resource.setProperty(ISByteIOResource.POSITION_PROPERTY, new Long(0));
 
-		Boolean destroyOnClose = (Boolean) creationParameters.get(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG);
+		Boolean destroyOnClose = (Boolean) creationParameters
+				.get(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG);
 		if (destroyOnClose == null)
 			destroyOnClose = Boolean.FALSE;
-		resource.setProperty(ISByteIOResource.DESTROY_ON_CLOSE_PROPERTY, destroyOnClose);
+		resource.setProperty(ISByteIOResource.DESTROY_ON_CLOSE_PROPERTY,
+				destroyOnClose);
 		MetadataType mdt = newEPR.getMetadata();
 		if (mdt == null)
-			newEPR.setMetadata(mdt =
-				new MetadataType(new MessageElement[] { new MessageElement(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG,
-					destroyOnClose) }));
+			newEPR.setMetadata(mdt = new MetadataType(
+					new MessageElement[] { new MessageElement(
+							ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG,
+							destroyOnClose) }));
 		else {
 			ArrayList<MessageElement> tmp = new ArrayList<MessageElement>();
 			for (MessageElement e : mdt.get_any())
 				tmp.add(e);
-			tmp.add(new MessageElement(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG, destroyOnClose));
+			tmp.add(new MessageElement(
+					ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG,
+					destroyOnClose));
 			mdt.set_any(tmp.toArray(new MessageElement[0]));
 		}
 
@@ -137,10 +143,12 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 		resource.setModTime(c);
 		resource.setAccessTime(c);
 
-		Subscribe s = (Subscribe) creationParameters.get(ByteIOConstants.SBYTEIO_SUBSCRIBE_CONSTRUCTION_PARAMETER);
+		Subscribe s = (Subscribe) creationParameters
+				.get(ByteIOConstants.SBYTEIO_SUBSCRIBE_CONSTRUCTION_PARAMETER);
 		if (s != null) {
 			WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
-			ResourceKey key = (ResourceKey) ctxt.getProperty(WorkingContext.CURRENT_RESOURCE_KEY);
+			ResourceKey key = (ResourceKey) ctxt
+					.getProperty(WorkingContext.CURRENT_RESOURCE_KEY);
 			key.dereference().commit();
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, rKey);
 			try {
@@ -163,28 +171,29 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 		setScheduledTerminationTime(future, rKey);
 	}
 
-	public StreamableByteIOServiceImpl() throws RemoteException
-	{
+	public StreamableByteIOServiceImpl() throws RemoteException {
 		super("StreamableByteIOPortType");
 
 		addImplementedPortType(WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE());
 	}
 
-	protected StreamableByteIOServiceImpl(String serviceName) throws RemoteException
-	{
+	protected StreamableByteIOServiceImpl(String serviceName)
+			throws RemoteException {
 		super(serviceName);
 
 		addImplementedPortType(WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE());
 	}
 
 	@RWXMapping(RWXCategory.READ)
-	public SeekReadResponse seekRead(SeekRead seekReadRequest) throws RemoteException, SeekNotPermittedFaultType,
-		CustomFaultType, ReadNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
-	{
+	public SeekReadResponse seekRead(SeekRead seekReadRequest)
+			throws RemoteException, SeekNotPermittedFaultType, CustomFaultType,
+			ReadNotPermittedFaultType, UnsupportedTransferFaultType,
+			ResourceUnknownFaultType {
 		int numBytes = seekReadRequest.getNumBytes().intValue();
 		long seekOffset = seekReadRequest.getOffset();
 		URI uri = seekReadRequest.getSeekOrigin();
-		TransferInformationType transType = seekReadRequest.getTransferInformation();
+		TransferInformationType transType = seekReadRequest
+				.getTransferInformation();
 
 		byte[] data = new byte[numBytes];
 		File myFile = null;
@@ -195,7 +204,9 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 			_resourceLock.lock();
 			raf = new RandomAccessFile(myFile, "r");
 
-			long offset = ((Long) _resource.getProperty(ISByteIOResource.POSITION_PROPERTY)).longValue();
+			long offset = ((Long) _resource
+					.getProperty(ISByteIOResource.POSITION_PROPERTY))
+					.longValue();
 			offset = seek(offset, uri, seekOffset, raf);
 
 			int bytesRead = readFully(raf, data, 0, numBytes);
@@ -206,13 +217,20 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 				System.arraycopy(tmp, 0, data, 0, bytesRead);
 			}
 
-			_resource.setProperty(ISByteIOResource.POSITION_PROPERTY, new Long(offset + bytesRead));
+			_resource.setProperty(ISByteIOResource.POSITION_PROPERTY, new Long(
+					offset + bytesRead));
 			TransferAgent.sendData(data, transType);
 		} catch (ResourceUnknownFaultType ruft) {
 			throw FaultManipulator.fillInFault(ruft);
 		} catch (IOException ioe) {
-			throw FaultManipulator.fillInFault(new CustomFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(ioe.toString()) }, null));
+			throw FaultManipulator
+					.fillInFault(new CustomFaultType(
+							null,
+							null,
+							null,
+							null,
+							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+									ioe.toString()) }, null));
 		} finally {
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
@@ -222,12 +240,14 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public SeekWriteResponse seekWrite(SeekWrite seekWriteRequest) throws RemoteException, SeekNotPermittedFaultType,
-		CustomFaultType, WriteNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
-	{
+	public SeekWriteResponse seekWrite(SeekWrite seekWriteRequest)
+			throws RemoteException, SeekNotPermittedFaultType, CustomFaultType,
+			WriteNotPermittedFaultType, UnsupportedTransferFaultType,
+			ResourceUnknownFaultType {
 		long seekOffset = seekWriteRequest.getOffset();
 		URI uri = seekWriteRequest.getSeekOrigin();
-		TransferInformationType transType = seekWriteRequest.getTransferInformation();
+		TransferInformationType transType = seekWriteRequest
+				.getTransferInformation();
 		byte[] data = TransferAgent.receiveData(transType);
 		File myFile = null;
 		RandomAccessFile raf = null;
@@ -238,26 +258,37 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 			_resourceLock.lock();
 			raf = new RandomAccessFile(myFile, "rw");
 
-			long offset = ((Long) _resource.getProperty(ISByteIOResource.POSITION_PROPERTY)).longValue();
+			long offset = ((Long) _resource
+					.getProperty(ISByteIOResource.POSITION_PROPERTY))
+					.longValue();
 			offset = seek(offset, uri, seekOffset, raf);
 
 			raf.write(data);
-			_resource.setProperty(ISByteIOResource.POSITION_PROPERTY, new Long(offset + data.length));
+			_resource.setProperty(ISByteIOResource.POSITION_PROPERTY, new Long(
+					offset + data.length));
 
-			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
+			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile,
+					_resource);
 		} catch (IOException ioe) {
-			throw FaultManipulator.fillInFault(new CustomFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(ioe.toString()) }, null));
+			throw FaultManipulator
+					.fillInFault(new CustomFaultType(
+							null,
+							null,
+							null,
+							null,
+							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+									ioe.toString()) }, null));
 		} finally {
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
 		}
 
-		return new SeekWriteResponse(new TransferInformationType(byteIOAttrs, transType.getTransferMechanism()));
+		return new SeekWriteResponse(new TransferInformationType(byteIOAttrs,
+				transType.getTransferMechanism()));
 	}
 
-	static private int readFully(RandomAccessFile raf, byte[] data, int off, int len) throws IOException
-	{
+	static private int readFully(RandomAccessFile raf, byte[] data, int off,
+			int len) throws IOException {
 		int r;
 		int totalRead = 0;
 
@@ -273,9 +304,9 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 		return totalRead;
 	}
 
-	static private long seek(long currentPosition, URI seekOrigin, long seekOffset, RandomAccessFile raf) throws IOException,
-		RemoteException
-	{
+	static private long seek(long currentPosition, URI seekOrigin,
+			long seekOffset, RandomAccessFile raf) throws IOException,
+			RemoteException {
 		long newPosition = currentPosition;
 		if (seekOrigin.equals(ByteIOConstants.SEEK_ORIGIN_BEGINNING_URI)) {
 			newPosition = seekOffset;
@@ -284,7 +315,8 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 		} else if (seekOrigin.equals(ByteIOConstants.SEEK_ORIGIN_END_URI)) {
 			newPosition = raf.length() + seekOffset;
 		} else {
-			throw new RemoteException("Invalid seek origin given (" + seekOrigin.toString() + ").");
+			throw new RemoteException("Invalid seek origin given ("
+					+ seekOrigin.toString() + ").");
 		}
 
 		raf.seek(newPosition);
@@ -292,28 +324,31 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 	}
 
 	@Override
-	protected void preDestroy() throws RemoteException, ResourceException
-	{
+	protected void preDestroy() throws RemoteException, ResourceException {
 		super.preDestroy();
 
 		TopicSet space = TopicSet.forPublisher(getClass());
-		PublisherTopic publisherTopic = space.createPublisherTopic(SBYTEIO_INSTANCE_DYING);
-		publisherTopic.publish(new ResourceTerminationContents(Calendar.getInstance()));
+		PublisherTopic publisherTopic = space
+				.createPublisherTopic(SBYTEIO_INSTANCE_DYING);
+		publisherTopic.publish(new ResourceTerminationContents(Calendar
+				.getInstance()));
 	}
 
 	/*
-	 * This method publish attributes update notification message and also return the updated
-	 * attributes as set of MessageElements. We use a single function instead of two for this two
-	 * operations in order to reduce the number of database access.
+	 * This method publish attributes update notification message and also
+	 * return the updated attributes as set of MessageElements. We use a single
+	 * function instead of two for this two operations in order to reduce the
+	 * number of database access.
 	 */
-	private MessageElement[] notifyAttributesUpdateAndGetMetadata(File currentFile, ISByteIOResource resource)
-		throws ResourceException
-	{
+	private MessageElement[] notifyAttributesUpdateAndGetMetadata(
+			File currentFile, ISByteIOResource resource)
+			throws ResourceException {
 
 		MessageElement[] attributes = new MessageElement[4];
 
 		TopicSet space = TopicSet.forPublisher(getClass());
-		PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_ATTRIBUTES_UPDATE_TOPIC);
+		PublisherTopic publisherTopic = space
+				.createPublisherTopic(BYTEIO_ATTRIBUTES_UPDATE_TOPIC);
 		ByteIOAttributesUpdateNotification message = new ByteIOAttributesUpdateNotification();
 
 		long fileSize = currentFile.length();
@@ -322,7 +357,8 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 
 		Calendar createTime = resource.getCreateTime();
 		message.setCreateTime(createTime);
-		attributes[1] = new MessageElement(ByteIOConstants.screatTime, createTime);
+		attributes[1] = new MessageElement(ByteIOConstants.screatTime,
+				createTime);
 
 		Calendar modTime = resource.getModTime();
 		message.setModificationTime(modTime);
@@ -330,7 +366,8 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 
 		Calendar accessTime = resource.getAccessTime();
 		message.setAccessTime(accessTime);
-		attributes[3] = new MessageElement(ByteIOConstants.saccessTime, accessTime);
+		attributes[3] = new MessageElement(ByteIOConstants.saccessTime,
+				accessTime);
 
 		publisherTopic.publish(message);
 		return attributes;

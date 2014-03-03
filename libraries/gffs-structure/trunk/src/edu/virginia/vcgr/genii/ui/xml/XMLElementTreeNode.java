@@ -7,12 +7,10 @@ import java.util.LinkedList;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 
-class XMLElementTreeNode extends QNameBasedTreeNode
-{
+class XMLElementTreeNode extends QNameBasedTreeNode {
 	static final long serialVersionUID = 0L;
 
-	XMLElementTreeNode(StartElement element)
-	{
+	XMLElementTreeNode(StartElement element) {
 		super(element.getName());
 
 		Iterator<?> attrs = element.getAttributes();
@@ -23,8 +21,7 @@ class XMLElementTreeNode extends QNameBasedTreeNode
 	}
 
 	@Override
-	public String asString(String tabs)
-	{
+	public String asString(String tabs) {
 		StringBuilder builder = new StringBuilder();
 
 		Collection<XMLTreeNode> attributeNodes = new LinkedList<XMLTreeNode>();
@@ -43,7 +40,8 @@ class XMLElementTreeNode extends QNameBasedTreeNode
 
 		builder.append(String.format("%s<%s", tabs, super.asString(tabs)));
 		for (XMLTreeNode attrNode : attributeNodes) {
-			builder.append(String.format("\n%s%s", tabs + "    ", attrNode.asString(tabs)));
+			builder.append(String.format("\n%s%s", tabs + "    ",
+					attrNode.asString(tabs)));
 		}
 
 		if (elementNodes.size() == 0 && textNodes.size() == 0)
@@ -58,10 +56,13 @@ class XMLElementTreeNode extends QNameBasedTreeNode
 			} else {
 				builder.append("\n");
 				for (XMLTreeNode node : textNodes)
-					builder.append(String.format("%s%s\n", tabs + "  ", node.asString(tabs)));
+					builder.append(String.format("%s%s\n", tabs + "  ",
+							node.asString(tabs)));
 				for (XMLTreeNode node : elementNodes)
-					builder.append(String.format("%s\n", node.asString(tabs + "  ")));
-				builder.append(String.format("%s</%s>", tabs, super.asString(tabs)));
+					builder.append(String.format("%s\n",
+							node.asString(tabs + "  ")));
+				builder.append(String.format("%s</%s>", tabs,
+						super.asString(tabs)));
 			}
 		}
 

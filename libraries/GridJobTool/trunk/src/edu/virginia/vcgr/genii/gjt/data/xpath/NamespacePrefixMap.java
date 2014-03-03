@@ -7,13 +7,11 @@ import java.util.Vector;
 
 import edu.virginia.vcgr.jsdl.sweep.parameters.NamespaceBinding;
 
-public class NamespacePrefixMap
-{
+public class NamespacePrefixMap {
 	private Map<String, String> _map = new HashMap<String, String>();
 	private int _next = 1;
 
-	public String prefixForNamespace(String namespaceURI)
-	{
+	public String prefixForNamespace(String namespaceURI) {
 		String result = _map.get(namespaceURI);
 		if (result == null)
 			_map.put(namespaceURI, result = String.format("ns%d", _next++));
@@ -21,8 +19,7 @@ public class NamespacePrefixMap
 		return result;
 	}
 
-	public List<NamespaceBinding> getNamespaceBindings()
-	{
+	public List<NamespaceBinding> getNamespaceBindings() {
 		List<NamespaceBinding> ret = new Vector<NamespaceBinding>(_map.size());
 
 		for (Map.Entry<String, String> entry : _map.entrySet()) {

@@ -42,27 +42,28 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
-public class DBBESResource extends BasicDBResource implements IBESResource
-{
+public class DBBESResource extends BasicDBResource implements IBESResource {
 	@Override
-	public void initialize(GenesisHashMap constructionParams) throws ResourceException
-	{
+	public void initialize(GenesisHashMap constructionParams)
+			throws ResourceException {
 		super.initialize(constructionParams);
 
-		ConstructionParameters cParams =
-			(ConstructionParameters) constructionParams.get(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME);
+		ConstructionParameters cParams = (ConstructionParameters) constructionParams
+				.get(ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME);
 
 		try {
 			if (!isServiceResource())
-				BES.createBES(_resourceKey, new BESPolicy(BESPolicyActions.NOACTION, BESPolicyActions.NOACTION), cParams);
+				BES.createBES(_resourceKey, new BESPolicy(
+						BESPolicyActions.NOACTION, BESPolicyActions.NOACTION),
+						cParams);
 		} catch (SQLException sqe) {
-			throw new ResourceException("Unable to create resource -- database error.", sqe);
+			throw new ResourceException(
+					"Unable to create resource -- database error.", sqe);
 		}
 	}
 
 	@Override
-	public void destroy() throws ResourceException
-	{
+	public void destroy() throws ResourceException {
 		try {
 			BES.deleteBES(getConnection(), _resourceKey);
 		} catch (SQLException sqe) {
@@ -72,29 +73,35 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		super.destroy();
 	}
 
-	public DBBESResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
-	{
+	public DBBESResource(ResourceKey parentKey,
+			ServerDatabaseConnectionPool connectionPool) throws SQLException {
 		super(parentKey, connectionPool);
 	}
 
 	@Override
-	public BESPolicy getPolicy() throws RemoteException
-	{
+	public BESPolicy getPolicy() throws RemoteException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				_connection.prepareStatement("SELECT userloggedinaction, screensaverinactiveaction "
-					+ "FROM bespolicytable WHERE besid = ?");
+			stmt = _connection
+					.prepareStatement("SELECT userloggedinaction, screensaverinactiveaction "
+							+ "FROM bespolicytable WHERE besid = ?");
 			stmt.setString(1, _resourceKey);
 
 			rs = stmt.executeQuery();
 			if (!rs.next())
-				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Resource is unknown.") }, null));
+				throw FaultManipulator
+						.fillInFault(new ResourceUnknownFaultType(
+								null,
+								null,
+								null,
+								null,
+								new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+										"Resource is unknown.") }, null));
 
-			return new BESPolicy(BESPolicyActions.valueOf(rs.getString(1)), BESPolicyActions.valueOf(rs.getString(2)));
+			return new BESPolicy(BESPolicyActions.valueOf(rs.getString(1)),
+					BESPolicyActions.valueOf(rs.getString(2)));
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to get BES policy.", sqe);
 		} finally {
@@ -103,8 +110,7 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		}
 	}
 
-	public BES getBES() throws RemoteException
-	{
+	public BES getBES() throws RemoteException {
 		BES bes = BES.getBES(_resourceKey);
 		if (bes == null)
 			throw new RemoteException("Couldn't find active BES entity.");
@@ -112,13 +118,12 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 	}
 
 	@Override
-	public void setPolicy(BESPolicy policy) throws RemoteException
-	{
+	public void setPolicy(BESPolicy policy) throws RemoteException {
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				_connection.prepareStatement("UPDATE bespolicytable " + "SET userloggedinaction = ?, "
+			stmt = _connection.prepareStatement("UPDATE bespolicytable "
+					+ "SET userloggedinaction = ?, "
 					+ "screensaverinactiveaction = ? " + "WHERE besid = ?");
 			stmt.setString(1, policy.getUserLoggedInAction().name());
 			stmt.setString(2, policy.getScreenSaverInactiveAction().name());
@@ -128,39 +133,41 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 
 			getBES().getPolicyEnactor().setPolicy(policy);
 		} catch (SQLException sqe) {
-			throw new RemoteException("Unable to update bes policy in database.", sqe);
+			throw new RemoteException(
+					"Unable to update bes policy in database.", sqe);
 		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
 
 	@Override
-	public Collection<BESActivity> getContainedActivities() throws RemoteException
-	{
+	public Collection<BESActivity> getContainedActivities()
+			throws RemoteException {
 		BES bes = BES.getBES(_resourceKey);
 		return bes.getContainedActivities();
 	}
 
 	@Override
-	public BESActivity getActivity(String activityid) throws RemoteException, UnknownActivityIdentifierFaultType
-	{
+	public BESActivity getActivity(String activityid) throws RemoteException,
+			UnknownActivityIdentifierFaultType {
 		BES bes = BES.getBES(_resourceKey);
 		BESActivity activity = bes.findActivity(activityid);
 		if (activity == null)
-			throw new UnknownActivityIdentifierFaultType("Unknown activity \"" + activityid + "\".", null);
+			throw new UnknownActivityIdentifierFaultType("Unknown activity \""
+					+ activityid + "\".", null);
 		return activity;
 	}
 
 	@Override
-	public BESActivity getActivity(EndpointReferenceType activity) throws RemoteException, UnknownActivityIdentifierFaultType
-	{
-		AddressingParameters ap = new AddressingParameters(activity.getReferenceParameters());
+	public BESActivity getActivity(EndpointReferenceType activity)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		AddressingParameters ap = new AddressingParameters(
+				activity.getReferenceParameters());
 		String id = ap.getResourceKey();
 		return getActivity(id);
 	}
 
-	public boolean isAcceptingNewActivities() throws RemoteException
-	{
+	public boolean isAcceptingNewActivities() throws RemoteException {
 		Boolean storedAccepting = (Boolean) getProperty(IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES);
 		if (storedAccepting != null && !storedAccepting.booleanValue())
 			return false;
@@ -171,12 +178,12 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 	}
 
 	@Override
-	public Collection<MatchingParameter> getMatchingParameters() throws ResourceException
-	{
+	public Collection<MatchingParameter> getMatchingParameters()
+			throws ResourceException {
 		Collection<MatchingParameter> ret = super.getMatchingParameters();
 
-		EnvironmentExport exp =
-			EnvironmentExport.besExport((BESConstructionParameters) (constructionParameters(GeniiBESServiceImpl.class)));
+		EnvironmentExport exp = EnvironmentExport
+				.besExport((BESConstructionParameters) (constructionParameters(GeniiBESServiceImpl.class)));
 		for (String key : exp.keySet())
 			ret.add(new MatchingParameter("supports:environment-variable", key));
 

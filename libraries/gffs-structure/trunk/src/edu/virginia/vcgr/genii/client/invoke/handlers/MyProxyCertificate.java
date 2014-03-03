@@ -18,33 +18,27 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
-public class MyProxyCertificate
-{
+public class MyProxyCertificate {
 	static private Log _logger = LogFactory.getLog(MyProxyCertificate.class);
-	private static ThreadLocal<Boolean> flag = new ThreadLocal<Boolean>()
-	{
+	private static ThreadLocal<Boolean> flag = new ThreadLocal<Boolean>() {
 		@Override
-		protected Boolean initialValue()
-		{
+		protected Boolean initialValue() {
 			return false;
 		}
 	};
 
-	private static ThreadLocal<String> pemFormattedCertificate = new ThreadLocal<String>()
-	{
+	private static ThreadLocal<String> pemFormattedCertificate = new ThreadLocal<String>() {
 		@Override
-		protected String initialValue()
-		{
+		protected String initialValue() {
 			return null;
 		}
 	};
 
 	/*
-	 * If the user has a myproxy certificate, set a thread local variable to the certificate's pem
-	 * formatted String
+	 * If the user has a myproxy certificate, set a thread local variable to the
+	 * certificate's pem formatted String
 	 */
-	public static void setIfXSEDEUser()
-	{
+	public static void setIfXSEDEUser() {
 		if (!isPEMFileSetByQueue()) {
 			try {
 				if (getMyProxyCertificate()) {
@@ -56,20 +50,17 @@ public class MyProxyCertificate
 		}
 	}
 
-	public static void setPEMFormattedCertificate(String s)
-	{
+	public static void setPEMFormattedCertificate(String s) {
 		flag.set(true);
 		pemFormattedCertificate.set(s);
 	}
 
-	public static void reset()
-	{
+	public static void reset() {
 		flag.remove();
 		pemFormattedCertificate.remove();
 	}
 
-	public static boolean isAvailable()
-	{
+	public static boolean isAvailable() {
 		try {
 			return flag.get();
 		} catch (NullPointerException e) {
@@ -77,20 +68,19 @@ public class MyProxyCertificate
 		}
 	}
 
-	private static boolean isPEMFileSetByQueue()
-	{
+	private static boolean isPEMFileSetByQueue() {
 		return (pemFormattedCertificate == null);
 	}
 
-	public static String getPEMString()
-	{
+	public static String getPEMString() {
 		return pemFormattedCertificate.get();
 	}
 
-	private static String getCertificateString(PrivateKey privKey, X509Certificate x509Certificate) throws IOException
-	{
+	private static String getCertificateString(PrivateKey privKey,
+			X509Certificate x509Certificate) throws IOException {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		new BASE64Encoder().encodeBuffer(privKey.getEncoded(), byteArrayOutputStream);
+		new BASE64Encoder().encodeBuffer(privKey.getEncoded(),
+				byteArrayOutputStream);
 
 		StringWriter archive = new StringWriter();
 
@@ -103,35 +93,41 @@ public class MyProxyCertificate
 		return archive.toString();
 	}
 
-	private static boolean getMyProxyCertificate() throws Throwable
-	{
+	private static boolean getMyProxyCertificate() throws Throwable {
 		ICallingContext callContext = ContextManager.getCurrentContext();
 		if (callContext == null)
 			return false;
 
-		KeyAndCertMaterial clientKeyMaterial =
-			ClientUtils.checkAndRenewCredentials(callContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+		KeyAndCertMaterial clientKeyMaterial = ClientUtils
+				.checkAndRenewCredentials(callContext,
+						BaseGridTool.credsValidUntil(),
+						new SecurityUpdateResults());
 
-		String issuerCommonName = clientKeyMaterial._clientCertChain[0].getIssuerDN().getName();
+		String issuerCommonName = clientKeyMaterial._clientCertChain[0]
+				.getIssuerDN().getName();
 		if (!issuerCommonName.contains("MyProxy")) {
 			return false;
 		}
 
-		String certificateString =
-			getCertificateString(clientKeyMaterial._clientPrivateKey, clientKeyMaterial._clientCertChain[0]);
+		String certificateString = getCertificateString(
+				clientKeyMaterial._clientPrivateKey,
+				clientKeyMaterial._clientCertChain[0]);
 		if (_logger.isDebugEnabled())
-			_logger.debug("got certificate for " + clientKeyMaterial._clientCertChain[0].getSubjectDN());
+			_logger.debug("got certificate for "
+					+ clientKeyMaterial._clientCertChain[0].getSubjectDN());
 		pemFormattedCertificate.set(certificateString);
 
 		/*
-		 * Can be removed after code review. Required to test locally try { BufferedReader reader =
-		 * new BufferedReader(new FileReader( "/if8/am2qa/.genesisII-2.0/x509up_u480965")); String
-		 * line = null; StringBuilder stringBuilder = new StringBuilder(); String ls =
-		 * System.getProperty("line.separator"); while ((line = reader.readLine()) != null) {
-		 * stringBuilder.append(line); stringBuilder.append(ls); }
-		 * pemFormattedCertificate.set(stringBuilder.toString()); reader.close(); } catch
-		 * (IOException e) { e.printStackTrace(); pemFormattedCertificate.set("arbit"); return
-		 * false; }
+		 * Can be removed after code review. Required to test locally try {
+		 * BufferedReader reader = new BufferedReader(new FileReader(
+		 * "/if8/am2qa/.genesisII-2.0/x509up_u480965")); String line = null;
+		 * StringBuilder stringBuilder = new StringBuilder(); String ls =
+		 * System.getProperty("line.separator"); while ((line =
+		 * reader.readLine()) != null) { stringBuilder.append(line);
+		 * stringBuilder.append(ls); }
+		 * pemFormattedCertificate.set(stringBuilder.toString());
+		 * reader.close(); } catch (IOException e) { e.printStackTrace();
+		 * pemFormattedCertificate.set("arbit"); return false; }
 		 */
 		return true;
 	}

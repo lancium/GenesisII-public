@@ -26,8 +26,7 @@ import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-class ArchitectureMappingElement
-{
+class ArchitectureMappingElement {
 	@XmlAttribute(name = "java-value", required = true)
 	private String _javaValue;
 
@@ -35,36 +34,36 @@ class ArchitectureMappingElement
 	private ProcessorArchitecture _arch;
 
 	@SuppressWarnings("unused")
-	private void afterUnmarshal(Unmarshaller u, Object parent) throws JAXBException
-	{
+	private void afterUnmarshal(Unmarshaller u, Object parent)
+			throws JAXBException {
 		if (_javaValue == null)
-			throw new JAXBException("Error trying to xml unmarshall Architecture mapping:  " + "java-value was null.");
+			throw new JAXBException(
+					"Error trying to xml unmarshall Architecture mapping:  "
+							+ "java-value was null.");
 
 		if (_arch == null)
-			throw new JAXBException("Error trying to xml unmarshall Architecture mapping:  " + "jsdl-value was null.");
+			throw new JAXBException(
+					"Error trying to xml unmarshall Architecture mapping:  "
+							+ "jsdl-value was null.");
 	}
 
 	/**
 	 * For use by XML deserialization only.
 	 */
 	@SuppressWarnings("unused")
-	private ArchitectureMappingElement()
-	{
+	private ArchitectureMappingElement() {
 	}
 
-	ArchitectureMappingElement(String javaValue, ProcessorArchitecture arch)
-	{
+	ArchitectureMappingElement(String javaValue, ProcessorArchitecture arch) {
 		_javaValue = javaValue;
 		_arch = arch;
 	}
 
-	final public String javaValue()
-	{
+	final public String javaValue() {
 		return _javaValue;
 	}
 
-	final ProcessorArchitecture architecture()
-	{
+	final ProcessorArchitecture architecture() {
 		return _arch;
 	}
 }

@@ -29,8 +29,7 @@ import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class ScriptTool extends BaseGridTool
-{
+public class ScriptTool extends BaseGridTool {
 	static final private String _DESCRIPTION = "config/tooldocs/description/dscript";
 
 	static final private String _USAGE = "config/tooldocs/usage/uscript";
@@ -42,8 +41,7 @@ public class ScriptTool extends BaseGridTool
 
 	private Collection<String> _globalPropertiesPaths = new LinkedList<String>();
 
-	private ScriptEngine scriptEngine(GeniiPath path)
-	{
+	private ScriptEngine scriptEngine(GeniiPath path) {
 		ScriptEngineManager manager = new ScriptEngineManager();
 		ScriptEngine engine = null;
 
@@ -54,16 +52,20 @@ public class ScriptTool extends BaseGridTool
 				for (ScriptEngineFactory factory : manager.getEngineFactories()) {
 					if (factory.getLanguageName().equals(_language)) {
 						engine = factory.getScriptEngine();
-						engine.setBindings(manager.getBindings(), ScriptContext.GLOBAL_SCOPE);
+						engine.setBindings(manager.getBindings(),
+								ScriptContext.GLOBAL_SCOPE);
 						break;
 					}
 				}
 
 				if (engine == null) {
-					stderr.format("No scripting engine registered for language %s!\n", _language);
+					stderr.format(
+							"No scripting engine registered for language %s!\n",
+							_language);
 					stderr.format("Valid languages include:  ");
 					boolean first = true;
-					for (ScriptEngineFactory factory : manager.getEngineFactories()) {
+					for (ScriptEngineFactory factory : manager
+							.getEngineFactories()) {
 						if (!first)
 							stderr.format(", ");
 						first = false;
@@ -78,25 +80,25 @@ public class ScriptTool extends BaseGridTool
 			engine = manager.getEngineByExtension(extension);
 
 			if (engine == null)
-				stderr.format("No scripting engine registered for extension %s!\n", extension);
+				stderr.format(
+						"No scripting engine registered for extension %s!\n",
+						extension);
 		}
 
 		return engine;
 	}
 
-	public void setGlobal_properties(String propertiesPath)
-	{
+	public void setGlobal_properties(String propertiesPath) {
 		_globalPropertiesPaths.add(propertiesPath);
 	}
 
-	public ScriptTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.GENERAL);
+	public ScriptTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.GENERAL);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
-	static private String getExtension(String filename)
-	{
+	static private String getExtension(String filename) {
 		int index = filename.lastIndexOf('.');
 		if (index <= 0)
 			return "xml";
@@ -104,13 +106,12 @@ public class ScriptTool extends BaseGridTool
 		return filename.substring(index + 1);
 	}
 
-	static private Reader openReader(GeniiPath path) throws IOException
-	{
+	static private Reader openReader(GeniiPath path) throws IOException {
 		return new InputStreamReader(path.openInputStream());
 	}
 
-	static private Properties loadProperties(String propertiesPath) throws IOException
-	{
+	static private Properties loadProperties(String propertiesPath)
+			throws IOException {
 		Properties ret = new Properties();
 		InputStream in = null;
 
@@ -125,8 +126,7 @@ public class ScriptTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		Reader reader = null;
 		int lcv;
 		Properties initialProperties = new Properties();
@@ -134,13 +134,15 @@ public class ScriptTool extends BaseGridTool
 		for (String propertiesPath : _globalPropertiesPaths) {
 			Properties props = loadProperties(propertiesPath);
 			for (Object propName : props.keySet()) {
-				initialProperties.setProperty(propName.toString(), props.getProperty(propName.toString()));
+				initialProperties.setProperty(propName.toString(),
+						props.getProperty(propName.toString()));
 			}
 		}
 
 		for (Object key : System.getProperties().keySet()) {
 			String sKey = (String) key;
-			initialProperties.setProperty(sKey, System.getProperties().getProperty(sKey));
+			initialProperties.setProperty(sKey, System.getProperties()
+					.getProperty(sKey));
 		}
 
 		Map<String, String> env = System.getenv();
@@ -154,7 +156,8 @@ public class ScriptTool extends BaseGridTool
 			int index = arg.indexOf('=');
 			if (index < 0)
 				break;
-			initialProperties.put(arg.substring(0, index), arg.substring(index + 1));
+			initialProperties.put(arg.substring(0, index),
+					arg.substring(index + 1));
 		}
 
 		try {
@@ -167,12 +170,16 @@ public class ScriptTool extends BaseGridTool
 			} else {
 				GeniiPath scriptFilePath = new GeniiPath(getArgument(lcv));
 				if (scriptFilePath.pathType() == GeniiPathType.Local) {
-					File scriptFile =
-						PathVariable.lookupVariable(System.getProperties(), GridEnvironment.GRID_PATH_ENV_VARIABLE).find(
+					File scriptFile = PathVariable.lookupVariable(
+							System.getProperties(),
+							GridEnvironment.GRID_PATH_ENV_VARIABLE).find(
 							scriptFilePath.path(), PathVariable.FindTypes.FILE);
 					if (scriptFile == null)
-						throw new FileNotFoundException(String.format("Unable to locate script file %s.", scriptFilePath));
-					scriptFilePath = new GeniiPath("local:" + scriptFile.getAbsolutePath());
+						throw new FileNotFoundException(String.format(
+								"Unable to locate script file %s.",
+								scriptFilePath));
+					scriptFilePath = new GeniiPath("local:"
+							+ scriptFile.getAbsolutePath());
 				}
 
 				engine = scriptEngine(scriptFilePath);
@@ -187,7 +194,8 @@ public class ScriptTool extends BaseGridTool
 			for (; lcv < args.size(); lcv++)
 				cArgs[lcv - start] = args.get(lcv);
 
-			engine.put("grid", new Grid(initialProperties, stdin, stdout, stderr));
+			engine.put("grid", new Grid(initialProperties, stdin, stdout,
+					stderr));
 			Bindings b = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
 			b.put("ARGV", cArgs);
 
@@ -212,7 +220,6 @@ public class ScriptTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 	}
 }

@@ -13,8 +13,7 @@
  */
 package edu.virginia.vcgr.genii.container.processmanager;
 
-public interface IProcessManagerProvider
-{
+public interface IProcessManagerProvider {
 	public boolean suspend(double thePid);
 
 	public boolean resume(double thePid);

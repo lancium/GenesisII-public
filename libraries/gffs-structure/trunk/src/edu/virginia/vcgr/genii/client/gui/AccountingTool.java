@@ -49,16 +49,14 @@ import edu.virginia.vcgr.genii.container.VCGRContainerPortType;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class AccountingTool extends BaseGridTool
-{
+public class AccountingTool extends BaseGridTool {
 	static private Log _logger = LogFactory.getLog(AccountingTool.class);
 
 	static final private String ACCOUNTING_TOOL_DESCRIPTION = "config/tooldocs/description/daccounting";
 
 	static private final String USAGE_RESOURCE = "config/tooldocs/usage/uaccounting";
 
-	static private class StatementBundle implements Closeable
-	{
+	static private class StatementBundle implements Closeable {
 		private PreparedStatement _lookupCID = null;
 		private PreparedStatement _insertCredential = null;
 		private PreparedStatement _lookupBESID = null;
@@ -68,35 +66,43 @@ public class AccountingTool extends BaseGridTool
 		private PreparedStatement _insertMapping = null;
 		private PreparedStatement _insertCommandLineElement = null;
 
-		private StatementBundle(Connection connection) throws SQLException
-		{
-			_lookupCID =
-				connection.prepareStatement("SELECT cid, credential FROM xcgcredentials " + "WHERE credentialhash = ?");
-			_insertCredential =
-				connection.prepareStatement("INSERT INTO xcgcredentials " + "(credential, credentialdesc, credentialhash) "
-					+ "VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-			_lookupBESID =
-				connection.prepareStatement("SELECT besid, besmachinename, arch, os "
-					+ "FROM xcgbescontainers WHERE besepi = ?");
-			_insertBES =
-				connection.prepareStatement("INSERT INTO xcgbescontainers "
-					+ "(besepi, besmachinename, arch, os) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-			_lookupAccountingRecord =
-				connection.prepareStatement("SELECT arid FROM xcgaccountingrecords "
-					+ "WHERE besaccountingrecordid = ? AND besid = ?");
-			_insertAccountingRecord =
-				connection.prepareStatement("INSERT INTO xcgaccountingrecords " + "(besaccountingrecordid, besid, exitcode, "
-					+ "usertimemicrosecs, kerneltimemicrosecs, " + "wallclocktimemicrosecs, maxrssbytes, recordtimestamp) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-			_insertMapping = connection.prepareStatement("INSERT INTO xcgareccredmap (cid, arid) VALUES (?, ?)");
+		private StatementBundle(Connection connection) throws SQLException {
+			_lookupCID = connection
+					.prepareStatement("SELECT cid, credential FROM xcgcredentials "
+							+ "WHERE credentialhash = ?");
+			_insertCredential = connection.prepareStatement(
+					"INSERT INTO xcgcredentials "
+							+ "(credential, credentialdesc, credentialhash) "
+							+ "VALUES (?, ?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
+			_lookupBESID = connection
+					.prepareStatement("SELECT besid, besmachinename, arch, os "
+							+ "FROM xcgbescontainers WHERE besepi = ?");
+			_insertBES = connection
+					.prepareStatement(
+							"INSERT INTO xcgbescontainers "
+									+ "(besepi, besmachinename, arch, os) VALUES (?, ?, ?, ?)",
+							Statement.RETURN_GENERATED_KEYS);
+			_lookupAccountingRecord = connection
+					.prepareStatement("SELECT arid FROM xcgaccountingrecords "
+							+ "WHERE besaccountingrecordid = ? AND besid = ?");
+			_insertAccountingRecord = connection
+					.prepareStatement(
+							"INSERT INTO xcgaccountingrecords "
+									+ "(besaccountingrecordid, besid, exitcode, "
+									+ "usertimemicrosecs, kerneltimemicrosecs, "
+									+ "wallclocktimemicrosecs, maxrssbytes, recordtimestamp) "
+									+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+							Statement.RETURN_GENERATED_KEYS);
+			_insertMapping = connection
+					.prepareStatement("INSERT INTO xcgareccredmap (cid, arid) VALUES (?, ?)");
 
-			_insertCommandLineElement =
-				connection.prepareStatement("INSERT INTO xcgcommandlines (arid, elementindex, element) VALUES (?, ?, ?)");
+			_insertCommandLineElement = connection
+					.prepareStatement("INSERT INTO xcgcommandlines (arid, elementindex, element) VALUES (?, ?, ?)");
 		}
 
 		@Override
-		public void close() throws IOException
-		{
+		public void close() throws IOException {
 			StreamUtils.close(_lookupCID);
 			StreamUtils.close(_insertCredential);
 			StreamUtils.close(_lookupBESID);
@@ -107,29 +113,31 @@ public class AccountingTool extends BaseGridTool
 		}
 	}
 
-	private void setPassword()
-	{
+	private void setPassword() {
 		AbstractLoginHandler handler = null;
-		if (!useGui() || !GuiUtils.supportsGraphics() || !UserPreferences.preferences().preferGUI()) {
+		if (!useGui() || !GuiUtils.supportsGraphics()
+				|| !UserPreferences.preferences().preferGUI()) {
 			handler = new TextLoginHandler(stdout, stderr, stdin);
 		} else {
 			handler = new GuiLoginHandler(stdout, stderr, stdin);
 		}
-		char[] pword = handler.getPassword("Accounting Database Password", "Password for accounting database:  ");
+		char[] pword = handler.getPassword("Accounting Database Password",
+				"Password for accounting database:  ");
 		String password = (pword == null) ? "" : new String(pword);
 		_connectProperties = new Properties();
 		_connectProperties.setProperty("password", password);
 
 	}
 
-	private Connection openTargetConnection(EndpointReferenceType epr) throws SQLException
-	{
+	private Connection openTargetConnection(EndpointReferenceType epr)
+			throws SQLException {
 		URI uri = epr.getAddress().get_value();
 
 		Connection cleanupConn = null;
 		try {
 			synchronized (_connect) {
-				cleanupConn = DriverManager.getConnection(uri.toString(), _connectProperties);
+				cleanupConn = DriverManager.getConnection(uri.toString(),
+						_connectProperties);
 			}
 			cleanupConn.setAutoCommit(false);
 			Connection ret = cleanupConn;
@@ -140,8 +148,8 @@ public class AccountingTool extends BaseGridTool
 		}
 	}
 
-	private long getCID(StatementBundle sBundle, Identity credential) throws SQLException
-	{
+	private long getCID(StatementBundle sBundle, Identity credential)
+			throws SQLException {
 		ResultSet rs = null;
 		int hash = credential.hashCode();
 		Identity query = null;
@@ -161,8 +169,10 @@ public class AccountingTool extends BaseGridTool
 			rs.close();
 			rs = null;
 
-			sBundle._insertCredential.setBlob(1, DBSerializer.toBlob(credential, null, null));
-			sBundle._insertCredential.setString(2, credential.describe(VerbosityLevel.HIGH));
+			sBundle._insertCredential.setBlob(1,
+					DBSerializer.toBlob(credential, null, null));
+			sBundle._insertCredential.setString(2,
+					credential.describe(VerbosityLevel.HIGH));
 			sBundle._insertCredential.setInt(3, hash);
 			sBundle._insertCredential.executeUpdate();
 			rs = sBundle._insertCredential.getGeneratedKeys();
@@ -176,9 +186,8 @@ public class AccountingTool extends BaseGridTool
 		}
 	}
 
-	private long getBESId(StatementBundle sBundle, String besEPI, String besMachineName, String arch, String os)
-		throws SQLException
-	{
+	private long getBESId(StatementBundle sBundle, String besEPI,
+			String besMachineName, String arch, String os) throws SQLException {
 		ResultSet rs = null;
 
 		try {
@@ -208,7 +217,8 @@ public class AccountingTool extends BaseGridTool
 
 			rs = sBundle._insertBES.getGeneratedKeys();
 			if (!rs.next())
-				throw new SQLException("Unable to get BESID auto-generated key.");
+				throw new SQLException(
+						"Unable to get BESID auto-generated key.");
 
 			return rs.getLong(1);
 		} finally {
@@ -216,8 +226,8 @@ public class AccountingTool extends BaseGridTool
 		}
 	}
 
-	private Long lookupAccountingRecordID(StatementBundle sBundle, long besaccountingrecordid, long besid) throws SQLException
-	{
+	private Long lookupAccountingRecordID(StatementBundle sBundle,
+			long besaccountingrecordid, long besid) throws SQLException {
 		ResultSet rs = null;
 
 		try {
@@ -235,20 +245,22 @@ public class AccountingTool extends BaseGridTool
 	}
 
 	@SuppressWarnings("unchecked")
-	private void addRecordToTargetDatabase(AccountingRecordType art, StatementBundle sBundle) throws IOException,
-		ClassNotFoundException, SQLException
-	{
+	private void addRecordToTargetDatabase(AccountingRecordType art,
+			StatementBundle sBundle) throws IOException,
+			ClassNotFoundException, SQLException {
 		ResultSet rs = null;
 
-		long besid = getBESId(sBundle, art.getBesEpi(), art.getBesMachineName(), art.getArch(), art.getOs());
+		long besid = getBESId(sBundle, art.getBesEpi(),
+				art.getBesMachineName(), art.getArch(), art.getOs());
 
 		if (lookupAccountingRecordID(sBundle, art.getRecordId(), besid) != null) {
-			stdout.format("Accounting record %d from bes %s already exists.  " + "Skipping.\n", art.getRecordId(),
-				art.getBesEpi());
+			stdout.format("Accounting record %d from bes %s already exists.  "
+					+ "Skipping.\n", art.getRecordId(), art.getBesEpi());
 			return;
 		}
 
-		Collection<Identity> credentials = (Collection<Identity>) DBSerializer.deserialize(art.getCredentials());
+		Collection<Identity> credentials = (Collection<Identity>) DBSerializer
+				.deserialize(art.getCredentials());
 
 		Collection<Long> cids = new Vector<Long>(credentials.size());
 
@@ -263,12 +275,14 @@ public class AccountingTool extends BaseGridTool
 			sBundle._insertAccountingRecord.setLong(5, art.getKernelTime());
 			sBundle._insertAccountingRecord.setLong(6, art.getWallclockTime());
 			sBundle._insertAccountingRecord.setLong(7, art.getMaximumRss());
-			Timestamp ts = new Timestamp(art.getRecordaddtime().getTimeInMillis());
+			Timestamp ts = new Timestamp(art.getRecordaddtime()
+					.getTimeInMillis());
 			sBundle._insertAccountingRecord.setTimestamp(8, ts);
 			sBundle._insertAccountingRecord.executeUpdate();
 			rs = sBundle._insertAccountingRecord.getGeneratedKeys();
 			if (!rs.next())
-				throw new SQLException("Unable to retrieve auto-generated record key.");
+				throw new SQLException(
+						"Unable to retrieve auto-generated record key.");
 
 			long arid = rs.getLong(1);
 
@@ -305,8 +319,7 @@ public class AccountingTool extends BaseGridTool
 	private Object _connect;
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath source = lookup(current, new GeniiPath(getArgument(0)));
 		RNSPath target = lookup(current, new GeniiPath(getArgument(1)));
@@ -315,7 +328,8 @@ public class AccountingTool extends BaseGridTool
 		_count = new Lock();
 		_connect = new Object();
 
-		collect(source.getEndpoint(), target.getEndpoint(), !_isNoCommit, _isRecursive);
+		collect(source.getEndpoint(), target.getEndpoint(), !_isNoCommit,
+				_isRecursive);
 
 		_count.join();
 
@@ -323,48 +337,44 @@ public class AccountingTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (!_isCollect)
-			throw new InvalidToolUsageException("The accounting tool requires the --collect flag.");
+			throw new InvalidToolUsageException(
+					"The accounting tool requires the --collect flag.");
 
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException("Missing required arguments.");
 	}
 
-	public AccountingTool()
-	{
-		super(new LoadFileResource(ACCOUNTING_TOOL_DESCRIPTION), new LoadFileResource(USAGE_RESOURCE), true,
-			ToolCategory.INTERNAL);
+	public AccountingTool() {
+		super(new LoadFileResource(ACCOUNTING_TOOL_DESCRIPTION),
+				new LoadFileResource(USAGE_RESOURCE), true,
+				ToolCategory.INTERNAL);
 	}
 
 	@Option({ "collect" })
-	public void setCollect()
-	{
+	public void setCollect() {
 		_isCollect = true;
 	}
 
 	@Option({ "recursive", "r" })
-	public void setRecursive()
-	{
+	public void setRecursive() {
 		_isRecursive = true;
 	}
 
 	@Option({ "no-commit" })
-	public void setNo_commit()
-	{
+	public void setNo_commit() {
 		_isNoCommit = true;
 	}
 
 	@Option({ "max-threads" })
-	public void setMax_threads(String max)
-	{
+	public void setMax_threads(String max) {
 		_maxThreads = Integer.parseInt(max);
 	}
 
-	public void collect(EndpointReferenceType source, EndpointReferenceType target, boolean doCommit, boolean isRecursive)
-		throws Throwable
-	{
+	public void collect(EndpointReferenceType source,
+			EndpointReferenceType target, boolean doCommit, boolean isRecursive)
+			throws Throwable {
 		Connection targetConnection = null;
 
 		try {
@@ -372,25 +382,29 @@ public class AccountingTool extends BaseGridTool
 			if (typeInfo.isContainer()) {
 				WSName containerName = new WSName(source);
 				if (!containerName.isValidWSName())
-					throw new IllegalArgumentException("Container EPR is not a valid WS-Name.");
+					throw new IllegalArgumentException(
+							"Container EPR is not a valid WS-Name.");
 
-				VCGRContainerPortType container = ClientUtils.createProxy(VCGRContainerPortType.class, source);
+				VCGRContainerPortType container = ClientUtils.createProxy(
+						VCGRContainerPortType.class, source);
 
 				targetConnection = openTargetConnection(target);
-				collect(container, containerName.getEndpointIdentifier().toString(), targetConnection, doCommit);
+				collect(container, containerName.getEndpointIdentifier()
+						.toString(), targetConnection, doCommit);
 			} else if (typeInfo.isRNS()) {
 				RNSPath sourceRoot = new RNSPath(source);
 				collect(sourceRoot, target, doCommit, isRecursive);
 			} else
-				throw new InvalidToolUsageException("Source is neither a directory nor a GenesisII container.");
+				throw new InvalidToolUsageException(
+						"Source is neither a directory nor a GenesisII container.");
 		} finally {
 			StreamUtils.close(targetConnection);
 		}
 	}
 
-	public void collect(VCGRContainerPortType container, String containerEPI, Connection targetConnection, boolean doCommit)
-		throws SQLException, IOException, ClassNotFoundException
-	{
+	public void collect(VCGRContainerPortType container, String containerEPI,
+			Connection targetConnection, boolean doCommit) throws SQLException,
+			IOException, ClassNotFoundException {
 		StatementBundle sBundle = null;
 		int read = 0;
 		WSIterable<AccountingRecordType> iterable = null;
@@ -398,15 +412,16 @@ public class AccountingTool extends BaseGridTool
 
 		try {
 			ClientUtils.setTimeout(container, 1000 * 60 * 20);
-			iterable =
-				WSIterable.axisIterable(AccountingRecordType.class, container.iterateAccountingRecords(null).getResult(), 100);
+			iterable = WSIterable.axisIterable(AccountingRecordType.class,
+					container.iterateAccountingRecords(null).getResult(), 100);
 
 			sBundle = new StatementBundle(targetConnection);
 
 			for (AccountingRecordType art : iterable) {
 				read++;
 				maxRecordId = Math.max(maxRecordId, art.getRecordId());
-				stdout.format("Retrieved record %d from %s.\n", art.getRecordId(), containerEPI);
+				stdout.format("Retrieved record %d from %s.\n",
+						art.getRecordId(), containerEPI);
 
 				addRecordToTargetDatabase(art, sBundle);
 			}
@@ -414,9 +429,12 @@ public class AccountingTool extends BaseGridTool
 			if (doCommit && read > 0) {
 				targetConnection.commit();
 
-				stdout.format("Committing up to record %d on %s.", maxRecordId, containerEPI);
+				stdout.format("Committing up to record %d on %s.", maxRecordId,
+						containerEPI);
 
-				container.commitAccountingRecords(new CommitAccountingRecordsRequestType(maxRecordId));
+				container
+						.commitAccountingRecords(new CommitAccountingRecordsRequestType(
+								maxRecordId));
 			} else if (read > 0) {
 				targetConnection.rollback();
 			}
@@ -426,9 +444,8 @@ public class AccountingTool extends BaseGridTool
 		}
 	}
 
-	public void collect(RNSPath sourceDirectory, EndpointReferenceType target, boolean doCommit, boolean isRecursive)
-		throws Throwable
-	{
+	public void collect(RNSPath sourceDirectory, EndpointReferenceType target,
+			boolean doCommit, boolean isRecursive) throws Throwable {
 		RNSRecursiveDescent descent = RNSRecursiveDescent.createDescent();
 		descent.setAvoidCycles(true);
 		descent.setRNSFilter(new IsContainerFilter());
@@ -436,48 +453,45 @@ public class AccountingTool extends BaseGridTool
 		if (!isRecursive)
 			descent.setMaximumDepth(1);
 
-		descent.descend(sourceDirectory, new RNSRecursiveDescentCallbackHandler(target, doCommit));
+		descent.descend(sourceDirectory,
+				new RNSRecursiveDescentCallbackHandler(target, doCommit));
 	}
 
-	private class RNSRecursiveDescentCallbackHandler implements RNSRecursiveDescentCallback
-	{
+	private class RNSRecursiveDescentCallbackHandler implements
+			RNSRecursiveDescentCallback {
 		private boolean _doCommit;
 		private ExecutorService _exec;
 		private EndpointReferenceType _target;
 
-		private RNSRecursiveDescentCallbackHandler(EndpointReferenceType target, boolean doCommit)
-		{
+		private RNSRecursiveDescentCallbackHandler(
+				EndpointReferenceType target, boolean doCommit) {
 			_target = target;
 			_doCommit = doCommit;
 			_exec = Executors.newFixedThreadPool(_maxThreads);
 		}
 
 		@Override
-		public void finish() throws Throwable
-		{
+		public void finish() throws Throwable {
 			// Nothing to do here
 		}
 
 		@Override
-		public RNSRecursiveDescentCallbackResult handleRNSPath(RNSPath path) throws Throwable
-		{
+		public RNSRecursiveDescentCallbackResult handleRNSPath(RNSPath path)
+				throws Throwable {
 			_count.increment();
 			_exec.submit(new ThreadHandler(path));
 
 			return RNSRecursiveDescentCallbackResult.ContinueLeaf;
 		}
 
-		private class ThreadHandler implements Runnable
-		{
+		private class ThreadHandler implements Runnable {
 			RNSPath _path;
 
-			public ThreadHandler(RNSPath path)
-			{
+			public ThreadHandler(RNSPath path) {
 				_path = path;
 			}
 
-			public void run()
-			{
+			public void run() {
 				stdout.format("Handling \"%s\".\n", _path);
 				stdout.flush();
 
@@ -487,12 +501,17 @@ public class AccountingTool extends BaseGridTool
 					EndpointReferenceType epr = _path.getEndpoint();
 					WSName name = new WSName(epr);
 					if (!name.isValidWSName())
-						throw new IllegalArgumentException("Container EPR is not a valid WS-Name.");
-					VCGRContainerPortType container = ClientUtils.createProxy(VCGRContainerPortType.class, epr);
+						throw new IllegalArgumentException(
+								"Container EPR is not a valid WS-Name.");
+					VCGRContainerPortType container = ClientUtils.createProxy(
+							VCGRContainerPortType.class, epr);
 					targetConnection = openTargetConnection(_target);
-					collect(container, name.getEndpointIdentifier().toString(), targetConnection, _doCommit);
+					collect(container, name.getEndpointIdentifier().toString(),
+							targetConnection, _doCommit);
 				} catch (Throwable cause) {
-					stderr.format("Unable to collect accounting information from container %s:  %s.\n", _path, cause);
+					stderr.format(
+							"Unable to collect accounting information from container %s:  %s.\n",
+							_path, cause);
 					_logger.info("exception occurred in run", cause);
 				} finally {
 					StreamUtils.close(targetConnection);
@@ -503,22 +522,18 @@ public class AccountingTool extends BaseGridTool
 		}
 	}
 
-	private class Lock
-	{
+	private class Lock {
 		private int _count;
 
-		public Lock()
-		{
+		public Lock() {
 			_count = 0;
 		}
 
-		public synchronized void increment()
-		{
+		public synchronized void increment() {
 			_count++;
 		}
 
-		public synchronized void decrement()
-		{
+		public synchronized void decrement() {
 			_count--;
 			if (_count < 0)
 				throw new RuntimeException("Count Underflow exception.");
@@ -527,28 +542,26 @@ public class AccountingTool extends BaseGridTool
 				notifyAll();
 		}
 
-		public synchronized void join() throws InterruptedException
-		{
+		public synchronized void join() throws InterruptedException {
 			while (_count > 0)
 				wait();
 		}
 
-		public String toString()
-		{
+		public String toString() {
 			return Integer.toString(_count);
 		}
 	}
 
-	static private class IsContainerFilter implements RNSFilter
-	{
+	static private class IsContainerFilter implements RNSFilter {
 		@Override
-		public boolean matches(RNSPath testEntry)
-		{
+		public boolean matches(RNSPath testEntry) {
 			try {
-				TypeInformation typeInfo = new TypeInformation(testEntry.getEndpoint());
+				TypeInformation typeInfo = new TypeInformation(
+						testEntry.getEndpoint());
 				return typeInfo.isContainer();
 			} catch (Throwable cause) {
-				_logger.warn("Filter encountered a problem getting the EPR.", cause);
+				_logger.warn("Filter encountered a problem getting the EPR.",
+						cause);
 				return false;
 			}
 		}

@@ -4,55 +4,47 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-public class Duration implements Serializable, Comparable<Duration>
-{
+public class Duration implements Serializable, Comparable<Duration> {
 	static final long serialVersionUID = 0L;
 
 	private long _milliseconds;
 
-	public Duration(long milliseconds)
-	{
+	public Duration(long milliseconds) {
 		if (milliseconds < 0)
-			throw new IllegalArgumentException("Duration value must be non-negative.");
+			throw new IllegalArgumentException(
+					"Duration value must be non-negative.");
 
 		_milliseconds = milliseconds;
 	}
 
-	public Duration(long timeoutValue, TimeUnit timeoutUnits)
-	{
+	public Duration(long timeoutValue, TimeUnit timeoutUnits) {
 		this(TimeUnit.MILLISECONDS.convert(timeoutValue, timeoutUnits));
 	}
 
-	final public long getTimeoutInMilliseconds()
-	{
+	final public long getTimeoutInMilliseconds() {
 		return _milliseconds;
 	}
 
-	final public long getTimeout(TimeUnit units)
-	{
+	final public long getTimeout(TimeUnit units) {
 		return units.convert(_milliseconds, TimeUnit.MILLISECONDS);
 	}
 
-	final public Calendar getExpiration(Calendar startTime)
-	{
+	final public Calendar getExpiration(Calendar startTime) {
 		Calendar ret = Calendar.getInstance();
 		ret.setTimeInMillis(startTime.getTimeInMillis() + _milliseconds);
 		return ret;
 	}
 
-	final public Calendar getExpiration()
-	{
+	final public Calendar getExpiration() {
 		return getExpiration(Calendar.getInstance());
 	}
 
-	public boolean equals(Duration other)
-	{
+	public boolean equals(Duration other) {
 		return _milliseconds == other._milliseconds;
 	}
 
 	@Override
-	public boolean equals(Object other)
-	{
+	public boolean equals(Object other) {
 		if (other instanceof Duration)
 			return equals((Duration) other);
 
@@ -60,25 +52,21 @@ public class Duration implements Serializable, Comparable<Duration>
 	}
 
 	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		return (int) _milliseconds;
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return Long.toString(_milliseconds);
 	}
 
-	public String toString(TimeUnit units)
-	{
+	public String toString(TimeUnit units) {
 		return Long.toString(getTimeout(units));
 	}
 
 	@Override
-	public int compareTo(Duration other)
-	{
+	public int compareTo(Duration other) {
 		long value = _milliseconds - other._milliseconds;
 		if (value < 0)
 			return -1;

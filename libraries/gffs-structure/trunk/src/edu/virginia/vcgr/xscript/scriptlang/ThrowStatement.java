@@ -12,19 +12,21 @@ import edu.virginia.vcgr.xscript.ReturnFromFunctionException;
 import edu.virginia.vcgr.xscript.XScriptContext;
 import edu.virginia.vcgr.xscript.macros.MacroReplacer;
 
-public class ThrowStatement implements ParseStatement
-{
+public class ThrowStatement implements ParseStatement {
 	private Constructor<? extends Throwable> _constructor;
 	private String _message;
 
 	@SuppressWarnings("unchecked")
-	public ThrowStatement(String className, String message) throws ScriptException
-	{
+	public ThrowStatement(String className, String message)
+			throws ScriptException {
 		try {
-			Class<?> clazz = GenesisClassLoader.classLoaderFactory().loadClass(className);
+			Class<?> clazz = GenesisClassLoader.classLoaderFactory().loadClass(
+					className);
 			if (!Throwable.class.isAssignableFrom(clazz))
-				throw new ScriptException(String.format("Class %s is not a Throwable.", className));
-			_constructor = (Constructor<? extends Throwable>) clazz.getConstructor(String.class);
+				throw new ScriptException(String.format(
+						"Class %s is not a Throwable.", className));
+			_constructor = (Constructor<? extends Throwable>) clazz
+					.getConstructor(String.class);
 		} catch (Exception e) {
 			throw new ScriptException(e);
 		}
@@ -33,12 +35,13 @@ public class ThrowStatement implements ParseStatement
 	}
 
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
-	{
+	public Object evaluate(XScriptContext context) throws ScriptException,
+			EarlyExitException, ReturnFromFunctionException {
 		Throwable cause;
 
 		try {
-			cause = _constructor.newInstance(MacroReplacer.replaceMacros(context, _message));
+			cause = _constructor.newInstance(MacroReplacer.replaceMacros(
+					context, _message));
 		} catch (InstantiationException ie) {
 			throw new ScriptException(ie);
 		} catch (IllegalAccessException iae) {

@@ -19,14 +19,13 @@ import javax.swing.SwingUtilities;
 import edu.virginia.vcgr.genii.client.dialog.InputDialog;
 import edu.virginia.vcgr.genii.client.dialog.InputValidator;
 
-public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, ActionListener
-{
+public class GuiInputDialog extends AbstractGuiDialog implements InputDialog,
+		ActionListener {
 
 	static private final String _OK_ACTION = "OK";
 
 	@Override
-	protected void okCalled()
-	{
+	protected void okCalled() {
 		_answer = _field.getText();
 
 		super.okCalled();
@@ -40,8 +39,7 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, Ac
 	private String _answer;
 	private InputValidator _validator;
 
-	public GuiInputDialog(String title, String prompt)
-	{
+	public GuiInputDialog(String title, String prompt) {
 		super(title, prompt);
 
 		_validator = null;
@@ -50,8 +48,7 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, Ac
 
 	}
 
-	protected JTextField createTextField()
-	{
+	protected JTextField createTextField() {
 		JTextField field = new JTextField();
 		Dimension dim = field.getMinimumSize();
 		dim.width = 100;
@@ -67,8 +64,7 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, Ac
 	}
 
 	@Override
-	protected JComponent createBody(Object[] bodyParameters)
-	{
+	protected JComponent createBody(Object[] bodyParameters) {
 		_label = new JLabel((String) bodyParameters[0]);
 		_field = createTextField();
 
@@ -76,47 +72,42 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, Ac
 
 		JPanel panel = new JPanel(new GridBagLayout());
 
-		panel.add(_label, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(_field, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-			new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(_label, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
+						5, 5, 5), 5, 5));
+		panel.add(_field, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+				new Insets(5, 5, 5, 5), 5, 5));
 
 		return panel;
 	}
 
 	@Override
-	public String getAnswer()
-	{
+	public String getAnswer() {
 		return _answer;
 	}
 
 	@Override
-	public String getDefaultAnswer()
-	{
+	public String getDefaultAnswer() {
 		return _defaultAnswer;
 	}
 
 	@Override
-	public InputValidator getInputValidator()
-	{
+	public InputValidator getInputValidator() {
 		return _validator;
 	}
 
 	@Override
-	public void setDefaultAnswer(String defaultAnswer)
-	{
+	public void setDefaultAnswer(String defaultAnswer) {
 		_defaultAnswer = defaultAnswer;
 		setDefaultValue();
 	}
 
-	private void setDefaultValue()
-	{
+	private void setDefaultValue() {
 		try {
 			if (!SwingUtilities.isEventDispatchThread()) {
-				SwingUtilities.invokeAndWait(new Runnable()
-				{
-					public void run()
-					{
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
 						setDefaultValue();
 					}
 				});
@@ -131,26 +122,24 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, Ac
 	}
 
 	@Override
-	public void setInputValidator(InputValidator validator)
-	{
+	public void setInputValidator(InputValidator validator) {
 		_validator = validator;
 	}
 
-	public void actionPerformed(ActionEvent arg0)
-	{
+	public void actionPerformed(ActionEvent arg0) {
 		super._okAction.actionPerformed(arg0);
 	}
 
-	private class InternalInputVerifier extends InputVerifier
-	{
+	private class InternalInputVerifier extends InputVerifier {
 		@Override
-		public boolean verify(JComponent input)
-		{
+		public boolean verify(JComponent input) {
 			String text = _field.getText();
 			if (_validator != null) {
 				String msg = _validator.validateInput(text);
 				if (msg != null) {
-					JOptionPane.showMessageDialog(_field, msg, "Input Validation Failed", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(_field, msg,
+							"Input Validation Failed",
+							JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 			}

@@ -16,8 +16,7 @@ package edu.virginia.vcgr.genii.security.axis;
 
 import java.util.StringTokenizer;
 
-public class MessageLevelSecurityRequirements
-{
+public class MessageLevelSecurityRequirements {
 	public static final int NONE = 0x00;
 	public static final int SIGN = 0x01;
 	public static final int ENCRYPT = 0x02;
@@ -25,18 +24,15 @@ public class MessageLevelSecurityRequirements
 
 	private final int _value;
 
-	public MessageLevelSecurityRequirements()
-	{
+	public MessageLevelSecurityRequirements() {
 		_value = NONE;
 	}
 
-	public MessageLevelSecurityRequirements(int value)
-	{
+	public MessageLevelSecurityRequirements(int value) {
 		_value = value;
 	}
 
-	public MessageLevelSecurityRequirements(String value)
-	{
+	public MessageLevelSecurityRequirements(String value) {
 
 		int temp = NONE;
 		if (value != null) {
@@ -58,21 +54,19 @@ public class MessageLevelSecurityRequirements
 		_value = temp;
 	}
 
-	public MessageLevelSecurityRequirements computeUnion(MessageLevelSecurityRequirements other)
-	{
+	public MessageLevelSecurityRequirements computeUnion(
+			MessageLevelSecurityRequirements other) {
 		if (other == null) {
 			return new MessageLevelSecurityRequirements(_value);
 		}
 		return new MessageLevelSecurityRequirements(_value | other._value);
 	}
 
-	public boolean equals(Object other)
-	{
+	public boolean equals(Object other) {
 		return (((MessageLevelSecurityRequirements) other)._value == _value);
 	}
 
-	public boolean superset(MessageLevelSecurityRequirements other)
-	{
+	public boolean superset(MessageLevelSecurityRequirements other) {
 		if ((other._value & _value) == other._value) {
 			return true;
 		}
@@ -80,28 +74,23 @@ public class MessageLevelSecurityRequirements
 		return false;
 	}
 
-	public boolean isNone()
-	{
+	public boolean isNone() {
 		return ((_value == NONE) || (_value == WARN));
 	}
 
-	public boolean isSign()
-	{
+	public boolean isSign() {
 		return ((_value & SIGN) > 0);
 	}
 
-	public boolean isEncrypt()
-	{
+	public boolean isEncrypt() {
 		return ((_value & ENCRYPT) > 0);
 	}
 
-	public boolean isWarn()
-	{
+	public boolean isWarn() {
 		return ((_value & WARN) > 0);
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		if (_value == NONE) {
 			return "NONE";
 		}

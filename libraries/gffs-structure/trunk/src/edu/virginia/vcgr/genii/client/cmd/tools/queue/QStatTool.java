@@ -19,32 +19,30 @@ import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.gpath.*;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class QStatTool extends BaseGridTool
-{
+public class QStatTool extends BaseGridTool {
 	static final private String _DESCRIPTION = "config/tooldocs/description/dqstat";
 	static final private String _USAGE = "config/tooldocs/usage/uqstat";
 	static final private String _MANPAGE = "config/tooldocs/man/qstat";
 
 	private boolean _full = false;
 
-	public QStatTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.EXECUTION);
+	public QStatTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.EXECUTION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "f", "full" })
-	public void setFull()
-	{
+	public void setFull() {
 		_full = true;
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException("<queue-path> must be a grid path. ");
+			throw new InvalidToolUsageException(
+					"<queue-path> must be a grid path. ");
 		ArrayList<JobTicket> tickets;
 		QueueManipulator manipulator = new QueueManipulator(gPath.path());
 
@@ -66,21 +64,19 @@ public class QStatTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() < 1)
 			throw new InvalidToolUsageException("Must supply a queue path.");
 	}
 
-	private void printHeader()
-	{
-		stdout.println(String.format("%1$-36s   %2$-21s   %3$-4s   %4$-8s", "Ticket", "Submit Time", "Tries", "State"));
+	private void printHeader() {
+		stdout.println(String.format("%1$-36s   %2$-21s   %3$-4s   %4$-8s",
+				"Ticket", "Submit Time", "Tries", "State"));
 	}
 
 	static private final String _FORMAT = "%1$-36s   %2$tH:%2$tM %2$tZ %2$td %2$tb %2$tY   %3$-4d   %4$s";
 
-	private void printJobInformation(JobInformation jobInfo)
-	{
+	private void printJobInformation(JobInformation jobInfo) {
 		String stateString = jobInfo.getScheduledOn();
 		if (stateString != null)
 			stateString = String.format("On %s", stateString);
@@ -91,7 +87,8 @@ public class QStatTool extends BaseGridTool
 		Calendar submitTime = jobInfo.getSubmitTime();
 		submitTime.setTimeZone(tz);
 
-		stdout.println(String.format(_FORMAT, jobInfo.getTicket(), submitTime, jobInfo.getFailedAttempts(), stateString));
+		stdout.println(String.format(_FORMAT, jobInfo.getTicket(), submitTime,
+				jobInfo.getFailedAttempts(), stateString));
 		ActivityStatusType ast = jobInfo.besActivityStatus();
 		if (_full) {
 			stdout.format("\tJob Name:  %s\n", jobInfo.jobName());

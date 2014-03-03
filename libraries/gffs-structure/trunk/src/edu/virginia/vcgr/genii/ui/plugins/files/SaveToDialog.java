@@ -30,11 +30,11 @@ import edu.virginia.vcgr.genii.ui.utils.LoggingTarget;
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under
+ *          the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
-public class SaveToDialog extends AbstractCombinedUIMenusPlugin
-{
+public class SaveToDialog extends AbstractCombinedUIMenusPlugin {
 	static private Log _logger = LogFactory.getLog(SaveToDialog.class);
 	JFileChooser _fileDialog = new JFileChooser();
 
@@ -42,20 +42,23 @@ public class SaveToDialog extends AbstractCombinedUIMenusPlugin
 	 * We support both RNS directories and ByteIO files with this plugin.
 	 */
 	@Override
-	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
-	{
+	public boolean isEnabled(
+			Collection<EndpointDescription> selectedDescriptions) {
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS
+		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS,
+		// but is it an RNS
 		// and NOT (isContainer, isBES ...
 		// Perhaps should be even more selective,
-		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
-		return ((tp.isRNS() || tp.isByteIO()) && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
+		TypeInformation tp = selectedDescriptions.iterator().next()
+				.typeInformation();
+		return ((tp.isRNS() || tp.isByteIO()) && !(tp.isContainer()
+				|| tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
 	}
 
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
-	{
+	protected void performMenuAction(UIPluginContext context, MenuType menuType)
+			throws UIPluginException {
 		if (context == null)
 			return;
 		if (_logger.isDebugEnabled())
@@ -63,56 +66,65 @@ public class SaveToDialog extends AbstractCombinedUIMenusPlugin
 		Closeable contextToken = null;
 		contextToken = null;
 		try {
-			contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+			contextToken = ContextManager.temporarilyAssumeContext(context
+					.uiContext().callingContext());
 
-			_fileDialog.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			_fileDialog
+					.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			int retPick = _fileDialog.showOpenDialog(context.ownerComponent());
 			if (retPick == JFileChooser.APPROVE_OPTION) {
-				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
+				Collection<RNSPath> paths = context.endpointRetriever()
+						.getTargetEndpoints();
 				RNSPath path = paths.iterator().next();
-				context
-					.uiContext()
-					.progressMonitorFactory()
-					.createMonitor(context.ownerComponent(), "Saving to local filesystem...", "", 1000L,
-						new SaveToTask(path, _fileDialog.getSelectedFile().toString()), null).start();
+				context.uiContext()
+						.progressMonitorFactory()
+						.createMonitor(
+								context.ownerComponent(),
+								"Saving to local filesystem...",
+								"",
+								1000L,
+								new SaveToTask(path, _fileDialog
+										.getSelectedFile().toString()), null)
+						.start();
 			}
 		} catch (Throwable cause) {
-			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
+			ErrorHandler.handleError(context.uiContext(),
+					context.ownerComponent(), cause);
 		} finally {
 			StreamUtils.close(contextToken);
 		}
 	}
 
-	private class SaveToTask extends AbstractTask<Integer>
-	{
+	private class SaveToTask extends AbstractTask<Integer> {
 		RNSPath path;
 		String target;
 
-		SaveToTask(RNSPath pathIn, String targetIn)
-		{
+		SaveToTask(RNSPath pathIn, String targetIn) {
 			path = pathIn;
 			target = targetIn;
 		}
 
-		private PathOutcome performSave(RNSPath source, TaskProgressListener progressListener)
-		{
+		private PathOutcome performSave(RNSPath source,
+				TaskProgressListener progressListener) {
 			if ((source == null) || (progressListener == null))
 				return null;
 			File file = _fileDialog.getSelectedFile();
 			String target = "local:" + file.toString();
 			// we assume they don't want to overwrite files without knowing it.
-			CopyMachine cm = new CopyMachine(source.pwd(), target, progressListener, false, null, null);
+			CopyMachine cm = new CopyMachine(source.pwd(), target,
+					progressListener, false, null, null);
 			return cm.copyTree();
 		}
 
 		@Override
-		public Integer execute(TaskProgressListener progressListener) throws Exception
-		{
+		public Integer execute(TaskProgressListener progressListener)
+				throws Exception {
 			if (progressListener == null)
 				return 1;
 			PathOutcome ret = performSave(path, progressListener);
 			if (PathOutcome.OUTCOME_SUCCESS.differs(ret)) {
-				String msg = "failed to save to the chosen path: " + target + " because " + PathOutcome.outcomeText(ret);
+				String msg = "failed to save to the chosen path: " + target
+						+ " because " + PathOutcome.outcomeText(ret);
 				LoggingTarget.logInfo(msg, null);
 				_logger.error(msg);
 				return 1;
@@ -121,8 +133,7 @@ public class SaveToDialog extends AbstractCombinedUIMenusPlugin
 		}
 
 		@Override
-		public boolean showProgressDialog()
-		{
+		public boolean showProgressDialog() {
 			return true;
 		}
 

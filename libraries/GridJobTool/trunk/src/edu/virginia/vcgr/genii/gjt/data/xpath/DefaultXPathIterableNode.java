@@ -1,29 +1,25 @@
 package edu.virginia.vcgr.genii.gjt.data.xpath;
 
-public class DefaultXPathIterableNode extends DefaultXPathNode implements XPathIterableNode
-{
+public class DefaultXPathIterableNode extends DefaultXPathNode implements
+		XPathIterableNode {
 	private int _index = 1;
 
-	public DefaultXPathIterableNode(String namespaceURI, String name)
-	{
+	public DefaultXPathIterableNode(String namespaceURI, String name) {
 		super(namespaceURI, name);
 	}
 
 	@Override
-	public void reset()
-	{
+	public void reset() {
 		_index = 1;
 	}
 
 	@Override
-	public void next()
-	{
+	public void next() {
 		_index++;
 	}
 
 	@Override
-	public String toString(NamespacePrefixMap prefixMap)
-	{
+	public String toString(NamespacePrefixMap prefixMap) {
 		return String.format("%s[%d]", super.toString(prefixMap), _index);
 	}
 }

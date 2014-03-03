@@ -24,7 +24,6 @@ import edu.virginia.vcgr.jsdl.sweep.SweepException;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface SweepTargetIdentifier
-{
+public interface SweepTargetIdentifier {
 	public SweepTarget identify(Node context) throws SweepException;
 }

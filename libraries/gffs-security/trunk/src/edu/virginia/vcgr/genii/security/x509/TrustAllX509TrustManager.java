@@ -24,48 +24,49 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A simple trust manager that always trusts everything.
  * 
- * The trust manager is responsible for managing the trust material that is used when making trust
- * decisions, and for deciding whether credentials presented by a peer should be accepted.
+ * The trust manager is responsible for managing the trust material that is used
+ * when making trust decisions, and for deciding whether credentials presented
+ * by a peer should be accepted.
  * 
  * @author dmerrill
  */
-public class TrustAllX509TrustManager implements X509TrustManager
-{
-	static private Log _logger = LogFactory.getLog(TrustAllX509TrustManager.class);
+public class TrustAllX509TrustManager implements X509TrustManager {
+	static private Log _logger = LogFactory
+			.getLog(TrustAllX509TrustManager.class);
 
 	/**
 	 * Constructor
 	 */
-	public TrustAllX509TrustManager()
-	{
+	public TrustAllX509TrustManager() {
 	}
 
 	/**
-	 * Return an array of certificate authority certificates which are trusted for authenticating
-	 * peers.
+	 * Return an array of certificate authority certificates which are trusted
+	 * for authenticating peers.
 	 */
-	public X509Certificate[] getAcceptedIssuers()
-	{
+	public X509Certificate[] getAcceptedIssuers() {
 		return new X509Certificate[0];
 	}
 
 	/**
-	 * Given the partial or complete certificate chain provided by the peer, build a certificate
-	 * path to a trusted root and return if it can be validated and is trusted for client SSL
-	 * authentication based on the authentication type.
+	 * Given the partial or complete certificate chain provided by the peer,
+	 * build a certificate path to a trusted root and return if it can be
+	 * validated and is trusted for client SSL authentication based on the
+	 * authentication type.
 	 */
-	public void checkClientTrusted(X509Certificate chain[], String authType) throws CertificateException
-	{
+	public void checkClientTrusted(X509Certificate chain[], String authType)
+			throws CertificateException {
 		_logger.debug("seeing client: " + chain[0].getSubjectDN());
 	}
 
 	/**
-	 * Given the partial or complete certificate chain provided by the peer, build a certificate
-	 * path to a trusted root and return if it can be validated and is trusted for server SSL
-	 * authentication based on the authentication type
+	 * Given the partial or complete certificate chain provided by the peer,
+	 * build a certificate path to a trusted root and return if it can be
+	 * validated and is trusted for server SSL authentication based on the
+	 * authentication type
 	 */
-	public void checkServerTrusted(X509Certificate chain[], String authType) throws CertificateException
-	{
+	public void checkServerTrusted(X509Certificate chain[], String authType)
+			throws CertificateException {
 		_logger.debug("seeing server: " + chain[0].getSubjectDN());
 	}
 }

@@ -29,11 +29,11 @@ import edu.virginia.vcgr.genii.ui.utils.LoggingTarget;
  * 
  * @author Andrew Grimshaw based on code by Chris Koeritz
  * @copyright Copyright (c) 2013 By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under
+ *          the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
-public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
-{
+public class CopyFromDialog extends AbstractCombinedUIMenusPlugin {
 	static private Log _logger = LogFactory.getLog(CopyFromDialog.class);
 	JFileChooser _fileDialog = new JFileChooser();
 
@@ -41,20 +41,23 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 	 * We support both RNS directories and ByteIO files with this plugin.
 	 */
 	@Override
-	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
-	{
+	public boolean isEnabled(
+			Collection<EndpointDescription> selectedDescriptions) {
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS
+		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS,
+		// but is it an RNS
 		// and NOT (isContainer, isBES ...
 		// Perhaps should be even more selective,
-		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
-		return ((tp.isRNS() || tp.isByteIO()) && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
+		TypeInformation tp = selectedDescriptions.iterator().next()
+				.typeInformation();
+		return ((tp.isRNS() || tp.isByteIO()) && !(tp.isContainer()
+				|| tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
 	}
 
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
-	{
+	protected void performMenuAction(UIPluginContext context, MenuType menuType)
+			throws UIPluginException {
 		if (context == null)
 			return;
 		if (_logger.isDebugEnabled())
@@ -62,59 +65,68 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 		Closeable contextToken = null;
 		contextToken = null;
 		try {
-			contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+			contextToken = ContextManager.temporarilyAssumeContext(context
+					.uiContext().callingContext());
 
-			_fileDialog.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			_fileDialog
+					.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			int retPick = _fileDialog.showOpenDialog(context.ownerComponent());
 			if (retPick == JFileChooser.APPROVE_OPTION) {
-				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
+				Collection<RNSPath> paths = context.endpointRetriever()
+						.getTargetEndpoints();
 				RNSPath path = paths.iterator().next();
-				context
-					.uiContext()
-					.progressMonitorFactory()
-					.createMonitor(context.ownerComponent(), "Copy from local filesystem", "", 1000L,
-						new SaveToTask(context, "local:" + _fileDialog.getSelectedFile().toString(), path.pwd()), null).start();
+				context.uiContext()
+						.progressMonitorFactory()
+						.createMonitor(
+								context.ownerComponent(),
+								"Copy from local filesystem",
+								"",
+								1000L,
+								new SaveToTask(context, "local:"
+										+ _fileDialog.getSelectedFile()
+												.toString(), path.pwd()), null)
+						.start();
 			}
 		} catch (Throwable cause) {
-			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
+			ErrorHandler.handleError(context.uiContext(),
+					context.ownerComponent(), cause);
 		} finally {
 			StreamUtils.close(contextToken);
 		}
 	}
 
-	private class SaveToTask extends AbstractTask<Integer>
-	{
+	private class SaveToTask extends AbstractTask<Integer> {
 		String src;
 		String target;
 		UIPluginContext _context;
 
-		SaveToTask(UIPluginContext context, String pathIn, String targetIn)
-		{
+		SaveToTask(UIPluginContext context, String pathIn, String targetIn) {
 			src = pathIn;
 			target = targetIn;
 			_context = context;
 
 		}
 
-		private PathOutcome performSave(TaskProgressListener progressListener)
-		{
+		private PathOutcome performSave(TaskProgressListener progressListener) {
 			if ((src == null) || (progressListener == null))
 				return null;
 			// we assume they don't want to overwrite files without knowing it.
-			CopyMachine cm = new CopyMachine(src, target, progressListener, false, null, null);
+			CopyMachine cm = new CopyMachine(src, target, progressListener,
+					false, null, null);
 			PathOutcome result = cm.copyTree();
 			_context.endpointRetriever().refresh();
 			return result;
 		}
 
 		@Override
-		public Integer execute(TaskProgressListener progressListener) throws Exception
-		{
+		public Integer execute(TaskProgressListener progressListener)
+				throws Exception {
 			if (progressListener == null)
 				return 1;
 			PathOutcome ret = performSave(progressListener);
 			if (PathOutcome.OUTCOME_SUCCESS.differs(ret)) {
-				String msg = "failed to save to the chosen path: " + target + " because " + PathOutcome.outcomeText(ret);
+				String msg = "failed to save to the chosen path: " + target
+						+ " because " + PathOutcome.outcomeText(ret);
 				LoggingTarget.logInfo(msg, null);
 				_logger.error(msg);
 				return 1;
@@ -123,8 +135,7 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 		}
 
 		@Override
-		public boolean showProgressDialog()
-		{
+		public boolean showProgressDialog() {
 			return true;
 		}
 

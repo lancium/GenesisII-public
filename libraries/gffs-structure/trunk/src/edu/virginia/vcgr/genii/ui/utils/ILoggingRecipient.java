@@ -5,7 +5,6 @@ package edu.virginia.vcgr.genii.ui.utils;
 /**
  * An interface for any object that can accept diagnostic info.
  */
-public interface ILoggingRecipient
-{
+public interface ILoggingRecipient {
 	public boolean consumeLogging(String message, Throwable cause);
 }

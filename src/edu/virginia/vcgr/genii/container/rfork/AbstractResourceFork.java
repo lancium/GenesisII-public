@@ -5,29 +5,26 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public abstract class AbstractResourceFork implements ResourceFork
-{
+public abstract class AbstractResourceFork implements ResourceFork {
 	private ResourceForkService _service;
 	private String _forkPath;
 	private String _forkName = null;
 
-	protected AbstractResourceFork(ResourceForkService service, String forkPath)
-	{
+	protected AbstractResourceFork(ResourceForkService service, String forkPath) {
 		_service = service;
 		_forkPath = forkPath.replaceAll("/{2,}", "/");
 	}
 
-	protected ResourceForkService getService()
-	{
+	protected ResourceForkService getService() {
 		return _service;
 	}
 
-	protected String getForkName()
-	{
+	protected String getForkName() {
 		if (_forkName == null) {
 			int index = _forkPath.lastIndexOf('/');
 			if (index < 0)
-				throw new RuntimeException("Invalid fork path given \"" + _forkPath + "\"-- must contain a slash character.");
+				throw new RuntimeException("Invalid fork path given \""
+						+ _forkPath + "\"-- must contain a slash character.");
 			_forkName = _forkPath.substring(index + 1);
 		}
 
@@ -35,27 +32,23 @@ public abstract class AbstractResourceFork implements ResourceFork
 	}
 
 	@Override
-	public void registerNotificationHandlers(NotificationMultiplexer multiplexer)
-	{
+	public void registerNotificationHandlers(NotificationMultiplexer multiplexer) {
 		// By default, there is nothing to do.
 	}
 
 	@Override
-	public String getForkPath()
-	{
+	public String getForkPath() {
 		return _forkPath;
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void destroy() throws ResourceException
-	{
+	public void destroy() throws ResourceException {
 		// Do nothing
 	}
 
 	@Override
-	public ResourceForkInformation describe()
-	{
+	public ResourceForkInformation describe() {
 		return new DefaultResourceForkInformation(getClass(), getForkPath());
 	}
 }

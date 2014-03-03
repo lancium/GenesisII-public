@@ -3,10 +3,8 @@ package edu.virginia.vcgr.genii.client.utils;
 import java.io.File;
 import java.util.regex.Pattern;
 
-public class SystemExec
-{
-	static public File findExecutableInPath(String executableName)
-	{
+public class SystemExec {
+	static public File findExecutableInPath(String executableName) {
 		String path = System.getenv("PATH");
 		if (path == null)
 			return null;

@@ -6,26 +6,25 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 
 /**
- * A simple tester that allows one to run just the SystemInfoProvider support on a targeted
- * platform.
+ * A simple tester that allows one to run just the SystemInfoProvider support on
+ * a targeted platform.
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under
+ *          the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
-public class TestSystemInfo
-{
+public class TestSystemInfo {
 	static private Log logger = LogFactory.getLog(TestSystemInfo.class);
 
-	public TestSystemInfo()
-	{
+	public TestSystemInfo() {
 		System.loadLibrary("VcgrContainerLib");
 	}
 
-	public void runTest()
-	{
-		System.out.println("Testing the SystemInfoProvider for " + OperatingSystemType.getCurrent().toString());
+	public void runTest() {
+		System.out.println("Testing the SystemInfoProvider for "
+				+ OperatingSystemType.getCurrent().toString());
 		System.out.println("  getting cpu speed...");
 		long cpuspeed = 0;
 		try {
@@ -76,14 +75,18 @@ public class TestSystemInfo
 			logger.error("Exception occurred", cause);
 		}
 		System.out.println("\nReport for system:");
-		System.out.println(String.format("  cpu speed=%d  user logged in=%b  screensaver active=%b", cpuspeed, loggedin,
-			screensaving));
-		System.out.println(String.format("  total physical memory=%d & available=%d", physmem, physmemavail));
-		System.out.println(String.format("  total virtual memory=%d & available=%d", virtmem, virtmemavail));
+		System.out.println(String.format(
+				"  cpu speed=%d  user logged in=%b  screensaver active=%b",
+				cpuspeed, loggedin, screensaving));
+		System.out.println(String.format(
+				"  total physical memory=%d & available=%d", physmem,
+				physmemavail));
+		System.out.println(String.format(
+				"  total virtual memory=%d & available=%d", virtmem,
+				virtmemavail));
 	}
 
-	public static void main(String s[])
-	{
+	public static void main(String s[]) {
 		TestSystemInfo tsi = new TestSystemInfo();
 		tsi.runTest();
 	}

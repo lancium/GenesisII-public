@@ -35,23 +35,24 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 @SuppressWarnings("unchecked")
-public class URIManager
-{
+public class URIManager {
 	static private Log _logger = LogFactory.getLog(URIManager.class);
 
 	static private final String DEFAULT_MAXIMUM_SIMULTANEOUS_CONNECTIONS = "128";
-	static private final String MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY =
-		"edu.virginia.vcgr.genii.client.io.uri-manager.max-simultaneous-connections";
+	static private final String MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY = "edu.virginia.vcgr.genii.client.io.uri-manager.max-simultaneous-connections";
 
-	static private final QName _URI_HANDLER_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "uri-handlers");
+	static private final QName _URI_HANDLER_QNAME = new QName(
+			GenesisIIConstants.GENESISII_NS, "uri-handlers");
 
 	static private Semaphore _connectionSemaphore;
 	static private HashMap<String, IURIHandler> _handlers = new HashMap<String, IURIHandler>();
 
 	static {
-		XMLConfiguration conf = ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
+		XMLConfiguration conf = ConfigurationManager.getCurrentConfiguration()
+				.getClientConfiguration();
 
-		Collection<IURIHandler> handlers = (Collection<IURIHandler>) conf.retrieveSection(_URI_HANDLER_QNAME);
+		Collection<IURIHandler> handlers = (Collection<IURIHandler>) conf
+				.retrieveSection(_URI_HANDLER_QNAME);
 
 		for (IURIHandler handler : handlers) {
 			String[] schemes = handler.getHandledProtocols();
@@ -60,15 +61,18 @@ public class URIManager
 			}
 		}
 
-		int count =
-			Integer.parseInt(Installation.getDeployment(new DeploymentName()).uriManagerProperties()
-				.getProperty(MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY, DEFAULT_MAXIMUM_SIMULTANEOUS_CONNECTIONS));
-		_logger.info(String.format("URIManager configured to allow up to %d simultaneous connections.", count));
+		int count = Integer.parseInt(Installation
+				.getDeployment(new DeploymentName())
+				.uriManagerProperties()
+				.getProperty(MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY,
+						DEFAULT_MAXIMUM_SIMULTANEOUS_CONNECTIONS));
+		_logger.info(String
+				.format("URIManager configured to allow up to %d simultaneous connections.",
+						count));
 		_connectionSemaphore = new Semaphore(count, true);
 	}
 
-	static public String[] getHandledProtocols()
-	{
+	static public String[] getHandledProtocols() {
 		String[] ret;
 		Set<String> keys = _handlers.keySet();
 		ret = new String[keys.size()];
@@ -77,28 +81,29 @@ public class URIManager
 		return ret;
 	}
 
-	static public boolean canRead(String scheme)
-	{
+	static public boolean canRead(String scheme) {
 		IURIHandler handler = _handlers.get(scheme);
 		return ((handler != null) && handler.canRead(scheme));
 	}
 
-	static public boolean canWrite(String scheme)
-	{
+	static public boolean canWrite(String scheme) {
 		IURIHandler handler = _handlers.get(scheme);
 		return ((handler != null) && handler.canWrite(scheme));
 	}
 
-	static public DataTransferStatistics get(URI source, File target, UsernamePasswordIdentity credential) throws IOException
-	{
-		_logger.info(String.format("Attempting to copy file from %s to %s.", source, target));
+	static public DataTransferStatistics get(URI source, File target,
+			UsernamePasswordIdentity credential) throws IOException {
+		_logger.info(String.format("Attempting to copy file from %s to %s.",
+				source, target));
 		String scheme = source.getScheme();
 		if (scheme == null)
-			throw new IOException("Don't know how to handle \"" + source + "\".");
+			throw new IOException("Don't know how to handle \"" + source
+					+ "\".");
 
 		IURIHandler handler = _handlers.get(scheme);
 		if (handler == null)
-			throw new IOException("Don't know how to handle \"" + source + "\".");
+			throw new IOException("Don't know how to handle \"" + source
+					+ "\".");
 
 		try {
 			_connectionSemaphore.acquireUninterruptibly();
@@ -109,17 +114,20 @@ public class URIManager
 		}
 	}
 
-	static public DataTransferStatistics put(File source, URI target, UsernamePasswordIdentity credential) throws IOException
-	{
-		_logger.info(String.format("Attempting to copy file from %s to %s.", source, target));
+	static public DataTransferStatistics put(File source, URI target,
+			UsernamePasswordIdentity credential) throws IOException {
+		_logger.info(String.format("Attempting to copy file from %s to %s.",
+				source, target));
 
 		String scheme = target.getScheme();
 		if (scheme == null)
-			throw new IOException("Don't know how to handle \"" + target + "\".");
+			throw new IOException("Don't know how to handle \"" + target
+					+ "\".");
 
 		IURIHandler handler = _handlers.get(scheme);
 		if (handler == null)
-			throw new IOException("Don't know how to handle \"" + target + "\".");
+			throw new IOException("Don't know how to handle \"" + target
+					+ "\".");
 
 		try {
 			_connectionSemaphore.acquireUninterruptibly();

@@ -33,8 +33,7 @@ import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 
-public class MkdirTool extends BaseGridTool
-{
+public class MkdirTool extends BaseGridTool {
 	static private final String _DESCRIPTION = "config/tooldocs/description/dmkdir";
 	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/umkdir";
 	static private final String _MANPAGE = "config/tooldocs/man/mkdir";
@@ -43,55 +42,54 @@ public class MkdirTool extends BaseGridTool
 	private boolean _parents = false;
 	private String _rnsService = null;
 
-	public MkdirTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE_RESOURCE), false, ToolCategory.DATA);
+	public MkdirTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(
+				_USAGE_RESOURCE), false, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "parents", "p" })
-	public void setParents()
-	{
+	public void setParents() {
 		_parents = true;
 	}
 
 	@Option({ "rns-service" })
-	public void setRns_service(String service)
-	{
+	public void setRns_service(String service) {
 		_rnsService = service;
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		return makeDirectory(_parents, _rnsService, getArguments(), stderr);
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() < 1)
 			throw new InvalidToolUsageException();
 	}
 
-	public static EndpointReferenceType lookupPath(String path) throws RNSPathDoesNotExistException, RNSException,
-		FileNotFoundException
-	{
-		NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
-		return RNSUtilities.findService(nsd.getRootContainer(), "EnhancedRNSPortType",
-			new PortType[] { WellKnownPortTypes.RNS_PORT_TYPE() }, new GeniiPath(path).path()).getEndpoint();
+	public static EndpointReferenceType lookupPath(String path)
+			throws RNSPathDoesNotExistException, RNSException,
+			FileNotFoundException {
+		NamespaceDefinitions nsd = Installation.getDeployment(
+				new DeploymentName()).namespace();
+		return RNSUtilities.findService(nsd.getRootContainer(),
+				"EnhancedRNSPortType",
+				new PortType[] { WellKnownPortTypes.RNS_PORT_TYPE() },
+				new GeniiPath(path).path()).getEndpoint();
 	}
 
-	public static int makeDirectory(boolean parents, String rnsService, List<String> pathsToCreate, PrintWriter stderr)
-		throws Exception
-	{
+	public static int makeDirectory(boolean parents, String rnsService,
+			List<String> pathsToCreate, PrintWriter stderr) throws Exception {
 		boolean createParents = false;
 		EndpointReferenceType service = null;
 
 		if (rnsService != null) {
 			GeniiPath gPath = new GeniiPath(rnsService);
 			if (gPath.pathType() != GeniiPathType.Grid)
-				throw new InvalidToolUsageException("RNSService must be a grid path. ");
+				throw new InvalidToolUsageException(
+						"RNSService must be a grid path. ");
 			service = lookupPath(rnsService);
 		}
 
@@ -119,30 +117,36 @@ public class MkdirTool extends BaseGridTool
 					RNSPath parent = path.getParent();
 
 					if (!parent.exists()) {
-						String msg = "Can't create directory \"" + path.pwd() + "\".";
+						String msg = "Can't create directory \"" + path.pwd()
+								+ "\".";
 						logger.error(msg);
 						if (stderr != null)
 							stderr.println(msg);
 						return 1;
 					}
 
-					TypeInformation typeInfo = new TypeInformation(parent.getEndpoint());
+					TypeInformation typeInfo = new TypeInformation(
+							parent.getEndpoint());
 					if (!typeInfo.isRNS()) {
-						String msg = "\"" + parent.pwd() + "\" is not a directory.";
+						String msg = "\"" + parent.pwd()
+								+ "\" is not a directory.";
 						logger.error(msg);
 						if (stderr != null)
 							stderr.println(msg);
 						return 1;
 					}
 
-					GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, service);
-					EndpointReferenceType newEPR = common.vcgrCreate(new VcgrCreate(null)).getEndpoint();
+					GeniiCommon common = ClientUtils.createProxy(
+							GeniiCommon.class, service);
+					EndpointReferenceType newEPR = common.vcgrCreate(
+							new VcgrCreate(null)).getEndpoint();
 					try {
 						path.link(newEPR);
 						newEPR = null;
 					} finally {
 						if (newEPR != null) {
-							common = ClientUtils.createProxy(GeniiCommon.class, newEPR);
+							common = ClientUtils.createProxy(GeniiCommon.class,
+									newEPR);
 							common.destroy(new Destroy());
 						}
 					}
@@ -151,7 +155,8 @@ public class MkdirTool extends BaseGridTool
 				File newFile = new File(gPath.path());
 				if (createParents) {
 					if (!newFile.mkdirs()) {
-						String msg = "Could not create directory " + gPath.path();
+						String msg = "Could not create directory "
+								+ gPath.path();
 						logger.error(msg);
 						if (stderr != null)
 							stderr.println(msg);

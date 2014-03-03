@@ -5,20 +5,17 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
-public class XScript extends CompiledScript
-{
+public class XScript extends CompiledScript {
 	private XScriptEngine _engine;
 	private ParseStatement _program;
 
-	XScript(XScriptEngine engine, ParseStatement program)
-	{
+	XScript(XScriptEngine engine, ParseStatement program) {
 		_engine = engine;
 		_program = program;
 	}
 
 	@Override
-	public Object eval(ScriptContext context) throws ScriptException
-	{
+	public Object eval(ScriptContext context) throws ScriptException {
 		try {
 			return _program.evaluate((XScriptContext) context);
 		} catch (EarlyExitException e) {
@@ -29,8 +26,7 @@ public class XScript extends CompiledScript
 	}
 
 	@Override
-	public ScriptEngine getEngine()
-	{
+	public ScriptEngine getEngine() {
 		return _engine;
 	}
 }

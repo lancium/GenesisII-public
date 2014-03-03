@@ -13,12 +13,11 @@ import edu.virginia.vcgr.genii.gjt.gui.fs.FilesystemCellRenderer;
 import edu.virginia.vcgr.genii.gjt.gui.fs.FilesystemCombo;
 import edu.virginia.vcgr.genii.gjt.gui.util.DefaultGrayedEmptyCellRenderer;
 
-class ArgumentTable extends JTable
-{
+class ArgumentTable extends JTable {
 	static final long serialVersionUID = 0L;
 
-	ArgumentTable(FilesystemMap filesystemMap, FilesystemAssociatedStringList arguments)
-	{
+	ArgumentTable(FilesystemMap filesystemMap,
+			FilesystemAssociatedStringList arguments) {
 		super(new ArgumentTableModel(arguments));
 
 		setShowHorizontalLines(true);
@@ -34,11 +33,13 @@ class ArgumentTable extends JTable
 		indexColumn.setMaxWidth(125);
 
 		textColumn.setHeaderValue("Argument");
-		textColumn.setCellRenderer(new DefaultGrayedEmptyCellRenderer("Argument"));
+		textColumn.setCellRenderer(new DefaultGrayedEmptyCellRenderer(
+				"Argument"));
 
 		fsColumn.setHeaderValue("Filesystem");
 		fsColumn.setCellRenderer(new FilesystemCellRenderer());
-		fsColumn.setCellEditor(new DefaultCellEditor(new FilesystemCombo(filesystemMap)));
+		fsColumn.setCellEditor(new DefaultCellEditor(new FilesystemCombo(
+				filesystemMap)));
 
 		putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 	}

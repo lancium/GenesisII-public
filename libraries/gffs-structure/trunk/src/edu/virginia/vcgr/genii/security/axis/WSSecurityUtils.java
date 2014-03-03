@@ -25,24 +25,17 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
  * 
  * @author dmerrill
  */
-public class WSSecurityUtils
-{
-	public static final String PKCS7_URI =
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#PKCS7";
-	public static final String X509v3_URI =
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3";
-	public static final String X509PKIPathv1_URI =
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509PKIPathv1";
+public class WSSecurityUtils {
+	public static final String PKCS7_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#PKCS7";
+	public static final String X509v3_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3";
+	public static final String X509PKIPathv1_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509PKIPathv1";
 
-	public static final String PASSWORD_DIGEST_URI =
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest";
-	public static final String PASSWORD_TEXT_URI =
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText";
-	public static final String USERNAME_TOKEN_URI =
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#UsernameToken";
+	public static final String PASSWORD_DIGEST_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest";
+	public static final String PASSWORD_TEXT_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText";
+	public static final String USERNAME_TOKEN_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#UsernameToken";
 
-	static public String getNameTokenFromUTSecTokenRef(MessageElement wseTokenRef) throws GeneralSecurityException
-	{
+	static public String getNameTokenFromUTSecTokenRef(
+			MessageElement wseTokenRef) throws GeneralSecurityException {
 		try {
 			UsernameToken bstToken = new UsernameToken(wseTokenRef);
 			return bstToken.getName();
@@ -51,8 +44,8 @@ public class WSSecurityUtils
 		}
 	}
 
-	static public String getPasswordTokenFromUTSecTokenRef(MessageElement wseTokenRef) throws GeneralSecurityException
-	{
+	static public String getPasswordTokenFromUTSecTokenRef(
+			MessageElement wseTokenRef) throws GeneralSecurityException {
 		try {
 			UsernameToken bstToken = new UsernameToken(wseTokenRef);
 			return bstToken.getPassword();
@@ -61,12 +54,14 @@ public class WSSecurityUtils
 		}
 	}
 
-	static public MessageElement makeUTSecTokenRef(String username, String password) throws GeneralSecurityException
-	{
+	static public MessageElement makeUTSecTokenRef(String username,
+			String password) throws GeneralSecurityException {
 		try {
-			MessageElement userElem = new MessageElement(WSConstants.WSSE_NS, "Username");
+			MessageElement userElem = new MessageElement(WSConstants.WSSE_NS,
+					"Username");
 			userElem.addTextNode(username);
-			MessageElement passElem = new MessageElement(WSConstants.WSSE_NS, "Password");
+			MessageElement passElem = new MessageElement(WSConstants.WSSE_NS,
+					"Password");
 			passElem.addTextNode(password);
 			MessageElement token = new MessageElement(UsernameToken.TOKEN);
 			token.addChild(userElem);
@@ -77,31 +72,37 @@ public class WSSecurityUtils
 		}
 	}
 
-	// returns true if the element seems to contain a recognized security token reference.
-	static public boolean matchesSecurityToken(MessageElement element)
-	{
-		return element.getQName().equals(GenesisIIConstants.WSSE11_NS_SECURITY_QNAME)
-			|| element.getQName().equals(GenesisIIConstants.INTERMEDIATE_WSE_NS_SECURITY_QNAME);
+	// returns true if the element seems to contain a recognized security token
+	// reference.
+	static public boolean matchesSecurityToken(MessageElement element) {
+		return element.getQName().equals(
+				GenesisIIConstants.WSSE11_NS_SECURITY_QNAME)
+				|| element.getQName().equals(
+						GenesisIIConstants.INTERMEDIATE_WSE_NS_SECURITY_QNAME);
 	}
 
 	// finds a child element in the security token, regardless of namespace.
-	static public MessageElement acquireChildSecurityElement(MessageElement element, String elementName)
-	{
-		MessageElement elem = element.getChildElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, elementName));
+	static public MessageElement acquireChildSecurityElement(
+			MessageElement element, String elementName) {
+		MessageElement elem = element.getChildElement(new QName(
+				org.apache.ws.security.WSConstants.WSSE11_NS, elementName));
 		if (elem == null)
-			elem = element.getChildElement(new QName(GenesisIIConstants.INTERMEDIATE_WSE_NS, elementName));
+			elem = element.getChildElement(new QName(
+					GenesisIIConstants.INTERMEDIATE_WSE_NS, elementName));
 		return elem;
 	}
 
-	static public X509Certificate[] getChainFromPkiPathSecTokenRef(MessageElement wseTokenRef) throws GeneralSecurityException
-	{
-		MessageElement element = acquireChildSecurityElement(wseTokenRef, "Embedded");
+	static public X509Certificate[] getChainFromPkiPathSecTokenRef(
+			MessageElement wseTokenRef) throws GeneralSecurityException {
+		MessageElement element = acquireChildSecurityElement(wseTokenRef,
+				"Embedded");
 		if (element != null) {
 			element = element.getChildElement(BinarySecurity.TOKEN_BST);
 			if (element != null) {
 				try {
 					PKIPathSecurity bstToken = new PKIPathSecurity(element);
-					return bstToken.getX509Certificates(false, new GIIBouncyCrypto());
+					return bstToken.getX509Certificates(false,
+							new GIIBouncyCrypto());
 				} catch (GenesisIISecurityException e) {
 					throw new GeneralSecurityException(e.getMessage(), e);
 				} catch (WSSecurityException e) {
@@ -114,31 +115,37 @@ public class WSSecurityUtils
 			}
 		}
 
-		throw new GeneralSecurityException("Message element does not contain a PKIPath certificate chain");
+		throw new GeneralSecurityException(
+				"Message element does not contain a PKIPath certificate chain");
 	}
 
-	static public MessageElement makePkiPathSecTokenRef(X509Certificate[] certChain) throws GeneralSecurityException
-	{
+	static public MessageElement makePkiPathSecTokenRef(
+			X509Certificate[] certChain) throws GeneralSecurityException {
 		return makePkiPathSecTokenRef(certChain, null);
 	}
 
-	static public MessageElement makePkiPathSecTokenRef(X509Certificate[] certChain, String wsuId)
-		throws GeneralSecurityException
-	{
+	static public MessageElement makePkiPathSecTokenRef(
+			X509Certificate[] certChain, String wsuId)
+			throws GeneralSecurityException {
 		try {
-			MessageElement binaryToken = new MessageElement(BinarySecurity.TOKEN_BST);
-			binaryToken.setAttributeNS(null, "ValueType", PKIPathSecurity.getType());
+			MessageElement binaryToken = new MessageElement(
+					BinarySecurity.TOKEN_BST);
+			binaryToken.setAttributeNS(null, "ValueType",
+					PKIPathSecurity.getType());
 			if (wsuId != null) {
 				binaryToken.setAttribute(WSConstants.WSU_NS, "Id", wsuId);
 			}
 			binaryToken.addTextNode("");
 			BinarySecurity bstToken = new PKIPathSecurity(binaryToken);
-			((PKIPathSecurity) bstToken).setX509Certificates(certChain, false, new GIIBouncyCrypto());
+			((PKIPathSecurity) bstToken).setX509Certificates(certChain, false,
+					new GIIBouncyCrypto());
 
-			MessageElement embedded = new MessageElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+			MessageElement embedded = new MessageElement(new QName(
+					org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
 			embedded.addChild(binaryToken);
 
-			MessageElement wseTokenRef = new MessageElement(GenesisIIConstants.WSSE11_NS_SECURITY_QNAME);
+			MessageElement wseTokenRef = new MessageElement(
+					GenesisIIConstants.WSSE11_NS_SECURITY_QNAME);
 			wseTokenRef.addChild(embedded);
 
 			return wseTokenRef;
@@ -155,10 +162,10 @@ public class WSSecurityUtils
 		}
 	}
 
-	static public X509Certificate getX509v3FromSecTokenRef(MessageElement wseTokenRef) throws GeneralSecurityException
-	{
-		MessageElement element =
-			wseTokenRef.getChildElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+	static public X509Certificate getX509v3FromSecTokenRef(
+			MessageElement wseTokenRef) throws GeneralSecurityException {
+		MessageElement element = wseTokenRef.getChildElement(new QName(
+				org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
 		if (element != null) {
 			element = element.getChildElement(BinarySecurity.TOKEN_BST);
 			if (element != null) {
@@ -176,22 +183,30 @@ public class WSSecurityUtils
 				}
 			}
 		}
-		throw new GeneralSecurityException("Message element does not contain a certificate");
+		throw new GeneralSecurityException(
+				"Message element does not contain a certificate");
 	}
 
-	static public MessageElement makeX509v3TokenRef(X509Certificate cert) throws GeneralSecurityException
-	{
+	static public MessageElement makeX509v3TokenRef(X509Certificate cert)
+			throws GeneralSecurityException {
 		try {
-			MessageElement binaryToken = new MessageElement(BinarySecurity.TOKEN_BST);
-			binaryToken.setAttributeNS(null, "ValueType", edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE);
+			MessageElement binaryToken = new MessageElement(
+					BinarySecurity.TOKEN_BST);
+			binaryToken
+					.setAttributeNS(
+							null,
+							"ValueType",
+							edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE);
 			binaryToken.addTextNode("");
 			X509Security bstToken = new X509Security(binaryToken);
 			bstToken.setX509Certificate(cert);
 
-			MessageElement embedded = new MessageElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+			MessageElement embedded = new MessageElement(new QName(
+					org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
 			embedded.addChild(binaryToken);
 
-			MessageElement wseTokenRef = new MessageElement(GenesisIIConstants.WSSE11_NS_SECURITY_QNAME);
+			MessageElement wseTokenRef = new MessageElement(
+					GenesisIIConstants.WSSE11_NS_SECURITY_QNAME);
 			wseTokenRef.addChild(embedded);
 
 			return wseTokenRef;

@@ -4,13 +4,11 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-class XMLEventFilter
-{
+class XMLEventFilter {
 	private XMLEventReader _reader;
 	private XMLEvent _nextEvent = null;
 
-	static private boolean isGoodEvent(XMLEvent event)
-	{
+	static private boolean isGoodEvent(XMLEvent event) {
 		if (event.isCharacters()) {
 			String data = event.asCharacters().getData().trim();
 			if (data.length() != 0)
@@ -23,8 +21,7 @@ class XMLEventFilter
 		return false;
 	}
 
-	XMLEventFilter(XMLEventReader reader) throws XMLStreamException
-	{
+	XMLEventFilter(XMLEventReader reader) throws XMLStreamException {
 		_reader = reader;
 
 		while (_reader.hasNext()) {
@@ -36,8 +33,7 @@ class XMLEventFilter
 		_nextEvent = null;
 	}
 
-	public XMLEvent next() throws XMLStreamException
-	{
+	public XMLEvent next() throws XMLStreamException {
 		XMLEvent ret = _nextEvent;
 
 		while (_reader.hasNext()) {
@@ -50,8 +46,7 @@ class XMLEventFilter
 		return ret;
 	}
 
-	public XMLEvent peek()
-	{
+	public XMLEvent peek() {
 		return _nextEvent;
 	}
 }

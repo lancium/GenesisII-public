@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.cmdLineManipulator;
 
-public interface CmdLineManipulatorConstants
-{
+public interface CmdLineManipulatorConstants {
 	static final public String NAMESPACE = "http://vcgr.cs.virginia.edu/cmdline-manipulators";
 
 	// job properties

@@ -11,8 +11,7 @@ import edu.virginia.vcgr.genii.wsdl.WsdlDocument;
 import edu.virginia.vcgr.genii.wsdl.WsdlException;
 import edu.virginia.vcgr.genii.wsdl.WsdlUtils;
 
-public class GenesisIIServiceGenerator extends GenesisIIGWsdlNormalizer
-{
+public class GenesisIIServiceGenerator extends GenesisIIGWsdlNormalizer {
 	static private final String _PORT_TYPE_ATTR = "portType";
 
 	@SuppressWarnings("unused")
@@ -24,8 +23,7 @@ public class GenesisIIServiceGenerator extends GenesisIIGWsdlNormalizer
 	protected String _bindingName = null;
 	protected String _serviceName = null;
 
-	public void setPortType(String str) throws BuildException
-	{
+	public void setPortType(String str) throws BuildException {
 		try {
 			_portType = WsdlUtils.getQNameFromString(str);
 		} catch (WsdlException we) {
@@ -33,24 +31,23 @@ public class GenesisIIServiceGenerator extends GenesisIIGWsdlNormalizer
 		}
 	}
 
-	public void setBindingName(String bindingName)
-	{
+	public void setBindingName(String bindingName) {
 		_bindingName = bindingName;
 	}
 
-	public void setServiceName(String serviceName)
-	{
+	public void setServiceName(String serviceName) {
 		_serviceName = serviceName;
 	}
 
-	static private Pattern _PORT_TYPE_PATTERN = Pattern.compile("^(.+)PortType$", Pattern.CASE_INSENSITIVE);
+	static private Pattern _PORT_TYPE_PATTERN = Pattern.compile(
+			"^(.+)PortType$", Pattern.CASE_INSENSITIVE);
 
-	public void validate() throws BuildException
-	{
+	public void validate() throws BuildException {
 		super.validate();
 
 		if (_portType == null)
-			throw new BuildException("\"" + _PORT_TYPE_ATTR + "\" attribute not set.");
+			throw new BuildException("\"" + _PORT_TYPE_ATTR
+					+ "\" attribute not set.");
 
 		Matcher matcher;
 		String portTypeLocal = _portType.getLocalPart();
@@ -64,12 +61,12 @@ public class GenesisIIServiceGenerator extends GenesisIIGWsdlNormalizer
 			_serviceName = portTypeLocal + "Service";
 	}
 
-	protected void internalExecute() throws BuildException
-	{
+	protected void internalExecute() throws BuildException {
 		try {
 			WsdlDocument doc = new WsdlDocument(_source);
 			doc.normalize();
-			doc.generateBindingAndService(_serviceName, _bindingName, _portType, _target);
+			doc.generateBindingAndService(_serviceName, _bindingName,
+					_portType, _target);
 		} catch (Exception e) {
 			throw new BuildException(e.getLocalizedMessage(), e);
 		}

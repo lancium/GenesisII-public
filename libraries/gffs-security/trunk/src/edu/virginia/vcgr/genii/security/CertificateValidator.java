@@ -3,8 +3,7 @@ package edu.virginia.vcgr.genii.security;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
-public interface CertificateValidator
-{
+public interface CertificateValidator {
 	/**
 	 * Verifies that the certificate chain is internally consistent.
 	 */
@@ -16,12 +15,15 @@ public interface CertificateValidator
 	public KeyStore getResourceTrustStore();
 
 	/**
-	 * Verifies that the certificate is found rooted in our local resource trust store.
+	 * Verifies that the certificate is found rooted in our local resource trust
+	 * store.
 	 */
 	public boolean validateIsTrustedResource(X509Certificate[] certChain);
 
 	/**
-	 * Verifies that the certificate is found rooted in the specified trust store.
+	 * Verifies that the certificate is found rooted in the specified trust
+	 * store.
 	 */
-	public boolean validateTrustedByKeystore(X509Certificate[] certChain, KeyStore store);
+	public boolean validateTrustedByKeystore(X509Certificate[] certChain,
+			KeyStore store);
 }

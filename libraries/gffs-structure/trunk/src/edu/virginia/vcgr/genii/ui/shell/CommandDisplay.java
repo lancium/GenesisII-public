@@ -19,8 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.prefs.shell.ShellUIPreferenceSet;
 
-public class CommandDisplay extends JTextPane
-{
+public class CommandDisplay extends JTextPane {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(CommandDisplay.class);
@@ -35,8 +34,7 @@ public class CommandDisplay extends JTextPane
 	private PrintWriter _outputWriter;
 	private PrintWriter _errorWriter;
 
-	private void write(String str, Style myStyle)
-	{
+	private void write(String str, Style myStyle) {
 		if (!SwingUtilities.isEventDispatchThread()) {
 			SwingUtilities.invokeLater(new WriterTask(str, myStyle));
 			return;
@@ -53,8 +51,7 @@ public class CommandDisplay extends JTextPane
 		}
 	}
 
-	private void start()
-	{
+	private void start() {
 		if (!SwingUtilities.isEventDispatchThread()) {
 			SwingUtilities.invokeLater(new Starter());
 			return;
@@ -66,20 +63,21 @@ public class CommandDisplay extends JTextPane
 				try {
 					doc.insertString(doc.getLength(), "\n\n", _plainStyle);
 				} catch (BadLocationException ble) {
-					_logger.warn("Unable to insert text to end of document.", ble);
+					_logger.warn("Unable to insert text to end of document.",
+							ble);
 				}
 			}
 		}
 	}
 
-	public CommandDisplay(UIContext uiContext)
-	{
+	public CommandDisplay(UIContext uiContext) {
 		super();
 
 		StyledDocument doc = getStyledDocument();
 
 		_plainStyle = doc.addStyle("Plain", null);
-		Font font = uiContext.preferences().preferenceSet(ShellUIPreferenceSet.class).shellFont();
+		Font font = uiContext.preferences()
+				.preferenceSet(ShellUIPreferenceSet.class).shellFont();
 		StyleConstants.setFontFamily(_plainStyle, font.getFamily());
 		StyleConstants.setFontSize(_plainStyle, font.getSize());
 		int size = StyleConstants.getFontSize(_plainStyle);
@@ -97,106 +95,89 @@ public class CommandDisplay extends JTextPane
 		StyleConstants.setForeground(_errorStyle, Color.RED);
 
 		_headerWriter = new PrintWriter(new CommandDisplayWriter(_headerStyle));
-		_commandWriter = new PrintWriter(new CommandDisplayWriter(_commandStyle));
+		_commandWriter = new PrintWriter(
+				new CommandDisplayWriter(_commandStyle));
 		_outputWriter = new PrintWriter(new CommandDisplayWriter(_plainStyle));
 		_errorWriter = new PrintWriter(new CommandDisplayWriter(_errorStyle));
 
 		setEditable(false);
 	}
 
-	public Display display()
-	{
+	public Display display() {
 		return new DisplayImpl();
 	}
 
-	private class DisplayImpl implements Display
-	{
+	private class DisplayImpl implements Display {
 		@Override
-		public void start()
-		{
+		public void start() {
 			CommandDisplay.this.start();
 		}
 
 		@Override
-		public PrintWriter command()
-		{
+		public PrintWriter command() {
 			return _commandWriter;
 		}
 
 		@Override
-		public PrintWriter error()
-		{
+		public PrintWriter error() {
 			return _errorWriter;
 		}
 
 		@Override
-		public PrintWriter header()
-		{
+		public PrintWriter header() {
 			return _headerWriter;
 		}
 
 		@Override
-		public PrintWriter output()
-		{
+		public PrintWriter output() {
 			return _outputWriter;
 		}
 	}
 
-	private class CommandDisplayWriter extends Writer
-	{
+	private class CommandDisplayWriter extends Writer {
 		private Style _myStyle;
 
-		private CommandDisplayWriter(Style myStyle)
-		{
+		private CommandDisplayWriter(Style myStyle) {
 			_myStyle = myStyle;
 		}
 
 		@Override
-		public void close() throws IOException
-		{
+		public void close() throws IOException {
 			// Ignore
 		}
 
 		@Override
-		public void flush() throws IOException
-		{
+		public void flush() throws IOException {
 			// Ignore
 		}
 
 		@Override
-		public void write(char[] cbuf, int off, int len) throws IOException
-		{
+		public void write(char[] cbuf, int off, int len) throws IOException {
 			CommandDisplay.this.write(new String(cbuf, off, len), _myStyle);
 		}
 	}
 
-	private class WriterTask implements Runnable
-	{
+	private class WriterTask implements Runnable {
 		private String _string;
 		private Style _myStyle;
 
-		private WriterTask(String str, Style myStyle)
-		{
+		private WriterTask(String str, Style myStyle) {
 			_string = str;
 			_myStyle = myStyle;
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			write(_string, _myStyle);
 		}
 	}
 
-	private class Starter implements Runnable
-	{
-		private Starter()
-		{
+	private class Starter implements Runnable {
+		private Starter() {
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			start();
 		}
 	}

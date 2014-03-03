@@ -13,8 +13,7 @@ import edu.virginia.vcgr.ogrsh.server.packing.IOGRSHReadBuffer;
 import edu.virginia.vcgr.ogrsh.server.packing.IOGRSHWriteBuffer;
 import edu.virginia.vcgr.ogrsh.server.packing.IPackable;
 
-public class OGRSHException extends Exception implements IPackable
-{
+public class OGRSHException extends Exception implements IPackable {
 	static private Log _logger = LogFactory.getLog(OGRSHException.class);
 
 	static final long serialVersionUID = 0L;
@@ -41,8 +40,7 @@ public class OGRSHException extends Exception implements IPackable
 
 	private int _exceptionNumber;
 
-	public OGRSHException(String msg, Throwable cause)
-	{
+	public OGRSHException(String msg, Throwable cause) {
 		super((msg == null) ? cause.getLocalizedMessage() : msg, cause);
 
 		if (cause instanceof OGRSHException)
@@ -59,45 +57,40 @@ public class OGRSHException extends Exception implements IPackable
 			_exceptionNumber = OGRSHException.EXCEPTION_UNKNOWN;
 
 		if (_logger.isDebugEnabled())
-			_logger.debug("OGRSHException(" + getLocalizedMessage() + ", " + _exceptionNumber
-				+ ") thrown because of another exception.", cause);
+			_logger.debug("OGRSHException(" + getLocalizedMessage() + ", "
+					+ _exceptionNumber
+					+ ") thrown because of another exception.", cause);
 	}
 
-	public OGRSHException(Throwable cause)
-	{
+	public OGRSHException(Throwable cause) {
 		this(cause.getLocalizedMessage(), cause);
 	}
 
-	public OGRSHException(int exceptionNumber, String message)
-	{
+	public OGRSHException(int exceptionNumber, String message) {
 		this(message, exceptionNumber);
 	}
 
-	public OGRSHException(String message, int exceptionNumber)
-	{
+	public OGRSHException(String message, int exceptionNumber) {
 		super(message);
 
 		_exceptionNumber = exceptionNumber;
 	}
 
-	public OGRSHException(IOGRSHReadBuffer readBuffer) throws IOException
-	{
-		this(Integer.class.cast(readBuffer.readObject()), String.class.cast(readBuffer.readObject()));
+	public OGRSHException(IOGRSHReadBuffer readBuffer) throws IOException {
+		this(Integer.class.cast(readBuffer.readObject()), String.class
+				.cast(readBuffer.readObject()));
 	}
 
-	public int getExceptionNumber()
-	{
+	public int getExceptionNumber() {
 		return _exceptionNumber;
 	}
 
-	public void pack(IOGRSHWriteBuffer writeBuffer) throws IOException
-	{
+	public void pack(IOGRSHWriteBuffer writeBuffer) throws IOException {
 		writeBuffer.writeObject(_exceptionNumber);
 		writeBuffer.writeObject(getLocalizedMessage());
 	}
 
-	public void unpack(IOGRSHReadBuffer readBuffer) throws IOException
-	{
+	public void unpack(IOGRSHReadBuffer readBuffer) throws IOException {
 		_exceptionNumber = Integer.class.cast(readBuffer.readObject());
 		readBuffer.readObject();
 	}

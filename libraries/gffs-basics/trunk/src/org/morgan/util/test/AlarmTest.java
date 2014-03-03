@@ -28,28 +28,23 @@ import junit.framework.TestCase;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class AlarmTest extends TestCase implements IEventHandler
-{
-	static private class TestEvent extends DefaultEvent
-	{
+public class AlarmTest extends TestCase implements IEventHandler {
+	static private class TestEvent extends DefaultEvent {
 		static final long serialVersionUID = 0;
 
 		private int _count;
 
-		public TestEvent(EventDescription desc)
-		{
+		public TestEvent(EventDescription desc) {
 			super(desc);
 
 			_count = 0;
 		}
 
-		public void inrement()
-		{
+		public void inrement() {
 			_count++;
 		}
 
-		public int getCount()
-		{
+		public int getCount() {
 			return _count;
 		}
 	}
@@ -57,40 +52,39 @@ public class AlarmTest extends TestCase implements IEventHandler
 	private EventManager _eManager;
 	private AlarmManager _aManager;
 
-	protected void setUp() throws Exception
-	{
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		_eManager = new EventManager();
 		_aManager = new AlarmManager(_eManager);
 	}
 
-	protected void tearDown() throws Exception
-	{
+	protected void tearDown() throws Exception {
 		_aManager = null;
 		_eManager = null;
 
 		super.tearDown();
 	}
 
-	public void testSimpleAlarm() throws Exception
-	{
-		EventDescription desc = _eManager.registerEventDescription("my-event", TestEvent.class);
+	public void testSimpleAlarm() throws Exception {
+		EventDescription desc = _eManager.registerEventDescription("my-event",
+				TestEvent.class);
 
 		_eManager.registerHandler(desc, this, 0);
 
 		TestEvent te = new TestEvent(desc);
 
-		IAlarmToken rToken = _aManager.addAlarm(new Date(new Date().getTime() + 1000), te);
+		IAlarmToken rToken = _aManager.addAlarm(new Date(
+				new Date().getTime() + 1000), te);
 		rToken.block();
 		TestCase.assertTrue(rToken.completed());
 		TestCase.assertEquals(1, rToken.eventCount());
 		TestCase.assertEquals(1, te.getCount());
 	}
 
-	public void testRepeatingAlarm() throws Exception
-	{
-		EventDescription desc = _eManager.registerEventDescription("my-event2", TestEvent.class);
+	public void testRepeatingAlarm() throws Exception {
+		EventDescription desc = _eManager.registerEventDescription("my-event2",
+				TestEvent.class);
 
 		_eManager.registerHandler(desc, this, 0);
 
@@ -113,8 +107,7 @@ public class AlarmTest extends TestCase implements IEventHandler
 		TestCase.assertTrue(rToken.completed());
 	}
 
-	public boolean handleEvent(IEvent iEvent)
-	{
+	public boolean handleEvent(IEvent iEvent) {
 		TestEvent event = (TestEvent) iEvent;
 		event.inrement();
 

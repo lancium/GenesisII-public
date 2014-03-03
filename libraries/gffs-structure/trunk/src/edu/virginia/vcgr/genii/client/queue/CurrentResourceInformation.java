@@ -15,8 +15,7 @@ import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
 @XmlRootElement(namespace = QueueConstants.QUEUE_NS, name = QueueConstants.CURRENT_RESOURCE_INFORMATION_NAME)
 @XmlAccessorType(XmlAccessType.NONE)
-public class CurrentResourceInformation
-{
+public class CurrentResourceInformation {
 	@XmlAttribute(name = "max-slots", required = true)
 	private int _maxSlots;
 
@@ -50,17 +49,19 @@ public class CurrentResourceInformation
 	@XmlElement(namespace = QueueConstants.QUEUE_NS, name = "next-update", nillable = true, required = false)
 	private Calendar _nextUpdate = null;
 
-	protected CurrentResourceInformation()
-	{
+	protected CurrentResourceInformation() {
 		// This is for JAXB Only
-		this(-1, -1, false, ProcessorArchitecture.other, OperatingSystemNames.other, "<unknown>", null,
-			ResourceManagerType.Unknown, false, null, null);
+		this(-1, -1, false, ProcessorArchitecture.other,
+				OperatingSystemNames.other, "<unknown>", null,
+				ResourceManagerType.Unknown, false, null, null);
 	}
 
-	public CurrentResourceInformation(int maxSlots, int currentSlotsUsed, boolean isAcceptingActivities,
-		ProcessorArchitecture processorArchitecture, OperatingSystemNames osType, String osVersion, Double physicalMemory,
-		ResourceManagerType resourceManagerType, boolean available, Date lastUpdated, Date nextUpdate)
-	{
+	public CurrentResourceInformation(int maxSlots, int currentSlotsUsed,
+			boolean isAcceptingActivities,
+			ProcessorArchitecture processorArchitecture,
+			OperatingSystemNames osType, String osVersion,
+			Double physicalMemory, ResourceManagerType resourceManagerType,
+			boolean available, Date lastUpdated, Date nextUpdate) {
 		_maxSlots = maxSlots;
 		_currentSlotsUsed = currentSlotsUsed;
 		_isAcceptingActivities = isAcceptingActivities;
@@ -81,64 +82,53 @@ public class CurrentResourceInformation
 		}
 	}
 
-	final public int maxSlots()
-	{
+	final public int maxSlots() {
 		return _maxSlots;
 	}
 
-	final public int currentSlotsUsed()
-	{
+	final public int currentSlotsUsed() {
 		return _currentSlotsUsed;
 	}
 
-	final public boolean isAcceptingActivities()
-	{
+	final public boolean isAcceptingActivities() {
 		return _isAcceptingActivities;
 	}
 
-	final public ProcessorArchitecture processorArchitecture()
-	{
+	final public ProcessorArchitecture processorArchitecture() {
 		return _processorArchitecture;
 	}
 
-	final public OperatingSystemNames operatingSystem()
-	{
+	final public OperatingSystemNames operatingSystem() {
 		return _operatingSystemType;
 	}
 
-	final public String operatingSystemVersion()
-	{
+	final public String operatingSystemVersion() {
 		return _operatingSystemVerison;
 	}
 
-	final public Double physicalMemory()
-	{
+	final public Double physicalMemory() {
 		return _physicalMemory;
 	}
 
-	final public ResourceManagerType resourceManagerType()
-	{
+	final public ResourceManagerType resourceManagerType() {
 		return _resourceManagerType;
 	}
 
-	final public boolean available()
-	{
+	final public boolean available() {
 		return _available;
 	}
 
-	final public Calendar lastUpdated()
-	{
+	final public Calendar lastUpdated() {
 		return _lastUpdated;
 	}
 
-	final public Calendar nextUpdate()
-	{
+	final public Calendar nextUpdate() {
 		return _nextUpdate;
 	}
 
 	@Override
-	final public String toString()
-	{
-		return String.format("%d slots of %d used", _currentSlotsUsed, _maxSlots);
+	final public String toString() {
+		return String.format("%d slots of %d used", _currentSlotsUsed,
+				_maxSlots);
 	}
 }

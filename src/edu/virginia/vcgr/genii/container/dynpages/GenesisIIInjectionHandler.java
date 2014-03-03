@@ -13,13 +13,12 @@ import org.morgan.dpage.ObjectInjectionHandler;
 
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
-class GenesisIIInjectionHandler implements ObjectInjectionHandler, Closeable
-{
+class GenesisIIInjectionHandler implements ObjectInjectionHandler, Closeable {
 	private ServerDatabaseConnectionPool _connectionPool;
 	private Connection _connection = null;
 
-	private Object getInjectionValue(Class<?> type, InjectObject annotation) throws InjectionException
-	{
+	private Object getInjectionValue(Class<?> type, InjectObject annotation)
+			throws InjectionException {
 		if (type.equals(ServerDatabaseConnectionPool.class))
 			return _connectionPool;
 		else if (type.equals(Connection.class)) {
@@ -27,35 +26,36 @@ class GenesisIIInjectionHandler implements ObjectInjectionHandler, Closeable
 				try {
 					_connection = _connectionPool.acquire(false);
 				} catch (SQLException sqe) {
-					throw new InjectionException("Error while trying to create conneciton.", sqe);
+					throw new InjectionException(
+							"Error while trying to create conneciton.", sqe);
 				}
 			}
 
 			return _connection;
 		} else
-			throw new InjectionException(String.format("Don't know how to inject into type \"%s\".", type.getName()));
+			throw new InjectionException(String.format(
+					"Don't know how to inject into type \"%s\".",
+					type.getName()));
 	}
 
-	GenesisIIInjectionHandler(ServerDatabaseConnectionPool connectionPool)
-	{
+	GenesisIIInjectionHandler(ServerDatabaseConnectionPool connectionPool) {
 		_connectionPool = connectionPool;
 	}
 
 	@Override
-	public Object getFieldInjectionValue(Field field, InjectObject annotation) throws InjectionException
-	{
+	public Object getFieldInjectionValue(Field field, InjectObject annotation)
+			throws InjectionException {
 		return getInjectionValue(field.getType(), annotation);
 	}
 
 	@Override
-	public Object getMethodInjectionValue(Method method, InjectObject annotation) throws InjectionException
-	{
+	public Object getMethodInjectionValue(Method method, InjectObject annotation)
+			throws InjectionException {
 		return getInjectionValue(method.getParameterTypes()[0], annotation);
 	}
 
 	@Override
-	public void close() throws IOException
-	{
+	public void close() throws IOException {
 		if (_connection != null)
 			_connectionPool.release(_connection);
 		_connection = null;

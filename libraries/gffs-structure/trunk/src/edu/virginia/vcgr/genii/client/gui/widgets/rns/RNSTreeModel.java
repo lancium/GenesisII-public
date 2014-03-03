@@ -12,15 +12,14 @@ import javax.swing.tree.TreePath;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 
-public class RNSTreeModel extends DefaultTreeModel implements TreeWillExpandListener, TreeExpansionListener
-{
+public class RNSTreeModel extends DefaultTreeModel implements
+		TreeWillExpandListener, TreeExpansionListener {
 	static final long serialVersionUID = 0L;
 	private Thread _backgroundThread;
 	private HashSet<RNSTreeNode> _expandedNodes = new HashSet<RNSTreeNode>();
 	private RNSTree _tree;
 
-	public RNSTreeModel(RNSPath rootPath) throws RNSPathDoesNotExistException
-	{
+	public RNSTreeModel(RNSPath rootPath) throws RNSPathDoesNotExistException {
 		super(new RNSTreeNode(rootPath), true);
 
 		_tree = null;
@@ -34,13 +33,11 @@ public class RNSTreeModel extends DefaultTreeModel implements TreeWillExpandList
 		_backgroundThread.start();
 	}
 
-	public void setTree(RNSTree tree)
-	{
+	public void setTree(RNSTree tree) {
 		_tree = tree;
 	}
 
-	synchronized protected void finalize()
-	{
+	synchronized protected void finalize() {
 		if (_backgroundThread != null) {
 			_backgroundThread.interrupt();
 			_backgroundThread = null;
@@ -48,13 +45,13 @@ public class RNSTreeModel extends DefaultTreeModel implements TreeWillExpandList
 	}
 
 	@Override
-	public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException
-	{
+	public void treeWillCollapse(TreeExpansionEvent event)
+			throws ExpandVetoException {
 	}
 
 	@Override
-	public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException
-	{
+	public void treeWillExpand(TreeExpansionEvent event)
+			throws ExpandVetoException {
 		RNSTreeNode node;
 
 		node = (RNSTreeNode) (event.getPath().getLastPathComponent());
@@ -62,8 +59,7 @@ public class RNSTreeModel extends DefaultTreeModel implements TreeWillExpandList
 			throw new ExpandVetoException(event);
 	}
 
-	public boolean prepareExpansion(RNSTreeNode node)
-	{
+	public boolean prepareExpansion(RNSTreeNode node) {
 		if (!node.getAllowsChildren())
 			return false;
 
@@ -73,32 +69,28 @@ public class RNSTreeModel extends DefaultTreeModel implements TreeWillExpandList
 	}
 
 	@Override
-	public void treeCollapsed(TreeExpansionEvent event)
-	{
+	public void treeCollapsed(TreeExpansionEvent event) {
 		synchronized (_expandedNodes) {
 			_expandedNodes.remove(event.getPath().getLastPathComponent());
 		}
 	}
 
 	@Override
-	public void treeExpanded(TreeExpansionEvent event)
-	{
+	public void treeExpanded(TreeExpansionEvent event) {
 		synchronized (_expandedNodes) {
-			_expandedNodes.add((RNSTreeNode) event.getPath().getLastPathComponent());
+			_expandedNodes.add((RNSTreeNode) event.getPath()
+					.getLastPathComponent());
 		}
 	}
 
-	private class BackgroundUpdater implements Runnable
-	{
+	private class BackgroundUpdater implements Runnable {
 		private RNSTreeModel _model;
 
-		public BackgroundUpdater(RNSTreeModel model)
-		{
+		public BackgroundUpdater(RNSTreeModel model) {
 			_model = model;
 		}
 
-		public void run()
-		{
+		public void run() {
 			try {
 				while (true) {
 					Thread.sleep(1000 * 5);

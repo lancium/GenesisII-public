@@ -4,8 +4,7 @@ import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-class ProgressWatcher<Type> implements Runnable
-{
+class ProgressWatcher<Type> implements Runnable {
 	private ExecutorService _executor;
 	private ProgressTask<Type> _task;
 	private Collection<ProgressListener<Type>> _listeners;
@@ -14,30 +13,27 @@ class ProgressWatcher<Type> implements Runnable
 	private boolean _cancelled = false;
 	private Future<Type> _future = null;
 
-	protected void fireTaskCancelled()
-	{
+	protected void fireTaskCancelled() {
 		for (ProgressListener<Type> listener : _listeners)
 			listener.taskCancelled();
 		_notifier.finished();
 	}
 
-	protected void fireTaskExcepted(Exception e)
-	{
+	protected void fireTaskExcepted(Exception e) {
 		for (ProgressListener<Type> listener : _listeners)
 			listener.taskExcepted(e);
 		_notifier.finished();
 	}
 
-	protected void fireTaskCompleted(Type result)
-	{
+	protected void fireTaskCompleted(Type result) {
 		for (ProgressListener<Type> listener : _listeners)
 			listener.taskCompleted(result);
 		_notifier.finished();
 	}
 
-	ProgressWatcher(ExecutorService executor, ProgressTask<Type> task, Collection<ProgressListener<Type>> listeners,
-		Collection<ProgressNotifier> notifiers)
-	{
+	ProgressWatcher(ExecutorService executor, ProgressTask<Type> task,
+			Collection<ProgressListener<Type>> listeners,
+			Collection<ProgressNotifier> notifiers) {
 		_executor = executor;
 		_task = task;
 		_listeners = listeners;
@@ -45,10 +41,10 @@ class ProgressWatcher<Type> implements Runnable
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		CancelController controller = new CancelControllerImpl();
-		CallableProgressTask<Type> callable = new CallableProgressTask<Type>(_task, _notifier);
+		CallableProgressTask<Type> callable = new CallableProgressTask<Type>(
+				_task, _notifier);
 
 		_notifier.initialize(controller, _task);
 
@@ -78,11 +74,9 @@ class ProgressWatcher<Type> implements Runnable
 		}
 	}
 
-	private class CancelControllerImpl implements CancelController
-	{
+	private class CancelControllerImpl implements CancelController {
 		@Override
-		public void cancelRequested()
-		{
+		public void cancelRequested() {
 			synchronized (ProgressWatcher.this) {
 				_cancelled = true;
 				if (_future != null)

@@ -22,13 +22,12 @@ import edu.virginia.vcgr.genii.security.credentials.X509Identity;
 import edu.virginia.vcgr.genii.ui.progress.AbstractTask;
 import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 
-class RemoteIdentityLookupTask extends AbstractTask<X509Identity[]>
-{
+class RemoteIdentityLookupTask extends AbstractTask<X509Identity[]> {
 	private Collection<RNSPath> _targets;
 
-	private X509Identity readFromByteIO(EndpointReferenceType target) throws FileNotFoundException, RemoteException,
-		IOException, CertificateException
-	{
+	private X509Identity readFromByteIO(EndpointReferenceType target)
+			throws FileNotFoundException, RemoteException, IOException,
+			CertificateException {
 		InputStream in = null;
 
 		try {
@@ -42,21 +41,22 @@ class RemoteIdentityLookupTask extends AbstractTask<X509Identity[]>
 		}
 	}
 
-	RemoteIdentityLookupTask(Collection<RNSPath> targets)
-	{
+	RemoteIdentityLookupTask(Collection<RNSPath> targets) {
 		_targets = targets;
 	}
 
 	@Override
-	public X509Identity[] execute(TaskProgressListener progressListener) throws Exception
-	{
-		Collection<X509Identity> result = new Vector<X509Identity>(_targets.size());
+	public X509Identity[] execute(TaskProgressListener progressListener)
+			throws Exception {
+		Collection<X509Identity> result = new Vector<X509Identity>(
+				_targets.size());
 
 		for (RNSPath target : _targets) {
 			progressListener.updateSubTitle("Getting remote type information.");
 			TypeInformation typeInfo = new TypeInformation(target.getEndpoint());
 			if (typeInfo.isByteIO()) {
-				progressListener.updateSubTitle("Reading certificate information from ByteIO.");
+				progressListener
+						.updateSubTitle("Reading certificate information from ByteIO.");
 				result.add(readFromByteIO(target.getEndpoint()));
 			} else {
 				progressListener.updateSubTitle("Getting resource identity.");

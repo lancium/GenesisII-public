@@ -16,14 +16,13 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @StateDescription({ TextStateTranslator.class })
-public class IsSchedulingPropertyFork extends SimpleStateResourceFork<Boolean>
-{
-	static private Log _logger = LogFactory.getLog(IsSchedulingPropertyFork.class);
+public class IsSchedulingPropertyFork extends SimpleStateResourceFork<Boolean> {
+	static private Log _logger = LogFactory
+			.getLog(IsSchedulingPropertyFork.class);
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	protected Boolean get() throws Throwable
-	{
+	protected Boolean get() throws Throwable {
 		ResourceKey rKey = getService().getResourceKey();
 
 		try {
@@ -36,10 +35,10 @@ public class IsSchedulingPropertyFork extends SimpleStateResourceFork<Boolean>
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	protected void set(Boolean state) throws Throwable
-	{
+	protected void set(Boolean state) throws Throwable {
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Setting \"is-scheduling-jobs\" property to %s.", state));
+			_logger.debug(String.format(
+					"Setting \"is-scheduling-jobs\" property to %s.", state));
 		ResourceKey rKey = getService().getResourceKey();
 
 		try {
@@ -50,8 +49,7 @@ public class IsSchedulingPropertyFork extends SimpleStateResourceFork<Boolean>
 		}
 	}
 
-	public IsSchedulingPropertyFork(ResourceForkService service, String forkPath)
-	{
+	public IsSchedulingPropertyFork(ResourceForkService service, String forkPath) {
 		super(service, forkPath);
 	}
 }

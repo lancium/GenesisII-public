@@ -6,8 +6,7 @@ import edu.virginia.vcgr.genii.gjt.data.analyze.Analysis;
 import edu.virginia.vcgr.genii.gjt.data.stage.AbstractStageData;
 import edu.virginia.vcgr.genii.gjt.data.stage.StageProtocol;
 
-public class GsiFtpStageData extends AbstractStageData
-{
+public class GsiFtpStageData extends AbstractStageData {
 	static final public int DEFAULT_GSIFTP_PORT = 5821;
 
 	@XmlAttribute(name = "host")
@@ -20,8 +19,7 @@ public class GsiFtpStageData extends AbstractStageData
 	private int _port = DEFAULT_GSIFTP_PORT;
 
 	@Override
-	protected void activateImpl()
-	{
+	protected void activateImpl() {
 		fireParameterizableStringModified("", _host);
 		fireParameterizableStringModified("", _path);
 
@@ -29,26 +27,22 @@ public class GsiFtpStageData extends AbstractStageData
 	}
 
 	@Override
-	protected void deactivateImpl()
-	{
+	protected void deactivateImpl() {
 		fireParameterizableStringModified("", _host);
 		fireParameterizableStringModified("", _path);
 
 		fireJobDescriptionModified();
 	}
 
-	GsiFtpStageData()
-	{
+	GsiFtpStageData() {
 		super(StageProtocol.gsiftp);
 	}
 
-	final String host()
-	{
+	final String host() {
 		return _host;
 	}
 
-	final void host(String host)
-	{
+	final void host(String host) {
 		String old = _host;
 		_host = host;
 
@@ -56,13 +50,11 @@ public class GsiFtpStageData extends AbstractStageData
 		fireJobDescriptionModified();
 	}
 
-	final String path()
-	{
+	final String path() {
 		return _path;
 	}
 
-	final void path(String path)
-	{
+	final void path(String path) {
 		String old = _path;
 		_path = path;
 
@@ -70,21 +62,18 @@ public class GsiFtpStageData extends AbstractStageData
 		fireJobDescriptionModified();
 	}
 
-	final int port()
-	{
+	final int port() {
 		return _port;
 	}
 
-	final void port(int port)
-	{
+	final void port(int port) {
 		_port = port;
 
 		fireJobDescriptionModified();
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		StringBuilder builder = new StringBuilder("gsiftp://");
 
 		if (_host == null || _host.length() == 0)
@@ -104,18 +93,19 @@ public class GsiFtpStageData extends AbstractStageData
 	}
 
 	@Override
-	public void analyze(String filename, Analysis analysis)
-	{
+	public void analyze(String filename, Analysis analysis) {
 		if (_host == null || _host.length() == 0)
-			analysis.addError("Hostname for data stage \"%s\" must be specified.", filename);
+			analysis.addError(
+					"Hostname for data stage \"%s\" must be specified.",
+					filename);
 
 		if (_path == null || _path.length() == 0)
-			analysis.addError("Path for data stage \"%s\" must be specified.", filename);
+			analysis.addError("Path for data stage \"%s\" must be specified.",
+					filename);
 	}
 
 	@Override
-	public String getJSDLURI()
-	{
+	public String getJSDLURI() {
 		return toString();
 	}
 }

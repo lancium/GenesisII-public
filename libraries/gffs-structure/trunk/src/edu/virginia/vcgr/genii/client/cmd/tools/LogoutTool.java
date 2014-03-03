@@ -19,8 +19,7 @@ import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class LogoutTool extends BaseGridTool
-{
+public class LogoutTool extends BaseGridTool {
 	static private Log _logger = LogFactory.getLog(LogoutTool.class);
 
 	static final private String _DESCRIPTION = "config/tooldocs/description/dlogout";
@@ -30,27 +29,24 @@ public class LogoutTool extends BaseGridTool
 	protected String _pattern = null;
 	protected boolean _all = false;
 
-	public LogoutTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.SECURITY);
+	public LogoutTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.SECURITY);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "pattern" })
-	public void setPattern(String pattern)
-	{
+	public void setPattern(String pattern) {
 		_pattern = pattern;
 	}
 
 	@Option({ "all" })
-	public void setAll()
-	{
+	public void setAll() {
 		_all = true;
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		ICallingContext callContext = ContextManager.getCurrentContext();
 
 		if ((callContext == null) && _all) {
@@ -66,10 +62,12 @@ public class LogoutTool extends BaseGridTool
 			ContextManager.storeCurrentContext(callContext);
 		} else if (_pattern != null) {
 			int flags = 0;
-			Pattern p = Pattern.compile("^.*" + Pattern.quote(_pattern) + ".*$", flags);
+			Pattern p = Pattern.compile(
+					"^.*" + Pattern.quote(_pattern) + ".*$", flags);
 
 			int numMatched = 0;
-			ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
+			ArrayList<NuCredential> credentials = TransientCredentials
+					.getTransientCredentials(callContext).getCredentials();
 			Iterator<NuCredential> itr = credentials.iterator();
 			while (itr.hasNext()) {
 				NuCredential cred = itr.next();
@@ -77,7 +75,8 @@ public class LogoutTool extends BaseGridTool
 				if (cred instanceof Identity) {
 					toMatch = cred.toString();
 				} else if (cred instanceof TrustCredential) {
-					toMatch = ((TrustCredential) cred).getRootIdentity().toString();
+					toMatch = ((TrustCredential) cred).getRootIdentity()
+							.toString();
 				}
 
 				Matcher matcher = p.matcher(toMatch);
@@ -90,13 +89,14 @@ public class LogoutTool extends BaseGridTool
 			}
 
 			if (numMatched == 0) {
-				throw new IOException("No credentials matched the pattern \"" + _pattern + "\".");
+				throw new IOException("No credentials matched the pattern \""
+						+ _pattern + "\".");
 			}
 			ContextManager.storeCurrentContext(callContext);
 		} else {
 			while (true) {
-				ArrayList<NuCredential> credentials =
-					TransientCredentials.getTransientCredentials(callContext).getCredentials();
+				ArrayList<NuCredential> credentials = TransientCredentials
+						.getTransientCredentials(callContext).getCredentials();
 				if (credentials.size() == 0)
 					break;
 				stdout.println("Please select a credential to logout from:");
@@ -114,14 +114,16 @@ public class LogoutTool extends BaseGridTool
 						break;
 					int which = Integer.parseInt(answer);
 					if (which >= credentials.size()) {
-						stderr.println("Selection index must be between 0 and " + (credentials.size() - 1));
+						stderr.println("Selection index must be between 0 and "
+								+ (credentials.size() - 1));
 					}
 					credentials.remove(which);
 					if (_logger.isDebugEnabled())
 						_logger.debug("Removing credential from current calling context credentials.");
 					ContextManager.storeCurrentContext(callContext);
 				} catch (Throwable t) {
-					stderr.println("Error getting login selection:  " + t.getLocalizedMessage());
+					stderr.println("Error getting login selection:  "
+							+ t.getLocalizedMessage());
 					break;
 				}
 			}
@@ -131,8 +133,7 @@ public class LogoutTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() != 0)
 			throw new InvalidToolUsageException();
 	}

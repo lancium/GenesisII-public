@@ -22,8 +22,7 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPoli
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public class SubscriptionConstructionParameters extends ConstructionParameters
-{
+public class SubscriptionConstructionParameters extends ConstructionParameters {
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "publisher-resource-key", nillable = false, required = true)
@@ -34,47 +33,47 @@ public class SubscriptionConstructionParameters extends ConstructionParameters
 	private EndpointReferenceType _consumerReference;
 
 	private TopicQueryExpression _topicQuery;
-	private Map<SubscriptionPolicyTypes, SubscriptionPolicy> _policies =
-		new EnumMap<SubscriptionPolicyTypes, SubscriptionPolicy>(SubscriptionPolicyTypes.class);
+	private Map<SubscriptionPolicyTypes, SubscriptionPolicy> _policies = new EnumMap<SubscriptionPolicyTypes, SubscriptionPolicy>(
+			SubscriptionPolicyTypes.class);
 
 	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "additional-user-data", nillable = true, required = false)
 	private AdditionalUserData _additionalUserData = null;
 
 	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "topic-query", nillable = true, required = false)
 	@XmlJavaTypeAdapter(HexBinaryAdapter.class)
-	private byte[] getTopicQuery() throws IOException
-	{
+	private byte[] getTopicQuery() throws IOException {
 		return DBSerializer.serialize(_topicQuery, -1);
 	}
 
 	@SuppressWarnings("unused")
-	private void setTopicQuery(byte[] topicQuery) throws IOException, ClassNotFoundException
-	{
-		_topicQuery = (TopicQueryExpression) DBSerializer.deserialize(topicQuery);
+	private void setTopicQuery(byte[] topicQuery) throws IOException,
+			ClassNotFoundException {
+		_topicQuery = (TopicQueryExpression) DBSerializer
+				.deserialize(topicQuery);
 	}
 
 	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "subscription-policies", nillable = true, required = false)
 	@XmlJavaTypeAdapter(HexBinaryAdapter.class)
-	private byte[] getPolicies() throws IOException
-	{
+	private byte[] getPolicies() throws IOException {
 		return DBSerializer.serialize(_policies, -1);
 	}
 
 	@SuppressWarnings({ "unused", "unchecked" })
-	private void setPolicies(byte[] policies) throws IOException, ClassNotFoundException
-	{
-		_policies = (Map<SubscriptionPolicyTypes, SubscriptionPolicy>) DBSerializer.deserialize(policies);
+	private void setPolicies(byte[] policies) throws IOException,
+			ClassNotFoundException {
+		_policies = (Map<SubscriptionPolicyTypes, SubscriptionPolicy>) DBSerializer
+				.deserialize(policies);
 	}
 
 	@SuppressWarnings("unused")
-	private SubscriptionConstructionParameters()
-	{
+	private SubscriptionConstructionParameters() {
 	}
 
-	public SubscriptionConstructionParameters(String publisherResourceKey, EndpointReferenceType consumerReference,
-		TopicQueryExpression topicQuery, Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies,
-		AdditionalUserData additionalUserData)
-	{
+	public SubscriptionConstructionParameters(String publisherResourceKey,
+			EndpointReferenceType consumerReference,
+			TopicQueryExpression topicQuery,
+			Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies,
+			AdditionalUserData additionalUserData) {
 		_publisherResourceKey = publisherResourceKey;
 		_consumerReference = consumerReference;
 		_topicQuery = topicQuery;
@@ -82,28 +81,23 @@ public class SubscriptionConstructionParameters extends ConstructionParameters
 		_additionalUserData = additionalUserData;
 	}
 
-	final public EndpointReferenceType consumerReference()
-	{
+	final public EndpointReferenceType consumerReference() {
 		return _consumerReference;
 	}
 
-	final public String publisherResourceKey()
-	{
+	final public String publisherResourceKey() {
 		return _publisherResourceKey;
 	}
 
-	final public TopicQueryExpression topicQuery()
-	{
+	final public TopicQueryExpression topicQuery() {
 		return _topicQuery;
 	}
 
-	final public Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies()
-	{
+	final public Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies() {
 		return _policies;
 	}
 
-	final public AdditionalUserData additionalUserData()
-	{
+	final public AdditionalUserData additionalUserData() {
 		return _additionalUserData;
 	}
 }

@@ -17,8 +17,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.Rollbackable;
 
-public class WorkingContext implements Closeable, Cloneable
-{
+public class WorkingContext implements Closeable, Cloneable {
 	static private Log _logger = LogFactory.getLog(WorkingContext.class);
 
 	static public final String TARGETED_SERVICE_NAME = "targeted-service-name";
@@ -34,13 +33,13 @@ public class WorkingContext implements Closeable, Cloneable
 	private boolean _closed = false;
 	private boolean _succeeded = true;
 
-	static public boolean hasCurrentWorkingContext()
-	{
-		return (_currentWorkingContext.get() != null) && (!_currentWorkingContext.get().isEmpty());
+	static public boolean hasCurrentWorkingContext() {
+		return (_currentWorkingContext.get() != null)
+				&& (!_currentWorkingContext.get().isEmpty());
 	}
 
-	static public WorkingContext getCurrentWorkingContext() throws ContextException
-	{
+	static public WorkingContext getCurrentWorkingContext()
+			throws ContextException {
 		Stack<WorkingContext> stack = _currentWorkingContext.get();
 		if (stack == null || stack.isEmpty())
 			throw new ContextException("Working context is null.");
@@ -50,8 +49,7 @@ public class WorkingContext implements Closeable, Cloneable
 		return ret;
 	}
 
-	static public void setCurrentWorkingContext(WorkingContext ctxt)
-	{
+	static public void setCurrentWorkingContext(WorkingContext ctxt) {
 		Stack<WorkingContext> stack = _currentWorkingContext.get();
 		Stack<WorkingContext> newStack = new Stack<WorkingContext>();
 		_currentWorkingContext.set(newStack);
@@ -64,8 +62,8 @@ public class WorkingContext implements Closeable, Cloneable
 		}
 	}
 
-	static public void temporarilyAssumeNewIdentity(EndpointReferenceType newTarget) throws ContextException
-	{
+	static public void temporarilyAssumeNewIdentity(
+			EndpointReferenceType newTarget) throws ContextException {
 		Stack<WorkingContext> stack = _currentWorkingContext.get();
 		if (stack == null || stack.isEmpty()) {
 			_currentWorkingContext.set(stack = new Stack<WorkingContext>());
@@ -83,12 +81,12 @@ public class WorkingContext implements Closeable, Cloneable
 			newContext.setProperty(TARGETED_SERVICE_NAME, serviceName);
 			stack.push(newContext);
 		} catch (AxisFault af) {
-			throw new ContextException("Unable to extract service name from EPR.", af);
+			throw new ContextException(
+					"Unable to extract service name from EPR.", af);
 		}
 	}
 
-	static public void releaseAssumedIdentity() throws ContextException
-	{
+	static public void releaseAssumedIdentity() throws ContextException {
 		Stack<WorkingContext> stack = _currentWorkingContext.get();
 		if (stack == null || stack.isEmpty())
 			throw new ContextException("Working context is null.");
@@ -100,24 +98,25 @@ public class WorkingContext implements Closeable, Cloneable
 
 	private HashMap<String, Object> _properties = new HashMap<String, Object>();
 
-	public Object getProperty(String propertyName)
-	{
+	public Object getProperty(String propertyName) {
 		Object obj = _properties.get(propertyName);
 		if (obj != null) {
 			if (_logger.isTraceEnabled())
-				_logger.trace(">>getprop " + propertyName + " has object type " + obj.getClass().getCanonicalName());
+				_logger.trace(">>getprop " + propertyName + " has object type "
+						+ obj.getClass().getCanonicalName());
 		}
 		return obj;
 	}
 
-	public void setProperty(String propertyName, Object value)
-	{
+	public void setProperty(String propertyName, Object value) {
 		if (value != null) {
 			if (_logger.isTraceEnabled())
-				_logger.trace("<<setprop " + propertyName + " has object type " + value.getClass().getCanonicalName());
+				_logger.trace("<<setprop " + propertyName + " has object type "
+						+ value.getClass().getCanonicalName());
 		} else {
 			if (_logger.isTraceEnabled())
-				_logger.trace("failure!  attempt to set property " + propertyName + " with a null object");
+				_logger.trace("failure!  attempt to set property "
+						+ propertyName + " with a null object");
 		}
 		Object obj = _properties.get(propertyName);
 		if (obj != null) {
@@ -125,7 +124,8 @@ public class WorkingContext implements Closeable, Cloneable
 				if (obj instanceof Rollbackable)
 					((Rollbackable) obj).rollbackResource();
 			} catch (Throwable t) {
-				_logger.error("Error committing/rolling-back database state.", t);
+				_logger.error("Error committing/rolling-back database state.",
+						t);
 			}
 
 			if (obj instanceof Closeable) {
@@ -135,13 +135,11 @@ public class WorkingContext implements Closeable, Cloneable
 		_properties.put(propertyName, value);
 	}
 
-	public void removeProperty(String propertyName)
-	{
+	public void removeProperty(String propertyName) {
 		_properties.remove(propertyName);
 	}
 
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		try {
 			StreamUtils.close(this);
 		} finally {
@@ -149,8 +147,7 @@ public class WorkingContext implements Closeable, Cloneable
 		}
 	}
 
-	synchronized public void close() throws IOException
-	{
+	synchronized public void close() throws IOException {
 		if (_closed)
 			return;
 
@@ -168,7 +165,8 @@ public class WorkingContext implements Closeable, Cloneable
 					}
 				}
 			} catch (Throwable t) {
-				_logger.error("Error committing/rolling-back database state.", t);
+				_logger.error("Error committing/rolling-back database state.",
+						t);
 			}
 
 			if (obj instanceof Closeable) {
@@ -179,14 +177,12 @@ public class WorkingContext implements Closeable, Cloneable
 		_properties.clear();
 	}
 
-	public void setFailed()
-	{
+	public void setFailed() {
 		_succeeded = false;
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object clone()
-	{
+	public Object clone() {
 		WorkingContext c = new WorkingContext();
 		c._properties = (HashMap<String, Object>) _properties.clone();
 		Collection<String> removeSet = new LinkedList<String>();

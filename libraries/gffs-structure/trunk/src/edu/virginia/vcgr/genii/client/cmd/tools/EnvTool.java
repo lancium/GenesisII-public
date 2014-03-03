@@ -9,21 +9,19 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class EnvTool extends BaseGridTool
-{
+public class EnvTool extends BaseGridTool {
 	static public final String USAGE = "config/tooldocs/usage/uenv";
 	static public final String DESCRIPTION = "config/tooldocs/description/denv";
 	static final private String _MANPAGE = "config/tooldocs/man/env";
 
-	public EnvTool()
-	{
-		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), true, ToolCategory.INTERNAL);
+	public EnvTool() {
+		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE),
+				true, ToolCategory.INTERNAL);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		Map<String, String> env = GridUserEnvironment.getGridUserEnvironment();
 		Set<String> keySet = env.keySet();
 		String[] keys = new String[keySet.size()];
@@ -36,8 +34,7 @@ public class EnvTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() != 0)
 			throw new InvalidToolUsageException("Too many arguments supplied.");
 	}

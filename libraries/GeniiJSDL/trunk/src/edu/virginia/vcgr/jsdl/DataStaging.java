@@ -29,10 +29,9 @@ import edu.virginia.vcgr.jsdl.hpcfse.HPCFSEConstants;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_filename", "_filesystemName", "_creationFlag", "_deleteOnTermination", "_source", "_target",
-	"_credentials" })
-public class DataStaging extends CommonJSDLElement
-{
+@XmlType(propOrder = { "_filename", "_filesystemName", "_creationFlag",
+		"_deleteOnTermination", "_source", "_target", "_credentials" })
+public class DataStaging extends CommonJSDLElement {
 	static final long serialVersionUID = 0L;
 
 	@XmlAttribute(name = "name", required = false)
@@ -65,13 +64,12 @@ public class DataStaging extends CommonJSDLElement
 	 * To be used only be xml unmarshalling.
 	 */
 	@SuppressWarnings("unused")
-	private DataStaging()
-	{
+	private DataStaging() {
 	}
 
-	public DataStaging(String name, String filename, String filesystemName, CreationFlag creationFlag,
-		boolean deleteOnTermination, SourceTarget source, SourceTarget target)
-	{
+	public DataStaging(String name, String filename, String filesystemName,
+			CreationFlag creationFlag, boolean deleteOnTermination,
+			SourceTarget source, SourceTarget target) {
 		if (filename == null)
 			throw new IllegalArgumentException("Filename cannot be null.");
 
@@ -87,106 +85,91 @@ public class DataStaging extends CommonJSDLElement
 		_target = target;
 	}
 
-	public DataStaging(String filename, String filesystemName, CreationFlag creationFlag, boolean deleteOnTermination,
-		SourceTarget source, SourceTarget target)
-	{
-		this(null, filename, filesystemName, creationFlag, deleteOnTermination, source, target);
+	public DataStaging(String filename, String filesystemName,
+			CreationFlag creationFlag, boolean deleteOnTermination,
+			SourceTarget source, SourceTarget target) {
+		this(null, filename, filesystemName, creationFlag, deleteOnTermination,
+				source, target);
 	}
 
-	public DataStaging(String filename, CreationFlag creationFlag, boolean deleteOnTermination, SourceTarget source,
-		SourceTarget target)
-	{
+	public DataStaging(String filename, CreationFlag creationFlag,
+			boolean deleteOnTermination, SourceTarget source,
+			SourceTarget target) {
 		this(filename, null, creationFlag, deleteOnTermination, source, target);
 	}
 
-	public DataStaging(String filename, CreationFlag creationFlag, boolean deleteOnTerminate)
-	{
+	public DataStaging(String filename, CreationFlag creationFlag,
+			boolean deleteOnTerminate) {
 		this(filename, creationFlag, deleteOnTerminate, null, null);
 	}
 
-	final public void name(String name)
-	{
+	final public void name(String name) {
 		_name = name;
 	}
 
-	final public String name()
-	{
+	final public String name() {
 		return _name;
 	}
 
-	final public void filename(String filename)
-	{
+	final public void filename(String filename) {
 		if (filename == null)
 			throw new IllegalArgumentException("Filename cannot be null.");
 
 		_filename = filename;
 	}
 
-	final public String filename()
-	{
+	final public String filename() {
 		return _filename;
 	}
 
-	final public void filesystemName(String fsName)
-	{
+	final public void filesystemName(String fsName) {
 		_filesystemName = fsName;
 	}
 
-	final public String filesystemName()
-	{
+	final public String filesystemName() {
 		return _filesystemName;
 	}
 
-	final public void creationFlag(CreationFlag creationFlag)
-	{
+	final public void creationFlag(CreationFlag creationFlag) {
 		if (creationFlag == null)
 			throw new IllegalArgumentException("Creation flag cannot be null.");
 
 		_creationFlag = creationFlag;
 	}
 
-	final public CreationFlag creationFlag()
-	{
+	final public CreationFlag creationFlag() {
 		return _creationFlag;
 	}
 
-	final public void deleteOnTermination(Boolean deleteOnTermination)
-	{
+	final public void deleteOnTermination(Boolean deleteOnTermination) {
 		_deleteOnTermination = deleteOnTermination;
 	}
 
-	final public Boolean deleteOnTermionation()
-	{
+	final public Boolean deleteOnTermionation() {
 		return _deleteOnTermination;
 	}
 
-	final public void source(SourceTarget source)
-	{
+	final public void source(SourceTarget source) {
 		_source = source;
 	}
 
-	final public SourceTarget source()
-	{
+	final public SourceTarget source() {
 		return _source;
 	}
 
-	final public void target(SourceTarget target)
-	{
+	final public void target(SourceTarget target) {
 		_target = target;
 	}
 
-	final public SourceTarget target()
-	{
+	final public SourceTarget target() {
 		return _target;
 	}
 
-	final public void credentials(Credential credentials)
-	{
+	final public void credentials(Credential credentials) {
 		_credentials = credentials;
 	}
 
-	final public Credential credentials()
-	{
+	final public Credential credentials() {
 		return _credentials;
 	}
 }

@@ -17,9 +17,9 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.macro.MacroUtils;
 import org.morgan.util.io.StreamUtils;
 
-public class DefaultExternalApplication extends AbstractExternalApplication
-{
-	static private Log _logger = LogFactory.getLog(DefaultExternalApplication.class);
+public class DefaultExternalApplication extends AbstractExternalApplication {
+	static private Log _logger = LogFactory
+			.getLog(DefaultExternalApplication.class);
 
 	static private AtomicLong _instanceId = new AtomicLong(0);
 
@@ -31,30 +31,34 @@ public class DefaultExternalApplication extends AbstractExternalApplication
 	private File _workingDirectory = null;
 	private Map<String, String> _environmentOverload = new HashMap<String, String>();
 
-	protected void readOutput(InputStream stream)
-	{
+	protected void readOutput(InputStream stream) {
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(stream));
 
 			String line;
 			while ((line = reader.readLine()) != null) {
-				_logger.info(String.format("[%x] External Application Output [%s]:  %s", _instanceNumber, this, line));
+				_logger.info(String.format(
+						"[%x] External Application Output [%s]:  %s",
+						_instanceNumber, this, line));
 			}
 		} catch (Throwable cause) {
-			_logger.warn("Error trying to read output/error stream from application.", cause);
+			_logger.warn(
+					"Error trying to read output/error stream from application.",
+					cause);
 		} finally {
 			StreamUtils.close(reader);
 			StreamUtils.close(stream);
 		}
 	}
 
-	protected void doRun(File content) throws Throwable
-	{
-		List<String> commandLine = new ArrayList<String>(_predefinedCommandLine.size());
+	protected void doRun(File content) throws Throwable {
+		List<String> commandLine = new ArrayList<String>(
+				_predefinedCommandLine.size());
 
 		for (String orig : _predefinedCommandLine)
-			commandLine.add(MacroUtils.replaceMacros(_macroResolution, String.format(orig, content.getAbsolutePath())));
+			commandLine.add(MacroUtils.replaceMacros(_macroResolution,
+					String.format(orig, content.getAbsolutePath())));
 
 		ProcessBuilder builder = new ProcessBuilder(commandLine);
 		if (_workingDirectory != null)
@@ -63,7 +67,8 @@ public class DefaultExternalApplication extends AbstractExternalApplication
 		if (_environmentOverload.size() > 0) {
 			Map<String, String> builderEnv = builder.environment();
 
-			for (Map.Entry<String, String> entry : _environmentOverload.entrySet())
+			for (Map.Entry<String, String> entry : _environmentOverload
+					.entrySet())
 				builderEnv.put(entry.getKey(), entry.getValue());
 		}
 
@@ -81,13 +86,15 @@ public class DefaultExternalApplication extends AbstractExternalApplication
 		}
 	}
 
-	public DefaultExternalApplication(String description, String... predefinedCommandLine)
-	{
+	public DefaultExternalApplication(String description,
+			String... predefinedCommandLine) {
 		if (description == null)
-			throw new IllegalArgumentException("DefaultExternalApplication MUST have a description.");
+			throw new IllegalArgumentException(
+					"DefaultExternalApplication MUST have a description.");
 
 		if (predefinedCommandLine.length == 0)
-			throw new IllegalArgumentException("Command line must have at least one token.");
+			throw new IllegalArgumentException(
+					"Command line must have at least one token.");
 
 		_macroResolution = new Properties();
 		for (Map.Entry<String, String> entry : System.getenv().entrySet())
@@ -100,8 +107,7 @@ public class DefaultExternalApplication extends AbstractExternalApplication
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return MacroUtils.replaceMacros(_macroResolution, _description);
 	}
 }

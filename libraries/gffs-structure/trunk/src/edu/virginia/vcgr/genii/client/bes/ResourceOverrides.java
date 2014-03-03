@@ -10,8 +10,7 @@ import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
-public class ResourceOverrides implements Serializable
-{
+public class ResourceOverrides implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS, name = "operating-system-name", required = false)
@@ -38,86 +37,70 @@ public class ResourceOverrides implements Serializable
 	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS, name = "wallclock-time-limit", required = false)
 	private String _wallclockTimeLimit = null;
 
-	final public OperatingSystemNames operatingSystemName()
-	{
+	final public OperatingSystemNames operatingSystemName() {
 		return _operatingSystemName;
 	}
 
-	final public void operatingSystemName(OperatingSystemNames name)
-	{
+	final public void operatingSystemName(OperatingSystemNames name) {
 		_operatingSystemName = name;
 	}
 
-	final public String operatingSystemVersion()
-	{
+	final public String operatingSystemVersion() {
 		return _operatingSystemVersion;
 	}
 
-	final public void operatingSystemVersion(String version)
-	{
+	final public void operatingSystemVersion(String version) {
 		_operatingSystemVersion = version;
 	}
 
-	final public ProcessorArchitecture cpuArchitecture()
-	{
+	final public ProcessorArchitecture cpuArchitecture() {
 		return _cpuArchitectureName;
 	}
 
-	final public void cpuArchitecture(ProcessorArchitecture arch)
-	{
+	final public void cpuArchitecture(ProcessorArchitecture arch) {
 		_cpuArchitectureName = arch;
 	}
 
-	final public Integer cpuCount()
-	{
+	final public Integer cpuCount() {
 		return _cpuCount;
 	}
 
-	final public void cpuCount(Integer count)
-	{
+	final public void cpuCount(Integer count) {
 		_cpuCount = count;
 	}
 
-	final public ClockSpeed cpuSpeed()
-	{
+	final public ClockSpeed cpuSpeed() {
 		return _cpuSpeed;
 	}
 
-	final public void cpuSpeed(ClockSpeed speed)
-	{
+	final public void cpuSpeed(ClockSpeed speed) {
 		_cpuSpeed = speed;
 	}
 
-	final public Size physicalMemory()
-	{
+	final public Size physicalMemory() {
 		return _physicalMemory;
 	}
 
-	final public void physicalMemory(Size mem)
-	{
+	final public void physicalMemory(Size mem) {
 		_physicalMemory = mem;
 	}
 
-	final public Size virtualMemory()
-	{
+	final public Size virtualMemory() {
 		return _virtualMemory;
 	}
 
-	final public void virtualMemory(Size mem)
-	{
+	final public void virtualMemory(Size mem) {
 		_virtualMemory = mem;
 	}
 
-	final public Duration wallclockTimeLimit()
-	{
+	final public Duration wallclockTimeLimit() {
 		if (_wallclockTimeLimit == null)
 			return null;
 
 		return new Duration(_wallclockTimeLimit);
 	}
 
-	final public void wallclockTimeLimit(Duration newValue)
-	{
+	final public void wallclockTimeLimit(Duration newValue) {
 		_wallclockTimeLimit = newValue == null ? null : newValue.toString();
 	}
 }

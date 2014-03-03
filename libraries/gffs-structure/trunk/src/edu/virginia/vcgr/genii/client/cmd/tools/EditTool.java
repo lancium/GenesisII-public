@@ -21,22 +21,20 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class EditTool extends BaseGridTool
-{
+public class EditTool extends BaseGridTool {
 	static final private String DESCRIPTION = "config/tooldocs/description/dedit";
 	static final private String USAGE = "config/tooldocs/usage/uedit";
 	static final private String _MANPAGE = "config/tooldocs/man/edit";
 
 	@Override
-	final protected void verify() throws ToolException
-	{
+	final protected void verify() throws ToolException {
 		if (numArguments() != 1)
-			throw new InvalidToolUsageException("Edit requires a file argument.");
+			throw new InvalidToolUsageException(
+					"Edit requires a file argument.");
 	}
 
 	@Override
-	final protected int runCommand() throws Throwable
-	{
+	final protected int runCommand() throws Throwable {
 		String arg = getArgument(0);
 
 		if (arg.startsWith("!")) {
@@ -65,20 +63,23 @@ public class EditTool extends BaseGridTool
 		}
 	}
 
-	public EditTool()
-	{
-		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), false, ToolCategory.DATA);
+	public EditTool() {
+		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE),
+				false, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 
 	}
 
-	final public int editFile(GeniiPath path) throws Throwable
-	{
-		String mimeType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(new File(path.path()));
+	final public int editFile(GeniiPath path) throws Throwable {
+		String mimeType = MimetypesFileTypeMap.getDefaultFileTypeMap()
+				.getContentType(new File(path.path()));
 
-		ExternalApplication app = ApplicationDatabase.database().getExternalApplication(mimeType);
+		ExternalApplication app = ApplicationDatabase.database()
+				.getExternalApplication(mimeType);
 		if (app == null) {
-			stderr.format("Unable to find registered application for file [%s] %s.\n", mimeType, path);
+			stderr.format(
+					"Unable to find registered application for file [%s] %s.\n",
+					mimeType, path);
 			return 1;
 		}
 
@@ -94,10 +95,11 @@ public class EditTool extends BaseGridTool
 		return 0;
 	}
 
-	final public int editCommand(String[] cLine) throws Throwable
-	{
-		String mimeType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType("gridedit.txt");
-		ExternalApplication app = ApplicationDatabase.database().getExternalApplication(mimeType);
+	final public int editCommand(String[] cLine) throws Throwable {
+		String mimeType = MimetypesFileTypeMap.getDefaultFileTypeMap()
+				.getContentType("gridedit.txt");
+		ExternalApplication app = ApplicationDatabase.database()
+				.getExternalApplication(mimeType);
 		if (app == null) {
 			stderr.println("Unable to find registered application for for text files.");
 			return 1;
@@ -142,7 +144,8 @@ public class EditTool extends BaseGridTool
 				}
 
 				stdout.format("Running:  %s\n", builder);
-				String[] newCLine = CommandLineFormer.formCommandLine(builder.toString());
+				String[] newCLine = CommandLineFormer.formCommandLine(builder
+						.toString());
 				CommandLineRunner runner = new CommandLineRunner();
 				return runner.runCommand(newCLine, stdout, stderr, stdin);
 			}

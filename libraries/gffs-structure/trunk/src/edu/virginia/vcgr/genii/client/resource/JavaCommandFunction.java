@@ -3,14 +3,12 @@ package edu.virginia.vcgr.genii.client.resource;
 import edu.virginia.vcgr.genii.common.XMLCommandFunction;
 import edu.virginia.vcgr.genii.common.XMLCommandParameter;
 
-public class JavaCommandFunction
-{
+public class JavaCommandFunction {
 	private String _functionName;
 	private String _functionDescription;
 	private JavaCommandParameter[] _parameters;
 
-	JavaCommandFunction(XMLCommandFunction f)
-	{
+	JavaCommandFunction(XMLCommandFunction f) {
 		_functionName = f.getName();
 		_functionDescription = f.getDescription();
 
@@ -23,24 +21,20 @@ public class JavaCommandFunction
 			_parameters[lcv] = new JavaCommandParameter(parameters[lcv]);
 	}
 
-	final public String name()
-	{
+	final public String name() {
 		return _functionName;
 	}
 
-	final public String description()
-	{
+	final public String description() {
 		return _functionDescription;
 	}
 
-	final public JavaCommandParameter[] parameters()
-	{
+	final public JavaCommandParameter[] parameters() {
 		return _parameters;
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		StringBuilder builder = new StringBuilder(_functionName + "(");
 		for (int lcv = 0; lcv < _parameters.length; lcv++) {
 			if (lcv != 0)

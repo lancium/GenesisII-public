@@ -9,14 +9,13 @@ import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigura
 import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigurationFactory;
 
 /**
- * This class is simply a repository for providers for given services. Each service will have
- * associated with it it's own resource provider. This allows each one to have its own key
- * translaters and resource types.
+ * This class is simply a repository for providers for given services. Each
+ * service will have associated with it it's own resource provider. This allows
+ * each one to have its own key translaters and resource types.
  * 
  * @author Mark Morgan (mmm2a@cs.virginia.edu)
  */
-class ResourceProviders
-{
+class ResourceProviders {
 	static private HashMap<String, IResourceProvider> _providerCache = new HashMap<String, IResourceProvider>();
 
 	/**
@@ -28,8 +27,8 @@ class ResourceProviders
 	 * @throws ResourceException
 	 *             If anything goes wrong.
 	 */
-	static IResourceProvider getProvider(String serviceName) throws ResourceException
-	{
+	static IResourceProvider getProvider(String serviceName)
+			throws ResourceException {
 		IResourceProvider provider = null;
 
 		synchronized (_providerCache) {
@@ -41,15 +40,21 @@ class ResourceProviders
 
 		Class<?> serviceClass = Container.classForService(serviceName);
 		if (serviceClass == null) {
-			throw new ResourceException(String.format("Unable to find service class for service %s.", serviceName));
+			throw new ResourceException(
+					String.format(
+							"Unable to find service class for service %s.",
+							serviceName));
 		}
 
-		GenesisIIServiceConfiguration conf = GenesisIIServiceConfigurationFactory.configurationFor(serviceClass);
+		GenesisIIServiceConfiguration conf = GenesisIIServiceConfigurationFactory
+				.configurationFor(serviceClass);
 		provider = conf.resourceProvider();
 
 		if (provider == null)
-			throw new ResourceException(String.format("Unable to find resource provider for service %s "
-				+ "(implemented by class %s).", serviceName, serviceClass));
+			throw new ResourceException(String.format(
+					"Unable to find resource provider for service %s "
+							+ "(implemented by class %s).", serviceName,
+					serviceClass));
 
 		synchronized (_providerCache) {
 			_providerCache.put(serviceName, provider);

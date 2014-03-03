@@ -9,26 +9,22 @@ import org.morgan.mnaming.InitialMNamingContext;
 import org.morgan.mnaming.MNamingException;
 
 @SuppressWarnings("deprecation")
-public class TestInitialMNamingContext
-{
+public class TestInitialMNamingContext {
 	@Before
-	public void setUp() throws Exception
-	{
+	public void setUp() throws Exception {
 		InitialMNamingContext ctxt = new InitialMNamingContext();
 		ctxt.bind("mem:one", "One");
 		ctxt.bind("mem:7", new Integer(7));
 	}
 
 	@After
-	public void tearDown() throws Exception
-	{
+	public void tearDown() throws Exception {
 		InitialMNamingContext ctxt = new InitialMNamingContext();
 		ctxt.clearAll();
 	}
 
 	@Test
-	public void testLookup() throws Exception
-	{
+	public void testLookup() throws Exception {
 		InitialMNamingContext ctxt = new InitialMNamingContext();
 
 		Assert.assertEquals("One", ctxt.lookup("mem:one"));
@@ -37,8 +33,7 @@ public class TestInitialMNamingContext
 	}
 
 	@Test
-	public void testGet() throws Exception
-	{
+	public void testGet() throws Exception {
 		InitialMNamingContext ctxt = new InitialMNamingContext();
 
 		Assert.assertEquals("One", ctxt.get("mem:one"));
@@ -46,8 +41,7 @@ public class TestInitialMNamingContext
 	}
 
 	@Test
-	public void testCastedLookup() throws Exception
-	{
+	public void testCastedLookup() throws Exception {
 		InitialMNamingContext ctxt = new InitialMNamingContext();
 
 		Assert.assertEquals("One", ctxt.lookup(String.class, "mem:one"));
@@ -55,8 +49,7 @@ public class TestInitialMNamingContext
 	}
 
 	@Test
-	public void testCastedGet() throws Exception
-	{
+	public void testCastedGet() throws Exception {
 		InitialMNamingContext ctxt = new InitialMNamingContext();
 
 		Assert.assertEquals("One", ctxt.get(String.class, "mem:one"));
@@ -64,8 +57,7 @@ public class TestInitialMNamingContext
 	}
 
 	@Test(expected = MNamingException.class)
-	public void testFailedGet() throws Exception
-	{
+	public void testFailedGet() throws Exception {
 		InitialMNamingContext ctxt = new InitialMNamingContext();
 
 		ctxt.get("mem:foo");

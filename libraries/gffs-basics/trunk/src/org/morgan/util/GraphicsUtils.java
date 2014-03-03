@@ -20,13 +20,13 @@ import java.awt.Point;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class GraphicsUtils
-{
-	static public void centerWindow(Component comp)
-	{
-		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+public class GraphicsUtils {
+	static public void centerWindow(Component comp) {
+		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getCenterPoint();
 
-		Point p = new Point(center.x - (comp.getWidth() / 2), center.y - (comp.getHeight() / 2));
+		Point p = new Point(center.x - (comp.getWidth() / 2), center.y
+				- (comp.getHeight() / 2));
 		comp.setLocation(p);
 	}
 }

@@ -11,37 +11,38 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.security.axis.AclAuthZClientTool;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 
-public class AuthZTool extends BaseGridTool
-{
+public class AuthZTool extends BaseGridTool {
 	static final private String _DESCRIPTION = "config/tooldocs/description/dauthz";
 	static final private String _USAGE = "config/tooldocs/usage/uauthz";
 	static final private String _MANPAGE = "config/tooldocs/man/authz";
 
-	public AuthZTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.SECURITY);
+	public AuthZTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.SECURITY);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
-		RNSPath path = lookup(new GeniiPath(getArgument(0)), RNSPathQueryFlags.MUST_EXIST);
+	protected int runCommand() throws Throwable {
+		RNSPath path = lookup(new GeniiPath(getArgument(0)),
+				RNSPathQueryFlags.MUST_EXIST);
 
 		// get the authz config from the target's attributes
-		GenesisIIBaseRP rp =
-			(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(path.getEndpoint(), GenesisIIBaseRP.class);
+		GenesisIIBaseRP rp = (GenesisIIBaseRP) ResourcePropertyManager
+				.createRPInterface(path.getEndpoint(), GenesisIIBaseRP.class);
 		AuthZConfig config = rp.getAuthZConfig();
 
 		boolean done = false;
 		while (!done) {
 			// display retrieved authz config
-			stdout.println("Authorization configuration for " + getArgument(0) + ":\n");
+			stdout.println("Authorization configuration for " + getArgument(0)
+					+ ":\n");
 
 			if ((config == null) || (config.get_any() == null)) {
 				stdout.println("No authorization module set.");
 			} else {
-				AclAuthZClientTool.displayAuthZConfig(config, stdout, stderr, stdin);
+				AclAuthZClientTool.displayAuthZConfig(config, stdout, stderr,
+						stdin);
 			}
 
 			boolean chosen = false;
@@ -64,23 +65,24 @@ public class AuthZTool extends BaseGridTool
 					continue;
 				}
 				switch (choice) {
-					case 1:
-						config = AclAuthZClientTool.modifyAuthZConfig(config, stdout, stderr, stdin);
-						if (config == null)
-							return 0;
-						chosen = true;
-						break;
-					case 2:
-						rp.setAuthZConfig(config);
-						chosen = true;
-						done = true;
-						break;
-					case 3:
-						chosen = true;
-						done = true;
-						break;
-					default:
-						stdout.println("Invalid choice.");
+				case 1:
+					config = AclAuthZClientTool.modifyAuthZConfig(config,
+							stdout, stderr, stdin);
+					if (config == null)
+						return 0;
+					chosen = true;
+					break;
+				case 2:
+					rp.setAuthZConfig(config);
+					chosen = true;
+					done = true;
+					break;
+				case 3:
+					chosen = true;
+					done = true;
+					break;
+				default:
+					stdout.println("Invalid choice.");
 				}
 			}
 		}
@@ -88,8 +90,7 @@ public class AuthZTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() != 1)
 			throw new InvalidToolUsageException();
 	}

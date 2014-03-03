@@ -6,39 +6,32 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractStreamableByteIOFactoryResourceFork extends AbstractResourceFork implements
-	StreamableByteIOFactoryResourceFork
-{
-	static private class SimpleCountingStream extends OutputStream
-	{
+public abstract class AbstractStreamableByteIOFactoryResourceFork extends
+		AbstractResourceFork implements StreamableByteIOFactoryResourceFork {
+	static private class SimpleCountingStream extends OutputStream {
 		private long _count = 0;
 
-		public long getCount()
-		{
+		public long getCount() {
 			return _count;
 		}
 
 		@Override
-		public void write(byte[] b)
-		{
+		public void write(byte[] b) {
 			_count += b.length;
 		}
 
 		@Override
-		public void write(byte[] b, int off, int len)
-		{
+		public void write(byte[] b, int off, int len) {
 			_count += len;
 		}
 
 		@Override
-		public void write(int b) throws IOException
-		{
+		public void write(int b) throws IOException {
 			_count++;
 		}
 	}
 
-	static private AdvertisedSize discoverAdvertisedSize(Class<?> cl)
-	{
+	static private AdvertisedSize discoverAdvertisedSize(Class<?> cl) {
 		if (cl == null || cl.equals(Object.class))
 			return null;
 
@@ -60,8 +53,7 @@ public abstract class AbstractStreamableByteIOFactoryResourceFork extends Abstra
 
 	static private Map<Class<?>, AdvertisedSize> _sizeMap = new HashMap<Class<?>, AdvertisedSize>();
 
-	static private AdvertisedSize getAdvertisedSize(Class<?> cl)
-	{
+	static private AdvertisedSize getAdvertisedSize(Class<?> cl) {
 		AdvertisedSize aSize = null;
 
 		synchronized (_sizeMap) {
@@ -75,56 +67,48 @@ public abstract class AbstractStreamableByteIOFactoryResourceFork extends Abstra
 		return aSize;
 	}
 
-	protected AbstractStreamableByteIOFactoryResourceFork(ResourceForkService service, String forkPath)
-	{
+	protected AbstractStreamableByteIOFactoryResourceFork(
+			ResourceForkService service, String forkPath) {
 		super(service, forkPath);
 	}
 
 	@Override
-	public Calendar accessTime()
-	{
+	public Calendar accessTime() {
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public void accessTime(Calendar newTime)
-	{
+	public void accessTime(Calendar newTime) {
 		// do nothing
 	}
 
 	@Override
-	public Calendar createTime()
-	{
+	public Calendar createTime() {
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public Calendar modificationTime()
-	{
+	public Calendar modificationTime() {
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public void modificationTime(Calendar newTime)
-	{
+	public void modificationTime(Calendar newTime) {
 		// do nothing
 	}
 
 	@Override
-	public boolean readable()
-	{
+	public boolean readable() {
 		return true;
 	}
 
 	@Override
-	public boolean writable()
-	{
+	public boolean writable() {
 		return true;
 	}
 
 	@Override
-	public long size()
-	{
+	public long size() {
 		AdvertisedSize aSize = getAdvertisedSize(getClass());
 
 		if (aSize != null && aSize.value() >= 0L)

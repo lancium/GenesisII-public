@@ -17,17 +17,14 @@ import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
-public abstract class EditableFile implements Closeable
-{
+public abstract class EditableFile implements Closeable {
 	private boolean _closed = false;
 
-	protected void doClose() throws IOException
-	{
+	protected void doClose() throws IOException {
 		// By default, nothing to do.
 	}
 
-	final protected void finalize() throws Exception
-	{
+	final protected void finalize() throws Exception {
 		close();
 	}
 
@@ -36,8 +33,7 @@ public abstract class EditableFile implements Closeable
 	public abstract File file();
 
 	@Override
-	final public void close() throws IOException
-	{
+	final public void close() throws IOException {
 		boolean doClose = false;
 
 		synchronized (this) {
@@ -51,13 +47,11 @@ public abstract class EditableFile implements Closeable
 			doClose();
 	}
 
-	static private class LocalEditableFile extends EditableFile
-	{
+	static private class LocalEditableFile extends EditableFile {
 		private File _file;
 		private long _originalModificationDate;
 
-		private LocalEditableFile(File file)
-		{
+		private LocalEditableFile(File file) {
 			if (!file.exists())
 				_originalModificationDate = -1L;
 			else
@@ -67,24 +61,21 @@ public abstract class EditableFile implements Closeable
 		}
 
 		@Override
-		final protected boolean wasModified()
-		{
-			return _file.exists() && _file.lastModified() > _originalModificationDate;
+		final protected boolean wasModified() {
+			return _file.exists()
+					&& _file.lastModified() > _originalModificationDate;
 		}
 
 		@Override
-		final public File file()
-		{
+		final public File file() {
 			return _file;
 		}
 	}
 
-	static private class GridEditableFile extends LocalEditableFile
-	{
+	static private class GridEditableFile extends LocalEditableFile {
 		private RNSPath _originalPath;
 
-		static private File downloadFile(RNSPath path) throws IOException
-		{
+		static private File downloadFile(RNSPath path) throws IOException {
 			String filename = path.getName();
 			String extension;
 
@@ -117,7 +108,8 @@ public abstract class EditableFile implements Closeable
 				tmp = null;
 				return ret;
 			} catch (RNSException rne) {
-				throw new IOException(String.format("Unable to copy grid file %s to temporary file.", path));
+				throw new IOException(String.format(
+						"Unable to copy grid file %s to temporary file.", path));
 			} finally {
 				StreamUtils.close(in);
 				StreamUtils.close(out);
@@ -127,8 +119,8 @@ public abstract class EditableFile implements Closeable
 			}
 		}
 
-		static private void uploadFile(File source, RNSPath target) throws IOException
-		{
+		static private void uploadFile(File source, RNSPath target)
+				throws IOException {
 			InputStream in = null;
 			OutputStream out = null;
 
@@ -138,23 +130,23 @@ public abstract class EditableFile implements Closeable
 
 				StreamUtils.copyStream(in, out);
 			} catch (RNSException e) {
-				throw new IOException(String.format("Unable to upload temporary file to %s.", target));
+				throw new IOException(String.format(
+						"Unable to upload temporary file to %s.", target));
 			} finally {
 				StreamUtils.close(in);
 				StreamUtils.close(out);
 			}
 		}
 
-		private GridEditableFile(RNSPath originalPath) throws FileNotFoundException, IOException
-		{
+		private GridEditableFile(RNSPath originalPath)
+				throws FileNotFoundException, IOException {
 			super(downloadFile(originalPath));
 
 			_originalPath = originalPath;
 		}
 
 		@Override
-		protected void doClose() throws IOException
-		{
+		protected void doClose() throws IOException {
 			try {
 				if (wasModified())
 					uploadFile(file(), _originalPath);
@@ -164,13 +156,13 @@ public abstract class EditableFile implements Closeable
 		}
 	}
 
-	static public EditableFile createEditableFile(String path) throws FileNotFoundException, IOException
-	{
+	static public EditableFile createEditableFile(String path)
+			throws FileNotFoundException, IOException {
 		return createEditableFile(new GeniiPath(path));
 	}
 
-	static public EditableFile createEditableFile(GeniiPath path) throws FileNotFoundException, IOException
-	{
+	static public EditableFile createEditableFile(GeniiPath path)
+			throws FileNotFoundException, IOException {
 		if (path.pathType() == GeniiPathType.Grid) {
 			RNSPath rnsPath = RNSPath.getCurrent().lookup(path.path());
 			return createEditableFile(rnsPath);
@@ -178,8 +170,8 @@ public abstract class EditableFile implements Closeable
 			return new LocalEditableFile(new File(path.path()));
 	}
 
-	static public EditableFile createEditableFile(RNSPath file) throws FileNotFoundException, IOException
-	{
+	static public EditableFile createEditableFile(RNSPath file)
+			throws FileNotFoundException, IOException {
 		return new GridEditableFile(file);
 	}
 }

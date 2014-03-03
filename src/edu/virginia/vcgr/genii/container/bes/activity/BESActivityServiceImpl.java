@@ -81,51 +81,59 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 @ForkRoot(RootRNSFork.class)
 @ConstructionParametersType(BESConstructionParameters.class)
 @GeniiServiceConfiguration(resourceProvider = BESActivityDBResourceProvider.class)
-public class BESActivityServiceImpl extends ResourceForkBaseService implements BESActivityPortType, BESActivityTopics
-{
-	static private Log _logger = LogFactory.getLog(BESActivityServiceImpl.class);
+public class BESActivityServiceImpl extends ResourceForkBaseService implements
+		BESActivityPortType, BESActivityTopics {
+	static private Log _logger = LogFactory
+			.getLog(BESActivityServiceImpl.class);
 
 	// One week of life
-	static private final long BES_ACTIVITY_LIFETIME = 1000L * 60 * 60 * 24 * 7 * 4;
+	static private final long BES_ACTIVITY_LIFETIME = 1000L * 60 * 60 * 24 * 7
+			* 4;
 	private BESActivityConstants bconsts = new BESActivityConstants();
 
 	@MInject(lazy = true)
 	private IBESActivityResource _resource;
 
-	public BESActivityServiceImpl() throws RemoteException
-	{
+	public BESActivityServiceImpl() throws RemoteException {
 		super("BESActivityPortType");
 
 		addImplementedPortType(bconsts.GENII_BES_ACTIVITY_PORT_TYPE());
 	}
 
-	public PortType getFinalWSResourceInterface()
-	{
+	public PortType getFinalWSResourceInterface() {
 		return bconsts.GENII_BES_ACTIVITY_PORT_TYPE();
 	}
 
 	@Override
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType activityEPR, ConstructionParameters cParams,
-		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
-	{
-		super.postCreate(rKey, activityEPR, cParams, creationParameters, resolverCreationParams);
+	protected void postCreate(ResourceKey rKey,
+			EndpointReferenceType activityEPR, ConstructionParameters cParams,
+			GenesisHashMap creationParameters,
+			Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException {
+		super.postCreate(rKey, activityEPR, cParams, creationParameters,
+				resolverCreationParams);
 
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Post creating a BES Activity with resource key \"%s\".", rKey.getResourceKey()));
+			_logger.debug(String.format(
+					"Post creating a BES Activity with resource key \"%s\".",
+					rKey.getResourceKey()));
 
-		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(creationParameters);
+		BESActivityInitInfo initInfo = BESActivityUtils
+				.extractCreationProperties(creationParameters);
 
 		Subscribe subscribe = initInfo.getSubscribeRequest();
 		if (subscribe != null)
-			processSubscribeRequest((String) _resource.getKey(), new SubscribeRequest(subscribe));
+			processSubscribeRequest((String) _resource.getKey(),
+					new SubscribeRequest(subscribe));
 
 		String activityServiceName = "BESActivityPortType";
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities(true);
 
-		BESWorkingDirectory workingDirectory =
-			new BESWorkingDirectory(
-				chooseDirectory((BESConstructionParameters) _resource.constructionParameters(getClass()), 5), true);
+		BESWorkingDirectory workingDirectory = new BESWorkingDirectory(
+				chooseDirectory(
+						(BESConstructionParameters) _resource
+								.constructionParameters(getClass()),
+						5), true);
 
 		FilesystemManager fsManager = new FilesystemManager();
 		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
@@ -135,60 +143,79 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			String jobName;
 			Vector<ExecutionPhase> executionPlan;
 
-			CloudConfiguration cConfig = ((BESConstructionParameters) cParams).getCloudConfiguration();
+			CloudConfiguration cConfig = ((BESConstructionParameters) cParams)
+					.getCloudConfiguration();
 
 			if (cConfig != null) {
 				PersonalityProvider provider = new ExecutionProvider();
-				JobRequest tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
-				executionPlan =
-					CloudJobWrapper.createExecutionPlan(_resource.getKey().toString(), initInfo.getContainerID(), tJob,
+				JobRequest tJob = (JobRequest) JSDLInterpreter.interpretJSDL(
+						provider, jsdl);
+				executionPlan = CloudJobWrapper.createExecutionPlan(_resource
+						.getKey().toString(), initInfo.getContainerID(), tJob,
 						((BESConstructionParameters) cParams));
 				jobName = tJob.getJobName();
 			} else {
 
-				NativeQueueConfiguration qConf = ((BESConstructionParameters) cParams).getNativeQueueConfiguration();
+				NativeQueueConfiguration qConf = ((BESConstructionParameters) cParams)
+						.getNativeQueueConfiguration();
 				ExecutionUnderstanding executionUnderstanding;
 
 				if (qConf != null) {
-					Object understanding =
-						JSDLInterpreter.interpretJSDL(new QSubPersonalityProvider(fsManager, workingDirectory), jsdl);
+					Object understanding = JSDLInterpreter.interpretJSDL(
+							new QSubPersonalityProvider(fsManager,
+									workingDirectory), jsdl);
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				} else {
-					Object understanding =
-						JSDLInterpreter.interpretJSDL(new ForkExecPersonalityProvider(fsManager, workingDirectory), jsdl);
+					Object understanding = JSDLInterpreter.interpretJSDL(
+							new ForkExecPersonalityProvider(fsManager,
+									workingDirectory), jsdl);
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				}
 
-				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams);
+				executionPlan = executionUnderstanding
+						.createExecutionPlan((BESConstructionParameters) cParams);
 				jobName = executionUnderstanding.getJobName();
 
 			}
 
-			_resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, fsManager);
+			_resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER,
+					fsManager);
 
 			BES bes = BES.getBES(initInfo.getContainerID());
 			if (bes == null)
-				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID()
-						+ "\".") }, null));
+				throw FaultManipulator
+						.fillInFault(new ResourceUnknownFaultType(
+								null,
+								null,
+								null,
+								null,
+								new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+										"Unknown BES \""
+												+ initInfo.getContainerID()
+												+ "\".") }, null));
 
 			try {
 				WSName wsname = new WSName(activityEPR);
 				if (wsname.isValidWSName())
-					_logger.info(String.format("The EPI %s corresponds to activity id %s.", wsname.getEndpointIdentifier(),
-						_resource.getKey()));
+					_logger.info(String.format(
+							"The EPI %s corresponds to activity id %s.",
+							wsname.getEndpointIdentifier(), _resource.getKey()));
 			} catch (Throwable cause) {
 				// This shouldn't fail, but I can't test it now and it's just
 				// for a print statement.
 			}
 
-			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners,
-				ContextManager.getExistingContext(), workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
+			bes.createActivity(_resource.getConnection(), _resource.getKey()
+					.toString(), jsdl, owners, ContextManager
+					.getExistingContext(), workingDirectory, executionPlan,
+					activityEPR, activityServiceName, jobName);
 
 			Calendar future = Calendar.getInstance();
-			future.setTimeInMillis(System.currentTimeMillis() + BES_ACTIVITY_LIFETIME);
-			_logger
-				.debug(String.format("Setting term. time for BES Activity with resource key \"%s\".", rKey.getResourceKey()));
+			future.setTimeInMillis(System.currentTimeMillis()
+					+ BES_ACTIVITY_LIFETIME);
+			_logger.debug(String
+					.format("Setting term. time for BES Activity with resource key \"%s\".",
+							rKey.getResourceKey()));
 			setScheduledTerminationTime(future, rKey);
 		} catch (IOException fnfe) {
 			throw new RemoteException("Unable to create new activity.", fnfe);
@@ -199,12 +226,13 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 		}
 	}
 
-	static public File getCommonDirectory(BESConstructionParameters creationProperties)
-	{
+	static public File getCommonDirectory(
+			BESConstructionParameters creationProperties) {
 		File basedir = null;
 
 		if (creationProperties != null) {
-			NativeQueueConfiguration qConf = creationProperties.getNativeQueueConfiguration();
+			NativeQueueConfiguration qConf = creationProperties
+					.getNativeQueueConfiguration();
 			if (qConf != null) {
 				File dir = qConf.sharedDirectory();
 				if (dir != null)
@@ -221,33 +249,47 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 		return configDir;
 	}
 
-	static private File chooseDirectory(BESConstructionParameters constructionParameters, int attempts)
-		throws ResourceException
-	{
-		return new File(getCommonDirectory(constructionParameters), new GUID().toString());
+	static private File chooseDirectory(
+			BESConstructionParameters constructionParameters, int attempts)
+			throws ResourceException {
+		return new File(getCommonDirectory(constructionParameters),
+				new GUID().toString());
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public BESActivityGetErrorResponseType getError(Object BESActivityGetErrorRequest) throws RemoteException,
-		ResourceUnknownFaultType
-	{
+	public BESActivityGetErrorResponseType getError(
+			Object BESActivityGetErrorRequest) throws RemoteException,
+			ResourceUnknownFaultType {
 		try {
 			byte[] serializedFault = null;
 			Collection<Throwable> faults = _resource.findActivity().getFaults();
 			if (faults != null && faults.size() > 0) {
 				Throwable cause = faults.iterator().next();
 				if (cause != null)
-					serializedFault = DBSerializer.serialize(cause, Long.MAX_VALUE);
+					serializedFault = DBSerializer.serialize(cause,
+							Long.MAX_VALUE);
 			}
 
 			return new BESActivityGetErrorResponseType(serializedFault);
 		} catch (SQLException sqe) {
-			throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(sqe.getLocalizedMessage()) }, null));
+			throw FaultManipulator
+					.fillInFault(new ResourceCreationFaultType(
+							null,
+							null,
+							null,
+							null,
+							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+									sqe.getLocalizedMessage()) }, null));
 		} catch (IOException ioe) {
-			throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(ioe.getLocalizedMessage()) }, null));
+			throw FaultManipulator
+					.fillInFault(new ResourceCreationFaultType(
+							null,
+							null,
+							null,
+							null,
+							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+									ioe.getLocalizedMessage()) }, null));
 		}
 	}
 }

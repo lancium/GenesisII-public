@@ -18,13 +18,11 @@ import java.util.HashMap;
 
 import org.morgan.util.cmdline.ICommandLine;
 
-public class ReducedCommandLine implements ICommandLine
-{
+public class ReducedCommandLine implements ICommandLine {
 	private ICommandLine _parentCommandLine;
 	private int _firstArgument;
 
-	public ReducedCommandLine(ICommandLine parentCommandLine, int firstArgument)
-	{
+	public ReducedCommandLine(ICommandLine parentCommandLine, int firstArgument) {
 		_parentCommandLine = parentCommandLine;
 		_firstArgument = firstArgument;
 	}
@@ -32,23 +30,19 @@ public class ReducedCommandLine implements ICommandLine
 	/**
 	 * Returns true if the command line has no arguments, options, or flags
 	 */
-	public boolean isEmpty()
-	{
+	public boolean isEmpty() {
 		return _parentCommandLine.isEmpty();
 	}
 
-	public int numArguments()
-	{
+	public int numArguments() {
 		return _parentCommandLine.numArguments() - _firstArgument;
 	}
 
-	public String getArgument(int number)
-	{
+	public String getArgument(int number) {
 		return _parentCommandLine.getArgument(number + _firstArgument);
 	}
 
-	public String[] getArguments()
-	{
+	public String[] getArguments() {
 		String[] ret = new String[numArguments()];
 		String[] tmp = _parentCommandLine.getArguments();
 		System.arraycopy(tmp, _firstArgument, ret, 0, ret.length);
@@ -56,33 +50,27 @@ public class ReducedCommandLine implements ICommandLine
 		return ret;
 	}
 
-	public boolean hasFlag(String flagName)
-	{
+	public boolean hasFlag(String flagName) {
 		return _parentCommandLine.hasFlag(flagName);
 	}
 
-	public String[] getFlags()
-	{
+	public String[] getFlags() {
 		return _parentCommandLine.getFlags();
 	}
 
-	public boolean hasOption(String optionName)
-	{
+	public boolean hasOption(String optionName) {
 		return _parentCommandLine.hasOption(optionName);
 	}
 
-	public HashMap<String, ArrayList<String>> getOptions()
-	{
+	public HashMap<String, ArrayList<String>> getOptions() {
 		return _parentCommandLine.getOptions();
 	}
 
-	public String getOptionValue(String optionName)
-	{
+	public String getOptionValue(String optionName) {
 		return _parentCommandLine.getOptionValue(optionName);
 	}
 
-	public String[] getOptionValues(String optionName)
-	{
+	public String[] getOptionValues(String optionName) {
 		return _parentCommandLine.getOptionValues(optionName);
 	}
 }

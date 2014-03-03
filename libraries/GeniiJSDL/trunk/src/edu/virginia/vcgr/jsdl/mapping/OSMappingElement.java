@@ -26,8 +26,7 @@ import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-class OSMappingElement
-{
+class OSMappingElement {
 	@XmlAttribute(name = "java-value", required = true)
 	private String _javaValue;
 
@@ -35,36 +34,36 @@ class OSMappingElement
 	private OperatingSystemNames _os;
 
 	@SuppressWarnings("unused")
-	private void afterUnmarshal(Unmarshaller u, Object parent) throws JAXBException
-	{
+	private void afterUnmarshal(Unmarshaller u, Object parent)
+			throws JAXBException {
 		if (_javaValue == null)
-			throw new JAXBException("Error trying to xml unmarshall Architecture mapping:  " + "java-value was null.");
+			throw new JAXBException(
+					"Error trying to xml unmarshall Architecture mapping:  "
+							+ "java-value was null.");
 
 		if (_os == null)
-			throw new JAXBException("Error trying to xml unmarshall Operating System name mapping:  " + "jsdl-value was null.");
+			throw new JAXBException(
+					"Error trying to xml unmarshall Operating System name mapping:  "
+							+ "jsdl-value was null.");
 	}
 
 	/**
 	 * For use by XML deserialization only.
 	 */
 	@SuppressWarnings("unused")
-	private OSMappingElement()
-	{
+	private OSMappingElement() {
 	}
 
-	OSMappingElement(String javaValue, OperatingSystemNames os)
-	{
+	OSMappingElement(String javaValue, OperatingSystemNames os) {
 		_javaValue = javaValue;
 		_os = os;
 	}
 
-	final public String javaValue()
-	{
+	final public String javaValue() {
 		return _javaValue;
 	}
 
-	final OperatingSystemNames os()
-	{
+	final OperatingSystemNames os() {
 		return _os;
 	}
 }

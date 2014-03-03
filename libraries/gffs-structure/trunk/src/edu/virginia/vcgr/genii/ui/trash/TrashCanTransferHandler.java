@@ -32,22 +32,20 @@ import edu.virginia.vcgr.genii.ui.rns.RNSTreeNode;
 import edu.virginia.vcgr.genii.ui.rns.dnd.RNSListTransferData;
 import edu.virginia.vcgr.genii.ui.rns.dnd.RNSListTransferable;
 
-class TrashCanTransferHandler extends TransferHandler
-{
+class TrashCanTransferHandler extends TransferHandler {
 	static final long serialVersionUID = 0L;
 
-	static private Log _logger = LogFactory.getLog(TrashCanTransferHandler.class);
+	static private Log _logger = LogFactory
+			.getLog(TrashCanTransferHandler.class);
 
 	private UIContext _uiContext;
 
-	TrashCanTransferHandler(UIContext uiContext)
-	{
+	TrashCanTransferHandler(UIContext uiContext) {
 		_uiContext = uiContext;
 	}
 
 	@Override
-	public boolean canImport(TransferSupport support)
-	{
+	public boolean canImport(TransferSupport support) {
 		Component comp = support.getComponent();
 
 		if (comp instanceof TrashCanWidget) {
@@ -60,7 +58,8 @@ class TrashCanTransferHandler extends TransferHandler
 				return true;
 			}
 
-			if (!support.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR))
+			if (!support
+					.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR))
 				return false;
 
 			boolean moveSupported = (support.getSourceDropActions() & TransferHandler.MOVE) > 0;
@@ -74,65 +73,73 @@ class TrashCanTransferHandler extends TransferHandler
 	}
 
 	@Override
-	public boolean importData(TransferSupport support)
-	{
+	public boolean importData(TransferSupport support) {
 		try {
 			Component comp = support.getComponent();
 			Transferable t = support.getTransferable();
 
 			if (comp instanceof TrashCanWidget) {
-				if (support.isDataFlavorSupported(ACLTransferable.DATA_FLAVOR) && support.getDropAction() == MOVE)
+				if (support.isDataFlavorSupported(ACLTransferable.DATA_FLAVOR)
+						&& support.getDropAction() == MOVE)
 					return true;
 
-				RNSListTransferData data = (RNSListTransferData) t.getTransferData(RNSListTransferable.RNS_PATH_LIST_FLAVOR);
+				RNSListTransferData data = (RNSListTransferData) t
+						.getTransferData(RNSListTransferable.RNS_PATH_LIST_FLAVOR);
 				_uiContext
-					.progressMonitorFactory()
-					.createMonitor(comp, "Moving Entries to Trash", "Moving entries to trash.", 1000L,
-						new RNSUnlinkedTask(data), new RNSUnlinkedCompletionListener(data.tree())).start();
+						.progressMonitorFactory()
+						.createMonitor(comp, "Moving Entries to Trash",
+								"Moving entries to trash.", 1000L,
+								new RNSUnlinkedTask(data),
+								new RNSUnlinkedCompletionListener(data.tree()))
+						.start();
 				return true;
 			}
 		} catch (IOException ioe) {
-			_logger.warn("Unable to perform drag-and-drop or cut/copy/paste action.", ioe);
-			ErrorHandler.handleError(_uiContext, (JComponent) support.getComponent(), ioe);
+			_logger.warn(
+					"Unable to perform drag-and-drop or cut/copy/paste action.",
+					ioe);
+			ErrorHandler.handleError(_uiContext,
+					(JComponent) support.getComponent(), ioe);
 		} catch (UnsupportedFlavorException e) {
-			_logger.warn("Unable to perform drag-and-drop or cut/copy/paste action.", e);
-			ErrorHandler.handleError(_uiContext, (JComponent) support.getComponent(), e);
+			_logger.warn(
+					"Unable to perform drag-and-drop or cut/copy/paste action.",
+					e);
+			ErrorHandler.handleError(_uiContext,
+					(JComponent) support.getComponent(), e);
 		}
 
 		return false;
 	}
 
-	private class RNSUnlinkResults
-	{
+	private class RNSUnlinkResults {
 		private Collection<RNSTreeNode> _successfulUnlinks;
 		private Collection<Pair<RNSTreeNode, RNSPath>> _failedUnlinks;
 
-		private RNSUnlinkResults(Collection<RNSTreeNode> successfulUnlinks, Collection<Pair<RNSTreeNode, RNSPath>> failedUnlinks)
-		{
+		private RNSUnlinkResults(Collection<RNSTreeNode> successfulUnlinks,
+				Collection<Pair<RNSTreeNode, RNSPath>> failedUnlinks) {
 			_successfulUnlinks = successfulUnlinks;
 			_failedUnlinks = failedUnlinks;
 		}
 	}
 
-	private class RNSUnlinkedTask extends AbstractTask<RNSUnlinkResults>
-	{
+	private class RNSUnlinkedTask extends AbstractTask<RNSUnlinkResults> {
 		private RNSListTransferData _transferData;
 
-		private RNSUnlinkedTask(RNSListTransferData transferData)
-		{
+		private RNSUnlinkedTask(RNSListTransferData transferData) {
 			_transferData = transferData;
 		}
 
 		@Override
-		public RNSUnlinkResults execute(TaskProgressListener progressListener) throws Exception
-		{
+		public RNSUnlinkResults execute(TaskProgressListener progressListener)
+				throws Exception {
 			Collection<RNSTreeNode> successes = new HashSet<RNSTreeNode>();
 			Collection<Pair<RNSTreeNode, RNSPath>> failed = new LinkedList<Pair<RNSTreeNode, RNSPath>>();
 
 			IContextResolver resolver = ContextManager.getResolver();
 
 			try {
-				ContextManager.setResolver(new MemoryBasedContextResolver(_transferData.sourceContext().callingContext()));
+				ContextManager.setResolver(new MemoryBasedContextResolver(
+						_transferData.sourceContext().callingContext()));
 				for (Pair<RNSTreeNode, RNSPath> pair : _transferData.paths()) {
 					RNSTreeNode node = pair.first();
 					RNSPath path = pair.second();
@@ -140,21 +147,30 @@ class TrashCanTransferHandler extends TransferHandler
 					if (node == null) {
 						_logger.warn("Not allowed to trash root of RNS space.");
 
-						JOptionPane.showMessageDialog(_transferData.tree(), "Not permitted to trash the root of RNS space.",
-							"Root Unlink Attempted", JOptionPane.WARNING_MESSAGE);
+						JOptionPane
+								.showMessageDialog(
+										_transferData.tree(),
+										"Not permitted to trash the root of RNS space.",
+										"Root Unlink Attempted",
+										JOptionPane.WARNING_MESSAGE);
 
 						failed.add(pair);
 					} else {
 						try {
-							_uiContext.trashCan().add(_transferData.sourceContext(), path);
+							_uiContext.trashCan().add(
+									_transferData.sourceContext(), path);
 							path.unlink();
 							successes.add(node);
 						} catch (Throwable cause) {
 							if (wasCancelled())
 								return null;
 
-							_logger.warn(String.format("Unable to unlink entry \"%s\".", path.pwd()), cause);
-							ErrorHandler.handleError(_transferData.sourceContext(), _transferData.tree(), cause);
+							_logger.warn(String.format(
+									"Unable to unlink entry \"%s\".",
+									path.pwd()), cause);
+							ErrorHandler.handleError(
+									_transferData.sourceContext(),
+									_transferData.tree(), cause);
 							failed.add(pair);
 						}
 					}
@@ -167,41 +183,38 @@ class TrashCanTransferHandler extends TransferHandler
 		}
 
 		@Override
-		public boolean showProgressDialog()
-		{
+		public boolean showProgressDialog() {
 			return false;
 		}
 	}
 
-	private class RNSUnlinkedCompletionListener implements TaskCompletionListener<RNSUnlinkResults>
-	{
+	private class RNSUnlinkedCompletionListener implements
+			TaskCompletionListener<RNSUnlinkResults> {
 		private RNSTree _tree;
 
-		private RNSUnlinkedCompletionListener(RNSTree tree)
-		{
+		private RNSUnlinkedCompletionListener(RNSTree tree) {
 			_tree = tree;
 		}
 
 		@Override
-		public void taskCancelled(Task<RNSUnlinkResults> task)
-		{
+		public void taskCancelled(Task<RNSUnlinkResults> task) {
 			// Shouldn't happen.
 		}
 
 		@Override
-		public void taskCompleted(Task<RNSUnlinkResults> task, RNSUnlinkResults result)
-		{
+		public void taskCompleted(Task<RNSUnlinkResults> task,
+				RNSUnlinkResults result) {
 			for (RNSTreeNode node : result._successfulUnlinks)
 				node.refresh(_tree);
 
 			if (!result._failedUnlinks.isEmpty())
-				JOptionPane.showMessageDialog(_tree, "Unable to move all entries to the trash can.", "Trash Operation Failed",
-					JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(_tree,
+						"Unable to move all entries to the trash can.",
+						"Trash Operation Failed", JOptionPane.WARNING_MESSAGE);
 		}
 
 		@Override
-		public void taskExcepted(Task<RNSUnlinkResults> task, Throwable cause)
-		{
+		public void taskExcepted(Task<RNSUnlinkResults> task, Throwable cause) {
 			// Shouldn't happen.
 		}
 	}

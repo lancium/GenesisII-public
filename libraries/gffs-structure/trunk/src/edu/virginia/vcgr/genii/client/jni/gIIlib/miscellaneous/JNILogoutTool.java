@@ -8,12 +8,10 @@ import edu.virginia.vcgr.genii.security.TransientCredentials;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JNILogoutTool extends JNILibraryBase
-{
+public class JNILogoutTool extends JNILibraryBase {
 	static private Log _logger = LogFactory.getLog(JNILogoutTool.class);
 
-	public static void logout()
-	{
+	public static void logout() {
 		tryToInitialize();
 
 		try {

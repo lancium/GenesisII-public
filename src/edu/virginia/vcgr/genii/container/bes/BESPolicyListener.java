@@ -2,8 +2,7 @@ package edu.virginia.vcgr.genii.container.bes;
 
 import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 
-public interface BESPolicyListener
-{
+public interface BESPolicyListener {
 	public void suspend() throws ExecutionException;
 
 	public void suspendOrKill() throws ExecutionException;

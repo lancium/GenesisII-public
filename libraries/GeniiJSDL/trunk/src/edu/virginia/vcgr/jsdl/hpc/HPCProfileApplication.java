@@ -37,11 +37,10 @@ import edu.virginia.vcgr.jsdl.ApplicationBase;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_executable", "_arguments", "_input", "_output", "_error", "_workingDirectory",
-	"_environmentVariables", "_userName" })
+@XmlType(propOrder = { "_executable", "_arguments", "_input", "_output",
+		"_error", "_workingDirectory", "_environmentVariables", "_userName" })
 @XmlRootElement(namespace = HPCConstants.HPCPA_NS, name = "HPCProfileApplication")
-public class HPCProfileApplication implements ApplicationBase, Serializable
-{
+public class HPCProfileApplication implements ApplicationBase, Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -75,99 +74,80 @@ public class HPCProfileApplication implements ApplicationBase, Serializable
 	@XmlElement(namespace = HPCConstants.HPCPA_NS, name = "UserName", required = false)
 	private UserName _userName = null;
 
-	public HPCProfileApplication(String executable, String... arguments)
-	{
+	public HPCProfileApplication(String executable, String... arguments) {
 		_executable = new FileName(executable);
 		for (String arg : arguments)
 			_arguments.add(new Argument(arg));
 	}
 
-	public HPCProfileApplication()
-	{
+	public HPCProfileApplication() {
 	}
 
-	final public void name(String name)
-	{
+	final public void name(String name) {
 		_name = name;
 	}
 
-	final public String name()
-	{
+	final public String name() {
 		return _name;
 	}
 
-	final public void executable(FileName executable)
-	{
+	final public void executable(FileName executable) {
 		_executable = executable;
 	}
 
-	final public FileName executable()
-	{
+	final public FileName executable() {
 		return _executable;
 	}
 
-	final public List<Argument> arguments()
-	{
+	final public List<Argument> arguments() {
 		return _arguments;
 	}
 
-	final public void input(FileName input)
-	{
+	final public void input(FileName input) {
 		_input = input;
 	}
 
-	final public FileName input()
-	{
+	final public FileName input() {
 		return _input;
 	}
 
-	final public void output(FileName output)
-	{
+	final public void output(FileName output) {
 		_output = output;
 	}
 
-	final public FileName output()
-	{
+	final public FileName output() {
 		return _output;
 	}
 
-	final public void error(FileName error)
-	{
+	final public void error(FileName error) {
 		_error = error;
 	}
 
-	final public FileName error()
-	{
+	final public FileName error() {
 		return _error;
 	}
 
-	final public void workingDirectory(DirectoryName workingDirectory)
-	{
+	final public void workingDirectory(DirectoryName workingDirectory) {
 		_workingDirectory = workingDirectory;
 	}
 
-	final public DirectoryName workingDirectory()
-	{
+	final public DirectoryName workingDirectory() {
 		return _workingDirectory;
 	}
 
-	final public List<Environment> environmentVariables()
-	{
+	final public List<Environment> environmentVariables() {
 		return _environmentVariables;
 	}
 
-	final public void userName(UserName userName)
-	{
+	final public void userName(UserName userName) {
 		_userName = userName;
 	}
 
-	final public UserName userName()
-	{
+	final public UserName userName() {
 		return _userName;
 	}
 
-	final public Map<QName, String> anyAttributes()
-	{
+	final public Map<QName, String> anyAttributes() {
 		return _anyAttributes;
 	}
 }

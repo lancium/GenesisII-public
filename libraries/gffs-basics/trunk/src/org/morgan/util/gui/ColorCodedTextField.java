@@ -29,8 +29,7 @@ import javax.swing.event.CaretListener;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class ColorCodedTextField extends JTextField implements CaretListener
-{
+public class ColorCodedTextField extends JTextField implements CaretListener {
 	static final long serialVersionUID = 0;
 
 	private boolean _isGood;
@@ -38,8 +37,7 @@ public class ColorCodedTextField extends JTextField implements CaretListener
 	private Color _badColor;
 	private Pattern _goodPattern;
 
-	public ColorCodedTextField(Color badColor, Pattern goodPattern)
-	{
+	public ColorCodedTextField(Color badColor, Pattern goodPattern) {
 		super();
 
 		_isGood = true;
@@ -50,8 +48,7 @@ public class ColorCodedTextField extends JTextField implements CaretListener
 		addCaretListener(this);
 	}
 
-	public void caretUpdate(CaretEvent ce)
-	{
+	public void caretUpdate(CaretEvent ce) {
 		Matcher m = _goodPattern.matcher(getText());
 		if (!_isGood && m.matches()) {
 			_isGood = true;
@@ -62,23 +59,24 @@ public class ColorCodedTextField extends JTextField implements CaretListener
 		}
 	}
 
-	public boolean isMatching()
-	{
+	public boolean isMatching() {
 		return _isGood;
 	}
 
-	static public void main(String[] args)
-	{
+	static public void main(String[] args) {
 		JDialog d = new JDialog();
 		d.getContentPane().setLayout(new GridBagLayout());
 		d.getContentPane().add(
-			new JLabel("Test"),
-			new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5,
-				5), 5, 5));
+				new JLabel("Test"),
+				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.WEST, GridBagConstraints.NONE,
+						new Insets(5, 5, 5, 5), 5, 5));
 		d.getContentPane().add(
-			new ColorCodedTextField(Color.RED, Pattern.compile("[0-9]*")),
-			new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(
-				5, 5, 5, 5), 5, 5));
+				new ColorCodedTextField(Color.RED, Pattern.compile("[0-9]*")),
+				new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
+						GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5),
+						5, 5));
 		d.pack();
 		d.setVisible(true);
 	}

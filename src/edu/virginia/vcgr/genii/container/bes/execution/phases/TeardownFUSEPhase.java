@@ -12,20 +12,18 @@ import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.fuse.GeniiFuse;
 import fuse.FuseException;
 
-public class TeardownFUSEPhase extends AbstractFUSEPhases
-{
+public class TeardownFUSEPhase extends AbstractFUSEPhases {
 	static private Log _logger = LogFactory.getLog(TeardownFUSEPhase.class);
 
 	static final long serialVersionUID = 0L;
 
-	public TeardownFUSEPhase(String mountPoint)
-	{
-		super(mountPoint, new ActivityState(ActivityStateEnumeration.Running, "fuse-teardown", false));
+	public TeardownFUSEPhase(String mountPoint) {
+		super(mountPoint, new ActivityState(ActivityStateEnumeration.Running,
+				"fuse-teardown", false));
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
-	{
+	public void execute(ExecutionContext context) throws Throwable {
 		long sleepTime = 250L;
 
 		try {
@@ -39,10 +37,12 @@ public class TeardownFUSEPhase extends AbstractFUSEPhases
 				GeniiFuse.unmountGenesisII(f, true);
 				Thread.sleep(250L);
 				if (!f.delete())
-					throw new IOException("Unable to delete old fuse directory.");
+					throw new IOException(
+							"Unable to delete old fuse directory.");
 				return;
 			} catch (Throwable exception) {
-				_logger.warn("Exception thrown while trying to unmount FUSE.", exception);
+				_logger.warn("Exception thrown while trying to unmount FUSE.",
+						exception);
 				Thread.sleep(sleepTime);
 				sleepTime <<= 2;
 			}

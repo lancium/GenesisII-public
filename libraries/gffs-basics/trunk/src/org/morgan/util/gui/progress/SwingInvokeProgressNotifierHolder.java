@@ -4,12 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
-class SwingInvokeProgressNotifierHolder implements ProgressNotifier
-{
+class SwingInvokeProgressNotifierHolder implements ProgressNotifier {
 	private ProgressNotifier _notifier;
 
-	public SwingInvokeProgressNotifierHolder(ProgressNotifier notifier)
-	{
+	public SwingInvokeProgressNotifierHolder(ProgressNotifier notifier) {
 		if (notifier == null)
 			throw new IllegalArgumentException("Notifier cannot be null.");
 
@@ -17,8 +15,7 @@ class SwingInvokeProgressNotifierHolder implements ProgressNotifier
 	}
 
 	@Override
-	public void initialize(CancelController controller, ProgressTask<?> task)
-	{
+	public void initialize(CancelController controller, ProgressTask<?> task) {
 		try {
 			if (!SwingUtilities.isEventDispatchThread())
 				SwingUtilities.invokeAndWait(new Initializer(controller, task));
@@ -32,8 +29,7 @@ class SwingInvokeProgressNotifierHolder implements ProgressNotifier
 	}
 
 	@Override
-	public void updateNote(String newNote)
-	{
+	public void updateNote(String newNote) {
 		if (!SwingUtilities.isEventDispatchThread())
 			SwingUtilities.invokeLater(new NoteUpdater(newNote));
 		else
@@ -41,8 +37,7 @@ class SwingInvokeProgressNotifierHolder implements ProgressNotifier
 	}
 
 	@Override
-	public void updateProgress(int newValue)
-	{
+	public void updateProgress(int newValue) {
 		if (!SwingUtilities.isEventDispatchThread())
 			SwingUtilities.invokeLater(new ProgressUpdater(newValue));
 		else
@@ -50,69 +45,57 @@ class SwingInvokeProgressNotifierHolder implements ProgressNotifier
 	}
 
 	@Override
-	public void finished()
-	{
+	public void finished() {
 		if (!SwingUtilities.isEventDispatchThread())
 			SwingUtilities.invokeLater(new Finisher());
 		else
 			_notifier.finished();
 	}
 
-	private class Initializer implements Runnable
-	{
+	private class Initializer implements Runnable {
 		private CancelController _controller;
 		private ProgressTask<?> _task;
 
-		private Initializer(CancelController controller, ProgressTask<?> task)
-		{
+		private Initializer(CancelController controller, ProgressTask<?> task) {
 			_controller = controller;
 			_task = task;
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			_notifier.initialize(_controller, _task);
 		}
 	}
 
-	private class NoteUpdater implements Runnable
-	{
+	private class NoteUpdater implements Runnable {
 		private String _note;
 
-		private NoteUpdater(String note)
-		{
+		private NoteUpdater(String note) {
 			_note = note;
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			_notifier.updateNote(_note);
 		}
 	}
 
-	private class ProgressUpdater implements Runnable
-	{
+	private class ProgressUpdater implements Runnable {
 		private int _progress;
 
-		private ProgressUpdater(int progress)
-		{
+		private ProgressUpdater(int progress) {
 			_progress = progress;
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			_notifier.updateProgress(_progress);
 		}
 	}
 
-	private class Finisher implements Runnable
-	{
+	private class Finisher implements Runnable {
 		@Override
-		public void run()
-		{
+		public void run() {
 			_notifier.finished();
 		}
 	}

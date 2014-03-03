@@ -11,35 +11,30 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 
 @SuppressWarnings("rawtypes")
-public class BESListModel extends AbstractListModel
-{
+public class BESListModel extends AbstractListModel {
 	static final long serialVersionUID = 0L;
 
 	private Map<String, WSName> _besContainers;
 	private Vector<String> _sortedPaths;
 
-	public BESListModel()
-	{
+	public BESListModel() {
 		_besContainers = BESState.knownBESContainers();
 		_sortedPaths = new Vector<String>(_besContainers.keySet());
 		Collections.sort(_sortedPaths);
 	}
 
 	@Override
-	public Object getElementAt(int index)
-	{
+	public Object getElementAt(int index) {
 		String path = _sortedPaths.get(index);
 		return new BESBundle(path, _besContainers.get(path).getEndpoint());
 	}
 
 	@Override
-	public int getSize()
-	{
+	public int getSize() {
 		return _sortedPaths.size();
 	}
 
-	public void addBES(String path, EndpointReferenceType target)
-	{
+	public void addBES(String path, EndpointReferenceType target) {
 		int oldSize = _sortedPaths.size();
 		BESState.addKnownBESContainer(path, target);
 		_besContainers = BESState.knownBESContainers();
@@ -48,8 +43,7 @@ public class BESListModel extends AbstractListModel
 		fireContentsChanged(this, 0, oldSize);
 	}
 
-	public void removeBES(String path)
-	{
+	public void removeBES(String path) {
 		int oldSize = _sortedPaths.size();
 
 		BESState.removeKnownBESContainer(path);

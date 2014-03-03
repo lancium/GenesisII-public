@@ -17,11 +17,10 @@ import edu.virginia.vcgr.genii.ui.plugins.MenuType;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 
-public class AccountingUserManagerPlugin extends AbstractCombinedUIMenusPlugin
-{
+public class AccountingUserManagerPlugin extends AbstractCombinedUIMenusPlugin {
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
-	{
+	protected void performMenuAction(UIPluginContext context, MenuType menuType)
+			throws UIPluginException {
 		String password = PasswordDialog.getPassword(context.ownerComponent());
 		if (password == null)
 			return;
@@ -31,9 +30,8 @@ public class AccountingUserManagerPlugin extends AbstractCombinedUIMenusPlugin
 		String url;
 
 		try {
-			url =
-				context.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint().getAddress().get_value()
-					.toString();
+			url = context.endpointRetriever().getTargetEndpoints().iterator()
+					.next().getEndpoint().getAddress().get_value().toString();
 
 			while (true) {
 				Properties info = new Properties();
@@ -44,14 +42,17 @@ public class AccountingUserManagerPlugin extends AbstractCombinedUIMenusPlugin
 					connection.setAutoCommit(false);
 					break;
 				} catch (SQLException sqe) {
-					ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), sqe);
+					ErrorHandler.handleError(context.uiContext(),
+							context.ownerComponent(), sqe);
 				}
 			}
 
-			Collection<CredentialBundle> dirtyBundles =
-				CredentialDialog.manageCredentials(context.ownerComponent(), connection);
+			Collection<CredentialBundle> dirtyBundles = CredentialDialog
+					.manageCredentials(context.ownerComponent(), connection);
 			if (dirtyBundles != null && dirtyBundles.size() > 0) {
-				stmt = connection.prepareStatement("UPDATE xcgcredentials SET credentialtype = ? " + "WHERE cid = ?");
+				stmt = connection
+						.prepareStatement("UPDATE xcgcredentials SET credentialtype = ? "
+								+ "WHERE cid = ?");
 
 				for (CredentialBundle bundle : dirtyBundles) {
 					if (bundle.credentialType() != null)
@@ -68,7 +69,8 @@ public class AccountingUserManagerPlugin extends AbstractCombinedUIMenusPlugin
 				connection.commit();
 			}
 		} catch (Throwable e) {
-			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), e);
+			ErrorHandler.handleError(context.uiContext(),
+					context.ownerComponent(), e);
 		} finally {
 			StreamUtils.close(stmt);
 			StreamUtils.close(connection);
@@ -76,11 +78,12 @@ public class AccountingUserManagerPlugin extends AbstractCombinedUIMenusPlugin
 	}
 
 	@Override
-	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
-	{
+	public boolean isEnabled(
+			Collection<EndpointDescription> selectedDescriptions) {
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
 
-		return selectedDescriptions.iterator().next().typeInformation().isJDBCURL();
+		return selectedDescriptions.iterator().next().typeInformation()
+				.isJDBCURL();
 	}
 }

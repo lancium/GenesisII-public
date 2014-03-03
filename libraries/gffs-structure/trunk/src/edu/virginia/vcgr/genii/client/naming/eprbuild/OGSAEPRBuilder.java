@@ -12,17 +12,16 @@ import org.w3c.dom.Element;
 
 import edu.virginia.vcgr.genii.security.axis.WSSecurityUtils;
 
-public class OGSAEPRBuilder extends WSNamingEPRBuilder
-{
+public class OGSAEPRBuilder extends WSNamingEPRBuilder {
 	private X509Certificate[] _certificateChain = null;
 	private Collection<MessageElement> _policies = new LinkedList<MessageElement>();
 	private boolean _requireEncryption = false;
 	private boolean _includeServerTls = false;
 	private boolean _requireSigning = false;
 
-	private Collection<MessageElement> policies()
-	{
-		Collection<MessageElement> ret = new LinkedList<MessageElement>(_policies);
+	private Collection<MessageElement> policies() {
+		Collection<MessageElement> ret = new LinkedList<MessageElement>(
+				_policies);
 
 		if (_requireEncryption)
 			ret.add(SecurityPolicy.requireEncryptionPolicy());
@@ -36,67 +35,58 @@ public class OGSAEPRBuilder extends WSNamingEPRBuilder
 		return ret;
 	}
 
-	public OGSAEPRBuilder(URI address)
-	{
+	public OGSAEPRBuilder(URI address) {
 		super(address);
 	}
 
-	final public void certificateChain(X509Certificate[] certificateChain)
-	{
+	final public void certificateChain(X509Certificate[] certificateChain) {
 		_certificateChain = certificateChain;
 	}
 
-	final public X509Certificate[] certificateChain()
-	{
+	final public X509Certificate[] certificateChain() {
 		return _certificateChain;
 	}
 
-	final public void addUsernamePasswordTokenPolicy(boolean isOptional)
-	{
+	final public void addUsernamePasswordTokenPolicy(boolean isOptional) {
 		_policies.add(SecurityPolicy.usernamePasswordPolicy(isOptional));
 	}
 
-	final public void requireEncryption(boolean requireEncryption)
-	{
+	final public void requireEncryption(boolean requireEncryption) {
 		_requireEncryption = requireEncryption;
 	}
 
-	final public boolean requireEncryption()
-	{
+	final public boolean requireEncryption() {
 		return _requireEncryption;
 	}
 
-	final public void includeServerTls(boolean includeServerTls)
-	{
+	final public void includeServerTls(boolean includeServerTls) {
 		_includeServerTls = includeServerTls;
 	}
 
-	final public boolean includeServerTls()
-	{
+	final public boolean includeServerTls() {
 		return _includeServerTls;
 	}
 
-	final public void requireMessageSigning(boolean requireSigning)
-	{
+	final public void requireMessageSigning(boolean requireSigning) {
 		_requireSigning = requireSigning;
 	}
 
-	final public boolean requireMessageSigning()
-	{
+	final public boolean requireMessageSigning() {
 		return _requireSigning;
 	}
 
 	@Override
-	public Collection<Element> metadata()
-	{
+	public Collection<Element> metadata() {
 		Collection<Element> ret = new LinkedList<Element>(super.metadata());
 
 		/* Add certificate chain */
 		if (_certificateChain != null) {
 			try {
-				ret.add(WSSecurityUtils.makePkiPathSecTokenRef(_certificateChain, "RecipientMessageIdentity"));
+				ret.add(WSSecurityUtils.makePkiPathSecTokenRef(
+						_certificateChain, "RecipientMessageIdentity"));
 			} catch (GeneralSecurityException gse) {
-				throw new ConfigurationException("Unable to generate certificate chain metadata!", gse);
+				throw new ConfigurationException(
+						"Unable to generate certificate chain metadata!", gse);
 			}
 		}
 

@@ -4,13 +4,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemType;
 
-public class FilesystemCellRenderer extends DefaultTableCellRenderer
-{
+public class FilesystemCellRenderer extends DefaultTableCellRenderer {
 	static final long serialVersionUID = 0l;
 
 	@Override
-	public void setValue(Object value)
-	{
+	public void setValue(Object value) {
 		FilesystemType fs = (FilesystemType) value;
 		if (fs == null) {
 			setText(null);

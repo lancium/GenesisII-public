@@ -10,8 +10,7 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.AccountingRecordType;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-class AccountingRecord
-{
+class AccountingRecord {
 	private long _arid;
 	private String _besEPI;
 	private String _arch;
@@ -27,9 +26,10 @@ class AccountingRecord
 	private Collection<Identity> _credentials = new LinkedList<Identity>();
 	private Vector<String> _commandLine = new Vector<String>(4);
 
-	AccountingRecord(long arid, String besEPI, String arch, String os, String machineName, int exitCode, long userTimeMicro,
-		long kernelTimeMicro, long wallclockTimeMicro, long maxRSS, Calendar timestamp)
-	{
+	AccountingRecord(long arid, String besEPI, String arch, String os,
+			String machineName, int exitCode, long userTimeMicro,
+			long kernelTimeMicro, long wallclockTimeMicro, long maxRSS,
+			Calendar timestamp) {
 		_arid = arid;
 		_besEPI = besEPI;
 		_arch = arch;
@@ -43,30 +43,28 @@ class AccountingRecord
 		_timestamp = timestamp;
 	}
 
-	final long recordID()
-	{
+	final long recordID() {
 		return _arid;
 	}
 
-	final void addCredential(Identity cred)
-	{
+	final void addCredential(Identity cred) {
 		_credentials.add(cred);
 	}
 
-	final void addCommandLineElement(int index, String element)
-	{
+	final void addCommandLineElement(int index, String element) {
 		_commandLine.setSize(index + 1);
 		_commandLine.set(index, element);
 	}
 
-	final AccountingRecordType convert() throws IOException
-	{
+	final AccountingRecordType convert() throws IOException {
 		for (int lcv = 0; lcv < _commandLine.size(); lcv++)
 			if (_commandLine.get(lcv) == null)
 				_commandLine.remove(lcv);
 
-		return new AccountingRecordType(_arid, _besEPI, _arch, _os, _machineName, _commandLine.toArray(new String[_commandLine
-			.size()]), _exitCode, _userTimeMicro, _kernelTimeMicro, _wallclockTimeMicro, _maxRSS, DBSerializer.serialize(
-			_credentials, Long.MAX_VALUE), _timestamp);
+		return new AccountingRecordType(_arid, _besEPI, _arch, _os,
+				_machineName, _commandLine.toArray(new String[_commandLine
+						.size()]), _exitCode, _userTimeMicro, _kernelTimeMicro,
+				_wallclockTimeMicro, _maxRSS, DBSerializer.serialize(
+						_credentials, Long.MAX_VALUE), _timestamp);
 	}
 }

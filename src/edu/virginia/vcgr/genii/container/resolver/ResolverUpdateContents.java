@@ -12,8 +12,7 @@ import edu.virginia.vcgr.genii.client.sync.VersionVector;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 
 @XmlRootElement(namespace = ResolverUpdateContents.RESOLVER_NAMESPACE, name = "ResolverUpdateContents")
-public class ResolverUpdateContents extends NotificationMessageContents
-{
+public class ResolverUpdateContents extends NotificationMessageContents {
 	static final long serialVersionUID = 0L;
 
 	static public final String RESOLVER_NAMESPACE = "http://vcgr.cs.virginia.edu/genii/genii-resolver";
@@ -30,45 +29,41 @@ public class ResolverUpdateContents extends NotificationMessageContents
 	@XmlElement(namespace = RESOLVER_NAMESPACE, name = "version")
 	private VersionVector _versionVector;
 
-	protected ResolverUpdateContents()
-	{
+	protected ResolverUpdateContents() {
 	}
 
-	public ResolverUpdateContents(int targetID, EndpointReferenceType entryReference, VersionVector versionVector)
-		throws ResourceException
-	{
+	public ResolverUpdateContents(int targetID,
+			EndpointReferenceType entryReference, VersionVector versionVector)
+			throws ResourceException {
 		_targetID = targetID;
 		if (entryReference != null)
 			_entryReference = EPRUtils.toBytes(entryReference);
 		_versionVector = versionVector;
 	}
 
-	public ResolverUpdateContents(URI targetEPI, int targetID, VersionVector versionVector) throws ResourceException
-	{
+	public ResolverUpdateContents(URI targetEPI, int targetID,
+			VersionVector versionVector) throws ResourceException {
 		_targetEPI = targetEPI;
 		_targetID = targetID;
 		_versionVector = versionVector;
 	}
 
-	final public URI targetEPI()
-	{
+	final public URI targetEPI() {
 		return _targetEPI;
 	}
 
-	final public int targetID()
-	{
+	final public int targetID() {
 		return _targetID;
 	}
 
-	final public EndpointReferenceType entryReference() throws ResourceException
-	{
+	final public EndpointReferenceType entryReference()
+			throws ResourceException {
 		if (_entryReference == null)
 			return null;
 		return EPRUtils.fromBytes(_entryReference);
 	}
 
-	final public VersionVector versionVector()
-	{
+	final public VersionVector versionVector() {
 		return _versionVector;
 	}
 }

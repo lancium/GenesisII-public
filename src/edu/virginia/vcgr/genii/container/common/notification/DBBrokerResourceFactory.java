@@ -8,16 +8,15 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class DBBrokerResourceFactory extends BasicDBResourceFactory
-{
-	public DBBrokerResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
-	{
+public class DBBrokerResourceFactory extends BasicDBResourceFactory {
+	public DBBrokerResourceFactory(ServerDatabaseConnectionPool pool)
+			throws SQLException {
 		super(pool);
 	}
 
 	@Override
-	public IResource instantiate(ResourceKey parentKey) throws ResourceException
-	{
+	public IResource instantiate(ResourceKey parentKey)
+			throws ResourceException {
 		try {
 			return new DBBrokerResource((ResourceKey) parentKey, _pool);
 		} catch (SQLException sqe) {

@@ -11,16 +11,14 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 
-public class RNSTreeNode extends DefaultMutableTreeNode
-{
+public class RNSTreeNode extends DefaultMutableTreeNode {
 	static final long serialVersionUID = 0L;
 	static private final int _MAX_FAILURES = 15;
-	static private final long _CACHE_WINDOW = 1000 * 15; // Data can be cached for 15 seconds.
+	static private final long _CACHE_WINDOW = 1000 * 15; // Data can be cached
+															// for 15 seconds.
 
 	static public enum NodeState {
-		NEEDS_EXPANSION,
-		EXPANDING,
-		EXPANDED
+		NEEDS_EXPANSION, EXPANDING, EXPANDED
 	}
 
 	private RNSPath _target;
@@ -29,8 +27,7 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 	private Date _updateTimestamp;
 	private int _failedCount = 0;
 
-	public RNSTreeNode(RNSPath target) throws RNSPathDoesNotExistException
-	{
+	public RNSTreeNode(RNSPath target) throws RNSPathDoesNotExistException {
 		_target = target;
 		_typeInfo = new TypeInformation(target.getEndpoint());
 
@@ -38,36 +35,33 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 		_nodeState = NodeState.NEEDS_EXPANSION;
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		return _target.getName();
 	}
 
-	public NodeState getNodeState()
-	{
+	public NodeState getNodeState() {
 		return _nodeState;
 	}
 
-	public RNSPath getRNSPath()
-	{
+	public RNSPath getRNSPath() {
 		return _target;
 	}
 
-	public void refresh(RNSTreeModel model)
-	{
+	public void refresh(RNSTreeModel model) {
 		_nodeState = NodeState.NEEDS_EXPANSION;
 		prepareExpansion(model);
 	}
 
-	synchronized public void prepareExpansion(RNSTreeModel model)
-	{
+	synchronized public void prepareExpansion(RNSTreeModel model) {
 		if (_nodeState == NodeState.NEEDS_EXPANSION) {
 			if (this.getChildCount() == 0) {
-				add(new DefaultMutableTreeNode("...looking up contents...", false));
+				add(new DefaultMutableTreeNode("...looking up contents...",
+						false));
 				model.nodesWereInserted(this, new int[] { 0 });
 			} else {
 				removeAllChildren();
-				add(new DefaultMutableTreeNode("...looking up contents...", false));
+				add(new DefaultMutableTreeNode("...looking up contents...",
+						false));
 				model.nodeStructureChanged(this);
 			}
 
@@ -80,8 +74,7 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 		}
 	}
 
-	private void resolveChildren(RNSTreeModel model)
-	{
+	private void resolveChildren(RNSTreeModel model) {
 		_nodeState = NodeState.EXPANDING;
 
 		Thread th = new Thread(new RNSNodeResolver(model, this));
@@ -89,8 +82,8 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 		th.start();
 	}
 
-	synchronized public void resolveChildren(RNSTreeModel model, RNSPath[] children)
-	{
+	synchronized public void resolveChildren(RNSTreeModel model,
+			RNSPath[] children) {
 		_nodeState = NodeState.EXPANDED;
 		_updateTimestamp = new Date(System.currentTimeMillis() + _CACHE_WINDOW);
 
@@ -106,13 +99,13 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 				model.nodeStructureChanged(this);
 				_failedCount = 0;
 			} catch (Throwable cause) {
-				resolveChildrenError(model, "Lookup Error:  " + cause.getLocalizedMessage());
+				resolveChildrenError(model,
+						"Lookup Error:  " + cause.getLocalizedMessage());
 			}
 		}
 	}
 
-	private void updateChildren(RNSTreeModel model, RNSPath[] children)
-	{
+	private void updateChildren(RNSTreeModel model, RNSPath[] children) {
 		HashMap<String, RNSPath> newChildren = new HashMap<String, RNSPath>();
 		HashMap<String, RNSTreeNode> existingChildren = new HashMap<String, RNSTreeNode>();
 		ArrayList<RNSTreeNode> remove = new ArrayList<RNSTreeNode>();
@@ -139,7 +132,8 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 
 				try {
 					oldNode._target = newPath;
-					oldNode._typeInfo = new TypeInformation(oldNode._target.getEndpoint());
+					oldNode._typeInfo = new TypeInformation(
+							oldNode._target.getEndpoint());
 					boolean allows = oldNode._typeInfo.isRNS();
 					if (oldNode.getAllowsChildren() != allows) {
 						changed.add(new Integer(lcv));
@@ -197,11 +191,12 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 		}
 	}
 
-	synchronized public void resolveChildrenError(RNSTreeModel model, String label)
-	{
+	synchronized public void resolveChildrenError(RNSTreeModel model,
+			String label) {
 		_nodeState = NodeState.EXPANDED;
 		_failedCount = Math.min(_failedCount + 1, _MAX_FAILURES);
-		_updateTimestamp = new Date(System.currentTimeMillis() + (_CACHE_WINDOW * _failedCount * _failedCount));
+		_updateTimestamp = new Date(System.currentTimeMillis()
+				+ (_CACHE_WINDOW * _failedCount * _failedCount));
 
 		removeAllChildren();
 		add(new DefaultMutableTreeNode(label, false));

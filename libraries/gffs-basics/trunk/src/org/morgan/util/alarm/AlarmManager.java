@@ -25,69 +25,66 @@ import org.morgan.util.event.IEventProgress;
 import org.morgan.util.event.SingletonEventFactory;
 
 /**
- * A manager for all alarms. This manager is responsible for raising the alarms when the time is
- * right.
+ * A manager for all alarms. This manager is responsible for raising the alarms
+ * when the time is right.
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class AlarmManager extends Thread
-{
+public class AlarmManager extends Thread {
 	private EventManager _eventManager;
 	private PriorityQueue<AlarmDescription> _alarms;
 
-	public AlarmManager(EventManager eventManager)
-	{
+	public AlarmManager(EventManager eventManager) {
 		super("Alarm Thread");
 
 		_eventManager = eventManager;
-		_alarms = new PriorityQueue<AlarmDescription>(32, DescriptionComparator.COMPARATOR);
+		_alarms = new PriorityQueue<AlarmDescription>(32,
+				DescriptionComparator.COMPARATOR);
 
 		setDaemon(true);
 		start();
 	}
 
-	private void insert(AlarmDescription desc)
-	{
+	private void insert(AlarmDescription desc) {
 		synchronized (_alarms) {
 			_alarms.add(desc);
 			_alarms.notifyAll();
 		}
 	}
 
-	private IAlarmToken addAlarm(Date nextOccurance, Long interval, IEventFactory factory)
-	{
-		AlarmDescription desc = new AlarmDescription(nextOccurance, interval, factory);
+	private IAlarmToken addAlarm(Date nextOccurance, Long interval,
+			IEventFactory factory) {
+		AlarmDescription desc = new AlarmDescription(nextOccurance, interval,
+				factory);
 		insert(desc);
 		return desc;
 	}
 
-	public IAlarmToken addAlarm(Date occurance, IEvent event)
-	{
+	public IAlarmToken addAlarm(Date occurance, IEvent event) {
 		return addAlarm(occurance, new SingletonEventFactory(event));
 	}
 
-	public IAlarmToken addAlarm(Date occurance, IEventFactory factory)
-	{
+	public IAlarmToken addAlarm(Date occurance, IEventFactory factory) {
 		return addAlarm(occurance, null, factory);
 	}
 
-	public IAlarmToken addAlarm(long interval, IEvent event)
-	{
+	public IAlarmToken addAlarm(long interval, IEvent event) {
 		return addAlarm(interval, new SingletonEventFactory(event));
 	}
 
-	public IAlarmToken addAlarm(long interval, IEventFactory factory)
-	{
-		return addAlarm(new Date(new Date().getTime() + interval), new Long(interval), factory);
+	public IAlarmToken addAlarm(long interval, IEventFactory factory) {
+		return addAlarm(new Date(new Date().getTime() + interval), new Long(
+				interval), factory);
 	}
 
-	public void run()
-	{
+	public void run() {
 		try {
 			synchronized (_alarms) {
 				while (true) {
 					AlarmDescription desc = _alarms.peek();
-					if ((desc != null) && ((desc._cancelled) || (desc._nextOccurance.compareTo(new Date()) <= 0))) {
+					if ((desc != null)
+							&& ((desc._cancelled) || (desc._nextOccurance
+									.compareTo(new Date()) <= 0))) {
 						if (desc._cancelled)
 							continue;
 
@@ -96,7 +93,8 @@ public class AlarmManager extends Thread
 						desc.raise();
 					} else {
 						if (desc != null) {
-							long timeToWait = desc._nextOccurance.getTime() - (new Date().getTime());
+							long timeToWait = desc._nextOccurance.getTime()
+									- (new Date().getTime());
 							if (timeToWait < 0)
 								continue;
 							_alarms.wait(timeToWait);
@@ -110,31 +108,29 @@ public class AlarmManager extends Thread
 		}
 	}
 
-	private class AlarmDescription implements IAlarmToken, IEventDoneHandler
-	{
+	private class AlarmDescription implements IAlarmToken, IEventDoneHandler {
 		private Date _nextOccurance;
 		private Long _repeatInterval;
 		private IEventFactory _factory;
 		private int _occurances = 0;
 		private boolean _cancelled = false;
 
-		AlarmDescription(Date nextOccurance, Long repeatInterval, IEventFactory factory)
-		{
+		AlarmDescription(Date nextOccurance, Long repeatInterval,
+				IEventFactory factory) {
 			_nextOccurance = nextOccurance;
 			_repeatInterval = repeatInterval;
 			_factory = factory;
 		}
 
-		void raise()
-		{
+		void raise() {
 			_eventManager.raise(_factory.create(), this);
 		}
 
-		public void eventDoneCallback(IEventProgress progress)
-		{
+		public void eventDoneCallback(IEventProgress progress) {
 			_occurances++;
 			if (!_cancelled && (_repeatInterval != null)) {
-				_nextOccurance = new Date(new Date().getTime() + _repeatInterval.longValue());
+				_nextOccurance = new Date(new Date().getTime()
+						+ _repeatInterval.longValue());
 
 				insert(this);
 			} else {
@@ -146,28 +142,23 @@ public class AlarmManager extends Thread
 			}
 		}
 
-		public boolean completed()
-		{
+		public boolean completed() {
 			return _cancelled || (_nextOccurance == null);
 		}
 
-		public int eventCount()
-		{
+		public int eventCount() {
 			return _occurances;
 		}
 
-		public Date nextOccurance()
-		{
+		public Date nextOccurance() {
 			return _nextOccurance;
 		}
 
-		public void cancel()
-		{
+		public void cancel() {
 			_cancelled = true;
 		}
 
-		public void block() throws InterruptedException
-		{
+		public void block() throws InterruptedException {
 			int start = _occurances;
 			while (true) {
 				if (_occurances > start)
@@ -182,8 +173,7 @@ public class AlarmManager extends Thread
 			}
 		}
 
-		public void block(long timeoutMS) throws InterruptedException
-		{
+		public void block(long timeoutMS) throws InterruptedException {
 			int start = _occurances;
 			if (_occurances > start)
 				return;
@@ -198,10 +188,9 @@ public class AlarmManager extends Thread
 		}
 	}
 
-	static private class DescriptionComparator implements Comparator<AlarmDescription>
-	{
-		public int compare(AlarmDescription one, AlarmDescription two)
-		{
+	static private class DescriptionComparator implements
+			Comparator<AlarmDescription> {
+		public int compare(AlarmDescription one, AlarmDescription two) {
 			return one._nextOccurance.compareTo(two._nextOccurance);
 		}
 

@@ -6,12 +6,15 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPolicy;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 
-public interface SubscriptionFactory
-{
-	public SubscribeRequest createRequest(TopicQueryExpression topicFilter, TerminationTimeType terminationTime,
-		AdditionalUserData additionalUserData, SubscriptionPolicy... policies);
+public interface SubscriptionFactory {
+	public SubscribeRequest createRequest(TopicQueryExpression topicFilter,
+			TerminationTimeType terminationTime,
+			AdditionalUserData additionalUserData,
+			SubscriptionPolicy... policies);
 
-	public Subscription subscribe(EndpointReferenceType publisher, TopicQueryExpression topicFilter,
-		TerminationTimeType terminationTime, AdditionalUserData additionalUserData, SubscriptionPolicy... policies)
-		throws SubscribeException;
+	public Subscription subscribe(EndpointReferenceType publisher,
+			TopicQueryExpression topicFilter,
+			TerminationTimeType terminationTime,
+			AdditionalUserData additionalUserData,
+			SubscriptionPolicy... policies) throws SubscribeException;
 }

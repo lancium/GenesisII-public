@@ -2,8 +2,7 @@ package edu.virginia.vcgr.genii.client.utils.units;
 
 import java.io.Serializable;
 
-public abstract class UnitableValue<U extends Enum<U>> implements Serializable
-{
+public abstract class UnitableValue<U extends Enum<U>> implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	private double _value;
@@ -15,19 +14,16 @@ public abstract class UnitableValue<U extends Enum<U>> implements Serializable
 
 	public abstract double as(U targetUnits);
 
-	protected UnitableValue(double value, U units)
-	{
+	protected UnitableValue(double value, U units) {
 		_value = value;
 		_units = (units == null) ? defaultUnits() : units;
 	}
 
-	protected UnitableValue(double value)
-	{
+	protected UnitableValue(double value) {
 		this(value, null);
 	}
 
-	protected UnitableValue(String textRepresentation)
-	{
+	protected UnitableValue(String textRepresentation) {
 		textRepresentation = textRepresentation.trim();
 		int lcv;
 
@@ -41,8 +37,9 @@ public abstract class UnitableValue<U extends Enum<U>> implements Serializable
 		String units = textRepresentation.substring(lcv + 1).trim();
 
 		if (numbers.length() == 0)
-			throw new IllegalArgumentException(String.format("Can't parse %s into a %s", textRepresentation, getClass()
-				.getName()));
+			throw new IllegalArgumentException(String.format(
+					"Can't parse %s into a %s", textRepresentation, getClass()
+							.getName()));
 
 		double value = Double.parseDouble(numbers);
 		U u = defaultUnits();
@@ -53,34 +50,28 @@ public abstract class UnitableValue<U extends Enum<U>> implements Serializable
 		_units = u;
 	}
 
-	protected UnitableValue()
-	{
+	protected UnitableValue() {
 		this(0.0);
 	}
 
-	final public double value()
-	{
+	final public double value() {
 		return _value;
 	}
 
-	final public U units()
-	{
+	final public U units() {
 		return (_units == null) ? defaultUnits() : _units;
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		return String.format("%f %s", _value, _units);
 	}
 
-	final public String toIntegralString()
-	{
+	final public String toIntegralString() {
 		return String.format("%d %s", (long) _value, _units);
 	}
 
-	final public String toString(int floatingPrecision)
-	{
+	final public String toString(int floatingPrecision) {
 		String formatString = String.format("%%.%df %%s", floatingPrecision);
 		return String.format(formatString, _value, _units);
 	}

@@ -25,17 +25,17 @@ import edu.virginia.vcgr.genii.security.identity.IdentityType;
 import eu.unicore.security.etd.TrustDelegation;
 
 /**
- * This class holds the credentials wallet for a grid session. Individual trust delegations in the
- * assertionChains member below are either: (1) isolated SAML assertions or (2) the most recently
- * delegated trust credential in a delegation chain. This is always true unless the object is being
- * deserialized or built from soap headers, in which case the reattachDelegations method can put
- * things right.
+ * This class holds the credentials wallet for a grid session. Individual trust
+ * delegations in the assertionChains member below are either: (1) isolated SAML
+ * assertions or (2) the most recently delegated trust credential in a
+ * delegation chain. This is always true unless the object is being deserialized
+ * or built from soap headers, in which case the reattachDelegations method can
+ * put things right.
  * 
  * @author myanhaona
  * @author ckoeritz
  */
-public class CredentialWallet implements Externalizable, Describable
-{
+public class CredentialWallet implements Externalizable, Describable {
 	static public final long serialVersionUID = 2636486491170348968L;
 
 	private static Log _logger = LogFactory.getLog(CredentialWallet.class);
@@ -46,14 +46,13 @@ public class CredentialWallet implements Externalizable, Describable
 	transient private Map<String, TrustCredential> assertionChains = new HashMap<String, TrustCredential>();
 
 	/**
-	 * constructor for creating a SAML credentials list manually: useful for the grid client.
+	 * constructor for creating a SAML credentials list manually: useful for the
+	 * grid client.
 	 */
-	public CredentialWallet()
-	{
+	public CredentialWallet() {
 	}
 
-	public CredentialWallet(List<NuCredential> creds)
-	{
+	public CredentialWallet(List<NuCredential> creds) {
 		for (NuCredential cred : creds) {
 			if (cred instanceof TrustCredential) {
 				TrustCredential tc = (TrustCredential) cred;
@@ -62,46 +61,51 @@ public class CredentialWallet implements Externalizable, Describable
 		}
 		reattachDelegations(true);
 		if (_logger.isDebugEnabled())
-			_logger.debug("added " + assertionChains.size() + " credentials into list");
+			_logger.debug("added " + assertionChains.size()
+					+ " credentials into list");
 	}
 
 	/**
-	 * fairly dangerous accessor function provided for generators based on this object.
+	 * fairly dangerous accessor function provided for generators based on this
+	 * object.
 	 */
-	public Map<String, TrustCredential> getAssertionChains()
-	{
+	public Map<String, TrustCredential> getAssertionChains() {
 		return assertionChains;
 	}
 
 	/**
 	 * returns true if there are no assertion chains held in this object.
 	 */
-	public boolean isEmpty()
-	{
+	public boolean isEmpty() {
 		return assertionChains.isEmpty();
 	}
 
 	/**
-	 * This method delegates trust to a new delegatee using an existing trust credential, which
-	 * increases the length of the delegation chain by one element.
+	 * This method delegates trust to a new delegatee using an existing trust
+	 * credential, which increases the length of the delegation chain by one
+	 * element.
 	 */
-	public void delegateTrust(X509Certificate[] delegatee, IdentityType delegateeType, X509Certificate[] issuer,
-		PrivateKey issuerPrivateKey, BasicConstraints restrictions, EnumSet<RWXCategory> accessCategories,
-		TrustCredential priorDelegation)
-	{
+	public void delegateTrust(X509Certificate[] delegatee,
+			IdentityType delegateeType, X509Certificate[] issuer,
+			PrivateKey issuerPrivateKey, BasicConstraints restrictions,
+			EnumSet<RWXCategory> accessCategories,
+			TrustCredential priorDelegation) {
 		try {
-			TrustCredential assertion =
-				CredentialCache.getCachedDelegationChain(delegatee, delegateeType, issuer, issuerPrivateKey, restrictions,
-					accessCategories, priorDelegation);
+			TrustCredential assertion = CredentialCache
+					.getCachedDelegationChain(delegatee, delegateeType, issuer,
+							issuerPrivateKey, restrictions, accessCategories,
+							priorDelegation);
 			if (!assertionChains.containsKey(priorDelegation.getId())) {
-				throw new SecurityException("failure to delegate trust; assertion is not part of credential wallet.");
+				throw new SecurityException(
+						"failure to delegate trust; assertion is not part of credential wallet.");
 			}
 			assertionChains.remove(priorDelegation.getId());
 			assertionChains.put(assertion.getId(), assertion);
 		} catch (Throwable e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("tossing inappropriate extension for delegatee " + delegatee[0].getSubjectDN() + " on chain of "
-					+ priorDelegation.toString());
+				_logger.debug("tossing inappropriate extension for delegatee "
+						+ delegatee[0].getSubjectDN() + " on chain of "
+						+ priorDelegation.toString());
 			assertionChains.remove(priorDelegation.getId());
 		}
 	}
@@ -109,8 +113,7 @@ public class CredentialWallet implements Externalizable, Describable
 	/**
 	 * Adds a new credential into the credentials wallet.
 	 */
-	public void addCredential(TrustCredential assertion)
-	{
+	public void addCredential(TrustCredential assertion) {
 		if (assertion.getPriorDelegationId() != null) {
 			assertionChains.remove(assertion.getPriorDelegationId());
 		}
@@ -120,40 +123,38 @@ public class CredentialWallet implements Externalizable, Describable
 	/**
 	 * adds a collection of credentials into the wallet.
 	 */
-	public void addCredentials(List<TrustCredential> assertions)
-	{
+	public void addCredentials(List<TrustCredential> assertions) {
 		for (TrustCredential assertion : assertions) {
 			this.addCredential(assertion);
 		}
 	}
 
-	public List<TrustCredential> getCredentials()
-	{
+	public List<TrustCredential> getCredentials() {
 		if (assertionChains.isEmpty()) {
 			return Collections.emptyList();
 		}
 		return new ArrayList<TrustCredential>(assertionChains.values());
 	}
 
-	public void removeInvalidCredentials()
-	{
+	public void removeInvalidCredentials() {
 		if (assertionChains.isEmpty())
 			return;
 
-		Iterator<TrustCredential> iterator = assertionChains.values().iterator();
+		Iterator<TrustCredential> iterator = assertionChains.values()
+				.iterator();
 		while (iterator.hasNext()) {
 			TrustCredential curr = iterator.next();
 			if (!curr.isValid()) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("actually found an invalid credential to remove: " + curr.toString());
+					_logger.debug("actually found an invalid credential to remove: "
+							+ curr.toString());
 				iterator.remove();
 			}
 		}
 	}
 
 	@Override
-	public String describe(VerbosityLevel verbosity)
-	{
+	public String describe(VerbosityLevel verbosity) {
 		StringBuilder buffer = new StringBuilder();
 		for (TrustCredential assertion : assertionChains.values()) {
 			buffer.append(assertion.describe(verbosity)).append("\n");
@@ -161,8 +162,7 @@ public class CredentialWallet implements Externalizable, Describable
 		return buffer.toString();
 	}
 
-	public String getFirstUserName()
-	{
+	public String getFirstUserName() {
 		for (TrustCredential assertion : assertionChains.values()) {
 			// see if the credential is a user cred
 			String temp = assertion.describe(VerbosityLevel.LOW);
@@ -173,7 +173,8 @@ public class CredentialWallet implements Externalizable, Describable
 				// LOW
 				String t2[] = temp.split("\"");
 				if (t2.length < 3) {
-					// System.err.println("the split gave me this as the username: " + t2[1]);
+					// System.err.println("the split gave me this as the username: "
+					// + t2[1]);
 				} else
 					return t2[1];
 			}
@@ -182,27 +183,29 @@ public class CredentialWallet implements Externalizable, Describable
 	}
 
 	/**
-	 * if credentials have been added willy nilly, possibly without their being linked together,
-	 * this will find and relink all of them properly. the only thing remaining in the wallet will
-	 * be isolated assertions or an assertion chain's most recent element. if removeInvalid is true,
-	 * then any expired or invalid delegations will be trashed. it is important not to clear those
-	 * out during deserialization though or one will not get back any credential, which leads to
-	 * unanticipated exceptions.
+	 * if credentials have been added willy nilly, possibly without their being
+	 * linked together, this will find and relink all of them properly. the only
+	 * thing remaining in the wallet will be isolated assertions or an assertion
+	 * chain's most recent element. if removeInvalid is true, then any expired
+	 * or invalid delegations will be trashed. it is important not to clear
+	 * those out during deserialization though or one will not get back any
+	 * credential, which leads to unanticipated exceptions.
 	 */
-	public void reattachDelegations(boolean removeInvalid)
-	{
+	public void reattachDelegations(boolean removeInvalid) {
 		Map<String, TrustCredential> allCreds = new HashMap<String, TrustCredential>();
 		allCreds.putAll(assertionChains);
 		assertionChains.clear();
 
-		// construct delegation chain from the map of detached delegations collected above
+		// construct delegation chain from the map of detached delegations
+		// collected above
 		while (!allCreds.isEmpty()) {
 			/*
-			 * if we don't actually change the remaining detached set, then this stays false, and we
-			 * know we will not make more progress.
+			 * if we don't actually change the remaining detached set, then this
+			 * stays false, and we know we will not make more progress.
 			 */
 			boolean progressMade = false;
-			Iterator<TrustCredential> delegationIterator = allCreds.values().iterator();
+			Iterator<TrustCredential> delegationIterator = allCreds.values()
+					.iterator();
 
 			while (delegationIterator.hasNext()) {
 				TrustCredential delegation = delegationIterator.next();
@@ -211,13 +214,16 @@ public class CredentialWallet implements Externalizable, Describable
 					delegationIterator.remove();
 					progressMade = true;
 				} else {
-					String priorDelegationId = delegation.getPriorDelegationId();
+					String priorDelegationId = delegation
+							.getPriorDelegationId();
 					/*
-					 * we pull in the stranded prior delegation if we can find it. otherwise we
-					 * haven't gotten it off the wire or from serialization yet.
+					 * we pull in the stranded prior delegation if we can find
+					 * it. otherwise we haven't gotten it off the wire or from
+					 * serialization yet.
 					 */
 					if (assertionChains.containsKey(priorDelegationId)) {
-						TrustCredential priorDelegation = assertionChains.remove(priorDelegationId);
+						TrustCredential priorDelegation = assertionChains
+								.remove(priorDelegationId);
 						try {
 							delegation.extendTrustChain(priorDelegation);
 							assertionChains.put(delegation.getId(), delegation);
@@ -246,8 +252,7 @@ public class CredentialWallet implements Externalizable, Describable
 	 * This leverages the unicore6 security library's serialization.
 	 */
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException
-	{
+	public void writeExternal(ObjectOutput out) throws IOException {
 		int howManyTotal = 0;
 		for (TrustCredential trustDelegation : assertionChains.values())
 			howManyTotal += trustDelegation.getDelegationDepth();
@@ -274,7 +279,8 @@ public class CredentialWallet implements Externalizable, Describable
 					if (_logger.isTraceEnabled())
 						_logger.trace("serializing: " + curr.toString());
 				} catch (IOException e) {
-					_logger.error("failed to serialize assertion: " + e.getMessage());
+					_logger.error("failed to serialize assertion: "
+							+ e.getMessage());
 				}
 
 				curr = curr.getPriorDelegation();
@@ -283,7 +289,8 @@ public class CredentialWallet implements Externalizable, Describable
 		if (_logger.isTraceEnabled())
 			_logger.trace("serialized " + addedAny + " credentials.");
 		if (_logger.isTraceEnabled())
-			_logger.trace("serialization track: " + ProgramTools.showLastFewOnStack(6));
+			_logger.trace("serialization track: "
+					+ ProgramTools.showLastFewOnStack(6));
 		if (addedAny != howManyTotal) {
 			String msg = "failure to count number of assertions properly";
 			_logger.error(msg);
@@ -291,15 +298,17 @@ public class CredentialWallet implements Externalizable, Describable
 	}
 
 	/*
-	 * This method is called when java recreates the SOAPCredentials wallet from a serialized
-	 * stream. First the no-argument constructor is been called. Then this method is invoked to
-	 * properly restore the properties of the wallet.
+	 * This method is called when java recreates the SOAPCredentials wallet from
+	 * a serialized stream. First the no-argument constructor is been called.
+	 * Then this method is invoked to properly restore the properties of the
+	 * wallet.
 	 */
 	@Override
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
-	{
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
 		if (assertionChains.size() > 0)
-			throw new SecurityException("ERROR: somehow an external read op already has assertions");
+			throw new SecurityException(
+					"ERROR: somehow an external read op already has assertions");
 		int assertionsToRead = 0;
 		try {
 			assertionsToRead = in.readInt();

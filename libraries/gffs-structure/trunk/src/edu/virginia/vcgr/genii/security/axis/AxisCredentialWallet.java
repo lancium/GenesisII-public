@@ -25,31 +25,28 @@ import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
  * @author myanhaona
  * @author ckoeritz
  */
-public class AxisCredentialWallet
-{
+public class AxisCredentialWallet {
 	private static Log _logger = LogFactory.getLog(AxisCredentialWallet.class);
 
 	private CredentialWallet _realCreds = null;
 
-	public AxisCredentialWallet()
-	{
+	public AxisCredentialWallet() {
 		_realCreds = new CredentialWallet();
 	}
 
 	/**
-	 * constructor for creating a SAML credentials list manually: useful for the grid client.
+	 * constructor for creating a SAML credentials list manually: useful for the
+	 * grid client.
 	 */
-	public AxisCredentialWallet(CredentialWallet realCreds)
-	{
+	public AxisCredentialWallet(CredentialWallet realCreds) {
 		_realCreds = realCreds;
 	}
 
 	/**
-	 * constructor for re-creating SAML credentials from a received SOAP message: useful for the
-	 * container.
+	 * constructor for re-creating SAML credentials from a received SOAP
+	 * message: useful for the container.
 	 */
-	public AxisCredentialWallet(MessageElement encodedCredentials)
-	{
+	public AxisCredentialWallet(MessageElement encodedCredentials) {
 		this(new CredentialWallet());
 		constructFromSOAPHeaderElement(encodedCredentials);
 	}
@@ -57,42 +54,47 @@ public class AxisCredentialWallet
 	/**
 	 * use with care to access the underlying saml credentials object.
 	 */
-	public CredentialWallet getRealCreds()
-	{
+	public CredentialWallet getRealCreds() {
 		return _realCreds;
 	}
 
-	public SOAPHeaderElement convertToSOAPElement()
-	{
-		SOAPHeaderElement encodedCredentials = new SOAPHeaderElement(GenesisIIConstants.DELEGATED_SAML_ASSERTIONS_QNAME);
-		SOAPHeaderElement unicoreToAxisConverter = new SOAPHeaderElement(GenesisIIConstants.DELEGATED_SAML_ASSERTIONS_QNAME);
+	public SOAPHeaderElement convertToSOAPElement() {
+		SOAPHeaderElement encodedCredentials = new SOAPHeaderElement(
+				GenesisIIConstants.DELEGATED_SAML_ASSERTIONS_QNAME);
+		SOAPHeaderElement unicoreToAxisConverter = new SOAPHeaderElement(
+				GenesisIIConstants.DELEGATED_SAML_ASSERTIONS_QNAME);
 		encodedCredentials.setActor(null);
 		encodedCredentials.setMustUnderstand(false);
 		int addedAny = 0;
-		for (TrustCredential trustDelegation : _realCreds.getAssertionChains().values()) {
+		for (TrustCredential trustDelegation : _realCreds.getAssertionChains()
+				.values()) {
 			List<AssertionDocument> assertionChain = new ArrayList<AssertionDocument>();
 			trustDelegation.getXMLChain(assertionChain);
 			for (AssertionDocument assertion : assertionChain) {
 				addedAny++;
-				encodedCredentials.appendChild(convertToAxis(unicoreToAxisConverter, assertion));
+				encodedCredentials.appendChild(convertToAxis(
+						unicoreToAxisConverter, assertion));
 			}
 		}
 		if (_logger.isTraceEnabled())
-			_logger.trace("encoded " + addedAny + " credentials for soap header.");
+			_logger.trace("encoded " + addedAny
+					+ " credentials for soap header.");
 		return encodedCredentials;
 	}
 
 	/*
-	 * The XML node representation of a trust delegation produced by UNICORE security library is not
-	 * compatible with our Axis library. Therefore, a conversion is needed before we can use them in
-	 * a SOAP message. This method does this conversion.
+	 * The XML node representation of a trust delegation produced by UNICORE
+	 * security library is not compatible with our Axis library. Therefore, a
+	 * conversion is needed before we can use them in a SOAP message. This
+	 * method does this conversion.
 	 */
-	public static NodeImpl convertToAxis(MessageElement placeHolder, AssertionDocument assertion)
-	{
+	public static NodeImpl convertToAxis(MessageElement placeHolder,
+			AssertionDocument assertion) {
 		try {
 			Node nodeToConvert = assertion.newDomNode();
 			Document doc = placeHolder.getOwnerDocument();
-			NodeImpl converted = (NodeImpl) doc.importNode(nodeToConvert.getLastChild(), true);
+			NodeImpl converted = (NodeImpl) doc.importNode(
+					nodeToConvert.getLastChild(), true);
 			return converted;
 		} catch (Exception e) {
 			_logger.error("failed to create axis style Node", e);
@@ -100,16 +102,18 @@ public class AxisCredentialWallet
 		}
 	}
 
-	private void constructFromSOAPHeaderElement(MessageElement encodedCredentials)
-	{
+	private void constructFromSOAPHeaderElement(
+			MessageElement encodedCredentials) {
 		// throw error if the SOAP header is not an XML encoded SAML element
-		if (!encodedCredentials.getQName().equals(GenesisIIConstants.DELEGATED_SAML_ASSERTIONS_QNAME)) {
+		if (!encodedCredentials.getQName().equals(
+				GenesisIIConstants.DELEGATED_SAML_ASSERTIONS_QNAME)) {
 			String msg = "failure; attempt to parse an invalid SAML credentials header.";
 			_logger.error(msg);
 			throw new SecurityException(msg);
 		}
 
-		// retrieve all delegated trust delegations from the SOAPHeader and store them in a map
+		// retrieve all delegated trust delegations from the SOAPHeader and
+		// store them in a map
 		Map<String, TrustCredential> detachedDelegations = new HashMap<String, TrustCredential>();
 		NodeList trustDelegationList = encodedCredentials.getChildNodes();
 		int delegationCount = trustDelegationList.getLength();

@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 
-public interface VExportFile extends VExportEntry
-{
+public interface VExportFile extends VExportEntry {
 	public void read(long offset, ByteBuffer target) throws IOException;
 
 	public void write(long offset, ByteBuffer source) throws IOException;

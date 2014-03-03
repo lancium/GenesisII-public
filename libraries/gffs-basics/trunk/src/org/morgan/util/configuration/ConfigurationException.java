@@ -18,22 +18,18 @@ package org.morgan.util.configuration;
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class ConfigurationException extends RuntimeException
-{
+public class ConfigurationException extends RuntimeException {
 	static final long serialVersionUID = 0;
 
-	public ConfigurationException(String msg)
-	{
+	public ConfigurationException(String msg) {
 		super(msg);
 	}
 
-	public ConfigurationException(Throwable cause)
-	{
+	public ConfigurationException(Throwable cause) {
 		super(cause);
 	}
 
-	public ConfigurationException(String msg, Throwable cause)
-	{
+	public ConfigurationException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 }

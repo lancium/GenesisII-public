@@ -22,8 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class MatchingParameter
-{
+public class MatchingParameter {
 	@XmlAttribute(name = "name")
 	private String _name;
 
@@ -31,25 +30,21 @@ public class MatchingParameter
 	private String _value;
 
 	@SuppressWarnings("unused")
-	private MatchingParameter()
-	{
+	private MatchingParameter() {
 		_name = null;
 		_value = null;
 	}
 
-	public MatchingParameter(String name, String value)
-	{
+	public MatchingParameter(String name, String value) {
 		_name = name;
 		_value = value;
 	}
 
-	final public String name()
-	{
+	final public String name() {
 		return _name;
 	}
 
-	final public String value()
-	{
+	final public String value() {
 		return _value;
 	}
 }

@@ -6,7 +6,6 @@ import edu.virginia.vcgr.genii.client.nativeq.CommonScriptBasedQueueConfiguratio
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 
 @XmlRootElement(namespace = NativeQueueConfiguration.NS, name = "pbs-configuration")
-public class PBSQueueConfiguration extends CommonScriptBasedQueueConfiguration
-{
+public class PBSQueueConfiguration extends CommonScriptBasedQueueConfiguration {
 	static final long serialVersionUID = 0L;
 }

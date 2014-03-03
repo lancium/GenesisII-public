@@ -2,8 +2,8 @@ package edu.virginia.vcgr.fsii.path;
 
 import java.util.Stack;
 
-public abstract class AbstractFilesystemPathRepresentation implements FilesystemPathRepresentation
-{
+public abstract class AbstractFilesystemPathRepresentation implements
+		FilesystemPathRepresentation {
 	/**
 	 * Retrieve the string representation of the root of this file system.
 	 * 
@@ -12,7 +12,8 @@ public abstract class AbstractFilesystemPathRepresentation implements Filesystem
 	abstract protected String getRootString();
 
 	/**
-	 * Converts the rooted string path array into a string representation of the path.
+	 * Converts the rooted string path array into a string representation of the
+	 * path.
 	 * 
 	 * @param path
 	 *            The rooted path array to convert into a string representation.
@@ -22,10 +23,11 @@ public abstract class AbstractFilesystemPathRepresentation implements Filesystem
 	abstract protected String toStringImpl(String[] path);
 
 	/**
-	 * Given a path string, split that string into its constituant parts. This is NOT the same as
-	 * converting it into a rooted path array for two reasons. One, the path doesn't have to be
-	 * rooted. And two, the array can contain empty strings (often the case when using the
-	 * String.split function) as well as . and .. elements.
+	 * Given a path string, split that string into its constituant parts. This
+	 * is NOT the same as converting it into a rooted path array for two
+	 * reasons. One, the path doesn't have to be rooted. And two, the array can
+	 * contain empty strings (often the case when using the String.split
+	 * function) as well as . and .. elements.
 	 * 
 	 * @param path
 	 *            The path to split into a string array.
@@ -34,7 +36,8 @@ public abstract class AbstractFilesystemPathRepresentation implements Filesystem
 	abstract protected String[] splitPath(String path);
 
 	/**
-	 * Indicates whether the given String represents a rooted (or absolute) path.
+	 * Indicates whether the given String represents a rooted (or absolute)
+	 * path.
 	 * 
 	 * @param path
 	 *            The path to test for rooted'ness.
@@ -44,17 +47,18 @@ public abstract class AbstractFilesystemPathRepresentation implements Filesystem
 	abstract protected boolean isRooted(String path);
 
 	/**
-	 * Parses a given path (relative to another rooted path) into a string array.
+	 * Parses a given path (relative to another rooted path) into a string
+	 * array.
 	 * 
 	 * @param currentPath
 	 *            The current rooted path to parse the new path relative to.
 	 * @param newPath
-	 *            The new path string to parse. This can be absolute or relative.
+	 *            The new path string to parse. This can be absolute or
+	 *            relative.
 	 * 
 	 * @return The newly parsed path array. This is guaranteed to be non-null.
 	 */
-	protected String[] parseImpl(String[] currentPath, String newPath)
-	{
+	protected String[] parseImpl(String[] currentPath, String newPath) {
 		Stack<String> ret = new Stack<String>();
 
 		if (!isRooted(newPath)) {
@@ -85,8 +89,7 @@ public abstract class AbstractFilesystemPathRepresentation implements Filesystem
 
 	@Override
 	/** {@inheritDoc} */
-	final public String[] parse(String[] currentPath, String newPath)
-	{
+	final public String[] parse(String[] currentPath, String newPath) {
 		if (currentPath == null)
 			currentPath = new String[0];
 
@@ -102,8 +105,7 @@ public abstract class AbstractFilesystemPathRepresentation implements Filesystem
 
 	@Override
 	/** {@inheritDoc} */
-	final public String toString(String[] path)
-	{
+	final public String toString(String[] path) {
 		if (path == null)
 			path = new String[0];
 

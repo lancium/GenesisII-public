@@ -44,8 +44,8 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
-public class RExportDBResource extends BasicDBResource implements IRExportResource
-{
+public class RExportDBResource extends BasicDBResource implements
+		IRExportResource {
 	static private Log _logger = LogFactory.getLog(RExportDBResource.class);
 
 	private String _myLocalPath = null;
@@ -61,7 +61,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	static private final String _UPDATE_PATH = "UPDATE rexport SET path = ? WHERE dirid = ?";
 
 	static private final String _RETRIEVE_REXPORT_ENTRIES_STMT = "SELECT dirid, name, endpoint, entryid, type "
-		+ "FROM rexportentry WHERE dirid = ?";
+			+ "FROM rexportentry WHERE dirid = ?";
 
 	static private final String _DELETE_REXPORT_ENTRY_ATTRS_STMT = "DELETE FROM rexportentryattr WHERE entryid = ?";
 
@@ -73,7 +73,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 	// delete all entry attr entries that match dirid
 	static private final String _DELETE_EXPORT_ENTRY_ATTR = "DELETE FROM rexportentryattr WHERE entryid in "
-		+ "(SELECT entryid FROM rexportentry WHERE dirid = ?)";
+			+ "(SELECT entryid FROM rexportentry WHERE dirid = ?)";
 
 	// delete all rexport entry entries that match dirid
 	static private final String _DELETE_EXPORT_ENTRIES_STMT = "DELETE FROM rexportentry WHERE dirid = ?";
@@ -90,38 +90,42 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	// then get all entryids of these
 	// delete all attr entries that match these entryids
 	static private final String _DESTROY_ALL_ATTRS_FOR_PARENT_STMT = "DELETE FROM rexportentryattr "
-		+ "WHERE entryid in (SELECT entryid FROM rexport WHERE dirid in "
-		+ "(SELECT dirid FROM rexport WHERE parentIds LIKE ?))";
+			+ "WHERE entryid in (SELECT entryid FROM rexport WHERE dirid in "
+			+ "(SELECT dirid FROM rexport WHERE parentIds LIKE ?))";
 
 	/* clear rexportentry entries */
 	// get all dirids that match parentId
 	// destroy all rexport entries that match these dirids
-	static private final String _DESTROY_ALL_ENTRIES_FOR_PARENT_STMT = "DELETE FROM rexportentry " + "WHERE dirid in "
-		+ "(SELECT dirid FROM rexport WHERE parentIds LIKE ?)";
+	static private final String _DESTROY_ALL_ENTRIES_FOR_PARENT_STMT = "DELETE FROM rexportentry "
+			+ "WHERE dirid in "
+			+ "(SELECT dirid FROM rexport WHERE parentIds LIKE ?)";
 
 	/* clear rexport given parentIds */
 	static private final String _DESTROY_ALL_DIRS_FOR_PARENT_STMT = "DELETE FROM rexport WHERE parentIds LIKE ?";
 
-	public RExportDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
-	{
+	public RExportDBResource(ResourceKey parentKey,
+			ServerDatabaseConnectionPool connectionPool) throws SQLException {
 		super(parentKey, connectionPool);
 	}
 
-	public void initialize(GenesisHashMap constructionParams) throws ResourceException
-	{
-		_myParentIds = (String) constructionParams.get(IRExportResource.PARENT_IDS_CONSTRUCTION_PARAM);
-		_myLocalPath = (String) constructionParams.get(IRExportResource.LOCALPATH_CONSTRUCTION_PARAM);
+	public void initialize(GenesisHashMap constructionParams)
+			throws ResourceException {
+		_myParentIds = (String) constructionParams
+				.get(IRExportResource.PARENT_IDS_CONSTRUCTION_PARAM);
+		_myLocalPath = (String) constructionParams
+				.get(IRExportResource.LOCALPATH_CONSTRUCTION_PARAM);
 
 		super.initialize(constructionParams);
 
-		Boolean isService = (Boolean) constructionParams.get(IResource.IS_SERVICE_CONSTRUCTION_PARAM);
+		Boolean isService = (Boolean) constructionParams
+				.get(IResource.IS_SERVICE_CONSTRUCTION_PARAM);
 		// ?when does this occur?
 		if (isService == null || !isService.booleanValue())
 			insertDirInfo();
 	}
 
-	public void load(String resourceKey) throws ResourceUnknownFaultType, ResourceException
-	{
+	public void load(String resourceKey) throws ResourceUnknownFaultType,
+			ResourceException {
 		super.load(resourceKey);
 
 		if (isServiceResource())
@@ -129,16 +133,16 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 		loadDirInfo();
 		/*
-		 * do we care if dir does not exist? this should be handled by other means if (!dirExists())
-		 * { _logger.error("Local file does not exist for RExportDir resource.");
+		 * do we care if dir does not exist? this should be handled by other
+		 * means if (!dirExists()) {
+		 * _logger.error("Local file does not exist for RExportDir resource.");
 		 * 
 		 * destroy(_connection, false); throw FaultManipulator.fillInFault(new
 		 * ResourceUnknownFaultType()); }
 		 */
 	}
 
-	protected void loadDirInfo() throws ResourceException
-	{
+	protected void loadDirInfo() throws ResourceException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
@@ -162,16 +166,15 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		}
 	}
 
-	public void setLocalPath(String localPath) throws ResourceException
-	{
+	public void setLocalPath(String localPath) throws ResourceException {
 		_myLocalPath = localPath;
 		updatePathInfo();
 	}
 
-	protected void insertDirInfo() throws ResourceException
-	{
+	protected void insertDirInfo() throws ResourceException {
 		/*
-		 * if (_myLocalPath == null) //|| _myParentIds == null) throw new ResourceException(
+		 * if (_myLocalPath == null) //|| _myParentIds == null) throw new
+		 * ResourceException(
 		 * "Cannot add RExport without valid parent IDs or path.");
 		 */
 
@@ -182,7 +185,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		if (_myParentIds == null)
 			_myParentIds = (String) "";
 
-		_logger.info("RExport table populated with replica for: " + _myLocalPath);
+		_logger.info("RExport table populated with replica for: "
+				+ _myLocalPath);
 
 		PreparedStatement stmt = null;
 
@@ -192,16 +196,17 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			stmt.setString(2, _myLocalPath);
 			stmt.setString(3, _myParentIds);
 			if (stmt.executeUpdate() != 1)
-				throw new ResourceException("Unable to insert RExport resource information.");
+				throw new ResourceException(
+						"Unable to insert RExport resource information.");
 		} catch (SQLException sqe) {
-			throw new ResourceException("Could not add rexport resource entry", sqe);
+			throw new ResourceException("Could not add rexport resource entry",
+					sqe);
 		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
 
-	protected void updatePathInfo() throws ResourceException
-	{
+	protected void updatePathInfo() throws ResourceException {
 		_logger.info("Updating Dir path in rexport table with: " + _myLocalPath);
 		PreparedStatement stmt = null;
 
@@ -211,38 +216,45 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			stmt.setString(2, _resourceKey);
 			stmt.executeUpdate();
 		} catch (SQLException sqe) {
-			throw new ResourceException("Could not update path for rexport resource entry", sqe);
+			throw new ResourceException(
+					"Could not update path for rexport resource entry", sqe);
 		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
 
-	protected RExportEntry createEntryForRealFile(String nextRealName, EndpointReferenceType serviceEPR, String entryType,
-		String localPath, String parentIds) throws ResourceException, RemoteException
-	{
+	protected RExportEntry createEntryForRealFile(String nextRealName,
+			EndpointReferenceType serviceEPR, String entryType,
+			String localPath, String parentIds) throws ResourceException,
+			RemoteException {
 		_logger.info("Creating new rexport entries");
 
-		MessageElement[] creationProperties = RExportUtils.createCreationProperties(localPath, parentIds, null);
+		MessageElement[] creationProperties = RExportUtils
+				.createCreationProperties(localPath, parentIds, null);
 
 		/* create new RExport resource */
-		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR);
-		VcgrCreateResponse resp = common.vcgrCreate(new VcgrCreate(creationProperties));
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
+				serviceEPR);
+		VcgrCreateResponse resp = common.vcgrCreate(new VcgrCreate(
+				creationProperties));
 
 		EndpointReferenceType entryReference = resp.getEndpoint();
 
 		// update entryref to include resolver epr
 		try {
-			entryReference =
-				RExportResolverUtils.setupRExport(entryReference, entryType, creationProperties[0].getValue(), null,
+			entryReference = RExportResolverUtils.setupRExport(entryReference,
+					entryType, creationProperties[0].getValue(), null,
 					nextRealName);
 		} catch (Exception e) {
-			_logger.error("Unable to create rexport resolver: " + e.getLocalizedMessage());
+			_logger.error("Unable to create rexport resolver: "
+					+ e.getLocalizedMessage());
 			throw new ResourceException("Unable to create rexport resolver.", e);
 		}
 
 		// create entry for new export resource in export DB
 		String newId = (new GUID()).toString();
-		RExportEntry newEntry = new RExportEntry(getId(), nextRealName, entryReference, newId, entryType, null);
+		RExportEntry newEntry = new RExportEntry(getId(), nextRealName,
+				entryReference, newId, entryType, null);
 		addEntry(newEntry, false);
 
 		return newEntry;
@@ -251,32 +263,34 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	/*
 	 * Initiate appropriate additions into db to store information about entry
 	 * 
-	 * in: entry - entry to be added into DB in: createOnDisk - if true, entry is to be created for
-	 * real as well
+	 * in: entry - entry to be added into DB in: createOnDisk - if true, entry
+	 * is to be created for real as well
 	 */
-	public void addEntry(RExportEntry entry, boolean createOnDisk) throws ResourceException, RNSEntryExistsFaultType
-	{
+	public void addEntry(RExportEntry entry, boolean createOnDisk)
+			throws ResourceException, RNSEntryExistsFaultType {
 		/* if createFile is true, create underlying file */
 		if (createOnDisk)
 			createOnDisk(entry.getName(), entry.getType());
 
-		addEntry(entry.getName(), entry.getEntryReference(), entry.getId(), entry.getType());
+		addEntry(entry.getName(), entry.getEntryReference(), entry.getId(),
+				entry.getType());
 		addAttributes(entry.getName(), entry.getAttributes(), entry.getId());
 	}
 
 	/*
 	 * Add entry info into db
 	 */
-	protected void addEntry(String entryName, EndpointReferenceType entryReference, String entryID, String entryType)
-		throws ResourceException, RNSEntryExistsFaultType
-	{
+	protected void addEntry(String entryName,
+			EndpointReferenceType entryReference, String entryID,
+			String entryType) throws ResourceException, RNSEntryExistsFaultType {
 		PreparedStatement stmt = null;
 
 		try {
 			stmt = _connection.prepareStatement(_ADD_ENTRY_STMT);
 			stmt.setString(1, getId());
 			stmt.setString(2, entryName);
-			stmt.setBlob(3, EPRUtils.toBlob(entryReference, "rexportentry", "endpoint"));
+			stmt.setBlob(3,
+					EPRUtils.toBlob(entryReference, "rexportentry", "endpoint"));
 			stmt.setString(4, entryID);
 			stmt.setString(5, entryType);
 			if (stmt.executeUpdate() != 1)
@@ -288,7 +302,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 				fault.setEntryName(entryName);
 				throw FaultManipulator.fillInFault(fault);
 			} else
-				throw new ResourceException("Could not add new rexport entry to table.", sqe);
+				throw new ResourceException(
+						"Could not add new rexport entry to table.", sqe);
 		} finally {
 			StreamUtils.close(stmt);
 		}
@@ -297,8 +312,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	/*
 	 * Add entry attr info into db
 	 */
-	protected void addAttributes(String entryName, MessageElement[] attrs, String entryID) throws ResourceException
-	{
+	protected void addAttributes(String entryName, MessageElement[] attrs,
+			String entryID) throws ResourceException {
 		PreparedStatement stmt = null;
 
 		try {
@@ -314,50 +329,61 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 					}
 				}
 				if (failed) {
-					throw new ResourceException("Unable to update attributes for RNS resource.");
+					throw new ResourceException(
+							"Unable to update attributes for RNS resource.");
 				}
 			}
 		} catch (SQLException sqe) {
-			throw new ResourceException("Problem with storing attrs in rexport table", sqe);
+			throw new ResourceException(
+					"Problem with storing attrs in rexport table", sqe);
 		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
 
-	protected void createOnDisk(String entryName, String entryType) throws ResourceException
-	{
-		String fullPath = RExportUtils.createFullPath(getLocalPath(), entryName);
+	protected void createOnDisk(String entryName, String entryType)
+			throws ResourceException {
+		String fullPath = RExportUtils
+				.createFullPath(getLocalPath(), entryName);
 
 		if (_logger.isDebugEnabled())
-			_logger.debug("Export Dir asked to create \"[" + entryType + "] " + fullPath + "\" on disk");
+			_logger.debug("Export Dir asked to create \"[" + entryType + "] "
+					+ fullPath + "\" on disk");
 
 		try {
 			// create real file if file
 			if (entryType.equals(RExportEntry._FILE_TYPE)) {
 				if (!RExportUtils.createLocalFile(fullPath))
-					throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType());
+					throw FaultManipulator
+							.fillInFault(new RNSEntryExistsFaultType());
 			}
 			// create real dir if dir
 			else if (entryType.equals(RExportEntry._DIR_TYPE)) {
 				if (!RExportUtils.createLocalDir(fullPath))
-					throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType());
+					throw FaultManipulator
+							.fillInFault(new RNSEntryExistsFaultType());
 			} else {
-				throw new ResourceException("Improper type for exported dir entry.");
+				throw new ResourceException(
+						"Improper type for exported dir entry.");
 			}
 		} catch (IOException ioe) {
-			_logger.error("Unable to create file/directory at path " + fullPath, ioe);
-			throw new ResourceException("Unable to create file/directory at path " + fullPath, ioe);
+			_logger.error(
+					"Unable to create file/directory at path " + fullPath, ioe);
+			throw new ResourceException(
+					"Unable to create file/directory at path " + fullPath, ioe);
 		}
 	}
 
-	protected void removeEntry(RExportEntry entry, boolean hardDestroy) throws ResourceException, ResourceUnknownFaultType
-	{
+	protected void removeEntry(RExportEntry entry, boolean hardDestroy)
+			throws ResourceException, ResourceUnknownFaultType {
 		try {
 			// get EPR of entry to be removed
-			ResourceKey rKey = ResourceManager.getTargetResource(entry.getEntryReference());
+			ResourceKey rKey = ResourceManager.getTargetResource(entry
+					.getEntryReference());
 
 			// get this resource
-			IRExportEntryResource resource = (IRExportEntryResource) rKey.dereference();
+			IRExportEntryResource resource = (IRExportEntryResource) rKey
+					.dereference();
 
 			resource.destroy(_connection, hardDestroy);
 		} catch (ResourceException ruft) {
@@ -370,7 +396,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 		try {
 			// delete attributes associated with entry
-			stmt = _connection.prepareStatement(_DELETE_REXPORT_ENTRY_ATTRS_STMT);
+			stmt = _connection
+					.prepareStatement(_DELETE_REXPORT_ENTRY_ATTRS_STMT);
 			stmt.setString(1, entry.getId());
 			stmt.executeUpdate();
 
@@ -385,29 +412,32 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			stmt.close();
 			stmt = null;
 		} catch (SQLException sqe) {
-			throw new ResourceException("Could not remove entry from rexport table", sqe);
+			throw new ResourceException(
+					"Could not remove entry from rexport table", sqe);
 		} finally {
 			StreamUtils.close(stmt);
 		}
 	}
 
 	/*
-	 * call destroy on this resource if hardDestroy, destroy primary's local resources as well
+	 * call destroy on this resource if hardDestroy, destroy primary's local
+	 * resources as well
 	 */
-	public void destroy(boolean hardDestroy) throws ResourceException, ResourceUnknownFaultType
-	{
+	public void destroy(boolean hardDestroy) throws ResourceException,
+			ResourceUnknownFaultType {
 		destroy(_connection, hardDestroy);
 	}
 
 	/*
-	 * destroy all entries under directory destroy info related to directory if hardDestroy, destroy
-	 * localFiles
+	 * destroy all entries under directory destroy info related to directory if
+	 * hardDestroy, destroy localFiles
 	 */
-	public void destroy(Connection connection, boolean hardDestroy) throws ResourceException, ResourceUnknownFaultType
-	{
+	public void destroy(Connection connection, boolean hardDestroy)
+			throws ResourceException, ResourceUnknownFaultType {
 		dirDestroyAllForParentDir(connection, getId(), false);
 		// not needed as files and dirs saved together in one table
-		// ExportedFileDBResource.fileDestroyAllForParentDir(_connection, getId(), false);
+		// ExportedFileDBResource.fileDestroyAllForParentDir(_connection,
+		// getId(), false);
 
 		/* Delete information related directly to parent exported dir */
 		PreparedStatement stmt = null;
@@ -433,8 +463,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			super.destroy();
 
 			/*
-			 * Delete underlying file system resources if necessary In the semantics where replica
-			 * is read only, hardDestroy is always false
+			 * Delete underlying file system resources if necessary In the
+			 * semantics where replica is read only, hardDestroy is always false
 			 */
 			if (hardDestroy)
 				destroyDirectory(getLocalPath());
@@ -445,16 +475,17 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		}
 	}
 
-	static void dirDestroyAllForParentDir(Connection connection, String parentId, boolean hardDestroy) throws ResourceException
-	{
-		String parentIdSearch =
-			"%" + RExportUtils._PARENT_ID_BEGIN_DELIMITER + parentId + RExportUtils._PARENT_ID_END_DELIMITER + "%";
+	static void dirDestroyAllForParentDir(Connection connection,
+			String parentId, boolean hardDestroy) throws ResourceException {
+		String parentIdSearch = "%" + RExportUtils._PARENT_ID_BEGIN_DELIMITER
+				+ parentId + RExportUtils._PARENT_ID_END_DELIMITER + "%";
 
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement(_RETRIEVE_ALL_DIR_IDS_FOR_PARENT_STMT);
+			stmt = connection
+					.prepareStatement(_RETRIEVE_ALL_DIR_IDS_FOR_PARENT_STMT);
 			stmt.setString(1, parentIdSearch);
 			rs = stmt.executeQuery();
 			Collection<String> dirids = new ArrayList<String>();
@@ -466,19 +497,22 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			stmt.close();
 			stmt = null;
 
-			stmt = connection.prepareStatement(_DESTROY_ALL_ATTRS_FOR_PARENT_STMT);
+			stmt = connection
+					.prepareStatement(_DESTROY_ALL_ATTRS_FOR_PARENT_STMT);
 			stmt.setString(1, parentIdSearch);
 			stmt.executeUpdate();
 			stmt.close();
 			stmt = null;
 
-			stmt = connection.prepareStatement(_DESTROY_ALL_ENTRIES_FOR_PARENT_STMT);
+			stmt = connection
+					.prepareStatement(_DESTROY_ALL_ENTRIES_FOR_PARENT_STMT);
 			stmt.setString(1, parentIdSearch);
 			stmt.executeUpdate();
 			stmt.close();
 			stmt = null;
 
-			stmt = connection.prepareStatement(_DESTROY_ALL_DIRS_FOR_PARENT_STMT);
+			stmt = connection
+					.prepareStatement(_DESTROY_ALL_DIRS_FOR_PARENT_STMT);
 			stmt.setString(1, parentIdSearch);
 			stmt.executeUpdate();
 			stmt.close();
@@ -486,20 +520,19 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 			BasicDBResource.destroyAll(connection, dirids);
 		} catch (SQLException sqe) {
-			throw new ResourceException("Could not destroy related entries.", sqe);
+			throw new ResourceException("Could not destroy related entries.",
+					sqe);
 		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}
 
-	protected void destroyDirectory(String path)
-	{
+	protected void destroyDirectory(String path) {
 		destroyDirectory(new File(path));
 	}
 
-	protected void destroyDirectory(File rootDir)
-	{
+	protected void destroyDirectory(File rootDir) {
 		if (!rootDir.exists() || !rootDir.isDirectory())
 			return;
 
@@ -514,19 +547,22 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		rootDir.delete();
 	}
 
-	protected Collection<File> listLocalEntrieAsFiles() throws ResourceException
-	{
+	protected Collection<File> listLocalEntrieAsFiles()
+			throws ResourceException {
 		// make sure localdir exists
 		String dirPath = getLocalPath();
 		if (dirPath == null)
-			throw new ResourceException("RExportDir has no local path.  Cannot sync entries.");
+			throw new ResourceException(
+					"RExportDir has no local path.  Cannot sync entries.");
 
 		// makes sure localdir is an existing dir
 		File dir = new File(dirPath);
 		if (!dir.exists())
-			throw new ResourceException("Local path for RExportDir does not exist.");
+			throw new ResourceException(
+					"Local path for RExportDir does not exist.");
 		if (!dir.isDirectory())
-			throw new ResourceException("" + "Local path for RExportDir is not a directory.");
+			throw new ResourceException(""
+					+ "Local path for RExportDir is not a directory.");
 
 		// get dir listing
 		File[] localEntries = dir.listFiles();
@@ -540,8 +576,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		return fileList;
 	}
 
-	public Collection<RExportEntry> retrieveEntries(String entryName) throws ResourceException
-	{
+	public Collection<RExportEntry> retrieveEntries(String entryName)
+			throws ResourceException {
 		// assume synced already
 		// retrieve what entries exist currently in db
 		Collection<RExportEntry> allKnownEntries = retrieveKnownEntries();
@@ -560,8 +596,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		return ret;
 	}
 
-	protected Collection<RExportEntry> retrieveKnownEntries() throws ResourceException
-	{
+	protected Collection<RExportEntry> retrieveKnownEntries()
+			throws ResourceException {
 		try {
 			Collection<RExportEntry> ret = retrieveBareEntries(getId());
 
@@ -570,15 +606,16 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 			return ret;
 		} catch (SQLException sqe) {
-			throw new ResourceException("Could not retrieve rexport resource entries", sqe);
+			throw new ResourceException(
+					"Could not retrieve rexport resource entries", sqe);
 		}
 	}
 
 	/*
 	 * retrieve entries currently in db
 	 */
-	protected Collection<RExportEntry> retrieveBareEntries(String id) throws SQLException, ResourceException
-	{
+	protected Collection<RExportEntry> retrieveBareEntries(String id)
+			throws SQLException, ResourceException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		ArrayList<RExportEntry> ret = new ArrayList<RExportEntry>();
@@ -589,9 +626,9 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				RExportEntry entry =
-					new RExportEntry(rs.getString(1), rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4),
-						rs.getString(5), null);
+				RExportEntry entry = new RExportEntry(rs.getString(1),
+						rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)),
+						rs.getString(4), rs.getString(5), null);
 				ret.add(entry);
 			}
 
@@ -602,30 +639,27 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		}
 	}
 
-	public String getId() throws ResourceException
-	{
+	public String getId() throws ResourceException {
 		return _resourceKey;
 	}
 
-	public String getLocalPath() throws ResourceException
-	{
+	public String getLocalPath() throws ResourceException {
 		return _myLocalPath;
 	}
 
-	public String getParentIds() throws ResourceException
-	{
+	public String getParentIds() throws ResourceException {
 		return _myParentIds;
 	}
 
 	/*
 	 * Extract resolver from given EPR
 	 */
-	static public EndpointReferenceType getResolver(EndpointReferenceType myEPR)
-	{
+	static public EndpointReferenceType getResolver(EndpointReferenceType myEPR) {
 
 		EndpointReferenceType resolverEPR = null;
 		WSName exportResolverWSName = new WSName(myEPR);
-		List<ResolverDescription> resolvers = exportResolverWSName.getResolvers();
+		List<ResolverDescription> resolvers = exportResolverWSName
+				.getResolvers();
 		if (resolvers.size() > 1) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("More than one resolver exists; using last");
@@ -638,8 +672,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		return resolverEPR;
 	}
 
-	private void fillInAttributes(RExportEntry entry) throws ResourceException
-	{
+	private void fillInAttributes(RExportEntry entry) throws ResourceException {
 		File entryFile = new File(getLocalPath(), entry.getName());
 		if (!entryFile.exists())
 			return;
@@ -653,22 +686,33 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 				attrs.add(attr);
 		}
 
-		QName transMechName = new QName(RandomByteIOAttributeHandlers.RANDOM_BYTEIO_NS, "TransferMechanism");
-		attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME), entryFile
-			.length()));
-		attrs.add(new MessageElement(transMechName, ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
-		attrs.add(new MessageElement(transMechName, ByteIOConstants.TRANSFER_TYPE_DIME_URI));
-		attrs.add(new MessageElement(transMechName, ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+		QName transMechName = new QName(
+				RandomByteIOAttributeHandlers.RANDOM_BYTEIO_NS,
+				"TransferMechanism");
+		attrs.add(new MessageElement(new QName(
+				ByteIOConstants.RANDOM_BYTEIO_NS,
+				ByteIOConstants.SIZE_ATTR_NAME), entryFile.length()));
+		attrs.add(new MessageElement(transMechName,
+				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
+		attrs.add(new MessageElement(transMechName,
+				ByteIOConstants.TRANSFER_TYPE_DIME_URI));
+		attrs.add(new MessageElement(transMechName,
+				ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
 
 		try {
-			IRByteIOResource resource =
-				(IRByteIOResource) (ResourceManager.getTargetResource(entry.getEntryReference()).dereference());
-			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME),
-				resource.getAccessTime()));
-			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME),
-				resource.getModTime()));
-			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME),
-				resource.getCreateTime()));
+			IRByteIOResource resource = (IRByteIOResource) (ResourceManager
+					.getTargetResource(entry.getEntryReference()).dereference());
+			attrs.add(new MessageElement(new QName(
+					ByteIOConstants.RANDOM_BYTEIO_NS,
+					ByteIOConstants.ACCESSTIME_ATTR_NAME), resource
+					.getAccessTime()));
+			attrs.add(new MessageElement(new QName(
+					ByteIOConstants.RANDOM_BYTEIO_NS,
+					ByteIOConstants.MODTIME_ATTR_NAME), resource.getModTime()));
+			attrs.add(new MessageElement(new QName(
+					ByteIOConstants.RANDOM_BYTEIO_NS,
+					ByteIOConstants.CREATTIME_ATTR_NAME), resource
+					.getCreateTime()));
 		} catch (ResourceUnknownFaultType ruft) {
 			// We couldn't find the resource, so we just skip it for now.
 		}

@@ -33,8 +33,7 @@ import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public class NativeQueueConfiguration implements Serializable, NativeQConstants
-{
+public class NativeQueueConfiguration implements Serializable, NativeQConstants {
 	static final long serialVersionUID = 0L;
 
 	@XmlAttribute(name = "provider", required = true)
@@ -53,10 +52,11 @@ public class NativeQueueConfiguration implements Serializable, NativeQConstants
 	private Object _providerConfiguration = null;
 
 	@SuppressWarnings("unused")
-	private void afterUnmarshal(Unmarshaller u, Object parent) throws JAXBException, NativeQueueException, IOException
-	{
+	private void afterUnmarshal(Unmarshaller u, Object parent)
+			throws JAXBException, NativeQueueException, IOException {
 		if (_any.size() > 1)
-			throw new JAXBException("A native queue configuration must have 0 or 1 provider configurations, not more.");
+			throw new JAXBException(
+					"A native queue configuration must have 0 or 1 provider configurations, not more.");
 
 		if (_any.size() == 0)
 			_providerConfiguration = null;
@@ -65,21 +65,24 @@ public class NativeQueueConfiguration implements Serializable, NativeQConstants
 			Class<?> configType = queue.providerConfigurationType();
 			JAXBContext context = JAXBContext.newInstance(configType);
 			u = context.createUnmarshaller();
-			_providerConfiguration = u.unmarshal(_any.iterator().next(), configType).getValue();
+			_providerConfiguration = u.unmarshal(_any.iterator().next(),
+					configType).getValue();
 		}
 
 		_any = null;
 	}
 
 	@SuppressWarnings("unused")
-	private boolean beforeMarshal(Marshaller m) throws JAXBException, ParserConfigurationException
-	{
+	private boolean beforeMarshal(Marshaller m) throws JAXBException,
+			ParserConfigurationException {
 		_any = new LinkedList<Element>();
 
 		if (_providerConfiguration != null) {
-			JAXBContext context = JAXBContext.newInstance(_providerConfiguration.getClass());
+			JAXBContext context = JAXBContext
+					.newInstance(_providerConfiguration.getClass());
 			Marshaller mm = context.createMarshaller();
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilderFactory factory = DocumentBuilderFactory
+					.newInstance();
 			factory.setNamespaceAware(true);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.newDocument();
@@ -90,8 +93,7 @@ public class NativeQueueConfiguration implements Serializable, NativeQConstants
 		return true;
 	}
 
-	private void writeObject(ObjectOutputStream out) throws IOException
-	{
+	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeObject(_providerName);
 		out.writeObject(_sharedDirectory);
 		out.writeObject(_trapSignals);
@@ -99,8 +101,8 @@ public class NativeQueueConfiguration implements Serializable, NativeQConstants
 	}
 
 	@SuppressWarnings("unchecked")
-	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-	{
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
 		_providerName = (String) in.readObject();
 		_sharedDirectory = (String) in.readObject();
 		_trapSignals = (Set<UnixSignals>) in.readObject();
@@ -110,45 +112,40 @@ public class NativeQueueConfiguration implements Serializable, NativeQConstants
 	}
 
 	@SuppressWarnings("unused")
-	private void readObjectNoData() throws ObjectStreamException
-	{
+	private void readObjectNoData() throws ObjectStreamException {
 		throw new StreamCorruptedException();
 	}
 
-	final public NativeQueue nativeQueue() throws NativeQueueException
-	{
+	final public NativeQueue nativeQueue() throws NativeQueueException {
 		return NativeQueues.getNativeQueue(_providerName);
 	}
 
-	final public NativeQueueConnection connect(ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorCon, File workingDirectory) throws NativeQueueException
-	{
+	final public NativeQueueConnection connect(
+			ResourceOverrides resourceOverrides,
+			CmdLineManipulatorConfiguration cmdLineManipulatorCon,
+			File workingDirectory) throws NativeQueueException {
 		NativeQueue queue = nativeQueue();
-		return queue.connect(resourceOverrides, cmdLineManipulatorCon, workingDirectory, this, _providerConfiguration);
+		return queue.connect(resourceOverrides, cmdLineManipulatorCon,
+				workingDirectory, this, _providerConfiguration);
 	}
 
-	final public void providerName(String providerName)
-	{
+	final public void providerName(String providerName) {
 		_providerName = providerName;
 	}
 
-	final public void providerConfiguration(Object conf)
-	{
+	final public void providerConfiguration(Object conf) {
 		_providerConfiguration = conf;
 	}
 
-	final public File sharedDirectory()
-	{
+	final public File sharedDirectory() {
 		return (_sharedDirectory == null) ? null : new File(_sharedDirectory);
 	}
 
-	final public void sharedDirectory(String directory)
-	{
+	final public void sharedDirectory(String directory) {
 		_sharedDirectory = directory;
 	}
 
-	final public Set<UnixSignals> trapSignals()
-	{
+	final public Set<UnixSignals> trapSignals() {
 		return _trapSignals;
 	}
 }

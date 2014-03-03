@@ -19,33 +19,36 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLock;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
-public class InstallationState implements Serializable
-{
+public class InstallationState implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(InstallationState.class);
 
-	private HashMap<String, ContainerInformation> _runningContainers; // Map of deployment name to
+	private HashMap<String, ContainerInformation> _runningContainers; // Map of
+																		// deployment
+																		// name
+																		// to
 																		// port
 
-	private InstallationState()
-	{
+	private InstallationState() {
 		_runningContainers = new HashMap<String, ContainerInformation>();
 	}
 
-	static private FileLock acquireLock(File installFile) throws FileLockException
-	{
+	static private FileLock acquireLock(File installFile)
+			throws FileLockException {
 		try {
-			return new FileLock(installFile, 5, GenesisIIConstants.DEFAULT_FILE_LOCK);
+			return new FileLock(installFile, 5,
+					GenesisIIConstants.DEFAULT_FILE_LOCK);
 		} catch (InterruptedException ie) {
 			Thread.interrupted();
-			_logger.fatal("Unexpected interruption exception while trying to read installation state.", ie);
+			_logger.fatal(
+					"Unexpected interruption exception while trying to read installation state.",
+					ie);
 			throw new FileLockException("Unable to lock file.", ie);
 		}
 	}
 
-	static private InstallationState readState(File installFile)
-	{
+	static private InstallationState readState(File installFile) {
 		FileInputStream fin = null;
 
 		try {
@@ -57,19 +60,23 @@ public class InstallationState implements Serializable
 			return new InstallationState();
 		} catch (ClassNotFoundException fnfe) {
 			// Corrupt state
-			_logger.error("Corrupt state found in installation description -- continuing with empty state.", fnfe);
+			_logger.error(
+					"Corrupt state found in installation description -- continuing with empty state.",
+					fnfe);
 			return new InstallationState();
 		} catch (IOException ioe) {
 			// Corrupt state
-			_logger.error("Corrupt state found in installation description -- continuing with empty state.", ioe);
+			_logger.error(
+					"Corrupt state found in installation description -- continuing with empty state.",
+					ioe);
 			return new InstallationState();
 		} finally {
 			StreamUtils.close(fin);
 		}
 	}
 
-	static private void writeState(File installFile, InstallationState state) throws IOException
-	{
+	static private void writeState(File installFile, InstallationState state)
+			throws IOException {
 		FileOutputStream fout = null;
 
 		try {
@@ -79,15 +86,17 @@ public class InstallationState implements Serializable
 			oos.flush();
 			oos.close();
 		} catch (IOException ioe) {
-			_logger.fatal("Unable to write installation state to permenant storage.", ioe);
+			_logger.fatal(
+					"Unable to write installation state to permenant storage.",
+					ioe);
 			throw ioe;
 		} finally {
 			StreamUtils.close(fout);
 		}
 	}
 
-	static public HashMap<String, ContainerInformation> getRunningContainers() throws FileLockException
-	{
+	static public HashMap<String, ContainerInformation> getRunningContainers()
+			throws FileLockException {
 		File installFile = getInstallationStateFile();
 		FileLock flock = null;
 
@@ -99,23 +108,24 @@ public class InstallationState implements Serializable
 		}
 	}
 
-	static public void addRunningContainer(String deploymentName, URL containerURL) throws IOException, FileLockException
-	{
+	static public void addRunningContainer(String deploymentName,
+			URL containerURL) throws IOException, FileLockException {
 		File installFile = getInstallationStateFile();
 		FileLock flock = null;
 
 		try {
 			flock = acquireLock(installFile);
 			InstallationState state = readState(installFile);
-			state._runningContainers.put(deploymentName, new ContainerInformation(deploymentName, containerURL));
+			state._runningContainers.put(deploymentName,
+					new ContainerInformation(deploymentName, containerURL));
 			writeState(installFile, state);
 		} finally {
 			StreamUtils.close(flock);
 		}
 	}
 
-	static public void removeRunningContainer(String deploymentName) throws IOException, FileLockException
-	{
+	static public void removeRunningContainer(String deploymentName)
+			throws IOException, FileLockException {
 		File installFile = getInstallationStateFile();
 		FileLock flock = null;
 
@@ -129,14 +139,14 @@ public class InstallationState implements Serializable
 		}
 	}
 
-	static private File getInstallationStateFile()
-	{
+	static private File getInstallationStateFile() {
 		/*
-		 * This isn't a perfect solution to bug #65, but until we have something better, it will
-		 * have to do. The problem is that the user's home directory may not be a local partition
-		 * which could cause troubles.
+		 * This isn't a perfect solution to bug #65, but until we have something
+		 * better, it will have to do. The problem is that the user's home
+		 * directory may not be a local partition which could cause troubles.
 		 */
-		File installFile = new File(System.getProperty("user.home"), ".installation-state");
+		File installFile = new File(System.getProperty("user.home"),
+				".installation-state");
 		return installFile;
 	}
 }

@@ -13,8 +13,7 @@ import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
-public class FuseTool extends BaseGridTool
-{
+public class FuseTool extends BaseGridTool {
 	static private Log _logger = LogFactory.getLog(FuseTool.class);
 
 	static final private String _DESCRIPTION = "config/tooldocs/description/dfuse";
@@ -27,45 +26,39 @@ public class FuseTool extends BaseGridTool
 	private boolean _daemon = false;
 	private String _sandbox = null;
 
-	public FuseTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.DATA);
+	public FuseTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "daemon" })
-	public void setDaemon()
-	{
+	public void setDaemon() {
 		_daemon = true;
 	}
 
 	@Option({ "sandbox" })
-	public void setSandbox(String sandbox)
-	{
+	public void setSandbox(String sandbox) {
 		_sandbox = sandbox;
 	}
 
 	@Option({ "mount" })
-	public void setMount()
-	{
+	public void setMount() {
 		_isMount = true;
 	}
 
 	@Option({ "unmount" })
-	public void setUnmount()
-	{
+	public void setUnmount() {
 		_isUnmount = true;
 	}
 
 	@Option({ "uid" })
-	public void setUid(String uid)
-	{
+	public void setUid(String uid) {
 		_uid = Integer.parseInt(uid);
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		if (_uid < 0) {
 			try {
 				String str = ExecutionEngine.simpleExecute("id", "-u");
@@ -78,9 +71,11 @@ public class FuseTool extends BaseGridTool
 
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Local)
-			throw new InvalidToolUsageException("mount-point must be a local path beginning with 'local:' ");
+			throw new InvalidToolUsageException(
+					"mount-point must be a local path beginning with 'local:' ");
 		if (_isMount) {
-			GeniiFuse.mountGenesisII(new File(gPath.path()), new String[] { "-f", "-s" }, null, _sandbox, _uid, _daemon);
+			GeniiFuse.mountGenesisII(new File(gPath.path()), new String[] {
+					"-f", "-s" }, null, _sandbox, _uid, _daemon);
 		} else {
 			GeniiFuse.unmountGenesisII(new File(gPath.path()));
 		}
@@ -89,15 +84,16 @@ public class FuseTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		int count = _isMount ? 1 : 0;
 		count += _isUnmount ? 1 : 0;
 
 		if (count != 1)
-			throw new InvalidToolUsageException("Couldn't determine if user intended to mount, or unmount.");
+			throw new InvalidToolUsageException(
+					"Couldn't determine if user intended to mount, or unmount.");
 
 		if (numArguments() != 1)
-			throw new InvalidToolUsageException("Mount point not correctly specified.");
+			throw new InvalidToolUsageException(
+					"Mount point not correctly specified.");
 	}
 }

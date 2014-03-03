@@ -7,12 +7,11 @@ import java.nio.ByteBuffer;
 import edu.virginia.vcgr.genii.client.lease.LeaseableResource;
 import edu.virginia.vcgr.genii.client.lease.LeaseeAgreement;
 
-public class AppendableBuffer implements Closeable
-{
+public class AppendableBuffer implements Closeable {
 	/**
-	 * Any IO exceptions that may occur during a flush. This is stored so that if the exception
-	 * occurs during an asynchronous operation, it can be thrown later when a synchronous one
-	 * occurs.
+	 * Any IO exceptions that may occur during a flush. This is stored so that
+	 * if the exception occurs during an asynchronous operation, it can be
+	 * thrown later when a synchronous one occurs.
 	 */
 	private IOException _ioe = null;
 
@@ -33,13 +32,13 @@ public class AppendableBuffer implements Closeable
 	private AppendResolver _resolver;
 
 	/**
-	 * Ensure that the given file offset can be written to the buffer. If the current state of the
-	 * buffer does not allow this, then flush what we currently have and reset.
+	 * Ensure that the given file offset can be written to the buffer. If the
+	 * current state of the buffer does not allow this, then flush what we
+	 * currently have and reset.
 	 * 
 	 * @throws IOException
 	 */
-	private void ensure() throws IOException
-	{
+	private void ensure() throws IOException {
 		ByteBuffer buffer;
 
 		if (_lease == null) {
@@ -61,23 +60,21 @@ public class AppendableBuffer implements Closeable
 	 * @param leaser
 	 *            The leaser to use when obtaining new byte array leases.
 	 * @param resolver
-	 *            The resolver to use when a buffer needs to be flushed to the sink.
+	 *            The resolver to use when a buffer needs to be flushed to the
+	 *            sink.
 	 */
-	public AppendableBuffer(ByteIOBufferLeaser leaser, AppendResolver resolver)
-	{
+	public AppendableBuffer(ByteIOBufferLeaser leaser, AppendResolver resolver) {
 		_leaser = leaser;
 		_resolver = resolver;
 	}
 
 	@Override
-	protected void finalize() throws IOException
-	{
+	protected void finalize() throws IOException {
 		close();
 	}
 
 	@Override
-	public void close() throws IOException
-	{
+	public void close() throws IOException {
 		synchronized (_lockObject) {
 			if (_lease != null) {
 				try {
@@ -91,8 +88,7 @@ public class AppendableBuffer implements Closeable
 		}
 	}
 
-	public void append(ByteBuffer source) throws IOException
-	{
+	public void append(ByteBuffer source) throws IOException {
 		synchronized (_lockObject) {
 			if (_ioe != null) {
 				IOException ioe = _ioe;
@@ -117,8 +113,7 @@ public class AppendableBuffer implements Closeable
 	 * 
 	 * @throws IOException
 	 */
-	public void flush() throws IOException
-	{
+	public void flush() throws IOException {
 		synchronized (_lockObject) {
 			if (_ioe != null) {
 				IOException ioe = _ioe;
@@ -141,11 +136,10 @@ public class AppendableBuffer implements Closeable
 	 * 
 	 * @author mmm2a
 	 */
-	private class LeaseeAgreementImpl implements LeaseeAgreement<ByteBuffer>
-	{
+	private class LeaseeAgreementImpl implements LeaseeAgreement<ByteBuffer> {
 		@Override
-		public LeaseableResource<ByteBuffer> relinquish(LeaseableResource<ByteBuffer> lease)
-		{
+		public LeaseableResource<ByteBuffer> relinquish(
+				LeaseableResource<ByteBuffer> lease) {
 			LeaseableResource<ByteBuffer> ret;
 
 			synchronized (_lockObject) {

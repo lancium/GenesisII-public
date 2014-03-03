@@ -49,17 +49,17 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 
 /**
- * The RNSPath class is the main client side interface between developers and the grid directory
- * structure. Nearly all directory related operations (including creating files and destroying
- * instances), should be handled through instances of this class. You will also notice that there
- * are very few public constructors for this class. This is intentional. As a general rule of thumb,
- * you should always get your "current" path instance from the
+ * The RNSPath class is the main client side interface between developers and
+ * the grid directory structure. Nearly all directory related operations
+ * (including creating files and destroying instances), should be handled
+ * through instances of this class. You will also notice that there are very few
+ * public constructors for this class. This is intentional. As a general rule of
+ * thumb, you should always get your "current" path instance from the
  * edu.virginia.vcgr.htc.client.context.ContextManager class.
  * 
  * @author Mark Morgan
  */
-public class RNSPath implements Serializable, Cloneable
-{
+public class RNSPath implements Serializable, Cloneable {
 	static final long serialVersionUID = -5879165350773440573L;
 
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
@@ -69,27 +69,29 @@ public class RNSPath implements Serializable, Cloneable
 	private EndpointReferenceType _cachedEPR;
 	private boolean _attemptedResolve;
 
-	static public interface RNSPathApplyFunction
-	{
-		// if the apply iteration should stop, then the derived method should return false.
+	static public interface RNSPathApplyFunction {
+		// if the apply iteration should stop, then the derived method should
+		// return false.
 		public boolean applyToPath(RNSPath applyTo) throws RNSException;
 	}
 
 	/**
-	 * Returns the current grid namespace path. This is similar to getcwd in posix systems but
-	 * refers only to grid paths here.
+	 * Returns the current grid namespace path. This is similar to getcwd in
+	 * posix systems but refers only to grid paths here.
 	 * 
-	 * @return The grid client's current working directory in the grid namespace.
+	 * @return The grid client's current working directory in the grid
+	 *         namespace.
 	 */
-	static public RNSPath getCurrent()
-	{
+	static public RNSPath getCurrent() {
 		try {
-			RNSPath toReturn = ContextManager.getExistingContext().getCurrentPath();
+			RNSPath toReturn = ContextManager.getExistingContext()
+					.getCurrentPath();
 			if (toReturn == null) {
 				_logger.error("got a null current path for RNS.");
 			} else {
 				if (_logger.isTraceEnabled())
-					_logger.trace("RNSPath: getCurrent = " + toReturn.toString());
+					_logger.trace("RNSPath: getCurrent = "
+							+ toReturn.toString());
 			}
 			return toReturn;
 		} catch (IOException ioe) {
@@ -97,19 +99,21 @@ public class RNSPath implements Serializable, Cloneable
 		}
 	}
 
-	static private <Type> Type createProxy(EndpointReferenceType epr, Class<Type> cl)
-	{
+	static private <Type> Type createProxy(EndpointReferenceType epr,
+			Class<Type> cl) {
 		try {
 			return ClientUtils.createProxy(cl, epr);
 		} catch (GenesisIISecurityException gse) {
-			throw new SecurityException("Unable to create Genesis II proxy.", gse);
+			throw new SecurityException("Unable to create Genesis II proxy.",
+					gse);
 		} catch (ResourceException re) {
-			throw new RuntimeException("Unknown exception occurred trying to create proxy.", re);
+			throw new RuntimeException(
+					"Unknown exception occurred trying to create proxy.", re);
 		}
 	}
 
-	private EndpointReferenceType resolveRequired() throws RNSPathDoesNotExistException
-	{
+	private EndpointReferenceType resolveRequired()
+			throws RNSPathDoesNotExistException {
 		EndpointReferenceType epr = resolveOptional();
 		if (epr == null)
 			throw new RNSPathDoesNotExistException(pwd());
@@ -117,15 +121,16 @@ public class RNSPath implements Serializable, Cloneable
 		return epr;
 	}
 
-	private EndpointReferenceType resolveOptional()
-	{
+	private EndpointReferenceType resolveOptional() {
 		try {
 			if (_cachedEPR == null && !_attemptedResolve) {
 				_attemptedResolve = true;
 				EndpointReferenceType parent = _parent.resolveOptional();
 				if (parent != null) {
-					RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parent, EnhancedRNSPortType.class));
-					RNSEntryResponseType[] entries = proxy.lookup(_nameFromParent);
+					RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(
+							parent, EnhancedRNSPortType.class));
+					RNSEntryResponseType[] entries = proxy
+							.lookup(_nameFromParent);
 					if (entries != null && entries.length == 1) {
 						_cachedEPR = entries[0].getEndpoint();
 						storeResourceConfigInCache();
@@ -141,10 +146,11 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Construct a new RNS path based off of component information. While it is permitted for users
-	 * to call this constructor directly, in general it is recommended that RNSPath instances be
-	 * obtained through other mechanisms such as calls to RNSPath.getCurrent() and by looking up
-	 * entries within other directories.
+	 * Construct a new RNS path based off of component information. While it is
+	 * permitted for users to call this constructor directly, in general it is
+	 * recommended that RNSPath instances be obtained through other mechanisms
+	 * such as calls to RNSPath.getCurrent() and by looking up entries within
+	 * other directories.
 	 * 
 	 * @param parent
 	 *            The RNSPath for the parent under which this entry exists.
@@ -153,25 +159,30 @@ public class RNSPath implements Serializable, Cloneable
 	 * @param cachedEPR
 	 *            The EPR of this entry (if it has one).
 	 * @param attemptedResolve
-	 *            Should we attempt to resolve the EPR of this entry if we don't have any EPR yet.
+	 *            Should we attempt to resolve the EPR of this entry if we don't
+	 *            have any EPR yet.
 	 */
-	public RNSPath(RNSPath parent, String nameFromParent, EndpointReferenceType cachedEPR, boolean attemptedResolve)
-	{
+	public RNSPath(RNSPath parent, String nameFromParent,
+			EndpointReferenceType cachedEPR, boolean attemptedResolve) {
 		_parent = parent;
 		_nameFromParent = nameFromParent;
 		_cachedEPR = cachedEPR;
 		_attemptedResolve = attemptedResolve;
 
-		if ((_parent == null && _nameFromParent != null) || (_parent != null && _nameFromParent == null)) {
-			throw new IllegalArgumentException("The parent and the nameFromParent parameters must either "
-				+ "both be null, or both be non-null.");
+		if ((_parent == null && _nameFromParent != null)
+				|| (_parent != null && _nameFromParent == null)) {
+			throw new IllegalArgumentException(
+					"The parent and the nameFromParent parameters must either "
+							+ "both be null, or both be non-null.");
 		}
 
 		if (_parent == null && _cachedEPR == null)
-			throw new IllegalArgumentException("Cannot have a null EPR for the root.");
+			throw new IllegalArgumentException(
+					"Cannot have a null EPR for the root.");
 
 		if (_cachedEPR == null) {
-			_cachedEPR = (EndpointReferenceType) CacheManager.getItemFromCache(pwd(), EndpointReferenceType.class);
+			_cachedEPR = (EndpointReferenceType) CacheManager.getItemFromCache(
+					pwd(), EndpointReferenceType.class);
 		}
 		if (_cachedEPR != null) {
 			_attemptedResolve = true;
@@ -184,37 +195,37 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Create a new RNSPath which represents a new rooted RNS namespace at the given EPR.
+	 * Create a new RNSPath which represents a new rooted RNS namespace at the
+	 * given EPR.
 	 * 
 	 * @param root
 	 *            The EPR which represents the root of this new namespace.
 	 */
-	public RNSPath(EndpointReferenceType root)
-	{
+	public RNSPath(EndpointReferenceType root) {
 		this(null, null, root, true);
 	}
 
-	public void finalize()
-	{
+	public void finalize() {
 		// hmmm: super noisy object creation tracing.
 		if (_logger.isTraceEnabled())
 			_logger.trace("-- cleaning RNSPath at path: " + pwd());
 	}
 
 	/**
-	 * Turn the current RNSPath into a sandbox. This essentially makes the current grid directory
-	 * the root of a new namespace.
+	 * Turn the current RNSPath into a sandbox. This essentially makes the
+	 * current grid directory the root of a new namespace.
 	 * 
-	 * @return The RNSPath of a new sandbox namespace rooted at the represented grid directory.
+	 * @return The RNSPath of a new sandbox namespace rooted at the represented
+	 *         grid directory.
 	 * 
 	 * @throws RNSPathDoesNotExistException
 	 */
-	public RNSPath createSandbox() throws RNSPathDoesNotExistException
-	{
+	public RNSPath createSandbox() throws RNSPathDoesNotExistException {
 		EndpointReferenceType newRoot = resolveRequired();
 		TypeInformation typeInfo = new TypeInformation(newRoot);
 		if (!typeInfo.isRNS())
-			throw new RNSPathDoesNotExistException("Path \"" + pwd() + "\" does not indicate a directory.");
+			throw new RNSPathDoesNotExistException("Path \"" + pwd()
+					+ "\" does not indicate a directory.");
 
 		return new RNSPath(newRoot);
 	}
@@ -224,8 +235,7 @@ public class RNSPath implements Serializable, Cloneable
 	 * 
 	 * @return The name of this RNS entry.
 	 */
-	public String getName()
-	{
+	public String getName() {
 		if (_nameFromParent == null)
 			return "/";
 
@@ -233,36 +243,36 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Get the EPR of the current entry if it exists. If the entry doesn't exist, this method throws
-	 * an exception.
+	 * Get the EPR of the current entry if it exists. If the entry doesn't
+	 * exist, this method throws an exception.
 	 * 
 	 * @return The EPR of this entry if it exists.
 	 * 
 	 * @throws RNSPathDoesNotExistException
 	 */
-	public EndpointReferenceType getEndpoint() throws RNSPathDoesNotExistException
-	{
+	public EndpointReferenceType getEndpoint()
+			throws RNSPathDoesNotExistException {
 		return resolveRequired();
 	}
 
 	/**
-	 * Get the EPR of the RNSPath if it exists in the cache. This is useful when a call is made from
-	 * some cache management subroutine where we don't want to have any unaccounted outcall.
+	 * Get the EPR of the RNSPath if it exists in the cache. This is useful when
+	 * a call is made from some cache management subroutine where we don't want
+	 * to have any unaccounted outcall.
 	 * 
 	 * @return the EPR of this entry if it exists in the cache
 	 * */
-	public EndpointReferenceType getCachedEPR()
-	{
+	public EndpointReferenceType getCachedEPR() {
 		return _cachedEPR;
 	}
 
 	/**
 	 * Return the full path to this entry starting at the root of the namespace.
 	 * 
-	 * @return A slash separated string representing the full grid path to this entry.
+	 * @return A slash separated string representing the full grid path to this
+	 *         entry.
 	 */
-	public String pwd()
-	{
+	public String pwd() {
 		if (_parent == null)
 			return "/";
 
@@ -274,29 +284,29 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Test to see if two RNS paths are equal. This comparison is for String path representation
-	 * only (no comparison of EPRs or other metadata is done).
+	 * Test to see if two RNS paths are equal. This comparison is for String
+	 * path representation only (no comparison of EPRs or other metadata is
+	 * done).
 	 * 
 	 * @param other
 	 *            The other path to compare against.
 	 * @return True if the two paths are equal, false otherwise.
 	 */
-	public boolean equals(RNSPath other)
-	{
+	public boolean equals(RNSPath other) {
 		return pwd().equals(other.pwd());
 	}
 
 	/**
-	 * Test to see if two RNS paths are equal. This comparison is for String path representation
-	 * only (no comparison of EPRs or other metadata is done).
+	 * Test to see if two RNS paths are equal. This comparison is for String
+	 * path representation only (no comparison of EPRs or other metadata is
+	 * done).
 	 * 
 	 * @param other
 	 *            The other path to compare against.
 	 * @return True if the two paths are equal, false otherwise.
 	 */
 	@Override
-	public boolean equals(Object other)
-	{
+	public boolean equals(Object other) {
 		if (other instanceof RNSPath)
 			return equals((RNSPath) other);
 
@@ -307,8 +317,7 @@ public class RNSPath implements Serializable, Cloneable
 	 * Calculate a hashcode for the path represented by this RNS path.
 	 */
 	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		return pwd().hashCode();
 	}
 
@@ -317,8 +326,7 @@ public class RNSPath implements Serializable, Cloneable
 	 * 
 	 * @return The root RNSPath entry for this namespace.
 	 */
-	public RNSPath getRoot()
-	{
+	public RNSPath getRoot() {
 		if (_parent == null)
 			return this;
 
@@ -330,8 +338,7 @@ public class RNSPath implements Serializable, Cloneable
 	 * 
 	 * @return The parent RNSPath entry for this entry.
 	 */
-	public RNSPath getParent()
-	{
+	public RNSPath getParent() {
 		if (_parent == null)
 			return this;
 
@@ -343,40 +350,42 @@ public class RNSPath implements Serializable, Cloneable
 	 * 
 	 * @return True if this entry is the root of a namespace, false otherwise.
 	 */
-	public boolean isRoot()
-	{
+	public boolean isRoot() {
 		return _parent == null;
 	}
 
 	/**
-	 * Determine if this entry represents a grid resource that exists (has an EPR) or doesn't.
+	 * Determine if this entry represents a grid resource that exists (has an
+	 * EPR) or doesn't.
 	 * 
 	 * @return True if this entry has an EPR, false otherwise.
 	 */
-	public boolean exists()
-	{
+	public boolean exists() {
 		return resolveOptional() != null;
 	}
 
 	/**
-	 * Assuming that this entry doesn't exist, this method creates a new directory at the indicated
-	 * path.
+	 * Assuming that this entry doesn't exist, this method creates a new
+	 * directory at the indicated path.
 	 * 
 	 * @throws RNSException
 	 * @throws RNSPathAlreadyExistsException
 	 * @throws RNSPathDoesNotExistException
 	 */
-	public void mkdir() throws RNSException, RNSPathAlreadyExistsException, RNSPathDoesNotExistException
-	{
+	public void mkdir() throws RNSException, RNSPathAlreadyExistsException,
+			RNSPathDoesNotExistException {
 		if (exists())
 			throw new RNSPathAlreadyExistsException(pwd());
 
 		if (_parent == null)
-			throw new RNSException("Someone tried to create the root directory, " + "which can't be done.");
+			throw new RNSException(
+					"Someone tried to create the root directory, "
+							+ "which can't be done.");
 
 		EndpointReferenceType parentEndpoint = _parent.resolveRequired();
 
-		RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parentEndpoint, EnhancedRNSPortType.class));
+		RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parentEndpoint,
+				EnhancedRNSPortType.class));
 		try {
 			_cachedEPR = proxy.add(_nameFromParent);
 			_attemptedResolve = true;
@@ -387,20 +396,22 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Similar to mkdir(), but this operation creates all directories that don't exist in the
-	 * indicated path, including this one.
+	 * Similar to mkdir(), but this operation creates all directories that don't
+	 * exist in the indicated path, including this one.
 	 * 
 	 * @throws RNSException
 	 * @throws RNSPathAlreadyExistsException
 	 * @throws RNSPathDoesNotExistException
 	 */
-	public void mkdirs() throws RNSException, RNSPathAlreadyExistsException, RNSPathDoesNotExistException
-	{
+	public void mkdirs() throws RNSException, RNSPathAlreadyExistsException,
+			RNSPathDoesNotExistException {
 		if (exists())
 			throw new RNSPathAlreadyExistsException(pwd());
 
 		if (_parent == null)
-			throw new RNSException("Someone tried to create the root directory, " + "which can't be done.");
+			throw new RNSException(
+					"Someone tried to create the root directory, "
+							+ "which can't be done.");
 
 		if (!_parent.exists())
 			_parent.mkdirs();
@@ -409,9 +420,9 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Creates a new ByteIO file at this path. This operation assumes that the current path doesn't
-	 * yet exist. The type of ByteIO created can be any valid ByteIO implementation that the parent
-	 * directory decides to create.
+	 * Creates a new ByteIO file at this path. This operation assumes that the
+	 * current path doesn't yet exist. The type of ByteIO created can be any
+	 * valid ByteIO implementation that the parent directory decides to create.
 	 * 
 	 * @return The EPR of a newly created ByteIO file.
 	 * 
@@ -419,18 +430,20 @@ public class RNSPath implements Serializable, Cloneable
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
 	 */
-	public EndpointReferenceType createNewFile() throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException,
-		RNSException
-	{
+	public EndpointReferenceType createNewFile()
+			throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException,
+			RNSException {
 		if (exists())
 			throw new RNSPathAlreadyExistsException(pwd());
 
 		if (_parent == null)
-			throw new RNSException("Someone tried to create a file as the root directory.");
+			throw new RNSException(
+					"Someone tried to create a file as the root directory.");
 
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 
-		RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parentEPR, EnhancedRNSPortType.class));
+		RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parentEPR,
+				EnhancedRNSPortType.class));
 		try {
 			_cachedEPR = proxy.createFile(_nameFromParent);
 			_attemptedResolve = true;
@@ -441,25 +454,24 @@ public class RNSPath implements Serializable, Cloneable
 		}
 	}
 
-	private void arrayify(ArrayList<RNSPath> rep)
-	{
+	private void arrayify(ArrayList<RNSPath> rep) {
 		if (_parent != null)
 			_parent.arrayify(rep);
 		rep.add(this);
 	}
 
 	/**
-	 * Lookup an RNSPath based off of this path. This path can be relative or absolute compared to
-	 * this path. The path does not have to exist either. If the indicated path does not exist, an
-	 * RNSPath entry with no EPR will be returned.
+	 * Lookup an RNSPath based off of this path. This path can be relative or
+	 * absolute compared to this path. The path does not have to exist either.
+	 * If the indicated path does not exist, an RNSPath entry with no EPR will
+	 * be returned.
 	 * 
 	 * @param path
 	 *            The relative or absolute path to lookup.
 	 * 
 	 * @return An RNSPath entry representing the path looked up.
 	 */
-	public RNSPath lookup(String path)
-	{
+	public RNSPath lookup(String path) {
 		try {
 			return lookup(path, RNSPathQueryFlags.DONT_CARE);
 		} catch (RNSPathDoesNotExistException rpdnee) {
@@ -472,26 +484,28 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Similar to lookup above, this operation looks up a new RNSPath entry at a given query path.
-	 * This operation however takes a flag which can specify whether or not to return directories
-	 * that don't actually exist.
+	 * Similar to lookup above, this operation looks up a new RNSPath entry at a
+	 * given query path. This operation however takes a flag which can specify
+	 * whether or not to return directories that don't actually exist.
 	 * 
 	 * @param path
 	 *            The RNS path to lookup.
 	 * @param queryFlag
-	 *            A flag indicating whether or not to fault if the entry exists/does not exist.
+	 *            A flag indicating whether or not to fault if the entry
+	 *            exists/does not exist.
 	 * 
 	 * @return The RNSPath entry that was found/indicated.
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSPathAlreadyExistsException
 	 */
-	public RNSPath lookup(String path, RNSPathQueryFlags queryFlag) throws RNSPathDoesNotExistException,
-		RNSPathAlreadyExistsException
-	{
+	public RNSPath lookup(String path, RNSPathQueryFlags queryFlag)
+			throws RNSPathDoesNotExistException, RNSPathAlreadyExistsException {
 		if (path == null)
-			throw new IllegalArgumentException("Cannot lookup a path which is null.");
+			throw new IllegalArgumentException(
+					"Cannot lookup a path which is null.");
 
-		// hmmm: this is the awesome place to just blast back an item from the CPFR cache.
+		// hmmm: this is the awesome place to just blast back an item from the
+		// CPFR cache.
 
 		String[] pathElements = PathUtils.normalizePath(pwd(), path);
 		ArrayList<RNSPath> arrayRep = new ArrayList<RNSPath>();
@@ -503,7 +517,8 @@ public class RNSPath implements Serializable, Cloneable
 				break;
 			if (lcv + 1 >= arrayRep.size())
 				break;
-			if (!pathElements[lcv].equals(arrayRep.get(lcv + 1)._nameFromParent))
+			if (!pathElements[lcv]
+					.equals(arrayRep.get(lcv + 1)._nameFromParent))
 				break;
 			lcv++;
 		}
@@ -529,8 +544,8 @@ public class RNSPath implements Serializable, Cloneable
 		return next;
 	}
 
-	private Collection<RNSPath> expand(RNSPath parent, String[] pathElements, int nextElement, FilterFactory filterType)
-	{
+	private Collection<RNSPath> expand(RNSPath parent, String[] pathElements,
+			int nextElement, FilterFactory filterType) {
 		Collection<RNSPath> ret = new LinkedList<RNSPath>();
 		Collection<RNSPath> tmp;
 
@@ -540,10 +555,12 @@ public class RNSPath implements Serializable, Cloneable
 			String element = pathElements[nextElement];
 
 			try {
-				TypeInformation typeInfo = new TypeInformation(parent.getEndpoint());
+				TypeInformation typeInfo = new TypeInformation(
+						parent.getEndpoint());
 				if (typeInfo.isRNS()) {
 					if (_logger.isDebugEnabled())
-						_logger.debug("Attempting to list contents of \"" + parent + "\".");
+						_logger.debug("Attempting to list contents of \""
+								+ parent + "\".");
 
 					// we first check if we need to create a filter !
 					boolean isFilterReqd = filterType.isFilterNeeded(element);
@@ -552,22 +569,25 @@ public class RNSPath implements Serializable, Cloneable
 						Filter filter = filterType.createFilter(element);
 						for (RNSPath candidate : parent.listContents()) {
 							if (filter.matches(candidate.getName())) {
-								tmp = expand(candidate, pathElements, nextElement + 1, filterType);
+								tmp = expand(candidate, pathElements,
+										nextElement + 1, filterType);
 								if (tmp != null)
 									ret.addAll(tmp);
 							}
 						}
 					} else {
 						/*
-						 * Even though this maybe just a single lookup-call with a single-element we
-						 * should iterate. This is because the container can set its
-						 * preferred-batch-size to 0 and also not return an initial-block, meaning
-						 * we must do an iterate-call.
+						 * Even though this maybe just a single lookup-call with
+						 * a single-element we should iterate. This is because
+						 * the container can set its preferred-batch-size to 0
+						 * and also not return an initial-block, meaning we must
+						 * do an iterate-call.
 						 */
 
 						for (RNSPath candidate : parent.listContents(element)) {
 							if (element.equals(candidate.getName())) {
-								tmp = expand(candidate, pathElements, nextElement + 1, filterType);
+								tmp = expand(candidate, pathElements,
+										nextElement + 1, filterType);
 								if (tmp != null)
 									ret.addAll(tmp);
 							}
@@ -576,7 +596,9 @@ public class RNSPath implements Serializable, Cloneable
 				}
 			} catch (RNSException rne) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("Skipping a directory in an RSNPath expansion which can't be expanded.", rne);
+					_logger.debug(
+							"Skipping a directory in an RSNPath expansion which can't be expanded.",
+							rne);
 			}
 		}
 
@@ -587,38 +609,41 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * A utility operation that looks up a path expression and returns exactly one matching path
-	 * entry. If more then one path entry matching the pathExpression, an exception is thrown.
+	 * A utility operation that looks up a path expression and returns exactly
+	 * one matching path entry. If more then one path entry matching the
+	 * pathExpression, an exception is thrown.
 	 * 
 	 * @param pathExpression
-	 *            A path expression which is to be looked up. This path expression can contain
-	 *            standard file system globbing patterns such as *.
+	 *            A path expression which is to be looked up. This path
+	 *            expression can contain standard file system globbing patterns
+	 *            such as *.
 	 * 
 	 * @return The resultant RNSPath entry (if any).
 	 * @throws RNSMultiLookupResultException
 	 */
-	public RNSPath expandSingleton(String pathExpression) throws RNSMultiLookupResultException
-	{
+	public RNSPath expandSingleton(String pathExpression)
+			throws RNSMultiLookupResultException {
 		return expandSingleton(pathExpression, null);
 	}
 
 	/**
-	 * This operation looks up pathExpressions and returns the exact matching entry that is found if
-	 * any.
+	 * This operation looks up pathExpressions and returns the exact matching
+	 * entry that is found if any.
 	 * 
 	 * @param pathExpression
-	 *            The path expression to lookup. This expression will be matched against the
-	 *            filterType indicated.
+	 *            The path expression to lookup. This expression will be matched
+	 *            against the filterType indicated.
 	 * @param filterType
-	 *            A filter which figures out how to expand the pathExpression language given. Two
-	 *            pathExpressio filterTypes are available by default -- one parses file globbing
-	 *            patterns, the other parses Regular Expressions.
+	 *            A filter which figures out how to expand the pathExpression
+	 *            language given. Two pathExpressio filterTypes are available by
+	 *            default -- one parses file globbing patterns, the other parses
+	 *            Regular Expressions.
 	 * 
 	 * @return The matched RNSPath entry.
 	 * @throws RNSMultiLookupResultException
 	 */
-	public RNSPath expandSingleton(String pathExpression, FilterFactory filterType) throws RNSMultiLookupResultException
-	{
+	public RNSPath expandSingleton(String pathExpression,
+			FilterFactory filterType) throws RNSMultiLookupResultException {
 		Collection<RNSPath> ret = expand(pathExpression, filterType);
 
 		if (ret.size() < 1)
@@ -630,22 +655,22 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Similar to expandSingleton above, but this version of the operation matches 0 or more
-	 * entries.
+	 * Similar to expandSingleton above, but this version of the operation
+	 * matches 0 or more entries.
 	 * 
 	 * @param pathExpression
 	 *            The file pattern globbing path expression to lookup.
 	 * 
-	 * @return A collection of zero or more RNSPath entries that matched the query.
+	 * @return A collection of zero or more RNSPath entries that matched the
+	 *         query.
 	 */
-	public Collection<RNSPath> expand(String pathExpression)
-	{
+	public Collection<RNSPath> expand(String pathExpression) {
 		return expand(pathExpression, new FilePatternFilterFactory());
 	}
 
 	/**
-	 * Similar to the expandSingleton operation above except that this version of the operation can
-	 * return 0 or more entries that match the path query.
+	 * Similar to the expandSingleton operation above except that this version
+	 * of the operation can return 0 or more entries that match the path query.
 	 * 
 	 * @param pathExpression
 	 *            The path expression to lookup.
@@ -654,18 +679,21 @@ public class RNSPath implements Serializable, Cloneable
 	 * 
 	 * @return The RNSPath entries that matched the query.
 	 */
-	public Collection<RNSPath> expand(String pathExpression, FilterFactory filterType)
-	{
+	public Collection<RNSPath> expand(String pathExpression,
+			FilterFactory filterType) {
 		if (pathExpression == null)
-			throw new IllegalArgumentException("Cannot lookup a path which is null.");
+			throw new IllegalArgumentException(
+					"Cannot lookup a path which is null.");
 
 		if (filterType == null)
 			filterType = new FilePatternFilterFactory();
 
 		try {
-			String[] pathElements = PathUtils.normalizePath(pwd(), pathExpression);
+			String[] pathElements = PathUtils.normalizePath(pwd(),
+					pathExpression);
 
-			Collection<RNSPath> ret = expand(getRoot(), pathElements, 0, filterType);
+			Collection<RNSPath> ret = expand(getRoot(), pathElements, 0,
+					filterType);
 			if (ret == null) {
 				ret = new ArrayList<RNSPath>(1);
 				ret.add(lookup(pathExpression, RNSPathQueryFlags.DONT_CARE));
@@ -673,23 +701,27 @@ public class RNSPath implements Serializable, Cloneable
 
 			return ret;
 		} catch (RNSException rne) {
-			throw new RuntimeException("Unexpected RNS path expansion exception.", rne);
+			throw new RuntimeException(
+					"Unexpected RNS path expansion exception.", rne);
 		}
 	}
 
 	/**
-	 * List the contents of the current RNS directory that match the given filter.
+	 * List the contents of the current RNS directory that match the given
+	 * filter.
 	 * 
 	 * @param filter
-	 *            A filter that is used to select entries in the current RNS directory.
+	 *            A filter that is used to select entries in the current RNS
+	 *            directory.
 	 * 
-	 * @return The set of all RNS entries in the current directory that matched the given pattern.
+	 * @return The set of all RNS entries in the current directory that matched
+	 *         the given pattern.
 	 * 
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
 	 */
-	public Collection<RNSPath> listContents(RNSFilter filter) throws RNSPathDoesNotExistException, RNSException
-	{
+	public Collection<RNSPath> listContents(RNSFilter filter)
+			throws RNSPathDoesNotExistException, RNSException {
 		Collection<RNSPath> ret = new LinkedList<RNSPath>();
 
 		for (RNSPath path : listContents()) {
@@ -703,16 +735,17 @@ public class RNSPath implements Serializable, Cloneable
 	/**
 	 * List all of the entries in the given RNS directory.
 	 * 
-	 * This does not add the items to the cache, since the directories could potentially be huge,
-	 * and this will just wash out entries we care about, like the root RNSPath.
+	 * This does not add the items to the cache, since the directories could
+	 * potentially be huge, and this will just wash out entries we care about,
+	 * like the root RNSPath.
 	 * 
 	 * @return The set of all RNSPath entries contained in this directory.
 	 * 
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
 	 */
-	public Collection<RNSPath> listContents() throws RNSPathDoesNotExistException, RNSException
-	{
+	public Collection<RNSPath> listContents()
+			throws RNSPathDoesNotExistException, RNSException {
 		EndpointReferenceType me = resolveRequired();
 		EnhancedRNSPortType rpt = createProxy(me, EnhancedRNSPortType.class);
 		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
@@ -723,13 +756,15 @@ public class RNSPath implements Serializable, Cloneable
 			LinkedList<RNSPath> ret = new LinkedList<RNSPath>();
 
 			for (RNSEntryResponseType entry : entries) {
-				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), true);
+				RNSPath newEntry = new RNSPath(this, entry.getEntryName(),
+						entry.getEndpoint(), true);
 				ret.add(newEntry);
 			}
 
 			return ret;
 		} catch (GenesisIISecurityException gse) {
-			throw new RNSException("Unable to list contents -- " + "security exception.", gse);
+			throw new RNSException("Unable to list contents -- "
+					+ "security exception.", gse);
 		} catch (RemoteException re) {
 			throw new RNSException("Unable to list contents.", re);
 		}
@@ -746,11 +781,12 @@ public class RNSPath implements Serializable, Cloneable
 	/**
 	 * This method performs grouped/batch-mode operation on the RNS paths.
 	 * 
-	 * This does not add the items to the cache, since the directories could potentially be huge,
-	 * and this will just wash out entries we care about, like the root RNSPath.
+	 * This does not add the items to the cache, since the directories could
+	 * potentially be huge, and this will just wash out entries we care about,
+	 * like the root RNSPath.
 	 */
-	public Collection<RNSPath> listContents(String... lookupPath) throws RNSPathDoesNotExistException, RNSException
-	{
+	public Collection<RNSPath> listContents(String... lookupPath)
+			throws RNSPathDoesNotExistException, RNSException {
 		EndpointReferenceType me = resolveRequired();
 		EnhancedRNSPortType rpt = createProxy(me, EnhancedRNSPortType.class);
 		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
@@ -760,12 +796,14 @@ public class RNSPath implements Serializable, Cloneable
 			entries = proxy.iterateList(lookupPath);
 			LinkedList<RNSPath> ret = new LinkedList<RNSPath>();
 			for (RNSEntryResponseType entry : entries) {
-				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), true);
+				RNSPath newEntry = new RNSPath(this, entry.getEntryName(),
+						entry.getEndpoint(), true);
 				ret.add(newEntry);
 			}
 			return ret;
 		} catch (GenesisIISecurityException gse) {
-			throw new RNSException("Unable to list contents -- " + "security exception.", gse);
+			throw new RNSException("Unable to list contents -- "
+					+ "security exception.", gse);
 		} catch (RemoteException re) {
 			throw new RNSException("Unable to list the contents.", re);
 		} finally {
@@ -776,13 +814,14 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * A more economical way of traversing and acting on the contents of an RNSPath than the
-	 * listContents methods. This applies the "applier" method to each object, which is just a way
-	 * to pass each RNSPath in the contents a specialized function without needing to instantiate
-	 * the whole list at once.
+	 * A more economical way of traversing and acting on the contents of an
+	 * RNSPath than the listContents methods. This applies the "applier" method
+	 * to each object, which is just a way to pass each RNSPath in the contents
+	 * a specialized function without needing to instantiate the whole list at
+	 * once.
 	 */
-	public boolean applyToContents(RNSPathApplyFunction applier) throws RNSException
-	{
+	public boolean applyToContents(RNSPathApplyFunction applier)
+			throws RNSException {
 		EndpointReferenceType me = resolveRequired();
 		EnhancedRNSPortType rpt = createProxy(me, EnhancedRNSPortType.class);
 		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
@@ -791,7 +830,8 @@ public class RNSPath implements Serializable, Cloneable
 		try {
 			entries = proxy.iterateList();
 			for (RNSEntryResponseType entry : entries) {
-				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), true);
+				RNSPath newEntry = new RNSPath(this, entry.getEntryName(),
+						entry.getEndpoint(), true);
 				boolean funcRet = applier.applyToPath(newEntry);
 				newEntry = null;
 				entry = null;
@@ -799,7 +839,8 @@ public class RNSPath implements Serializable, Cloneable
 					return false;
 			}
 		} catch (GenesisIISecurityException gse) {
-			throw new RNSException("Unable to list contents -- security exception.", gse);
+			throw new RNSException(
+					"Unable to list contents -- security exception.", gse);
 		} catch (RemoteException re) {
 			throw new RNSException("Unable to list contents.", re);
 		} finally {
@@ -813,8 +854,8 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Assuming that the indicated RNSPath entry does not yet exist (but that it's parent does),
-	 * links the given EPR into this named entry.
+	 * Assuming that the indicated RNSPath entry does not yet exist (but that
+	 * it's parent does), links the given EPR into this named entry.
 	 * 
 	 * @param epr
 	 *            The EPR to link to this indicated name.
@@ -823,18 +864,20 @@ public class RNSPath implements Serializable, Cloneable
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
 	 */
-	public void link(EndpointReferenceType epr) throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException,
-		RNSException
-	{
+	public void link(EndpointReferenceType epr)
+			throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException,
+			RNSException {
 		if (exists())
 			throw new RNSPathAlreadyExistsException(pwd());
 
 		if (_parent == null)
-			throw new RNSException("Someone tried to link the root directory, " + "which can't be done.");
+			throw new RNSException("Someone tried to link the root directory, "
+					+ "which can't be done.");
 
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 
-		RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parentEPR, EnhancedRNSPortType.class));
+		RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parentEPR,
+				EnhancedRNSPortType.class));
 		try {
 			_cachedEPR = proxy.add(_nameFromParent, epr);
 			_attemptedResolve = true;
@@ -845,14 +888,13 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Unlink this RNSPath entry from the namespace (this will never destroy the target resource --
-	 * it merely unlinks it from the filesystem).
+	 * Unlink this RNSPath entry from the namespace (this will never destroy the
+	 * target resource -- it merely unlinks it from the filesystem).
 	 * 
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
 	 */
-	public void unlink() throws RNSPathDoesNotExistException, RNSException
-	{
+	public void unlink() throws RNSPathDoesNotExistException, RNSException {
 		if (!exists())
 			throw new RNSPathDoesNotExistException(pwd());
 
@@ -861,7 +903,8 @@ public class RNSPath implements Serializable, Cloneable
 
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 
-		EnhancedRNSPortType rpt = createProxy(parentEPR, EnhancedRNSPortType.class);
+		EnhancedRNSPortType rpt = createProxy(parentEPR,
+				EnhancedRNSPortType.class);
 		removeEPRFromCache();
 		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
 		try {
@@ -874,14 +917,13 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Similar to unlink above, but this operation also destroy the target resource if at all
-	 * possible.
+	 * Similar to unlink above, but this operation also destroy the target
+	 * resource if at all possible.
 	 * 
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
 	 */
-	public void delete() throws RNSPathDoesNotExistException, RNSException
-	{
+	public void delete() throws RNSPathDoesNotExistException, RNSException {
 		if (!exists())
 			throw new RNSPathDoesNotExistException(pwd());
 
@@ -897,7 +939,8 @@ public class RNSPath implements Serializable, Cloneable
 				common.destroy(new Destroy());
 			}
 
-			EnhancedRNSPortType rpt = createProxy(parentEPR, EnhancedRNSPortType.class);
+			EnhancedRNSPortType rpt = createProxy(parentEPR,
+					EnhancedRNSPortType.class);
 			RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
 			proxy.remove(_nameFromParent);
 			_cachedEPR = null;
@@ -907,29 +950,32 @@ public class RNSPath implements Serializable, Cloneable
 		}
 	}
 
-	private void removeEPRFromCache()
-	{
+	private void removeEPRFromCache() {
 		CacheManager.removeItemFromCache(pwd(), EndpointReferenceType.class);
 	}
 
 	/*
-	 * RNSPath is the class that links between the client-side code and the web services endPoints
-	 * residing on the containers. So when we resolve an EPR for RNSPath or creating an RNSPath from
-	 * some already cached EPR, we should store the rnsPath to endPointIdentifier mapping of the
-	 * concerned EPR in a resource configuration instance. This configuration will subsequently
-	 * bridge/govern cache related settings of any information related to the EPR. This method also
-	 * puts the EPR in the cache in case it is already not there.
+	 * RNSPath is the class that links between the client-side code and the web
+	 * services endPoints residing on the containers. So when we resolve an EPR
+	 * for RNSPath or creating an RNSPath from some already cached EPR, we
+	 * should store the rnsPath to endPointIdentifier mapping of the concerned
+	 * EPR in a resource configuration instance. This configuration will
+	 * subsequently bridge/govern cache related settings of any information
+	 * related to the EPR. This method also puts the EPR in the cache in case it
+	 * is already not there.
 	 */
-	private void storeResourceConfigInCache()
-	{
+	private void storeResourceConfigInCache() {
 		if (_cachedEPR == null)
 			return;
 		WSName wsName = new WSName(_cachedEPR);
-		// In future, we have to support EPRs that do not have any valid endPointIdentifier
+		// In future, we have to support EPRs that do not have any valid
+		// endPointIdentifier
 		// to make our caching strategy robust.
 		if (wsName.isValidWSName()) {
-			WSResourceConfig resourceConfig = new WSResourceConfig(wsName, pwd());
-			CacheManager.putItemInCache(wsName.getEndpointIdentifier(), resourceConfig);
+			WSResourceConfig resourceConfig = new WSResourceConfig(wsName,
+					pwd());
+			CacheManager.putItemInCache(wsName.getEndpointIdentifier(),
+					resourceConfig);
 		}
 		CacheManager.putItemInCache(pwd(), _cachedEPR);
 	}
@@ -937,26 +983,23 @@ public class RNSPath implements Serializable, Cloneable
 	/**
 	 * Returns the pwd() for this RNSPath entry.
 	 */
-	public String toString()
-	{
+	public String toString() {
 		return pwd();
 	}
 
-	private Object writeReplace() throws ObjectStreamException
-	{
+	private Object writeReplace() throws ObjectStreamException {
 		return new RNSPathSerializedRepresentation(this);
 	}
 
-	static private class RNSPathSerializedRepresentation implements Serializable
-	{
+	static private class RNSPathSerializedRepresentation implements
+			Serializable {
 		static final long serialVersionUID = 2134908123740L;
 
 		private String _path;
 		private EndpointReferenceType _root;
 		private EndpointReferenceType _cachedTarget;
 
-		public RNSPathSerializedRepresentation(RNSPath path)
-		{
+		public RNSPathSerializedRepresentation(RNSPath path) {
 			RNSPath root = path;
 
 			while (root._parent != null)
@@ -967,8 +1010,7 @@ public class RNSPath implements Serializable, Cloneable
 			_cachedTarget = path._cachedEPR;
 		}
 
-		public Object readResolve() throws ObjectStreamException
-		{
+		public Object readResolve() throws ObjectStreamException {
 			String[] split = _path.split("/");
 
 			RNSPath last = new RNSPath(_root);
@@ -985,23 +1027,21 @@ public class RNSPath implements Serializable, Cloneable
 			return last;
 		}
 
-		private void writeObject(ObjectOutputStream out) throws IOException
-		{
+		private void writeObject(ObjectOutputStream out) throws IOException {
 			out.writeObject(_path);
 			EPRUtils.serializeEPR(out, _root);
 			EPRUtils.serializeEPR(out, _cachedTarget);
 		}
 
-		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-		{
+		private void readObject(ObjectInputStream in) throws IOException,
+				ClassNotFoundException {
 			_path = (String) in.readObject();
 			_root = EPRUtils.deserializeEPR(in);
 			_cachedTarget = EPRUtils.deserializeEPR(in);
 		}
 
 		@SuppressWarnings("unused")
-		private void readObjectNoData() throws ObjectStreamException
-		{
+		private void readObjectNoData() throws ObjectStreamException {
 			throw new StreamCorruptedException();
 		}
 	}

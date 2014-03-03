@@ -1,15 +1,12 @@
 package edu.virginia.vcgr.genii.algorithm.structures.cache;
 
-class TimeoutList<KeyType, DataType> extends CacheList<KeyType, DataType>
-{
-	public TimeoutList()
-	{
+class TimeoutList<KeyType, DataType> extends CacheList<KeyType, DataType> {
+	public TimeoutList() {
 		super(RoleBasedCacheNode.ROLE_TIMEOUT);
 	}
 
 	@Override
-	public void insert(RoleBasedCacheNode<KeyType, DataType> node)
-	{
+	public void insert(RoleBasedCacheNode<KeyType, DataType> node) {
 		// We'll start at the end because most likely we're adding to the end
 		if (_tail == null) {
 			// The list is empty

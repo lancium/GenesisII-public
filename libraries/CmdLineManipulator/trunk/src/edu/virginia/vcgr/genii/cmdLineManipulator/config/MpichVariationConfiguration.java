@@ -11,8 +11,7 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorConstants;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(namespace = CmdLineManipulatorConstants.NAMESPACE, name = "mpich-configuration")
-public class MpichVariationConfiguration extends CommonVariationConfiguration
-{
+public class MpichVariationConfiguration extends CommonVariationConfiguration {
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = NAMESPACE, name = "processNum-flag", required = false, nillable = false)
@@ -21,23 +20,19 @@ public class MpichVariationConfiguration extends CommonVariationConfiguration
 	@XmlElement(namespace = NAMESPACE, name = "supported-spmd-variation", required = true, nillable = false)
 	private Set<String> _spmdVariations = null;
 
-	final public String processNumFlag()
-	{
+	final public String processNumFlag() {
 		return _processNumFlag;
 	}
 
-	final public void processNumFlag(String newFlag)
-	{
+	final public void processNumFlag(String newFlag) {
 		_processNumFlag = newFlag;
 	}
 
-	final public Set<String> spmdVariations()
-	{
+	final public Set<String> spmdVariations() {
 		return _spmdVariations;
 	}
 
-	final public void spmdVariations(Set<String> spmdVars)
-	{
+	final public void spmdVariations(Set<String> spmdVars) {
 		_spmdVariations = spmdVars;
 	}
 

@@ -28,8 +28,7 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class GroupName implements Serializable
-{
+public class GroupName implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -38,28 +37,23 @@ public class GroupName implements Serializable
 	@XmlValue
 	private String _value;
 
-	public GroupName(String value)
-	{
+	public GroupName(String value) {
 		_value = value;
 	}
 
-	public GroupName()
-	{
+	public GroupName() {
 		this(null);
 	}
 
-	final public void value(String value)
-	{
+	final public void value(String value) {
 		_value = value;
 	}
 
-	final public String value()
-	{
+	final public String value() {
 		return _value;
 	}
 
-	final public Map<QName, String> anyAttributes()
-	{
+	final public Map<QName, String> anyAttributes() {
 		return _anyAttributes;
 	}
 }

@@ -2,8 +2,7 @@ package edu.virginia.vcgr.genii.algorithm.structures.cache;
 
 import java.util.Date;
 
-class RoleBasedCacheNode<KeyType, DataType>
-{
+class RoleBasedCacheNode<KeyType, DataType> {
 	static public final int ROLE_LRU = 0;
 	static public final int ROLE_TIMEOUT = 1;
 	static private final int _NUM_ROLES = 2;
@@ -16,8 +15,7 @@ class RoleBasedCacheNode<KeyType, DataType>
 
 	private Date _invalidationDate;
 
-	public RoleBasedCacheNode(KeyType key, DataType data, Date invalidationDate)
-	{
+	public RoleBasedCacheNode(KeyType key, DataType data, Date invalidationDate) {
 		_next = new Object[_NUM_ROLES];
 		_previous = new Object[_NUM_ROLES];
 
@@ -31,56 +29,48 @@ class RoleBasedCacheNode<KeyType, DataType>
 		_invalidationDate = invalidationDate;
 	}
 
-	public KeyType getKey()
-	{
+	public KeyType getKey() {
 		return _key;
 	}
 
-	public DataType getData()
-	{
+	public DataType getData() {
 		return _data;
 	}
 
-	public Date getInvalidationDate()
-	{
+	public Date getInvalidationDate() {
 		return _invalidationDate;
 	}
 
-	public void setInvalidationDate(long millisecondsFromNow)
-	{
-		_invalidationDate = new Date(System.currentTimeMillis() + millisecondsFromNow);
+	public void setInvalidationDate(long millisecondsFromNow) {
+		_invalidationDate = new Date(System.currentTimeMillis()
+				+ millisecondsFromNow);
 	}
 
 	@SuppressWarnings("unchecked")
-	public RoleBasedCacheNode<KeyType, DataType> getPrevious(int role)
-	{
+	public RoleBasedCacheNode<KeyType, DataType> getPrevious(int role) {
 		return RoleBasedCacheNode.class.cast(_previous[role]);
 	}
 
 	@SuppressWarnings("unchecked")
-	public RoleBasedCacheNode<KeyType, DataType> getNext(int role)
-	{
+	public RoleBasedCacheNode<KeyType, DataType> getNext(int role) {
 		return RoleBasedCacheNode.class.cast(_next[role]);
 	}
 
-	public void setPrevious(int role, RoleBasedCacheNode<KeyType, DataType> previous)
-	{
+	public void setPrevious(int role,
+			RoleBasedCacheNode<KeyType, DataType> previous) {
 		_previous[role] = previous;
 	}
 
-	public void setNext(int role, RoleBasedCacheNode<KeyType, DataType> next)
-	{
+	public void setNext(int role, RoleBasedCacheNode<KeyType, DataType> next) {
 		_next[role] = next;
 	}
 
-	public void clearLinks(int role)
-	{
+	public void clearLinks(int role) {
 		_previous[role] = null;
 		_next[role] = null;
 	}
 
-	public void clearLinks()
-	{
+	public void clearLinks() {
 		for (int lcv = 0; lcv < _NUM_ROLES; lcv++)
 			clearLinks(lcv);
 	}

@@ -19,38 +19,38 @@ import edu.virginia.vcgr.genii.ui.utils.ecombo.EnumComboBox;
 import edu.virginia.vcgr.genii.ui.utils.ecombo.EnumComboSort;
 
 @SuppressWarnings("rawtypes")
-class FilterPanel extends JPanel
-{
+class FilterPanel extends JPanel {
 	static final long serialVersionUID = 0l;
 
 	private HistoryEventFilter _filter;
 
-	FilterPanel(HistoryEventFilter filter)
-	{
+	FilterPanel(HistoryEventFilter filter) {
 		super(new GridBagLayout());
 
 		_filter = filter;
 
-		add(new JLabel("Minimum Event Level"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JLabel("Minimum Event Level"), new GridBagConstraints(0, 0, 1,
+				1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
 
-		EnumComboBox<HistoryEventLevel> levelBox =
-			new EnumComboBox<HistoryEventLevel>(HistoryEventLevel.class, EnumComboSort.ByOrdinal, false, LevelIcon.ICON_MAP);
+		EnumComboBox<HistoryEventLevel> levelBox = new EnumComboBox<HistoryEventLevel>(
+				HistoryEventLevel.class, EnumComboSort.ByOrdinal, false,
+				LevelIcon.ICON_MAP);
 		levelBox.setSelectedItem(filter.levelFilter());
 		levelBox.addItemListener(new LevelSelectionListener());
 
-		add(levelBox, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(levelBox, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
+						5, 5, 5), 5, 5));
 
-		add(new JButton(new CategoryFilterAction()), new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JButton(new CategoryFilterAction()), new GridBagConstraints(2,
+				0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST,
+				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
-	private class LevelSelectionListener implements ItemListener
-	{
+	private class LevelSelectionListener implements ItemListener {
 		@Override
-		public void itemStateChanged(ItemEvent e)
-		{
+		public void itemStateChanged(ItemEvent e) {
 			JComboBox box = (JComboBox) e.getSource();
 			HistoryEventLevel level = (HistoryEventLevel) box.getSelectedItem();
 			if (level != null)
@@ -58,19 +58,19 @@ class FilterPanel extends JPanel
 		}
 	}
 
-	private class CategoryFilterAction extends AbstractAction
-	{
+	private class CategoryFilterAction extends AbstractAction {
 		static final long serialVersionUID = 0l;
 
-		private CategoryFilterAction()
-		{
+		private CategoryFilterAction() {
 			super("Displayed Categories");
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e)
-		{
-			HistoryCategoryFilterDialog.modifyFilter(SwingUtilities.getWindowAncestor(FilterPanel.this), _filter);
+		final public void actionPerformed(ActionEvent e) {
+			HistoryCategoryFilterDialog
+					.modifyFilter(
+							SwingUtilities.getWindowAncestor(FilterPanel.this),
+							_filter);
 		}
 	}
 }

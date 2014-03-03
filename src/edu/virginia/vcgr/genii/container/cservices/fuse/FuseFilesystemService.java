@@ -21,8 +21,7 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServicePropertyListener;
 
-public class FuseFilesystemService extends AbstractContainerService
-{
+public class FuseFilesystemService extends AbstractContainerService {
 	static private Log _logger = LogFactory.getLog(FuseFilesystemService.class);
 
 	static final private int NUM_CREATE_DIR_ATTEMPTS = 8;
@@ -38,13 +37,13 @@ public class FuseFilesystemService extends AbstractContainerService
 	private String _configuredFuseDir = null;
 	private File _fuseDirectory;
 
-	private void selectFuseDirectory(String propertyValue)
-	{
+	private void selectFuseDirectory(String propertyValue) {
 		String dirPath;
 
 		if (propertyValue == null) {
 			if (_configuredFuseDir == null) {
-				dirPath = ConfigurationManager.getCurrentConfiguration().getUserDirectory().getAbsolutePath();
+				dirPath = ConfigurationManager.getCurrentConfiguration()
+						.getUserDirectory().getAbsolutePath();
 			} else
 				dirPath = _configuredFuseDir;
 		} else
@@ -56,19 +55,19 @@ public class FuseFilesystemService extends AbstractContainerService
 				_fuseDirectory = _fuseDirectory.getAbsoluteFile();
 			}
 		} catch (IOException ioe) {
-			throw new ConfigurationException("Unable to find fuse service directory.", ioe);
+			throw new ConfigurationException(
+					"Unable to find fuse service directory.", ioe);
 		}
 	}
 
-	private void selectFuseDirectory()
-	{
-		String prop = (String) getContainerServicesProperties().getProperty(FUSE_DIR_CSERVICE_PROPERTY);
+	private void selectFuseDirectory() {
+		String prop = (String) getContainerServicesProperties().getProperty(
+				FUSE_DIR_CSERVICE_PROPERTY);
 		selectFuseDirectory(prop);
 	}
 
 	@Override
-	protected void loadService() throws Throwable
-	{
+	protected void loadService() throws Throwable {
 		_logger.info(String.format("Loading %s.", SERVICE_NAME));
 		Connection connection = null;
 
@@ -77,23 +76,25 @@ public class FuseFilesystemService extends AbstractContainerService
 			FuseFilesystemDatabase.createTables(connection);
 
 			_parentDir2MountPoint2Id.clear();
-			FuseFilesystemDatabase.loadAll(connection, _parentDir2MountPoint2Id);
+			FuseFilesystemDatabase
+					.loadAll(connection, _parentDir2MountPoint2Id);
 		} finally {
 			getConnectionPool().release(connection);
 		}
 
 		getContainerServicesProperties().addPropertyChangeListener(
-			Pattern.compile("^" + Pattern.quote(FUSE_DIR_CSERVICE_PROPERTY) + "$"), new PropertyChangeListener());
+				Pattern.compile("^" + Pattern.quote(FUSE_DIR_CSERVICE_PROPERTY)
+						+ "$"), new PropertyChangeListener());
 
 		selectFuseDirectory();
 	}
 
 	@Override
-	protected void startService() throws Throwable
-	{
+	protected void startService() throws Throwable {
 		// Clean up old directories that don't have matching reservations
 		for (File parentDir : _parentDir2MountPoint2Id.keySet()) {
-			Map<String, Long> mountPoint = _parentDir2MountPoint2Id.get(parentDir);
+			Map<String, Long> mountPoint = _parentDir2MountPoint2Id
+					.get(parentDir);
 			for (File child : parentDir.listFiles()) {
 				if (!mountPoint.containsKey(child.getName()))
 					child.delete();
@@ -101,38 +102,33 @@ public class FuseFilesystemService extends AbstractContainerService
 		}
 	}
 
-	private FuseFilesystemService(String fuseDir)
-	{
+	private FuseFilesystemService(String fuseDir) {
 		super(SERVICE_NAME);
 
 		_configuredFuseDir = fuseDir;
 	}
 
-	public FuseFilesystemService(Properties constructionProperties)
-	{
+	public FuseFilesystemService(Properties constructionProperties) {
 		this(constructionProperties.getProperty(FUSE_DIR_PROPERTY));
 	}
 
-	public FuseFilesystemService()
-	{
+	public FuseFilesystemService() {
 		this((String) null);
 	}
 
 	@Override
-	public void setProperties(Properties properties)
-	{
+	public void setProperties(Properties properties) {
 		super.setProperties(properties);
 
 		_configuredFuseDir = properties.getProperty(FUSE_DIR_PROPERTY);
 	}
 
-	final public JSDLFileSystem reserveFuseFilesystem() throws IOException, SQLException
-	{
+	final public JSDLFileSystem reserveFuseFilesystem() throws IOException,
+			SQLException {
 		return new FuseFileSystem(acquire());
 	}
 
-	final public File acquire() throws IOException, SQLException
-	{
+	final public File acquire() throws IOException, SQLException {
 		File ret = null;
 		long id;
 
@@ -149,17 +145,21 @@ public class FuseFilesystemService extends AbstractContainerService
 			try {
 				Thread.sleep(BACKOFF_BASE << attempt);
 			} catch (Throwable cause) {
-				_logger.warn("Exception thrown while waiting for another attempt.", cause);
+				_logger.warn(
+						"Exception thrown while waiting for another attempt.",
+						cause);
 			}
 		}
 
 		if (ret == null)
-			throw new IOException(String.format("Unable to find suitable fuse mount point."));
+			throw new IOException(
+					String.format("Unable to find suitable fuse mount point."));
 
 		Connection conn = null;
 		try {
 			conn = getConnectionPool().acquire(true);
-			id = FuseFilesystemDatabase.store(conn, _fuseDirectory, ret.getName());
+			id = FuseFilesystemDatabase.store(conn, _fuseDirectory,
+					ret.getName());
 		} finally {
 			getConnectionPool().release(conn);
 		}
@@ -168,7 +168,8 @@ public class FuseFilesystemService extends AbstractContainerService
 		synchronized (_parentDir2MountPoint2Id) {
 			mounts = _parentDir2MountPoint2Id.get(_fuseDirectory);
 			if (mounts == null)
-				_parentDir2MountPoint2Id.put(_fuseDirectory, mounts = new HashMap<String, Long>());
+				_parentDir2MountPoint2Id.put(_fuseDirectory,
+						mounts = new HashMap<String, Long>());
 		}
 
 		synchronized (mounts) {
@@ -178,8 +179,7 @@ public class FuseFilesystemService extends AbstractContainerService
 		return ret;
 	}
 
-	final public void release(File directory) throws SQLException
-	{
+	final public void release(File directory) throws SQLException {
 		File parent = directory.getParentFile().getAbsoluteFile();
 		Map<String, Long> mounts;
 		Long id = null;
@@ -207,11 +207,10 @@ public class FuseFilesystemService extends AbstractContainerService
 		directory.delete();
 	}
 
-	private class PropertyChangeListener implements ContainerServicePropertyListener
-	{
+	private class PropertyChangeListener implements
+			ContainerServicePropertyListener {
 		@Override
-		public void propertyChanged(String propertyName, Serializable newValue)
-		{
+		public void propertyChanged(String propertyName, Serializable newValue) {
 			selectFuseDirectory((String) newValue);
 		}
 	}

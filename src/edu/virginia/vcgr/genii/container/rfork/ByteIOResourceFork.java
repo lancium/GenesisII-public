@@ -2,8 +2,7 @@ package edu.virginia.vcgr.genii.container.rfork;
 
 import java.util.Calendar;
 
-public interface ByteIOResourceFork extends ResourceFork
-{
+public interface ByteIOResourceFork extends ResourceFork {
 	public long size();
 
 	public Calendar createTime();

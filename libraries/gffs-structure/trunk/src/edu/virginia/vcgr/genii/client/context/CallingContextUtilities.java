@@ -14,12 +14,12 @@ import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
 
-final public class CallingContextUtilities
-{
-	private static Log _logger = LogFactory.getLog(CallingContextUtilities.class);
+final public class CallingContextUtilities {
+	private static Log _logger = LogFactory
+			.getLog(CallingContextUtilities.class);
 
-	static public ICallingContext setupCallingContextAfterCombinedExtraction(ICallingContext context)
-	{
+	static public ICallingContext setupCallingContextAfterCombinedExtraction(
+			ICallingContext context) {
 		WorkingContext workingContext = null;
 		try {
 			workingContext = WorkingContext.getCurrentWorkingContext();
@@ -28,8 +28,7 @@ final public class CallingContextUtilities
 		}
 		CredentialWallet creds = null;
 		if (workingContext != null) {
-			creds =
-				(CredentialWallet) workingContext
+			creds = (CredentialWallet) workingContext
 					.getProperty(SAMLConstants.SAML_CREDENTIALS_WORKING_CONTEXT_CREDS_PROPERTY_NAME);
 		}
 		ArrayList<NuCredential> callerCredentials = new ArrayList<NuCredential>();
@@ -37,33 +36,36 @@ final public class CallingContextUtilities
 			Collection<TrustCredential> assertions = creds.getCredentials();
 
 			/*
-			 * Deserialize the encoded caller-credentials and add them to a "caller-only" cred-set:
-			 * they will be added to the transient cred-set later (along with any other creds
-			 * conveyed outside the calling-context) during security-processing.
+			 * Deserialize the encoded caller-credentials and add them to a
+			 * "caller-only" cred-set: they will be added to the transient
+			 * cred-set later (along with any other creds conveyed outside the
+			 * calling-context) during security-processing.
 			 */
 			if (assertions != null) {
 				Iterator<TrustCredential> itr = assertions.iterator();
 				while (itr.hasNext()) {
 					NuCredential cred = (NuCredential) itr.next();
 					if (_logger.isTraceEnabled())
-						_logger.trace("found credential in context: " + cred.toString());
+						_logger.trace("found credential in context: "
+								+ cred.toString());
 					callerCredentials.add(cred);
 				}
 			} else {
 				_logger.warn("got no credentials from calling context.");
 			}
 		}
-		context.setTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY, callerCredentials);
+		context.setTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY,
+				callerCredentials);
 
 		return context;
 	}
 
 	/*
-	 * This method augments any new trust delegation retrieved from some RPC exchange in the calling
-	 * context of the current GRID user.
+	 * This method augments any new trust delegation retrieved from some RPC
+	 * exchange in the calling context of the current GRID user.
 	 */
-	public static void updateCallingContext(TrustCredential assertion) throws Exception
-	{
+	public static void updateCallingContext(TrustCredential assertion)
+			throws Exception {
 		// get the calling context (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();
 		if (callContext == null) {
@@ -72,14 +74,15 @@ final public class CallingContextUtilities
 		}
 
 		// retrieve the credentials wallet from the context and update it
-		CredentialWallet wallet =
-			(CredentialWallet) callContext.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);
+		CredentialWallet wallet = (CredentialWallet) callContext
+				.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);
 		if (wallet == null) {
 			wallet = new CredentialWallet();
 		}
 		wallet.addCredential(assertion);
 
 		// restore the credentials wallet in the calling context
-		callContext.setTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME, wallet);
+		callContext.setTransientProperty(
+				SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME, wallet);
 	}
 }

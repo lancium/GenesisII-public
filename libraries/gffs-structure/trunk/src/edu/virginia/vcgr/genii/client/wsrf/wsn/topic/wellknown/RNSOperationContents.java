@@ -13,8 +13,7 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.client.sync.VersionVector;
 
 @XmlRootElement(namespace = RNSConstants.GENII_RNS_NS, name = "RNSOperationContents")
-public class RNSOperationContents extends NotificationMessageContents
-{
+public class RNSOperationContents extends NotificationMessageContents {
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = RNSConstants.GENII_RNS_NS, name = "operation", nillable = false, required = true)
@@ -29,13 +28,12 @@ public class RNSOperationContents extends NotificationMessageContents
 	@XmlElement(namespace = RNSConstants.GENII_RNS_NS, name = "versionVector")
 	private VersionVector _versionVector;
 
-	protected RNSOperationContents()
-	{
+	protected RNSOperationContents() {
 	}
 
-	public RNSOperationContents(RNSOperations operation, String entryName, EndpointReferenceType entryReference,
-		VersionVector versionVector) throws ResourceException
-	{
+	public RNSOperationContents(RNSOperations operation, String entryName,
+			EndpointReferenceType entryReference, VersionVector versionVector)
+			throws ResourceException {
 		_operation = operation;
 		_entryName = entryName;
 		if (entryReference != null)
@@ -43,25 +41,22 @@ public class RNSOperationContents extends NotificationMessageContents
 		_versionVector = versionVector;
 	}
 
-	final public RNSOperations operation()
-	{
+	final public RNSOperations operation() {
 		return _operation;
 	}
 
-	final public String entryName()
-	{
+	final public String entryName() {
 		return _entryName;
 	}
 
-	final public EndpointReferenceType entryReference() throws ResourceException
-	{
+	final public EndpointReferenceType entryReference()
+			throws ResourceException {
 		if (_entryReference == null)
 			return null;
 		return EPRUtils.fromBytes(_entryReference);
 	}
 
-	final public VersionVector versionVector()
-	{
+	final public VersionVector versionVector() {
 		return _versionVector;
 	}
 }

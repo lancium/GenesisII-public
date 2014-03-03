@@ -7,25 +7,21 @@ import java.util.LinkedList;
 
 import org.morgan.util.io.StreamUtils;
 
-public class RollingCommandHistory implements Iterable<FTPAction>, Closeable
-{
+public class RollingCommandHistory implements Iterable<FTPAction>, Closeable {
 	private LinkedList<FTPAction> _history = new LinkedList<FTPAction>();
 	private int _historyCapacity;
 
-	public RollingCommandHistory(int historyCapacity)
-	{
+	public RollingCommandHistory(int historyCapacity) {
 		_historyCapacity = historyCapacity;
 	}
 
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		super.finalize();
 
 		close();
 	}
 
-	public FTPAction addCommand(ICommandHandler handler)
-	{
+	public FTPAction addCommand(ICommandHandler handler) {
 		FTPAction ret;
 		_history.addFirst(ret = new FTPAction(handler));
 		while (_history.size() > _historyCapacity) {
@@ -36,18 +32,17 @@ public class RollingCommandHistory implements Iterable<FTPAction>, Closeable
 	}
 
 	@Override
-	public Iterator<FTPAction> iterator()
-	{
+	public Iterator<FTPAction> iterator() {
 		return _history.iterator();
 	}
 
-	public FTPAction lastCompleted(Class<? extends ICommandHandler> handlerType)
-	{
+	public FTPAction lastCompleted(Class<? extends ICommandHandler> handlerType) {
 		for (FTPAction action : _history) {
 			if (action.completed() != null) {
 				if (handlerType == null)
 					return action;
-				if (handlerType.isAssignableFrom(action.getHandler().getClass()))
+				if (handlerType
+						.isAssignableFrom(action.getHandler().getClass()))
 					return action;
 			}
 		}
@@ -56,8 +51,7 @@ public class RollingCommandHistory implements Iterable<FTPAction>, Closeable
 	}
 
 	@Override
-	synchronized public void close() throws IOException
-	{
+	synchronized public void close() throws IOException {
 		FTPAction action;
 		while (true) {
 			if (_history.isEmpty())

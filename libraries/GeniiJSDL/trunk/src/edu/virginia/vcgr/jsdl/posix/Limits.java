@@ -28,8 +28,7 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class Limits implements Serializable
-{
+public class Limits implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -38,28 +37,23 @@ public class Limits implements Serializable
 	@XmlValue
 	private long _value;
 
-	public Limits(long limit)
-	{
+	public Limits(long limit) {
 		_value = limit;
 	}
 
-	public Limits()
-	{
+	public Limits() {
 		_value = 0;
 	}
 
-	final public void value(long value)
-	{
+	final public void value(long value) {
 		_value = value;
 	}
 
-	final public long value()
-	{
+	final public long value() {
 		return _value;
 	}
 
-	final public Map<QName, String> anyAttributes()
-	{
+	final public Map<QName, String> anyAttributes() {
 		return _anyAttributes;
 	}
 }

@@ -17,53 +17,61 @@ import edu.virginia.vcgr.genii.client.stats.TimeInterval;
 import edu.virginia.vcgr.genii.container.ContainerStatisticsResultType;
 import edu.virginia.vcgr.genii.container.VCGRContainerPortType;
 
-public class ContainerStatsTool extends BaseGridTool
-{
+public class ContainerStatsTool extends BaseGridTool {
 	static final private String _DESCRIPTION = "config/tooldocs/description/dcontainer-stats";
 	static final private String _USAGE = "config/tooldocs/usage/ucontainer-stats";
 	static final private String _MANPAGE = "config/tooldocs/man/container-stats";
 
-	public ContainerStatsTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.INTERNAL);
+	public ContainerStatsTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.INTERNAL);
 		addManPage(new LoadFileResource(_MANPAGE));
 
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected int runCommand() throws Throwable
-	{
-		RNSPath container = lookup(new GeniiPath(getArgument(0)), RNSPathQueryFlags.MUST_EXIST);
+	protected int runCommand() throws Throwable {
+		RNSPath container = lookup(new GeniiPath(getArgument(0)),
+				RNSPathQueryFlags.MUST_EXIST);
 
-		VCGRContainerPortType proxy = ClientUtils.createProxy(VCGRContainerPortType.class, container.getEndpoint());
+		VCGRContainerPortType proxy = ClientUtils.createProxy(
+				VCGRContainerPortType.class, container.getEndpoint());
 		ContainerStatisticsResultType result = proxy.containerStatistics(null);
 
-		stdout.format("Container start time:  %1tc\n", result.getContainerStartTime());
-		Map<TimeInterval, DatabaseStatisticsReport> dbReport =
-			(Map<TimeInterval, DatabaseStatisticsReport>) DBSerializer.deserialize(result.getDbStatisticsReport());
-		Map<TimeInterval, MethodStatisticsReport> methodReport =
-			(Map<TimeInterval, MethodStatisticsReport>) DBSerializer.deserialize(result.getMethodStatisticsReport());
+		stdout.format("Container start time:  %1tc\n",
+				result.getContainerStartTime());
+		Map<TimeInterval, DatabaseStatisticsReport> dbReport = (Map<TimeInterval, DatabaseStatisticsReport>) DBSerializer
+				.deserialize(result.getDbStatisticsReport());
+		Map<TimeInterval, MethodStatisticsReport> methodReport = (Map<TimeInterval, MethodStatisticsReport>) DBSerializer
+				.deserialize(result.getMethodStatisticsReport());
 		stdout.format("Database Statistics:\n");
 		for (TimeInterval ti : dbReport.keySet()) {
 			stdout.format("  %s:\n", ti.longDescription());
 			DatabaseStatisticsReport report = dbReport.get(ti);
-			stdout.format("    Num Opened = %d, Num Closed = %d, Average Duration = %d ms\n", report.numOpened(),
-				report.numClosed(), report.averageDuration());
+			stdout.format(
+					"    Num Opened = %d, Num Closed = %d, Average Duration = %d ms\n",
+					report.numOpened(), report.numClosed(),
+					report.averageDuration());
 		}
 		stdout.format("Method Statistics:\n");
 		for (TimeInterval ti : methodReport.keySet()) {
 			stdout.format("  %s:\n", ti.longDescription());
 			MethodStatisticsReport report = methodReport.get(ti);
 			stdout.format("    Totals:  %s\n", report.totals());
-			Map<String, MethodStatisticsReportPoint> classes = report.classTotals();
-			Map<String, Map<String, MethodStatisticsReportPoint>> methods = report.methodTotals();
+			Map<String, MethodStatisticsReportPoint> classes = report
+					.classTotals();
+			Map<String, Map<String, MethodStatisticsReportPoint>> methods = report
+					.methodTotals();
 			for (String className : classes.keySet()) {
-				stdout.format("    Class Totals(%s):  %s\n", className, classes.get(className));
-				Map<String, MethodStatisticsReportPoint> methodMap = methods.get(className);
+				stdout.format("    Class Totals(%s):  %s\n", className,
+						classes.get(className));
+				Map<String, MethodStatisticsReportPoint> methodMap = methods
+						.get(className);
 				if (methodMap != null) {
 					for (String methodName : methodMap.keySet()) {
-						stdout.format("      Method (%s):  %s\n", methodName, methodMap.get(methodName));
+						stdout.format("      Method (%s):  %s\n", methodName,
+								methodMap.get(methodName));
 					}
 				}
 			}
@@ -73,9 +81,9 @@ public class ContainerStatsTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() != 1)
-			throw new InvalidToolUsageException("Missing required \"container-path\" parameter.");
+			throw new InvalidToolUsageException(
+					"Missing required \"container-path\" parameter.");
 	}
 }

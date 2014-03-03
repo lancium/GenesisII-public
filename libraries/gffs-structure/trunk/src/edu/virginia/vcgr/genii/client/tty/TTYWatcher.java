@@ -12,15 +12,14 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 
-public class TTYWatcher
-{
+public class TTYWatcher {
 	static private final int DEFAULT_BUFFER_SIZE = 1024 * 8;
 
 	static private WatcherThread _watcherThread = null;
 
-	synchronized static public void watch(PrintWriter stdout, PrintWriter stderr, EndpointReferenceType tty)
-		throws TTYException, RemoteException, FileNotFoundException, IOException
-	{
+	synchronized static public void watch(PrintWriter stdout,
+			PrintWriter stderr, EndpointReferenceType tty) throws TTYException,
+			RemoteException, FileNotFoundException, IOException {
 		if (_watcherThread != null)
 			throw new TTYException("Already watching a tty object.");
 
@@ -28,8 +27,7 @@ public class TTYWatcher
 		_watcherThread.start();
 	}
 
-	synchronized static public void unwatch() throws TTYException
-	{
+	synchronized static public void unwatch() throws TTYException {
 		if (_watcherThread == null)
 			throw new TTYException("Not currently watching a tty object.");
 
@@ -37,16 +35,15 @@ public class TTYWatcher
 		_watcherThread = null;
 	}
 
-	static private class WatcherThread extends Thread implements Closeable
-	{
+	static private class WatcherThread extends Thread implements Closeable {
 		private PrintWriter _out;
 		private PrintWriter _err;
 		private InputStream _in;
 		private boolean _quit;
 
-		public WatcherThread(PrintWriter out, PrintWriter err, EndpointReferenceType epr) throws RemoteException, IOException,
-			FileNotFoundException
-		{
+		public WatcherThread(PrintWriter out, PrintWriter err,
+				EndpointReferenceType epr) throws RemoteException, IOException,
+				FileNotFoundException {
 			super("TTY Watcher Thread");
 
 			setDaemon(false);
@@ -56,15 +53,13 @@ public class TTYWatcher
 			_quit = false;
 		}
 
-		protected void finalize() throws Throwable
-		{
+		protected void finalize() throws Throwable {
 			super.finalize();
 
 			close();
 		}
 
-		synchronized public void close()
-		{
+		synchronized public void close() {
 			if (_in != null) {
 				_quit = true;
 				interrupt();
@@ -73,8 +68,7 @@ public class TTYWatcher
 			}
 		}
 
-		public void run()
-		{
+		public void run() {
 			byte[] data = new byte[DEFAULT_BUFFER_SIZE];
 			while (!_quit) {
 				try {
@@ -87,7 +81,8 @@ public class TTYWatcher
 					if (_quit)
 						return;
 
-					_err.format("Error in TTY Watcher (%s)-- Quiting\n", cause.getLocalizedMessage());
+					_err.format("Error in TTY Watcher (%s)-- Quiting\n",
+							cause.getLocalizedMessage());
 					_quit = true;
 				}
 			}

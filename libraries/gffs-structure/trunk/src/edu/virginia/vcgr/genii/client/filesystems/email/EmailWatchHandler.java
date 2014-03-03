@@ -28,28 +28,28 @@ import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemUsageInformation;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemWatchHandler;
 
-public class EmailWatchHandler implements FilesystemWatchHandler
-{
+public class EmailWatchHandler implements FilesystemWatchHandler {
 	static private Log _logger = LogFactory.getLog(EmailWatchHandler.class);
 
 	private EmailWatchConfiguration _config;
 
-	private EmailWatchHandler(InputStream configStream) throws JAXBException
-	{
-		JAXBContext context = JAXBContext.newInstance(EmailWatchConfiguration.class);
+	private EmailWatchHandler(InputStream configStream) throws JAXBException {
+		JAXBContext context = JAXBContext
+				.newInstance(EmailWatchConfiguration.class);
 		Unmarshaller u = context.createUnmarshaller();
-		_config = u.unmarshal(new StreamSource(configStream), EmailWatchConfiguration.class).getValue();
+		_config = u.unmarshal(new StreamSource(configStream),
+				EmailWatchConfiguration.class).getValue();
 	}
 
-	public EmailWatchHandler(Element element) throws JAXBException
-	{
-		JAXBContext context = JAXBContext.newInstance(EmailWatchConfiguration.class);
+	public EmailWatchHandler(Element element) throws JAXBException {
+		JAXBContext context = JAXBContext
+				.newInstance(EmailWatchConfiguration.class);
 		Unmarshaller u = context.createUnmarshaller();
-		_config = u.unmarshal(element, EmailWatchConfiguration.class).getValue();
+		_config = u.unmarshal(element, EmailWatchConfiguration.class)
+				.getValue();
 	}
 
-	final public void sendMessage(String subject, String message)
-	{
+	final public void sendMessage(String subject, String message) {
 		final AddressInfoConfiguration addr = _config.addr();
 		final ConnectConfig connect = _config.connection();
 
@@ -85,37 +85,41 @@ public class EmailWatchHandler implements FilesystemWatchHandler
 			// Set message content
 			msg.setText(message);
 
-			Transport transport = session.getTransport(USE_SSL ? "smtps" : "smtp");
+			Transport transport = session.getTransport(USE_SSL ? "smtps"
+					: "smtp");
 			transport.connect(HOST, PORT, USERNAME, PASSWORD);
 			transport.sendMessage(msg, address);
 		} catch (MessagingException mex) {
-			_logger.error("Error trying to send email for file system notification.", mex);
+			_logger.error(
+					"Error trying to send email for file system notification.",
+					mex);
 		}
 	}
 
 	@Override
-	public void notifyFilesystemEvent(FilesystemManager manager, String filesystemName, Filesystem filesystem,
-		FilesystemUsageInformation usageInformation, boolean matched)
-	{
+	public void notifyFilesystemEvent(FilesystemManager manager,
+			String filesystemName, Filesystem filesystem,
+			FilesystemUsageInformation usageInformation, boolean matched) {
 		final String SUBJECT = _config.subject(matched);
 		final String MESSAGE = _config.message(matched);
 
 		sendMessage(SUBJECT, MESSAGE);
 	}
 
-	static public void main(String[] args) throws Throwable
-	{
+	static public void main(String[] args) throws Throwable {
 		InputStream in = null;
 
 		try {
 			if (args.length == 1) {
 				in = new FileInputStream(args[0]);
 			} else {
-				in = EmailWatchHandler.class.getResourceAsStream("config/test-emailwatch-config.xml");
+				in = EmailWatchHandler.class
+						.getResourceAsStream("config/test-emailwatch-config.xml");
 			}
 
 			EmailWatchHandler handler = new EmailWatchHandler(in);
-			handler.sendMessage("Test Message", "This is a test message send from Java.");
+			handler.sendMessage("Test Message",
+					"This is a test message send from Java.");
 		} finally {
 			StreamUtils.close(in);
 		}

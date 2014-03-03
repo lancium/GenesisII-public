@@ -26,24 +26,21 @@ import org.w3c.dom.UserDataHandler;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-class DeltaInformation implements Cloneable
-{
+class DeltaInformation implements Cloneable {
 	static final String USER_HANDLER_KEY = "edu.virginia.vcgr.jsdl.sweep.parameters.xpath.substring-delta-information";
 
 	private TreeSet<DeltaPoint> _deltas;
 
-	private DeltaInformation(TreeSet<DeltaPoint> deltas)
-	{
+	private DeltaInformation(TreeSet<DeltaPoint> deltas) {
 		_deltas = deltas;
 	}
 
-	DeltaInformation()
-	{
+	DeltaInformation() {
 		this(new TreeSet<DeltaPoint>(DeltaPoint.ORDER_COMPARATOR));
 	}
 
-	final String replace(String original, String replacement, int start, int length)
-	{
+	final String replace(String original, String replacement, int start,
+			int length) {
 		String ret;
 		DeltaPoint point = null;
 		Iterator<DeltaPoint> iterator = _deltas.iterator();
@@ -61,7 +58,8 @@ class DeltaInformation implements Cloneable
 			ret = original.substring(0, start) + replacement;
 			delta = replacement.length() - (original.length() - start);
 		} else {
-			ret = original.substring(0, start) + replacement + original.substring(start + length);
+			ret = original.substring(0, start) + replacement
+					+ original.substring(start + length);
 			delta = replacement.length() - length;
 		}
 
@@ -79,9 +77,9 @@ class DeltaInformation implements Cloneable
 	}
 
 	@Override
-	final public Object clone()
-	{
-		TreeSet<DeltaPoint> deltas = new TreeSet<DeltaPoint>(DeltaPoint.ORDER_COMPARATOR);
+	final public Object clone() {
+		TreeSet<DeltaPoint> deltas = new TreeSet<DeltaPoint>(
+				DeltaPoint.ORDER_COMPARATOR);
 		for (DeltaPoint pt : _deltas)
 			deltas.add((DeltaPoint) pt.clone());
 
@@ -89,16 +87,14 @@ class DeltaInformation implements Cloneable
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		return _deltas.toString();
 	}
 
-	static UserDataHandler USER_DATA_HANDLER = new UserDataHandler()
-	{
+	static UserDataHandler USER_DATA_HANDLER = new UserDataHandler() {
 		@Override
-		public void handle(short operation, String key, Object data, Node src, Node dst)
-		{
+		public void handle(short operation, String key, Object data, Node src,
+				Node dst) {
 			if (data != null && src != null && dst != null && src != dst)
 				dst.setUserData(key, ((DeltaInformation) data).clone(), this);
 		}

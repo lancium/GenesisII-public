@@ -9,15 +9,15 @@ import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils;
 
-class CmdLineManipulatorUpgrader
-{
-	static private Log _logger = LogFactory.getLog(CmdLineManipulatorUpgrader.class);
+class CmdLineManipulatorUpgrader {
+	static private Log _logger = LogFactory
+			.getLog(CmdLineManipulatorUpgrader.class);
 
-	static boolean upgrade(BESConstructionParameters params) throws IOException
-	{
+	static boolean upgrade(BESConstructionParameters params) throws IOException {
 		boolean ret = false;
 
-		CmdLineManipulatorConfiguration manipulatorConf = params.getCmdLineManipulatorConfiguration();
+		CmdLineManipulatorConfiguration manipulatorConf = params
+				.getCmdLineManipulatorConfiguration();
 
 		// determine if pwrapper should be added
 		if (manipulatorConf == null) {

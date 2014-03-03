@@ -26,38 +26,47 @@ import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 
-public class DeployDatabase implements Closeable
-{
+public class DeployDatabase implements Closeable {
 	static private Log _logger = LogFactory.getLog(DeployDatabase.class);
 
-	static private QName _CONFIGURATION_SECTION = new QName("http://vcgr.cs.virginia.edu/Genesis-II",
-		"deployment-configuration");
+	static private QName _CONFIGURATION_SECTION = new QName(
+			"http://vcgr.cs.virginia.edu/Genesis-II",
+			"deployment-configuration");
 	static private final String _DEPLOYMENT_POOL_PROPERTY = "edu.virginia.vcgr.genii.container.deployment.connection-pool";
 
 	static private final String[] _TABLE_CREATION_STMTS = {
-		"CREATE TABLE DEPLOYMENTS (" + "INSTANCE_ID VARCHAR(512) PRIMARY KEY," + "DEPLOYMENT_ID VARCHAR(512),"
-			+ "DIRECTORY_NAME VARCHAR(128)," + "LAST_ACCESSED TIMESTAMP," + "USE_COUNT INTEGER," + "STATE VARCHAR(32))",
-		"CREATE TABLE DEPLOYMENT_STAMPS (" + "INSTANCE_ID VARCHAR(512)," + "COMPONENT_ID VARCHAR(512),"
-			+ "MODIFICATION_TIME TIMESTAMP)" };
+			"CREATE TABLE DEPLOYMENTS ("
+					+ "INSTANCE_ID VARCHAR(512) PRIMARY KEY,"
+					+ "DEPLOYMENT_ID VARCHAR(512),"
+					+ "DIRECTORY_NAME VARCHAR(128),"
+					+ "LAST_ACCESSED TIMESTAMP," + "USE_COUNT INTEGER,"
+					+ "STATE VARCHAR(32))",
+			"CREATE TABLE DEPLOYMENT_STAMPS (" + "INSTANCE_ID VARCHAR(512),"
+					+ "COMPONENT_ID VARCHAR(512),"
+					+ "MODIFICATION_TIME TIMESTAMP)" };
 
 	/*
 	 * Hypersonic static private final String _FIND_STALE_INSTANCES_TEXT =
 	 * "SELECT INSTANCE_ID, DIRECTORY_NAME FROM DEPLOYMENTS WHERE " +
 	 * "(((USE_COUNT = 0) AND ((STATE = ?) OR " +
-	 * "(DATEDIFF('ms', LAST_ACCESSED, CURRENT_TIMESTAMP) > ?)))" + "OR(STATE = ?))";
+	 * "(DATEDIFF('ms', LAST_ACCESSED, CURRENT_TIMESTAMP) > ?)))" +
+	 * "OR(STATE = ?))";
 	 */
 	static private final String _FIND_STALE_INSTANCES_TEXT = "SELECT INSTANCE_ID, DIRECTORY_NAME FROM DEPLOYMENTS WHERE "
-		+ "(((USE_COUNT = 0) AND ((STATE = ?) OR "
-		+ "({fn TIMESTAMPDIFF(SQL_TSI_DAY, LAST_ACCESSED, CURRENT_TIMESTAMP)} > ?)))" + "OR(STATE = ?))";
+			+ "(((USE_COUNT = 0) AND ((STATE = ?) OR "
+			+ "({fn TIMESTAMPDIFF(SQL_TSI_DAY, LAST_ACCESSED, CURRENT_TIMESTAMP)} > ?)))"
+			+ "OR(STATE = ?))";
 	static private final String _SET_STATE_TEXT = "UPDATE DEPLOYMENTS SET STATE = ? WHERE INSTANCE_ID = ?";
 	static private final String _DELETE_DEPLOYMENTS_TEXT = "DELETE FROM DEPLOYMENTS WHERE INSTANCE_ID = ?";
 	static private final String _DELETE_STAMPS_TEXT = "DELETE FROM DEPLOYMENT_STAMPS WHERE INSTANCE_ID = ?";
 	static private final String _FIND_KNOWN_DEPLOYMENTS_TEXT = "SELECT INSTANCE_ID, COMPONENT_ID, MODIFICATION_TIME FROM "
-		+ "DEPLOYMENT_STAMPS";
+			+ "DEPLOYMENT_STAMPS";
 	static private final String _CREATE_DEPLOYMENT_TEXT = "INSERT INTO DEPLOYMENTS VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?, ?)";
 	static private final String _CREATE_STAMP_TEXT = "INSERT INTO DEPLOYMENT_STAMPS VALUES (?, ?, ?)";
 	static private final String _UPDATE_COUNT_TEXT = "UPDATE DEPLOYMENTS SET LAST_ACCESSED = CURRENT_TIMESTAMP, "
-		+ "USE_COUNT = (" + "(SELECT USE_COUNT FROM DEPLOYMENTS WHERE INSTANCE_ID = ?)" + " + ?) WHERE INSTANCE_ID = ?";
+			+ "USE_COUNT = ("
+			+ "(SELECT USE_COUNT FROM DEPLOYMENTS WHERE INSTANCE_ID = ?)"
+			+ " + ?) WHERE INSTANCE_ID = ?";
 	static private final String _GET_DIRECTORY_TEXT = "SELECT DIRECTORY_NAME FROM DEPLOYMENTS WHERE INSTANCE_ID = ?";
 
 	static private ServerDatabaseConnectionPool _pool = null;
@@ -85,15 +94,13 @@ public class DeployDatabase implements Closeable
 		}
 	}
 
-	public DeployDatabase() throws SQLException
-	{
+	public DeployDatabase() throws SQLException {
 		_connection = _pool.acquire(false);
 
 		prepareStatements();
 	}
 
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		try {
 			close();
 		} finally {
@@ -101,8 +108,7 @@ public class DeployDatabase implements Closeable
 		}
 	}
 
-	public void close() throws IOException
-	{
+	public void close() throws IOException {
 		synchronized (this) {
 			StreamUtils.close(_findStaleInstances);
 			StreamUtils.close(_setState);
@@ -119,18 +125,21 @@ public class DeployDatabase implements Closeable
 		}
 	}
 
-	private void prepareStatements() throws SQLException
-	{
-		_findStaleInstances = _connection.prepareStatement(_FIND_STALE_INSTANCES_TEXT);
+	private void prepareStatements() throws SQLException {
+		_findStaleInstances = _connection
+				.prepareStatement(_FIND_STALE_INSTANCES_TEXT);
 		_findStaleInstances.setString(1, DeploymentState.STALE.name());
 		_findStaleInstances.setString(3, DeploymentState.PARTIAL.name());
 
 		_setState = _connection.prepareStatement(_SET_STATE_TEXT);
-		_deleteDeployments = _connection.prepareStatement(_DELETE_DEPLOYMENTS_TEXT);
+		_deleteDeployments = _connection
+				.prepareStatement(_DELETE_DEPLOYMENTS_TEXT);
 		_deleteStamps = _connection.prepareStatement(_DELETE_STAMPS_TEXT);
-		_findKnownDeployments = _connection.prepareStatement(_FIND_KNOWN_DEPLOYMENTS_TEXT);
+		_findKnownDeployments = _connection
+				.prepareStatement(_FIND_KNOWN_DEPLOYMENTS_TEXT);
 
-		_createDeployment = _connection.prepareStatement(_CREATE_DEPLOYMENT_TEXT);
+		_createDeployment = _connection
+				.prepareStatement(_CREATE_DEPLOYMENT_TEXT);
 		_createStamp = _connection.prepareStatement(_CREATE_STAMP_TEXT);
 
 		_updateCount = _connection.prepareStatement(_UPDATE_COUNT_TEXT);
@@ -138,18 +147,16 @@ public class DeployDatabase implements Closeable
 		_getDirectory = _connection.prepareStatement(_GET_DIRECTORY_TEXT);
 	}
 
-	public void commit() throws SQLException
-	{
+	public void commit() throws SQLException {
 		_connection.commit();
 	}
 
-	public void rollback() throws SQLException
-	{
+	public void rollback() throws SQLException {
 		_connection.rollback();
 	}
 
-	public Collection<DeploymentInformation> retrieveStaleDeployments(long timeoutDays) throws SQLException
-	{
+	public Collection<DeploymentInformation> retrieveStaleDeployments(
+			long timeoutDays) throws SQLException {
 		// keep in mind that stale means:
 		// USE_COUNT == 0 && LAST_ACCESSED > timeout
 		// USE_COUNT == 0 && STALE
@@ -164,7 +171,8 @@ public class DeployDatabase implements Closeable
 
 			ArrayList<DeploymentInformation> ret = new ArrayList<DeploymentInformation>();
 			while (rs.next()) {
-				ret.add(new DeploymentInformation(rs.getString(1), rs.getString(2)));
+				ret.add(new DeploymentInformation(rs.getString(1), rs
+						.getString(2)));
 			}
 
 			return ret;
@@ -173,8 +181,8 @@ public class DeployDatabase implements Closeable
 		}
 	}
 
-	public void setState(String instanceID, DeploymentState state) throws SQLException
-	{
+	public void setState(String instanceID, DeploymentState state)
+			throws SQLException {
 		int result;
 		synchronized (_setState) {
 			_setState.setString(1, state.name());
@@ -183,11 +191,11 @@ public class DeployDatabase implements Closeable
 		}
 
 		if (result != 1)
-			throw new SQLException("Unable to update state for instance " + instanceID);
+			throw new SQLException("Unable to update state for instance "
+					+ instanceID);
 	}
 
-	public void deleteDeployment(String instanceID) throws SQLException
-	{
+	public void deleteDeployment(String instanceID) throws SQLException {
 		_deleteDeployments.setString(1, instanceID);
 		_deleteStamps.setString(1, instanceID);
 
@@ -195,8 +203,8 @@ public class DeployDatabase implements Closeable
 		_deleteStamps.executeUpdate();
 	}
 
-	public HashMap<DeploySnapshot, String> getKnownDeployments() throws SQLException
-	{
+	public HashMap<DeploySnapshot, String> getKnownDeployments()
+			throws SQLException {
 		ResultSet rs = null;
 		HashMap<String, Collection<DeployFacet>> tmp = new HashMap<String, Collection<DeployFacet>>();
 
@@ -213,7 +221,8 @@ public class DeployDatabase implements Closeable
 				facet.add(new DeployFacet(componentID, modTime));
 			}
 
-			HashMap<DeploySnapshot, String> ret = new HashMap<DeploySnapshot, String>(tmp.size());
+			HashMap<DeploySnapshot, String> ret = new HashMap<DeploySnapshot, String>(
+					tmp.size());
 			for (String instanceID : tmp.keySet()) {
 				Collection<DeployFacet> facets = tmp.get(instanceID);
 				ret.put(new DeploySnapshot(facets), instanceID);
@@ -224,8 +233,8 @@ public class DeployDatabase implements Closeable
 		}
 	}
 
-	public String createDeployment(String deploymentID, String deployDirectory, DeploySnapshot snapshot) throws SQLException
-	{
+	public String createDeployment(String deploymentID, String deployDirectory,
+			DeploySnapshot snapshot) throws SQLException {
 		String instanceID = new GUID().toString();
 		_createDeployment.setString(1, instanceID);
 		_createDeployment.setString(2, deploymentID);
@@ -248,8 +257,7 @@ public class DeployDatabase implements Closeable
 		return instanceID;
 	}
 
-	public void updateCount(String instanceID, int delta) throws SQLException
-	{
+	public void updateCount(String instanceID, int delta) throws SQLException {
 		_updateCount.setString(1, instanceID);
 		_updateCount.setInt(2, delta);
 		_updateCount.setString(3, instanceID);
@@ -258,8 +266,7 @@ public class DeployDatabase implements Closeable
 			throw new SQLException("Unable to update counts.");
 	}
 
-	public String getDirectory(String instanceID) throws SQLException
-	{
+	public String getDirectory(String instanceID) throws SQLException {
 		ResultSet rs = null;
 
 		try {
@@ -275,16 +282,17 @@ public class DeployDatabase implements Closeable
 		}
 	}
 
-	static private ServerDatabaseConnectionPool getConnectionPool()
-	{
-		XMLConfiguration xmlConf = ConfigurationManager.getCurrentConfiguration().getContainerConfiguration();
-		Properties properties = (Properties) xmlConf.retrieveSection(_CONFIGURATION_SECTION);
+	static private ServerDatabaseConnectionPool getConnectionPool() {
+		XMLConfiguration xmlConf = ConfigurationManager
+				.getCurrentConfiguration().getContainerConfiguration();
+		Properties properties = (Properties) xmlConf
+				.retrieveSection(_CONFIGURATION_SECTION);
 		String instanceName = properties.getProperty(_DEPLOYMENT_POOL_PROPERTY);
 		return getConnectionPool(instanceName);
 	}
 
-	static private ServerDatabaseConnectionPool getConnectionPool(String poolName)
-	{
+	static private ServerDatabaseConnectionPool getConnectionPool(
+			String poolName) {
 		ServerDatabaseConnectionPool pool = null;
 		Object obj = NamedInstances.getServerInstances().lookup(poolName);
 		if (obj != null) {
@@ -292,16 +300,17 @@ public class DeployDatabase implements Closeable
 			return pool;
 		}
 
-		throw new ConfigurationException("Couldn't find connection pool \"" + poolName + "\".");
+		throw new ConfigurationException("Couldn't find connection pool \""
+				+ poolName + "\".");
 	}
 
-	static private void createTables() throws SQLException
-	{
+	static private void createTables() throws SQLException {
 		Connection connection = null;
 
 		try {
 			connection = _pool.acquire(false);
-			DatabaseTableUtils.createTables(connection, false, _TABLE_CREATION_STMTS);
+			DatabaseTableUtils.createTables(connection, false,
+					_TABLE_CREATION_STMTS);
 			connection.commit();
 		} finally {
 			_pool.release(connection);

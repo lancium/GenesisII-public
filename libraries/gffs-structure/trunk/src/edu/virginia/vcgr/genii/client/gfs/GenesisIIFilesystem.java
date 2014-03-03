@@ -51,37 +51,34 @@ import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class GenesisIIFilesystem implements FSFilesystem
-{
+public class GenesisIIFilesystem implements FSFilesystem {
 	private RNSPath _root;
 	private RNSPath _lastPath;
 	private Collection<Identity> _callerIdentities;
 
-	private FileHandleTable<GeniiOpenFile> _fileTable = new FileHandleTable<GeniiOpenFile>(256);
+	private FileHandleTable<GeniiOpenFile> _fileTable = new FileHandleTable<GeniiOpenFile>(
+			256);
 
-	final static private long toNonNull(Long l)
-	{
+	final static private long toNonNull(Long l) {
 		if (l == null)
 			return 0;
 		return l.longValue();
 	}
 
-	final static private long toMillis(Calendar c)
-	{
+	final static private long toMillis(Calendar c) {
 		if (c == null)
 			return System.currentTimeMillis();
 		return c.getTimeInMillis();
 	}
 
-	final static private Calendar toCalendar(long time)
-	{
+	final static private Calendar toCalendar(long time) {
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(time);
 		return c;
 	}
 
-	FilesystemStatStructure stat(String name, EndpointReferenceType target) throws FSException
-	{
+	FilesystemStatStructure stat(String name, EndpointReferenceType target)
+			throws FSException {
 		TypeInformation typeInfo = new TypeInformation(target);
 		FilesystemEntryType type;
 
@@ -96,8 +93,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 		try {
 			if (typeInfo.isRByteIO()) {
 				try {
-					RandomByteIORP rp =
-						(RandomByteIORP) ResourcePropertyManager.createRPInterface(target, RandomByteIORP.class);
+					RandomByteIORP rp = (RandomByteIORP) ResourcePropertyManager
+							.createRPInterface(target, RandomByteIORP.class);
 					size = toNonNull(rp.getSize());
 					created = toMillis(rp.getCreateTime());
 					modified = toMillis(rp.getModificationTime());
@@ -109,8 +106,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 				}
 			} else if (typeInfo.isSByteIO()) {
 				try {
-					StreamableByteIORP rp =
-						(StreamableByteIORP) ResourcePropertyManager.createRPInterface(target, StreamableByteIORP.class);
+					StreamableByteIORP rp = (StreamableByteIORP) ResourcePropertyManager
+							.createRPInterface(target, StreamableByteIORP.class);
 					size = toNonNull(rp.getSize());
 					created = toMillis(rp.getCreateTime());
 					modified = toMillis(rp.getModificationTime());
@@ -122,8 +119,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 				}
 			} else if (typeInfo.isSByteIOFactory()) {
 				try {
-					StreamableByteIORP rp =
-						(StreamableByteIORP) ResourcePropertyManager.createRPInterface(target, StreamableByteIORP.class);
+					StreamableByteIORP rp = (StreamableByteIORP) ResourcePropertyManager
+							.createRPInterface(target, StreamableByteIORP.class);
 					size = toNonNull(rp.getSize());
 					created = toMillis(rp.getCreateTime());
 					modified = toMillis(rp.getModificationTime());
@@ -141,26 +138,29 @@ public class GenesisIIFilesystem implements FSFilesystem
 			Permissions permissions;
 
 			try {
-				permissions = (new GenesisIIACLManager(target, _callerIdentities)).getPermissions();
+				permissions = (new GenesisIIACLManager(target,
+						_callerIdentities)).getPermissions();
 			} catch (Throwable cause) {
 				permissions = new Permissions();
 			}
 
 			int inode = (int) MetadataManager.generateInodeNumber(target);
-			return new FilesystemStatStructure(inode, name, type, size, created, modified, accessed, permissions);
+			return new FilesystemStatStructure(inode, name, type, size,
+					created, modified, accessed, permissions);
 		} catch (Throwable cause) {
-			throw FSExceptions.translate(String.format("Unable to stat target %s.", name), cause);
+			throw FSExceptions.translate(
+					String.format("Unable to stat target %s.", name), cause);
 		}
 	}
 
-	FilesystemStatStructure stat(RNSPath target) throws RNSPathDoesNotExistException, FSException
-	{
+	FilesystemStatStructure stat(RNSPath target)
+			throws RNSPathDoesNotExistException, FSException {
 		return stat(target.getName(), target.getEndpoint());
 	}
 
-	public GenesisIIFilesystem(RNSPath root, String sandbox) throws IOException, RNSPathDoesNotExistException,
-		GeneralSecurityException
-	{
+	public GenesisIIFilesystem(RNSPath root, String sandbox)
+			throws IOException, RNSPathDoesNotExistException,
+			GeneralSecurityException {
 		ICallingContext callingContext = ContextManager.getExistingContext();
 
 		if (_root == null)
@@ -175,18 +175,18 @@ public class GenesisIIFilesystem implements FSFilesystem
 		_callerIdentities = KeystoreManager.getCallerIdentities(callingContext);
 	}
 
-	protected GeniiOpenFile lookup(long fileHandle) throws FSException
-	{
+	protected GeniiOpenFile lookup(long fileHandle) throws FSException {
 		GeniiOpenFile gof = _fileTable.get((int) fileHandle);
 		if (gof == null)
-			throw new FSInvalidFileHandleException(String.format("Invalid file handle (%d).", fileHandle));
+			throw new FSInvalidFileHandleException(String.format(
+					"Invalid file handle (%d).", fileHandle));
 
 		return gof;
 	}
 
-	public RNSPath lookup(String[] pathComponents) throws FSException
-	{
-		String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(pathComponents);
+	public RNSPath lookup(String[] pathComponents) throws FSException {
+		String fullPath = UnixFilesystemPathRepresentation.INSTANCE
+				.toString(pathComponents);
 
 		RNSPath entry;
 		synchronized (_lastPath) {
@@ -198,14 +198,16 @@ public class GenesisIIFilesystem implements FSFilesystem
 	}
 
 	@Override
-	public void chmod(String[] path, Permissions permissions) throws FSException
-	{
+	public void chmod(String[] path, Permissions permissions)
+			throws FSException {
 		RNSPath target = lookup(path);
 		if (!target.exists())
-			throw new FSEntryNotFoundException(String.format("Couldn't find target path %s.", target.pwd()));
+			throw new FSEntryNotFoundException(String.format(
+					"Couldn't find target path %s.", target.pwd()));
 
 		try {
-			GenesisIIACLManager mgr = new GenesisIIACLManager(target.getEndpoint(), _callerIdentities);
+			GenesisIIACLManager mgr = new GenesisIIACLManager(
+					target.getEndpoint(), _callerIdentities);
 			mgr.setPermissions(permissions);
 		} catch (Throwable cause) {
 			throw FSExceptions.translate("Couldn't change permissions.", cause);
@@ -213,28 +215,28 @@ public class GenesisIIFilesystem implements FSFilesystem
 	}
 
 	@Override
-	public void close(long fileHandle) throws FSException
-	{
+	public void close(long fileHandle) throws FSException {
 		_fileTable.release((int) fileHandle);
 	}
 
 	@Override
-	public void flush(long fileHandle) throws FSException
-	{
+	public void flush(long fileHandle) throws FSException {
 		GeniiOpenFile gof = lookup(fileHandle);
 		gof.flush();
 	}
 
 	@Override
-	public void link(String[] sourcePath, String[] targetPath) throws FSException
-	{
+	public void link(String[] sourcePath, String[] targetPath)
+			throws FSException {
 		RNSPath source = lookup(sourcePath);
 		RNSPath target = lookup(targetPath);
 
 		if (!source.exists())
-			throw new FSEntryNotFoundException(String.format("Couldn't find entry %s.", source.pwd()));
+			throw new FSEntryNotFoundException(String.format(
+					"Couldn't find entry %s.", source.pwd()));
 		if (target.exists())
-			throw new FSEntryAlreadyExistsException(String.format("Entry %s already exists.", target.pwd()));
+			throw new FSEntryAlreadyExistsException(String.format(
+					"Entry %s already exists.", target.pwd()));
 
 		try {
 			target.link(source.getEndpoint());
@@ -245,40 +247,48 @@ public class GenesisIIFilesystem implements FSFilesystem
 	}
 
 	@Override
-	public DirectoryHandle listDirectory(String[] path) throws FSException
-	{
-		String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(path);
+	public DirectoryHandle listDirectory(String[] path) throws FSException {
+		String fullPath = UnixFilesystemPathRepresentation.INSTANCE
+				.toString(path);
 		RNSPath target = lookup(path);
 		if (!target.exists())
-			throw new FSEntryNotFoundException(String.format("The directory %s does not exist.", target.pwd()));
+			throw new FSEntryNotFoundException(String.format(
+					"The directory %s does not exist.", target.pwd()));
 
 		try {
 			TypeInformation info = new TypeInformation(target.getEndpoint());
 			if (info.isEnhancedRNS()) {
-				EnhancedRNSPortType pt = ClientUtils.createProxy(EnhancedRNSPortType.class, target.getEndpoint());
-				RNSIterable entries = new RNSIterable(fullPath, pt.lookup(null), null, RNSConstants.PREFERRED_BATCH_SIZE);
+				EnhancedRNSPortType pt = ClientUtils.createProxy(
+						EnhancedRNSPortType.class, target.getEndpoint());
+				RNSIterable entries = new RNSIterable(fullPath,
+						pt.lookup(null), null,
+						RNSConstants.PREFERRED_BATCH_SIZE);
 				return new EnhancedRNSHandle(this, entries);
 			} else if (info.isRNS()) {
 				return new DefaultRNSHandle(this, target.listContents());
 			} else {
-				throw new FSNotADirectoryException(String.format("Path %s is not a directory.", target.pwd()));
+				throw new FSNotADirectoryException(String.format(
+						"Path %s is not a directory.", target.pwd()));
 			}
 		} catch (Throwable cause) {
-			throw FSExceptions.translate("Unable to list directory contents.", cause);
+			throw FSExceptions.translate("Unable to list directory contents.",
+					cause);
 		}
 	}
 
 	@Override
-	public void mkdir(String[] path, Permissions initialPermissions) throws FSException
-	{
+	public void mkdir(String[] path, Permissions initialPermissions)
+			throws FSException {
 		RNSPath target = lookup(path);
 		if (target.exists())
-			throw new FSEntryAlreadyExistsException(String.format("Directory %s already exists.", target.pwd()));
+			throw new FSEntryAlreadyExistsException(String.format(
+					"Directory %s already exists.", target.pwd()));
 
 		try {
 			target.mkdir();
 			if (initialPermissions != null) {
-				GenesisIIACLManager mgr = new GenesisIIACLManager(target.getEndpoint(), _callerIdentities);
+				GenesisIIACLManager mgr = new GenesisIIACLManager(
+						target.getEndpoint(), _callerIdentities);
 				mgr.setCreatePermissions(initialPermissions);
 			}
 			DirectoryManager.addNewDirEntry(target, this, true);
@@ -287,22 +297,27 @@ public class GenesisIIFilesystem implements FSFilesystem
 		}
 	}
 
-	private long open(String[] path, boolean wasCreated, RNSPath target, EndpointReferenceType epr, OpenFlags flags,
-		OpenModes mode) throws FSException, ResourceException, GenesisIISecurityException, RemoteException, IOException
-	{
+	private long open(String[] path, boolean wasCreated, RNSPath target,
+			EndpointReferenceType epr, OpenFlags flags, OpenModes mode)
+			throws FSException, ResourceException, GenesisIISecurityException,
+			RemoteException, IOException {
 		GeniiOpenFile gof;
 
 		TypeInformation tInfo = new TypeInformation(epr);
 		if (tInfo.isRByteIO())
-			gof = new RandomByteIOOpenFile(path, epr, true, mode == OpenModes.READ_WRITE, flags.isAppend());
+			gof = new RandomByteIOOpenFile(path, epr, true,
+					mode == OpenModes.READ_WRITE, flags.isAppend());
 		else if (tInfo.isSByteIO())
-			gof = new StreamableByteIOOpenFile(path, wasCreated, epr, true, mode == OpenModes.READ_WRITE, flags.isAppend());
+			gof = new StreamableByteIOOpenFile(path, wasCreated, epr, true,
+					mode == OpenModes.READ_WRITE, flags.isAppend());
 		else if (tInfo.isSByteIOFactory())
-			gof = new StreamableByteIOFactoryOpenFile(path, epr, true, mode == OpenModes.READ_WRITE, flags.isAppend());
+			gof = new StreamableByteIOFactoryOpenFile(path, epr, true,
+					mode == OpenModes.READ_WRITE, flags.isAppend());
 		else {
-			String eprString = ObjectSerializer.toString(epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint"), false);
-			gof =
-				new GenericGeniiOpenFile(path, ByteBuffer.wrap(eprString.getBytes()), true, mode == OpenModes.READ_WRITE,
+			String eprString = ObjectSerializer.toString(epr, new QName(
+					GenesisIIConstants.GENESISII_NS, "endpoint"), false);
+			gof = new GenericGeniiOpenFile(path, ByteBuffer.wrap(eprString
+					.getBytes()), true, mode == OpenModes.READ_WRITE,
 					flags.isAppend());
 		}
 
@@ -310,8 +325,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	}
 
 	@Override
-	public long open(String[] path, OpenFlags flags, OpenModes mode, Permissions initialPermissions) throws FSException
-	{
+	public long open(String[] path, OpenFlags flags, OpenModes mode,
+			Permissions initialPermissions) throws FSException {
 		RNSPath target = lookup(path);
 		EndpointReferenceType epr;
 
@@ -323,16 +338,19 @@ public class GenesisIIFilesystem implements FSFilesystem
 				epr = target.getEndpoint();
 
 				if (flags.isExclusive())
-					throw new FSEntryAlreadyExistsException(String.format("Path %s already exists.", target.pwd()));
+					throw new FSEntryAlreadyExistsException(String.format(
+							"Path %s already exists.", target.pwd()));
 
 				return open(path, false, target, epr, flags, mode);
 			} else {
 				if (!flags.isCreate())
-					throw new FSEntryNotFoundException(String.format("Couldn't find path %s.", target.pwd()));
+					throw new FSEntryNotFoundException(String.format(
+							"Couldn't find path %s.", target.pwd()));
 
 				epr = target.createNewFile();
 				if (initialPermissions != null)
-					(new GenesisIIACLManager(epr, _callerIdentities)).setCreatePermissions(initialPermissions);
+					(new GenesisIIACLManager(epr, _callerIdentities))
+							.setCreatePermissions(initialPermissions);
 
 				DirectoryManager.addNewDirEntry(target, this, true);
 				return open(path, true, target, epr, flags, mode);
@@ -343,25 +361,25 @@ public class GenesisIIFilesystem implements FSFilesystem
 	}
 
 	@Override
-	public void read(long fileHandle, long offset, ByteBuffer target) throws FSException
-	{
+	public void read(long fileHandle, long offset, ByteBuffer target)
+			throws FSException {
 		GeniiOpenFile gof = lookup(fileHandle);
 		gof.read(offset, target);
 	}
 
 	@Override
-	public void write(long fileHandle, long offset, ByteBuffer source) throws FSException
-	{
+	public void write(long fileHandle, long offset, ByteBuffer source)
+			throws FSException {
 		GeniiOpenFile gof = lookup(fileHandle);
 		gof.write(offset, source);
 	}
 
 	@Override
-	public FilesystemStatStructure stat(String[] path) throws FSException
-	{
+	public FilesystemStatStructure stat(String[] path) throws FSException {
 		RNSPath target = lookup(path);
 		if (!target.exists())
-			throw new FSEntryNotFoundException(String.format("Unable to locate path %s.", target.pwd()));
+			throw new FSEntryNotFoundException(String.format(
+					"Unable to locate path %s.", target.pwd()));
 
 		try {
 			return stat(target);
@@ -371,18 +389,19 @@ public class GenesisIIFilesystem implements FSFilesystem
 	}
 
 	@Override
-	public void truncate(String[] path, long newSize) throws FSException
-	{
+	public void truncate(String[] path, long newSize) throws FSException {
 		RNSPath target = lookup(path);
 		if (!target.exists())
-			throw new FSEntryNotFoundException(String.format("Couldn't find path %s.", target.pwd()));
+			throw new FSEntryNotFoundException(String.format(
+					"Couldn't find path %s.", target.pwd()));
 
 		try {
 			TypeInformation info = new TypeInformation(target.getEndpoint());
 			if (info.isRByteIO()) {
-				RandomByteIOTransferer transferer =
-					RandomByteIOTransfererFactory.createRandomByteIOTransferer(ClientUtils.createProxy(
-						RandomByteIOPortType.class, target.getEndpoint()));
+				RandomByteIOTransferer transferer = RandomByteIOTransfererFactory
+						.createRandomByteIOTransferer(ClientUtils.createProxy(
+								RandomByteIOPortType.class,
+								target.getEndpoint()));
 				transferer.truncAppend(newSize, new byte[0]);
 
 			} else if (info.isSByteIO()) {
@@ -390,20 +409,22 @@ public class GenesisIIFilesystem implements FSFilesystem
 			} else if (info.isSByteIOFactory()) {
 				// Can't do this.
 			} else if (info.isRNS()) {
-				throw new FSNotAFileException(String.format("Path %s is not a file.", target.pwd()));
+				throw new FSNotAFileException(String.format(
+						"Path %s is not a file.", target.pwd()));
 			} else
-				throw new FSIllegalAccessException(String.format("Path %s is read only.", target.pwd()));
+				throw new FSIllegalAccessException(String.format(
+						"Path %s is read only.", target.pwd()));
 		} catch (Throwable cause) {
 			throw FSExceptions.translate("Unable to truncate file.", cause);
 		}
 	}
 
 	@Override
-	public void unlink(String[] path) throws FSException
-	{
+	public void unlink(String[] path) throws FSException {
 		RNSPath target = lookup(path);
 		if (!target.exists())
-			throw new FSEntryNotFoundException(String.format("Couldn't locate path %s.", target.pwd()));
+			throw new FSEntryNotFoundException(String.format(
+					"Couldn't locate path %s.", target.pwd()));
 
 		try {
 			MetadataManager.removeCachedAttributes(target);
@@ -415,47 +436,54 @@ public class GenesisIIFilesystem implements FSFilesystem
 	}
 
 	@Override
-	public void updateTimes(String[] path, long accessTime, long modificationTime) throws FSException
-	{
+	public void updateTimes(String[] path, long accessTime,
+			long modificationTime) throws FSException {
 		RNSPath target = lookup(path);
 		if (!target.exists())
-			throw new FSEntryNotFoundException(String.format("Unable to find path %s.", target.pwd()));
+			throw new FSEntryNotFoundException(String.format(
+					"Unable to find path %s.", target.pwd()));
 
 		try {
 			TypeInformation info = new TypeInformation(target.getEndpoint());
 			if (info.isRByteIO()) {
-				RandomByteIORP rp =
-					(RandomByteIORP) ResourcePropertyManager.createRPInterface(target.getEndpoint(), RandomByteIORP.class);
+				RandomByteIORP rp = (RandomByteIORP) ResourcePropertyManager
+						.createRPInterface(target.getEndpoint(),
+								RandomByteIORP.class);
 				rp.setAccessTime(toCalendar(accessTime));
 				rp.setModificationTime(toCalendar(modificationTime));
 			} else if (info.isSByteIO()) {
-				StreamableByteIORP rp =
-					(StreamableByteIORP) ResourcePropertyManager.createRPInterface(target.getEndpoint(),
-						StreamableByteIORP.class);
+				StreamableByteIORP rp = (StreamableByteIORP) ResourcePropertyManager
+						.createRPInterface(target.getEndpoint(),
+								StreamableByteIORP.class);
 				rp.setAccessTime(toCalendar(accessTime));
 				rp.setModificationTime(toCalendar(modificationTime));
 			}
 		} catch (Throwable cause) {
-			throw FSExceptions.translate(String.format("Unable to update timestamps for %s.", target.pwd()), cause);
+			throw FSExceptions.translate(
+					String.format("Unable to update timestamps for %s.",
+							target.pwd()), cause);
 		}
 	}
 
 	@Override
-	public void rename(String[] fromPath, String[] toPath) throws FSException
-	{
+	public void rename(String[] fromPath, String[] toPath) throws FSException {
 		RNSPath from = lookup(fromPath);
 		RNSPath to = lookup(toPath);
 
 		if (!from.exists())
-			throw new FSEntryNotFoundException(String.format("Unable to locate path %s.", from.pwd()));
+			throw new FSEntryNotFoundException(String.format(
+					"Unable to locate path %s.", from.pwd()));
 		if (to.exists())
-			throw new FSEntryAlreadyExistsException(String.format("Path %s already exists.", to.pwd()));
+			throw new FSEntryAlreadyExistsException(String.format(
+					"Path %s already exists.", to.pwd()));
 
 		try {
 			to.link(from.getEndpoint());
 			from.unlink();
 		} catch (Throwable cause) {
-			throw FSExceptions.translate(String.format("Unable to rename %s to %s.", from.pwd(), to.pwd()), cause);
+			throw FSExceptions.translate(
+					String.format("Unable to rename %s to %s.", from.pwd(),
+							to.pwd()), cause);
 		}
 	}
 }

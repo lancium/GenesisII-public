@@ -7,14 +7,13 @@ import javax.script.Bindings;
 import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
 
-public class XScriptContext extends SimpleScriptContext implements XScriptConstants, Cloneable
-{
+public class XScriptContext extends SimpleScriptContext implements
+		XScriptConstants, Cloneable {
 	private Stack<Bindings> _bindings = new Stack<Bindings>();
 
 	private Throwable _lastException = null;
 
-	static private Bindings cloneBindings(Bindings original)
-	{
+	static private Bindings cloneBindings(Bindings original) {
 		if (original == null)
 			return null;
 
@@ -25,8 +24,7 @@ public class XScriptContext extends SimpleScriptContext implements XScriptConsta
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException
-	{
+	public Object clone() throws CloneNotSupportedException {
 		XScriptContext ret = (XScriptContext) super.clone();
 
 		ret._lastException = _lastException;
@@ -40,13 +38,11 @@ public class XScriptContext extends SimpleScriptContext implements XScriptConsta
 		return ret;
 	}
 
-	public void setException(Throwable e)
-	{
+	public void setException(Throwable e) {
 		_lastException = e;
 	}
 
-	public Throwable getLastException()
-	{
+	public Throwable getLastException() {
 		try {
 			return _lastException;
 		} finally {
@@ -55,20 +51,18 @@ public class XScriptContext extends SimpleScriptContext implements XScriptConsta
 	}
 
 	@Override
-	public Object getAttribute(String name, int scope)
-	{
+	public Object getAttribute(String name, int scope) {
 		switch (scope) {
-			case ENGINE_SCOPE:
-			case GLOBAL_SCOPE:
-				return super.getAttribute(name, scope);
-			default:
-				return _bindings.get(scope - BOTTOM_SCOPE).get(name);
+		case ENGINE_SCOPE:
+		case GLOBAL_SCOPE:
+			return super.getAttribute(name, scope);
+		default:
+			return _bindings.get(scope - BOTTOM_SCOPE).get(name);
 		}
 	}
 
 	@Override
-	public Object getAttribute(String name)
-	{
+	public Object getAttribute(String name) {
 		for (int lcv = _bindings.size() - 1; lcv >= 0; lcv--) {
 			Object ret = _bindings.get(lcv).get(name);
 			if (ret != null)
@@ -79,8 +73,7 @@ public class XScriptContext extends SimpleScriptContext implements XScriptConsta
 	}
 
 	@Override
-	public int getAttributesScope(String name)
-	{
+	public int getAttributesScope(String name) {
 		for (int lcv = _bindings.size() - 1; lcv >= 0; lcv--) {
 			Object ret = _bindings.get(lcv).get(name);
 			if (ret != null)
@@ -91,20 +84,18 @@ public class XScriptContext extends SimpleScriptContext implements XScriptConsta
 	}
 
 	@Override
-	public Bindings getBindings(int scope)
-	{
+	public Bindings getBindings(int scope) {
 		switch (scope) {
-			case ENGINE_SCOPE:
-			case GLOBAL_SCOPE:
-				return super.getBindings(scope);
-			default:
-				return _bindings.get(scope - BOTTOM_SCOPE);
+		case ENGINE_SCOPE:
+		case GLOBAL_SCOPE:
+			return super.getBindings(scope);
+		default:
+			return _bindings.get(scope - BOTTOM_SCOPE);
 		}
 	}
 
 	@Override
-	public List<Integer> getScopes()
-	{
+	public List<Integer> getScopes() {
 		List<Integer> ret = super.getScopes();
 
 		for (int lcv = 0; lcv < _bindings.size(); lcv++)
@@ -114,56 +105,50 @@ public class XScriptContext extends SimpleScriptContext implements XScriptConsta
 	}
 
 	@Override
-	public Object removeAttribute(String name, int scope)
-	{
+	public Object removeAttribute(String name, int scope) {
 		switch (scope) {
-			case ENGINE_SCOPE:
-			case GLOBAL_SCOPE:
-				return super.removeAttribute(name, scope);
-			default:
-				Bindings b = _bindings.get(scope - BOTTOM_SCOPE);
-				return b.remove(name);
+		case ENGINE_SCOPE:
+		case GLOBAL_SCOPE:
+			return super.removeAttribute(name, scope);
+		default:
+			Bindings b = _bindings.get(scope - BOTTOM_SCOPE);
+			return b.remove(name);
 		}
 	}
 
-	public void setAttribute(String name, Object value)
-	{
+	public void setAttribute(String name, Object value) {
 		_bindings.peek().put(name, value);
 	}
 
 	@Override
-	public void setAttribute(String name, Object value, int scope)
-	{
+	public void setAttribute(String name, Object value, int scope) {
 		switch (scope) {
-			case ENGINE_SCOPE:
-			case GLOBAL_SCOPE:
-				super.setAttribute(name, value, scope);
-				break;
-			default:
-				_bindings.get(scope - BOTTOM_SCOPE).put(name, value);
+		case ENGINE_SCOPE:
+		case GLOBAL_SCOPE:
+			super.setAttribute(name, value, scope);
+			break;
+		default:
+			_bindings.get(scope - BOTTOM_SCOPE).put(name, value);
 		}
 	}
 
 	@Override
-	public void setBindings(Bindings bindings, int scope)
-	{
+	public void setBindings(Bindings bindings, int scope) {
 		switch (scope) {
-			case ENGINE_SCOPE:
-			case GLOBAL_SCOPE:
-				super.setBindings(bindings, scope);
-				break;
-			default:
-				_bindings.set(scope - BOTTOM_SCOPE, bindings);
+		case ENGINE_SCOPE:
+		case GLOBAL_SCOPE:
+			super.setBindings(bindings, scope);
+			break;
+		default:
+			_bindings.set(scope - BOTTOM_SCOPE, bindings);
 		}
 	}
 
-	public void push()
-	{
+	public void push() {
 		_bindings.push(new SimpleBindings());
 	}
 
-	public void pop()
-	{
+	public void pop() {
 		_bindings.pop();
 	}
 }

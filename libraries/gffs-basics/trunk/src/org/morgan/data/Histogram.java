@@ -8,12 +8,11 @@ import java.util.Vector;
 
 import org.morgan.util.Pair;
 
-public class Histogram<DataRangeType> implements Iterable<Pair<String, Integer>>
-{
+public class Histogram<DataRangeType> implements
+		Iterable<Pair<String, Integer>> {
 	static final private int DEFAULT_NUM_COLUMNS = 80;
 
-	static private String toSimpleString(Collection<Pair<String, Integer>> items)
-	{
+	static private String toSimpleString(Collection<Pair<String, Integer>> items) {
 		StringBuilder builder = new StringBuilder();
 		for (Pair<String, Integer> item : items) {
 			if (builder.length() > 0)
@@ -25,15 +24,14 @@ public class Histogram<DataRangeType> implements Iterable<Pair<String, Integer>>
 		return builder.toString();
 	}
 
-	static private <Type> List<Pair<Type, Integer>> createList(Pair<Type, Integer> pair)
-	{
+	static private <Type> List<Pair<Type, Integer>> createList(
+			Pair<Type, Integer> pair) {
 		List<Pair<Type, Integer>> ret = new Vector<Pair<Type, Integer>>(1);
 		ret.add(pair);
 		return ret;
 	}
 
-	static private int getDigitsAndSign(int value)
-	{
+	static private int getDigitsAndSign(int value) {
 		if (value == 0)
 			return 1;
 		if (value < 0)
@@ -48,10 +46,11 @@ public class Histogram<DataRangeType> implements Iterable<Pair<String, Integer>>
 
 	private DataRangeLabelDelegate<DataRangeType> _labelDelegate;
 
-	public Histogram(List<Pair<DataRangeType, Integer>> sortedItems, DataRangeLabelDelegate<DataRangeType> labelDelegate)
-	{
+	public Histogram(List<Pair<DataRangeType, Integer>> sortedItems,
+			DataRangeLabelDelegate<DataRangeType> labelDelegate) {
 		_bins = new Vector<Pair<DataRangeType, Integer>>(sortedItems);
-		_labelDelegate = (labelDelegate == null) ? new DefaultDataRangeLabelDelegate() : labelDelegate;
+		_labelDelegate = (labelDelegate == null) ? new DefaultDataRangeLabelDelegate()
+				: labelDelegate;
 
 		_minValue = Integer.MAX_VALUE;
 		_maxValue = Integer.MIN_VALUE;
@@ -62,68 +61,65 @@ public class Histogram<DataRangeType> implements Iterable<Pair<String, Integer>>
 		}
 	}
 
-	public Histogram(List<Pair<DataRangeType, Integer>> sortedItems)
-	{
+	public Histogram(List<Pair<DataRangeType, Integer>> sortedItems) {
 		this(sortedItems, null);
 	}
 
-	public Histogram(DataRangeLabelDelegate<DataRangeType> labelDelegate, Pair<DataRangeType, Integer> sortedItem)
-	{
+	public Histogram(DataRangeLabelDelegate<DataRangeType> labelDelegate,
+			Pair<DataRangeType, Integer> sortedItem) {
 		this(createList(sortedItem), labelDelegate);
 	}
 
-	public Histogram(Pair<DataRangeType, Integer> sortedItem)
-	{
+	public Histogram(Pair<DataRangeType, Integer> sortedItem) {
 		this(null, sortedItem);
 	}
 
-	final public int minimumValue()
-	{
+	final public int minimumValue() {
 		return _minValue;
 	}
 
-	final public int maximumValue()
-	{
+	final public int maximumValue() {
 		return _maxValue;
 	}
 
-	final public int size()
-	{
+	final public int size() {
 		return _bins.size();
 	}
 
-	final public boolean isEmpty()
-	{
+	final public boolean isEmpty() {
 		return _bins.isEmpty();
 	}
 
 	@Override
-	final public Iterator<Pair<String, Integer>> iterator()
-	{
-		Vector<Pair<String, Integer>> ret = new Vector<Pair<String, Integer>>(_bins.size());
+	final public Iterator<Pair<String, Integer>> iterator() {
+		Vector<Pair<String, Integer>> ret = new Vector<Pair<String, Integer>>(
+				_bins.size());
 		for (Pair<DataRangeType, Integer> item : _bins)
-			ret.add(new Pair<String, Integer>(_labelDelegate.toString(item.first()), item.second()));
+			ret.add(new Pair<String, Integer>(_labelDelegate.toString(item
+					.first()), item.second()));
 
 		return ret.iterator();
 	}
 
 	/**
-	 * Returns a multi-line string with no line having more than the specified number of columns.
-	 * Each line will correspond to an item in the histo gram with the following format: <label>:
-	 * {marks} [<value>] Where {marks} is some number of minuses, or pluses (or a 0) indicating the
-	 * scaled size of the value for that label. An example output for values of -10, 0, and 10 might
-	 * be Minus 10: ----- [-10] Zero : 0 [ 0] Plus 10 : +++++ [ 10]
+	 * Returns a multi-line string with no line having more than the specified
+	 * number of columns. Each line will correspond to an item in the histo gram
+	 * with the following format: <label>: {marks} [<value>] Where {marks} is
+	 * some number of minuses, or pluses (or a 0) indicating the scaled size of
+	 * the value for that label. An example output for values of -10, 0, and 10
+	 * might be Minus 10: ----- [-10] Zero : 0 [ 0] Plus 10 : +++++ [ 10]
 	 * 
 	 * @param columns
 	 * @return
 	 */
-	final public String toString(int columns)
-	{
-		int maxValueDigits = Math.max(getDigitsAndSign(_minValue), getDigitsAndSign(_maxValue));
+	final public String toString(int columns) {
+		int maxValueDigits = Math.max(getDigitsAndSign(_minValue),
+				getDigitsAndSign(_maxValue));
 		int maxLabelLength = 0;
 		int spaceLeftForMarks;
 
-		Vector<Pair<String, Integer>> items = new Vector<Pair<String, Integer>>(_bins.size());
+		Vector<Pair<String, Integer>> items = new Vector<Pair<String, Integer>>(
+				_bins.size());
 
 		for (Pair<DataRangeType, Integer> item : _bins) {
 			String label = _labelDelegate.toString(item.first());
@@ -131,14 +127,17 @@ public class Histogram<DataRangeType> implements Iterable<Pair<String, Integer>>
 			maxLabelLength = Math.max(maxLabelLength, label.length());
 		}
 
-		spaceLeftForMarks = columns - (maxLabelLength + 2) - (maxValueDigits + 3);
+		spaceLeftForMarks = columns - (maxLabelLength + 2)
+				- (maxValueDigits + 3);
 
 		if (spaceLeftForMarks < 9)
 			return toSimpleString(items);
 
-		String format = String.format("%%-%ds: %%s [%%%dd]", maxLabelLength, maxValueDigits);
+		String format = String.format("%%-%ds: %%s [%%%dd]", maxLabelLength,
+				maxValueDigits);
 		StringBuilder builder = new StringBuilder();
-		MarkingContext context = new MarkingContext(_minValue, _maxValue, spaceLeftForMarks);
+		MarkingContext context = new MarkingContext(_minValue, _maxValue,
+				spaceLeftForMarks);
 
 		for (Pair<String, Integer> item : items) {
 			if (builder.length() > 0)
@@ -147,36 +146,33 @@ public class Histogram<DataRangeType> implements Iterable<Pair<String, Integer>>
 			String label = item.first();
 			int value = item.second().intValue();
 
-			builder.append(String.format(format, label, context.makeMarks(value), value));
+			builder.append(String.format(format, label,
+					context.makeMarks(value), value));
 		}
 
 		return builder.toString();
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		return toString(DEFAULT_NUM_COLUMNS);
 	}
 
-	private class DefaultDataRangeLabelDelegate implements DataRangeLabelDelegate<DataRangeType>
-	{
+	private class DefaultDataRangeLabelDelegate implements
+			DataRangeLabelDelegate<DataRangeType> {
 		@Override
-		final public String toString(DataRangeType dataRange)
-		{
+		final public String toString(DataRangeType dataRange) {
 			return dataRange.toString();
 		}
 	}
 
-	static private class MarkingContext
-	{
+	static private class MarkingContext {
 		private int _spaceForMarks;
 		private int _zeroPosition;
 		private int _spread;
 		private double _valuesPerMark;
 
-		private MarkingContext(int minValue, int maxValue, int spaceForMarks)
-		{
+		private MarkingContext(int minValue, int maxValue, int spaceForMarks) {
 			_spaceForMarks = spaceForMarks;
 			if (minValue < 0) {
 				if (maxValue > 0) {
@@ -193,8 +189,7 @@ public class Histogram<DataRangeType> implements Iterable<Pair<String, Integer>>
 			_valuesPerMark = (double) _spread / _spaceForMarks;
 		}
 
-		public String makeMarks(int value)
-		{
+		public String makeMarks(int value) {
 			char[] characters = new char[_spaceForMarks];
 			Arrays.fill(characters, ' ');
 			double counter = 0.0;

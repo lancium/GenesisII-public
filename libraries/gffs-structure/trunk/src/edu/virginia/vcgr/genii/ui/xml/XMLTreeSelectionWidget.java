@@ -7,13 +7,12 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.Document;
 import javax.swing.tree.TreePath;
 
-public class XMLTreeSelectionWidget extends JTextArea implements TreeSelectionListener
-{
+public class XMLTreeSelectionWidget extends JTextArea implements
+		TreeSelectionListener {
 	static final long serialVersionUID = 0L;
 
 	@Override
-	public void valueChanged(TreeSelectionEvent e)
-	{
+	public void valueChanged(TreeSelectionEvent e) {
 		Document doc = getDocument();
 		try {
 			doc.remove(0, doc.getLength());

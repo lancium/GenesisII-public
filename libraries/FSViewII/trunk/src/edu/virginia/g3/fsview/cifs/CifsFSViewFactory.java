@@ -12,40 +12,43 @@ import edu.virginia.g3.fsview.FSViewAuthenticationInformationTypes;
 import edu.virginia.g3.fsview.FSViewSession;
 import edu.virginia.g3.fsview.UsernamePasswordAuthenticationInformation;
 
-final public class CifsFSViewFactory extends AbstractFSViewFactory
-{
+final public class CifsFSViewFactory extends AbstractFSViewFactory {
 	static final private String[] SUPPORTED_URI_SCHEMES = { "smb" };
 	static final private String DESCRIPTION = "Samba File System";
 
-	public CifsFSViewFactory()
-	{
-		super(new CifsViewInformationManager(), SUPPORTED_URI_SCHEMES, DESCRIPTION,
-			FSViewAuthenticationInformationTypes.UsernamePassword, FSViewAuthenticationInformationTypes.DomainUsernamePassword);
+	public CifsFSViewFactory() {
+		super(new CifsViewInformationManager(), SUPPORTED_URI_SCHEMES,
+				DESCRIPTION,
+				FSViewAuthenticationInformationTypes.UsernamePassword,
+				FSViewAuthenticationInformationTypes.DomainUsernamePassword);
 	}
 
 	@Override
-	final public FSViewSession openSession(URI fsRoot, FSViewAuthenticationInformation authInfo, boolean readOnly)
-		throws IOException
-	{
+	final public FSViewSession openSession(URI fsRoot,
+			FSViewAuthenticationInformation authInfo, boolean readOnly)
+			throws IOException {
 		DomainUsernamePassswordAuthenticationInformation dup;
 
 		switch (authInfo.authenticationType()) {
-			case UsernamePassword:
-				authInfo =
-					new DomainUsernamePassswordAuthenticationInformation(
-						((UsernamePasswordAuthenticationInformation) authInfo).username(),
-						((UsernamePasswordAuthenticationInformation) authInfo).password());
+		case UsernamePassword:
+			authInfo = new DomainUsernamePassswordAuthenticationInformation(
+					((UsernamePasswordAuthenticationInformation) authInfo)
+							.username(),
+					((UsernamePasswordAuthenticationInformation) authInfo)
+							.password());
 
-			case DomainUsernamePassword:
-				dup = (DomainUsernamePassswordAuthenticationInformation) authInfo;
-				break;
+		case DomainUsernamePassword:
+			dup = (DomainUsernamePassswordAuthenticationInformation) authInfo;
+			break;
 
-			default:
-				throw new IllegalArgumentException("Authentication information must be either "
-					+ "UsernamePassword or DomainUsernamePassword.");
+		default:
+			throw new IllegalArgumentException(
+					"Authentication information must be either "
+							+ "UsernamePassword or DomainUsernamePassword.");
 		}
 
-		NtlmPasswordAuthentication smbAuthInfo = new NtlmPasswordAuthentication(dup.domain(), dup.username(), dup.password());
+		NtlmPasswordAuthentication smbAuthInfo = new NtlmPasswordAuthentication(
+				dup.domain(), dup.username(), dup.password());
 		return new CifsFSViewSession(this, fsRoot, smbAuthInfo, readOnly);
 	}
 }

@@ -5,8 +5,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 import org.w3c.dom.Element;
 
-class ApplicationRegistration
-{
+class ApplicationRegistration {
 	@XmlAttribute(name = "type", required = true)
 	private ApplicationRegistrationTypes _registrationType = null;
 
@@ -16,15 +15,16 @@ class ApplicationRegistration
 	@XmlAnyElement
 	private Element _configuration = null;
 
-	final ApplicationRegistrationTypes registrationType()
-	{
+	final ApplicationRegistrationTypes registrationType() {
 		return _registrationType;
 	}
 
-	final ExternalApplication createApplication() throws ClassNotFoundException, InstantiationException, IllegalAccessException
-	{
+	final ExternalApplication createApplication()
+			throws ClassNotFoundException, InstantiationException,
+			IllegalAccessException {
 		Class<?> factoryClass = Class.forName(_factoryClassName);
-		ExternalApplicationFactory factory = (ExternalApplicationFactory) factoryClass.newInstance();
+		ExternalApplicationFactory factory = (ExternalApplicationFactory) factoryClass
+				.newInstance();
 		return factory.createApplication(_configuration);
 	}
 }

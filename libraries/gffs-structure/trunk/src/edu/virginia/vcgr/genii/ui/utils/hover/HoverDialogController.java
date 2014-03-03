@@ -22,8 +22,7 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class HoverDialogController
-{
+public class HoverDialogController {
 	static final public int DEFAULT_HOVER_TIME = 1500;
 
 	private Rectangle _screenSize;
@@ -35,23 +34,25 @@ public class HoverDialogController
 	private int _hoverTime;
 
 	@Override
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		dispose();
 	}
 
-	public HoverDialogController(Component sourceComponent, HoverDialogProvider provider, int hoverTime)
-	{
+	public HoverDialogController(Component sourceComponent,
+			HoverDialogProvider provider, int hoverTime) {
 		if (sourceComponent == null)
-			throw new IllegalArgumentException("Source component cannot be null.");
+			throw new IllegalArgumentException(
+					"Source component cannot be null.");
 
 		if (provider == null)
-			throw new IllegalArgumentException("Hover dialog provider cannot be null.");
+			throw new IllegalArgumentException(
+					"Hover dialog provider cannot be null.");
 
 		if (hoverTime < 0)
 			throw new IllegalArgumentException("Hover time cannot be negative.");
 
-		_screenSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		_screenSize = GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getMaximumWindowBounds();
 
 		_provider = provider;
 		_hoverTime = hoverTime;
@@ -69,13 +70,12 @@ public class HoverDialogController
 		}
 	}
 
-	public HoverDialogController(Component sourceComponent, HoverDialogProvider provider)
-	{
+	public HoverDialogController(Component sourceComponent,
+			HoverDialogProvider provider) {
 		this(sourceComponent, provider, DEFAULT_HOVER_TIME);
 	}
 
-	synchronized final public void dispose()
-	{
+	synchronized final public void dispose() {
 		if (!_disposed) {
 			_disposed = true;
 
@@ -86,13 +86,12 @@ public class HoverDialogController
 		}
 	}
 
-	private class MouseListenerImpl extends MouseAdapter implements ActionListener, HierarchyListener, ChangeListener
-	{
+	private class MouseListenerImpl extends MouseAdapter implements
+			ActionListener, HierarchyListener, ChangeListener {
 		private Point _lastViewPosition = null;
 		private JDialog _dialog = null;
 
-		private void destroyDialog()
-		{
+		private void destroyDialog() {
 			if (_dialog != null) {
 				_dialog.setVisible(false);
 				_dialog = null;
@@ -100,8 +99,7 @@ public class HoverDialogController
 		}
 
 		@Override
-		final public void mouseExited(MouseEvent e)
-		{
+		final public void mouseExited(MouseEvent e) {
 			if (_timer != null) {
 				_timer.stop();
 				_timer = null;
@@ -111,8 +109,7 @@ public class HoverDialogController
 		}
 
 		@Override
-		final public void mouseMoved(MouseEvent e)
-		{
+		final public void mouseMoved(MouseEvent e) {
 			_exited = false;
 
 			if (_timer != null) {
@@ -129,7 +126,8 @@ public class HoverDialogController
 
 			if (_provider.updatePosition(e.getComponent(), e.getPoint())) {
 				_lastScreenPoint = new Point(point);
-				SwingUtilities.convertPointToScreen(_lastScreenPoint, e.getComponent());
+				SwingUtilities.convertPointToScreen(_lastScreenPoint,
+						e.getComponent());
 
 				_timer = new Timer(_hoverTime, this);
 				_timer.start();
@@ -137,8 +135,7 @@ public class HoverDialogController
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e)
-		{
+		final public void actionPerformed(ActionEvent e) {
 			if (_disposed)
 				return;
 
@@ -157,14 +154,17 @@ public class HoverDialogController
 					dialog.setUndecorated(true);
 				dialog.pack();
 
-				Point location = new Point(_lastScreenPoint.x - 1, _lastScreenPoint.y - 1);
+				Point location = new Point(_lastScreenPoint.x - 1,
+						_lastScreenPoint.y - 1);
 
 				dialog.setLocation(location);
 				Rectangle dialogSize = dialog.getBounds();
 				int deltaX, deltaY;
 
-				deltaX = (int) Math.min(0.0, _screenSize.getMaxX() - dialogSize.getMaxX());
-				deltaY = (int) Math.min(0.0, _screenSize.getMaxY() - dialogSize.getMaxY());
+				deltaX = (int) Math.min(0.0,
+						_screenSize.getMaxX() - dialogSize.getMaxX());
+				deltaY = (int) Math.min(0.0,
+						_screenSize.getMaxY() - dialogSize.getMaxY());
 
 				location.translate(deltaX, deltaY);
 				dialog.setLocation(location);
@@ -175,8 +175,7 @@ public class HoverDialogController
 		}
 
 		@Override
-		public void hierarchyChanged(HierarchyEvent e)
-		{
+		public void hierarchyChanged(HierarchyEvent e) {
 			if ((e.getChangeFlags() & (HierarchyEvent.PARENT_CHANGED)) > 0x0) {
 				if ((e.getChangeFlags() & (HierarchyEvent.COMPONENT_EVENT_MASK)) > 0x0) {
 					Container c = e.getChangedParent();
@@ -187,15 +186,17 @@ public class HoverDialogController
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e)
-		{
+		public void stateChanged(ChangeEvent e) {
 			Point p = ((JViewport) e.getSource()).getViewPosition();
 			if (_lastViewPosition != null) {
 				if (!p.equals(_lastViewPosition) && _lastScreenPoint != null) {
 					Point mousePoint = new Point(_lastScreenPoint);
-					SwingUtilities.convertPointFromScreen(mousePoint, ((JViewport) e.getSource()).getView());
-					mouseMoved(new MouseEvent(((JViewport) e.getSource()).getView(), 0, System.currentTimeMillis(), 0x0,
-						mousePoint.x, mousePoint.y, 0, false));
+					SwingUtilities.convertPointFromScreen(mousePoint,
+							((JViewport) e.getSource()).getView());
+					mouseMoved(new MouseEvent(
+							((JViewport) e.getSource()).getView(), 0,
+							System.currentTimeMillis(), 0x0, mousePoint.x,
+							mousePoint.y, 0, false));
 				}
 			}
 
@@ -203,24 +204,20 @@ public class HoverDialogController
 		}
 	}
 
-	private class DialogDestroy implements WindowFocusListener
-	{
+	private class DialogDestroy implements WindowFocusListener {
 		private JDialog _dialog;
 
-		private DialogDestroy(JDialog dialog)
-		{
+		private DialogDestroy(JDialog dialog) {
 			_dialog = dialog;
 		}
 
 		@Override
-		public void windowGainedFocus(WindowEvent e)
-		{
+		public void windowGainedFocus(WindowEvent e) {
 			// Do nothing
 		}
 
 		@Override
-		public void windowLostFocus(WindowEvent e)
-		{
+		public void windowLostFocus(WindowEvent e) {
 			_dialog.setVisible(false);
 			_dialog.removeWindowFocusListener(this);
 		}

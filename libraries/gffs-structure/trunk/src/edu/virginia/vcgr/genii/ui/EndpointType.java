@@ -7,27 +7,18 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 
 public enum EndpointType {
-	DIRECTORY(),
-	FILE(),
-	BES(),
-	QUEUE(),
-	HEAVY_EXPORT(),
-	LIGHT_EXPORT(),
-	USER(),
-	UNKNOWN();
+	DIRECTORY(), FILE(), BES(), QUEUE(), HEAVY_EXPORT(), LIGHT_EXPORT(), USER(), UNKNOWN();
 
-	static public EndpointType determineType(RNSPath target) throws RNSPathDoesNotExistException
-	{
+	static public EndpointType determineType(RNSPath target)
+			throws RNSPathDoesNotExistException {
 		return determineType(target.getEndpoint());
 	}
 
-	static public EndpointType determineType(EndpointReferenceType target)
-	{
+	static public EndpointType determineType(EndpointReferenceType target) {
 		return determineType(new TypeInformation(target));
 	}
 
-	static public EndpointType determineType(TypeInformation typeInfo)
-	{
+	static public EndpointType determineType(TypeInformation typeInfo) {
 		if (typeInfo.isQueue())
 			return QUEUE;
 		else if (typeInfo.isBES())
@@ -50,13 +41,12 @@ public enum EndpointType {
 			return UNKNOWN;
 	}
 
-	static public boolean isLocal(EndpointReferenceType target)
-	{
+	static public boolean isLocal(EndpointReferenceType target) {
 		return false;
 	}
 
-	static public boolean isLocal(RNSPath path) throws RNSPathDoesNotExistException
-	{
+	static public boolean isLocal(RNSPath path)
+			throws RNSPathDoesNotExistException {
 		return isLocal(path.getEndpoint());
 	}
 }

@@ -9,15 +9,14 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-public class DependencyGraph
-{
-	static private Class<?>[] dependentClasses(Class<?> sourceClass, String sourceMethodName,
-		Class<?>[] sourceMethodParameterTypes)
-	{
+public class DependencyGraph {
+	static private Class<?>[] dependentClasses(Class<?> sourceClass,
+			String sourceMethodName, Class<?>[] sourceMethodParameterTypes) {
 		GridDependency dependency = null;
 
 		try {
-			Method sourceMethod = sourceClass.getMethod(sourceMethodName, sourceMethodParameterTypes);
+			Method sourceMethod = sourceClass.getMethod(sourceMethodName,
+					sourceMethodParameterTypes);
 			dependency = sourceMethod.getAnnotation(GridDependency.class);
 		} catch (Throwable cause) {
 			// Couldn't find the method, but that's no problem, it may not have
@@ -33,13 +32,14 @@ public class DependencyGraph
 		return dependency.value();
 	}
 
-	static public DependencyGraph buildGraph(Collection<Class<?>> serviceClasses, String sourceMethodName,
-		Class<?>[] sourceMethodParameterTypes) throws GraphException
-	{
+	static public DependencyGraph buildGraph(
+			Collection<Class<?>> serviceClasses, String sourceMethodName,
+			Class<?>[] sourceMethodParameterTypes) throws GraphException {
 		DependencyGraph ret = new DependencyGraph();
 
 		for (Class<?> serviceClass : serviceClasses)
-			ret.addClass(serviceClass, sourceMethodName, sourceMethodParameterTypes);
+			ret.addClass(serviceClass, sourceMethodName,
+					sourceMethodParameterTypes);
 
 		ret.detectCycles();
 
@@ -48,21 +48,24 @@ public class DependencyGraph
 
 	private Map<Class<?>, Set<Class<?>>> _graph = new HashMap<Class<?>, Set<Class<?>>>();
 
-	private DependencyGraph()
-	{
+	private DependencyGraph() {
 	}
 
-	private void addClass(Class<?> cl, String sourceMethodName, Class<?>[] sourceMethodParameterTypes) throws GraphException
-	{
+	private void addClass(Class<?> cl, String sourceMethodName,
+			Class<?>[] sourceMethodParameterTypes) throws GraphException {
 		Set<Class<?>> depSet = _graph.get(cl);
 		if (depSet != null)
 			return;
 
 		_graph.put(cl, depSet = new HashSet<Class<?>>());
-		Class<?>[] dependencies = dependentClasses(cl, sourceMethodName, sourceMethodParameterTypes);
+		Class<?>[] dependencies = dependentClasses(cl, sourceMethodName,
+				sourceMethodParameterTypes);
 		for (Class<?> dep : dependencies) {
 			if (dep.equals(cl))
-				throw new GraphException(String.format("Error adding %s to graph -- it depends on itself!", cl));
+				throw new GraphException(
+						String.format(
+								"Error adding %s to graph -- it depends on itself!",
+								cl));
 			depSet.add(dep);
 		}
 
@@ -70,8 +73,7 @@ public class DependencyGraph
 			addClass(dep, sourceMethodName, sourceMethodParameterTypes);
 	}
 
-	static private String toString(Class<?> cl)
-	{
+	static private String toString(Class<?> cl) {
 		String ret = cl.getName();
 		int index = ret.lastIndexOf('.');
 		if (index >= 0)
@@ -80,18 +82,15 @@ public class DependencyGraph
 		return ret;
 	}
 
-	static private class GraphBasedComparator implements Comparator<Class<?>>
-	{
+	static private class GraphBasedComparator implements Comparator<Class<?>> {
 		private Map<Class<?>, Set<Class<?>>> _totalMap;
 
-		private GraphBasedComparator(Map<Class<?>, Set<Class<?>>> totalMap)
-		{
+		private GraphBasedComparator(Map<Class<?>, Set<Class<?>>> totalMap) {
 			_totalMap = totalMap;
 		}
 
 		@Override
-		public int compare(Class<?> o1, Class<?> o2)
-		{
+		public int compare(Class<?> o1, Class<?> o2) {
 			Set<Class<?>> o1Set = _totalMap.get(o1);
 			if (o1Set == null)
 				o1Set = new HashSet<Class<?>>();
@@ -109,24 +108,20 @@ public class DependencyGraph
 		}
 	}
 
-	static private class GraphBasedObjectComparator<T> implements Comparator<T>
-	{
+	static private class GraphBasedObjectComparator<T> implements Comparator<T> {
 		private Comparator<Class<?>> _classComparator;
 
-		private GraphBasedObjectComparator(Comparator<Class<?>> classComparator)
-		{
+		private GraphBasedObjectComparator(Comparator<Class<?>> classComparator) {
 			_classComparator = classComparator;
 		}
 
 		@Override
-		public int compare(T o1, T o2)
-		{
+		public int compare(T o1, T o2) {
 			return _classComparator.compare(o1.getClass(), o2.getClass());
 		}
 	}
 
-	private void addAll(Set<Class<?>> totalSet, Class<?> key)
-	{
+	private void addAll(Set<Class<?>> totalSet, Class<?> key) {
 		Set<Class<?>> dep = _graph.get(key);
 		if (dep != null) {
 			for (Class<?> next : dep) {
@@ -136,8 +131,7 @@ public class DependencyGraph
 		}
 	}
 
-	private Map<Class<?>, Set<Class<?>>> createTotalMap()
-	{
+	private Map<Class<?>, Set<Class<?>>> createTotalMap() {
 		Map<Class<?>, Set<Class<?>>> totalMap = new HashMap<Class<?>, Set<Class<?>>>();
 
 		for (Class<?> key : _graph.keySet()) {
@@ -150,10 +144,11 @@ public class DependencyGraph
 		return totalMap;
 	}
 
-	private void throwCycle(LinkedList<Class<?>> visitSet) throws GraphException
-	{
+	private void throwCycle(LinkedList<Class<?>> visitSet)
+			throws GraphException {
 		Class<?> last = visitSet.getLast();
-		StringBuilder builder = new StringBuilder("Cycle detected in dependency graph:  ");
+		StringBuilder builder = new StringBuilder(
+				"Cycle detected in dependency graph:  ");
 		boolean started = false;
 		for (Class<?> node : visitSet) {
 			if (started) {
@@ -169,8 +164,8 @@ public class DependencyGraph
 		throw new GraphException(builder.toString());
 	}
 
-	private void detectCycles(LinkedList<Class<?>> visitSet) throws GraphException
-	{
+	private void detectCycles(LinkedList<Class<?>> visitSet)
+			throws GraphException {
 		Class<?> current = visitSet.getLast();
 		Set<Class<?>> edgeSet = _graph.get(current);
 		if (edgeSet != null) {
@@ -189,8 +184,7 @@ public class DependencyGraph
 		return;
 	}
 
-	private void detectCycles() throws GraphException
-	{
+	private void detectCycles() throws GraphException {
 		for (Class<?> testClass : _graph.keySet()) {
 			LinkedList<Class<?>> visitSet = new LinkedList<Class<?>>();
 			visitSet.add(testClass);
@@ -198,13 +192,13 @@ public class DependencyGraph
 		}
 	}
 
-	final public Comparator<Class<?>> createComparator(Collection<Class<?>> classes)
-	{
+	final public Comparator<Class<?>> createComparator(
+			Collection<Class<?>> classes) {
 		return new GraphBasedComparator(createTotalMap());
 	}
 
-	final public <T> Comparator<T> createObjectComparator(Class<T> objClass)
-	{
-		return new GraphBasedObjectComparator<T>(new GraphBasedComparator(createTotalMap()));
+	final public <T> Comparator<T> createObjectComparator(Class<T> objClass) {
+		return new GraphBasedObjectComparator<T>(new GraphBasedComparator(
+				createTotalMap()));
 	}
 }

@@ -3,18 +3,13 @@ package edu.virginia.vcgr.genii.security;
 import java.util.EnumSet;
 
 public enum RWXCategory {
-	INHERITED,
-	READ,
-	WRITE,
-	EXECUTE,
-	OPEN,
-	CLOSED;
+	INHERITED, READ, WRITE, EXECUTE, OPEN, CLOSED;
 
 	// a constant representing all rwx capabilities.
-	public final static EnumSet<RWXCategory> FULL_ACCESS = EnumSet.of(RWXCategory.READ, RWXCategory.WRITE, RWXCategory.EXECUTE);
+	public final static EnumSet<RWXCategory> FULL_ACCESS = EnumSet.of(
+			RWXCategory.READ, RWXCategory.WRITE, RWXCategory.EXECUTE);
 
-	public static RWXCategory getMatchingCategory(String categoryName)
-	{
+	public static RWXCategory getMatchingCategory(String categoryName) {
 
 		if (categoryName == null)
 			return null;

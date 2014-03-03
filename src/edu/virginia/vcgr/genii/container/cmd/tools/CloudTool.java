@@ -15,8 +15,7 @@ import edu.virginia.vcgr.genii.cloud.CloudStat;
 import edu.virginia.vcgr.genii.cloud.VMStat;
 import edu.virginia.vcgr.genii.cloud.VMStats;
 
-public class CloudTool extends BaseGridTool
-{
+public class CloudTool extends BaseGridTool {
 
 	static private final String _DESCRIPTION = "config/tooldocs/description/dcloudTool";
 
@@ -31,45 +30,42 @@ public class CloudTool extends BaseGridTool
 	private boolean _vmstatus = false;
 
 	@Option({ "shrink" })
-	public void setShrink(String count)
-	{
+	public void setShrink(String count) {
 		_shrink = Integer.parseInt(count);
 		_count++;
 	}
 
 	@Option({ "kill" })
-	public void setKill(String id)
-	{
+	public void setKill(String id) {
 		_kill = id;
 		_count++;
 	}
 
 	@Option({ "spawn" })
-	public void setSpawn(String count)
-	{
+	public void setSpawn(String count) {
 		_spawn = Integer.parseInt(count);
 		_count++;
 	}
 
 	@Option({ "vmstatus" })
-	public void setVMStatus()
-	{
+	public void setVMStatus() {
 		_vmstatus = true;
 		_count++;
 	}
 
-	public CloudTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE_RESOURCE), false, ToolCategory.INTERNAL);
+	public CloudTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(
+				_USAGE_RESOURCE), false, ToolCategory.INTERNAL);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 
-		RNSPath bes = lookup(new GeniiPath(getArgument(0)), RNSPathQueryFlags.MUST_EXIST);
-		CloudRP rp = (CloudRP) ResourcePropertyManager.createRPInterface(bes.getEndpoint(), CloudRP.class);
+		RNSPath bes = lookup(new GeniiPath(getArgument(0)),
+				RNSPathQueryFlags.MUST_EXIST);
+		CloudRP rp = (CloudRP) ResourcePropertyManager.createRPInterface(
+				bes.getEndpoint(), CloudRP.class);
 
 		if (_spawn != -1) {
 			stdout.println("Attempting to spawn " + _spawn + " resources");
@@ -90,7 +86,8 @@ public class CloudTool extends BaseGridTool
 			stdout.println("Resources");
 			VMStats tStats = rp.getVMStatus();
 			for (VMStat tStat : tStats.getResources()) {
-				stdout.println(tStat.getID() + " " + tStat.getLoad() + " " + tStat.getState() + " " + tStat.getHost());
+				stdout.println(tStat.getID() + " " + tStat.getLoad() + " "
+						+ tStat.getState() + " " + tStat.getHost());
 			}
 		}
 		if (_count == 0) {
@@ -102,8 +99,7 @@ public class CloudTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() != 1)
 			throw new InvalidToolUsageException();
 		if (!(_count == 1 || _count == 0))

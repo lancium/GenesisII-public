@@ -11,13 +11,12 @@ import edu.virginia.g3.fsview.AbstractFSViewRandomAccessFileEntry;
 import edu.virginia.g3.fsview.FSViewDirectoryEntry;
 import edu.virginia.g3.fsview.utils.IOUtils;
 
-final class FileFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFileEntry<FileFSViewSession>
-{
+final class FileFSViewRandomAccessFileEntry extends
+		AbstractFSViewRandomAccessFileEntry<FileFSViewSession> {
 	private File _file;
 
 	@Override
-	final protected void truncateImpl(long newLength) throws IOException
-	{
+	final protected void truncateImpl(long newLength) throws IOException {
 		RandomAccessFile raf = null;
 
 		try {
@@ -29,8 +28,7 @@ final class FileFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final protected void appendImpl(ByteBuffer content) throws IOException
-	{
+	final protected void appendImpl(ByteBuffer content) throws IOException {
 		FileOutputStream out = null;
 
 		try {
@@ -42,8 +40,8 @@ final class FileFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final protected void writeImpl(long offset, ByteBuffer source) throws IOException
-	{
+	final protected void writeImpl(long offset, ByteBuffer source)
+			throws IOException {
 		RandomAccessFile raf = null;
 
 		try {
@@ -56,21 +54,19 @@ final class FileFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final protected boolean canWriteImpl()
-	{
+	final protected boolean canWriteImpl() {
 		return _file.canWrite();
 	}
 
-	FileFSViewRandomAccessFileEntry(FileFSViewSession session, FSViewDirectoryEntry parentEntry, String entryName, File file)
-	{
+	FileFSViewRandomAccessFileEntry(FileFSViewSession session,
+			FSViewDirectoryEntry parentEntry, String entryName, File file) {
 		super(FileFSViewSession.class, session, parentEntry, entryName);
 
 		_file = file;
 	}
 
 	@Override
-	final public void read(long offset, ByteBuffer sink) throws IOException
-	{
+	final public void read(long offset, ByteBuffer sink) throws IOException {
 		RandomAccessFile raf = null;
 
 		try {
@@ -83,20 +79,17 @@ final class FileFSViewRandomAccessFileEntry extends AbstractFSViewRandomAccessFi
 	}
 
 	@Override
-	final public Long size()
-	{
+	final public Long size() {
 		return _file.length();
 	}
 
 	@Override
-	final public boolean canRead()
-	{
+	final public boolean canRead() {
 		return _file.canRead();
 	}
 
 	@Override
-	final public Calendar lastModified()
-	{
+	final public Calendar lastModified() {
 		Calendar ret = Calendar.getInstance();
 		ret.setTimeInMillis(_file.lastModified());
 		return ret;

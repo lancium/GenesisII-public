@@ -8,16 +8,14 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "container-services")
-class Version1Configuration
-{
+class Version1Configuration {
 	@XmlElement(name = "variable", nillable = true, required = false)
 	private Collection<Version1Variable> _variables = new LinkedList<Version1Variable>();
 
 	@XmlElement(name = "container-service", nillable = true, required = false)
 	private Collection<Version1ContainerService> _services = new LinkedList<Version1ContainerService>();
 
-	final Properties variables()
-	{
+	final Properties variables() {
 		Properties ret = new Properties();
 		for (Version1Variable variable : _variables)
 			ret.setProperty(variable.name(), variable.value());
@@ -25,8 +23,7 @@ class Version1Configuration
 		return ret;
 	}
 
-	final Collection<Version1ContainerService> services()
-	{
+	final Collection<Version1ContainerService> services() {
 		return _services;
 	}
 }

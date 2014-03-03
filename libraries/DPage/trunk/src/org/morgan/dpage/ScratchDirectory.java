@@ -4,12 +4,10 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 
-class ScratchDirectory extends File implements Closeable
-{
+class ScratchDirectory extends File implements Closeable {
 	private static final long serialVersionUID = 1L;
 
-	static private void recursiveDelete(File directory)
-	{
+	static private void recursiveDelete(File directory) {
 		if (directory.isDirectory())
 			for (File entry : directory.listFiles())
 				recursiveDelete(entry);
@@ -18,19 +16,16 @@ class ScratchDirectory extends File implements Closeable
 	}
 
 	@Override
-	protected void finalize() throws Throwable
-	{
+	protected void finalize() throws Throwable {
 		close();
 	}
 
-	ScratchDirectory(File parent, String child)
-	{
+	ScratchDirectory(File parent, String child) {
 		super(parent, child);
 	}
 
 	@Override
-	synchronized public void close() throws IOException
-	{
+	synchronized public void close() throws IOException {
 		if (exists())
 			recursiveDelete(this);
 	}

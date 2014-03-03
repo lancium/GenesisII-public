@@ -18,19 +18,16 @@ import java.io.Serializable;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class DefaultEvent implements IEvent, Serializable
-{
+public class DefaultEvent implements IEvent, Serializable {
 	static final long serialVersionUID = 0;
 
 	private EventDescription _desc;
 
-	public DefaultEvent(EventDescription ed)
-	{
+	public DefaultEvent(EventDescription ed) {
 		_desc = ed;
 	}
 
-	public EventDescription getDescription()
-	{
+	public EventDescription getDescription() {
 		return _desc;
 	}
 }

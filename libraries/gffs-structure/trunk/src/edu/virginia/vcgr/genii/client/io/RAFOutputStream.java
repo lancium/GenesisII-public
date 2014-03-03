@@ -17,37 +17,30 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 
-public class RAFOutputStream extends OutputStream
-{
+public class RAFOutputStream extends OutputStream {
 	private RandomAccessFile _raf;
 
-	public RAFOutputStream(RandomAccessFile raf)
-	{
+	public RAFOutputStream(RandomAccessFile raf) {
 		_raf = raf;
 	}
 
-	public void close() throws IOException
-	{
+	public void close() throws IOException {
 		_raf.close();
 	}
 
-	public void flush() throws IOException
-	{
+	public void flush() throws IOException {
 		_raf.getChannel().force(false);
 	}
 
-	public void write(byte[] b) throws IOException
-	{
+	public void write(byte[] b) throws IOException {
 		_raf.write(b);
 	}
 
-	public void write(byte[] b, int off, int len) throws IOException
-	{
+	public void write(byte[] b, int off, int len) throws IOException {
 		_raf.write(b, off, len);
 	}
 
-	public void write(int b) throws IOException
-	{
+	public void write(int b) throws IOException {
 		_raf.write(b);
 	}
 }

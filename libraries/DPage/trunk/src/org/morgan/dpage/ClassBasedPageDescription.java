@@ -2,19 +2,17 @@ package org.morgan.dpage;
 
 import java.io.IOException;
 
-class ClassBasedPageDescription implements PageDescription
-{
+class ClassBasedPageDescription implements PageDescription {
 	private Class<? extends DynamicPage> _pageClass;
 
 	@SuppressWarnings("unchecked")
-	public ClassBasedPageDescription(ClassLoader loader, String className) throws ClassNotFoundException
-	{
+	public ClassBasedPageDescription(ClassLoader loader, String className)
+			throws ClassNotFoundException {
 		_pageClass = (Class<? extends DynamicPage>) loader.loadClass(className);
 	}
 
 	@Override
-	public DynamicPage loadPage() throws IOException
-	{
+	public DynamicPage loadPage() throws IOException {
 		try {
 			return _pageClass.newInstance();
 		} catch (InstantiationException e) {

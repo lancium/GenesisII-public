@@ -9,22 +9,21 @@ import edu.virginia.vcgr.xscript.XScriptContext;
 import edu.virginia.vcgr.xscript.XScriptParser;
 import edu.virginia.vcgr.xscript.macros.MacroReplacer;
 
-public class IfStatement implements ParseStatement
-{
+public class IfStatement implements ParseStatement {
 	private String _test;
 	private ParseStatement _thenStmt;
 	private ParseStatement _elseStmt;
 
-	public IfStatement(String test, ParseStatement thenStmt, ParseStatement elseStmt)
-	{
+	public IfStatement(String test, ParseStatement thenStmt,
+			ParseStatement elseStmt) {
 		_test = test;
 		_thenStmt = thenStmt;
 		_elseStmt = elseStmt;
 	}
 
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
-	{
+	public Object evaluate(XScriptContext context) throws ScriptException,
+			EarlyExitException, ReturnFromFunctionException {
 		boolean test;
 
 		String property = MacroReplacer.replaceMacros(context, _test);

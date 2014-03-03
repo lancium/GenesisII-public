@@ -13,21 +13,21 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.morgan.util.io.StreamUtils;
 
-public class DataChannelManager
-{
+public class DataChannelManager {
 	static private Logger _logger = Logger.getLogger(DataChannelManager.class);
 
-	static private String describeSocket(ServerSocket ss) throws SocketException
-	{
+	static private String describeSocket(ServerSocket ss)
+			throws SocketException {
 		int port = ss.getLocalPort();
 
 		_logger.info("Describing socket port " + port);
-		return String.format("=%s,%d,%d", FTPHostname.getLocalHost(FTPHostname.HostFormats.IP_ADDR).replace('.', ','),
-			port / 256, port % 256);
+		return String.format("=%s,%d,%d",
+				FTPHostname.getLocalHost(FTPHostname.HostFormats.IP_ADDR)
+						.replace('.', ','), port / 256, port % 256);
 	}
 
-	static public DataChannelKey acquireDataChannel(long timeoutSeconds) throws IOException, SocketException
-	{
+	static public DataChannelKey acquireDataChannel(long timeoutSeconds)
+			throws IOException, SocketException {
 		String socketDescription;
 		ServerSocketChannel serverChannel = null;
 		ServerSocket servSock;
@@ -39,9 +39,11 @@ public class DataChannelManager
 
 			socketDescription = describeSocket(servSock);
 
-			Date timeoutDate = new Date(System.currentTimeMillis() + timeoutSeconds * 1000);
+			Date timeoutDate = new Date(System.currentTimeMillis()
+					+ timeoutSeconds * 1000);
 			DataChannelImpl ret = new DataChannelImpl(socketDescription);
-			Thread th = new Thread(new ChannelHandler(serverChannel, ret, timeoutDate));
+			Thread th = new Thread(new ChannelHandler(serverChannel, ret,
+					timeoutDate));
 			th.setName("Data Channel Manager Thread");
 			th.setDaemon(true);
 			th.start();
@@ -53,22 +55,20 @@ public class DataChannelManager
 		}
 	}
 
-	static private class ChannelHandler implements Runnable
-	{
+	static private class ChannelHandler implements Runnable {
 		private Date _timeoutDate;
 		private DataChannelImpl _dataChannel;
 		private ServerSocketChannel _serverChannel;
 
-		public ChannelHandler(ServerSocketChannel serverChannel, DataChannelImpl dataChannel, Date timeoutDate)
-		{
+		public ChannelHandler(ServerSocketChannel serverChannel,
+				DataChannelImpl dataChannel, Date timeoutDate) {
 			_timeoutDate = timeoutDate;
 			_dataChannel = dataChannel;
 			_serverChannel = serverChannel;
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			SocketAcceptor acceptor = null;
 
 			try {
@@ -76,29 +76,27 @@ public class DataChannelManager
 				SocketChannel channel = acceptor.accept(_timeoutDate);
 				_dataChannel.manageSocketChannel(channel, _timeoutDate);
 			} catch (IOException ioe) {
-				_logger.error("IO Exception while trying to create data channel.", ioe);
+				_logger.error(
+						"IO Exception while trying to create data channel.",
+						ioe);
 			} finally {
 				StreamUtils.close(acceptor);
 			}
 		}
 	}
 
-	static private class SocketAcceptor implements Closeable
-	{
+	static private class SocketAcceptor implements Closeable {
 		private ServerSocketChannel _serverChannel;
 
-		public SocketAcceptor(ServerSocketChannel serverChannel)
-		{
+		public SocketAcceptor(ServerSocketChannel serverChannel) {
 			_serverChannel = serverChannel;
 		}
 
-		protected void finalize() throws Throwable
-		{
+		protected void finalize() throws Throwable {
 			close();
 		}
 
-		public SocketChannel accept(Date timeoutDate) throws IOException
-		{
+		public SocketChannel accept(Date timeoutDate) throws IOException {
 			_serverChannel.configureBlocking(false);
 			Selector selector = null;
 			SelectionKey key = null;
@@ -130,8 +128,7 @@ public class DataChannelManager
 			}
 		}
 
-		public void close()
-		{
+		public void close() {
 			if (_serverChannel != null)
 				try {
 					_serverChannel.close();
@@ -140,27 +137,23 @@ public class DataChannelManager
 		}
 	}
 
-	static private class DataChannelImpl implements DataChannelKey
-	{
+	static private class DataChannelImpl implements DataChannelKey {
 		volatile private boolean _cleanedUp = false;
 		private SocketChannel _channel;
 		private String _socketDescription;
 		private Object _signalObj = new Object();
 		private boolean _gaveUp = false;
 
-		public DataChannelImpl(String socketDescription)
-		{
+		public DataChannelImpl(String socketDescription) {
 			_socketDescription = socketDescription;
 			_channel = null;
 		}
 
-		protected void finalize() throws Throwable
-		{
+		protected void finalize() throws Throwable {
 			close();
 		}
 
-		public void manageSocketChannel(SocketChannel channel, Date timeoutDate)
-		{
+		public void manageSocketChannel(SocketChannel channel, Date timeoutDate) {
 			synchronized (_signalObj) {
 				_channel = channel;
 
@@ -200,9 +193,9 @@ public class DataChannelManager
 		}
 
 		@Override
-		public SocketChannel getChannel(long timeoutSeconds)
-		{
-			Date timeoutDate = new Date(System.currentTimeMillis() + timeoutSeconds * 1000);
+		public SocketChannel getChannel(long timeoutSeconds) {
+			Date timeoutDate = new Date(System.currentTimeMillis()
+					+ timeoutSeconds * 1000);
 			synchronized (_signalObj) {
 				while (true) {
 					if (_gaveUp)
@@ -236,13 +229,11 @@ public class DataChannelManager
 		}
 
 		@Override
-		public String getServerSocketDescription()
-		{
+		public String getServerSocketDescription() {
 			return _socketDescription;
 		}
 
-		public void close()
-		{
+		public void close() {
 			synchronized (_signalObj) {
 				_gaveUp = true;
 				_signalObj.notifyAll();

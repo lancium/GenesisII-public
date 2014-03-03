@@ -32,15 +32,15 @@ import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.ResourceConstraints;
 
-public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfiguration>
-{
+public class PBSQueueConnection extends
+		ScriptBasedQueueConnection<PBSQueueConfiguration> {
 	static private Log _logger = LogFactory.getLog(PBSQueueConnection.class);
 
 	static final public long DEFAULT_CACHE_WINDOW = 1000L * 30;
-	static final public URI PBS_MANAGER_TYPE = URI.create("http://vcgr.cs.virginia.edu/genesisII/nativeq/pbs");
+	static final public URI PBS_MANAGER_TYPE = URI
+			.create("http://vcgr.cs.virginia.edu/genesisII/nativeq/pbs");
 
-	static private String toWallTimeFormat(double value)
-	{
+	static private String toWallTimeFormat(double value) {
 		long total = (long) value;
 		long seconds = total % 60;
 		total /= 60;
@@ -65,12 +65,15 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 	private List<String> _qstatStart;
 	private List<String> _qdelStart;
 
-	PBSQueueConnection(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf,
-		File workingDirectory, NativeQueueConfiguration nativeQueueConfig, PBSQueueConfiguration pbsConfig, String queueName,
-		List<String> qsubStart, List<String> qstatStart, List<String> qdelStart, JobStateCache statusCache)
-		throws NativeQueueException
-	{
-		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf, nativeQueueConfig, pbsConfig);
+	PBSQueueConnection(ResourceOverrides resourceOverrides,
+			CmdLineManipulatorConfiguration cmdLineManipulatorConf,
+			File workingDirectory, NativeQueueConfiguration nativeQueueConfig,
+			PBSQueueConfiguration pbsConfig, String queueName,
+			List<String> qsubStart, List<String> qstatStart,
+			List<String> qdelStart, JobStateCache statusCache)
+			throws NativeQueueException {
+		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf,
+				nativeQueueConfig, pbsConfig);
 
 		_statusCache = statusCache;
 
@@ -89,8 +92,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 	}
 
 	@Override
-	public void cancel(JobToken token) throws NativeQueueException
-	{
+	public void cancel(JobToken token) throws NativeQueueException {
 		List<String> commandLine = new LinkedList<String>();
 		commandLine.addAll(_qdelStart);
 
@@ -102,10 +104,11 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 		execute(builder);
 	}
 
-	static private class JobStatusParser implements ScriptLineParser
-	{
-		static private Pattern JOB_TOKEN_PATTERN = Pattern.compile("^\\s*Job Id:\\s*(\\S+)\\s*$");
-		static private Pattern JOB_STATE_PATTERN = Pattern.compile("^\\s*job_state\\s*=\\s*(\\S+)\\s*$");
+	static private class JobStatusParser implements ScriptLineParser {
+		static private Pattern JOB_TOKEN_PATTERN = Pattern
+				.compile("^\\s*Job Id:\\s*(\\S+)\\s*$");
+		static private Pattern JOB_STATE_PATTERN = Pattern
+				.compile("^\\s*job_state\\s*=\\s*(\\S+)\\s*$");
 
 		private Map<String, String> _matchedPairs = new HashMap<String, String>();
 
@@ -113,20 +116,19 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 		private String _lastState = null;
 
 		@Override
-		public Pattern[] getHandledPatterns()
-		{
+		public Pattern[] getHandledPatterns() {
 			return new Pattern[] { JOB_TOKEN_PATTERN, JOB_STATE_PATTERN };
 		}
 
 		@Override
-		public void parseLine(Matcher matcher) throws NativeQueueException
-		{
+		public void parseLine(Matcher matcher) throws NativeQueueException {
 			if (matcher.pattern() == JOB_TOKEN_PATTERN)
 				_lastToken = matcher.group(1);
 			else if (matcher.pattern() == JOB_STATE_PATTERN) {
 				_lastState = matcher.group(1);
 				if (_lastToken == null)
-					throw new NativeQueueException("Unable to parse status output.");
+					throw new NativeQueueException(
+							"Unable to parse status output.");
 
 				_matchedPairs.put(_lastToken, _lastState);
 				_lastToken = null;
@@ -135,17 +137,15 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 				throw new NativeQueueException("Unable to parse status output.");
 		}
 
-		public Map<String, String> getStateMap() throws NativeQueueException
-		{
+		public Map<String, String> getStateMap() throws NativeQueueException {
 			return _matchedPairs;
 		}
 	}
 
-	private class BulkPBSStatusFetcher implements BulkStatusFetcher
-	{
+	private class BulkPBSStatusFetcher implements BulkStatusFetcher {
 		@Override
-		public Map<JobToken, NativeQueueState> getStateMap() throws NativeQueueException
-		{
+		public Map<JobToken, NativeQueueState> getStateMap()
+				throws NativeQueueException {
 			Map<JobToken, NativeQueueState> ret = new HashMap<JobToken, NativeQueueState>();
 
 			List<String> commandLine = new LinkedList<String>();
@@ -162,9 +162,11 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 			Map<String, String> stateMap = parser.getStateMap();
 			for (String tokenString : stateMap.keySet()) {
 				PBSJobToken token = new PBSJobToken(tokenString);
-				PBSQueueState state = PBSQueueState.fromStateSymbol(stateMap.get(tokenString));
+				PBSQueueState state = PBSQueueState.fromStateSymbol(stateMap
+						.get(tokenString));
 				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Putting %s[%s]\n", token, state));
+					_logger.debug(String.format("Putting %s[%s]\n", token,
+							state));
 				ret.put(token, state);
 			}
 
@@ -173,9 +175,10 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 	}
 
 	@Override
-	public NativeQueueState getStatus(JobToken token) throws NativeQueueException
-	{
-		NativeQueueState state = _statusCache.get(token, new BulkPBSStatusFetcher(), DEFAULT_CACHE_WINDOW);
+	public NativeQueueState getStatus(JobToken token)
+			throws NativeQueueException {
+		NativeQueueState state = _statusCache.get(token,
+				new BulkPBSStatusFetcher(), DEFAULT_CACHE_WINDOW);
 		if (state == null)
 			state = PBSQueueState.fromStateSymbol("C");
 
@@ -183,15 +186,17 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 	}
 
 	@Override
-	protected void generateQueueHeaders(PrintStream script, File workingDirectory, ApplicationDescription application)
-		throws NativeQueueException, IOException
-	{
+	protected void generateQueueHeaders(PrintStream script,
+			File workingDirectory, ApplicationDescription application)
+			throws NativeQueueException, IOException {
 		super.generateQueueHeaders(script, workingDirectory, application);
 
 		if (application.getSPMDVariation() != null) {
 			// add directives for specifying stdout and stderr redirects
-			script.format("#PBS -o %s\n", application.getStdoutRedirect(workingDirectory));
-			script.format("#PBS -e %s\n", application.getStderrRedirect(workingDirectory));
+			script.format("#PBS -o %s\n",
+					application.getStdoutRedirect(workingDirectory));
+			script.format("#PBS -e %s\n",
+					application.getStderrRedirect(workingDirectory));
 
 			// add directive for specifying multiple processors
 			Integer numProcs = application.getNumProcesses();
@@ -200,42 +205,52 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 			if (numProcs != null) {
 				if (numProcsPerHost != null) {
 					Integer hosts = numProcs / numProcsPerHost;
-					script.format("#PBS -l nodes=%d:ppn=%d\n", hosts.intValue(), numProcsPerHost.intValue());
+					script.format("#PBS -l nodes=%d:ppn=%d\n",
+							hosts.intValue(), numProcsPerHost.intValue());
 				} else {
-					script.format("#PBS -l nodes=%d:ppn=1\n", numProcs.intValue());
+					script.format("#PBS -l nodes=%d:ppn=1\n",
+							numProcs.intValue());
 				}
 			}
 
 		}
 
-		ResourceConstraints resourceConstraints = application.getResourceConstraints();
+		ResourceConstraints resourceConstraints = application
+				.getResourceConstraints();
 		if (resourceConstraints != null) {
-			Double totalPhyscialMemory = resourceConstraints.getTotalPhysicalMemory();
-			if ((totalPhyscialMemory != null) && (!totalPhyscialMemory.equals(Double.NaN)))
-				script.format("#PBS -l mem=%d\n", totalPhyscialMemory.longValue());
+			Double totalPhyscialMemory = resourceConstraints
+					.getTotalPhysicalMemory();
+			if ((totalPhyscialMemory != null)
+					&& (!totalPhyscialMemory.equals(Double.NaN)))
+				script.format("#PBS -l mem=%d\n",
+						totalPhyscialMemory.longValue());
 
 			Double wallclockTime = resourceConstraints.getWallclockTimeLimit();
 			if (wallclockTime != null && !wallclockTime.equals(Double.NaN))
-				script.format("#PBS -l walltime=%s\n", toWallTimeFormat(wallclockTime));
+				script.format("#PBS -l walltime=%s\n",
+						toWallTimeFormat(wallclockTime));
 		}
 	}
 
 	@Override
-	protected List<String>
-		generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
-			throws NativeQueueException, IOException
-	{
+	protected List<String> generateApplicationBody(PrintStream script,
+			File workingDirectory, ApplicationDescription application)
+			throws NativeQueueException, IOException {
 		URI variation = application.getSPMDVariation();
 		if (variation != null) {
-			// temporarily set std redirects to null; these are written as pbs directives
-			File stdoutRedirect = application.getStdoutRedirect(workingDirectory);
-			File stderrRedirect = application.getStderrRedirect(workingDirectory);
+			// temporarily set std redirects to null; these are written as pbs
+			// directives
+			File stdoutRedirect = application
+					.getStdoutRedirect(workingDirectory);
+			File stderrRedirect = application
+					.getStderrRedirect(workingDirectory);
 
 			application.setStdoutRedirect(null);
 			application.setStderrRedirect(null);
 
 			// proceed as usual
-			List<String> finalCmdLine = super.generateApplicationBody(script, workingDirectory, application);
+			List<String> finalCmdLine = super.generateApplicationBody(script,
+					workingDirectory, application);
 
 			// reset std redirects in application description
 			if (stdoutRedirect != null)
@@ -245,13 +260,15 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 
 			return finalCmdLine;
 		} else
-			return super.generateApplicationBody(script, workingDirectory, application);
+			return super.generateApplicationBody(script, workingDirectory,
+					application);
 	}
 
 	@Override
-	public JobToken submit(ApplicationDescription application) throws NativeQueueException
-	{
-		Pair<File, List<String>> submissionReturn = generateSubmitScript(getWorkingDirectory(), application);
+	public JobToken submit(ApplicationDescription application)
+			throws NativeQueueException {
+		Pair<File, List<String>> submissionReturn = generateSubmitScript(
+				getWorkingDirectory(), application);
 
 		List<String> command = new LinkedList<String>();
 
@@ -273,27 +290,31 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(getWorkingDirectory());
 
-		return new PBSJobToken(execute(builder).trim(), submissionReturn.second());
+		return new PBSJobToken(execute(builder).trim(),
+				submissionReturn.second());
 	}
 
 	@Override
-	public int getExitCode(JobToken token) throws NativeQueueException
-	{
+	public int getExitCode(JobToken token) throws NativeQueueException {
 		BufferedReader reader = null;
 
 		try {
-			reader = new BufferedReader(new FileReader(new File(getWorkingDirectory(), QUEUE_SCRIPT_RESULT_FILENAME)));
+			reader = new BufferedReader(new FileReader(new File(
+					getWorkingDirectory(), QUEUE_SCRIPT_RESULT_FILENAME)));
 			String line = reader.readLine();
 			if (line == null) {
 				StreamUtils.close(reader);
-				throw new NativeQueueException("Unable to determine application exit status.");
+				throw new NativeQueueException(
+						"Unable to determine application exit status.");
 			}
 			StreamUtils.close(reader);
 			return Integer.parseInt(line.trim());
 		} catch (FileNotFoundException ioe) {
-			throw new NativeQueueException("Application doesn't appear to have exited.", ioe);
+			throw new NativeQueueException(
+					"Application doesn't appear to have exited.", ioe);
 		} catch (IOException ioe) {
-			throw new NativeQueueException("Unable to determine application exit status.", ioe);
+			throw new NativeQueueException(
+					"Unable to determine application exit status.", ioe);
 		}
 	}
 }

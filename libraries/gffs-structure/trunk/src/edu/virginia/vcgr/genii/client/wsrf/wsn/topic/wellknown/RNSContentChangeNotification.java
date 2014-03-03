@@ -16,11 +16,11 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.client.rns.RNSOperation;
 
 @XmlRootElement(namespace = RNSConstants.GENII_RNS_NS, name = "RNSContentChangeNotification")
-public class RNSContentChangeNotification extends NotificationMessageContents
-{
+public class RNSContentChangeNotification extends NotificationMessageContents {
 
 	static final long serialVersionUID = 0L;
-	static private Log _logger = LogFactory.getLog(RNSContentChangeNotification.class);
+	static private Log _logger = LogFactory
+			.getLog(RNSContentChangeNotification.class);
 
 	@XmlElement(namespace = RNSConstants.GENII_RNS_NS, name = "Operation", nillable = false, required = true)
 	private RNSOperation operation;
@@ -31,13 +31,12 @@ public class RNSContentChangeNotification extends NotificationMessageContents
 	@XmlElement(namespace = RNSConstants.GENII_RNS_NS, name = "elementCount", nillable = false, required = true)
 	private int elementCount;
 
-	public RNSContentChangeNotification()
-	{
+	public RNSContentChangeNotification() {
 	}
 
-	public RNSContentChangeNotification(RNSOperation operation, EndpointReferenceType entryEPR, int elementCount,
-		MessageElement[] entryAttributes)
-	{
+	public RNSContentChangeNotification(RNSOperation operation,
+			EndpointReferenceType entryEPR, int elementCount,
+			MessageElement[] entryAttributes) {
 
 		this.operation = operation;
 		this.elementCount = elementCount;
@@ -54,40 +53,33 @@ public class RNSContentChangeNotification extends NotificationMessageContents
 	}
 
 	@XmlTransient
-	public RNSOperation getOperation()
-	{
+	public RNSOperation getOperation() {
 		return operation;
 	}
 
-	public void setOperation(RNSOperation operation)
-	{
+	public void setOperation(RNSOperation operation) {
 		this.operation = operation;
 	}
 
 	@XmlTransient
-	public int getElementCount()
-	{
+	public int getElementCount() {
 		return elementCount;
 	}
 
-	public void setElementCount(int elementCount)
-	{
+	public void setElementCount(int elementCount) {
 		this.elementCount = elementCount;
 	}
 
 	@XmlTransient
-	public byte[] getEntryEPR()
-	{
+	public byte[] getEntryEPR() {
 		return entryEPR;
 	}
 
-	public void setEntryEPR(byte[] entryEPR)
-	{
+	public void setEntryEPR(byte[] entryEPR) {
 		this.entryEPR = entryEPR;
 	}
 
-	public EndpointReferenceType getEntry()
-	{
+	public EndpointReferenceType getEntry() {
 		if (entryEPR == null)
 			return null;
 		try {

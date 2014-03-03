@@ -27,9 +27,10 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_jobName", "_description", "_jobAnnotation", "_jobProject" })
-public class JobIdentification extends CommonJSDLElement implements Serializable
-{
+@XmlType(propOrder = { "_jobName", "_description", "_jobAnnotation",
+		"_jobProject" })
+public class JobIdentification extends CommonJSDLElement implements
+		Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "JobName")
@@ -44,43 +45,35 @@ public class JobIdentification extends CommonJSDLElement implements Serializable
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "JobProject")
 	private List<String> _jobProject = new LinkedList<String>();
 
-	public JobIdentification(String jobName)
-	{
+	public JobIdentification(String jobName) {
 		_jobName = jobName;
 	}
 
-	public JobIdentification()
-	{
+	public JobIdentification() {
 		this(null);
 	}
 
-	final public void jobName(String jobName)
-	{
+	final public void jobName(String jobName) {
 		_jobName = jobName;
 	}
 
-	final public String jobName()
-	{
+	final public String jobName() {
 		return _jobName;
 	}
 
-	final public void description(String description)
-	{
+	final public void description(String description) {
 		_description = description;
 	}
 
-	final public String description()
-	{
+	final public String description() {
 		return _description;
 	}
 
-	final public List<String> annotations()
-	{
+	final public List<String> annotations() {
 		return _jobAnnotation;
 	}
 
-	final public List<String> projects()
-	{
+	final public List<String> projects() {
 		return _jobProject;
 	}
 }

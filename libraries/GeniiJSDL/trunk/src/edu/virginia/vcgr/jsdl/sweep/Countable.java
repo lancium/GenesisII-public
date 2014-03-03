@@ -20,7 +20,6 @@ package edu.virginia.vcgr.jsdl.sweep;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface Countable
-{
+public interface Countable {
 	public int size();
 }

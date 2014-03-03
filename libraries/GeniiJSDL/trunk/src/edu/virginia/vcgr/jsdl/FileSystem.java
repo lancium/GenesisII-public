@@ -31,8 +31,7 @@ import edu.virginia.vcgr.jsdl.rangevalue.RangeValue;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlType(propOrder = { "_fsType", "_description", "_mountPoint", "_diskSpace" })
-public class FileSystem extends CommonJSDLElement implements Serializable
-{
+public class FileSystem extends CommonJSDLElement implements Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlAttribute(name = "name", required = true)
@@ -55,74 +54,63 @@ public class FileSystem extends CommonJSDLElement implements Serializable
 	 * Only to be used by the XML Unmarshaller
 	 */
 	@SuppressWarnings("unused")
-	private FileSystem()
-	{
+	private FileSystem() {
 	}
 
-	public FileSystem(String name, FileSystemType fsType)
-	{
+	public FileSystem(String name, FileSystemType fsType) {
 		if (name == null)
-			throw new IllegalArgumentException("Not allowed to have a null name.");
+			throw new IllegalArgumentException(
+					"Not allowed to have a null name.");
 
 		_name = name;
 		_fsType = fsType;
 	}
 
-	public FileSystem(String name)
-	{
+	public FileSystem(String name) {
 		this(name, null);
 	}
 
-	final public void name(String name)
-	{
+	final public void name(String name) {
 		if (name == null)
-			throw new IllegalArgumentException("Not allowed to have a null name.");
+			throw new IllegalArgumentException(
+					"Not allowed to have a null name.");
 
 		_name = name;
 	}
 
-	final public String name()
-	{
+	final public String name() {
 		return _name;
 	}
 
-	final public void fsType(FileSystemType fsType)
-	{
+	final public void fsType(FileSystemType fsType) {
 		_fsType = fsType;
 	}
 
-	final public FileSystemType fsType()
-	{
+	final public FileSystemType fsType() {
 		return _fsType;
 	}
 
-	final public void description(String description)
-	{
+	final public void description(String description) {
 		_description = description;
 	}
 
-	final public String description()
-	{
+	final public String description() {
 		return _description;
 	}
 
-	final public void mountPoint(String mountPoint)
-	{
+	final public void mountPoint(String mountPoint) {
 		_mountPoint = mountPoint;
 	}
 
-	final public String mountPoint()
-	{
+	final public String mountPoint() {
 		return _mountPoint;
 	}
 
-	final public void diskSpace(RangeValue range)
-	{
+	final public void diskSpace(RangeValue range) {
 		_diskSpace = range;
 	}
 
-	final public RangeValue diskSpace()
-	{
+	final public RangeValue diskSpace() {
 		return _diskSpace;
 	}
 }

@@ -29,22 +29,26 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.UnsupportedTopicQ
 @XmlEnum(URI.class)
 public enum TopicQueryDialects implements TopicQueryDialectable {
 	@XmlEnumValue(TopicConstants.SIMPLE_DIALECT_URI)
-	Simple(TopicConstants.SIMPLE_DIALECT_URI, new SimpleTopicQueryExpressionFactory()),
+	Simple(TopicConstants.SIMPLE_DIALECT_URI,
+			new SimpleTopicQueryExpressionFactory()),
 
 	@XmlEnumValue(TopicConstants.CONCRETE_DIALECT_URI)
-	Concrete(TopicConstants.CONCRETE_DIALECT_URI, new ConcreteTopicQueryExpressionFactory()),
+	Concrete(TopicConstants.CONCRETE_DIALECT_URI,
+			new ConcreteTopicQueryExpressionFactory()),
 
 	@XmlEnumValue(TopicConstants.FULL_DIALECT_URI)
-	Full(TopicConstants.FULL_DIALECT_URI, new UnsupportedTopicQueryExpressionFactory()),
+	Full(TopicConstants.FULL_DIALECT_URI,
+			new UnsupportedTopicQueryExpressionFactory()),
 
 	@XmlEnumValue(TopicConstants.XPATH_DIALECT_URI)
-	XPath(TopicConstants.XPATH_DIALECT_URI, new UnsupportedTopicQueryExpressionFactory());
+	XPath(TopicConstants.XPATH_DIALECT_URI,
+			new UnsupportedTopicQueryExpressionFactory());
 
 	private URI _dialect;
 	private TopicQueryExpressionFactory _factory;
 
-	private TopicQueryDialects(String dialect, TopicQueryExpressionFactory factory)
-	{
+	private TopicQueryDialects(String dialect,
+			TopicQueryExpressionFactory factory) {
 		_dialect = URI.create(dialect);
 		_factory = factory;
 		if (_factory == null) {
@@ -53,8 +57,7 @@ public enum TopicQueryDialects implements TopicQueryDialectable {
 	}
 
 	static public edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects convert(
-		TopicQueryDialects toConvert)
-	{
+			TopicQueryDialects toConvert) {
 		if (toConvert.equals(Simple))
 			return edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects.Simple;
 		if (toConvert.equals(Concrete))
@@ -67,51 +70,47 @@ public enum TopicQueryDialects implements TopicQueryDialectable {
 		return null;
 	}
 
-	final public URI dialect()
-	{
+	final public URI dialect() {
 		return _dialect;
 	}
 
-	static public edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects fromURI(URI uri)
-	{
+	static public edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects fromURI(
+			URI uri) {
 		for (edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects dialect : edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects
-			.values()) {
+				.values()) {
 			if (uri.equals(dialect.dialect()))
 				return dialect;
 		}
 
-		throw new IllegalArgumentException(String.format("TopicQueryDialect \"%s\" unknown.", uri));
+		throw new IllegalArgumentException(String.format(
+				"TopicQueryDialect \"%s\" unknown.", uri));
 	}
 
-	static public TopicQueryExpression createSimpleExpression(QName root)
-	{
+	static public TopicQueryExpression createSimpleExpression(QName root) {
 		return new SimpleTopicQueryExpression(root);
 	}
 
-	static public TopicQueryExpression createConcreteExpression(TopicPath path)
-	{
+	static public TopicQueryExpression createConcreteExpression(TopicPath path) {
 		return new ConcreteTopicQueryExpression(path);
 	}
 
-	static public TopicQueryExpression createFromElement(Element e) throws InvalidFilterFaultType, TopicNotSupportedFaultType
-	{
+	static public TopicQueryExpression createFromElement(Element e)
+			throws InvalidFilterFaultType, TopicNotSupportedFaultType {
 		String dialectString = e.getAttribute("Dialect");
 		if (dialectString == null)
 			throw FaultManipulator.fillInFault(new InvalidFilterFaultType());
 
-		edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects dialect =
-			edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects.fromURI(URI.create(dialectString));
+		edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects dialect = edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects
+				.fromURI(URI.create(dialectString));
 
 		return dialect.getFactory().createFromElement(e);
 	}
 
-	private Object readResolve() throws ObjectStreamException
-	{
+	private Object readResolve() throws ObjectStreamException {
 		return convert(this);
 	}
 
-	private Object writeReplace() throws ObjectStreamException
-	{
+	private Object writeReplace() throws ObjectStreamException {
 		return readResolve();
 	}
 }

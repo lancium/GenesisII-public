@@ -16,25 +16,24 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class FilesystemUsageFork extends AbstractStreamableByteIOFactoryResourceFork
-{
-	public FilesystemUsageFork(ResourceForkService service, String forkPath)
-	{
+public class FilesystemUsageFork extends
+		AbstractStreamableByteIOFactoryResourceFork {
+	public FilesystemUsageFork(ResourceForkService service, String forkPath) {
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void modifyState(InputStream source) throws IOException
-	{
-		throw new IOException("Not allowed to modify the the filesystem summary.");
+	public void modifyState(InputStream source) throws IOException {
+		throw new IOException(
+				"Not allowed to modify the the filesystem summary.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void snapshotState(OutputStream sink) throws IOException
-	{
-		FilesystemManager mgr = ConfigurationManager.getCurrentConfiguration().filesystemManager();
+	public void snapshotState(OutputStream sink) throws IOException {
+		FilesystemManager mgr = ConfigurationManager.getCurrentConfiguration()
+				.filesystemManager();
 
 		PrintStream ps = new PrintStream(sink);
 
@@ -43,8 +42,10 @@ public class FilesystemUsageFork extends AbstractStreamableByteIOFactoryResource
 		for (String fsName : mgr.filesystems()) {
 			Filesystem fs = mgr.lookup(fsName);
 			FilesystemUsageInformation usageInfo = fs.currentUsage();
-			ps.format("Filesystem \"%s\" at %s:  %s (%.2f%%) space free.\n", fsName, fs.filesystemRoot(),
-				new Size(usageInfo.spaceUsable(), SizeUnits.Megabytes).toString(2), usageInfo.percentAvailable());
+			ps.format("Filesystem \"%s\" at %s:  %s (%.2f%%) space free.\n",
+					fsName, fs.filesystemRoot(),
+					new Size(usageInfo.spaceUsable(), SizeUnits.Megabytes)
+							.toString(2), usageInfo.percentAvailable());
 		}
 
 		ps.close();

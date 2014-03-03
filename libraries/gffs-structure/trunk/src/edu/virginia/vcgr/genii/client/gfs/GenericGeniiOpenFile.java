@@ -6,31 +6,29 @@ import java.nio.ByteBuffer;
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 import edu.virginia.vcgr.fsii.exceptions.FSIllegalAccessException;
 
-class GenericGeniiOpenFile extends GeniiOpenFile
-{
+class GenericGeniiOpenFile extends GeniiOpenFile {
 	private ByteBuffer _content;
 
-	GenericGeniiOpenFile(String[] path, ByteBuffer content, boolean canRead, boolean canWrite, boolean isAppend)
-	{
+	GenericGeniiOpenFile(String[] path, ByteBuffer content, boolean canRead,
+			boolean canWrite, boolean isAppend) {
 		super(path, canRead, canWrite, isAppend);
 		_content = content;
 	}
 
 	@Override
-	protected void appendImpl(ByteBuffer source) throws FSException
-	{
-		throw new FSIllegalAccessException("Unable to write to a generic entry.");
+	protected void appendImpl(ByteBuffer source) throws FSException {
+		throw new FSIllegalAccessException(
+				"Unable to write to a generic entry.");
 	}
 
 	@Override
-	protected void closeImpl() throws IOException
-	{
+	protected void closeImpl() throws IOException {
 		// do nothing
 	}
 
 	@Override
-	synchronized protected void readImpl(long offset, ByteBuffer target) throws FSException
-	{
+	synchronized protected void readImpl(long offset, ByteBuffer target)
+			throws FSException {
 		long bytesLeft = _content.remaining() - offset;
 		if (bytesLeft <= 0)
 			return;
@@ -46,8 +44,8 @@ class GenericGeniiOpenFile extends GeniiOpenFile
 	}
 
 	@Override
-	protected void writeImpl(long offset, ByteBuffer source) throws FSException
-	{
-		throw new FSIllegalAccessException("Unable to write to a generic entry.");
+	protected void writeImpl(long offset, ByteBuffer source) throws FSException {
+		throw new FSIllegalAccessException(
+				"Unable to write to a generic entry.");
 	}
 }

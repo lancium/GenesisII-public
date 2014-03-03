@@ -12,8 +12,7 @@ import edu.virginia.vcgr.genii.client.gfs.cache.objects.GeniiCachedResource;
 /**
  * This class manages the cache for g-icing
  */
-public class GeniiCacheManager
-{
+public class GeniiCacheManager {
 	private Hashtable<String, GeniiCachedResource> _cache = new Hashtable<String, GeniiCachedResource>();
 	private int cacheLifeTime;
 	private static GeniiCacheManager _manager;
@@ -26,20 +25,18 @@ public class GeniiCacheManager
 	 * 
 	 * @param cacheLifeInSeconds
 	 */
-	public GeniiCacheManager(int cacheLifeInSeconds, GenesisIIFilesystem fs)
-	{
+	public GeniiCacheManager(int cacheLifeInSeconds, GenesisIIFilesystem fs) {
 		cacheLifeTime = cacheLifeInSeconds;
 		_fs = fs;
 		_manager = this;
 	}
 
-	public static GeniiCacheManager getInstance()
-	{
+	public static GeniiCacheManager getInstance() {
 		return _manager;
 	}
 
-	public synchronized GeniiCachedResource getCacheItem(String path, boolean doRefresh) throws FSException
-	{
+	public synchronized GeniiCachedResource getCacheItem(String path,
+			boolean doRefresh) throws FSException {
 		long currentTime = System.currentTimeMillis();
 		GeniiCachedResource resource = _cache.get(path);
 
@@ -47,8 +44,10 @@ public class GeniiCacheManager
 		if ((resource != null && (currentTime - resource.getTimeOfEntry()) > (cacheLifeTime * 1000))) {
 
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Refreshing cache item %s.  Old time is " + "%d, new time is %d", path,
-					resource.getTimeOfEntry(), currentTime));
+				_logger.debug(String.format(
+						"Refreshing cache item %s.  Old time is "
+								+ "%d, new time is %d", path,
+						resource.getTimeOfEntry(), currentTime));
 
 			// Only refresh if a file or told to refresh (for dir's)
 			if (doRefresh || !resource.isDirectory()) {
@@ -59,20 +58,18 @@ public class GeniiCacheManager
 		return resource;
 	}
 
-	public synchronized void putCacheItem(String path, GeniiCachedResource resource)
-	{
+	public synchronized void putCacheItem(String path,
+			GeniiCachedResource resource) {
 		if (resource != null) {
 			_cache.put(path, resource);
 		}
 	}
 
-	public synchronized GeniiCachedResource removeCacheItem(String path)
-	{
+	public synchronized GeniiCachedResource removeCacheItem(String path) {
 		return _cache.remove(path);
 	}
 
-	public GenesisIIFilesystem get_fs()
-	{
+	public GenesisIIFilesystem get_fs() {
 		return _fs;
 	}
 }

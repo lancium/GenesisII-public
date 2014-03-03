@@ -7,26 +7,25 @@ import edu.virginia.vcgr.genii.client.configuration.UserConfig;
 import edu.virginia.vcgr.genii.client.configuration.UserConfigUtils;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class SetUserConfigTool extends BaseGridTool
-{
+public class SetUserConfigTool extends BaseGridTool {
 	static private final String _DESCRIPTION = "config/tooldocs/description/dset-user-config";
 	static private final String _USAGE = "config/tooldocs/usage/uset-user-config";
 	static private final String _MANPAGE = "config/tooldocs/man/set-user-config";
 
-	public SetUserConfigTool()
-	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.GENERAL);
+	public SetUserConfigTool() {
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
+				false, ToolCategory.GENERAL);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		DeploymentName deploymentName = new DeploymentName(getArgument(0));
 		UserConfig userConfig = new UserConfig(deploymentName);
 		UserConfigUtils.setCurrentUserConfig(userConfig);
 
-		// reload configuration information so that rest of application uses new configuration
+		// reload configuration information so that rest of application uses new
+		// configuration
 		// information
 		// (necessary for example during a grid script).
 		UserConfigUtils.reloadConfiguration();
@@ -34,14 +33,15 @@ public class SetUserConfigTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		int numArgs = numArguments();
 		if (numArgs != 1)
-			throw new InvalidToolUsageException("Missing argument <user config dir>");
+			throw new InvalidToolUsageException(
+					"Missing argument <user config dir>");
 		String userConfigDir = getArgument(0);
 		if (userConfigDir == null || userConfigDir.length() == 0)
-			throw new InvalidToolUsageException("Invalid format for argument <user config dir>");
+			throw new InvalidToolUsageException(
+					"Invalid format for argument <user config dir>");
 	}
 
 }

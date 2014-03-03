@@ -22,35 +22,33 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = DBPullPointResourceProvider.class)
-public class GeniiPullPointServiceImpl extends GenesisIIBase implements GeniiPullPointPortType
-{
-	public GeniiPullPointServiceImpl() throws RemoteException
-	{
+public class GeniiPullPointServiceImpl extends GenesisIIBase implements
+		GeniiPullPointPortType {
+	public GeniiPullPointServiceImpl() throws RemoteException {
 		super("GeniiPullPointPortType");
 
 		addImplementedPortType(WSRFConstants.WSN_PULL_POINT_PORT());
 	}
 
 	@Override
-	public PortType getFinalWSResourceInterface()
-	{
+	public PortType getFinalWSResourceInterface() {
 		return WellKnownPortTypes.GENII_PULL_POINT_PORT();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public DestroyPullPointResponse destroyPullPoint(DestroyPullPoint arg0) throws RemoteException,
-		UnableToDestroyPullPointFaultType, ResourceUnknownFaultType
-	{
+	public DestroyPullPointResponse destroyPullPoint(DestroyPullPoint arg0)
+			throws RemoteException, UnableToDestroyPullPointFaultType,
+			ResourceUnknownFaultType {
 		super.destroy(new Destroy());
 		return new DestroyPullPointResponse();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetMessagesResponse getMessages(GetMessages arg0) throws RemoteException, UnableToGetMessagesFaultType,
-		ResourceUnknownFaultType
-	{
+	public GetMessagesResponse getMessages(GetMessages arg0)
+			throws RemoteException, UnableToGetMessagesFaultType,
+			ResourceUnknownFaultType {
 		throw FaultManipulator.fillInFault(new UnableToGetMessagesFaultType());
 	}
 }

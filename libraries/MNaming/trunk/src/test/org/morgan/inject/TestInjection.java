@@ -11,8 +11,7 @@ import org.morgan.inject.MNamingInjectionResolver;
 import org.morgan.mnaming.InitialMNamingContext;
 
 @SuppressWarnings("deprecation")
-public class TestInjection
-{
+public class TestInjection {
 	private InitialMNamingContext _context = new InitialMNamingContext();
 
 	private MInjector _injector = new MInjector(new MNamingInjectionResolver());
@@ -23,8 +22,7 @@ public class TestInjection
 	private String _method;
 
 	@MInject(name = "mem:name")
-	private void setMethod(String value)
-	{
+	private void setMethod(String value) {
 		_method = value;
 	}
 
@@ -32,33 +30,28 @@ public class TestInjection
 	private SentenceGenerator _generator = new SentenceGenerator();
 
 	@Before
-	public void setUp() throws Exception
-	{
+	public void setUp() throws Exception {
 		_context.bind("mem:name", "Mark");
 		_injector.inject(this);
 	}
 
 	@After
-	public void tearDown() throws Exception
-	{
+	public void tearDown() throws Exception {
 		_context.clearAll();
 	}
 
 	@Test
-	public void testField() throws Exception
-	{
+	public void testField() throws Exception {
 		Assert.assertEquals("Mark", _field);
 	}
 
 	@Test
-	public void testMethod() throws Exception
-	{
+	public void testMethod() throws Exception {
 		Assert.assertEquals("Mark", _method);
 	}
 
 	@Test
-	public void testRecursive() throws Exception
-	{
+	public void testRecursive() throws Exception {
 		Assert.assertEquals("Hello, Mark!", _generator.toString());
 	}
 }

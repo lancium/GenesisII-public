@@ -9,34 +9,29 @@ import javax.xml.soap.SOAPException;
 import org.apache.axis.attachments.AttachmentPart;
 import org.morgan.util.io.StreamUtils;
 
-public class GeniiAttachment
-{
+public class GeniiAttachment {
 	private String _name;
 	private byte[] _data;
 
-	public GeniiAttachment(String name, byte[] data)
-	{
+	public GeniiAttachment(String name, byte[] data) {
 		_name = name;
 		_data = data;
 	}
 
-	public GeniiAttachment(byte[] data)
-	{
+	public GeniiAttachment(byte[] data) {
 		this(null, data);
 	}
 
-	public byte[] getData()
-	{
+	public byte[] getData() {
 		return _data;
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 
-	static public byte[] extractData(AttachmentPart part) throws SOAPException, IOException
-	{
+	static public byte[] extractData(AttachmentPart part) throws SOAPException,
+			IOException {
 		InputStream in = null;
 
 		try {

@@ -8,7 +8,6 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorConstants;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(namespace = CmdLineManipulatorConstants.NAMESPACE, name = "aprun-configuration")
-public class AprunVariationConfiguration extends CommonVariationConfiguration
-{
+public class AprunVariationConfiguration extends CommonVariationConfiguration {
 	static final long serialVersionUID = 0L;
 }

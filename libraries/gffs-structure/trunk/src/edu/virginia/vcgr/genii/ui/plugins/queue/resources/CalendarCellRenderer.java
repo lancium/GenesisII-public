@@ -5,13 +5,11 @@ import java.util.TimeZone;
 
 import javax.swing.table.DefaultTableCellRenderer;
 
-class CalendarCellRenderer extends DefaultTableCellRenderer
-{
+class CalendarCellRenderer extends DefaultTableCellRenderer {
 	static final long serialVersionUID = 0L;
 
 	@Override
-	final protected void setValue(Object value)
-	{
+	final protected void setValue(Object value) {
 		if (value == null)
 			super.setValue("");
 		else {

@@ -7,12 +7,10 @@ import javax.swing.JComboBox;
 import edu.virginia.vcgr.genii.gjt.data.variables.VariableDefinitionType;
 
 @SuppressWarnings("rawtypes")
-public class VariableDefinitionTypeCombo extends JComboBox
-{
+public class VariableDefinitionTypeCombo extends JComboBox {
 	static final long serialVersionUID = 0L;
 
-	static private Vector<VariableDefinitionType> getItems()
-	{
+	static private Vector<VariableDefinitionType> getItems() {
 		Vector<VariableDefinitionType> ret = new Vector<VariableDefinitionType>();
 
 		ret.add(VariableDefinitionType.UndefinedVariable);
@@ -26,8 +24,7 @@ public class VariableDefinitionTypeCombo extends JComboBox
 	}
 
 	@SuppressWarnings("unchecked")
-	public VariableDefinitionTypeCombo()
-	{
+	public VariableDefinitionTypeCombo() {
 		super(getItems());
 	}
 }

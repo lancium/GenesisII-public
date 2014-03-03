@@ -22,33 +22,29 @@ import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
-class Version1Upgrader
-{
-	static private OperatingSystemNames getOperatingSystemName(Properties props, String propName)
-	{
+class Version1Upgrader {
+	static private OperatingSystemNames getOperatingSystemName(
+			Properties props, String propName) {
 		String value = props.getProperty(propName);
 		return (value == null) ? null : OperatingSystemNames.valueOf(value);
 	}
 
-	static private String getString(Properties props, String name)
-	{
+	static private String getString(Properties props, String name) {
 		return props.getProperty(name);
 	}
 
-	static private ProcessorArchitecture getProcessorArchitecture(Properties props, String name)
-	{
+	static private ProcessorArchitecture getProcessorArchitecture(
+			Properties props, String name) {
 		String value = props.getProperty(name);
 		return (value == null) ? null : ProcessorArchitecture.valueOf(value);
 	}
 
-	static private Integer getInteger(Properties props, String name)
-	{
+	static private Integer getInteger(Properties props, String name) {
 		String value = props.getProperty(name);
 		return (value == null) ? null : Integer.parseInt(value);
 	}
 
-	static private ClockSpeed getClockSpeed(Properties props, String name)
-	{
+	static private ClockSpeed getClockSpeed(Properties props, String name) {
 		String value = props.getProperty(name);
 		if (value == null)
 			return null;
@@ -57,8 +53,7 @@ class Version1Upgrader
 		return new ClockSpeed(d, ClockSpeedUnits.Hertz);
 	}
 
-	static private Size getSize(Properties props, String name)
-	{
+	static private Size getSize(Properties props, String name) {
 		String value = props.getProperty(name);
 		if (value == null)
 			return null;
@@ -67,8 +62,8 @@ class Version1Upgrader
 		return new Size(d, SizeUnits.Bytes);
 	}
 
-	static private Collection<UnixSignals> getSignals(Properties props, String name) throws IOException
-	{
+	static private Collection<UnixSignals> getSignals(Properties props,
+			String name) throws IOException {
 		String value = props.getProperty(name);
 		if (value == null)
 			return null;
@@ -86,8 +81,7 @@ class Version1Upgrader
 		return UnixSignals.parseTrapAndKillSet(signalStrings);
 	}
 
-	static private boolean upgrade(ResourceOverrides overrides, Properties props)
-	{
+	static private boolean upgrade(ResourceOverrides overrides, Properties props) {
 		boolean ret = false;
 
 		final String BASE = "edu.virginia.vcgr.genii.native-q.resource-override.";
@@ -144,8 +138,8 @@ class Version1Upgrader
 		return ret;
 	}
 
-	static private boolean upgrade(NativeQueueConfiguration nativeQueueConf, Properties props) throws IOException
-	{
+	static private boolean upgrade(NativeQueueConfiguration nativeQueueConf,
+			Properties props) throws IOException {
 		boolean ret = false;
 
 		final String BASE1 = "edu.virginia.vcgr.genii.container.bes.";
@@ -189,8 +183,9 @@ class Version1Upgrader
 		return ret;
 	}
 
-	static private void upgradeScriptBasedConf(CommonScriptBasedQueueConfiguration conf, Properties props, String provName)
-	{
+	static private void upgradeScriptBasedConf(
+			CommonScriptBasedQueueConfiguration conf, Properties props,
+			String provName) {
 		final String BASE = "edu.virginia.vcgr.genii.client.nativeq.";
 		final String QNAME_FMT = BASE + "%s.queue-name";
 		final String BINDIR_FMT = BASE + "%s.bin-directory";
@@ -215,16 +210,17 @@ class Version1Upgrader
 		conf.submitScriptName(props.getProperty(SCRIPTNAME));
 	}
 
-	static private ExecutableApplicationConfiguration getAppConf(Properties props, String pathFmt, String argFmt,
-		String provName, String appName)
-	{
+	static private ExecutableApplicationConfiguration getAppConf(
+			Properties props, String pathFmt, String argFmt, String provName,
+			String appName) {
 		String path = null;
 		Collection<String> args = new LinkedList<String>();
 
 		path = props.getProperty(String.format(pathFmt, provName, appName));
 		int lcv = 0;
 		while (true) {
-			String arg = props.getProperty(String.format(argFmt, provName, appName, lcv++));
+			String arg = props.getProperty(String.format(argFmt, provName,
+					appName, lcv++));
 			if (arg == null)
 				break;
 			args.add(arg);
@@ -233,18 +229,16 @@ class Version1Upgrader
 		return new ExecutableApplicationConfiguration(path, args);
 	}
 
-	static private void upgrade(PBSQueueConfiguration conf, Properties props)
-	{
+	static private void upgrade(PBSQueueConfiguration conf, Properties props) {
 		upgradeScriptBasedConf(conf, props, "pbs");
 	}
 
-	static private void upgrade(SGEQueueConfiguration conf, Properties props)
-	{
+	static private void upgrade(SGEQueueConfiguration conf, Properties props) {
 		upgradeScriptBasedConf(conf, props, "sge");
 	}
 
-	static boolean upgrade(BESConstructionParameters params, Properties props) throws IOException
-	{
+	static boolean upgrade(BESConstructionParameters params, Properties props)
+			throws IOException {
 		boolean ret = false;
 
 		ResourceOverrides resourceOverrides = params.getResourceOverrides();
@@ -253,7 +247,8 @@ class Version1Upgrader
 			ret = true;
 		}
 
-		NativeQueueConfiguration queueConf = params.getNativeQueueConfiguration();
+		NativeQueueConfiguration queueConf = params
+				.getNativeQueueConfiguration();
 		if (queueConf == null)
 			queueConf = new NativeQueueConfiguration();
 		if (upgrade(queueConf, props)) {

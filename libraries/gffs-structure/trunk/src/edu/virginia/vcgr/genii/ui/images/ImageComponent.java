@@ -6,20 +6,17 @@ import java.awt.Image;
 
 import javax.swing.JComponent;
 
-public class ImageComponent extends JComponent
-{
+public class ImageComponent extends JComponent {
 	static final long serialVersionUID = 0L;
 
 	private Image _image;
 
 	@Override
-	protected void paintComponent(Graphics g)
-	{
+	protected void paintComponent(Graphics g) {
 		g.drawImage(_image, 0, 0, null);
 	}
 
-	public ImageComponent(Image image)
-	{
+	public ImageComponent(Image image) {
 		_image = image;
 
 		int height = _image.getHeight(null);

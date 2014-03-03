@@ -26,8 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlRootElement(namespace = HPCFSEConstants.WSSEC_SECEXT_NS, name = "UsernameToken")
-public class UsernameToken implements SecurityToken, Serializable
-{
+public class UsernameToken implements SecurityToken, Serializable {
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = HPCFSEConstants.WSSEC_SECEXT_NS, name = "Username", required = true)
@@ -40,39 +39,33 @@ public class UsernameToken implements SecurityToken, Serializable
 	 * Only used for XML Unmarshalling.
 	 */
 	@SuppressWarnings("unused")
-	private UsernameToken()
-	{
+	private UsernameToken() {
 	}
 
-	public UsernameToken(String username, String password)
-	{
+	public UsernameToken(String username, String password) {
 		username(username);
 		password(password);
 	}
 
-	final public void username(String username)
-	{
+	final public void username(String username) {
 		if (username == null)
 			throw new IllegalArgumentException("User name cannot be null.");
 
 		_username = username;
 	}
 
-	final public String username()
-	{
+	final public String username() {
 		return _username;
 	}
 
-	final public void password(String password)
-	{
+	final public void password(String password) {
 		if (password == null)
 			throw new IllegalArgumentException("Password cannot be null.");
 
 		_password = password;
 	}
 
-	final public String password()
-	{
+	final public String password() {
 		return _password;
 	}
 }

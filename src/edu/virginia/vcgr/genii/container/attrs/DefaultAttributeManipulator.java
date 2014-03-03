@@ -31,9 +31,9 @@ import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesRequestFailedFaultT
 
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 
-public class DefaultAttributeManipulator implements IAttributeManipulator
-{
-	static private Log _logger = LogFactory.getLog(DefaultAttributeManipulator.class);
+public class DefaultAttributeManipulator implements IAttributeManipulator {
+	static private Log _logger = LogFactory
+			.getLog(DefaultAttributeManipulator.class);
 
 	private Object _target;
 	private QName _attrQName;
@@ -41,9 +41,8 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 	private Method _setMethod;
 	private boolean _isSingleSet;
 
-	private DefaultAttributeManipulator(Object target, QName attrQName, Method getterMethod, Method setterMethod,
-		boolean isSingleSet)
-	{
+	private DefaultAttributeManipulator(Object target, QName attrQName,
+			Method getterMethod, Method setterMethod, boolean isSingleSet) {
 		_target = target;
 		_attrQName = attrQName;
 		_getMethod = getterMethod;
@@ -51,19 +50,17 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 		_isSingleSet = isSingleSet;
 	}
 
-	public QName getAttributeQName()
-	{
+	public QName getAttributeQName() {
 		return _attrQName;
 	}
 
-	public boolean allowsSet()
-	{
+	public boolean allowsSet() {
 		return _setMethod != null;
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<MessageElement> getAttributeValues() throws ResourceUnknownFaultType, RemoteException
-	{
+	public Collection<MessageElement> getAttributeValues()
+			throws ResourceUnknownFaultType, RemoteException {
 		Object ret;
 
 		try {
@@ -92,13 +89,14 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 		}
 	}
 
-	public void setAttributeValues(Collection<MessageElement> values) throws ResourceUnknownFaultType, RemoteException,
-		UnableToModifyResourcePropertyFaultType
-	{
+	public void setAttributeValues(Collection<MessageElement> values)
+			throws ResourceUnknownFaultType, RemoteException,
+			UnableToModifyResourcePropertyFaultType {
 		Object[] params = null;
 
 		if (_setMethod == null)
-			throw FaultManipulator.fillInFault(new UnableToModifyResourcePropertyFaultType());
+			throw FaultManipulator
+					.fillInFault(new UnableToModifyResourcePropertyFaultType());
 
 		if (_isSingleSet) {
 			if (values.size() == 0)
@@ -106,7 +104,8 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 			else if (values.size() == 1)
 				params = new Object[] { values.iterator().next() };
 			else
-				throw FaultManipulator.fillInFault(new UpdateResourcePropertiesRequestFailedFaultType());
+				throw FaultManipulator
+						.fillInFault(new UpdateResourcePropertiesRequestFailedFaultType());
 		} else {
 			params = new Object[] { values };
 		}
@@ -127,20 +126,21 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 		}
 	}
 
-	static public IAttributeManipulator createManipulator(Object target, QName attributeName, String getMethodName)
-		throws NoSuchMethodException
-	{
+	static public IAttributeManipulator createManipulator(Object target,
+			QName attributeName, String getMethodName)
+			throws NoSuchMethodException {
 		return createManipulator(target, attributeName, getMethodName, null);
 	}
 
 	@SuppressWarnings("unchecked")
-	static public IAttributeManipulator createManipulator(Object target, QName attributeName, String getMethodName,
-		String setMethodName) throws NoSuchMethodException
-	{
+	static public IAttributeManipulator createManipulator(Object target,
+			QName attributeName, String getMethodName, String setMethodName)
+			throws NoSuchMethodException {
 		Class<? extends Object> clazz;
 
 		if (target == null)
-			throw new IllegalArgumentException("Parameter \"target\" cannot be null.");
+			throw new IllegalArgumentException(
+					"Parameter \"target\" cannot be null.");
 
 		if (target instanceof Class) {
 			clazz = (Class<? extends Object>) target;
@@ -148,23 +148,28 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 		} else {
 			clazz = target.getClass();
 		}
-//		if (clazz == MessageElement.class)
-//			clazz = org.apache.axis.message.MessageElement.class;
+		// if (clazz == MessageElement.class)
+		// clazz = org.apache.axis.message.MessageElement.class;
 		if (_logger.isTraceEnabled())
 			_logger.trace("target class found: " + clazz.getCanonicalName());
 
 		if (attributeName == null)
-			throw new IllegalArgumentException("Parameter \"attributeName\" cannot be null.");
+			throw new IllegalArgumentException(
+					"Parameter \"attributeName\" cannot be null.");
 		if (getMethodName == null)
-			throw new IllegalArgumentException("Parameter \"getMethodName\" cannot be null.");
+			throw new IllegalArgumentException(
+					"Parameter \"getMethodName\" cannot be null.");
 
 		Method getter = clazz.getMethod(getMethodName, new Class[0]);
 		Class<? extends Object> returnType = getter.getReturnType();
 		if (_logger.isTraceEnabled())
-			_logger.trace("return type decided on: " + returnType.getCanonicalName());
+			_logger.trace("return type decided on: "
+					+ returnType.getCanonicalName());
 
-		if (!((MessageElement.class.isAssignableFrom(returnType)) || (Collection.class.isAssignableFrom(returnType))))
-			throw new IllegalArgumentException("Method \"" + getMethodName + "\" does not appear to return the correct type.");
+		if (!((MessageElement.class.isAssignableFrom(returnType)) || (Collection.class
+				.isAssignableFrom(returnType))))
+			throw new IllegalArgumentException("Method \"" + getMethodName
+					+ "\" does not appear to return the correct type.");
 
 		Method setter;
 		boolean isSingleSet = true;
@@ -172,19 +177,21 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 			setter = null;
 		else {
 			try {
-				setter = clazz.getMethod(setMethodName, new Class[] { Collection.class });
+				setter = clazz.getMethod(setMethodName,
+						new Class[] { Collection.class });
 				isSingleSet = false;
 			} catch (NoSuchMethodException nsme) {
-				setter = clazz.getMethod(setMethodName, new Class[] { MessageElement.class });
+				setter = clazz.getMethod(setMethodName,
+						new Class[] { MessageElement.class });
 			}
 		}
 
-		return new DefaultAttributeManipulator(target, attributeName, getter, setter, isSingleSet);
+		return new DefaultAttributeManipulator(target, attributeName, getter,
+				setter, isSingleSet);
 	}
 
 	@Override
-	final public String toString()
-	{
+	final public String toString() {
 		return String.format("[%s] %s/%s", _attrQName, _getMethod, _setMethod);
 	}
 }

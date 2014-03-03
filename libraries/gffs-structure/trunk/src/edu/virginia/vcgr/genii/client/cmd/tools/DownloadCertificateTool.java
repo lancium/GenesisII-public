@@ -22,13 +22,12 @@ import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class DownloadCertificateTool extends BaseGridTool
-{
+public class DownloadCertificateTool extends BaseGridTool {
 	static private final String USAGE = "config/tooldocs/usage/udownload-certificate";
 	static private final String DESCRIPTION = "config/tooldocs/description/ddownload-certificate";
 
-	static private void writeFile(InputStream in, File outputFile) throws IOException
-	{
+	static private void writeFile(InputStream in, File outputFile)
+			throws IOException {
 		FileOutputStream fos = null;
 
 		try {
@@ -39,20 +38,21 @@ public class DownloadCertificateTool extends BaseGridTool
 		}
 	}
 
-	public DownloadCertificateTool()
-	{
-		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), true, ToolCategory.SECURITY);
+	public DownloadCertificateTool() {
+		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE),
+				true, ToolCategory.SECURITY);
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
-	{
+	protected int runCommand() throws Throwable {
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException("<rns-path-to-idp> must be a grid path. ");
+			throw new InvalidToolUsageException(
+					"<rns-path-to-idp> must be a grid path. ");
 		GeniiPath localPath = new GeniiPath(getArgument(1));
 		if (localPath.pathType() != GeniiPathType.Local)
-			throw new InvalidToolUsageException("<target-local-file> must be a local path begining with 'local:' ");
+			throw new InvalidToolUsageException(
+					"<target-local-file> must be a local path begining with 'local:' ");
 		RNSPath target = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
 		TypeInformation typeInfo = new TypeInformation(target.getEndpoint());
 
@@ -68,7 +68,8 @@ public class DownloadCertificateTool extends BaseGridTool
 
 				X509Certificate[] chain = EPRUtils.extractCertChain(epr);
 				if (chain == null || chain.length < 1)
-					stderr.println("Remote endpoint does not contain a " + "valid certificate chain.");
+					stderr.println("Remote endpoint does not contain a "
+							+ "valid certificate chain.");
 				else
 					in = new ByteArrayInputStream(chain[0].getEncoded());
 			}
@@ -82,8 +83,7 @@ public class DownloadCertificateTool extends BaseGridTool
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException();
 	}

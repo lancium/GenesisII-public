@@ -10,8 +10,7 @@ import org.morgan.util.io.StreamUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class GridEnvironment
-{
+public class GridEnvironment {
 	static public final String GRID_ENVIRONMENT_FILENAME = ".gridenv.properties";
 
 	static public final String GRID_PATH_ENV_VARIABLE = "GPATH";
@@ -20,8 +19,7 @@ public class GridEnvironment
 
 	static private boolean _loaded = false;
 
-	static private File getGridEnvFile()
-	{
+	static private File getGridEnvFile() {
 		String homedirPath = System.getProperty("user.home");
 		if (homedirPath == null) {
 			_logger.warn("Unable to find user's home directory property.");
@@ -30,17 +28,19 @@ public class GridEnvironment
 
 		File homedir = new File(homedirPath);
 		File gridenvFile = new File(homedir, GRID_ENVIRONMENT_FILENAME);
-		if (!gridenvFile.exists() || !gridenvFile.isFile() || !gridenvFile.canRead()) {
+		if (!gridenvFile.exists() || !gridenvFile.isFile()
+				|| !gridenvFile.canRead()) {
 			if (_logger.isTraceEnabled())
-				_logger.trace(String.format("Unable to locate grid environment file %s.", gridenvFile));
+				_logger.trace(String.format(
+						"Unable to locate grid environment file %s.",
+						gridenvFile));
 			return null;
 		}
 
 		return gridenvFile;
 	}
 
-	static private Properties loadProperties(File gridFile)
-	{
+	static private Properties loadProperties(File gridFile) {
 		FileInputStream fin = null;
 
 		try {
@@ -49,15 +49,15 @@ public class GridEnvironment
 			props.load(fin);
 			return props;
 		} catch (IOException ioe) {
-			_logger.warn(String.format("Unable to load grid environment file %s.", gridFile));
+			_logger.warn(String.format(
+					"Unable to load grid environment file %s.", gridFile));
 			return null;
 		} finally {
 			StreamUtils.close(fin);
 		}
 	}
 
-	synchronized static public void loadGridEnvironment()
-	{
+	synchronized static public void loadGridEnvironment() {
 		if (_loaded)
 			return;
 

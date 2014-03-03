@@ -15,8 +15,7 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public abstract class BaseLoginTool extends BaseGridTool
-{
+public abstract class BaseLoginTool extends BaseGridTool {
 
 	static public final String PKCS12 = "PKCS12";
 	static public final String JKS = "JKS";
@@ -31,67 +30,57 @@ public abstract class BaseLoginTool extends BaseGridTool
 	protected String _pattern = null;
 	protected String _authnUri = null;
 
-	protected BaseLoginTool(String description, String usage, boolean isHidden)
-	{
-		super(new LoadFileResource(description), new LoadFileResource(usage), isHidden, ToolCategory.INTERNAL);
+	protected BaseLoginTool(String description, String usage, boolean isHidden) {
+		super(new LoadFileResource(description), new LoadFileResource(usage),
+				isHidden, ToolCategory.INTERNAL);
 	}
 
-	public BaseLoginTool()
-	{
+	public BaseLoginTool() {
 		super(null, null, false);
 	}
 
 	@Option({ "storetype" })
-	public void setStoretype(String storeType)
-	{
+	public void setStoretype(String storeType) {
 		_storeType = storeType;
 	}
 
 	@Option({ "password" })
-	public void setPassword(String password)
-	{
+	public void setPassword(String password) {
 		_password = password;
 	}
 
 	@Option({ "username" })
-	public void setUsername(String username)
-	{
+	public void setUsername(String username) {
 		_username = username;
 	}
 
 	@Option({ "alias" })
-	public void setAlias()
-	{
+	public void setAlias() {
 		_aliasPatternFlag = true;
 	}
 
 	@Option({ "toolIdentity" })
-	public void setToolIdentity()
-	{
+	public void setToolIdentity() {
 		_replaceClientToolIdentityFlag = true;
 	}
 
 	@Option({ "pattern" })
-	public void setPattern(String pattern)
-	{
+	public void setPattern(String pattern) {
 		_pattern = pattern;
 	}
 
 	@Option({ "validDuration" })
-	public void setValidDuration(String durationString) throws ParseException
-	{
+	public void setValidDuration(String durationString) throws ParseException {
 		_durationString = durationString;
 	}
 
 	@Option({ "validMillis" })
-	public void setValidMillis(long validMillis) throws ParseException
-	{
+	public void setValidMillis(long validMillis) throws ParseException {
 		_credentialValidMillis = validMillis;
 	}
 
 	// Copies t1's credentials to t2
-	public static final void copyCreds(BaseLoginTool t1, BaseLoginTool t2)
-	{
+	public static final void copyCreds(BaseLoginTool t1, BaseLoginTool t2) {
 		t2.setStoretype(t1._storeType);
 		t2.setPassword(t1._password);
 		t2.setUsername(t1._username);
@@ -103,28 +92,31 @@ public abstract class BaseLoginTool extends BaseGridTool
 		t2._arguments = t1._arguments;
 	}
 
-	protected final void aquireUsername() throws DialogException, UserCancelException
-	{
-		DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
+	protected final void aquireUsername() throws DialogException,
+			UserCancelException {
+		DialogProvider provider = DialogFactory.getProvider(stdout, stderr,
+				stdin, useGui());
 
 		if (_username == null) {
-			InputDialog usernameDialog = provider.createInputDialog("Username", "Please enter username.");
+			InputDialog usernameDialog = provider.createInputDialog("Username",
+					"Please enter username.");
 			usernameDialog.showDialog();
 			_username = usernameDialog.getAnswer();
 		}
 	}
 
-	protected final void aquirePassword() throws ToolException
-	{
+	protected final void aquirePassword() throws ToolException {
 
 		if (_password == null) {
 			AbstractLoginHandler handler = null;
-			if (!useGui() || !GuiUtils.supportsGraphics() || !UserPreferences.preferences().preferGUI()) {
+			if (!useGui() || !GuiUtils.supportsGraphics()
+					|| !UserPreferences.preferences().preferGUI()) {
 				handler = new TextLoginHandler(stdout, stderr, stdin);
 			} else {
 				handler = new GuiLoginHandler(stdout, stderr, stdin);
 			}
-			char[] pword = handler.getPassword("Username/Password Login", String.format("Password for %s:  ", _username));
+			char[] pword = handler.getPassword("Username/Password Login",
+					String.format("Password for %s:  ", _username));
 			if (pword == null)
 				throw new ToolException("Unable to aquire password");
 			_password = new String(pword);

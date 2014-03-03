@@ -29,12 +29,12 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.io.IURIHandler;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-public class URIHandlerSectionHandler implements IXMLConfigurationSectionHandler
-{
-	static private QName _CHILD_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "uri-handler");
+public class URIHandlerSectionHandler implements
+		IXMLConfigurationSectionHandler {
+	static private QName _CHILD_QNAME = new QName(
+			GenesisIIConstants.GENESISII_NS, "uri-handler");
 
-	public Object parse(Node n)
-	{
+	public Object parse(Node n) {
 		NodeList children = n.getChildNodes();
 		int length = children.getLength();
 		Collection<IURIHandler> handlers = new ArrayList<IURIHandler>(length);
@@ -43,21 +43,28 @@ public class URIHandlerSectionHandler implements IXMLConfigurationSectionHandler
 		for (int lcv = 0; lcv < length; lcv++) {
 			Node child = children.item(lcv);
 			if (child.getNodeType() == Node.ELEMENT_NODE) {
-				QName childQName = new QName(child.getNamespaceURI(), child.getLocalName());
+				QName childQName = new QName(child.getNamespaceURI(),
+						child.getLocalName());
 				if (!childQName.equals(_CHILD_QNAME))
-					throw new ConfigurationException("Found unexpected child node \"" + childQName + "\".");
+					throw new ConfigurationException(
+							"Found unexpected child node \"" + childQName
+									+ "\".");
 
 				String className = child.getTextContent();
 
 				try {
 					Class<?> cl = Class.forName(className, true, loader);
 					if (!IURIHandler.class.isAssignableFrom(cl))
-						throw new ConfigurationException("Class \"" + className
-							+ "\" does not implement the IURIHandler interface.");
+						throw new ConfigurationException(
+								"Class \""
+										+ className
+										+ "\" does not implement the IURIHandler interface.");
 					Constructor<?> cons = cl.getConstructor(new Class[0]);
 					handlers.add((IURIHandler) cons.newInstance(new Object[0]));
 				} catch (NoSuchMethodException nsme) {
-					throw new ConfigurationException("Couldn't find default constructor for \"" + className + "\".", nsme);
+					throw new ConfigurationException(
+							"Couldn't find default constructor for \""
+									+ className + "\".", nsme);
 				} catch (InstantiationException ie) {
 					throw new ConfigurationException(ie.getMessage(), ie);
 				} catch (InvocationTargetException ite) {
@@ -65,7 +72,8 @@ public class URIHandlerSectionHandler implements IXMLConfigurationSectionHandler
 				} catch (IllegalAccessException iae) {
 					throw new ConfigurationException(iae.getMessage(), iae);
 				} catch (ClassNotFoundException cnfe) {
-					throw new ConfigurationException("Couldn't locate class \"" + className + "\".");
+					throw new ConfigurationException("Couldn't locate class \""
+							+ className + "\".");
 				}
 			}
 		}

@@ -7,26 +7,23 @@ import java.io.PrintWriter;
 import edu.virginia.vcgr.genii.client.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.io.GetPassword2;
 
-class ConsolePackage
-{
+class ConsolePackage {
 	private PrintWriter _stdout;
 	private PrintWriter _stderr;
 	private BufferedReader _stdin;
 
-	public ConsolePackage(PrintWriter stdout, PrintWriter stderr, BufferedReader stdin)
-	{
+	public ConsolePackage(PrintWriter stdout, PrintWriter stderr,
+			BufferedReader stdin) {
 		_stdout = stdout;
 		_stderr = stderr;
 		_stdin = stdin;
 	}
 
-	public String readLine() throws DialogException
-	{
+	public String readLine() throws DialogException {
 		return readLine(false);
 	}
 
-	public String readLine(boolean hiddenInput) throws DialogException
-	{
+	public String readLine(boolean hiddenInput) throws DialogException {
 		try {
 			if (hiddenInput) {
 				return GetPassword2.getPassword("");
@@ -38,13 +35,11 @@ class ConsolePackage
 		}
 	}
 
-	public PrintWriter stdout()
-	{
+	public PrintWriter stdout() {
 		return _stdout;
 	}
 
-	public PrintWriter stderr()
-	{
+	public PrintWriter stderr() {
 		return _stderr;
 	}
 }

@@ -69,34 +69,38 @@ import edu.virginia.vcgr.genii.security.identity.IdentityType;
 import edu.virginia.vcgr.genii.security.x509.CertEntry;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
-public class AxisClientHeaderHandler extends BasicHandler
-{
+public class AxisClientHeaderHandler extends BasicHandler {
 	static final long serialVersionUID = 0L;
 
-	static private Log _logger = LogFactory.getLog(AxisClientHeaderHandler.class);
+	static private Log _logger = LogFactory
+			.getLog(AxisClientHeaderHandler.class);
 
-	private void setGenesisIIHeaders(MessageContext msgContext) throws AxisFault
-	{
+	private void setGenesisIIHeaders(MessageContext msgContext)
+			throws AxisFault {
 		SOAPHeader header;
 
 		try {
 			header = (SOAPHeader) msgContext.getMessage().getSOAPHeader();
 
 			Version currentVersion;
-			ApplicationLauncherConsole console = ApplicationLauncher.getConsole();
+			ApplicationLauncherConsole console = ApplicationLauncher
+					.getConsole();
 			if (console != null) {
 				currentVersion = console.currentVersion();
 
-				if (currentVersion != null && !currentVersion.equals(Version.EMPTY_VERSION)) {
-					SOAPHeaderElement geniiVersion =
-						new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION, currentVersion.toString());
+				if (currentVersion != null
+						&& !currentVersion.equals(Version.EMPTY_VERSION)) {
+					SOAPHeaderElement geniiVersion = new SOAPHeaderElement(
+							GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION,
+							currentVersion.toString());
 					geniiVersion.setActor(null);
 					geniiVersion.setMustUnderstand(false);
 					header.addChildElement(geniiVersion);
 				}
 			}
 
-			SOAPHeaderElement isGenesisII = new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME, Boolean.TRUE);
+			SOAPHeaderElement isGenesisII = new SOAPHeaderElement(
+					GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME, Boolean.TRUE);
 			isGenesisII.setActor(null);
 			isGenesisII.setMustUnderstand(false);
 			header.addChildElement(isGenesisII);
@@ -105,11 +109,11 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 	}
 
-	private void setMessageID(MessageContext msgContext) throws AxisFault
-	{
-		SOAPHeaderElement messageid =
-			new SOAPHeaderElement(new QName(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "MessageID"),
-				"urn:uuid:" + new GUID());
+	private void setMessageID(MessageContext msgContext) throws AxisFault {
+		SOAPHeaderElement messageid = new SOAPHeaderElement(new QName(
+				EndpointReferenceType.getTypeDesc().getXmlType()
+						.getNamespaceURI(), "MessageID"), "urn:uuid:"
+				+ new GUID());
 		messageid.setActor(null);
 		messageid.setMustUnderstand(false);
 		try {
@@ -119,14 +123,13 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 	}
 
-	private void setSOAPAction(MessageContext msgContext) throws AxisFault
-	{
+	private void setSOAPAction(MessageContext msgContext) throws AxisFault {
 		String uri = msgContext.getSOAPActionURI();
 
 		if ((uri != null) && (uri.length() > 0)) {
-			SOAPHeaderElement action =
-				new SOAPHeaderElement(new QName(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "Action"),
-					uri);
+			SOAPHeaderElement action = new SOAPHeaderElement(new QName(
+					EndpointReferenceType.getTypeDesc().getXmlType()
+							.getNamespaceURI(), "Action"), uri);
 			action.setActor(null);
 			action.setMustUnderstand(false);
 			try {
@@ -138,60 +141,77 @@ public class AxisClientHeaderHandler extends BasicHandler
 	}
 
 	@SuppressWarnings("unchecked")
-	private void setWSAddressingHeaders(MessageContext msgContext) throws AxisFault
-	{
-		if (!msgContext.containsProperty(CommConstants.TARGET_EPR_PROPERTY_NAME))
+	private void setWSAddressingHeaders(MessageContext msgContext)
+			throws AxisFault {
+		if (!msgContext
+				.containsProperty(CommConstants.TARGET_EPR_PROPERTY_NAME))
 			return;
 
-		EndpointReferenceType target = (EndpointReferenceType) msgContext.getProperty(CommConstants.TARGET_EPR_PROPERTY_NAME);
+		EndpointReferenceType target = (EndpointReferenceType) msgContext
+				.getProperty(CommConstants.TARGET_EPR_PROPERTY_NAME);
 		if (target == null)
 			return;
 
 		try {
-			String WSA_NS = EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI();
-			SOAPHeader header = (SOAPHeader) msgContext.getMessage().getSOAPHeader();
+			String WSA_NS = EndpointReferenceType.getTypeDesc().getXmlType()
+					.getNamespaceURI();
+			SOAPHeader header = (SOAPHeader) msgContext.getMessage()
+					.getSOAPHeader();
 
-			SOAPHeaderElement to = new SOAPHeaderElement(new QName(WSA_NS, "To"), target.getAddress().get_value().toString());
+			SOAPHeaderElement to = new SOAPHeaderElement(
+					new QName(WSA_NS, "To"), target.getAddress().get_value()
+							.toString());
 			header.addChildElement(to);
 
 			// specify that we need to sign the To header
-			ArrayList<WSEncryptionPart> signParts =
-				(ArrayList<WSEncryptionPart>) msgContext.getProperty(CommConstants.MESSAGE_SEC_SIGN_PARTS);
+			ArrayList<WSEncryptionPart> signParts = (ArrayList<WSEncryptionPart>) msgContext
+					.getProperty(CommConstants.MESSAGE_SEC_SIGN_PARTS);
 			if (signParts == null) {
 				signParts = new ArrayList<WSEncryptionPart>();
-				msgContext.setProperty(CommConstants.MESSAGE_SEC_SIGN_PARTS, signParts);
+				msgContext.setProperty(CommConstants.MESSAGE_SEC_SIGN_PARTS,
+						signParts);
 			}
-			signParts.add(new WSEncryptionPart("To", "http://www.w3.org/2005/08/addressing", "Element"));
+			signParts.add(new WSEncryptionPart("To",
+					"http://www.w3.org/2005/08/addressing", "Element"));
 
 			ReferenceParametersType rpt = target.getReferenceParameters();
 			if (rpt != null) {
 				MessageElement[] any = rpt.get_any();
 				if (any != null) {
-					Collection<QName> referenceParameters = new ArrayList<QName>(any.length);
+					Collection<QName> referenceParameters = new ArrayList<QName>(
+							any.length);
 
 					for (MessageElement elem : any) {
 						SOAPHeaderElement she = new SOAPHeaderElement(elem);
 
-						// dgm4d: Haxx for problem where resource keys go missing:
+						// dgm4d: Haxx for problem where resource keys go
+						// missing:
 						// Basically we have resource keys occasionally set
-						// as MessageElement.objectValue, which isn't deep-copied
-						// from "elem" during the SOAPHeaderElement construction.
-						if ((elem.getObjectValue() != null) && ((she.getChildren() == null) || (she.getChildren().isEmpty()))) {
+						// as MessageElement.objectValue, which isn't
+						// deep-copied
+						// from "elem" during the SOAPHeaderElement
+						// construction.
+						if ((elem.getObjectValue() != null)
+								&& ((she.getChildren() == null) || (she
+										.getChildren().isEmpty()))) {
 							she.setObjectValue(elem.getObjectValue());
 						}
 
-						she.removeAttributeNS(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(),
-							"IsReferenceParameter");
-						she.addAttribute(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(),
-							"IsReferenceParameter", "true");
+						she.removeAttributeNS(EndpointReferenceType
+								.getTypeDesc().getXmlType().getNamespaceURI(),
+								"IsReferenceParameter");
+						she.addAttribute(EndpointReferenceType.getTypeDesc()
+								.getXmlType().getNamespaceURI(),
+								"IsReferenceParameter", "true");
 						header.addChildElement(she);
 						referenceParameters.add(elem.getQName());
 					}
 
 					for (QName refParamName : referenceParameters) {
 						// specify that we need to sign the reference params
-						signParts.add(new WSEncryptionPart(refParamName.getLocalPart(), refParamName.getNamespaceURI(),
-							"Element"));
+						signParts.add(new WSEncryptionPart(refParamName
+								.getLocalPart(),
+								refParamName.getNamespaceURI(), "Element"));
 					}
 				}
 			}
@@ -200,27 +220,32 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 	}
 
-	public static void delegateCredentials(CredentialWallet wallet, ICallingContext callingContext,
-		MessageContext messageContext, MessageSecurity msgSecData) throws Exception
-	{
+	public static void delegateCredentials(CredentialWallet wallet,
+			ICallingContext callingContext, MessageContext messageContext,
+			MessageSecurity msgSecData) throws Exception {
 		if ((wallet == null) || (msgSecData == null)) {
 			_logger.error("failure in calling delegate credentials; null object passed");
 			return;
 		}
 
 		X509Certificate[] resourceCertChain = msgSecData._resourceCertChain;
-		KeyAndCertMaterial clientKeyAndCertificate = callingContext.getActiveKeyAndCertMaterial();
+		KeyAndCertMaterial clientKeyAndCertificate = callingContext
+				.getActiveKeyAndCertMaterial();
 
-		long beginTime = System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset;
-		long endTime = System.currentTimeMillis() + SecurityConstants.CredentialExpirationMillis;
+		long beginTime = System.currentTimeMillis()
+				- SecurityConstants.CredentialGoodFromOffset;
+		long endTime = System.currentTimeMillis()
+				+ SecurityConstants.CredentialExpirationMillis;
 
-		BasicConstraints restrictions = new BasicConstraints(beginTime, endTime, SecurityConstants.MaxDelegationDepth);
+		BasicConstraints restrictions = new BasicConstraints(beginTime,
+				endTime, SecurityConstants.MaxDelegationDepth);
 
-		EnumSet<RWXCategory> accessCategories = EnumSet.of(RWXCategory.READ, RWXCategory.WRITE, RWXCategory.EXECUTE);
+		EnumSet<RWXCategory> accessCategories = EnumSet.of(RWXCategory.READ,
+				RWXCategory.WRITE, RWXCategory.EXECUTE);
 
 		/*
-		 * A new credentials wallet is needed for the resource. Otherwise, the operation of
-		 * delegation will corrupt client's own credentials wallet.
+		 * A new credentials wallet is needed for the resource. Otherwise, the
+		 * operation of delegation will corrupt client's own credentials wallet.
 		 */
 		AxisCredentialWallet walletForResource = new AxisCredentialWallet();
 
@@ -233,9 +258,11 @@ public class AxisClientHeaderHandler extends BasicHandler
 					_logger.trace("no resource cert chain; using bare credentials.");
 			} else {
 				try {
-					walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
-						clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
-						accessCategories, trustDelegation);
+					walletForResource.getRealCreds().delegateTrust(
+							resourceCertChain, IdentityType.OTHER,
+							clientKeyAndCertificate._clientCertChain,
+							clientKeyAndCertificate._clientPrivateKey,
+							restrictions, accessCategories, trustDelegation);
 				} catch (Throwable e) {
 					_logger.error("failed to delegate trust", e);
 				}
@@ -244,39 +271,47 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 		if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
 			/*
-			 * the idea here is that all we need is one assurance that the resource trusts this
-			 * outgoing connection and that therefore the recipient should also.
+			 * the idea here is that all we need is one assurance that the
+			 * resource trusts this outgoing connection and that therefore the
+			 * recipient should also.
 			 */
 			CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
 			if (tlsKey != null) {
-				// this credential says that the resource trusts the tls connection cert.
-				TrustCredential newTC =
-					CredentialCache.getCachedCredential(tlsKey._certChain, IdentityType.CONNECTION,
-						clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
-						RWXCategory.FULL_ACCESS);
+				// this credential says that the resource trusts the tls
+				// connection cert.
+				TrustCredential newTC = CredentialCache.getCachedCredential(
+						tlsKey._certChain, IdentityType.CONNECTION,
+						clientKeyAndCertificate._clientCertChain,
+						clientKeyAndCertificate._clientPrivateKey,
+						restrictions, RWXCategory.FULL_ACCESS);
 				walletForResource.getRealCreds().addCredential(newTC);
 				if (_logger.isTraceEnabled())
 					_logger.trace("made credential for connection: " + newTC);
 				foundAny = true;
 
-				// this credential says that the tls connection cert trusts a pass-through tls
+				// this credential says that the tls connection cert trusts a
+				// pass-through tls
 				// identity, if any.
-				X509Certificate passThrough =
-					(X509Certificate) callingContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
+				X509Certificate passThrough = (X509Certificate) callingContext
+						.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 				if (passThrough != null) {
-					// verify that this cert matches the last TLS we saw from the client, or we
+					// verify that this cert matches the last TLS we saw from
+					// the client, or we
 					// won't propagate it.
-					X509Certificate lastTLS =
-						(X509Certificate) callingContext.getSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
+					X509Certificate lastTLS = (X509Certificate) callingContext
+							.getSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
 					if (lastTLS.equals(passThrough)) {
 						X509Certificate passOn[] = new X509Certificate[1];
 						passOn[0] = passThrough;
-						TrustCredential newerTC =
-							CredentialCache.getCachedCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain,
-								tlsKey._privateKey, restrictions, RWXCategory.FULL_ACCESS);
+						TrustCredential newerTC = CredentialCache
+								.getCachedCredential(passOn,
+										IdentityType.CONNECTION,
+										tlsKey._certChain, tlsKey._privateKey,
+										restrictions, RWXCategory.FULL_ACCESS);
 						walletForResource.getRealCreds().addCredential(newerTC);
 						if (_logger.isTraceEnabled())
-							_logger.trace("made credential for pass-through connection: " + newerTC);
+							_logger.trace("made credential for pass-through connection: "
+									+ newerTC);
 					} else {
 						_logger.trace("ignoring pass-through credential that doesn't match client's last TLS certificate.");
 					}
@@ -290,16 +325,19 @@ public class AxisClientHeaderHandler extends BasicHandler
 		if (!foundAny) {
 			_logger.debug("Found zero credentials to delegate for soap header.");
 		}
-		final javax.xml.soap.SOAPHeader soapHeader = messageContext.getMessage().getSOAPHeader();
+		final javax.xml.soap.SOAPHeader soapHeader = messageContext
+				.getMessage().getSOAPHeader();
 		soapHeader.addChildElement(walletForResource.convertToSOAPElement());
 	}
 
 	@SuppressWarnings("unchecked")
-	private void setCallingContextHeaders(MessageContext msgContext) throws AxisFault
-	{
+	private void setCallingContextHeaders(MessageContext msgContext)
+			throws AxisFault {
 		ICallingContext callContext = null;
-		if (msgContext.containsProperty(CommConstants.CALLING_CONTEXT_PROPERTY_NAME)) {
-			callContext = (ICallingContext) msgContext.getProperty(CommConstants.CALLING_CONTEXT_PROPERTY_NAME);
+		if (msgContext
+				.containsProperty(CommConstants.CALLING_CONTEXT_PROPERTY_NAME)) {
+			callContext = (ICallingContext) msgContext
+					.getProperty(CommConstants.CALLING_CONTEXT_PROPERTY_NAME);
 		}
 
 		if (callContext == null) {
@@ -311,17 +349,23 @@ public class AxisClientHeaderHandler extends BasicHandler
 		} else {
 			// update any stale creds
 			try {
-				ClientUtils.checkAndRenewCredentials(callContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+				ClientUtils.checkAndRenewCredentials(callContext,
+						BaseGridTool.credsValidUntil(),
+						new SecurityUpdateResults());
 			} catch (GeneralSecurityException e) {
-				throw new GenesisIISecurityException("Could not prepare outgoing calling context: " + e.getMessage(), e);
+				throw new GenesisIISecurityException(
+						"Could not prepare outgoing calling context: "
+								+ e.getMessage(), e);
 			}
-			// create a new derived calling context transient for the life of this call.
+			// create a new derived calling context transient for the life of
+			// this call.
 			callContext = callContext.deriveNewContext();
 		}
 
 		// load the credentials up that we will be sending out.
 		CredentialWallet wallet = new CredentialWallet();
-		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
+		TransientCredentials transientCredentials = TransientCredentials
+				.getTransientCredentials(callContext);
 		if (transientCredentials != null) {
 			for (NuCredential cred : transientCredentials.getCredentials()) {
 				if (cred instanceof TrustCredential)
@@ -330,10 +374,11 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 
 		/*
-		 * process the transient credentials to prepare the serializable portion of the calling
-		 * context for them.
+		 * process the transient credentials to prepare the serializable portion
+		 * of the calling context for them.
 		 */
-		MessageSecurity msgSecData = (MessageSecurity) msgContext.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
+		MessageSecurity msgSecData = (MessageSecurity) msgContext
+				.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
 
 		try {
 			delegateCredentials(wallet, callContext, msgContext, msgSecData);
@@ -343,27 +388,31 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 		try {
 			if (_logger.isTraceEnabled()) {
-				_logger.trace(String.format("Calling Context:\n%s", callContext.describe()));
+				_logger.trace(String.format("Calling Context:\n%s",
+						callContext.describe()));
 			}
 		} catch (Throwable cause) {
 			_logger.warn("Unable to log calling context information.", cause);
 		}
 
 		try {
-			SOAPHeader header = (SOAPHeader) msgContext.getMessage().getSOAPHeader();
-			SOAPHeaderElement context =
-				new SOAPHeaderElement(ObjectSerializer.toElement(callContext.getSerialized(),
-					GenesisIIConstants.CONTEXT_INFORMATION_QNAME));
+			SOAPHeader header = (SOAPHeader) msgContext.getMessage()
+					.getSOAPHeader();
+			SOAPHeaderElement context = new SOAPHeaderElement(
+					ObjectSerializer.toElement(callContext.getSerialized(),
+							GenesisIIConstants.CONTEXT_INFORMATION_QNAME));
 			header.addChildElement(context);
 
 			// specify that we need to sign the calling context
-			ArrayList<WSEncryptionPart> signParts =
-				(ArrayList<WSEncryptionPart>) msgContext.getProperty(CommConstants.MESSAGE_SEC_SIGN_PARTS);
+			ArrayList<WSEncryptionPart> signParts = (ArrayList<WSEncryptionPart>) msgContext
+					.getProperty(CommConstants.MESSAGE_SEC_SIGN_PARTS);
 			if (signParts == null) {
 				signParts = new ArrayList<WSEncryptionPart>();
-				msgContext.setProperty(CommConstants.MESSAGE_SEC_SIGN_PARTS, signParts);
+				msgContext.setProperty(CommConstants.MESSAGE_SEC_SIGN_PARTS,
+						signParts);
 			}
-			signParts.add(new WSEncryptionPart("calling-context", "http://vcgr.cs.virginia.edu/Genesis-II", "Element"));
+			signParts.add(new WSEncryptionPart("calling-context",
+					"http://vcgr.cs.virginia.edu/Genesis-II", "Element"));
 
 		} catch (IOException e) {
 			throw new AxisFault(e.getLocalizedMessage(), e);
@@ -372,12 +421,14 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 
 		if (_logger.isTraceEnabled())
-			_logger.trace("context after setting headers:\n" + callContext.dumpContext());
+			_logger.trace("context after setting headers:\n"
+					+ callContext.dumpContext());
 	}
 
-	private void setClientID(MessageContext msgContext) throws AxisFault
-	{
-		SOAPHeaderElement clientId = new SOAPHeaderElement(GenesisIIConstants.CLIENT_ID_QNAME, ClientIdGenerator.getClientId());
+	private void setClientID(MessageContext msgContext) throws AxisFault {
+		SOAPHeaderElement clientId = new SOAPHeaderElement(
+				GenesisIIConstants.CLIENT_ID_QNAME,
+				ClientIdGenerator.getClientId());
 		clientId.setActor(null);
 		clientId.setMustUnderstand(false);
 		try {
@@ -387,11 +438,14 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 	}
 
-	private void setMyProxyCertificateHeaders(MessageContext msgContext) throws AxisFault
-	{
+	private void setMyProxyCertificateHeaders(MessageContext msgContext)
+			throws AxisFault {
 		if (_logger.isTraceEnabled())
-			_logger.trace("the myproxy header is: " + MyProxyCertificate.getPEMString());
-		SOAPHeaderElement pemKey = new SOAPHeaderElement(GenesisIIConstants.MYPROXY_QNAME, MyProxyCertificate.getPEMString());
+			_logger.trace("the myproxy header is: "
+					+ MyProxyCertificate.getPEMString());
+		SOAPHeaderElement pemKey = new SOAPHeaderElement(
+				GenesisIIConstants.MYPROXY_QNAME,
+				MyProxyCertificate.getPEMString());
 		try {
 			msgContext.getMessage().getSOAPHeader().addChildElement(pemKey);
 		} catch (SOAPException se) {
@@ -399,8 +453,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 	}
 
-	public void invoke(MessageContext msgContext) throws AxisFault
-	{
+	public void invoke(MessageContext msgContext) throws AxisFault {
 		setMessageID(msgContext);
 		setSOAPAction(msgContext);
 		setWSAddressingHeaders(msgContext);

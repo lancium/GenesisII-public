@@ -19,53 +19,59 @@ import org.morgan.ftp.PathAlreadyExistsException;
 import org.morgan.ftp.PathDoesNotExistException;
 import org.morgan.ftp.UnauthenticatedException;
 
-public class LocalBackend implements IBackend
-{
+public class LocalBackend implements IBackend {
 	static private Logger _logger = Logger.getLogger(LocalBackend.class);
 
 	private LocalBackendConfiguration _backendConfiguration;
 	private UserConfiguration _authenticatedAs = null;
 	private File _pwd;
 
-	static private boolean isSubdirectoryOf(File root, File subDir)
-	{
+	static private boolean isSubdirectoryOf(File root, File subDir) {
 		try {
-			String canonicalizedAbsoluteRoot = root.getAbsoluteFile().getCanonicalPath();
-			String canonicalizedAbsoluteSubDir = subDir.getAbsoluteFile().getCanonicalPath();
+			String canonicalizedAbsoluteRoot = root.getAbsoluteFile()
+					.getCanonicalPath();
+			String canonicalizedAbsoluteSubDir = subDir.getAbsoluteFile()
+					.getCanonicalPath();
 
-			return (canonicalizedAbsoluteSubDir + "/").startsWith(canonicalizedAbsoluteRoot);
+			return (canonicalizedAbsoluteSubDir + "/")
+					.startsWith(canonicalizedAbsoluteRoot);
 		} catch (IOException ioe) {
-			_logger.error("Unexpected IO exception trying to canonicalize file paths.", ioe);
+			_logger.error(
+					"Unexpected IO exception trying to canonicalize file paths.",
+					ioe);
 			return false;
 		}
 	}
 
-	static private String reRoot(File root, File file)
-	{
+	static private String reRoot(File root, File file) {
 		try {
-			String canonicalizedAbsoluteRoot = root.getAbsoluteFile().getCanonicalPath();
-			String canonicalizedAbsoluteSubDir = file.getAbsoluteFile().getCanonicalPath();
+			String canonicalizedAbsoluteRoot = root.getAbsoluteFile()
+					.getCanonicalPath();
+			String canonicalizedAbsoluteSubDir = file.getAbsoluteFile()
+					.getCanonicalPath();
 
-			String result = canonicalizedAbsoluteSubDir.substring(canonicalizedAbsoluteRoot.length()).trim();
+			String result = canonicalizedAbsoluteSubDir.substring(
+					canonicalizedAbsoluteRoot.length()).trim();
 			if (result.length() == 0)
 				result = "/";
 
 			return result;
 		} catch (IOException ioe) {
-			_logger.error("Unexpected IO exception trying to canonicalize file paths.", ioe);
+			_logger.error(
+					"Unexpected IO exception trying to canonicalize file paths.",
+					ioe);
 			return "/";
 		}
 	}
 
-	public LocalBackend(LocalBackendConfiguration conf)
-	{
+	public LocalBackend(LocalBackendConfiguration conf) {
 		_backendConfiguration = conf;
 		_pwd = new File("/");
 	}
 
 	@Override
-	public boolean authenticate(String username, String password) throws FTPException
-	{
+	public boolean authenticate(String username, String password)
+			throws FTPException {
 		UserConfiguration userConf = _backendConfiguration.findUser(username);
 		if (userConf == null)
 			return false;
@@ -79,8 +85,7 @@ public class LocalBackend implements IBackend
 		return false;
 	}
 
-	private File getRootFile() throws UnauthenticatedException
-	{
+	private File getRootFile() throws UnauthenticatedException {
 		if (_authenticatedAs == null)
 			throw new UnauthenticatedException();
 
@@ -88,12 +93,12 @@ public class LocalBackend implements IBackend
 	}
 
 	@Override
-	public void cwd(String path) throws FTPException
-	{
+	public void cwd(String path) throws FTPException {
 		File root = getRootFile();
 		File newDir = new File(path.startsWith("/") ? root : _pwd, path);
 
-		if (newDir.exists() && newDir.isDirectory() && isSubdirectoryOf(root, newDir)) {
+		if (newDir.exists() && newDir.isDirectory()
+				&& isSubdirectoryOf(root, newDir)) {
 			_pwd = newDir;
 			return;
 		}
@@ -102,8 +107,7 @@ public class LocalBackend implements IBackend
 	}
 
 	@Override
-	public void delete(String entry) throws FTPException
-	{
+	public void delete(String entry) throws FTPException {
 		File root = getRootFile();
 		File file = new File(entry.startsWith("/") ? root : _pwd, entry);
 
@@ -118,8 +122,7 @@ public class LocalBackend implements IBackend
 	}
 
 	@Override
-	public boolean exists(String entry) throws FTPException
-	{
+	public boolean exists(String entry) throws FTPException {
 		File root = getRootFile();
 		File newDir = new File(entry.startsWith("/") ? root : _pwd, entry);
 
@@ -127,14 +130,12 @@ public class LocalBackend implements IBackend
 	}
 
 	@Override
-	public String getGreeting()
-	{
+	public String getGreeting() {
 		return "Mark Morgan FTP Server (Local Version)";
 	}
 
 	@Override
-	public String mkdir(String path) throws FTPException
-	{
+	public String mkdir(String path) throws FTPException {
 		File root = getRootFile();
 		File newDir = new File(path.startsWith("/") ? root : _pwd, path);
 
@@ -150,14 +151,12 @@ public class LocalBackend implements IBackend
 	}
 
 	@Override
-	public String pwd() throws FTPException
-	{
+	public String pwd() throws FTPException {
 		return reRoot(getRootFile(), _pwd);
 	}
 
 	@Override
-	public void removeDirectory(String directory) throws FTPException
-	{
+	public void removeDirectory(String directory) throws FTPException {
 		File root = getRootFile();
 		File file = new File(directory.startsWith("/") ? root : _pwd, directory);
 
@@ -172,11 +171,12 @@ public class LocalBackend implements IBackend
 	}
 
 	@Override
-	public void rename(String oldEntry, String newEntry) throws FTPException
-	{
+	public void rename(String oldEntry, String newEntry) throws FTPException {
 		File root = getRootFile();
-		File oldFile = new File(oldEntry.startsWith("/") ? root : _pwd, oldEntry);
-		File newFile = new File(newEntry.startsWith("/") ? root : _pwd, newEntry);
+		File oldFile = new File(oldEntry.startsWith("/") ? root : _pwd,
+				oldEntry);
+		File newFile = new File(newEntry.startsWith("/") ? root : _pwd,
+				newEntry);
 
 		if (!oldFile.exists() || !isSubdirectoryOf(root, oldFile))
 			throw new PathDoesNotExistException(oldEntry);
@@ -190,8 +190,7 @@ public class LocalBackend implements IBackend
 	}
 
 	@Override
-	public InputStream retrieve(String entry) throws FTPException
-	{
+	public InputStream retrieve(String entry) throws FTPException {
 		File root = getRootFile();
 		File file = new File(entry.startsWith("/") ? root : _pwd, entry);
 
@@ -208,8 +207,7 @@ public class LocalBackend implements IBackend
 	}
 
 	@Override
-	public long size(String path) throws FTPException
-	{
+	public long size(String path) throws FTPException {
 		File root = getRootFile();
 		File file = new File(path.startsWith("/") ? root : _pwd, path);
 
@@ -220,8 +218,7 @@ public class LocalBackend implements IBackend
 	}
 
 	@Override
-	public OutputStream store(String entry) throws FTPException
-	{
+	public OutputStream store(String entry) throws FTPException {
 		File root = getRootFile();
 		File file = new File(entry.startsWith("/") ? root : _pwd, entry);
 
@@ -241,8 +238,7 @@ public class LocalBackend implements IBackend
 	}
 
 	@Override
-	public ListEntry[] list() throws FTPException
-	{
+	public ListEntry[] list() throws FTPException {
 		File[] files = _pwd.listFiles();
 		if (files == null)
 			return new ListEntry[0];
@@ -251,11 +247,18 @@ public class LocalBackend implements IBackend
 		for (int lcv = 0; lcv < files.length; lcv++) {
 			File file = files[lcv];
 
-			ret[lcv] =
-				new ListEntry(file.getName(), new Date(file.lastModified()), file.length(), _authenticatedAs.getUser(),
-					"unknown", new FilePermissions((file.canRead() ? FilePermissions.READ_PERM : 0)
-						| (file.canWrite() ? FilePermissions.WRITE_PERM : 0)
-						| (file.canExecute() ? FilePermissions.EXEC_PERM : 0), 0, 0), 1, file.isDirectory());
+			ret[lcv] = new ListEntry(
+					file.getName(),
+					new Date(file.lastModified()),
+					file.length(),
+					_authenticatedAs.getUser(),
+					"unknown",
+					new FilePermissions(
+							(file.canRead() ? FilePermissions.READ_PERM : 0)
+									| (file.canWrite() ? FilePermissions.WRITE_PERM
+											: 0)
+									| (file.canExecute() ? FilePermissions.EXEC_PERM
+											: 0), 0, 0), 1, file.isDirectory());
 		}
 
 		return ret;

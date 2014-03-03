@@ -20,8 +20,7 @@ import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
 import edu.virginia.vcgr.genii.client.gfs.cache.GenesisIICachedFilesystem;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
-public abstract class JNILibraryBase extends ApplicationBase
-{
+public abstract class JNILibraryBase extends ApplicationBase {
 	static private Log _logger = LogFactory.getLog(JNILibraryBase.class);
 
 	public static boolean USE_CACHE_FS = false;
@@ -30,12 +29,12 @@ public abstract class JNILibraryBase extends ApplicationBase
 
 	static private FilesystemPathRepresentation PATHREP = UnixFilesystemPathRepresentation.INSTANCE;
 	static private FSFilesystem _fs = null;
-	static private FileHandleTable<FilesystemHandle> _openHandles = new FileHandleTable<FilesystemHandle>(1024);
+	static private FileHandleTable<FilesystemHandle> _openHandles = new FileHandleTable<FilesystemHandle>(
+			1024);
 
 	// Members for the mirroring test harness
 
-	synchronized static public void tryToInitialize()
-	{
+	synchronized static public void tryToInitialize() {
 		boolean didInit = false;
 		if (!isInitialized) {
 			initialize();
@@ -45,14 +44,19 @@ public abstract class JNILibraryBase extends ApplicationBase
 		ICallingContext callingContext;
 		try {
 			callingContext = ContextManager.getExistingContext();
-			ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+			ClientUtils
+					.checkAndRenewCredentials(callingContext,
+							BaseGridTool.credsValidUntil(),
+							new SecurityUpdateResults());
 
 			if (didInit) {
 				if (USE_CACHE_FS) {
-					_fs =
-						new GenesisIICachedFilesystem(new GenesisIIFilesystem(callingContext.getCurrentPath().getRoot(), null));
+					_fs = new GenesisIICachedFilesystem(
+							new GenesisIIFilesystem(callingContext
+									.getCurrentPath().getRoot(), null));
 				} else {
-					_fs = new GenesisIIFilesystem(callingContext.getCurrentPath().getRoot(), null);
+					_fs = new GenesisIIFilesystem(callingContext
+							.getCurrentPath().getRoot(), null);
 				}
 			}
 		} catch (Exception e) {
@@ -60,8 +64,7 @@ public abstract class JNILibraryBase extends ApplicationBase
 		}
 	}
 
-	static private void initialize()
-	{
+	static private void initialize() {
 		try {
 			prepareClientApplication();
 			isInitialized = true;
@@ -73,8 +76,7 @@ public abstract class JNILibraryBase extends ApplicationBase
 	/**
 	 * Cleans up paths so that they are all consistent (important for Caching)
 	 */
-	static private String cleanupPath(String path)
-	{
+	static private String cleanupPath(String path) {
 		String newPath = path;
 
 		// All root directory pointers are '/'
@@ -92,8 +94,7 @@ public abstract class JNILibraryBase extends ApplicationBase
 		return newPath;
 	}
 
-	static public String[] convertPath(String path)
-	{
+	static public String[] convertPath(String path) {
 		if (!isValidPath(path))
 			return null;
 		path = cleanupPath(path);
@@ -102,7 +103,8 @@ public abstract class JNILibraryBase extends ApplicationBase
 		return PATHREP.parse(null, path);
 	}
 
-	static private Pattern DESKTOP_INI_PAT = Pattern.compile("^.*desktop\\.ini$", Pattern.CASE_INSENSITIVE);
+	static private Pattern DESKTOP_INI_PAT = Pattern.compile(
+			"^.*desktop\\.ini$", Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * Checks for valid paths (filters out commonly unused names)
@@ -110,8 +112,7 @@ public abstract class JNILibraryBase extends ApplicationBase
 	 * @param path
 	 * @return
 	 */
-	static public boolean isValidPath(String path)
-	{
+	static public boolean isValidPath(String path) {
 		if (path != null) {
 			if (path.contains(":") || DESKTOP_INI_PAT.matcher(path).matches()) {
 				if (JNILibraryBase.DEBUG)
@@ -124,18 +125,15 @@ public abstract class JNILibraryBase extends ApplicationBase
 		return true;
 	}
 
-	static protected FSFilesystem getFilesystem()
-	{
+	static protected FSFilesystem getFilesystem() {
 		return _fs;
 	}
 
-	static protected FileHandleTable<FilesystemHandle> openHandles()
-	{
+	static protected FileHandleTable<FilesystemHandle> openHandles() {
 		return _openHandles;
 	}
 
-	static public String toString(ArrayList<String> array, int start, int length)
-	{
+	static public String toString(ArrayList<String> array, int start, int length) {
 		if (array == null)
 			return "null";
 
@@ -155,8 +153,7 @@ public abstract class JNILibraryBase extends ApplicationBase
 		return builder.toString();
 	}
 
-	static public String toString(ArrayList<String> array)
-	{
+	static public String toString(ArrayList<String> array) {
 		if (array == null)
 			return "null";
 

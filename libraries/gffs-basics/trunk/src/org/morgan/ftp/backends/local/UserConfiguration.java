@@ -2,16 +2,15 @@ package org.morgan.ftp.backends.local;
 
 import java.io.File;
 
-public class UserConfiguration
-{
+public class UserConfiguration {
 	private String _user;
 	private File _userDir;
 	private String _password;
 	private boolean _canRead;
 	private boolean _canWrite;
 
-	public UserConfiguration(String username, String password, File userDir, boolean canRead, boolean canWrite)
-	{
+	public UserConfiguration(String username, String password, File userDir,
+			boolean canRead, boolean canWrite) {
 		_user = username;
 		_password = password;
 
@@ -21,18 +20,15 @@ public class UserConfiguration
 		_canWrite = canWrite;
 	}
 
-	public String getUser()
-	{
+	public String getUser() {
 		return _user;
 	}
 
-	public File getUserDir()
-	{
+	public File getUserDir() {
 		return _userDir;
 	}
 
-	public boolean authenticate(String password)
-	{
+	public boolean authenticate(String password) {
 		if (password == null) {
 			if (_password == null)
 				return true;
@@ -46,13 +42,11 @@ public class UserConfiguration
 		return _password.equals(password);
 	}
 
-	public boolean canRead()
-	{
+	public boolean canRead() {
 		return _canRead;
 	}
 
-	public boolean canWrite()
-	{
+	public boolean canWrite() {
 		return _canWrite;
 	}
 }

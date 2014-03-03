@@ -20,93 +20,92 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
-class StreamableByteIOOpenFile extends OperatorBasedOpenFile
-{
-	static private BasicFileOperator createOperator(StreamableByteIOPortType portType) throws ResourceException,
-		GenesisIISecurityException, RemoteException, IOException
-	{
-		StreamableByteIOTransferer transferer = StreamableByteIOTransfererFactory.createStreamableByteIOTransferer(portType);
+class StreamableByteIOOpenFile extends OperatorBasedOpenFile {
+	static private BasicFileOperator createOperator(
+			StreamableByteIOPortType portType) throws ResourceException,
+			GenesisIISecurityException, RemoteException, IOException {
+		StreamableByteIOTransferer transferer = StreamableByteIOTransfererFactory
+				.createStreamableByteIOTransferer(portType);
 
-		return new BasicFileOperator(ByteIOBufferLeaser.leaser(transferer.getTransferProtocol()), new ReadResolverImpl(
-			transferer), new WriteResolverImpl(transferer), new AppendResolverImpl(transferer), false);
+		return new BasicFileOperator(ByteIOBufferLeaser.leaser(transferer
+				.getTransferProtocol()), new ReadResolverImpl(transferer),
+				new WriteResolverImpl(transferer), new AppendResolverImpl(
+						transferer), false);
 	}
 
 	private StreamableByteIOPortType _destroyer = null;
 
-	StreamableByteIOOpenFile(String[] path, boolean wasCreated, StreamableByteIOPortType portType, boolean canRead,
-		boolean canWrite, boolean isAppend) throws ResourceException, GenesisIISecurityException, RemoteException, IOException
-	{
+	StreamableByteIOOpenFile(String[] path, boolean wasCreated,
+			StreamableByteIOPortType portType, boolean canRead,
+			boolean canWrite, boolean isAppend) throws ResourceException,
+			GenesisIISecurityException, RemoteException, IOException {
 		super(path, createOperator(portType), canRead, canWrite, isAppend);
 
 		if (wasCreated)
 			_destroyer = portType;
 	}
 
-	StreamableByteIOOpenFile(String[] path, boolean wasCreated, EndpointReferenceType target, boolean canRead,
-		boolean canWrite, boolean isAppend) throws ResourceException, GenesisIISecurityException, RemoteException, IOException
-	{
-		this(path, wasCreated, ClientUtils.createProxy(StreamableByteIOPortType.class, target), canRead, canWrite, isAppend);
+	StreamableByteIOOpenFile(String[] path, boolean wasCreated,
+			EndpointReferenceType target, boolean canRead, boolean canWrite,
+			boolean isAppend) throws ResourceException,
+			GenesisIISecurityException, RemoteException, IOException {
+		this(path, wasCreated, ClientUtils.createProxy(
+				StreamableByteIOPortType.class, target), canRead, canWrite,
+				isAppend);
 	}
 
 	@Override
-	protected void closeImpl() throws IOException
-	{
+	protected void closeImpl() throws IOException {
 		super.closeImpl();
 
 		if (_destroyer != null)
 			_destroyer.destroy(new Destroy());
 	}
 
-	static private class ReadResolverImpl implements ReadResolver
-	{
+	static private class ReadResolverImpl implements ReadResolver {
 		private StreamableByteIOTransferer _transferer;
 
-		private ReadResolverImpl(StreamableByteIOTransferer transferer)
-		{
+		private ReadResolverImpl(StreamableByteIOTransferer transferer) {
 			_transferer = transferer;
 		}
 
 		@Override
-		public void read(long fileOffset, ByteBuffer destination) throws IOException
-		{
-			_transferer.seekRead(SeekOrigin.SEEK_BEGINNING, fileOffset, destination);
+		public void read(long fileOffset, ByteBuffer destination)
+				throws IOException {
+			_transferer.seekRead(SeekOrigin.SEEK_BEGINNING, fileOffset,
+					destination);
 		}
 	}
 
-	static private class WriteResolverImpl implements WriteResolver
-	{
+	static private class WriteResolverImpl implements WriteResolver {
 		private StreamableByteIOTransferer _transferer;
 
-		private WriteResolverImpl(StreamableByteIOTransferer transferer)
-		{
+		private WriteResolverImpl(StreamableByteIOTransferer transferer) {
 			_transferer = transferer;
 		}
 
 		@Override
-		public void truncate(long offset) throws IOException
-		{
+		public void truncate(long offset) throws IOException {
 			// We have to ignore -- can't truncate streams.
 		}
 
 		@Override
-		public void write(long fileOffset, ByteBuffer source) throws IOException
-		{
-			_transferer.seekWrite(SeekOrigin.SEEK_BEGINNING, fileOffset, source);
+		public void write(long fileOffset, ByteBuffer source)
+				throws IOException {
+			_transferer
+					.seekWrite(SeekOrigin.SEEK_BEGINNING, fileOffset, source);
 		}
 	}
 
-	static private class AppendResolverImpl implements AppendResolver
-	{
+	static private class AppendResolverImpl implements AppendResolver {
 		private StreamableByteIOTransferer _transferer;
 
-		private AppendResolverImpl(StreamableByteIOTransferer transferer)
-		{
+		private AppendResolverImpl(StreamableByteIOTransferer transferer) {
 			_transferer = transferer;
 		}
 
 		@Override
-		public void append(ByteBuffer source) throws IOException
-		{
+		public void append(ByteBuffer source) throws IOException {
 			_transferer.seekWrite(SeekOrigin.SEEK_END, 0, source);
 		}
 	}
