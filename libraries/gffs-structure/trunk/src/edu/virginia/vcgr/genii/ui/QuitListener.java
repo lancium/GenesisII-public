@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.ui;
 
-public interface QuitListener {
+public interface QuitListener
+{
 	/**
 	 * Called when the application is about to exit.
 	 * 

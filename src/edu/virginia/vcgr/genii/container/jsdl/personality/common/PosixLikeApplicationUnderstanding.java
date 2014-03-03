@@ -15,8 +15,8 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirector
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.StringOrPath;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PassiveStreamRedirectionDescription;
 
-public abstract class PosixLikeApplicationUnderstanding extends
-		CommonApplicationUnderstanding {
+public abstract class PosixLikeApplicationUnderstanding extends CommonApplicationUnderstanding
+{
 	private Integer _numProcesses = null;
 	private Integer _numProcessesPerHost = null;
 	private URI _spmdVariation = null;
@@ -28,112 +28,127 @@ public abstract class PosixLikeApplicationUnderstanding extends
 	private FilesystemRelativePath _stderrRedirect = null;
 	private Map<String, StringOrPath> _environment = new HashMap<String, StringOrPath>();
 
-	protected PosixLikeApplicationUnderstanding(FilesystemManager fsManager,
-			BESWorkingDirectory workingDirectory) {
+	protected PosixLikeApplicationUnderstanding(FilesystemManager fsManager, BESWorkingDirectory workingDirectory)
+	{
 		super(fsManager, workingDirectory);
 	}
 
-	public void setSPMDVariation(URI spmdVariation) {
+	public void setSPMDVariation(URI spmdVariation)
+	{
 		_spmdVariation = spmdVariation;
 	}
 
-	public URI getSPMDVariation() {
+	public URI getSPMDVariation()
+	{
 		return _spmdVariation;
 	}
 
-	public void setNumProcesses(int numProcesses) {
+	public void setNumProcesses(int numProcesses)
+	{
 		_numProcesses = new Integer(numProcesses);
 	}
 
-	public Integer getNumProcesses() {
+	public Integer getNumProcesses()
+	{
 		return _numProcesses;
 	}
 
-	public void setNumProcessesPerHost(int numProcessesPerHost) {
+	public void setNumProcessesPerHost(int numProcessesPerHost)
+	{
 		_numProcessesPerHost = new Integer(numProcessesPerHost);
 	}
 
-	public Integer getNumProcessesPerHost() {
+	public Integer getNumProcessesPerHost()
+	{
 		return _numProcessesPerHost;
 	}
 
-	public void setExecutable(FilesystemRelativePath executable) {
+	public void setExecutable(FilesystemRelativePath executable)
+	{
 		_executable = executable;
 	}
 
-	public FilesystemRelativePath getExecutable() {
+	public FilesystemRelativePath getExecutable()
+	{
 		return _executable;
 	}
 
-	public void addArgument(StringOrPath arg) {
+	public void addArgument(StringOrPath arg)
+	{
 		_arguments.add(arg);
 	}
 
-	public Collection<StringOrPath> getArguments() {
+	public Collection<StringOrPath> getArguments()
+	{
 		return _arguments;
 	}
 
-	public void setStdinRedirect(FilesystemRelativePath stdinRedirect) {
+	public void setStdinRedirect(FilesystemRelativePath stdinRedirect)
+	{
 		_stdinRedirect = stdinRedirect;
 	}
 
-	public FilesystemRelativePath getStdinRedirect() {
+	public FilesystemRelativePath getStdinRedirect()
+	{
 		return _stdinRedirect;
 	}
 
-	public void setStdoutRedirect(FilesystemRelativePath stdoutRedirect) {
+	public void setStdoutRedirect(FilesystemRelativePath stdoutRedirect)
+	{
 		_stdoutRedirect = stdoutRedirect;
 	}
 
-	public FilesystemRelativePath getStdoutRedirect() {
+	public FilesystemRelativePath getStdoutRedirect()
+	{
 		return _stdoutRedirect;
 	}
 
-	public void setStderrRedirect(FilesystemRelativePath stderrRedirect) {
+	public void setStderrRedirect(FilesystemRelativePath stderrRedirect)
+	{
 		_stderrRedirect = stderrRedirect;
 	}
 
-	public FilesystemRelativePath getStderrRedirect() {
+	public FilesystemRelativePath getStderrRedirect()
+	{
 		return _stderrRedirect;
 	}
 
-	public void addEnvironment(String variable, StringOrPath value) {
+	public void addEnvironment(String variable, StringOrPath value)
+	{
 		_environment.put(variable, value);
 	}
 
-	public Map<String, StringOrPath> getEnvironment() {
+	public Map<String, StringOrPath> getEnvironment()
+	{
 		return _environment;
 	}
 
-	public void validate() throws JSDLException {
+	public void validate() throws JSDLException
+	{
 		if (_executable == null)
-			throw new InvalidJSDLException(
-					"Can't run JSDL without an executable to run.");
+			throw new InvalidJSDLException("Can't run JSDL without an executable to run.");
 	}
 
-	protected PassiveStreamRedirectionDescription getStreamRedirectionDescription()
-			throws JSDLException {
+	protected PassiveStreamRedirectionDescription getStreamRedirectionDescription() throws JSDLException
+	{
 		/*
-		 * Old way StreamRedirectionSource stdin = null; StreamRedirectionSink
-		 * stdout = null; StreamRedirectionSink stderr = null;
+		 * Old way StreamRedirectionSource stdin = null; StreamRedirectionSink stdout = null;
+		 * StreamRedirectionSink stderr = null;
 		 * 
-		 * FilesystemRelativePath stdinRedirect = getStdinRedirect();
-		 * FilesystemRelativePath stdoutRedirect = getStdoutRedirect();
-		 * FilesystemRelativePath stderrRedirect = getStderrRedirect();
+		 * FilesystemRelativePath stdinRedirect = getStdinRedirect(); FilesystemRelativePath
+		 * stdoutRedirect = getStdoutRedirect(); FilesystemRelativePath stderrRedirect =
+		 * getStderrRedirect();
 		 * 
 		 * if (stdinRedirect != null) stdin = new FileRedirectionSource(
-		 * getFilesystemManager().lookup(stdinRedirect)); if (stdoutRedirect !=
-		 * null) stdout = new FileRedirectionSink(
-		 * getFilesystemManager().lookup(stdoutRedirect)); if (stderrRedirect !=
-		 * null) stderr = new FileRedirectionSink(
+		 * getFilesystemManager().lookup(stdinRedirect)); if (stdoutRedirect != null) stdout = new
+		 * FileRedirectionSink( getFilesystemManager().lookup(stdoutRedirect)); if (stderrRedirect
+		 * != null) stderr = new FileRedirectionSink(
 		 * getFilesystemManager().lookup(stderrRedirect));
 		 * 
-		 * StreamRedirectionSink tty = discoverTTYRedirectionSink(); if (tty !=
-		 * null) { if (stdout != null) stdout = new TeeRedirectionSink(stdout,
-		 * tty); else stdout = tty;
+		 * StreamRedirectionSink tty = discoverTTYRedirectionSink(); if (tty != null) { if (stdout
+		 * != null) stdout = new TeeRedirectionSink(stdout, tty); else stdout = tty;
 		 * 
-		 * if (stderr != null) stderr = new TeeRedirectionSink(stderr, tty);
-		 * else stderr = tty; }
+		 * if (stderr != null) stderr = new TeeRedirectionSink(stderr, tty); else stderr = tty; }
 		 */
 
 		File stdin = null;

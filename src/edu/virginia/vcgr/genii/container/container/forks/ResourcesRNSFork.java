@@ -22,39 +22,38 @@ import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class ResourcesRNSFork extends ReadOnlyRNSResourceFork {
+public class ResourcesRNSFork extends ReadOnlyRNSResourceFork
+{
 	static private Log _logger = LogFactory.getLog(ResourcesRNSFork.class);
 
-	public ResourcesRNSFork(ResourceForkService service, String forkPath) {
+	public ResourcesRNSFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR,
-			String entryName) throws IOException {
+	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR, String entryName) throws IOException
+	{
 		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
 		ResourceForkInformation info;
 		IResource resource = getService().getResourceKey().dereference();
 		Connection connection = ((BasicDBResource) resource).getConnection();
 
 		if (entryName == null || entryName.equals("summary")) {
-			info = new ResourcesSummaryFork(getService(),
-					formForkPath("summary")).describe();
+			info = new ResourcesSummaryFork(getService(), formForkPath("summary")).describe();
 			entries.add(createInternalEntry(exemplarEPR, "summary", info));
 		}
 
 		try {
-			Map<String, Collection<ResourceSummaryInformation>> map = ResourceSummary
-					.resources(connection);
+			Map<String, Collection<ResourceSummaryInformation>> map = ResourceSummary.resources(connection);
 			for (String key : map.keySet()) {
 				int index = key.lastIndexOf('.');
 				if (index >= 0)
 					key = key.substring(index + 1);
 
 				if (entryName == null || entryName.equals(key)) {
-					info = new ClassSpecificResourcesRNSFork(getService(),
-							formForkPath(key)).describe();
+					info = new ClassSpecificResourcesRNSFork(getService(), formForkPath(key)).describe();
 					entries.add(createInternalEntry(exemplarEPR, key, info));
 				}
 			}

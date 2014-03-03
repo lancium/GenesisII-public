@@ -2,7 +2,8 @@ package edu.virginia.vcgr.genii.client.filesystems.email;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class EmailWatchConfiguration {
+public class EmailWatchConfiguration
+{
 	@XmlElement(namespace = "http://vcgr.cs.virginia.edu/filesystems/connect", name = "connection", required = true)
 	private ConnectConfig _connection = null;
 
@@ -21,23 +22,27 @@ public class EmailWatchConfiguration {
 	@XmlElement(namespace = "http://vcgr.cs.virginia.edu/filesystems/email-watch", name = "positive-message", required = false)
 	private String _positiveMessage = null;
 
-	String message(boolean isNegative) {
+	String message(boolean isNegative)
+	{
 		if (isNegative || _positiveMessage == null)
 			return _message;
 		return _positiveMessage;
 	}
 
-	String subject(boolean isNegative) {
+	String subject(boolean isNegative)
+	{
 		if (isNegative || _positiveMessage == null)
 			return _subject;
 		return _positiveSubject;
 	}
 
-	AddressInfoConfiguration addr() {
+	AddressInfoConfiguration addr()
+	{
 		return _addr;
 	}
 
-	ConnectConfig connection() {
+	ConnectConfig connection()
+	{
 		return _connection;
 	}
 }

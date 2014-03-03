@@ -14,13 +14,13 @@ import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 
-public class Prefetcher {
+public class Prefetcher
+{
 	static private Log _logger = LogFactory.getLog(Prefetcher.class);
 
-	public static MessageElement[] preFetch(EndpointReferenceType target,
-			MessageElement[] existingAttributes,
-			AttributesPreFetcherFactory factory, ResourceKey rKey,
-			ResourceForkService service) {
+	public static MessageElement[] preFetch(EndpointReferenceType target, MessageElement[] existingAttributes,
+		AttributesPreFetcherFactory factory, ResourceKey rKey, ResourceForkService service)
+	{
 
 		AttributePreFetcher preFetcher = null;
 

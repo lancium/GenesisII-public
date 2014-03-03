@@ -7,18 +7,22 @@ package edu.virginia.vcgr.genii.container.context;
  * client can create new GUIDs to fool the container. However, that will only affect the
  * faulty/mischievous client, not others.
  */
-public class ClientConfig {
+public class ClientConfig
+{
 
-	private static ThreadLocal<ClientConfig> _clientConfig = new ThreadLocal<ClientConfig>() {
+	private static ThreadLocal<ClientConfig> _clientConfig = new ThreadLocal<ClientConfig>()
+	{
 		@Override
-		protected ClientConfig initialValue() {
+		protected ClientConfig initialValue()
+		{
 			return null;
 		}
 	};
 
 	private String clientId;
 
-	public static void setClientConfig(String clientId) {
+	public static void setClientConfig(String clientId)
+	{
 		if (clientId == null)
 			return;
 		ClientConfig clientConfig = new ClientConfig();
@@ -26,11 +30,13 @@ public class ClientConfig {
 		_clientConfig.set(clientConfig);
 	}
 
-	public static ClientConfig getCurrentClientConfig() {
+	public static ClientConfig getCurrentClientConfig()
+	{
 		return _clientConfig.get();
 	}
 
-	public String getClientId() {
+	public String getClientId()
+	{
 		return clientId;
 	}
 }

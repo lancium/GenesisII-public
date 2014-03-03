@@ -9,20 +9,23 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class JobSubmissionFork extends
-		AbstractStreamableByteIOFactoryResourceFork {
-	public JobSubmissionFork(ResourceForkService service, String forkPath) {
+public class JobSubmissionFork extends AbstractStreamableByteIOFactoryResourceFork
+{
+	public JobSubmissionFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public void modifyState(InputStream source) throws IOException {
+	public void modifyState(InputStream source) throws IOException
+	{
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void snapshotState(OutputStream sink) throws IOException {
+	public void snapshotState(OutputStream sink) throws IOException
+	{
 		// do nothing
 	}
 }

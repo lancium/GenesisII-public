@@ -9,10 +9,10 @@ import edu.virginia.vcgr.genii.gjt.data.variables.list.ValueListVariableDefiniti
 import edu.virginia.vcgr.genii.gjt.data.variables.undef.UndefinedVariableDefinition;
 import edu.virginia.vcgr.jsdl.sweep.SweepFunction;
 
-@XmlSeeAlso({ UndefinedVariableDefinition.class,
-		ValueListVariableDefinition.class, IntegerLoopVariableDefinition.class,
-		DoubleLoopVariableDefinition.class })
-public interface VariableDefinition {
+@XmlSeeAlso({ UndefinedVariableDefinition.class, ValueListVariableDefinition.class, IntegerLoopVariableDefinition.class,
+	DoubleLoopVariableDefinition.class })
+public interface VariableDefinition
+{
 	public int size();
 
 	public Describer<? extends VariableDefinition> describer();

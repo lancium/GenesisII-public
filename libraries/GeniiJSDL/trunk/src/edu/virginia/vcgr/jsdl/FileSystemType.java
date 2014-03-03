@@ -21,5 +21,8 @@ package edu.virginia.vcgr.jsdl;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 public enum FileSystemType {
-	swap, temporary, spool, normal
+	swap,
+	temporary,
+	spool,
+	normal
 }

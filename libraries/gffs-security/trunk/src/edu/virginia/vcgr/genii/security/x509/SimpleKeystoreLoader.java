@@ -25,7 +25,8 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.security.wincrypto.WinX509KeyManager;
 
-public class SimpleKeystoreLoader implements CallbackHandler {
+public class SimpleKeystoreLoader implements CallbackHandler
+{
 	static public final String PKCS12 = "PKCS12";
 	static public final String JKS = "JKS";
 	static public final String WINDOWS = "WIN";
@@ -34,12 +35,13 @@ public class SimpleKeystoreLoader implements CallbackHandler {
 
 	private char[] _passwordChars = null;
 
-	public SimpleKeystoreLoader() {
+	public SimpleKeystoreLoader()
+	{
 	}
 
-	private void addEntriesFromFile(Collection<CertEntry> entries,
-			InputStream storeInput, String storeType)
-			throws GeneralSecurityException, IOException {
+	private void addEntriesFromFile(Collection<CertEntry> entries, InputStream storeInput, String storeType)
+		throws GeneralSecurityException, IOException
+	{
 		KeyStore specifiedKs = null;
 
 		if (storeType == null) {
@@ -47,8 +49,8 @@ public class SimpleKeystoreLoader implements CallbackHandler {
 			storeType = PKCS12;
 		}
 
-		KeyStore.Builder builder = new InputStreamBuilder(storeType, null,
-				storeInput, new KeyStore.CallbackHandlerProtection(this),
+		KeyStore.Builder builder =
+			new InputStreamBuilder(storeType, null, storeInput, new KeyStore.CallbackHandlerProtection(this),
 				AccessController.getContext());
 		specifiedKs = builder.getKeyStore();
 
@@ -56,8 +58,7 @@ public class SimpleKeystoreLoader implements CallbackHandler {
 			Enumeration<String> aliases = specifiedKs.aliases();
 			while (aliases.hasMoreElements()) {
 				String alias = aliases.nextElement();
-				Certificate[] aliasCertChain = specifiedKs
-						.getCertificateChain(alias);
+				Certificate[] aliasCertChain = specifiedKs.getCertificateChain(alias);
 				if (aliasCertChain == null)
 					continue;
 
@@ -66,7 +67,8 @@ public class SimpleKeystoreLoader implements CallbackHandler {
 		}
 	}
 
-	private void addEntriesFromWindows(Collection<CertEntry> entries) {
+	private void addEntriesFromWindows(Collection<CertEntry> entries)
+	{
 		if (OperatingSystemType.getCurrent().isWindows()) {
 			WinX509KeyManager km = new WinX509KeyManager();
 			String[] aliases = km.getClientAliases(null, null);
@@ -74,19 +76,18 @@ public class SimpleKeystoreLoader implements CallbackHandler {
 				PrivateKey privateKey = km.getPrivateKey(alias);
 				String friendlyName = km.getFriendlyName(alias);
 				if (privateKey != null) {
-					X509Certificate[] aliasCertChain = km
-							.getCertificateChain(alias);
+					X509Certificate[] aliasCertChain = km.getCertificateChain(alias);
 					if (aliasCertChain != null) {
-						entries.add(new CertEntry(aliasCertChain, alias,
-								privateKey, friendlyName));
+						entries.add(new CertEntry(aliasCertChain, alias, privateKey, friendlyName));
 					}
 				}
 			}
 		}
 	}
 
-	protected Collection<CertEntry> retrieveCertEntries(InputStream storeInput,
-			String storeType) throws GeneralSecurityException, IOException {
+	protected Collection<CertEntry> retrieveCertEntries(InputStream storeInput, String storeType)
+		throws GeneralSecurityException, IOException
+	{
 		ArrayList<CertEntry> list = new ArrayList<CertEntry>();
 
 		if ((storeType != null) && storeType.equals(WINDOWS)) {
@@ -98,28 +99,25 @@ public class SimpleKeystoreLoader implements CallbackHandler {
 		return list;
 	}
 
-	public CertEntry selectCert(InputStream storeInput, String storeType,
-			String password, boolean isAliasPattern, String entryPattern)
-			throws GeneralSecurityException, IOException {
+	public CertEntry selectCert(InputStream storeInput, String storeType, String password, boolean isAliasPattern,
+		String entryPattern) throws GeneralSecurityException, IOException
+	{
 		_passwordChars = password.toCharArray();
-		Collection<CertEntry> entries = retrieveCertEntries(storeInput,
-				storeType);
+		Collection<CertEntry> entries = retrieveCertEntries(storeInput, storeType);
 		CertEntry entry = null;
 
 		if (entryPattern != null) {
 			int flags = 0;
 			if (isAliasPattern)
 				flags = Pattern.CASE_INSENSITIVE;
-			Pattern p = Pattern.compile("^.*" + Pattern.quote(entryPattern)
-					+ ".*$", flags);
+			Pattern p = Pattern.compile("^.*" + Pattern.quote(entryPattern) + ".*$", flags);
 
 			int numMatched = 0;
 			CertEntry selectedEntry = null;
 			for (CertEntry iter : entries) {
 				String toMatch = null;
 				if (!isAliasPattern)
-					toMatch = ((X509Certificate) (iter._certChain[0]))
-							.getSubjectDN().getName();
+					toMatch = ((X509Certificate) (iter._certChain[0])).getSubjectDN().getName();
 				else
 					toMatch = iter._alias;
 
@@ -131,12 +129,9 @@ public class SimpleKeystoreLoader implements CallbackHandler {
 			}
 
 			if (numMatched == 0) {
-				throw new IOException("No certificates matched the pattern \""
-						+ entryPattern + "\".");
+				throw new IOException("No certificates matched the pattern \"" + entryPattern + "\".");
 			} else if (numMatched > 1) {
-				throw new IOException(
-						"Multiple certificates matched the pattern \""
-								+ entryPattern + "\".");
+				throw new IOException("Multiple certificates matched the pattern \"" + entryPattern + "\".");
 			} else {
 				entry = selectedEntry;
 			}
@@ -151,8 +146,7 @@ public class SimpleKeystoreLoader implements CallbackHandler {
 
 		if (entry._privateKey == null) {
 			try {
-				entry._privateKey = (PrivateKey) entry._keyStore.getKey(
-						entry._alias, _passwordChars);
+				entry._privateKey = (PrivateKey) entry._keyStore.getKey(entry._alias, _passwordChars);
 			} catch (UnrecoverableKeyException uke) {
 				_logger.error("failed to find key using password", uke);
 				return null;
@@ -162,19 +156,20 @@ public class SimpleKeystoreLoader implements CallbackHandler {
 		return entry;
 	}
 
-	private void handle(PasswordCallback callback) {
+	private void handle(PasswordCallback callback)
+	{
 		if (_passwordChars != null)
 			callback.setPassword(_passwordChars);
 	}
 
 	@Override
-	public void handle(Callback[] callbacks) {
+	public void handle(Callback[] callbacks)
+	{
 		for (Callback cb : callbacks) {
 			if (cb instanceof PasswordCallback) {
 				handle((PasswordCallback) cb);
 			} else {
-				_logger.error("Can't handle security callback of type \""
-						+ cb.getClass().getName() + "\".");
+				_logger.error("Can't handle security callback of type \"" + cb.getClass().getName() + "\".");
 			}
 		}
 

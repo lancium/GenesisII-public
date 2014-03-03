@@ -20,34 +20,35 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
-public class CdTool extends BaseGridTool {
+public class CdTool extends BaseGridTool
+{
 	private static Log _logger = LogFactory.getLog(CdTool.class);
 
 	static final private String _DESCRIPTION = "config/tooldocs/description/dcd";
 	static final private String _USAGE = "config/tooldocs/usage/ucd";
 	static final private String _MANPAGE = "config/tooldocs/man/cd";
 
-	public CdTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.DATA);
+	public CdTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		chdir(getArgument(0));
 		return 0;
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() == 0) {
-			Map<String, String> env = GridUserEnvironment
-					.getGridUserEnvironment();
+			Map<String, String> env = GridUserEnvironment.getGridUserEnvironment();
 			String value = env.get("HOME");
 			if (value == null)
-				throw new InvalidToolUsageException(
-						"\"HOME\" variable undefined.");
+				throw new InvalidToolUsageException("\"HOME\" variable undefined.");
 
 			addArgument(value);
 		}
@@ -56,15 +57,13 @@ public class CdTool extends BaseGridTool {
 			throw new InvalidToolUsageException();
 	}
 
-	static public void chdir(String target) throws ResourceException,
-			RNSException, RemoteException, IOException,
-			InvalidToolUsageException {
-		RNSPath path = lookup(new GeniiPath(target),
-				RNSPathQueryFlags.MUST_EXIST);
+	static public void chdir(String target) throws ResourceException, RNSException, RemoteException, IOException,
+		InvalidToolUsageException
+	{
+		RNSPath path = lookup(new GeniiPath(target), RNSPathQueryFlags.MUST_EXIST);
 		TypeInformation typeInfo = new TypeInformation(path.getEndpoint());
 		if (!typeInfo.isRNS())
-			throw new RNSException("Path \"" + path.pwd()
-					+ "\" is not an RNS directory.");
+			throw new RNSException("Path \"" + path.pwd() + "\" is not an RNS directory.");
 
 		ICallingContext ctxt = ContextManager.getExistingContext();
 		if (_logger.isDebugEnabled())

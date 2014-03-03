@@ -6,17 +6,18 @@ import edu.virginia.vcgr.genii.gjt.data.stage.DataStage;
 import edu.virginia.vcgr.genii.gjt.data.stage.StageData;
 import edu.virginia.vcgr.genii.gjt.data.stage.StageProtocol;
 
-public class DataStageCellRenderer extends DefaultTableCellRenderer {
+public class DataStageCellRenderer extends DefaultTableCellRenderer
+{
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void setValue(Object value) {
+	protected void setValue(Object value)
+	{
 		DataStage stage = (DataStage) value;
 
 		if (stage != null) {
 			StageData stageData = stage.current();
-			if (stageData != null
-					&& stageData.protocol() != StageProtocol.undefined) {
+			if (stageData != null && stageData.protocol() != StageProtocol.undefined) {
 				setText(stageData.toString());
 				setToolTipText(stageData.toString());
 			} else

@@ -20,14 +20,13 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfi
 import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public class BESConstructionParameters extends ConstructionParameters implements
-		Serializable {
+public class BESConstructionParameters extends ConstructionParameters implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	static final public String BES_CONS_PARMS_NS = "http://vcgr.cs.virginia.edu/construction-parameters/bes";
 
-	static private Log _logger = LogFactory
-			.getLog(BESConstructionParameters.class);
+	static private Log _logger = LogFactory.getLog(BESConstructionParameters.class);
 
 	private ResourceOverrides _resourceOverrides = new ResourceOverrides();
 	private NativeQueueConfiguration _nativeQueueConf = null;
@@ -40,11 +39,13 @@ public class BESConstructionParameters extends ConstructionParameters implements
 
 	private CloudConfiguration _cloudBES = null;
 
-	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE, name = "environment-export", nillable = true, required = false)
+	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE, name = "environment-export", nillable = true,
+		required = false)
 	private EnvironmentExport _environmentExport = null;
 
 	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "pre-execution-delay", required = false, nillable = true)
-	final private String getPreExecutionDelayString() {
+	final private String getPreExecutionDelayString()
+	{
 		if (_preExecutionDelay == null)
 			return null;
 
@@ -52,7 +53,8 @@ public class BESConstructionParameters extends ConstructionParameters implements
 	}
 
 	@SuppressWarnings("unused")
-	final private void setPreExecutionDelayString(String value) {
+	final private void setPreExecutionDelayString(String value)
+	{
 		if (value == null)
 			_preExecutionDelay = null;
 		else
@@ -60,7 +62,8 @@ public class BESConstructionParameters extends ConstructionParameters implements
 	}
 
 	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "post-execution-delay", required = false, nillable = true)
-	final private String getPostExecutionDelayString() {
+	final private String getPostExecutionDelayString()
+	{
 		if (_postExecutionDelay == null)
 			return null;
 
@@ -68,31 +71,35 @@ public class BESConstructionParameters extends ConstructionParameters implements
 	}
 
 	@SuppressWarnings("unused")
-	final private void setPostExecutionDelayString(String value) {
+	final private void setPostExecutionDelayString(String value)
+	{
 		if (value == null)
 			_postExecutionDelay = null;
 		else
 			_postExecutionDelay = new Duration(value);
 	}
 
-	public BESConstructionParameters(ResourceOverrides resourceOverrides,
-			NativeQueueConfiguration queueConfiguration,
-			CmdLineManipulatorConfiguration cmdLineManipulatorConf) {
+	public BESConstructionParameters(ResourceOverrides resourceOverrides, NativeQueueConfiguration queueConfiguration,
+		CmdLineManipulatorConfiguration cmdLineManipulatorConf)
+	{
 		setResourceOverrides(resourceOverrides);
 		setNativeQueueConfiguration(queueConfiguration);
 		setCmdLineManipulatorConfiguration(cmdLineManipulatorConf);
 	}
 
-	public BESConstructionParameters() {
+	public BESConstructionParameters()
+	{
 		this(null, null, null);
 	}
 
 	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "resource-overrides", required = false, nillable = true)
-	final public ResourceOverrides getResourceOverrides() {
+	final public ResourceOverrides getResourceOverrides()
+	{
 		return _resourceOverrides;
 	}
 
-	final public void setResourceOverrides(ResourceOverrides resourceOverrides) {
+	final public void setResourceOverrides(ResourceOverrides resourceOverrides)
+	{
 		if (resourceOverrides == null)
 			resourceOverrides = new ResourceOverrides();
 
@@ -100,55 +107,62 @@ public class BESConstructionParameters extends ConstructionParameters implements
 	}
 
 	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "nativeq", required = false, nillable = false)
-	final public NativeQueueConfiguration getNativeQueueConfiguration() {
+	final public NativeQueueConfiguration getNativeQueueConfiguration()
+	{
 		return _nativeQueueConf;
 	}
 
-	final public void setNativeQueueConfiguration(
-			NativeQueueConfiguration nativeQueueConf) {
+	final public void setNativeQueueConfiguration(NativeQueueConfiguration nativeQueueConf)
+	{
 		_nativeQueueConf = nativeQueueConf;
 	}
 
 	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "cloudbes", required = false, nillable = false)
-	final public CloudConfiguration getCloudConfiguration() {
+	final public CloudConfiguration getCloudConfiguration()
+	{
 		return _cloudBES;
 	}
 
-	final public void setCloudConfiguration(CloudConfiguration cloudConf) {
+	final public void setCloudConfiguration(CloudConfiguration cloudConf)
+	{
 		_cloudBES = cloudConf;
 	}
 
 	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "cmdline-manipulators", required = false, nillable = false)
-	final public CmdLineManipulatorConfiguration getCmdLineManipulatorConfiguration() {
+	final public CmdLineManipulatorConfiguration getCmdLineManipulatorConfiguration()
+	{
 		return _cmdLineManipulatorConf;
 	}
 
-	final public void setCmdLineManipulatorConfiguration(
-			CmdLineManipulatorConfiguration cmdLineManipulatorConf) {
+	final public void setCmdLineManipulatorConfiguration(CmdLineManipulatorConfiguration cmdLineManipulatorConf)
+	{
 		if (cmdLineManipulatorConf == null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Null cmdline manipulator configuration found.");
 			cmdLineManipulatorConf = new CmdLineManipulatorConfiguration();
-			CmdLineManipulatorUtils
-					.addPwrapperManipulator(cmdLineManipulatorConf);
+			CmdLineManipulatorUtils.addPwrapperManipulator(cmdLineManipulatorConf);
 		}
 
 		_cmdLineManipulatorConf = cmdLineManipulatorConf;
 	}
 
-	final public Duration preExecutionDelay() {
+	final public Duration preExecutionDelay()
+	{
 		return _preExecutionDelay;
 	}
 
-	final public Duration postExecutionDelay() {
+	final public Duration postExecutionDelay()
+	{
 		return _postExecutionDelay;
 	}
 
-	final public EnvironmentExport environmentExport() {
+	final public EnvironmentExport environmentExport()
+	{
 		return _environmentExport;
 	}
 
-	final public File fuseDirectory() {
+	final public File fuseDirectory()
+	{
 		if (_fuseDirectory == null)
 			return null;
 
@@ -157,13 +171,10 @@ public class BESConstructionParameters extends ConstructionParameters implements
 			ret.mkdirs();
 
 		if (!ret.exists() || !ret.isDirectory()) {
-			_logger.warn(String.format("Unable to prepare fuse directory %s.",
-					_fuseDirectory));
+			_logger.warn(String.format("Unable to prepare fuse directory %s.", _fuseDirectory));
 			return null;
 		} else if (!ret.canWrite()) {
-			_logger.warn(String.format(
-					"Not permitted to write into fuse directory %s.",
-					_fuseDirectory));
+			_logger.warn(String.format("Not permitted to write into fuse directory %s.", _fuseDirectory));
 			return null;
 		}
 

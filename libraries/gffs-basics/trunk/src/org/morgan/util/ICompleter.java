@@ -14,13 +14,14 @@
 package org.morgan.util;
 
 /**
- * This is a simple interface for lists of things that need to be completed. For
- * example, when you have a list of things and someone is typing in a search,
- * this interface can be used to complete that list for the search.
+ * This is a simple interface for lists of things that need to be completed. For example, when you
+ * have a list of things and someone is typing in a search, this interface can be used to complete
+ * that list for the search.
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public interface ICompleter<T> {
+public interface ICompleter<T>
+{
 	public T complete(String partial);
 
 	public Iterable<T> completeAll(String partial);

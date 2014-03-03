@@ -9,22 +9,26 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.JSpinner.DefaultEditor;
 
-public class NullableNumberSpinnerEditor extends DefaultEditor {
+public class NullableNumberSpinnerEditor extends DefaultEditor
+{
 	static final long serialVersionUID = 0L;
 
-	static private class NumberFormatterFactory extends
-			AbstractFormatterFactory {
+	static private class NumberFormatterFactory extends AbstractFormatterFactory
+	{
 		@Override
-		public AbstractFormatter getFormatter(JFormattedTextField tf) {
+		public AbstractFormatter getFormatter(JFormattedTextField tf)
+		{
 			return new NullableNumberFormatter();
 		}
 	}
 
-	static private class NullableNumberFormatter extends AbstractFormatter {
+	static private class NullableNumberFormatter extends AbstractFormatter
+	{
 		static final long serialVersionUID = 0L;
 
 		@Override
-		public Object stringToValue(String text) throws ParseException {
+		public Object stringToValue(String text) throws ParseException
+		{
 			text = text.trim();
 			if (text.equals(""))
 				return new NullableNumber();
@@ -33,17 +37,20 @@ public class NullableNumberSpinnerEditor extends DefaultEditor {
 		}
 
 		@Override
-		public String valueToString(Object value) throws ParseException {
+		public String valueToString(Object value) throws ParseException
+		{
 			return value.toString();
 		}
 	}
 
-	public NullableNumberSpinnerEditor(JSpinner spinner) {
+	public NullableNumberSpinnerEditor(JSpinner spinner)
+	{
 		super(spinner);
 	}
 
 	@Override
-	public JFormattedTextField getTextField() {
+	public JFormattedTextField getTextField()
+	{
 		JFormattedTextField ret = super.getTextField();
 		ret.setFormatterFactory(new NumberFormatterFactory());
 		ret.setEditable(true);
@@ -52,7 +59,8 @@ public class NullableNumberSpinnerEditor extends DefaultEditor {
 	}
 
 	@Override
-	public void commitEdit() throws ParseException {
+	public void commitEdit() throws ParseException
+	{
 		Long value;
 		String text = getTextField().getText().trim();
 

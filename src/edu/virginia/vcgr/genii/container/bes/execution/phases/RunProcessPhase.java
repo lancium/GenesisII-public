@@ -33,8 +33,8 @@ import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
-public class RunProcessPhase extends AbstractRunProcessPhase implements
-		TerminateableExecutionPhase, Serializable {
+public class RunProcessPhase extends AbstractRunProcessPhase implements TerminateableExecutionPhase, Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	static final private String EXECUTING_STAGE = "executing";
@@ -56,18 +56,16 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements
 
 	private PassiveStreamRedirectionDescription _redirects;
 
-	static private void destroyProcess(ProcessWrapperToken process) {
+	static private void destroyProcess(ProcessWrapperToken process)
+	{
 		process.cancel();
 	}
 
-	public RunProcessPhase(File fuseMountPoint, URI spmdVariation,
-			Integer numProcesses, Integer numProcessesPerHost,
-			File commonDirectory, File executable, String[] arguments,
-			Map<String, String> environment,
-			PassiveStreamRedirectionDescription redirects,
-			BESConstructionParameters constructionParameters) {
-		super(new ActivityState(ActivityStateEnumeration.Running,
-				EXECUTING_STAGE, false), constructionParameters);
+	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
+		File commonDirectory, File executable, String[] arguments, Map<String, String> environment,
+		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters)
+	{
+		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE, false), constructionParameters);
 
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
@@ -76,14 +74,12 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements
 		_commonDirectory = commonDirectory;
 
 		if (executable == null)
-			throw new IllegalArgumentException(
-					"Argument \"executable\" cannot be null.");
+			throw new IllegalArgumentException("Argument \"executable\" cannot be null.");
 		if (arguments == null)
 			arguments = new String[0];
 
 		if (redirects == null)
-			redirects = new PassiveStreamRedirectionDescription(null, null,
-					null);
+			redirects = new PassiveStreamRedirectionDescription(null, null, null);
 
 		_executable = executable;
 		_arguments = arguments;
@@ -92,7 +88,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements
 		_redirects = redirects;
 	}
 
-	protected void finalize() throws Throwable {
+	protected void finalize() throws Throwable
+	{
 		synchronized (_processLock) {
 			if (_process != null)
 				destroyProcess(_process);
@@ -100,12 +97,12 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable {
+	public void execute(ExecutionContext context) throws Throwable
+	{
 		File stderrFile = null;
 		List<String> command, newCmdLine;
 		ProcessWrapperToken token;
-		HistoryContext history = HistoryContextFactory
-				.createContext(HistoryEventCategory.CreatingActivity);
+		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
 		synchronized (_processLock) {
 			command = new Vector<String>();
@@ -113,19 +110,16 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements
 			for (String arg : _arguments)
 				command.add(arg);
 
-			File workingDirectory = context.getCurrentWorkingDirectory()
-					.getWorkingDirectory();
+			File workingDirectory = context.getCurrentWorkingDirectory().getWorkingDirectory();
 
-			ProcessWrapper wrapper = ProcessWrapperFactory
-					.createWrapper(_commonDirectory);
+			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(_commonDirectory);
 
 			if (_environment == null)
 				_environment = new HashMap<String, String>();
 
 			setExportedEnvironment(_environment);
-			history.createDebugWriter("Activity Environment Set")
-					.format("Activity environment set to %s", _environment)
-					.close();
+			history.createDebugWriter("Activity Environment Set").format("Activity environment set to %s", _environment)
+				.close();
 
 			if (_environment != null) {
 				String ogrshConfig = _environment.get("OGRSH_CONFIG");
@@ -138,8 +132,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements
 				if (geniiUserDir != null && !geniiUserDir.startsWith("/")) {
 					File f = new File(workingDirectory, geniiUserDir);
 					_environment.put("GENII_USER_DIR", f.getAbsolutePath());
-					_logger.info("rewrote GENII_USER_DIR to be: "
-							+ _environment.get("GENII_USER_DIR"));
+					_logger.info("rewrote GENII_USER_DIR to be: " + _environment.get("GENII_USER_DIR"));
 				}
 
 				_environment = overloadEnvironment(_environment);
@@ -152,54 +145,44 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements
 			for (String s : _arguments)
 				args.add(s);
 
-			File resourceUsageFile = new ResourceUsageDirectory(
-					workingDirectory).getNewResourceUsageFile();
+			File resourceUsageFile = new ResourceUsageDirectory(workingDirectory).getNewResourceUsageFile();
 
 			HashMap<String, Object> jobProperties = new HashMap<String, Object>();
-			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties,
-					_executable.getAbsolutePath(), args);
-			CmdLineManipulatorUtils.addEnvProperties(jobProperties,
-					_fuseMountPoint, _environment, workingDirectory,
-					_redirects.stdinSource(), _redirects.stdoutSink(),
-					stderrFile, resourceUsageFile, wrapper.getPathToWrapper());
-			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties,
-					_spmdVariation, _numProcesses, _numProcessesPerHost);
+			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, _executable.getAbsolutePath(), args);
+			CmdLineManipulatorUtils.addEnvProperties(jobProperties, _fuseMountPoint, _environment, workingDirectory,
+				_redirects.stdinSource(), _redirects.stdoutSink(), stderrFile, resourceUsageFile, wrapper.getPathToWrapper());
+			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, _spmdVariation, _numProcesses, _numProcessesPerHost);
 
 			newCmdLine = new Vector<String>();
 			if (_logger.isDebugEnabled())
 				_logger.debug("Trying to call cmdLine manipulators.");
-			newCmdLine = CmdLineManipulatorUtils.callCmdLineManipulators(
-					jobProperties, _constructionParameters
-							.getCmdLineManipulatorConfiguration());
+			newCmdLine =
+				CmdLineManipulatorUtils.callCmdLineManipulators(jobProperties,
+					_constructionParameters.getCmdLineManipulatorConfiguration());
 
-			// for testing only - use default cmdLine format to compare to
-			// transform
+			// for testing only - use default cmdLine format to compare to transform
 			String[] arguments = new String[command.size() - 1];
 			for (int lcv = 1; lcv < command.size(); lcv++)
 				arguments[lcv - 1] = command.get(lcv);
 
-			Vector<String> testCmdLine = wrapper.formCommandLine(
-					_fuseMountPoint, _environment, workingDirectory,
-					_redirects.stdinSource(), _redirects.stdoutSink(),
-					stderrFile, resourceUsageFile, command.get(0), arguments);
+			Vector<String> testCmdLine =
+				wrapper.formCommandLine(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(),
+					_redirects.stdoutSink(), stderrFile, resourceUsageFile, command.get(0), arguments);
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format(
-						"Previous cmdLine format with pwrapper only:\n %s",
-						testCmdLine.toString()));
+				_logger.debug(String.format("Previous cmdLine format with pwrapper only:\n %s", testCmdLine.toString()));
 
 			if (_logger.isDebugEnabled())
 				_logger.debug("Trying to start a new process on machine using fork/exec or spawn.");
 			preDelay();
 
-			PrintWriter hWriter = history.createInfoWriter(
-					"BES Starting Activity").format("BES starting activity: ");
+			PrintWriter hWriter = history.createInfoWriter("BES Starting Activity").format("BES starting activity: ");
 			for (String arg : newCmdLine)
 				hWriter.format(" %s", arg);
 			hWriter.close();
 
-			token = wrapper.execute(_fuseMountPoint, _environment,
-					workingDirectory, _redirects.stdinSource(),
-					resourceUsageFile, newCmdLine);
+			token =
+				wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile,
+					newCmdLine);
 		}
 
 		try {
@@ -225,20 +208,15 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements
 				_logger.error("Somehow we got an exit with no exit results.");
 				history.debug("Job Exited with No Resulst");
 			} else {
-				history.trace("Job Exited with Exit Code %d",
-						results.exitCode());
+				history.trace("Job Exited with Exit Code %d", results.exitCode());
 
-				_logger.info(String.format("Process exited with exit-code %d.",
-						results.exitCode()));
+				_logger.info(String.format("Process exited with exit-code %d.", results.exitCode()));
 
-				AccountingService acctService = ContainerServices
-						.findService(AccountingService.class);
+				AccountingService acctService = ContainerServices.findService(AccountingService.class);
 				if (acctService != null) {
-					acctService.addAccountingRecord(
-							context.getCallingContext(), context.getBESEPI(),
-							null, null, null, newCmdLine, results.exitCode(),
-							results.userTime(), results.kernelTime(),
-							results.wallclockTime(), results.maximumRSS());
+					acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), null, null, null,
+						newCmdLine, results.exitCode(), results.userTime(), results.kernelTime(), results.wallclockTime(),
+						results.maximumRSS());
 				}
 			}
 
@@ -257,10 +235,9 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements
 	}
 
 	@Override
-	public void terminate(boolean countAsFailedAttempt)
-			throws ExecutionException {
-		HistoryContext history = HistoryContextFactory
-				.createContext(HistoryEventCategory.Terminating);
+	public void terminate(boolean countAsFailedAttempt) throws ExecutionException
+	{
+		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Terminating);
 
 		history.info("Terminating Activity Per Request");
 

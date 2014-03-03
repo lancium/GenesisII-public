@@ -25,8 +25,8 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
-public class CloudProcessAccountingPhase extends AbstractCloudExecutionPhase
-		implements Serializable {
+public class CloudProcessAccountingPhase extends AbstractCloudExecutionPhase implements Serializable
+{
 
 	static final long serialVersionUID = 0L;
 	private String _activityID;
@@ -36,13 +36,11 @@ public class CloudProcessAccountingPhase extends AbstractCloudExecutionPhase
 	private BESConstructionParameters _constructionParameters;
 	private Collection<String> _commandLine;
 
-	static private Log _logger = LogFactory
-			.getLog(CloudProcessAccountingPhase.class);
+	static private Log _logger = LogFactory.getLog(CloudProcessAccountingPhase.class);
 
-	public CloudProcessAccountingPhase(String activityID, String besid,
-			String remoteFile, String localFile,
-			Collection<String> commandLine,
-			BESConstructionParameters constructionParameters) {
+	public CloudProcessAccountingPhase(String activityID, String besid, String remoteFile, String localFile,
+		Collection<String> commandLine, BESConstructionParameters constructionParameters)
+	{
 
 		_activityID = activityID;
 		_besid = besid;
@@ -53,18 +51,18 @@ public class CloudProcessAccountingPhase extends AbstractCloudExecutionPhase
 	}
 
 	@Override
-	public ActivityState getPhaseState() {
-		return new ActivityState(ActivityStateEnumeration.Running,
-				"processing-accounting-data", false);
+	public ActivityState getPhaseState()
+	{
+		return new ActivityState(ActivityStateEnumeration.Running, "processing-accounting-data", false);
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable {
+	public void execute(ExecutionContext context) throws Throwable
+	{
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID = tManage.aquireResource(_activityID);
 
-		HistoryContext history = HistoryContextFactory
-				.createContext(HistoryEventCategory.Default);
+		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Default);
 
 		history.createInfoWriter("Processing Accounting Data").close();
 
@@ -75,33 +73,25 @@ public class CloudProcessAccountingPhase extends AbstractCloudExecutionPhase
 
 		if (resourceUsageFile != null) {
 			try {
-				ExitResults eResults = ProcessWrapper
-						.readResults(resourceUsageFile);
+				ExitResults eResults = ProcessWrapper.readResults(resourceUsageFile);
 				exitCode = eResults.exitCode();
 
 				_logger.info("Processing Accounting Data");
-				history.createInfoWriter(
-						"Job exited with exit code " + exitCode).close();
-				AccountingService acctService = ContainerServices
-						.findService(AccountingService.class);
+				history.createInfoWriter("Job exited with exit code " + exitCode).close();
+				AccountingService acctService = ContainerServices.findService(AccountingService.class);
 				if (acctService != null) {
-					OperatingSystemNames osName = _constructionParameters
-							.getResourceOverrides().operatingSystemName();
+					OperatingSystemNames osName = _constructionParameters.getResourceOverrides().operatingSystemName();
 
-					ProcessorArchitecture arch = _constructionParameters
-							.getResourceOverrides().cpuArchitecture();
+					ProcessorArchitecture arch = _constructionParameters.getResourceOverrides().cpuArchitecture();
 
-					acctService.addAccountingRecord(
-							context.getCallingContext(), context.getBESEPI(),
-							arch, osName, null, _commandLine, exitCode,
-							eResults.userTime(), eResults.kernelTime(),
-							eResults.wallclockTime(), eResults.maximumRSS());
+					acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), arch, osName, null,
+						_commandLine, exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(),
+						eResults.maximumRSS());
 				}
 
 			} catch (ProcessWrapperException pwe) {
 				history.warn(pwe, "Error Acquiring Accounting Info");
-				throw new IgnoreableFault(
-						"Error trying to read resource usage information.", pwe);
+				throw new IgnoreableFault("Error trying to read resource usage information.", pwe);
 			}
 		}
 
@@ -110,12 +100,14 @@ public class CloudProcessAccountingPhase extends AbstractCloudExecutionPhase
 	}
 
 	@Override
-	protected Log getLog() {
+	protected Log getLog()
+	{
 		return _logger;
 	}
 
 	@Override
-	protected String getPhase() {
+	protected String getPhase()
+	{
 		return "Processing Accounting Data";
 	}
 }

@@ -22,7 +22,8 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface SweepConstants {
+public interface SweepConstants
+{
 	static final public String SWEEP_NS = "http://schemas.ogf.org/jsdl/2009/03/sweep";
 	static final public String SWEEP_FUNC_NS = "http://schemas.ogf.org/jsdl/2009/03/sweep/functions";
 

@@ -38,7 +38,8 @@ import org.xml.sax.SAXException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JarDescription {
+public class JarDescription
+{
 	static private final String _NAMESPACE = "http://vcgr.cs.virginia.edu";
 
 	static private Log _logger = LogFactory.getLog(JarDescription.class);
@@ -53,13 +54,15 @@ public class JarDescription {
 	static private QName _JAR_FILE_QNAME = new QName(_NAMESPACE, "jar-file");
 	static private QName _JAR_DIR_QNAME = new QName(_NAMESPACE, "jar-dir");
 
-	static private QName getQName(Node node) {
+	static private QName getQName(Node node)
+	{
 		return new QName(node.getNamespaceURI(), node.getLocalName());
 	}
 
 	private Vector<URL> _jarFiles = new Vector<URL>();
 
-	private void parseJarFiles(Node jarFilesNode) throws IOException {
+	private void parseJarFiles(Node jarFilesNode) throws IOException
+	{
 		File baseDir;
 
 		NamedNodeMap attrs = jarFilesNode.getAttributes();
@@ -78,8 +81,7 @@ public class JarDescription {
 				if (childQName.equals(_JAR_FILE_QNAME)) {
 					Node textNode = child.getFirstChild();
 					if (textNode.getNodeType() != Node.TEXT_NODE)
-						throw new IOException(
-								"Found jar file node without text content.");
+						throw new IOException("Found jar file node without text content.");
 
 					File jarFile = new File(baseDir, textNode.getTextContent());
 					_jarFiles.add(jarFile.toURI().toURL());
@@ -89,8 +91,8 @@ public class JarDescription {
 		}
 	}
 
-	private void findJars(File jarDir, boolean isRecursive)
-			throws MalformedURLException {
+	private void findJars(File jarDir, boolean isRecursive) throws MalformedURLException
+	{
 		for (File testFile : jarDir.listFiles()) {
 			if (testFile.isDirectory() && isRecursive)
 				findJars(testFile, isRecursive);
@@ -99,7 +101,8 @@ public class JarDescription {
 		}
 	}
 
-	private void parseJarDir(Node jarDirNode) throws IOException {
+	private void parseJarDir(Node jarDirNode) throws IOException
+	{
 		boolean isRecursive = Boolean.parseBoolean(_RECURSIVE_ATTR_DEFAULT);
 
 		NamedNodeMap attrs = jarDirNode.getAttributes();
@@ -115,10 +118,10 @@ public class JarDescription {
 		findJars(jarDir, isRecursive);
 	}
 
-	private void initialize(Node node) throws IOException {
+	private void initialize(Node node) throws IOException
+	{
 		if (!getQName(node).equals(_ROOT_QNAME))
-			throw new IOException("Root element not correct -- expected "
-					+ _ROOT_QNAME);
+			throw new IOException("Root element not correct -- expected " + _ROOT_QNAME);
 
 		NodeList children = node.getChildNodes();
 		int length = children.getLength();
@@ -132,14 +135,13 @@ public class JarDescription {
 				else if (childQName.equals(_JAR_DIR_QNAME))
 					parseJarDir(child);
 				else
-					throw new IOException("Unexpected XML element "
-							+ childQName);
+					throw new IOException("Unexpected XML element " + childQName);
 			}
 		}
 	}
 
-	private void initialize(InputStream in)
-			throws ParserConfigurationException, IOException, SAXException {
+	private void initialize(InputStream in) throws ParserConfigurationException, IOException, SAXException
+	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
 		DocumentBuilder builder = factory.newDocumentBuilder();
@@ -147,12 +149,13 @@ public class JarDescription {
 		initialize(doc.getDocumentElement());
 	}
 
-	public JarDescription(String filepath) throws FileNotFoundException,
-			IOException {
+	public JarDescription(String filepath) throws FileNotFoundException, IOException
+	{
 		this(new File(filepath));
 	}
 
-	public JarDescription(File file) throws FileNotFoundException, IOException {
+	public JarDescription(File file) throws FileNotFoundException, IOException
+	{
 		FileInputStream fin = null;
 
 		try {
@@ -172,7 +175,8 @@ public class JarDescription {
 		}
 	}
 
-	public JarDescription(InputStream in) throws IOException {
+	public JarDescription(InputStream in) throws IOException
+	{
 		try {
 			initialize(in);
 		} catch (ParserConfigurationException pce) {
@@ -182,14 +186,13 @@ public class JarDescription {
 		}
 	}
 
-	public ClassLoader createClassLoader() throws IOException {
-		URLClassLoader sysloader = (URLClassLoader) ClassLoader
-				.getSystemClassLoader();
+	public ClassLoader createClassLoader() throws IOException
+	{
+		URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
 		Class<URLClassLoader> sysclass = URLClassLoader.class;
 
 		try {
-			Method method = sysclass.getDeclaredMethod("addURL",
-					new Class<?>[] { URL.class });
+			Method method = sysclass.getDeclaredMethod("addURL", new Class<?>[] { URL.class });
 			method.setAccessible(true);
 			for (URL u : _jarFiles) {
 				method.invoke(sysloader, new Object[] { u });

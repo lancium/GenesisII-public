@@ -21,42 +21,41 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
-public class SetResourcePropertiesTool extends BaseGridTool {
+public class SetResourcePropertiesTool extends BaseGridTool
+{
 	static final private String _DESCRIPTION = "config/tooldocs/description/dset-resource-properties";
 	static final private String _USAGE = "config/tooldocs/usage/uset-resource-properties";
-	static final private LoadFileResource _MANPAGE = new LoadFileResource(
-			"config/tooldocs/man/set-resource-properties");
+	static final private LoadFileResource _MANPAGE = new LoadFileResource("config/tooldocs/man/set-resource-properties");
 
-	public SetResourcePropertiesTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.GENERAL);
+	public SetResourcePropertiesTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.GENERAL);
 		addManPage(_MANPAGE);
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException();
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		GeniiPath target = new GeniiPath(getArgument(0));
 		GeniiPath rpFile = new GeniiPath(getArgument(1));
 
 		if (target.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException(String.format(
-					"Target (%s) must be a grid path!", target));
+			throw new InvalidToolUsageException(String.format("Target (%s) must be a grid path!", target));
 
 		InputStream in = null;
 		try {
 			in = rpFile.openInputStream();
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(true);
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			MessageElement me = new MessageElement(builder.parse(in)
-					.getDocumentElement());
+			MessageElement me = new MessageElement(builder.parse(in).getDocumentElement());
 			Collection<MessageElement> properties = new LinkedList<MessageElement>();
 			Iterator<?> iter = me.getChildElements();
 			while (iter.hasNext()) {
@@ -67,14 +66,10 @@ public class SetResourcePropertiesTool extends BaseGridTool {
 				}
 			}
 
-			RNSPath targetPath = RNSPath.getCurrent().lookup(target.path(),
-					RNSPathQueryFlags.MUST_EXIST);
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-					targetPath.getEndpoint());
-			common.setResourceProperties(new SetResourceProperties(null,
-					new UpdateType(properties
-							.toArray(new MessageElement[properties.size()])),
-					null));
+			RNSPath targetPath = RNSPath.getCurrent().lookup(target.path(), RNSPathQueryFlags.MUST_EXIST);
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, targetPath.getEndpoint());
+			common.setResourceProperties(new SetResourceProperties(null, new UpdateType(properties
+				.toArray(new MessageElement[properties.size()])), null));
 			return 0;
 		} finally {
 			org.morgan.util.io.StreamUtils.close(in);

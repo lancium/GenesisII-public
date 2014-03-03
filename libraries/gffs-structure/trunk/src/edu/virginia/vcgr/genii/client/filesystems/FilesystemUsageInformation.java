@@ -2,7 +2,8 @@ package edu.virginia.vcgr.genii.client.filesystems;
 
 import java.io.File;
 
-final public class FilesystemUsageInformation {
+final public class FilesystemUsageInformation
+{
 	private long _totalSpace;
 	private long _totalAvailable;
 	private long _totalUsable;
@@ -10,7 +11,8 @@ final public class FilesystemUsageInformation {
 	private double _percentUsed;
 	private double _percentAvailable;
 
-	public FilesystemUsageInformation(File file) {
+	public FilesystemUsageInformation(File file)
+	{
 		_totalSpace = file.getTotalSpace();
 		_totalAvailable = file.getFreeSpace();
 		_totalUsable = file.getUsableSpace();
@@ -20,40 +22,45 @@ final public class FilesystemUsageInformation {
 			_percentAvailable = 0.0;
 		} else {
 			_percentUsed = (double) _totalUsed / (double) _totalSpace * 100;
-			_percentAvailable = (double) _totalAvailable / (double) _totalSpace
-					* 100;
+			_percentAvailable = (double) _totalAvailable / (double) _totalSpace * 100;
 		}
 	}
 
-	final public long filesystemSize() {
+	final public long filesystemSize()
+	{
 		return _totalSpace;
 	}
 
-	final public long spaceAvailable() {
+	final public long spaceAvailable()
+	{
 		return _totalAvailable;
 	}
 
-	final public long spaceUsable() {
+	final public long spaceUsable()
+	{
 		return _totalUsable;
 	}
 
-	final public long spaceUsed() {
+	final public long spaceUsed()
+	{
 		return _totalUsed;
 	}
 
-	final public double percentUsed() {
+	final public double percentUsed()
+	{
 		return _percentUsed;
 	}
 
-	final public double percentAvailable() {
+	final public double percentAvailable()
+	{
 		return _percentAvailable;
 	}
 
 	@Override
-	final public String toString() {
-		return String
-				.format("FS Size = %d, FS Used = %d, FS Available = %d, FS Usable = %d, Percent Used = %.2f%%, Percent Avail = %.2f%%",
-						_totalSpace, _totalUsed, _totalAvailable, _totalUsable,
-						_percentUsed, _percentAvailable);
+	final public String toString()
+	{
+		return String.format(
+			"FS Size = %d, FS Used = %d, FS Available = %d, FS Usable = %d, Percent Used = %.2f%%, Percent Avail = %.2f%%",
+			_totalSpace, _totalUsed, _totalAvailable, _totalUsable, _percentUsed, _percentAvailable);
 	}
 }

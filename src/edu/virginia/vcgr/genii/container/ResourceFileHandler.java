@@ -28,21 +28,23 @@ import org.mortbay.jetty.handler.AbstractHandler;
 
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-public class ResourceFileHandler extends AbstractHandler {
+public class ResourceFileHandler extends AbstractHandler
+{
 	static final long serialVersionUID = 0;
 
 	private String _resourceBase;
 
-	public ResourceFileHandler(String resourceBase) {
+	public ResourceFileHandler(String resourceBase)
+	{
 		_resourceBase = resourceBase;
 		while (_resourceBase.endsWith("/")) {
 			_resourceBase = _resourceBase.substring(0, _resourceBase.length());
 		}
 	}
 
-	public void handle(String target, HttpServletRequest arg2,
-			HttpServletResponse arg3, int dispatch) throws HttpException,
-			IOException, ServletException {
+	public void handle(String target, HttpServletRequest arg2, HttpServletResponse arg3, int dispatch) throws HttpException,
+		IOException, ServletException
+	{
 		InputStream in = null;
 		OutputStream out = null;
 		ClassLoader loader = GenesisClassLoader.classLoaderFactory();
@@ -53,17 +55,14 @@ public class ResourceFileHandler extends AbstractHandler {
 			if (!target.endsWith("/")) {
 				in = loader.getResourceAsStream(_resourceBase + target);
 				if (in == null) {
-					in = loader.getResourceAsStream(_resourceBase + target
-							+ "/index.html");
+					in = loader.getResourceAsStream(_resourceBase + target + "/index.html");
 				}
 			} else {
-				in = loader.getResourceAsStream(_resourceBase + target
-						+ "index.html");
+				in = loader.getResourceAsStream(_resourceBase + target + "index.html");
 			}
 
 			if (in == null) {
-				throw new IOException("Couldn't find resource \"" + target
-						+ "\".");
+				throw new IOException("Couldn't find resource \"" + target + "\".");
 			}
 
 			StreamUtils.copyStream(in, out);

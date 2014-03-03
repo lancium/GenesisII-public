@@ -4,20 +4,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Support for traversing a filesystem-like tree and travelling to all
- * sub-nodes. This is generic based on the nodeType involved, and requires
- * creation of a helper class based on TreeTraversalPathQuery to answer
- * questions about the targeted filesystem. Note that instances of this class
- * are intended for a single thread to use at a time; they are not thread-safe
- * for use from different threads.
+ * Support for traversing a filesystem-like tree and travelling to all sub-nodes. This is generic
+ * based on the nodeType involved, and requires creation of a helper class based on
+ * TreeTraversalPathQuery to answer questions about the targeted filesystem. Note that instances of
+ * this class are intended for a single thread to use at a time; they are not thread-safe for use
+ * from different threads.
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under
- *          the terms of the Apache License v2.0:
- *          http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under the terms of the
+ *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
-public class TreeTraverser<nodeType> {
+public class TreeTraverser<nodeType>
+{
 	static private Log _logger = LogFactory.getLog(TreeTraverser.class);
 
 	// the functions we will invoke when we see certain things in the tree.
@@ -29,25 +28,22 @@ public class TreeTraverser<nodeType> {
 	// an object that can answer important questions for us about the nodeType.
 	private TreeTraversalPathQuery<nodeType> _querier;
 
-	// we will not try to keep traversing if the directory depth goes beyond
-	// this limit.
+	// we will not try to keep traversing if the directory depth goes beyond this limit.
 	private int _maximumRecursionDepth = 100;
 
 	private int _depth; // tracks how far we have delved into the tree.
 
 	/**
-	 * Constructs an object for recursing a directory tree. This takes a path
-	 * query object for navigating the nodeType properly. It also will accept 4
-	 * alert methods to be invoked when (1) entering a directory, (2) leaving a
-	 * directory, (3) hitting a file, and (4) encountering a cycle in the tree
-	 * hierarchy (due to links, for example). Any of the alert methods may be
+	 * Constructs an object for recursing a directory tree. This takes a path query object for
+	 * navigating the nodeType properly. It also will accept 4 alert methods to be invoked when (1)
+	 * entering a directory, (2) leaving a directory, (3) hitting a file, and (4) encountering a
+	 * cycle in the tree hierarchy (due to links, for example). Any of the alert methods may be
 	 * null.
 	 */
 	public TreeTraverser(TreeTraversalPathQuery<nodeType> querierMethod,
-			TreeTraversalActionAlert<nodeType> enterDirectoryAlert,
-			TreeTraversalActionAlert<nodeType> exitDirectoryAlert,
-			TreeTraversalActionAlert<nodeType> fileAlert,
-			TreeTraversalActionAlert<nodeType> bounceAlert) {
+		TreeTraversalActionAlert<nodeType> enterDirectoryAlert, TreeTraversalActionAlert<nodeType> exitDirectoryAlert,
+		TreeTraversalActionAlert<nodeType> fileAlert, TreeTraversalActionAlert<nodeType> bounceAlert)
+	{
 		_querier = querierMethod;
 		_dirEnter = enterDirectoryAlert;
 		_dirExit = exitDirectoryAlert;
@@ -56,22 +52,22 @@ public class TreeTraverser<nodeType> {
 	}
 
 	/**
-	 * enables users to set their preferred maximum depth of directory
-	 * traversal.
+	 * enables users to set their preferred maximum depth of directory traversal.
 	 */
-	public void setMaximumRecursionDepth(int newMaxDepth) {
+	public void setMaximumRecursionDepth(int newMaxDepth)
+	{
 		_maximumRecursionDepth = newMaxDepth;
 	}
 
 	/**
-	 * Traverses a directory tree structure and performs operations on the file
-	 * and directory nodes found. The directory and file ActionAlerts will be
-	 * invoked when the traversal encounters these items during the recursion.
-	 * The bounceAlert will be called when a cycle in the traversal graph has
-	 * been detected. This will return zero if no errors were encountered during
+	 * Traverses a directory tree structure and performs operations on the file and directory nodes
+	 * found. The directory and file ActionAlerts will be invoked when the traversal encounters
+	 * these items during the recursion. The bounceAlert will be called when a cycle in the
+	 * traversal graph has been detected. This will return zero if no errors were encountered during
 	 * tree traversal.
 	 */
-	public PathOutcome recursePath(nodeType path) {
+	public PathOutcome recursePath(nodeType path)
+	{
 		if ((path == null) || (_querier == null))
 			return PathOutcome.OUTCOME_NOTHING;
 		if (_logger.isDebugEnabled())
@@ -87,18 +83,16 @@ public class TreeTraverser<nodeType> {
 			// anything else is a failure return.
 			return ret;
 		} catch (Throwable cause) {
-			_logger.error(
-					"recursePath saw unexpected exception; stifling it and returning error.",
-					cause);
+			_logger.error("recursePath saw unexpected exception; stifling it and returning error.", cause);
 		}
 		return PathOutcome.OUTCOME_ERROR; // failure if got to here.
 	}
 
 	/**
-	 * Processes a path while avoiding cycles. The hash set should be empty to
-	 * start with.
+	 * Processes a path while avoiding cycles. The hash set should be empty to start with.
 	 */
-	private PathOutcome innerRecursePath(nodeType path) {
+	private PathOutcome innerRecursePath(nodeType path)
+	{
 		if ((path == null) || (_querier == null))
 			return PathOutcome.OUTCOME_NOTHING;
 		if (_logger.isDebugEnabled())
@@ -110,8 +104,7 @@ public class TreeTraverser<nodeType> {
 		}
 		PathOutcome ret = _querier.checkPathSanity(path, _bounce);
 		if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
-			_logger.info("checkPathSanity considers this a bad path: "
-					+ path.toString());
+			_logger.info("checkPathSanity considers this a bad path: " + path.toString());
 			_depth--;
 			return ret;
 		}
@@ -144,26 +137,20 @@ public class TreeTraverser<nodeType> {
 			// contained.toString());
 			if (_querier.isDirectory(contained)) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("found dir, diving into: "
-							+ contained.toString());
+					_logger.debug("found dir, diving into: " + contained.toString());
 				try {
 					// dive into directories first, so we do depth first.
 					ret = innerRecursePath(contained);
 					if (_logger.isDebugEnabled())
-						_logger.debug("came back out of: "
-								+ contained.toString());
-					// continuable bouncing is fine, we just need to stop
-					// working on this path.
-					if (ret.differs(PathOutcome.OUTCOME_CONTINUABLE)
-							&& ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
+						_logger.debug("came back out of: " + contained.toString());
+					// continuable bouncing is fine, we just need to stop working on this path.
+					if (ret.differs(PathOutcome.OUTCOME_CONTINUABLE) && ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
 						_depth--;
 						return ret; // stop running recursion.
 					}
 				} catch (Throwable cause) {
 					if (_logger.isDebugEnabled())
-						_logger.debug(
-								"recursePath encountered unexpected exception while calling innerRecursePath",
-								cause);
+						_logger.debug("recursePath encountered unexpected exception while calling innerRecursePath", cause);
 					_depth--;
 					return PathOutcome.OUTCOME_ERROR;
 				}
@@ -179,8 +166,7 @@ public class TreeTraverser<nodeType> {
 					}
 				}
 			} else {
-				_logger.warn("hit unknown node type (not file, not dir) during traversal: "
-						+ contained.toString());
+				_logger.warn("hit unknown node type (not file, not dir) during traversal: " + contained.toString());
 			}
 		}
 

@@ -40,7 +40,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 
-public class ServerWSDoAllSender extends WSDoAllSender {
+public class ServerWSDoAllSender extends WSDoAllSender
+{
 	static final long serialVersionUID = 0L;
 
 	public static final String CRYPTO_ALIAS = "SENDER_CRYPTO_ALIAS";
@@ -48,25 +49,25 @@ public class ServerWSDoAllSender extends WSDoAllSender {
 
 	private PrivateKey _serverPrivateKey;
 
-	public ServerWSDoAllSender() {
+	public ServerWSDoAllSender()
+	{
 	}
 
-	public void configure(PrivateKey serverPrivateKey) {
+	public void configure(PrivateKey serverPrivateKey)
+	{
 		_serverPrivateKey = serverPrivateKey;
 
-		setOption(WSHandlerConstants.PW_CALLBACK_CLASS,
-				ServerWSDoAllReceiver.ServerPWCallback.class.getName());
+		setOption(WSHandlerConstants.PW_CALLBACK_CLASS, ServerWSDoAllReceiver.ServerPWCallback.class.getName());
 		setOption(WSHandlerConstants.USER, ServerWSDoAllSender.CRYPTO_ALIAS);
-		setOption(WSHandlerConstants.ENCRYPTION_USER,
-				WSHandlerConstants.USE_REQ_SIG_CERT);
+		setOption(WSHandlerConstants.ENCRYPTION_USER, WSHandlerConstants.USE_REQ_SIG_CERT);
 		setOption(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
 	}
 
-	public void invoke(MessageContext msgContext) throws AxisFault {
+	public void invoke(MessageContext msgContext) throws AxisFault
+	{
 
 		// get the incoming security actions
-		Vector<?> results = (Vector<?>) msgContext
-				.getProperty(WSHandlerConstants.RECV_RESULTS);
+		Vector<?> results = (Vector<?>) msgContext.getProperty(WSHandlerConstants.RECV_RESULTS);
 		if (results == null) {
 			// no security results
 			return;
@@ -81,14 +82,14 @@ public class ServerWSDoAllSender extends WSDoAllSender {
 		while (itr.hasNext()) {
 			WSSecurityEngineResult r = (WSSecurityEngineResult) itr.next();
 			switch (r.getAction()) {
-			case WSConstants.SIGN:
-				action = action + " " + WSHandlerConstants.SIGNATURE;
-				break;
-			case WSConstants.ENCR:
-				action = action + " " + WSHandlerConstants.ENCRYPT;
-				break;
-			default:
-				break;
+				case WSConstants.SIGN:
+					action = action + " " + WSHandlerConstants.SIGNATURE;
+					break;
+				case WSConstants.ENCR:
+					action = action + " " + WSHandlerConstants.ENCRYPT;
+					break;
+				default:
+					break;
 			}
 		}
 		if (action.length() == 0) {
@@ -105,11 +106,10 @@ public class ServerWSDoAllSender extends WSDoAllSender {
 	}
 
 	/**
-	 * Hook to allow subclasses to load their Signature Crypto however they see
-	 * fit.
+	 * Hook to allow subclasses to load their Signature Crypto however they see fit.
 	 */
-	public Crypto loadSignatureCrypto(RequestData reqData)
-			throws WSSecurityException {
+	public Crypto loadSignatureCrypto(RequestData reqData) throws WSSecurityException
+	{
 
 		AbstractCrypto crypto = null;
 		try {
@@ -121,11 +121,9 @@ public class ServerWSDoAllSender extends WSDoAllSender {
 			// initially placed it in the working context when the incoming
 			// message arrived
 			WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
-			Certificate[] targetCertChain = (Certificate[]) ctxt
-					.getProperty(WorkingContext.CERT_CHAIN_KEY);
+			Certificate[] targetCertChain = (Certificate[]) ctxt.getProperty(WorkingContext.CERT_CHAIN_KEY);
 
-			keyStore.setKeyEntry(CRYPTO_ALIAS, _serverPrivateKey,
-					CRYTO_PASS.toCharArray(), targetCertChain);
+			keyStore.setKeyEntry(CRYPTO_ALIAS, _serverPrivateKey, CRYTO_PASS.toCharArray(), targetCertChain);
 
 			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
@@ -142,11 +140,10 @@ public class ServerWSDoAllSender extends WSDoAllSender {
 	}
 
 	/**
-	 * Hook to allow subclasses to load their Encryption Crypto however they see
-	 * fit.
+	 * Hook to allow subclasses to load their Encryption Crypto however they see fit.
 	 */
-	protected Crypto loadEncryptionCrypto(RequestData reqData)
-			throws WSSecurityException {
+	protected Crypto loadEncryptionCrypto(RequestData reqData) throws WSSecurityException
+	{
 		AbstractCrypto crypto = null;
 		try {
 			// create an in-memory keystore for the server's key material
@@ -167,7 +164,8 @@ public class ServerWSDoAllSender extends WSDoAllSender {
 		}
 	}
 
-	public static class ClientPWCallback implements CallbackHandler {
+	public static class ClientPWCallback implements CallbackHandler
+	{
 
 		/**
 		 * 
@@ -175,8 +173,8 @@ public class ServerWSDoAllSender extends WSDoAllSender {
 		 * 
 		 */
 
-		public void handle(Callback[] callbacks) throws IOException,
-				UnsupportedCallbackException {
+		public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
+		{
 			for (int i = 0; i < callbacks.length; i++) {
 				if (callbacks[i] instanceof WSPasswordCallback) {
 					WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
@@ -186,8 +184,7 @@ public class ServerWSDoAllSender extends WSDoAllSender {
 					}
 
 				} else {
-					throw new UnsupportedCallbackException(callbacks[i],
-							"Unrecognized Callback");
+					throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
 				}
 
 			}

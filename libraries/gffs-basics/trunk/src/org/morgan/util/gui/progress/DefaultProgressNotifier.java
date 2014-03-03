@@ -8,7 +8,8 @@ import java.awt.Dialog.ModalityType;
 
 import javax.swing.SwingUtilities;
 
-public class DefaultProgressNotifier implements ProgressNotifier {
+public class DefaultProgressNotifier implements ProgressNotifier
+{
 	private Component _parent;
 	private String _title;
 	private String _initialNote;
@@ -23,8 +24,8 @@ public class DefaultProgressNotifier implements ProgressNotifier {
 	private boolean _finished = false;
 	private ProgressNotifier _dialog = null;
 
-	public DefaultProgressNotifier(Component parent, String title,
-			String initialNote, long millisToWait) {
+	public DefaultProgressNotifier(Component parent, String title, String initialNote, long millisToWait)
+	{
 		_parent = parent;
 		_title = title;
 		_initialNote = initialNote;
@@ -32,8 +33,8 @@ public class DefaultProgressNotifier implements ProgressNotifier {
 	}
 
 	@Override
-	public void initialize(CancelController cancelController,
-			ProgressTask<?> task) {
+	public void initialize(CancelController cancelController, ProgressTask<?> task)
+	{
 		_controller = cancelController;
 		_task = task;
 
@@ -43,7 +44,8 @@ public class DefaultProgressNotifier implements ProgressNotifier {
 	}
 
 	@Override
-	public void updateNote(String newNote) {
+	public void updateNote(String newNote)
+	{
 		synchronized (this) {
 			_initialNote = newNote;
 			if (_dialog != null)
@@ -52,7 +54,8 @@ public class DefaultProgressNotifier implements ProgressNotifier {
 	}
 
 	@Override
-	public void updateProgress(int newValue) {
+	public void updateProgress(int newValue)
+	{
 		synchronized (this) {
 			_progress = newValue;
 			if (_dialog != null)
@@ -61,7 +64,8 @@ public class DefaultProgressNotifier implements ProgressNotifier {
 	}
 
 	@Override
-	public void finished() {
+	public void finished()
+	{
 		synchronized (this) {
 			synchronized (finishLock) {
 				finishLock.notifyAll();
@@ -73,9 +77,11 @@ public class DefaultProgressNotifier implements ProgressNotifier {
 		}
 	}
 
-	private class Waiter implements Runnable {
+	private class Waiter implements Runnable
+	{
 		@Override
-		public void run() {
+		public void run()
+		{
 			long moveOnTime = System.currentTimeMillis() + _millisToWait;
 
 			long toWait = moveOnTime - System.currentTimeMillis();
@@ -96,9 +102,8 @@ public class DefaultProgressNotifier implements ProgressNotifier {
 					if (_parent != null)
 						owner = SwingUtilities.getWindowAncestor(_parent);
 
-					ProgressNotifierDialog dialog = new ProgressNotifierDialog(
-							owner, _title, _initialNote, _task, _progress,
-							_controller);
+					ProgressNotifierDialog dialog =
+						new ProgressNotifierDialog(owner, _title, _initialNote, _task, _progress, _controller);
 
 					dialog.pack();
 					GraphicsUtils.centerWindow(dialog);

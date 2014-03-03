@@ -29,13 +29,14 @@ import edu.virginia.vcgr.genii.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 
 /**
- * This class implements an abstract notion of resource key. It can translate
- * between WS-Addressing and internal key representations and also manages the
- * lifetime of the java object for the resource.
+ * This class implements an abstract notion of resource key. It can translate between WS-Addressing
+ * and internal key representations and also manages the lifetime of the java object for the
+ * resource.
  * 
  * @author Mark Morgan (mmm2a@cs.virginia.edu)
  */
-public class ResourceKey implements Closeable, Rollbackable {
+public class ResourceKey implements Closeable, Rollbackable
+{
 	static private HashMap<Object, ReferenceCounter> _lockTable = new HashMap<Object, ReferenceCounter>();
 	static private Log _logger = LogFactory.getLog(ResourceKey.class);
 
@@ -48,7 +49,8 @@ public class ResourceKey implements Closeable, Rollbackable {
 	private boolean _incrementedCounter = false;
 	private AddressingParameters _addressingParameters;
 
-	static private void incrementCounter(IResource resource) {
+	static private void incrementCounter(IResource resource)
+	{
 		Object key = resource.getLockKey();
 		synchronized (_lockTable) {
 			ReferenceCounter counter = _lockTable.get(key);
@@ -60,7 +62,8 @@ public class ResourceKey implements Closeable, Rollbackable {
 		}
 	}
 
-	static private void decrementCounter(IResource resource) {
+	static private void decrementCounter(IResource resource)
+	{
 		Object key = resource.getLockKey();
 		synchronized (_lockTable) {
 			ReferenceCounter counter = _lockTable.get(key);
@@ -71,7 +74,8 @@ public class ResourceKey implements Closeable, Rollbackable {
 		}
 	}
 
-	protected void finalize() throws Throwable {
+	protected void finalize() throws Throwable
+	{
 		try {
 			close();
 		} catch (IOException ioe) {
@@ -82,8 +86,7 @@ public class ResourceKey implements Closeable, Rollbackable {
 	}
 
 	/**
-	 * Create a new resource key for the named service using the given
-	 * construction parameters.
+	 * Create a new resource key for the named service using the given construction parameters.
 	 * 
 	 * @param serviceName
 	 *            The name of the service to create a key for.
@@ -92,8 +95,8 @@ public class ResourceKey implements Closeable, Rollbackable {
 	 * @throws ResourceException
 	 *             If anything goes wrong.
 	 */
-	ResourceKey(String serviceName, GenesisHashMap constructionParameters)
-			throws ResourceException {
+	ResourceKey(String serviceName, GenesisHashMap constructionParameters) throws ResourceException
+	{
 		boolean noExceptions = false;
 		_serviceName = serviceName;
 		IResourceProvider provider = null;
@@ -105,11 +108,9 @@ public class ResourceKey implements Closeable, Rollbackable {
 			_cachedResource.initialize(constructionParameters);
 			incrementCounter(_cachedResource);
 			_incrementedCounter = true;
-			RequiredConstructionParamWorker.setRequiredConstructionParameters(
-					_cachedResource, constructionParameters);
+			RequiredConstructionParamWorker.setRequiredConstructionParameters(_cachedResource, constructionParameters);
 			noExceptions = true;
-			_addressingParameters = new AddressingParameters(
-					_cachedResource.getKey(), null, null);
+			_addressingParameters = new AddressingParameters(_cachedResource.getKey(), null, null);
 		} catch (ResourceException e) {
 			_logger.error("resource exception occurred: " + e.getMessage());
 			throw e;
@@ -127,16 +128,14 @@ public class ResourceKey implements Closeable, Rollbackable {
 	 * @param serviceName
 	 *            The name of the service to which the state belongs.
 	 * @param refParams
-	 *            The WS-Addressing ReferenceParmaeters which address the target
-	 *            resource.
+	 *            The WS-Addressing ReferenceParmaeters which address the target resource.
 	 * @throws ResourceUnknownFaultType
-	 *             If the addressing information refers to a resource which
-	 *             can't be found.
+	 *             If the addressing information refers to a resource which can't be found.
 	 * @throws ResourceException
 	 *             If anything else goes wrong.
 	 */
-	public ResourceKey(String serviceName, AddressingParameters addrParams)
-			throws ResourceUnknownFaultType, ResourceException {
+	public ResourceKey(String serviceName, AddressingParameters addrParams) throws ResourceUnknownFaultType, ResourceException
+	{
 		boolean noExceptions = false;
 		_serviceName = serviceName;
 		_addressingParameters = addrParams;
@@ -168,7 +167,8 @@ public class ResourceKey implements Closeable, Rollbackable {
 	 * 
 	 * @return The actual resource.
 	 */
-	public IResource dereference() {
+	public IResource dereference()
+	{
 		return _cachedResource;
 	}
 
@@ -179,7 +179,8 @@ public class ResourceKey implements Closeable, Rollbackable {
 	 * @throws ResourceException
 	 *             If anything goes wrong.
 	 */
-	public String getResourceKey() throws ResourceException {
+	public String getResourceKey() throws ResourceException
+	{
 		return dereference().getKey();
 	}
 
@@ -189,19 +190,20 @@ public class ResourceKey implements Closeable, Rollbackable {
 	 * @throws ResourceException
 	 *             If anything goes wrong.
 	 */
-	public void destroy() throws ResourceException {
+	public void destroy() throws ResourceException
+	{
 		dereference().destroy();
 	}
 
 	/**
-	 * Because resource can be created multiple times for a given resource, you
-	 * can't simply lock on the resource. Rather, you can get this object and
-	 * lock on it. This method assumes that the internal key representation
-	 * supports a reasonable hashcode and equals semantic.
+	 * Because resource can be created multiple times for a given resource, you can't simply lock on
+	 * the resource. Rather, you can get this object and lock on it. This method assumes that the
+	 * internal key representation supports a reasonable hashcode and equals semantic.
 	 * 
 	 * @return An object which can be locked on.
 	 */
-	final public ResourceLock getResourceLock() {
+	final public ResourceLock getResourceLock()
+	{
 		synchronized (_lockTable) {
 			return _lockTable.get(_cachedResource.getLockKey()).lock();
 		}
@@ -212,19 +214,20 @@ public class ResourceKey implements Closeable, Rollbackable {
 	 * 
 	 * @return The associated provider.
 	 */
-	public IResourceProvider getProvider() {
+	public IResourceProvider getProvider()
+	{
 		return _provider;
 	}
 
 	/**
-	 * Return resources used by this key (and it's underlying resource) to the
-	 * system. This method should ALWAYS be called when the user is done with
-	 * the resource.
+	 * Return resources used by this key (and it's underlying resource) to the system. This method
+	 * should ALWAYS be called when the user is done with the resource.
 	 * 
 	 * @throws IOException
 	 *             if something goes wrong with the close.
 	 */
-	synchronized public void close() throws IOException {
+	synchronized public void close() throws IOException
+	{
 		if (_closed)
 			return;
 
@@ -235,50 +238,49 @@ public class ResourceKey implements Closeable, Rollbackable {
 		_cachedResource.close();
 	}
 
-	static private class ReferenceCounter {
+	static private class ReferenceCounter
+	{
 		private int _count;
 		private ResourceLock _lock = new ResourceLockImpl();
 
-		public ReferenceCounter() {
+		public ReferenceCounter()
+		{
 			_count = 0;
 		}
 
-		final public ResourceLock lock() {
+		final public ResourceLock lock()
+		{
 			return _lock;
 		}
 
-		final public void increment() {
+		final public void increment()
+		{
 			_count++;
 		}
 
-		final public int decrement() {
+		final public int decrement()
+		{
 			return --_count;
 		}
 	}
 
-	private void translateConstructionParameters(String serviceName,
-			GenesisHashMap consParms) throws ResourceException {
-		URI epi = (URI) consParms
-				.get(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
+	private void translateConstructionParameters(String serviceName, GenesisHashMap consParms) throws ResourceException
+	{
+		URI epi = (URI) consParms.get(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
 		if (epi == null) {
-			throw new MissingConstructionParamException(
-					IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
+			throw new MissingConstructionParamException(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
 		}
 
-		X509Certificate[] duplicatedCertificate = (X509Certificate[]) consParms
-				.get(IResource.DUPLICATED_CERTIFICATE_PARAM);
+		X509Certificate[] duplicatedCertificate = (X509Certificate[]) consParms.get(IResource.DUPLICATED_CERTIFICATE_PARAM);
 		if (duplicatedCertificate != null) {
-			consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
-					duplicatedCertificate);
+			consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM, duplicatedCertificate);
 		} else {
-			CertCreationSpec spec = (CertCreationSpec) consParms
-					.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
+			CertCreationSpec spec = (CertCreationSpec) consParms.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
 			if (spec != null) {
 				try {
 					// Add in any additional CNs specified
 					ArrayList<String> CNs = new ArrayList<String>();
-					String[] additionalCNs = (String[]) consParms
-							.get(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM);
+					String[] additionalCNs = (String[]) consParms.get(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM);
 					if (additionalCNs != null) {
 						CNs.addAll(Arrays.asList(additionalCNs));
 					}
@@ -286,18 +288,14 @@ public class ResourceKey implements Closeable, Rollbackable {
 
 					// Add in any additional organizations specified
 					ArrayList<String> orgs = new ArrayList<String>();
-					String[] additionalOrgs = (String[]) consParms
-							.get(IResource.ADDITIONAL_ORGS_CONSTRUCTION_PARAM);
+					String[] additionalOrgs = (String[]) consParms.get(IResource.ADDITIONAL_ORGS_CONSTRUCTION_PARAM);
 					if (additionalOrgs != null) {
 						orgs.addAll(Arrays.asList(additionalOrgs));
 					}
-					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields = CertTool
-							.constructCommonDnFields(epi.toString(), orgs, CNs,
-									null); // uid
-					consParms.put(
-							IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
-							CertTool.createResourceCertChain(spec,
-									additionalFields));
+					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields =
+						CertTool.constructCommonDnFields(epi.toString(), orgs, CNs, null); // uid
+					consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
+						CertTool.createResourceCertChain(spec, additionalFields));
 				} catch (GeneralSecurityException gse) {
 					throw new ResourceException(gse.getLocalizedMessage(), gse);
 				}
@@ -305,21 +303,25 @@ public class ResourceKey implements Closeable, Rollbackable {
 		}
 	}
 
-	public String getServiceName() {
+	public String getServiceName()
+	{
 		return _serviceName;
 	}
 
-	public AddressingParameters getAddressingParameters() {
+	public AddressingParameters getAddressingParameters()
+	{
 		return _addressingParameters;
 	}
 
 	@Override
-	public void rollbackResource() {
+	public void rollbackResource()
+	{
 		this.dereference().rollback();
 	}
 
 	@Override
-	public void commitResource() throws ResourceException {
+	public void commitResource() throws ResourceException
+	{
 		this.dereference().commit();
 	}
 }

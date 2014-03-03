@@ -6,10 +6,12 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-public class FTPHostname {
+public class FTPHostname
+{
 	static final public String HOSTNAME_OVERRIDE_PROPERTY = "org.morgan.net.Hostname.hostname-override";
 
-	static public InetAddress getMostGlobal(InetAddress[] addrs) {
+	static public InetAddress getMostGlobal(InetAddress[] addrs)
+	{
 		InetAddress[] ret = new InetAddress[5];
 		for (int lcv = 0; lcv < ret.length; lcv++)
 			ret[lcv] = null;
@@ -39,10 +41,10 @@ public class FTPHostname {
 		return null;
 	}
 
-	static public InetAddress getMostGlobal() throws SocketException {
+	static public InetAddress getMostGlobal() throws SocketException
+	{
 		ArrayList<InetAddress> tmp = new ArrayList<InetAddress>();
-		Enumeration<NetworkInterface> interfaces = NetworkInterface
-				.getNetworkInterfaces();
+		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 
 		while (interfaces.hasMoreElements()) {
 			NetworkInterface iface = interfaces.nextElement();
@@ -58,10 +60,12 @@ public class FTPHostname {
 	}
 
 	static public enum HostFormats {
-		IP_ADDR(), DNS_NAME()
+		IP_ADDR(),
+		DNS_NAME()
 	}
 
-	static public String format(InetAddress addr, HostFormats format) {
+	static public String format(InetAddress addr, HostFormats format)
+	{
 		if (format.equals(HostFormats.IP_ADDR)) {
 			return addr.getHostAddress();
 		} else {
@@ -69,8 +73,8 @@ public class FTPHostname {
 		}
 	}
 
-	static public String getLocalHost(HostFormats format)
-			throws SocketException {
+	static public String getLocalHost(HostFormats format) throws SocketException
+	{
 		String value = System.getProperty(HOSTNAME_OVERRIDE_PROPERTY);
 		if (value != null)
 			return value;

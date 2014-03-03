@@ -26,47 +26,33 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class DBBESActivityResourceFactory extends BasicDBResourceFactory
-		implements IBESActivityResourceFactory {
+public class DBBESActivityResourceFactory extends BasicDBResourceFactory implements IBESActivityResourceFactory
+{
 	@SuppressWarnings("unused")
-	static private Log _logger = LogFactory
-			.getLog(DBBESActivityResourceFactory.class);
+	static private Log _logger = LogFactory.getLog(DBBESActivityResourceFactory.class);
 
 	static private final String[] _CREATE_STMTS = new String[] {
-			"CREATE TABLE besactivityfaultstable ("
-					+ "faultid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,"
-					+ "besactivityid VARCHAR(256) NOT NULL,"
-					+ "fault BLOB(2G))",
-			"CREATE TABLE besactivitiestable ("
-					+ "activityid VARCHAR(256) NOT NULL PRIMARY KEY,"
-					+ "besid VARCHAR(256) NOT NULL,"
-					+ "jsdl BLOB(2G) NOT NULL," + "owners BLOB(2G) NOT NULL,"
-					+ "callingcontext BLOB(2G) NOT NULL,"
-					+ "state BLOB(2G) NOT NULL,"
-					+ "submittime TIMESTAMP NOT NULL,"
-					+ "suspendrequested SMALLINT NOT NULL,"
-					+ "terminaterequested SMALLINT NOT NULL,"
-					+ "activitycwd VARCHAR(256) NOT NULL,"
-					+ "executionplan BLOB(2G) NOT NULL,"
-					+ "nextphase INTEGER NOT NULL,"
-					+ "activityepr BLOB(2G) NOT NULL,"
-					+ "activityservicename VARCHAR(128) NOT NULL,"
-					+ "jobname VARCHAR(256) NOT NULL)",
-			"CREATE TABLE besactivitypropertiestable ("
-					+ "activityid VARCHAR(256) NOT NULL,"
-					+ "propertyname VARCHAR(256) NOT NULL,"
-					+ "propertyvalue BLOB(2G),"
-					+ "CONSTRAINT besactivitypropertiesconstraint1 "
-					+ "PRIMARY KEY (activityid, propertyname))",
-			"CREATE INDEX besactivityfaultsindex ON besactivityfaultstable(besactivityid)",
-			"CREATE INDEX besactivitiestableindex ON besactivitiestable(besid)" };
+		"CREATE TABLE besactivityfaultstable (" + "faultid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,"
+			+ "besactivityid VARCHAR(256) NOT NULL," + "fault BLOB(2G))",
+		"CREATE TABLE besactivitiestable (" + "activityid VARCHAR(256) NOT NULL PRIMARY KEY," + "besid VARCHAR(256) NOT NULL,"
+			+ "jsdl BLOB(2G) NOT NULL," + "owners BLOB(2G) NOT NULL," + "callingcontext BLOB(2G) NOT NULL,"
+			+ "state BLOB(2G) NOT NULL," + "submittime TIMESTAMP NOT NULL," + "suspendrequested SMALLINT NOT NULL,"
+			+ "terminaterequested SMALLINT NOT NULL," + "activitycwd VARCHAR(256) NOT NULL,"
+			+ "executionplan BLOB(2G) NOT NULL," + "nextphase INTEGER NOT NULL," + "activityepr BLOB(2G) NOT NULL,"
+			+ "activityservicename VARCHAR(128) NOT NULL," + "jobname VARCHAR(256) NOT NULL)",
+		"CREATE TABLE besactivitypropertiestable (" + "activityid VARCHAR(256) NOT NULL,"
+			+ "propertyname VARCHAR(256) NOT NULL," + "propertyvalue BLOB(2G),"
+			+ "CONSTRAINT besactivitypropertiesconstraint1 " + "PRIMARY KEY (activityid, propertyname))",
+		"CREATE INDEX besactivityfaultsindex ON besactivityfaultstable(besactivityid)",
+		"CREATE INDEX besactivitiestableindex ON besactivitiestable(besid)" };
 
-	public DBBESActivityResourceFactory(ServerDatabaseConnectionPool pool)
-			throws SQLException {
+	public DBBESActivityResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
+	{
 		super(pool);
 	}
 
-	protected void createTables() throws SQLException {
+	protected void createTables() throws SQLException
+	{
 		Connection conn = null;
 		super.createTables();
 
@@ -79,7 +65,8 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory
 		}
 	}
 
-	public IResource instantiate(ResourceKey rKey) throws ResourceException {
+	public IResource instantiate(ResourceKey rKey) throws ResourceException
+	{
 		try {
 			return new DBBESActivityResource(rKey, _pool);
 		} catch (SQLException sqe) {

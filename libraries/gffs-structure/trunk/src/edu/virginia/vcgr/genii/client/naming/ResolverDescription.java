@@ -19,46 +19,52 @@ import org.ws.addressing.EndpointReferenceType;
 
 import org.apache.axis.types.URI;
 
-public class ResolverDescription {
+public class ResolverDescription
+{
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(ResolverDescription.class);
 
 	static public enum ResolverType {
-		REFERENCE_RESOLVER, EPI_RESOLVER
+		REFERENCE_RESOLVER,
+		EPI_RESOLVER
 	};
 
 	private EndpointReferenceType _epr;
 	private URI _epi;
 	private ResolverType _type;
 
-	public ResolverDescription(URI epi, EndpointReferenceType epr,
-			ResolverType type) {
+	public ResolverDescription(URI epi, EndpointReferenceType epr, ResolverType type)
+	{
 		_epr = epr;
 		_type = type;
 		_epi = epi;
 	}
 
-	public EndpointReferenceType getEPR() {
+	public EndpointReferenceType getEPR()
+	{
 		return _epr;
 	}
 
-	public URI getEPI() {
+	public URI getEPI()
+	{
 		return _epi;
 	}
 
-	public ResolverType getType() {
+	public ResolverType getType()
+	{
 		return _type;
 	}
 
-	public boolean equals(ResolverDescription other) {
-		if (_epr != null && other.getEPR() != null
-				&& _epr.equals(other.getEPR()) && _type != null
-				&& other.getType() != null && _type.equals(other.getType()))
+	public boolean equals(ResolverDescription other)
+	{
+		if (_epr != null && other.getEPR() != null && _epr.equals(other.getEPR()) && _type != null && other.getType() != null
+			&& _type.equals(other.getType()))
 			return true;
 		return false;
 	}
 
-	public boolean equals(Object other) {
+	public boolean equals(Object other)
+	{
 		if (!(other instanceof ResolverDescription))
 			return false;
 

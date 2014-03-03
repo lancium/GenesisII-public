@@ -64,49 +64,46 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 import edu.virginia.vcgr.genii.security.rwx.RWXManager;
 
 /**
- * AuthZ provider implementation of GII Acls: an access-control mechanism
- * comprised of read/write/execute policy-sets.
+ * AuthZ provider implementation of GII Acls: an access-control mechanism comprised of
+ * read/write/execute policy-sets.
  * 
- * NOTES: - The presence of a NULL certificate in the ACL indicates open access.
- * - A NULL ACL indicates no access
+ * NOTES: - The presence of a NULL certificate in the ACL indicates open access. - A NULL ACL
+ * indicates no access
  * 
  * @author dmerrill
  */
-public class AclAuthZProvider implements IAuthZProvider, AclTopics {
+public class AclAuthZProvider implements IAuthZProvider, AclTopics
+{
 	/*
-	 * cak: this one seems too dangerous to change over to a SAML-named
-	 * counterpart. it is the name under which all the Acl information is stored
-	 * in any grid we would want to migrate.
+	 * cak: this one seems too dangerous to change over to a SAML-named counterpart. it is the name
+	 * under which all the Acl information is stored in any grid we would want to migrate.
 	 */
 	static public final String GENII_ACL_PROPERTY_NAME = "genii.container.security.authz.gaml-acl";
 
 	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec = new MessageLevelSecurityRequirements(
-			MessageLevelSecurityRequirements.NONE);
+		MessageLevelSecurityRequirements.NONE);
 
 	static protected HashMap<String, X509Certificate> _defaultCertCache = new HashMap<String, X509Certificate>();
 
 	static private Log _logger = LogFactory.getLog(AclAuthZProvider.class);
 
 	/*
-	 * NOTE: 'static' below is an implementation change--we are only scanning
-	 * the default owners once now. we have already been telling people to stop
-	 * the container if they want to update the admin certificate or default
-	 * owners...
+	 * NOTE: 'static' below is an implementation change--we are only scanning the default owners
+	 * once now. we have already been telling people to stop the container if they want to update
+	 * the admin certificate or default owners...
 	 */
 	static private X509Certificate[] _defaultInitialResourceOwners = null;
 
-	public AclAuthZProvider() throws GeneralSecurityException, IOException {
+	public AclAuthZProvider() throws GeneralSecurityException, IOException
+	{
 		if (_defaultInitialResourceOwners == null) {
-			Collection<File> ownerFiles = InstallationProperties
-					.getInstallationProperties().getDefaultOwnerFiles();
-			// Installation.getDeployment(new
-			// DeploymentName()).security().getDefaultOwnerFiles();
+			Collection<File> ownerFiles = InstallationProperties.getInstallationProperties().getDefaultOwnerFiles();
+			// Installation.getDeployment(new DeploymentName()).security().getDefaultOwnerFiles();
 
 			// read in the certificates that are to serve as default owner
 			if ((ownerFiles != null) && (ownerFiles.size() > 0)) {
 				synchronized (_defaultCertCache) {
-					Collection<X509Certificate> ownerCerts = new ArrayList<X509Certificate>(
-							ownerFiles.size());
+					Collection<X509Certificate> ownerCerts = new ArrayList<X509Certificate>(ownerFiles.size());
 
 					for (File ownerFile : ownerFiles) {
 						// skip files of the wrong type.
@@ -120,84 +117,67 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 						if (ownerFile.isDirectory())
 							continue;
 						if (_logger.isDebugEnabled())
-							_logger.debug("adding " + ownerFile
-									+ " as container owner certificate file.");
-						X509Certificate ownerCert = _defaultCertCache
-								.get(ownerFile.getName());
+							_logger.debug("adding " + ownerFile + " as container owner certificate file.");
+						X509Certificate ownerCert = _defaultCertCache.get(ownerFile.getName());
 						if (ownerCert == null) {
-							CertificateFactory cf = CertificateFactory
-									.getInstance("X.509");
+							CertificateFactory cf = CertificateFactory.getInstance("X.509");
 							FileInputStream fin = null;
 							try {
-								ownerCert = (X509Certificate) cf
-										.generateCertificate(fin = new FileInputStream(
-												ownerFile));
-								_defaultCertCache.put(ownerFile.getName(),
-										ownerCert);
+								ownerCert = (X509Certificate) cf.generateCertificate(fin = new FileInputStream(ownerFile));
+								_defaultCertCache.put(ownerFile.getName(), ownerCert);
 							} finally {
 								StreamUtils.close(fin);
 							}
 						}
 						ownerCerts.add(ownerCert);
 						if (_logger.isDebugEnabled())
-							_logger.debug("setting up administrator access for "
-									+ ownerCert.getSubjectDN());
+							_logger.debug("setting up administrator access for " + ownerCert.getSubjectDN());
 					}
 
-					_defaultInitialResourceOwners = ownerCerts
-							.toArray(new X509Certificate[ownerCerts.size()]);
+					_defaultInitialResourceOwners = ownerCerts.toArray(new X509Certificate[ownerCerts.size()]);
 				}
 			} else {
-				_defaultInitialResourceOwners = new X509Certificate[] { Container
-						.getContainerCertChain()[0] };
+				_defaultInitialResourceOwners = new X509Certificate[] { Container.getContainerCertChain()[0] };
 			}
 		}
 	}
 
 	/**
-	 * Presently configures the specified resource to have default access
-	 * allowed for every credential in the bag of credentials. We may want to
-	 * look at restricting this in the future to special credentials.
+	 * Presently configures the specified resource to have default access allowed for every
+	 * credential in the bag of credentials. We may want to look at restricting this in the future
+	 * to special credentials.
 	 */
-	public void setDefaultAccess(ICallingContext callingContext,
-			IResource resource, X509Certificate[] serviceCertChain)
-			throws AuthZSecurityException, ResourceException {
+	public void setDefaultAccess(ICallingContext callingContext, IResource resource, X509Certificate[] serviceCertChain)
+		throws AuthZSecurityException, ResourceException
+	{
 
 		HashSet<Identity> defaultOwners = new HashSet<Identity>();
 
 		// Add desired authorized identities from incoming cred
 		if (callingContext != null) {
-			TransientCredentials transientCredentials = TransientCredentials
-					.getTransientCredentials(callingContext);
+			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callingContext);
 
 			for (NuCredential cred : transientCredentials.getCredentials()) {
 
 				if (cred instanceof Identity) {
 					if (_logger.isTraceEnabled())
-						_logger.trace("adding identity to UMask... "
-								+ cred.describe(VerbosityLevel.HIGH));
+						_logger.trace("adding identity to UMask... " + cred.describe(VerbosityLevel.HIGH));
 					if (((Identity) cred).placeInUMask())
 						defaultOwners.add((Identity) cred);
 				} else if (cred instanceof TrustCredential) {
-					X509Identity assertedIdentity = ((TrustCredential) cred)
-							.getRootIdentity();
+					X509Identity assertedIdentity = ((TrustCredential) cred).getRootIdentity();
 					if (assertedIdentity.placeInUMask()) {
 						if (_logger.isTraceEnabled())
-							_logger.trace("adding cred to UMask... "
-									+ assertedIdentity
-											.describe(VerbosityLevel.HIGH));
+							_logger.trace("adding cred to UMask... " + assertedIdentity.describe(VerbosityLevel.HIGH));
 						defaultOwners.add(assertedIdentity);
 					} else {
 						if (_logger.isTraceEnabled())
-							_logger.trace("NOT adding cred to UMask... "
-									+ assertedIdentity
-											.describe(VerbosityLevel.HIGH));
+							_logger.trace("NOT adding cred to UMask... " + assertedIdentity.describe(VerbosityLevel.HIGH));
 					}
 
 				} else {
 					if (_logger.isTraceEnabled())
-						_logger.trace("NOT adding this thing to UMask... "
-								+ cred.describe(VerbosityLevel.HIGH));
+						_logger.trace("NOT adding this thing to UMask... " + cred.describe(VerbosityLevel.HIGH));
 				}
 			}
 		}
@@ -207,21 +187,19 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 		if (defaultOwners.isEmpty()) {
 			if (_defaultInitialResourceOwners != null) {
 				for (X509Certificate cert : _defaultInitialResourceOwners) {
-					defaultOwners.add(new X509Identity(
-							new X509Certificate[] { cert }));
+					defaultOwners.add(new X509Identity(new X509Certificate[] { cert }));
 				}
 			}
 		}
 
 		/*
-		 * dgm4d: this is a security issue // Add the resoure's static creating
-		 * service if (serviceCertChain != null) { defaultOwners.add(new
-		 * X509Identity(serviceCertChain)); }
+		 * dgm4d: this is a security issue // Add the resoure's static creating service if
+		 * (serviceCertChain != null) { defaultOwners.add(new X509Identity(serviceCertChain)); }
 		 */
 
 		// Add the resource itself
-		defaultOwners.add(new X509Identity((X509Certificate[]) resource
-				.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME)));
+		defaultOwners
+			.add(new X509Identity((X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME)));
 
 		Acl acl = new Acl();
 		acl.readAcl.addAll(defaultOwners);
@@ -231,25 +209,25 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 		resource.setProperty(GENII_ACL_PROPERTY_NAME, acl);
 	}
 
-	private boolean checkAclAccess(Identity identity, RWXCategory category,
-			Acl acl) {
+	private boolean checkAclAccess(Identity identity, RWXCategory category, Acl acl)
+	{
 		Collection<AclEntry> trustList = null;
 		switch (category) {
-		case READ:
-			trustList = acl.readAcl;
-			break;
-		case WRITE:
-			trustList = acl.writeAcl;
-			break;
-		case EXECUTE:
-			trustList = acl.executeAcl;
-			break;
-		case OPEN:
-			return true;
-		case CLOSED:
-			return false;
-		case INHERITED:
-			_logger.warn("unprocessed case for inherited attribute.");
+			case READ:
+				trustList = acl.readAcl;
+				break;
+			case WRITE:
+				trustList = acl.writeAcl;
+				break;
+			case EXECUTE:
+				trustList = acl.executeAcl;
+				break;
+			case OPEN:
+				return true;
+			case CLOSED:
+				return false;
+			case INHERITED:
+				_logger.warn("unprocessed case for inherited attribute.");
 		}
 		if (trustList == null) {
 			// Empty ACL
@@ -270,8 +248,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 						return true;
 					}
 				} catch (Exception e) {
-					_logger.error("caught exception coming from isPermitted check on identity: "
-							+ identity.toString());
+					_logger.error("caught exception coming from isPermitted check on identity: " + identity.toString());
 				}
 			}
 		}
@@ -281,24 +258,23 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 	}
 
 	@Override
-	public boolean checkAccess(
-			Collection<NuCredential> authenticatedCallerCredentials,
-			IResource resource, Class<?> serviceClass, Method operation) {
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
+		Class<?> serviceClass, Method operation)
+	{
 		RWXCategory category = RWXManager.lookup(serviceClass, operation);
 
 		if (!checkAccess(authenticatedCallerCredentials, resource, category)) {
 			String msg = "denying access for operation: " + operation.getName();
 			String asset = ResourceManager.getResourceName(resource);
-			msg = msg.concat("on " + asset + " at "
-					+ ProgramTools.showLastFewOnStack(4));
+			msg = msg.concat("on " + asset + " at " + ProgramTools.showLastFewOnStack(4));
 			_logger.error(msg);
 			return false;
 		}
 		return true;
 	}
 
-	public void blurtCredentials(String prefixedMessage,
-			Collection<NuCredential> creds) {
+	public void blurtCredentials(String prefixedMessage, Collection<NuCredential> creds)
+	{
 		if (!_logger.isDebugEnabled())
 			return; // no printing unless debug mode allowed.
 		StringBuilder credsAsString = new StringBuilder(prefixedMessage);
@@ -312,11 +288,10 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 	}
 
 	@Override
-	public boolean checkAccess(
-			Collection<NuCredential> authenticatedCallerCredentials,
-			IResource resource, RWXCategory category) {
-		String messagePrefix = "checkAccess for " + category + " on "
-				+ ResourceManager.getResourceName(resource) + " ";
+	public boolean
+		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
+	{
+		String messagePrefix = "checkAccess for " + category + " on " + ResourceManager.getResourceName(resource) + " ";
 
 		try {
 			ICallingContext callContext = ContextManager.getExistingContext();
@@ -336,31 +311,26 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 						if (((X509Identity) cred).checkRWXAccess(category)) {
 							if (checkAclAccess((Identity) cred, category, acl)) {
 								if (_logger.isDebugEnabled())
-									_logger.debug(messagePrefix
-											+ "granted to identity with x509: "
-											+ cred.describe(VerbosityLevel.LOW));
+									_logger.debug(messagePrefix + "granted to identity with x509: "
+										+ cred.describe(VerbosityLevel.LOW));
 								return true;
 							}
 						}
 					} else if (checkAclAccess((Identity) cred, category, acl)) {
 						// straight-up identity (username/password)
 						if (_logger.isDebugEnabled())
-							_logger.debug(messagePrefix
-									+ "access granted to identity: "
-									+ cred.describe(VerbosityLevel.LOW));
+							_logger.debug(messagePrefix + "access granted to identity: " + cred.describe(VerbosityLevel.LOW));
 						return true;
 					}
 				} else if (cred instanceof TrustCredential) {
 					TrustCredential sa = (TrustCredential) cred;
 					if (sa.checkRWXAccess(category)) {
-						// check root identity of trust delegation to see if it
-						// has access.
+						// check root identity of trust delegation to see if it has access.
 						X509Identity ia = (X509Identity) sa.getRootIdentity();
 						if (checkAclAccess(ia, category, acl)) {
 							if (_logger.isDebugEnabled())
-								_logger.debug(messagePrefix
-										+ "granted to trust credential's root identity: "
-										+ sa.describe(VerbosityLevel.LOW));
+								_logger.debug(messagePrefix + "granted to trust credential's root identity: "
+									+ sa.describe(VerbosityLevel.LOW));
 							return true;
 						}
 					}
@@ -370,36 +340,30 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 			// Check Administrator Access
 			if (Security.isAdministrator(callContext)) {
 				if (_logger.isDebugEnabled())
-					_logger.debug(messagePrefix
-							+ "granted because caller is admin.");
+					_logger.debug(messagePrefix + "granted because caller is admin.");
 				return true;
 			}
 
 			// Nobody appreciates us.
 			if (_logger.isTraceEnabled()) {
-				blurtCredentials(messagePrefix
-						+ " was not granted for credential set: ",
-						authenticatedCallerCredentials);
+				blurtCredentials(messagePrefix + " was not granted for credential set: ", authenticatedCallerCredentials);
 			}
 			return false;
 		} catch (AuthZSecurityException ase) {
-			_logger.error("failure, saw authorization security exception for "
-					+ messagePrefix + ":" + ase.getMessage());
+			_logger.error("failure, saw authorization security exception for " + messagePrefix + ":" + ase.getMessage());
 			return false;
 		} catch (IOException e) {
-			_logger.error("failure, saw IO exception processing credential for "
-					+ messagePrefix + ":" + e.getMessage());
+			_logger.error("failure, saw IO exception processing credential for " + messagePrefix + ":" + e.getMessage());
 			return false;
 		} catch (ConfigurationException e) {
-			_logger.error("saw config exception for " + messagePrefix + ":"
-					+ e.getMessage());
+			_logger.error("saw config exception for " + messagePrefix + ":" + e.getMessage());
 			return false;
 		}
 	}
 
-	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(
-			IResource resource) throws AuthZSecurityException,
-			ResourceException {
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource) throws AuthZSecurityException,
+		ResourceException
+	{
 		try {
 			// get ACL
 			Acl acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
@@ -407,32 +371,28 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 			if (acl == null) {
 
 				// return no security requirements if null ACL
-				return new MessageLevelSecurityRequirements(
-						MessageLevelSecurityRequirements.NONE);
+				return new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
 
 			} else if (acl.requireEncryption) {
 
 				// add in encryption
-				return _defaultMinMsgSec
-						.computeUnion(new MessageLevelSecurityRequirements(
-								MessageLevelSecurityRequirements.ENCRYPT));
+				return _defaultMinMsgSec.computeUnion(new MessageLevelSecurityRequirements(
+					MessageLevelSecurityRequirements.ENCRYPT));
 			}
 
 			return _defaultMinMsgSec;
 		} catch (ResourceException e) {
-			throw new AuthZSecurityException(
-					"Could not retrieve minimum incoming message level security.",
-					e);
+			throw new AuthZSecurityException("Could not retrieve minimum incoming message level security.", e);
 		}
 	}
 
-	public AuthZConfig getAuthZConfig(IResource resource)
-			throws AuthZSecurityException, ResourceException {
+	public AuthZConfig getAuthZConfig(IResource resource) throws AuthZSecurityException, ResourceException
+	{
 		return getAuthZConfig(resource, true);
 	}
 
-	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize)
-			throws AuthZSecurityException, ResourceException {
+	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize) throws AuthZSecurityException, ResourceException
+	{
 		try {
 			// get ACL
 			Acl acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
@@ -448,20 +408,19 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 		}
 	}
 
-	public void setAuthZConfig(AuthZConfig config, IResource resource)
-			throws AuthZSecurityException, ResourceException {
+	public void setAuthZConfig(AuthZConfig config, IResource resource) throws AuthZSecurityException, ResourceException
+	{
 		Acl acl = AxisAcl.decodeAcl(config);
 		resource.setProperty(GENII_ACL_PROPERTY_NAME, acl);
 		resource.commit();
 	}
 
 	/**
-	 * Inform subscribers that one or more entries has been added or removed
-	 * from one or more ACLs.
+	 * Inform subscribers that one or more entries has been added or removed from one or more ACLs.
 	 */
-	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig,
-			IResource resource) throws AuthZSecurityException,
-			ResourceException {
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource)
+		throws AuthZSecurityException, ResourceException
+	{
 		if (resource.isServiceResource())
 			return;
 		Acl oldAcl = AxisAcl.decodeAcl(oldConfig);
@@ -474,25 +433,20 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 		List<String> tagList = new ArrayList<String>();
 		findDeltas(entryList, tagList, newAcl.readAcl, oldAcl.readAcl, "r");
 		findDeltas(entryList, tagList, newAcl.writeAcl, oldAcl.writeAcl, "w");
-		findDeltas(entryList, tagList, newAcl.executeAcl, oldAcl.executeAcl,
-				"x");
+		findDeltas(entryList, tagList, newAcl.executeAcl, oldAcl.executeAcl, "x");
 		if (entryList.size() > 0) {
-			VersionVector vvr = VersionedResourceUtils
-					.incrementResourceVersion(resource);
+			VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(resource);
 			TopicSet space = TopicSet.forPublisher(getClass());
-			PublisherTopic publisherTopic = space
-					.createPublisherTopic(GENII_ACL_CHANGE_TOPIC);
-			AclEntryListType entryArray = AxisAcl.encodeIdentityList(entryList,
-					false);
+			PublisherTopic publisherTopic = space.createPublisherTopic(GENII_ACL_CHANGE_TOPIC);
+			AclEntryListType entryArray = AxisAcl.encodeIdentityList(entryList, false);
 			String[] tagArray = tagList.toArray(new String[0]);
-			publisherTopic.publish(new AclChangeContents(entryArray, tagArray,
-					vvr));
+			publisherTopic.publish(new AclChangeContents(entryArray, tagArray, vvr));
 		}
 	}
 
-	private static void findDeltas(List<AclEntry> entryList,
-			List<String> tagList, Collection<AclEntry> newAcl,
-			Collection<AclEntry> oldAcl, String mode) {
+	private static void findDeltas(List<AclEntry> entryList, List<String> tagList, Collection<AclEntry> newAcl,
+		Collection<AclEntry> oldAcl, String mode)
+	{
 		if (newAcl == null)
 			newAcl = new ArrayList<AclEntry>();
 		if (oldAcl == null)
@@ -504,16 +458,14 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 			Iterator<AclEntry> oldIter = oldAcl.iterator();
 			while ((!found) && oldIter.hasNext()) {
 				AclEntry oldEntry = oldIter.next();
-				if (((entry == null) && (oldEntry == null))
-						|| ((entry != null) && entry.equals(oldEntry))) {
+				if (((entry == null) && (oldEntry == null)) || ((entry != null) && entry.equals(oldEntry))) {
 					found = true;
 					oldIter.remove();
 				}
 			}
 			if (!found) {
 				if (_logger.isTraceEnabled())
-					_logger.trace("adding acl to list: " + entry == null ? "wildcard"
-							: entry);
+					_logger.trace("adding acl to list: " + entry == null ? "wildcard" : entry);
 				entryList.add(entry);
 				tagList.add("+" + mode);
 			}
@@ -522,20 +474,18 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 		while (oldIter.hasNext()) {
 			AclEntry oldEntry = oldIter.next();
 			if (_logger.isTraceEnabled())
-				_logger.trace("removing acl from list " + oldEntry == null ? "wildcard"
-						: oldEntry);
+				_logger.trace("removing acl from list " + oldEntry == null ? "wildcard" : oldEntry);
 			entryList.add(oldEntry);
 			tagList.add("-" + mode);
 		}
 	}
 
 	/**
-	 * Update the resource ACLs with the changes that have been applied to a
-	 * replica.
+	 * Update the resource ACLs with the changes that have been applied to a replica.
 	 */
-	public void receiveAuthZConfig(NotificationMessageContents message,
-			IResource resource) throws ResourceException,
-			AuthZSecurityException {
+	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource) throws ResourceException,
+		AuthZSecurityException
+	{
 		Acl acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
 		AclChangeContents contents = (AclChangeContents) message;
 		AclEntryListType encodedList = contents.aclEntryList();
@@ -545,8 +495,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics {
 			return;
 		String[] tagList = contents.tagList();
 		if ((tagList == null) || (tagList.length != length))
-			throw new AuthZSecurityException("AclChangeContents "
-					+ "entry list does not match tag list");
+			throw new AuthZSecurityException("AclChangeContents " + "entry list does not match tag list");
 		for (int idx = 0; idx < length; idx++) {
 			AclEntry entry = entryList.get(idx);
 			String tag = tagList[idx];

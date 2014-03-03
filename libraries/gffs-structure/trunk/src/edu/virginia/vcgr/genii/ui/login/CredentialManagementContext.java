@@ -16,7 +16,8 @@ import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 
-final public class CredentialManagementContext {
+final public class CredentialManagementContext
+{
 	private UIContext _uiContext;
 
 	private Collection<CredentialListener> _listeners = new LinkedList<CredentialListener>();
@@ -25,7 +26,8 @@ final public class CredentialManagementContext {
 	private LogoutAction _logoutAction;
 	private LogoutAllAction _logoutAllAction;
 
-	final protected void fireCredentialsChanged() {
+	final protected void fireCredentialsChanged()
+	{
 		Collection<CredentialListener> listeners;
 
 		synchronized (_listeners) {
@@ -36,7 +38,8 @@ final public class CredentialManagementContext {
 			listener.credentialsChanged(this);
 	}
 
-	CredentialManagementContext(UIContext uiContext) {
+	CredentialManagementContext(UIContext uiContext)
+	{
 		_uiContext = uiContext;
 
 		_loginAction = new LoginAction();
@@ -48,15 +51,16 @@ final public class CredentialManagementContext {
 		addCredentialListener(_logoutAllAction);
 	}
 
-	final public Collection<NuCredential> loginItems() {
-		TransientCredentials transientCredentials = TransientCredentials
-				.getTransientCredentials(_uiContext.callingContext());
+	final public Collection<NuCredential> loginItems()
+	{
+		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(_uiContext.callingContext());
 		return transientCredentials.getCredentials();
 	}
 
-	final public void logoutAll(Component source) {
-		int response = JOptionPane.showConfirmDialog(source,
-				"Are you sure you want to log out from all credentials?",
+	final public void logoutAll(Component source)
+	{
+		int response =
+			JOptionPane.showConfirmDialog(source, "Are you sure you want to log out from all credentials?",
 				"Logout All Confirmation", JOptionPane.YES_NO_OPTION);
 		if (response == JOptionPane.YES_OPTION) {
 			try {
@@ -64,129 +68,145 @@ final public class CredentialManagementContext {
 				_uiContext.callingContext().setActiveKeyAndCertMaterial(null);
 				fireCredentialsChanged();
 			} catch (Throwable cause) {
-				ErrorHandler
-						.handleError(_uiContext, (JComponent) source, cause);
+				ErrorHandler.handleError(_uiContext, (JComponent) source, cause);
 			}
 		}
 	}
 
-	final public void logout(Component source) {
+	final public void logout(Component source)
+	{
 		new LogoutDialog(source, this);
 	}
 
-	final public void logout(Component source, NuCredential[] credentials) {
-		TransientCredentials transientCredentials = TransientCredentials
-				.getTransientCredentials(_uiContext.callingContext());
+	final public void logout(Component source, NuCredential[] credentials)
+	{
+		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(_uiContext.callingContext());
 		for (NuCredential credential : credentials)
 			transientCredentials.remove(credential);
 		fireCredentialsChanged();
 	}
 
-	final public void login(Component source) {
-		Collection<NuCredential> credentials = LoginDialog.doLogin(source,
-				_uiContext);
+	final public void login(Component source)
+	{
+		Collection<NuCredential> credentials = LoginDialog.doLogin(source, _uiContext);
 		if (credentials != null) {
-			TransientCredentials.getTransientCredentials(
-					_uiContext.callingContext()).addAll(credentials);
+			TransientCredentials.getTransientCredentials(_uiContext.callingContext()).addAll(credentials);
 			fireCredentialsChanged();
 		}
 	}
 
-	final public void addCredentialListener(CredentialListener listener) {
+	final public void addCredentialListener(CredentialListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	final public void removeCredentialListener(CredentialListener listener) {
+	final public void removeCredentialListener(CredentialListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	final public Action loginAction() {
+	final public Action loginAction()
+	{
 		return _loginAction;
 	}
 
-	final public Action logoutAction() {
+	final public Action logoutAction()
+	{
 		return _logoutAction;
 	}
 
-	final public Action logoutAllAction() {
+	final public Action logoutAllAction()
+	{
 		return _logoutAllAction;
 	}
 
-	private class LoginAction extends AbstractAction implements
-			CredentialListener {
+	private class LoginAction extends AbstractAction implements CredentialListener
+	{
 		static final long serialVersionUID = 0L;
 
-		private LoginAction() {
+		private LoginAction()
+		{
 			super("Login");
 
 			evaluateStatus();
 		}
 
-		final private void evaluateStatus() {
+		final private void evaluateStatus()
+		{
 			// Nothing to do
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			login((Component) e.getSource());
 		}
 
 		@Override
-		final public void credentialsChanged(CredentialManagementContext context) {
+		final public void credentialsChanged(CredentialManagementContext context)
+		{
 			evaluateStatus();
 		}
 	}
 
-	private class LogoutAction extends AbstractAction implements
-			CredentialListener {
+	private class LogoutAction extends AbstractAction implements CredentialListener
+	{
 		static final long serialVersionUID = 0L;
 
-		private LogoutAction() {
+		private LogoutAction()
+		{
 			super("Logout");
 
 			evaluateStatus();
 		}
 
-		final private void evaluateStatus() {
+		final private void evaluateStatus()
+		{
 			setEnabled(!loginItems().isEmpty());
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			logout((Component) e.getSource());
 		}
 
 		@Override
-		final public void credentialsChanged(CredentialManagementContext context) {
+		final public void credentialsChanged(CredentialManagementContext context)
+		{
 			evaluateStatus();
 		}
 	}
 
-	private class LogoutAllAction extends AbstractAction implements
-			CredentialListener {
+	private class LogoutAllAction extends AbstractAction implements CredentialListener
+	{
 		static final long serialVersionUID = 0L;
 
-		private LogoutAllAction() {
+		private LogoutAllAction()
+		{
 			super("Logout All");
 
 			evaluateStatus();
 		}
 
-		final private void evaluateStatus() {
+		final private void evaluateStatus()
+		{
 			setEnabled(!loginItems().isEmpty());
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			logoutAll((Component) e.getSource());
 		}
 
 		@Override
-		final public void credentialsChanged(CredentialManagementContext context) {
+		final public void credentialsChanged(CredentialManagementContext context)
+		{
 			evaluateStatus();
 		}
 	}

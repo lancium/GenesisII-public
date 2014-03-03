@@ -24,8 +24,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 @SuppressWarnings("rawtypes")
-public class MenuDialog<EntryType> extends JDialog implements ActionListener,
-		ListSelectionListener {
+public class MenuDialog<EntryType> extends JDialog implements ActionListener, ListSelectionListener
+{
 	static final long serialVersionUID = 0L;
 	static private Log _logger = LogFactory.getLog(MenuDialog.class);
 
@@ -42,7 +42,8 @@ public class MenuDialog<EntryType> extends JDialog implements ActionListener,
 
 	static SynchronousQueue<Object> waitingQueue = new SynchronousQueue<Object>();
 
-	private Object[] createListContents(Collection<?> entries) {
+	private Object[] createListContents(Collection<?> entries)
+	{
 		Object[] ret = new Object[entries.size()];
 		entries.toArray(ret);
 
@@ -50,7 +51,8 @@ public class MenuDialog<EntryType> extends JDialog implements ActionListener,
 	}
 
 	@SuppressWarnings("unchecked")
-	private MenuDialog(String title, String prompt, Collection<?> entries) {
+	private MenuDialog(String title, String prompt, Collection<?> entries)
+	{
 		super();
 
 		setTitle(title);
@@ -58,14 +60,11 @@ public class MenuDialog<EntryType> extends JDialog implements ActionListener,
 
 		container.setLayout(new GridBagLayout());
 
-		container.add(new JLabel(prompt), new GridBagConstraints(0, 0, 2, 1,
-				1.0, 1.0, GridBagConstraints.WEST,
-				GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JLabel(prompt), new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.WEST,
+			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
-		container.add(new JScrollPane(_list = new JList(
-				createListContents(entries))), new GridBagConstraints(0, 1, 2,
-				1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH,
-				new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JScrollPane(_list = new JList(createListContents(entries))), new GridBagConstraints(0, 1, 2, 1, 1.0,
+			1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		_list.addListSelectionListener(this);
 		_list.addMouseListener(new ActionJList(_list));
@@ -73,22 +72,21 @@ public class MenuDialog<EntryType> extends JDialog implements ActionListener,
 		JButton button = new JButton("OK");
 		button.setActionCommand(_OK_ACTION);
 		button.addActionListener(this);
-		container.add(button, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0,
-				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
-						10, 10, 10, 10), 10, 10));
+		container.add(button, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			new Insets(10, 10, 10, 10), 10, 10));
 		_okButton = button;
 		_okButton.setEnabled(false);
 
 		button = new JButton("Cancel");
 		button.setActionCommand(_CANCEL_ACTION);
 		button.addActionListener(this);
-		container.add(button, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0,
-				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
-						10, 10, 10, 10), 10, 10));
+		container.add(button, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			new Insets(10, 10, 10, 10), 10, 10));
 	}
 
 	@SuppressWarnings("unchecked")
-	public void actionPerformed(ActionEvent arg0) {
+	public void actionPerformed(ActionEvent arg0)
+	{
 		try {
 			if (arg0.getActionCommand().equals(_CANCEL_ACTION))
 				waitingQueue.put(new String("cancel"));
@@ -102,18 +100,19 @@ public class MenuDialog<EntryType> extends JDialog implements ActionListener,
 	}
 
 	@SuppressWarnings("unchecked")
-	static public <EntryType> EntryType getMenuSelection(String t, String p,
-			Collection<? extends EntryType> e) {
+	static public <EntryType> EntryType getMenuSelection(String t, String p, Collection<? extends EntryType> e)
+	{
 		MenuDialog.entries = e;
 		MenuDialog.title = t;
 		MenuDialog.prompt = p;
 
 		// Swing thread-safe initializer
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		javax.swing.SwingUtilities.invokeLater(new Runnable()
+		{
 
-			public void run() {
-				MenuDialog<EntryType> mDialog = new MenuDialog<EntryType>(
-						title, prompt, entries);
+			public void run()
+			{
+				MenuDialog<EntryType> mDialog = new MenuDialog<EntryType>(title, prompt, entries);
 				mDialog.pack();
 				GuiUtils.centerComponent(mDialog);
 				mDialog.setAlwaysOnTop(true);
@@ -124,8 +123,7 @@ public class MenuDialog<EntryType> extends JDialog implements ActionListener,
 		});
 		try {
 			Object toReturn = waitingQueue.take();
-			if (toReturn instanceof String
-					&& ((String) toReturn).equals("cancel")) {
+			if (toReturn instanceof String && ((String) toReturn).equals("cancel")) {
 				return null;
 			} else {
 				return (EntryType) toReturn;
@@ -136,7 +134,8 @@ public class MenuDialog<EntryType> extends JDialog implements ActionListener,
 		}
 	}
 
-	public void valueChanged(ListSelectionEvent e) {
+	public void valueChanged(ListSelectionEvent e)
+	{
 		int[] selected = _list.getSelectedIndices();
 		if (selected == null || selected.length == 0)
 			_okButton.setEnabled(false);
@@ -144,14 +143,17 @@ public class MenuDialog<EntryType> extends JDialog implements ActionListener,
 			_okButton.setEnabled(true);
 	}
 
-	private class ActionJList extends MouseAdapter {
+	private class ActionJList extends MouseAdapter
+	{
 		protected JList _list;
 
-		public ActionJList(JList l) {
+		public ActionJList(JList l)
+		{
 			_list = l;
 		}
 
-		public void mouseClicked(MouseEvent e) {
+		public void mouseClicked(MouseEvent e)
+		{
 			if (e.getClickCount() == 2) {
 				int index = _list.locationToIndex(e.getPoint());
 				_list.ensureIndexIsVisible(index);

@@ -9,9 +9,11 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class DBSubscriptionResourceFactory extends BasicDBResourceFactory {
+public class DBSubscriptionResourceFactory extends BasicDBResourceFactory
+{
 	@Override
-	protected void createTables() throws SQLException {
+	protected void createTables() throws SQLException
+	{
 		Connection conn = null;
 		super.createTables();
 
@@ -24,14 +26,14 @@ public class DBSubscriptionResourceFactory extends BasicDBResourceFactory {
 		}
 	}
 
-	public DBSubscriptionResourceFactory(ServerDatabaseConnectionPool pool)
-			throws SQLException {
+	public DBSubscriptionResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
+	{
 		super(pool);
 	}
 
 	@Override
-	public IResource instantiate(ResourceKey parentKey)
-			throws ResourceException {
+	public IResource instantiate(ResourceKey parentKey) throws ResourceException
+	{
 		try {
 			return new DBSubscriptionResource((ResourceKey) parentKey, _pool);
 		} catch (SQLException sqe) {

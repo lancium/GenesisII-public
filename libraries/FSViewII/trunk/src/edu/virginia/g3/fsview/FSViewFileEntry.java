@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public interface FSViewFileEntry extends FSViewEntry {
+public interface FSViewFileEntry extends FSViewEntry
+{
 	public FSViewFileEntryType fileType();
 
 	public Long size();

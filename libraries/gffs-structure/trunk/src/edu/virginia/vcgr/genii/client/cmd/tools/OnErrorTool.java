@@ -6,21 +6,23 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class OnErrorTool extends BaseGridTool {
+public class OnErrorTool extends BaseGridTool
+{
 	static final private String _DESCRIPTION = "config/tooldocs/description/donerror";
 	static final private String _USAGE = "config/tooldocs/usage/uonerror";
 	static final private String _MANPAGE = "config/tooldocs/man/onerror";
 
 	static private Log _logger = LogFactory.getLog(OnErrorTool.class);
 
-	public OnErrorTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false);
+	public OnErrorTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		// if no previous error, then no harm no foul and no error now.
 		if (getLastExit() == 0)
 			return 0;
@@ -43,11 +45,13 @@ public class OnErrorTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 	}
 
 	@Override
-	public void addArgument(String argument) {
+	public void addArgument(String argument)
+	{
 		_arguments.add(argument);
 	}
 }

@@ -12,9 +12,10 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class QueueUtils {
-	static private final byte[] serializeIdentity(Identity id)
-			throws IOException {
+public class QueueUtils
+{
+	static private final byte[] serializeIdentity(Identity id) throws IOException
+	{
 		ByteArrayOutputStream baos = null;
 		ObjectOutputStream oos = null;
 
@@ -29,8 +30,8 @@ public class QueueUtils {
 		}
 	}
 
-	static public final byte[][] serializeIdentities(
-			Collection<Identity> identities) throws IOException {
+	static public final byte[][] serializeIdentities(Collection<Identity> identities) throws IOException
+	{
 		byte[][] ret = new byte[identities.size()][];
 		int lcv = 0;
 		for (Identity identity : identities) {
@@ -40,8 +41,8 @@ public class QueueUtils {
 		return ret;
 	}
 
-	static private final Identity deserializeIdentity(byte[] data)
-			throws IOException, ClassNotFoundException {
+	static private final Identity deserializeIdentity(byte[] data) throws IOException, ClassNotFoundException
+	{
 		ByteArrayInputStream bais = null;
 		ObjectInputStream ois = null;
 
@@ -54,8 +55,8 @@ public class QueueUtils {
 		}
 	}
 
-	static public final Collection<Identity> deserializeIdentities(byte[][] data)
-			throws IOException, ClassNotFoundException {
+	static public final Collection<Identity> deserializeIdentities(byte[][] data) throws IOException, ClassNotFoundException
+	{
 		ArrayList<Identity> ret = new ArrayList<Identity>();
 
 		for (byte[] id : data) {

@@ -27,7 +27,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
-public class CopyTool extends BaseGridTool {
+public class CopyTool extends BaseGridTool
+{
 	static private final String _DESCRIPTION = "config/tooldocs/description/dcp";
 	static private final String _USAGE = "config/tooldocs/usage/ucp";
 	static private final String _MANPAGE = "config/tooldocs/man/cp";
@@ -42,35 +43,40 @@ public class CopyTool extends BaseGridTool {
 	RNSPath _logLocation = null;
 
 	@Option({ "recursive", "r" })
-	public void setRecursive() {
+	public void setRecursive()
+	{
 		isRecursive = true;
 	}
 
 	@Option({ "force", "f" })
-	public void setForce() {
+	public void setForce()
+	{
 		isForced = true;
 	}
 
 	@Option({ "reliable" })
-	public void setReliable(String logLocationStr) {
+	public void setReliable(String logLocationStr)
+	{
 		isReliable = true;
 		_logLocationStr = logLocationStr;
 	}
 
 	@Option({ "reliable-on-local" })
-	public void setReliableOnLocal(String logLocationStr) {
+	public void setReliableOnLocal(String logLocationStr)
+	{
 		isReliableOnLocal = true;
 		_logLocationStr = logLocationStr;
 	}
 
-	public CopyTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.DATA);
+	public CopyTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		if (isReliable) {
 
 			// RunTool.submitJob(jsdlFileName, besContainer, optJobName, null)
@@ -82,14 +88,12 @@ public class CopyTool extends BaseGridTool {
 		int toReturn = 0;
 		for (int i = 0; i < numArguments() - 1; i++) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("CopyTool: copying from " + getArgument(i)
-						+ " to " + argLast);
-			PathOutcome ret = copy(getArgument(i), argLast, isRecursive,
-					isForced, _logLocation, stderr);
+				_logger.debug("CopyTool: copying from " + getArgument(i) + " to " + argLast);
+			PathOutcome ret = copy(getArgument(i), argLast, isRecursive, isForced, _logLocation, stderr);
 
 			if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
-				String msg = "Failed to copy from " + getArgument(i) + " to "
-						+ argLast + " because " + PathOutcome.outcomeText(ret)
+				String msg =
+					"Failed to copy from " + getArgument(i) + " to " + argLast + " because " + PathOutcome.outcomeText(ret)
 						+ ".";
 				stderr.println(msg);
 				_logger.error(msg);
@@ -100,14 +104,14 @@ public class CopyTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() < 2)
 			throw new InvalidToolUsageException();
 		if (isReliable || isReliableOnLocal) {
 			RNSPath current = RNSPath.getCurrent();
 			try {
-				_logLocation = current.lookup(_logLocationStr,
-						RNSPathQueryFlags.DONT_CARE);
+				_logLocation = current.lookup(_logLocationStr, RNSPathQueryFlags.DONT_CARE);
 				if (!_logLocation.exists()) {
 
 					_logLocation.createNewFile();
@@ -115,20 +119,15 @@ public class CopyTool extends BaseGridTool {
 					Document doc = null;
 
 					try {
-						dBuilder = DocumentBuilderFactory.newInstance()
-								.newDocumentBuilder();
+						dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 						doc = dBuilder.newDocument();
 						Element rootElement = doc.createElement("files");
 						doc.appendChild(rootElement);
 
-						TransformerFactory transformerFactory = TransformerFactory
-								.newInstance();
-						Transformer transformer = transformerFactory
-								.newTransformer();
+						TransformerFactory transformerFactory = TransformerFactory.newInstance();
+						Transformer transformer = transformerFactory.newTransformer();
 						DOMSource source = new DOMSource(doc);
-						StreamResult result = new StreamResult(
-								new RandomByteIOOutputStream(
-										_logLocation.getEndpoint()));
+						StreamResult result = new StreamResult(new RandomByteIOOutputStream(_logLocation.getEndpoint()));
 						transformer.transform(source, result);
 					} catch (ParserConfigurationException e) {
 						_logger.error("caught ParserConfigurationException", e);
@@ -139,32 +138,27 @@ public class CopyTool extends BaseGridTool {
 					}
 				}
 			} catch (RNSException e) {
-				throw new InvalidToolUsageException(
-						"Cannot create log at given location");
+				throw new InvalidToolUsageException("Cannot create log at given location");
 			}
 
 		}
 	}
 
 	/**
-	 * performs a copy operation from a source to a target. if the source or
-	 * target mention grid: or local:, then those are used. otherwise this
-	 * assumes both are in grid: space.
+	 * performs a copy operation from a source to a target. if the source or target mention grid: or
+	 * local:, then those are used. otherwise this assumes both are in grid: space.
 	 */
-	public static PathOutcome copy(String sourcePath, String targetPath,
-			boolean recursive, boolean force, RNSPath logLocation,
-			PrintWriter stderr) {
+	public static PathOutcome copy(String sourcePath, String targetPath, boolean recursive, boolean force, RNSPath logLocation,
+		PrintWriter stderr)
+	{
 		if ((sourcePath == null) || (targetPath == null))
 			return PathOutcome.OUTCOME_NOTHING;
-		PathOutcome toReturn = PathOutcome.OUTCOME_ERROR; // until we know more
-															// specifically.
+		PathOutcome toReturn = PathOutcome.OUTCOME_ERROR; // until we know more specifically.
 		if (!recursive) {
-			toReturn = CopyMachine.copyOneFile(sourcePath, targetPath,
-					logLocation);
+			toReturn = CopyMachine.copyOneFile(sourcePath, targetPath, logLocation);
 		} else {
 			// do a recursive copy by traversing source.
-			CopyMachine mimeo = new CopyMachine(sourcePath, targetPath, null,
-					force, stderr, logLocation);
+			CopyMachine mimeo = new CopyMachine(sourcePath, targetPath, null, force, stderr, logLocation);
 			toReturn = mimeo.copyTree();
 		}
 		return toReturn;

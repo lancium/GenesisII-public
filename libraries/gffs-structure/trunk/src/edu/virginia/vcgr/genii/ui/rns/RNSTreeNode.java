@@ -21,7 +21,8 @@ import edu.virginia.vcgr.genii.ui.progress.Task;
 import edu.virginia.vcgr.genii.ui.progress.TaskCompletionListener;
 import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 
-public class RNSTreeNode extends DefaultMutableTreeNode {
+public class RNSTreeNode extends DefaultMutableTreeNode
+{
 	static final long serialVersionUID = 0L;
 
 	static final private int DEFAULT_GC_WINDOW = 1000 * 16;
@@ -30,7 +31,8 @@ public class RNSTreeNode extends DefaultMutableTreeNode {
 	private RNSTreeNodeState _nodeState;
 	private Timer _gcTimer = null;
 
-	RNSTreeNode(RNSTreeNode original) {
+	RNSTreeNode(RNSTreeNode original)
+	{
 		super(original.getUserObject(), original.allowsChildren);
 		_nodeState = original._nodeState;
 
@@ -43,7 +45,8 @@ public class RNSTreeNode extends DefaultMutableTreeNode {
 			_gcTimer = new Timer(DEFAULT_GC_WINDOW, _gcListener);
 	}
 
-	public RNSTreeNode(RNSTreeObject object) {
+	public RNSTreeNode(RNSTreeObject object)
+	{
 		super(object, object.allowsChildren());
 
 		if (allowsChildren) {
@@ -53,7 +56,8 @@ public class RNSTreeNode extends DefaultMutableTreeNode {
 			_nodeState = RNSTreeNodeState.EXPANDED;
 	}
 
-	RNSTreeNode lookup(String name) {
+	RNSTreeNode lookup(String name)
+	{
 		for (Object child : children) {
 			if (child.toString().equals(name))
 				return (RNSTreeNode) child;
@@ -62,11 +66,13 @@ public class RNSTreeNode extends DefaultMutableTreeNode {
 		return null;
 	}
 
-	RNSTreeNodeState nodeState() {
+	RNSTreeNodeState nodeState()
+	{
 		return _nodeState;
 	}
 
-	void collapse() {
+	void collapse()
+	{
 		if (_gcTimer != null)
 			_gcTimer.stop();
 		_gcTimer = new Timer(DEFAULT_GC_WINDOW, _gcListener);
@@ -74,13 +80,15 @@ public class RNSTreeNode extends DefaultMutableTreeNode {
 		_gcTimer.start();
 	}
 
-	void noteExpansion() {
+	void noteExpansion()
+	{
 		if (_gcTimer != null)
 			_gcTimer.stop();
 		_gcTimer = null;
 	}
 
-	void expand(RNSTree tree) {
+	void expand(RNSTree tree)
+	{
 		if (_nodeState == RNSTreeNodeState.EXPANDING)
 			return;
 
@@ -90,48 +98,44 @@ public class RNSTreeNode extends DefaultMutableTreeNode {
 		model.reload(RNSTreeNode.this);
 
 		RNSFilledInTreeObject object = (RNSFilledInTreeObject) getUserObject();
-		model.uiContext()
-				.progressMonitorFactory()
-				.createMonitor(
-						tree,
-						null,
-						null,
-						1000L * 1000,
-						new ExpansionTask(model.uiContext().callingContext(),
-								object.path()),
-						new ExpansionCompletionListener(tree, model.uiContext()))
-				.start();
+		model
+			.uiContext()
+			.progressMonitorFactory()
+			.createMonitor(tree, null, null, 1000L * 1000,
+				new ExpansionTask(model.uiContext().callingContext(), object.path()),
+				new ExpansionCompletionListener(tree, model.uiContext())).start();
 	}
 
-	public void refresh(RNSTree tree) {
+	public void refresh(RNSTree tree)
+	{
 		expand(tree);
 	}
 
-	private class ExpansionTask extends AbstractTask<RNSPath[]> {
+	private class ExpansionTask extends AbstractTask<RNSPath[]>
+	{
 		private RNSPath _parent;
 		private ICallingContext _context;
 		private LoggingContext logContext;
 
-		private ExpansionTask(ICallingContext context, RNSPath parent) {
+		private ExpansionTask(ICallingContext context, RNSPath parent)
+		{
 			_context = context;
 			_parent = parent;
 			try {
-				logContext = (LoggingContext) LoggingContext
-						.getCurrentLoggingContext().clone();
+				logContext = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				logContext = new LoggingContext();
 			}
 		}
 
 		@Override
-		public RNSPath[] execute(TaskProgressListener progressListener)
-				throws Exception {
+		public RNSPath[] execute(TaskProgressListener progressListener) throws Exception
+		{
 			LoggingContext.assumeLoggingContext(logContext);
 			IContextResolver resolver = ContextManager.getResolver();
 
 			try {
-				ContextManager.setResolver(new MemoryBasedContextResolver(
-						_context));
+				ContextManager.setResolver(new MemoryBasedContextResolver(_context));
 				return _parent.listContents().toArray(new RNSPath[0]);
 			} finally {
 				ContextManager.setResolver(resolver);
@@ -139,28 +143,32 @@ public class RNSTreeNode extends DefaultMutableTreeNode {
 		}
 
 		@Override
-		public boolean showProgressDialog() {
+		public boolean showProgressDialog()
+		{
 			return false;
 		}
 	}
 
-	private class ExpansionCompletionListener implements
-			TaskCompletionListener<RNSPath[]> {
+	private class ExpansionCompletionListener implements TaskCompletionListener<RNSPath[]>
+	{
 		private UIContext _context;
 		private RNSTree _tree;
 
-		private ExpansionCompletionListener(RNSTree tree, UIContext context) {
+		private ExpansionCompletionListener(RNSTree tree, UIContext context)
+		{
 			_context = context;
 			_tree = tree;
 		}
 
 		@Override
-		public void taskCancelled(Task<RNSPath[]> task) {
+		public void taskCancelled(Task<RNSPath[]> task)
+		{
 			// This shouldn't happen -- no cancels allowed.
 		}
 
 		@Override
-		public void taskCompleted(Task<RNSPath[]> task, RNSPath[] result) {
+		public void taskCompleted(Task<RNSPath[]> task, RNSPath[] result)
+		{
 			RNSTreeModel model = (RNSTreeModel) _tree.getModel();
 
 			removeAllChildren();
@@ -178,7 +186,8 @@ public class RNSTreeNode extends DefaultMutableTreeNode {
 		}
 
 		@Override
-		public void taskExcepted(Task<RNSPath[]> task, Throwable cause) {
+		public void taskExcepted(Task<RNSPath[]> task, Throwable cause)
+		{
 			RNSTreeModel model = (RNSTreeModel) _tree.getModel();
 
 			removeAllChildren();
@@ -192,9 +201,11 @@ public class RNSTreeNode extends DefaultMutableTreeNode {
 		}
 	}
 
-	private class GCListener implements ActionListener {
+	private class GCListener implements ActionListener
+	{
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)
+		{
 			removeAllChildren();
 			add(new RNSTreeNode(DefaultRNSTreeObject.createExpandingObject()));
 			_nodeState = RNSTreeNodeState.NEEDS_EXPANSION;

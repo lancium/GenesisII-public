@@ -26,27 +26,26 @@ import edu.virginia.vcgr.jsdl.spmd.SPMDApplication;
 import edu.virginia.vcgr.jsdl.sweep.Sweep;
 
 /**
- * This utility class provides a singleton JAXBContext that can be used to
- * create JAXB Marshallers and Unmarshallers for XML serializing and
- * deserializing of JSDL documents.
+ * This utility class provides a singleton JAXBContext that can be used to create JAXB Marshallers
+ * and Unmarshallers for XML serializing and deserializing of JSDL documents.
  * 
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class JSDLUtility {
+public class JSDLUtility
+{
 	/**
-	 * The singleton JAXBContext that one should by default use to create JSDL
-	 * Marshallers and Unmarshallers.
+	 * The singleton JAXBContext that one should by default use to create JSDL Marshallers and
+	 * Unmarshallers.
 	 */
 	static public JAXBContext JSDLContext;
 
 	static {
 		try {
-			JSDLContext = JAXBContext.newInstance(JobDefinition.class,
-					Sweep.class, POSIXApplication.class,
-					HPCProfileApplication.class, SPMDApplication.class);
+			JSDLContext =
+				JAXBContext.newInstance(JobDefinition.class, Sweep.class, POSIXApplication.class, HPCProfileApplication.class,
+					SPMDApplication.class);
 		} catch (JAXBException e) {
-			throw new RuntimeException(
-					"Unable to configure JSDL JAXB Context.", e);
+			throw new RuntimeException("Unable to configure JSDL JAXB Context.", e);
 		}
 	}
 }

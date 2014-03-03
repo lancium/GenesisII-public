@@ -51,51 +51,48 @@ import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl
-		implements ApplicationDescriptionPortType {
-	static private Log _logger = LogFactory
-			.getLog(ApplicationDescriptionServiceImpl.class);
+public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl implements ApplicationDescriptionPortType
+{
+	static private Log _logger = LogFactory.getLog(ApplicationDescriptionServiceImpl.class);
 
-	static final public String APPLICATION_DESCRIPTION_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.appdesc.app_desc_property";
-	static final public String APPLICATION_VERSION_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.appdesc.app_vers_property";
+	static final public String APPLICATION_DESCRIPTION_PROPERTY_NAME =
+		"edu.virginia.vcgr.genii.container.appdesc.app_desc_property";
+	static final public String APPLICATION_VERSION_PROPERTY_NAME =
+		"edu.virginia.vcgr.genii.container.appdesc.app_vers_property";
 
 	@Override
-	protected void setAttributeHandlers() throws NoSuchMethodException,
-			ResourceException, ResourceUnknownFaultType {
+	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
+	{
 		super.setAttributeHandlers();
 
 		new ApplicationDescriptionAttributeHandler(getAttributePackage());
 	}
 
 	@Override
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType myEPR,
-			ConstructionParameters cParams, GenesisHashMap creationParameters,
-			Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException {
-		super.postCreate(rKey, myEPR, cParams, creationParameters,
-				resolverCreationParams);
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
+	{
+		super.postCreate(rKey, myEPR, cParams, creationParameters, resolverCreationParams);
 
 		IResource resource = rKey.dereference();
 
 		org.apache.axis.message.MessageElement elem;
 
-		elem = creationParameters
-				.getAxisMessageElement(ApplicationDescriptionCreator.APPLICATION_NAME_CREATION_PARAMETER);
+		elem = creationParameters.getAxisMessageElement(ApplicationDescriptionCreator.APPLICATION_NAME_CREATION_PARAMETER);
 		if (elem != null)
-			resource.setProperty(APPLICATION_DESCRIPTION_PROPERTY_NAME,
-					elem.getValue());
+			resource.setProperty(APPLICATION_DESCRIPTION_PROPERTY_NAME, elem.getValue());
 
-		elem = creationParameters
-				.getAxisMessageElement(ApplicationDescriptionCreator.APPLICATION_VERSION_CREATION_PARAMETER);
+		elem = creationParameters.getAxisMessageElement(ApplicationDescriptionCreator.APPLICATION_VERSION_CREATION_PARAMETER);
 		if (elem != null) {
 			String value = elem.getValue();
 			if (value != null)
-				resource.setProperty(APPLICATION_VERSION_PROPERTY_NAME,
-						new ApplicationVersion(elem.getValue()));
+				resource.setProperty(APPLICATION_VERSION_PROPERTY_NAME, new ApplicationVersion(elem.getValue()));
 		}
 	}
 
-	public ApplicationDescriptionServiceImpl() throws RemoteException {
+	public ApplicationDescriptionServiceImpl() throws RemoteException
+	{
 		super("ApplicationDescriptionPortType");
 
 		addImplementedPortType(WellKnownPortTypes.APPDESC_PORT_TYPE());
@@ -103,19 +100,15 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl
 
 	@RWXMapping(RWXCategory.EXECUTE)
 	public CreateDeploymentDocumentResponseType createDeploymentDocument(
-			CreateDeploymentDocumentRequestType createDeploymentDocumentRequest)
-			throws RemoteException, DeploymentExistsFaultType {
+		CreateDeploymentDocumentRequestType createDeploymentDocumentRequest) throws RemoteException, DeploymentExistsFaultType
+	{
 		String name = createDeploymentDocumentRequest.getName();
-		DeploymentDocumentType deployDoc = createDeploymentDocumentRequest
-				.getDeploymentDocument();
+		DeploymentDocumentType deployDoc = createDeploymentDocumentRequest.getDeploymentDocument();
 
-		URI deploymentType = ApplicationDescriptionUtils
-				.determineDeploymentType(deployDoc);
-		PlatformDescriptionType[] platformDesc = deployDoc
-				.getPlatformDescription();
+		URI deploymentType = ApplicationDescriptionUtils.determineDeploymentType(deployDoc);
+		PlatformDescriptionType[] platformDesc = deployDoc.getPlatformDescription();
 
-		SupportDocumentType supportDoc = new SupportDocumentType(platformDesc,
-				null, deploymentType);
+		SupportDocumentType supportDoc = new SupportDocumentType(platformDesc, null, deploymentType);
 
 		CreateFileRequestType createFile = new CreateFileRequestType(name);
 		EndpointReferenceType newFile = null;
@@ -124,26 +117,17 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl
 
 		try {
 			CreateFileResponseType response = null;
-			response = super
-					.createFile(
-							createFile,
-							new MessageElement[] { new MessageElement(
-									ApplicationDescriptionConstants.SUPPORT_DOCUMENT_ATTR_QNAME,
-									supportDoc) });
+			response =
+				super.createFile(createFile, new MessageElement[] { new MessageElement(
+					ApplicationDescriptionConstants.SUPPORT_DOCUMENT_ATTR_QNAME, supportDoc) });
 			newFile = response.getEndpoint();
 			bos = ByteIOStreamFactory.createOutputStream(newFile);
 			writer = new OutputStreamWriter(bos);
-			ObjectSerializer
-					.serialize(
-							writer,
-							deployDoc,
-							new QName(
-									"http://vcgr.cs.virginia.edu/genii/application-description",
-									"deployment-description"));
+			ObjectSerializer.serialize(writer, deployDoc, new QName(
+				"http://vcgr.cs.virginia.edu/genii/application-description", "deployment-description"));
 			writer.flush();
 
-			CreateDeploymentDocumentResponseType ret = new CreateDeploymentDocumentResponseType(
-					newFile);
+			CreateDeploymentDocumentResponseType ret = new CreateDeploymentDocumentResponseType(newFile);
 			newFile = null;
 			return ret;
 		} catch (IOException ioe) {
@@ -153,8 +137,7 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl
 
 			if (newFile != null) {
 				try {
-					GeniiCommon common = ClientUtils.createProxy(
-							GeniiCommon.class, newFile);
+					GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, newFile);
 					common.destroy(new Destroy());
 				} catch (Throwable t) {
 					_logger.error(t);
@@ -164,28 +147,21 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl
 	}
 
 	@Override
-	protected RNSEntryResponseType add(RNSEntryType entry)
-			throws RemoteException {
-		if (entry == null || entry.getEndpoint() == null
-				|| entry.getEntryName() == null) {
-			throw FaultManipulator
-					.fillInFault(new BaseFaultType(
-							null,
-							null,
-							null,
-							null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-									"The \"add\" operation is only limitedly supported for this service.") },
-							null));
+	protected RNSEntryResponseType add(RNSEntryType entry) throws RemoteException
+	{
+		if (entry == null || entry.getEndpoint() == null || entry.getEntryName() == null) {
+			throw FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
+				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+					"The \"add\" operation is only limitedly supported for this service.") }, null));
 		}
 
 		return super.add(entry);
 	}
 
 	@RWXMapping(RWXCategory.READ)
-	public OpenStreamResponse openStream(Object openStreamRequest)
-			throws RemoteException, ResourceCreationFaultType,
-			ResourceUnknownFaultType {
+	public OpenStreamResponse openStream(Object openStreamRequest) throws RemoteException, ResourceCreationFaultType,
+		ResourceUnknownFaultType
+	{
 		return null;
 	}
 }

@@ -10,38 +10,43 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork
-		implements RandomByteIOResourceFork {
-	final private VExportFile getTarget() throws IOException {
+public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork implements RandomByteIOResourceFork
+{
+	final private VExportFile getTarget() throws IOException
+	{
 		return LightWeightExportUtils.getFile(getForkPath());
 	}
 
-	public LightWeightExportFileFork(ResourceForkService service,
-			String forkPath) {
+	public LightWeightExportFileFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void read(long offset, ByteBuffer dest) throws IOException {
+	public void read(long offset, ByteBuffer dest) throws IOException
+	{
 		getTarget().read(offset, dest);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void truncAppend(long offset, ByteBuffer source) throws IOException {
+	public void truncAppend(long offset, ByteBuffer source) throws IOException
+	{
 		getTarget().truncAppend(offset, source);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void write(long offset, ByteBuffer source) throws IOException {
+	public void write(long offset, ByteBuffer source) throws IOException
+	{
 		getTarget().write(offset, source);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Calendar accessTime() {
+	public Calendar accessTime()
+	{
 		try {
 			return getTarget().accessTime();
 		} catch (IOException ioe) {
@@ -51,7 +56,8 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void accessTime(Calendar newTime) {
+	public void accessTime(Calendar newTime)
+	{
 		try {
 			getTarget().accessTime(newTime);
 		} catch (IOException ioe) {
@@ -60,7 +66,8 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Calendar createTime() {
+	public Calendar createTime()
+	{
 		try {
 			return getTarget().createTime();
 		} catch (IOException ioe) {
@@ -70,7 +77,8 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public Calendar modificationTime() {
+	public Calendar modificationTime()
+	{
 		try {
 			return getTarget().modificationTime();
 		} catch (IOException ioe) {
@@ -80,7 +88,8 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void modificationTime(Calendar newTime) {
+	public void modificationTime(Calendar newTime)
+	{
 		try {
 			getTarget().modificationTime(newTime);
 		} catch (IOException ioe) {
@@ -89,7 +98,8 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public boolean readable() {
+	public boolean readable()
+	{
 		try {
 			return getTarget().readable();
 		} catch (IOException ioe) {
@@ -99,7 +109,8 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public long size() {
+	public long size()
+	{
 		try {
 			return getTarget().size();
 		} catch (IOException ioe) {
@@ -108,7 +119,8 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork
 	}
 
 	@Override
-	public boolean writable() {
+	public boolean writable()
+	{
 		try {
 			return getTarget().writable();
 		} catch (IOException ioe) {

@@ -2,52 +2,60 @@ package org.morgan.util.cache;
 
 import java.util.HashMap;
 
-public class LRUCache<KeyType, DataType> extends
-		AbstractCache<KeyType, DataType> {
+public class LRUCache<KeyType, DataType> extends AbstractCache<KeyType, DataType>
+{
 	private ICacheMissResolver<KeyType, DataType> _resolver;
 	private ICacheDataVerifier<KeyType, DataType> _verifier;
 
-	static private class DataTypeNode<KeyType, DataType> {
+	static private class DataTypeNode<KeyType, DataType>
+	{
 		private KeyType _key;
 		private DataType _data;
 
 		private DataTypeNode<KeyType, DataType> _previous;
 		private DataTypeNode<KeyType, DataType> _next;
 
-		public DataTypeNode(KeyType key, DataType data,
-				DataTypeNode<KeyType, DataType> previous,
-				DataTypeNode<KeyType, DataType> next) {
+		public DataTypeNode(KeyType key, DataType data, DataTypeNode<KeyType, DataType> previous,
+			DataTypeNode<KeyType, DataType> next)
+		{
 			_key = key;
 			_data = data;
 			_previous = previous;
 			_next = next;
 		}
 
-		public DataTypeNode(KeyType key, DataType data) {
+		public DataTypeNode(KeyType key, DataType data)
+		{
 			this(key, data, null, null);
 		}
 
-		public KeyType getKey() {
+		public KeyType getKey()
+		{
 			return _key;
 		}
 
-		public DataType getData() {
+		public DataType getData()
+		{
 			return _data;
 		}
 
-		public void previous(DataTypeNode<KeyType, DataType> node) {
+		public void previous(DataTypeNode<KeyType, DataType> node)
+		{
 			_previous = node;
 		}
 
-		public DataTypeNode<KeyType, DataType> previous() {
+		public DataTypeNode<KeyType, DataType> previous()
+		{
 			return _previous;
 		}
 
-		public void next(DataTypeNode<KeyType, DataType> node) {
+		public void next(DataTypeNode<KeyType, DataType> node)
+		{
 			_next = node;
 		}
 
-		public DataTypeNode<KeyType, DataType> next() {
+		public DataTypeNode<KeyType, DataType> next()
+		{
 			return _next;
 		}
 	}
@@ -57,16 +65,14 @@ public class LRUCache<KeyType, DataType> extends
 	private DataTypeNode<KeyType, DataType> _head;
 	private DataTypeNode<KeyType, DataType> _tail;
 
-	public LRUCache(int capacity,
-			ICacheMissResolver<KeyType, DataType> resolver,
-			ICacheDataVerifier<KeyType, DataType> verifier) {
+	public LRUCache(int capacity, ICacheMissResolver<KeyType, DataType> resolver, ICacheDataVerifier<KeyType, DataType> verifier)
+	{
 		if (resolver == null)
 			throw new IllegalArgumentException("\"resolver\" must be non-null.");
 		if (verifier == null)
 			throw new IllegalArgumentException("\"verifier\" must be non-null.");
 		if (capacity < 8)
-			throw new IllegalArgumentException(
-					"\"capacity\" must be at least 8 elements.");
+			throw new IllegalArgumentException("\"capacity\" must be at least 8 elements.");
 
 		_resolver = resolver;
 		_verifier = verifier;
@@ -77,7 +83,8 @@ public class LRUCache<KeyType, DataType> extends
 	}
 
 	@Override
-	protected DataType miss(KeyType key) throws CacheMissException {
+	protected DataType miss(KeyType key) throws CacheMissException
+	{
 		DataType ret;
 		DataTypeNode<KeyType, DataType> node;
 		try {
@@ -110,7 +117,8 @@ public class LRUCache<KeyType, DataType> extends
 	}
 
 	@Override
-	protected DataType tableLookup(KeyType key) {
+	protected DataType tableLookup(KeyType key)
+	{
 		DataTypeNode<KeyType, DataType> node;
 
 		node = _table.get(key);
@@ -151,7 +159,8 @@ public class LRUCache<KeyType, DataType> extends
 	}
 
 	@Override
-	public void clear() {
+	public void clear()
+	{
 		_table.clear();
 
 		_head = _tail = null;

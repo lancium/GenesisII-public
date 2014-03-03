@@ -14,7 +14,8 @@ import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
-public class ByteIOTool extends BaseGridTool {
+public class ByteIOTool extends BaseGridTool
+{
 	static final private String _DESCRIPTION = "config/tooldocs/description/dbyteio";
 	static final private String _USAGE = "config/tooldocs/usage/ubyteio";
 
@@ -22,28 +23,32 @@ public class ByteIOTool extends BaseGridTool {
 	private boolean _write = false;
 	private boolean _append = false;
 
-	public ByteIOTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.DATA);
+	public ByteIOTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.DATA);
 	}
 
 	@Option({ "read", "r" })
-	public void setRead() {
+	public void setRead()
+	{
 		_read = true;
 	}
 
 	@Option({ "write", "w" })
-	public void setWrite() {
+	public void setWrite()
+	{
 		_write = true;
 	}
 
 	@Option({ "append", "a" })
-	public void setAppend() {
+	public void setAppend()
+	{
 		_append = true;
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		boolean ok1 = _read && !_write && !_append && (numArguments() == 3);
 		boolean ok2 = !_read && _write && !_append && (numArguments() == 3);
 		boolean ok3 = !_read && !_write && _append && (numArguments() == 2);
@@ -52,10 +57,10 @@ public class ByteIOTool extends BaseGridTool {
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		RNSPath current = RNSPath.getCurrent();
-		RNSPath rnsPath = current.lookup(getArgument(0),
-				RNSPathQueryFlags.MUST_EXIST);
+		RNSPath rnsPath = current.lookup(getArgument(0), RNSPathQueryFlags.MUST_EXIST);
 		EndpointReferenceType fileEPR = rnsPath.getEndpoint();
 		if (_read) {
 			long offset = Long.parseLong(getArgument(1));
@@ -74,40 +79,31 @@ public class ByteIOTool extends BaseGridTool {
 		return 0;
 	}
 
-	private void doRead(EndpointReferenceType fileEPR, long offset, int size)
-			throws IOException {
-		RandomByteIOPortType clientStub = ClientUtils.createProxy(
-				RandomByteIOPortType.class, fileEPR);
-		RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(
-				clientStub);
-		RandomByteIOTransferer transferer = factory
-				.createRandomByteIOTransferer();
+	private void doRead(EndpointReferenceType fileEPR, long offset, int size) throws IOException
+	{
+		RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, fileEPR);
+		RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
+		RandomByteIOTransferer transferer = factory.createRandomByteIOTransferer();
 		byte[] data = transferer.read(offset, size, 1, 0);
 		String text = new String(data);
 		stdout.println(text);
 	}
 
-	private void doWrite(EndpointReferenceType fileEPR, long offset, String text)
-			throws IOException {
-		RandomByteIOPortType clientStub = ClientUtils.createProxy(
-				RandomByteIOPortType.class, fileEPR);
-		RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(
-				clientStub);
-		RandomByteIOTransferer transferer = factory
-				.createRandomByteIOTransferer();
+	private void doWrite(EndpointReferenceType fileEPR, long offset, String text) throws IOException
+	{
+		RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, fileEPR);
+		RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
+		RandomByteIOTransferer transferer = factory.createRandomByteIOTransferer();
 		byte[] data = text.getBytes();
 		transferer.write(offset, data.length, 0, data);
 	}
 
-	private void doAppend(EndpointReferenceType fileEPR, String text)
-			throws IOException {
+	private void doAppend(EndpointReferenceType fileEPR, String text) throws IOException
+	{
 		text = text + "\n";
-		RandomByteIOPortType clientStub = ClientUtils.createProxy(
-				RandomByteIOPortType.class, fileEPR);
-		RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(
-				clientStub);
-		RandomByteIOTransferer transferer = factory
-				.createRandomByteIOTransferer();
+		RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, fileEPR);
+		RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
+		RandomByteIOTransferer transferer = factory.createRandomByteIOTransferer();
 		byte[] data = text.getBytes();
 		transferer.append(data);
 	}

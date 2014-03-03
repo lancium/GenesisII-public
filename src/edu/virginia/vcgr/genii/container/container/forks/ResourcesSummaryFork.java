@@ -21,22 +21,24 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class ResourcesSummaryFork extends
-		AbstractStreamableByteIOFactoryResourceFork {
-	public ResourcesSummaryFork(ResourceForkService service, String forkPath) {
+public class ResourcesSummaryFork extends AbstractStreamableByteIOFactoryResourceFork
+{
+	public ResourcesSummaryFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void modifyState(InputStream source) throws IOException {
-		throw new IOException(
-				"Not allowed to modify the the resources summary.");
+	public void modifyState(InputStream source) throws IOException
+	{
+		throw new IOException("Not allowed to modify the the resources summary.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void snapshotState(OutputStream sink) throws IOException {
+	public void snapshotState(OutputStream sink) throws IOException
+	{
 		PrintStream ps = new PrintStream(sink);
 		long total = 0;
 
@@ -44,21 +46,17 @@ public class ResourcesSummaryFork extends
 			ResourceKey key = getService().getResourceKey();
 			IResource resource = key.dereference();
 			if (resource instanceof BasicDBResource) {
-				Connection connection = ((BasicDBResource) resource)
-						.getConnection();
-				Map<String, Collection<ResourceSummaryInformation>> map = ResourceSummary
-						.resources(connection);
+				Connection connection = ((BasicDBResource) resource).getConnection();
+				Map<String, Collection<ResourceSummaryInformation>> map = ResourceSummary.resources(connection);
 
 				List<String> keys = new Vector<String>(map.keySet());
 				Collections.sort(keys);
 				for (String className : keys) {
-					Collection<ResourceSummaryInformation> summaryInfo = map
-							.get(className);
+					Collection<ResourceSummaryInformation> summaryInfo = map.get(className);
 					if (summaryInfo != null) {
 						total += summaryInfo.size();
 
-						ps.format("Number of resource for \"%s\":  %d\n",
-								className, summaryInfo.size());
+						ps.format("Number of resource for \"%s\":  %d\n", className, summaryInfo.size());
 					}
 				}
 

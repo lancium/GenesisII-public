@@ -9,36 +9,39 @@ import javax.swing.table.AbstractTableModel;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
-public class ExportTableModel extends AbstractTableModel implements
-		IExportChangeListener {
+public class ExportTableModel extends AbstractTableModel implements IExportChangeListener
+{
 	static final long serialVersionUID = 0L;
 
-	static final private String[] _COLUMN_NAMES = new String[] {
-			"Container Path", "Local Path", "RNS Path" };
+	static final private String[] _COLUMN_NAMES = new String[] { "Container Path", "Local Path", "RNS Path" };
 
-	static private class RowData {
+	static private class RowData
+	{
 		private String _deploymentName;
 		private ExportDirInformation _exportInfo;
 
-		public RowData(String deploymentName, ExportDirInformation exportInfo) {
+		public RowData(String deploymentName, ExportDirInformation exportInfo)
+		{
 			_deploymentName = deploymentName;
 			_exportInfo = exportInfo;
 		}
 
-		public String getDeploymentName() {
+		public String getDeploymentName()
+		{
 			return _deploymentName;
 		}
 
-		public ExportDirInformation getExportDirInformation() {
+		public ExportDirInformation getExportDirInformation()
+		{
 			return _exportInfo;
 		}
 	}
 
 	private ArrayList<RowData> _rowData;
 
-	public ExportTableModel() throws FileLockException {
-		HashMap<String, Collection<ExportDirInformation>> exports = ExportDirState
-				.getKnownExports();
+	public ExportTableModel() throws FileLockException
+	{
+		HashMap<String, Collection<ExportDirInformation>> exports = ExportDirState.getKnownExports();
 		_rowData = new ArrayList<RowData>();
 
 		for (String deploymentName : exports.keySet()) {
@@ -49,50 +52,56 @@ public class ExportTableModel extends AbstractTableModel implements
 	}
 
 	@Override
-	public int getColumnCount() {
+	public int getColumnCount()
+	{
 		return _COLUMN_NAMES.length;
 	}
 
 	@Override
-	public int getRowCount() {
+	public int getRowCount()
+	{
 		return _rowData.size();
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
+	public Object getValueAt(int rowIndex, int columnIndex)
+	{
 		RowData data = _rowData.get(rowIndex);
 		switch (columnIndex) {
-		case 0:
-			return data.getDeploymentName();
-		case 1:
-			return data.getExportDirInformation().getLocalPath();
-		case 2:
-			return data.getExportDirInformation().getRNSPath();
-		default:
-			return null;
+			case 0:
+				return data.getDeploymentName();
+			case 1:
+				return data.getExportDirInformation().getLocalPath();
+			case 2:
+				return data.getExportDirInformation().getRNSPath();
+			default:
+				return null;
 		}
 	}
 
 	@Override
-	public Class<?> getColumnClass(int index) {
+	public Class<?> getColumnClass(int index)
+	{
 		return String.class;
 	}
 
 	@Override
-	public String getColumnName(int index) {
+	public String getColumnName(int index)
+	{
 		return _COLUMN_NAMES[index];
 	}
 
 	@Override
-	public boolean isCellEditable(int rowIndex, int colIndex) {
+	public boolean isCellEditable(int rowIndex, int colIndex)
+	{
 		return false;
 	}
 
 	@Override
-	public void exportsUpdated() {
+	public void exportsUpdated()
+	{
 		try {
-			HashMap<String, Collection<ExportDirInformation>> exports = ExportDirState
-					.getKnownExports();
+			HashMap<String, Collection<ExportDirInformation>> exports = ExportDirState.getKnownExports();
 			_rowData = new ArrayList<RowData>();
 
 			for (String deploymentName : exports.keySet()) {
@@ -107,7 +116,8 @@ public class ExportTableModel extends AbstractTableModel implements
 		}
 	}
 
-	public ExportDirInformation getRow(int rowNumber) {
+	public ExportDirInformation getRow(int rowNumber)
+	{
 		return _rowData.get(rowNumber).getExportDirInformation();
 	}
 }

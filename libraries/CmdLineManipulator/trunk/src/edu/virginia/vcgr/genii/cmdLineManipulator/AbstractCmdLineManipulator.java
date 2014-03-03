@@ -13,54 +13,55 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.config.CommonVariationConfigur
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.VariationConfiguration;
 import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
 
-public abstract class AbstractCmdLineManipulator<ConfigType> implements
-		CmdLineManipulator<ConfigType>, CmdLineManipulatorConstants {
-	static private Log _logger = LogFactory
-			.getLog(AbstractCmdLineManipulator.class);
+public abstract class AbstractCmdLineManipulator<ConfigType> implements CmdLineManipulator<ConfigType>,
+	CmdLineManipulatorConstants
+{
+	static private Log _logger = LogFactory.getLog(AbstractCmdLineManipulator.class);
 
 	private String _manipulatorType;
 	private Class<ConfigType> _variationConfigurationType;
 
-	protected AbstractCmdLineManipulator(String manipulatorType,
-			Class<ConfigType> variationConfigurationType) {
+	protected AbstractCmdLineManipulator(String manipulatorType, Class<ConfigType> variationConfigurationType)
+	{
 		_manipulatorType = manipulatorType;
 		_variationConfigurationType = variationConfigurationType;
 	}
 
 	@Override
-	public String getManipulatorType() {
+	public String getManipulatorType()
+	{
 		return _manipulatorType;
 	}
 
 	@Override
-	public Class<ConfigType> variationConfigurationType() {
+	public Class<ConfigType> variationConfigurationType()
+	{
 		return _variationConfigurationType;
 	}
 
-	abstract protected void tweakCmdLine(Map<String, Object> jobProperties,
-			Map<String, Object> manipulatorProps, String variationName);
+	abstract protected void tweakCmdLine(Map<String, Object> jobProperties, Map<String, Object> manipulatorProps,
+		String variationName);
 
-	protected void validateJob(Map<String, Object> jobProperties) {
+	protected void validateJob(Map<String, Object> jobProperties)
+	{
 
 		_logger.debug("**Confirming job executable provided");
 
 		if (jobExectuable(jobProperties) == null)
-			throw new IllegalArgumentException(
-					"Null job executable passed to manipulator.");
+			throw new IllegalArgumentException("Null job executable passed to manipulator.");
 	}
 
 	/*
-	 * Ensure correct tweaker has been called based on type Extract
-	 * executable/args if specified in configuration
+	 * Ensure correct tweaker has been called based on type Extract executable/args if specified in
+	 * configuration
 	 */
-	protected void processManipulatorConfiguration(
-			Map<String, Object> jobProps,
-			CmdLineManipulatorConfiguration manipConfig, String varName,
-			Map<String, Object> manipProps) throws CmdLineManipulatorException {
+	protected void processManipulatorConfiguration(Map<String, Object> jobProps, CmdLineManipulatorConfiguration manipConfig,
+		String varName, Map<String, Object> manipProps) throws CmdLineManipulatorException
+	{
 		_logger.debug("**Processing General Manipulator Construction Configuration");
 
-		CommonVariationConfiguration commonConfig = (CommonVariationConfiguration) getVariationConfiguration(
-				manipConfig, varName);
+		CommonVariationConfiguration commonConfig =
+			(CommonVariationConfiguration) getVariationConfiguration(manipConfig, varName);
 
 		if (commonConfig != null) {
 
@@ -68,18 +69,14 @@ public abstract class AbstractCmdLineManipulator<ConfigType> implements
 			String executable = commonConfig.execCmd();
 			if (executable != null) {
 				manipProps.put(MANIP_EXEC, executable);
-				_logger.debug(String.format(
-						"\tManipulator executable from configuration: %s",
-						executable));
+				_logger.debug(String.format("\tManipulator executable from configuration: %s", executable));
 			}
 
 			// Extract additional arguments executable
 			List<String> additionalArgs = commonConfig.additionalArgs();
 			if (additionalArgs != null) {
 				manipProps.put(MANIP_ARGS, additionalArgs);
-				_logger.debug(String.format(
-						"\tManipulator arguments from configuration: %s.",
-						additionalArgs));
+				_logger.debug(String.format("\tManipulator arguments from configuration: %s.", additionalArgs));
 			}
 		}
 	}
@@ -87,14 +84,13 @@ public abstract class AbstractCmdLineManipulator<ConfigType> implements
 	/*
 	 * Ensure that the correct tweaker has been called based on its type
 	 */
-	protected Object getVariationConfiguration(
-			CmdLineManipulatorConfiguration manipConfig, String variationName)
-			throws CmdLineManipulatorException {
+	protected Object getVariationConfiguration(CmdLineManipulatorConfiguration manipConfig, String variationName)
+		throws CmdLineManipulatorException
+	{
 		_logger.debug("**Acquiring Variation Configuration");
 
 		if (manipConfig == null) {
-			throw new IllegalArgumentException(
-					"Null cmdLine manipulator configuration.");
+			throw new IllegalArgumentException("Null cmdLine manipulator configuration.");
 		}
 
 		Set<VariationConfiguration> variations = manipConfig.variationSet();
@@ -107,10 +103,8 @@ public abstract class AbstractCmdLineManipulator<ConfigType> implements
 				String manipulatorType = variation.variationType();
 
 				if (!manipulatorType.equals(_manipulatorType)) {
-					throw new CmdLineManipulatorException(String.format(
-							"Loaded manipulator type \"%s\" "
-									+ "does not match requested type \"%s\".",
-							manipulatorType, _manipulatorType));
+					throw new CmdLineManipulatorException(String.format("Loaded manipulator type \"%s\" "
+						+ "does not match requested type \"%s\".", manipulatorType, _manipulatorType));
 				}
 
 				// extract configuration
@@ -118,13 +112,11 @@ public abstract class AbstractCmdLineManipulator<ConfigType> implements
 			}
 		}
 
-		throw new CmdLineManipulatorException("No tweaker found with name: "
-				+ variationName);
+		throw new CmdLineManipulatorException("No tweaker found with name: " + variationName);
 	}
 
-	protected static List<String> formCommandLine(
-			Map<String, Object> jobProperties)
-			throws CmdLineManipulatorException {
+	protected static List<String> formCommandLine(Map<String, Object> jobProperties) throws CmdLineManipulatorException
+	{
 		List<String> commandLine = new ArrayList<String>();
 
 		// get job executable
@@ -144,35 +136,37 @@ public abstract class AbstractCmdLineManipulator<ConfigType> implements
 		return commandLine;
 	}
 
-	protected static String jobExectuable(Map<String, Object> jobProps) {
+	protected static String jobExectuable(Map<String, Object> jobProps)
+	{
 		return (String) jobProps.get(JOB_EXECUTABLE_NAME);
 	}
 
-	protected static void setJobExecutable(String executable,
-			Map<String, Object> jobProps, String varName) {
+	protected static void setJobExecutable(String executable, Map<String, Object> jobProps, String varName)
+	{
 		jobProps.put(JOB_EXECUTABLE_NAME, executable);
-		_logger.debug(String.format("**%s manipulator transformed exec: %s",
-				varName, executable));
+		_logger.debug(String.format("**%s manipulator transformed exec: %s", varName, executable));
 	}
 
 	@SuppressWarnings("unchecked")
-	protected static List<String> jobArguments(Map<String, Object> jobProps) {
+	protected static List<String> jobArguments(Map<String, Object> jobProps)
+	{
 		return (List<String>) jobProps.get(JOB_ARGUMENTS);
 	}
 
-	protected static void setJobArguments(List<String> args,
-			Map<String, Object> jobProps, String varName) {
+	protected static void setJobArguments(List<String> args, Map<String, Object> jobProps, String varName)
+	{
 		jobProps.put(CmdLineManipulatorConstants.JOB_ARGUMENTS, args);
-		_logger.debug(String.format("**%s manipulator transformed args: %s",
-				varName, args));
+		_logger.debug(String.format("**%s manipulator transformed args: %s", varName, args));
 	}
 
-	protected static String manipulatorExec(Map<String, Object> manipProps) {
+	protected static String manipulatorExec(Map<String, Object> manipProps)
+	{
 		return (String) manipProps.get(MANIP_EXEC);
 	}
 
 	@SuppressWarnings("unchecked")
-	protected static List<String> manipulatorArgs(Map<String, Object> manipProps) {
+	protected static List<String> manipulatorArgs(Map<String, Object> manipProps)
+	{
 		return (List<String>) manipProps.get(MANIP_ARGS);
 	}
 }

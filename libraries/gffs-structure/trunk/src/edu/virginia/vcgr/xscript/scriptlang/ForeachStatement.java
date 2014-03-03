@@ -19,7 +19,8 @@ import edu.virginia.vcgr.xscript.ReturnFromFunctionException;
 import edu.virginia.vcgr.xscript.XScriptContext;
 import edu.virginia.vcgr.xscript.macros.MacroReplacer;
 
-public class ForeachStatement implements ParseStatement {
+public class ForeachStatement implements ParseStatement
+{
 	private String _paramName;
 	private String _filter;
 	private String _sourceDir;
@@ -27,8 +28,9 @@ public class ForeachStatement implements ParseStatement {
 	private String _sourceRNS;
 	private ParseStatement _innerStatement;
 
-	public ForeachStatement(String paramName, String filter, String sourceDir,
-			String sourceFile, String sourceRNS, ParseStatement innerStatement) {
+	public ForeachStatement(String paramName, String filter, String sourceDir, String sourceFile, String sourceRNS,
+		ParseStatement innerStatement)
+	{
 		_paramName = paramName;
 		_filter = filter;
 		_sourceDir = sourceDir;
@@ -37,9 +39,9 @@ public class ForeachStatement implements ParseStatement {
 		_innerStatement = innerStatement;
 	}
 
-	private Object evaluateSourceDir(XScriptContext context, String paramName,
-			Pattern filter, String sourceDir) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException {
+	private Object evaluateSourceDir(XScriptContext context, String paramName, Pattern filter, String sourceDir)
+		throws ScriptException, EarlyExitException, ReturnFromFunctionException
+	{
 		File dir = new File(sourceDir);
 		if (!dir.exists())
 			return null;
@@ -58,9 +60,9 @@ public class ForeachStatement implements ParseStatement {
 		return ret;
 	}
 
-	private Object evaluateSourceFile(XScriptContext context, String paramName,
-			Pattern filter, String sourceFile) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException {
+	private Object evaluateSourceFile(XScriptContext context, String paramName, Pattern filter, String sourceFile)
+		throws ScriptException, EarlyExitException, ReturnFromFunctionException
+	{
 		String line;
 		BufferedReader reader = null;
 
@@ -86,19 +88,17 @@ public class ForeachStatement implements ParseStatement {
 		}
 	}
 
-	private Object evaluateSourceRNS(XScriptContext context, String paramName,
-			Pattern filter, String sourceRNS) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException {
+	private Object evaluateSourceRNS(XScriptContext context, String paramName, Pattern filter, String sourceRNS)
+		throws ScriptException, EarlyExitException, ReturnFromFunctionException
+	{
 		Object ret = null;
 
 		RNSPath targetPath;
 		try {
-			targetPath = RNSPath.getCurrent().lookup(sourceRNS,
-					RNSPathQueryFlags.MUST_EXIST);
+			targetPath = RNSPath.getCurrent().lookup(sourceRNS, RNSPathQueryFlags.MUST_EXIST);
 
 			for (RNSPath entry : targetPath.listContents()) {
-				if ((filter == null)
-						|| (filter.matcher(entry.getName()).matches())) {
+				if ((filter == null) || (filter.matcher(entry.getName()).matches())) {
 					context.setAttribute(paramName, entry.getName());
 					ret = _innerStatement.evaluate(context);
 				}
@@ -115,23 +115,19 @@ public class ForeachStatement implements ParseStatement {
 	}
 
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException {
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
+	{
 		Pattern pattern = null;
 
 		if (_filter != null)
-			pattern = Pattern.compile(MacroReplacer.replaceMacros(context,
-					_filter));
+			pattern = Pattern.compile(MacroReplacer.replaceMacros(context, _filter));
 		String paramName = MacroReplacer.replaceMacros(context, _paramName);
 
 		if (_sourceDir != null)
-			return evaluateSourceDir(context, paramName, pattern,
-					MacroReplacer.replaceMacros(context, _sourceDir));
+			return evaluateSourceDir(context, paramName, pattern, MacroReplacer.replaceMacros(context, _sourceDir));
 		else if (_sourceFile != null)
-			return evaluateSourceFile(context, paramName, pattern,
-					MacroReplacer.replaceMacros(context, _sourceFile));
+			return evaluateSourceFile(context, paramName, pattern, MacroReplacer.replaceMacros(context, _sourceFile));
 		else
-			return evaluateSourceRNS(context, paramName, pattern,
-					MacroReplacer.replaceMacros(context, _sourceRNS));
+			return evaluateSourceRNS(context, paramName, pattern, MacroReplacer.replaceMacros(context, _sourceRNS));
 	}
 }

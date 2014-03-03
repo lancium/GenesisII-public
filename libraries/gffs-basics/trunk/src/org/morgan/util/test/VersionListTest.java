@@ -26,23 +26,21 @@ import junit.framework.TestCase;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class VersionListTest extends TestCase {
-	public void testParsing() throws Exception {
+public class VersionListTest extends TestCase
+{
+	public void testParsing() throws Exception
+	{
 		InputStream in = null;
 
 		try {
-			in = GenesisClassLoader.classLoaderFactory().getResourceAsStream(
-					"org/morgan/util/test/example-version-list.ver");
+			in = GenesisClassLoader.classLoaderFactory().getResourceAsStream("org/morgan/util/test/example-version-list.ver");
 			VersionList vList = new VersionList(in);
 
 			String[] files = vList.getRelativeFiles();
 			TestCase.assertEquals(3, files.length);
-			TestCase.assertEquals(new Version(1, 0, 0),
-					vList.getVersion("foo/bar/com.1"));
-			TestCase.assertEquals(new Version(1, 2, 0),
-					vList.getVersion("foo/bar/com.2"));
-			TestCase.assertEquals(new Version(1, 2, 3),
-					vList.getVersion("foo/bar/com.3"));
+			TestCase.assertEquals(new Version(1, 0, 0), vList.getVersion("foo/bar/com.1"));
+			TestCase.assertEquals(new Version(1, 2, 0), vList.getVersion("foo/bar/com.2"));
+			TestCase.assertEquals(new Version(1, 2, 3), vList.getVersion("foo/bar/com.3"));
 
 			vList.store(System.out);
 		} finally {

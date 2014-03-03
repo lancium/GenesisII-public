@@ -19,7 +19,8 @@ import org.morgan.util.configuration.ConfigurationException;
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.procmgmt.ProcessManager;
 
-public class ProcessWrapper {
+public class ProcessWrapper
+{
 	static private Log _logger = LogFactory.getLog(ProcessWrapper.class);
 
 	static private JAXBContext _context;
@@ -28,27 +29,22 @@ public class ProcessWrapper {
 		try {
 			_context = JAXBContext.newInstance(ExitResults.class);
 		} catch (JAXBException e) {
-			throw new ConfigurationException(
-					"Unable to initialize JAXBContext for ExitResults class.",
-					e);
+			throw new ConfigurationException("Unable to initialize JAXBContext for ExitResults class.", e);
 		}
 	}
 
-	static public ExitResults readResults(File file)
-			throws ProcessWrapperException {
+	static public ExitResults readResults(File file) throws ProcessWrapperException
+	{
 		try {
 			Unmarshaller u = _context.createUnmarshaller();
 			return (ExitResults) u.unmarshal(file);
 		} catch (JAXBException e) {
-			throw new ProcessWrapperException(
-					"Unable to read exit results from file.", e);
+			throw new ProcessWrapperException("Unable to read exit results from file.", e);
 		} finally {
 			try {
 				file.delete();
 			} catch (Throwable cause) {
-				_logger.warn(String.format(
-						"Unable to cleanup resource usage file \"%s\".", file),
-						cause);
+				_logger.warn(String.format("Unable to cleanup resource usage file \"%s\".", file), cause);
 			}
 		}
 	}
@@ -58,44 +54,47 @@ public class ProcessWrapper {
 	private ExecutorService _threadPool;
 	private File _pathToWrapper;
 
-	public File getPathToWrapper() {
+	public File getPathToWrapper()
+	{
 		return _pathToWrapper;
 	}
 
-	protected void fireProcessCompleted(ProcessWrapperToken token) {
+	protected void fireProcessCompleted(ProcessWrapperToken token)
+	{
 		ProcessWrapperListener[] listeners;
 
 		synchronized (_listeners) {
-			listeners = _listeners
-					.toArray(new ProcessWrapperListener[_listeners.size()]);
+			listeners = _listeners.toArray(new ProcessWrapperListener[_listeners.size()]);
 		}
 
 		for (ProcessWrapperListener listener : listeners)
 			listener.processCompleted(token);
 	}
 
-	ProcessWrapper(ExecutorService threadPool, File pathToWrapper) {
+	ProcessWrapper(ExecutorService threadPool, File pathToWrapper)
+	{
 		_threadPool = threadPool;
 		_pathToWrapper = pathToWrapper;
 	}
 
-	final public void addProcessWrapperListener(ProcessWrapperListener listener) {
+	final public void addProcessWrapperListener(ProcessWrapperListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	final public void removeProcessWrapperListener(
-			ProcessWrapperListener listener) {
+	final public void removeProcessWrapperListener(ProcessWrapperListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	final public Vector<String> formCommandLine(File fuseMountPoint,
-			Map<String, String> environmentOverload, File workingDirectory,
-			File stdinRedirect, File stdoutRedirect, File stderrRedirect,
-			File resourceUsagePath, String executable, String... arguments) {
+	final public Vector<String> formCommandLine(File fuseMountPoint, Map<String, String> environmentOverload,
+		File workingDirectory, File stdinRedirect, File stdoutRedirect, File stderrRedirect, File resourceUsagePath,
+		String executable, String... arguments)
+	{
 		Vector<String> ret;
 
 		if (executable == null)
@@ -131,52 +130,41 @@ public class ProcessWrapper {
 		return ret;
 	}
 
-	final public ProcessWrapperToken execute(File fuseMountPoint,
-			Map<String, String> environmentOverload, File workingDirectory,
-			File stdinRedirect, File resourceUsageFile, List<String> command)
-			throws ProcessWrapperException {
+	final public ProcessWrapperToken execute(File fuseMountPoint, Map<String, String> environmentOverload,
+		File workingDirectory, File stdinRedirect, File resourceUsageFile, List<String> command) throws ProcessWrapperException
+	{
 		if (!_pathToWrapper.exists())
-			throw new ProcessWrapperException(String.format(
-					"Cannot find required Process Wrapper binary \"%s\"!",
-					_pathToWrapper));
+			throw new ProcessWrapperException(String.format("Cannot find required Process Wrapper binary \"%s\"!",
+				_pathToWrapper));
 		if (!_pathToWrapper.isFile())
-			throw new ProcessWrapperException(String.format(
-					"Process Wrapper binary \"%s\" is not a file!",
-					_pathToWrapper));
+			throw new ProcessWrapperException(String.format("Process Wrapper binary \"%s\" is not a file!", _pathToWrapper));
 		if (!_pathToWrapper.canExecute())
-			throw new ProcessWrapperException(String.format(
-					"Path to process wrapper binary \"%s\" is not executable!",
-					_pathToWrapper));
+			throw new ProcessWrapperException(String.format("Path to process wrapper binary \"%s\" is not executable!",
+				_pathToWrapper));
 
 		if (workingDirectory != null) {
 			if (!workingDirectory.exists())
-				throw new ProcessWrapperException(String.format(
-						"Working directory %s does not exist!",
-						workingDirectory));
+				throw new ProcessWrapperException(String.format("Working directory %s does not exist!", workingDirectory));
 			if (!workingDirectory.isDirectory())
-				throw new ProcessWrapperException(String.format(
-						"Working directory %s is not a directory!",
-						workingDirectory));
+				throw new ProcessWrapperException(String.format("Working directory %s is not a directory!", workingDirectory));
 		}
 
 		if (stdinRedirect != null) {
 			if (!stdinRedirect.exists())
-				throw new ProcessWrapperException(String.format(
-						"Stdin source file %s does not exist!", stdinRedirect));
+				throw new ProcessWrapperException(String.format("Stdin source file %s does not exist!", stdinRedirect));
 			if (!stdinRedirect.isFile())
-				throw new ProcessWrapperException(String.format(
-						"Stdin source file %s is not a file!", stdinRedirect));
+				throw new ProcessWrapperException(String.format("Stdin source file %s is not a file!", stdinRedirect));
 		}
 
 		ProcessBuilder builder = new ProcessBuilder(new Vector<String>(command));
 
-		ProcessWrapperWorker worker = new ProcessWrapperWorker(
-				resourceUsageFile, builder);
+		ProcessWrapperWorker worker = new ProcessWrapperWorker(resourceUsageFile, builder);
 		_threadPool.execute(worker);
 		return worker;
 	}
 
-	private class ProcessWrapperWorker implements Runnable, ProcessWrapperToken {
+	private class ProcessWrapperWorker implements Runnable, ProcessWrapperToken
+	{
 		private File _resourceUsageFile;
 		private ProcessBuilder _builder;
 		private Process _process = null;
@@ -186,14 +174,15 @@ public class ProcessWrapper {
 		volatile private boolean _done = false;
 		private Object _lockObject = new Object();
 
-		private ProcessWrapperWorker(File resourceUsageFile,
-				ProcessBuilder builder) {
+		private ProcessWrapperWorker(File resourceUsageFile, ProcessBuilder builder)
+		{
 			_resourceUsageFile = resourceUsageFile;
 			_builder = builder;
 		}
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			try {
 				synchronized (_lockObject) {
 					if (!_done)
@@ -208,8 +197,7 @@ public class ProcessWrapper {
 				}
 			} catch (Throwable cause) {
 				synchronized (_lockObject) {
-					_exception = new ProcessWrapperException(
-							"Unable to execute process!", cause);
+					_exception = new ProcessWrapperException("Unable to execute process!", cause);
 				}
 			} finally {
 				synchronized (_lockObject) {
@@ -223,7 +211,8 @@ public class ProcessWrapper {
 		}
 
 		@Override
-		public void cancel() {
+		public void cancel()
+		{
 			synchronized (_lockObject) {
 				_done = true;
 				if (_process != null) {
@@ -240,7 +229,8 @@ public class ProcessWrapper {
 		}
 
 		@Override
-		public ExitResults results() throws ProcessWrapperException {
+		public ExitResults results() throws ProcessWrapperException
+		{
 			synchronized (_lockObject) {
 				if (!_done)
 					return null;
@@ -250,14 +240,14 @@ public class ProcessWrapper {
 				throw _exception;
 
 			if (_results == null)
-				throw new ProcessWrapperException(
-						"Internal error -- process doesn't have results.");
+				throw new ProcessWrapperException("Internal error -- process doesn't have results.");
 
 			return _results;
 		}
 
 		@Override
-		public void join() throws InterruptedException {
+		public void join() throws InterruptedException
+		{
 			synchronized (_lockObject) {
 				while (!_done)
 					_lockObject.wait();

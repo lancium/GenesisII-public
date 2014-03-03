@@ -12,24 +12,21 @@ import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-public class ScheduledTerminationInvoker implements IAroundInvoker {
-	static private Log _logger = LogFactory
-			.getLog(ScheduledTerminationInvoker.class);
+public class ScheduledTerminationInvoker implements IAroundInvoker
+{
+	static private Log _logger = LogFactory.getLog(ScheduledTerminationInvoker.class);
 
 	@Override
-	public Object invoke(InvocationContext invocationContext) throws Exception {
+	public Object invoke(InvocationContext invocationContext) throws Exception
+	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		Calendar termTime = (Calendar) resource
-				.getProperty(IResource.SCHEDULED_TERMINATION_TIME_PROPERTY_NAME);
+		Calendar termTime = (Calendar) resource.getProperty(IResource.SCHEDULED_TERMINATION_TIME_PROPERTY_NAME);
 		if (termTime != null) {
 			if (termTime.before(Calendar.getInstance())) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("Terminating a scheduled termination resource.");
-				((GenesisIIBase) invocationContext.getTarget())
-						.destroy(new Destroy());
-				throw FaultManipulator
-						.fillInFault(new ResourceUnknownFaultType(null, null,
-								null, null, null, null));
+				((GenesisIIBase) invocationContext.getTarget()).destroy(new Destroy());
+				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null, null, null));
 			}
 		}
 

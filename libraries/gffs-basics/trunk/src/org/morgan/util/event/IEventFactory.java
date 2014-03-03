@@ -16,6 +16,7 @@ package org.morgan.util.event;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public interface IEventFactory {
+public interface IEventFactory
+{
 	public IEvent create();
 }

@@ -11,8 +11,9 @@ import edu.virginia.vcgr.genii.gjt.data.variables.Clearable;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 
-public class EnvironmentList extends DefaultDataItem implements Clearable,
-		PostUnmarshallListener, Iterable<StringStringFilesystemTriple> {
+public class EnvironmentList extends DefaultDataItem implements Clearable, PostUnmarshallListener,
+	Iterable<StringStringFilesystemTriple>
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlTransient
@@ -24,11 +25,12 @@ public class EnvironmentList extends DefaultDataItem implements Clearable,
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "value")
 	private Vector<StringStringFilesystemTriple> _items = new Vector<StringStringFilesystemTriple>();
 
-	public EnvironmentList() {
+	public EnvironmentList()
+	{
 	}
 
-	public EnvironmentList(ParameterizableBroker pBroker,
-			ModificationBroker mBroker) {
+	public EnvironmentList(ParameterizableBroker pBroker, ModificationBroker mBroker)
+	{
 		_pBroker = pBroker;
 		_mBroker = mBroker;
 
@@ -36,14 +38,16 @@ public class EnvironmentList extends DefaultDataItem implements Clearable,
 		addModificationListener(mBroker);
 	}
 
-	public void add(StringStringFilesystemTriple value) {
+	public void add(StringStringFilesystemTriple value)
+	{
 		_items.add(value);
 		fireParameterizableStringModified("", value.getKey());
 		fireParameterizableStringModified("", value.getValue());
 		fireJobDescriptionModified();
 	}
 
-	public void remove(int index) {
+	public void remove(int index)
+	{
 		StringStringFilesystemTriple item = _items.remove(index);
 		if (item != null) {
 			fireParameterizableStringModified(item.getKey(), "");
@@ -52,16 +56,19 @@ public class EnvironmentList extends DefaultDataItem implements Clearable,
 		}
 	}
 
-	public StringStringFilesystemTriple get(int index) {
+	public StringStringFilesystemTriple get(int index)
+	{
 		return _items.get(index);
 	}
 
-	public int size() {
+	public int size()
+	{
 		return _items.size();
 	}
 
 	@Override
-	public void clear() {
+	public void clear()
+	{
 		for (StringStringFilesystemTriple item : _items) {
 			fireParameterizableStringModified(item.getKey(), "");
 			fireParameterizableStringModified(item.getValue(), "");
@@ -73,27 +80,27 @@ public class EnvironmentList extends DefaultDataItem implements Clearable,
 		_items.clear();
 	}
 
-	public ParameterizableBroker getParameterizableBroker() {
+	public ParameterizableBroker getParameterizableBroker()
+	{
 		return _pBroker;
 	}
 
-	public ModificationBroker getModificationBroker() {
+	public ModificationBroker getModificationBroker()
+	{
 		return _mBroker;
 	}
 
 	@Override
-	public void postUnmarshall(ParameterizableBroker parameterBroker,
-			ModificationBroker modificationBroker) {
+	public void postUnmarshall(ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
+	{
 		_pBroker = parameterBroker;
 		_mBroker = modificationBroker;
 
 		/*
-		 * Don't need to do this because we derive off of a class that
-		 * automatically does it
+		 * Don't need to do this because we derive off of a class that automatically does it
 		 */
 		/*
-		 * addParameterizableListener(parameterBroker);
-		 * addModificationListener(modificationBroker);
+		 * addParameterizableListener(parameterBroker); addModificationListener(modificationBroker);
 		 */
 
 		for (StringStringFilesystemTriple item : _items) {
@@ -105,7 +112,8 @@ public class EnvironmentList extends DefaultDataItem implements Clearable,
 	}
 
 	@Override
-	public Iterator<StringStringFilesystemTriple> iterator() {
+	public Iterator<StringStringFilesystemTriple> iterator()
+	{
 		return Collections.unmodifiableList(_items).iterator();
 	}
 }

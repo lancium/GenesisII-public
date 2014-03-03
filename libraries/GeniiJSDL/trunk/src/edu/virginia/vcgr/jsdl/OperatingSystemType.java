@@ -22,25 +22,30 @@ import javax.xml.bind.annotation.XmlElement;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class OperatingSystemType extends CommonJSDLElement {
+public class OperatingSystemType extends CommonJSDLElement
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "OperatingSystemName")
 	private OperatingSystemNames _osName;
 
-	public OperatingSystemType(OperatingSystemNames osName) {
+	public OperatingSystemType(OperatingSystemNames osName)
+	{
 		_osName = osName;
 	}
 
-	public OperatingSystemType() {
+	public OperatingSystemType()
+	{
 		this(null);
 	}
 
-	final public void osName(OperatingSystemNames osName) {
+	final public void osName(OperatingSystemNames osName)
+	{
 		_osName = osName;
 	}
 
-	final public OperatingSystemNames osName() {
+	final public OperatingSystemNames osName()
+	{
 		return _osName;
 	}
 }

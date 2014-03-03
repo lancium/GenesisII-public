@@ -12,21 +12,25 @@ import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 import javax.swing.event.MouseInputAdapter;
 
-class DraggableImageComponent extends JComponent {
+class DraggableImageComponent extends JComponent
+{
 	static final long serialVersionUID = 0L;
 
 	private BufferedImage _image;
 
-	protected BufferedImage getImage() {
+	protected BufferedImage getImage()
+	{
 		return _image;
 	}
 
-	protected void setImage(BufferedImage image) {
+	protected void setImage(BufferedImage image)
+	{
 		_image = image;
 		repaint();
 	}
 
-	protected DraggableImageComponent(BufferedImage image) {
+	protected DraggableImageComponent(BufferedImage image)
+	{
 		_image = image;
 
 		Dimension d = new Dimension(_image.getWidth(), _image.getHeight());
@@ -41,26 +45,27 @@ class DraggableImageComponent extends JComponent {
 	}
 
 	@Override
-	protected void paintComponent(Graphics g) {
+	protected void paintComponent(Graphics g)
+	{
 		super.paintComponent(g);
 
 		BufferedImage image = getImage();
 
 		Graphics2D gg = (Graphics2D) g;
 		if (!isEnabled()) {
-			gg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-					0.2f));
+			gg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
 		}
 
-		g.drawImage(image, (getWidth() - image.getWidth()) / 2,
-				(getHeight() - image.getHeight()) / 2, null);
+		g.drawImage(image, (getWidth() - image.getWidth()) / 2, (getHeight() - image.getHeight()) / 2, null);
 	}
 
-	private class SimpleDragHandler extends MouseInputAdapter {
+	private class SimpleDragHandler extends MouseInputAdapter
+	{
 		private MouseEvent _firstMouseEvent = null;
 
 		@Override
-		public void mousePressed(MouseEvent e) {
+		public void mousePressed(MouseEvent e)
+		{
 			if (isEnabled()) {
 				_firstMouseEvent = e;
 				e.consume();
@@ -68,7 +73,8 @@ class DraggableImageComponent extends JComponent {
 		}
 
 		@Override
-		public void mouseDragged(MouseEvent e) {
+		public void mouseDragged(MouseEvent e)
+		{
 			if (!isEnabled())
 				return;
 
@@ -80,8 +86,7 @@ class DraggableImageComponent extends JComponent {
 					JComponent c = (JComponent) e.getSource();
 					TransferHandler handler = getTransferHandler();
 					if (handler != null)
-						handler.exportAsDrag(c, _firstMouseEvent,
-								TransferHandler.LINK);
+						handler.exportAsDrag(c, _firstMouseEvent, TransferHandler.LINK);
 					_firstMouseEvent = null;
 				}
 			}

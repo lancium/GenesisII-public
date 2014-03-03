@@ -4,27 +4,31 @@ import java.util.Collection;
 
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class ReducedJobInformation {
+public class ReducedJobInformation
+{
 	private JobTicket _jobTicket;
 	private Collection<Identity> _owners;
 	private QueueStates _state;
 
-	public ReducedJobInformation(JobTicket ticket, Collection<Identity> owners,
-			QueueStates state) {
+	public ReducedJobInformation(JobTicket ticket, Collection<Identity> owners, QueueStates state)
+	{
 		_jobTicket = ticket;
 		_owners = owners;
 		_state = state;
 	}
 
-	public JobTicket getTicket() {
+	public JobTicket getTicket()
+	{
 		return _jobTicket;
 	}
 
-	public Collection<Identity> getOwners() {
+	public Collection<Identity> getOwners()
+	{
 		return _owners;
 	}
 
-	public QueueStates getJobState() {
+	public QueueStates getJobState()
+	{
 		return _state;
 	}
 }

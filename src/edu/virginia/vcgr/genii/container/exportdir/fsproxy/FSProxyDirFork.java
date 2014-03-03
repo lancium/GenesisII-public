@@ -22,32 +22,34 @@ import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class FSProxyDirFork extends AbstractRNSResourceFork implements
-		RNSResourceFork {
-	private FSViewSession session() throws IOException {
+public class FSProxyDirFork extends AbstractRNSResourceFork implements RNSResourceFork
+{
+	private FSViewSession session() throws IOException
+	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		FSProxyConstructionParameters consParms = (FSProxyConstructionParameters) resource
-				.constructionParameters(FSProxyServiceImpl.class);
+		FSProxyConstructionParameters consParms =
+			(FSProxyConstructionParameters) resource.constructionParameters(FSProxyServiceImpl.class);
 
 		return consParms.connectionInformation().openSession();
 	}
 
-	public FSProxyDirFork(ResourceForkService service, String forkPath) {
+	public FSProxyDirFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	final public EndpointReferenceType add(EndpointReferenceType exemplarEPR,
-			String entryName, EndpointReferenceType entry) throws IOException {
-		throw new IOException("Not allowed to add arbitrary endpoints to a "
-				+ "light-weight export.");
+	final public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry)
+		throws IOException
+	{
+		throw new IOException("Not allowed to add arbitrary endpoints to a " + "light-weight export.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR,
-			String entryName) throws IOException {
+	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR, String entryName) throws IOException
+	{
 		FSViewSession session = null;
 		Collection<InternalEntry> ret = new LinkedList<InternalEntry>();
 
@@ -60,26 +62,22 @@ public class FSProxyDirFork extends AbstractRNSResourceFork implements
 
 				if (entryName == null || entryName.equals("root")) {
 					ret.add(createInternalEntry(exemplarEPR, "root",
-							new FSProxyFileFork(getService(), formForkPath(""))
-									.describe()));
+						new FSProxyFileFork(getService(), formForkPath("")).describe()));
 				}
 
 				return ret;
 			}
 
-			for (FSViewEntry child : ((FSViewDirectoryEntry) entry)
-					.listEntries()) {
+			for (FSViewEntry child : ((FSViewDirectoryEntry) entry).listEntries()) {
 				String dName = child.entryName();
 
 				if (entryName == null || entryName.equals(dName)) {
 					ResourceForkInformation info;
 
 					if (child.entryType() == FSViewEntryType.Directory)
-						info = new FSProxyDirFork(getService(),
-								formForkPath(dName)).describe();
+						info = new FSProxyDirFork(getService(), formForkPath(dName)).describe();
 					else
-						info = new FSProxyFileFork(getService(),
-								formForkPath(dName)).describe();
+						info = new FSProxyFileFork(getService(), formForkPath(dName)).describe();
 
 					ret.add(createInternalEntry(exemplarEPR, dName, info));
 				}
@@ -93,15 +91,15 @@ public class FSProxyDirFork extends AbstractRNSResourceFork implements
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public boolean remove(String entryName) throws IOException {
+	public boolean remove(String entryName) throws IOException
+	{
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.Directory)
-				throw new IOException(String.format(
-						"FSViewEntry %s is not a directory!", entry));
+				throw new IOException(String.format("FSViewEntry %s is not a directory!", entry));
 			((FSViewDirectoryEntry) entry).delete(entryName);
 			return true;
 		} finally {
@@ -111,22 +109,20 @@ public class FSProxyDirFork extends AbstractRNSResourceFork implements
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR,
-			String newFileName) throws IOException {
+	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR, String newFileName) throws IOException
+	{
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.Directory)
-				throw new IOException(String.format(
-						"FSViewEntry %s is not a directory!", entry));
+				throw new IOException(String.format("FSViewEntry %s is not a directory!", entry));
 			((FSViewDirectoryEntry) entry).createFile(newFileName);
 			String forkPath = formForkPath(newFileName);
 			ResourceForkService service = getService();
 
-			return service.createForkEPR(forkPath, new FSProxyFileFork(service,
-					forkPath).describe());
+			return service.createForkEPR(forkPath, new FSProxyFileFork(service, forkPath).describe());
 		} finally {
 			StreamUtils.close(session);
 		}
@@ -134,22 +130,20 @@ public class FSProxyDirFork extends AbstractRNSResourceFork implements
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR,
-			String newDirectoryName) throws IOException {
+	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR, String newDirectoryName) throws IOException
+	{
 		FSViewSession session = null;
 
 		try {
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.Directory)
-				throw new IOException(String.format(
-						"FSViewEntry %s is not a directory!", entry));
+				throw new IOException(String.format("FSViewEntry %s is not a directory!", entry));
 			((FSViewDirectoryEntry) entry).createDirectory(newDirectoryName);
 			String forkPath = formForkPath(newDirectoryName);
 			ResourceForkService service = getService();
 
-			return service.createForkEPR(forkPath, new FSProxyDirFork(service,
-					forkPath).describe());
+			return service.createForkEPR(forkPath, new FSProxyDirFork(service, forkPath).describe());
 		} finally {
 			StreamUtils.close(session);
 		}

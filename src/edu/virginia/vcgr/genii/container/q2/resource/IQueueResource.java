@@ -7,9 +7,9 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
-public interface IQueueResource extends IResource {
-	static public final QName QUEUE_EPR_CONSTRUCTION_PARAMETER = new QName(
-			"http://tempuri.org", "queue-epr");
+public interface IQueueResource extends IResource
+{
+	static public final QName QUEUE_EPR_CONSTRUCTION_PARAMETER = new QName("http://tempuri.org", "queue-epr");
 
 	static final public String TOTAL_COUNT_PROPERTY_NAME = "total-job-count";
 
@@ -17,6 +17,5 @@ public interface IQueueResource extends IResource {
 
 	public boolean isAcceptingNewActivites() throws ResourceException;
 
-	public void isAcceptingNewActivites(boolean isAccepting)
-			throws ResourceException;
+	public void isAcceptingNewActivites(boolean isAccepting) throws ResourceException;
 }

@@ -8,7 +8,8 @@ import org.apache.commons.logging.LogFactory;
 /**
  * compatibility object that throws out old credentials. do not use this!
  */
-public class TransientCredentials implements Serializable {
+public class TransientCredentials implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	static public Log _logger = LogFactory.getLog(TransientCredentials.class);

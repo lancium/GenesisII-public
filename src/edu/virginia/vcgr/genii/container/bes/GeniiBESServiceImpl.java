@@ -105,8 +105,8 @@ import edu.virginia.vcgr.jsdl.JobDefinition;
 @ConstructionParametersType(BESConstructionParameters.class)
 @GeniiServiceConfiguration(resourceProvider = BESDBResourceProvider.class)
 @GridDependency(BESActivityServiceImpl.class)
-public class GeniiBESServiceImpl extends ResourceForkBaseService implements
-		GeniiBESPortType {
+public class GeniiBESServiceImpl extends ResourceForkBaseService implements GeniiBESPortType
+{
 	static private Log _logger = LogFactory.getLog(GeniiBESServiceImpl.class);
 
 	BESConstants bconsts = new BESConstants();
@@ -114,7 +114,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	@MInject(lazy = true)
 	private IBESResource _resource;
 
-	private void cleanupBadActivities() {
+	private void cleanupBadActivities()
+	{
 		Collection<BESActivity> allActivities = BES.getAllActivities();
 		boolean isGood;
 
@@ -124,52 +125,42 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 				isGood = activity.isGood();
 			} catch (Throwable cause) {
 				_logger.warn(
-						String.format(
-								"Unable to determine is activity %s is good -- deleting it!",
-								activity.getActivityID()), cause);
+					String.format("Unable to determine is activity %s is good -- deleting it!", activity.getActivityID()),
+					cause);
 			}
 
 			boolean success = false;
 			try {
-				WorkingContext.temporarilyAssumeNewIdentity(activity
-						.getActivityEPR());
+				WorkingContext.temporarilyAssumeNewIdentity(activity.getActivityEPR());
 				success = true;
 
 				if (isGood) {
 					isGood = true;
 					try {
-						Calendar createTime = ResourceManager
-								.getCurrentResource().dereference()
-								.createTime();
+						Calendar createTime = ResourceManager.getCurrentResource().dereference().createTime();
 						if (createTime == null)
 							isGood = false;
 						else
-							isGood = (System.currentTimeMillis() - createTime
-									.getTimeInMillis()) < (1000L * 60 * 60 * 24 * 28);
+							isGood = (System.currentTimeMillis() - createTime.getTimeInMillis()) < (1000L * 60 * 60 * 24 * 28);
 					} catch (Throwable cause) {
-						_logger.warn("Couldn't get create time for activity.",
-								cause);
+						_logger.warn("Couldn't get create time for activity.", cause);
 					}
 				}
 
 				if (!isGood) {
-					_logger.info(String
-							.format("Cleaning up a BES activity that we have determined is bad:  %s.",
-									activity.getActivityID()));
+					_logger.info(String.format("Cleaning up a BES activity that we have determined is bad:  %s.",
+						activity.getActivityID()));
 
 					new BESActivityServiceImpl().destroy(new Destroy());
 				}
 			} catch (Throwable cause) {
-				_logger.error(String.format(
-						"Unable to cleanup \"bad\" activity %s.",
-						activity.getActivityID()), cause);
+				_logger.error(String.format("Unable to cleanup \"bad\" activity %s.", activity.getActivityID()), cause);
 			} finally {
 				if (success) {
 					try {
 						WorkingContext.releaseAssumedIdentity();
 					} catch (Throwable cause) {
-						_logger.error("Unable to release assumed context.",
-								cause);
+						_logger.error("Unable to release assumed context.", cause);
 					}
 				}
 			}
@@ -177,30 +168,30 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	}
 
 	@Override
-	public boolean startup() {
+	public boolean startup()
+	{
 		return super.startup();
 	}
 
 	@Override
-	public void postStartup() {
+	public void postStartup()
+	{
 		try {
 			/*
-			 * In order to make out calls, we have to have a working context so
-			 * we go ahead and create an empty one.
+			 * In order to make out calls, we have to have a working context so we go ahead and
+			 * create an empty one.
 			 */
 			WorkingContext.setCurrentWorkingContext(new WorkingContext());
 
 			/*
-			 * Now we get the database connection pool configured with this
-			 * service
+			 * Now we get the database connection pool configured with this service
 			 */
-			ServerDatabaseConnectionPool connectionPool = ((DBBESResourceFactory) ResourceManager
-					.getServiceResource(_serviceName).getProvider()
-					.getFactory()).getConnectionPool();
+			ServerDatabaseConnectionPool connectionPool =
+				((DBBESResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory())
+					.getConnectionPool();
 
 			// Set cloud connection DB pool
-			CloudMonitor.setConnectionPool((new CloudDBResourceFactory(
-					connectionPool).getConnectionPool()));
+			CloudMonitor.setConnectionPool((new CloudDBResourceFactory(connectionPool).getConnectionPool()));
 
 			BES.loadAllInstances(connectionPool);
 
@@ -216,8 +207,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	}
 
 	@Override
-	protected void setAttributeHandlers() throws NoSuchMethodException,
-			ResourceException, ResourceUnknownFaultType {
+	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
+	{
 		super.setAttributeHandlers();
 
 		new CloudAttributesHandler(getAttributePackage());
@@ -225,18 +216,17 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	}
 
 	@Override
-	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
-			ConstructionParameters cParams,
-			GenesisHashMap constructionParameters,
-			Collection<MessageElement> resolverCreationParameters)
-			throws ResourceException, BaseFaultType, RemoteException {
-		super.postCreate(key, newEPR, cParams, constructionParameters,
-				resolverCreationParameters);
+	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR, ConstructionParameters cParams,
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
+		BaseFaultType, RemoteException
+	{
+		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParameters);
 	}
 
 	static private EndpointReferenceType _localActivityServiceEPR = null;
 
-	public GeniiBESServiceImpl() throws RemoteException {
+	public GeniiBESServiceImpl() throws RemoteException
+	{
 		super("GeniiBESPortType");
 
 		addImplementedPortType(bconsts.BES_FACTORY_PORT_TYPE());
@@ -245,19 +235,18 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	}
 
 	@Override
-	public PortType getFinalWSResourceInterface() {
+	public PortType getFinalWSResourceInterface()
+	{
 		return bconsts.GENII_BES_PORT_TYPE();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateActivityResponseType createActivity(
-			CreateActivityType parameters) throws RemoteException,
-			NotAcceptingNewActivitiesFaultType, InvalidRequestMessageFaultType,
-			UnsupportedFeatureFaultType, NotAuthorizedFaultType {
+	public CreateActivityResponseType createActivity(CreateActivityType parameters) throws RemoteException,
+		NotAcceptingNewActivitiesFaultType, InvalidRequestMessageFaultType, UnsupportedFeatureFaultType, NotAuthorizedFaultType
+	{
 		InMemoryHistoryEventSink historySink = new InMemoryHistoryEventSink();
-		HistoryContext history = HistoryContextFactory.createContext(
-				HistoryEventCategory.CreatingActivity, historySink);
+		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity, historySink);
 
 		ActivityDocumentType adt = parameters.getActivityDocument();
 		JobDefinition_Type jdt = adt.getJobDefinition();
@@ -268,12 +257,10 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 			JobDefinition jaxbType = JSDLUtils.convert(jdt);
 			if (jaxbType.parameterSweeps().size() > 0) {
 				history.createErrorWriter("Parameter Sweep Unsupported.")
-						.format("This type of BES container does not "
-								+ "support Parameter Sweeps.").close();
+					.format("This type of BES container does not " + "support Parameter Sweeps.").close();
 
 				throw new UnsupportedFeatureFaultType(
-						new String[] { "This BES container does not support JSDL parameter sweeps." },
-						null);
+					new String[] { "This BES container does not support JSDL parameter sweeps." }, null);
 			}
 		} catch (JAXBException je) {
 			history.warn(je, "JAXB Error parsing JSDL");
@@ -304,57 +291,47 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		if (_localActivityServiceEPR == null) {
 			// only need to make this epr from scratch once (which involves
 			// a get-attr rpc to the service to get its full epr)
-			_localActivityServiceEPR = EPRUtils.makeEPR(Container
-					.getServiceURL("BESActivityPortType"));
+			_localActivityServiceEPR = EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
 		}
 
-		_logger.info(String.format(
-				"BES with resource key \"%s\" is creating an activity.",
-				_resource.getKey()));
+		_logger.info(String.format("BES with resource key \"%s\" is creating an activity.", _resource.getKey()));
 
 		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
 		history.info("BES Creating Activity Instance");
 
-		EndpointReferenceType entryReference = new BESActivityServiceImpl()
-				.CreateEPR(
-						BESActivityUtils.createCreationProperties(jdt,
-								_resource.getKey(),
-								(BESConstructionParameters) _resource
-										.constructionParameters(getClass()),
-								subscribe), Container
-								.getServiceURL("BESActivityPortType"));
+		EndpointReferenceType entryReference =
+			new BESActivityServiceImpl().CreateEPR(
+				BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
+					(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe),
+				Container.getServiceURL("BESActivityPortType"));
 
-		return new CreateActivityResponseType(entryReference, adt,
-				historySink.eventMessages());
+		return new CreateActivityResponseType(entryReference, adt, historySink.eventMessages());
 
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetActivityDocumentsResponseType getActivityDocuments(
-			GetActivityDocumentsType parameters) throws RemoteException {
+	public GetActivityDocumentsResponseType getActivityDocuments(GetActivityDocumentsType parameters) throws RemoteException
+	{
 		Collection<GetActivityDocumentResponseType> response = new LinkedList<GetActivityDocumentResponseType>();
 
 		for (EndpointReferenceType target : parameters.getActivityIdentifier()) {
 			try {
 				BESActivity activity = _resource.getActivity(target);
-				response.add(new GetActivityDocumentResponseType(target,
-						activity.getJobDefinition(), null, null));
+				response.add(new GetActivityDocumentResponseType(target, activity.getJobDefinition(), null, null));
 			} catch (Throwable cause) {
-				response.add(new GetActivityDocumentResponseType(target, null,
-						BESFaultManager.constructFault(cause), null));
+				response.add(new GetActivityDocumentResponseType(target, null, BESFaultManager.constructFault(cause), null));
 			}
 		}
 
-		return new GetActivityDocumentsResponseType(
-				response.toArray(new GetActivityDocumentResponseType[0]), null);
+		return new GetActivityDocumentsResponseType(response.toArray(new GetActivityDocumentResponseType[0]), null);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetActivityStatusesResponseType getActivityStatuses(
-			GetActivityStatusesType parameters) throws RemoteException,
-			UnknownActivityIdentifierFaultType {
+	public GetActivityStatusesResponseType getActivityStatuses(GetActivityStatusesType parameters) throws RemoteException,
+		UnknownActivityIdentifierFaultType
+	{
 		Collection<GetActivityStatusResponseType> response = new LinkedList<GetActivityStatusResponseType>();
 
 		for (EndpointReferenceType target : parameters.getActivityIdentifier()) {
@@ -362,25 +339,19 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 				BESActivity activity = _resource.getActivity(target);
 				activity.verifyOwner();
 				Collection<Throwable> faults = activity.getFaults();
-				response.add(new GetActivityStatusResponseType(
-						target,
-						activity.getState().toActivityStatusType(),
-						((faults == null) || (faults.size() == 0)) ? null
-								: BESFaultManager.constructFault(faults
-										.toArray(new Throwable[faults.size()])),
-						null));
+				response.add(new GetActivityStatusResponseType(target, activity.getState().toActivityStatusType(),
+					((faults == null) || (faults.size() == 0)) ? null : BESFaultManager.constructFault(faults
+						.toArray(new Throwable[faults.size()])), null));
 			} catch (Throwable cause) {
-				response.add(new GetActivityStatusResponseType(target, null,
-						BESFaultManager.constructFault(cause), null));
+				response.add(new GetActivityStatusResponseType(target, null, BESFaultManager.constructFault(cause), null));
 			}
 		}
 
-		return new GetActivityStatusesResponseType(
-				response.toArray(new GetActivityStatusResponseType[0]), null);
+		return new GetActivityStatusesResponseType(response.toArray(new GetActivityStatusResponseType[0]), null);
 	}
 
-	static private void addAndrewsClassAttributes(String resourceName,
-			Collection<MessageElement> any) {
+	static private void addAndrewsClassAttributes(String resourceName, Collection<MessageElement> any)
+	{
 		final String classNamespace = "http://cs.virginia.edu/classes/andrews-class";
 
 		final QName reliability = new QName(classNamespace, "reliability");
@@ -401,21 +372,20 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		any.add(new MessageElement(downtime, dt));
 	}
 
-	private void addMatchingParameters(Collection<MessageElement> any)
-			throws ResourceUnknownFaultType, ResourceException {
-		Collection<MatchingParameter> matchingParams = _resource
-				.getMatchingParameters();
+	private void addMatchingParameters(Collection<MessageElement> any) throws ResourceUnknownFaultType, ResourceException
+	{
+		Collection<MatchingParameter> matchingParams = _resource.getMatchingParameters();
 		for (MatchingParameter param : matchingParams) {
-			MessageElement me = new MessageElement(
-					GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, param);
+			MessageElement me = new MessageElement(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, param);
 			any.add(me);
 		}
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetFactoryAttributesDocumentResponseType getFactoryAttributesDocument(
-			GetFactoryAttributesDocumentType parameters) throws RemoteException {
+	public GetFactoryAttributesDocumentResponseType getFactoryAttributesDocument(GetFactoryAttributesDocumentType parameters)
+		throws RemoteException
+	{
 		Collection<MessageElement> any = new ArrayList<MessageElement>(4);
 		String resourceName = Hostname.getLocalHostname().toString();
 
@@ -424,28 +394,23 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		URI localResourceManagerType = null;
 
 		try {
-			namingProfiles = new URI[] {
-					new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING),
-					new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
+			namingProfiles =
+				new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING), new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
 			besExtensions = new URI[0];
 
-			BESConstructionParameters consParms = (BESConstructionParameters) _resource
-					.constructionParameters(getClass());
+			BESConstructionParameters consParms = (BESConstructionParameters) _resource.constructionParameters(getClass());
 			if (consParms != null) {
-				NativeQueueConfiguration nqconf = consParms
-						.getNativeQueueConfiguration();
+				NativeQueueConfiguration nqconf = consParms.getNativeQueueConfiguration();
 				if (nqconf != null) {
 					NativeQueue nq = nqconf.nativeQueue();
 					if (nq != null) {
-						localResourceManagerType = nq.resourceManagerType()
-								.toApacheAxisURI();
+						localResourceManagerType = nq.resourceManagerType().toApacheAxisURI();
 					}
 				}
 			}
 
 			if (localResourceManagerType == null)
-				localResourceManagerType = new URI(
-						BESConstants.LOCAL_RESOURCE_MANAGER_TYPE_SIMPLE);
+				localResourceManagerType = new URI(BESConstants.LOCAL_RESOURCE_MANAGER_TYPE_SIMPLE);
 		} catch (Throwable cause) {
 			// This really shouldn't happen
 			_logger.fatal("Unexpected exception in BES.", cause);
@@ -455,37 +420,22 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		addMatchingParameters(any);
 
 		try {
-			MessageElement wallclockAttr = BESAttributesHandler
-					.getWallclockTimeLimitAttr();
+			MessageElement wallclockAttr = BESAttributesHandler.getWallclockTimeLimitAttr();
 			if (wallclockAttr != null)
 				any.add(wallclockAttr);
 			any.addAll(BESAttributesHandler.getSupportedFilesystemsAttr());
-			MessageElement[] resourceAny = any.toArray(new MessageElement[any
-					.size()]);
+			MessageElement[] resourceAny = any.toArray(new MessageElement[any.size()]);
 
-			return new GetFactoryAttributesDocumentResponseType(
-					new FactoryResourceAttributesDocumentType(
-							new BasicResourceAttributesDocumentType(
-									resourceName,
-									BESAttributesHandler.getOperatingSystem(),
-									BESAttributesHandler.getCPUArchitecture(),
-									new Double((double) BESAttributesHandler
-											.getCPUCount()), new Double(
-											(double) BESAttributesHandler
-													.getCPUSpeed()),
-									new Double((double) BESAttributesHandler
-											.getPhysicalMemory()), new Double(
-											(double) BESAttributesHandler
-													.getVirtualMemory()),
-									resourceAny),
-							BESAttributesHandler.getIsAcceptingNewActivities(),
-							BESAttributesHandler.getName(),
-							BESAttributesHandler.getDescription(),
-							BESAttributesHandler.getTotalNumberOfActivities(),
-							BESAttributesHandler.getActivityReferences(), 0,
-							null, namingProfiles, besExtensions,
-							localResourceManagerType,
-							any.toArray(new MessageElement[any.size()])), null);
+			return new GetFactoryAttributesDocumentResponseType(new FactoryResourceAttributesDocumentType(
+				new BasicResourceAttributesDocumentType(resourceName, BESAttributesHandler.getOperatingSystem(),
+					BESAttributesHandler.getCPUArchitecture(), new Double((double) BESAttributesHandler.getCPUCount()),
+					new Double((double) BESAttributesHandler.getCPUSpeed()), new Double(
+						(double) BESAttributesHandler.getPhysicalMemory()), new Double(
+						(double) BESAttributesHandler.getVirtualMemory()), resourceAny),
+				BESAttributesHandler.getIsAcceptingNewActivities(), BESAttributesHandler.getName(),
+				BESAttributesHandler.getDescription(), BESAttributesHandler.getTotalNumberOfActivities(),
+				BESAttributesHandler.getActivityReferences(), 0, null, namingProfiles, besExtensions, localResourceManagerType,
+				any.toArray(new MessageElement[any.size()])), null);
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unexpected BES exception.", sqe);
 		}
@@ -493,105 +443,104 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public StartAcceptingNewActivitiesResponseType startAcceptingNewActivities(
-			StartAcceptingNewActivitiesType parameters) throws RemoteException {
-		_resource.setProperty(IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES,
-				Boolean.TRUE);
+	public StartAcceptingNewActivitiesResponseType startAcceptingNewActivities(StartAcceptingNewActivitiesType parameters)
+		throws RemoteException
+	{
+		_resource.setProperty(IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES, Boolean.TRUE);
 		return new StartAcceptingNewActivitiesResponseType(null);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public StopAcceptingNewActivitiesResponseType stopAcceptingNewActivities(
-			StopAcceptingNewActivitiesType parameters) throws RemoteException {
-		_resource.setProperty(IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES,
-				Boolean.FALSE);
+	public StopAcceptingNewActivitiesResponseType stopAcceptingNewActivities(StopAcceptingNewActivitiesType parameters)
+		throws RemoteException
+	{
+		_resource.setProperty(IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES, Boolean.FALSE);
 		return new StopAcceptingNewActivitiesResponseType(null);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public TerminateActivitiesResponseType terminateActivities(
-			TerminateActivitiesType parameters) throws RemoteException,
-			UnknownActivityIdentifierFaultType {
+	public TerminateActivitiesResponseType terminateActivities(TerminateActivitiesType parameters) throws RemoteException,
+		UnknownActivityIdentifierFaultType
+	{
 		Collection<TerminateActivityResponseType> responses = new LinkedList<TerminateActivityResponseType>();
 
 		for (EndpointReferenceType aepr : parameters.getActivityIdentifier()) {
 			responses.add(terminateActivity(aepr));
 		}
 
-		return new TerminateActivitiesResponseType(
-				responses.toArray(new TerminateActivityResponseType[0]), null);
+		return new TerminateActivitiesResponseType(responses.toArray(new TerminateActivityResponseType[0]), null);
 	}
 
-	static public TerminateActivityResponseType terminateActivity(
-			EndpointReferenceType activity) throws RemoteException {
+	static public TerminateActivityResponseType terminateActivity(EndpointReferenceType activity) throws RemoteException
+	{
 		try {
-			GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class,
-					activity);
+			GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, activity);
 			client.destroy(new Destroy());
 			return new TerminateActivityResponseType(activity, true, null, null);
 		} catch (Throwable cause) {
-			return new TerminateActivityResponseType(activity, false,
-					BESFaultManager.constructFault(cause), null);
+			return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
 		}
 	}
 
 	@Override
-	public Object completeJobs(String[] completeRequest) throws RemoteException {
+	public Object completeJobs(String[] completeRequest) throws RemoteException
+	{
 		return null;
 	}
 
 	@Override
-	public Object configureResource(ConfigureRequestType configureRequest)
-			throws RemoteException {
+	public Object configureResource(ConfigureRequestType configureRequest) throws RemoteException
+	{
 		return null;
 	}
 
 	@Override
-	public Object forceUpdate(String[] forceUpdateRequest)
-			throws RemoteException {
+	public Object forceUpdate(String[] forceUpdateRequest) throws RemoteException
+	{
 		return null;
 	}
 
 	@Override
-	public GetJobLogResponse getJobLog(GetJobLogRequest getJobLogRequest)
-			throws RemoteException {
+	public GetJobLogResponse getJobLog(GetJobLogRequest getJobLogRequest) throws RemoteException
+	{
 		return null;
 	}
 
 	@Override
-	public IterateListResponseType iterateListJobs(Object iterateListRequest)
-			throws RemoteException {
+	public IterateListResponseType iterateListJobs(Object iterateListRequest) throws RemoteException
+	{
 		return null;
 	}
 
 	@Override
-	public IterateStatusResponseType iterateStatus(String[] iterateStatusRequest)
-			throws RemoteException {
+	public IterateStatusResponseType iterateStatus(String[] iterateStatusRequest) throws RemoteException
+	{
 		return null;
 	}
 
 	@Override
-	public Object killJobs(String[] killRequest) throws RemoteException {
+	public Object killJobs(String[] killRequest) throws RemoteException
+	{
 		return null;
 	}
 
 	@Override
-	public JobErrorPacket[] queryErrorInformation(QueryErrorRequest arg0)
-			throws RemoteException {
+	public JobErrorPacket[] queryErrorInformation(QueryErrorRequest arg0) throws RemoteException
+	{
 		return null;
 	}
 
 	@Override
-	public Object rescheduleJobs(String[] rescheduleJobsRequest)
-			throws RemoteException {
+	public Object rescheduleJobs(String[] rescheduleJobsRequest) throws RemoteException
+	{
 		return null;
 	}
 
 	@Override
-	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest)
-			throws RemoteException {
+	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest) throws RemoteException
+	{
 		return null;
 	}
 }

@@ -15,19 +15,21 @@ import edu.virginia.vcgr.genii.client.dialog.CheckBoxDialog;
 import edu.virginia.vcgr.genii.client.dialog.CheckBoxItem;
 import edu.virginia.vcgr.genii.client.dialog.MenuItem;
 
-public class GuiCheckBoxDialog extends AbstractGuiDialog implements
-		CheckBoxDialog {
+public class GuiCheckBoxDialog extends AbstractGuiDialog implements CheckBoxDialog
+{
 	static final long serialVersionUID = 0L;
 
 	private CheckBoxItem[] _items;
 	private JCheckBox[] _boxes;
 
-	public GuiCheckBoxDialog(String title, String prompt, CheckBoxItem... items) {
+	public GuiCheckBoxDialog(String title, String prompt, CheckBoxItem... items)
+	{
 		super(title, prompt, items);
 	}
 
 	@Override
-	protected JComponent createBody(Object[] parameters) {
+	protected JComponent createBody(Object[] parameters)
+	{
 		String prompt = (String) parameters[0];
 		_items = (CheckBoxItem[]) parameters[1];
 
@@ -41,22 +43,19 @@ public class GuiCheckBoxDialog extends AbstractGuiDialog implements
 		JPanel panel = new JPanel(new GridBagLayout());
 
 		for (JCheckBox box : _boxes) {
-			panel.add(box, new GridBagConstraints(0,
-					GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0,
-					GridBagConstraints.WEST, GridBagConstraints.NONE,
-					new Insets(1, 1, 1, 1), 1, 1));
+			panel.add(box, new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0, GridBagConstraints.WEST,
+				GridBagConstraints.NONE, new Insets(1, 1, 1, 1), 1, 1));
 		}
 
-		panel.add(new JLabel(prompt), new GridBagConstraints(0,
-				GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0,
-				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
-						5, 5, 5), 5, 5));
+		panel.add(new JLabel(prompt), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0,
+			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		return panel;
 	}
 
 	@Override
-	public Collection<MenuItem> getCheckedItems() {
+	public Collection<MenuItem> getCheckedItems()
+	{
 		Collection<MenuItem> items = new LinkedList<MenuItem>();
 
 		for (int lcv = 0; lcv < _boxes.length; lcv++) {

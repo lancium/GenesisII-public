@@ -9,15 +9,16 @@ import javax.swing.JTextField;
 
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 
-public class BrowseRNSPathAction extends AbstractAction {
+public class BrowseRNSPathAction extends AbstractAction
+{
 	static final long serialVersionUID = 0L;
 
 	private JDialog _parent;
 	private JTextField _target;
 	String _title;
 
-	public BrowseRNSPathAction(JDialog parent, String label, JTextField target,
-			String title) {
+	public BrowseRNSPathAction(JDialog parent, String label, JTextField target, String title)
+	{
 		super(label);
 
 		_parent = parent;
@@ -26,7 +27,8 @@ public class BrowseRNSPathAction extends AbstractAction {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e)
+	{
 		try {
 			RNSBrowserDialog dialog = new RNSBrowserDialog(_parent, _title);
 			dialog.setModalityType(ModalityType.APPLICATION_MODAL);

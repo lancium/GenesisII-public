@@ -15,14 +15,14 @@ import org.apache.log4j.Logger;
 
 import edu.virginia.vcgr.genii.gjt.util.Duple;
 
-public class VariableManager implements ParameterizableListener {
+public class VariableManager implements ParameterizableListener
+{
 	static private Logger _logger = Logger.getLogger(VariableManager.class);
 
-	static final private Pattern VARIABLE_PATTERN = Pattern
-			.compile("\\$\\{([^}]+)\\}");
+	static final private Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{([^}]+)\\}");
 
-	static final public Duple<String, List<VariableInformation>> findVariables(
-			String text) {
+	static final public Duple<String, List<VariableInformation>> findVariables(String text)
+	{
 		int shift = 0;
 		int lastEnd = 0;
 		StringBuilder newString = new StringBuilder();
@@ -32,22 +32,21 @@ public class VariableManager implements ParameterizableListener {
 		while (matcher.find()) {
 			newString.append(text.substring(lastEnd, matcher.start()));
 			lastEnd = matcher.end();
-			info.add(new VariableInformation(matcher.group(1), matcher.start()
-					- shift));
+			info.add(new VariableInformation(matcher.group(1), matcher.start() - shift));
 			shift += 3;
 			newString.append(matcher.group(1));
 		}
 		newString.append(text.substring(lastEnd));
 
-		return new Duple<String, List<VariableInformation>>(
-				newString.toString(), info);
+		return new Duple<String, List<VariableInformation>>(newString.toString(), info);
 	}
 
 	private Map<String, VariableCounter> _counters = new HashMap<String, VariableCounter>();
 
 	private Collection<VariableListener> _listeners = new LinkedList<VariableListener>();
 
-	final private void fireVariableAdded(String variableName) {
+	final private void fireVariableAdded(String variableName)
+	{
 		Collection<VariableListener> listeners;
 
 		synchronized (_listeners) {
@@ -58,7 +57,8 @@ public class VariableManager implements ParameterizableListener {
 			listener.variableAdded(this, variableName);
 	}
 
-	final private void fireVariableRemoved(String variableName) {
+	final private void fireVariableRemoved(String variableName)
+	{
 		Collection<VariableListener> listeners;
 
 		synchronized (_listeners) {
@@ -69,8 +69,8 @@ public class VariableManager implements ParameterizableListener {
 			listener.variableRemoved(this, variableName);
 	}
 
-	final private void modifyCounts(String text,
-			Map<String, VariableCounter> counts, int multiplier) {
+	final private void modifyCounts(String text, Map<String, VariableCounter> counts, int multiplier)
+	{
 		Matcher matcher = VARIABLE_PATTERN.matcher(text);
 		while (matcher.find()) {
 			String name = matcher.group(1);
@@ -81,19 +81,22 @@ public class VariableManager implements ParameterizableListener {
 		}
 	}
 
-	final public void addVariableListener(VariableListener listener) {
+	final public void addVariableListener(VariableListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	final public void removeVariableListener(VariableListener listener) {
+	final public void removeVariableListener(VariableListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	final public Set<String> variables() {
+	final public Set<String> variables()
+	{
 		Set<String> ret = new HashSet<String>();
 		for (Map.Entry<String, VariableCounter> variable : _counters.entrySet()) {
 			if (variable.getValue().get() > 0)
@@ -103,7 +106,8 @@ public class VariableManager implements ParameterizableListener {
 		return ret;
 	}
 
-	final void modifyVariableCount(String variableName, int delta) {
+	final void modifyVariableCount(String variableName, int delta)
+	{
 		boolean added = false;
 		boolean removed = false;
 
@@ -114,22 +118,18 @@ public class VariableManager implements ParameterizableListener {
 			VariableCounter counter = _counters.get(variableName);
 			if (delta > 0) {
 				if (counter == null) {
-					_counters.put(variableName, counter = new VariableCounter(
-							delta));
+					_counters.put(variableName, counter = new VariableCounter(delta));
 					added = true;
 				} else
 					counter.modify(delta);
 			} else {
 				if (counter == null) {
-					_logger.warn(String.format(
-							"Variable manager asked to decrement a variable "
-									+ "that doesn't exist (%s).", variableName));
+					_logger.warn(String.format("Variable manager asked to decrement a variable " + "that doesn't exist (%s).",
+						variableName));
 				} else {
 					if (counter.modify(delta) < 0) {
-						_logger.warn(String.format(
-								"Variable manager asked to decrement a variable "
-										+ "below a count of 0 (%s).",
-								variableName));
+						_logger.warn(String.format("Variable manager asked to decrement a variable "
+							+ "below a count of 0 (%s).", variableName));
 						counter.set(0);
 					}
 
@@ -140,8 +140,8 @@ public class VariableManager implements ParameterizableListener {
 				}
 			}
 
-			_logger.debug(String.format("Variable %s has a count of %d\n",
-					variableName, (counter == null) ? delta : counter.get()));
+			_logger.debug(String.format("Variable %s has a count of %d\n", variableName,
+				(counter == null) ? delta : counter.get()));
 		}
 
 		if (added)
@@ -150,7 +150,8 @@ public class VariableManager implements ParameterizableListener {
 			fireVariableRemoved(variableName);
 	}
 
-	final void handleStringReplacement(String oldValue, String newValue) {
+	final void handleStringReplacement(String oldValue, String newValue)
+	{
 		Map<String, VariableCounter> tmpCounter = new HashMap<String, VariableCounter>();
 
 		if (oldValue == null)
@@ -169,7 +170,8 @@ public class VariableManager implements ParameterizableListener {
 	}
 
 	@Override
-	public void parameterizableStringModified(String oldValue, String newValue) {
+	public void parameterizableStringModified(String oldValue, String newValue)
+	{
 		handleStringReplacement(oldValue, newValue);
 	}
 }

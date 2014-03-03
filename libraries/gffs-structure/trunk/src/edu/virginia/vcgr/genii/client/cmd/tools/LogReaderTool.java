@@ -26,7 +26,8 @@ import edu.virginia.vcgr.genii.common.LogHierarchyEntryType;
 import edu.virginia.vcgr.genii.common.LogRetrieveResponseType;
 import edu.virginia.vcgr.genii.common.RPCCallerType;
 
-public class LogReaderTool extends BaseGridTool {
+public class LogReaderTool extends BaseGridTool
+{
 	private final Log _logger = LogFactory.getLog(LogReaderTool.class);
 	static final private String _DESCRIPTION = "config/tooldocs/description/dreadlog";
 	static final private String _USAGE = "config/tooldocs/usage/ureadlog";
@@ -38,36 +39,40 @@ public class LogReaderTool extends BaseGridTool {
 	private boolean _entries = true;
 	private boolean _recursive = false;
 
-	public LogReaderTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.DATA);
+	public LogReaderTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "resource" })
-	public void setResource(String path) {
+	public void setResource(String path)
+	{
 		_resourcePath = path;
 	}
 
 	@Option({ "rpcs-only" })
-	public void setRpcs() {
+	public void setRpcs()
+	{
 		_rpcs = true;
 		_entries = false;
 	}
 
 	@Option({ "entries-only" })
-	public void setLogEntries() {
+	public void setLogEntries()
+	{
 		_entries = true;
 		_rpcs = false;
 	}
 
 	@Option({ "recursive", "r" })
-	public void setrecursive() {
+	public void setrecursive()
+	{
 		_recursive = true;
 	}
 
-	private Collection<EndpointReferenceType> getEPRFromDatabase(
-			String[] whichRPCs) throws ToolException {
+	private Collection<EndpointReferenceType> getEPRFromDatabase(String[] whichRPCs) throws ToolException
+	{
 		Collection<EndpointReferenceType> ret = null;
 		if (whichRPCs != null && whichRPCs.length > 0) {
 			DLogDatabase db = DLogUtils.getDBConnector();
@@ -80,8 +85,7 @@ public class LogReaderTool extends BaseGridTool {
 							ret.add(epr);
 					}
 				} catch (SQLException e) {
-					throw new ToolException(
-							"Problem retrieving EPRs for specified RPCID(s)", e);
+					throw new ToolException("Problem retrieving EPRs for specified RPCID(s)", e);
 				}
 			}
 		}
@@ -89,7 +93,8 @@ public class LogReaderTool extends BaseGridTool {
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		List<String> args = getArguments();
 		List<GeniiCommon> loggers = new LinkedList<GeniiCommon>();
 
@@ -116,11 +121,9 @@ public class LogReaderTool extends BaseGridTool {
 				}
 			}
 		} else if (_resourcePath != null) {
-			RNSPath resourcePath = RNSPath.getCurrent().lookup(_resourcePath,
-					RNSPathQueryFlags.MUST_EXIST);
+			RNSPath resourcePath = RNSPath.getCurrent().lookup(_resourcePath, RNSPathQueryFlags.MUST_EXIST);
 
-			GeniiCommon logger = DLogUtils
-					.getLogger(resourcePath.getEndpoint());
+			GeniiCommon logger = DLogUtils.getLogger(resourcePath.getEndpoint());
 			if (logger == null) {
 				stdout.println("No logger services available for this resource");
 				return 0;
@@ -128,10 +131,8 @@ public class LogReaderTool extends BaseGridTool {
 				loggers.add(logger);
 			}
 		} else {
-			RNSPath loggerPath = RNSPath.getCurrent().lookup(_logServicePath,
-					RNSPathQueryFlags.MUST_EXIST);
-			loggers.add(ClientUtils.createProxy(GeniiCommon.class,
-					loggerPath.getEndpoint()));
+			RNSPath loggerPath = RNSPath.getCurrent().lookup(_logServicePath, RNSPathQueryFlags.MUST_EXIST);
+			loggers.add(ClientUtils.createProxy(GeniiCommon.class, loggerPath.getEndpoint()));
 		}
 
 		// create a port
@@ -164,22 +165,21 @@ public class LogReaderTool extends BaseGridTool {
 		return 0;
 	}
 
-	private void printEntries(String rpcID, DLogDatabase db)
-			throws SQLException, RemoteException {
+	private void printEntries(String rpcID, DLogDatabase db) throws SQLException, RemoteException
+	{
 		// for the local kind
 		printEntries(rpcID, db, 1);
 	}
 
-	private void printEntries(String rpcID, DLogDatabase db, int level)
-			throws SQLException, RemoteException {
+	private void printEntries(String rpcID, DLogDatabase db, int level) throws SQLException, RemoteException
+	{
 		String indent = "";
 		for (int i = 0; i < level; ++i) {
 			indent += "  ";
 		}
 
 		if (_rpcs) {
-			Map<String, Collection<RPCCallerType>> childIDs = db
-					.selectChildren(rpcID);
+			Map<String, Collection<RPCCallerType>> childIDs = db.selectChildren(rpcID);
 
 			if (childIDs != null && !childIDs.isEmpty()) {
 				for (String parent : childIDs.keySet()) {
@@ -192,30 +192,21 @@ public class LogReaderTool extends BaseGridTool {
 						stdout.println(indent + "+" + child.getRpcid());
 						try {
 							if (_recursive) {
-								EndpointReferenceType targetEPR = child
-										.getMetadata().getTargetEPR();
+								EndpointReferenceType targetEPR = child.getMetadata().getTargetEPR();
 
 								if (targetEPR == null) {
-									printEntries(child.getRpcid(), db,
-											level + 1);
+									printEntries(child.getRpcid(), db, level + 1);
 								} else {
-									GeniiCommon logger = DLogUtils
-											.getLogger(targetEPR);
+									GeniiCommon logger = DLogUtils.getLogger(targetEPR);
 									if (logger != null)
-										printEntries(child.getRpcid(), logger,
-												level + 1);
+										printEntries(child.getRpcid(), logger, level + 1);
 									else
-										stdout.println(indent
-												+ "No logger for "
-												+ child.getRpcid());
+										stdout.println(indent + "No logger for " + child.getRpcid());
 								}
 							}
 						} catch (RemoteException e) {
-							stderr.println(indent
-									+ "Couldn't find endpoint for entry "
-									+ child.getRpcid());
-							_logger.error("Couldn't find endpoint for entry "
-									+ child.getRpcid(), e);
+							stderr.println(indent + "Couldn't find endpoint for entry " + child.getRpcid());
+							_logger.error("Couldn't find endpoint for entry " + child.getRpcid(), e);
 						}
 					}
 				}
@@ -230,8 +221,7 @@ public class LogReaderTool extends BaseGridTool {
 			if (logs != null) {
 				for (LogEntryType entry : logs) {
 					stdout.println(indent + "-" + entry.getMessage());
-					if (entry.getStackTrace() != null
-							&& !entry.getStackTrace().isEmpty()) {
+					if (entry.getStackTrace() != null && !entry.getStackTrace().isEmpty()) {
 						stdout.println(indent + "--- Stack trace follows: ---");
 						stdout.println(entry.getStackTrace());
 						stdout.println(indent + "--- End Stack Trace ---");
@@ -243,13 +233,13 @@ public class LogReaderTool extends BaseGridTool {
 		}
 	}
 
-	protected void printEntries(String rpcID, GeniiCommon logger)
-			throws RemoteException {
+	protected void printEntries(String rpcID, GeniiCommon logger) throws RemoteException
+	{
 		printEntries(rpcID, logger, 1);
 	}
 
-	protected void printEntries(String rpcID, GeniiCommon logger, int level)
-			throws RemoteException {
+	protected void printEntries(String rpcID, GeniiCommon logger, int level) throws RemoteException
+	{
 		String indent = "";
 		for (int i = 0; i < level; ++i) {
 			indent += "  ";
@@ -270,19 +260,13 @@ public class LogReaderTool extends BaseGridTool {
 
 						try {
 							if (_recursive) {
-								EndpointReferenceType targetEPR = child
-										.getMetadata().getTargetEPR();
-								GeniiCommon newlogger = DLogUtils
-										.getLogger(targetEPR);
-								printEntries(child.getRpcid(), newlogger,
-										level + 1);
+								EndpointReferenceType targetEPR = child.getMetadata().getTargetEPR();
+								GeniiCommon newlogger = DLogUtils.getLogger(targetEPR);
+								printEntries(child.getRpcid(), newlogger, level + 1);
 							}
 						} catch (RemoteException e) {
-							stderr.println(indent
-									+ "Couldn't find endpoint for entry "
-									+ child.getRpcid());
-							_logger.error("Couldn't find endpoint for entry "
-									+ child.getRpcid(), e);
+							stderr.println(indent + "Couldn't find endpoint for entry " + child.getRpcid());
+							_logger.error("Couldn't find endpoint for entry " + child.getRpcid(), e);
 						}
 					}
 				}
@@ -297,8 +281,7 @@ public class LogReaderTool extends BaseGridTool {
 			if (logs != null) {
 				for (LogEntryType entry : logs) {
 					stdout.println(indent + "-" + entry.getMessage());
-					if (entry.getStackTrace() != null
-							&& !entry.getStackTrace().isEmpty()) {
+					if (entry.getStackTrace() != null && !entry.getStackTrace().isEmpty()) {
 						stdout.println(indent + "--- Stack trace follows: ---");
 						stdout.println(entry.getStackTrace());
 						stdout.println(indent + "--- End Stack Trace ---");
@@ -311,9 +294,9 @@ public class LogReaderTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
-		if (_logServicePath == null && _resourcePath == null
-				&& getArguments().size() == 0) {
+	protected void verify() throws ToolException
+	{
+		if (_logServicePath == null && _resourcePath == null && getArguments().size() == 0) {
 			throw new InvalidToolUsageException(usage());
 		}
 	}

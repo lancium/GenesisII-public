@@ -13,49 +13,44 @@ import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemUsageInformation;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemWatchHandler;
 
-public class LogWatchHandler implements FilesystemWatchHandler {
+public class LogWatchHandler implements FilesystemWatchHandler
+{
 	static private Log _logger = LogFactory.getLog(LogWatchHandler.class);
 
 	private LogWatchConfiguration _config;
 
-	public LogWatchHandler(Element element) throws JAXBException {
-		JAXBContext context = JAXBContext
-				.newInstance(LogWatchConfiguration.class);
+	public LogWatchHandler(Element element) throws JAXBException
+	{
+		JAXBContext context = JAXBContext.newInstance(LogWatchConfiguration.class);
 		Unmarshaller u = context.createUnmarshaller();
 		_config = u.unmarshal(element, LogWatchConfiguration.class).getValue();
 	}
 
 	@Override
-	public void notifyFilesystemEvent(FilesystemManager manager,
-			String filesystemName, Filesystem filesystem,
-			FilesystemUsageInformation usageInformation, boolean matched) {
+	public void notifyFilesystemEvent(FilesystemManager manager, String filesystemName, Filesystem filesystem,
+		FilesystemUsageInformation usageInformation, boolean matched)
+	{
 		switch (_config.level()) {
-		case Trace:
-			if (_logger.isTraceEnabled())
-				_logger.trace(_config.format(filesystemName,
-						usageInformation.percentUsed()));
-			break;
-		case Debug:
-			if (_logger.isDebugEnabled())
-				_logger.debug(_config.format(filesystemName,
-						usageInformation.percentUsed()));
-			break;
-		case Info:
-			_logger.info(_config.format(filesystemName,
-					usageInformation.percentUsed()));
-			break;
-		case Warn:
-			_logger.warn(_config.format(filesystemName,
-					usageInformation.percentUsed()));
-			break;
-		case Error:
-			_logger.error(_config.format(filesystemName,
-					usageInformation.percentUsed()));
-			break;
-		case Fatal:
-			_logger.fatal(_config.format(filesystemName,
-					usageInformation.percentUsed()));
-			break;
+			case Trace:
+				if (_logger.isTraceEnabled())
+					_logger.trace(_config.format(filesystemName, usageInformation.percentUsed()));
+				break;
+			case Debug:
+				if (_logger.isDebugEnabled())
+					_logger.debug(_config.format(filesystemName, usageInformation.percentUsed()));
+				break;
+			case Info:
+				_logger.info(_config.format(filesystemName, usageInformation.percentUsed()));
+				break;
+			case Warn:
+				_logger.warn(_config.format(filesystemName, usageInformation.percentUsed()));
+				break;
+			case Error:
+				_logger.error(_config.format(filesystemName, usageInformation.percentUsed()));
+				break;
+			case Fatal:
+				_logger.fatal(_config.format(filesystemName, usageInformation.percentUsed()));
+				break;
 		}
 	}
 }

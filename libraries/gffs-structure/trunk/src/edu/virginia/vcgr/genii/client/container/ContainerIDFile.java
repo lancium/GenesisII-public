@@ -14,14 +14,15 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLock;
 
-public class ContainerIDFile {
+public class ContainerIDFile
+{
 	static private Log _logger = LogFactory.getLog(ContainerIDFile.class);
 
 	static final private String _CONTAINER_ID_FILENAME = "container-id.dat";
 
-	static public GUID containerID() {
-		File target = new File(ConfigurationManager.getCurrentConfiguration()
-				.getUserDirectory(), _CONTAINER_ID_FILENAME);
+	static public GUID containerID()
+	{
+		File target = new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(), _CONTAINER_ID_FILENAME);
 
 		if (!target.exists())
 			return null;
@@ -48,9 +49,9 @@ public class ContainerIDFile {
 		return null;
 	}
 
-	static public void containerID(GUID guid) {
-		File target = new File(ConfigurationManager.getCurrentConfiguration()
-				.getUserDirectory(), _CONTAINER_ID_FILENAME);
+	static public void containerID(GUID guid)
+	{
+		File target = new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(), _CONTAINER_ID_FILENAME);
 
 		FileLock lock = null;
 		PrintWriter pw = null;

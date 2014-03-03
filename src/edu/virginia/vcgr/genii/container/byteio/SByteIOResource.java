@@ -11,19 +11,18 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
-public class SByteIOResource extends RByteIOResource implements
-		ISByteIOResource {
-	static public QName MUST_DESTROY_PROPERTY = new QName(
-			GenesisIIConstants.GENESISII_NS, "must-destroy");
+public class SByteIOResource extends RByteIOResource implements ISByteIOResource
+{
+	static public QName MUST_DESTROY_PROPERTY = new QName(GenesisIIConstants.GENESISII_NS, "must-destroy");
 	static private final String _INTERNAL_MUST_DESTROY_PROPERTY = "edu.virginia.vcgr.genii.byteio.sbyteio.must-destroy";
 
-	public SByteIOResource(ResourceKey parentKey,
-			ServerDatabaseConnectionPool connectionPool) throws SQLException {
+	public SByteIOResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
+	{
 		super(parentKey, connectionPool);
 	}
 
-	public File chooseFile(GenesisHashMap creationProperties)
-			throws ResourceException {
+	public File chooseFile(GenesisHashMap creationProperties) throws ResourceException
+	{
 		org.apache.axis.message.MessageElement fileAny;
 		org.apache.axis.message.MessageElement deleteAny;
 		// String fileAny;
@@ -33,24 +32,17 @@ public class SByteIOResource extends RByteIOResource implements
 
 		if (!isServiceResource()) {
 			if (creationProperties == null)
-				throw new ResourceException(
-						"StreamableByteIO Instances MUST have a file path.");
+				throw new ResourceException("StreamableByteIO Instances MUST have a file path.");
 
-			fileAny = creationProperties
-					.getAxisMessageElement(FILE_PATH_PROPERTY);
+			fileAny = creationProperties.getAxisMessageElement(FILE_PATH_PROPERTY);
 			// fileAny = (String)creationProperties.get(FILE_PATH_PROPERTY);
 			if (fileAny == null)
-				throw new ResourceException(
-						"StreamableByteIO Instances MUST have a file path "
-								+ "element creation property.");
-			deleteAny = creationProperties
-					.getAxisMessageElement(MUST_DESTROY_PROPERTY);
-			// deleteAny =
-			// (Boolean)creationProperties.get(MUST_DESTROY_PROPERTY);
+				throw new ResourceException("StreamableByteIO Instances MUST have a file path " + "element creation property.");
+			deleteAny = creationProperties.getAxisMessageElement(MUST_DESTROY_PROPERTY);
+			// deleteAny = (Boolean)creationProperties.get(MUST_DESTROY_PROPERTY);
 			if (deleteAny == null)
-				throw new ResourceException(
-						"StreamableByteIO Instances MUST have a must destroy "
-								+ "element creation property.");
+				throw new ResourceException("StreamableByteIO Instances MUST have a must destroy "
+					+ "element creation property.");
 			try {
 				file = new File(fileAny.getValue());
 				// file = new File(fileAny);
@@ -65,8 +57,7 @@ public class SByteIOResource extends RByteIOResource implements
 		}
 
 		if (!file.exists())
-			throw new ResourceException("Cannot read file \""
-					+ file.getAbsolutePath() + "\".");
+			throw new ResourceException("Cannot read file \"" + file.getAbsolutePath() + "\".");
 
 		setProperty(_INTERNAL_FILE_PATH_PROP_NAME, file.getAbsolutePath());
 		setProperty(_INTERNAL_MUST_DESTROY_PROPERTY, mustDelete);
@@ -74,7 +65,8 @@ public class SByteIOResource extends RByteIOResource implements
 		return file;
 	}
 
-	public void destroy() throws ResourceException {
+	public void destroy() throws ResourceException
+	{
 		Boolean mustDestroy = (Boolean) getProperty(_INTERNAL_MUST_DESTROY_PROPERTY);
 		if (mustDestroy != null && mustDestroy.booleanValue()) {
 			File myFile = getCurrentFile();

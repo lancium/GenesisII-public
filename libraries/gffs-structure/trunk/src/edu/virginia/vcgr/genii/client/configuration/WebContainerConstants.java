@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.configuration;
 
-public interface WebContainerConstants {
+public interface WebContainerConstants
+{
 	static public final String LISTEN_PORT_PROP = "edu.virginia.vcgr.genii.container.listen-port";
 	static public final String DPAGES_PORT_PROP = "edu.virginia.vcgr.genii.container.dpages-port";
 

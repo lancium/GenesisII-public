@@ -26,26 +26,31 @@ import org.morgan.util.Version;
 import org.morgan.util.io.StreamUtils;
 
 /**
- * Reads and stores a file whose format is line after line of:
- * version:relative-path with a hash symbol meaning comment to end of line
+ * Reads and stores a file whose format is line after line of: version:relative-path with a hash
+ * symbol meaning comment to end of line
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class VersionList {
+public class VersionList
+{
 	private HashMap<String, Version> _versions = new HashMap<String, Version>();
 
-	public VersionList() {
+	public VersionList()
+	{
 	}
 
-	public VersionList(InputStream in) throws IOException {
+	public VersionList(InputStream in) throws IOException
+	{
 		this(new BufferedReader(new InputStreamReader(in)));
 	}
 
-	public VersionList(Reader reader) throws IOException {
+	public VersionList(Reader reader) throws IOException
+	{
 		this(new BufferedReader(reader));
 	}
 
-	public VersionList(BufferedReader reader) throws IOException {
+	public VersionList(BufferedReader reader) throws IOException
+	{
 		String origLine;
 		String line;
 
@@ -59,31 +64,31 @@ public class VersionList {
 				continue;
 			int firstBracket = line.indexOf("[");
 			if (firstBracket < 0)
-				throw new IOException("Can't parse version line \"" + origLine
-						+ "\".");
+				throw new IOException("Can't parse version line \"" + origLine + "\".");
 			int secondBracket = line.indexOf("]", firstBracket);
 			if (secondBracket < 0)
-				throw new IOException("Can't parse version line \"" + origLine
-						+ "\".");
+				throw new IOException("Can't parse version line \"" + origLine + "\".");
 
 			String relativePath = line.substring(0, firstBracket).trim();
-			Version v = new Version(line.substring(firstBracket + 1,
-					secondBracket).trim());
+			Version v = new Version(line.substring(firstBracket + 1, secondBracket).trim());
 			_versions.put(relativePath, v);
 		}
 	}
 
-	public String[] getRelativeFiles() {
+	public String[] getRelativeFiles()
+	{
 		String[] ret = new String[_versions.size()];
 		_versions.keySet().toArray(ret);
 		return ret;
 	}
 
-	public Version getVersion(String relativeFile) {
+	public Version getVersion(String relativeFile)
+	{
 		return _versions.get(relativeFile);
 	}
 
-	public void store(File outputFile) throws IOException {
+	public void store(File outputFile) throws IOException
+	{
 		PrintStream ps = null;
 
 		try {
@@ -94,7 +99,8 @@ public class VersionList {
 		}
 	}
 
-	public void store(PrintStream ps) {
+	public void store(PrintStream ps)
+	{
 		ps.println("#");
 		ps.println("# Auto generated");
 		ps.println("#");

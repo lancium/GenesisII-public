@@ -14,27 +14,29 @@ import edu.virginia.vcgr.genii.security.credentials.X509Identity;
  * @author dmerrill
  * @author ckoeritz
  */
-public class AxisX509Identity implements XMLCompatible {
+public class AxisX509Identity implements XMLCompatible
+{
 	X509Identity _realId;
 
-	public AxisX509Identity(X509Identity toOutput) {
+	public AxisX509Identity(X509Identity toOutput)
+	{
 		_realId = toOutput;
 	}
 
-	public AxisX509Identity(MessageElement secRef)
-			throws GeneralSecurityException {
-		_realId.setIdentity(WSSecurityUtils
-				.getChainFromPkiPathSecTokenRef(secRef));
+	public AxisX509Identity(MessageElement secRef) throws GeneralSecurityException
+	{
+		_realId.setIdentity(WSSecurityUtils.getChainFromPkiPathSecTokenRef(secRef));
 	}
 
 	@Override
-	public String getTokenType() {
+	public String getTokenType()
+	{
 		return WSSecurityUtils.X509PKIPathv1_URI;
 	}
 
 	@Override
-	public Element convertToMessageElement() throws GeneralSecurityException {
-		return (Element) WSSecurityUtils.makePkiPathSecTokenRef(_realId
-				.getOriginalAsserter());
+	public Element convertToMessageElement() throws GeneralSecurityException
+	{
+		return (Element) WSSecurityUtils.makePkiPathSecTokenRef(_realId.getOriginalAsserter());
 	}
 }

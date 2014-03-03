@@ -1,6 +1,7 @@
 package org.morgan.util.gui.progress;
 
-public interface ProgressTask<Type> {
+public interface ProgressTask<Type>
+{
 	public boolean isProgressIndeterminate();
 
 	public int getMinimumProgressValue();

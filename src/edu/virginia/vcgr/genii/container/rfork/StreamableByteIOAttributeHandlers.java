@@ -10,56 +10,59 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 
-public class StreamableByteIOAttributeHandlers extends ByteIOAttributeHandlers {
+public class StreamableByteIOAttributeHandlers extends ByteIOAttributeHandlers
+{
 	static public final String STREAMABLE_BYTEIO_NS = "http://schemas.ggf.org/byteio/2005/10/streamable-access";
 
-	public StreamableByteIOAttributeHandlers(StreamableByteIOResourceFork fork,
-			AttributePackage pkg) throws NoSuchMethodException {
+	public StreamableByteIOAttributeHandlers(StreamableByteIOResourceFork fork, AttributePackage pkg)
+		throws NoSuchMethodException
+	{
 		super(fork, pkg);
 	}
 
-	private long getPosition() throws ResourceException,
-			ResourceUnknownFaultType {
+	private long getPosition() throws ResourceException, ResourceUnknownFaultType
+	{
 		return ((StreamableByteIOResourceFork) _fork).getPosition();
 	}
 
-	private boolean getSeekable() {
+	private boolean getSeekable()
+	{
 		return ((StreamableByteIOResourceFork) _fork).getSeekable();
 	}
 
-	private boolean getEndOfStream() throws ResourceException,
-			ResourceUnknownFaultType {
+	private boolean getEndOfStream() throws ResourceException, ResourceUnknownFaultType
+	{
 		return ((StreamableByteIOResourceFork) _fork).getEndOfStream();
 	}
 
-	private boolean getDestroyOnClose() throws ResourceException,
-			ResourceUnknownFaultType {
+	private boolean getDestroyOnClose() throws ResourceException, ResourceUnknownFaultType
+	{
 		return ((StreamableByteIOResourceFork) _fork).getDestroyOnClose();
 	}
 
-	public MessageElement getPositionAttr() throws ResourceException,
-			ResourceUnknownFaultType {
+	public MessageElement getPositionAttr() throws ResourceException, ResourceUnknownFaultType
+	{
 		return new MessageElement(GetPositionNamespace(), getPosition());
 	}
 
-	public MessageElement getSeekableAttr() throws ResourceException,
-			ResourceUnknownFaultType {
+	public MessageElement getSeekableAttr() throws ResourceException, ResourceUnknownFaultType
+	{
 		return new MessageElement(GetSeekableNamespace(), getSeekable());
 	}
 
-	public MessageElement getEndOfStreamAttr() throws ResourceException,
-			ResourceUnknownFaultType {
+	public MessageElement getEndOfStreamAttr() throws ResourceException, ResourceUnknownFaultType
+	{
 		return new MessageElement(GetEndOfStreamNamespace(), getEndOfStream());
 	}
 
-	public MessageElement getDestroyOnCloseAttr() throws ResourceException,
-			ResourceUnknownFaultType {
-		return new MessageElement(GetDestroyOnCloseNamespace(),
-				getDestroyOnClose());
+	public MessageElement getDestroyOnCloseAttr() throws ResourceException, ResourceUnknownFaultType
+	{
+		return new MessageElement(GetDestroyOnCloseNamespace(), getDestroyOnClose());
 	}
 
 	@Override
-	protected void registerHandlers() throws NoSuchMethodException {
+	protected void registerHandlers() throws NoSuchMethodException
+	{
 		super.registerHandlers();
 
 		addHandler(GetPositionNamespace(), "getPositionAttr");
@@ -69,59 +72,71 @@ public class StreamableByteIOAttributeHandlers extends ByteIOAttributeHandlers {
 
 	}
 
-	protected QName GetDestroyOnCloseNamespace() {
+	protected QName GetDestroyOnCloseNamespace()
+	{
 		return ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG;
 	}
 
-	protected QName GetSizeNamespace() {
+	protected QName GetSizeNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "Size");
 
 	}
 
-	protected QName GetPositionNamespace() {
+	protected QName GetPositionNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "Position");
 	}
 
-	protected QName GetReadableNamespace() {
+	protected QName GetReadableNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "Readable");
 
 	}
 
-	protected QName GetWriteableNamespace() {
+	protected QName GetWriteableNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "Writeable");
 
 	}
 
-	protected QName GetSeekableNamespace() {
+	protected QName GetSeekableNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "Seekable");
 	}
 
-	protected QName GetTransferMechanismNamespace() {
+	protected QName GetTransferMechanismNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "TransferMechanism");
 
 	}
 
-	protected QName GetEndOfStreamNamespace() {
+	protected QName GetEndOfStreamNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "EndOfStream");
 
 	}
 
-	protected QName GetDataResourceNamespace() {
+	protected QName GetDataResourceNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "DataResource");
 
 	}
 
-	protected QName GetCreateTimeNamespace() {
+	protected QName GetCreateTimeNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "CreateTime");
 
 	}
 
-	protected QName GetModificationTimeNamespace() {
+	protected QName GetModificationTimeNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "ModificationTime");
 
 	}
 
-	protected QName GetAccessTimeNamespace() {
+	protected QName GetAccessTimeNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "AccessTime");
 
 	}

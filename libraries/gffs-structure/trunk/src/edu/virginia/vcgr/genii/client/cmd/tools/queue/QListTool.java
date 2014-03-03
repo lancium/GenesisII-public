@@ -13,24 +13,25 @@ import edu.virginia.vcgr.genii.client.gpath.*;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class QListTool extends BaseGridTool {
+public class QListTool extends BaseGridTool
+{
 
 	static final private String _DESCRIPTION = "config/tooldocs/description/dqlist";
 	static final private String _USAGE = "config/tooldocs/usage/uqlist";
 	static final private String _MANPAGE = "config/tooldocs/man/qlist";
 
-	public QListTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.EXECUTION);
+	public QListTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.EXECUTION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException(
-					"<queue-path> must be a grid path. ");
+			throw new InvalidToolUsageException("<queue-path> must be a grid path. ");
 		QueueManipulator manipulator = new QueueManipulator(gPath.path());
 		Iterator<ReducedJobInformation> jobs = manipulator.list();
 
@@ -43,19 +44,20 @@ public class QListTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() != 1)
 			throw new InvalidToolUsageException();
 	}
 
-	private void printHeader() {
-		stdout.printf("%1$-36s   %2$-8s   %3$-30s\n", "Ticket", "State",
-				"Owner Identities");
+	private void printHeader()
+	{
+		stdout.printf("%1$-36s   %2$-8s   %3$-30s\n", "Ticket", "State", "Owner Identities");
 	}
 
-	private void printJobInformation(ReducedJobInformation jobInfo) {
-		stdout.printf("%1$-36s   %2$-8s", jobInfo.getTicket(),
-				jobInfo.getJobState());
+	private void printJobInformation(ReducedJobInformation jobInfo)
+	{
+		stdout.printf("%1$-36s   %2$-8s", jobInfo.getTicket(), jobInfo.getJobState());
 		Collection<Identity> owners = jobInfo.getOwners();
 		if (owners.size() <= 0)
 			stdout.printf("\n");

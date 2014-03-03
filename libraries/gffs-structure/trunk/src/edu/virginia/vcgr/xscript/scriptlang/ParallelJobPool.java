@@ -8,22 +8,25 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.xscript.ParseStatement;
 import edu.virginia.vcgr.xscript.XScriptContext;
 
-public class ParallelJobPool {
+public class ParallelJobPool
+{
 	static private Log _logger = LogFactory.getLog(ParallelJobPool.class);
 
 	static public final String PARALLEL_JOB_POOL_BINDING_NAME = "Parallel Job Pool Binding";
 
-	static private class ParallelJobContext {
+	static private class ParallelJobContext
+	{
 		private XScriptContext _scriptContext;
 		private ParseStatement _statement;
 
-		private ParallelJobContext(ParseStatement statement,
-				XScriptContext scriptContext) {
+		private ParallelJobContext(ParseStatement statement, XScriptContext scriptContext)
+		{
 			_scriptContext = scriptContext;
 			_statement = statement;
 		}
 
-		private void run() {
+		private void run()
+		{
 			try {
 				_statement.evaluate(_scriptContext);
 			} catch (Throwable cause) {
@@ -36,18 +39,19 @@ public class ParallelJobPool {
 	private LinkedList<ParallelJobContext> _jobs = new LinkedList<ParallelJobContext>();
 	private Thread[] _threads;
 
-	public ParallelJobPool(int poolSize) {
+	public ParallelJobPool(int poolSize)
+	{
 		_threads = new Thread[poolSize];
 
 		while (poolSize > 0) {
-			_threads[--poolSize] = new Thread(new ParallelJobWorker(),
-					"Script Worker");
+			_threads[--poolSize] = new Thread(new ParallelJobWorker(), "Script Worker");
 			_threads[poolSize].setDaemon(true);
 			_threads[poolSize].start();
 		}
 	}
 
-	public void blockAndStop() {
+	public void blockAndStop()
+	{
 		synchronized (_jobs) {
 			_finished = true;
 			_jobs.notifyAll();
@@ -61,8 +65,8 @@ public class ParallelJobPool {
 		}
 	}
 
-	public void addParallelJob(ParseStatement statement,
-			XScriptContext parentContext) {
+	public void addParallelJob(ParseStatement statement, XScriptContext parentContext)
+	{
 		XScriptContext childContext;
 		try {
 			childContext = (XScriptContext) parentContext.clone();
@@ -77,9 +81,11 @@ public class ParallelJobPool {
 		}
 	}
 
-	private class ParallelJobWorker implements Runnable {
+	private class ParallelJobWorker implements Runnable
+	{
 		@Override
-		public void run() {
+		public void run()
+		{
 			while (true) {
 				ParallelJobContext nextJob = null;
 				synchronized (_jobs) {

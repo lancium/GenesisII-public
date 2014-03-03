@@ -2,13 +2,12 @@ package edu.virginia.vcgr.genii.client.db;
 
 import java.util.Properties;
 
-public abstract class NotTheServerDatabaseConnectionPool extends
-		DatabaseConnectionPool {
-	public NotTheServerDatabaseConnectionPool(Properties connectionProperties,
-			String specialString) throws IllegalAccessException,
-			ClassNotFoundException, InstantiationException {
-		super(new DatabaseConnectionPool.DBPropertyNames(),
-				connectionProperties, specialString);
+public abstract class NotTheServerDatabaseConnectionPool extends DatabaseConnectionPool
+{
+	public NotTheServerDatabaseConnectionPool(Properties connectionProperties, String specialString)
+		throws IllegalAccessException, ClassNotFoundException, InstantiationException
+	{
+		super(new DatabaseConnectionPool.DBPropertyNames(), connectionProperties, specialString);
 	}
 	//
 	// //hmmm: more of this could be pushed down into basis class.
@@ -21,8 +20,7 @@ public abstract class NotTheServerDatabaseConnectionPool extends
 	// boolean succeeded = false;
 	//
 	// int maxSnooze = 4 * 1000; // in milliseconds.
-	// int eachSleep = 500; // number of milliseconds to snooze between lock
-	// attempts.
+	// int eachSleep = 500; // number of milliseconds to snooze between lock attempts.
 	// int attempts = (int) ((double) maxSnooze / (double) eachSleep + 1);
 	//
 	// for (int lcv = 0; lcv < attempts; lcv++) {
@@ -37,8 +35,7 @@ public abstract class NotTheServerDatabaseConnectionPool extends
 	// if (connection == null)
 	// connection = createConnection();
 	//
-	// ((DatabaseConnectionInterceptor)
-	// Proxy.getInvocationHandler(connection)).setAcquired();
+	// ((DatabaseConnectionInterceptor) Proxy.getInvocationHandler(connection)).setAcquired();
 	//
 	// succeeded = true;
 	// return connection;
@@ -57,8 +54,7 @@ public abstract class NotTheServerDatabaseConnectionPool extends
 	// }
 	// }
 	//
-	// _logger.error("Unable to acquire/create connections in " + maxSnooze /
-	// 1000 +
+	// _logger.error("Unable to acquire/create connections in " + maxSnooze / 1000 +
 	// " seconds.  Giving up.", lastException);
 	// throw lastException;
 	// }
@@ -77,8 +73,7 @@ public abstract class NotTheServerDatabaseConnectionPool extends
 	//
 	// synchronized (get_connPool()) {
 	// if (_logger.isDebugEnabled())
-	// _logger.debug("Releasing a database connection [" + get_connPool().size()
-	// + "].");
+	// _logger.debug("Releasing a database connection [" + get_connPool().size() + "].");
 	//
 	// try {
 	// try {
@@ -92,16 +87,14 @@ public abstract class NotTheServerDatabaseConnectionPool extends
 	// }
 	//
 	// try {
-	// ((DatabaseConnectionInterceptor)
-	// Proxy.getInvocationHandler(conn)).getConnection().close();
+	// ((DatabaseConnectionInterceptor) Proxy.getInvocationHandler(conn)).getConnection().close();
 	// } catch (Throwable t) {
 	// _logger.error("Error closing the connection.", t);
 	// }
 	// } finally {
 	// get_lock().readLock().unlock();
 	//
-	// ((DatabaseConnectionInterceptor)
-	// Proxy.getInvocationHandler(conn)).setReleased();
+	// ((DatabaseConnectionInterceptor) Proxy.getInvocationHandler(conn)).setReleased();
 	// }
 	// }
 	// }
@@ -111,12 +104,10 @@ public abstract class NotTheServerDatabaseConnectionPool extends
 	// if (_logger.isDebugEnabled())
 	// _logger.debug("Creating a new database connection.");
 	//
-	// Connection conn = DriverManager.getConnection(get_connectString(),
-	// get_user(),
+	// Connection conn = DriverManager.getConnection(get_connectString(), get_user(),
 	// get_password());
 	// conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-	// return (Connection)
-	// Proxy.newProxyInstance(GenesisClassLoader.classLoaderFactory(), new
+	// return (Connection) Proxy.newProxyInstance(GenesisClassLoader.classLoaderFactory(), new
 	// Class[] { Connection.class },
 	// new DatabaseConnectionInterceptor(conn));
 	// }

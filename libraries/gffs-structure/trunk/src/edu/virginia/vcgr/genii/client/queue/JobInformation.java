@@ -7,7 +7,8 @@ import org.ggf.bes.factory.ActivityStatusType;
 
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class JobInformation extends ReducedJobInformation {
+public class JobInformation extends ReducedJobInformation
+{
 	private int _priority;
 	private Calendar _submitTime;
 	private Calendar _startTime;
@@ -17,11 +18,10 @@ public class JobInformation extends ReducedJobInformation {
 	private String _jobName;
 	private ActivityStatusType _besActivityStatus;
 
-	public JobInformation(JobTicket ticket, String jobName,
-			Collection<Identity> owners, QueueStates state, int prioity,
-			Calendar submitTime, Calendar startTime, Calendar finishTime,
-			int failedAttempts, ActivityStatusType besActivityStatus,
-			String scheduledOn) {
+	public JobInformation(JobTicket ticket, String jobName, Collection<Identity> owners, QueueStates state, int prioity,
+		Calendar submitTime, Calendar startTime, Calendar finishTime, int failedAttempts, ActivityStatusType besActivityStatus,
+		String scheduledOn)
+	{
 		super(ticket, owners, state);
 
 		_priority = prioity;
@@ -34,35 +34,43 @@ public class JobInformation extends ReducedJobInformation {
 		_besActivityStatus = besActivityStatus;
 	}
 
-	final public String jobName() {
+	final public String jobName()
+	{
 		return _jobName;
 	}
 
-	public int getPriority() {
+	public int getPriority()
+	{
 		return _priority;
 	}
 
-	public Calendar getSubmitTime() {
+	public Calendar getSubmitTime()
+	{
 		return _submitTime;
 	}
 
-	public Calendar getStartTime() {
+	public Calendar getStartTime()
+	{
 		return _startTime;
 	}
 
-	public Calendar getFinishTime() {
+	public Calendar getFinishTime()
+	{
 		return _finishTime;
 	}
 
-	public int getFailedAttempts() {
+	public int getFailedAttempts()
+	{
 		return _failedAttempts;
 	}
 
-	public String getScheduledOn() {
+	public String getScheduledOn()
+	{
 		return _scheduledOn;
 	}
 
-	public ActivityStatusType besActivityStatus() {
+	public ActivityStatusType besActivityStatus()
+	{
 		return _besActivityStatus;
 	}
 }

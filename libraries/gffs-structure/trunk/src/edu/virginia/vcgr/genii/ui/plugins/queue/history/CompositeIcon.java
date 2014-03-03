@@ -5,11 +5,13 @@ import java.awt.Graphics;
 
 import javax.swing.Icon;
 
-public class CompositeIcon implements Icon {
+public class CompositeIcon implements Icon
+{
 	private int _spacing;
 	private Icon[] _icons;
 
-	CompositeIcon(int spacing, Icon... icons) {
+	CompositeIcon(int spacing, Icon... icons)
+	{
 		_spacing = spacing;
 
 		if (icons.length <= 0)
@@ -19,7 +21,8 @@ public class CompositeIcon implements Icon {
 	}
 
 	@Override
-	public void paintIcon(Component c, Graphics g, int x, int y) {
+	public void paintIcon(Component c, Graphics g, int x, int y)
+	{
 		boolean first = true;
 
 		int height = getIconHeight();
@@ -34,7 +37,8 @@ public class CompositeIcon implements Icon {
 	}
 
 	@Override
-	public int getIconWidth() {
+	public int getIconWidth()
+	{
 		int width = 0;
 
 		for (Icon icon : _icons) {
@@ -48,7 +52,8 @@ public class CompositeIcon implements Icon {
 	}
 
 	@Override
-	public int getIconHeight() {
+	public int getIconHeight()
+	{
 		int height = 0;
 
 		for (Icon icon : _icons)

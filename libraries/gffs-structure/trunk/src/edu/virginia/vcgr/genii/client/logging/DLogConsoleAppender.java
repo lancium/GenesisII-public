@@ -4,10 +4,12 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.MDC;
 import org.apache.log4j.spi.LoggingEvent;
 
-public class DLogConsoleAppender extends ConsoleAppender {
+public class DLogConsoleAppender extends ConsoleAppender
+{
 
 	@Override
-	public void append(LoggingEvent event) {
+	public void append(LoggingEvent event)
+	{
 		String rpcid = DLogUtils.getRPCID();
 		if (rpcid == null) {
 			MDC.put("RPCID", "NULL ID");

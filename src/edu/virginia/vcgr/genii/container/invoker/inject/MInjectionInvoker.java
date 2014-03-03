@@ -7,21 +7,23 @@ import org.morgan.inject.MNamingInjectionResolver;
 import edu.virginia.vcgr.genii.container.invoker.IAroundInvoker;
 import edu.virginia.vcgr.genii.container.invoker.InvocationContext;
 
-public class MInjectionInvoker implements IAroundInvoker {
+public class MInjectionInvoker implements IAroundInvoker
+{
 	static private MInjector _injector;
 
 	static {
-		_injector = new MInjector(new ResourceMInjectResolver(),
-				new CallingContextInjectionResolver(),
-				new MNamingInjectionResolver());
+		_injector =
+			new MInjector(new ResourceMInjectResolver(), new CallingContextInjectionResolver(), new MNamingInjectionResolver());
 	}
 
-	static public void inject(Object target) throws InjectionException {
+	static public void inject(Object target) throws InjectionException
+	{
 		_injector.inject(target);
 	}
 
 	@Override
-	public Object invoke(InvocationContext invocationContext) throws Exception {
+	public Object invoke(InvocationContext invocationContext) throws Exception
+	{
 		inject(invocationContext.getTarget());
 		return invocationContext.proceed();
 	}

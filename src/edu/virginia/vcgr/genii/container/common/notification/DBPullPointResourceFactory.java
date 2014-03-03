@@ -8,19 +8,21 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class DBPullPointResourceFactory extends BasicDBResourceFactory {
+public class DBPullPointResourceFactory extends BasicDBResourceFactory
+{
 	@Override
-	protected void createTables() throws SQLException {
+	protected void createTables() throws SQLException
+	{
 	}
 
-	public DBPullPointResourceFactory(ServerDatabaseConnectionPool pool)
-			throws SQLException {
+	public DBPullPointResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
+	{
 		super(pool);
 	}
 
 	@Override
-	public IResource instantiate(ResourceKey parentKey)
-			throws ResourceException {
+	public IResource instantiate(ResourceKey parentKey) throws ResourceException
+	{
 		try {
 			return new DBPullPointResource((ResourceKey) parentKey, _pool);
 		} catch (SQLException sqe) {

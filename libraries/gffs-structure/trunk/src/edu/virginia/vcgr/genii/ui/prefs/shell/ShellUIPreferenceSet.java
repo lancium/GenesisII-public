@@ -9,7 +9,8 @@ import edu.virginia.vcgr.genii.ui.prefs.AbstractUIPreferenceSet;
 import edu.virginia.vcgr.genii.ui.shell.InputBindings;
 import edu.virginia.vcgr.genii.ui.shell.InputBindingsType;
 
-public class ShellUIPreferenceSet extends AbstractUIPreferenceSet {
+public class ShellUIPreferenceSet extends AbstractUIPreferenceSet
+{
 	static final private String PREFERENCE_SET_TITLE = "Shell";
 	static final private String PREFERENCE_NODE_NAME = "shell";
 
@@ -27,14 +28,15 @@ public class ShellUIPreferenceSet extends AbstractUIPreferenceSet {
 	private Font _font;
 
 	@Override
-	protected Preferences preferenceNode(Preferences uiPreferencesRoot) {
+	protected Preferences preferenceNode(Preferences uiPreferencesRoot)
+	{
 		return uiPreferencesRoot.node(PREFERENCE_NODE_NAME);
 	}
 
 	@Override
-	protected void loadImpl(Preferences prefNode) {
-		String bindingsName = prefNode.get(BINDINGS_KEY, InputBindingsType
-				.defaultBindings().name());
+	protected void loadImpl(Preferences prefNode)
+	{
+		String bindingsName = prefNode.get(BINDINGS_KEY, InputBindingsType.defaultBindings().name());
 		_bindings = InputBindingsType.valueOf(bindingsName);
 
 		String fontFamily = prefNode.get(FONT_FAMILY_KEY, DEFAULT_FONT_FAMILY);
@@ -45,7 +47,8 @@ public class ShellUIPreferenceSet extends AbstractUIPreferenceSet {
 	}
 
 	@Override
-	protected void storeImpl(Preferences prefNode) {
+	protected void storeImpl(Preferences prefNode)
+	{
 		prefNode.put(BINDINGS_KEY, _bindings.name());
 
 		prefNode.put(FONT_FAMILY_KEY, _font.getFamily());
@@ -53,33 +56,38 @@ public class ShellUIPreferenceSet extends AbstractUIPreferenceSet {
 		prefNode.putInt(FONT_SIZE_KEY, _font.getSize());
 	}
 
-	InputBindingsType inputBindingsType() {
+	InputBindingsType inputBindingsType()
+	{
 		return _bindings;
 	}
 
-	public ShellUIPreferenceSet() {
+	public ShellUIPreferenceSet()
+	{
 		super(PREFERENCE_SET_TITLE);
 
 		_bindings = InputBindingsType.defaultBindings();
 	}
 
 	@Override
-	public JPanel createEditor() {
+	public JPanel createEditor()
+	{
 		return new ShellUIPreferenceSetEditor(this);
 	}
 
 	@Override
-	public void load(JPanel editor) {
-		_bindings = ((ShellUIPreferenceSetEditor) editor)
-				.selectedBindingsType();
+	public void load(JPanel editor)
+	{
+		_bindings = ((ShellUIPreferenceSetEditor) editor).selectedBindingsType();
 		_font = ((ShellUIPreferenceSetEditor) editor).selectedFont();
 	}
 
-	final public InputBindings createBindings() {
+	final public InputBindings createBindings()
+	{
 		return _bindings.createBindings();
 	}
 
-	final public Font shellFont() {
+	final public Font shellFont()
+	{
 		return _font;
 	}
 }

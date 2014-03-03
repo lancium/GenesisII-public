@@ -10,12 +10,13 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 /**
- * This class is a worker class that is used by the BESResourceManager to
- * automatically update the BES resources on a regular interval.
+ * This class is a worker class that is used by the BESResourceManager to automatically update the
+ * BES resources on a regular interval.
  * 
  * @author mmm2a
  */
-public class BESResourceUpdater implements Closeable {
+public class BESResourceUpdater implements Closeable
+{
 	static private Log _logger = LogFactory.getLog(BESResourceUpdater.class);
 
 	volatile private boolean _closed = false;
@@ -23,8 +24,8 @@ public class BESResourceUpdater implements Closeable {
 	private BESManager _manager;
 	private long _updateFrequency;
 
-	public BESResourceUpdater(ServerDatabaseConnectionPool connectionPool,
-			BESManager manager, long updateFrequency) {
+	public BESResourceUpdater(ServerDatabaseConnectionPool connectionPool, BESManager manager, long updateFrequency)
+	{
 		_connectionPool = connectionPool;
 		_manager = manager;
 		_updateFrequency = updateFrequency;
@@ -37,13 +38,15 @@ public class BESResourceUpdater implements Closeable {
 		thread.start();
 	}
 
-	protected void finalize() throws Throwable {
+	protected void finalize() throws Throwable
+	{
 		super.finalize();
 
 		close();
 	}
 
-	synchronized public void close() throws IOException {
+	synchronized public void close() throws IOException
+	{
 		if (_closed)
 			return;
 
@@ -51,8 +54,10 @@ public class BESResourceUpdater implements Closeable {
 	}
 
 	/* The update worker that the thread is using */
-	private class UpdaterWorker implements Runnable {
-		public void run() {
+	private class UpdaterWorker implements Runnable
+	{
+		public void run()
+		{
 			try {
 				Thread.sleep(1000L * 45);
 			} catch (Throwable cause) {
@@ -75,8 +80,7 @@ public class BESResourceUpdater implements Closeable {
 				} catch (InterruptedException ie) {
 					Thread.interrupted();
 				} catch (Throwable cause) {
-					_logger.warn("Unable to update BES resources in queue.",
-							cause);
+					_logger.warn("Unable to update BES resources in queue.", cause);
 				} finally {
 					_connectionPool.release(connection);
 				}

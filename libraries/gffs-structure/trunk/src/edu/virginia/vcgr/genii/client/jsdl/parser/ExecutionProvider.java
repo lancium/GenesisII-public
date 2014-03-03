@@ -28,76 +28,83 @@ import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionSPMDApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionSourceURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionTargetURIFacet;
 
-public class ExecutionProvider extends DefaultPersonalityProvider {
+public class ExecutionProvider extends DefaultPersonalityProvider
+{
 	@Override
-	public Object createNewUnderstanding() {
+	public Object createNewUnderstanding()
+	{
 		return new JobRequest();
 	}
 
 	@Override
-	public DataStagingFacet getDataStagingFacet(Object currentUnderstanding) {
+	public DataStagingFacet getDataStagingFacet(Object currentUnderstanding)
+	{
 		return new ExecutionDataStagingFacet();
 	}
 
 	@Override
-	public FileSystemFacet getFileSystemFacet(Object currentUnderstanding) {
+	public FileSystemFacet getFileSystemFacet(Object currentUnderstanding)
+	{
 		return new ExecutionFilesystemFacet();
 	}
 
 	@Override
-	public JobIdentificationFacet getJobIdentificationFacet(
-			Object currentUnderstanding) {
+	public JobIdentificationFacet getJobIdentificationFacet(Object currentUnderstanding)
+	{
 		return new ExecutionJobIdentificationFacet();
 	}
 
 	@Override
-	public SourceURIFacet getSourceURIFacet(Object currentUnderstanding) {
+	public SourceURIFacet getSourceURIFacet(Object currentUnderstanding)
+	{
 		return new ExecutionSourceURIFacet();
 	}
 
 	@Override
-	public TargetURIFacet getTargetURIFacet(Object currentUnderstanding) {
+	public TargetURIFacet getTargetURIFacet(Object currentUnderstanding)
+	{
 		return new ExecutionTargetURIFacet();
 	}
 
 	@Override
-	public ResourcesFacet getResourcesFacet(Object currentUnderstanding) {
+	public ResourcesFacet getResourcesFacet(Object currentUnderstanding)
+	{
 		return new ExecutionResourcesFacet();
 	}
 
 	@Override
-	public POSIXApplicationFacet getPOSIXApplicationFacet(
-			Object currentUnderstanding) {
+	public POSIXApplicationFacet getPOSIXApplicationFacet(Object currentUnderstanding)
+	{
 		return new ExecutionPOSIXApplicationFacet();
 	}
 
 	@Override
-	public HPCApplicationFacet getHPCApplicationFacet(
-			Object currentUnderstanding) {
+	public HPCApplicationFacet getHPCApplicationFacet(Object currentUnderstanding)
+	{
 		return new ExecutionHPCApplicationFacet();
 	}
 
 	@Override
-	public SPMDApplicationFacet getSPMDApplicationFacet(
-			Object currentUnderstanding) {
+	public SPMDApplicationFacet getSPMDApplicationFacet(Object currentUnderstanding)
+	{
 		return new ExecutionSPMDApplicationFacet();
 	}
 
 	@Override
-	public CPUArchitectureFacet getCPUArchitectureFacet(
-			Object currentUnderstanding) throws JSDLException {
+	public CPUArchitectureFacet getCPUArchitectureFacet(Object currentUnderstanding) throws JSDLException
+	{
 		return new ExecutionCPUArchitectureFacet();
 	}
 
 	@Override
-	public OperatingSystemFacet getOperatingSystemFacet(
-			Object currentUnderstanding) throws JSDLException {
+	public OperatingSystemFacet getOperatingSystemFacet(Object currentUnderstanding) throws JSDLException
+	{
 		return new ExecutionOperatingSystemFacet();
 	}
 
 	@Override
-	public OperatingSystemTypeFacet getOperatingSystemTypeFacet(
-			Object currentUnderstanding) throws JSDLException {
+	public OperatingSystemTypeFacet getOperatingSystemTypeFacet(Object currentUnderstanding) throws JSDLException
+	{
 		return new ExecutionOperatingSystemTypeFacet();
 	}
 }

@@ -23,12 +23,13 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 /**
- * An implementation of the standard Java Input stream that reads from remote
- * Streamable ByteIO resources.
+ * An implementation of the standard Java Input stream that reads from remote Streamable ByteIO
+ * resources.
  * 
  * @author mmm2a
  */
-public class StreamableByteIOInputStream extends InputStream {
+public class StreamableByteIOInputStream extends InputStream
+{
 	static final private long MAX_SLEEP = 1000 * 8;
 
 	private StreamableByteIOTransferer _transferer;
@@ -40,8 +41,7 @@ public class StreamableByteIOInputStream extends InputStream {
 	private Boolean _destroyOnClose = null;
 
 	/**
-	 * Create a new StreamableByteIO input stream for a given endpoint and
-	 * transfer protocol.
+	 * Create a new StreamableByteIO input stream for a given endpoint and transfer protocol.
 	 * 
 	 * @param epr
 	 *            The source ByteIO to read bytes from.
@@ -51,13 +51,13 @@ public class StreamableByteIOInputStream extends InputStream {
 	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
-	public StreamableByteIOInputStream(EndpointReferenceType epr,
-			URI desiredTransferProtocol) throws IOException, RemoteException {
+	public StreamableByteIOInputStream(EndpointReferenceType epr, URI desiredTransferProtocol) throws IOException,
+		RemoteException
+	{
 		TypeInformation tInfo = new TypeInformation(epr);
 
 		if (tInfo.isSByteIOFactory()) {
-			StreamableByteIOFactory sFactory = ClientUtils.createProxy(
-					StreamableByteIOFactory.class, epr);
+			StreamableByteIOFactory sFactory = ClientUtils.createProxy(StreamableByteIOFactory.class, epr);
 			_createdSByteIO = sFactory.openStream(null).getEndpoint();
 			epr = _createdSByteIO;
 		} else {
@@ -65,19 +65,15 @@ public class StreamableByteIOInputStream extends InputStream {
 		}
 
 		try {
-			_rp = (StreamableByteIORP) ResourcePropertyManager
-					.createRPInterface(epr, StreamableByteIORP.class);
+			_rp = (StreamableByteIORP) ResourcePropertyManager.createRPInterface(epr, StreamableByteIORP.class);
 		} catch (ResourcePropertyException rpe) {
 			throw new IOException("Unable to create RP interface.", rpe);
 		}
 
 		_targetByteIO = epr;
-		StreamableByteIOPortType clientStub = ClientUtils.createProxy(
-				StreamableByteIOPortType.class, epr);
-		StreamableByteIOTransfererFactory factory = new StreamableByteIOTransfererFactory(
-				clientStub);
-		_transferer = factory
-				.createStreamableByteIOTransferer(desiredTransferProtocol);
+		StreamableByteIOPortType clientStub = ClientUtils.createProxy(StreamableByteIOPortType.class, epr);
+		StreamableByteIOTransfererFactory factory = new StreamableByteIOTransfererFactory(clientStub);
+		_transferer = factory.createStreamableByteIOTransferer(desiredTransferProtocol);
 	}
 
 	/**
@@ -89,8 +85,8 @@ public class StreamableByteIOInputStream extends InputStream {
 	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
-	public StreamableByteIOInputStream(EndpointReferenceType epr)
-			throws IOException, RemoteException {
+	public StreamableByteIOInputStream(EndpointReferenceType epr) throws IOException, RemoteException
+	{
 		this(epr, null);
 	}
 
@@ -99,7 +95,8 @@ public class StreamableByteIOInputStream extends InputStream {
 	 * 
 	 * @return true if the stream is at EOF, false otherwise.
 	 */
-	private boolean determineEndOfStream() {
+	private boolean determineEndOfStream()
+	{
 		Boolean eof = _rp.getEOF();
 		if (eof == null)
 			return false;
@@ -117,13 +114,13 @@ public class StreamableByteIOInputStream extends InputStream {
 	 * 
 	 * @throws IOException
 	 */
-	private byte[] read(int length) throws IOException {
+	private byte[] read(int length) throws IOException
+	{
 		long sleep = 1000L;
 
 		try {
 			while (!_endOfStream) {
-				byte[] data = _transferer.seekRead(SeekOrigin.SEEK_CURRENT,
-						_nextSeek, length);
+				byte[] data = _transferer.seekRead(SeekOrigin.SEEK_CURRENT, _nextSeek, length);
 				_nextSeek = 0L;
 
 				if (data.length > 0)
@@ -148,7 +145,8 @@ public class StreamableByteIOInputStream extends InputStream {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int read() throws IOException {
+	public int read() throws IOException
+	{
 		byte[] data = read(1);
 		if (data.length == 0)
 			return -1;
@@ -159,7 +157,8 @@ public class StreamableByteIOInputStream extends InputStream {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int read(byte[] b) throws IOException {
+	public int read(byte[] b) throws IOException
+	{
 		byte[] data = read(b.length);
 		if (data.length == 0)
 			return -1;
@@ -171,7 +170,8 @@ public class StreamableByteIOInputStream extends InputStream {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int read(byte[] b, int off, int len) throws IOException {
+	public int read(byte[] b, int off, int len) throws IOException
+	{
 		byte[] data = read(len);
 		if (data.length == 0)
 			return -1;
@@ -183,7 +183,8 @@ public class StreamableByteIOInputStream extends InputStream {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public long skip(long n) throws IOException {
+	public long skip(long n) throws IOException
+	{
 		Long position = _rp.getPosition();
 		_nextSeek += n;
 		if (position == null)
@@ -196,10 +197,10 @@ public class StreamableByteIOInputStream extends InputStream {
 	 * {@inheritDoc}
 	 */
 	@Override
-	synchronized public void close() throws IOException {
+	synchronized public void close() throws IOException
+	{
 		if (_createdSByteIO != null || destroyOnClose()) {
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-					_targetByteIO);
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, _targetByteIO);
 			common.destroy(null);
 
 			_createdSByteIO = null;
@@ -208,26 +209,26 @@ public class StreamableByteIOInputStream extends InputStream {
 	}
 
 	/**
-	 * Create a new buffered input stream based off of this input stream using
-	 * the target transferer's preferred transfer size.
+	 * Create a new buffered input stream based off of this input stream using the target
+	 * transferer's preferred transfer size.
 	 * 
 	 * @return The newly created buffered input stream.
 	 */
-	public BufferedInputStream createPreferredBufferedStream() {
+	public BufferedInputStream createPreferredBufferedStream()
+	{
 		return new BufferedInputStream(this, _transferer.getPreferredReadSize());
 	}
 
 	/**
-	 * Determines whether or not this streamable byteIO should be destroyed (the
-	 * target resource that is) when closed. This depends on a number of factors
-	 * including whether or not the target resource was actually a streamable
-	 * ByteIO when it started, or merely a factory that could create then (as
-	 * snapshots).
+	 * Determines whether or not this streamable byteIO should be destroyed (the target resource
+	 * that is) when closed. This depends on a number of factors including whether or not the target
+	 * resource was actually a streamable ByteIO when it started, or merely a factory that could
+	 * create then (as snapshots).
 	 * 
-	 * @return true if the target should be destroyed when closed, false
-	 *         otherwise.
+	 * @return true if the target should be destroyed when closed, false otherwise.
 	 */
-	synchronized private boolean destroyOnClose() {
+	synchronized private boolean destroyOnClose()
+	{
 		if (_destroyOnClose != null)
 			return _destroyOnClose.booleanValue();
 
@@ -239,13 +240,13 @@ public class StreamableByteIOInputStream extends InputStream {
 	}
 
 	/**
-	 * Determines whether or not this streamable byteIO should be destroyed (the
-	 * target resource that is) when closed. This depends on a number of factors
-	 * including whether or not the target resource was actually a streamable
-	 * ByteIO when it started, or merely a factory that could create then (as
-	 * snapshots).
+	 * Determines whether or not this streamable byteIO should be destroyed (the target resource
+	 * that is) when closed. This depends on a number of factors including whether or not the target
+	 * resource was actually a streamable ByteIO when it started, or merely a factory that could
+	 * create then (as snapshots).
 	 */
-	private void discoverDestroyOnCloseFromEPR(MetadataType mdt) {
+	private void discoverDestroyOnCloseFromEPR(MetadataType mdt)
+	{
 		if (mdt == null)
 			return;
 

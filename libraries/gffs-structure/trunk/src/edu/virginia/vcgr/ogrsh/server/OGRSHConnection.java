@@ -28,7 +28,8 @@ import edu.virginia.vcgr.ogrsh.server.packing.DefaultOGRSHWriteBuffer;
 import edu.virginia.vcgr.ogrsh.server.session.Session;
 import edu.virginia.vcgr.ogrsh.server.session.SessionManager;
 
-public class OGRSHConnection implements Runnable {
+public class OGRSHConnection implements Runnable
+{
 	static private Log _logger = LogFactory.getLog(OGRSHConnection.class);
 
 	static private final String _EXCEPTION = "exception";
@@ -43,7 +44,8 @@ public class OGRSHConnection implements Runnable {
 	private ByteOrder _byteOrder;
 	private InvocationMatcher _matcher;
 
-	private void determineByteOrder() throws IOException {
+	private void determineByteOrder() throws IOException
+	{
 		ByteBuffer shortBuffer = ByteBuffer.allocate(2);
 		CommUtils.readFully(_socketChannel, shortBuffer);
 		shortBuffer.flip();
@@ -60,7 +62,8 @@ public class OGRSHConnection implements Runnable {
 		_intBuffer.order(_byteOrder);
 	}
 
-	private void validateConnection() throws IOException {
+	private void validateConnection() throws IOException
+	{
 		CommUtils.readFully(_socketChannel, _intBuffer);
 		_intBuffer.flip();
 		int size = _intBuffer.getInt();
@@ -75,14 +78,13 @@ public class OGRSHConnection implements Runnable {
 				return;
 		}
 
-		throw new IOException("Unable to validate connection.  "
-				+ "Disconnecting unauthorized client.");
+		throw new IOException("Unable to validate connection.  " + "Disconnecting unauthorized client.");
 	}
 
-	private ByteBuffer handleInvocation(ByteBuffer request) throws IOException {
+	private ByteBuffer handleInvocation(ByteBuffer request) throws IOException
+	{
 		OGRSHException exception = null;
-		DefaultOGRSHWriteBuffer writeBuffer = new DefaultOGRSHWriteBuffer(
-				_byteOrder);
+		DefaultOGRSHWriteBuffer writeBuffer = new DefaultOGRSHWriteBuffer(_byteOrder);
 
 		writeBuffer.writeRaw(new byte[4], 0, 4);
 		ByteBuffer ret = null;
@@ -112,8 +114,8 @@ public class OGRSHConnection implements Runnable {
 		return ret;
 	}
 
-	public OGRSHConnection(SessionManager sessionManager,
-			SocketChannel channel, GUID serverSecret) {
+	public OGRSHConnection(SessionManager sessionManager, SocketChannel channel, GUID serverSecret)
+	{
 		_serverSecret = serverSecret;
 		_socketChannel = channel;
 		_sessionManager = sessionManager;
@@ -123,7 +125,8 @@ public class OGRSHConnection implements Runnable {
 		addHandlers();
 	}
 
-	public void run() {
+	public void run()
+	{
 		try {
 			try {
 				determineByteOrder();
@@ -140,9 +143,7 @@ public class OGRSHConnection implements Runnable {
 						CommUtils.readFully(_socketChannel, _intBuffer);
 					} catch (IOException ioe) {
 						if (_logger.isDebugEnabled())
-							_logger.debug(
-									"Closing server because client closed socket.",
-									ioe);
+							_logger.debug("Closing server because client closed socket.", ioe);
 						_done = true;
 						break;
 					}
@@ -151,8 +152,7 @@ public class OGRSHConnection implements Runnable {
 					if (messageSize < 0) {
 						_done = true;
 					} else {
-						ByteBuffer messageBuffer = ByteBuffer
-								.allocate(messageSize);
+						ByteBuffer messageBuffer = ByteBuffer.allocate(messageSize);
 						messageBuffer.order(_byteOrder);
 						CommUtils.readFully(_socketChannel, messageBuffer);
 						messageBuffer.flip();
@@ -162,8 +162,7 @@ public class OGRSHConnection implements Runnable {
 					}
 				}
 			} catch (IOException ioe) {
-				_logger.error("Error reading/writing communication channel.",
-						ioe);
+				_logger.error("Error reading/writing communication channel.", ioe);
 			}
 
 			try {
@@ -177,7 +176,8 @@ public class OGRSHConnection implements Runnable {
 		}
 	}
 
-	private void addHandlers() {
+	private void addHandlers()
+	{
 		_matcher.addHandlerInstance(this);
 		_matcher.addHandlerInstance(new TestingHandler());
 		_matcher.addHandlerInstance(new DirectoryHandler());
@@ -185,8 +185,8 @@ public class OGRSHConnection implements Runnable {
 	}
 
 	@OGRSHOperation
-	public String setupConnection(String requestedSessionID)
-			throws OGRSHException {
+	public String setupConnection(String requestedSessionID) throws OGRSHException
+	{
 		if (_mySession != null)
 			_sessionManager.releaseSession(_mySession);
 
@@ -198,8 +198,7 @@ public class OGRSHConnection implements Runnable {
 			_mySession = _sessionManager.createNewSession();
 		} else {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Duplicating an existing session ("
-						+ requestedSessionID + ").");
+				_logger.debug("Duplicating an existing session (" + requestedSessionID + ").");
 
 			// load existing session
 			GUID desiredSessionKey = GUID.fromString(requestedSessionID);
@@ -207,13 +206,12 @@ public class OGRSHConnection implements Runnable {
 		}
 
 		if (_logger.isDebugEnabled())
-			_logger.debug("Returning session \"" + _mySession.getSessionID()
-					+ "\".");
+			_logger.debug("Returning session \"" + _mySession.getSessionID() + "\".");
 		return _mySession.getSessionID().toString();
 	}
 
-	private int connectNetFromStoredContext(String storedContextURL)
-			throws OGRSHException {
+	private int connectNetFromStoredContext(String storedContextURL) throws OGRSHException
+	{
 		InputStream in = null;
 
 		try {
@@ -225,28 +223,24 @@ public class OGRSHConnection implements Runnable {
 			ctxt.getActiveKeyAndCertMaterial();
 			return 0;
 		} catch (ClassNotFoundException cnfe) {
-			throw new OGRSHException(
-					OGRSHException.EXCEPTION_CORRUPTED_REQUEST,
-					"The stored calling context appears to be corrupt.");
+			throw new OGRSHException(OGRSHException.EXCEPTION_CORRUPTED_REQUEST,
+				"The stored calling context appears to be corrupt.");
 		} catch (GeneralSecurityException gse) {
-			throw new OGRSHException(OGRSHException.PERMISSION_DENIED,
-					"Unable to initialize key and cert material.");
+			throw new OGRSHException(OGRSHException.PERMISSION_DENIED, "Unable to initialize key and cert material.");
 		} catch (MalformedURLException mue) {
-			throw new OGRSHException(OGRSHException.MALFORMED_URL, "The URL \""
-					+ storedContextURL + "\" is malformed.");
+			throw new OGRSHException(OGRSHException.MALFORMED_URL, "The URL \"" + storedContextURL + "\" is malformed.");
 		} catch (IOException ioe) {
-			_logger.info("exception occurred in connectNetFromStoredContext",
-					ioe);
+			_logger.info("exception occurred in connectNetFromStoredContext", ioe);
 			throw new OGRSHException(OGRSHException.IO_EXCEPTION,
-					"An IO Exception occured while trying to acquire root RNS EPR.");
+				"An IO Exception occured while trying to acquire root RNS EPR.");
 		} finally {
 			StreamUtils.close(in);
 		}
 	}
 
 	@OGRSHOperation
-	public int connectNet(String rootRNSUrl, int isStoredContext)
-			throws OGRSHException {
+	public int connectNet(String rootRNSUrl, int isStoredContext) throws OGRSHException
+	{
 		if (isStoredContext != 0)
 			return connectNetFromStoredContext(rootRNSUrl);
 		try {
@@ -255,21 +249,19 @@ public class OGRSHConnection implements Runnable {
 			ctxt.getActiveKeyAndCertMaterial();
 			return 0;
 		} catch (GeneralSecurityException gse) {
-			throw new OGRSHException(OGRSHException.PERMISSION_DENIED,
-					"Unable to initialize key and cert material.");
+			throw new OGRSHException(OGRSHException.PERMISSION_DENIED, "Unable to initialize key and cert material.");
 		} catch (MalformedURLException mue) {
-			throw new OGRSHException(OGRSHException.MALFORMED_URL, "The URL \""
-					+ rootRNSUrl + "\" is malformed.");
+			throw new OGRSHException(OGRSHException.MALFORMED_URL, "The URL \"" + rootRNSUrl + "\" is malformed.");
 		} catch (IOException ioe) {
 			_logger.info("exception occurred in connectNet", ioe);
 			throw new OGRSHException(OGRSHException.IO_EXCEPTION,
-					"An IO Exception occured while trying to acquire root RNS EPR.");
+				"An IO Exception occured while trying to acquire root RNS EPR.");
 		}
 	}
 
 	@OGRSHOperation
-	public int loginSession(String file, String password,
-			String patternOrUsername) throws OGRSHException {
+	public int loginSession(String file, String password, String patternOrUsername) throws OGRSHException
+	{
 		// Assuming certificate based login
 		KeystoreLoginTool tool = new KeystoreLoginTool();
 		try {
@@ -283,9 +275,8 @@ public class OGRSHConnection implements Runnable {
 				tool.addArgument(file);
 			}
 
-			return tool.run(new PrintWriter(System.out), new PrintWriter(
-					System.err), new BufferedReader(new InputStreamReader(
-					System.in)));
+			return tool.run(new PrintWriter(System.out), new PrintWriter(System.err), new BufferedReader(new InputStreamReader(
+				System.in)));
 		} catch (ToolException te) {
 			// This shouldn't happen
 			_logger.error("Unexpected login exception.", te);

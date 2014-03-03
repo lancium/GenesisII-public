@@ -31,10 +31,11 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
-public class DBBESActivityResource extends BasicDBResource implements
-		IBESActivityResource {
+public class DBBESActivityResource extends BasicDBResource implements IBESActivityResource
+{
 	@Override
-	public void destroy() throws ResourceException {
+	public void destroy() throws ResourceException
+	{
 		FilesystemManager fsManager = (FilesystemManager) getProperty(FILESYSTEM_MANAGER);
 		fsManager.releaseAll();
 
@@ -43,8 +44,7 @@ public class DBBESActivityResource extends BasicDBResource implements
 
 		BES bes = BES.findBESForActivity(_resourceKey);
 		if (bes == null)
-			throw new ResourceException("Unable to find bes for activity "
-					+ _resourceKey);
+			throw new ResourceException("Unable to find bes for activity " + _resourceKey);
 		BESActivity activity = bes.findActivity(_resourceKey);
 
 		BESWorkingDirectory dir = activity.getActivityCWD();
@@ -58,14 +58,11 @@ public class DBBESActivityResource extends BasicDBResource implements
 
 			File[] entries = f.listFiles();
 			if (entries == null || entries.length == 0) {
-				if (BESUtilities.isDeletable(dir.getWorkingDirectory())
-						|| dir.mustDelete())
-					PersistentDelete
-							.persistentDelete(dir.getWorkingDirectory());
+				if (BESUtilities.isDeletable(dir.getWorkingDirectory()) || dir.mustDelete())
+					PersistentDelete.persistentDelete(dir.getWorkingDirectory());
 			}
 		} else {
-			if (BESUtilities.isDeletable(dir.getWorkingDirectory())
-					|| dir.mustDelete())
+			if (BESUtilities.isDeletable(dir.getWorkingDirectory()) || dir.mustDelete())
 				PersistentDelete.persistentDelete(dir.getWorkingDirectory());
 		}
 
@@ -74,39 +71,29 @@ public class DBBESActivityResource extends BasicDBResource implements
 		} catch (UnknownActivityIdentifierFaultType uaift) {
 			throw new ResourceException("Unable to delete activity.", uaift);
 		} catch (SQLException sqe) {
-			throw new ResourceException(
-					"Unable to remove activity from database.", sqe);
+			throw new ResourceException("Unable to remove activity from database.", sqe);
 		}
 	}
 
-	public DBBESActivityResource(ResourceKey parentKey,
-			ServerDatabaseConnectionPool connectionPool) throws SQLException {
+	public DBBESActivityResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
+	{
 		super(parentKey, connectionPool);
 	}
 
-	public BESActivity findActivity() throws ResourceUnknownFaultType {
+	public BESActivity findActivity() throws ResourceUnknownFaultType
+	{
 		BES bes = BES.findBESForActivity(_resourceKey);
 		if (bes == null)
 			throw FaultManipulator
-					.fillInFault(new ResourceUnknownFaultType(
-							null,
-							null,
-							null,
-							null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-									"Unknown BES \"" + _resourceKey + "\".") },
-							null));
+				.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + _resourceKey + "\".") },
+					null));
 		BESActivity activity = bes.findActivity(_resourceKey);
 		if (activity == null)
 			throw FaultManipulator
-					.fillInFault(new ResourceUnknownFaultType(
-							null,
-							null,
-							null,
-							null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-									"Unknown BES \"" + _resourceKey + "\".") },
-							null));
+				.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + _resourceKey + "\".") },
+					null));
 
 		return activity;
 	}

@@ -20,33 +20,38 @@ import org.morgan.util.Version;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-class OutOfDateRecord {
+class OutOfDateRecord
+{
 	private String _relativeName;
 	private File _tmpFile;
 	private Version _oldVersion;
 	private Version _newVersion;
 
-	public OutOfDateRecord(String relativeName, File updateDir,
-			Version oldVersion, Version newVersion) {
+	public OutOfDateRecord(String relativeName, File updateDir, Version oldVersion, Version newVersion)
+	{
 		_relativeName = relativeName;
 		_tmpFile = new File(updateDir, relativeName + ".tmp");
 		_oldVersion = oldVersion;
 		_newVersion = newVersion;
 	}
 
-	public String getRelativeName() {
+	public String getRelativeName()
+	{
 		return _relativeName;
 	}
 
-	public File getTmpFile() {
+	public File getTmpFile()
+	{
 		return _tmpFile;
 	}
 
-	public Version getOldVersion() {
+	public Version getOldVersion()
+	{
 		return _oldVersion;
 	}
 
-	public Version getNewVersion() {
+	public Version getNewVersion()
+	{
 		return _newVersion;
 	}
 }

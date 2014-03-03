@@ -5,9 +5,11 @@ import java.util.Calendar;
 
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
-public class BaseFaultFixer implements IAroundInvoker {
+public class BaseFaultFixer implements IAroundInvoker
+{
 	@Override
-	public Object invoke(InvocationContext invocationContext) throws Exception {
+	public Object invoke(InvocationContext invocationContext) throws Exception
+	{
 		try {
 			return invocationContext.proceed();
 		} catch (BaseFaultType bft) {

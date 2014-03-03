@@ -2,14 +2,16 @@ package org.morgan.ftp;
 
 import java.net.SocketAddress;
 
-public class FTPConfiguration {
+public class FTPConfiguration
+{
 	private int _listenPort;
 	private int _idleTimeoutSeconds;
 	private int _dataConnectionTimeout;
 	private int _missedAuthenticationsLimit;
 	private NetworkConstraint[] _networkConstraints;
 
-	public FTPConfiguration(int listenPort) {
+	public FTPConfiguration(int listenPort)
+	{
 		_listenPort = listenPort;
 		_idleTimeoutSeconds = 150;
 		_dataConnectionTimeout = 60;
@@ -18,23 +20,28 @@ public class FTPConfiguration {
 		_networkConstraints = null;
 	}
 
-	public int getListenPort() {
+	public int getListenPort()
+	{
 		return _listenPort;
 	}
 
-	public int getIdleTimeoutSeconds() {
+	public int getIdleTimeoutSeconds()
+	{
 		return _idleTimeoutSeconds;
 	}
 
-	public int getDataConnectionTimeoutSeconds() {
+	public int getDataConnectionTimeoutSeconds()
+	{
 		return _dataConnectionTimeout;
 	}
 
-	public int getMissedAuthenticationsLimit() {
+	public int getMissedAuthenticationsLimit()
+	{
 		return _missedAuthenticationsLimit;
 	}
 
-	public boolean connectionAllowed(SocketAddress addr) {
+	public boolean connectionAllowed(SocketAddress addr)
+	{
 		if (_networkConstraints == null)
 			return true;
 
@@ -46,23 +53,28 @@ public class FTPConfiguration {
 		return false;
 	}
 
-	public void setListenPort(int port) {
+	public void setListenPort(int port)
+	{
 		_listenPort = port;
 	}
 
-	public void setIdleTimeoutSeconds(int timeoutSeconds) {
+	public void setIdleTimeoutSeconds(int timeoutSeconds)
+	{
 		_idleTimeoutSeconds = timeoutSeconds;
 	}
 
-	public void setDataConnectionTimeoutSeconds(int timeoutSeconds) {
+	public void setDataConnectionTimeoutSeconds(int timeoutSeconds)
+	{
 		_dataConnectionTimeout = timeoutSeconds;
 	}
 
-	public void setMissedAuthenticationsLimit(int missLimit) {
+	public void setMissedAuthenticationsLimit(int missLimit)
+	{
 		_missedAuthenticationsLimit = missLimit;
 	}
 
-	public void setNetworkConstraints(NetworkConstraint[] constraints) {
+	public void setNetworkConstraints(NetworkConstraint[] constraints)
+	{
 		_networkConstraints = constraints;
 	}
 }

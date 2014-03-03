@@ -30,12 +30,14 @@ import org.apache.ws.security.components.crypto.CredentialException;
  * 
  * @author dgm4d
  */
-public class GIIBouncyCrypto extends BouncyCastle {
+public class GIIBouncyCrypto extends BouncyCastle
+{
 	// ArrayList containing all of the message-level cert-chains that were
 	// extracted using the WSS4J signature processor
 	protected ArrayList<X509Certificate[]> loadedCerts = new ArrayList<X509Certificate[]>();
 
-	public GIIBouncyCrypto() throws CredentialException, IOException {
+	public GIIBouncyCrypto() throws CredentialException, IOException
+	{
 		super(null);
 
 		// Set the JCE provider (i.e., cert-factory) to BC. (For some reason
@@ -43,8 +45,7 @@ public class GIIBouncyCrypto extends BouncyCastle {
 		// of our use of client-side self-signed creds... idk.)
 
 		properties = new Properties();
-		properties.setProperty(
-				"org.apache.ws.security.crypto.merlin.cert.provider", "BC");
+		properties.setProperty("org.apache.ws.security.crypto.merlin.cert.provider", "BC");
 	}
 
 	/**
@@ -57,8 +58,8 @@ public class GIIBouncyCrypto extends BouncyCastle {
 	 * @throws org.apache.ws.security.WSSecurityException
 	 * 
 	 */
-	public X509Certificate loadCertificate(InputStream in)
-			throws WSSecurityException {
+	public X509Certificate loadCertificate(InputStream in) throws WSSecurityException
+	{
 		X509Certificate cert = super.loadCertificate(in);
 
 		if (cert != null) {
@@ -77,14 +78,12 @@ public class GIIBouncyCrypto extends BouncyCastle {
 	 * @param data
 	 *            The <code>byte</code> array containg the X509 data
 	 * @param reverse
-	 *            If set the first certificate in input data will the last in
-	 *            the array
-	 * @return An array of X509 certificates, ordered according to the reverse
-	 *         flag
+	 *            If set the first certificate in input data will the last in the array
+	 * @return An array of X509 certificates, ordered according to the reverse flag
 	 * @throws WSSecurityException
 	 */
-	public X509Certificate[] getX509Certificates(byte[] data, boolean reverse)
-			throws WSSecurityException {
+	public X509Certificate[] getX509Certificates(byte[] data, boolean reverse) throws WSSecurityException
+	{
 
 		X509Certificate[] certs = super.getX509Certificates(data, reverse);
 
@@ -95,7 +94,8 @@ public class GIIBouncyCrypto extends BouncyCastle {
 		return certs;
 	}
 
-	public ArrayList<X509Certificate[]> getLoadedCerts() {
+	public ArrayList<X509Certificate[]> getLoadedCerts()
+	{
 		return loadedCerts;
 	}
 

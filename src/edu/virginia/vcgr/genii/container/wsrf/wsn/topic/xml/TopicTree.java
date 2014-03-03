@@ -8,14 +8,17 @@ import org.w3c.dom.Element;
 
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 
-class TopicTree {
+class TopicTree
+{
 	TopicTreeNode _root;
 
-	TopicTree() {
+	TopicTree()
+	{
 		_root = new TopicTreeNode();
 	}
 
-	final void addTopic(TopicPath path) {
+	final void addTopic(TopicPath path)
+	{
 		LinkedList<QName> topicPath = path.pathComponents();
 		topicPath.removeFirst();
 		TopicTreeNode node = _root;
@@ -28,7 +31,8 @@ class TopicTree {
 		node.isTopic();
 	}
 
-	final void describe(Element rootDocument) {
+	final void describe(Element rootDocument)
+	{
 		_root.describe(rootDocument);
 	}
 }

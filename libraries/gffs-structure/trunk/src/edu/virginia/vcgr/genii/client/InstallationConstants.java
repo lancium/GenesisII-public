@@ -2,7 +2,8 @@ package edu.virginia.vcgr.genii.client;
 
 import edu.virginia.vcgr.genii.client.configuration.WebContainerConstants;
 
-public class InstallationConstants {
+public class InstallationConstants
+{
 	static public final String INSTALLATION_PROPERTIES_FILENAME = "installation.properties";
 
 	static public final String CONTAINER_PORT_PROPERTY = WebContainerConstants.LISTEN_PORT_PROP;

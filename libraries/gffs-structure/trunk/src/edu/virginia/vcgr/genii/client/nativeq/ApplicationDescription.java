@@ -9,7 +9,8 @@ import java.util.Map;
 
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.ResourceConstraints;
 
-public class ApplicationDescription {
+public class ApplicationDescription
+{
 	private File _fuseMountPoint;
 	private URI _spmdVariation;
 	private Integer _numProcesses;
@@ -23,20 +24,17 @@ public class ApplicationDescription {
 	private ResourceConstraints _resourceConstraints;
 	private File _resourceUsagePath;
 
-	public ApplicationDescription(File fuseMountPoint, URI spmdVariation,
-			Integer numProcesses, Integer numProcessesPerHost,
-			String executableName, Collection<String> arguments,
-			Map<String, String> environment, String stdinRedirect,
-			String stdoutRedirect, String stderrRedirect,
-			ResourceConstraints resourceConstraints, File resourceUsagePath) {
+	public ApplicationDescription(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
+		String executableName, Collection<String> arguments, Map<String, String> environment, String stdinRedirect,
+		String stdoutRedirect, String stderrRedirect, ResourceConstraints resourceConstraints, File resourceUsagePath)
+	{
 		_fuseMountPoint = fuseMountPoint;
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
 		_numProcessesPerHost = numProcessesPerHost;
 
 		if (executableName == null)
-			throw new IllegalArgumentException(
-					"Executable name cannot be null.");
+			throw new IllegalArgumentException("Executable name cannot be null.");
 
 		if (arguments == null)
 			arguments = new ArrayList<String>();
@@ -54,35 +52,43 @@ public class ApplicationDescription {
 		_resourceUsagePath = resourceUsagePath;
 	}
 
-	public URI getSPMDVariation() {
+	public URI getSPMDVariation()
+	{
 		return _spmdVariation;
 	}
 
-	public Integer getNumProcesses() {
+	public Integer getNumProcesses()
+	{
 		return _numProcesses;
 	}
 
-	public Integer getNumProcessesPerHost() {
+	public Integer getNumProcessesPerHost()
+	{
 		return _numProcessesPerHost;
 	}
 
-	public String getExecutableName() {
+	public String getExecutableName()
+	{
 		return _executableName;
 	}
 
-	public File getFuseMountPoint() {
+	public File getFuseMountPoint()
+	{
 		return _fuseMountPoint;
 	}
 
-	public Collection<String> getArguments() {
+	public Collection<String> getArguments()
+	{
 		return _arguments;
 	}
 
-	public Map<String, String> getEnvironment() {
+	public Map<String, String> getEnvironment()
+	{
 		return _environment;
 	}
 
-	public File getStdinRedirect(File workingDirectory) {
+	public File getStdinRedirect(File workingDirectory)
+	{
 		if (_stdinRedirect == null)
 			return null;
 
@@ -93,7 +99,8 @@ public class ApplicationDescription {
 		return new File(workingDirectory, _stdinRedirect);
 	}
 
-	public File getStdoutRedirect(File workingDirectory) {
+	public File getStdoutRedirect(File workingDirectory)
+	{
 		if (_stdoutRedirect == null)
 			return null;
 
@@ -104,11 +111,13 @@ public class ApplicationDescription {
 		return new File(workingDirectory, _stdoutRedirect);
 	}
 
-	public void setStdoutRedirect(String stdoutRedirect) {
+	public void setStdoutRedirect(String stdoutRedirect)
+	{
 		_stdoutRedirect = stdoutRedirect;
 	}
 
-	public File getStderrRedirect(File workingDirectory) {
+	public File getStderrRedirect(File workingDirectory)
+	{
 		if (_stderrRedirect == null)
 			return null;
 
@@ -119,15 +128,18 @@ public class ApplicationDescription {
 		return new File(workingDirectory, _stderrRedirect);
 	}
 
-	public void setStderrRedirect(String stderrRedirect) {
+	public void setStderrRedirect(String stderrRedirect)
+	{
 		_stderrRedirect = stderrRedirect;
 	}
 
-	public ResourceConstraints getResourceConstraints() {
+	public ResourceConstraints getResourceConstraints()
+	{
 		return _resourceConstraints;
 	}
 
-	public File getResourceUsagePath() {
+	public File getResourceUsagePath()
+	{
 		return _resourceUsagePath;
 	}
 }

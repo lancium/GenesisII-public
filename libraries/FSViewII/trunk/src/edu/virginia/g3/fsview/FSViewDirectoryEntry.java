@@ -2,7 +2,8 @@ package edu.virginia.g3.fsview;
 
 import java.io.IOException;
 
-public interface FSViewDirectoryEntry extends FSViewEntry {
+public interface FSViewDirectoryEntry extends FSViewEntry
+{
 	public FSViewEntry lookup(String name) throws IOException;
 
 	public FSViewEntry[] listEntries() throws IOException;

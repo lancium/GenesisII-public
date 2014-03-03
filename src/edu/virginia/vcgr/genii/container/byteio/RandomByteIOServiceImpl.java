@@ -92,10 +92,9 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = RByteIOResourceProvider.class)
-public class RandomByteIOServiceImpl extends GenesisIIBase implements
-		RandomByteIOPortType, ByteIOTopics, AclTopics {
-	static private Log _logger = LogFactory
-			.getLog(RandomByteIOServiceImpl.class);
+public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByteIOPortType, ByteIOTopics, AclTopics
+{
+	static private Log _logger = LogFactory.getLog(RandomByteIOServiceImpl.class);
 	static private final int VALID_BLOCK_SIZE = 1024;
 
 	@MInject(lazy = true)
@@ -105,42 +104,42 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 	private ResourceLock _resourceLock;
 
 	@Override
-	protected void setAttributeHandlers() throws NoSuchMethodException,
-			ResourceException, ResourceUnknownFaultType {
+	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
+	{
 		super.setAttributeHandlers();
 		new VersionedResourceAttributeHandlers(getAttributePackage());
 		new RandomByteIOAttributeHandlers(getAttributePackage());
 	}
 
-	public RandomByteIOServiceImpl() throws RemoteException {
+	public RandomByteIOServiceImpl() throws RemoteException
+	{
 		this("RandomByteIOPortType");
 	}
 
-	protected RandomByteIOServiceImpl(String serviceName)
-			throws RemoteException {
+	protected RandomByteIOServiceImpl(String serviceName) throws RemoteException
+	{
 		super(serviceName);
 		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE());
-		addImplementedPortType(WellKnownPortTypes
-				.GENII_NOTIFICATION_CONSUMER_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE());
 	}
 
-	public PortType getFinalWSResourceInterface() {
+	public PortType getFinalWSResourceInterface()
+	{
 		return WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE();
 	}
 
 	@Override
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-			ConstructionParameters cParams, GenesisHashMap creationParameters,
-			Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException {
-		super.postCreate(rKey, newEPR, cParams, creationParameters,
-				resolverCreationParams);
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
+	{
+		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 
 		IRByteIOResource resource = (IRByteIOResource) rKey.dereference();
 		resource.chooseFile(creationParameters);
 
-		EndpointReferenceType primaryEPR = (EndpointReferenceType) creationParameters
-				.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		EndpointReferenceType primaryEPR =
+			(EndpointReferenceType) creationParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (primaryEPR != null) {
 			VersionedResourceUtils.initializeReplica(resource, primaryEPR, 0);
 			WorkingContext context = WorkingContext.getCurrentWorkingContext();
@@ -157,7 +156,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 	}
 
 	@Override
-	protected void preDestroy() throws RemoteException, ResourceException {
+	protected void preDestroy() throws RemoteException, ResourceException
+	{
 		super.preDestroy();
 
 		DestroyFlags flags = VersionedResourceUtils.preDestroy(_resource);
@@ -165,32 +165,27 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 			if (_logger.isDebugEnabled())
 				_logger.debug("RandomByteIOServiceImpl: publish destroy notification");
 			TopicSet space = TopicSet.forPublisher(getClass());
-			PublisherTopic publisherTopic = space
-					.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
-			ByteIOOperations operation = (flags.isUnlinked ? ByteIOOperations.Unlink
-					: ByteIOOperations.Destroy);
-			publisherTopic.publish(new ByteIOContentsChangedContents(operation,
-					0, 0, 0, 0, flags.vvr));
+			PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
+			ByteIOOperations operation = (flags.isUnlinked ? ByteIOOperations.Unlink : ByteIOOperations.Destroy);
+			publisherTopic.publish(new ByteIOContentsChangedContents(operation, 0, 0, 0, 0, flags.vvr));
 		}
 	}
 
 	@RWXMapping(RWXCategory.READ)
-	public ReadResponse read(Read read) throws RemoteException,
-			CustomFaultType, ReadNotPermittedFaultType,
-			UnsupportedTransferFaultType, ResourceUnknownFaultType {
+	public ReadResponse read(Read read) throws RemoteException, CustomFaultType, ReadNotPermittedFaultType,
+		UnsupportedTransferFaultType, ResourceUnknownFaultType
+	{
 		if (_resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME) != null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("read: resource in error state");
-			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(),
-					"bad replica");
+			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(), "bad replica");
 		}
 
 		int bytesPerBlock = read.getBytesPerBlock();
 		int numBlocks = read.getNumBlocks();
 		long startOffset = read.getStartOffset();
 		long stride = read.getStride();
-		TransferInformationType transferInformation = read
-				.getTransferInformation();
+		TransferInformationType transferInformation = read.getTransferInformation();
 
 		RandomAccessFile raf = null;
 		try {
@@ -221,8 +216,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 		} catch (ResourceUnknownFaultType ruft) {
 			throw FaultManipulator.fillInFault(ruft);
 		} catch (IOException ioe) {
-			throw FaultManipulator.fillInFault(new CustomFaultType(),
-					ioe.toString());
+			throw FaultManipulator.fillInFault(new CustomFaultType(), ioe.toString());
 		} finally {
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
@@ -230,8 +224,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 		return new ReadResponse(transferInformation);
 	}
 
-	static private int readFully(RandomAccessFile raf, byte[] data, int off,
-			int len) throws IOException {
+	static private int readFully(RandomAccessFile raf, byte[] data, int off, int len) throws IOException
+	{
 		int totalRead = 0;
 		int r;
 		while ((r = raf.read(data, off, len)) >= 0) {
@@ -245,14 +239,13 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 	}
 
 	/**
-	 * Ensure that the local cache contains valid data from the given start
-	 * offset.
+	 * Ensure that the local cache contains valid data from the given start offset.
 	 * 
-	 * This function always begins and ends with the resource locked, but the
-	 * resource may be unlocked in the middle.
+	 * This function always begins and ends with the resource locked, but the resource may be
+	 * unlocked in the middle.
 	 */
-	private void downloadIfNecessary(long startOffset, int validSize,
-			File cacheFile) throws IOException {
+	private void downloadIfNecessary(long startOffset, int validSize, File cacheFile) throws IOException
+	{
 		File file = _resource.getBitmapFile();
 		if (file == null)
 			return;
@@ -294,15 +287,11 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 		// TODO: incrementVersionLockCount(_resource);
 		_resourceLock.unlock();
 		try {
-			EndpointReferenceType primaryEPR = EPRUtils
-					.fromBytes((byte[]) _resource
-							.getProperty(SyncProperty.PRIMARY_EPR_PROP_NAME));
-			RandomByteIOPortType clientStub = ClientUtils.createProxy(
-					RandomByteIOPortType.class, primaryEPR);
-			RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(
-					clientStub);
-			RandomByteIOTransferer transferer = factory
-					.createRandomByteIOTransferer();
+			EndpointReferenceType primaryEPR =
+				EPRUtils.fromBytes((byte[]) _resource.getProperty(SyncProperty.PRIMARY_EPR_PROP_NAME));
+			RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, primaryEPR);
+			RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
+			RandomByteIOTransferer transferer = factory.createRandomByteIOTransferer();
 			for (PrimaryFileSegment segment : segmentList) {
 				segment.download(transferer, VALID_BLOCK_SIZE);
 			}
@@ -325,20 +314,18 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public WriteResponse write(Write write) throws RemoteException,
-			CustomFaultType, WriteNotPermittedFaultType,
-			UnsupportedTransferFaultType, ResourceUnknownFaultType {
+	public WriteResponse write(Write write) throws RemoteException, CustomFaultType, WriteNotPermittedFaultType,
+		UnsupportedTransferFaultType, ResourceUnknownFaultType
+	{
 		if (_resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME) != null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("write: resource in error state");
-			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(),
-					"bad replica");
+			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(), "bad replica");
 		}
 		long startOffset = write.getStartOffset();
 		int bytesPerBlock = write.getBytesPerBlock();
 		long stride = write.getStride();
-		TransferInformationType transferInformation = write
-				.getTransferInformation();
+		TransferInformationType transferInformation = write.getTransferInformation();
 		byte[] data = TransferAgent.receiveData(transferInformation);
 		RandomAccessFile raf = null;
 		MessageElement[] byteIOAttrs = null;
@@ -362,41 +349,33 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 				dataOffset += toWrite;
 			}
 
-			VersionVector vvr = VersionedResourceUtils
-					.incrementResourceVersion(_resource);
+			VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(_resource);
 			GeniiAttachment attachment = new GeniiAttachment(data);
 			TopicSet space = TopicSet.forPublisher(getClass());
-			PublisherTopic publisherTopic = space
-					.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
-			publisherTopic.publish(new ByteIOContentsChangedContents(
-					ByteIOOperations.Write, startOffset, bytesPerBlock, stride,
-					data.length, vvr), attachment);
-			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile,
-					_resource);
+			PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
+			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.Write, startOffset, bytesPerBlock,
+				stride, data.length, vvr), attachment);
+			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		} catch (IOException ioe) {
-			throw FaultManipulator.fillInFault(new CustomFaultType(),
-					ioe.toString());
+			throw FaultManipulator.fillInFault(new CustomFaultType(), ioe.toString());
 		} finally {
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
 		}
-		return new WriteResponse(new TransferInformationType(byteIOAttrs,
-				transferInformation.getTransferMechanism()));
+		return new WriteResponse(new TransferInformationType(byteIOAttrs, transferInformation.getTransferMechanism()));
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public AppendResponse append(Append append) throws RemoteException,
-			CustomFaultType, WriteNotPermittedFaultType,
-			UnsupportedTransferFaultType, ResourceUnknownFaultType {
+	public AppendResponse append(Append append) throws RemoteException, CustomFaultType, WriteNotPermittedFaultType,
+		UnsupportedTransferFaultType, ResourceUnknownFaultType
+	{
 		if (_resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME) != null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("append: resource in error state");
-			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(),
-					"bad replica");
+			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(), "bad replica");
 		}
 		long startOffset = 0;
-		TransferInformationType transferInformation = append
-				.getTransferInformation();
+		TransferInformationType transferInformation = append.getTransferInformation();
 		byte[] data = TransferAgent.receiveData(transferInformation);
 		RandomAccessFile raf = null;
 		MessageElement[] byteIOAttrs = null;
@@ -412,42 +391,34 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 			raf = null;
 			updateBitmap(startOffset, data.length, myFile.length());
 
-			VersionVector vvr = VersionedResourceUtils
-					.incrementResourceVersion(_resource);
+			VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(_resource);
 			GeniiAttachment attachment = new GeniiAttachment(data);
 			TopicSet space = TopicSet.forPublisher(getClass());
-			PublisherTopic publisherTopic = space
-					.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
-			publisherTopic.publish(new ByteIOContentsChangedContents(
-					ByteIOOperations.Append, startOffset, data.length, 0,
-					data.length, vvr), attachment);
-			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile,
-					_resource);
+			PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
+			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.Append, startOffset, data.length, 0,
+				data.length, vvr), attachment);
+			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		} catch (IOException ioe) {
-			throw FaultManipulator.fillInFault(new CustomFaultType(),
-					ioe.toString());
+			throw FaultManipulator.fillInFault(new CustomFaultType(), ioe.toString());
 		} finally {
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
 		}
-		return new AppendResponse(new TransferInformationType(byteIOAttrs,
-				append.getTransferInformation().getTransferMechanism()));
+		return new AppendResponse(new TransferInformationType(byteIOAttrs, append.getTransferInformation()
+			.getTransferMechanism()));
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public TruncAppendResponse truncAppend(TruncAppend truncAppend)
-			throws RemoteException, CustomFaultType,
-			WriteNotPermittedFaultType, TruncateNotPermittedFaultType,
-			UnsupportedTransferFaultType, ResourceUnknownFaultType {
+	public TruncAppendResponse truncAppend(TruncAppend truncAppend) throws RemoteException, CustomFaultType,
+		WriteNotPermittedFaultType, TruncateNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
+	{
 		if (_resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME) != null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("truncAppend: resource in error state");
-			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(),
-					"bad replica");
+			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(), "bad replica");
 		}
 		long startOffset = truncAppend.getOffset();
-		TransferInformationType transferInformation = truncAppend
-				.getTransferInformation();
+		TransferInformationType transferInformation = truncAppend.getTransferInformation();
 		byte[] data = TransferAgent.receiveData(transferInformation);
 		RandomAccessFile raf = null;
 		MessageElement[] byteIOAttrs = null;
@@ -463,34 +434,28 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 			raf = null;
 			updateBitmap(startOffset, data.length, myFile.length());
 
-			VersionVector vvr = VersionedResourceUtils
-					.incrementResourceVersion(_resource);
+			VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(_resource);
 			GeniiAttachment attachment = new GeniiAttachment(data);
 			TopicSet space = TopicSet.forPublisher(getClass());
-			PublisherTopic publisherTopic = space
-					.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
-			publisherTopic.publish(new ByteIOContentsChangedContents(
-					ByteIOOperations.TruncAppend, startOffset, data.length, 0,
-					data.length, vvr), attachment);
-			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile,
-					_resource);
+			PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
+			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.TruncAppend, startOffset, data.length, 0,
+				data.length, vvr), attachment);
+			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		} catch (IOException ioe) {
-			throw FaultManipulator.fillInFault(new CustomFaultType(),
-					ioe.toString());
+			throw FaultManipulator.fillInFault(new CustomFaultType(), ioe.toString());
 		} finally {
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
 		}
-		return new TruncAppendResponse(new TransferInformationType(byteIOAttrs,
-				truncAppend.getTransferInformation().getTransferMechanism()));
+		return new TruncAppendResponse(new TransferInformationType(byteIOAttrs, truncAppend.getTransferInformation()
+			.getTransferMechanism()));
 	}
 
 	/**
-	 * For each block that was completly overwritten with valid data, mark the
-	 * block as valid.
+	 * For each block that was completly overwritten with valid data, mark the block as valid.
 	 */
-	private void updateBitmap(long firstByte, int size, long fileSize)
-			throws ResourceException, IOException {
+	private void updateBitmap(long firstByte, int size, long fileSize) throws ResourceException, IOException
+	{
 		File file = _resource.getBitmapFile();
 		if (file == null)
 			return;
@@ -504,8 +469,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 		if ((lastByte < lastByteOfBlock) && (lastByte < fileSize))
 			lastBlock--;
 		if (_logger.isDebugEnabled())
-			_logger.debug("write (" + firstByte + ", " + size + "): blocks "
-					+ firstBlock + " - " + lastBlock);
+			_logger.debug("write (" + firstByte + ", " + size + "): blocks " + firstBlock + " - " + lastBlock);
 		if (lastBlock < firstBlock)
 			return;
 		BitmapFile bitmapFile = null;
@@ -520,54 +484,48 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 	}
 
 	@Override
-	public ResourceSyncRunner getClassResourceSyncRunner() {
+	public ResourceSyncRunner getClassResourceSyncRunner()
+	{
 		return new GeniiFileSyncRunner();
 	}
 
 	@Override
-	protected void registerNotificationHandlers(
-			NotificationMultiplexer multiplexer) {
+	protected void registerNotificationHandlers(NotificationMultiplexer multiplexer)
+	{
 		super.registerNotificationHandlers(multiplexer);
-		multiplexer.registerNotificationHandler(
-				ByteIOTopics.BYTEIO_CONTENTS_CHANGED_TOPIC
-						.asConcreteQueryExpression(),
-				new ByteIOContentsChangedNotificationHandler());
-		multiplexer.registerNotificationHandler(
-				AclTopics.GENII_ACL_CHANGE_TOPIC.asConcreteQueryExpression(),
-				new AclChangeNotificationHandler());
+		multiplexer.registerNotificationHandler(ByteIOTopics.BYTEIO_CONTENTS_CHANGED_TOPIC.asConcreteQueryExpression(),
+			new ByteIOContentsChangedNotificationHandler());
+		multiplexer.registerNotificationHandler(AclTopics.GENII_ACL_CHANGE_TOPIC.asConcreteQueryExpression(),
+			new AclChangeNotificationHandler());
 	}
 
-	private class ByteIOContentsChangedNotificationHandler extends
-			AbstractNotificationHandler<ByteIOContentsChangedContents> {
-		private ByteIOContentsChangedNotificationHandler() {
+	private class ByteIOContentsChangedNotificationHandler extends AbstractNotificationHandler<ByteIOContentsChangedContents>
+	{
+		private ByteIOContentsChangedNotificationHandler()
+		{
 			super(ByteIOContentsChangedContents.class);
 		}
 
 		@Override
-		public String handleNotification(TopicPath topicPath,
-				EndpointReferenceType producerReference,
-				EndpointReferenceType subscriptionReference,
-				ByteIOContentsChangedContents contents) throws Exception {
+		public String handleNotification(TopicPath topicPath, EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference, ByteIOContentsChangedContents contents) throws Exception
+		{
 			ByteIOOperations operation = contents.operation();
 			long offset = contents.offset();
 			int bytesPerBlock = contents.bytesPerBlock();
 			long stride = contents.stride();
 			int size = contents.size();
 			VersionVector remoteVector = contents.versionVector();
-			if (!(operation.equals(ByteIOOperations.Write)
-					|| operation.equals(ByteIOOperations.Append)
-					|| operation.equals(ByteIOOperations.TruncAppend)
-					|| operation.equals(ByteIOOperations.Destroy) || operation
-						.equals(ByteIOOperations.Unlink))) {
+			if (!(operation.equals(ByteIOOperations.Write) || operation.equals(ByteIOOperations.Append)
+				|| operation.equals(ByteIOOperations.TruncAppend) || operation.equals(ByteIOOperations.Destroy) || operation
+					.equals(ByteIOOperations.Unlink))) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("RandomByteIOServiceImpl.notify: invalid parameters");
 				return NotificationConstants.FAIL;
 			}
 			IRByteIOResource resource = _resource;
-			// The notification contains the identity of the user who modified
-			// the resource.
-			// The identity is delegated to the resource that sent the
-			// notification.
+			// The notification contains the identity of the user who modified the resource.
+			// The identity is delegated to the resource that sent the notification.
 			// The notification is signed by the resource.
 			if (!ServerWSDoAllReceiver.checkAccess(resource, RWXCategory.WRITE)) {
 				if (_logger.isDebugEnabled())
@@ -578,14 +536,11 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 			try {
 				data = TransferAgent.extractAttachmentData();
 				if (_logger.isDebugEnabled())
-					_logger.debug("RandomByteIOServiceImpl.notify: data.length="
-							+ (data == null ? 0 : data.length));
+					_logger.debug("RandomByteIOServiceImpl.notify: data.length=" + (data == null ? 0 : data.length));
 			} catch (Exception exception) {
 				// Should we ask the caller to try again?
 				if (_logger.isDebugEnabled())
-					_logger.debug(
-							"RandomByteIOServiceImpl.notify: attachment failure",
-							exception);
+					_logger.debug("RandomByteIOServiceImpl.notify: attachment failure", exception);
 				return NotificationConstants.FAIL;
 			}
 			RandomAccessFile raf = null;
@@ -593,16 +548,12 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 			try {
 				_resourceLock.lock();
 				if (operation.equals(ByteIOOperations.Destroy)) {
-					resource.setProperty(SyncProperty.IS_DESTROYED_PROP_NAME,
-							"true");
+					resource.setProperty(SyncProperty.IS_DESTROYED_PROP_NAME, "true");
 					destroy(new Destroy());
 					return NotificationConstants.OK;
 				}
-				VersionVector localVector = (VersionVector) resource
-						.getProperty(SyncProperty.VERSION_VECTOR_PROP_NAME);
-				MessageFlags flags = VersionedResourceUtils
-						.validateNotification(resource, localVector,
-								remoteVector);
+				VersionVector localVector = (VersionVector) resource.getProperty(SyncProperty.VERSION_VECTOR_PROP_NAME);
+				MessageFlags flags = VersionedResourceUtils.validateNotification(resource, localVector, remoteVector);
 				if (flags.status != null)
 					return flags.status;
 				if (operation.equals(ByteIOOperations.Unlink)) {
@@ -612,22 +563,18 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 				}
 				File bitmapFile = resource.getBitmapFile();
 				if (size > 0) {
-					if (((data == null) && (bitmapFile == null))
-							|| ((data != null) && (data.length != size))) {
+					if (((data == null) && (bitmapFile == null)) || ((data != null) && (data.length != size))) {
 						if (_logger.isDebugEnabled())
-							_logger.debug("RandomByteIOServiceImpl.notify: attachment size failure, "
-									+ "expected " + size);
+							_logger.debug("RandomByteIOServiceImpl.notify: attachment size failure, " + "expected " + size);
 						return NotificationConstants.FAIL;
 					}
 				}
 				File myFile = resource.getCurrentFile();
 				raf = new RandomAccessFile(myFile, "rw");
-				if (operation.equals(ByteIOOperations.Append)
-						|| operation.equals(ByteIOOperations.TruncAppend))
+				if (operation.equals(ByteIOOperations.Append) || operation.equals(ByteIOOperations.TruncAppend))
 					raf.setLength(offset);
 				if (bitmapFile != null)
-					updateBitmap(bitmapFile, raf, offset, bytesPerBlock,
-							stride, size);
+					updateBitmap(bitmapFile, raf, offset, bytesPerBlock, stride, size);
 				if (data != null) {
 					int dataOffset = 0;
 					while (dataOffset < data.length) {
@@ -642,45 +589,36 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 				}
 				raf.close();
 				raf = null;
-				VersionedResourceUtils.updateVersionVector(resource,
-						localVector, remoteVector);
+				VersionedResourceUtils.updateVersionVector(resource, localVector, remoteVector);
 				replay = flags.replay;
 			} catch (Exception ioe) {
-				_logger.error(
-						"RandomByteIOServiceImpl.notify: error writing data",
-						ioe);
-				resource.setProperty(SyncProperty.ERROR_STATE_PROP_NAME,
-						"error");
+				_logger.error("RandomByteIOServiceImpl.notify: error writing data", ioe);
+				resource.setProperty(SyncProperty.ERROR_STATE_PROP_NAME, "error");
 				return NotificationConstants.FAIL;
 			} finally {
 				StreamUtils.close(raf);
 				_resourceLock.unlock();
 			}
 			if (replay) {
-				VersionVector vvr = VersionedResourceUtils
-						.incrementResourceVersion(resource);
+				VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(resource);
 				GeniiAttachment attachment = new GeniiAttachment(data);
 				if (_logger.isDebugEnabled())
 					_logger.debug("RandomByteIOServiceImpl.notify: replay message");
-				TopicSet space = TopicSet
-						.forPublisher(RandomByteIOServiceImpl.class);
-				PublisherTopic publisherTopic = space
-						.createPublisherTopic(topicPath);
-				publisherTopic.publish(new ByteIOContentsChangedContents(
-						operation, offset, bytesPerBlock, stride, size, vvr),
-						attachment);
+				TopicSet space = TopicSet.forPublisher(RandomByteIOServiceImpl.class);
+				PublisherTopic publisherTopic = space.createPublisherTopic(topicPath);
+				publisherTopic.publish(new ByteIOContentsChangedContents(operation, offset, bytesPerBlock, stride, size, vvr),
+					attachment);
 			}
 			return NotificationConstants.OK;
 		}
 
 		/**
-		 * For each block that would be written, clear that block in the bitmap.
-		 * If this would write past the end of the file, then pad the file to
-		 * its new length.
+		 * For each block that would be written, clear that block in the bitmap. If this would write
+		 * past the end of the file, then pad the file to its new length.
 		 */
-		private void updateBitmap(File file, RandomAccessFile raf, long offset,
-				int bytesPerBlock, long stride, int dataSize)
-				throws IOException {
+		private void updateBitmap(File file, RandomAccessFile raf, long offset, int bytesPerBlock, long stride, int dataSize)
+			throws IOException
+		{
 			BitmapFile bitmapFile = null;
 			long fileSize = 0;
 			try {
@@ -709,20 +647,18 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 	}
 
 	/*
-	 * This method publish attributes update notification message and also
-	 * return the updated attributes as set of MessageElements. We use a single
-	 * function instead of two for this two operations in order to reduce the
-	 * number of database access.
+	 * This method publish attributes update notification message and also return the updated
+	 * attributes as set of MessageElements. We use a single function instead of two for this two
+	 * operations in order to reduce the number of database access.
 	 */
-	private MessageElement[] notifyAttributesUpdateAndGetMetadata(
-			File currentFile, IRByteIOResource resource)
-			throws ResourceException {
+	private MessageElement[] notifyAttributesUpdateAndGetMetadata(File currentFile, IRByteIOResource resource)
+		throws ResourceException
+	{
 
 		MessageElement[] attributes = new MessageElement[4];
 
 		TopicSet space = TopicSet.forPublisher(getClass());
-		PublisherTopic publisherTopic = space
-				.createPublisherTopic(BYTEIO_ATTRIBUTES_UPDATE_TOPIC);
+		PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_ATTRIBUTES_UPDATE_TOPIC);
 		ByteIOAttributesUpdateNotification message = new ByteIOAttributesUpdateNotification();
 
 		long fileSize = currentFile.length();
@@ -731,8 +667,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 
 		Calendar createTime = resource.getCreateTime();
 		message.setCreateTime(createTime);
-		attributes[1] = new MessageElement(ByteIOConstants.rcreatTime,
-				createTime);
+		attributes[1] = new MessageElement(ByteIOConstants.rcreatTime, createTime);
 
 		Calendar modTime = resource.getModTime();
 		message.setModificationTime(modTime);
@@ -740,8 +675,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements
 
 		Calendar accessTime = resource.getAccessTime();
 		message.setAccessTime(accessTime);
-		attributes[3] = new MessageElement(ByteIOConstants.raccessTime,
-				accessTime);
+		attributes[3] = new MessageElement(ByteIOConstants.raccessTime, accessTime);
 
 		publisherTopic.publish(message);
 		return attributes;

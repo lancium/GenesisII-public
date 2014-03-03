@@ -7,7 +7,8 @@ import javax.swing.JPanel;
 import edu.virginia.vcgr.genii.client.history.HistoryEventLevel;
 import edu.virginia.vcgr.genii.ui.prefs.AbstractUIPreferenceSet;
 
-public class HistoryUIPreferenceSet extends AbstractUIPreferenceSet {
+public class HistoryUIPreferenceSet extends AbstractUIPreferenceSet
+{
 	static final private String PREFERENCE_SET_TITLE = "Resource History";
 
 	static final private String PREFERENCE_NODE_NAME = "history";
@@ -19,12 +20,14 @@ public class HistoryUIPreferenceSet extends AbstractUIPreferenceSet {
 	private HistoryEventLevel _preferredLevel = null;
 
 	@Override
-	final protected Preferences preferenceNode(Preferences uiPreferencesRoot) {
+	final protected Preferences preferenceNode(Preferences uiPreferencesRoot)
+	{
 		return uiPreferencesRoot.node(PREFERENCE_NODE_NAME);
 	}
 
 	@Override
-	final protected void loadImpl(Preferences prefNode) {
+	final protected void loadImpl(Preferences prefNode)
+	{
 		String value = prefNode.get(PREFERRED_LEVEL_KEY, null);
 		if (value == null)
 			_preferredLevel = null;
@@ -33,18 +36,21 @@ public class HistoryUIPreferenceSet extends AbstractUIPreferenceSet {
 	}
 
 	@Override
-	final protected void storeImpl(Preferences prefNode) {
+	final protected void storeImpl(Preferences prefNode)
+	{
 		if (_preferredLevel == null)
 			prefNode.remove(PREFERRED_LEVEL_KEY);
 		else
 			prefNode.put(PREFERRED_LEVEL_KEY, _preferredLevel.name());
 	}
 
-	public HistoryUIPreferenceSet() {
+	public HistoryUIPreferenceSet()
+	{
 		super(PREFERENCE_SET_TITLE);
 	}
 
-	final public HistoryEventLevel preferredLevel() {
+	final public HistoryEventLevel preferredLevel()
+	{
 		if (_preferredLevel == null)
 			return DEFAULT_PREFERRED_LEVEL;
 
@@ -52,12 +58,14 @@ public class HistoryUIPreferenceSet extends AbstractUIPreferenceSet {
 	}
 
 	@Override
-	final public JPanel createEditor() {
+	final public JPanel createEditor()
+	{
 		return new HistoryUIPreferenceEditor(this);
 	}
 
 	@Override
-	final public void load(JPanel editor) {
+	final public void load(JPanel editor)
+	{
 		_preferredLevel = ((HistoryUIPreferenceEditor) editor).preferredLevel();
 	}
 }

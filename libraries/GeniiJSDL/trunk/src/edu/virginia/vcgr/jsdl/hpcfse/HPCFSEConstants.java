@@ -20,8 +20,10 @@ package edu.virginia.vcgr.jsdl.hpcfse;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class HPCFSEConstants {
+public class HPCFSEConstants
+{
 	static final public String HPCFSE_NS = "http://schemas.ogf.org/hpcp/2007/11/ac";
 
-	static final public String WSSEC_SECEXT_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+	static final public String WSSEC_SECEXT_NS =
+		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 }

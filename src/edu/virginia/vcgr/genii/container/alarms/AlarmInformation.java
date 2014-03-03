@@ -4,7 +4,8 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
-class AlarmInformation {
+class AlarmInformation
+{
 	private long _alarmID;
 	private long _repeatInterval;
 	private ICallingContext _callingContext;
@@ -12,9 +13,9 @@ class AlarmInformation {
 	private String _methodName;
 	private Object _userData;
 
-	AlarmInformation(long alarmID, long repeatInterval,
-			ICallingContext callingContext, EndpointReferenceType target,
-			String methodName, Object userData) {
+	AlarmInformation(long alarmID, long repeatInterval, ICallingContext callingContext, EndpointReferenceType target,
+		String methodName, Object userData)
+	{
 		_alarmID = alarmID;
 		_repeatInterval = repeatInterval;
 		_callingContext = callingContext;
@@ -23,27 +24,33 @@ class AlarmInformation {
 		_userData = userData;
 	}
 
-	final long alarmID() {
+	final long alarmID()
+	{
 		return _alarmID;
 	}
 
-	final long repeatInterval() {
+	final long repeatInterval()
+	{
 		return _repeatInterval;
 	}
 
-	final ICallingContext callingContext() {
+	final ICallingContext callingContext()
+	{
 		return _callingContext;
 	}
 
-	final EndpointReferenceType target() {
+	final EndpointReferenceType target()
+	{
 		return _target;
 	}
 
-	final String methodName() {
+	final String methodName()
+	{
 		return _methodName;
 	}
 
-	final Object userData() {
+	final Object userData()
+	{
 		return _userData;
 	}
 }

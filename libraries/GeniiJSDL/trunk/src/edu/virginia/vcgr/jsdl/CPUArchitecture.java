@@ -23,7 +23,8 @@ import javax.xml.bind.annotation.XmlElement;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class CPUArchitecture extends CommonJSDLElement implements Serializable {
+public class CPUArchitecture extends CommonJSDLElement implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "CPUArchitectureName", required = true)
@@ -33,23 +34,25 @@ public class CPUArchitecture extends CommonJSDLElement implements Serializable {
 	 * Only to be used by XML unmarshalling.
 	 */
 	@SuppressWarnings("unused")
-	private CPUArchitecture() {
+	private CPUArchitecture()
+	{
 	}
 
-	public CPUArchitecture(ProcessorArchitecture processorArchitecture) {
+	public CPUArchitecture(ProcessorArchitecture processorArchitecture)
+	{
 		if (processorArchitecture == null)
-			throw new IllegalArgumentException(
-					"ProcessorArchitecture cannot be null.");
+			throw new IllegalArgumentException("ProcessorArchitecture cannot be null.");
 
 		_processorArchitecture = processorArchitecture;
 	}
 
-	final public void processorArchitecture(
-			ProcessorArchitecture processorArchitecture) {
+	final public void processorArchitecture(ProcessorArchitecture processorArchitecture)
+	{
 		_processorArchitecture = processorArchitecture;
 	}
 
-	final public ProcessorArchitecture processorArchitecture() {
+	final public ProcessorArchitecture processorArchitecture()
+	{
 		return _processorArchitecture;
 	}
 }

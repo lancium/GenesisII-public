@@ -14,8 +14,8 @@ import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
-public class CloudStageInPhase extends AbstractCloudExecutionPhase implements
-		Serializable {
+public class CloudStageInPhase extends AbstractCloudExecutionPhase implements Serializable
+{
 
 	static final long serialVersionUID = 0L;
 
@@ -23,8 +23,8 @@ public class CloudStageInPhase extends AbstractCloudExecutionPhase implements
 
 	static private Log _logger = LogFactory.getLog(CloudStageInPhase.class);
 
-	public CloudStageInPhase(String activityID, String besid,
-			String workingDir, String stageScript) {
+	public CloudStageInPhase(String activityID, String besid, String workingDir, String stageScript)
+	{
 		_activityID = activityID;
 		_besid = besid;
 		_workingDir = workingDir;
@@ -32,15 +32,15 @@ public class CloudStageInPhase extends AbstractCloudExecutionPhase implements
 	}
 
 	@Override
-	public ActivityState getPhaseState() {
-		return new ActivityState(ActivityStateEnumeration.Running,
-				"staging-in", false);
+	public ActivityState getPhaseState()
+	{
+		return new ActivityState(ActivityStateEnumeration.Running, "staging-in", false);
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable {
-		HistoryContext history = HistoryContextFactory
-				.createContext(HistoryEventCategory.StageIn);
+	public void execute(ExecutionContext context) throws Throwable
+	{
+		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.StageIn);
 
 		history.createInfoWriter("Sending Stage in command").close();
 
@@ -48,23 +48,23 @@ public class CloudStageInPhase extends AbstractCloudExecutionPhase implements
 		String resourceID = tManage.aquireResource(_activityID);
 
 		// Build Command (nohup and set to background)
-		String command = "nohup " + _workingDir + _stageScript
-				+ " &> /dev/null &";
+		String command = "nohup " + _workingDir + _stageScript + " &> /dev/null &";
 
 		tryExecuteCommand(resourceID, command, System.out, System.err, tManage);
 
-		_logger.info("CloudBES: Activity " + _activityID
-				+ " Sent Stage In Command");
+		_logger.info("CloudBES: Activity " + _activityID + " Sent Stage In Command");
 
 	}
 
 	@Override
-	protected Log getLog() {
+	protected Log getLog()
+	{
 		return _logger;
 	}
 
 	@Override
-	protected String getPhase() {
+	protected String getPhase()
+	{
 		return "Stage-In";
 	}
 

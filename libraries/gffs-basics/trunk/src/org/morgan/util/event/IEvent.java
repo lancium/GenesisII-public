@@ -16,6 +16,7 @@ package org.morgan.util.event;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public interface IEvent {
+public interface IEvent
+{
 	public EventDescription getDescription();
 }

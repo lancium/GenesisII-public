@@ -11,30 +11,27 @@ import org.morgan.dpage.InjectParameter;
 import edu.virginia.vcgr.genii.container.dynpages.templates.GenesisIIStyledPage;
 import edu.virginia.vcgr.genii.container.q2.QueueManager;
 
-public class QueueInformation extends GenesisIIStyledPage {
+public class QueueInformation extends GenesisIIStyledPage
+{
 	static final private String PAGE_TITLE = "Grid Queue Information";
 
 	@InjectParameter("queueID")
 	private String _queueID;
 
-	private void generateAllQueuesPage(PrintStream ps) throws IOException {
+	private void generateAllQueuesPage(PrintStream ps) throws IOException
+	{
 		ps.println("<H2>Grid Queues Available</H2>");
 		ps.println("<UL>");
 		for (String queueID : QueueManager.listAllQueues()) {
-			ps.format(
-					"<LI><A HREF=\"queue-info.html?queueID=%s\">Grid Queue %s</A></LI>",
-					queueID, queueID);
+			ps.format("<LI><A HREF=\"queue-info.html?queueID=%s\">Grid Queue %s</A></LI>", queueID, queueID);
 		}
 		ps.println("</UL>");
 	}
 
-	private void generateResourcesAvailable(PrintStream ps, QueueManager queue)
-			throws IOException {
-		ps.format("<H2>Total Resources Available:  %d</H2><BR/>",
-				queue.totalSlots());
-		ps.format(
-				"<H2>Total Jobs Finished Since 14 August 2009:  %d</H2><BR/>",
-				(669378L + queue.totalFinishedAllTime()));
+	private void generateResourcesAvailable(PrintStream ps, QueueManager queue) throws IOException
+	{
+		ps.format("<H2>Total Resources Available:  %d</H2><BR/>", queue.totalSlots());
+		ps.format("<H2>Total Jobs Finished Since 14 August 2009:  %d</H2><BR/>", (669378L + queue.totalFinishedAllTime()));
 		ps.println("<TABLE border=\"0\" cellpadding=\"50\">");
 		ps.println("<TR>");
 		ps.println("<TD>");
@@ -42,29 +39,24 @@ public class QueueInformation extends GenesisIIStyledPage {
 		Map<String, Long> jobMap = queue.summarizeJobs();
 		for (String category : jobMap.keySet()) {
 			if (category.equals("Error"))
-				ps.format("<LI>%d Jobs Currently in Error</LI>",
-						jobMap.get(category));
+				ps.format("<LI>%d Jobs Currently in Error</LI>", jobMap.get(category));
 			else if (category.equals("Finished"))
-				ps.format("<LI>%d Jobs Finished but Not Reaped</LI>",
-						jobMap.get(category));
+				ps.format("<LI>%d Jobs Finished but Not Reaped</LI>", jobMap.get(category));
 			else
-				ps.format("<LI>%d Jobs Currently %s</LI>",
-						jobMap.get(category), category);
+				ps.format("<LI>%d Jobs Currently %s</LI>", jobMap.get(category), category);
 		}
 		ps.println("</UL>");
 		ps.println("</TD>");
 		ps.println("<TD>");
-		ps.format(
-				"<IMG SRC=\"queue-resources.png?queueID=%1$s&width=%2$d&height=%3$d\" "
-						+ "ALT=\"*\" width=\"%2$d\" height=\"%3$d\"/>",
-				_queueID, QueueResources.WIDTH, QueueResources.HEIGHT);
+		ps.format("<IMG SRC=\"queue-resources.png?queueID=%1$s&width=%2$d&height=%3$d\" "
+			+ "ALT=\"*\" width=\"%2$d\" height=\"%3$d\"/>", _queueID, QueueResources.WIDTH, QueueResources.HEIGHT);
 		ps.println("</TD>");
 		ps.println("</TR>");
 		ps.println("</TABLE>");
 	}
 
-	private void generateQueuePage(PrintStream ps, String queueID)
-			throws IOException {
+	private void generateQueuePage(PrintStream ps, String queueID) throws IOException
+	{
 		try {
 			QueueManager queue = QueueManager.getManager(queueID);
 			if (queue == null)
@@ -79,14 +71,16 @@ public class QueueInformation extends GenesisIIStyledPage {
 	}
 
 	@Override
-	protected void generateContent(PrintStream ps) throws IOException {
+	protected void generateContent(PrintStream ps) throws IOException
+	{
 		if (_queueID == null)
 			generateAllQueuesPage(ps);
 		else
 			generateQueuePage(ps, _queueID);
 	}
 
-	public QueueInformation() {
+	public QueueInformation()
+	{
 		super("images/grid_logo_medium.jpg", PAGE_TITLE);
 	}
 }

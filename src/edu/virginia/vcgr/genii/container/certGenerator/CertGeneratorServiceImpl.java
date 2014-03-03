@@ -55,58 +55,53 @@ import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 
 @GeniiServiceConfiguration(resourceProvider = CertGeneratorDBResourceProvider.class)
-public class CertGeneratorServiceImpl extends GenesisIIBase implements
-		CertGeneratorPortType {
-	static private Log _logger = LogFactory
-			.getLog(CertGeneratorServiceImpl.class);
+public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGeneratorPortType
+{
+	static private Log _logger = LogFactory.getLog(CertGeneratorServiceImpl.class);
 
 	@MInject(lazy = true)
 	private ICertGeneratorResource _resource;
 
-	public CertGeneratorServiceImpl() throws RemoteException {
+	public CertGeneratorServiceImpl() throws RemoteException
+	{
 		super("CertGeneratorPortType");
 
-		addImplementedPortType(WellKnownPortTypes
-				.CERT_GENERATOR_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE());
 	}
 
-	protected CertGeneratorServiceImpl(String serviceName)
-			throws RemoteException {
+	protected CertGeneratorServiceImpl(String serviceName) throws RemoteException
+	{
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes
-				.CERT_GENERATOR_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE());
 	}
 
-	public PortType getFinalWSResourceInterface() {
+	public PortType getFinalWSResourceInterface()
+	{
 		return WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE();
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
 	public GenerateX509V3CertificateChainResponseType generateX509V3CertificateChain(
-			GenerateX509V3CertificateChainRequestType request)
-			throws java.rmi.RemoteException,
-			edu.virginia.vcgr.genii.certGenerator.InvalidCertificateRequestFaultType,
-			ResourceUnknownFaultType {
+		GenerateX509V3CertificateChainRequestType request) throws java.rmi.RemoteException,
+		edu.virginia.vcgr.genii.certGenerator.InvalidCertificateRequestFaultType, ResourceUnknownFaultType
+	{
 		GenerateX509V3CertificateChainResponseType response = null;
 
 		if (request == null)
-			throw FaultManipulator
-					.fillInFault(new InvalidCertificateRequestFaultType());
+			throw FaultManipulator.fillInFault(new InvalidCertificateRequestFaultType());
 
 		PublicKeyType pkt = request.getPublicKey();
 		X509NameType x509Name = request.getX509Name();
 		if (x509Name == null)
-			throw FaultManipulator
-					.fillInFault(new InvalidCertificateRequestFaultType());
+			throw FaultManipulator.fillInFault(new InvalidCertificateRequestFaultType());
 
 		PublicKey pk = null;
 		try {
 			pk = SecurityUtilities.deserializePublicKey(pkt.getPublicKey());
 		} catch (Throwable t) {
 			_logger.error("Invalid Certificate Request", t);
-			throw FaultManipulator
-					.fillInFault(new InvalidCertificateRequestFaultType());
+			throw FaultManipulator.fillInFault(new InvalidCertificateRequestFaultType());
 		}
 
 		// get CA certificate from resource state.
@@ -133,8 +128,8 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements
 		X509Certificate newCert = null;
 
 		try {
-			newCert = CertTool.createIntermediateCert(x509Name.getX509Name(),
-					defaultDuration, pk, issuerPrivateKey, issuerChain[0]);
+			newCert =
+				CertTool.createIntermediateCert(x509Name.getX509Name(), defaultDuration, pk, issuerPrivateKey, issuerChain[0]);
 
 			int count = issuerChain.length + 1;
 			byte[][] newCertChainBytes = new byte[count][];
@@ -142,29 +137,25 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements
 			for (int i = 0; i < issuerChain.length; i++) {
 				newCertChainBytes[i + 1] = issuerChain[i].getEncoded();
 			}
-			CertificateChainType certificateChain = new CertificateChainType(
-					count, newCertChainBytes);
-			response = new GenerateX509V3CertificateChainResponseType(
-					certificateChain);
+			CertificateChainType certificateChain = new CertificateChainType(count, newCertChainBytes);
+			response = new GenerateX509V3CertificateChainResponseType(certificateChain);
 		} catch (GeneralSecurityException gse) {
 			_logger.error("A security exception occurred.", gse);
-			throw FaultManipulator
-					.fillInFault(new InvalidCertificateRequestFaultType());
+			throw FaultManipulator.fillInFault(new InvalidCertificateRequestFaultType());
 		}
 
 		return response;
 	}
 
 	@Override
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-			ConstructionParameters cParams, GenesisHashMap creationParameters,
-			Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException {
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
+		BaseFaultType, RemoteException
+	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new certGenerator Resource.");
 
-		super.postCreate(rKey, newEPR, cParams, creationParameters,
-				resolverCreationParams);
+		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 
 		ICertGeneratorResource resource = null;
 
@@ -174,18 +165,14 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements
 	}
 
 	@Override
-	protected Object translateConstructionParameter(MessageElement parameter)
-			throws Exception {
+	protected Object translateConstructionParameter(MessageElement parameter) throws Exception
+	{
 		QName messageName = parameter.getQName();
-		if (messageName
-				.equals(CertGeneratorUtils.CERT_GENERATOR_DEFAULT_VALIDITY_CONSTRUCTION_PARAMETER))
+		if (messageName.equals(CertGeneratorUtils.CERT_GENERATOR_DEFAULT_VALIDITY_CONSTRUCTION_PARAMETER))
 			return new Long((String) parameter.getObjectValue(String.class));
-		else if (messageName
-				.equals(CertGeneratorUtils.CERT_GENERATOR_ISSUER_CHAIN_CONSTRUCTION_PARAMETER)) {
-			byte[] certChainBytes = (byte[]) parameter
-					.getObjectValue(byte[].class);
-			X509Certificate[] certChain = (X509Certificate[]) DBSerializer
-					.deserialize(certChainBytes);
+		else if (messageName.equals(CertGeneratorUtils.CERT_GENERATOR_ISSUER_CHAIN_CONSTRUCTION_PARAMETER)) {
+			byte[] certChainBytes = (byte[]) parameter.getObjectValue(byte[].class);
+			X509Certificate[] certChain = (X509Certificate[]) DBSerializer.deserialize(certChainBytes);
 
 			X509Certificate issuerCert = certChain[0];
 			issuerCert.checkValidity(new Date());
@@ -199,12 +186,9 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements
 			issuerCert.verify(pk);
 
 			return certChain;
-		} else if (messageName
-				.equals(CertGeneratorUtils.CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER)) {
-			byte[] privateKeyBytes = (byte[]) parameter
-					.getObjectValue(byte[].class);
-			PrivateKey privateKey = (PrivateKey) DBSerializer
-					.deserialize(privateKeyBytes);
+		} else if (messageName.equals(CertGeneratorUtils.CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER)) {
+			byte[] privateKeyBytes = (byte[]) parameter.getObjectValue(byte[].class);
+			PrivateKey privateKey = (PrivateKey) DBSerializer.deserialize(privateKeyBytes);
 			return privateKey;
 		} else
 			return super.translateConstructionParameter(parameter);

@@ -32,7 +32,8 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public abstract class CommonJSDLElement implements Serializable {
+public abstract class CommonJSDLElement implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -41,14 +42,17 @@ public abstract class CommonJSDLElement implements Serializable {
 	@XmlAnyElement
 	private List<Element> _any = new LinkedList<Element>();
 
-	protected CommonJSDLElement() {
+	protected CommonJSDLElement()
+	{
 	}
 
-	public Map<QName, String> anyAttributes() {
+	public Map<QName, String> anyAttributes()
+	{
 		return _anyAttributes;
 	}
 
-	public List<Element> any() {
+	public List<Element> any()
+	{
 		return _any;
 	}
 }

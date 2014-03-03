@@ -6,20 +6,22 @@ import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 import edu.virginia.vcgr.genii.gjt.units.FriendlyTimeUnit;
 
-public class TimeValue extends DefaultDataItem implements
-		UnitValue<Long, FriendlyTimeUnit>, PostUnmarshallListener {
+public class TimeValue extends DefaultDataItem implements UnitValue<Long, FriendlyTimeUnit>, PostUnmarshallListener
+{
 	@XmlAttribute(name = "value")
 	private Long _value;
 
 	@XmlAttribute(name = "units")
 	private FriendlyTimeUnit _units;
 
-	public TimeValue() {
+	public TimeValue()
+	{
 		_value = null;
 		_units = FriendlyTimeUnit.Hours;
 	}
 
-	public TimeValue(ParameterizableBroker pBroker, ModificationBroker mBroker) {
+	public TimeValue(ParameterizableBroker pBroker, ModificationBroker mBroker)
+	{
 		this();
 
 		addParameterizableListener(pBroker);
@@ -27,30 +29,34 @@ public class TimeValue extends DefaultDataItem implements
 	}
 
 	@Override
-	final public Long value() {
+	final public Long value()
+	{
 		return _value;
 	}
 
 	@Override
-	final public void value(Long value) {
+	final public void value(Long value)
+	{
 		_value = value;
 		fireJobDescriptionModified();
 	}
 
 	@Override
-	final public FriendlyTimeUnit units() {
+	final public FriendlyTimeUnit units()
+	{
 		return _units;
 	}
 
 	@Override
-	final public void units(FriendlyTimeUnit units) {
+	final public void units(FriendlyTimeUnit units)
+	{
 		_units = units;
 		fireJobDescriptionModified();
 	}
 
 	@Override
-	public void postUnmarshall(ParameterizableBroker parameterBroker,
-			ModificationBroker modificationBroker) {
+	public void postUnmarshall(ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
+	{
 		fireJobDescriptionModified();
 	}
 }

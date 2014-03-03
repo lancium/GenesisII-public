@@ -6,11 +6,11 @@ import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider;
 
-public class DBPublisherRegistrationResourceProvider extends
-		BasicDBResourceProvider {
+public class DBPublisherRegistrationResourceProvider extends BasicDBResourceProvider
+{
 	@Override
-	protected IResourceFactory instantiateResourceFactory(
-			ServerDatabaseConnectionPool pool) throws SQLException {
+	protected IResourceFactory instantiateResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
+	{
 		return new DBPublisherRegistrationResourceFactory(pool);
 	}
 }

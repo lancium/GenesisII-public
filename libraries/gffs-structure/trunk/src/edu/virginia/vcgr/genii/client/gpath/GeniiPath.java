@@ -23,7 +23,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 
-public class GeniiPath implements Serializable {
+public class GeniiPath implements Serializable
+{
 	static final long serialVersionUID = 0L;
 	static private Log _logger = LogFactory.getLog(GeniiPath.class);
 	static final private GeniiPathType DEFAULT_PATH_TYPE = GeniiPathType.Grid;
@@ -34,7 +35,8 @@ public class GeniiPath implements Serializable {
 	transient private Object _cacheLock = new Object();
 	transient private RNSPath _cachedLookup = null;
 
-	private RNSPath lookup() {
+	private RNSPath lookup()
+	{
 		synchronized (_cacheLock) {
 			if (_cachedLookup == null)
 				_cachedLookup = RNSPath.getCurrent().lookup(_path);
@@ -43,7 +45,8 @@ public class GeniiPath implements Serializable {
 		return _cachedLookup;
 	}
 
-	public GeniiPath(String path) {
+	public GeniiPath(String path)
+	{
 		if (path == null)
 			path = "";
 
@@ -65,36 +68,42 @@ public class GeniiPath implements Serializable {
 		_pathType = DEFAULT_PATH_TYPE;
 	}
 
-	public GeniiPath(RNSPath rnsPath) {
+	public GeniiPath(RNSPath rnsPath)
+	{
 		_pathType = GeniiPathType.Grid;
 		_path = rnsPath.pwd();
 		_cachedLookup = rnsPath;
 	}
 
-	public void reset() {
+	public void reset()
+	{
 		_cachedLookup = null;
 	}
 
-	public RNSPath lookupRNS() {
+	public RNSPath lookupRNS()
+	{
 		switch (_pathType) {
-		case Grid:
-			return lookup();
-		default:
-			return null;
+			case Grid:
+				return lookup();
+			default:
+				return null;
 		}
 	}
 
 	@Override
-	final public int hashCode() {
+	final public int hashCode()
+	{
 		return _path.hashCode();
 	}
 
-	final public boolean equals(GeniiPath other) {
+	final public boolean equals(GeniiPath other)
+	{
 		return (_pathType == other._pathType) && (_path.equals(other._path));
 	}
 
 	@Override
-	final public boolean equals(Object other) {
+	final public boolean equals(Object other)
+	{
 		if (other instanceof GeniiPath)
 			return equals((GeniiPath) other);
 
@@ -102,43 +111,48 @@ public class GeniiPath implements Serializable {
 	}
 
 	@Override
-	final public String toString() {
+	final public String toString()
+	{
 		return String.format("%s:%s", _pathType, _path);
 	}
 
-	final public GeniiPathType pathType() {
+	final public GeniiPathType pathType()
+	{
 		return _pathType;
 	}
 
-	final public String path() {
+	final public String path()
+	{
 		return _path;
 	}
 
-	final public boolean exists() {
+	final public boolean exists()
+	{
 		switch (_pathType) {
-		case Grid:
-			RNSPath gPath = lookup();
-			return gPath.exists();
+			case Grid:
+				RNSPath gPath = lookup();
+				return gPath.exists();
 
-		case Local:
-			File lPath = new File(_path);
-			return lPath.exists();
+			case Local:
+				File lPath = new File(_path);
+				return lPath.exists();
 		}
 
 		return false;
 	}
 
-	final public boolean isFile() {
+	final public boolean isFile()
+	{
 		try {
 			switch (_pathType) {
-			case Grid:
-				RNSPath gPath = lookup();
-				TypeInformation info = new TypeInformation(gPath.getEndpoint());
-				return info.isByteIO();
+				case Grid:
+					RNSPath gPath = lookup();
+					TypeInformation info = new TypeInformation(gPath.getEndpoint());
+					return info.isByteIO();
 
-			case Local:
-				File lPath = new File(_path);
-				return lPath.isFile();
+				case Local:
+					File lPath = new File(_path);
+					return lPath.isFile();
 			}
 		} catch (Throwable cause) {
 			// Do nothing
@@ -147,17 +161,18 @@ public class GeniiPath implements Serializable {
 		return false;
 	}
 
-	final public boolean isDirectory() {
+	final public boolean isDirectory()
+	{
 		try {
 			switch (_pathType) {
-			case Grid:
-				RNSPath gPath = lookup();
-				TypeInformation info = new TypeInformation(gPath.getEndpoint());
-				return info.isRNS();
+				case Grid:
+					RNSPath gPath = lookup();
+					TypeInformation info = new TypeInformation(gPath.getEndpoint());
+					return info.isRNS();
 
-			case Local:
-				File lPath = new File(_path);
-				return lPath.isDirectory();
+				case Local:
+					File lPath = new File(_path);
+					return lPath.isDirectory();
 			}
 		} catch (Throwable cause) {
 			// Do nothing
@@ -167,14 +182,14 @@ public class GeniiPath implements Serializable {
 	}
 
 	/**
-	 * returns the last component of the path. this doesn't include local: or
-	 * grid: in the returned string.
+	 * returns the last component of the path. this doesn't include local: or grid: in the returned
+	 * string.
 	 */
-	final public String getName() {
+	final public String getName()
+	{
 		String basename = path();
 		int slash_posn = basename.lastIndexOf('/');
-		// ASG September 28, 2013. The code only checked for '/', not '\' as we
-		// see in Windows
+		// ASG September 28, 2013. The code only checked for '/', not '\' as we see in Windows
 		if (slash_posn < 0) // there was no '/'
 			slash_posn = basename.lastIndexOf('\\');
 		if (slash_posn >= 0)
@@ -183,10 +198,11 @@ public class GeniiPath implements Serializable {
 	}
 
 	/**
-	 * returns everything but the last component of the path. this does not
-	 * include grid: or local: in the returned string.
+	 * returns everything but the last component of the path. this does not include grid: or local:
+	 * in the returned string.
 	 */
-	final public String getParent() {
+	final public String getParent()
+	{
 		String dirname = path();
 		int slash_posn = dirname.lastIndexOf('/');
 		if (slash_posn >= 1)
@@ -194,109 +210,102 @@ public class GeniiPath implements Serializable {
 		return dirname;
 	}
 
-	final public InputStream openInputStream() throws IOException {
+	final public InputStream openInputStream() throws IOException
+	{
 		try {
 			switch (_pathType) {
-			case Grid:
-				RNSPath gPath = lookup();
-				TypeInformation typeInfo = new TypeInformation(
-						gPath.getEndpoint());
-				if (!typeInfo.isByteIO())
-					throw new IOException(String.format(
-							"%s does not refer to a file.", this));
-				return ByteIOStreamFactory.createInputStream(gPath
-						.getEndpoint());
+				case Grid:
+					RNSPath gPath = lookup();
+					TypeInformation typeInfo = new TypeInformation(gPath.getEndpoint());
+					if (!typeInfo.isByteIO())
+						throw new IOException(String.format("%s does not refer to a file.", this));
+					return ByteIOStreamFactory.createInputStream(gPath.getEndpoint());
 
-			case Local:
-				File lPath = new File(_path);
-				return new FileInputStream(lPath);
+				case Local:
+					File lPath = new File(_path);
+					return new FileInputStream(lPath);
 
-			default:
-				throw new IllegalArgumentException(
-						"Unexpected path type in GeniiPath.");
+				default:
+					throw new IllegalArgumentException("Unexpected path type in GeniiPath.");
 			}
 		} catch (RNSPathDoesNotExistException e) {
-			throw new FileNotFoundException(String.format(
-					"Couldn't find file %s!", this));
+			throw new FileNotFoundException(String.format("Couldn't find file %s!", this));
 		}
 	}
 
-	final public OutputStream openOutputStream() throws IOException {
+	final public OutputStream openOutputStream() throws IOException
+	{
 		try {
 			switch (_pathType) {
-			case Grid:
-				RNSPath gPath = lookup();
-				if (gPath.exists()) {
-					TypeInformation typeInfo = new TypeInformation(
-							gPath.getEndpoint());
-					if (!typeInfo.isByteIO())
-						throw new IOException(String.format(
-								"%s does not refer to a file.", this));
-				}
+				case Grid:
+					RNSPath gPath = lookup();
+					if (gPath.exists()) {
+						TypeInformation typeInfo = new TypeInformation(gPath.getEndpoint());
+						if (!typeInfo.isByteIO())
+							throw new IOException(String.format("%s does not refer to a file.", this));
+					}
 
-				return ByteIOStreamFactory.createOutputStream(gPath);
+					return ByteIOStreamFactory.createOutputStream(gPath);
 
-			case Local:
-				File lPath = new File(_path);
-				return new FileOutputStream(lPath);
+				case Local:
+					File lPath = new File(_path);
+					return new FileOutputStream(lPath);
 
-			default:
-				throw new IllegalArgumentException(
-						"Unexpected path type in GeniiPath.");
+				default:
+					throw new IllegalArgumentException("Unexpected path type in GeniiPath.");
 			}
 		} catch (RNSException e) {
-			throw new FileNotFoundException(String.format(
-					"Couldn't open ouput file %s!", this));
+			throw new FileNotFoundException(String.format("Couldn't open ouput file %s!", this));
 		}
 	}
 
-	final public RandomAccessFile openRandomAccessFile() throws IOException {
+	final public RandomAccessFile openRandomAccessFile() throws IOException
+	{
 		try {
 			switch (_pathType) {
-			case Grid:
-				RNSPath gPath = lookup();
-				if (gPath.exists()) {
-					TypeInformation typeInfo = new TypeInformation(
-							gPath.getEndpoint());
-					if (!typeInfo.isByteIO())
-						throw new IOException(String.format(
-								"%s does not refer to a file.", this));
-				}
+				case Grid:
+					RNSPath gPath = lookup();
+					if (gPath.exists()) {
+						TypeInformation typeInfo = new TypeInformation(gPath.getEndpoint());
+						if (!typeInfo.isByteIO())
+							throw new IOException(String.format("%s does not refer to a file.", this));
+					}
 
-				return null;
+					return null;
 
-			case Local:
-				RandomAccessFile lPath = new RandomAccessFile(_path, "rws");
-				return lPath;
+				case Local:
+					RandomAccessFile lPath = new RandomAccessFile(_path, "rws");
+					return lPath;
 
-			default:
-				throw new IllegalArgumentException(
-						"Unexpected path type in GeniiPath.");
+				default:
+					throw new IllegalArgumentException("Unexpected path type in GeniiPath.");
 			}
 		} catch (RNSException e) {
-			throw new FileNotFoundException(String.format(
-					"Couldn't open ouput file %s!", this));
+			throw new FileNotFoundException(String.format("Couldn't open ouput file %s!", this));
 		}
 	}
 
 	/**
-	 * helper class that has room for either Java File object or an RNSPath.
-	 * This allows a set of paths to be returned without lots of object casting
-	 * after the lookups are already done.
+	 * helper class that has room for either Java File object or an RNSPath. This allows a set of
+	 * paths to be returned without lots of object casting after the lookups are already done.
 	 */
-	public static class PathMixIn {
+	public static class PathMixIn
+	{
 		public RNSPath _rns = null;
 		public File _file = null;
 
-		PathMixIn(RNSPath rns) {
+		PathMixIn(RNSPath rns)
+		{
 			_rns = rns;
 		}
 
-		PathMixIn(File file) {
+		PathMixIn(File file)
+		{
 			_file = file;
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			if (_rns != null)
 				return _rns.toString();
 			if (_file != null)
@@ -308,7 +317,8 @@ public class GeniiPath implements Serializable {
 	/**
 	 * returns a list of paths of either local java File or RNSPath objects.
 	 */
-	public static Collection<PathMixIn> pathExpander(String path) {
+	public static Collection<PathMixIn> pathExpander(String path)
+	{
 		Collection<PathMixIn> toReturn = null;
 
 		GeniiPath gp = new GeniiPath(path);
@@ -326,8 +336,7 @@ public class GeniiPath implements Serializable {
 		} else {
 			File dir = new File(gp.getParent());
 			if (dir.isFile()) {
-				// if our directory is a file, then there were no directory
-				// components in the path.
+				// if our directory is a file, then there were no directory components in the path.
 				dir = new File(".");
 			}
 			if (!dir.exists()) {

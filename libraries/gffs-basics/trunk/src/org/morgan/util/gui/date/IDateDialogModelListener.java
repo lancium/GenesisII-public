@@ -18,7 +18,8 @@ import java.util.Calendar;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public interface IDateDialogModelListener {
+public interface IDateDialogModelListener
+{
 	public void selectedDateChange(Calendar newDate);
 
 	public void selectedMonthChange(Calendar newMonth);

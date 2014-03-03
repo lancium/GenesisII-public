@@ -27,9 +27,9 @@ import edu.virginia.vcgr.genii.container.cservices.ContainerService;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 @XmlRootElement(name = "container-service")
-public class ContainerServiceConfiguration {
-	static private Log _logger = LogFactory
-			.getLog(ContainerServiceConfiguration.class);
+public class ContainerServiceConfiguration
+{
+	static private Log _logger = LogFactory.getLog(ContainerServiceConfiguration.class);
 
 	@XmlTransient
 	private File _sourceFile;
@@ -46,13 +46,13 @@ public class ContainerServiceConfiguration {
 	@XmlAnyElement
 	private Collection<Element> _anyElements = new LinkedList<Element>();
 
-	ContainerServiceConfiguration() {
+	ContainerServiceConfiguration()
+	{
 		this(null, null);
 	}
 
-	public ContainerServiceConfiguration(
-			Class<? extends ContainerService> serviceClass,
-			Properties properties) {
+	public ContainerServiceConfiguration(Class<? extends ContainerService> serviceClass, Properties properties)
+	{
 		_serviceClass = serviceClass;
 		_className = (_serviceClass == null) ? null : _serviceClass.getName();
 
@@ -61,16 +61,17 @@ public class ContainerServiceConfiguration {
 
 		for (Object key : properties.keySet()) {
 			String name = key.toString();
-			_properties.add(new ContainerServiceProperty(name, properties
-					.getProperty(name)));
+			_properties.add(new ContainerServiceProperty(name, properties.getProperty(name)));
 		}
 	}
 
-	final public File configurationFile() {
+	final public File configurationFile()
+	{
 		return _sourceFile;
 	}
 
-	final public Properties properties() {
+	final public Properties properties()
+	{
 		Properties ret = new Properties();
 		for (ContainerServiceProperty property : _properties)
 			ret.setProperty(property.name(), property.value());
@@ -79,24 +80,23 @@ public class ContainerServiceConfiguration {
 	}
 
 	@SuppressWarnings("unchecked")
-	final public Class<? extends ContainerService> serviceClass()
-			throws ClassNotFoundException {
+	final public Class<? extends ContainerService> serviceClass() throws ClassNotFoundException
+	{
 		if (_serviceClass == null) {
-			_serviceClass = (Class<? extends ContainerService>) GenesisClassLoader
-					.classLoaderFactory().loadClass(_className);
+			_serviceClass = (Class<? extends ContainerService>) GenesisClassLoader.classLoaderFactory().loadClass(_className);
 		}
 
 		return _serviceClass;
 	}
 
-	final public Collection<Element> anyElements() {
+	final public Collection<Element> anyElements()
+	{
 		return _anyElements;
 	}
 
-	final public ContainerService instantiate() throws SecurityException,
-			NoSuchMethodException, IllegalArgumentException,
-			InstantiationException, IllegalAccessException,
-			InvocationTargetException, ClassNotFoundException {
+	final public ContainerService instantiate() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+		InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException
+	{
 		ContainerService ret = null;
 		Constructor<? extends ContainerService> cons;
 		serviceClass();
@@ -114,10 +114,8 @@ public class ContainerServiceConfiguration {
 			ret = cons.newInstance((Object) any);
 		} catch (NoSuchMethodException nsme1) {
 			if (any.length > 1)
-				throw new NoSuchMethodException(String.format(
-						"Unable to find suitable constructor for "
-								+ "service %s defined in file %s.",
-						_serviceClass, _sourceFile));
+				throw new NoSuchMethodException(String.format("Unable to find suitable constructor for "
+					+ "service %s defined in file %s.", _serviceClass, _sourceFile));
 			try {
 				cons = _serviceClass.getConstructor(Element.class);
 				if (any.length == 0)
@@ -136,31 +134,28 @@ public class ContainerServiceConfiguration {
 		return ret;
 	}
 
-	static public Collection<ContainerServiceConfiguration> loadConfigurations(
-			HierarchicalDirectory sourceDirectory) throws IOException {
+	static public Collection<ContainerServiceConfiguration> loadConfigurations(HierarchicalDirectory sourceDirectory)
+		throws IOException
+	{
 		Collection<ContainerServiceConfiguration> ret = new LinkedList<ContainerServiceConfiguration>();
 		JAXBContext context;
 		Unmarshaller unmarshaller;
 
 		try {
-			context = JAXBContext
-					.newInstance(ContainerServiceConfiguration.class);
+			context = JAXBContext.newInstance(ContainerServiceConfiguration.class);
 			unmarshaller = context.createUnmarshaller();
 		} catch (JAXBException e) {
 			throw new IOException("Unable to load container services.", e);
 		}
 
-		for (File sourceFile : sourceDirectory
-				.listFiles(ExtensionFileFilter.XML)) {
+		for (File sourceFile : sourceDirectory.listFiles(ExtensionFileFilter.XML)) {
 			try {
-				ContainerServiceConfiguration conf = (ContainerServiceConfiguration) unmarshaller
-						.unmarshal(sourceFile);
+				ContainerServiceConfiguration conf = (ContainerServiceConfiguration) unmarshaller.unmarshal(sourceFile);
 				conf._sourceFile = sourceFile;
 				ret.add(conf);
 			} catch (JAXBException e) {
-				_logger.error(String.format(
-						"Unable to load container service configuration "
-								+ "from file \"%s\".", sourceFile), e);
+				_logger.error(
+					String.format("Unable to load container service configuration " + "from file \"%s\".", sourceFile), e);
 			}
 		}
 

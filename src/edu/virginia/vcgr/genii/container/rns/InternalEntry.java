@@ -16,7 +16,8 @@ package edu.virginia.vcgr.genii.container.rns;
 import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
-public class InternalEntry {
+public class InternalEntry
+{
 	private String _name;
 	private EndpointReferenceType _entryReference;
 	private MessageElement[] _attributes;
@@ -24,40 +25,46 @@ public class InternalEntry {
 	// added by ak3ka
 	private boolean _isExists;
 
-	public InternalEntry(String name, EndpointReferenceType entryReference,
-			MessageElement[] attributes, boolean isExists) {
+	public InternalEntry(String name, EndpointReferenceType entryReference, MessageElement[] attributes, boolean isExists)
+	{
 		_name = name;
 		_entryReference = entryReference;
 		_attributes = attributes;
 		_isExists = isExists;
 	}
 
-	public InternalEntry(String name, EndpointReferenceType entryReference,
-			MessageElement[] attributes) {
+	public InternalEntry(String name, EndpointReferenceType entryReference, MessageElement[] attributes)
+	{
 		this(name, entryReference, attributes, true);
 	}
 
-	public InternalEntry(String name, EndpointReferenceType entryReference) {
+	public InternalEntry(String name, EndpointReferenceType entryReference)
+	{
 		this(name, entryReference, null);
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		return _name;
 	}
 
-	public EndpointReferenceType getEntryReference() {
+	public EndpointReferenceType getEntryReference()
+	{
 		return _entryReference;
 	}
 
-	public void setAttributes(MessageElement[] attr) {
+	public void setAttributes(MessageElement[] attr)
+	{
 		_attributes = attr;
 	}
 
-	public MessageElement[] getAttributes() {
+	public MessageElement[] getAttributes()
+	{
 		return _attributes;
 	}
 
-	public boolean isExistent() {
+	public boolean isExistent()
+	{
 		return _isExists;
 	}
 

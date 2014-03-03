@@ -29,7 +29,8 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class ThreadsPerProcess implements Serializable {
+public class ThreadsPerProcess implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -41,35 +42,42 @@ public class ThreadsPerProcess implements Serializable {
 	@XmlValue
 	private Long _value = null;
 
-	private ThreadsPerProcess() {
+	private ThreadsPerProcess()
+	{
 		this(null, null);
 	}
 
-	private ThreadsPerProcess(Long value, Boolean actualIndividualCPUCount) {
+	private ThreadsPerProcess(Long value, Boolean actualIndividualCPUCount)
+	{
 		_actualIndividualCPUCount = actualIndividualCPUCount;
 		_value = value;
 	}
 
-	final public boolean actualIndividualCPUCount() {
+	final public boolean actualIndividualCPUCount()
+	{
 		if (_actualIndividualCPUCount == null)
 			return false;
 
 		return _actualIndividualCPUCount;
 	}
 
-	final public Long value() {
+	final public Long value()
+	{
 		return _value;
 	}
 
-	final public Map<QName, String> anyAttributes() {
+	final public Map<QName, String> anyAttributes()
+	{
 		return _anyAttributes;
 	}
 
-	static public ThreadsPerProcess threadsPerProcess(long value) {
+	static public ThreadsPerProcess threadsPerProcess(long value)
+	{
 		return new ThreadsPerProcess(value, null);
 	}
 
-	static public ThreadsPerProcess useActualIndividualCPUCount() {
+	static public ThreadsPerProcess useActualIndividualCPUCount()
+	{
 		return new ThreadsPerProcess(null, true);
 	}
 }

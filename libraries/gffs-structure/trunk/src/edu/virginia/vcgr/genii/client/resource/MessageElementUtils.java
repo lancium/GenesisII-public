@@ -26,8 +26,10 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
-public class MessageElementUtils {
-	static public byte[] toBytes(MessageElement me) throws ResourceException {
+public class MessageElementUtils
+{
+	static public byte[] toBytes(MessageElement me) throws ResourceException
+	{
 		ByteArrayOutputStream baos = null;
 
 		try {
@@ -49,14 +51,13 @@ public class MessageElementUtils {
 
 	}
 
-	static public MessageElement fromBytes(byte[] data)
-			throws ResourceException {
+	static public MessageElement fromBytes(byte[] data) throws ResourceException
+	{
 		ByteArrayInputStream bais = null;
 
 		try {
 			bais = new ByteArrayInputStream(data);
-			return (MessageElement) ObjectDeserializer.deserialize(
-					new InputSource(bais), MessageElement.class);
+			return (MessageElement) ObjectDeserializer.deserialize(new InputSource(bais), MessageElement.class);
 		} finally {
 			StreamUtils.close(bais);
 		}

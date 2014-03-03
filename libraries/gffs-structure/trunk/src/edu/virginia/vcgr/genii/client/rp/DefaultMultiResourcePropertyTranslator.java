@@ -9,13 +9,12 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 
 /**
- * This is the default resource property translator used for multi-valued
- * resource properties.
+ * This is the default resource property translator used for multi-valued resource properties.
  * 
  * @author mmm2a
  */
-public class DefaultMultiResourcePropertyTranslator implements
-		MultiResourcePropertyTranslator {
+public class DefaultMultiResourcePropertyTranslator implements MultiResourcePropertyTranslator
+{
 	/**
 	 * The single valued RP translator to use internally.
 	 */
@@ -25,9 +24,9 @@ public class DefaultMultiResourcePropertyTranslator implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <Type> Collection<Type> deserialize(Class<Type> clazz,
-			Collection<MessageElement> elements)
-			throws ResourcePropertyException {
+	public <Type> Collection<Type> deserialize(Class<Type> clazz, Collection<MessageElement> elements)
+		throws ResourcePropertyException
+	{
 		if (elements == null)
 			elements = new Vector<MessageElement>();
 
@@ -43,10 +42,9 @@ public class DefaultMultiResourcePropertyTranslator implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Collection<MessageElement> serialize(QName name,
-			Collection<Object> obj) throws ResourcePropertyException {
-		Collection<MessageElement> ret = new ArrayList<MessageElement>(
-				obj.size());
+	public Collection<MessageElement> serialize(QName name, Collection<Object> obj) throws ResourcePropertyException
+	{
+		Collection<MessageElement> ret = new ArrayList<MessageElement>(obj.size());
 		for (Object o : obj) {
 			ret.add(_single.serialize(name, o));
 		}

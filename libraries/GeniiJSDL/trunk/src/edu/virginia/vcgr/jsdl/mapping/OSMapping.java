@@ -31,19 +31,21 @@ import edu.virginia.vcgr.jsdl.OperatingSystemNames;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlRootElement(namespace = MappingConstants.GENII_NS, name = "os-map")
-class OSMapping {
+class OSMapping
+{
 	@XmlElement(namespace = MappingConstants.GENII_NS, name = "os-mapping", required = false, nillable = true)
 	private List<OSMappingElement> _mappings = new LinkedList<OSMappingElement>();
 
 	/**
 	 * For use only by XML unmarshalling.
 	 */
-	private OSMapping() {
+	private OSMapping()
+	{
 	}
 
-	Map<String, OperatingSystemNames> mapping() {
-		Map<String, OperatingSystemNames> map = new HashMap<String, OperatingSystemNames>(
-				_mappings.size());
+	Map<String, OperatingSystemNames> mapping()
+	{
+		Map<String, OperatingSystemNames> map = new HashMap<String, OperatingSystemNames>(_mappings.size());
 
 		for (OSMappingElement e : _mappings)
 			map.put(e.javaValue(), e.os());

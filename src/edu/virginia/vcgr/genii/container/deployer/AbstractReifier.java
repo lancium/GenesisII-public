@@ -19,14 +19,14 @@ import edu.virginia.vcgr.genii.client.jsdl.posix.JSDLPosixConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
-public abstract class AbstractReifier implements IJSDLReifier {
-	public JobDefinition_Type reifyJSDL(File deployDirectory,
-			JobDefinition_Type jobDef) throws DeploymentException {
+public abstract class AbstractReifier implements IJSDLReifier
+{
+	public JobDefinition_Type reifyJSDL(File deployDirectory, JobDefinition_Type jobDef) throws DeploymentException
+	{
 		JobDescription_Type description = jobDef.getJobDescription();
 		Application_Type application = description.getApplication();
 		if (application == null) {
-			application = new Application_Type("Auto Generated", null, null,
-					null);
+			application = new Application_Type("Auto Generated", null, null, null);
 			description.setApplication(application);
 		}
 
@@ -38,8 +38,8 @@ public abstract class AbstractReifier implements IJSDLReifier {
 		return jobDef;
 	}
 
-	private Application_Type reifyApplication(File deployDirectory,
-			Application_Type application) throws DeploymentException {
+	private Application_Type reifyApplication(File deployDirectory, Application_Type application) throws DeploymentException
+	{
 		try {
 			Collection<MessageElement> elements = new ArrayList<MessageElement>();
 
@@ -58,8 +58,7 @@ public abstract class AbstractReifier implements IJSDLReifier {
 			}
 
 			if (elements.size() == 0)
-				elements.add(reifyPOSIXApplication(deployDirectory,
-						new POSIXApplication_Type()));
+				elements.add(reifyPOSIXApplication(deployDirectory, new POSIXApplication_Type()));
 
 			application.set_any(elements.toArray(new MessageElement[0]));
 			return application;
@@ -68,30 +67,23 @@ public abstract class AbstractReifier implements IJSDLReifier {
 		}
 	}
 
-	private MessageElement reifyPOSIXApplication(File deployDirectory,
-			MessageElement element) throws ResourceException {
-		POSIXApplication_Type posixApplication = ObjectDeserializer.toObject(
-				element, POSIXApplication_Type.class);
+	private MessageElement reifyPOSIXApplication(File deployDirectory, MessageElement element) throws ResourceException
+	{
+		POSIXApplication_Type posixApplication = ObjectDeserializer.toObject(element, POSIXApplication_Type.class);
 		return reifyPOSIXApplication(deployDirectory, posixApplication);
 	}
 
-	private MessageElement reifyPOSIXApplication(File deployDirectory,
-			POSIXApplication_Type posixApplication) {
-		posixApplication = POSIXApplicationReifier.reifyApplication(
-				deployDirectory, this, posixApplication);
-		return new MessageElement(
-				JSDLPosixConstants.JSDL_POSIX_APPLICATION_QNAME,
-				posixApplication);
+	private MessageElement reifyPOSIXApplication(File deployDirectory, POSIXApplication_Type posixApplication)
+	{
+		posixApplication = POSIXApplicationReifier.reifyApplication(deployDirectory, this, posixApplication);
+		return new MessageElement(JSDLPosixConstants.JSDL_POSIX_APPLICATION_QNAME, posixApplication);
 	}
 
-	private MessageElement reifyHPCApplication(File deployDirectory,
-			MessageElement element) throws ResourceException {
-		HPCProfileApplication_Type hpcApplication = ObjectDeserializer
-				.toObject(element, HPCProfileApplication_Type.class);
-		hpcApplication = HPCApplicationReifier.reifyApplication(
-				deployDirectory, this, hpcApplication);
-		return new MessageElement(HPCConstants.HPC_APPLICATION_QNAME,
-				hpcApplication);
+	private MessageElement reifyHPCApplication(File deployDirectory, MessageElement element) throws ResourceException
+	{
+		HPCProfileApplication_Type hpcApplication = ObjectDeserializer.toObject(element, HPCProfileApplication_Type.class);
+		hpcApplication = HPCApplicationReifier.reifyApplication(deployDirectory, this, hpcApplication);
+		return new MessageElement(HPCConstants.HPC_APPLICATION_QNAME, hpcApplication);
 	}
 
 	public abstract String[] getAdditionalPaths(File deployDirectory);

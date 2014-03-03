@@ -8,9 +8,10 @@ import org.ggf.bes.factory.ActivityDocumentType;
 
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
 
-public class BESUtils {
-	static public void addSubscription(ActivityDocumentType adt,
-			SubscribeRequest s) {
+public class BESUtils
+{
+	static public void addSubscription(ActivityDocumentType adt, SubscribeRequest s)
+	{
 		Collection<MessageElement> anyC;
 
 		MessageElement[] any = adt.get_any();
@@ -22,9 +23,7 @@ public class BESUtils {
 				anyC.add(a);
 		}
 		BESConstants bconsts = new BESConstants();
-		anyC.add(new MessageElement(
-				bconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME, s
-						.asRequestType()));
+		anyC.add(new MessageElement(bconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME, s.asRequestType()));
 		adt.set_any(anyC.toArray(new MessageElement[0]));
 	}
 }

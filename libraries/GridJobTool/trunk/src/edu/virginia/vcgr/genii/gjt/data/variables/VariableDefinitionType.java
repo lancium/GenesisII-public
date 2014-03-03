@@ -9,29 +9,28 @@ import edu.virginia.vcgr.genii.gjt.data.variables.list.ValueListVariableDefiniti
 import edu.virginia.vcgr.genii.gjt.data.variables.undef.UndefinedVariableDefinition;
 
 public enum VariableDefinitionType {
-	UndefinedVariable(UndefinedVariableDefinition.DESCRIPTION, null), IntegerLoop(
-			IntegerLoopVariableDefinition.DESCRIPTION,
-			new IntegerLoopVariableDefinitionEditorFactory()), DoubleLoop(
-			DoubleLoopVariableDefinition.DESCRIPTION,
-			new DoubleLoopVariableDefinitionEditorFactory()), ValueList(
-			ValueListVariableDefinition.DESCRIPTION,
-			new ValueListVariableDefinitionEditorFactory());
+	UndefinedVariable(UndefinedVariableDefinition.DESCRIPTION, null),
+	IntegerLoop(IntegerLoopVariableDefinition.DESCRIPTION, new IntegerLoopVariableDefinitionEditorFactory()),
+	DoubleLoop(DoubleLoopVariableDefinition.DESCRIPTION, new DoubleLoopVariableDefinitionEditorFactory()),
+	ValueList(ValueListVariableDefinition.DESCRIPTION, new ValueListVariableDefinitionEditorFactory());
 
 	private String _description;
 	private VariableDefinitionEditorFactory _editorFactory;
 
-	private VariableDefinitionType(String description,
-			VariableDefinitionEditorFactory editorFactory) {
+	private VariableDefinitionType(String description, VariableDefinitionEditorFactory editorFactory)
+	{
 		_description = description;
 		_editorFactory = editorFactory;
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return _description;
 	}
 
-	public VariableDefinitionEditorFactory editorFactory() {
+	public VariableDefinitionEditorFactory editorFactory()
+	{
 		return _editorFactory;
 	}
 }

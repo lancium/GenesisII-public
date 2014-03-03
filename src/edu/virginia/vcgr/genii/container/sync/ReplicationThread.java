@@ -33,24 +33,28 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AclTopics;
 import edu.virginia.vcgr.genii.resolver.UpdateResponseType;
 
-public class ReplicationThread extends Thread {
+public class ReplicationThread extends Thread
+{
 	static private Log _logger = LogFactory.getLog(ReplicationThread.class);
 
 	private WorkingContext _context;
 	private Stack<ReplicationItem> _workstack;
 
-	public ReplicationThread(WorkingContext context) {
+	public ReplicationThread(WorkingContext context)
+	{
 		this._context = (WorkingContext) context.clone();
 		this._workstack = new Stack<ReplicationItem>();
 	}
 
-	public void add(ReplicationItem item) {
+	public void add(ReplicationItem item)
+	{
 		synchronized (_workstack) {
 			_workstack.push(item);
 		}
 	}
 
-	public void run() {
+	public void run()
+	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("ReplicationThread: entered run()");
 		WorkingContext.setCurrentWorkingContext(_context);
@@ -69,37 +73,35 @@ public class ReplicationThread extends Thread {
 			_logger.debug("ReplicationThread: exiting");
 	}
 
-	private void doSync(ReplicationItem item) {
+	private void doSync(ReplicationItem item)
+	{
 		EndpointReferenceType myEPR = item.localEPR;
 		ResourceSyncRunner runner = item.runner;
 		ResourceKey rKey = null;
 		try {
 			if (myEPR == null) {
-				myEPR = (EndpointReferenceType) WorkingContext
-						.getCurrentWorkingContext().getProperty(
-								WorkingContext.EPR_PROPERTY_NAME);
+				myEPR =
+					(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
+						WorkingContext.EPR_PROPERTY_NAME);
 			} else {
 				WorkingContext.temporarilyAssumeNewIdentity(myEPR);
 			}
 			rKey = ResourceManager.getCurrentResource();
 		} catch (Exception exception) {
-			_logger.error("ReplicationThread: error getting resource",
-					exception);
+			_logger.error("ReplicationThread: error getting resource", exception);
 			return;
 		}
 		ResourceLock resourceLock = rKey.getResourceLock();
 		try {
 			resourceLock.lock();
 			IResource resource = rKey.dereference();
-			String state = (String) resource
-					.getProperty(SyncProperty.ERROR_STATE_PROP_NAME);
+			String state = (String) resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME);
 			if (state == null) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("ReplicationThread: replica is not in error state");
 				return;
 			}
-			byte[] primaryData = (byte[]) resource
-					.getProperty(SyncProperty.PRIMARY_EPR_PROP_NAME);
+			byte[] primaryData = (byte[]) resource.getProperty(SyncProperty.PRIMARY_EPR_PROP_NAME);
 			if (primaryData == null) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("ReplicationThread: primaryEPR is undefined");
@@ -107,19 +109,15 @@ public class ReplicationThread extends Thread {
 			}
 			EndpointReferenceType primaryEPR = EPRUtils.fromBytes(primaryData);
 			WSName primaryName = new WSName(primaryEPR);
-			Integer idValue = (Integer) resource
-					.getProperty(SyncProperty.TARGET_ID_PROP_NAME);
+			Integer idValue = (Integer) resource.getProperty(SyncProperty.TARGET_ID_PROP_NAME);
 			if (idValue == null) {
-				List<ResolverDescription> resolverList = ResolverUtils
-						.getResolvers(primaryName);
+				List<ResolverDescription> resolverList = ResolverUtils.getResolvers(primaryName);
 				if ((resolverList == null) || (resolverList.size() == 0)) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("ReplicationThread: primaryEPR has no resolver element");
 					return;
 				}
-				UpdateResponseType response = VersionedResourceUtils
-						.updateResolver(resolverList, myEPR,
-								rKey.getResourceKey());
+				UpdateResponseType response = VersionedResourceUtils.updateResolver(resolverList, myEPR, rKey.getResourceKey());
 				// myEPR = response.getNew_EPR();
 				idValue = new Integer(response.getTargetID());
 				if (_logger.isDebugEnabled())
@@ -129,27 +127,21 @@ public class ReplicationThread extends Thread {
 			}
 			int myTargetID = idValue;
 
-			// For setting up subscriptions, myEPR must refer to a physical
-			// resource.
+			// For setting up subscriptions, myEPR must refer to a physical resource.
 			WSName myName = new WSName(myEPR);
 			if (myName.hasValidResolver()) {
 				myName.removeAllResolvers();
 				myEPR = myName.getEndpoint();
 			}
 			if (state.equals("unsubscribed")) {
-				// Subscribe before downloading version vector, to avoid race
-				// condition.
+				// Subscribe before downloading version vector, to avoid race condition.
 				TopicPath topic = runner.getSyncTopic();
-				TopicQueryExpression topicFilter = topic
-						.asConcreteQueryExpression();
+				TopicQueryExpression topicFilter = topic.asConcreteQueryExpression();
 				TopicPath secondTopic = AclTopics.GENII_ACL_CHANGE_TOPIC;
-				TopicQueryExpression secondFilter = secondTopic
-						.asConcreteQueryExpression();
+				TopicQueryExpression secondFilter = secondTopic.asConcreteQueryExpression();
 				SubscriptionPolicy policy = new PersistentNotificationSubscriptionPolicy();
-				SubscriptionFactory factory = new DefaultSubscriptionFactory(
-						myEPR);
-				EndpointReferenceType[] replicaList = VersionedResourceUtils
-						.getTargetEPRs(primaryName);
+				SubscriptionFactory factory = new DefaultSubscriptionFactory(myEPR);
+				EndpointReferenceType[] replicaList = VersionedResourceUtils.getTargetEPRs(primaryName);
 				if (replicaList == null) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("ReplicationThread: failed to get list of replicas");
@@ -160,64 +152,50 @@ public class ReplicationThread extends Thread {
 					if (replicaEPR == null)
 						continue;
 					if (_logger.isDebugEnabled())
-						_logger.debug("ReplicationThread: subscribe targetID="
-								+ targetID);
+						_logger.debug("ReplicationThread: subscribe targetID=" + targetID);
 					// Create subscription so that will send to this.
-					factory.subscribe(replicaEPR, topicFilter, null, null,
-							policy);
-					factory.subscribe(replicaEPR, secondFilter, null, null,
-							policy);
+					factory.subscribe(replicaEPR, topicFilter, null, null, policy);
+					factory.subscribe(replicaEPR, secondFilter, null, null, policy);
 					// Create subscription so this will send to that.
-					SubscribeRequest request = AbstractSubscriptionFactory
-							.createRequest(replicaEPR, topicFilter, null, null,
-									policy);
-					GenesisIIBase.processSubscribeRequest(resource.getKey(),
-							request);
-					request = AbstractSubscriptionFactory.createRequest(
-							replicaEPR, secondFilter, null, null, policy);
-					GenesisIIBase.processSubscribeRequest(resource.getKey(),
-							request);
+					SubscribeRequest request =
+						AbstractSubscriptionFactory.createRequest(replicaEPR, topicFilter, null, null, policy);
+					GenesisIIBase.processSubscribeRequest(resource.getKey(), request);
+					request = AbstractSubscriptionFactory.createRequest(replicaEPR, secondFilter, null, null, policy);
+					GenesisIIBase.processSubscribeRequest(resource.getKey(), request);
 				}
 			}
 			resource.setProperty(SyncProperty.ERROR_STATE_PROP_NAME, "error");
 			resource.commit();
 
-			// If the physical resource dies before or during the
-			// synchronization process,
+			// If the physical resource dies before or during the synchronization process,
 			// do not try to synchronize from another replica.
 			// If our state contains half of resource A and half of resource B,
 			// then it may be an illegal state.
-			// In the worst case, this resource gets confused and tries to copy
-			// itself.
-			// Bottom line: primaryEPR should refer to a physical resource, not
-			// a logical resource.
+			// In the worst case, this resource gets confused and tries to copy itself.
+			// Bottom line: primaryEPR should refer to a physical resource, not a logical resource.
 			if (primaryName.hasValidResolver()) {
 				primaryName.removeAllResolvers();
 				primaryEPR = primaryName.getEndpoint();
 			}
 
 			// Get the version vector of the primary instance.
-			VersionVector remoteVector = VersionedResourceUtils
-					.getVersionVector(primaryEPR);
+			VersionVector remoteVector = VersionedResourceUtils.getVersionVector(primaryEPR);
 			VersionVector localVector = new VersionVector();
 			localVector.setVersion(myTargetID, 0);
 			if (remoteVector != null)
 				localVector.copy(remoteVector);
-			resource.setProperty(SyncProperty.VERSION_VECTOR_PROP_NAME,
-					localVector);
+			resource.setProperty(SyncProperty.VERSION_VECTOR_PROP_NAME, localVector);
 
 			// Get the state data from the primary instance.
 			// Save it in the local database and filesystem.
 			runner.doSync(resource, primaryEPR, myEPR, this);
 
-			// The replica may service read and write requests as soon as we
-			// release the lock.
+			// The replica may service read and write requests as soon as we release the lock.
 			resource.setProperty(SyncProperty.ERROR_STATE_PROP_NAME, null);
 			resource.commit();
 
 			// copy ACL entries from primary resource to replicated resource
-			ResourceSecurityPolicy oldSP = new ResourceSecurityPolicy(
-					primaryEPR);
+			ResourceSecurityPolicy oldSP = new ResourceSecurityPolicy(primaryEPR);
 			ResourceSecurityPolicy newSP = new ResourceSecurityPolicy(myEPR);
 			newSP.copyFrom(oldSP);
 		} catch (Throwable fault) {

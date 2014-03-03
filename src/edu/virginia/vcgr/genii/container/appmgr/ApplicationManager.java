@@ -24,26 +24,23 @@ import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
-public class ApplicationManager {
+public class ApplicationManager
+{
 	static private Log _logger = LogFactory.getLog(ApplicationManager.class);
 
-	static public File prepareApplication(File executable) throws IOException {
-		HistoryContext history = HistoryContextFactory
-				.createContext(HistoryEventCategory.CreatingActivity);
+	static public File prepareApplication(File executable) throws IOException
+	{
+		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
-		history.createTraceWriter("Preparing Activity Executable")
-				.format("Preparing executable %s", executable).close();
+		history.createTraceWriter("Preparing Activity Executable").format("Preparing executable %s", executable).close();
 
 		if (executable.exists())
 			return FileSystemUtils.makeExecutable(executable);
 
 		history.createWarnWriter("Executable Not Found")
-				.format("Can't locate executable %s -- we'll keep going just in case.",
-						executable).close();
+			.format("Can't locate executable %s -- we'll keep going just in case.", executable).close();
 
-		_logger.warn(String.format(
-				"Executable file \"%s\" does not seem to exist.",
-				executable.getAbsolutePath()));
+		_logger.warn(String.format("Executable file \"%s\" does not seem to exist.", executable.getAbsolutePath()));
 
 		return null;
 	}

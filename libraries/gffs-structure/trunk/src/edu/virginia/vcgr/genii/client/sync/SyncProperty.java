@@ -2,7 +2,8 @@ package edu.virginia.vcgr.genii.client.sync;
 
 import javax.xml.namespace.QName;
 
-public class SyncProperty {
+public class SyncProperty
+{
 	static public final String RESOURCE_SYNC_NS = "http://vcgr.cs.virginia.edu/genii/resource-sync";
 
 	static public final String PRIMARY_EPR_PROP_NAME = "edu.virginia.vcgr.genii.sync.primary-epr";
@@ -12,10 +13,7 @@ public class SyncProperty {
 	static public final String IS_DESTROYED_PROP_NAME = "edu.virginia.vcgr.genii.sync.is-destroyed";
 	static public final String UNLINKED_REPLICA_PROP_NAME = "edu.virginia.vcgr.genii.sync.unlinked-replica";
 
-	static public final QName VERSION_VECTOR_QNAME = new QName(
-			RESOURCE_SYNC_NS, "VersionVector");
-	static public final QName REPLICATION_STATUS_QNAME = new QName(
-			RESOURCE_SYNC_NS, "ReplicationStatus");
-	static public final QName UNLINKED_REPLICA_QNAME = new QName(
-			RESOURCE_SYNC_NS, "UnlinkedReplica");
+	static public final QName VERSION_VECTOR_QNAME = new QName(RESOURCE_SYNC_NS, "VersionVector");
+	static public final QName REPLICATION_STATUS_QNAME = new QName(RESOURCE_SYNC_NS, "ReplicationStatus");
+	static public final QName UNLINKED_REPLICA_QNAME = new QName(RESOURCE_SYNC_NS, "UnlinkedReplica");
 }

@@ -8,12 +8,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
-public class DatabaseTableUtils {
+public class DatabaseTableUtils
+{
 	static private Log _logger = LogFactory.getLog(DatabaseTableUtils.class);
 
-	static public void createTables(Connection connection,
-			boolean failOnExists, String... tableStatements)
-			throws SQLException {
+	static public void createTables(Connection connection, boolean failOnExists, String... tableStatements) throws SQLException
+	{
 		Statement stmt = null;
 		SQLException catchFail = null;
 		try {
@@ -23,25 +23,19 @@ public class DatabaseTableUtils {
 				try {
 					stmt.executeUpdate(tableStatement);
 				} catch (SQLException sqe) {
-					// In the X/Open standard, 42S01 is "table exists" and 42S11
-					// is "index exists".
+					// In the X/Open standard, 42S01 is "table exists" and 42S11 is "index exists".
 					// X0Y32 is a derby-specific error state.
-					// 42000 is "access denied", but MySQL returns it for
-					// "index exists".
-					if (sqe.getSQLState().equals("X0Y32")
-							|| sqe.getSQLState().equals("42S01")
-							|| sqe.getSQLState().equals("42S11")
-							|| (sqe.getSQLState().equals("42000") && tableStatement
-									.toUpperCase().startsWith("CREATE INDEX "))) {
+					// 42000 is "access denied", but MySQL returns it for "index exists".
+					if (sqe.getSQLState().equals("X0Y32") || sqe.getSQLState().equals("42S01")
+						|| sqe.getSQLState().equals("42S11")
+						|| (sqe.getSQLState().equals("42000") && tableStatement.toUpperCase().startsWith("CREATE INDEX "))) {
 						// The table already exists.
 						if (failOnExists) {
 							catchFail = sqe;
 							break;
 						} else {
 							if (_logger.isTraceEnabled())
-								_logger.trace(
-										"Received an SQL Exception for a table "
-												+ "that already exists.", sqe);
+								_logger.trace("Received an SQL Exception for a table " + "that already exists.", sqe);
 						}
 					} else {
 						catchFail = sqe;
@@ -57,8 +51,9 @@ public class DatabaseTableUtils {
 		}
 	}
 
-	static public void addColumns(Connection connection, boolean failOnExists,
-			String... addColumnStatements) throws SQLException {
+	static public void addColumns(Connection connection, boolean failOnExists, String... addColumnStatements)
+		throws SQLException
+	{
 		Statement stmt = null;
 		SQLException catchFail = null;
 		try {
@@ -73,9 +68,7 @@ public class DatabaseTableUtils {
 							break;
 						} else {
 							if (_logger.isTraceEnabled())
-								_logger.trace(
-										"Received an SQL Exception for a column that already exists.",
-										sqe);
+								_logger.trace("Received an SQL Exception for a column that already exists.", sqe);
 						}
 					} else {
 						sqe = catchFail;

@@ -20,13 +20,15 @@ import javax.swing.JTextArea;
 
 import edu.virginia.vcgr.genii.gjt.gui.GridJobToolFrame;
 
-public class AboutDialog extends JDialog {
+public class AboutDialog extends JDialog
+{
 	static final long serialVersionUID = 0L;
 
 	static private final Dimension ICON_SIZE = new Dimension(128, 128);
 	static private final String VERSION_STRING = "Version 1.0";
 
-	public AboutDialog(JDialog owner) {
+	public AboutDialog(JDialog owner)
+	{
 		super(owner);
 		setTitle("About Grid Job Tool");
 
@@ -37,8 +39,7 @@ public class AboutDialog extends JDialog {
 
 		BufferedImage image = null;
 		try {
-			image = ImageIO.read(GridJobToolFrame.class
-					.getResource("images/GenesisII-Icon.png"));
+			image = ImageIO.read(GridJobToolFrame.class.getResource("images/GenesisII-Icon.png"));
 		} catch (IOException ioe) {
 		}
 
@@ -48,37 +49,35 @@ public class AboutDialog extends JDialog {
 		icon.setMinimumSize(ICON_SIZE);
 		icon.setMaximumSize(ICON_SIZE);
 
-		JTextArea text = new JTextArea(
-				"Grid Job Tool\n\n"
-						+ VERSION_STRING
-						+ "\n\n"
-						+ "This software is licensed under the Apache 2.0 license and\n"
-						+ "may be modified and/or distributed freely so long as this\n"
-						+ "license agreement and the University of Virginia CS department\n"
-						+ "logo and the Genesis II logo remain intact and displayed.\n\n"
-						+ "This software product was developed by Mark Morgan.");
+		JTextArea text =
+			new JTextArea("Grid Job Tool\n\n" + VERSION_STRING + "\n\n"
+				+ "This software is licensed under the Apache 2.0 license and\n"
+				+ "may be modified and/or distributed freely so long as this\n"
+				+ "license agreement and the University of Virginia CS department\n"
+				+ "logo and the Genesis II logo remain intact and displayed.\n\n"
+				+ "This software product was developed by Mark Morgan.");
 		text.setEditable(false);
 
-		container.add(icon, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
-				GridBagConstraints.NORTH, GridBagConstraints.NONE, new Insets(
-						5, 5, 5, 5), 5, 5));
-		container.add(text, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0,
-				GridBagConstraints.NORTH, GridBagConstraints.BOTH, new Insets(
-						5, 5, 5, 5), 5, 5));
-		container.add(new JButton(new OKAction()), new GridBagConstraints(0, 1,
-				2, 1, 1.0, 1.0, GridBagConstraints.SOUTHEAST,
-				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(icon, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
+		container.add(text, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
+			new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JButton(new OKAction()), new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTHEAST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
-	private class OKAction extends AbstractAction {
+	private class OKAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		public OKAction() {
+		public OKAction()
+		{
 			super("OK");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent event) {
+		public void actionPerformed(ActionEvent event)
+		{
 			dispose();
 		}
 	}

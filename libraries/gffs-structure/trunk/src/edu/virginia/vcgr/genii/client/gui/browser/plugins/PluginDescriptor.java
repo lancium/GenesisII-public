@@ -1,15 +1,16 @@
 package edu.virginia.vcgr.genii.client.gui.browser.plugins;
 
 /**
- * A PluginDescriptor is a simple descriptor object which describes the content
- * about a plugin which is the same for all plugin types.
+ * A PluginDescriptor is a simple descriptor object which describes the content about a plugin which
+ * is the same for all plugin types.
  * 
  * @author mmm2a
  * 
  * @param <Type>
  *            The type of plugin that you are describing.
  */
-public class PluginDescriptor<Type extends IPlugin> {
+public class PluginDescriptor<Type extends IPlugin>
+{
 	private String _pluginName;
 	private Type _plugin;
 
@@ -21,7 +22,8 @@ public class PluginDescriptor<Type extends IPlugin> {
 	 * @param plugin
 	 *            The actual plugin implementation.
 	 */
-	protected PluginDescriptor(String pluginName, Type plugin) {
+	protected PluginDescriptor(String pluginName, Type plugin)
+	{
 		_pluginName = pluginName;
 		_plugin = plugin;
 	}
@@ -31,7 +33,8 @@ public class PluginDescriptor<Type extends IPlugin> {
 	 * 
 	 * @return The plugin name.
 	 */
-	public String getPluginName() {
+	public String getPluginName()
+	{
 		return _pluginName;
 	}
 
@@ -40,7 +43,8 @@ public class PluginDescriptor<Type extends IPlugin> {
 	 * 
 	 * @return The plugin implementation object.
 	 */
-	public Type getPlugin() {
+	public Type getPlugin()
+	{
 		return _plugin;
 	}
 }

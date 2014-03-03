@@ -25,24 +25,26 @@ import edu.virginia.vcgr.genii.security.identity.IdentityType;
  * 
  * @author dmerrill
  */
-public class UsernamePasswordIdentity implements Identity, NuCredential,
-		XMLCompatible {
+public class UsernamePasswordIdentity implements Identity, NuCredential, XMLCompatible
+{
 	static public final long serialVersionUID = 0L;
 
 	protected String _userName;
 	protected String _password;
 
 	// zero-arg constructor for externalizable use only.
-	public UsernamePasswordIdentity() {
+	public UsernamePasswordIdentity()
+	{
 	}
 
-	public UsernamePasswordIdentity(String userName, String password) {
+	public UsernamePasswordIdentity(String userName, String password)
+	{
 		_userName = userName;
 		_password = password;
 	}
 
-	public UsernamePasswordIdentity(String userName, String password,
-			boolean hash) {
+	public UsernamePasswordIdentity(String userName, String password, boolean hash)
+	{
 		_userName = userName;
 		// gensalt can be used to increase complexity
 		if (hash && (password != null))
@@ -51,52 +53,59 @@ public class UsernamePasswordIdentity implements Identity, NuCredential,
 			_password = password;
 	}
 
-	public UsernamePasswordIdentity(MessageElement secToken)
-			throws GeneralSecurityException {
+	public UsernamePasswordIdentity(MessageElement secToken) throws GeneralSecurityException
+	{
 		_userName = WSSecurityUtils.getNameTokenFromUTSecTokenRef(secToken);
 		_password = WSSecurityUtils.getPasswordTokenFromUTSecTokenRef(secToken);
 	}
 
-	public String getUserName() {
+	public String getUserName()
+	{
 		return _userName;
 	}
 
-	public String getPassword() {
+	public String getPassword()
+	{
 		return _password;
 	}
 
 	/**
-	 * Returns a URI (e.g., a WS-Security Token Profile URI) indicating the
-	 * token type
+	 * Returns a URI (e.g., a WS-Security Token Profile URI) indicating the token type
 	 */
 	@Override
-	public String getTokenType() {
+	public String getTokenType()
+	{
 		return WSSecurityUtils.PASSWORD_TEXT_URI;
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return describe(VerbosityLevel.HIGH);
 	}
 
 	@Override
-	public String describe(VerbosityLevel verbosity) {
+	public String describe(VerbosityLevel verbosity)
+	{
 		return String.format("(Username-Token) (OWNER) %s", _userName);
 	}
 
 	@Override
-	public Element convertToMessageElement() throws GeneralSecurityException {
+	public Element convertToMessageElement() throws GeneralSecurityException
+	{
 		return WSSecurityUtils.makeUTSecTokenRef(_userName, _password);
 	}
 
 	@Override
-	public X509Certificate[] getOriginalAsserter() {
+	public X509Certificate[] getOriginalAsserter()
+	{
 		// Username tokens are not asserted by anything
 		return null;
 	}
 
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(Object other)
+	{
 		if (other == null) {
 			return false;
 		}
@@ -116,7 +125,8 @@ public class UsernamePasswordIdentity implements Identity, NuCredential,
 	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		if (_userName != null) {
 			return _userName.hashCode();
 		}
@@ -125,21 +135,22 @@ public class UsernamePasswordIdentity implements Identity, NuCredential,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(ObjectOutput out) throws IOException
+	{
 		out.writeUTF(_userName);
 		out.writeUTF(_password);
 	}
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
-			ClassNotFoundException {
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
+	{
 		_userName = in.readUTF();
 		_password = in.readUTF();
 	}
 
 	@Override
-	public boolean isPermitted(Identity identity)
-			throws GeneralSecurityException {
+	public boolean isPermitted(Identity identity) throws GeneralSecurityException
+	{
 		// Dont grant access if current password is blank or null password
 		if (_password.equals("") || _password == null)
 			return false;
@@ -153,45 +164,45 @@ public class UsernamePasswordIdentity implements Identity, NuCredential,
 		if (!_userName.equals(((UsernamePasswordIdentity) identity)._userName))
 			return false;
 
-		if (!BCrypt.checkpw(((UsernamePasswordIdentity) identity)._password,
-				_password)) {
+		if (!BCrypt.checkpw(((UsernamePasswordIdentity) identity)._password, _password)) {
 			return false;
 		}
 		return true;
 	}
 
 	@Override
-	public AclEntry sanitize() {
-		// Temporarily allow return of password until we change set/get acls to
-		// be
-		// out of resource properties. Should return hash if passwords are set
-		// properly
+	public AclEntry sanitize()
+	{
+		// Temporarily allow return of password until we change set/get acls to be
+		// out of resource properties. Should return hash if passwords are set properly
 		// (With our up to date client)
 		return new UsernamePasswordIdentity(_userName, _password);
 	}
 
 	@Override
-	public boolean placeInUMask() {
+	public boolean placeInUMask()
+	{
 		// Do not place usernames/passwords in newly created resources.
 		return false;
 	}
 
 	@Override
-	public IdentityType getType() {
+	public IdentityType getType()
+	{
 		return IdentityType.USER;
 	}
 
 	@Override
-	public void setType(IdentityType type) {
-		// This does not do anything, as username password tokens are not
-		// transferred with
+	public void setType(IdentityType type)
+	{
+		// This does not do anything, as username password tokens are not transferred with
 		// serialization.
 		// So this flag would be lost.
 	}
 
 	@Override
-	public void checkValidity(Date date) throws AttributeInvalidException {
-		// the former version of this (without delegation depth) also had a null
-		// implementation.
+	public void checkValidity(Date date) throws AttributeInvalidException
+	{
+		// the former version of this (without delegation depth) also had a null implementation.
 	}
 }

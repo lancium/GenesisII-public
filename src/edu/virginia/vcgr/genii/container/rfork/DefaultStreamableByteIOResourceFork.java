@@ -28,55 +28,47 @@ import edu.virginia.vcgr.genii.security.rwx.RWXManager;
 import edu.virginia.vcgr.genii.security.rwx.RWXMappingException;
 import edu.virginia.vcgr.genii.security.rwx.RWXMappingResolver;
 
-public class DefaultStreamableByteIOResourceFork extends
-		AbstractStreamableByteIOResourceFork {
-	static public class DependentStreamableMappingResolver implements
-			MappingResolver {
+public class DefaultStreamableByteIOResourceFork extends AbstractStreamableByteIOResourceFork
+{
+	static public class DependentStreamableMappingResolver implements MappingResolver
+	{
 		@Override
-		public RWXCategory resolve(Class<?> serviceClass, Method operation) {
+		public RWXCategory resolve(Class<?> serviceClass, Method operation)
+		{
 			try {
 				ResourceKey rKey = ResourceManager.getCurrentResource();
 				AddressingParameters ap = rKey.getAddressingParameters();
 				if (ap != null) {
-					ResourceForkInformation info = (ResourceForkInformation) ap
-							.getResourceForkInformation();
+					ResourceForkInformation info = (ResourceForkInformation) ap.getResourceForkInformation();
 					if (info != null) {
-						DefaultStreamableByteIOResourceFork fork = (DefaultStreamableByteIOResourceFork) info
-								.instantiateFork(null);
-						Class<? extends StreamableByteIOFactoryResourceFork> dependentForkClass = fork._dependentFork
-								.getClass();
+						DefaultStreamableByteIOResourceFork fork =
+							(DefaultStreamableByteIOResourceFork) info.instantiateFork(null);
+						Class<? extends StreamableByteIOFactoryResourceFork> dependentForkClass =
+							fork._dependentFork.getClass();
 
 						Method targetMethod;
 
 						if (operation.getName().equals("seekRead")) {
-							targetMethod = dependentForkClass.getMethod(
-									"snapshotState", OutputStream.class);
+							targetMethod = dependentForkClass.getMethod("snapshotState", OutputStream.class);
 						} else if (operation.getName().equals("seekWrite")) {
-							targetMethod = dependentForkClass.getMethod(
-									"modifyState", InputStream.class);
+							targetMethod = dependentForkClass.getMethod("modifyState", InputStream.class);
 						} else if (operation.getName().equals("destroy")) {
 							return RWXCategory.OPEN;
 						} else
-							throw new RWXMappingException("Target method \""
-									+ operation.getName()
-									+ "\" is not one of seekRead or seekWrite.");
+							throw new RWXMappingException("Target method \"" + operation.getName()
+								+ "\" is not one of seekRead or seekWrite.");
 
-						return RWXManager.lookup(dependentForkClass,
-								targetMethod);
+						return RWXManager.lookup(dependentForkClass, targetMethod);
 					}
 				}
 			} catch (ResourceException re) {
-				throw new RWXMappingException(
-						"Unable to find RWXCategory for target operation.", re);
+				throw new RWXMappingException("Unable to find RWXCategory for target operation.", re);
 			} catch (ResourceUnknownFaultType e) {
-				throw new RWXMappingException(
-						"Unable to find RWXCategory for target operation.", e);
+				throw new RWXMappingException("Unable to find RWXCategory for target operation.", e);
 			} catch (SecurityException e) {
-				throw new RWXMappingException(
-						"Unable to find RWXCategory for target operation.", e);
+				throw new RWXMappingException("Unable to find RWXCategory for target operation.", e);
 			} catch (NoSuchMethodException e) {
-				throw new RWXMappingException(
-						"Unable to find RWXCategory for target operation.", e);
+				throw new RWXMappingException("Unable to find RWXCategory for target operation.", e);
 			}
 
 			throw new RWXMappingException("Unable to find target fork.");
@@ -88,10 +80,9 @@ public class DefaultStreamableByteIOResourceFork extends
 	private File _targetFile;
 	private StreamableByteIOFactoryResourceFork _dependentFork;
 
-	public DefaultStreamableByteIOResourceFork(ResourceForkService service,
-			String forkPath, boolean destroyOnClose, boolean doNotify,
-			StreamableByteIOFactoryResourceFork dependentFork)
-			throws IOException {
+	public DefaultStreamableByteIOResourceFork(ResourceForkService service, String forkPath, boolean destroyOnClose,
+		boolean doNotify, StreamableByteIOFactoryResourceFork dependentFork) throws IOException
+	{
 		super(service, forkPath);
 
 		_destroyOnClose = destroyOnClose;
@@ -111,10 +102,9 @@ public class DefaultStreamableByteIOResourceFork extends
 		}
 	}
 
-	public DefaultStreamableByteIOResourceFork(ResourceForkService service,
-			String forkPath, boolean destroyOnClose, boolean doNotify,
-			StreamableByteIOFactoryResourceFork dependentFork,
-			String containerFilename) throws IOException {
+	public DefaultStreamableByteIOResourceFork(ResourceForkService service, String forkPath, boolean destroyOnClose,
+		boolean doNotify, StreamableByteIOFactoryResourceFork dependentFork, String containerFilename) throws IOException
+	{
 		super(service, forkPath);
 
 		_destroyOnClose = destroyOnClose;
@@ -128,7 +118,8 @@ public class DefaultStreamableByteIOResourceFork extends
 
 	@Override
 	@RWXMappingResolver(DependentStreamableMappingResolver.class)
-	public void destroy() throws ResourceException {
+	public void destroy() throws ResourceException
+	{
 		try {
 			if (_doNotify && isDirty()) {
 				InputStream input = null;
@@ -136,8 +127,7 @@ public class DefaultStreamableByteIOResourceFork extends
 					input = new MarkableFileInputStream(_targetFile);
 					_dependentFork.modifyState(input);
 				} catch (IOException e) {
-					throw new ResourceException(
-							"Unable to modify dependent state.", e);
+					throw new ResourceException("Unable to modify dependent state.", e);
 				} finally {
 					StreamUtils.close(input);
 				}
@@ -149,23 +139,26 @@ public class DefaultStreamableByteIOResourceFork extends
 	}
 
 	@Override
-	public boolean getDestroyOnClose() {
+	public boolean getDestroyOnClose()
+	{
 		return _destroyOnClose;
 	}
 
 	@Override
-	public boolean getEndOfStream() {
+	public boolean getEndOfStream()
+	{
 		long position = getPosition();
 		return position >= _targetFile.length();
 	}
 
 	@Override
-	public boolean getSeekable() {
+	public boolean getSeekable()
+	{
 		return true;
 	}
 
-	private void seek(SeekOrigin origin, long seekOffset, RandomAccessFile raf)
-			throws IOException {
+	private void seek(SeekOrigin origin, long seekOffset, RandomAccessFile raf) throws IOException
+	{
 		long offset = 0;
 
 		if (origin == SeekOrigin.SEEK_BEGINNING)
@@ -180,8 +173,8 @@ public class DefaultStreamableByteIOResourceFork extends
 
 	@Override
 	@RWXMappingResolver(DependentStreamableMappingResolver.class)
-	public void seekRead(SeekOrigin origin, long seekOffset,
-			ByteBuffer destination) throws IOException {
+	public void seekRead(SeekOrigin origin, long seekOffset, ByteBuffer destination) throws IOException
+	{
 		RandomAccessFile raf = null;
 
 		try {
@@ -201,8 +194,8 @@ public class DefaultStreamableByteIOResourceFork extends
 
 	@Override
 	@RWXMappingResolver(DependentStreamableMappingResolver.class)
-	public void seekWrite(SeekOrigin origin, long seekOffset, ByteBuffer source)
-			throws IOException {
+	public void seekWrite(SeekOrigin origin, long seekOffset, ByteBuffer source) throws IOException
+	{
 		RandomAccessFile raf = null;
 
 		try {
@@ -221,51 +214,59 @@ public class DefaultStreamableByteIOResourceFork extends
 	}
 
 	@Override
-	public Calendar accessTime() {
+	public Calendar accessTime()
+	{
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public void accessTime(Calendar newTime) {
+	public void accessTime(Calendar newTime)
+	{
 		// Do nothing
 	}
 
 	@Override
-	public Calendar createTime() {
+	public Calendar createTime()
+	{
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public Calendar modificationTime() {
+	public Calendar modificationTime()
+	{
 		Calendar ret = Calendar.getInstance();
 		ret.setTimeInMillis(_targetFile.lastModified());
 		return ret;
 	}
 
 	@Override
-	public void modificationTime(Calendar newTime) {
+	public void modificationTime(Calendar newTime)
+	{
 		_targetFile.setLastModified(newTime.getTimeInMillis());
 	}
 
 	@Override
-	public boolean readable() {
+	public boolean readable()
+	{
 		return true;
 	}
 
 	@Override
-	public long size() {
+	public long size()
+	{
 		return _targetFile.length();
 	}
 
 	@Override
-	public boolean writable() {
+	public boolean writable()
+	{
 		return true;
 	}
 
 	@Override
-	public ResourceForkInformation describe() {
-		return new DefaultStreamableByteIOResourceForkInformation(
-				getForkPath(), _dependentFork, _targetFile.getName(),
-				_destroyOnClose, _doNotify);
+	public ResourceForkInformation describe()
+	{
+		return new DefaultStreamableByteIOResourceForkInformation(getForkPath(), _dependentFork, _targetFile.getName(),
+			_destroyOnClose, _doNotify);
 	}
 }

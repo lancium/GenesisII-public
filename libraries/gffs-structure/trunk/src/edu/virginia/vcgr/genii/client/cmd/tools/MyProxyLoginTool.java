@@ -27,7 +27,8 @@ import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
-public class MyProxyLoginTool extends BaseLoginTool {
+public class MyProxyLoginTool extends BaseLoginTool
+{
 	private static Log _logger = LogFactory.getLog(MyProxyLoginTool.class);
 
 	static private final String _DESCRIPTION = "config/tooldocs/description/dMyProxyLogin";
@@ -39,22 +40,23 @@ public class MyProxyLoginTool extends BaseLoginTool {
 	static public final String MYPROXY_HOST_PROP = "edu.virginia.vcgr.genii.client.myproxy.host";
 	static public final String MYPROXY_LIFETIME_PROP = "edu.virginia.vcgr.genii.client.myproxy.lifetime";
 
-	protected MyProxyLoginTool(String description, String usage,
-			boolean isHidden) {
+	protected MyProxyLoginTool(String description, String usage, boolean isHidden)
+	{
 		super(description, usage, isHidden);
 	}
 
-	public MyProxyLoginTool() {
+	public MyProxyLoginTool()
+	{
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		overrideCategory(ToolCategory.SECURITY);
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (_durationString != null) {
 			try {
-				_credentialValidMillis = (long) new Duration(_durationString)
-						.as(DurationUnits.Milliseconds);
+				_credentialValidMillis = (long) new Duration(_durationString).as(DurationUnits.Milliseconds);
 			} catch (IllegalArgumentException pe) {
 				throw new ToolException("Invalid duration string given.", pe);
 			}
@@ -62,7 +64,8 @@ public class MyProxyLoginTool extends BaseLoginTool {
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		// make sure username/password are set
 		aquireUsername();
 		aquirePassword();
@@ -74,13 +77,11 @@ public class MyProxyLoginTool extends BaseLoginTool {
 		// Load properties file
 		Properties myProxyProperties = loadMyProxyProperties();
 
-		int port = Integer.parseInt(myProxyProperties
-				.getProperty(MYPROXY_PORT_PROP));
+		int port = Integer.parseInt(myProxyProperties.getProperty(MYPROXY_PORT_PROP));
 
 		String host = myProxyProperties.getProperty(MYPROXY_HOST_PROP);
 
-		int lifetime = Integer.parseInt(myProxyProperties
-				.getProperty(MYPROXY_LIFETIME_PROP));
+		int lifetime = Integer.parseInt(myProxyProperties.getProperty(MYPROXY_LIFETIME_PROP));
 
 		mp.setPort(port);
 		mp.setHost(host);
@@ -89,16 +90,13 @@ public class MyProxyLoginTool extends BaseLoginTool {
 		mp.setPassphrase(pass);
 
 		/*
-		 * Myproxy trust root most likely want to make configurable in the
-		 * future Can be overriden with either environment variable
-		 * GLOBUS_LOCATION or X509_CERT_DIR
+		 * Myproxy trust root most likely want to make configurable in the future Can be overriden
+		 * with either environment variable GLOBUS_LOCATION or X509_CERT_DIR
 		 */
 
-		File trustRoot = new File(ContainerProperties.getContainerProperties()
-				.getDeploymentsDirectory()
-				+ "/"
-				+ Installation.getDeployment(new DeploymentName()).getName()
-						.toString() + "/security/myproxy-certs/");
+		File trustRoot =
+			new File(ContainerProperties.getContainerProperties().getDeploymentsDirectory() + "/"
+				+ Installation.getDeployment(new DeploymentName()).getName().toString() + "/security/myproxy-certs/");
 
 		// Set trust root
 		System.setProperty("X509_CERT_DIR", trustRoot.getCanonicalPath());
@@ -123,18 +121,16 @@ public class MyProxyLoginTool extends BaseLoginTool {
 		X509Certificate[] keyMat = new X509Certificate[1];
 		keyMat[0] = mp.getCertificate();
 
-		String msg = "Replacing client tool identity with MyProxy credentials for \""
-				+ keyMat[0].getSubjectDN().getName() + "\".";
+		String msg =
+			"Replacing client tool identity with MyProxy credentials for \"" + keyMat[0].getSubjectDN().getName() + "\".";
 		stdout.println(msg);
 		_logger.info(msg);
 
-		KeyAndCertMaterial clientKeyMaterial = new KeyAndCertMaterial(keyMat,
-				mp.getPrivateKey());
+		KeyAndCertMaterial clientKeyMaterial = new KeyAndCertMaterial(keyMat, mp.getPrivateKey());
 		callContext.setActiveKeyAndCertMaterial(clientKeyMaterial);
 
 		// add the pass through identity to the calling context.
-		callContext.setSingleValueProperty(
-				GenesisIIConstants.PASS_THROUGH_IDENTITY, keyMat[0]);
+		callContext.setSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY, keyMat[0]);
 
 		// update the saved context before we leave.
 		ContextManager.storeCurrentContext(callContext);
@@ -142,23 +138,20 @@ public class MyProxyLoginTool extends BaseLoginTool {
 		return 0;
 	}
 
-	static private Properties loadMyProxyProperties() {
+	static private Properties loadMyProxyProperties()
+	{
 		FileInputStream fin = null;
 		Properties ret = new Properties();
 
-		Deployment deployment = Installation
-				.getDeployment(new DeploymentName());
+		Deployment deployment = Installation.getDeployment(new DeploymentName());
 		try {
 
-			fin = new FileInputStream(
-					deployment
-							.getConfigurationFile(MYPROXY_PROPERTIES_FILENAME));
+			fin = new FileInputStream(deployment.getConfigurationFile(MYPROXY_PROPERTIES_FILENAME));
 			ret.load(fin);
 			return ret;
 		} catch (IOException ioe) {
-			throw new InvalidDeploymentException(deployment.getName()
-					.toString(),
-					"Unable to load myproxy  properties from deployment.");
+			throw new InvalidDeploymentException(deployment.getName().toString(),
+				"Unable to load myproxy  properties from deployment.");
 		} finally {
 			StreamUtils.close(fin);
 		}

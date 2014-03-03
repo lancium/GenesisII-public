@@ -8,8 +8,8 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorConstants;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(namespace = CmdLineManipulatorConstants.NAMESPACE, name = "pwrapper-configuration")
-public class PwrapperVariationConfiguration extends
-		CommonVariationConfiguration {
+public class PwrapperVariationConfiguration extends CommonVariationConfiguration
+{
 	static final long serialVersionUID = 0L;
 
 }

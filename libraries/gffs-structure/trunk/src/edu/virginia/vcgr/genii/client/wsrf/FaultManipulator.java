@@ -21,21 +21,22 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 
-public class FaultManipulator {
-	static public <FaultType extends BaseFaultType> FaultType fillInFault(
-			FaultType bft) {
+public class FaultManipulator
+{
+	static public <FaultType extends BaseFaultType> FaultType fillInFault(FaultType bft)
+	{
 		return fillInFault(bft, null);
 	}
 
-	static public <FaultType extends BaseFaultType> FaultType fillInFault(
-			FaultType bft, String error) {
+	static public <FaultType extends BaseFaultType> FaultType fillInFault(FaultType bft, String error)
+	{
 		if (bft.getTimestamp() == null)
 			bft.setTimestamp(Calendar.getInstance());
 		if (bft.getOriginator() == null) {
 			try {
-				EndpointReferenceType originator = (EndpointReferenceType) WorkingContext
-						.getCurrentWorkingContext().getProperty(
-								WorkingContext.EPR_PROPERTY_NAME);
+				EndpointReferenceType originator =
+					(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
+						WorkingContext.EPR_PROPERTY_NAME);
 				bft.setOriginator(originator);
 			} catch (Throwable t) {
 			}
@@ -44,8 +45,7 @@ public class FaultManipulator {
 			error = bft.getClass().getName() + ":  " + bft.toString();
 		}
 		if (error != null) {
-			BaseFaultTypeDescription description = new BaseFaultTypeDescription(
-					error);
+			BaseFaultTypeDescription description = new BaseFaultTypeDescription(error);
 			bft.setDescription(new BaseFaultTypeDescription[] { description });
 		}
 		return bft;

@@ -18,11 +18,12 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.xml.sax.InputSource;
 
-public class DBSerializer {
+public class DBSerializer
+{
 	static private Log _logger = LogFactory.getLog(DBSerializer.class);
 
-	static public Blob toBlob(Object obj, String tableName, String columnName)
-			throws SQLException {
+	static public Blob toBlob(Object obj, String tableName, String columnName) throws SQLException
+	{
 		long maxLength = BlobLimits.limits().getLimit(tableName, columnName);
 		SerialBlob blob;
 
@@ -32,15 +33,11 @@ public class DBSerializer {
 		try {
 			blob = new SerialBlob(serialize(obj, maxLength));
 			if (_logger.isTraceEnabled())
-				_logger.trace(String.format(
-						"Created a blob of length %d bytes for %s.%s which has a "
-								+ "max length of %d bytes.", blob.length(),
-						tableName, columnName, maxLength));
+				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a "
+					+ "max length of %d bytes.", blob.length(), tableName, columnName, maxLength));
 			if (blob.length() > maxLength) {
-				_logger.error(String
-						.format("Error:  Blob was created with %d bytes for %s.%s, "
-								+ "but the maximum length for that column is %d bytes.",
-								blob.length(), tableName, columnName, maxLength));
+				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "
+					+ "but the maximum length for that column is %d bytes.", blob.length(), tableName, columnName, maxLength));
 			}
 
 			return blob;
@@ -50,7 +47,8 @@ public class DBSerializer {
 		}
 	}
 
-	static public Object fromBlob(Blob b) throws SQLException {
+	static public Object fromBlob(Blob b) throws SQLException
+	{
 		InputStream in = null;
 		ObjectInputStream oin = null;
 
@@ -61,13 +59,11 @@ public class DBSerializer {
 			oin = new ObjectInputStream(in = b.getBinaryStream());
 			return oin.readObject();
 		} catch (IOException e) {
-			String msg = "unable to deserialize from blob (io exception): "
-					+ e.getMessage();
+			String msg = "unable to deserialize from blob (io exception): " + e.getMessage();
 			_logger.error(msg);
 			throw new SQLException(msg, e);
 		} catch (ClassNotFoundException e) {
-			String msg = "unable to deserialize from blob (class not found): "
-					+ e.getMessage();
+			String msg = "unable to deserialize from blob (class not found): " + e.getMessage();
 			_logger.error(msg);
 			throw new SQLException(msg, e);
 		} finally {
@@ -75,8 +71,8 @@ public class DBSerializer {
 		}
 	}
 
-	static public byte[] serialize(Object obj, long maxLength)
-			throws IOException {
+	static public byte[] serialize(Object obj, long maxLength) throws IOException
+	{
 		ObjectOutputStream oos = null;
 		ByteArrayOutputStream baos = null;
 
@@ -94,16 +90,14 @@ public class DBSerializer {
 		byte[] data = baos.toByteArray();
 		if ((maxLength > 0) && (data.length > maxLength)) {
 			if (_logger.isTraceEnabled())
-				_logger.trace(String
-						.format("The blob was too large (%d), we no longer attempt to compress it.",
-								data.length));
+				_logger.trace(String.format("The blob was too large (%d), we no longer attempt to compress it.", data.length));
 		}
 
 		return data;
 	}
 
-	static public Object deserialize(byte[] data) throws IOException,
-			ClassNotFoundException {
+	static public Object deserialize(byte[] data) throws IOException, ClassNotFoundException
+	{
 		ObjectInputStream ois = null;
 
 		if (data == null)
@@ -117,10 +111,10 @@ public class DBSerializer {
 		}
 	}
 
-	static private QName _SERIALIZE_NAME = new QName("http://tempuri.org",
-			"serialized-entity");
+	static private QName _SERIALIZE_NAME = new QName("http://tempuri.org", "serialized-entity");
 
-	static public byte[] xmlSerialize(Object obj) throws IOException {
+	static public byte[] xmlSerialize(Object obj) throws IOException
+	{
 		ByteArrayOutputStream baos = null;
 		OutputStreamWriter writer = null;
 
@@ -139,8 +133,8 @@ public class DBSerializer {
 	}
 
 	@SuppressWarnings("unchecked")
-	static public <Type> Type xmlDeserialize(Class<Type> type, byte[] data)
-			throws IOException {
+	static public <Type> Type xmlDeserialize(Class<Type> type, byte[] data) throws IOException
+	{
 		ByteArrayInputStream bais = null;
 
 		if (data == null)
@@ -148,15 +142,14 @@ public class DBSerializer {
 
 		try {
 			bais = new ByteArrayInputStream(data);
-			return (Type) ObjectDeserializer.deserialize(new InputSource(bais),
-					type);
+			return (Type) ObjectDeserializer.deserialize(new InputSource(bais), type);
 		} finally {
 			StreamUtils.close(bais);
 		}
 	}
 
-	static public Blob xmlToBlob(Object obj, String tableName, String columnName)
-			throws SQLException {
+	static public Blob xmlToBlob(Object obj, String tableName, String columnName) throws SQLException
+	{
 		long maxLength = BlobLimits.limits().getLimit(tableName, columnName);
 
 		if (obj == null)
@@ -166,15 +159,11 @@ public class DBSerializer {
 			byte[] data = xmlSerialize(obj);
 
 			if (_logger.isTraceEnabled())
-				_logger.trace(String.format(
-						"Created a blob of length %d bytes for %s.%s which has a "
-								+ "max length of %d bytes.", data.length,
-						tableName, columnName, maxLength));
+				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a "
+					+ "max length of %d bytes.", data.length, tableName, columnName, maxLength));
 			if (data.length > maxLength) {
-				_logger.error(String
-						.format("Error:  Blob was created with %d bytes for %s.%s, "
-								+ "but the maximum length for that column is %d bytes.",
-								data.length, tableName, columnName, maxLength));
+				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "
+					+ "but the maximum length for that column is %d bytes.", data.length, tableName, columnName, maxLength));
 			}
 
 			return new SerialBlob(data);
@@ -184,8 +173,8 @@ public class DBSerializer {
 	}
 
 	@SuppressWarnings("unchecked")
-	static public <Type> Type xmlFromBlob(Class<Type> type, Blob blob)
-			throws IOException, ClassNotFoundException {
+	static public <Type> Type xmlFromBlob(Class<Type> type, Blob blob) throws IOException, ClassNotFoundException
+	{
 		InputStream in = null;
 
 		if (blob == null)
@@ -193,8 +182,7 @@ public class DBSerializer {
 
 		try {
 			in = blob.getBinaryStream();
-			return (Type) ObjectDeserializer.deserialize(new InputSource(in),
-					type);
+			return (Type) ObjectDeserializer.deserialize(new InputSource(in), type);
 		} catch (SQLException sqe) {
 			throw new IOException("Unable to deserialize object.", sqe);
 		} finally {

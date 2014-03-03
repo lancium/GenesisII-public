@@ -12,15 +12,16 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Some tools for working with the host's networking configuration.
  */
-public class NetworkConfigTools {
+public class NetworkConfigTools
+{
 	static private Log _logger = LogFactory.getLog(NetworkConfigTools.class);
 
-	public static Collection<String> getIPAddresses() {
+	public static Collection<String> getIPAddresses()
+	{
 		HashSet<String> ips = new HashSet<String>();
 		StringBuilder log = new StringBuilder();
 		try {
-			Enumeration<NetworkInterface> e = NetworkInterface
-					.getNetworkInterfaces();
+			Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
 			while (e.hasMoreElements()) {
 				NetworkInterface n = (NetworkInterface) e.nextElement();
 				Enumeration<InetAddress> ee = n.getInetAddresses();
@@ -32,8 +33,7 @@ public class NetworkConfigTools {
 				}
 			}
 		} catch (Throwable t) {
-			String msg = "failed to query IP addresses for the host: "
-					+ t.getMessage();
+			String msg = "failed to query IP addresses for the host: " + t.getMessage();
 			log.append(msg + "\n");
 			_logger.error(msg);
 		}

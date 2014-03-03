@@ -11,11 +11,13 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 /**
  * Password callback handler for resolving password/usernames for a JAAS login.
  */
-public class LoginCallbackHandler implements CallbackHandler {
+public class LoginCallbackHandler implements CallbackHandler
+{
 	private String password;
 	private String username;
 
-	public LoginCallbackHandler(String name, String password) {
+	public LoginCallbackHandler(String name, String password)
+	{
 		super();
 		this.username = name;
 		this.password = password;
@@ -29,8 +31,8 @@ public class LoginCallbackHandler implements CallbackHandler {
 	 * @throws IOException
 	 *             if an input or output error occurs.
 	 */
-	public void handle(Callback[] callbacks) throws IOException,
-			UnsupportedCallbackException {
+	public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
+	{
 		for (int i = 0; i < callbacks.length; i++) {
 			if (callbacks[i] instanceof NameCallback && username != null) {
 				NameCallback nc = (NameCallback) callbacks[i];

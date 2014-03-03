@@ -30,145 +30,150 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.ui.plugins.LazyLoadTabHandler;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 
-public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler {
+public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
+{
 	static final long serialVersionUID = 0L;
 
 	static final private Dimension TABLE_SIZE = new Dimension(1200, 600);
 
-	private class PopupListener extends MouseAdapter {
+	private class PopupListener extends MouseAdapter
+	{
 		@Override
-		final public void mouseClicked(MouseEvent e) {
+		final public void mouseClicked(MouseEvent e)
+		{
 			if (e.isPopupTrigger())
 				popup(e);
 		}
 
 		@Override
-		final public void mousePressed(MouseEvent e) {
+		final public void mousePressed(MouseEvent e)
+		{
 			if (e.isPopupTrigger())
 				popup(e);
 		}
 
 		@Override
-		final public void mouseReleased(MouseEvent e) {
+		final public void mouseReleased(MouseEvent e)
+		{
 			if (e.isPopupTrigger())
 				popup(e);
 		}
 	}
 
-	private class RefreshAction extends AbstractAction {
+	private class RefreshAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private RefreshAction() {
+		private RefreshAction()
+		{
 			super("Refresh");
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			_model.refresh(_table);
 		}
 	}
 
-	private class JobHistoryAction extends AbstractAction {
+	private class JobHistoryAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private JobHistoryAction(int[] selectedRows) {
+		private JobHistoryAction(int[] selectedRows)
+		{
 			super("Job History");
 
 			setEnabled(selectedRows.length == 1);
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			RowSorter<? extends TableModel> sorter = _table.getRowSorter();
 
 			Collection<String> jobTickets = new LinkedList<String>();
 			for (int row : _table.getSelectedRows())
-				jobTickets.add(_model
-						.row(sorter == null ? row : sorter
-								.convertRowIndexToModel(row)).getTicket()
-						.toString());
+				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
 
 			QueueManipulation.jobHistory(_context, _table, _model, jobTickets);
 		}
 	}
 
-	private class DumpJobHistoryAction extends AbstractAction {
+	private class DumpJobHistoryAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private DumpJobHistoryAction(int[] selectedRows) {
+		private DumpJobHistoryAction(int[] selectedRows)
+		{
 			super("Dump Job History");
 
 			setEnabled(selectedRows.length == 1);
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			RowSorter<? extends TableModel> sorter = _table.getRowSorter();
 
 			Collection<String> jobTickets = new LinkedList<String>();
 			for (int row : _table.getSelectedRows())
-				jobTickets.add(_model
-						.row(sorter == null ? row : sorter
-								.convertRowIndexToModel(row)).getTicket()
-						.toString());
+				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
 
-			String answer = JOptionPane.showInputDialog(
-					(Component) e.getSource(),
-					"Where would you like to store the history dump?");
+			String answer =
+				JOptionPane.showInputDialog((Component) e.getSource(), "Where would you like to store the history dump?");
 			if (answer == null)
 				return;
 
-			QueueManipulation.dumpJobHistory(_context, _table, _model,
-					jobTickets, new GeniiPath(answer));
+			QueueManipulation.dumpJobHistory(_context, _table, _model, jobTickets, new GeniiPath(answer));
 		}
 	}
 
-	private class JobKillerAction extends AbstractAction {
+	private class JobKillerAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private JobKillerAction(int[] rows) {
+		private JobKillerAction(int[] rows)
+		{
 			super("End Jobs");
 
 			setEnabled(rows.length > 0);
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			RowSorter<? extends TableModel> sorter = _table.getRowSorter();
 
 			Collection<String> jobTickets = new LinkedList<String>();
 			for (int row : _table.getSelectedRows())
-				jobTickets.add(_model
-						.row(sorter == null ? row : sorter
-								.convertRowIndexToModel(row)).getTicket()
-						.toString());
+				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
 
 			QueueManipulation.killJobs(_context, _table, _model, jobTickets);
 		}
 	}
 
-	private class JobCompleterAction extends AbstractAction {
+	private class JobCompleterAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private JobCompleterAction(int[] rows) {
+		private JobCompleterAction(int[] rows)
+		{
 			super("Remove Jobs");
 
 			setEnabled(rows.length > 0);
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			RowSorter<? extends TableModel> sorter = _table.getRowSorter();
 
 			Collection<String> jobTickets = new LinkedList<String>();
 			for (int row : _table.getSelectedRows())
-				jobTickets.add(_model
-						.row(sorter == null ? row : sorter
-								.convertRowIndexToModel(row)).getTicket()
-						.toString());
+				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
 
-			QueueManipulation
-					.completeJobs(_context, _table, _model, jobTickets);
+			QueueManipulation.completeJobs(_context, _table, _model, jobTickets);
 		}
 	}
 
@@ -176,7 +181,8 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler {
 	private JTable _table;
 	private QueueManagerTableModel _model;
 
-	private void popup(MouseEvent e) {
+	private void popup(MouseEvent e)
+	{
 		int[] rows = _table.getSelectedRows();
 
 		JPopupMenu popup = new JPopupMenu("Queue Manager Popup");
@@ -191,8 +197,9 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler {
 		popup.show(_table, e.getX(), e.getY());
 	}
 
-	public QueueManagerPanel(UIPluginContext context) throws ResourceException,
-			GenesisIISecurityException, RNSPathDoesNotExistException {
+	public QueueManagerPanel(UIPluginContext context) throws ResourceException, GenesisIISecurityException,
+		RNSPathDoesNotExistException
+	{
 		super(new GridBagLayout());
 
 		setName("Job Management");
@@ -206,23 +213,21 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler {
 		_table.addMouseListener(new PopupListener());
 
 		_table.getActionMap().put("Refresh", new RefreshAction());
-		_table.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0x0),
-				"Refresh");
+		_table.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0x0), "Refresh");
 
 		JScrollPane pane = new JScrollPane(_table);
 
-		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-						5, 5, 5, 5), 5, 5));
-		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1,
-				1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
+		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+			5, 5, 5, 5), 5, 5));
+		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		setPreferredSize(TABLE_SIZE);
 	}
 
 	@Override
-	final public void load() {
+	final public void load()
+	{
 		_model.refresh(_table);
 	}
 }

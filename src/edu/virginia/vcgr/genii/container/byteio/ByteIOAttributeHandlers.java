@@ -38,13 +38,15 @@ import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
-	public ByteIOAttributeHandlers(AttributePackage pkg)
-			throws NoSuchMethodException {
+public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler
+{
+	public ByteIOAttributeHandlers(AttributePackage pkg) throws NoSuchMethodException
+	{
 		super(pkg);
 	}
 
-	static private long calculateChecksum(File f) throws IOException {
+	static private long calculateChecksum(File f) throws IOException
+	{
 		byte[] fileData = new byte[1024 * 8];
 		ChecksumStream in = null;
 		try {
@@ -58,8 +60,8 @@ public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
 		}
 	}
 
-	private long getChecksum() throws ResourceException,
-			ResourceUnknownFaultType {
+	private long getChecksum() throws ResourceException, ResourceUnknownFaultType
+	{
 		IRByteIOResource resource = null;
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -70,18 +72,14 @@ public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
 
 		File f = resource.getCurrentFile();
 		if (f.exists()) {
-			Long storedModified = (Long) resource
-					.getProperty("genii.last-modified.property");
-			if (storedModified == null
-					|| (storedModified.longValue() != f.lastModified())) {
+			Long storedModified = (Long) resource.getProperty("genii.last-modified.property");
+			if (storedModified == null || (storedModified.longValue() != f.lastModified())) {
 				ResourceLock lock = rKey.getResourceLock();
 				try {
 					lock.lock();
 					long checksum = calculateChecksum(f);
-					resource.setProperty("genii.last-modified.property",
-							new Long(f.lastModified()));
-					resource.setProperty("genii.stored-checksum.property",
-							new Long(checksum));
+					resource.setProperty("genii.last-modified.property", new Long(f.lastModified()));
+					resource.setProperty("genii.stored-checksum.property", new Long(checksum));
 					return checksum;
 				} catch (IOException ioe) {
 					throw new ResourceException(ioe.getLocalizedMessage(), ioe);
@@ -89,16 +87,15 @@ public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
 					lock.unlock();
 				}
 			} else {
-				return ((Long) resource
-						.getProperty("genii.stored-checksum.property"))
-						.longValue();
+				return ((Long) resource.getProperty("genii.stored-checksum.property")).longValue();
 			}
 		}
 
 		return 0;
 	}
 
-	private long getSize() throws ResourceException, ResourceUnknownFaultType {
+	private long getSize() throws ResourceException, ResourceUnknownFaultType
+	{
 		IRByteIOResource resource = null;
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -113,11 +110,10 @@ public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
 		return 0;
 	}
 
-	private boolean getReadable() throws ResourceException,
-			ResourceUnknownFaultType {
+	private boolean getReadable() throws ResourceException, ResourceUnknownFaultType
+	{
 		IRByteIOResource resource = null;
-		resource = (IRByteIOResource) (ResourceManager.getCurrentResource()
-				.dereference());
+		resource = (IRByteIOResource) (ResourceManager.getCurrentResource().dereference());
 		if (resource.isServiceResource()) {
 			return true;
 		}
@@ -128,8 +124,8 @@ public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
 		return true;
 	}
 
-	private boolean getWriteable() throws ResourceException,
-			ResourceUnknownFaultType {
+	private boolean getWriteable() throws ResourceException, ResourceUnknownFaultType
+	{
 		IRByteIOResource resource = null;
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -144,8 +140,8 @@ public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
 		return true;
 	}
 
-	private Calendar getCreateTime() throws ResourceException,
-			ResourceUnknownFaultType {
+	private Calendar getCreateTime() throws ResourceException, ResourceUnknownFaultType
+	{
 		IRByteIOResource resource = null;
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -156,30 +152,28 @@ public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
 		return resource.getCreateTime();
 	}
 
-	private Calendar getModificationTime() throws ResourceException,
-			ResourceUnknownFaultType {
+	private Calendar getModificationTime() throws ResourceException, ResourceUnknownFaultType
+	{
 		IRByteIOResource resource = null;
-		resource = (IRByteIOResource) (ResourceManager.getCurrentResource()
-				.dereference());
+		resource = (IRByteIOResource) (ResourceManager.getCurrentResource().dereference());
 		if (resource.isServiceResource()) {
 			return null;
 		}
 		return resource.getModTime();
 	}
 
-	private void setModificationTime(Calendar c) throws ResourceException,
-			ResourceUnknownFaultType {
+	private void setModificationTime(Calendar c) throws ResourceException, ResourceUnknownFaultType
+	{
 		IRByteIOResource resource = null;
-		resource = (IRByteIOResource) (ResourceManager.getCurrentResource()
-				.dereference());
+		resource = (IRByteIOResource) (ResourceManager.getCurrentResource().dereference());
 		if (resource.isServiceResource())
 			return;
 
 		resource.setModTime(c);
 	}
 
-	private Calendar getAccessTime() throws ResourceException,
-			ResourceUnknownFaultType {
+	private Calendar getAccessTime() throws ResourceException, ResourceUnknownFaultType
+	{
 		IRByteIOResource resource = null;
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -190,39 +184,38 @@ public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
 		return resource.getAccessTime();
 	}
 
-	private void setAccessTime(Calendar c) throws ResourceException,
-			ResourceUnknownFaultType {
+	private void setAccessTime(Calendar c) throws ResourceException, ResourceUnknownFaultType
+	{
 		IRByteIOResource resource = null;
-		resource = (IRByteIOResource) (ResourceManager.getCurrentResource()
-				.dereference());
+		resource = (IRByteIOResource) (ResourceManager.getCurrentResource().dereference());
 		if (resource.isServiceResource())
 			return;
 
 		resource.setAccessTime(c);
 	}
 
-	public MessageElement getChecksumAttr() throws ResourceUnknownFaultType,
-			ResourceException {
-		return new MessageElement(ByteIOConstants.FILE_CHECKSUM_ATTR_NAME,
-				getChecksum());
+	public MessageElement getChecksumAttr() throws ResourceUnknownFaultType, ResourceException
+	{
+		return new MessageElement(ByteIOConstants.FILE_CHECKSUM_ATTR_NAME, getChecksum());
 	}
 
-	public MessageElement getSizeAttr() throws ResourceUnknownFaultType,
-			ResourceException {
+	public MessageElement getSizeAttr() throws ResourceUnknownFaultType, ResourceException
+	{
 		return new MessageElement(GetSizeNamespace(), getSize());
 	}
 
-	public MessageElement getReadableAttr() throws ResourceUnknownFaultType,
-			ResourceException {
+	public MessageElement getReadableAttr() throws ResourceUnknownFaultType, ResourceException
+	{
 		return new MessageElement(GetReadableNamespace(), getReadable());
 	}
 
-	public MessageElement getWriteableAttr() throws ResourceUnknownFaultType,
-			ResourceException {
+	public MessageElement getWriteableAttr() throws ResourceUnknownFaultType, ResourceException
+	{
 		return new MessageElement(GetWriteableNamespace(), getWriteable());
 	}
 
-	public Collection<MessageElement> getTransferMechsAttr() {
+	public Collection<MessageElement> getTransferMechsAttr()
+	{
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
 		URI[] mechArr = TransferAgent.getTransferMechs();
 		for (URI mech : mechArr) {
@@ -231,44 +224,41 @@ public abstract class ByteIOAttributeHandlers extends AbstractAttributeHandler {
 		return ret;
 	}
 
-	public MessageElement getCreateTimeAttr() throws ResourceUnknownFaultType,
-			ResourceException {
+	public MessageElement getCreateTimeAttr() throws ResourceUnknownFaultType, ResourceException
+	{
 		return new MessageElement(GetCreateTimeNamespace(), getCreateTime());
 	}
 
-	public MessageElement getModificationTimeAttr()
-			throws ResourceUnknownFaultType, ResourceException {
-		return new MessageElement(GetModificationTimeNamespace(),
-				getModificationTime());
+	public MessageElement getModificationTimeAttr() throws ResourceUnknownFaultType, ResourceException
+	{
+		return new MessageElement(GetModificationTimeNamespace(), getModificationTime());
 	}
 
-	public void setModificationTimeAttr(MessageElement element)
-			throws ResourceException, ResourceUnknownFaultType {
-		setModificationTime(ObjectDeserializer
-				.toObject(element, Calendar.class));
+	public void setModificationTimeAttr(MessageElement element) throws ResourceException, ResourceUnknownFaultType
+	{
+		setModificationTime(ObjectDeserializer.toObject(element, Calendar.class));
 	}
 
-	public MessageElement getAccessTimeAttr() throws ResourceUnknownFaultType,
-			ResourceException {
+	public MessageElement getAccessTimeAttr() throws ResourceUnknownFaultType, ResourceException
+	{
 		return new MessageElement(GetAccessTimeNamespace(), getAccessTime());
 	}
 
-	public void setAccessTimeAttr(MessageElement element)
-			throws ResourceException, ResourceUnknownFaultType {
+	public void setAccessTimeAttr(MessageElement element) throws ResourceException, ResourceUnknownFaultType
+	{
 		setAccessTime(ObjectDeserializer.toObject(element, Calendar.class));
 	}
 
 	@Override
-	protected void registerHandlers() throws NoSuchMethodException {
+	protected void registerHandlers() throws NoSuchMethodException
+	{
 		addHandler(GetSizeNamespace(), "getSizeAttr");
 		addHandler(GetReadableNamespace(), "getReadableAttr");
 		addHandler(GetWriteableNamespace(), "getWriteableAttr");
 		addHandler(GetTransferMechanismNamespace(), "getTransferMechsAttr");
 		addHandler(GetCreateTimeNamespace(), "getCreateTimeAttr");
-		addHandler(GetModificationTimeNamespace(), "getModificationTimeAttr",
-				"setModificationTimeAttr");
-		addHandler(GetAccessTimeNamespace(), "getAccessTimeAttr",
-				"setAccessTimeAttr");
+		addHandler(GetModificationTimeNamespace(), "getModificationTimeAttr", "setModificationTimeAttr");
+		addHandler(GetAccessTimeNamespace(), "getAccessTimeAttr", "setAccessTimeAttr");
 	}
 
 	protected abstract QName GetSizeNamespace();

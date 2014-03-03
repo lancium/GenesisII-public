@@ -22,27 +22,28 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class JSDLComponentNotSupportedException extends JSDLValidationException {
+public class JSDLComponentNotSupportedException extends JSDLValidationException
+{
 	static final long serialVersionUID = 0L;
 
-	public JSDLComponentNotSupportedException(XMLDocumentPath path) {
-		super(String.format("The JSDL element %s is not supported.",
-				path.currentElement()));
+	public JSDLComponentNotSupportedException(XMLDocumentPath path)
+	{
+		super(String.format("The JSDL element %s is not supported.", path.currentElement()));
 	}
 
-	public JSDLComponentNotSupportedException(XMLDocumentPath path,
-			QName attributeName) {
-		super(
-				String.format(
-						"The attribute %s is not supported inside of the JSDL element %s.",
-						path.currentElement(), attributeName));
+	public JSDLComponentNotSupportedException(XMLDocumentPath path, QName attributeName)
+	{
+		super(String.format("The attribute %s is not supported inside of the JSDL element %s.", path.currentElement(),
+			attributeName));
 	}
 
-	public JSDLComponentNotSupportedException(String msg) {
+	public JSDLComponentNotSupportedException(String msg)
+	{
 		super(msg);
 	}
 
-	public JSDLComponentNotSupportedException(String msg, Throwable cause) {
+	public JSDLComponentNotSupportedException(String msg, Throwable cause)
+	{
 		super(msg, cause);
 	}
 }

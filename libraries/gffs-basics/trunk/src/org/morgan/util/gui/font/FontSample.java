@@ -5,17 +5,18 @@ import java.awt.Font;
 
 import javax.swing.JLabel;
 
-class FontSample extends JLabel {
+class FontSample extends JLabel
+{
 	static final long serialVersionUID = 0L;
 
-	FontSample(FontModel model) {
+	FontSample(FontModel model)
+	{
 		super("Sample Text");
 
 		setFont(model.selectedFont());
 
 		Dimension preferredSize = getPreferredSize();
-		preferredSize = new Dimension(preferredSize.width * 3 / 2,
-				preferredSize.height);
+		preferredSize = new Dimension(preferredSize.width * 3 / 2, preferredSize.height);
 		setPreferredSize(preferredSize);
 		setMinimumSize(preferredSize);
 		setMaximumSize(preferredSize);
@@ -23,9 +24,11 @@ class FontSample extends JLabel {
 		model.addFontListener(new InternalFontListener());
 	}
 
-	private class InternalFontListener implements FontListener {
+	private class InternalFontListener implements FontListener
+	{
 		@Override
-		public void fontChanged(Font newFont) {
+		public void fontChanged(Font newFont)
+		{
 			setFont(newFont);
 			revalidate();
 			repaint();

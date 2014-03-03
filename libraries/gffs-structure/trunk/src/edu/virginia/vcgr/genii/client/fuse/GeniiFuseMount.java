@@ -26,7 +26,8 @@ import fuse.FuseException;
 import fuse.FuseStat;
 import fuse.FuseStatfs;
 
-public class GeniiFuseMount implements Filesystem {
+public class GeniiFuseMount implements Filesystem
+{
 	static private Log _logger = LogFactory.getLog(GeniiFuseMount.class);
 
 	static private final int BLOCK_SIZE = 512;
@@ -39,19 +40,20 @@ public class GeniiFuseMount implements Filesystem {
 
 	private Map<String, Long> _mknodFiles = new HashMap<String, Long>();
 
-	public GeniiFuseMount(GenesisIIFilesystem fs, int uid) {
+	public GeniiFuseMount(GenesisIIFilesystem fs, int uid)
+	{
 		_uid = uid;
 		_fs = fs;
 	}
 
 	@Override
-	public void chmod(String path, int mode) throws FuseException {
+	public void chmod(String path, int mode) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("chmod(%s, 0%o)", path, mode));
 
 		try {
-			_fs.chmod(PATHREP.parse(null, path),
-					MetadataManager.permissionsFromMode(mode));
+			_fs.chmod(PATHREP.parse(null, path), MetadataManager.permissionsFromMode(mode));
 		} catch (Throwable cause) {
 			_logger.info("chmod exception:", cause);
 			throw FuseExceptions.translate("Unable to chmod target.", cause);
@@ -59,7 +61,8 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void chown(String path, int uid, int gid) throws FuseException {
+	public void chown(String path, int uid, int gid) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("chown(%s, %d, %d)", path, uid, gid));
 
@@ -67,7 +70,8 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void flush(String path, long fileHandle) throws FuseException {
+	public void flush(String path, long fileHandle) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("flush(%s, %d)", path, fileHandle));
 
@@ -80,17 +84,17 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void fsync(String path, long fileHandle, boolean isDatasync)
-			throws FuseException {
+	public void fsync(String path, long fileHandle, boolean isDatasync) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("fsync(%s, %d, %s)", path, fileHandle,
-					isDatasync));
+			_logger.trace(String.format("fsync(%s, %d, %s)", path, fileHandle, isDatasync));
 
 		// For now, we don't do this.
 	}
 
 	@Override
-	public FuseStat getattr(String path) throws FuseException {
+	public FuseStat getattr(String path) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("getattr(%s)", path));
 		FilesystemStatStructure statstruct = MetadataManager.retrieveStat(path);
@@ -114,13 +118,13 @@ public class GeniiFuseMount implements Filesystem {
 		} catch (Throwable cause) {
 			if (_logger.isTraceEnabled())
 				_logger.trace("getattr exception:", cause);
-			throw FuseExceptions.translate("Unable to getattr target: " + path,
-					cause);
+			throw FuseExceptions.translate("Unable to getattr target: " + path, cause);
 		}
 	}
 
 	@Override
-	public FuseDirEnt[] getdir(String path) throws FuseException {
+	public FuseDirEnt[] getdir(String path) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("getdir(%s)", path));
 		FuseDirEnt[] dirEntries = DirectoryManager.getDir(path);
@@ -150,7 +154,8 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void link(String from, String to) throws FuseException {
+	public void link(String from, String to) throws FuseException
+	{
 		_logger.trace(String.format("link(%s, %s)", from, to));
 
 		try {
@@ -162,13 +167,13 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void mkdir(String path, int mode) throws FuseException {
+	public void mkdir(String path, int mode) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("mkdir(%s, 0%o)", path, mode));
 
 		try {
-			_fs.mkdir(PATHREP.parse(null, path),
-					MetadataManager.permissionsFromMode(mode));
+			_fs.mkdir(PATHREP.parse(null, path), MetadataManager.permissionsFromMode(mode));
 		} catch (Throwable cause) {
 			_logger.info("mkdir exception:", cause);
 			throw FuseExceptions.translate("Unable to make directory.", cause);
@@ -176,15 +181,15 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void mknod(String path, int mode, int rdev) throws FuseException {
+	public void mknod(String path, int mode, int rdev) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("mknod(%s, 0%o, %d)", path, mode, rdev));
 
 		try {
 			if (rdev == 0) {
-				long fileHandle = _fs.open(PATHREP.parse(null, path),
-						new OpenFlags(true, false, false, true),
-						OpenModes.READ_WRITE,
+				long fileHandle =
+					_fs.open(PATHREP.parse(null, path), new OpenFlags(true, false, false, true), OpenModes.READ_WRITE,
 						MetadataManager.permissionsFromMode(mode));
 
 				// We don't close the file now because it's about to be opened
@@ -198,12 +203,12 @@ public class GeniiFuseMount implements Filesystem {
 			throw FuseExceptions.translate("Unable to make node.", cause);
 		}
 
-		throw new FuseFunctionNotImplementedException(
-				"Haven't implemented mknod for devices other than 0.");
+		throw new FuseFunctionNotImplementedException("Haven't implemented mknod for devices other than 0.");
 	}
 
 	@Override
-	public long open(String path, int flags) throws FuseException {
+	public long open(String path, int flags) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("open(%s, 0x%x)", path, flags));
 
@@ -218,9 +223,8 @@ public class GeniiFuseMount implements Filesystem {
 		boolean writable = (flags & (FilesystemConstants.O_RDWR | FilesystemConstants.O_WRONLY)) > 0;
 
 		try {
-			return _fs.open(PATHREP.parse(null, path), new OpenFlags(false,
-					false, false, false), writable ? OpenModes.READ_WRITE
-					: OpenModes.READ, null);
+			return _fs.open(PATHREP.parse(null, path), new OpenFlags(false, false, false, false),
+				writable ? OpenModes.READ_WRITE : OpenModes.READ, null);
 		} catch (Throwable cause) {
 			_logger.info("open exception:", cause);
 			throw FuseExceptions.translate("Unable to open files.", cause);
@@ -228,11 +232,10 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void read(String path, long fileHandle, ByteBuffer buffer,
-			long offset) throws FuseException {
+	public void read(String path, long fileHandle, ByteBuffer buffer, long offset) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("read(%s, %d, %s, %d)", path,
-					fileHandle, buffer, offset));
+			_logger.trace(String.format("read(%s, %d, %s, %d)", path, fileHandle, buffer, offset));
 
 		try {
 			_fs.read(fileHandle, offset, buffer);
@@ -243,20 +246,19 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public String readlink(String path) throws FuseException {
+	public String readlink(String path) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("readlink(%s)", path));
 
-		throw new FuseFunctionNotImplementedException(
-				"The readLink function is not supported.");
+		throw new FuseFunctionNotImplementedException("The readLink function is not supported.");
 	}
 
 	@Override
-	public void release(String path, long fileHandle, int flags)
-			throws FuseException {
+	public void release(String path, long fileHandle, int flags) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("release(%s, %d, 0x%x, args)", path,
-					fileHandle, flags));
+			_logger.trace(String.format("release(%s, %d, 0x%x, args)", path, fileHandle, flags));
 
 		try {
 			_fs.close(fileHandle);
@@ -267,7 +269,8 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void rename(String from, String to) throws FuseException {
+	public void rename(String from, String to) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("rename(%s, %s)", from, to));
 
@@ -280,7 +283,8 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void rmdir(String path) throws FuseException {
+	public void rmdir(String path) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("rmdir(%s)", path));
 
@@ -288,13 +292,13 @@ public class GeniiFuseMount implements Filesystem {
 			_fs.unlink(PATHREP.parse(null, path));
 		} catch (Throwable cause) {
 			_logger.info("rmdir exception:", cause);
-			throw FuseExceptions
-					.translate("Unable to remove directory.", cause);
+			throw FuseExceptions.translate("Unable to remove directory.", cause);
 		}
 	}
 
 	@Override
-	public FuseStatfs statfs() throws FuseException {
+	public FuseStatfs statfs() throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace("statfs()");
 
@@ -310,16 +314,17 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void symlink(String from, String to) throws FuseException {
+	public void symlink(String from, String to) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("symlink(%s, %s)", from, to));
 
-		throw new FuseFunctionNotImplementedException(
-				"symlink is not implemented.");
+		throw new FuseFunctionNotImplementedException("symlink is not implemented.");
 	}
 
 	@Override
-	public void truncate(String path, long newSize) throws FuseException {
+	public void truncate(String path, long newSize) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("truncate(%s, %d)", path, newSize));
 
@@ -332,7 +337,8 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void unlink(String path) throws FuseException {
+	public void unlink(String path) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("unlink(%s)", path));
 
@@ -345,14 +351,13 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void utime(String path, int atime, int mtime) throws FuseException {
+	public void utime(String path, int atime, int mtime) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String
-					.format("utime(%s, %d, %d)", path, atime, mtime));
+			_logger.trace(String.format("utime(%s, %d, %d)", path, atime, mtime));
 
 		try {
-			_fs.updateTimes(PATHREP.parse(null, path), atime * 1000L,
-					mtime * 1000L);
+			_fs.updateTimes(PATHREP.parse(null, path), atime * 1000L, mtime * 1000L);
 		} catch (Throwable cause) {
 			_logger.info("utime exception:", cause);
 			throw FuseExceptions.translate("Unable to update times.", cause);
@@ -360,11 +365,10 @@ public class GeniiFuseMount implements Filesystem {
 	}
 
 	@Override
-	public void write(String path, long fileHandle, boolean isWritepage,
-			ByteBuffer buffer, long offset) throws FuseException {
+	public void write(String path, long fileHandle, boolean isWritepage, ByteBuffer buffer, long offset) throws FuseException
+	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("write(%s, %d, %s, %s, %d)", path,
-					fileHandle, isWritepage, buffer, offset));
+			_logger.trace(String.format("write(%s, %d, %s, %s, %d)", path, fileHandle, isWritepage, buffer, offset));
 
 		try {
 			_fs.write(fileHandle, offset, buffer);

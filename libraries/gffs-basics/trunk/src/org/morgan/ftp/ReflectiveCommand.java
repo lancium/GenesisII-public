@@ -3,18 +3,21 @@ package org.morgan.ftp;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class ReflectiveCommand extends AbstractCommand {
+public class ReflectiveCommand extends AbstractCommand
+{
 	private Constructor<? extends ICommandHandler> _constructor;
 
-	public ReflectiveCommand(Class<? extends ICommandHandler> handlerClass,
-			String... handledVerbs) throws NoSuchMethodException {
+	public ReflectiveCommand(Class<? extends ICommandHandler> handlerClass, String... handledVerbs)
+		throws NoSuchMethodException
+	{
 		super(handledVerbs);
 
 		_constructor = handlerClass.getConstructor(ICommand.class);
 	}
 
 	@Override
-	public ICommandHandler createHandler() throws FTPException {
+	public ICommandHandler createHandler() throws FTPException
+	{
 		try {
 			return _constructor.newInstance(this);
 		} catch (InstantiationException ie) {
@@ -28,8 +31,7 @@ public class ReflectiveCommand extends AbstractCommand {
 			if (cause == null)
 				cause = ite;
 
-			throw new InternalException("Unable to create command instance.",
-					cause);
+			throw new InternalException("Unable to create command instance.", cause);
 		}
 	}
 }

@@ -48,7 +48,8 @@ import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class XMLConfiguration {
+public class XMLConfiguration
+{
 	static private Log _logger = LogFactory.getLog(XMLConfiguration.class);
 
 	static public final String NAMESPACE = "http://www.mark-morgan.net/org/morgan/util/configuration";
@@ -57,16 +58,15 @@ public class XMLConfiguration {
 	static public final String CONFIG_SECTION_NAME = "name";
 	static public final String CONFIG_SECTION_CLASS = "class";
 
-	static public QName CONFIG_SECTIONS_QNAME = new QName(NAMESPACE,
-			CONFIG_SECTIONS);
-	static public QName CONFIG_SECTION_QNAME = new QName(NAMESPACE,
-			CONFIG_SECTION);
+	static public QName CONFIG_SECTIONS_QNAME = new QName(NAMESPACE, CONFIG_SECTIONS);
+	static public QName CONFIG_SECTION_QNAME = new QName(NAMESPACE, CONFIG_SECTION);
 
 	private HashMap<QName, ArrayList<Object>> _configurations = new HashMap<QName, ArrayList<Object>>();
 	private HashMap<QName, ArrayList<Node>> _unparsedXML = new HashMap<QName, ArrayList<Node>>();
 	private HashMap<QName, IXMLConfigurationSectionHandler> _handlers = new HashMap<QName, IXMLConfigurationSectionHandler>();
 
-	static public QName getQName(Node n) {
+	static public QName getQName(Node n)
+	{
 		String namespace = n.getNamespaceURI();
 		String name = n.getLocalName();
 		if (name == null)
@@ -74,26 +74,19 @@ public class XMLConfiguration {
 		return new QName(namespace, name);
 	}
 
-	private IXMLConfigurationSectionHandler getNamedHandler(String clazz)
-			throws ConfigurationException {
+	private IXMLConfigurationSectionHandler getNamedHandler(String clazz) throws ConfigurationException
+	{
 		try {
 			ClassLoader loader = GenesisClassLoader.classLoaderFactory();
 			Class<?> cl = loader.loadClass(clazz);
 			if (!IXMLConfigurationSectionHandler.class.isAssignableFrom(cl))
-				throw new ConfigurationException(
-						"Class \""
-								+ clazz
-								+ "\" does not implement IXMLConfigurationSectionHandler.");
+				throw new ConfigurationException("Class \"" + clazz + "\" does not implement IXMLConfigurationSectionHandler.");
 			Constructor<?> cons = cl.getConstructor(new Class[0]);
-			return (IXMLConfigurationSectionHandler) cons
-					.newInstance(new Object[0]);
+			return (IXMLConfigurationSectionHandler) cons.newInstance(new Object[0]);
 		} catch (ClassNotFoundException cnfe) {
-			throw new ConfigurationException("Couldn't find class \"" + clazz
-					+ "\".");
+			throw new ConfigurationException("Couldn't find class \"" + clazz + "\".");
 		} catch (NoSuchMethodException nsme) {
-			throw new ConfigurationException(
-					"Couldn't find a default constructor for class \"" + clazz
-							+ "\".", nsme);
+			throw new ConfigurationException("Couldn't find a default constructor for class \"" + clazz + "\".", nsme);
 		} catch (InvocationTargetException ite) {
 			Throwable cause = ite.getCause();
 			if (cause == null)
@@ -101,16 +94,14 @@ public class XMLConfiguration {
 
 			throw new ConfigurationException(cause);
 		} catch (InstantiationException ia) {
-			throw new ConfigurationException("Couldn't create instance of \""
-					+ clazz + "\".", ia);
+			throw new ConfigurationException("Couldn't create instance of \"" + clazz + "\".", ia);
 		} catch (IllegalAccessException iae) {
-			throw new ConfigurationException("Couldn't create instance of \""
-					+ clazz + "\".", iae);
+			throw new ConfigurationException("Couldn't create instance of \"" + clazz + "\".", iae);
 		}
 	}
 
-	private void addConfigHandler(Node responsibleNode, String name,
-			String clazz) throws ConfigurationException {
+	private void addConfigHandler(Node responsibleNode, String name, String clazz) throws ConfigurationException
+	{
 		QName section;
 		name = name.trim();
 		clazz = clazz.trim();
@@ -119,12 +110,9 @@ public class XMLConfiguration {
 		if (index < 0)
 			section = new QName(name);
 		else {
-			String ns = responsibleNode.lookupNamespaceURI(name.substring(0,
-					index));
+			String ns = responsibleNode.lookupNamespaceURI(name.substring(0, index));
 			if (ns == null)
-				throw new ConfigurationException(
-						"Couldn't look-up a namespace for \""
-								+ name.substring(0, index) + "\".");
+				throw new ConfigurationException("Couldn't look-up a namespace for \"" + name.substring(0, index) + "\".");
 			section = new QName(ns, name.substring(index + 1));
 		}
 
@@ -132,8 +120,8 @@ public class XMLConfiguration {
 		_handlers.put(section, handler);
 	}
 
-	private void handleConfigSections(Node configSections)
-			throws ConfigurationException {
+	private void handleConfigSections(Node configSections) throws ConfigurationException
+	{
 		NodeList children = configSections.getChildNodes();
 		int length = children.getLength();
 
@@ -142,27 +130,24 @@ public class XMLConfiguration {
 			if (configSection.getNodeType() == Node.ELEMENT_NODE) {
 				QName name = getQName(configSection);
 				if (!name.equals(CONFIG_SECTION_QNAME))
-					throw new ConfigurationException(
-							"Found an invalid node in a config-sections element.");
+					throw new ConfigurationException("Found an invalid node in a config-sections element.");
 
 				NamedNodeMap attrs = configSection.getAttributes();
 				Node nameNode = attrs.getNamedItem(CONFIG_SECTION_NAME);
 				Node classNode = attrs.getNamedItem(CONFIG_SECTION_CLASS);
 
 				if (nameNode == null)
-					throw new ConfigurationException(
-							"Found a config-section element with no name.");
+					throw new ConfigurationException("Found a config-section element with no name.");
 				if (classNode == null)
-					throw new ConfigurationException(
-							"Founda  config-section element with no class.");
+					throw new ConfigurationException("Founda  config-section element with no class.");
 
-				addConfigHandler(configSection, nameNode.getTextContent(),
-						classNode.getTextContent());
+				addConfigHandler(configSection, nameNode.getTextContent(), classNode.getTextContent());
 			}
 		}
 	}
 
-	private void handleChild(Node child) throws ConfigurationException {
+	private void handleChild(Node child) throws ConfigurationException
+	{
 		QName nodeQName = XMLConfiguration.getQName(child);
 		if (_logger.isTraceEnabled())
 			_logger.trace("handling node: " + nodeQName);
@@ -178,7 +163,8 @@ public class XMLConfiguration {
 		}
 	}
 
-	private void initialize(Node node) throws ConfigurationException {
+	private void initialize(Node node) throws ConfigurationException
+	{
 		NodeList children = node.getChildNodes();
 		int length = children.getLength();
 
@@ -190,9 +176,9 @@ public class XMLConfiguration {
 		}
 	}
 
-	private void initialize(InputStream in)
-			throws ParserConfigurationException, IOException, SAXException,
-			ConfigurationException {
+	private void initialize(InputStream in) throws ParserConfigurationException, IOException, SAXException,
+		ConfigurationException
+	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
 		DocumentBuilder builder = factory.newDocumentBuilder();
@@ -200,13 +186,13 @@ public class XMLConfiguration {
 		initialize(doc.getDocumentElement());
 	}
 
-	public XMLConfiguration(String filepath) throws FileNotFoundException,
-			IOException, ConfigurationException {
+	public XMLConfiguration(String filepath) throws FileNotFoundException, IOException, ConfigurationException
+	{
 		this(new File(filepath));
 	}
 
-	public XMLConfiguration(File file) throws FileNotFoundException,
-			IOException, ConfigurationException {
+	public XMLConfiguration(File file) throws FileNotFoundException, IOException, ConfigurationException
+	{
 		FileInputStream fin = null;
 
 		try {
@@ -226,8 +212,8 @@ public class XMLConfiguration {
 		}
 	}
 
-	public XMLConfiguration(InputStream in) throws IOException,
-			ConfigurationException {
+	public XMLConfiguration(InputStream in) throws IOException, ConfigurationException
+	{
 		try {
 			initialize(in);
 		} catch (ParserConfigurationException pce) {
@@ -237,35 +223,32 @@ public class XMLConfiguration {
 		}
 	}
 
-	public XMLConfiguration(Node node) throws ConfigurationException {
+	public XMLConfiguration(Node node) throws ConfigurationException
+	{
 		initialize(node);
 	}
 
 	/**
-	 * Retrieve a section from a configuration. If more than one section is
-	 * registered with this name, or if none are, this will throw an exception.
+	 * Retrieve a section from a configuration. If more than one section is registered with this
+	 * name, or if none are, this will throw an exception.
 	 * 
 	 * @param sectionName
 	 *            The name of the section to retrieve.
 	 * @return The object, parsed by the registered handler.
 	 * @throws ConfigurationException
-	 *             if no sections with this name exist, or if more than one
-	 *             exists.
+	 *             if no sections with this name exist, or if more than one exists.
 	 */
-	synchronized public Object retrieveSection(QName sectionName)
-			throws ConfigurationException {
+	synchronized public Object retrieveSection(QName sectionName) throws ConfigurationException
+	{
 		ArrayList<Node> unparsed = _unparsedXML.get(sectionName);
 		if (unparsed != null) {
 			if (unparsed.size() > 1)
-				throw new ConfigurationException(
-						"Too many sections with name \"" + sectionName
-								+ "\" to retrieve to retrieve a singleton.");
+				throw new ConfigurationException("Too many sections with name \"" + sectionName
+					+ "\" to retrieve to retrieve a singleton.");
 
-			IXMLConfigurationSectionHandler handler = _handlers
-					.get(sectionName);
+			IXMLConfigurationSectionHandler handler = _handlers.get(sectionName);
 			if (handler == null)
-				throw new ConfigurationException("No handlers defined for \""
-						+ sectionName + "\".");
+				throw new ConfigurationException("No handlers defined for \"" + sectionName + "\".");
 
 			Object obj = handler.parse(unparsed.get(0));
 			ArrayList<Object> list = new ArrayList<Object>(1);
@@ -276,26 +259,22 @@ public class XMLConfiguration {
 		} else {
 			ArrayList<Object> list = _configurations.get(sectionName);
 			if (list == null)
-				throw new ConfigurationException(
-						"No section found with name \"" + sectionName + "\".");
+				throw new ConfigurationException("No section found with name \"" + sectionName + "\".");
 			if (list.size() > 1)
-				throw new ConfigurationException(
-						"Too many sections with name \"" + sectionName
-								+ "\" to retrieve to retrieve a singleton.");
+				throw new ConfigurationException("Too many sections with name \"" + sectionName
+					+ "\" to retrieve to retrieve a singleton.");
 
 			return list.get(0);
 		}
 	}
 
-	synchronized public ArrayList<Object> retrieveSections(QName sectionName)
-			throws ConfigurationException {
+	synchronized public ArrayList<Object> retrieveSections(QName sectionName) throws ConfigurationException
+	{
 		ArrayList<Node> unparsed = _unparsedXML.get(sectionName);
 		if (unparsed != null) {
-			IXMLConfigurationSectionHandler handler = _handlers
-					.get(sectionName);
+			IXMLConfigurationSectionHandler handler = _handlers.get(sectionName);
 			if (handler == null)
-				throw new ConfigurationException("No handlers defined for \""
-						+ sectionName + "\".");
+				throw new ConfigurationException("No handlers defined for \"" + sectionName + "\".");
 
 			ArrayList<Object> list = new ArrayList<Object>(unparsed.size());
 			_configurations.put(sectionName, list);
@@ -308,8 +287,7 @@ public class XMLConfiguration {
 		} else {
 			ArrayList<Object> ret = _configurations.get(sectionName);
 			if (ret == null)
-				throw new ConfigurationException(
-						"No section found with name \"" + sectionName + "\".");
+				throw new ConfigurationException("No section found with name \"" + sectionName + "\".");
 			return ret;
 		}
 	}

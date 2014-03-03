@@ -17,12 +17,14 @@ import edu.virginia.vcgr.genii.gjt.util.IOSource;
 import edu.virginia.vcgr.genii.gjt.util.IOUtils;
 import edu.virginia.vcgr.genii.gjt.util.OverridenIOSource;
 
-public class Filter<E extends Enum<E>> {
+public class Filter<E extends Enum<E>>
+{
 	static private Logger _logger = Logger.getLogger(Filter.class);
 
 	static private final String FILENAME_FORMAT = "%s-filter.dat";
 
-	static private String getShortName(Class<?> theClass) {
+	static private String getShortName(Class<?> theClass)
+	{
 		String className = theClass.getName();
 		int lastIndex = className.lastIndexOf('.');
 		if (lastIndex >= 0)
@@ -31,29 +33,25 @@ public class Filter<E extends Enum<E>> {
 		return className;
 	}
 
-	private void addFilterElement(Class<E> filterClass, EnumSet<E> filterSet,
-			String line, int lineno) {
+	private void addFilterElement(Class<E> filterClass, EnumSet<E> filterSet, String line, int lineno)
+	{
 		try {
 			E enumeration = Enum.valueOf(filterClass, line);
 			filterSet.add(enumeration);
 		} catch (IllegalArgumentException iae) {
-			_logger.error(
-					String.format(
-							"The name %s at line %d does not exist in the enumeration.",
-							line, lineno), iae);
+			_logger.error(String.format("The name %s at line %d does not exist in the enumeration.", line, lineno), iae);
 		}
 	}
 
 	private Set<E> _filterSet;
 
-	Filter(File configurationDirectory, Class<E> filterClass)
-			throws IOException {
+	Filter(File configurationDirectory, Class<E> filterClass) throws IOException
+	{
 		int lineno = 0;
 		EnumSet<E> filterSet;
-		String filename = String.format(FILENAME_FORMAT,
-				getShortName(filterClass));
-		IOSource source = new OverridenIOSource(new FileIOSource(new File(
-				configurationDirectory, filename)), new ClassRelativeIOSource(
+		String filename = String.format(FILENAME_FORMAT, getShortName(filterClass));
+		IOSource source =
+			new OverridenIOSource(new FileIOSource(new File(configurationDirectory, filename)), new ClassRelativeIOSource(
 				Filter.class, filename));
 		String line;
 
@@ -80,7 +78,8 @@ public class Filter<E extends Enum<E>> {
 		_filterSet = filterSet;
 	}
 
-	final public boolean contains(E value) {
+	final public boolean contains(E value)
+	{
 		return _filterSet.contains(value);
 	}
 }

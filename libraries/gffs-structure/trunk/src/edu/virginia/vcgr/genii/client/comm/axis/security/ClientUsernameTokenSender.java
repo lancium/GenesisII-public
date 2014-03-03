@@ -36,13 +36,12 @@ import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 /**
- * Client-side UsernameToken message-level security handler for outgoing
- * (request) messages.
+ * Client-side UsernameToken message-level security handler for outgoing (request) messages.
  * 
  * @author dgm4d
  */
-public class ClientUsernameTokenSender extends WSDoAllSender implements
-		ISecuritySendHandler {
+public class ClientUsernameTokenSender extends WSDoAllSender implements ISecuritySendHandler
+{
 	static final long serialVersionUID = 0L;
 
 	public static final String CRYPTO_ALIAS = "CRYPTO_ALIAS";
@@ -52,47 +51,43 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements
 	private boolean _serialize = false;
 	private String _securityActions = "";
 
-	public ClientUsernameTokenSender() {
+	public ClientUsernameTokenSender()
+	{
 	}
 
 	/**
-	 * Indicates that this handler is the final handler and should serialize the
-	 * message context
+	 * Indicates that this handler is the final handler and should serialize the message context
 	 */
-	public void setToSerialize() {
+	public void setToSerialize()
+	{
 		_serialize = true;
 	}
 
 	/**
-	 * Configures the Send handler. Returns whether or not this handler is to
-	 * perform any actions
+	 * Configures the Send handler. Returns whether or not this handler is to perform any actions
 	 */
-	public boolean configure(ICallingContext callContext,
-			MessageSecurity msgSecData) throws GeneralSecurityException {
+	public boolean configure(ICallingContext callContext, MessageSecurity msgSecData) throws GeneralSecurityException
+	{
 		_utIdentity = null;
 
 		// get credentials from calling context
-		ArrayList<NuCredential> credentials = TransientCredentials
-				.getTransientCredentials(callContext).getCredentials();
+		ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
 
 		for (NuCredential cred : credentials) {
 			if (cred instanceof UsernamePasswordIdentity) {
 				if (_utIdentity != null) {
-					throw new GeneralSecurityException(
-							"Cannot have more than one username-token credential");
+					throw new GeneralSecurityException("Cannot have more than one username-token credential");
 				}
 				_utIdentity = (UsernamePasswordIdentity) cred;
 			}
 		}
 
 		if (_utIdentity == null) {
-			_securityActions = _securityActions + " "
-					+ WSHandlerConstants.NO_SECURITY;
+			_securityActions = _securityActions + " " + WSHandlerConstants.NO_SECURITY;
 			return false;
 		}
 
-		_securityActions = _securityActions + " "
-				+ WSHandlerConstants.USERNAME_TOKEN;
+		_securityActions = _securityActions + " " + WSHandlerConstants.USERNAME_TOKEN;
 		// _securityActions = _securityActions + " " +
 		// WSHandlerConstants.TIMESTAMP;
 
@@ -101,29 +96,27 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements
 		return true;
 	}
 
-	public void invoke(MessageContext msgContext) throws AxisFault {
+	public void invoke(MessageContext msgContext) throws AxisFault
+	{
 
 		if (!_serialize) {
 			// don't let this handler serialize just yet: there may be more
-			_securityActions = _securityActions + " "
-					+ WSHandlerConstants.NO_SERIALIZATION;
+			_securityActions = _securityActions + " " + WSHandlerConstants.NO_SERIALIZATION;
 		}
 
 		_securityActions = _securityActions.trim();
 		setOption(WSHandlerConstants.ACTION, _securityActions);
-		setOption(WSHandlerConstants.PW_CALLBACK_CLASS,
-				ClientUsernameTokenSender.ClientPWCallback.class.getName());
+		setOption(WSHandlerConstants.PW_CALLBACK_CLASS, ClientUsernameTokenSender.ClientPWCallback.class.getName());
 
 		super.invoke(msgContext);
 	}
 
-	public WSPasswordCallback getPassword(String username, int doAction,
-			String clsProp, String refProp, RequestData reqData)
-			throws WSSecurityException {
+	public WSPasswordCallback getPassword(String username, int doAction, String clsProp, String refProp, RequestData reqData)
+		throws WSSecurityException
+	{
 
 		if ((doAction == WSConstants.UT) && (_utIdentity != null)) {
-			WSPasswordCallback pwCb = new WSPasswordCallback(username,
-					WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
+			WSPasswordCallback pwCb = new WSPasswordCallback(username, WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
 			pwCb.setPassword(_utIdentity.getPassword());
 
 			return pwCb;
@@ -132,7 +125,8 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements
 		return super.getPassword(username, doAction, clsProp, refProp, reqData);
 	}
 
-	public static class ClientPWCallback implements CallbackHandler {
+	public static class ClientPWCallback implements CallbackHandler
+	{
 
 		/**
 		 * 
@@ -140,24 +134,22 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements
 		 * 
 		 */
 
-		public void handle(Callback[] callbacks) throws IOException,
-				UnsupportedCallbackException {
+		public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException
+		{
 			for (int i = 0; i < callbacks.length; i++) {
 				if (callbacks[i] instanceof WSPasswordCallback) {
 					WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
 					switch (pc.getUsage()) {
-					case WSPasswordCallback.DECRYPT:
-					case WSPasswordCallback.SIGNATURE:
-						pc.setPassword(CRYTO_PASS);
-						break;
-					default:
-						throw new UnsupportedCallbackException(callbacks[i],
-								"Unrecognized Callback");
+						case WSPasswordCallback.DECRYPT:
+						case WSPasswordCallback.SIGNATURE:
+							pc.setPassword(CRYTO_PASS);
+							break;
+						default:
+							throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
 					}
 
 				} else {
-					throw new UnsupportedCallbackException(callbacks[i],
-							"Unrecognized Callback");
+					throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
 				}
 
 			}

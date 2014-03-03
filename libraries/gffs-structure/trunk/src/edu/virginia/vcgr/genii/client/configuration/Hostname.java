@@ -32,8 +32,10 @@ import org.morgan.util.configuration.XMLConfiguration;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 
-public class Hostname {
-	static private final String _EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY = "edu.virginia.vcgr.genii.container.external-hostname-override";
+public class Hostname
+{
+	static private final String _EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY =
+		"edu.virginia.vcgr.genii.container.external-hostname-override";
 	static private final String _EPR_ADDRESSING_MODE_PROPERTY = "edu.virginia.vcgr.genii.container.epr-addressing-mode";
 	static private final String _EPR_ADDRESSING_MODE_DEFAULT_VALUE = "auto";
 
@@ -42,15 +44,14 @@ public class Hostname {
 	private InetAddress _address = null;
 	private String _externalName;
 
-	static private String getGlobalProperty(String propertyName) {
+	static private String getGlobalProperty(String propertyName)
+	{
 		try {
-			XMLConfiguration conf = ConfigurationManager
-					.getCurrentConfiguration().getRoleSpecificConfiguration();
+			XMLConfiguration conf = ConfigurationManager.getCurrentConfiguration().getRoleSpecificConfiguration();
 			if (conf == null)
 				return null;
 
-			Properties props = (Properties) conf
-					.retrieveSection(GenesisIIConstants.GLOBAL_PROPERTY_SECTION_NAME);
+			Properties props = (Properties) conf.retrieveSection(GenesisIIConstants.GLOBAL_PROPERTY_SECTION_NAME);
 
 			return props.getProperty(propertyName);
 		} catch (ConfigurationException ce) {
@@ -60,9 +61,9 @@ public class Hostname {
 		}
 	}
 
-	static private String getHostnameOverride() {
-		String toReturn = InstallationProperties.getInstallationProperties()
-				.getProperty(_EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
+	static private String getHostnameOverride()
+	{
+		String toReturn = InstallationProperties.getInstallationProperties().getProperty(_EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
 		if (toReturn == null)
 			toReturn = getGlobalProperty(_EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
 		// consider a blank name to be a non-established one.
@@ -71,11 +72,13 @@ public class Hostname {
 		return toReturn;
 	}
 
-	static private String getEPRAddressingMode() {
+	static private String getEPRAddressingMode()
+	{
 		return getGlobalProperty(_EPR_ADDRESSING_MODE_PROPERTY);
 	}
 
-	static private InetAddress getMostGlobal(InetAddress[] addrs) {
+	static private InetAddress getMostGlobal(InetAddress[] addrs)
+	{
 		InetAddress[] ret = new InetAddress[5];
 		for (int lcv = 0; lcv < ret.length; lcv++)
 			ret[lcv] = null;
@@ -85,9 +88,7 @@ public class Hostname {
 
 			if (addr instanceof Inet6Address) {
 				if (_logger.isDebugEnabled())
-					_logger.debug(String
-							.format("Skipping address \"%s\" because it's an IPv6 address.",
-									addr));
+					_logger.debug(String.format("Skipping address \"%s\" because it's an IPv6 address.", addr));
 				continue;
 			}
 
@@ -113,7 +114,8 @@ public class Hostname {
 		return null;
 	}
 
-	static private String formString(InetAddress addr) {
+	static private String formString(InetAddress addr)
+	{
 		String mode = getEPRAddressingMode();
 		if (mode == null)
 			mode = _EPR_ADDRESSING_MODE_DEFAULT_VALUE;
@@ -133,10 +135,10 @@ public class Hostname {
 		return addr.getHostAddress();
 	}
 
-	static public InetAddress getMostGlobal() throws SocketException {
+	static public InetAddress getMostGlobal() throws SocketException
+	{
 		ArrayList<InetAddress> tmp = new ArrayList<InetAddress>();
-		Enumeration<NetworkInterface> interfaces = NetworkInterface
-				.getNetworkInterfaces();
+		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 
 		while (interfaces.hasMoreElements()) {
 			NetworkInterface iface = interfaces.nextElement();
@@ -151,8 +153,8 @@ public class Hostname {
 		return getMostGlobal(addrs);
 	}
 
-	private Hostname(String givenAddress) throws UnknownHostException,
-			SocketException {
+	private Hostname(String givenAddress) throws UnknownHostException, SocketException
+	{
 		InetAddress[] addrs = InetAddress.getAllByName(givenAddress);
 		InetAddress addr = getMostGlobal(addrs);
 		if (addr == null)
@@ -171,7 +173,8 @@ public class Hostname {
 		}
 	}
 
-	private Hostname() throws SocketException {
+	private Hostname() throws SocketException
+	{
 		_externalName = getHostnameOverride();
 		if (_externalName != null)
 			return;
@@ -180,11 +183,13 @@ public class Hostname {
 		_externalName = formString(_address);
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		return _externalName;
 	}
 
-	public String toShortString() {
+	public String toShortString()
+	{
 		String ret = toString();
 
 		int index = ret.indexOf('.');
@@ -194,7 +199,8 @@ public class Hostname {
 		return ret;
 	}
 
-	synchronized public InetAddress getAddress() throws UnknownHostException {
+	synchronized public InetAddress getAddress() throws UnknownHostException
+	{
 		if (_address == null)
 			_address = InetAddress.getByName(_externalName);
 
@@ -203,7 +209,8 @@ public class Hostname {
 
 	static private Hostname _localHost = null;
 
-	synchronized static public Hostname getLocalHostname() {
+	synchronized static public Hostname getLocalHostname()
+	{
 		try {
 			if (_localHost == null)
 				_localHost = new Hostname();
@@ -215,8 +222,8 @@ public class Hostname {
 		}
 	}
 
-	static public Hostname lookupHostname(String givenHostname)
-			throws UnknownHostException {
+	static public Hostname lookupHostname(String givenHostname) throws UnknownHostException
+	{
 		try {
 			return new Hostname(givenHostname);
 		} catch (SocketException se) {
@@ -224,16 +231,15 @@ public class Hostname {
 		}
 	}
 
-	static private Pattern _URL_PATTERN = Pattern
-			.compile("([^:]+):\\/\\/([^:\\/]+)(.*)");
+	static private Pattern _URL_PATTERN = Pattern.compile("([^:]+):\\/\\/([^:\\/]+)(.*)");
 
-	static public String normalizeURL(String url) throws UnknownHostException {
+	static public String normalizeURL(String url) throws UnknownHostException
+	{
 		Matcher urlMatcher = _URL_PATTERN.matcher(url);
 		if (!urlMatcher.matches()) {
 			/*
-			 * This doesn't allow for URI's in the name throw new
-			 * IllegalArgumentException( "url \"" + url +
-			 * "\" does not appear valid.");
+			 * This doesn't allow for URI's in the name throw new IllegalArgumentException( "url \""
+			 * + url + "\" does not appear valid.");
 			 */
 			return url;
 		}

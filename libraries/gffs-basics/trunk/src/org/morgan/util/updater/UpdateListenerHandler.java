@@ -21,25 +21,30 @@ import org.morgan.util.Version;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-class UpdateListenerHandler {
+class UpdateListenerHandler
+{
 	private ArrayList<IUpdateListener> _listeners = new ArrayList<IUpdateListener>();
 
-	protected UpdateListenerHandler() {
+	protected UpdateListenerHandler()
+	{
 	}
 
-	public void addUpdateListener(IUpdateListener listener) {
+	public void addUpdateListener(IUpdateListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	public void removeUpdateListener(IUpdateListener listener) {
+	public void removeUpdateListener(IUpdateListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	private IUpdateListener[] getListeners() {
+	private IUpdateListener[] getListeners()
+	{
 		IUpdateListener[] listeners;
 
 		synchronized (_listeners) {
@@ -50,50 +55,56 @@ class UpdateListenerHandler {
 		return listeners;
 	}
 
-	protected void fireExceptionOccurred(String msg, IOException ioe) {
+	protected void fireExceptionOccurred(String msg, IOException ioe)
+	{
 		IUpdateListener[] listeners = getListeners();
 		for (IUpdateListener listener : listeners) {
 			listener.exceptionOccurred(msg, ioe);
 		}
 	}
 
-	protected void fireStartingUpdate(int filesToUpdate) {
+	protected void fireStartingUpdate(int filesToUpdate)
+	{
 		IUpdateListener[] listeners = getListeners();
 		for (IUpdateListener listener : listeners) {
 			listener.startingUpdate(filesToUpdate);
 		}
 	}
 
-	protected void fireFinishedUpdate() {
+	protected void fireFinishedUpdate()
+	{
 		IUpdateListener[] listeners = getListeners();
 		for (IUpdateListener listener : listeners) {
 			listener.finishedUpdate();
 		}
 	}
 
-	protected void fireStartingFileUpdate(String fileName, Version oldVersion,
-			Version newVersion) {
+	protected void fireStartingFileUpdate(String fileName, Version oldVersion, Version newVersion)
+	{
 		IUpdateListener[] listeners = getListeners();
 		for (IUpdateListener listener : listeners) {
 			listener.startingFileUpdate(fileName, oldVersion, newVersion);
 		}
 	}
 
-	protected void fireFinishedFileUpdate(String fileName) {
+	protected void fireFinishedFileUpdate(String fileName)
+	{
 		IUpdateListener[] listeners = getListeners();
 		for (IUpdateListener listener : listeners) {
 			listener.finishedFileUpdate(fileName);
 		}
 	}
 
-	protected void fireStartingCommit() {
+	protected void fireStartingCommit()
+	{
 		IUpdateListener[] listeners = getListeners();
 		for (IUpdateListener listener : listeners) {
 			listener.startingCommit();
 		}
 	}
 
-	protected void fireFinishedCommit() {
+	protected void fireFinishedCommit()
+	{
 		IUpdateListener[] listeners = getListeners();
 		for (IUpdateListener listener : listeners) {
 			listener.finishedCommit();

@@ -12,23 +12,17 @@ import edu.virginia.vcgr.genii.client.bes.BESPolicyActions;
 import edu.virginia.vcgr.genii.client.machine.MachineFacetUpdater;
 import edu.virginia.vcgr.genii.client.machine.MachineListener;
 
-public class BESPolicyEnactor implements Closeable {
+public class BESPolicyEnactor implements Closeable
+{
 	static private Log _logger = LogFactory.getLog(BESPolicyEnactor.class);
 
-	static private final long USER_LOGIN_CHECK_FREQUENCY = 1000 * 30; /*
-																	 * 30
-																	 * seconds
-																	 */
-	static private final long SCREENSAVER_INACTIVE_CHECK_FREQUENCY = 1000 * 30; /*
-																				 * 30
-																				 * seconds
-																				 */
+	static private final long USER_LOGIN_CHECK_FREQUENCY = 1000 * 30; /* 30 seconds */
+	static private final long SCREENSAVER_INACTIVE_CHECK_FREQUENCY = 1000 * 30; /* 30 seconds */
 
 	static private MachineFacetUpdater _updater;
 
 	static {
-		_updater = new MachineFacetUpdater(USER_LOGIN_CHECK_FREQUENCY,
-				SCREENSAVER_INACTIVE_CHECK_FREQUENCY);
+		_updater = new MachineFacetUpdater(USER_LOGIN_CHECK_FREQUENCY, SCREENSAVER_INACTIVE_CHECK_FREQUENCY);
 		_updater.start();
 	}
 
@@ -39,32 +33,36 @@ public class BESPolicyEnactor implements Closeable {
 	private BESPolicyMachineListener _machineListener = null;
 	private Collection<BESPolicyListener> _listeners = new ArrayList<BESPolicyListener>();
 
-	public BESPolicyEnactor(BESPolicy policy) {
+	public BESPolicyEnactor(BESPolicy policy)
+	{
 		_policy = policy;
 		_machineListener = new BESPolicyMachineListener();
-		_lastAction = _policy.getCurrentAction(_lastUserLoggedInStatus,
-				_lastScreenSaverActiveStatus);
+		_lastAction = _policy.getCurrentAction(_lastUserLoggedInStatus, _lastScreenSaverActiveStatus);
 
 		_updater.addMachineListener(_machineListener);
 	}
 
-	protected void finalize() {
+	protected void finalize()
+	{
 		close();
 	}
 
-	synchronized public void close() {
+	synchronized public void close()
+	{
 		if (_machineListener != null)
 			_updater.removeMachineListener(_machineListener);
 
 		_machineListener = null;
 	}
 
-	public void setPolicy(BESPolicy policy) {
+	public void setPolicy(BESPolicy policy)
+	{
 		_policy = policy;
 		updateAction();
 	}
 
-	public void addBESPolicyListener(BESPolicyListener listener) {
+	public void addBESPolicyListener(BESPolicyListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
@@ -72,14 +70,15 @@ public class BESPolicyEnactor implements Closeable {
 		fireNewAction(listener, _lastAction);
 	}
 
-	public void removeBESPolicyListener(BESPolicyListener listener) {
+	public void removeBESPolicyListener(BESPolicyListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	private void fireNewAction(BESPolicyListener listener,
-			BESPolicyActions action) {
+	private void fireNewAction(BESPolicyListener listener, BESPolicyActions action)
+	{
 		try {
 			if (action.equals(BESPolicyActions.NOACTION))
 				listener.resume();
@@ -94,7 +93,8 @@ public class BESPolicyEnactor implements Closeable {
 		}
 	}
 
-	private void fireNewAction(BESPolicyActions action) {
+	private void fireNewAction(BESPolicyActions action)
+	{
 		Collection<BESPolicyListener> listeners;
 
 		synchronized (_listeners) {
@@ -106,28 +106,32 @@ public class BESPolicyEnactor implements Closeable {
 		}
 	}
 
-	private void updateAction() {
-		BESPolicyActions newAction = _policy.getCurrentAction(
-				_lastUserLoggedInStatus, _lastScreenSaverActiveStatus);
+	private void updateAction()
+	{
+		BESPolicyActions newAction = _policy.getCurrentAction(_lastUserLoggedInStatus, _lastScreenSaverActiveStatus);
 		if (!newAction.equals(_lastAction)) {
 			_lastAction = newAction;
 			fireNewAction(newAction);
 		}
 	}
 
-	synchronized BESPolicyActions getCurrentAction() {
+	synchronized BESPolicyActions getCurrentAction()
+	{
 		return _lastAction;
 	}
 
-	private class BESPolicyMachineListener implements MachineListener {
+	private class BESPolicyMachineListener implements MachineListener
+	{
 		@Override
-		public void screenSaverActivated(boolean activated) {
+		public void screenSaverActivated(boolean activated)
+		{
 			_lastScreenSaverActiveStatus = new Boolean(activated);
 			updateAction();
 		}
 
 		@Override
-		public void userLoggedIn(boolean loggedIn) {
+		public void userLoggedIn(boolean loggedIn)
+		{
 			_lastUserLoggedInStatus = new Boolean(loggedIn);
 			updateAction();
 		}

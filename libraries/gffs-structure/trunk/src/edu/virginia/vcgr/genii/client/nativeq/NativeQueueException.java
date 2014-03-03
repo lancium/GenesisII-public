@@ -1,13 +1,16 @@
 package edu.virginia.vcgr.genii.client.nativeq;
 
-public class NativeQueueException extends Exception {
+public class NativeQueueException extends Exception
+{
 	static final long serialVersionUID = 0L;
 
-	public NativeQueueException(String msg) {
+	public NativeQueueException(String msg)
+	{
 		super(msg);
 	}
 
-	public NativeQueueException(String msg, Throwable cause) {
+	public NativeQueueException(String msg, Throwable cause)
+	{
 		super(msg, cause);
 	}
 }

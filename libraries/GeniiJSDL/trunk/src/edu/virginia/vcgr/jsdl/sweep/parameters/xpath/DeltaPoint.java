@@ -22,40 +22,49 @@ import java.util.Comparator;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-class DeltaPoint implements Cloneable {
+class DeltaPoint implements Cloneable
+{
 	private int _start;
 	private int _delta;
 
-	DeltaPoint(int start, int delta) {
+	DeltaPoint(int start, int delta)
+	{
 		_start = start;
 		_delta = delta;
 	}
 
-	final int start() {
+	final int start()
+	{
 		return _start;
 	}
 
-	final int delta() {
+	final int delta()
+	{
 		return _delta;
 	}
 
-	final void shift(int delta) {
+	final void shift(int delta)
+	{
 		_start += delta;
 	}
 
 	@Override
-	final public Object clone() {
+	final public Object clone()
+	{
 		return new DeltaPoint(_start, _delta);
 	}
 
 	@Override
-	final public String toString() {
+	final public String toString()
+	{
 		return String.format("%d%+d", _start, _delta);
 	}
 
-	static Comparator<DeltaPoint> ORDER_COMPARATOR = new Comparator<DeltaPoint>() {
+	static Comparator<DeltaPoint> ORDER_COMPARATOR = new Comparator<DeltaPoint>()
+	{
 		@Override
-		final public int compare(DeltaPoint o1, DeltaPoint o2) {
+		final public int compare(DeltaPoint o1, DeltaPoint o2)
+		{
 			return o1._start - o2._start;
 		}
 	};

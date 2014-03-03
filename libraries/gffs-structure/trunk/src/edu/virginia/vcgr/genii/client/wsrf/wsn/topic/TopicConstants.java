@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.wsrf.wsn.topic;
 
-public interface TopicConstants {
+public interface TopicConstants
+{
 	static final public String TOPIC_NS = "http://docs.oasis-open.org/wsn/t-1";
 
 	static final public String SIMPLE_DIALECT_URI = "http://docs.oasis-open.org/wsn/t-1/TopicExpression/Simple";

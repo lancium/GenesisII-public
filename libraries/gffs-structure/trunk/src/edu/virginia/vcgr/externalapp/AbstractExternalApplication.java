@@ -8,25 +8,24 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 
-public abstract class AbstractExternalApplication implements
-		ExternalApplication {
-	static private Log _logger = LogFactory
-			.getLog(AbstractExternalApplication.class);
+public abstract class AbstractExternalApplication implements ExternalApplication
+{
+	static private Log _logger = LogFactory.getLog(AbstractExternalApplication.class);
 
 	protected abstract void doRun(File content) throws Throwable;
 
-	protected AbstractExternalApplication() {
+	protected AbstractExternalApplication()
+	{
 	}
 
-	protected File launch(File content) throws Throwable {
+	protected File launch(File content) throws Throwable
+	{
 		if (content.exists()) {
 			if (!content.canRead())
-				throw new IOException(String.format(
-						"Unable to read file \"%s\".", content));
+				throw new IOException(String.format("Unable to read file \"%s\".", content));
 
 			if (!content.canWrite())
-				throw new IOException(String.format(
-						"Unable to modify file \"%s\".", content));
+				throw new IOException(String.format("Unable to modify file \"%s\".", content));
 		}
 
 		long lastModified = content.lastModified();
@@ -38,8 +37,8 @@ public abstract class AbstractExternalApplication implements
 	}
 
 	@Override
-	public ExternalApplicationToken launch(File content,
-			ExternalApplicationCallback... callbacks) {
+	public ExternalApplicationToken launch(File content, ExternalApplicationCallback... callbacks)
+	{
 		Launchable token = new Launchable(content, callbacks);
 		Thread th = new Thread(token, "Abstract External Application Runner");
 		th.setDaemon(false);
@@ -47,30 +46,30 @@ public abstract class AbstractExternalApplication implements
 		return token;
 	}
 
-	private class Launchable implements Runnable, ExternalApplicationToken {
+	private class Launchable implements Runnable, ExternalApplicationToken
+	{
 		private File _fileContent;
 		private ExternalApplicationCallback[] _callbacks;
 		volatile private boolean _done = false;
 		private Object _lockObject = new Object();
 		private Throwable _exception = null;
 
-		private Launchable(File fileContent,
-				ExternalApplicationCallback[] callbacks) {
+		private Launchable(File fileContent, ExternalApplicationCallback[] callbacks)
+		{
 			_fileContent = fileContent;
 			_callbacks = callbacks;
 		}
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			try {
 				_fileContent = launch(_fileContent);
 				for (ExternalApplicationCallback callback : _callbacks) {
 					try {
 						callback.externalApplicationExited(_fileContent);
 					} catch (Throwable cause) {
-						_logger.warn(
-								"Error calling callback for external application.",
-								cause);
+						_logger.warn("Error calling callback for external application.", cause);
 					}
 				}
 			} catch (Throwable cause) {
@@ -79,9 +78,7 @@ public abstract class AbstractExternalApplication implements
 					try {
 						callback.externalApplicationFailed(cause);
 					} catch (Throwable cause2) {
-						_logger.warn(
-								"Error calling callback for external application.",
-								cause2);
+						_logger.warn("Error calling callback for external application.", cause2);
 					}
 				}
 			} finally {
@@ -93,7 +90,8 @@ public abstract class AbstractExternalApplication implements
 		}
 
 		@Override
-		public File getResult() throws ToolException {
+		public File getResult() throws ToolException
+		{
 			synchronized (_lockObject) {
 				while (!_done) {
 					try {
@@ -105,8 +103,7 @@ public abstract class AbstractExternalApplication implements
 			}
 
 			if (_exception != null)
-				throw new ToolException(_exception.getLocalizedMessage(),
-						_exception);
+				throw new ToolException(_exception.getLocalizedMessage(), _exception);
 
 			return _fileContent;
 		}

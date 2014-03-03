@@ -22,6 +22,7 @@ import edu.virginia.vcgr.jsdl.sweep.SweepException;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface SweepTarget {
+public interface SweepTarget
+{
 	public void replace(Object value) throws SweepException;
 }

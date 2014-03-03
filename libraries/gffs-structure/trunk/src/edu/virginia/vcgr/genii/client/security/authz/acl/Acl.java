@@ -10,7 +10,8 @@ import edu.virginia.vcgr.genii.security.acl.AclEntry;
 /**
  * compatibility class that can read from old db blobs.
  */
-public class Acl implements Serializable {
+public class Acl implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	public boolean requireEncryption = false;
@@ -18,7 +19,8 @@ public class Acl implements Serializable {
 	public List<AclEntry> writeAcl = new ArrayList<AclEntry>();
 	public List<AclEntry> executeAcl = new ArrayList<AclEntry>();
 
-	private Object readResolve() throws ObjectStreamException {
+	private Object readResolve() throws ObjectStreamException
+	{
 		edu.virginia.vcgr.genii.security.acl.Acl toReturn = new edu.virginia.vcgr.genii.security.acl.Acl();
 		toReturn.readAcl = readAcl;
 		toReturn.writeAcl = writeAcl;
@@ -26,7 +28,8 @@ public class Acl implements Serializable {
 		return toReturn;
 	}
 
-	private Object writeReplace() throws ObjectStreamException {
+	private Object writeReplace() throws ObjectStreamException
+	{
 		return readResolve();
 	}
 }

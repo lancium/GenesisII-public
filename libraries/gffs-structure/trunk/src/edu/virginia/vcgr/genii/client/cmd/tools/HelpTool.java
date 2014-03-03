@@ -16,7 +16,8 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class HelpTool extends BaseGridTool {
+public class HelpTool extends BaseGridTool
+{
 	static private final String _DESCRIPTION = "config/tooldocs/description/dhelp";
 	static private final String _USAGE = "config/tooldocs/usage/uhelp";
 	static final private String _MANPAGE = "config/tooldocs/man/help";
@@ -24,20 +25,21 @@ public class HelpTool extends BaseGridTool {
 	private Map<String, ToolDescription> _tools;
 	private boolean _verbose = false;
 
-	public HelpTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				true, ToolCategory.GENERAL);
+	public HelpTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), true, ToolCategory.GENERAL);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "verbose", "v" })
-	public void setVerbose() {
+	public void setVerbose()
+	{
 		_verbose = true;
 	}
 
-	public int runCommand() throws Throwable {
-		_tools = CommandLineRunner.getToolList(ConfigurationManager
-				.getCurrentConfiguration().getClientConfiguration());
+	public int runCommand() throws Throwable
+	{
+		_tools = CommandLineRunner.getToolList(ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
 
 		List<String> arguments = getArguments();
 		if (arguments.size() == 0) {
@@ -71,14 +73,15 @@ public class HelpTool extends BaseGridTool {
 		return 0;
 	}
 
-	protected static void printHelp(ToolDescription description, PrintWriter out)
-			throws ToolException {
+	protected static void printHelp(ToolDescription description, PrintWriter out) throws ToolException
+	{
 		out.println(description.getToolDescription());
 		out.println();
 		out.println(description.getUsage());
 	}
 
-	private void printCategory(ToolCategory cat) throws Throwable {
+	private void printCategory(ToolCategory cat) throws Throwable
+	{
 		if (!cat.isHidden()) {
 			SortedSet<String> toolNames = new TreeSet<String>();
 
@@ -97,7 +100,8 @@ public class HelpTool extends BaseGridTool {
 
 	}
 
-	private void printTools(Iterable<String> toolNames) throws Throwable {
+	private void printTools(Iterable<String> toolNames) throws Throwable
+	{
 		for (String tool : toolNames) {
 			ToolDescription description = _tools.get(tool);
 			if (description != null && !description.isHidden())
@@ -107,7 +111,8 @@ public class HelpTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if ((getArguments().size() > 1) || (getArguments().size() < 0)) {
 			throw new InvalidToolUsageException();
 		}

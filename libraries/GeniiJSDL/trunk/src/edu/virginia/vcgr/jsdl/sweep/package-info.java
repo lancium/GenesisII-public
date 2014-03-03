@@ -15,7 +15,8 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-@XmlSchema(namespace = SweepConstants.SWEEP_NS, xmlns = { @XmlNs(prefix = "jsdl-sweep", namespaceURI = SweepConstants.SWEEP_NS) })
+@XmlSchema(namespace = SweepConstants.SWEEP_NS,
+	xmlns = { @XmlNs(prefix = "jsdl-sweep", namespaceURI = SweepConstants.SWEEP_NS) })
 package edu.virginia.vcgr.jsdl.sweep;
 
 import javax.xml.bind.annotation.XmlSchema;

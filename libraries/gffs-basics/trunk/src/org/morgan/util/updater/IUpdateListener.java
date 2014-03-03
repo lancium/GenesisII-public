@@ -20,15 +20,15 @@ import org.morgan.util.Version;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public interface IUpdateListener {
+public interface IUpdateListener
+{
 	public void exceptionOccurred(String msg, IOException ioe);
 
 	public void startingUpdate(int filesToUpdate);
 
 	public void finishedUpdate();
 
-	public void startingFileUpdate(String fileName, Version oldVersion,
-			Version newVersion);
+	public void startingFileUpdate(String fileName, Version oldVersion, Version newVersion);
 
 	public void finishedFileUpdate(String fileName);
 

@@ -10,25 +10,30 @@ import java.util.Vector;
 
 import org.morgan.utils.io.IOUtils;
 
-public class ContextDescription {
+public class ContextDescription
+{
 	private Map<String, Collection<Serializable>> _properties;
 	private Map<String, Serializable> _transientProperties;
 
-	public ContextDescription() {
+	public ContextDescription()
+	{
 		_properties = new HashMap<String, Collection<Serializable>>();
 		_transientProperties = new HashMap<String, Serializable>();
 	}
 
-	void setProperty(String propertyName, Collection<Serializable> values) {
+	void setProperty(String propertyName, Collection<Serializable> values)
+	{
 		_properties.put(propertyName, new Vector<Serializable>(values));
 	}
 
-	void setTransientProperty(String propertyName, Serializable value) {
+	void setTransientProperty(String propertyName, Serializable value)
+	{
 		_transientProperties.put(propertyName, value);
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		StringWriter writer = new StringWriter();
 		PrintWriter pw = new PrintWriter(writer);
 
@@ -38,8 +43,7 @@ public class ContextDescription {
 
 		pw.println("Transient Properties:");
 		for (String property : _transientProperties.keySet())
-			pw.format("\t%s => %s\n", property,
-					_transientProperties.get(property));
+			pw.format("\t%s => %s\n", property, _transientProperties.get(property));
 
 		pw.close();
 		IOUtils.close(writer);

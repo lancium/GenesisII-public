@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.ui.shell;
 
-public interface BindingActionListener {
+public interface BindingActionListener
+{
 	public void beep();
 
 	public void clear();

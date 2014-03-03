@@ -3,13 +3,14 @@ package edu.virginia.vcgr.genii.client.utils.file;
 import java.io.File;
 import java.io.FileFilter;
 
-public class ExtensionFileFilter implements FileFilter {
+public class ExtensionFileFilter implements FileFilter
+{
 	private String _extension;
 
-	public ExtensionFileFilter(String extension) {
+	public ExtensionFileFilter(String extension)
+	{
 		if (extension == null)
-			throw new IllegalArgumentException(
-					"Extension string cannot be null.");
+			throw new IllegalArgumentException("Extension string cannot be null.");
 
 		int index = extension.lastIndexOf('.');
 		if (index >= 0)
@@ -19,11 +20,11 @@ public class ExtensionFileFilter implements FileFilter {
 	}
 
 	@Override
-	final public boolean accept(File pathname) {
+	final public boolean accept(File pathname)
+	{
 		return pathname.getName().endsWith(_extension);
 	}
 
 	static public ExtensionFileFilter XML = new ExtensionFileFilter("xml");
-	static public ExtensionFileFilter PROPERTIES = new ExtensionFileFilter(
-			"properties");
+	static public ExtensionFileFilter PROPERTIES = new ExtensionFileFilter("properties");
 }

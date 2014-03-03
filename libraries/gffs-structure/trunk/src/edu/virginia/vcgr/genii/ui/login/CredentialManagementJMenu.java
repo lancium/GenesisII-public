@@ -6,25 +6,28 @@ import javax.swing.JMenu;
 
 import edu.virginia.vcgr.genii.ui.UIContext;
 
-public class CredentialManagementJMenu extends JMenu {
+public class CredentialManagementJMenu extends JMenu
+{
 	static final long serialVersionUID = 0L;
 
-	static private class CredentialManagementActionImpl extends
-			CredentialManagementAction {
+	static private class CredentialManagementActionImpl extends CredentialManagementAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private CredentialManagementActionImpl(
-				CredentialManagementContext context) {
+		private CredentialManagementActionImpl(CredentialManagementContext context)
+		{
 			super(context);
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent event) {
+		final public void actionPerformed(ActionEvent event)
+		{
 			// Nothing to do.
 		}
 	}
 
-	CredentialManagementJMenu(CredentialManagementContext context) {
+	CredentialManagementJMenu(CredentialManagementContext context)
+	{
 		super(new CredentialManagementActionImpl(context));
 
 		add(context.loginAction());
@@ -32,7 +35,8 @@ public class CredentialManagementJMenu extends JMenu {
 		add(context.logoutAllAction());
 	}
 
-	public CredentialManagementJMenu(UIContext context) {
+	public CredentialManagementJMenu(UIContext context)
+	{
 		this(new CredentialManagementContext(context));
 	}
 }

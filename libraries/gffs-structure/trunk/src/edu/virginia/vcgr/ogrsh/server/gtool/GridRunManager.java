@@ -19,7 +19,8 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.cmd.ITool;
 
-public class GridRunManager implements Closeable {
+public class GridRunManager implements Closeable
+{
 	static final private int STDIN = 0;
 	static final private int STDOUT = 1;
 	static final private int STDERR = 2;
@@ -30,13 +31,13 @@ public class GridRunManager implements Closeable {
 
 	private ITool _gridTool;
 
-	static private void readFully(ByteBuffer buffer, Selector selector,
-			Date timeoutTime) throws SocketTimeoutException, IOException {
+	static private void readFully(ByteBuffer buffer, Selector selector, Date timeoutTime) throws SocketTimeoutException,
+		IOException
+	{
 		while (buffer.hasRemaining()) {
 			long timeout = timeoutTime.getTime() - System.currentTimeMillis();
 			if (timeout <= 0)
-				throw new SocketTimeoutException(
-						"Timed out trying to read socket channel.");
+				throw new SocketTimeoutException("Timed out trying to read socket channel.");
 			if (selector.select(timeout) > 0) {
 				for (SelectionKey key : selector.selectedKeys()) {
 					SocketChannel channel = (SocketChannel) key.channel();
@@ -46,8 +47,9 @@ public class GridRunManager implements Closeable {
 		}
 	}
 
-	static private int identifyChannel(SocketChannel channel, String secretKey,
-			Date timeoutTime) throws SocketTimeoutException, IOException {
+	static private int identifyChannel(SocketChannel channel, String secretKey, Date timeoutTime)
+		throws SocketTimeoutException, IOException
+	{
 		Selector selector = Selector.open();
 		SelectionKey key = null;
 		int whichChannel;
@@ -63,8 +65,7 @@ public class GridRunManager implements Closeable {
 		whichChannelBuffer.flip();
 		whichChannel = (int) whichChannelBuffer.get();
 		if ((whichChannel < 0) || (whichChannel > 2))
-			throw new IOException(
-					"Corrupt socket channel found -- invalid channel number.");
+			throw new IOException("Corrupt socket channel found -- invalid channel number.");
 
 		readFully(keyLengthBuffer, selector, timeoutTime);
 		keyLengthBuffer.flip();
@@ -76,16 +77,16 @@ public class GridRunManager implements Closeable {
 		keyBuffer.get(data);
 		String sKey = new String(data);
 		if (!sKey.equals(secretKey))
-			throw new IOException(
-					"Corrupt socket channel found -- invalid secret key.");
+			throw new IOException("Corrupt socket channel found -- invalid secret key.");
 
 		key.cancel();
 		channel.configureBlocking(true);
 		return whichChannel;
 	}
 
-	static private SocketChannel[] connectChannels(ServerSocketChannel server,
-			String secretKey, Date timeoutTime) throws IOException {
+	static private SocketChannel[] connectChannels(ServerSocketChannel server, String secretKey, Date timeoutTime)
+		throws IOException
+	{
 		Selector selector = Selector.open();
 		SocketChannel channel = null;
 		SocketChannel[] ret = null;
@@ -98,13 +99,11 @@ public class GridRunManager implements Closeable {
 		try {
 			while (numConnected < 3) {
 				channel = null;
-				long timeLeft = timeoutTime.getTime()
-						- System.currentTimeMillis();
+				long timeLeft = timeoutTime.getTime() - System.currentTimeMillis();
 				if (selector.select(timeLeft) > 0) {
 					try {
 						channel = server.accept();
-						int whichChannel = identifyChannel(channel, secretKey,
-								timeoutTime);
+						int whichChannel = identifyChannel(channel, secretKey, timeoutTime);
 						channels[whichChannel] = channel;
 						channel = null;
 					} finally {
@@ -125,35 +124,34 @@ public class GridRunManager implements Closeable {
 		}
 	}
 
-	private void connectStreams(ServerSocketChannel server, String secretKey,
-			Date timeoutTime) throws IOException {
-		SocketChannel[] channels = connectChannels(server, secretKey,
-				timeoutTime);
+	private void connectStreams(ServerSocketChannel server, String secretKey, Date timeoutTime) throws IOException
+	{
+		SocketChannel[] channels = connectChannels(server, secretKey, timeoutTime);
 
-		Socket[] sockets = new Socket[] { channels[0].socket(),
-				channels[1].socket(), channels[2].socket() };
+		Socket[] sockets = new Socket[] { channels[0].socket(), channels[1].socket(), channels[2].socket() };
 
 		sockets[STDIN].shutdownOutput();
 		sockets[STDOUT].shutdownInput();
 		sockets[STDERR].shutdownInput();
 
-		_in = new BufferedReader(new InputStreamReader(
-				sockets[STDIN].getInputStream()));
+		_in = new BufferedReader(new InputStreamReader(sockets[STDIN].getInputStream()));
 		_out = new PrintWriter(sockets[STDOUT].getOutputStream());
 		_err = new PrintWriter(sockets[STDERR].getOutputStream(), true);
 	}
 
-	GridRunManager(ServerSocketChannel server, String secretKey, ITool tool,
-			Date timeoutTime) throws IOException {
+	GridRunManager(ServerSocketChannel server, String secretKey, ITool tool, Date timeoutTime) throws IOException
+	{
 		connectStreams(server, secretKey, timeoutTime);
 		_gridTool = tool;
 	}
 
-	protected void finalize() throws Throwable {
+	protected void finalize() throws Throwable
+	{
 		close();
 	}
 
-	public int runTool() throws Throwable {
+	public int runTool() throws Throwable
+	{
 		int ret = _gridTool.run(_out, _err, _in);
 
 		_out.flush();
@@ -162,7 +160,8 @@ public class GridRunManager implements Closeable {
 		return ret;
 	}
 
-	synchronized public void close() throws IOException {
+	synchronized public void close() throws IOException
+	{
 		StreamUtils.close(_in);
 		StreamUtils.close(_out);
 		StreamUtils.close(_err);

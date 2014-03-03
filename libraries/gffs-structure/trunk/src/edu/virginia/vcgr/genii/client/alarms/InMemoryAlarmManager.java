@@ -11,24 +11,24 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 
-public class InMemoryAlarmManager {
+public class InMemoryAlarmManager
+{
 	static private Log _logger = LogFactory.getLog(InMemoryAlarmManager.class);
 
 	static public InMemoryAlarmManager MANAGER = new InMemoryAlarmManager();
 
 	private PriorityQueue<AlarmInformation> _queue = new PriorityQueue<AlarmInformation>();
 
-	private InMemoryAlarmManager() {
-		Thread th = new Thread(new InMemoryAlarmManagerWorker(),
-				"In Memory Alarm Manager Worker Thread");
+	private InMemoryAlarmManager()
+	{
+		Thread th = new Thread(new InMemoryAlarmManagerWorker(), "In Memory Alarm Manager Worker Thread");
 		th.setDaemon(true);
 		th.start();
 	}
 
-	final private AlarmToken addAlarm(AlarmHandler handler, Object userData,
-			Calendar nextOccurance, Long repeatInterval) {
-		AlarmInformation info = new AlarmInformation(handler, userData,
-				nextOccurance, repeatInterval);
+	final private AlarmToken addAlarm(AlarmHandler handler, Object userData, Calendar nextOccurance, Long repeatInterval)
+	{
+		AlarmInformation info = new AlarmInformation(handler, userData, nextOccurance, repeatInterval);
 		synchronized (_queue) {
 			_queue.add(info);
 			_queue.notify();
@@ -37,45 +37,47 @@ public class InMemoryAlarmManager {
 		return info;
 	}
 
-	final public AlarmToken addAlarm(AlarmHandler handler, Object userData,
-			Calendar occurance) {
+	final public AlarmToken addAlarm(AlarmHandler handler, Object userData, Calendar occurance)
+	{
 		return addAlarm(handler, userData, occurance, null);
 	}
 
-	final public AlarmToken addAlarm(AlarmHandler handler, Calendar occurance) {
+	final public AlarmToken addAlarm(AlarmHandler handler, Calendar occurance)
+	{
 		return addAlarm(handler, null, occurance);
 	}
 
-	final public AlarmToken addAlarm(AlarmHandler handler, Object userData,
-			long repeatInterval) {
+	final public AlarmToken addAlarm(AlarmHandler handler, Object userData, long repeatInterval)
+	{
 		if (repeatInterval <= 0)
-			throw new IllegalArgumentException(
-					"Repeat interval must be positive.");
+			throw new IllegalArgumentException("Repeat interval must be positive.");
 
 		Calendar nextOccurance = Calendar.getInstance();
-		nextOccurance.setTimeInMillis(nextOccurance.getTimeInMillis()
-				+ repeatInterval);
+		nextOccurance.setTimeInMillis(nextOccurance.getTimeInMillis() + repeatInterval);
 		return addAlarm(handler, userData, nextOccurance, repeatInterval);
 	}
 
-	final public AlarmToken addAlarm(AlarmHandler handler, long repeatInterval) {
+	final public AlarmToken addAlarm(AlarmHandler handler, long repeatInterval)
+	{
 		return addAlarm(handler, null, repeatInterval);
 	}
 
-	private class InMemoryAlarmManagerWorker implements Runnable {
+	private class InMemoryAlarmManagerWorker implements Runnable
+	{
 		private LoggingContext _context;
 
-		private InMemoryAlarmManagerWorker() {
+		private InMemoryAlarmManagerWorker()
+		{
 			try {
-				_context = (LoggingContext) LoggingContext
-						.getCurrentLoggingContext().clone();
+				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				_context = new LoggingContext();
 			}
 		}
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			LoggingContext.assumeLoggingContext(_context);
 			Collection<AlarmInformation> alarmsToRun = new LinkedList<AlarmInformation>();
 			AlarmInformation info;
@@ -120,9 +122,7 @@ public class InMemoryAlarmManager {
 							if (when == null)
 								sleepTime = 1L;
 							else
-								sleepTime = when.getTimeInMillis()
-										- Calendar.getInstance()
-												.getTimeInMillis();
+								sleepTime = when.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
 
 							if (sleepTime <= 0L)
 								sleepTime = 1L;

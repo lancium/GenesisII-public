@@ -9,18 +9,23 @@ import javax.swing.Icon;
 
 import edu.virginia.vcgr.genii.client.utils.icon.IconProvider;
 
-class DefaultIconProvider implements IconProvider {
+class DefaultIconProvider implements IconProvider
+{
 	private int _iconSize;
 
-	DefaultIconProvider(int iconSize) {
+	DefaultIconProvider(int iconSize)
+	{
 		_iconSize = iconSize;
 	}
 
 	@Override
-	public Icon createIcon() {
-		return new Icon() {
+	public Icon createIcon()
+	{
+		return new Icon()
+		{
 			@Override
-			final public void paintIcon(Component c, Graphics g, int x, int y) {
+			final public void paintIcon(Component c, Graphics g, int x, int y)
+			{
 				final Color ICON_COLOR = Color.blue;
 
 				Graphics2D g2 = (Graphics2D) (g.create());
@@ -31,12 +36,14 @@ class DefaultIconProvider implements IconProvider {
 			}
 
 			@Override
-			final public int getIconWidth() {
+			final public int getIconWidth()
+			{
 				return _iconSize;
 			}
 
 			@Override
-			final public int getIconHeight() {
+			final public int getIconHeight()
+			{
 				return _iconSize;
 			}
 		};

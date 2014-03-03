@@ -8,15 +8,15 @@ import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 
 @SuppressWarnings("rawtypes")
-class EnumComboModel<Type extends Enum<Type>> extends AbstractListModel
-		implements ComboBoxModel {
+class EnumComboModel<Type extends Enum<Type>> extends AbstractListModel implements ComboBoxModel
+{
 	static final long serialVersionUID = 0l;
 
 	private Vector<Type> _values;
 	private Object _selectedValue = null;
 
-	EnumComboModel(Class<Type> enumClass, EnumComboSort sort,
-			boolean includeNull) {
+	EnumComboModel(Class<Type> enumClass, EnumComboSort sort, boolean includeNull)
+	{
 		if (sort == null)
 			sort = EnumComboSort.Alphabetically;
 
@@ -39,37 +39,43 @@ class EnumComboModel<Type extends Enum<Type>> extends AbstractListModel
 	}
 
 	@Override
-	public Object getSelectedItem() {
+	public Object getSelectedItem()
+	{
 		return _selectedValue;
 	}
 
 	@Override
-	public void setSelectedItem(Object anItem) {
+	public void setSelectedItem(Object anItem)
+	{
 		_selectedValue = anItem;
 	}
 
 	@Override
-	public Object getElementAt(int index) {
+	public Object getElementAt(int index)
+	{
 		return _values.get(index);
 	}
 
 	@Override
-	public int getSize() {
+	public int getSize()
+	{
 		return _values.size();
 	}
 
-	static private class AlphabeticComparator<Type extends Enum<Type>>
-			implements Comparator<Type> {
+	static private class AlphabeticComparator<Type extends Enum<Type>> implements Comparator<Type>
+	{
 		@Override
-		final public int compare(Type o1, Type o2) {
+		final public int compare(Type o1, Type o2)
+		{
 			return o1.toString().compareTo(o2.toString());
 		}
 	}
 
-	static private class OrdinalComparator<Type extends Enum<Type>> implements
-			Comparator<Type> {
+	static private class OrdinalComparator<Type extends Enum<Type>> implements Comparator<Type>
+	{
 		@Override
-		final public int compare(Type o1, Type o2) {
+		final public int compare(Type o1, Type o2)
+		{
 			return o1.ordinal() - o2.ordinal();
 		}
 	}

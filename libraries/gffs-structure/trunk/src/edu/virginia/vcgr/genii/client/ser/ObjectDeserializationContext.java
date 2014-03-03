@@ -25,18 +25,18 @@ import org.xml.sax.Locator;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
-public class ObjectDeserializationContext extends DeserializationContext {
+public class ObjectDeserializationContext extends DeserializationContext
+{
 	private Deserializer topDeserializer = null;
 
-	public ObjectDeserializationContext(
-			org.apache.axis.message.MessageElement element)
-			throws ResourceException {
+	public ObjectDeserializationContext(org.apache.axis.message.MessageElement element) throws ResourceException
+	{
 		this(element, null);
 	}
 
-	public ObjectDeserializationContext(
-			org.apache.axis.message.MessageElement element, Class<?> javaClass)
-			throws ResourceException {
+	public ObjectDeserializationContext(org.apache.axis.message.MessageElement element, Class<?> javaClass)
+		throws ResourceException
+	{
 		super(Config.getContext(), new SOAPHandler());
 
 		init(element.getType(), javaClass);
@@ -45,17 +45,16 @@ public class ObjectDeserializationContext extends DeserializationContext {
 		inputSource = new InputSource(new StringReader(inputString));
 	}
 
-	public ObjectDeserializationContext(Element element)
-			throws ResourceException {
+	public ObjectDeserializationContext(Element element) throws ResourceException
+	{
 		this(element, null);
 	}
 
-	public ObjectDeserializationContext(Element element, Class<?> javaClass)
-			throws ResourceException {
+	public ObjectDeserializationContext(Element element, Class<?> javaClass) throws ResourceException
+	{
 		super(Config.getContext(), new SOAPHandler());
 
-		String typeAttr = element.getAttributeNS(
-				Constants.URI_DEFAULT_SCHEMA_XSI, "type");
+		String typeAttr = element.getAttributeNS(Constants.URI_DEFAULT_SCHEMA_XSI, "type");
 
 		QName type = null;
 
@@ -69,15 +68,15 @@ public class ObjectDeserializationContext extends DeserializationContext {
 		inputSource = new InputSource(new StringReader(inputString));
 	}
 
-	public ObjectDeserializationContext(InputSource input, Class<?> javaClass)
-			throws ResourceException {
+	public ObjectDeserializationContext(InputSource input, Class<?> javaClass) throws ResourceException
+	{
 		super(Config.getContext(), new SOAPHandler());
 		init(null, javaClass);
 		this.inputSource = input;
 	}
 
-	private void setDeserializer(QName type, Class<?> javaClass)
-			throws ResourceException {
+	private void setDeserializer(QName type, Class<?> javaClass) throws ResourceException
+	{
 		if (type == null && javaClass == null) {
 			throw new ResourceException("Type or class required.");
 		}
@@ -95,7 +94,8 @@ public class ObjectDeserializationContext extends DeserializationContext {
 		}
 	}
 
-	private void init(QName type, Class<?> javaClass) throws ResourceException {
+	private void init(QName type, Class<?> javaClass) throws ResourceException
+	{
 		msgContext.setEncodingStyle("");
 		popElementHandler();
 
@@ -105,28 +105,29 @@ public class ObjectDeserializationContext extends DeserializationContext {
 			throw new ResourceException("No Deserializer.");
 		}
 
-		pushElementHandler(new EnvelopeHandler(
-				(SOAPHandler) this.topDeserializer));
+		pushElementHandler(new EnvelopeHandler((SOAPHandler) this.topDeserializer));
 	}
 
 	// overwrites the superclass method
-	public void setDocumentLocator(Locator locator) {
+	public void setDocumentLocator(Locator locator)
+	{
 	}
 
-	public Object getValue() {
-		return (this.topDeserializer == null) ? null : this.topDeserializer
-				.getValue();
+	public Object getValue()
+	{
+		return (this.topDeserializer == null) ? null : this.topDeserializer.getValue();
 	}
 
-	public org.apache.axis.message.MessageElement getMessageElement() {
-		if (this.topDeserializer == null
-				|| !(this.topDeserializer instanceof SOAPHandler)) {
+	public org.apache.axis.message.MessageElement getMessageElement()
+	{
+		if (this.topDeserializer == null || !(this.topDeserializer instanceof SOAPHandler)) {
 			return null;
 		}
 		return ((SOAPHandler) this.topDeserializer).myElement;
 	}
 
-	public QName getQName() {
+	public QName getQName()
+	{
 		org.apache.axis.message.MessageElement element = getMessageElement();
 		return (element == null) ? null : element.getQName();
 	}

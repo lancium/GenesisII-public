@@ -5,7 +5,8 @@ import java.io.Closeable;
 import edu.virginia.vcgr.ogrsh.server.dir.StatBuffer;
 import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
 
-public interface IFileDescriptor extends Closeable {
+public interface IFileDescriptor extends Closeable
+{
 	static public final int SEEK_SET = 0;
 	static public final int SEEK_CUR = 1;
 	static public final int SEEK_END = 2;

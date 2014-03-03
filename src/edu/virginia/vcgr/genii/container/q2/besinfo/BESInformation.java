@@ -29,7 +29,8 @@ import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.q2.matching.DefaultMatchingParameter;
 import edu.virginia.vcgr.genii.container.q2.matching.MatchingParameters;
 
-public class BESInformation {
+public class BESInformation
+{
 	static private Log _logger = LogFactory.getLog(BESInformation.class);
 
 	private MatchingParameters _matchingParameters;
@@ -51,22 +52,21 @@ public class BESInformation {
 
 	private Set<String> _supportedFilesystems = new HashSet<String>();
 
-	public BESInformation(GetFactoryAttributesDocumentResponseType attrs) {
+	public BESInformation(GetFactoryAttributesDocumentResponseType attrs)
+	{
 		_matchingParameters = new MatchingParameters();
 
 		_numContainedActivities = -1L;
 		_isAcceptingNewActivites = false;
 
-		FactoryResourceAttributesDocumentType d1 = attrs
-				.getFactoryResourceAttributesDocument();
+		FactoryResourceAttributesDocumentType d1 = attrs.getFactoryResourceAttributesDocument();
 		if (d1 != null) {
 			_resourceManagerType = d1.getLocalResourceManagerType();
 
 			_numContainedActivities = d1.getTotalNumberOfActivities();
 			_isAcceptingNewActivites = d1.isIsAcceptingNewActivities();
 
-			BasicResourceAttributesDocumentType d2 = d1
-					.getBasicResourceAttributesDocument();
+			BasicResourceAttributesDocumentType d2 = d1.getBasicResourceAttributesDocument();
 			if (d2 != null) {
 				_cpuCount = d2.getCPUCount();
 				_cpuSpeed = d2.getCPUSpeed();
@@ -97,14 +97,11 @@ public class BESInformation {
 				MessageElement[] resourceAny = d2.get_any();
 				if (resourceAny != null) {
 					for (MessageElement anyE : resourceAny) {
-						if (anyE.getQName().equals(
-								bconsts.BES_WALLCLOCK_TIMELIMIT_ATTR)) {
+						if (anyE.getQName().equals(bconsts.BES_WALLCLOCK_TIMELIMIT_ATTR)) {
 							try {
-								_wallclockTimeLimit = (Double) ObjectDeserializer
-										.toObject(anyE, Double.class);
+								_wallclockTimeLimit = (Double) ObjectDeserializer.toObject(anyE, Double.class);
 							} catch (Throwable cause) {
-								_logger.warn("Unable to parse wallclock time limit "
-										+ "from BES information.");
+								_logger.warn("Unable to parse wallclock time limit " + "from BES information.");
 							}
 						}
 					}
@@ -115,24 +112,19 @@ public class BESInformation {
 			if (any != null) {
 				for (MessageElement a : any) {
 					QName elementName = a.getQName();
-					if (elementName
-							.equals(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME)) {
+					if (elementName.equals(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME)) {
 						try {
-							MatchingParameter mp = ObjectDeserializer.toObject(
-									a, MatchingParameter.class);
+							MatchingParameter mp = ObjectDeserializer.toObject(a, MatchingParameter.class);
 
 							// Need to create new matching parameter
 							edu.virginia.vcgr.genii.container.q2.matching.MatchingParameter tParam;
-							tParam = new DefaultMatchingParameter(mp.getName(),
-									mp.getValue(), false);
+							tParam = new DefaultMatchingParameter(mp.getName(), mp.getValue(), false);
 							_matchingParameters.add(tParam);
 
 						} catch (Throwable cause) {
-							_logger.warn("Unable to parse matching parameters "
-									+ "from BES information.");
+							_logger.warn("Unable to parse matching parameters " + "from BES information.");
 						}
-					} else if (elementName
-							.equals(bconsts.FILESYSTEM_SUPPORT_ATTR)) {
+					} else if (elementName.equals(bconsts.FILESYSTEM_SUPPORT_ATTR)) {
 						String fs = a.getValue();
 						if (fs != null && fs.length() > 0)
 							_supportedFilesystems.add(fs);
@@ -143,15 +135,14 @@ public class BESInformation {
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		StringWriter writer = new StringWriter();
 		PrintWriter pw = new PrintWriter(writer);
 
-		pw.format("%s Version %s on %s\n", _operatingSystemType,
-				_operatingSystemVerison, _processorArchitecture);
+		pw.format("%s Version %s on %s\n", _operatingSystemType, _operatingSystemVerison, _processorArchitecture);
 		pw.format("%s bytes of physical memory available\n", _physicalMemory);
-		pw.format("%d activites contained; accepting new ones?  %s\n",
-				_numContainedActivities, _isAcceptingNewActivites);
+		pw.format("%d activites contained; accepting new ones?  %s\n", _numContainedActivities, _isAcceptingNewActivites);
 
 		pw.println(_matchingParameters);
 
@@ -162,59 +153,73 @@ public class BESInformation {
 		return writer.toString();
 	}
 
-	final public MatchingParameters getMatchingParameters() {
+	final public MatchingParameters getMatchingParameters()
+	{
 		return _matchingParameters;
 	}
 
-	final public ProcessorArchitectureEnumeration getProcessorArchitecture() {
+	final public ProcessorArchitectureEnumeration getProcessorArchitecture()
+	{
 		return _processorArchitecture;
 	}
 
-	final public OperatingSystemTypeEnumeration getOperatingSystemType() {
+	final public OperatingSystemTypeEnumeration getOperatingSystemType()
+	{
 		return _operatingSystemType;
 	}
 
-	final public String getOperatingSystemVersion() {
+	final public String getOperatingSystemVersion()
+	{
 		return _operatingSystemVerison;
 	}
 
-	final public Double getCPUCount() {
+	final public Double getCPUCount()
+	{
 		return _cpuCount;
 	}
 
-	final public Double getCPUSpeed() {
+	final public Double getCPUSpeed()
+	{
 		return _cpuSpeed;
 	}
 
-	final public Double getPhysicalMemory() {
+	final public Double getPhysicalMemory()
+	{
 		return _physicalMemory;
 	}
 
-	final public Double getVirtualMemory() {
+	final public Double getVirtualMemory()
+	{
 		return _virtualMemory;
 	}
 
-	final public Double getWallclockTimeLimit() {
+	final public Double getWallclockTimeLimit()
+	{
 		return _wallclockTimeLimit;
 	}
 
-	final public boolean isAcceptingNewActivities() {
+	final public boolean isAcceptingNewActivities()
+	{
 		return _isAcceptingNewActivites;
 	}
 
-	final public long getNumberOfContainedResources() {
+	final public long getNumberOfContainedResources()
+	{
 		return _numContainedActivities;
 	}
 
-	final public URI resourceManagerType() {
+	final public URI resourceManagerType()
+	{
 		return _resourceManagerType;
 	}
 
-	final public boolean supportsFilesystems(String fs) {
+	final public boolean supportsFilesystems(String fs)
+	{
 		return _supportedFilesystems.contains(fs);
 	}
 
-	final public Set<String> supportedFilesystems() {
+	final public Set<String> supportedFilesystems()
+	{
 		return Collections.unmodifiableSet(_supportedFilesystems);
 	}
 }

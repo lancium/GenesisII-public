@@ -7,12 +7,15 @@ import java.io.OutputStream;
 
 import edu.virginia.vcgr.genii.procmgmt.ProcessManager;
 
-public class RunnerKiller {
-	static private class StreamCopier extends Thread {
+public class RunnerKiller
+{
+	static private class StreamCopier extends Thread
+	{
 		private InputStream _in;
 		private OutputStream _out;
 
-		private StreamCopier(InputStream in, OutputStream out) {
+		private StreamCopier(InputStream in, OutputStream out)
+		{
 			super("Stream Copier");
 
 			_in = in;
@@ -22,7 +25,8 @@ public class RunnerKiller {
 		}
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			byte[] data = new byte[1024];
 			int read;
 
@@ -37,15 +41,14 @@ public class RunnerKiller {
 		}
 	}
 
-	static public void main(String[] args) throws Throwable {
-		ProcessBuilder builder = new ProcessBuilder(
-				"C:\\Documents and Settings\\Mark Morgan\\longrun\\LongRunner\\Debug\\RunnerRunner.bat");
-		builder.directory(new File(
-				"C:\\Documents and Settings\\Mark Morgan\\longrun\\LongRunner\\Debug"));
+	static public void main(String[] args) throws Throwable
+	{
+		ProcessBuilder builder =
+			new ProcessBuilder("C:\\Documents and Settings\\Mark Morgan\\longrun\\LongRunner\\Debug\\RunnerRunner.bat");
+		builder.directory(new File("C:\\Documents and Settings\\Mark Morgan\\longrun\\LongRunner\\Debug"));
 		Process p = builder.start();
 
-		new StreamCopier(new FileInputStream("build.xml"), p.getOutputStream())
-				.start();
+		new StreamCopier(new FileInputStream("build.xml"), p.getOutputStream()).start();
 		new StreamCopier(p.getInputStream(), System.out).start();
 		new StreamCopier(p.getErrorStream(), System.err).start();
 

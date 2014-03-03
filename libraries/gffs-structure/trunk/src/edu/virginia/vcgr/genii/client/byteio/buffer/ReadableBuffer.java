@@ -8,20 +8,19 @@ import edu.virginia.vcgr.genii.client.lease.LeaseableResource;
 import edu.virginia.vcgr.genii.client.lease.LeaseeAgreement;
 
 /**
- * A buffer object that can use leased by arrays to buffer or cache ByteIO
- * reads.
+ * A buffer object that can use leased by arrays to buffer or cache ByteIO reads.
  * 
  * @author mmm2a
  */
-public class ReadableBuffer implements Closeable {
+public class ReadableBuffer implements Closeable
+{
 	/**
 	 * An internal lock object on which synchronization will be done.
 	 */
 	private Object _lockObject = new Object();
 
 	/**
-	 * The current offset within the real file at which the current buffer of
-	 * bytes starts.
+	 * The current offset within the real file at which the current buffer of bytes starts.
 	 */
 	private long _blockOffsetInFile = -1L;
 
@@ -35,20 +34,20 @@ public class ReadableBuffer implements Closeable {
 	private ReadResolver _resolver;
 
 	/**
-	 * Ensure that the current buffer contains the file offset indicated (if at
-	 * all possible).
+	 * Ensure that the current buffer contains the file offset indicated (if at all possible).
 	 * 
 	 * @param fileOffset
 	 *            The file offset that we want to ensure is available
 	 * @throws IOException
 	 */
-	private void ensure(long fileOffset) throws IOException {
+	private void ensure(long fileOffset) throws IOException
+	{
 		if (_lease == null)
 			_lease = _leaser.obtainLease(new LeaseeAgreementImpl());
 		ByteBuffer buffer = _lease.resource();
 
 		if ((_blockOffsetInFile < 0) || (fileOffset < _blockOffsetInFile)
-				|| ((_blockOffsetInFile + buffer.limit()) <= fileOffset)) {
+			|| ((_blockOffsetInFile + buffer.limit()) <= fileOffset)) {
 			buffer.clear();
 			_resolver.read(fileOffset, buffer);
 			buffer.flip();
@@ -64,18 +63,21 @@ public class ReadableBuffer implements Closeable {
 	 * @param resolver
 	 *            The resolver to use to fill in byte buffers.
 	 */
-	public ReadableBuffer(ByteIOBufferLeaser leaser, ReadResolver resolver) {
+	public ReadableBuffer(ByteIOBufferLeaser leaser, ReadResolver resolver)
+	{
 		_resolver = resolver;
 		_leaser = leaser;
 	}
 
 	@Override
-	protected void finalize() {
+	protected void finalize()
+	{
 		close();
 	}
 
 	@Override
-	public void close() {
+	public void close()
+	{
 		synchronized (_lockObject) {
 			if (_lease != null)
 				_lease.cancel();
@@ -84,8 +86,8 @@ public class ReadableBuffer implements Closeable {
 		}
 	}
 
-	public void read(long fileOffset, ByteBuffer destination)
-			throws IOException {
+	public void read(long fileOffset, ByteBuffer destination) throws IOException
+	{
 		synchronized (_lockObject) {
 			ensure(fileOffset);
 			ByteBuffer buffer = _lease.resource();
@@ -107,10 +109,11 @@ public class ReadableBuffer implements Closeable {
 	 * 
 	 * @author mmm2a
 	 */
-	private class LeaseeAgreementImpl implements LeaseeAgreement<ByteBuffer> {
+	private class LeaseeAgreementImpl implements LeaseeAgreement<ByteBuffer>
+	{
 		@Override
-		public LeaseableResource<ByteBuffer> relinquish(
-				LeaseableResource<ByteBuffer> lease) {
+		public LeaseableResource<ByteBuffer> relinquish(LeaseableResource<ByteBuffer> lease)
+		{
 			synchronized (_lockObject) {
 				LeaseableResource<ByteBuffer> ret = _lease;
 				_lease = null;

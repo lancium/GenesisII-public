@@ -30,22 +30,21 @@ import edu.virginia.vcgr.genii.ui.shell.Display;
 import edu.virginia.vcgr.genii.ui.shell.ExecutionContext;
 import edu.virginia.vcgr.genii.ui.shell.WordCompleter;
 
-public class GridExecutionContext implements ExecutionContext {
+public class GridExecutionContext implements ExecutionContext
+{
 	private ICallingContext _callingContext;
 	private CommandLineRunner _runner;
 	private SortedSet<String> _sortedCommands;
 	private Map<String, ToolDescription> _tools;
 
-	private void executeGridCommand(String[] cLine, Display display,
-			Reader stdin) throws Exception {
+	private void executeGridCommand(String[] cLine, Display display, Reader stdin) throws Exception
+	{
 		IContextResolver resolver = ContextManager.getResolver();
 
 		try {
-			ContextManager.setResolver(new MemoryBasedContextResolver(
-					_callingContext));
+			ContextManager.setResolver(new MemoryBasedContextResolver(_callingContext));
 			// December 30, 2012 by ASG
-			// We need to support "time <command>" in the gui shell as we do in
-			// the main shell.
+			// We need to support "time <command>" in the gui shell as we do in the main shell.
 			// I am copying the technique used in the main shell.
 			boolean displayElapsed = false;
 			int firstArg = 0;
@@ -56,8 +55,7 @@ public class GridExecutionContext implements ExecutionContext {
 			long startTime = System.currentTimeMillis();
 			String[] passArgs = new String[cLine.length - firstArg];
 			System.arraycopy(cLine, firstArg, passArgs, 0, passArgs.length);
-			_runner.runCommand(passArgs, display.output(), display.error(),
-					stdin);
+			_runner.runCommand(passArgs, display.output(), display.error(), stdin);
 			long elapsed = System.currentTimeMillis() - startTime;
 
 			if (displayElapsed) {
@@ -70,9 +68,7 @@ public class GridExecutionContext implements ExecutionContext {
 				long seconds = elapsed / (1000);
 				if (seconds != 0)
 					elapsed = elapsed % (seconds * 1000);
-				display.output().println(
-						"Elapsed time: " + hours + "h:" + minutes + "m:"
-								+ seconds + "s." + elapsed + "ms");
+				display.output().println("Elapsed time: " + hours + "h:" + minutes + "m:" + seconds + "s." + elapsed + "ms");
 			}
 		} catch (Exception e) {
 			throw e;
@@ -84,12 +80,12 @@ public class GridExecutionContext implements ExecutionContext {
 		}
 	}
 
-	public GridExecutionContext(ICallingContext callingContext) {
+	public GridExecutionContext(ICallingContext callingContext)
+	{
 		_callingContext = callingContext;
 		_runner = new CommandLineRunner();
 		_sortedCommands = new TreeSet<String>();
-		_tools = CommandLineRunner.getToolList(ConfigurationManager
-				.getCurrentConfiguration().getClientConfiguration());
+		_tools = CommandLineRunner.getToolList(ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
 
 		for (String toolName : _runner.getToolList().keySet()) {
 			ToolDescription description = _runner.getToolList().get(toolName);
@@ -106,23 +102,26 @@ public class GridExecutionContext implements ExecutionContext {
 	}
 
 	@Override
-	public WordCompleter commandCompleter() {
+	public WordCompleter commandCompleter()
+	{
 		return new CommandCompleter();
 	}
 
 	@Override
-	public WordCompleter pathCompleter() {
+	public WordCompleter pathCompleter()
+	{
 		return new PathCompleter();
 	}
 
 	@Override
-	public WordCompleter optionCompleter() {
+	public WordCompleter optionCompleter()
+	{
 		return new OptionCompleter();
 	}
 
 	@Override
-	public void executeCommand(String commandLine, Display display, Reader stdin)
-			throws Exception {
+	public void executeCommand(String commandLine, Display display, Reader stdin) throws Exception
+	{
 		String[] cLine = CommandLineFormer.formCommandLine(commandLine);
 		if (cLine.length == 0)
 			return;
@@ -130,11 +129,12 @@ public class GridExecutionContext implements ExecutionContext {
 		executeGridCommand(cLine, display, stdin);
 	}
 
-	private class CommandCompleter implements WordCompleter {
+	private class CommandCompleter implements WordCompleter
+	{
 		@Override
-		public String[] completions(String partial) {
-			Collection<String> completions = new Vector<String>(
-					_sortedCommands.size());
+		public String[] completions(String partial)
+		{
+			Collection<String> completions = new Vector<String>(_sortedCommands.size());
 			for (String cmd : _sortedCommands) {
 				if (cmd.startsWith(partial))
 					completions.add(cmd);
@@ -144,9 +144,11 @@ public class GridExecutionContext implements ExecutionContext {
 		}
 	}
 
-	private class PathCompleter implements WordCompleter {
+	private class PathCompleter implements WordCompleter
+	{
 		@Override
-		public String[] completions(String originalPartial) throws Exception {
+		public String[] completions(String originalPartial) throws Exception
+		{
 			Collection<String> ret = new LinkedList<String>();
 			String directory;
 			String partialFile;
@@ -170,19 +172,14 @@ public class GridExecutionContext implements ExecutionContext {
 				IContextResolver resolver = ContextManager.getResolver();
 
 				try {
-					ContextManager.setResolver(new MemoryBasedContextResolver(
-							_callingContext));
-					RNSPath directoryPath = RNSPath.getCurrent().lookup(
-							directory);
+					ContextManager.setResolver(new MemoryBasedContextResolver(_callingContext));
+					RNSPath directoryPath = RNSPath.getCurrent().lookup(directory);
 					for (RNSPath entry : directoryPath.listContents()) {
 						String entryName = entry.getName();
 
 						if (entryName.startsWith(partialFile)) {
-							TypeInformation type = new TypeInformation(
-									entry.getEndpoint());
-							ret.add(originalPartial
-									+ entryName.substring(partialFile.length())
-									+ (type.isRNS() ? "/" : ""));
+							TypeInformation type = new TypeInformation(entry.getEndpoint());
+							ret.add(originalPartial + entryName.substring(partialFile.length()) + (type.isRNS() ? "/" : ""));
 						}
 					}
 
@@ -197,9 +194,7 @@ public class GridExecutionContext implements ExecutionContext {
 					String entryName = entry.getName();
 
 					if (entryName.startsWith(partialFile)) {
-						ret.add(originalPartial
-								+ entryName.substring(partialFile.length())
-								+ (entry.isDirectory() ? "/" : ""));
+						ret.add(originalPartial + entryName.substring(partialFile.length()) + (entry.isDirectory() ? "/" : ""));
 					}
 				}
 
@@ -208,10 +203,12 @@ public class GridExecutionContext implements ExecutionContext {
 		}
 	}
 
-	private class OptionCompleter implements WordCompleter {
+	private class OptionCompleter implements WordCompleter
+	{
 
 		@Override
-		public String[] completions(String partial) throws Exception {
+		public String[] completions(String partial) throws Exception
+		{
 
 			String stem;
 			int last = partial.lastIndexOf(" ");
@@ -255,8 +252,7 @@ public class GridExecutionContext implements ExecutionContext {
 			int index = partial.indexOf(' ');
 			String cmd = partial.substring(0, index);
 			ToolDescription desc = _tools.get(cmd);
-			AccessibleObject options[] = new OptionSetter(
-					desc.getToolInstance()).getOptions();
+			AccessibleObject options[] = new OptionSetter(desc.getToolInstance()).getOptions();
 			ArrayList<String> ret = new ArrayList<String>();
 			int shortsFound = 0;
 			int shortsToFind = 0;

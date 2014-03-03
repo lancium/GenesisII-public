@@ -29,9 +29,9 @@ import javax.swing.JComponent;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-class MonthComponent extends JComponent {
-	static final String[] _LETTER_ARRAY = new String[] { "S", "M", "T", "W",
-			"T", "F", "S" };
+class MonthComponent extends JComponent
+{
+	static final String[] _LETTER_ARRAY = new String[] { "S", "M", "T", "W", "T", "F", "S" };
 
 	static final long _MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
 	static final long serialVersionUID = 0;
@@ -49,58 +49,65 @@ class MonthComponent extends JComponent {
 	private Calendar _selected;
 	private Calendar _viewed;
 
-	MonthComponent(Calendar today, Calendar selected, Calendar viewedMonth) {
+	MonthComponent(Calendar today, Calendar selected, Calendar viewedMonth)
+	{
 		_today = today;
 		_selected = selected;
 		_viewed = viewedMonth;
 		calculateFirstDisplayedDate();
 
-		Dimension size = new Dimension(_MIN_CELL_WIDTH * _CELLS_PER_ROW,
-				_MIN_CELL_HEIGHT * _CELLS_PER_COL);
+		Dimension size = new Dimension(_MIN_CELL_WIDTH * _CELLS_PER_ROW, _MIN_CELL_HEIGHT * _CELLS_PER_COL);
 		setPreferredSize(size);
 		setMinimumSize(size);
 	}
 
-	public void selectDate(Calendar c) {
+	public void selectDate(Calendar c)
+	{
 		_selected = (Calendar) c.clone();
 		repaint();
 	}
 
-	public void showMonth(Calendar month) {
+	public void showMonth(Calendar month)
+	{
 		_viewed = (Calendar) month.clone();
 		calculateFirstDisplayedDate();
 		repaint();
 	}
 
-	public void setSize(Dimension d) {
+	public void setSize(Dimension d)
+	{
 		super.setSize(d);
 
 		_cellWidth = d.width / _CELLS_PER_ROW;
 		_cellHeight = d.height / _CELLS_PER_COL;
 	}
 
-	public void setSize(int x, int y) {
+	public void setSize(int x, int y)
+	{
 		super.setSize(x, y);
 
 		_cellWidth = x / _CELLS_PER_ROW;
 		_cellHeight = y / _CELLS_PER_COL;
 	}
 
-	public void setBounds(Rectangle bounds) {
+	public void setBounds(Rectangle bounds)
+	{
 		super.setBounds(bounds);
 
 		_cellWidth = bounds.width / _CELLS_PER_ROW;
 		_cellHeight = bounds.height / _CELLS_PER_COL;
 	}
 
-	public void setBounds(int x, int y, int width, int height) {
+	public void setBounds(int x, int y, int width, int height)
+	{
 		super.setBounds(x, y, width, height);
 
 		_cellWidth = width / _CELLS_PER_ROW;
 		_cellHeight = height / _CELLS_PER_COL;
 	}
 
-	final private void calculateFirstDisplayedDate() {
+	final private void calculateFirstDisplayedDate()
+	{
 		_firstDisplayedDate = (Calendar) _viewed.clone();
 		_firstDisplayedDate.set(Calendar.DAY_OF_MONTH, 1);
 		int dayOfWeek = _firstDisplayedDate.get(Calendar.DAY_OF_WEEK);
@@ -108,37 +115,40 @@ class MonthComponent extends JComponent {
 		rollDay(_firstDisplayedDate, -1 * daysOff);
 	}
 
-	final private Point getCellUL(int row, int col) {
+	final private Point getCellUL(int row, int col)
+	{
 		return new Point(col * _cellWidth, _cellHeight * row);
 	}
 
-	final private void rollDay(Calendar c, int days) {
+	final private void rollDay(Calendar c, int days)
+	{
 		c.setTimeInMillis(c.getTimeInMillis() + (days * _MILLIS_PER_DAY));
 	}
 
-	final private void paintCenteredString(Graphics2D g, FontMetrics metrics,
-			Point ul, int cellWidth, int cellHeight, String str) {
+	final private void paintCenteredString(Graphics2D g, FontMetrics metrics, Point ul, int cellWidth, int cellHeight,
+		String str)
+	{
 		Rectangle2D sbounds = metrics.getStringBounds(str, g);
 		ul.x += (cellWidth - sbounds.getWidth()) / 2;
 		ul.y += (cellHeight - sbounds.getHeight()) / 2 + sbounds.getHeight();
 		g.drawString(str, ul.x, ul.y);
 	}
 
-	final private boolean sameDay(Calendar test, Calendar orig) {
+	final private boolean sameDay(Calendar test, Calendar orig)
+	{
 		if (test.get(Calendar.DAY_OF_YEAR) != orig.get(Calendar.DAY_OF_YEAR))
 			return false;
 		return test.get(Calendar.YEAR) == orig.get(Calendar.YEAR);
 	}
 
-	protected void paintComponent(Graphics _g) {
+	protected void paintComponent(Graphics _g)
+	{
 		Graphics2D g = (Graphics2D) _g;
 
 		Rectangle bounds = getBounds();
 
-		g.drawLine(0, _cellHeight / 2 + _cellHeight, bounds.width - 1,
-				_cellHeight / 2 + _cellHeight);
-		g.drawLine(0, bounds.height - 1 - (_cellHeight / 2), bounds.width - 1,
-				bounds.height - 1 - (_cellHeight / 2));
+		g.drawLine(0, _cellHeight / 2 + _cellHeight, bounds.width - 1, _cellHeight / 2 + _cellHeight);
+		g.drawLine(0, bounds.height - 1 - (_cellHeight / 2), bounds.width - 1, bounds.height - 1 - (_cellHeight / 2));
 
 		Calendar firstDayOfMonth = (Calendar) _viewed.clone();
 		firstDayOfMonth.set(Calendar.DAY_OF_MONTH, 1);
@@ -184,24 +194,22 @@ class MonthComponent extends JComponent {
 					g.setColor(Color.BLACK);
 				}
 
-				if (!ignore && inReal
-						&& current.get(Calendar.DAY_OF_MONTH) == 1) {
+				if (!ignore && inReal && current.get(Calendar.DAY_OF_MONTH) == 1) {
 					g.setFont(f.deriveFont(Font.ITALIC));
 					g.setColor(Color.GRAY);
 					inReal = false;
 				}
 
-				String str = Integer.toString(current
-						.get(Calendar.DAY_OF_MONTH));
-				paintCenteredString(g, metrics, ul, _cellWidth, _cellHeight,
-						str);
+				String str = Integer.toString(current.get(Calendar.DAY_OF_MONTH));
+				paintCenteredString(g, metrics, ul, _cellWidth, _cellHeight, str);
 
 				rollDay(current, 1);
 			}
 		}
 	}
 
-	public Calendar getDate(int x, int y) {
+	public Calendar getDate(int x, int y)
+	{
 		int row = y / _cellHeight;
 		int col = x / _cellWidth;
 

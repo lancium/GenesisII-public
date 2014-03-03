@@ -1,11 +1,12 @@
 package edu.virginia.vcgr.genii.client.dialog;
 
-public class SimpleCheckBoxItem extends SimpleMenuItem implements CheckBoxItem {
+public class SimpleCheckBoxItem extends SimpleMenuItem implements CheckBoxItem
+{
 	private boolean _isEditable;
 	private boolean _isChecked;
 
-	public SimpleCheckBoxItem(String tag, Object content, boolean isChecked,
-			boolean isEditable) {
+	public SimpleCheckBoxItem(String tag, Object content, boolean isChecked, boolean isEditable)
+	{
 		super(tag, content);
 
 		_isChecked = isChecked;
@@ -13,22 +14,26 @@ public class SimpleCheckBoxItem extends SimpleMenuItem implements CheckBoxItem {
 	}
 
 	@Override
-	public boolean isChecked() {
+	public boolean isChecked()
+	{
 		return _isChecked;
 	}
 
 	@Override
-	public void setChecked(boolean isChecked) {
+	public void setChecked(boolean isChecked)
+	{
 		_isChecked = isChecked;
 	}
 
 	@Override
-	public boolean isEditable() {
+	public boolean isEditable()
+	{
 		return _isEditable;
 	}
 
 	@Override
-	public void setEditable(boolean isEditable) {
+	public void setEditable(boolean isEditable)
+	{
 		_isEditable = isEditable;
 	}
 }

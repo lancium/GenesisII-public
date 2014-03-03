@@ -54,12 +54,13 @@ import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 /**
- * A utility class which allows users to create dynamic, client side proxies for
- * talking to remote service endpoints.
+ * A utility class which allows users to create dynamic, client side proxies for talking to remote
+ * service endpoints.
  * 
  * @author mmm2a
  */
-public class ClientUtils {
+public class ClientUtils
+{
 	static private Log _logger = LogFactory.getLog(ClientUtils.class);
 
 	private static final Pattern _PORT_PATTERN = Pattern.compile("^get.+");
@@ -71,19 +72,18 @@ public class ClientUtils {
 	static private Integer __clientRsaKeyLength = null;
 
 	/**
-	 * Class to wipe our loaded config stuff in the event the config manager
-	 * reloads.
+	 * Class to wipe our loaded config stuff in the event the config manager reloads.
 	 */
 	static {
 		// register ourselves to renew our defaults if the configuration is
 		// unloaded
-		ConfigurationManager
-				.addConfigurationUnloadListener(new ConfigUnloadListener());
+		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
 	}
 
-	public static class ConfigUnloadListener implements
-			ConfigurationUnloadedListener {
-		public void notifyUnloaded() {
+	public static class ConfigUnloadListener implements ConfigurationUnloadedListener
+	{
+		public void notifyUnloaded()
+		{
 			synchronized (ClientUtils.class) {
 				__clientRsaKeyLength = null;
 			}
@@ -93,55 +93,51 @@ public class ClientUtils {
 	/**
 	 * Retrieves the client's minimum allowable level of message security
 	 */
-	static public synchronized int getClientRsaKeyLength()
-			throws GeneralSecurityException {
+	static public synchronized int getClientRsaKeyLength() throws GeneralSecurityException
+	{
 		if (__clientRsaKeyLength != null) {
 			return __clientRsaKeyLength;
 		}
 
-		String rsaKeyLength = Installation
-				.getDeployment(new DeploymentName())
-				.security()
-				.getProperty(
-						KeystoreSecurityConstants.Client.CLIENT_RSA_KEY_LENGTH_PROP);
+		String rsaKeyLength =
+			Installation.getDeployment(new DeploymentName()).security()
+				.getProperty(KeystoreSecurityConstants.Client.CLIENT_RSA_KEY_LENGTH_PROP);
 
 		__clientRsaKeyLength = Integer.parseInt(rsaKeyLength);
 		return __clientRsaKeyLength;
 	}
 
-	static public void setDefaultTimeoutForThread(Long newTimeout) {
+	static public void setDefaultTimeoutForThread(Long newTimeout)
+	{
 		_TIMEOUTS.set(newTimeout);
 	}
 
 	/**
-	 * Generates transient key and certificate material to be used for outgoing
-	 * message security.
+	 * Generates transient key and certificate material to be used for outgoing message security.
 	 */
-	private static KeyAndCertMaterial generateKeyAndCertMaterial(long timeout,
-			TimeUnit units) throws GeneralSecurityException {
+	private static KeyAndCertMaterial generateKeyAndCertMaterial(long timeout, TimeUnit units) throws GeneralSecurityException
+	{
 		KeyPair keyPair = CertTool.generateKeyPair(getClientRsaKeyLength());
-		X509Certificate[] clientCertChain = { CertTool.createMasterCert(
-				"C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=Client Cert "
-						+ (new GUID()).toString(),
-				TimeUnit.MILLISECONDS.convert(timeout, units),
-				keyPair.getPublic(), keyPair.getPrivate()) };
+		X509Certificate[] clientCertChain =
+			{ CertTool.createMasterCert(
+				"C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=Client Cert " + (new GUID()).toString(),
+				TimeUnit.MILLISECONDS.convert(timeout, units), keyPair.getPublic(), keyPair.getPrivate()) };
 		return new KeyAndCertMaterial(clientCertChain, keyPair.getPrivate());
 	}
 
 	/**
-	 * Note that it is possible for a calling context not to have ANY key and
-	 * cert material, in which case this method does nothing.
+	 * Note that it is possible for a calling context not to have ANY key and cert material, in
+	 * which case this method does nothing.
 	 * 
 	 * @param callContext
 	 *            The calling context containing the
-	 * @return The client's key and cert material, re-generated if necessary.
-	 *         (Upon refresh, all previous attributes will be renewed if
-	 *         possible, discarded otherwise)
+	 * @return The client's key and cert material, re-generated if necessary. (Upon refresh, all
+	 *         previous attributes will be renewed if possible, discarded otherwise)
 	 * @throws GeneralSecurityException
 	 */
-	public static KeyAndCertMaterial checkAndRenewCredentials(
-			ICallingContext callContext, Date validUntil,
-			SecurityUpdateResults results) throws GeneralSecurityException {
+	public static KeyAndCertMaterial checkAndRenewCredentials(ICallingContext callContext, Date validUntil,
+		SecurityUpdateResults results) throws GeneralSecurityException
+	{
 		if (callContext == null) {
 			// we never had any client identity.
 			String msg = "No calling-context in which to store credentials.";
@@ -151,24 +147,19 @@ public class ClientUtils {
 
 		boolean updated = false;
 		KeyAndCertMaterial retval = callContext.getActiveKeyAndCertMaterial();
-		ArrayList<NuCredential> credentials = TransientCredentials
-				.getTransientCredentials(callContext).getCredentials();
+		ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
 
 		// Ensure client identity is valid
 		try {
 			if (retval != null) {
 				// check the time validity of our client identity
 				for (X509Certificate cert : retval._clientCertChain) {
-					// (Check 10 seconds into the future so as to avoid the
-					// credential
+					// (Check 10 seconds into the future so as to avoid the credential
 					// expiring in-flight)
-					cert.checkValidity(new Date(
-							System.currentTimeMillis() + 10000));
+					cert.checkValidity(new Date(System.currentTimeMillis() + 10000));
 				}
-			} else if (ConfigurationManager.getCurrentConfiguration()
-					.isClientRole()) {
-				throw new CertificateExpiredException(
-						"Client role with no certificate.");
+			} else if (ConfigurationManager.getCurrentConfiguration().isClientRole()) {
+				throw new CertificateExpiredException("Client role with no certificate.");
 			}
 		} catch (CertificateExpiredException e) {
 			if (!ConfigurationManager.getCurrentConfiguration().isClientRole()) {
@@ -176,26 +167,21 @@ public class ClientUtils {
 				// a specific identity that has now expired.
 				throw e;
 			} else {
-				// We're in the client role, meaning we can generate our own new
-				// client identity.
+				// We're in the client role, meaning we can generate our own new client identity.
 
-				_logger.warn("Renewing client tool identity until "
-						+ validUntil);
+				_logger.warn("Renewing client tool identity until " + validUntil);
 				/*
-				 * old rule: We create an identity for either 24 hours, or until
-				 * the valid duration expires (which ever is longer) + 10
-				 * seconds of slop for in transit time outs.
+				 * old rule: We create an identity for either 24 hours, or until the valid duration
+				 * expires (which ever is longer) + 10 seconds of slop for in transit time outs.
 				 * 
-				 * new rule: we create an identity for the duration requested or
-				 * our current default time-out, based on whichever is longer,
-				 * plus 10 seconds of slop for in transit time outs.
+				 * new rule: we create an identity for the duration requested or our current default
+				 * time-out, based on whichever is longer, plus 10 seconds of slop for in transit
+				 * time outs.
 				 */
-				retval = generateKeyAndCertMaterial(
-						Math.max(
-								edu.virginia.vcgr.genii.security.SecurityConstants.defaultCredentialExpirationMillis,
-								validUntil.getTime()
-										- System.currentTimeMillis() + 10000),
-						TimeUnit.MILLISECONDS);
+				retval =
+					generateKeyAndCertMaterial(Math.max(
+						edu.virginia.vcgr.genii.security.SecurityConstants.defaultCredentialExpirationMillis,
+						validUntil.getTime() - System.currentTimeMillis() + 10000), TimeUnit.MILLISECONDS);
 				callContext.setActiveKeyAndCertMaterial(retval);
 				updated = true;
 
@@ -218,11 +204,9 @@ public class ClientUtils {
 		while (itr.hasNext()) {
 			NuCredential cred = itr.next();
 			try {
-				// (Check 10 seconds into the future so as to avoid the
-				// credential expiring
+				// (Check 10 seconds into the future so as to avoid the credential expiring
 				// in-flight).
-				cred.checkValidity(new Date(System.currentTimeMillis()
-						+ (10 * 1000)));
+				cred.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
 			} catch (AttributeExpiredException e) {
 				updated = true;
 				_logger.warn("Discarding credential " + cred, e);
@@ -233,9 +217,7 @@ public class ClientUtils {
 
 		// persist any updates
 		try {
-			if (updated
-					&& ConfigurationManager.getCurrentConfiguration()
-							.isClientRole()) {
+			if (updated && ConfigurationManager.getCurrentConfiguration().isClientRole()) {
 				ContextManager.storeCurrentContext(callContext);
 			}
 		} catch (Exception ex) {
@@ -246,11 +228,11 @@ public class ClientUtils {
 	}
 
 	/**
-	 * Throws out any current credentials. This will ensure that the next call
-	 * to checkAndRenewCredentials() causes a new TLS certificate to be created.
+	 * Throws out any current credentials. This will ensure that the next call to
+	 * checkAndRenewCredentials() causes a new TLS certificate to be created.
 	 */
-	public static void invalidateCredentials(ICallingContext callContext)
-			throws GeneralSecurityException {
+	public static void invalidateCredentials(ICallingContext callContext) throws GeneralSecurityException
+	{
 		if (callContext == null) {
 			// we never had any client identity.
 			String msg = "No calling-context in which to store credentials.";
@@ -269,8 +251,8 @@ public class ClientUtils {
 		TransientCredentials.globalLogout(callContext);
 	}
 
-	static public Method getLocatorPortTypeMethod(Class<?> locator)
-			throws ResourceException {
+	static public Method getLocatorPortTypeMethod(Class<?> locator) throws ResourceException
+	{
 		Method[] methods = locator.getMethods();
 		Method targetMethod = null;
 
@@ -288,19 +270,18 @@ public class ClientUtils {
 		}
 
 		if (targetMethod == null)
-			throw new ResourceException("It doesn't look like \""
-					+ locator.getName() + "\" is an Axis generated locator.");
+			throw new ResourceException("It doesn't look like \"" + locator.getName() + "\" is an Axis generated locator.");
 
 		return targetMethod;
 	}
 
-	static private Class<?> getLocatorPortType(Class<?> locator)
-			throws ResourceException {
+	static private Class<?> getLocatorPortType(Class<?> locator) throws ResourceException
+	{
 		return getLocatorPortTypeMethod(locator).getReturnType();
 	}
 
-	static public Class<?>[] getLocatorPortTypes(Class<?>[] locators)
-			throws ResourceException {
+	static public Class<?>[] getLocatorPortTypes(Class<?>[] locators) throws ResourceException
+	{
 		Class<?>[] ret = new Class[locators.length];
 		for (int lcv = 0; lcv < locators.length; lcv++) {
 			ret[lcv] = getLocatorPortType(locators[lcv]);
@@ -311,41 +292,38 @@ public class ClientUtils {
 
 	static private IProxyFactory _proxyFactory = null;
 
-	synchronized static private IProxyFactory getProxyFactory()
-			throws ResourceException {
+	synchronized static private IProxyFactory getProxyFactory() throws ResourceException
+	{
 		if (_proxyFactory == null) {
-			_proxyFactory = (IProxyFactory) NamedInstances.getClientInstances()
-					.lookup(_PROXY_FACTORY_INSTANCE_NAME);
+			_proxyFactory = (IProxyFactory) NamedInstances.getClientInstances().lookup(_PROXY_FACTORY_INSTANCE_NAME);
 		}
 
 		return _proxyFactory;
 	}
 
 	/**
-	 * Create a new, dynamically generated client stub which has the interface
-	 * specified and is prepared to talk to the endpoint given.
+	 * Create a new, dynamically generated client stub which has the interface specified and is
+	 * prepared to talk to the endpoint given.
 	 * 
 	 * @param iface
-	 *            The class which represents the java interface that the client
-	 *            stub should implement for communication.
+	 *            The class which represents the java interface that the client stub should
+	 *            implement for communication.
 	 * @param epr
-	 *            The EndpointReferenceType that indicates the target of the
-	 *            newly generated client stub.
-	 * @return An dynamically generated client proxy which implements the passed
-	 *         in interface and is configured to communicate to the given EPR.
+	 *            The EndpointReferenceType that indicates the target of the newly generated client
+	 *            stub.
+	 * @return An dynamically generated client proxy which implements the passed in interface and is
+	 *         configured to communicate to the given EPR.
 	 */
-	static public <IFace> IFace createProxy(Class<IFace> iface,
-			EndpointReferenceType epr) throws ResourceException,
-			GenesisIISecurityException {
+	static public <IFace> IFace createProxy(Class<IFace> iface, EndpointReferenceType epr) throws ResourceException,
+		GenesisIISecurityException
+	{
 		try {
 			ICallingContext context = null;
 
 			try {
 				context = ContextManager.getExistingContext();
 			} catch (Throwable t) {
-				_logger.warn(
-						"Unknown exception occurred trying to create a client proxy.",
-						t);
+				_logger.warn("Unknown exception occurred trying to create a client proxy.", t);
 			}
 
 			return createProxy(iface, epr, context);
@@ -355,78 +333,71 @@ public class ClientUtils {
 	}
 
 	/**
-	 * Create a new, dynamically generated client stub which has the interface
-	 * specified and is prepared to talk to the endpoint given.
+	 * Create a new, dynamically generated client stub which has the interface specified and is
+	 * prepared to talk to the endpoint given.
 	 * 
 	 * @param loader
-	 *            The class loader to use when generating the new class for this
-	 *            client stub.
+	 *            The class loader to use when generating the new class for this client stub.
 	 * @param iface
-	 *            The class which represents the java interface that the client
-	 *            stub should implement for communication.
+	 *            The class which represents the java interface that the client stub should
+	 *            implement for communication.
 	 * @param epr
-	 *            The EndpointReferenceType that indicates the target of the
-	 *            newly generated client stub.
-	 * @return An dynamically generated client proxy which implements the passed
-	 *         in interface and is configured to communicate to the given EPR.
+	 *            The EndpointReferenceType that indicates the target of the newly generated client
+	 *            stub.
+	 * @return An dynamically generated client proxy which implements the passed in interface and is
+	 *         configured to communicate to the given EPR.
 	 */
-	static public <IFace> IFace createProxy(ClassLoader loader,
-			Class<IFace> iface, EndpointReferenceType epr)
-			throws ResourceException, GenesisIISecurityException {
+	static public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr)
+		throws ResourceException, GenesisIISecurityException
+	{
 		try {
-			return createProxy(loader, iface, epr,
-					ContextManager.getExistingContext());
+			return createProxy(loader, iface, epr, ContextManager.getExistingContext());
 		} catch (IOException ioe) {
 			throw new ResourceException(ioe.getMessage(), ioe);
 		}
 	}
 
 	/**
-	 * Create a new, dynamically generated client stub which has the interface
-	 * specified and is prepared to talk to the endpoint given.
+	 * Create a new, dynamically generated client stub which has the interface specified and is
+	 * prepared to talk to the endpoint given.
 	 * 
 	 * @param iface
-	 *            The class which represents the java interface that the client
-	 *            stub should implement for communication.
+	 *            The class which represents the java interface that the client stub should
+	 *            implement for communication.
 	 * @param epr
-	 *            The EndpointReferenceType that indicates the target of the
-	 *            newly generated client stub.
+	 *            The EndpointReferenceType that indicates the target of the newly generated client
+	 *            stub.
 	 * @param callContext
-	 *            A calling context to use instead of the current context when
-	 *            making out calls.
-	 * @return An dynamically generated client proxy which implements the passed
-	 *         in interface and is configured to communicate to the given EPR.
+	 *            A calling context to use instead of the current context when making out calls.
+	 * @return An dynamically generated client proxy which implements the passed in interface and is
+	 *         configured to communicate to the given EPR.
 	 */
-	static public <IFace> IFace createProxy(Class<IFace> iface,
-			EndpointReferenceType epr, ICallingContext callContext)
-			throws ResourceException, GenesisIISecurityException {
-		return createProxy(GenesisClassLoader.classLoaderFactory(), iface, epr,
-				callContext);
+	static public <IFace> IFace createProxy(Class<IFace> iface, EndpointReferenceType epr, ICallingContext callContext)
+		throws ResourceException, GenesisIISecurityException
+	{
+		return createProxy(GenesisClassLoader.classLoaderFactory(), iface, epr, callContext);
 	}
 
 	/**
-	 * Create a new, dynamically generated client stub which has the interface
-	 * specified and is prepared to talk to the endpoint given.
+	 * Create a new, dynamically generated client stub which has the interface specified and is
+	 * prepared to talk to the endpoint given.
 	 * 
 	 * @param loader
-	 *            The class loader to use when generating the new class for this
-	 *            client stub.
+	 *            The class loader to use when generating the new class for this client stub.
 	 * @param iface
-	 *            The class which represents the java interface that the client
-	 *            stub should implement for communication.
+	 *            The class which represents the java interface that the client stub should
+	 *            implement for communication.
 	 * @param epr
-	 *            The EndpointReferenceType that indicates the target of the
-	 *            newly generated client stub.
+	 *            The EndpointReferenceType that indicates the target of the newly generated client
+	 *            stub.
 	 * @param callContext
-	 *            A calling context to use instead of the current context when
-	 *            making out calls.
-	 * @return An dynamically generated client proxy which implements the passed
-	 *         in interface and is configured to communicate to the given EPR.
+	 *            A calling context to use instead of the current context when making out calls.
+	 * @return An dynamically generated client proxy which implements the passed in interface and is
+	 *         configured to communicate to the given EPR.
 	 */
-	static public <IFace> IFace createProxy(ClassLoader loader,
-			Class<IFace> iface, EndpointReferenceType epr,
-			ICallingContext callContext) throws ResourceException,
-			GenesisIISecurityException {
+	static public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr,
+		ICallingContext callContext) throws ResourceException, GenesisIISecurityException
+	{
 		IProxyFactory factory = getProxyFactory();
 		IFace face = factory.createProxy(loader, iface, epr, callContext);
 
@@ -438,38 +409,37 @@ public class ClientUtils {
 	}
 
 	/**
-	 * Given a dynamically generated proxy generated by the ClientUtils class,
-	 * return the EPR which the given proxy is configured to communicate with.
+	 * Given a dynamically generated proxy generated by the ClientUtils class, return the EPR which
+	 * the given proxy is configured to communicate with.
 	 * 
 	 * @param clientProxy
 	 *            The client proxy object generated earlier by this class.
-	 * @return The EndpointReferenceType that the given proxy is configured to
-	 *         communicate with.
+	 * @return The EndpointReferenceType that the given proxy is configured to communicate with.
 	 */
-	static public EndpointReferenceType extractEPR(Object clientProxy)
-			throws ResourceException {
+	static public EndpointReferenceType extractEPR(Object clientProxy) throws ResourceException
+	{
 		return getProxyFactory().extractTargetEPR(clientProxy);
 	}
 
-	static public void setAttachments(Object clientProxy,
-			Collection<GeniiAttachment> attachments,
-			AttachmentType attachmentType) throws ResourceException {
-		getProxyFactory().setAttachments(clientProxy, attachments,
-				attachmentType);
+	static public void
+		setAttachments(Object clientProxy, Collection<GeniiAttachment> attachments, AttachmentType attachmentType)
+			throws ResourceException
+	{
+		getProxyFactory().setAttachments(clientProxy, attachments, attachmentType);
 	}
 
-	static public Collection<GeniiAttachment> getAttachments(Object clientProxy)
-			throws ResourceException {
+	static public Collection<GeniiAttachment> getAttachments(Object clientProxy) throws ResourceException
+	{
 		return getProxyFactory().getAttachments(clientProxy);
 	}
 
-	static public GenesisIIEndpointInformation getLastEndpointInformation(
-			Object clientProxy) throws ResourceException {
+	static public GenesisIIEndpointInformation getLastEndpointInformation(Object clientProxy) throws ResourceException
+	{
 		return getProxyFactory().getLastEndpointInformation(clientProxy);
 	}
 
-	static public void setTimeout(Object clientProxy, int timeoutMillis)
-			throws ResourceException {
+	static public void setTimeout(Object clientProxy, int timeoutMillis) throws ResourceException
+	{
 		getProxyFactory().setTimeout(clientProxy, timeoutMillis);
 	}
 }

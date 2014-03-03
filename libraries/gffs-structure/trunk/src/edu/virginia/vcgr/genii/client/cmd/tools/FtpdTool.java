@@ -10,7 +10,8 @@ import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.network.ftp.GeniiBackendConfiguration;
 import edu.virginia.vcgr.genii.network.ftp.GeniiBackendFactory;
 
-public class FtpdTool extends BaseGridTool {
+public class FtpdTool extends BaseGridTool
+{
 	static private final String _DESCRIPTION = "config/tooldocs/description/dftpd";
 	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/uftpd";
 	static private final String _MANPAGE = "config/tooldocs/man/ftpd";
@@ -23,39 +24,45 @@ public class FtpdTool extends BaseGridTool {
 
 	static private FTPDaemon _daemon = null;
 
-	public FtpdTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(
-				_USAGE_RESOURCE), true, ToolCategory.ANTIQUATED);
+	public FtpdTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE_RESOURCE), true, ToolCategory.ANTIQUATED);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "block" })
-	public void setBlock() {
+	public void setBlock()
+	{
 		_block = true;
 	}
 
 	@Option({ "idle-timeout" })
-	public void setIdle_timeout(String seconds) {
+	public void setIdle_timeout(String seconds)
+	{
 		_idleTimeout = Integer.parseInt(seconds);
 	}
 
 	@Option({ "data-connection-timeout" })
-	public void setData_connection_timeout(String timeout) {
+	public void setData_connection_timeout(String timeout)
+	{
 		_dataConnectionTimeout = Integer.parseInt(timeout);
 	}
 
 	@Option({ "max-auth-attempts" })
-	public void setMax_auth_attempts(String max) {
+	public void setMax_auth_attempts(String max)
+	{
 		_maxAuthAttempts = Integer.parseInt(max);
 	}
 
 	@Option({ "sandbox" })
-	public void setSandbox(String sandBox) {
+	public void setSandbox(String sandBox)
+	{
 		_sandbox = sandBox;
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		String arg = getArgument(0);
 
 		if (arg.equals("stop")) {
@@ -72,15 +79,13 @@ public class FtpdTool extends BaseGridTool {
 			return 0;
 		}
 
-		GeniiBackendConfiguration backConf = new GeniiBackendConfiguration(
-				stdin, stdout, stderr);
+		GeniiBackendConfiguration backConf = new GeniiBackendConfiguration(stdin, stdout, stderr);
 
 		FTPConfiguration conf = new FTPConfiguration(Integer.parseInt(arg));
 
 		synchronized (FtpdTool.class) {
 			if (_daemon != null) {
-				this.stderr.println("An ftpd is already running on port "
-						+ _daemon.getPort());
+				this.stderr.println("An ftpd is already running on port " + _daemon.getPort());
 				return 1;
 			}
 
@@ -100,8 +105,7 @@ public class FtpdTool extends BaseGridTool {
 				NetworkConstraint[] constraints = new NetworkConstraint[numArguments() - 1];
 
 				for (int lcv = 1; lcv < numArguments(); lcv++)
-					constraints[lcv - 1] = new NetworkConstraint(
-							getArgument(lcv));
+					constraints[lcv - 1] = new NetworkConstraint(getArgument(lcv));
 
 				conf.setNetworkConstraints(constraints);
 			}
@@ -123,7 +127,8 @@ public class FtpdTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() < 1)
 			throw new InvalidToolUsageException();
 	}

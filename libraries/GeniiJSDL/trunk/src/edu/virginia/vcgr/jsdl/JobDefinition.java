@@ -33,7 +33,8 @@ import edu.virginia.vcgr.jsdl.sweep.SweepConstants;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlRootElement(namespace = JSDLConstants.JSDL_NS, name = "JobDefinition")
-public class JobDefinition extends CommonJSDLElement implements Serializable {
+public class JobDefinition extends CommonJSDLElement implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlID
@@ -50,35 +51,43 @@ public class JobDefinition extends CommonJSDLElement implements Serializable {
 	 * For use only with XML Unmarshalling.
 	 */
 	@SuppressWarnings("unused")
-	private JobDefinition() {
+	private JobDefinition()
+	{
 	}
 
-	public JobDefinition(String id, JobDescription jobDescription) {
+	public JobDefinition(String id, JobDescription jobDescription)
+	{
 		_id = id;
 		_jobDescription = jobDescription;
 	}
 
-	public JobDefinition(JobDescription jobDescription) {
+	public JobDefinition(JobDescription jobDescription)
+	{
 		this(null, jobDescription);
 	}
 
-	final public void jobDescription(JobDescription jobDescription) {
+	final public void jobDescription(JobDescription jobDescription)
+	{
 		_jobDescription = jobDescription;
 	}
 
-	final public JobDescription jobDescription() {
+	final public JobDescription jobDescription()
+	{
 		return _jobDescription;
 	}
 
-	final public List<Sweep> parameterSweeps() {
+	final public List<Sweep> parameterSweeps()
+	{
 		return _parameterSweeps;
 	}
 
-	final public String id() {
+	final public String id()
+	{
 		return _id;
 	}
 
-	final public void id(String id) {
+	final public void id(String id)
+	{
 		_id = id;
 	}
 }

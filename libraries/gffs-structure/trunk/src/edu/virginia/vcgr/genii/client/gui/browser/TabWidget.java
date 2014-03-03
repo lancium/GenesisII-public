@@ -18,12 +18,12 @@ import edu.virginia.vcgr.genii.client.gui.browser.plugins.TabPluginDescriptor;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 /**
- * This is the main widget that handles the tabs to the right of the rns tree
- * browser.
+ * This is the main widget that handles the tabs to the right of the rns tree browser.
  * 
  * @author mmm2a
  */
-public class TabWidget extends JTabbedPane implements TreeSelectionListener {
+public class TabWidget extends JTabbedPane implements TreeSelectionListener
+{
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(TabWidget.class);
@@ -35,13 +35,12 @@ public class TabWidget extends JTabbedPane implements TreeSelectionListener {
 	 * Create a new tab widget.
 	 * 
 	 * @param selectionCallback
-	 *            The selection callback to use to determine which rns paths are
-	 *            currently selected.
+	 *            The selection callback to use to determine which rns paths are currently selected.
 	 * @param pluginManager
 	 *            The plugin manager from whence to get tabs.
 	 */
-	public TabWidget(ISelectionCallback selectionCallback,
-			PluginManager pluginManager) {
+	public TabWidget(ISelectionCallback selectionCallback, PluginManager pluginManager)
+	{
 		super();
 
 		_pluginManager = pluginManager;
@@ -55,10 +54,11 @@ public class TabWidget extends JTabbedPane implements TreeSelectionListener {
 	}
 
 	/**
-	 * This method is called every time we need to reset the tabs we are
-	 * displaying (everytime the selection changes).
+	 * This method is called every time we need to reset the tabs we are displaying (everytime the
+	 * selection changes).
 	 */
-	private void setTabs() {
+	private void setTabs()
+	{
 		removeAll();
 
 		RNSPath[] paths = _selectionCallback.getSelectedPaths();
@@ -78,7 +78,8 @@ public class TabWidget extends JTabbedPane implements TreeSelectionListener {
 	}
 
 	@Override
-	public void valueChanged(TreeSelectionEvent e) {
+	public void valueChanged(TreeSelectionEvent e)
+	{
 		setTabs();
 	}
 }

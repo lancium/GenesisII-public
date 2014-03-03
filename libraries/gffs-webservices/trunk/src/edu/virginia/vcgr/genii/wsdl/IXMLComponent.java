@@ -2,7 +2,8 @@ package edu.virginia.vcgr.genii.wsdl;
 
 import org.w3c.dom.Node;
 
-public interface IXMLComponent {
+public interface IXMLComponent
+{
 	public Node getRepresentedNode();
 
 	public IXMLComponent getParent();

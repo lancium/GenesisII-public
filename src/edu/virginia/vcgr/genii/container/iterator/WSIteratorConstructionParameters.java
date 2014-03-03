@@ -15,11 +15,12 @@ import org.morgan.util.GUID;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.iterator.IteratorConstants;
 
-public class WSIteratorConstructionParameters extends ConstructionParameters
-		implements Closeable {
+public class WSIteratorConstructionParameters extends ConstructionParameters implements Closeable
+{
 	static final long serialVersionUID = 0L;
 
-	static private Map<String, WSIteratorConstructionParameters> _originalConsParms = new HashMap<String, WSIteratorConstructionParameters>();
+	static private Map<String, WSIteratorConstructionParameters> _originalConsParms =
+		new HashMap<String, WSIteratorConstructionParameters>();
 
 	transient private int _preferredBatchSize;
 
@@ -33,22 +34,23 @@ public class WSIteratorConstructionParameters extends ConstructionParameters
 
 	/* For JAXB Only */
 	@SuppressWarnings("unused")
-	private WSIteratorConstructionParameters() {
+	private WSIteratorConstructionParameters()
+	{
 	}
 
 	@XmlElement(namespace = IteratorConstants.ITERATOR_NS, name = "iterator-key", nillable = false, required = true)
-	private String getKey() {
+	private String getKey()
+	{
 		return _key;
 	}
 
 	@SuppressWarnings("unused")
-	private void setKey(String key) {
+	private void setKey(String key)
+	{
 		_key = key;
-		WSIteratorConstructionParameters original = _originalConsParms
-				.get(_key);
+		WSIteratorConstructionParameters original = _originalConsParms.get(_key);
 		if (original == null)
-			throw new IllegalStateException(
-					"Can't find original construction parameters!");
+			throw new IllegalStateException("Can't find original construction parameters!");
 
 		_isIndexedIterator = original._isIndexedIterator;
 		_contentsIterator = original._contentsIterator;
@@ -56,18 +58,19 @@ public class WSIteratorConstructionParameters extends ConstructionParameters
 	}
 
 	@Override
-	final protected void finalize() throws Throwable {
+	final protected void finalize() throws Throwable
+	{
 		close();
 	}
 
-	public WSIteratorConstructionParameters(
-			Iterator<MessageElement> contentsIterator, int preferredBlockSize) {
+	public WSIteratorConstructionParameters(Iterator<MessageElement> contentsIterator, int preferredBlockSize)
+	{
 		this(contentsIterator, preferredBlockSize, null);
 	}
 
-	public WSIteratorConstructionParameters(
-			Iterator<MessageElement> contentsIterator, int preferredBlockSize,
-			InMemoryIteratorWrapper imiw) {
+	public WSIteratorConstructionParameters(Iterator<MessageElement> contentsIterator, int preferredBlockSize,
+		InMemoryIteratorWrapper imiw)
+	{
 		// List<InMemoryIteratorEntry> indices
 		synchronized (this) {
 			_key = new GUID().toString();
@@ -75,8 +78,7 @@ public class WSIteratorConstructionParameters extends ConstructionParameters
 		}
 
 		/*
-		 * We don't need to fill the first block as we have to be disjoint with
-		 * what is returned
+		 * We don't need to fill the first block as we have to be disjoint with what is returned
 		 */
 
 		if (contentsIterator.hasNext())
@@ -87,8 +89,7 @@ public class WSIteratorConstructionParameters extends ConstructionParameters
 
 		_preferredBatchSize = preferredBlockSize;
 
-		if (imiw == null || imiw.getIndices() == null
-				|| imiw.getIndices().size() == 0) {
+		if (imiw == null || imiw.getIndices() == null || imiw.getIndices().size() == 0) {
 			_isIndexedIterator = false;
 			_imiw = null;
 		}
@@ -105,37 +106,44 @@ public class WSIteratorConstructionParameters extends ConstructionParameters
 
 	}
 
-	final public int preferredBatchSize() {
+	final public int preferredBatchSize()
+	{
 		return _preferredBatchSize;
 	}
 
-	final public Iterator<MessageElement> getContentsIterator() {
+	final public Iterator<MessageElement> getContentsIterator()
+	{
 		return _contentsIterator;
 	}
 
 	@Override
-	final synchronized public void close() throws IOException {
+	final synchronized public void close() throws IOException
+	{
 		if (_key != null) {
 			_originalConsParms.remove(_key);
 			_key = null;
 		}
 	}
 
-	public boolean remainingContents(Object tempObj) {
+	public boolean remainingContents(Object tempObj)
+	{
 		if (_contentsIterator != null || _isIndexedIterator)
 			return true;
 		return false;
 	}
 
-	public boolean isIndexedIterator() {
+	public boolean isIndexedIterator()
+	{
 		return _isIndexedIterator;
 	}
 
-	public List<InMemoryIteratorEntry> getIndices() {
+	public List<InMemoryIteratorEntry> getIndices()
+	{
 		return _imiw.getIndices();
 	}
 
-	public InMemoryIteratorWrapper getWrapper() {
+	public InMemoryIteratorWrapper getWrapper()
+	{
 		return _imiw;
 	}
 }

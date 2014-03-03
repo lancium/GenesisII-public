@@ -12,15 +12,16 @@ import edu.virginia.vcgr.xscript.XScriptContext;
 import edu.virginia.vcgr.xscript.XScriptParser;
 import edu.virginia.vcgr.xscript.macros.MacroReplacer;
 
-public class DefineStatement implements ParseStatement {
+public class DefineStatement implements ParseStatement
+{
 	private String _variable;
 	private String _source;
 	private Pattern _pattern;
 	private String _replacement;
 	private String _isGlobal;
 
-	DefineStatement(String variable, String source, Pattern pattern,
-			String replacement, String isGlobal) {
+	DefineStatement(String variable, String source, Pattern pattern, String replacement, String isGlobal)
+	{
 		_variable = variable;
 		_source = source;
 		_pattern = pattern;
@@ -29,8 +30,8 @@ public class DefineStatement implements ParseStatement {
 	}
 
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException {
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
+	{
 		String variable = MacroReplacer.replaceMacros(context, _variable);
 		String source = MacroReplacer.replaceMacros(context, _source);
 		String result;

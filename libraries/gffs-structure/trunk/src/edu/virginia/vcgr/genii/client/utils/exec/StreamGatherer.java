@@ -7,7 +7,8 @@ import java.io.InputStream;
 
 import org.morgan.util.io.StreamUtils;
 
-public class StreamGatherer implements Closeable {
+public class StreamGatherer implements Closeable
+{
 	static private final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 	static private final long DEFAULT_TIMEOUT = 1000L * 4;
 
@@ -16,7 +17,8 @@ public class StreamGatherer implements Closeable {
 	private InputStream _source;
 	private IOException _ioe = null;
 
-	public StreamGatherer(InputStream source) {
+	public StreamGatherer(InputStream source)
+	{
 		_source = source;
 		_sink = new ByteArrayOutputStream();
 
@@ -26,11 +28,13 @@ public class StreamGatherer implements Closeable {
 		_streamThread.start();
 	}
 
-	public byte[] getData() throws IOException {
+	public byte[] getData() throws IOException
+	{
 		return getData(DEFAULT_TIMEOUT);
 	}
 
-	public byte[] getData(long timeoutMS) throws IOException {
+	public byte[] getData(long timeoutMS) throws IOException
+	{
 		if (_ioe != null)
 			throw _ioe;
 
@@ -53,20 +57,24 @@ public class StreamGatherer implements Closeable {
 		return _sink.toByteArray();
 	}
 
-	protected void finalize() {
+	protected void finalize()
+	{
 		close();
 	}
 
 	@Override
-	synchronized public void close() {
+	synchronized public void close()
+	{
 		if (_source != null)
 			StreamUtils.close(_source);
 		_source = null;
 	}
 
-	private class GatherWorker implements Runnable {
+	private class GatherWorker implements Runnable
+	{
 		@Override
-		public void run() {
+		public void run()
+		{
 			byte[] data = new byte[DEFAULT_BUFFER_SIZE];
 			int read;
 

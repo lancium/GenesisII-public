@@ -29,7 +29,8 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class NumberOfProcesses implements Serializable {
+public class NumberOfProcesses implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -41,35 +42,42 @@ public class NumberOfProcesses implements Serializable {
 	@XmlValue
 	private Long _value = null;
 
-	private NumberOfProcesses() {
+	private NumberOfProcesses()
+	{
 		this(null, null);
 	}
 
-	private NumberOfProcesses(Long value, Boolean actualTotalCPUCount) {
+	private NumberOfProcesses(Long value, Boolean actualTotalCPUCount)
+	{
 		_actualTotalCPUCount = actualTotalCPUCount;
 		_value = value;
 	}
 
-	final public boolean actualTotalCPUCount() {
+	final public boolean actualTotalCPUCount()
+	{
 		if (_actualTotalCPUCount == null)
 			return false;
 
 		return _actualTotalCPUCount;
 	}
 
-	final public Long value() {
+	final public Long value()
+	{
 		return _value;
 	}
 
-	final public Map<QName, String> anyAttributes() {
+	final public Map<QName, String> anyAttributes()
+	{
 		return _anyAttributes;
 	}
 
-	static public NumberOfProcesses numberOfProccesses(long value) {
+	static public NumberOfProcesses numberOfProccesses(long value)
+	{
 		return new NumberOfProcesses(value, null);
 	}
 
-	static public NumberOfProcesses useActualTotalCPUCount() {
+	static public NumberOfProcesses useActualTotalCPUCount()
+	{
 		return new NumberOfProcesses(null, true);
 	}
 }

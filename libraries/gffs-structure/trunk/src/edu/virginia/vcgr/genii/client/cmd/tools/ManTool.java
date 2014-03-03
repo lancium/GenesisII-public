@@ -10,30 +10,32 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class ManTool extends BaseGridTool {
+public class ManTool extends BaseGridTool
+{
 
 	static private final String _DESCRIPTION = "config/tooldocs/description/dman";
 	static private final String _USAGE = "config/tooldocs/usage/uman";
 	static final private String _MANPAGE = "config/tooldocs/man/man";
 
-	public ManTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				true, ToolCategory.GENERAL);
+	public ManTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), true, ToolCategory.GENERAL);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (getArguments().size() != 1)
 			throw new InvalidToolUsageException();
 
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
-		Map<String, ToolDescription> _tools = CommandLineRunner
-				.getToolList(ConfigurationManager.getCurrentConfiguration()
-						.getClientConfiguration());
+	protected int runCommand() throws Throwable
+	{
+		Map<String, ToolDescription> _tools =
+			CommandLineRunner.getToolList(ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
 
 		String tool = getArguments().get(0);
 		ToolDescription description = _tools.get(tool);
@@ -46,8 +48,8 @@ public class ManTool extends BaseGridTool {
 		return 0;
 	}
 
-	protected static void printManPage(ToolDescription description,
-			PrintWriter out) throws ToolException {
+	protected static void printManPage(ToolDescription description, PrintWriter out) throws ToolException
+	{
 		out.println(description.getUsage());
 		out.println();
 		if (description.getManPage() == null)

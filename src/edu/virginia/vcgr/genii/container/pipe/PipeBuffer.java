@@ -2,22 +2,24 @@ package edu.virginia.vcgr.genii.container.pipe;
 
 import java.nio.ByteBuffer;
 
-final class PipeBuffer {
+final class PipeBuffer
+{
 	private Object _lockObject = new Object();
 
 	private ByteBuffer _buffer;
 
-	PipeBuffer(int pipeSize) {
+	PipeBuffer(int pipeSize)
+	{
 		_buffer = ByteBuffer.allocate(pipeSize);
 	}
 
-	void read(ByteBuffer sink, long timeoutMS) throws InterruptedException {
+	void read(ByteBuffer sink, long timeoutMS) throws InterruptedException
+	{
 		long startTime = System.currentTimeMillis();
 
 		synchronized (_lockObject) {
 			while (_buffer.position() == 0) {
-				long sleepTime = timeoutMS
-						- (System.currentTimeMillis() - startTime);
+				long sleepTime = timeoutMS - (System.currentTimeMillis() - startTime);
 				if (sleepTime <= 0)
 					throw new InterruptedException();
 
@@ -35,13 +37,13 @@ final class PipeBuffer {
 		}
 	}
 
-	void write(ByteBuffer source, long timeoutMS) throws InterruptedException {
+	void write(ByteBuffer source, long timeoutMS) throws InterruptedException
+	{
 		long startTime = System.currentTimeMillis();
 
 		synchronized (_lockObject) {
 			while (!_buffer.hasRemaining()) {
-				long sleepTime = timeoutMS
-						- (System.currentTimeMillis() - startTime);
+				long sleepTime = timeoutMS - (System.currentTimeMillis() - startTime);
 				if (sleepTime <= 0)
 					throw new InterruptedException();
 

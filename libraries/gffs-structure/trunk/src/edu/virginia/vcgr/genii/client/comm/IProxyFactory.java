@@ -23,33 +23,28 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
-public interface IProxyFactory {
-	public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface,
-			EndpointReferenceType epr, ICallingContext callContext)
-			throws ResourceException, GenesisIISecurityException;
+public interface IProxyFactory
+{
+	public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr,
+		ICallingContext callContext) throws ResourceException, GenesisIISecurityException;
 
 	/**
-	 * This method can be used to determine the EPR that a proxy (created by
-	 * this same class (not necessarily same instance)) points to.
+	 * This method can be used to determine the EPR that a proxy (created by this same class (not
+	 * necessarily same instance)) points to.
 	 * 
 	 * @param proxy
-	 *            An object that was returned from the createClientProxy method
-	 *            above in this same class.
+	 *            An object that was returned from the createClientProxy method above in this same
+	 *            class.
 	 * @return The EndpointReferenceType that the given proxy targets.
 	 */
-	public EndpointReferenceType extractTargetEPR(Object proxy)
-			throws ResourceException;
+	public EndpointReferenceType extractTargetEPR(Object proxy) throws ResourceException;
 
-	public void setAttachments(Object clientProxy,
-			Collection<GeniiAttachment> attachments,
-			AttachmentType attachmentType) throws ResourceException;
+	public void setAttachments(Object clientProxy, Collection<GeniiAttachment> attachments, AttachmentType attachmentType)
+		throws ResourceException;
 
-	public Collection<GeniiAttachment> getAttachments(Object clientProxy)
-			throws ResourceException;
+	public Collection<GeniiAttachment> getAttachments(Object clientProxy) throws ResourceException;
 
-	public void setTimeout(Object clientProxy, int timeoutMillis)
-			throws ResourceException;
+	public void setTimeout(Object clientProxy, int timeoutMillis) throws ResourceException;
 
-	public GenesisIIEndpointInformation getLastEndpointInformation(
-			Object clientProxy) throws ResourceException;
+	public GenesisIIEndpointInformation getLastEndpointInformation(Object clientProxy) throws ResourceException;
 }

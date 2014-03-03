@@ -10,22 +10,25 @@ import java.util.LinkedList;
 
 import org.morgan.util.io.StreamUtils;
 
-public class TextContent {
+public class TextContent
+{
 	private Collection<String> _content;
 
-	public TextContent(Collection<String> content) {
+	public TextContent(Collection<String> content)
+	{
 		_content = new ArrayList<String>(content);
 	}
 
-	public TextContent(String... content) {
+	public TextContent(String... content)
+	{
 		_content = new ArrayList<String>(content.length);
 		for (String s : content) {
 			_content.add(s);
 		}
 	}
 
-	public TextContent(
-			edu.virginia.vcgr.genii.client.io.LoadFileResource resource) {
+	public TextContent(edu.virginia.vcgr.genii.client.io.LoadFileResource resource)
+	{
 		String line;
 		InputStream in = null;
 		BufferedReader reader = null;
@@ -35,9 +38,7 @@ public class TextContent {
 		try {
 			in = resource.open();
 			if (in == null)
-				throw new IllegalArgumentException(
-						"Unable to open indicated file resource \"" + resource
-								+ "\".");
+				throw new IllegalArgumentException("Unable to open indicated file resource \"" + resource + "\".");
 			reader = new BufferedReader(new InputStreamReader(in));
 			while ((line = reader.readLine()) != null) {
 				_content.add(line);
@@ -50,12 +51,14 @@ public class TextContent {
 		}
 	}
 
-	public Collection<String> getContent() {
+	public Collection<String> getContent()
+	{
 		return _content;
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
 

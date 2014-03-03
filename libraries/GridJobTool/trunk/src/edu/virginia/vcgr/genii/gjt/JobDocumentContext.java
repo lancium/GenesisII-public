@@ -26,18 +26,22 @@ import edu.virginia.vcgr.jsdl.JSDLUtility;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.sweep.Sweep;
 
-public class JobDocumentContext {
+public class JobDocumentContext
+{
 	static private Logger _logger = Logger.getLogger(JobDocumentContext.class);
 
-	static private class JobDocumentClosedWindowAdapter extends WindowAdapter {
+	static private class JobDocumentClosedWindowAdapter extends WindowAdapter
+	{
 		private JobToolListener _listener;
 
-		private JobDocumentClosedWindowAdapter(JobToolListener listener) {
+		private JobDocumentClosedWindowAdapter(JobToolListener listener)
+		{
 			_listener = listener;
 		}
 
 		@Override
-		final public void windowClosed(WindowEvent e) {
+		final public void windowClosed(WindowEvent e)
+		{
 			_listener.jobWindowClosed();
 		}
 	}
@@ -55,15 +59,14 @@ public class JobDocumentContext {
 
 	private GridJobToolFrame _frame;
 
-	private void setFrameTitle() {
-		String filename = (_file == null) ? "New Job Document" : _file
-				.getAbsolutePath();
-		_frame.setTitle(String.format("Grid Job Tool - %s%s", filename,
-				_modified ? "*" : ""));
+	private void setFrameTitle()
+	{
+		String filename = (_file == null) ? "New Job Document" : _file.getAbsolutePath();
+		_frame.setTitle(String.format("Grid Job Tool - %s%s", filename, _modified ? "*" : ""));
 	}
 
-	JobDocumentContext(JobApplicationContext applicationContext,
-			File initialFile, JobToolListener listener) throws IOException {
+	JobDocumentContext(JobApplicationContext applicationContext, File initialFile, JobToolListener listener) throws IOException
+	{
 		_applicationContext = applicationContext;
 		_variableManager = new VariableManager();
 		_file = initialFile;
@@ -88,58 +91,69 @@ public class JobDocumentContext {
 
 		_frame = GridJobToolFrame.createNewFrame(this);
 		if (listener != null)
-			_frame.addWindowListener(new JobDocumentClosedWindowAdapter(
-					listener));
+			_frame.addWindowListener(new JobDocumentClosedWindowAdapter(listener));
 
 		setFrameTitle();
 
 		mBroker.addModificationListener(new ModificationListenerImpl());
 	}
 
-	void setInitial() {
+	void setInitial()
+	{
 		_initial = true;
 	}
 
-	boolean isInitial() {
+	boolean isInitial()
+	{
 		return _initial;
 	}
 
-	void start() {
+	void start()
+	{
 		_frame.pack();
 		GUIUtils.centerComponent(_frame);
 		_frame.setVisible(true);
 	}
 
-	final public JobApplicationContext applicationContext() {
+	final public JobApplicationContext applicationContext()
+	{
 		return _applicationContext;
 	}
 
-	final public ParameterizableBroker getParameterizableBroker() {
+	final public ParameterizableBroker getParameterizableBroker()
+	{
 		return _pBroker;
 	}
 
-	final public ModificationBroker getModificationBroker() {
+	final public ModificationBroker getModificationBroker()
+	{
 		return _mBroker;
 	}
 
-	final public JobDocument jobDocument() {
+	final public JobDocument jobDocument()
+	{
 		return _document;
 	}
 
-	final public VariableManager variableManager() {
+	final public VariableManager variableManager()
+	{
 		return _variableManager;
 	}
 
-	final public boolean isModified() {
+	final public boolean isModified()
+	{
 		return _modified;
 	}
 
-	final public void saveAs() {
+	final public void saveAs()
+	{
 		if (!_frame.hasFocus()) {
 			_frame.requestFocusInWindow();
-			SwingUtilities.invokeLater(new Runnable() {
+			SwingUtilities.invokeLater(new Runnable()
+			{
 				@Override
-				public void run() {
+				public void run()
+				{
 					saveAs();
 				}
 			});
@@ -147,8 +161,7 @@ public class JobDocumentContext {
 		}
 
 		while (true) {
-			File target = _applicationContext.getDesiredFile(_frame, false,
-					false);
+			File target = _applicationContext.getDesiredFile(_frame, false, false);
 			if (target != null) {
 				String name = target.getName();
 				int index = name.lastIndexOf('.');
@@ -156,8 +169,8 @@ public class JobDocumentContext {
 					target = new File(target.getParentFile(), name + ".gjp");
 
 				if (target.exists()) {
-					int result = JOptionPane.showConfirmDialog(_frame,
-							"Overwrite existing file?", "File Exists",
+					int result =
+						JOptionPane.showConfirmDialog(_frame, "Overwrite existing file?", "File Exists",
 							JOptionPane.YES_NO_CANCEL_OPTION);
 					if (result == JOptionPane.CANCEL_OPTION)
 						return;
@@ -172,10 +185,8 @@ public class JobDocumentContext {
 					setFrameTitle();
 					return;
 				} catch (IOException ioe) {
-					JOptionPane.showMessageDialog(_frame,
-							"Error saving project file.",
-							"Error Saving Project File",
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(_frame, "Error saving project file.", "Error Saving Project File",
+						JOptionPane.ERROR_MESSAGE);
 					_logger.error("Unable to save project file.", ioe);
 					return;
 				}
@@ -184,7 +195,8 @@ public class JobDocumentContext {
 		}
 	}
 
-	final public void save() {
+	final public void save()
+	{
 		if (_file == null) {
 			saveAs();
 			return;
@@ -193,9 +205,11 @@ public class JobDocumentContext {
 		try {
 			if (!_frame.hasFocus()) {
 				_frame.requestFocusInWindow();
-				SwingUtilities.invokeLater(new Runnable() {
+				SwingUtilities.invokeLater(new Runnable()
+				{
 					@Override
-					public void run() {
+					public void run()
+					{
 						save();
 					}
 				});
@@ -205,38 +219,38 @@ public class JobDocumentContext {
 			_modified = false;
 			setFrameTitle();
 		} catch (IOException ioe) {
-			JOptionPane.showMessageDialog(_frame, "Error saving project file.",
-					"Error Saving Project File", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(_frame, "Error saving project file.", "Error Saving Project File",
+				JOptionPane.ERROR_MESSAGE);
 			_logger.error("Unable to save project file.", ioe);
 		}
 	}
 
-	final public void close() {
+	final public void close()
+	{
 		_frame.dispose();
 	}
 
-	final public void generateJSDL() {
+	final public void generateJSDL()
+	{
 		if (!_frame.hasFocus()) {
 			_frame.requestFocusInWindow();
-			SwingUtilities.invokeLater(new Runnable() {
+			SwingUtilities.invokeLater(new Runnable()
+			{
 				@Override
-				public void run() {
+				public void run()
+				{
 					generateJSDL();
 				}
 			});
 			return;
 		}
 
-		if (((Boolean) (_applicationContext.preferences()
-				.preference(ToolPreference.PopupForWarnings))).booleanValue()) {
+		if (((Boolean) (_applicationContext.preferences().preference(ToolPreference.PopupForWarnings))).booleanValue()) {
 			Analysis analysis = jobDocument().analyze();
 			if (analysis.hasWarnings()) {
-				int result = JOptionPane
-						.showConfirmDialog(
-								_frame,
-								"There are still warnings!  Do you still want to generate JSDL?",
-								"JSDL Generation Confirmation",
-								JOptionPane.YES_NO_OPTION);
+				int result =
+					JOptionPane.showConfirmDialog(_frame, "There are still warnings!  Do you still want to generate JSDL?",
+						"JSDL Generation Confirmation", JOptionPane.YES_NO_OPTION);
 
 				if (result != JOptionPane.YES_OPTION)
 					return;
@@ -250,41 +264,34 @@ public class JobDocumentContext {
 		for (Sweep sweep : sweeps)
 			count += sweep.size();
 
-		int limit = (((Integer) (_applicationContext.preferences()
-				.preference(ToolPreference.ParameterSweepPopupLimit)))
-				.intValue());
+		int limit =
+			(((Integer) (_applicationContext.preferences().preference(ToolPreference.ParameterSweepPopupLimit))).intValue());
 
 		if (count >= limit) {
-			int result = JOptionPane
-					.showConfirmDialog(
-							_frame,
-							String.format(
-									"This JSDL document contains %d jobs!  Do you want to continue?",
-									count), "JSDL Generation Confirmation",
-							JOptionPane.YES_NO_OPTION);
+			int result =
+				JOptionPane.showConfirmDialog(_frame,
+					String.format("This JSDL document contains %d jobs!  Do you want to continue?", count),
+					"JSDL Generation Confirmation", JOptionPane.YES_NO_OPTION);
 
 			if (result != JOptionPane.YES_OPTION)
 				return;
 		}
 
-		JobDefinitionListener generationListener = _applicationContext
-				.getGenerationListener();
+		JobDefinitionListener generationListener = _applicationContext.getGenerationListener();
 		if (generationListener != null) {
 			generationListener.jobDefinitionGenerated(jobDef);
 		} else {
 			while (true) {
-				File target = _applicationContext.getDesiredFile(_frame, false,
-						true);
+				File target = _applicationContext.getDesiredFile(_frame, false, true);
 				if (target != null) {
 					String name = target.getName();
 					int index = name.lastIndexOf('.');
 					if (index < 0)
-						target = new File(target.getParentFile(), name
-								+ ".jsdl");
+						target = new File(target.getParentFile(), name + ".jsdl");
 
 					if (target.exists()) {
-						int result = JOptionPane.showConfirmDialog(_frame,
-								"Overwrite existing file?", "File Exists",
+						int result =
+							JOptionPane.showConfirmDialog(_frame, "Overwrite existing file?", "File Exists",
 								JOptionPane.YES_NO_CANCEL_OPTION);
 						if (result == JOptionPane.CANCEL_OPTION)
 							return;
@@ -293,17 +300,13 @@ public class JobDocumentContext {
 					}
 
 					try {
-						Marshaller m = JSDLUtility.JSDLContext
-								.createMarshaller();
-						m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-								Boolean.TRUE);
+						Marshaller m = JSDLUtility.JSDLContext.createMarshaller();
+						m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 						m.marshal(jobDef, target);
 						return;
 					} catch (JAXBException e) {
-						JOptionPane.showMessageDialog(_frame,
-								"Error generating JSDL file.",
-								"Error Generating JSDL File",
-								JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(_frame, "Error generating JSDL file.", "Error Generating JSDL File",
+							JOptionPane.ERROR_MESSAGE);
 						_logger.error("Unable to generate JSDL file.", e);
 						return;
 					}
@@ -313,9 +316,11 @@ public class JobDocumentContext {
 		}
 	}
 
-	private class ModificationListenerImpl implements ModificationListener {
+	private class ModificationListenerImpl implements ModificationListener
+	{
 		@Override
-		public void jobDescriptionModified() {
+		public void jobDescriptionModified()
+		{
 			_modified = true;
 			_initial = false;
 			setFrameTitle();

@@ -32,7 +32,8 @@ import edu.virginia.vcgr.jsdl.JSDLConstants;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlType(propOrder = { "_lowerBound", "_upperBound" })
-public class Range implements Serializable, Matchable {
+public class Range implements Serializable, Matchable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -48,46 +49,52 @@ public class Range implements Serializable, Matchable {
 	 * This constructor is for XML unmarshalling only.
 	 */
 	@SuppressWarnings("unused")
-	private Range() {
+	private Range()
+	{
 		_lowerBound = null;
 		_upperBound = null;
 	}
 
-	public Range(Boundary lowerBound, Boundary upperBound) {
+	public Range(Boundary lowerBound, Boundary upperBound)
+	{
 		if (lowerBound == null)
-			throw new IllegalArgumentException(
-					"lowerBound argument cannot be null.");
+			throw new IllegalArgumentException("lowerBound argument cannot be null.");
 
 		if (upperBound == null)
-			throw new IllegalArgumentException(
-					"upperBound argument cannot be null.");
+			throw new IllegalArgumentException("upperBound argument cannot be null.");
 
 		_lowerBound = lowerBound;
 		_upperBound = upperBound;
 	}
 
-	final public void lowerBound(Boundary lowerBound) {
+	final public void lowerBound(Boundary lowerBound)
+	{
 		_lowerBound = lowerBound;
 	}
 
-	final public Boundary lowerBound() {
+	final public Boundary lowerBound()
+	{
 		return _lowerBound;
 	}
 
-	final public void upperBound(Boundary upperBound) {
+	final public void upperBound(Boundary upperBound)
+	{
 		_upperBound = upperBound;
 	}
 
-	final public Boundary upperBound() {
+	final public Boundary upperBound()
+	{
 		return _upperBound;
 	}
 
-	final public Map<QName, String> anyAttributes() {
+	final public Map<QName, String> anyAttributes()
+	{
 		return _anyAttributes;
 	}
 
 	@Override
-	final public boolean matches(Number number) {
+	final public boolean matches(Number number)
+	{
 		return _lowerBound.isFloor(number) && _upperBound.isCeiling(number);
 	}
 }

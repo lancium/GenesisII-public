@@ -2,8 +2,8 @@ package edu.virginia.g3.fsview;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class DomainUsernamePassswordAuthenticationInformation extends
-		AbstractFSViewAuthenticationInformation {
+public class DomainUsernamePassswordAuthenticationInformation extends AbstractFSViewAuthenticationInformation
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlAttribute(name = "domain")
@@ -16,12 +16,13 @@ public class DomainUsernamePassswordAuthenticationInformation extends
 	private String _password;
 
 	@SuppressWarnings("unused")
-	private DomainUsernamePassswordAuthenticationInformation() {
+	private DomainUsernamePassswordAuthenticationInformation()
+	{
 		this(null, null);
 	}
 
-	public DomainUsernamePassswordAuthenticationInformation(String domain,
-			String username, String password) {
+	public DomainUsernamePassswordAuthenticationInformation(String domain, String username, String password)
+	{
 		super(FSViewAuthenticationInformationTypes.DomainUsernamePassword);
 
 		if (username == null)
@@ -44,25 +45,29 @@ public class DomainUsernamePassswordAuthenticationInformation extends
 		_password = password;
 	}
 
-	public DomainUsernamePassswordAuthenticationInformation(String username,
-			String password) {
+	public DomainUsernamePassswordAuthenticationInformation(String username, String password)
+	{
 		this(null, username, password);
 	}
 
-	final public String domain() {
+	final public String domain()
+	{
 		return _domain;
 	}
 
-	final public String username() {
+	final public String username()
+	{
 		return _userName;
 	}
 
-	final public String password() {
+	final public String password()
+	{
 		return _password;
 	}
 
 	@Override
-	final public String toString() {
+	final public String toString()
+	{
 		return String.format("%s\\%s/*******", _domain, _userName);
 	}
 }

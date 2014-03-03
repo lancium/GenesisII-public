@@ -12,16 +12,16 @@ import edu.virginia.vcgr.genii.client.dialog.InputValidator;
 import edu.virginia.vcgr.genii.client.dialog.MenuItem;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 
-public class TextCheckBoxDialog extends TextInputDialog implements
-		CheckBoxDialog {
+public class TextCheckBoxDialog extends TextInputDialog implements CheckBoxDialog
+{
 	static final long serialVersionUID = 0L;
 
 	private CheckBoxItem[] _items;
 	private Map<String, CheckBoxItem> _itemMap;
 	private int _longestTag;
 
-	public TextCheckBoxDialog(String title, ConsolePackage pkg, String prompt,
-			CheckBoxItem... items) throws DialogException {
+	public TextCheckBoxDialog(String title, ConsolePackage pkg, String prompt, CheckBoxItem... items) throws DialogException
+	{
 		super(title, pkg, prompt);
 
 		_items = items;
@@ -33,8 +33,7 @@ public class TextCheckBoxDialog extends TextInputDialog implements
 			String tag = item.getTag();
 
 			if (_itemMap.containsKey(tag))
-				throw new DialogException(
-						"More then one menu item has the tag \"" + tag + "\".");
+				throw new DialogException("More then one menu item has the tag \"" + tag + "\".");
 			_itemMap.put(tag, item);
 			_longestTag = Math.max(_longestTag, tag.length());
 		}
@@ -43,35 +42,36 @@ public class TextCheckBoxDialog extends TextInputDialog implements
 	}
 
 	@Override
-	protected String generateHint() {
+	protected String generateHint()
+	{
 		if (getHelp() != null) {
 			return "Hint:  You may enter \"Cancel\" to cancel this selection, "
-					+ "or \"Help\" to get help.\nPlease hit <enter> when done!";
+				+ "or \"Help\" to get help.\nPlease hit <enter> when done!";
 		} else {
-			return "Hint:  You may enter \"Cancel\" to cancel this selection.\n"
-					+ "Please hit <enter> when done!";
+			return "Hint:  You may enter \"Cancel\" to cancel this selection.\n" + "Please hit <enter> when done!";
 		}
 	}
 
 	@Override
-	protected void showContent() {
-		String pattern = String.format("\t(%%s) %%%ds\t%%s%%s\n",
-				(_longestTag + 2));
+	protected void showContent()
+	{
+		String pattern = String.format("\t(%%s) %%%ds\t%%s%%s\n", (_longestTag + 2));
 
 		_package.stdout().println();
 		for (CheckBoxItem item : _items) {
-			_package.stdout().format(pattern, item.isChecked() ? "*" : " ",
-					String.format("[%s]", item.getTag()), item,
-					item.isEditable() ? "" : " <not modifiable>");
+			_package.stdout().format(pattern, item.isChecked() ? "*" : " ", String.format("[%s]", item.getTag()), item,
+				item.isEditable() ? "" : " <not modifiable>");
 		}
 		_package.stdout().println();
 
 		super.showContent();
 	}
 
-	private class InternalInputValidator implements InputValidator {
+	private class InternalInputValidator implements InputValidator
+	{
 		@Override
-		public String validateInput(String input) {
+		public String validateInput(String input)
+		{
 			CheckBoxItem item;
 			item = _itemMap.get(input);
 			if (item != null) {
@@ -88,7 +88,8 @@ public class TextCheckBoxDialog extends TextInputDialog implements
 	}
 
 	@Override
-	public void showDialog() throws UserCancelException, DialogException {
+	public void showDialog() throws UserCancelException, DialogException
+	{
 		String answer;
 
 		while (true) {
@@ -121,7 +122,8 @@ public class TextCheckBoxDialog extends TextInputDialog implements
 	}
 
 	@Override
-	public Collection<MenuItem> getCheckedItems() {
+	public Collection<MenuItem> getCheckedItems()
+	{
 		Collection<MenuItem> items = new LinkedList<MenuItem>();
 
 		for (CheckBoxItem item : _items) {

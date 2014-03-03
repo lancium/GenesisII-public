@@ -15,16 +15,17 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.ogrsh.server.session.OGRSHContextResolver;
 import edu.virginia.vcgr.ogrsh.server.session.SessionManager;
 
-public class OGRSHServer extends ApplicationBase {
+public class OGRSHServer extends ApplicationBase
+{
 	static private Log _logger = LogFactory.getLog(OGRSHServer.class);
 
-	static public void main(String[] args) {
+	static public void main(String[] args)
+	{
 		String deploymentName = System.getenv("GENII_DEPLOYMENT_NAME");
 		if (deploymentName != null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Using Deployment \"" + deploymentName + "\".");
-			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY,
-					deploymentName);
+			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deploymentName);
 		} else {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Using Deployment \"default\".");
@@ -49,8 +50,7 @@ public class OGRSHServer extends ApplicationBase {
 			serverSocket.bind(null);
 
 			serverSecret = new GUID();
-			System.out.println("Server[" + serverSecret
-					+ "] listening on port " + serverSocket.getLocalPort());
+			System.out.println("Server[" + serverSecret + "] listening on port " + serverSocket.getLocalPort());
 			serverChannel.configureBlocking(true);
 		} catch (IOException ioe) {
 			_logger.fatal("Unable to open server socket.", ioe);
@@ -61,8 +61,7 @@ public class OGRSHServer extends ApplicationBase {
 			try {
 				SocketChannel socketChannel = serverChannel.accept();
 				socketChannel.configureBlocking(true);
-				OGRSHConnection connection = new OGRSHConnection(
-						sessionManager, socketChannel, serverSecret);
+				OGRSHConnection connection = new OGRSHConnection(sessionManager, socketChannel, serverSecret);
 				Thread th = new Thread(connection);
 				th.setDaemon(true);
 				th.start();

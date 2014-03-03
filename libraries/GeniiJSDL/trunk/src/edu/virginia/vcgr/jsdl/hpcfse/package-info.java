@@ -16,8 +16,8 @@
  * the License.
  */
 @XmlSchema(namespace = HPCFSEConstants.HPCFSE_NS, xmlns = {
-		@XmlNs(prefix = "hpcfse-ac", namespaceURI = HPCFSEConstants.HPCFSE_NS),
-		@XmlNs(prefix = "wss", namespaceURI = HPCFSEConstants.WSSEC_SECEXT_NS) })
+	@XmlNs(prefix = "hpcfse-ac", namespaceURI = HPCFSEConstants.HPCFSE_NS),
+	@XmlNs(prefix = "wss", namespaceURI = HPCFSEConstants.WSSEC_SECEXT_NS) })
 package edu.virginia.vcgr.jsdl.hpcfse;
 
 import javax.xml.bind.annotation.XmlSchema;

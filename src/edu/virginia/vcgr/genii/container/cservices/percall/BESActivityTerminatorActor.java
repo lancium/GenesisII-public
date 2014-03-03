@@ -37,11 +37,11 @@ import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 
-public class BESActivityTerminatorActor implements OutcallActor {
+public class BESActivityTerminatorActor implements OutcallActor
+{
 	static final long serialVersionUID = 0L;
 
-	static private Log _logger = LogFactory
-			.getLog(BESActivityTerminatorActor.class);
+	static private Log _logger = LogFactory.getLog(BESActivityTerminatorActor.class);
 
 	private HistoryEventToken _historyToken;
 	private String _historyKey;
@@ -49,25 +49,24 @@ public class BESActivityTerminatorActor implements OutcallActor {
 	private EndpointReferenceType _activityEPR;
 	private LoggingContext _context;
 
-	public BESActivityTerminatorActor(String historyKey,
-			HistoryEventToken historyToken, String besName,
-			EndpointReferenceType activityEPR) {
+	public BESActivityTerminatorActor(String historyKey, HistoryEventToken historyToken, String besName,
+		EndpointReferenceType activityEPR)
+	{
 		_historyKey = historyKey;
 		_historyToken = historyToken;
 		_activityEPR = activityEPR;
 		_besName = besName;
 		try {
-			_context = (LoggingContext) LoggingContext
-					.getCurrentLoggingContext().clone();
+			_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 		} catch (ContextException e) {
 			_context = new LoggingContext();
 		}
 	}
 
 	@Override
-	public boolean enactOutcall(ICallingContext callingContext,
-			EndpointReferenceType target, GeniiAttachment attachment)
-			throws Throwable {
+	public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target, GeniiAttachment attachment)
+		throws Throwable
+	{
 		LoggingContext.adoptExistingContext(_context);
 
 		if (_logger.isDebugEnabled())
@@ -78,11 +77,9 @@ public class BESActivityTerminatorActor implements OutcallActor {
 		try {
 			token = ContextManager.temporarilyAssumeContext(callingContext);
 
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-					_activityEPR, callingContext);
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, _activityEPR, callingContext);
 
-			GeniiBESPortType bes = ClientUtils.createProxy(
-					GeniiBESPortType.class, target, callingContext);
+			GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, target, callingContext);
 
 			// First, attmept to get the history log
 			if (_historyToken != null && _historyKey != null) {
@@ -92,40 +89,30 @@ public class BESActivityTerminatorActor implements OutcallActor {
 				try {
 					parentNumber = _historyToken.retrieve();
 					if (parentNumber != null) {
-						HistoryContainerService service = ContainerServices
-								.findService(HistoryContainerService.class);
+						HistoryContainerService service = ContainerServices.findService(HistoryContainerService.class);
 
-						IterateHistoryEventsResponseType resp = common
-								.iterateHistoryEvents(new IterateHistoryEventsRequestType());
+						IterateHistoryEventsResponseType resp =
+							common.iterateHistoryEvents(new IterateHistoryEventsRequestType());
 						if (resp != null) {
-							iter = WSIterable.axisIterable(
-									HistoryEventBundleType.class,
-									resp.getResult(), 25);
+							iter = WSIterable.axisIterable(HistoryEventBundleType.class, resp.getResult(), 25);
 							for (HistoryEventBundleType bundle : iter) {
-								HistoryEvent event = (HistoryEvent) DBSerializer
-										.deserialize(bundle.getData());
+								HistoryEvent event = (HistoryEvent) DBSerializer.deserialize(bundle.getData());
 
 								HistoryEventSource source = event.eventSource();
 								if (_besName != null)
-									source = new SimpleStringHistoryEventSource(
-											String.format("BES Resource %s",
-													_besName), null, source);
+									source =
+										new SimpleStringHistoryEventSource(String.format("BES Resource %s", _besName), null,
+											source);
 
-								service.addRecord(_historyKey, event
-										.eventNumber().wrapWith(parentNumber),
-										event.eventTimestamp(), event
-												.eventCategory(), event
-												.eventLevel(), event
-												.eventProperties(), source,
-										event.eventData(), null);
+								service.addRecord(_historyKey, event.eventNumber().wrapWith(parentNumber),
+									event.eventTimestamp(), event.eventCategory(), event.eventLevel(), event.eventProperties(),
+									source, event.eventData(), null);
 							}
 						}
 					}
 				} catch (Throwable cause) {
 					if (_logger.isDebugEnabled())
-						_logger.debug(
-								"Error trying to get history events for activity.",
-								cause);
+						_logger.debug("Error trying to get history events for activity.", cause);
 				} finally {
 					StreamUtils.close(iter);
 				}
@@ -133,17 +120,14 @@ public class BESActivityTerminatorActor implements OutcallActor {
 
 			// Now, go ahead and kill it.
 			ClientUtils.setTimeout(bes, 8 * 1000);
-			TerminateActivitiesResponseType resp = bes
-					.terminateActivities(new TerminateActivitiesType(
-							new EndpointReferenceType[] { _activityEPR }, null));
+			TerminateActivitiesResponseType resp =
+				bes.terminateActivities(new TerminateActivitiesType(new EndpointReferenceType[] { _activityEPR }, null));
 			if (resp != null) {
 				TerminateActivityResponseType[] resps = resp.getResponse();
 				if (resps != null && resps.length == 1) {
-					if (resps[0].isTerminated()
-							|| (resps[0].getFault() != null))
+					if (resps[0].isTerminated() || (resps[0].getFault() != null))
 						return true;
-					_logger.warn("Response says that we didn't terminate the activity:  "
-							+ resps[0].getFault());
+					_logger.warn("Response says that we didn't terminate the activity:  " + resps[0].getFault());
 				}
 			}
 
@@ -154,7 +138,8 @@ public class BESActivityTerminatorActor implements OutcallActor {
 		}
 	}
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
+	private void writeObject(ObjectOutputStream out) throws IOException
+	{
 		EPRUtils.serializeEPR(out, _activityEPR);
 		out.writeObject(_historyToken);
 		out.writeObject(_besName);
@@ -162,8 +147,8 @@ public class BESActivityTerminatorActor implements OutcallActor {
 		out.writeObject(_context);
 	}
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
 		_activityEPR = EPRUtils.deserializeEPR(in);
 		_historyToken = (HistoryEventToken) in.readObject();
 		_besName = (String) in.readObject();
@@ -172,7 +157,8 @@ public class BESActivityTerminatorActor implements OutcallActor {
 	}
 
 	@SuppressWarnings("unused")
-	private void readObjectNoData() throws ObjectStreamException {
+	private void readObjectNoData() throws ObjectStreamException
+	{
 		throw new StreamCorruptedException();
 	}
 }

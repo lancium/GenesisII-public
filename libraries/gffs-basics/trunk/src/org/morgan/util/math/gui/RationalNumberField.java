@@ -28,7 +28,8 @@ import org.morgan.util.math.RationalNumber;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class RationalNumberField extends JTextField {
+public class RationalNumberField extends JTextField
+{
 	static final long serialVersionUID = 0;
 
 	private Color _normalBackground;
@@ -36,7 +37,8 @@ public class RationalNumberField extends JTextField {
 	private Color _badBackground;
 	private Color _badForeground;
 
-	private RationalNumberField(String str) {
+	private RationalNumberField(String str)
+	{
 		super(str);
 
 		addCaretListener(new Listener());
@@ -47,20 +49,25 @@ public class RationalNumberField extends JTextField {
 		_badForeground = Color.BLACK;
 	}
 
-	public RationalNumberField() {
+	public RationalNumberField()
+	{
 		this("0");
 	}
 
-	public RationalNumberField(RationalNumber num) {
+	public RationalNumberField(RationalNumber num)
+	{
 		this(num.toString());
 	}
 
-	public RationalNumber getValue() {
+	public RationalNumber getValue()
+	{
 		return RationalNumber.fromString(getText());
 	}
 
-	private class Listener implements CaretListener {
-		public void caretUpdate(CaretEvent evt) {
+	private class Listener implements CaretListener
+	{
+		public void caretUpdate(CaretEvent evt)
+		{
 			System.err.println("Action event.");
 			try {
 				getValue();
@@ -74,16 +81,15 @@ public class RationalNumberField extends JTextField {
 		}
 	}
 
-	static public void main(String[] args) throws Exception {
+	static public void main(String[] args) throws Exception
+	{
 		JDialog diag = new JDialog();
 		diag.getContentPane().setLayout(new GridBagLayout());
 
 		diag.getContentPane().add(
-				new RationalNumberField(),
-				new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-						GridBagConstraints.CENTER,
-						GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5),
-						5, 5));
+			new RationalNumberField(),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(
+				5, 5, 5, 5), 5, 5));
 		diag.pack();
 		diag.setVisible(true);
 	}

@@ -5,25 +5,27 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.ContainerConfiguration;
 
-public class GetServerPort {
+public class GetServerPort
+{
 	static private final String _USAGE = "Usage: GetServerPort <deployment name>";
 
-	static private void printUsage() {
+	static private void printUsage()
+	{
 		System.out.print(_USAGE + "\n");
 	}
 
-	static public int getServerPort(String deployName) {
+	static public int getServerPort(String deployName)
+	{
 		System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deployName);
 		String userDir = GetUserDir.getUserDir();
-		ConfigurationManager configurationManager = ConfigurationManager
-				.initializeConfiguration(userDir);
-		ContainerConfiguration serverConf = new ContainerConfiguration(
-				configurationManager);
+		ConfigurationManager configurationManager = ConfigurationManager.initializeConfiguration(userDir);
+		ContainerConfiguration serverConf = new ContainerConfiguration(configurationManager);
 
 		return serverConf.getListenPort();
 	}
 
-	static public void main(String[] args) {
+	static public void main(String[] args)
+	{
 		if (args.length != 1) {
 			printUsage();
 			return;

@@ -4,9 +4,10 @@ import java.util.Stack;
 
 import javax.script.ScriptContext;
 
-public class MacroReplacer {
-	static private MacroExpression findMacroSubExpression(
-			MacroTokenizer tokenizer) {
+public class MacroReplacer
+{
+	static private MacroExpression findMacroSubExpression(MacroTokenizer tokenizer)
+	{
 		Stack<MacroExpression> stack = new Stack<MacroExpression>();
 		String token;
 
@@ -29,11 +30,11 @@ public class MacroReplacer {
 				stack.push(new ConcatenateExpression(stack.pop(), expr));
 		}
 
-		throw new RuntimeException(
-				"Unable to parse line...couldn't locate end of macro.");
+		throw new RuntimeException("Unable to parse line...couldn't locate end of macro.");
 	}
 
-	static public String replaceMacros(ScriptContext variables, String input) {
+	static public String replaceMacros(ScriptContext variables, String input)
+	{
 		Stack<MacroExpression> stack = new Stack<MacroExpression>();
 		MacroTokenizer tokenizer = new MacroTokenizer(input);
 		String token;

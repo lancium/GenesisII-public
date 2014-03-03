@@ -1,4 +1,4 @@
 package edu.virginia.vcgr.genii.container.cservices.wsn;
 
-public class WSNDatabase {
-}
+public class WSNDatabase
+{}

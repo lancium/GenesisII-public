@@ -8,19 +8,22 @@ import edu.virginia.vcgr.genii.client.gui.MenuDialog;
 import edu.virginia.vcgr.genii.client.gui.PasswordDialog;
 import edu.virginia.vcgr.genii.security.x509.CertEntry;
 
-public class GuiLoginHandler extends AbstractLoginHandler {
-	public GuiLoginHandler(PrintWriter out, PrintWriter err, BufferedReader in) {
+public class GuiLoginHandler extends AbstractLoginHandler
+{
+	public GuiLoginHandler(PrintWriter out, PrintWriter err, BufferedReader in)
+	{
 		super(out, err, in);
 	}
 
 	@Override
-	public char[] getPassword(String title, String prompt) {
+	public char[] getPassword(String title, String prompt)
+	{
 		return PasswordDialog.getPassword(title, prompt);
 	}
 
 	@Override
-	protected CertEntry selectCert(Collection<CertEntry> entries) {
-		return MenuDialog.getMenuSelection("Certificate Selection",
-				"Please select desired certificate.", entries);
+	protected CertEntry selectCert(Collection<CertEntry> entries)
+	{
+		return MenuDialog.getMenuSelection("Certificate Selection", "Please select desired certificate.", entries);
 	}
 }

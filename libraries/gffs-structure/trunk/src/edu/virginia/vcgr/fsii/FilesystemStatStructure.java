@@ -2,7 +2,8 @@ package edu.virginia.vcgr.fsii;
 
 import edu.virginia.vcgr.fsii.security.Permissions;
 
-public class FilesystemStatStructure {
+public class FilesystemStatStructure
+{
 	private String _name;
 	private FilesystemEntryType _entryType;
 
@@ -16,9 +17,9 @@ public class FilesystemStatStructure {
 
 	private Permissions _permissions;
 
-	public FilesystemStatStructure(int inode, String name,
-			FilesystemEntryType entryType, long size, long created,
-			long lastModified, long lastAcceessed, Permissions permissions) {
+	public FilesystemStatStructure(int inode, String name, FilesystemEntryType entryType, long size, long created,
+		long lastModified, long lastAcceessed, Permissions permissions)
+	{
 		_inode = inode;
 		_name = name;
 		_entryType = entryType;
@@ -29,35 +30,43 @@ public class FilesystemStatStructure {
 		_permissions = permissions;
 	}
 
-	public int getINode() {
+	public int getINode()
+	{
 		return _inode;
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		return _name;
 	}
 
-	public FilesystemEntryType getEntryType() {
+	public FilesystemEntryType getEntryType()
+	{
 		return _entryType;
 	}
 
-	public long getSize() {
+	public long getSize()
+	{
 		return _size;
 	}
 
-	public long getCreated() {
+	public long getCreated()
+	{
 		return _created;
 	}
 
-	public long getLastModified() {
+	public long getLastModified()
+	{
 		return _lastModified;
 	}
 
-	public long getLastAccessed() {
+	public long getLastAccessed()
+	{
 		return _lastAccessed;
 	}
 
-	public Permissions getPermissions() {
+	public Permissions getPermissions()
+	{
 		return _permissions;
 	}
 }

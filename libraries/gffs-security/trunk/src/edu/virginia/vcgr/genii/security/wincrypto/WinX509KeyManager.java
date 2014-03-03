@@ -24,16 +24,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Responsible for managing the key material which is used to authenticate the
- * local SSLSocket to its peer. If no key material is available, the socket will
- * be unable to present authentication credentials.
+ * Responsible for managing the key material which is used to authenticate the local SSLSocket to
+ * its peer. If no key material is available, the socket will be unable to present authentication
+ * credentials.
  * 
- * This particular key manager uses key material from the "My" Windows
- * cryptography key provider
+ * This particular key manager uses key material from the "My" Windows cryptography key provider
  * 
  * @author dmerrill
  */
-public class WinX509KeyManager implements X509KeyManager {
+public class WinX509KeyManager implements X509KeyManager
+{
 	static private Log _logger = LogFactory.getLog(WinX509KeyManager.class);
 
 	static WinCryptoLib cryptoLib = new WinCryptoLib();
@@ -41,16 +41,16 @@ public class WinX509KeyManager implements X509KeyManager {
 	/**
 	 * Constructor
 	 */
-	public WinX509KeyManager() {
+	public WinX509KeyManager()
+	{
 	}
 
 	/**
-	 * Choose an alias to authenticate the client side of a secure socket given
-	 * the public key type and the list of certificate issuer authorities
-	 * recognized by the peer (if any).
+	 * Choose an alias to authenticate the client side of a secure socket given the public key type
+	 * and the list of certificate issuer authorities recognized by the peer (if any).
 	 */
-	public String chooseClientAlias(String[] keyType, Principal[] issuers,
-			Socket socket) {
+	public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
+	{
 
 		String alias = null;
 
@@ -78,12 +78,11 @@ public class WinX509KeyManager implements X509KeyManager {
 	}
 
 	/**
-	 * Choose an alias to authenticate the server side of a secure socket given
-	 * the public key type and the list of certificate issuer authorities
-	 * recognized by the peer (if any).
+	 * Choose an alias to authenticate the server side of a secure socket given the public key type
+	 * and the list of certificate issuer authorities recognized by the peer (if any).
 	 */
-	public String chooseServerAlias(String keyType, Principal[] issuers,
-			Socket socket) {
+	public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket)
+	{
 
 		String alias = null;
 
@@ -111,11 +110,12 @@ public class WinX509KeyManager implements X509KeyManager {
 	}
 
 	/**
-	 * Returns the certificate chain associated with the given alias. Returns
-	 * null if the certificate chain is invalid for any reason
+	 * Returns the certificate chain associated with the given alias. Returns null if the
+	 * certificate chain is invalid for any reason
 	 * 
 	 */
-	public X509Certificate[] getCertificateChain(String alias) {
+	public X509Certificate[] getCertificateChain(String alias)
+	{
 		try {
 			return cryptoLib.getCertificateChain("My", alias);
 
@@ -127,12 +127,13 @@ public class WinX509KeyManager implements X509KeyManager {
 	}
 
 	/**
-	 * Get the matching aliases for authenticating the client side of a secure
-	 * socket given the public key type and the list of certificate issuer
-	 * authorities recognized by the peer (if any).
+	 * Get the matching aliases for authenticating the client side of a secure socket given the
+	 * public key type and the list of certificate issuer authorities recognized by the peer (if
+	 * any).
 	 * 
 	 */
-	public String[] getClientAliases(String keyType, Principal[] issuers) {
+	public String[] getClientAliases(String keyType, Principal[] issuers)
+	{
 		// get the aliases within the local user keystore
 		ArrayList<String> aliases;
 		try {
@@ -156,16 +157,14 @@ public class WinX509KeyManager implements X509KeyManager {
 				// alias certs
 				// will throw exceptions during cert chain lookup.
 				boolean matchingIssuer = false;
-				X509Certificate[] aliasCertChain = cryptoLib
-						.getCertificateChain("My", alias);
+				X509Certificate[] aliasCertChain = cryptoLib.getCertificateChain("My", alias);
 				if (issuerSet == null) {
 					// no issuers specified and no exceptions during chain
 					// lookup
 					matchingIssuer = true;
 				} else {
 					for (int i = 0; i < aliasCertChain.length; i++) {
-						if (issuerSet.contains(aliasCertChain[i]
-								.getIssuerX500Principal())) {
+						if (issuerSet.contains(aliasCertChain[i].getIssuerX500Principal())) {
 							matchingIssuer = true;
 							break;
 						}
@@ -186,11 +185,12 @@ public class WinX509KeyManager implements X509KeyManager {
 	}
 
 	/**
-	 * Get the matching aliases for authenticating the server side of a secure
-	 * socket given the public key type and the list of certificate issuer
-	 * authorities recognized by the peer (if any).
+	 * Get the matching aliases for authenticating the server side of a secure socket given the
+	 * public key type and the list of certificate issuer authorities recognized by the peer (if
+	 * any).
 	 */
-	public String[] getServerAliases(String keyType, Principal[] issuers) {
+	public String[] getServerAliases(String keyType, Principal[] issuers)
+	{
 		// same implementation currently as getClientAliases()
 		return getClientAliases(keyType, issuers);
 	}
@@ -198,7 +198,8 @@ public class WinX509KeyManager implements X509KeyManager {
 	/**
 	 * Returns the key associated with the given alias.
 	 */
-	public PrivateKey getPrivateKey(String alias) {
+	public PrivateKey getPrivateKey(String alias)
+	{
 
 		try {
 			return cryptoLib.getPrivateKey("My", alias);
@@ -209,7 +210,8 @@ public class WinX509KeyManager implements X509KeyManager {
 
 	}
 
-	public String getFriendlyName(String alias) {
+	public String getFriendlyName(String alias)
+	{
 		try {
 			return cryptoLib.getFriendlyName("My", alias);
 		} catch (WinCryptoException e) {

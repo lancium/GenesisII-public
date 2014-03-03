@@ -7,12 +7,13 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.POSIXApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.jsdl.personality.common.CommonPersonalityProvider;
 
-public class ForkExecPersonalityProvider extends CommonPersonalityProvider {
+public class ForkExecPersonalityProvider extends CommonPersonalityProvider
+{
 	private FilesystemManager _fsManager;
 	private BESWorkingDirectory _workingDirectory;
 
-	public ForkExecPersonalityProvider(FilesystemManager fsManager,
-			BESWorkingDirectory workingDirectory) {
+	public ForkExecPersonalityProvider(FilesystemManager fsManager, BESWorkingDirectory workingDirectory)
+	{
 		super(fsManager);
 
 		_fsManager = fsManager;
@@ -20,14 +21,14 @@ public class ForkExecPersonalityProvider extends CommonPersonalityProvider {
 	}
 
 	@Override
-	public POSIXApplicationFacet getPOSIXApplicationFacet(
-			Object currentUnderstanding) throws JSDLException {
+	public POSIXApplicationFacet getPOSIXApplicationFacet(Object currentUnderstanding) throws JSDLException
+	{
 		return new ForkExecPOSIXApplicationFacet(_fsManager, _workingDirectory);
 	}
 
 	@Override
-	public HPCApplicationFacet getHPCApplicationFacet(
-			Object currentUnderstanding) throws JSDLException {
+	public HPCApplicationFacet getHPCApplicationFacet(Object currentUnderstanding) throws JSDLException
+	{
 		return new ForkExecHPCApplicationFacet(_fsManager, _workingDirectory);
 	}
 }

@@ -23,10 +23,12 @@ import junit.framework.TestCase;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class DefaultCompleterTest extends TestCase {
+public class DefaultCompleterTest extends TestCase
+{
 	private ICompleter<String> _completer;
 
-	protected void setUp() throws Exception {
+	protected void setUp() throws Exception
+	{
 		super.setUp();
 
 		HashSet<String> strings = new HashSet<String>();
@@ -42,7 +44,8 @@ public class DefaultCompleterTest extends TestCase {
 		_completer = DefaultCompleter.buildCompleter(strings);
 	}
 
-	public void testCompleter() {
+	public void testCompleter()
+	{
 		TestCase.assertEquals("Appleton", _completer.complete(""));
 		TestCase.assertEquals("Appleton", _completer.complete("A"));
 		TestCase.assertEquals("Appleton", _completer.complete("App"));

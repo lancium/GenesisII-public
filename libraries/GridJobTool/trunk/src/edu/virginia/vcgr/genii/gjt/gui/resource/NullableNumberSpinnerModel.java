@@ -4,7 +4,8 @@ import javax.swing.AbstractSpinnerModel;
 
 import edu.virginia.vcgr.genii.gjt.data.SettableLong;
 
-public class NullableNumberSpinnerModel extends AbstractSpinnerModel {
+public class NullableNumberSpinnerModel extends AbstractSpinnerModel
+{
 	private static final long serialVersionUID = 1;
 
 	private SettableLong _value;
@@ -13,8 +14,8 @@ public class NullableNumberSpinnerModel extends AbstractSpinnerModel {
 	private long _maximum;
 	private long _step;
 
-	public NullableNumberSpinnerModel(SettableLong initialValue, long minimum,
-			long maximum, long step) {
+	public NullableNumberSpinnerModel(SettableLong initialValue, long minimum, long maximum, long step)
+	{
 		_value = initialValue;
 		_minimum = minimum;
 		_maximum = maximum;
@@ -22,7 +23,8 @@ public class NullableNumberSpinnerModel extends AbstractSpinnerModel {
 	}
 
 	@Override
-	public Object getNextValue() {
+	public Object getNextValue()
+	{
 		Long nextValue;
 
 		if (_value.value() == null)
@@ -38,7 +40,8 @@ public class NullableNumberSpinnerModel extends AbstractSpinnerModel {
 	}
 
 	@Override
-	public Object getPreviousValue() {
+	public Object getPreviousValue()
+	{
 		Long nextValue;
 
 		if (_value.value() == null)
@@ -54,12 +57,14 @@ public class NullableNumberSpinnerModel extends AbstractSpinnerModel {
 	}
 
 	@Override
-	public Object getValue() {
+	public Object getValue()
+	{
 		return new NullableNumber(_value.value());
 	}
 
 	@Override
-	public void setValue(Object value) {
+	public void setValue(Object value)
+	{
 		NullableNumber newValue = (NullableNumber) value;
 		if (!newValue.equals(new NullableNumber(_value.value()))) {
 			_value.value(newValue.value());

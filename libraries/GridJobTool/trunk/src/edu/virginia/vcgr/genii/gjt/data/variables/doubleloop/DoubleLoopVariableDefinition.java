@@ -10,21 +10,24 @@ import edu.virginia.vcgr.genii.gjt.data.variables.VariableDefinitionType;
 import edu.virginia.vcgr.jsdl.sweep.SweepFunction;
 import edu.virginia.vcgr.jsdl.sweep.functions.LoopDoubleSweepFunction;
 
-public class DoubleLoopVariableDefinition extends AbstractVariableDefinition {
+public class DoubleLoopVariableDefinition extends AbstractVariableDefinition
+{
 	static final public String DESCRIPTION = "Double Loop";
 
-	static private Describer<? extends VariableDefinition> DESCRIBER = new Describer<DoubleLoopVariableDefinition>() {
+	static private Describer<? extends VariableDefinition> DESCRIBER = new Describer<DoubleLoopVariableDefinition>()
+	{
 		@Override
-		public String describe(DoubleLoopVariableDefinition type, int verbosity) {
+		public String describe(DoubleLoopVariableDefinition type, int verbosity)
+		{
 			if (type._step == 1)
 				return String.format("[%.2f, %.2f]", type._start, type._end);
 			else
-				return String.format("[%.2f, %.2f] by %.2f", type._start,
-						type._end, type._step);
+				return String.format("[%.2f, %.2f] by %.2f", type._start, type._end, type._step);
 		}
 
 		@Override
-		public int maximumVerbosity() {
+		public int maximumVerbosity()
+		{
 			return 0;
 		}
 	};
@@ -43,11 +46,13 @@ public class DoubleLoopVariableDefinition extends AbstractVariableDefinition {
 
 	/* Used for XML deserialization */
 	@SuppressWarnings("unused")
-	private DoubleLoopVariableDefinition() {
+	private DoubleLoopVariableDefinition()
+	{
 		this(0.0, 0.0, 0.1);
 	}
 
-	DoubleLoopVariableDefinition(double start, double end, double step) {
+	DoubleLoopVariableDefinition(double start, double end, double step)
+	{
 		super(VariableDefinitionType.DoubleLoop, DESCRIBER);
 
 		_start = start;
@@ -56,7 +61,8 @@ public class DoubleLoopVariableDefinition extends AbstractVariableDefinition {
 	}
 
 	@Override
-	final public int size() {
+	final public int size()
+	{
 		if (_size < 0) {
 			int count = 0;
 
@@ -70,7 +76,8 @@ public class DoubleLoopVariableDefinition extends AbstractVariableDefinition {
 	}
 
 	@Override
-	public SweepFunction generateFunction() {
+	public SweepFunction generateFunction()
+	{
 		return new LoopDoubleSweepFunction(_start, _end, _step);
 	}
 }

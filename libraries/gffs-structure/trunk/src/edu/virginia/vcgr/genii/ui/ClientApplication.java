@@ -43,7 +43,8 @@ import edu.virginia.vcgr.genii.ui.rns.RNSTreeObjectType;
 import edu.virginia.vcgr.genii.ui.trash.TrashCanWidget;
 
 @SuppressWarnings("rawtypes")
-public class ClientApplication extends UIFrame {
+public class ClientApplication extends UIFrame
+{
 	static final long serialVersionUID = 0L;
 
 	// static private Log _logger = LogFactory.getLog(ClientApplication.class);
@@ -54,30 +55,32 @@ public class ClientApplication extends UIFrame {
 	private boolean _exit = false;
 	private RNSTree _browserTree;
 	private JTabbedPane _tabbedPane = new JTabbedPane();
-	private JList _debugTarget; // text area that is targeted for informative
-								// updates.
-	private LoggingLinkage _debugLinkage; // connects our debugging target to
-											// logging.
+	private JList _debugTarget; // text area that is targeted for informative updates.
+	private LoggingLinkage _debugLinkage; // connects our debugging target to logging.
 
-	private void setupMacApplication() {
+	private void setupMacApplication()
+	{
 		MacOSXSpecifics.setupMacOSApplication(_context);
 	}
 
 	/*
 	 * shows a new status line in the message window at the bottom of the UI.
 	 */
-	public void addStatusLine(String message, String detail) {
+	public void addStatusLine(String message, String detail)
+	{
 		_debugLinkage.consumeLogging(message, new Exception(detail));
 	}
 
 	/*
 	 * add a status line without extra detail.
 	 */
-	public void addStatusLine(String message) {
+	public void addStatusLine(String message)
+	{
 		addStatusLine(message, "status message");
 	}
 
-	protected boolean handleQuit() {
+	protected boolean handleQuit()
+	{
 		if (!_context.fireQuitRequested())
 			return false;
 
@@ -89,18 +92,16 @@ public class ClientApplication extends UIFrame {
 		return true;
 	}
 
-	public ClientApplication(boolean launchShell) throws FileNotFoundException,
-			RNSPathDoesNotExistException, IOException {
+	public ClientApplication(boolean launchShell) throws FileNotFoundException, RNSPathDoesNotExistException, IOException
+	{
 		this(new UIContext(new ApplicationContext()), launchShell);
 	}
 
 	@SuppressWarnings("unchecked")
-	public ClientApplication(UIContext context, boolean launchShell)
-			throws FileNotFoundException, IOException,
-			RNSPathDoesNotExistException {
-		super(
-				context,
-				"XSEDE GFFS GUI - Provided as part of Genesis II from the University of Virginia");
+	public ClientApplication(UIContext context, boolean launchShell) throws FileNotFoundException, IOException,
+		RNSPathDoesNotExistException
+	{
+		super(context, "XSEDE GFFS GUI - Provided as part of Genesis II from the University of Virginia");
 
 		if (!_context.isInitialized()) {
 			_context.setApplicationEventListener(new ApplicationEventListenerImpl());
@@ -112,9 +113,11 @@ public class ClientApplication extends UIFrame {
 		_tabbedPane.setMinimumSize(TABBED_PANE_SIZE);
 		_tabbedPane.setPreferredSize(TABBED_PANE_SIZE);
 
-		_tabbedPane.addChangeListener(new ChangeListener() {
+		_tabbedPane.addChangeListener(new ChangeListener()
+		{
 			@Override
-			public void stateChanged(ChangeEvent e) {
+			public void stateChanged(ChangeEvent e)
+			{
 				Component jc = _tabbedPane.getSelectedComponent();
 				if (jc != null && (jc instanceof LazilyLoadedTab))
 					((LazilyLoadedTab) jc).load();
@@ -129,39 +132,29 @@ public class ClientApplication extends UIFrame {
 		Container content = getContentPane();
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-		splitPane.setLeftComponent(GUIUtils.addTitle(
-				"GFFS Directory Structure", new TearoffPanel(scroller,
-						_browserTree.createTearoffHandler(_context),
-						new IconBasedTearoffThumb())));
+		splitPane.setLeftComponent(GUIUtils.addTitle("GFFS Directory Structure",
+			new TearoffPanel(scroller, _browserTree.createTearoffHandler(_context), new IconBasedTearoffThumb())));
 		splitPane.setRightComponent(_tabbedPane);
 
-		content.add(splitPane, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-						5, 5, 5, 5), 5, 5));
+		content.add(splitPane, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(new CredentialManagementButton(_uiContext),
-				new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-						GridBagConstraints.WEST, GridBagConstraints.NONE,
-						new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new CredentialManagementButton(_uiContext), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(new TrashCanWidget(_context, _uiContext),
-				new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
-						GridBagConstraints.EAST, GridBagConstraints.NONE,
-						new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new TrashCanWidget(_context, _uiContext), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
+			GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		// new code to add a diagnostics logging view.
 		LoggingListModel listModel = new LoggingListModel();
 		_debugTarget = new JList(listModel);
 		JScrollPane debugScroller = new JScrollPane(_debugTarget);
-		content.add(debugScroller, new GridBagConstraints(0, 2, 3, 1, 1.0, 1.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-						5, 5, 5, 5), 5, 5));
+		content.add(debugScroller, new GridBagConstraints(0, 2, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
-		UIPlugins plugins = new UIPlugins(new UIPluginContext(_uiContext,
-				_browserTree, _browserTree));
+		UIPlugins plugins = new UIPlugins(new UIPluginContext(_uiContext, _browserTree, _browserTree));
 		plugins.addTopLevelMenus(getJMenuBar());
-		_browserTree
-				.addTreeSelectionListener(new RNSSelectionListener(plugins));
+		_browserTree.addTreeSelectionListener(new RNSSelectionListener(plugins));
 
 		getMenuFactory().addHelpMenu(_uiContext, getJMenuBar());
 
@@ -171,61 +164,61 @@ public class ClientApplication extends UIFrame {
 			plugins.fireMenuAction(GridShellPlugin.class);
 
 		_debugLinkage = new LoggingLinkage(_debugTarget);
-		_debugLinkage.consumeLogging("Application Started", new Exception(
-				"All is well."));
+		_debugLinkage.consumeLogging("Application Started", new Exception("All is well."));
 
 		/*
-		 * try { EndpointReferenceType epr = new
-		 * LocalContainer(_uiContext).getEndpoint(); EnhancedRNSPortType rns =
-		 * ClientUtils.createProxy(EnhancedRNSPortType.class, epr,
-		 * _uiContext.callingContext()); ListResponse resp = rns.list(new
-		 * List()); for (EntryType entry : resp.getEntryList()) {
-		 * System.err.format("Entry:  %s\n", entry.getEntry_name()); } } catch
-		 * (ContainerNotRunningException cnre) {
+		 * try { EndpointReferenceType epr = new LocalContainer(_uiContext).getEndpoint();
+		 * EnhancedRNSPortType rns = ClientUtils.createProxy(EnhancedRNSPortType.class, epr,
+		 * _uiContext.callingContext()); ListResponse resp = rns.list(new List()); for (EntryType
+		 * entry : resp.getEntryList()) { System.err.format("Entry:  %s\n", entry.getEntry_name());
+		 * } } catch (ContainerNotRunningException cnre) {
 		 * _logger.info("exception in ClientApplication", cnre); }
 		 */
 	}
 
 	@Override
-	public void dispose() {
+	public void dispose()
+	{
 		if (handleQuit())
 			_context.fireDispose();
 	}
 
-	public void join() throws InterruptedException {
+	public void join() throws InterruptedException
+	{
 		synchronized (_joinLock) {
 			while (!_exit)
 				_joinLock.wait();
 		}
 	}
 
-	public UIContext getContext() {
+	public UIContext getContext()
+	{
 		return _uiContext;
 	}
 
-	private class ApplicationEventListenerImpl implements
-			ApplicationEventListener {
+	private class ApplicationEventListenerImpl implements ApplicationEventListener
+	{
 		@Override
-		public void aboutRequested() {
-			GuiHelpAction.DisplayUrlHelp(HelpLinkConfiguration
-					.get_help_url(HelpLinkConfiguration.MAIN_HELP));
+		public void aboutRequested()
+		{
+			GuiHelpAction.DisplayUrlHelp(HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.MAIN_HELP));
 			// System.err.println("About not implemented.");
 		}
 
 		@Override
-		public void preferencesRequested() {
+		public void preferencesRequested()
+		{
 			try {
 				_uiContext.preferences().launchEditor(ClientApplication.this);
 			} catch (BackingStoreException bse) {
-				JOptionPane.showMessageDialog(ClientApplication.this,
-						"Unable to store preferences.",
-						"Preferences Store Exception",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(ClientApplication.this, "Unable to store preferences.",
+					"Preferences Store Exception", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
 		@Override
-		public boolean quitRequested() {
+		public boolean quitRequested()
+		{
 			boolean ret = handleQuit();
 			if (ret)
 				_context.fireDispose();
@@ -233,27 +226,27 @@ public class ClientApplication extends UIFrame {
 		}
 	}
 
-	private class RNSSelectionListener implements TreeSelectionListener {
+	private class RNSSelectionListener implements TreeSelectionListener
+	{
 		private UIPlugins _plugins;
 
-		private RNSSelectionListener(UIPlugins plugins) {
+		private RNSSelectionListener(UIPlugins plugins)
+		{
 			_plugins = plugins;
 		}
 
 		@Override
-		public void valueChanged(TreeSelectionEvent e) {
+		public void valueChanged(TreeSelectionEvent e)
+		{
 			Collection<EndpointDescription> descriptions = new LinkedList<EndpointDescription>();
 			TreePath[] paths = _browserTree.getSelectionPaths();
 			if (paths != null) {
 				for (TreePath path : paths) {
-					RNSTreeNode node = (RNSTreeNode) path
-							.getLastPathComponent();
+					RNSTreeNode node = (RNSTreeNode) path.getLastPathComponent();
 					RNSTreeObject obj = (RNSTreeObject) node.getUserObject();
 					if (obj.objectType() == RNSTreeObjectType.ENDPOINT_OBJECT) {
 						RNSFilledInTreeObject fObj = (RNSFilledInTreeObject) obj;
-						descriptions.add(new EndpointDescription(fObj
-								.typeInformation(), fObj.endpointType(), fObj
-								.isLocal()));
+						descriptions.add(new EndpointDescription(fObj.typeInformation(), fObj.endpointType(), fObj.isLocal()));
 					}
 				}
 			}

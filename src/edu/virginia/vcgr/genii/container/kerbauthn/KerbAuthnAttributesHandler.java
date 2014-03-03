@@ -19,37 +19,34 @@ import edu.virginia.vcgr.genii.security.SecurityConstants;
  * additional security checking that might restrict access to its methods beyond what is already
  * employed by GenesisIIBase class's default access checking code.
  */
-public class KerbAuthnAttributesHandler extends AbstractAttributeHandler {
+public class KerbAuthnAttributesHandler extends AbstractAttributeHandler
+{
 
-	public KerbAuthnAttributesHandler(AttributePackage pkg)
-			throws NoSuchMethodException {
+	public KerbAuthnAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
+	{
 		super(pkg);
 	}
 
 	@Override
-	protected void registerHandlers() throws NoSuchMethodException {
+	protected void registerHandlers() throws NoSuchMethodException
+	{
 		addHandler(SecurityConstants.NEW_KERB_IDP_REALM_QNAME, "getRealmAttr");
 		addHandler(SecurityConstants.NEW_KERB_IDP_KDC_QNAME, "getKdcAttr");
 	}
 
-	public MessageElement getRealmAttr() throws ResourceUnknownFaultType,
-			ResourceException {
+	public MessageElement getRealmAttr() throws ResourceUnknownFaultType, ResourceException
+	{
 		ResourceKey resourceKey = ResourceManager.getCurrentResource();
 		IResource resource = resourceKey.dereference();
-		String realm = (String) resource
-				.getProperty(SecurityConstants.NEW_KERB_IDP_REALM_QNAME
-						.getLocalPart());
-		return new MessageElement(SecurityConstants.NEW_KERB_IDP_REALM_QNAME,
-				realm);
+		String realm = (String) resource.getProperty(SecurityConstants.NEW_KERB_IDP_REALM_QNAME.getLocalPart());
+		return new MessageElement(SecurityConstants.NEW_KERB_IDP_REALM_QNAME, realm);
 	}
 
-	public MessageElement getKdcAttr() throws ResourceUnknownFaultType,
-			ResourceException {
+	public MessageElement getKdcAttr() throws ResourceUnknownFaultType, ResourceException
+	{
 		ResourceKey resourceKey = ResourceManager.getCurrentResource();
 		IResource resource = resourceKey.dereference();
-		String kdc = (String) resource
-				.getProperty(SecurityConstants.NEW_KERB_IDP_KDC_QNAME
-						.getLocalPart());
+		String kdc = (String) resource.getProperty(SecurityConstants.NEW_KERB_IDP_KDC_QNAME.getLocalPart());
 		return new MessageElement(SecurityConstants.NEW_KERB_IDP_KDC_QNAME, kdc);
 	}
 }

@@ -21,7 +21,8 @@ import org.morgan.util.Pair;
 import org.morgan.util.configuration.ConfigurationException;
 import org.xml.sax.SAXException;
 
-public class UIPlugins {
+public class UIPlugins
+{
 	static private Log _logger = LogFactory.getLog(UIPlugins.class);
 
 	static private final int MAX_GROUP_SIZE = 8;
@@ -33,85 +34,77 @@ public class UIPlugins {
 			_plugins = UIPluginConfigParser.parse();
 		} catch (ParserConfigurationException e) {
 			_logger.fatal("Unable to configure XML parser for plugins.", e);
-			throw new ConfigurationException(
-					"Unable to configure XML parser for plugins.", e);
+			throw new ConfigurationException("Unable to configure XML parser for plugins.", e);
 		} catch (SAXException e) {
 			_logger.fatal("Unable to parse XML config for plugins.", e);
-			throw new ConfigurationException(
-					"Unable to parse XML config for plugins.", e);
+			throw new ConfigurationException("Unable to parse XML config for plugins.", e);
 		} catch (IOException e) {
 			_logger.fatal("Unable to read plugin configuration.", e);
-			throw new ConfigurationException(
-					"Unable to read plugin configuration.", e);
+			throw new ConfigurationException("Unable to read plugin configuration.", e);
 		} catch (UIPluginException e) {
 			_logger.fatal("Unable to configure plugins.", e);
 			throw new ConfigurationException("Unable to configure plugins.", e);
 		}
 	}
 
-	private Map<String, Map<String, Collection<UITopMenuPluginAction>>> _topMenuActions = new LinkedHashMap<String, Map<String, Collection<UITopMenuPluginAction>>>();
-	private Map<String, Collection<UIPopupMenuPluginAction>> _popupMenuActions = new LinkedHashMap<String, Collection<UIPopupMenuPluginAction>>();
+	private Map<String, Map<String, Collection<UITopMenuPluginAction>>> _topMenuActions =
+		new LinkedHashMap<String, Map<String, Collection<UITopMenuPluginAction>>>();
+	private Map<String, Collection<UIPopupMenuPluginAction>> _popupMenuActions =
+		new LinkedHashMap<String, Collection<UIPopupMenuPluginAction>>();
 	private Collection<Pair<String, UITabPlugin>> _tabs = new LinkedList<Pair<String, UITabPlugin>>();
 
-	private Collection<UIMenuPluginAction<? extends UIMenuPlugin>> _allActions = new LinkedList<UIMenuPluginAction<? extends UIMenuPlugin>>();
+	private Collection<UIMenuPluginAction<? extends UIMenuPlugin>> _allActions =
+		new LinkedList<UIMenuPluginAction<? extends UIMenuPlugin>>();
 
 	private UIPluginContext _context;
 
-	public UIPlugins(UIPluginContext context) {
+	public UIPlugins(UIPluginContext context)
+	{
 		_context = context;
 
 		for (UIPluginDescription desc : _plugins) {
 			UITabFacetDescription tabDesc = desc.tabFacetDescription();
 			if (tabDesc != null) {
-				_tabs.add(new Pair<String, UITabPlugin>(tabDesc.tabName(),
-						tabDesc.getPlugin()));
+				_tabs.add(new Pair<String, UITabPlugin>(tabDesc.tabName(), tabDesc.getPlugin()));
 			}
 
-			UIPopupMenuFacetDescription popDesc = desc
-					.popupMenuFacetDescription();
+			UIPopupMenuFacetDescription popDesc = desc.popupMenuFacetDescription();
 			if (popDesc != null) {
-				UIPopupMenuPluginAction action = new UIPopupMenuPluginAction(
-						popDesc.getPlugin(), popDesc.itemName(), context);
+				UIPopupMenuPluginAction action = new UIPopupMenuPluginAction(popDesc.getPlugin(), popDesc.itemName(), context);
 				action.updateStatus(new Vector<EndpointDescription>(0));
 				_allActions.add(action);
-				Collection<UIPopupMenuPluginAction> actions = _popupMenuActions
-						.get(popDesc.groupName());
+				Collection<UIPopupMenuPluginAction> actions = _popupMenuActions.get(popDesc.groupName());
 				if (actions == null)
-					_popupMenuActions
-							.put(popDesc.groupName(),
-									actions = new LinkedList<UIPopupMenuPluginAction>());
+					_popupMenuActions.put(popDesc.groupName(), actions = new LinkedList<UIPopupMenuPluginAction>());
 				actions.add(action);
 			}
 
 			UITopMenuFacetDescription topDesc = desc.topMenuFacetDescription();
 			if (topDesc != null) {
-				UITopMenuPluginAction action = new UITopMenuPluginAction(
-						topDesc.getPlugin(), topDesc.itemName(), context);
+				UITopMenuPluginAction action = new UITopMenuPluginAction(topDesc.getPlugin(), topDesc.itemName(), context);
 				action.updateStatus(new Vector<EndpointDescription>(0));
 				_allActions.add(action);
-				Map<String, Collection<UITopMenuPluginAction>> menu = _topMenuActions
-						.get(topDesc.menuName());
+				Map<String, Collection<UITopMenuPluginAction>> menu = _topMenuActions.get(topDesc.menuName());
 				if (menu == null)
-					_topMenuActions
-							.put(topDesc.menuName(),
-									menu = new LinkedHashMap<String, Collection<UITopMenuPluginAction>>());
-				Collection<UITopMenuPluginAction> actions = menu.get(topDesc
-						.groupName());
+					_topMenuActions.put(topDesc.menuName(), menu =
+						new LinkedHashMap<String, Collection<UITopMenuPluginAction>>());
+				Collection<UITopMenuPluginAction> actions = menu.get(topDesc.groupName());
 				if (actions == null)
-					menu.put(topDesc.groupName(),
-							actions = new LinkedList<UITopMenuPluginAction>());
+					menu.put(topDesc.groupName(), actions = new LinkedList<UITopMenuPluginAction>());
 				actions.add(action);
 			}
 		}
 	}
 
-	public void updateStatuses(Collection<EndpointDescription> descriptions) {
+	public void updateStatuses(Collection<EndpointDescription> descriptions)
+	{
 		for (UIMenuPluginAction<? extends UIMenuPlugin> action : _allActions) {
 			action.updateStatus(descriptions);
 		}
 	}
 
-	public void addTopLevelMenus(JMenuBar menuBar) {
+	public void addTopLevelMenus(JMenuBar menuBar)
+	{
 		Map<String, JMenu> menus = new LinkedHashMap<String, JMenu>();
 
 		for (int lcv = 0; lcv < menuBar.getMenuCount(); lcv++) {
@@ -120,8 +113,7 @@ public class UIPlugins {
 		}
 
 		for (String menuName : _topMenuActions.keySet()) {
-			Map<String, Collection<UITopMenuPluginAction>> groups = _topMenuActions
-					.get(menuName);
+			Map<String, Collection<UITopMenuPluginAction>> groups = _topMenuActions.get(menuName);
 			JMenu menu = menus.get(menuName);
 			if (menu == null) {
 				menus.put(menuName, menu = new JMenu(menuName));
@@ -132,8 +124,7 @@ public class UIPlugins {
 			Map<String, Collection<Action>> groupActions = new LinkedHashMap<String, Collection<Action>>();
 
 			for (String groupName : groups.keySet()) {
-				Collection<UITopMenuPluginAction> actions = groups
-						.get(groupName);
+				Collection<UITopMenuPluginAction> actions = groups.get(groupName);
 				if (actions.size() <= 1)
 					singles.addAll(actions);
 				else
@@ -166,13 +157,13 @@ public class UIPlugins {
 		}
 	}
 
-	public JPopupMenu createPopupMenu() {
+	public JPopupMenu createPopupMenu()
+	{
 		Collection<Action> singles = new LinkedList<Action>();
 		Map<String, Collection<Action>> actionGroups = new LinkedHashMap<String, Collection<Action>>();
 
 		for (String group : _popupMenuActions.keySet()) {
-			Collection<UIPopupMenuPluginAction> actions = _popupMenuActions
-					.get(group);
+			Collection<UIPopupMenuPluginAction> actions = _popupMenuActions.get(group);
 			Collection<UIPopupMenuPluginAction> enabledActions = new LinkedList<UIPopupMenuPluginAction>();
 			for (UIPopupMenuPluginAction a : actions) {
 				if (a.isEnabled())
@@ -217,11 +208,10 @@ public class UIPlugins {
 		return null;
 	}
 
-	public void setTabPanes(JTabbedPane tabbedPane,
-			Collection<EndpointDescription> targets) {
+	public void setTabPanes(JTabbedPane tabbedPane, Collection<EndpointDescription> targets)
+	{
 		int selectedIndex = tabbedPane.getSelectedIndex();
-		String selectedTitle = (selectedIndex < 0) ? null : tabbedPane
-				.getTitleAt(selectedIndex);
+		String selectedTitle = (selectedIndex < 0) ? null : tabbedPane.getTitleAt(selectedIndex);
 
 		tabbedPane.removeAll();
 		int index = 0;
@@ -230,18 +220,16 @@ public class UIPlugins {
 				if (selectedTitle != null && pair.first().equals(selectedTitle))
 					selectedIndex = index;
 				index++;
-				tabbedPane.addTab(pair.first(),
-						pair.second().getComponent(_context));
+				tabbedPane.addTab(pair.first(), pair.second().getComponent(_context));
 			}
 		}
 
-		if (selectedTitle != null
-				&& (selectedIndex >= 0 && selectedIndex < tabbedPane
-						.getTabCount()))
+		if (selectedTitle != null && (selectedIndex >= 0 && selectedIndex < tabbedPane.getTabCount()))
 			tabbedPane.setSelectedIndex(selectedIndex);
 	}
 
-	public void fireMenuAction(Class<? extends UIMenuPlugin> pluginType) {
+	public void fireMenuAction(Class<? extends UIMenuPlugin> pluginType)
+	{
 		UIMenuPluginAction<? extends UIMenuPlugin> action = null;
 
 		for (UIMenuPluginAction<? extends UIMenuPlugin> a : _allActions) {
@@ -250,8 +238,7 @@ public class UIPlugins {
 		}
 
 		if (action == null)
-			throw new IllegalArgumentException(String.format(
-					"Couldn't find plugin type %s.", pluginType));
+			throw new IllegalArgumentException(String.format("Couldn't find plugin type %s.", pluginType));
 
 		action.actionPerformed(new ActionEvent(this, 0, null));
 	}

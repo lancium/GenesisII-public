@@ -22,7 +22,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
-public class XMLTextWidget extends JTextPane {
+public class XMLTextWidget extends JTextPane
+{
 	static final long serialVersionUID = 0L;
 
 	public Style PLAIN_STYLE = null;
@@ -33,7 +34,8 @@ public class XMLTextWidget extends JTextPane {
 
 	static private Log _logger = LogFactory.getLog(XMLTextWidget.class);
 
-	private void createStyles(StyledDocument exemplar) {
+	private void createStyles(StyledDocument exemplar)
+	{
 		PLAIN_STYLE = exemplar.addStyle("Plain", null);
 		int size = StyleConstants.getFontSize(PLAIN_STYLE);
 
@@ -55,14 +57,16 @@ public class XMLTextWidget extends JTextPane {
 		StyleConstants.setItalic(ATTRIBUTE_STYLE, true);
 	}
 
-	public XMLTextWidget() {
+	public XMLTextWidget()
+	{
 		createStyles(getStyledDocument());
 
 		setFocusable(true);
 		setEditable(false);
 	}
 
-	public XMLTextWidget(QName objectName, Object... objects) {
+	public XMLTextWidget(QName objectName, Object... objects)
+	{
 		this();
 
 		for (Object object : objects) {
@@ -74,7 +78,8 @@ public class XMLTextWidget extends JTextPane {
 		}
 	}
 
-	public XMLTextWidget(MessageElement... elements) {
+	public XMLTextWidget(MessageElement... elements)
+	{
 		this();
 
 		for (MessageElement me : elements) {
@@ -86,7 +91,8 @@ public class XMLTextWidget extends JTextPane {
 		}
 	}
 
-	public void clear() {
+	public void clear()
+	{
 		try {
 			StyledDocument doc = getStyledDocument();
 			doc.remove(0, doc.getLength());
@@ -95,12 +101,11 @@ public class XMLTextWidget extends JTextPane {
 		}
 	}
 
-	public void appendDocument(QName objectName, Object object)
-			throws ResourceException, XMLStreamException,
-			FactoryConfigurationError {
+	public void appendDocument(QName objectName, Object object) throws ResourceException, XMLStreamException,
+		FactoryConfigurationError
+	{
 		try {
-			XMLPrettyPrinter pp = new XMLPrettyPrinter(
-					new XMLTextWidgetFormatHandler());
+			XMLPrettyPrinter pp = new XMLPrettyPrinter(new XMLTextWidgetFormatHandler());
 			pp.formatDocument(objectName, object);
 		} catch (IOException ioe) {
 			appendError("Unable to format XML document.", ioe);
@@ -109,11 +114,10 @@ public class XMLTextWidget extends JTextPane {
 		append(PLAIN_STYLE, "\n\n");
 	}
 
-	public void appendDocument(MessageElement me) throws XMLStreamException,
-			FactoryConfigurationError, Exception {
+	public void appendDocument(MessageElement me) throws XMLStreamException, FactoryConfigurationError, Exception
+	{
 		try {
-			XMLPrettyPrinter pp = new XMLPrettyPrinter(
-					new XMLTextWidgetFormatHandler());
+			XMLPrettyPrinter pp = new XMLPrettyPrinter(new XMLTextWidgetFormatHandler());
 			pp.formatDocument(me);
 		} catch (IOException ioe) {
 			appendError("Unable to format XML document.", ioe);
@@ -122,14 +126,15 @@ public class XMLTextWidget extends JTextPane {
 		append(PLAIN_STYLE, "\n\n");
 	}
 
-	public void appendHeader(String contents) {
+	public void appendHeader(String contents)
+	{
 		append(HEADER_STYLE, contents);
 	}
 
-	public void appendDocument(XMLEventReader reader) throws XMLStreamException {
+	public void appendDocument(XMLEventReader reader) throws XMLStreamException
+	{
 		try {
-			XMLPrettyPrinter pp = new XMLPrettyPrinter(
-					new XMLTextWidgetFormatHandler());
+			XMLPrettyPrinter pp = new XMLPrettyPrinter(new XMLTextWidgetFormatHandler());
 			pp.formatDocument(reader);
 		} catch (IOException ioe) {
 			appendError("Unable to format XML document.", ioe);
@@ -138,11 +143,13 @@ public class XMLTextWidget extends JTextPane {
 		append(PLAIN_STYLE, "\n\n");
 	}
 
-	public void appendError(String contents) {
+	public void appendError(String contents)
+	{
 		appendError(contents, null);
 	}
 
-	public void appendError(String contents, Throwable cause) {
+	public void appendError(String contents, Throwable cause)
+	{
 		StringWriter writer = new StringWriter();
 		PrintWriter pWriter = new PrintWriter(writer);
 		pWriter.format("%s:\n", contents);
@@ -152,7 +159,8 @@ public class XMLTextWidget extends JTextPane {
 		append(ERROR_STYLE, writer.toString());
 	}
 
-	public void append(Style style, String content) {
+	public void append(Style style, String content)
+	{
 		StyledDocument doc = getStyledDocument();
 
 		try {
@@ -162,39 +170,47 @@ public class XMLTextWidget extends JTextPane {
 		}
 	}
 
-	public boolean getScrollableTracksViewportWidth() {
+	public boolean getScrollableTracksViewportWidth()
+	{
 		return false;
 	}
 
-	private class XMLTextWidgetFormatHandler implements XMLFormatHandler {
+	private class XMLTextWidgetFormatHandler implements XMLFormatHandler
+	{
 		private LinkedList<Style> _styles = new LinkedList<Style>();
 
-		private XMLTextWidgetFormatHandler() {
+		private XMLTextWidgetFormatHandler()
+		{
 			_styles.addFirst(PLAIN_STYLE);
 		}
 
 		@Override
-		public void appendText(String text) throws IOException {
+		public void appendText(String text) throws IOException
+		{
 			append(_styles.peek(), text);
 		}
 
 		@Override
-		public void endAttribute() throws IOException {
+		public void endAttribute() throws IOException
+		{
 			_styles.pop();
 		}
 
 		@Override
-		public void endElement() throws IOException {
+		public void endElement() throws IOException
+		{
 			_styles.pop();
 		}
 
 		@Override
-		public void startAttribute() throws IOException {
+		public void startAttribute() throws IOException
+		{
 			_styles.push(ATTRIBUTE_STYLE);
 		}
 
 		@Override
-		public void startElement() throws IOException {
+		public void startElement() throws IOException
+		{
 			_styles.push(ELEMENT_STYLE);
 		}
 	}

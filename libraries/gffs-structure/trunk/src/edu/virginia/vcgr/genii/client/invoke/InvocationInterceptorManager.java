@@ -8,11 +8,13 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
-public class InvocationInterceptorManager {
-	private HashMap<MethodDescription, Vector<OperationHandler>> _handlers = new HashMap<MethodDescription, Vector<OperationHandler>>();
+public class InvocationInterceptorManager
+{
+	private HashMap<MethodDescription, Vector<OperationHandler>> _handlers =
+		new HashMap<MethodDescription, Vector<OperationHandler>>();
 
-	public void addInterceptorClass(Object interceptorHandler)
-			throws NoSuchMethodException {
+	public void addInterceptorClass(Object interceptorHandler) throws NoSuchMethodException
+	{
 		HashMap<MethodDescription, OperationHandler> handlers = new HashMap<MethodDescription, OperationHandler>();
 
 		Class<?> cl = interceptorHandler.getClass();
@@ -30,9 +32,9 @@ public class InvocationInterceptorManager {
 		}
 	}
 
-	private void analyzeClass(
-			HashMap<MethodDescription, OperationHandler> handlers,
-			Object interceptor, Class<?> cl) throws NoSuchMethodException {
+	private void analyzeClass(HashMap<MethodDescription, OperationHandler> handlers, Object interceptor, Class<?> cl)
+		throws NoSuchMethodException
+	{
 		if (cl.equals(Object.class))
 			return;
 
@@ -47,10 +49,9 @@ public class InvocationInterceptorManager {
 		}
 	}
 
-	private void addMethod(
-			HashMap<MethodDescription, OperationHandler> handlers,
-			Object interceptor, Class<?> cl, Method m, PipelineProcessor proc)
-			throws NoSuchMethodException {
+	private void addMethod(HashMap<MethodDescription, OperationHandler> handlers, Object interceptor, Class<?> cl, Method m,
+		PipelineProcessor proc) throws NoSuchMethodException
+	{
 		Class<?>[] interceptorPTypes = m.getParameterTypes();
 		Class<?>[] portTypePTypes;
 
@@ -69,8 +70,7 @@ public class InvocationInterceptorManager {
 		Class<?> portType = proc.portType();
 
 		if (!portType.isInterface())
-			throw new RuntimeException("Port type class \""
-					+ portType.getName() + "\" is not an interface.");
+			throw new RuntimeException("Port type class \"" + portType.getName() + "\" is not an interface.");
 
 		String portMethod = proc.methodName();
 
@@ -78,17 +78,15 @@ public class InvocationInterceptorManager {
 			portMethod = m.getName();
 
 		portType.getMethod(portMethod, portTypePTypes);
-		handlers.put(new MethodDescription(portMethod, portTypePTypes),
-				new OperationHandler(interceptor, m,
-						portTypePTypes.length == interceptorPTypes.length));
+		handlers.put(new MethodDescription(portMethod, portTypePTypes), new OperationHandler(interceptor, m,
+			portTypePTypes.length == interceptorPTypes.length));
 	}
 
-	public Object invoke(EndpointReferenceType target,
-			ICallingContext callingContext, IFinalInvoker finalObject,
-			Method finalMethod, Object[] finalParams) throws Throwable {
+	public Object invoke(EndpointReferenceType target, ICallingContext callingContext, IFinalInvoker finalObject,
+		Method finalMethod, Object[] finalParams) throws Throwable
+	{
 		Vector<OperationHandler> handlers;
-		MethodDescription desc = new MethodDescription(finalMethod.getName(),
-				finalMethod.getParameterTypes());
+		MethodDescription desc = new MethodDescription(finalMethod.getName(), finalMethod.getParameterTypes());
 
 		synchronized (_handlers) {
 			handlers = _handlers.get(desc);
@@ -98,8 +96,7 @@ public class InvocationInterceptorManager {
 				handlers = new Vector<OperationHandler>(handlers);
 		}
 
-		InvocationContext ctxt = new InvocationContext(handlers, target,
-				callingContext, finalParams, finalObject, finalMethod);
+		InvocationContext ctxt = new InvocationContext(handlers, target, callingContext, finalParams, finalObject, finalMethod);
 		return ctxt.proceed();
 	}
 }

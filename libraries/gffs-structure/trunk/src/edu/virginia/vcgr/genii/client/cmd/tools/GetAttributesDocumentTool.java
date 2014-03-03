@@ -22,7 +22,8 @@ import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class GetAttributesDocumentTool extends BaseGridTool {
+public class GetAttributesDocumentTool extends BaseGridTool
+{
 	static final private String _DESCRIPTION = "config/tooldocs/description/dgetattributes";
 	static final private String _USAGE = "config/tooldocs/usage/uget-attributes";
 	static final private String _MANPAGE = "config/tooldocs/man/get-attributes";
@@ -30,40 +31,39 @@ public class GetAttributesDocumentTool extends BaseGridTool {
 	private boolean _human = false;
 	private boolean _local = false;
 
-	public GetAttributesDocumentTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.ADMINISTRATION);
+	public GetAttributesDocumentTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.ADMINISTRATION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "human", "h" })
-	public void setHuman() {
+	public void setHuman()
+	{
 		_human = true;
 	}
 
 	@Option({ "local", "l" })
-	public void setLocal() {
+	public void setLocal()
+	{
 		_human = true;
 		_local = true;
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException(
-					"<target> must be a grid path. ");
+			throw new InvalidToolUsageException("<target> must be a grid path. ");
 		RNSPath path = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
 
-		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-				path.getEndpoint());
-		GetResourcePropertyDocumentResponse resp = common
-				.getResourcePropertyDocument(new GetResourcePropertyDocument());
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, path.getEndpoint());
+		GetResourcePropertyDocumentResponse resp = common.getResourcePropertyDocument(new GetResourcePropertyDocument());
 		if (_human) {
 			SortedMap<String, String> sortMap = new TreeMap<String, String>();
 			for (MessageElement child : resp.get_any()) {
-				String name = (_local ? child.getName() : child.getQName()
-						.toString());
+				String name = (_local ? child.getName() : child.getQName().toString());
 				String value = child.getValue();
 				if (value == null) {
 					NodeList nodeList = child.getChildNodes();
@@ -76,8 +76,7 @@ public class GetAttributesDocumentTool extends BaseGridTool {
 				stdout.println(entry.getKey() + "=" + entry.getValue());
 			}
 		} else {
-			MessageElement document = new MessageElement(new QName(
-					GenesisIIConstants.GENESISII_NS, "attributes"));
+			MessageElement document = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
 			for (MessageElement child : resp.get_any()) {
 				document.addChild(child);
 			}
@@ -87,7 +86,8 @@ public class GetAttributesDocumentTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() != 1)
 			throw new InvalidToolUsageException();
 	}

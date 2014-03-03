@@ -20,14 +20,15 @@ package edu.virginia.vcgr.jsdl.sweep;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 
 /**
- * The SweepListener interface is a callback interface implemented by callers
- * that wish to receive the results of parameter sweep operations. When a caller
- * wishes to "expand" the job definitions represented by a parameter sweep, s/he
- * uses this callback to receive the generated singleton jobs.
+ * The SweepListener interface is a callback interface implemented by callers that wish to receive
+ * the results of parameter sweep operations. When a caller wishes to "expand" the job definitions
+ * represented by a parameter sweep, s/he uses this callback to receive the generated singleton
+ * jobs.
  * 
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface SweepListener {
+public interface SweepListener
+{
 	/**
 	 * Receive a generated "singleton" parameter sweep job.
 	 * 

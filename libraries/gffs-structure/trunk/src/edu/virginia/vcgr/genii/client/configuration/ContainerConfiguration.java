@@ -13,9 +13,9 @@ import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.security.x509.CertEntry;
 import edu.virginia.vcgr.genii.security.x509.SimpleKeystoreLoader;
 
-public class ContainerConfiguration {
-	static private Log _logger = LogFactory
-			.getLog(ContainerConfiguration.class);
+public class ContainerConfiguration
+{
+	static private Log _logger = LogFactory.getLog(ContainerConfiguration.class);
 
 	static private final String _NOTIFICATION_POOL_SIZE = "edu.virginia.vcgr.genii.container.notification.work-pool-size";
 	static private final String _NOTIFICATION_POOL_SIZE_DEFAULT = "5";
@@ -36,114 +36,116 @@ public class ContainerConfiguration {
 	static Object _lockSavedCert = new Object();
 
 	/*
-	 * static holder for the "real" container configuration, owned by the
-	 * container object. this will be null if the role is not actually for a
-	 * container.
+	 * static holder for the "real" container configuration, owned by the container object. this
+	 * will be null if the role is not actually for a container.
 	 */
 	private static ContainerConfiguration _theConConf = null;
 
 	/**
-	 * constructor uses the configuration manager to retrieve most properties.
-	 * some are filled in by the container itself, such as the ssl information.
+	 * constructor uses the configuration manager to retrieve most properties. some are filled in by
+	 * the container itself, such as the ssl information.
 	 */
-	public ContainerConfiguration(ConfigurationManager manager) {
+	public ContainerConfiguration(ConfigurationManager manager)
+	{
 		_configuration = manager.getContainerConfiguration();
 
-		_globalProperties = (Properties) _configuration
-				.retrieveSection(GenesisIIConstants.GLOBAL_PROPERTY_SECTION_NAME);
+		_globalProperties = (Properties) _configuration.retrieveSection(GenesisIIConstants.GLOBAL_PROPERTY_SECTION_NAME);
 		setupProperties(_globalProperties);
 
 		DeploymentName name = new DeploymentName();
 
-		// we always create the ssl info now since we use features from it even
-		// if ssl is not
+		// we always create the ssl info now since we use features from it even if ssl is not
 		// enabled.
-		_sslInformation = new SslInformation(Installation.getDeployment(name)
-				.security());
+		_sslInformation = new SslInformation(Installation.getDeployment(name).security());
 
-		String trustSelfSigned = Installation.getDeployment(name)
-				.webContainerProperties()
-				.getProperty(WebContainerConstants.TRUST_SELF_SIGNED);
+		String trustSelfSigned =
+			Installation.getDeployment(name).webContainerProperties().getProperty(WebContainerConstants.TRUST_SELF_SIGNED);
 
 		if (trustSelfSigned != null && trustSelfSigned.equalsIgnoreCase("true"))
 			_trustSelfSigned = true;
 	}
 
 	/**
-	 * returns the statically held reference to the container's real
-	 * configuration. this is null for a client.
+	 * returns the statically held reference to the container's real configuration. this is null for
+	 * a client.
 	 */
-	static public ContainerConfiguration getTheContainerConfig() {
+	static public ContainerConfiguration getTheContainerConfig()
+	{
 		return _theConConf;
 	}
 
-	static public void setTheContainerConfig(ContainerConfiguration realConf) {
+	static public void setTheContainerConfig(ContainerConfiguration realConf)
+	{
 		_theConConf = realConf;
 	}
 
-	public Properties getGlobalProperties() {
+	public Properties getGlobalProperties()
+	{
 		return _globalProperties;
 	}
 
-	public int getNotificationPoolSize() {
+	public int getNotificationPoolSize()
+	{
 		return _notificationPoolSize;
 	}
 
-	public int getListenPort() {
+	public int getListenPort()
+	{
 		return _listenPort;
 	}
 
-	public Integer getDPagesPort() {
+	public Integer getDPagesPort()
+	{
 		return _dpagesPort;
 	}
 
-	public int getMaxAcceptorThreads() {
+	public int getMaxAcceptorThreads()
+	{
 		return _maxThreads;
 	}
 
-	public boolean isSSL() {
+	public boolean isSSL()
+	{
 		return _sslInformation != null;
 	}
 
-	public boolean trustSelfSigned() {
+	public boolean trustSelfSigned()
+	{
 		return _trustSelfSigned;
 	}
 
-	public SslInformation getSslInformation() {
+	public SslInformation getSslInformation()
+	{
 		return _sslInformation;
 	}
 
-	private void setupProperties(Properties props) {
-		String sListenPort = InstallationProperties.getInstallationProperties()
-				.getContainerPort();
+	private void setupProperties(Properties props)
+	{
+		String sListenPort = InstallationProperties.getInstallationProperties().getContainerPort();
 		if (sListenPort == null)
-			sListenPort = Installation
-					.getDeployment(new DeploymentName())
-					.webContainerProperties()
-					.getProperty(WebContainerConstants.LISTEN_PORT_PROP,
-							_DEFAULT_LISTEN_PORT_VALUE);
+			sListenPort =
+				Installation.getDeployment(new DeploymentName()).webContainerProperties()
+					.getProperty(WebContainerConstants.LISTEN_PORT_PROP, _DEFAULT_LISTEN_PORT_VALUE);
 		_listenPort = Integer.parseInt(sListenPort);
 
-		String dListenPort = Installation.getDeployment(new DeploymentName())
-				.webContainerProperties()
+		String dListenPort =
+			Installation.getDeployment(new DeploymentName()).webContainerProperties()
 				.getProperty(WebContainerConstants.DPAGES_PORT_PROP);
 		if (dListenPort != null)
 			_dpagesPort = Integer.valueOf(dListenPort);
 
-		String sMaxThreads = Installation
-				.getDeployment(new DeploymentName())
-				.webContainerProperties()
-				.getProperty(WebContainerConstants.MAX_ACCEPT_THREADS_PROP,
-						_DEFAULT_MAX_ACCEPT_THREADS);
+		String sMaxThreads =
+			Installation.getDeployment(new DeploymentName()).webContainerProperties()
+				.getProperty(WebContainerConstants.MAX_ACCEPT_THREADS_PROP, _DEFAULT_MAX_ACCEPT_THREADS);
 		_maxThreads = Integer.parseInt(sMaxThreads);
 
-		String notSize = props.getProperty(_NOTIFICATION_POOL_SIZE,
-				_NOTIFICATION_POOL_SIZE_DEFAULT);
+		String notSize = props.getProperty(_NOTIFICATION_POOL_SIZE, _NOTIFICATION_POOL_SIZE_DEFAULT);
 		_notificationPoolSize = Integer.parseInt(notSize);
 	}
 
 	// returns the container TLS certificate for outgoing connections.
-	public static CertEntry getContainerTLSCert() {
+	public static CertEntry getContainerTLSCert()
+	{
 		synchronized (_lockSavedCert) {
 			if (_savedContainerCert != null)
 				return _savedContainerCert;
@@ -151,8 +153,7 @@ public class ContainerConfiguration {
 
 		try {
 			if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
-				ContainerConfiguration containerConf = ContainerConfiguration
-						.getTheContainerConfig();
+				ContainerConfiguration containerConf = ContainerConfiguration.getTheContainerConfig();
 				if (containerConf == null) {
 					_logger.error("failure: found that container configuration is null for a server role.");
 				} else {
@@ -160,18 +161,13 @@ public class ContainerConfiguration {
 					SimpleKeystoreLoader skl = new SimpleKeystoreLoader();
 					File actualKeyStore = new File(si.getKeystoreFilename());
 					if (_logger.isTraceEnabled())
-						_logger.trace("loading keystore from file: "
-								+ actualKeyStore.getAbsolutePath());
-					FileInputStream keyInput = new FileInputStream(
-							actualKeyStore);
+						_logger.trace("loading keystore from file: " + actualKeyStore.getAbsolutePath());
+					FileInputStream keyInput = new FileInputStream(actualKeyStore);
 
-					CertEntry entry = skl.selectCert(keyInput,
-							si.getKeystoreType(), si.getKeystorePassword(),
-							false, null);
+					CertEntry entry = skl.selectCert(keyInput, si.getKeystoreType(), si.getKeystorePassword(), false, null);
 					if (entry != null) {
 						if (_logger.isDebugEnabled())
-							_logger.debug("selected this certificate for tls outcalls: "
-									+ entry._certChain[0].getSubjectDN());
+							_logger.debug("selected this certificate for tls outcalls: " + entry._certChain[0].getSubjectDN());
 						synchronized (_lockSavedCert) {
 							_savedContainerCert = entry;
 						}

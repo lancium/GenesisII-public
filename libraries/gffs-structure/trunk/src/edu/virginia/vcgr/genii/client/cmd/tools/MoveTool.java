@@ -13,33 +13,30 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
-public class MoveTool extends BaseGridTool {
+public class MoveTool extends BaseGridTool
+{
 	static final private String DESCRIPTION = "config/tooldocs/description/dmv";
 	static final private String USAGE = "config/tooldocs/usage/umv";
 	static final private String _MANPAGE = "config/tooldocs/man/mv";
 
-	static private int moveLocal(String source, String target)
-			throws IOException {
+	static private int moveLocal(String source, String target) throws IOException
+	{
 		File sourceFile = new File(source);
 		if (!sourceFile.exists())
-			throw new FileNotFoundException(String.format(
-					"Path %s does not exist.", source));
+			throw new FileNotFoundException(String.format("Path %s does not exist.", source));
 
 		File targetFile = new File(target);
 		if (!sourceFile.renameTo(targetFile))
-			throw new IOException(String.format(
-					"Unable to move local file %s to %s.", source, target));
+			throw new IOException(String.format("Unable to move local file %s to %s.", source, target));
 
 		return 0;
 	}
 
-	static private int moveGrid(String source, String target)
-			throws RNSException {
+	static private int moveGrid(String source, String target) throws RNSException
+	{
 		RNSPath current = RNSPath.getCurrent();
-		RNSPath sourcePath = current.lookup(source,
-				RNSPathQueryFlags.MUST_EXIST);
-		RNSPath targetPath = current.lookup(target,
-				RNSPathQueryFlags.MUST_NOT_EXIST);
+		RNSPath sourcePath = current.lookup(source, RNSPathQueryFlags.MUST_EXIST);
+		RNSPath targetPath = current.lookup(target, RNSPathQueryFlags.MUST_NOT_EXIST);
 
 		targetPath.link(sourcePath.getEndpoint());
 
@@ -55,20 +52,21 @@ public class MoveTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() != 2)
-			throw new InvalidToolUsageException(
-					"Incorrect number of arguments.");
+			throw new InvalidToolUsageException("Incorrect number of arguments.");
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		GeniiPath source = new GeniiPath(getArgument(0));
 		GeniiPath target = new GeniiPath(getArgument(1));
 
 		if (source.pathType() != target.pathType())
 			throw new InvalidToolUsageException(
-					"The source and target must both be local paths, or they must both be grid paths.");
+				"The source and target must both be local paths, or they must both be grid paths.");
 
 		if (source.pathType() == GeniiPathType.Local)
 			return moveLocal(source.path(), target.path());
@@ -76,9 +74,9 @@ public class MoveTool extends BaseGridTool {
 			return moveGrid(source.path(), target.path());
 	}
 
-	public MoveTool() {
-		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE),
-				false, ToolCategory.DATA);
+	public MoveTool()
+	{
+		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), false, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 }

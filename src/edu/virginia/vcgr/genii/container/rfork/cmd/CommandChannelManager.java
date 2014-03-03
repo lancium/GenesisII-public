@@ -25,13 +25,14 @@ import edu.virginia.vcgr.genii.client.utils.instantiation.FromString;
 import edu.virginia.vcgr.genii.common.XMLCommandFunction;
 import edu.virginia.vcgr.genii.common.XMLCommandParameter;
 
-public class CommandChannelManager {
+public class CommandChannelManager
+{
 	static private Log _logger = LogFactory.getLog(CommandChannelManager.class);
 
 	static private Map<Class<?>, Map<String, Method>> _handlerMap = new HashMap<Class<?>, Map<String, Method>>();
 
-	static private Map<String, Method> determineMethodMap(Class<?> targetClass,
-			Map<String, Method> methodMap) {
+	static private Map<String, Method> determineMethodMap(Class<?> targetClass, Map<String, Method> methodMap)
+	{
 		if (targetClass == null || targetClass.equals(Object.class))
 			return methodMap;
 
@@ -53,7 +54,8 @@ public class CommandChannelManager {
 		return methodMap;
 	}
 
-	static private Method getHandler(Class<?> targetClass, String command) {
+	static private Method getHandler(Class<?> targetClass, String command)
+	{
 		Map<String, Method> methodMap;
 
 		synchronized (_handlerMap) {
@@ -61,8 +63,7 @@ public class CommandChannelManager {
 		}
 
 		if (methodMap == null) {
-			methodMap = determineMethodMap(targetClass,
-					new HashMap<String, Method>());
+			methodMap = determineMethodMap(targetClass, new HashMap<String, Method>());
 			synchronized (_handlerMap) {
 				_handlerMap.put(targetClass, methodMap);
 			}
@@ -71,7 +72,8 @@ public class CommandChannelManager {
 		return methodMap.get(command);
 	}
 
-	static private Map<String, Method> getHandlers(Class<?> targetClass) {
+	static private Map<String, Method> getHandlers(Class<?> targetClass)
+	{
 		Map<String, Method> methodMap;
 
 		synchronized (_handlerMap) {
@@ -79,8 +81,7 @@ public class CommandChannelManager {
 		}
 
 		if (methodMap == null) {
-			methodMap = determineMethodMap(targetClass,
-					new HashMap<String, Method>());
+			methodMap = determineMethodMap(targetClass, new HashMap<String, Method>());
 			synchronized (_handlerMap) {
 				_handlerMap.put(targetClass, methodMap);
 			}
@@ -89,11 +90,10 @@ public class CommandChannelManager {
 		return methodMap;
 	}
 
-	static public void handleCommand(Object target, InputStream commandContent)
-			throws IOException {
+	static public void handleCommand(Object target, InputStream commandContent) throws IOException
+	{
 		StringBuilder builder = new StringBuilder();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				commandContent));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(commandContent));
 		String line;
 
 		while ((line = reader.readLine()) != null) {
@@ -114,43 +114,34 @@ public class CommandChannelManager {
 				if ((lcv + 1) >= cmd.length)
 					args[lcv] = null;
 				else
-					args[lcv] = FromString.fromString(cmd[lcv + 1],
-							paramTypes[lcv]);
+					args[lcv] = FromString.fromString(cmd[lcv + 1], paramTypes[lcv]);
 			}
 
 			try {
 				handler.invoke(target, args);
 			} catch (IllegalArgumentException e) {
-				_logger.error(String.format(
-						"Unable to invoke command handler for command '%s'.",
-						builder.toString()), e);
-				throw new IOException(String.format(
-						"Unable to invoke command handler for command '%s'.",
-						builder.toString()), e);
+				_logger.error(String.format("Unable to invoke command handler for command '%s'.", builder.toString()), e);
+				throw new IOException(String.format("Unable to invoke command handler for command '%s'.", builder.toString()),
+					e);
 
 			} catch (IllegalAccessException e) {
-				_logger.error(String.format(
-						"Unable to invoke command handler for command '%s'.",
-						builder.toString()), e);
-				throw new IOException(String.format(
-						"Unable to invoke command handler for command '%s'.",
-						builder.toString()), e);
+				_logger.error(String.format("Unable to invoke command handler for command '%s'.", builder.toString()), e);
+				throw new IOException(String.format("Unable to invoke command handler for command '%s'.", builder.toString()),
+					e);
 			} catch (InvocationTargetException e) {
 				Throwable cause = e.getCause();
 				if (cause instanceof IOException)
 					throw ((IOException) cause);
 
-				_logger.error(String.format(
-						"Unable to invoke command handler for command '%s'.",
-						builder.toString()), cause);
-				throw new IOException(String.format(
-						"Unable to invoke command handler for command '%s'.",
-						builder.toString()), cause);
+				_logger.error(String.format("Unable to invoke command handler for command '%s'.", builder.toString()), cause);
+				throw new IOException(String.format("Unable to invoke command handler for command '%s'.", builder.toString()),
+					cause);
 			}
 		}
 	}
 
-	static public String[] describeCommands(Object target) {
+	static public String[] describeCommands(Object target)
+	{
 		Map<String, Method> handlers = getHandlers(target.getClass());
 		Collection<String> ret = new Vector<String>(handlers.size());
 
@@ -187,7 +178,8 @@ public class CommandChannelManager {
 		return ret.toArray(new String[ret.size()]);
 	}
 
-	static public void appendMetadata(EndpointReferenceType epr, Class<?> source) {
+	static public void appendMetadata(EndpointReferenceType epr, Class<?> source)
+	{
 		Map<String, Method> handlers = getHandlers(source);
 		if (handlers == null || handlers.size() == 0)
 			return;
@@ -207,8 +199,7 @@ public class CommandChannelManager {
 			Class<?>[] methodParameters = method.getParameterTypes();
 			Annotation[][] annotations = method.getParameterAnnotations();
 
-			Collection<XMLCommandParameter> parameters = new Vector<XMLCommandParameter>(
-					methodParameters.length);
+			Collection<XMLCommandParameter> parameters = new Vector<XMLCommandParameter>(methodParameters.length);
 
 			for (int lcv = 0; lcv < methodParameters.length; lcv++) {
 				Class<?> parameterType = methodParameters[lcv];
@@ -236,12 +227,10 @@ public class CommandChannelManager {
 						parameterDescription = null;
 				}
 
-				parameters.add(new XMLCommandParameter(parameterName,
-						parameterType.toString(), parameterDescription));
+				parameters.add(new XMLCommandParameter(parameterName, parameterType.toString(), parameterDescription));
 			}
 
-			CommandHandler cHandler = method
-					.getAnnotation(CommandHandler.class);
+			CommandHandler cHandler = method.getAnnotation(CommandHandler.class);
 			String description = null;
 
 			if (cHandler != null) {
@@ -250,14 +239,11 @@ public class CommandChannelManager {
 					description = null;
 			}
 
-			XMLCommandFunction function = new XMLCommandFunction(description,
-					parameters.toArray(new XMLCommandParameter[parameters
-							.size()]), commandName);
-			metadata.add(new MessageElement(
-					GenesisIIConstants.COMMAND_FUNCTION_QNAME, function));
+			XMLCommandFunction function =
+				new XMLCommandFunction(description, parameters.toArray(new XMLCommandParameter[parameters.size()]), commandName);
+			metadata.add(new MessageElement(GenesisIIConstants.COMMAND_FUNCTION_QNAME, function));
 		}
 
-		epr.setMetadata(new MetadataType(metadata
-				.toArray(new MessageElement[metadata.size()])));
+		epr.setMetadata(new MetadataType(metadata.toArray(new MessageElement[metadata.size()])));
 	}
 }

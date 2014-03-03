@@ -32,73 +32,64 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @ConstructionParametersType(WSIteratorConstructionParameters.class)
 @GeniiServiceConfiguration(resourceProvider = WSIteratorDBResourceProvider.class)
-public class WSIteratorServiceImpl extends GenesisIIBase implements
-		WSIteratorPortType {
+public class WSIteratorServiceImpl extends GenesisIIBase implements WSIteratorPortType
+{
 	static final public String SERVICE_NAME = "WSIteratorPortType";
 	static final private long lifeTime = 1000L * 60 * 5;
 
 	@Override
-	protected void setAttributeHandlers() throws NoSuchMethodException,
-			ResourceException, ResourceUnknownFaultType {
+	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
+	{
 		super.setAttributeHandlers();
 
 		new WSIteratorAttributesHandler(getAttributePackage());
 	}
 
-	public WSIteratorServiceImpl() throws RemoteException {
+	public WSIteratorServiceImpl() throws RemoteException
+	{
 		super(SERVICE_NAME);
 
 		addImplementedPortType(IteratorConstants.ITERATOR_PORT_TYPE());
 	}
 
 	@Override
-	public PortType getFinalWSResourceInterface() {
+	public PortType getFinalWSResourceInterface()
+	{
 		return IteratorConstants.ITERATOR_PORT_TYPE();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public IterateResponseType iterate(IterateRequestType request)
-			throws RemoteException {
-		WSIteratorResource resource = (WSIteratorResource) ResourceManager
-				.getCurrentResource().dereference();
+	public IterateResponseType iterate(IterateRequestType request) throws RemoteException
+	{
+		WSIteratorResource resource = (WSIteratorResource) ResourceManager.getCurrentResource().dereference();
 
-		extendLifeTime(ResourceManager.getCurrentResource()); // extend the
-																// lifetime of
-																// this
-																// resource
-																// between each
-																// iteration
+		extendLifeTime(ResourceManager.getCurrentResource()); // extend the lifetime of this
+																// resource between each iteration
 
-		Collection<Pair<Long, MessageElement>> entries = resource
-				.retrieveEntries(request.getStartOffset().intValue(), request
-						.getElementCount().intValue());
-		IterableElementType[] iterableElements = new IterableElementType[entries
-				.size()];
+		Collection<Pair<Long, MessageElement>> entries =
+			resource.retrieveEntries(request.getStartOffset().intValue(), request.getElementCount().intValue());
+		IterableElementType[] iterableElements = new IterableElementType[entries.size()];
 		int lcv = 0;
 		for (Pair<Long, MessageElement> entry : entries) {
-			iterableElements[lcv++] = new IterableElementType(
-					new MessageElement[] { entry.second() }, new UnsignedLong(
-							entry.first()));
+			iterableElements[lcv++] =
+				new IterableElementType(new MessageElement[] { entry.second() }, new UnsignedLong(entry.first()));
 		}
 
-		return new IterateResponseType(
-				new UnsignedLong(resource.iteratorSize()), iterableElements);
+		return new IterateResponseType(new UnsignedLong(resource.iteratorSize()), iterableElements);
 	}
 
 	@Override
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-			ConstructionParameters cParams,
-			GenesisHashMap constructionParameters,
-			Collection<MessageElement> resolverCreationParameters)
-			throws ResourceException, BaseFaultType, RemoteException {
-		super.postCreate(rKey, newEPR, cParams, constructionParameters,
-				resolverCreationParameters);
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
+		BaseFaultType, RemoteException
+	{
+		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
 		extendLifeTime(rKey);
 	}
 
-	private void extendLifeTime(ResourceKey rKey) throws BaseFaultType,
-			ResourceException {
+	private void extendLifeTime(ResourceKey rKey) throws BaseFaultType, ResourceException
+	{
 		Calendar future = Calendar.getInstance();
 		future.setTimeInMillis(System.currentTimeMillis() + lifeTime);
 		setScheduledTerminationTime(future, rKey);

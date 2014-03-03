@@ -10,43 +10,39 @@ import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.iterator.resource.WSIteratorResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-final class WSIteratorAttributesHandler extends AbstractAttributeHandler {
-	private long getElementCount() throws ResourceUnknownFaultType,
-			ResourceException {
-		WSIteratorResource resource = (WSIteratorResource) ResourceManager
-				.getCurrentResource();
+final class WSIteratorAttributesHandler extends AbstractAttributeHandler
+{
+	private long getElementCount() throws ResourceUnknownFaultType, ResourceException
+	{
+		WSIteratorResource resource = (WSIteratorResource) ResourceManager.getCurrentResource();
 		return resource.iteratorSize();
 	}
 
-	private long getPreferredBatchSize() throws ResourceException,
-			ResourceUnknownFaultType {
-		WSIteratorResource resource = (WSIteratorResource) ResourceManager
-				.getCurrentResource();
-		return (Long) resource
-				.getProperty(WSIteratorResource.PREFERRED_BATCH_SIZE_PROPERTY);
+	private long getPreferredBatchSize() throws ResourceException, ResourceUnknownFaultType
+	{
+		WSIteratorResource resource = (WSIteratorResource) ResourceManager.getCurrentResource();
+		return (Long) resource.getProperty(WSIteratorResource.PREFERRED_BATCH_SIZE_PROPERTY);
 	}
 
-	WSIteratorAttributesHandler(AttributePackage pkg)
-			throws NoSuchMethodException {
+	WSIteratorAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
+	{
 		super(pkg);
 	}
 
 	@Override
-	final protected void registerHandlers() throws NoSuchMethodException {
+	final protected void registerHandlers() throws NoSuchMethodException
+	{
 		addHandler(WSIteratorRP.ELEMENT_COUNT_QNAME, "getElementCountAttr");
-		addHandler(WSIteratorRP.PREFERRED_BATCH_SIZE_QNAME,
-				"getPreferredBatchSizeAttr");
+		addHandler(WSIteratorRP.PREFERRED_BATCH_SIZE_QNAME, "getPreferredBatchSizeAttr");
 	}
 
-	final public MessageElement getElementCountAttr()
-			throws ResourceUnknownFaultType, ResourceException {
-		return new MessageElement(WSIteratorRP.ELEMENT_COUNT_QNAME,
-				getElementCount());
+	final public MessageElement getElementCountAttr() throws ResourceUnknownFaultType, ResourceException
+	{
+		return new MessageElement(WSIteratorRP.ELEMENT_COUNT_QNAME, getElementCount());
 	}
 
-	final public MessageElement getPreferredBatchSizeAttr()
-			throws ResourceException, ResourceUnknownFaultType {
-		return new MessageElement(WSIteratorRP.PREFERRED_BATCH_SIZE_QNAME,
-				getPreferredBatchSize());
+	final public MessageElement getPreferredBatchSizeAttr() throws ResourceException, ResourceUnknownFaultType
+	{
+		return new MessageElement(WSIteratorRP.PREFERRED_BATCH_SIZE_QNAME, getPreferredBatchSize());
 	}
 }

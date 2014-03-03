@@ -18,35 +18,42 @@ import javax.swing.tree.TreePath;
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
 import edu.virginia.vcgr.genii.ui.UIContext;
 
-class HistoryEventTree extends JTree {
+class HistoryEventTree extends JTree
+{
 	static final long serialVersionUID = 0L;
 
-	private class RightClickListener extends MouseAdapter {
+	private class RightClickListener extends MouseAdapter
+	{
 		@Override
-		final public void mouseClicked(MouseEvent e) {
+		final public void mouseClicked(MouseEvent e)
+		{
 			if (e.isPopupTrigger())
 				popup(e.getPoint());
 		}
 
 		@Override
-		final public void mousePressed(MouseEvent e) {
+		final public void mousePressed(MouseEvent e)
+		{
 			if (e.isPopupTrigger())
 				popup(e.getPoint());
 		}
 
 		@Override
-		final public void mouseReleased(MouseEvent e) {
+		final public void mouseReleased(MouseEvent e)
+		{
 			if (e.isPopupTrigger())
 				popup(e.getPoint());
 		}
 	}
 
-	private class DisplayEventDetailsAction extends AbstractAction {
+	private class DisplayEventDetailsAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0l;
 
 		private HistoryEvent _event;
 
-		private DisplayEventDetailsAction(HistoryEvent event) {
+		private DisplayEventDetailsAction(HistoryEvent event)
+		{
 			super("Event Details");
 
 			_event = event;
@@ -54,11 +61,10 @@ class HistoryEventTree extends JTree {
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			HistoryEventDisplayDialog dialog;
-			dialog = new HistoryEventDisplayDialog(
-					SwingUtilities.getWindowAncestor(HistoryEventTree.this),
-					_context);
+			dialog = new HistoryEventDisplayDialog(SwingUtilities.getWindowAncestor(HistoryEventTree.this), _context);
 			dialog.setEvent(_event);
 
 			dialog.pack();
@@ -69,13 +75,13 @@ class HistoryEventTree extends JTree {
 		}
 	}
 
-	private void popup(Point location) {
+	private void popup(Point location)
+	{
 		HistoryEvent event = null;
 
 		TreePath path = getPathForLocation(location.x, location.y);
 		if (path != null) {
-			HistoryEventTreeNode node = (HistoryEventTreeNode) path
-					.getLastPathComponent();
+			HistoryEventTreeNode node = (HistoryEventTreeNode) path.getLastPathComponent();
 			if (node != null)
 				event = node.event();
 		}
@@ -88,12 +94,11 @@ class HistoryEventTree extends JTree {
 
 	private UIContext _context;
 
-	HistoryEventTree(UIContext context, Collection<HistoryEvent> events,
-			HistoryEventFilter filter) {
+	HistoryEventTree(UIContext context, Collection<HistoryEvent> events, HistoryEventFilter filter)
+	{
 		super(new HistoryEventTreeModel(events, filter));
 
-		setBorder(new AttemptNumberBorder(new Color(225, 255, 225),
-				Color.black, null));
+		setBorder(new AttemptNumberBorder(new Color(225, 255, 225), Color.black, null));
 		_context = context;
 
 		setRootVisible(false);
@@ -104,8 +109,7 @@ class HistoryEventTree extends JTree {
 		addMouseListener(new RightClickListener());
 
 		/*
-		 * new HoverDialogController(this, new
-		 * HistoryEventDisplayDialogProvider(context));
+		 * new HoverDialogController(this, new HistoryEventDisplayDialogProvider(context));
 		 */
 	}
 

@@ -8,11 +8,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 
-public class Hostname {
+public class Hostname
+{
 	static private String _hostname = null;
 	static private String _ipAddress = null;
 
-	static private InetAddress getMostGlobal(Collection<InetAddress> addrs) {
+	static private InetAddress getMostGlobal(Collection<InetAddress> addrs)
+	{
 		InetAddress[] ret = new InetAddress[5];
 		Arrays.fill(ret, null);
 
@@ -37,15 +39,14 @@ public class Hostname {
 			if (ret[lcv] != null)
 				return ret[lcv];
 
-		throw new RuntimeException(
-				"Unable to determine local host's network address.");
+		throw new RuntimeException("Unable to determine local host's network address.");
 	}
 
-	static private InetAddress getMostGlobal() {
+	static private InetAddress getMostGlobal()
+	{
 		try {
 			Collection<InetAddress> tmp = new ArrayList<InetAddress>();
-			Enumeration<NetworkInterface> interfaces = NetworkInterface
-					.getNetworkInterfaces();
+			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 
 			while (interfaces.hasMoreElements()) {
 				NetworkInterface iface = interfaces.nextElement();
@@ -56,12 +57,12 @@ public class Hostname {
 
 			return getMostGlobal(tmp);
 		} catch (SocketException se) {
-			throw new RuntimeException(
-					"Unable to determine local host's network address.", se);
+			throw new RuntimeException("Unable to determine local host's network address.", se);
 		}
 	}
 
-	synchronized static public String getCurrentHostname() {
+	synchronized static public String getCurrentHostname()
+	{
 		if (_hostname == null) {
 			InetAddress addr = getMostGlobal();
 			_hostname = addr.getCanonicalHostName();
@@ -71,7 +72,8 @@ public class Hostname {
 		return _hostname;
 	}
 
-	synchronized static public String getCurrentIPAddress() {
+	synchronized static public String getCurrentIPAddress()
+	{
 		if (_ipAddress == null) {
 			InetAddress addr = getMostGlobal();
 			_hostname = addr.getCanonicalHostName();

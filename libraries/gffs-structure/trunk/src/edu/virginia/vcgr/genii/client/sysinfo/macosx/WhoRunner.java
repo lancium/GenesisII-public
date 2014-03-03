@@ -10,21 +10,24 @@ import java.util.regex.Pattern;
 
 import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 
-class WhoRunner {
-	static private final Pattern WHO_PATTERN = Pattern
-			.compile("^\\s*([^\\s]+).*$");
+class WhoRunner
+{
+	static private final Pattern WHO_PATTERN = Pattern.compile("^\\s*([^\\s]+).*$");
 
 	private Collection<String> _loggedIn;
 
-	private WhoRunner(Collection<String> loggedIn) {
+	private WhoRunner(Collection<String> loggedIn)
+	{
 		_loggedIn = loggedIn;
 	}
 
-	Collection<String> loggedIn() {
+	Collection<String> loggedIn()
+	{
 		return Collections.unmodifiableCollection(_loggedIn);
 	}
 
-	static WhoRunner run() throws IOException {
+	static WhoRunner run() throws IOException
+	{
 		Collection<String> loggedIn = new Vector<String>(8);
 		List<String> results = ExecutionEngine.simpleMultilineExecute("who");
 		for (String result : results) {

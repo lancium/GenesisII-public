@@ -20,26 +20,27 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @ForkRoot(FSProxyDirFork.class)
 @ConstructionParametersType(FSProxyConstructionParameters.class)
-public class FSProxyServiceImpl extends ResourceForkBaseService implements
-		FSProxyPortType {
+public class FSProxyServiceImpl extends ResourceForkBaseService implements FSProxyPortType
+{
 	static final public String SERVICE_NAME = "FSProxyPortType";
 
-	public FSProxyServiceImpl() throws RemoteException {
+	public FSProxyServiceImpl() throws RemoteException
+	{
 		super(SERVICE_NAME);
 
-		addImplementedPortType(WellKnownPortTypes
-				.EXPORTED_FSPROXY_ROOT_SERVICE_PORT_TYPE());
+		addImplementedPortType(WellKnownPortTypes.EXPORTED_FSPROXY_ROOT_SERVICE_PORT_TYPE());
 	}
 
 	@Override
-	public PortType getFinalWSResourceInterface() {
+	public PortType getFinalWSResourceInterface()
+	{
 		return WellKnownPortTypes.EXPORTED_FSPROXY_ROOT_SERVICE_PORT_TYPE();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public QuitExportResponse quitExport(QuitExport arg0)
-			throws RemoteException, ResourceUnknownFaultType {
+	public QuitExportResponse quitExport(QuitExport arg0) throws RemoteException, ResourceUnknownFaultType
+	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
 		resource.destroy();
 

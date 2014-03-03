@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
-abstract class AbstractTaskProgressMonitor implements ProgressMonitor {
+abstract class AbstractTaskProgressMonitor implements ProgressMonitor
+{
 	private Collection<ProgressMonitorListener> _listeners = new LinkedList<ProgressMonitorListener>();
 
-	final protected void fireTaskStarted() {
+	final protected void fireTaskStarted()
+	{
 		Collection<ProgressMonitorListener> listeners;
 
 		synchronized (_listeners) {
@@ -18,7 +20,8 @@ abstract class AbstractTaskProgressMonitor implements ProgressMonitor {
 			listener.taskStarted();
 	}
 
-	final protected void fireTaskCompleted() {
+	final protected void fireTaskCompleted()
+	{
 		Collection<ProgressMonitorListener> listeners;
 
 		synchronized (_listeners) {
@@ -30,16 +33,16 @@ abstract class AbstractTaskProgressMonitor implements ProgressMonitor {
 	}
 
 	@Override
-	final public void addProgressMonitorListener(
-			ProgressMonitorListener listener) {
+	final public void addProgressMonitorListener(ProgressMonitorListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
 	@Override
-	final public void removeProgressMonitorListener(
-			ProgressMonitorListener listener) {
+	final public void removeProgressMonitorListener(ProgressMonitorListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}

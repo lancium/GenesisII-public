@@ -9,7 +9,8 @@ import javax.swing.JComboBox;
 import edu.virginia.vcgr.genii.gjt.data.UnitValue;
 
 @SuppressWarnings("rawtypes")
-abstract class UnitValueComboBox<U extends Enum<U>> extends JComboBox {
+abstract class UnitValueComboBox<U extends Enum<U>> extends JComboBox
+{
 	static final long serialVersionUID = 0L;
 
 	private UnitValue<Long, U> _value;
@@ -17,7 +18,8 @@ abstract class UnitValueComboBox<U extends Enum<U>> extends JComboBox {
 	protected abstract U[] getItems();
 
 	@SuppressWarnings("unchecked")
-	protected UnitValueComboBox(UnitValue<Long, U> initialValue) {
+	protected UnitValueComboBox(UnitValue<Long, U> initialValue)
+	{
 		setModel(new DefaultComboBoxModel(getItems()));
 		_value = initialValue;
 
@@ -26,9 +28,11 @@ abstract class UnitValueComboBox<U extends Enum<U>> extends JComboBox {
 	}
 
 	@SuppressWarnings("unchecked")
-	private class ItemListenerImpl implements ItemListener {
+	private class ItemListenerImpl implements ItemListener
+	{
 		@Override
-		public void itemStateChanged(ItemEvent e) {
+		public void itemStateChanged(ItemEvent e)
+		{
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				_value.units((U) e.getItem());
 			}

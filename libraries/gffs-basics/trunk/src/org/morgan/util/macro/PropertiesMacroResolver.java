@@ -2,10 +2,12 @@ package org.morgan.util.macro;
 
 import java.util.Properties;
 
-public class PropertiesMacroResolver implements MacroResolver {
+public class PropertiesMacroResolver implements MacroResolver
+{
 	private Properties _properties;
 
-	public PropertiesMacroResolver(Properties properties) {
+	public PropertiesMacroResolver(Properties properties)
+	{
 		if (properties == null)
 			throw new IllegalArgumentException("Properties cannot be null.");
 
@@ -13,7 +15,8 @@ public class PropertiesMacroResolver implements MacroResolver {
 	}
 
 	@Override
-	final public String lookup(String key) {
+	final public String lookup(String key)
+	{
 		return _properties.getProperty(key);
 	}
 }

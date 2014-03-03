@@ -6,11 +6,12 @@ import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PathUtils {
-	static private Pattern windowsRootPathPattern = Pattern
-			.compile("^[a-zA-Z]:\\\\.*");
+public class PathUtils
+{
+	static private Pattern windowsRootPathPattern = Pattern.compile("^[a-zA-Z]:\\\\.*");
 
-	static public URI pathToURI(String path) throws URISyntaxException {
+	static public URI pathToURI(String path) throws URISyntaxException
+	{
 		if (path == null)
 			return null;
 

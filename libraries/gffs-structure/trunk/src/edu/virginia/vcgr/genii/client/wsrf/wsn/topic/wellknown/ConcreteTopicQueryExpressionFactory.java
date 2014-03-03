@@ -12,32 +12,34 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPathExpression;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpressionFactory;
 
-public class ConcreteTopicQueryExpressionFactory implements
-		TopicQueryExpressionFactory {
-	static private class NamespaceResolverImpl implements NamespaceResolver {
+public class ConcreteTopicQueryExpressionFactory implements TopicQueryExpressionFactory
+{
+	static private class NamespaceResolverImpl implements NamespaceResolver
+	{
 		private Element _sourceElement;
 
-		private NamespaceResolverImpl(Element sourceElement) {
+		private NamespaceResolverImpl(Element sourceElement)
+		{
 			_sourceElement = sourceElement;
 		}
 
 		@Override
-		public String getNamespaceURI(String prefix) {
+		public String getNamespaceURI(String prefix)
+		{
 			String ret = _sourceElement.lookupNamespaceURI(prefix);
 			if (ret == null || ret.isEmpty())
-				throw new ConfigurationException(String.format(
-						"Unable to lookup prefix %s.", prefix));
+				throw new ConfigurationException(String.format("Unable to lookup prefix %s.", prefix));
 
 			return ret;
 		}
 	}
 
 	@Override
-	public TopicQueryExpression createFromElement(Element e)
-			throws TopicNotSupportedFaultType {
+	public TopicQueryExpression createFromElement(Element e) throws TopicNotSupportedFaultType
+	{
 		/*
-		 * This is SO stupid, but somehow Apache Axis doesn't actually implement
-		 * the correct functionallity.
+		 * This is SO stupid, but somehow Apache Axis doesn't actually implement the correct
+		 * functionallity.
 		 */
 		if (e instanceof MessageElement) {
 			try {
@@ -46,8 +48,7 @@ public class ConcreteTopicQueryExpressionFactory implements
 			} catch (TopicNotSupportedFaultType f) {
 				throw f;
 			} catch (Exception ee) {
-				throw FaultManipulator
-						.fillInFault(new TopicNotSupportedFaultType());
+				throw FaultManipulator.fillInFault(new TopicNotSupportedFaultType());
 			}
 		}
 
@@ -57,21 +58,17 @@ public class ConcreteTopicQueryExpressionFactory implements
 		expression = e.getTextContent();
 
 		if (expression == null)
-			throw FaultManipulator
-					.fillInFault(new TopicNotSupportedFaultType());
+			throw FaultManipulator.fillInFault(new TopicNotSupportedFaultType());
 
 		expression = expression.trim();
 		if (expression.length() == 0)
-			throw FaultManipulator
-					.fillInFault(new TopicNotSupportedFaultType());
+			throw FaultManipulator.fillInFault(new TopicNotSupportedFaultType());
 
 		try {
-			TopicPathExpression tpe = TopicPathExpression.fromString(resolver,
-					expression);
+			TopicPathExpression tpe = TopicPathExpression.fromString(resolver, expression);
 			return new ConcreteTopicQueryExpression(tpe.topicPath());
 		} catch (ConfigurationException ce) {
-			throw FaultManipulator
-					.fillInFault(new TopicNotSupportedFaultType());
+			throw FaultManipulator.fillInFault(new TopicNotSupportedFaultType());
 		}
 	}
 }

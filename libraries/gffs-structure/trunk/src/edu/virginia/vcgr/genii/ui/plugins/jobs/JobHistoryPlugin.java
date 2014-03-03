@@ -30,23 +30,21 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 import edu.virginia.vcgr.genii.ui.plugins.queue.history.JobHistoryFrame;
 
-public class JobHistoryPlugin extends AbstractCombinedUIMenusPlugin {
-	private Collection<HistoryEvent> readHistoryEvents(UIPluginContext context,
-			MenuType menuType) throws IOException,
-			RNSPathDoesNotExistException, ClassNotFoundException {
+public class JobHistoryPlugin extends AbstractCombinedUIMenusPlugin
+{
+	private Collection<HistoryEvent> readHistoryEvents(UIPluginContext context, MenuType menuType) throws IOException,
+		RNSPathDoesNotExistException, ClassNotFoundException
+	{
 		Collection<HistoryEvent> events = null;
 		InputStream in = null;
 		Closeable token = null;
 
 		try {
-			token = ContextManager.temporarilyAssumeContext(context.uiContext()
-					.callingContext());
+			token = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 
-			Collection<RNSPath> paths = context.endpointRetriever()
-					.getTargetEndpoints();
+			Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 			if (paths != null && paths.size() == 1) {
-				EndpointReferenceType target = paths.iterator().next()
-						.getEndpoint();
+				EndpointReferenceType target = paths.iterator().next().getEndpoint();
 				TypeInformation typeInfo = new TypeInformation(target);
 				if (typeInfo.isByteIO())
 					in = ByteIOStreamFactory.createInputStream(target);
@@ -77,36 +75,31 @@ public class JobHistoryPlugin extends AbstractCombinedUIMenusPlugin {
 	}
 
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType)
-			throws UIPluginException {
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
+	{
 		try {
-			Collection<HistoryEvent> events = readHistoryEvents(context,
-					menuType);
+			Collection<HistoryEvent> events = readHistoryEvents(context, menuType);
 			if (events == null)
 				return;
 
-			JobHistoryFrame frame = new JobHistoryFrame((UIContext) context
-					.uiContext().clone(), null, null, events);
+			JobHistoryFrame frame = new JobHistoryFrame((UIContext) context.uiContext().clone(), null, null, events);
 			frame.pack();
 			GUIUtils.centerWindow(frame);
 			frame.setVisible(true);
 		} catch (Throwable cause) {
-			ErrorHandler.handleError(context.uiContext(),
-					context.ownerComponent(), cause);
+			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
 		}
 	}
 
 	@Override
-	public boolean isEnabled(
-			Collection<EndpointDescription> selectedDescriptions) {
+	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
+	{
 		// return true;
-		// ASG: 09-13-2013 ARG $%&$# who thought returning true always was a
-		// good idea?
+		// ASG: 09-13-2013 ARG $%&$# who thought returning true always was a good idea?
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
 
-		TypeInformation typeInfo = selectedDescriptions.iterator().next()
-				.typeInformation();
+		TypeInformation typeInfo = selectedDescriptions.iterator().next().typeInformation();
 		// need to see if what we are really looking for
 		return (typeInfo.isBESActivity());
 

@@ -16,7 +16,8 @@ import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class RmTool extends BaseGridTool {
+public class RmTool extends BaseGridTool
+{
 	static private final String _DESCRIPTION = "config/tooldocs/description/drm";
 	static private final String _USAGE = "config/tooldocs/usage/urm";
 	static private final String _MANPAGE = "config/tooldocs/man/rm";
@@ -27,27 +28,29 @@ public class RmTool extends BaseGridTool {
 	private boolean _force = false;
 
 	@Option({ "recursive", "r" })
-	public void setRecursive() {
+	public void setRecursive()
+	{
 		_recursive = true;
 	}
 
 	@Option({ "force", "f" })
-	public void setForce() {
+	public void setForce()
+	{
 		_force = true;
 	}
 
-	public RmTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.DATA);
+	public RmTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	/**
-	 * implements the actual activity of rm, once all parameters have been
-	 * grabbed.
+	 * implements the actual activity of rm, once all parameters have been grabbed.
 	 */
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		boolean recursive = _recursive;
 		boolean force = _force;
 
@@ -63,8 +66,7 @@ public class RmTool extends BaseGridTool {
 				ret = rm(fPath, recursive, force);
 			}
 			if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
-				String msg = "Failed to remove " + gPath.toString()
-						+ " because " + PathOutcome.outcomeText(ret) + ".";
+				String msg = "Failed to remove " + gPath.toString() + " because " + PathOutcome.outcomeText(ret) + ".";
 				stderr.println(msg);
 				_logger.error(msg);
 				toReturn = 1;
@@ -78,7 +80,8 @@ public class RmTool extends BaseGridTool {
 	 * checks that the arguments seem appropriate.
 	 */
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() < 1)
 			throw new InvalidToolUsageException();
 	}
@@ -86,42 +89,36 @@ public class RmTool extends BaseGridTool {
 	/**
 	 * removes a path pointed at by a java File object.
 	 */
-	private PathOutcome rm(File path, boolean recursive, boolean force) {
+	private PathOutcome rm(File path, boolean recursive, boolean force)
+	{
 		if (path == null)
 			return PathOutcome.OUTCOME_NOTHING;
 		if (_logger.isDebugEnabled())
-			_logger.debug("entered into rm on Java File: path="
-					+ path.toString() + " recurs=" + recursive + " force="
-					+ force);
+			_logger.debug("entered into rm on Java File: path=" + path.toString() + " recurs=" + recursive + " force=" + force);
 		if (!path.exists()) {
 			if (force)
-				return PathOutcome.OUTCOME_SUCCESS; // no error for this case
-													// with force enabled.
+				return PathOutcome.OUTCOME_SUCCESS; // no error for this case with force enabled.
 			stderr.println(path.getName() + " does not exist.");
 			return PathOutcome.OUTCOME_NOTHING;
 		}
 		if (recursive)
-			// recursive case will traverse into directories and eat all
-			// contents.
+			// recursive case will traverse into directories and eat all contents.
 			return PathDisposal.recursiveDelete(path);
 		else
 			// not recursive, just remove the thing itself, if we can.
-			return PathDisposal.removeAppropriately(path,
-					new JavaFileHierarchyHelper(), null);
+			return PathDisposal.removeAppropriately(path, new JavaFileHierarchyHelper(), null);
 	}
 
 	/**
 	 * removes a "filePath" in RNS space using the "currentPath" as an entre.
 	 */
-	public PathOutcome rm(RNSPath currentPath, String filePath,
-			boolean recursive, boolean force) {
+	public PathOutcome rm(RNSPath currentPath, String filePath, boolean recursive, boolean force)
+	{
 		if ((currentPath == null) || (filePath == null))
 			return PathOutcome.OUTCOME_NOTHING;
 		if (_logger.isDebugEnabled())
-			_logger.debug("entered into rm on RNSPath + String: currpath="
-					+ currentPath.toString() + " filepath="
-					+ filePath.toString() + " recurs=" + recursive + " force="
-					+ force);
+			_logger.debug("entered into rm on RNSPath + String: currpath=" + currentPath.toString() + " filepath="
+				+ filePath.toString() + " recurs=" + recursive + " force=" + force);
 		for (RNSPath file : currentPath.expand(filePath)) {
 			PathOutcome ret = rm(file, recursive, force);
 			if (ret.differs(PathOutcome.OUTCOME_SUCCESS))
@@ -133,20 +130,19 @@ public class RmTool extends BaseGridTool {
 	/**
 	 * removes an RNS "path" from RNS space.
 	 */
-	public PathOutcome rm(RNSPath path, boolean recursive, boolean force) {
+	public PathOutcome rm(RNSPath path, boolean recursive, boolean force)
+	{
 		if (path == null)
 			return PathOutcome.OUTCOME_NOTHING;
 		if (_logger.isDebugEnabled())
-			_logger.debug("entered into rm on RNSPath: path=" + path.toString()
-					+ " recurs=" + recursive + " force=" + force);
+			_logger.debug("entered into rm on RNSPath: path=" + path.toString() + " recurs=" + recursive + " force=" + force);
 		PathOutcome ret = PathOutcome.OUTCOME_ERROR;
 		if (recursive) {
 			// do directory traversal into rns space and destroy contents.
 			ret = PathDisposal.recursiveDelete(path);
 		} else {
 			// not recursive, so just clean the item itself.
-			ret = PathDisposal.removeAppropriately(path,
-					new RNSPathHierarchyHelper(), null);
+			ret = PathDisposal.removeAppropriately(path, new RNSPathHierarchyHelper(), null);
 		}
 		if (ret.same(PathOutcome.OUTCOME_SUCCESS))
 			return ret;

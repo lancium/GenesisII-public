@@ -2,22 +2,26 @@ package org.morgan.ftp;
 
 import java.util.ArrayList;
 
-public class FTPListenerManager {
+public class FTPListenerManager
+{
 	private ArrayList<FTPListener> _listeners = new ArrayList<FTPListener>();
 
-	public void addFTPListener(FTPListener listener) {
+	public void addFTPListener(FTPListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	public void removeFTPListener(FTPListener listener) {
+	public void removeFTPListener(FTPListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	public void fireSessionOpened(int sessionID) {
+	public void fireSessionOpened(int sessionID)
+	{
 		FTPListener[] listeners;
 
 		synchronized (_listeners) {
@@ -29,7 +33,8 @@ public class FTPListenerManager {
 		}
 	}
 
-	public void fireSessionClosed(int sessionID) {
+	public void fireSessionClosed(int sessionID)
+	{
 		FTPListener[] listeners;
 
 		synchronized (_listeners) {
@@ -41,7 +46,8 @@ public class FTPListenerManager {
 		}
 	}
 
-	public void fireUserAuthenticated(int sessionID, String username) {
+	public void fireUserAuthenticated(int sessionID, String username)
+	{
 		FTPListener[] listeners;
 
 		synchronized (_listeners) {

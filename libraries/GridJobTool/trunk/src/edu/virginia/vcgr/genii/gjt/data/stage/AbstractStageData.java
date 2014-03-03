@@ -10,8 +10,8 @@ import edu.virginia.vcgr.genii.gjt.data.xpath.XPathBuilder;
 import edu.virginia.vcgr.jsdl.DataStaging;
 import edu.virginia.vcgr.jsdl.sweep.SweepParameter;
 
-public abstract class AbstractStageData extends DefaultDataItem implements
-		StageData {
+public abstract class AbstractStageData extends DefaultDataItem implements StageData
+{
 	@XmlTransient
 	private StageProtocol _protocol;
 
@@ -19,7 +19,8 @@ public abstract class AbstractStageData extends DefaultDataItem implements
 	private boolean _active = false;
 
 	@SuppressWarnings("unused")
-	private AbstractStageData() {
+	private AbstractStageData()
+	{
 		// For deserialization only
 	}
 
@@ -28,42 +29,48 @@ public abstract class AbstractStageData extends DefaultDataItem implements
 	protected abstract void deactivateImpl();
 
 	@Override
-	public void fireJobDescriptionModified() {
+	public void fireJobDescriptionModified()
+	{
 		if (_active)
 			super.fireJobDescriptionModified();
 	}
 
 	@Override
-	public void fireParameterizableStringModified(String oldValue,
-			String newValue) {
+	public void fireParameterizableStringModified(String oldValue, String newValue)
+	{
 		if (_active)
 			super.fireParameterizableStringModified(oldValue, newValue);
 	}
 
-	protected AbstractStageData(StageProtocol protocol) {
+	protected AbstractStageData(StageProtocol protocol)
+	{
 		_protocol = protocol;
 	}
 
 	@Override
-	final public StageProtocol protocol() {
+	final public StageProtocol protocol()
+	{
 		return _protocol;
 	}
 
 	@Override
-	final public void activate() {
+	final public void activate()
+	{
 		_active = true;
 		activateImpl();
 	}
 
 	@Override
-	final public void deactivate() {
+	final public void deactivate()
+	{
 		deactivateImpl();
 		_active = false;
 	}
 
 	@Override
-	public void generateAdditionalJSDL(DataStaging jsdlStaging,
-			XPathBuilder builder, Map<String, List<SweepParameter>> variables) {
+	public void generateAdditionalJSDL(DataStaging jsdlStaging, XPathBuilder builder,
+		Map<String, List<SweepParameter>> variables)
+	{
 		// Don't do anything
 	}
 }

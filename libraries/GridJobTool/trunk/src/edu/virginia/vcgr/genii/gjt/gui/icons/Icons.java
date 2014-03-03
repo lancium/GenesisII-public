@@ -19,7 +19,8 @@ import org.apache.log4j.Logger;
 
 import edu.virginia.vcgr.genii.gjt.util.IOUtils;
 
-public class Icons {
+public class Icons
+{
 	static private Logger _logger = Logger.getLogger(Icons.class);
 
 	static private final int MINIMUM_POINT_SIZE = 4;
@@ -30,30 +31,27 @@ public class Icons {
 	static final private String FOLDER_48_48 = "folder-48x48.png";
 	static final private String SMALL_CHECK = "small-check.png";
 
-	static final public Icon EmptyAt16By16 = createEmptyIcon(new Dimension(16,
-			16));
+	static final public Icon EmptyAt16By16 = createEmptyIcon(new Dimension(16, 16));
 	static final public Icon CheckMarkAt16By16 = loadIcon(SMALL_CHECK);
 	static final public Icon YesFolderAt24By24 = loadIcon(YES_FOLDER_24_24);
 	static final public Icon NoFolderAt24By24 = loadIcon(NO_FOLDER_24_24);
 	static final public Icon FolderAt24By24 = loadIcon(FOLDER_24_24);
 	static final public Icon FolderAt48By48 = loadIcon(FOLDER_48_48);
 
-	static private Icon loadIcon(String iconName) {
+	static private Icon loadIcon(String iconName)
+	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		InputStream in = null;
 
 		try {
 			in = Icons.class.getResourceAsStream(iconName);
 			if (in == null)
-				throw new FileNotFoundException(String.format(
-						"Unable to load icon \"%s\".", iconName));
+				throw new FileNotFoundException(String.format("Unable to load icon \"%s\".", iconName));
 			IOUtils.copy(in, baos);
 			baos.flush();
 			return new ImageIcon(baos.toByteArray());
 		} catch (Throwable cause) {
-			_logger.error(
-					String.format("Unable to load icon \"%s\".", iconName),
-					cause);
+			_logger.error(String.format("Unable to load icon \"%s\".", iconName), cause);
 			return null;
 		} finally {
 			IOUtils.close(in);
@@ -61,12 +59,12 @@ public class Icons {
 		}
 	}
 
-	static public Icon labelIcon(Icon original, String text) {
-		BufferedImage newImage = new BufferedImage(original.getIconWidth(),
-				original.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+	static public Icon labelIcon(Icon original, String text)
+	{
+		BufferedImage newImage =
+			new BufferedImage(original.getIconWidth(), original.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D g = null;
-		Rectangle canvas = new Rectangle(0, 0, original.getIconWidth(),
-				original.getIconHeight());
+		Rectangle canvas = new Rectangle(0, 0, original.getIconWidth(), original.getIconHeight());
 		Rectangle2D r;
 
 		try {
@@ -76,8 +74,7 @@ public class Icons {
 			Font font = g.getFont();
 			while (true) {
 				r = font.getStringBounds(text, g.getFontRenderContext());
-				if (r.getWidth() <= canvas.width
-						&& r.getHeight() < canvas.height)
+				if (r.getWidth() <= canvas.width && r.getHeight() < canvas.height)
 					break;
 				float size = font.getSize2D();
 				if (size <= MINIMUM_POINT_SIZE)
@@ -88,7 +85,7 @@ public class Icons {
 			g.setFont(font);
 			g.setColor(Color.BLACK);
 			g.drawString(text, (int) ((canvas.width - r.getWidth()) / 2),
-					(int) ((canvas.height - r.getHeight()) / 2 + r.getHeight()));
+				(int) ((canvas.height - r.getHeight()) / 2 + r.getHeight()));
 
 			return new ImageIcon(newImage);
 		} finally {
@@ -96,15 +93,16 @@ public class Icons {
 		}
 	}
 
-	static public Icon createEmptyIcon(Dimension size) {
-		BufferedImage newImage = new BufferedImage(size.width, size.height,
-				BufferedImage.TYPE_4BYTE_ABGR);
+	static public Icon createEmptyIcon(Dimension size)
+	{
+		BufferedImage newImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR);
 		return new ImageIcon(newImage);
 	}
 
-	static public Icon createGrayedIcon(Icon original) {
-		BufferedImage newImage = new BufferedImage(original.getIconWidth(),
-				original.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+	static public Icon createGrayedIcon(Icon original)
+	{
+		BufferedImage newImage =
+			new BufferedImage(original.getIconWidth(), original.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D g = null;
 
 		try {
@@ -117,18 +115,16 @@ public class Icons {
 		}
 	}
 
-	static public Icon createTextIcon(Font font, Color color, Dimension size,
-			String text) {
-		BufferedImage newImage = new BufferedImage(size.width, size.height,
-				BufferedImage.TYPE_4BYTE_ABGR);
+	static public Icon createTextIcon(Font font, Color color, Dimension size, String text)
+	{
+		BufferedImage newImage = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D g = null;
 
 		try {
 			g = newImage.createGraphics();
 			g.setFont(font);
 			g.setColor(color);
-			Rectangle2D rect = font.getStringBounds(text,
-					g.getFontRenderContext());
+			Rectangle2D rect = font.getStringBounds(text, g.getFontRenderContext());
 			g.drawString(text, (float) 5, (float) (rect.getHeight() + 5));
 
 			return new ImageIcon(newImage);

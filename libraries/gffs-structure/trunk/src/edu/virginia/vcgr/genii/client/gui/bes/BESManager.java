@@ -24,29 +24,26 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 
-public class BESManager {
-	static public String createBES(String path, BESListModel model) {
+public class BESManager
+{
+	static public String createBES(String path, BESListModel model)
+	{
 		EndpointReferenceType newBES = null;
 		RNSPath target = null;
 
 		try {
-			Map<String, ContainerInformation> containers = InstallationState
-					.getRunningContainers();
+			Map<String, ContainerInformation> containers = InstallationState.getRunningContainers();
 			if (containers.size() == 0)
 				return "No local container found.";
 			else if (containers.size() > 1)
 				return "Too many local containers found.";
 
-			ContainerInformation cInfo = containers.get(containers.keySet()
-					.iterator().next());
-			EndpointReferenceType service = EPRUtils.makeEPR(cInfo
-					.getContainerURL().toString()
-					+ "/axis/services/GeniiBESPortType");
+			ContainerInformation cInfo = containers.get(containers.keySet().iterator().next());
+			EndpointReferenceType service =
+				EPRUtils.makeEPR(cInfo.getContainerURL().toString() + "/axis/services/GeniiBESPortType");
 
-			target = RNSPath.getCurrent().lookup(path,
-					RNSPathQueryFlags.MUST_NOT_EXIST);
-			GeniiBESPortType servicePT = ClientUtils.createProxy(
-					GeniiBESPortType.class, service);
+			target = RNSPath.getCurrent().lookup(path, RNSPathQueryFlags.MUST_NOT_EXIST);
+			GeniiBESPortType servicePT = ClientUtils.createProxy(GeniiBESPortType.class, service);
 			newBES = servicePT.vcgrCreate(new VcgrCreate()).getEndpoint();
 			target.link(newBES);
 			model.addBES(target.pwd(), newBES);
@@ -81,8 +78,7 @@ public class BESManager {
 
 			if (newBES != null) {
 				try {
-					GeniiCommon common = ClientUtils.createProxy(
-							GeniiCommon.class, newBES);
+					GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, newBES);
 					common.destroy(new Destroy());
 				} catch (Throwable cause) {
 				}
@@ -90,8 +86,8 @@ public class BESManager {
 		}
 	}
 
-	static public String removeBES(String path, EndpointReferenceType bes,
-			BESListModel model) {
+	static public String removeBES(String path, EndpointReferenceType bes, BESListModel model)
+	{
 		try {
 			RNSPath target = RNSPath.getCurrent().lookup(path);
 			target.unlink();
@@ -100,8 +96,7 @@ public class BESManager {
 		}
 
 		try {
-			GeniiCommon common = ClientUtils
-					.createProxy(GeniiCommon.class, bes);
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, bes);
 			common.destroy(new Destroy());
 			model.removeBES(path);
 		} catch (Throwable cause) {

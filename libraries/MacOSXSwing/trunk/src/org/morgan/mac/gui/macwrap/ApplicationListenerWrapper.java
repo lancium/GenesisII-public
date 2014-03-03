@@ -6,16 +6,15 @@ import java.lang.reflect.Proxy;
 
 import org.apache.log4j.Logger;
 
-class ApplicationListenerWrapper implements InvocationHandler {
-	static private Logger _logger = Logger
-			.getLogger(ApplicationListenerWrapper.class);
+class ApplicationListenerWrapper implements InvocationHandler
+{
+	static private Logger _logger = Logger.getLogger(ApplicationListenerWrapper.class);
 
 	static Class<?> REAL_APPLICATION_LISTENER_CLASS;
 
 	static {
 		try {
-			REAL_APPLICATION_LISTENER_CLASS = Class
-					.forName("com.apple.eawt.ApplicationListener");
+			REAL_APPLICATION_LISTENER_CLASS = Class.forName("com.apple.eawt.ApplicationListener");
 		} catch (ClassNotFoundException e) {
 			_logger.fatal("Unable to load ApplicationListener class.", e);
 			System.exit(1);
@@ -23,13 +22,14 @@ class ApplicationListenerWrapper implements InvocationHandler {
 	}
 	private ApplicationListener _newListener;
 
-	private ApplicationListenerWrapper(ApplicationListener newListener) {
+	private ApplicationListenerWrapper(ApplicationListener newListener)
+	{
 		_newListener = newListener;
 	}
 
 	@Override
-	final public Object invoke(Object proxy, Method method, Object[] args)
-			throws Throwable {
+	final public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+	{
 		ApplicationEvent event = new ApplicationEvent(args[0]);
 
 		if (method.getName().equals("handleAbout"))
@@ -47,15 +47,14 @@ class ApplicationListenerWrapper implements InvocationHandler {
 		else if (method.getName().equals("handleReOpenApplication"))
 			_newListener.handleReOpenApplication(event);
 		else if (method.getName().equals("equals"))
-			return _newListener.equals(((ApplicationListenerWrapper) Proxy
-					.getInvocationHandler(args[0]))._newListener);
+			return _newListener.equals(((ApplicationListenerWrapper) Proxy.getInvocationHandler(args[0]))._newListener);
 
 		return null;
 	}
 
-	static Object wrapApplicationListener(ApplicationListener listener) {
-		return Proxy.newProxyInstance(null,
-				new Class<?>[] { REAL_APPLICATION_LISTENER_CLASS },
-				new ApplicationListenerWrapper(listener));
+	static Object wrapApplicationListener(ApplicationListener listener)
+	{
+		return Proxy.newProxyInstance(null, new Class<?>[] { REAL_APPLICATION_LISTENER_CLASS }, new ApplicationListenerWrapper(
+			listener));
 	}
 }

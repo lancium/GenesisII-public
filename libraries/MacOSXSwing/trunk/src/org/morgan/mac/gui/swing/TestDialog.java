@@ -15,10 +15,11 @@ import org.morgan.mac.gui.macwrap.ApplicationAdapter;
 import org.morgan.mac.gui.macwrap.ApplicationEvent;
 import org.morgan.mac.gui.macwrap.MacOSXGuiSetup;
 
-public class TestDialog {
-	static public void main(String[] args) {
-		MacOSXGuiSetup.setupMacOSXGuiApplication("Test Dialog", true, false,
-				true, true);
+public class TestDialog
+{
+	static public void main(String[] args)
+	{
+		MacOSXGuiSetup.setupMacOSXGuiApplication("Test Dialog", true, false, true, true);
 
 		JFrame dialog = new JFrame();
 		dialog.setTitle("This is a test.");
@@ -30,28 +31,29 @@ public class TestDialog {
 		menuBar.add(menu);
 		dialog.setJMenuBar(menuBar);
 
-		content.add(new JLabel("Hello, World!"), new GridBagConstraints(0, 0,
-				1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JLabel("Hello, World!"), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		dialog.pack();
 
 		Application application = Application.getApplication();
-		application.addApplicationListener(new ApplicationAdapterListener(
-				dialog));
+		application.addApplicationListener(new ApplicationAdapterListener(dialog));
 		dialog.setVisible(true);
 
 		application.setDockIconBadge("Mark");
 	}
 
-	static private class ApplicationAdapterListener extends ApplicationAdapter {
+	static private class ApplicationAdapterListener extends ApplicationAdapter
+	{
 		private JFrame _dialog;
 
-		private ApplicationAdapterListener(JFrame dialog) {
+		private ApplicationAdapterListener(JFrame dialog)
+		{
 			_dialog = dialog;
 		}
 
 		@Override
-		public void handleQuit(ApplicationEvent event) {
+		public void handleQuit(ApplicationEvent event)
+		{
 			System.err.println("Asked to quit from the OS.");
 			_dialog.dispose();
 		}

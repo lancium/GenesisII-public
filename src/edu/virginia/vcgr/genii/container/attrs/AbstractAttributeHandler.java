@@ -15,27 +15,27 @@ package edu.virginia.vcgr.genii.container.attrs;
 
 import javax.xml.namespace.QName;
 
-public abstract class AbstractAttributeHandler {
+public abstract class AbstractAttributeHandler
+{
 	private AttributePackage _package;
 
 	protected abstract void registerHandlers() throws NoSuchMethodException;
 
-	protected AbstractAttributeHandler(AttributePackage pkg)
-			throws NoSuchMethodException {
+	protected AbstractAttributeHandler(AttributePackage pkg) throws NoSuchMethodException
+	{
 		_package = pkg;
 
 		registerHandlers();
 	}
 
-	protected void addHandler(QName attributeName, String getMethodName)
-			throws NoSuchMethodException {
-		_package.addManipulator(DefaultAttributeManipulator.createManipulator(
-				this, attributeName, getMethodName));
+	protected void addHandler(QName attributeName, String getMethodName) throws NoSuchMethodException
+	{
+		_package.addManipulator(DefaultAttributeManipulator.createManipulator(this, attributeName, getMethodName));
 	}
 
-	protected void addHandler(QName attributeName, String getMethodName,
-			String setMethodName) throws NoSuchMethodException {
-		_package.addManipulator(DefaultAttributeManipulator.createManipulator(
-				this, attributeName, getMethodName, setMethodName));
+	protected void addHandler(QName attributeName, String getMethodName, String setMethodName) throws NoSuchMethodException
+	{
+		_package.addManipulator(DefaultAttributeManipulator
+			.createManipulator(this, attributeName, getMethodName, setMethodName));
 	}
 }

@@ -6,5 +6,7 @@ package edu.virginia.vcgr.genii.client.gui.browser.plugins;
  * @author mmm2a
  */
 public enum PluginStatus {
-	HIDDEN(), INACTIVE(), ACTIVTE()
+	HIDDEN(),
+	INACTIVE(),
+	ACTIVTE()
 }

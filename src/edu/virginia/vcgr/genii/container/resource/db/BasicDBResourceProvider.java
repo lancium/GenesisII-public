@@ -11,11 +11,12 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
 
-public class BasicDBResourceProvider implements IResourceProvider,
-		Initializable {
+public class BasicDBResourceProvider implements IResourceProvider, Initializable
+{
 	private IResourceFactory _factory = null;
 
-	public BasicDBResourceProvider() {
+	public BasicDBResourceProvider()
+	{
 	}
 
 	private ServerDatabaseConnectionPool createConnectionPool()
@@ -23,8 +24,7 @@ public class BasicDBResourceProvider implements IResourceProvider,
 	{
 		ServerDatabaseConnectionPool pool = null;
 
-		Object obj = NamedInstances.getServerInstances().lookup(
-				"connection-pool");
+		Object obj = NamedInstances.getServerInstances().lookup("connection-pool");
 		if (obj != null) {
 			pool = (ServerDatabaseConnectionPool) obj;
 			return pool;
@@ -33,7 +33,8 @@ public class BasicDBResourceProvider implements IResourceProvider,
 		throw new ConfigurationException("Couldn't find connection pool.");
 	}
 
-	synchronized public IResourceFactory getFactory() {
+	synchronized public IResourceFactory getFactory()
+	{
 		if (_factory == null) {
 			try {
 				_factory = instantiateResourceFactory(createConnectionPool());
@@ -45,14 +46,15 @@ public class BasicDBResourceProvider implements IResourceProvider,
 		return _factory;
 	}
 
-	protected IResourceFactory instantiateResourceFactory(
-			ServerDatabaseConnectionPool pool) throws SQLException,
-			ResourceException {
+	protected IResourceFactory instantiateResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException,
+		ResourceException
+	{
 		return new BasicDBResourceFactory(pool);
 	}
 
 	@Override
-	public void initialize() throws Throwable {
+	public void initialize() throws Throwable
+	{
 		getFactory();
 	}
 }

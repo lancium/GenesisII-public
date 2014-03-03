@@ -11,7 +11,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-public class QueryGUI extends JFrame {
+public class QueryGUI extends JFrame
+{
 
 	/**
 	 * those are the labels and text fields that the GUI has
@@ -57,7 +58,8 @@ public class QueryGUI extends JFrame {
 	private JButton OKButton;
 	private JButton CancelButton;
 
-	public QueryGUI() {
+	public QueryGUI()
+	{
 		initComponents();
 	}
 
@@ -65,7 +67,8 @@ public class QueryGUI extends JFrame {
 	/*
 	 * Initializing the components of the GUI and setting up the layout
 	 */
-	private void initComponents() {
+	private void initComponents()
+	{
 		OperatingSystem = new JLabel();
 		OperatingSystem.setText("Operating System");
 
@@ -124,8 +127,10 @@ public class QueryGUI extends JFrame {
 		setTitle("Information Service");
 
 		OKButton.setText("OK");
-		OKButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+		OKButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				submitButtonActionPerformed(evt);
 				readyToReturn = false;
 
@@ -133,8 +138,10 @@ public class QueryGUI extends JFrame {
 		});
 
 		CancelButton.setText("Cancel");
-		CancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+		CancelButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
 				submitButtonActionPerformed(evt);
 				readyToReturn = false;
 			}
@@ -145,303 +152,168 @@ public class QueryGUI extends JFrame {
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 
-		layout.setHorizontalGroup(layout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+		layout
+			.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(
-						layout.createSequentialGroup()
-								.addContainerGap()
+					layout
+						.createSequentialGroup()
+						.addContainerGap()
+						.addGroup(
+							layout
+								.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.LEADING)
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		OperatingSystem,
-																		javax.swing.GroupLayout.PREFERRED_SIZE,
-																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		javax.swing.GroupLayout.PREFERRED_SIZE)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		OSTypeLabel)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		OSType)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		OSVersionLabel)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		OSVersion))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		CPU))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		CPUArchitectureNameLabel)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		CPUArchitectureName))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		CPUCountLabel)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		CPUCount)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		CPUSpeedLabel)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		CPUSpeed))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		Memory)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		PhysicalMamoryLabel)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		PhysicalMemory)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		VirtualMemoryLabel)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		VirtualMemory))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		IsAcceptingNewActivities)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		CommonNameLabel)
-																.addComponent(
-																		CommonName)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		TotalNumberOfActivitiesLabel)
-																.addComponent(
-																		TotalNumberOfActivities)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		LocalResourceManagerTypeLabel)
-																.addComponent(
-																		LocalResourcemanagerType)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		NamingProfileLabel)
-																.addComponent(
-																		NamingProfile)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		OKButton)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		CancelButton)))
-								.addContainerGap(27, Short.MAX_VALUE)));
+									layout
+										.createSequentialGroup()
+										.addComponent(OperatingSystem, javax.swing.GroupLayout.PREFERRED_SIZE,
+											javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(OSTypeLabel)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(OSType)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(OSVersionLabel)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(OSVersion))
+								.addGroup(
+									layout.createSequentialGroup()
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(CPU))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(CPUArchitectureNameLabel)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(CPUArchitectureName))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(CPUCountLabel)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(CPUCount)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(CPUSpeedLabel)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(CPUSpeed))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(Memory)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(PhysicalMamoryLabel)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(PhysicalMemory)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(VirtualMemoryLabel)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(VirtualMemory))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(IsAcceptingNewActivities)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(CommonNameLabel).addComponent(CommonName)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(TotalNumberOfActivitiesLabel)
+										.addComponent(TotalNumberOfActivities)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(LocalResourceManagerTypeLabel)
+										.addComponent(LocalResourcemanagerType)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(NamingProfileLabel).addComponent(NamingProfile)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+								.addGroup(
+									layout.createSequentialGroup().addComponent(OKButton)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(CancelButton))).addContainerGap(27, Short.MAX_VALUE)));
 
-		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL,
-				new java.awt.Component[] { OSTypeLabel, OSType, OSVersionLabel,
-						OSVersion });
-		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL,
-				new java.awt.Component[] { CPUCountLabel, CPUCount,
-						CPUSpeedLabel, CPUSpeed });
-		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL,
-				new java.awt.Component[] { CPUArchitectureNameLabel,
-						CPUArchitectureName });
-		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL,
-				new java.awt.Component[] { PhysicalMamoryLabel, PhysicalMemory,
-						VirtualMemoryLabel, VirtualMemory });
-		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL,
-				new java.awt.Component[] { CommonNameLabel, CommonName });
-		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL,
-				new java.awt.Component[] { TotalNumberOfActivitiesLabel,
-						TotalNumberOfActivities });
-		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL,
-				new java.awt.Component[] { LocalResourceManagerTypeLabel,
-						LocalResourcemanagerType });
-		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL,
-				new java.awt.Component[] { NamingProfileLabel, NamingProfile });
+		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { OSTypeLabel, OSType, OSVersionLabel,
+			OSVersion });
+		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { CPUCountLabel, CPUCount,
+			CPUSpeedLabel, CPUSpeed });
+		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { CPUArchitectureNameLabel,
+			CPUArchitectureName });
+		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { PhysicalMamoryLabel, PhysicalMemory,
+			VirtualMemoryLabel, VirtualMemory });
+		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { CommonNameLabel, CommonName });
+		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { TotalNumberOfActivitiesLabel,
+			TotalNumberOfActivities });
+		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { LocalResourceManagerTypeLabel,
+			LocalResourcemanagerType });
+		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { NamingProfileLabel, NamingProfile });
 
-		layout.setVerticalGroup(layout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+			layout
+				.createSequentialGroup()
+				.addContainerGap()
 				.addGroup(
-						layout.createSequentialGroup()
-								.addContainerGap()
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(
-														OperatingSystem,
-														javax.swing.GroupLayout.PREFERRED_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(OSTypeLabel)
-												.addComponent(OSType)
-												.addComponent(OSVersionLabel)
-												.addComponent(OSVersion))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(CPU))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(
-														CPUArchitectureNameLabel)
-												.addComponent(
-														CPUArchitectureName))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(CPUCountLabel)
-												.addComponent(CPUCount)
-												.addComponent(CPUSpeedLabel)
-												.addComponent(CPUSpeed))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(Memory))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(
-														PhysicalMamoryLabel)
-												.addComponent(PhysicalMemory)
-												.addComponent(
-														VirtualMemoryLabel)
-												.addComponent(VirtualMemory))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(
-														IsAcceptingNewActivities))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(CommonNameLabel)
-												.addComponent(CommonName))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(
-														TotalNumberOfActivitiesLabel)
-												.addComponent(
-														TotalNumberOfActivities))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(
-														LocalResourceManagerTypeLabel)
-												.addComponent(
-														LocalResourcemanagerType))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(
-														NamingProfileLabel)
-												.addComponent(NamingProfile))
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(OKButton)
-												.addComponent(CancelButton))
-								.addContainerGap(21, Short.MAX_VALUE)));
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(OperatingSystem,
+						javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+						javax.swing.GroupLayout.PREFERRED_SIZE))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(OSTypeLabel)
+						.addComponent(OSType).addComponent(OSVersionLabel).addComponent(OSVersion))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(CPU))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(CPUArchitectureNameLabel).addComponent(CPUArchitectureName))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(CPUCountLabel)
+						.addComponent(CPUCount).addComponent(CPUSpeedLabel).addComponent(CPUSpeed))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(Memory))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(PhysicalMamoryLabel)
+						.addComponent(PhysicalMemory).addComponent(VirtualMemoryLabel).addComponent(VirtualMemory))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(
+						IsAcceptingNewActivities))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(CommonNameLabel)
+						.addComponent(CommonName))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(TotalNumberOfActivitiesLabel).addComponent(TotalNumberOfActivities))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(LocalResourceManagerTypeLabel).addComponent(LocalResourcemanagerType))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(NamingProfileLabel)
+						.addComponent(NamingProfile))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(
+					layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(OKButton)
+						.addComponent(CancelButton)).addContainerGap(21, Short.MAX_VALUE)));
 		pack();
 		toFront();
 	}
 
-	protected void submitButtonActionPerformed(ActionEvent evt) {
+	protected void submitButtonActionPerformed(ActionEvent evt)
+	{
 
 		/*
-		 * if the user wants to submit the so-formed query the values entered in
-		 * the GUI are stored in the variable queryParameters
+		 * if the user wants to submit the so-formed query the values entered in the GUI are stored
+		 * in the variable queryParameters
 		 */
 		if (evt.getSource() == OKButton) {
 			queryParameters.setOSTypevalue(OSType.getText());
 			queryParameters.setOSVersionValue(OSVersion.getText());
-			queryParameters.setCPUArchitectureNameValue(CPUArchitectureName
-					.getText());
+			queryParameters.setCPUArchitectureNameValue(CPUArchitectureName.getText());
 			queryParameters.setCPUCountValue(CPUCount.getText());
 			queryParameters.setCPUSpeedValue(CPUSpeed.getText());
 			queryParameters.setPhysicalMemoryValue(PhysicalMemory.getText());
 			queryParameters.setVirtualMemoryValue(VirtualMemory.getText());
 			queryParameters.setCommonNameValue(CommonName.getText());
-			queryParameters
-					.setTotalNumberOfActivitiesValue(TotalNumberOfActivities
-							.getText());
-			queryParameters
-					.setLocalResourceManagervalue(LocalResourcemanagerType
-							.getText());
+			queryParameters.setTotalNumberOfActivitiesValue(TotalNumberOfActivities.getText());
+			queryParameters.setLocalResourceManagervalue(LocalResourcemanagerType.getText());
 			queryParameters.setNamingProfileValue(NamingProfile.getText());
-			queryParameters
-					.setIsAcceptingNewActivitiesValue(IsAcceptingNewActivities
-							.isSelected());
+			queryParameters.setIsAcceptingNewActivitiesValue(IsAcceptingNewActivities.isSelected());
 		}
 
 		// if the user decides to cancel the query
@@ -452,13 +324,13 @@ public class QueryGUI extends JFrame {
 		dispose();
 	}
 
-	public GUIInternalStruct runGUI() {
+	public GUIInternalStruct runGUI()
+	{
 		new QueryGUI().setVisible(true);
 		boolean stayInLoop = true;
 
 		/*
-		 * loop until either the OK or the Cancel button of the GUI has been
-		 * clicked on
+		 * loop until either the OK or the Cancel button of the GUI has been clicked on
 		 */
 		while (stayInLoop) {
 			stayInLoop = readyToReturn;

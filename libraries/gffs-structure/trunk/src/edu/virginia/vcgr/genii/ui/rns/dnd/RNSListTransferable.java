@@ -22,7 +22,8 @@ import edu.virginia.vcgr.genii.ui.rns.RNSTree;
 import edu.virginia.vcgr.genii.ui.rns.RNSTreeNode;
 
 @SuppressWarnings("serial")
-public class RNSListTransferable extends ListTransferable {
+public class RNSListTransferable extends ListTransferable
+{
 	static private Log _logger = LogFactory.getLog(RNSListTransferable.class);
 
 	static final public DataFlavor RNS_PATH_LIST_FLAVOR;
@@ -32,14 +33,13 @@ public class RNSListTransferable extends ListTransferable {
 	static {
 		try {
 			String FLAVOR_PATTERN = "%s;class=\"%s\"";
-			RNS_PATH_LIST_FLAVOR = new DataFlavor(String.format(FLAVOR_PATTERN,
-					DataFlavor.javaJVMLocalObjectMimeType,
+			RNS_PATH_LIST_FLAVOR =
+				new DataFlavor(String.format(FLAVOR_PATTERN, DataFlavor.javaJVMLocalObjectMimeType,
 					RNSListTransferData.class.getName()));
 
 			SUPPORTED_FLAVORS = new DataFlavor[] { RNS_PATH_LIST_FLAVOR };
 		} catch (ClassNotFoundException cnfe) {
-			throw new ConfigurationException(
-					"Unable to create DnD transfer flavors.", cnfe);
+			throw new ConfigurationException("Unable to create DnD transfer flavors.", cnfe);
 		}
 	};
 
@@ -47,44 +47,43 @@ public class RNSListTransferable extends ListTransferable {
 	private UIContext _sourceContext;
 	private Collection<Pair<RNSTreeNode, RNSPath>> _paths;
 
-	RNSListTransferable(RNSTree tree, UIContext sourceContext,
-			Collection<Pair<RNSTreeNode, RNSPath>> paths) {
+	RNSListTransferable(RNSTree tree, UIContext sourceContext, Collection<Pair<RNSTreeNode, RNSPath>> paths)
+	{
 		_sourceContext = sourceContext;
 		_paths = new Vector<Pair<RNSTreeNode, RNSPath>>(paths);
 		_tree = tree;
 		FLAVORS.add(RNS_PATH_LIST_FLAVOR);
 	}
 
-	public UIContext getSourceContext() {
+	public UIContext getSourceContext()
+	{
 		return _sourceContext;
 	}
 
 	// this can take a while to complete.
-	public File renderToFile(RNSPath path) {
+	public File renderToFile(RNSPath path)
+	{
 		if (path == null)
 			return null;
 		File localDir = Extemporizer.createTempDirectory("temp-rns", "dir");
 		if (_logger.isDebugEnabled())
-			_logger.debug("trying to store " + path.toString()
-					+ " into temporary path: " + localDir);
-		PathOutcome ret = CopyTool.copy(path.toString(), "local:" + localDir,
-				true, true, null, null);
+			_logger.debug("trying to store " + path.toString() + " into temporary path: " + localDir);
+		PathOutcome ret = CopyTool.copy(path.toString(), "local:" + localDir, true, true, null, null);
 		if (ret.same(PathOutcome.OUTCOME_SUCCESS)) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("made a copy of " + path.toString() + " in "
-						+ localDir);
+				_logger.debug("made a copy of " + path.toString() + " in " + localDir);
 			return localDir.listFiles()[0];
 		} else {
 			if (_logger.isDebugEnabled())
-				_logger.debug("failed to make a copy of " + path.toString()
-						+ " in " + localDir + " because "
-						+ PathOutcome.outcomeText(ret));
+				_logger.debug("failed to make a copy of " + path.toString() + " in " + localDir + " because "
+					+ PathOutcome.outcomeText(ret));
 		}
 		return null;
 	}
 
 	@Override
-	public boolean loadDataJustInTime(DataFlavor flavor) {
+	public boolean loadDataJustInTime(DataFlavor flavor)
+	{
 		if (flavor == null)
 			return false;
 		// need to fill the underlying vector in the base class now.
@@ -95,8 +94,8 @@ public class RNSListTransferable extends ListTransferable {
 	}
 
 	@Override
-	public Object getTransferData(DataFlavor flavor)
-			throws UnsupportedFlavorException, IOException {
+	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
+	{
 		if (flavor == null)
 			return null;
 		if (_logger.isDebugEnabled())
@@ -107,8 +106,7 @@ public class RNSListTransferable extends ListTransferable {
 			return new RNSListTransferData(_tree, _sourceContext, _paths);
 		} else {
 			if (_logger.isDebugEnabled())
-				_logger.debug("into non-rns path case for data, has elems="
-						+ super.size());
+				_logger.debug("into non-rns path case for data, has elems=" + super.size());
 			return super.getTransferData(flavor);
 		}
 	}

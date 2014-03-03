@@ -24,7 +24,8 @@ import javax.net.ssl.X509KeyManager;
  * 
  * @author dmerrill
  */
-public class SingleSSLX509KeyManager implements X509KeyManager {
+public class SingleSSLX509KeyManager implements X509KeyManager
+{
 
 	private static final String CLIENT_ALIAS = "DefaultClientAlias";
 	private static final String SERVER_ALIAS = "DefaultServerAlias";
@@ -34,36 +35,36 @@ public class SingleSSLX509KeyManager implements X509KeyManager {
 	/**
 	 * Constructor
 	 */
-	public SingleSSLX509KeyManager(KeyAndCertMaterial keyAndCertMaterial) {
+	public SingleSSLX509KeyManager(KeyAndCertMaterial keyAndCertMaterial)
+	{
 		_keyAndCertMaterial = keyAndCertMaterial;
 	}
 
 	/**
-	 * Choose an alias to authenticate the client side of a secure socket given
-	 * the public key type and the list of certificate issuer authorities
-	 * recognized by the peer (if any).
+	 * Choose an alias to authenticate the client side of a secure socket given the public key type
+	 * and the list of certificate issuer authorities recognized by the peer (if any).
 	 */
-	public String chooseClientAlias(String[] keyType, Principal[] issuers,
-			Socket socket) {
+	public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
+	{
 		return CLIENT_ALIAS;
 	}
 
 	/**
-	 * Choose an alias to authenticate the server side of a secure socket given
-	 * the public key type and the list of certificate issuer authorities
-	 * recognized by the peer (if any).
+	 * Choose an alias to authenticate the server side of a secure socket given the public key type
+	 * and the list of certificate issuer authorities recognized by the peer (if any).
 	 */
-	public String chooseServerAlias(String keyType, Principal[] issuers,
-			Socket socket) {
+	public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket)
+	{
 		return SERVER_ALIAS;
 	}
 
 	/**
-	 * Returns the certificate chain associated with the given alias. Returns
-	 * null if the certificate chain is invalid for any reason
+	 * Returns the certificate chain associated with the given alias. Returns null if the
+	 * certificate chain is invalid for any reason
 	 * 
 	 */
-	public X509Certificate[] getCertificateChain(String alias) {
+	public X509Certificate[] getCertificateChain(String alias)
+	{
 		if (_keyAndCertMaterial == null)
 			return null;
 
@@ -71,22 +72,24 @@ public class SingleSSLX509KeyManager implements X509KeyManager {
 	}
 
 	/**
-	 * Get the matching aliases for authenticating the client side of a secure
-	 * socket given the public key type and the list of certificate issuer
-	 * authorities recognized by the peer (if any).
+	 * Get the matching aliases for authenticating the client side of a secure socket given the
+	 * public key type and the list of certificate issuer authorities recognized by the peer (if
+	 * any).
 	 * 
 	 */
-	public String[] getClientAliases(String keyType, Principal[] issuers) {
+	public String[] getClientAliases(String keyType, Principal[] issuers)
+	{
 		String[] retval = { CLIENT_ALIAS };
 		return retval;
 	}
 
 	/**
-	 * Get the matching aliases for authenticating the server side of a secure
-	 * socket given the public key type and the list of certificate issuer
-	 * authorities recognized by the peer (if any).
+	 * Get the matching aliases for authenticating the server side of a secure socket given the
+	 * public key type and the list of certificate issuer authorities recognized by the peer (if
+	 * any).
 	 */
-	public String[] getServerAliases(String keyType, Principal[] issuers) {
+	public String[] getServerAliases(String keyType, Principal[] issuers)
+	{
 		String[] retval = { SERVER_ALIAS };
 		return retval;
 	}
@@ -94,7 +97,8 @@ public class SingleSSLX509KeyManager implements X509KeyManager {
 	/**
 	 * Returns the key associated with the given alias.
 	 */
-	public PrivateKey getPrivateKey(String alias) {
+	public PrivateKey getPrivateKey(String alias)
+	{
 		if (_keyAndCertMaterial == null)
 			return null;
 

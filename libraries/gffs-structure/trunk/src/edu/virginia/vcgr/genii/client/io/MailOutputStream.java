@@ -39,12 +39,12 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 
-class MailOutputStream extends OutputStream {
+class MailOutputStream extends OutputStream
+{
 	static private final String _FILENAME_X_HEADER = "X-AttachmentFilename";
 	static private Log _logger = LogFactory.getLog(MailOutputStream.class);
 
-	static private QName _SMTP_PROPERTIES = new QName(
-			GenesisIIConstants.GENESISII_NS, "smtp-properties");
+	static private QName _SMTP_PROPERTIES = new QName(GenesisIIConstants.GENESISII_NS, "smtp-properties");
 	static private final String _SMTP_PASSWORD_PROPERTY = "edu.virginia.vcgr.htc.smtp.password";
 
 	private Session _session;
@@ -53,12 +53,12 @@ class MailOutputStream extends OutputStream {
 	private Properties _mailProps;
 	private ByteArrayOutputStream _baos = new ByteArrayOutputStream();
 
-	public MailOutputStream(String address, Properties headers)
-			throws IOException {
+	public MailOutputStream(String address, Properties headers) throws IOException
+	{
 		_mailProps = null;
 		try {
-			_mailProps = (Properties) (ConfigurationManager
-					.getCurrentConfiguration().getClientConfiguration()
+			_mailProps =
+				(Properties) (ConfigurationManager.getCurrentConfiguration().getClientConfiguration()
 					.retrieveSection(_SMTP_PROPERTIES));
 		} catch (Throwable t) {
 			_logger.error(t);
@@ -68,8 +68,7 @@ class MailOutputStream extends OutputStream {
 			_mailProps = new Properties();
 			_mailProps.put("mail.smtp.host", "localhost");
 			_mailProps.put("mail.smtp.auth", "false");
-			_mailProps.put("mail.smtp.from",
-					"vcgr-grid@" + Hostname.getLocalHostname());
+			_mailProps.put("mail.smtp.from", "vcgr-grid@" + Hostname.getLocalHostname());
 		}
 
 		_session = Session.getInstance(_mailProps);
@@ -81,8 +80,7 @@ class MailOutputStream extends OutputStream {
 				String value = headers.getProperty(header);
 				_message.setHeader(header, value);
 			}
-			_message.addRecipient(RecipientType.TO,
-					new InternetAddress(address));
+			_message.addRecipient(RecipientType.TO, new InternetAddress(address));
 
 			_multipart = new MimeMultipart();
 			_message.setContent(_multipart);
@@ -95,12 +93,12 @@ class MailOutputStream extends OutputStream {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() throws IOException
+	{
 		_baos.close();
 		Transport transport = null;
 		try {
-			ByteArrayDataSource source = new ByteArrayDataSource(
-					_baos.toByteArray(), "application/octet-stream");
+			ByteArrayDataSource source = new ByteArrayDataSource(_baos.toByteArray(), "application/octet-stream");
 			MimeBodyPart part = new MimeBodyPart();
 			part.setDataHandler(new DataHandler(source));
 
@@ -127,17 +125,20 @@ class MailOutputStream extends OutputStream {
 	}
 
 	@Override
-	public void write(byte[] b) throws IOException {
+	public void write(byte[] b) throws IOException
+	{
 		_baos.write(b);
 	}
 
 	@Override
-	public void write(byte[] b, int off, int len) throws IOException {
+	public void write(byte[] b, int off, int len) throws IOException
+	{
 		_baos.write(b, off, len);
 	}
 
 	@Override
-	public void write(int arg0) throws IOException {
+	public void write(int arg0) throws IOException
+	{
 		_baos.write(arg0);
 	}
 }

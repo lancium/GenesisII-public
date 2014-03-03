@@ -10,26 +10,31 @@ import edu.virginia.vcgr.fsii.FilesystemStatStructure;
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
 
-public class DirectoryHandle extends AbstractFilesystemHandle {
+public class DirectoryHandle extends AbstractFilesystemHandle
+{
 	static private Log _logger = LogFactory.getLog(DirectoryHandle.class);
 
-	public DirectoryHandle(FSFilesystem fs, String[] path) {
+	public DirectoryHandle(FSFilesystem fs, String[] path)
+	{
 		super(fs, path);
 	}
 
 	@Override
-	public boolean isDirectoryHandle() {
+	public boolean isDirectoryHandle()
+	{
 		return true;
 	}
 
 	@Override
-	synchronized public void close() throws IOException {
+	synchronized public void close() throws IOException
+	{
 	}
 
-	public Iterable<FilesystemStatStructure> listEntries() throws FSException {
+	public Iterable<FilesystemStatStructure> listEntries() throws FSException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("DirectoryHandle::listEntries(%s)",
-					UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
+				UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
 
 		return _fs.listDirectory(_path);
 	}

@@ -11,8 +11,9 @@ import edu.virginia.vcgr.genii.gjt.data.variables.Clearable;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 
-public class FilesystemAssociatedStringList extends DefaultDataItem implements
-		Clearable, PostUnmarshallListener, Iterable<StringFilesystemPair> {
+public class FilesystemAssociatedStringList extends DefaultDataItem implements Clearable, PostUnmarshallListener,
+	Iterable<StringFilesystemPair>
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlTransient
@@ -24,11 +25,12 @@ public class FilesystemAssociatedStringList extends DefaultDataItem implements
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "value")
 	private Vector<StringFilesystemPair> _items = new Vector<StringFilesystemPair>();
 
-	public FilesystemAssociatedStringList() {
+	public FilesystemAssociatedStringList()
+	{
 	}
 
-	public FilesystemAssociatedStringList(ParameterizableBroker pBroker,
-			ModificationBroker mBroker) {
+	public FilesystemAssociatedStringList(ParameterizableBroker pBroker, ModificationBroker mBroker)
+	{
 		_pBroker = pBroker;
 		_mBroker = mBroker;
 
@@ -36,13 +38,15 @@ public class FilesystemAssociatedStringList extends DefaultDataItem implements
 		addModificationListener(mBroker);
 	}
 
-	public void add(StringFilesystemPair value) {
+	public void add(StringFilesystemPair value)
+	{
 		_items.add(value);
 		fireParameterizableStringModified("", value.get());
 		fireJobDescriptionModified();
 	}
 
-	public void remove(int index) {
+	public void remove(int index)
+	{
 		StringFilesystemPair item = _items.remove(index);
 		if (item != null) {
 			fireParameterizableStringModified(item.get(), "");
@@ -50,28 +54,33 @@ public class FilesystemAssociatedStringList extends DefaultDataItem implements
 		}
 	}
 
-	public void moveUp(int index) {
+	public void moveUp(int index)
+	{
 		StringFilesystemPair pair = _items.remove(index);
 		_items.insertElementAt(pair, index - 1);
 		fireJobDescriptionModified();
 	}
 
-	public void moveDown(int index) {
+	public void moveDown(int index)
+	{
 		StringFilesystemPair pair = _items.remove(index);
 		_items.insertElementAt(pair, index + 1);
 		fireJobDescriptionModified();
 	}
 
-	public StringFilesystemPair get(int index) {
+	public StringFilesystemPair get(int index)
+	{
 		return _items.get(index);
 	}
 
-	public int size() {
+	public int size()
+	{
 		return _items.size();
 	}
 
 	@Override
-	public void clear() {
+	public void clear()
+	{
 		for (StringFilesystemPair item : _items)
 			fireParameterizableStringModified(item.get(), "");
 		if (_items.size() > 0)
@@ -80,27 +89,27 @@ public class FilesystemAssociatedStringList extends DefaultDataItem implements
 		_items.clear();
 	}
 
-	public ParameterizableBroker getParameterizableBroker() {
+	public ParameterizableBroker getParameterizableBroker()
+	{
 		return _pBroker;
 	}
 
-	public ModificationBroker getModificationBroker() {
+	public ModificationBroker getModificationBroker()
+	{
 		return _mBroker;
 	}
 
 	@Override
-	public void postUnmarshall(ParameterizableBroker parameterBroker,
-			ModificationBroker modificationBroker) {
+	public void postUnmarshall(ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
+	{
 		_pBroker = parameterBroker;
 		_mBroker = modificationBroker;
 
 		/*
-		 * Don't need to do this because we derive off of a class that
-		 * automatically does it
+		 * Don't need to do this because we derive off of a class that automatically does it
 		 */
 		/*
-		 * addParameterizableListener(parameterBroker);
-		 * addModificationListener(modificationBroker);
+		 * addParameterizableListener(parameterBroker); addModificationListener(modificationBroker);
 		 */
 
 		for (StringFilesystemPair item : _items)
@@ -110,7 +119,8 @@ public class FilesystemAssociatedStringList extends DefaultDataItem implements
 	}
 
 	@Override
-	public Iterator<StringFilesystemPair> iterator() {
+	public Iterator<StringFilesystemPair> iterator()
+	{
 		return Collections.unmodifiableList(_items).iterator();
 	}
 }

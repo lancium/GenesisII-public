@@ -7,7 +7,8 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
-public class InvocationContext {
+public class InvocationContext
+{
 	private EndpointReferenceType _target;
 	private ICallingContext _callingContext;
 	private Vector<OperationHandler> _handlers;
@@ -16,9 +17,9 @@ public class InvocationContext {
 	private int _myStage;
 	private Object[] _params;
 
-	InvocationContext(Vector<OperationHandler> handlers,
-			EndpointReferenceType target, ICallingContext callingContext,
-			Object[] params, IFinalInvoker finalInvoker, Method finalMethod) {
+	InvocationContext(Vector<OperationHandler> handlers, EndpointReferenceType target, ICallingContext callingContext,
+		Object[] params, IFinalInvoker finalInvoker, Method finalMethod)
+	{
 		_target = target;
 		_callingContext = callingContext;
 		_handlers = handlers;
@@ -28,7 +29,8 @@ public class InvocationContext {
 		_finalMethod = finalMethod;
 	}
 
-	private InvocationContext(InvocationContext old) {
+	private InvocationContext(InvocationContext old)
+	{
 		_target = old._target;
 		_callingContext = old._callingContext;
 		_handlers = old._handlers;
@@ -38,29 +40,32 @@ public class InvocationContext {
 		_finalMethod = old._finalMethod;
 	}
 
-	public EndpointReferenceType getTarget() {
+	public EndpointReferenceType getTarget()
+	{
 		return _target;
 	}
 
-	public ICallingContext getCallingContext() {
+	public ICallingContext getCallingContext()
+	{
 		return _callingContext;
 	}
 
-	public Object[] getParams() {
+	public Object[] getParams()
+	{
 		return _params;
 	}
 
-	public void updateParams(Object[] newParams) {
+	public void updateParams(Object[] newParams)
+	{
 		_params = newParams;
 	}
 
-	public Object proceed() throws Throwable {
+	public Object proceed() throws Throwable
+	{
 		InvocationContext nextStage = new InvocationContext(this);
 		if (nextStage._myStage >= nextStage._handlers.size())
-			return _finalInvoker.finalInvoke(_finalInvoker, _finalMethod,
-					_params);
+			return _finalInvoker.finalInvoke(_finalInvoker, _finalMethod, _params);
 
-		return nextStage._handlers.get(nextStage._myStage).handle(nextStage,
-				_params);
+		return nextStage._handlers.get(nextStage._myStage).handle(nextStage, _params);
 	}
 }

@@ -16,18 +16,22 @@ package org.morgan.util.event;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class EventException extends Exception {
+public class EventException extends Exception
+{
 	static final long serialVersionUID = 0;
 
-	public EventException(String msg) {
+	public EventException(String msg)
+	{
 		super(msg);
 	}
 
-	public EventException(String msg, Throwable t) {
+	public EventException(String msg, Throwable t)
+	{
 		super(msg, t);
 	}
 
-	public EventException(Throwable t) {
+	public EventException(Throwable t)
+	{
 		super(t);
 	}
 }

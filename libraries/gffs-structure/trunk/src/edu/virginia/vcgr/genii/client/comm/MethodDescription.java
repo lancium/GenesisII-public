@@ -15,18 +15,22 @@ package edu.virginia.vcgr.genii.client.comm;
 
 import java.lang.reflect.Method;
 
-public class MethodDescription {
+public class MethodDescription
+{
 	private Method _method;
 
-	public MethodDescription(Method m) {
+	public MethodDescription(Method m)
+	{
 		_method = m;
 	}
 
-	public int hashCode() {
+	public int hashCode()
+	{
 		return _method.getName().hashCode();
 	}
 
-	public boolean equals(MethodDescription other) {
+	public boolean equals(MethodDescription other)
+	{
 		if (other._method.getName().equals(_method.getName())) {
 			Class<?>[] otherParameterTypes = other._method.getParameterTypes();
 			Class<?>[] myParameterTypes = _method.getParameterTypes();
@@ -44,11 +48,13 @@ public class MethodDescription {
 		return false;
 	}
 
-	public boolean equals(Object other) {
+	public boolean equals(Object other)
+	{
 		return equals((MethodDescription) other);
 	}
 
-	public Method getMethod() {
+	public Method getMethod()
+	{
 		return _method;
 	}
 }

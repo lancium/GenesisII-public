@@ -27,20 +27,20 @@ import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.X509Identity;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
 
-public class RNSContainerUtilities {
+public class RNSContainerUtilities
+{
 	static private Log _logger = LogFactory.getLog(RNSContainerUtilities.class);
 
-	static public LookupResponseType translate(
-			Iterable<RNSEntryResponseType> entries,
-			IteratorBuilder<Object> builder) throws RemoteException {
+	static public LookupResponseType translate(Iterable<RNSEntryResponseType> entries, IteratorBuilder<Object> builder)
+		throws RemoteException
+	{
 
 		return indexedTranslate(entries, builder, null);
 	}
 
-	public static LookupResponseType indexedTranslate(
-			Iterable<RNSEntryResponseType> entries,
-			IteratorBuilder<Object> builder, InMemoryIteratorWrapper imiw)
-			throws RemoteException {
+	public static LookupResponseType indexedTranslate(Iterable<RNSEntryResponseType> entries, IteratorBuilder<Object> builder,
+		InMemoryIteratorWrapper imiw) throws RemoteException
+	{
 
 		builder.preferredBatchSize(RNSConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(entries);
@@ -56,22 +56,17 @@ public class RNSContainerUtilities {
 			if (rKey != null) {
 				try {
 					// Get the access control list of the directory
-					acl = (Acl) rKey.dereference().getProperty(
-							AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+					acl = (Acl) rKey.dereference().getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
 					// Now add "w" everyone -- so the client can clean up
 					// (destroy) the iterator properly later
 					acl.writeAcl.add(null);
 				} catch (ResourceException e1) {
-					_logger.warn("failed to look up the ACL for resource "
-							+ rKey.dereference());
+					_logger.warn("failed to look up the ACL for resource " + rKey.dereference());
 				}
 				// Now that the iterator is created and the ACL built up, set
 				// the ACL of the iterator to that of the directory.
-				ResourceManager
-						.getTargetResource(iit.getIteratorEndpoint())
-						.dereference()
-						.setProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME,
-								acl);
+				ResourceManager.getTargetResource(iit.getIteratorEndpoint()).dereference()
+					.setProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME, acl);
 			}
 		}
 
@@ -88,41 +83,35 @@ public class RNSContainerUtilities {
 			}
 		}
 
-		return new LookupResponseType(batch == null ? null
-				: batch.toArray(new RNSEntryResponseType[batch.size()]),
-				iit.getIteratorEndpoint());
+		return new LookupResponseType(batch == null ? null : batch.toArray(new RNSEntryResponseType[batch.size()]),
+			iit.getIteratorEndpoint());
 	}
 
-	public static NuCredential loadRNSResourceCredential(IRNSResource resource) {
+	public static NuCredential loadRNSResourceCredential(IRNSResource resource)
+	{
 		NuCredential credential = null;
 		try {
-			credential = (NuCredential) resource
-					.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME
-							.getLocalPart());
+			credential = (NuCredential) resource.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart());
 		} catch (ResourceException e) {
 			_logger.error("resource exception loading credential, quashing");
 		}
 
 		if (credential == null) {
-			_logger.warn("found null credential for resource: "
-					+ resource.toString() + "  is this db conversion issue?");
+			_logger.warn("found null credential for resource: " + resource.toString() + "  is this db conversion issue?");
 			X509Certificate[] resourceCertChain = null;
 			try {
-				resourceCertChain = (X509Certificate[]) resource
-						.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+				resourceCertChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			} catch (ResourceException e) {
 				_logger.error("failed to load resource certificate chain!  this is quite bad.  resource is: "
-						+ resource.toString());
+					+ resource.toString());
 			}
 
 			// trying to find the real types involved by looking at ACLs.
 			Acl acl = null;
 			try {
-				acl = (Acl) resource
-						.getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+				acl = (Acl) resource.getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
 			} catch (ResourceException e1) {
-				_logger.warn("failed to look up the ACL for resource "
-						+ resource);
+				_logger.warn("failed to look up the ACL for resource " + resource);
 			}
 
 			// we will fill this in if we can find it in the resource ACL.
@@ -132,8 +121,7 @@ public class RNSContainerUtilities {
 				for (AclEntry entry : trustList) {
 					if (entry instanceof X509Identity) {
 						X509Identity id = (X509Identity) entry;
-						if (id.getOriginalAsserter()[0]
-								.equals(resourceCertChain[0])) {
+						if (id.getOriginalAsserter()[0].equals(resourceCertChain[0])) {
 							found = id;
 						}
 					}
@@ -141,23 +129,18 @@ public class RNSContainerUtilities {
 			}
 			if (found != null) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("found an identity that matches our certificate: "
-							+ found);
+					_logger.debug("found an identity that matches our certificate: " + found);
 				credential = found;
 			} else {
 				if (_logger.isDebugEnabled())
 					_logger.debug("found no identity matching our certificate, so using type of OTHER.");
-				credential = new X509Identity(resourceCertChain,
-						IdentityType.OTHER);
+				credential = new X509Identity(resourceCertChain, IdentityType.OTHER);
 			}
 			// store the new credential back for the resource.
 			try {
-				resource.setProperty(
-						SecurityConstants.IDP_STORED_CREDENTIAL_QNAME
-								.getLocalPart(), credential);
+				resource.setProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart(), credential);
 			} catch (ResourceException e) {
-				_logger.error("failed to save credential for: "
-						+ resource.toString());
+				_logger.error("failed to save credential for: " + resource.toString());
 			}
 		}
 

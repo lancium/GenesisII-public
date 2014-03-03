@@ -11,20 +11,20 @@ import javax.swing.tree.TreePath;
 
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
 
-public class HistoryEventTreeModel implements TreeModel {
+public class HistoryEventTreeModel implements TreeModel
+{
 	private Collection<TreeModelListener> _listeners = new LinkedList<TreeModelListener>();
 
 	private HistoryEventTreeNode _originalRoot;
 	private HistoryEventTreeNode _currentRoot;
 
-	final protected void fireTreeNodesChanged(Object source, Object[] path,
-			int[] childIndices, Object[] children) {
+	final protected void fireTreeNodesChanged(Object source, Object[] path, int[] childIndices, Object[] children)
+	{
 		TreeModelEvent e = null;
 		TreeModelListener[] listeners = null;
 
 		synchronized (_listeners) {
-			listeners = _listeners.toArray(new TreeModelListener[_listeners
-					.size()]);
+			listeners = _listeners.toArray(new TreeModelListener[_listeners.size()]);
 		}
 
 		// Process the listeners last to first, notifying
@@ -36,14 +36,13 @@ public class HistoryEventTreeModel implements TreeModel {
 		}
 	}
 
-	final protected void fireTreeNodesInserted(Object source, Object[] path,
-			int[] childIndices, Object[] children) {
+	final protected void fireTreeNodesInserted(Object source, Object[] path, int[] childIndices, Object[] children)
+	{
 		TreeModelEvent e = null;
 		TreeModelListener[] listeners = null;
 
 		synchronized (_listeners) {
-			listeners = _listeners.toArray(new TreeModelListener[_listeners
-					.size()]);
+			listeners = _listeners.toArray(new TreeModelListener[_listeners.size()]);
 		}
 
 		// Process the listeners last to first, notifying
@@ -55,14 +54,13 @@ public class HistoryEventTreeModel implements TreeModel {
 		}
 	}
 
-	final protected void fireTreeNodesRemoved(Object source, Object[] path,
-			int[] childIndices, Object[] children) {
+	final protected void fireTreeNodesRemoved(Object source, Object[] path, int[] childIndices, Object[] children)
+	{
 		TreeModelEvent e = null;
 		TreeModelListener[] listeners = null;
 
 		synchronized (_listeners) {
-			listeners = _listeners.toArray(new TreeModelListener[_listeners
-					.size()]);
+			listeners = _listeners.toArray(new TreeModelListener[_listeners.size()]);
 		}
 
 		// Process the listeners last to first, notifying
@@ -74,14 +72,13 @@ public class HistoryEventTreeModel implements TreeModel {
 		}
 	}
 
-	final protected void fireTreeStructureChanged(Object source, Object[] path,
-			int[] childIndices, Object[] children) {
+	final protected void fireTreeStructureChanged(Object source, Object[] path, int[] childIndices, Object[] children)
+	{
 		TreeModelEvent e = null;
 		TreeModelListener[] listeners = null;
 
 		synchronized (_listeners) {
-			listeners = _listeners.toArray(new TreeModelListener[_listeners
-					.size()]);
+			listeners = _listeners.toArray(new TreeModelListener[_listeners.size()]);
 		}
 
 		// Process the listeners last to first, notifying
@@ -93,52 +90,57 @@ public class HistoryEventTreeModel implements TreeModel {
 		}
 	}
 
-	HistoryEventTreeModel(Collection<HistoryEvent> events,
-			HistoryEventFilter initialFilter) {
+	HistoryEventTreeModel(Collection<HistoryEvent> events, HistoryEventFilter initialFilter)
+	{
 		_originalRoot = HistoryEventTreeNode.formTree(events);
-		_currentRoot = HistoryEventTreeNode.formTree(_originalRoot,
-				initialFilter);
+		_currentRoot = HistoryEventTreeNode.formTree(_originalRoot, initialFilter);
 		initialFilter.addFilterListener(new HistoryEventFilterListenerImpl());
 	}
 
 	@Override
-	final public void addTreeModelListener(TreeModelListener l) {
+	final public void addTreeModelListener(TreeModelListener l)
+	{
 		synchronized (_listeners) {
 			_listeners.add(l);
 		}
 	}
 
 	@Override
-	final public void removeTreeModelListener(TreeModelListener l) {
+	final public void removeTreeModelListener(TreeModelListener l)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(l);
 		}
 	}
 
 	@Override
-	final public Object getRoot() {
+	final public Object getRoot()
+	{
 		return _currentRoot;
 	}
 
 	@Override
-	final public Object getChild(Object parent, int index) {
+	final public Object getChild(Object parent, int index)
+	{
 		return ((HistoryEventTreeNode) parent).children().get(index);
 	}
 
 	@Override
-	final public int getChildCount(Object parent) {
+	final public int getChildCount(Object parent)
+	{
 		return ((HistoryEventTreeNode) parent).childCount();
 	}
 
 	@Override
-	final public boolean isLeaf(Object node) {
+	final public boolean isLeaf(Object node)
+	{
 		return getChildCount(node) == 0;
 	}
 
 	@Override
-	final public int getIndexOfChild(Object parent, Object child) {
-		List<HistoryEventTreeNode> children = ((HistoryEventTreeNode) parent)
-				.children();
+	final public int getIndexOfChild(Object parent, Object child)
+	{
+		List<HistoryEventTreeNode> children = ((HistoryEventTreeNode) parent).children();
 		for (int lcv = 0; lcv < children.size(); lcv++)
 			if (children.get(lcv) == child)
 				return lcv;
@@ -147,19 +149,18 @@ public class HistoryEventTreeModel implements TreeModel {
 	}
 
 	@Override
-	final public void valueForPathChanged(TreePath path, Object newValue) {
+	final public void valueForPathChanged(TreePath path, Object newValue)
+	{
 		// We don't allow changes.
 	}
 
-	private class HistoryEventFilterListenerImpl implements
-			HistoryEventFilterListener {
+	private class HistoryEventFilterListenerImpl implements HistoryEventFilterListener
+	{
 		@Override
-		public void filterChanged(HistoryEventFilter newFilter) {
-			_currentRoot = HistoryEventTreeNode.formTree(_originalRoot,
-					newFilter);
-			fireTreeStructureChanged(_currentRoot,
-					new Object[] { _currentRoot }, new int[] {},
-					new Object[] {});
+		public void filterChanged(HistoryEventFilter newFilter)
+		{
+			_currentRoot = HistoryEventTreeNode.formTree(_originalRoot, newFilter);
+			fireTreeStructureChanged(_currentRoot, new Object[] { _currentRoot }, new int[] {}, new Object[] {});
 		}
 	}
 }

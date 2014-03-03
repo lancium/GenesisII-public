@@ -21,19 +21,20 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class HelpButton extends JButton {
+public class HelpButton extends JButton
+{
 	static final long serialVersionUID = 0L;
 
 	private Icon _helpIcon;
 	private Icon _grayedIcon;
 
-	public HelpButton() {
+	public HelpButton()
+	{
 		setContentAreaFilled(false);
 
 		prepareIcons();
 
-		Dimension dim = new Dimension(_helpIcon.getIconWidth(),
-				_helpIcon.getIconHeight());
+		Dimension dim = new Dimension(_helpIcon.getIconWidth(), _helpIcon.getIconHeight());
 
 		setPreferredSize(dim);
 		setMaximumSize(dim);
@@ -42,7 +43,8 @@ public class HelpButton extends JButton {
 	}
 
 	// Paint the round background and label.
-	protected void paintComponent(Graphics g) {
+	protected void paintComponent(Graphics g)
+	{
 		if (getModel().isArmed()) {
 			// You might want to make the highlight color
 			// a property of the RoundButton class.
@@ -60,13 +62,15 @@ public class HelpButton extends JButton {
 	}
 
 	// Paint the border of the button using a simple stroke.
-	protected void paintBorder(Graphics g) {
+	protected void paintBorder(Graphics g)
+	{
 	}
 
 	// Hit detection.
 	private Shape shape;
 
-	public boolean contains(int x, int y) {
+	public boolean contains(int x, int y)
+	{
 		// If the button has changed size, make a new shape object.
 		if (shape == null || !shape.getBounds().equals(getBounds())) {
 			shape = new Ellipse2D.Float(0, 0, getWidth(), getHeight());
@@ -75,9 +79,9 @@ public class HelpButton extends JButton {
 		return shape.contains(x, y);
 	}
 
-	private void prepareIcons() {
-		ColorConvertOp converter = new ColorConvertOp(
-				ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+	private void prepareIcons()
+	{
+		ColorConvertOp converter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
 
 		BufferedImage original = getHelpImage();
 		BufferedImage greyed = converter.filter(original, null);
@@ -86,13 +90,12 @@ public class HelpButton extends JButton {
 		_grayedIcon = new ImageIcon(greyed);
 	}
 
-	static public BufferedImage getHelpImage() {
+	static public BufferedImage getHelpImage()
+	{
 		InputStream in = null;
 
 		try {
-			in = new LoadFileResource(
-					GenesisIIConstants.IMAGE_RELATIVE_LOCATION
-							.concat("help-icon.png")).open();
+			in = new LoadFileResource(GenesisIIConstants.IMAGE_RELATIVE_LOCATION.concat("help-icon.png")).open();
 			return ImageIO.read(in);
 		} catch (IOException ioe) {
 			throw new RuntimeException("Unable to load help icon.", ioe);
@@ -101,7 +104,8 @@ public class HelpButton extends JButton {
 		}
 	}
 
-	static public Icon getHelpIcon() {
+	static public Icon getHelpIcon()
+	{
 		return new ImageIcon(getHelpImage());
 	}
 }

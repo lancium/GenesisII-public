@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.history;
 
-public interface HistoryEventSource {
+public interface HistoryEventSource
+{
 	public HistoryEventSource alsoKnownAs();
 
 	public HistoryEventSource alsoKnownAs(HistoryEventSource aka);

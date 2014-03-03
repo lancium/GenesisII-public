@@ -32,7 +32,8 @@ import edu.virginia.vcgr.jsdl.sweep.eval.EvaluationContext;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlRootElement(namespace = SweepConstants.SWEEP_NS, name = "Sweep")
-public class Sweep implements Serializable, Countable, Evaluable {
+public class Sweep implements Serializable, Countable, Evaluable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = SweepConstants.SWEEP_NS, name = "Assignment", required = true, nillable = false)
@@ -41,7 +42,8 @@ public class Sweep implements Serializable, Countable, Evaluable {
 	@XmlElement(namespace = SweepConstants.SWEEP_NS, name = "Sweep", required = false, nillable = false)
 	private List<Sweep> _subSweeps;
 
-	public Sweep(SweepAssignment... assignments) {
+	public Sweep(SweepAssignment... assignments)
+	{
 		_assignments = new Vector<SweepAssignment>(assignments.length);
 		for (SweepAssignment assignment : assignments)
 			_assignments.add(assignment);
@@ -49,29 +51,35 @@ public class Sweep implements Serializable, Countable, Evaluable {
 		_subSweeps = new Vector<Sweep>();
 	}
 
-	public Sweep() {
+	public Sweep()
+	{
 		_assignments = new Vector<SweepAssignment>();
 		_subSweeps = new Vector<Sweep>();
 	}
 
-	final public void addAssignment(SweepAssignment assignment) {
+	final public void addAssignment(SweepAssignment assignment)
+	{
 		_assignments.add(assignment);
 	}
 
-	final public void addSubSweep(Sweep subSweep) {
+	final public void addSubSweep(Sweep subSweep)
+	{
 		_subSweeps.add(subSweep);
 	}
 
-	final public List<SweepAssignment> assignments() {
+	final public List<SweepAssignment> assignments()
+	{
 		return _assignments;
 	}
 
-	final public List<Sweep> subSweeps() {
+	final public List<Sweep> subSweeps()
+	{
 		return _subSweeps;
 	}
 
 	@Override
-	final public int size() {
+	final public int size()
+	{
 		int assignmentSize = 0;
 		int subSweepSize;
 
@@ -90,10 +98,10 @@ public class Sweep implements Serializable, Countable, Evaluable {
 	}
 
 	@Override
-	public void evaluate(EvaluationContext context) throws SweepException {
+	public void evaluate(EvaluationContext context) throws SweepException
+	{
 		boolean emittable = (_subSweeps == null) || (_subSweeps.isEmpty());
-		List<Iterator<Evaluable>> concurrentAssignments = new Vector<Iterator<Evaluable>>(
-				_assignments.size());
+		List<Iterator<Evaluable>> concurrentAssignments = new Vector<Iterator<Evaluable>>(_assignments.size());
 		Iterator<Evaluable> firstAssignment = null;
 
 		for (SweepAssignment assignment : _assignments) {
@@ -113,8 +121,7 @@ public class Sweep implements Serializable, Countable, Evaluable {
 				firstCopy.emit();
 			else {
 				for (Sweep s : _subSweeps) {
-					EvaluationContext secondCopy = (EvaluationContext) firstCopy
-							.clone();
+					EvaluationContext secondCopy = (EvaluationContext) firstCopy.clone();
 					s.evaluate(secondCopy);
 				}
 			}

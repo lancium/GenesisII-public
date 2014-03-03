@@ -24,7 +24,8 @@ import javax.xml.bind.annotation.XmlType;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlType(propOrder = { "_osType", "_osVersion", "_description" })
-public class OperatingSystem extends CommonJSDLElement {
+public class OperatingSystem extends CommonJSDLElement
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "OperatingSystemType")
@@ -36,35 +37,43 @@ public class OperatingSystem extends CommonJSDLElement {
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "Description")
 	private String _description;
 
-	public OperatingSystem(OperatingSystemType osType) {
+	public OperatingSystem(OperatingSystemType osType)
+	{
 		_osType = osType;
 	}
 
-	public OperatingSystem() {
+	public OperatingSystem()
+	{
 		this(null);
 	}
 
-	final public void osType(OperatingSystemType osType) {
+	final public void osType(OperatingSystemType osType)
+	{
 		_osType = osType;
 	}
 
-	final public OperatingSystemType osType() {
+	final public OperatingSystemType osType()
+	{
 		return _osType;
 	}
 
-	final public void osVersion(String osVersion) {
+	final public void osVersion(String osVersion)
+	{
 		_osVersion = osVersion;
 	}
 
-	final public String osVersion() {
+	final public String osVersion()
+	{
 		return _osVersion;
 	}
 
-	final public void description(String description) {
+	final public void description(String description)
+	{
 		_description = description;
 	}
 
-	final public String description() {
+	final public String description()
+	{
 		return _description;
 	}
 }

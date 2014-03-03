@@ -37,7 +37,8 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.StageOutPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StoreContextPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.TeardownFUSEPhase;
 
-public class CommonExecutionUnderstanding implements ExecutionUnderstanding {
+public class CommonExecutionUnderstanding implements ExecutionUnderstanding
+{
 	private FilesystemManager _fsManager;
 
 	private String _jobAnnotation = null;
@@ -55,35 +56,43 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding {
 
 	private ApplicationUnderstanding _application = null;
 
-	public CommonExecutionUnderstanding(FilesystemManager fsManager) {
+	public CommonExecutionUnderstanding(FilesystemManager fsManager)
+	{
 		_fsManager = fsManager;
 	}
 
-	public void setJobAnnotation(String jobAnnotation) {
+	public void setJobAnnotation(String jobAnnotation)
+	{
 		_jobAnnotation = jobAnnotation;
 	}
 
-	public void setJobName(String jobName) {
+	public void setJobName(String jobName)
+	{
 		_jobName = jobName;
 	}
 
-	public String getJobAnnotation() {
+	public String getJobAnnotation()
+	{
 		return _jobAnnotation;
 	}
 
-	public String getJobName() {
+	public String getJobName()
+	{
 		return _jobName;
 	}
 
-	public void setFuseMountDirectory(String fuseDirectory) {
+	public void setFuseMountDirectory(String fuseDirectory)
+	{
 		_fuseDirectory = fuseDirectory;
 	}
 
-	public String getFuseMountDirectory() {
+	public String getFuseMountDirectory()
+	{
 		return _fuseDirectory;
 	}
 
-	public void addDataStaging(DataStagingUnderstanding stage) {
+	public void addDataStaging(DataStagingUnderstanding stage)
+	{
 		URI source = stage.getSourceURI();
 		URI target = stage.getTargetURI();
 
@@ -96,54 +105,60 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding {
 			_pureCleans.add(stage);
 	}
 
-	public void addFilesystem(FilesystemUnderstanding understanding)
-			throws JSDLException {
+	public void addFilesystem(FilesystemUnderstanding understanding) throws JSDLException
+	{
 		if (understanding.isScratchFileSystem()) {
-			_fsManager.addFilesystem("SCRATCH",
-					understanding.createScratchFilesystem(_jobAnnotation));
+			_fsManager.addFilesystem("SCRATCH", understanding.createScratchFilesystem(_jobAnnotation));
 		} else if (understanding.isGridFileSystem()) {
-			_fsManager.addFilesystem(understanding.getFileSystemName(),
-					understanding.createGridFilesystem());
+			_fsManager.addFilesystem(understanding.getFileSystemName(), understanding.createGridFilesystem());
 		}
 	}
 
-	public void setApplication(ApplicationUnderstanding application) {
+	public void setApplication(ApplicationUnderstanding application)
+	{
 		_application = application;
 	}
 
-	public void setRequiredOGRSHVersion(String version) {
+	public void setRequiredOGRSHVersion(String version)
+	{
 		_requiredOGRSHVersion = version;
 	}
 
-	public String getRequiredOGRSHVersion() {
+	public String getRequiredOGRSHVersion()
+	{
 		return _requiredOGRSHVersion;
 	}
 
-	public BESWorkingDirectory getWorkingDirectory() {
+	public BESWorkingDirectory getWorkingDirectory()
+	{
 		if (_application == null)
 			return null;
 
 		return _application.getWorkingDirectory();
 	}
 
-	public Double getTotalPhysicalMemory() {
+	public Double getTotalPhysicalMemory()
+	{
 		return _totalPhysicalMemory;
 	}
 
-	public void setTotalPhysicalMemory(Double totalPhysicalMemory) {
+	public void setTotalPhysicalMemory(Double totalPhysicalMemory)
+	{
 		_totalPhysicalMemory = totalPhysicalMemory;
 	}
 
-	public Double getWallclockTimeLimit() {
+	public Double getWallclockTimeLimit()
+	{
 		return _wallclockTimeLimit;
 	}
 
-	public void setWallclockTimeLimit(Double wallclockTimeLimit) {
+	public void setWallclockTimeLimit(Double wallclockTimeLimit)
+	{
 		_wallclockTimeLimit = wallclockTimeLimit;
 	}
 
-	final public Vector<ExecutionPhase> createExecutionPlan(
-			BESConstructionParameters creationProperties) throws JSDLException {
+	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties) throws JSDLException
+	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();
 
@@ -155,8 +170,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding {
 		for (DataStagingUnderstanding stage : _stageIns) {
 			File stageFile = _fsManager.lookup(stage.getFilePath());
 
-			ret.add(new StageInPhase(stage.getSourceURI(), stageFile, stage
-					.getCreationFlag(), stage.getUsernamePassword()));
+			ret.add(new StageInPhase(stage.getSourceURI(), stageFile, stage.getCreationFlag(), stage.getUsernamePassword()));
 
 			if (stage.isDeleteOnTerminate())
 				cleanups.add(new CleanupPhase(stageFile));
@@ -174,8 +188,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding {
 			String storedOGRSHContextFilename = "stored-ogrsh-context.dat";
 			String OGRSHConfigFilename = "ogrsh-config.xml";
 
-			ret.add(new SetupOGRSHPhase(storedOGRSHContextFilename,
-					OGRSHConfigFilename));
+			ret.add(new SetupOGRSHPhase(storedOGRSHContextFilename, OGRSHConfigFilename));
 			ret.add(new StoreContextPhase(storedOGRSHContextFilename));
 
 			cleanups.add(new CleanupPhase(new File(storedOGRSHContextFilename)));
@@ -188,31 +201,24 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding {
 
 		// Check wallclock time and memory constraint
 		if (creationProperties != null) {
-			ResourceOverrides overrides = creationProperties
-					.getResourceOverrides();
+			ResourceOverrides overrides = creationProperties.getResourceOverrides();
 			if (overrides != null) {
 				// check memory
 				Size besUpperLimit = overrides.physicalMemory();
-				Double requestedSize = resourceConstraints
-						.getTotalPhysicalMemory();
+				Double requestedSize = resourceConstraints.getTotalPhysicalMemory();
 				if (besUpperLimit != null && requestedSize != null) {
 					if (requestedSize > besUpperLimit.as(SizeUnits.Bytes))
-						throw new JSDLMatchException(
-								String.format(
-										"Job requested %f bytes, but BES limits to %s.",
-										requestedSize, besUpperLimit));
+						throw new JSDLMatchException(String.format("Job requested %f bytes, but BES limits to %s.",
+							requestedSize, besUpperLimit));
 				}
 
 				// Wallclock
 				Duration besUpperWall = overrides.wallclockTimeLimit();
-				Double requestedWall = resourceConstraints
-						.getWallclockTimeLimit();
+				Double requestedWall = resourceConstraints.getWallclockTimeLimit();
 				if (besUpperWall != null && requestedWall != null) {
 					if (requestedWall > besUpperWall.as(DurationUnits.Seconds))
-						throw new JSDLMatchException(
-								String.format(
-										"Job requested %f seconds, but BES limits to %s.",
-										requestedWall, besUpperWall));
+						throw new JSDLMatchException(String.format("Job requested %f seconds, but BES limits to %s.",
+							requestedWall, besUpperWall));
 				}
 			}
 		}
@@ -222,38 +228,34 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding {
 		if (gridFs != null)
 			fuseMountPoint = gridFs.getMountPoint();
 
-		JobUnderstandingContext jobContext = new JobUnderstandingContext(
-				fuseMountPoint, resourceConstraints);
+		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints);
 
 		if (_application != null)
-			_application.addExecutionPhases(creationProperties, ret, cleanups,
-					jobContext);
+			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext);
 
 		for (DataStagingUnderstanding stage : _stageOuts) {
 			File stageFile = _fsManager.lookup(stage.getFilePath());
 
-			ret.add(new StageOutPhase(stageFile, stage.getTargetURI(), stage
-					.getUsernamePassword()));
+			ret.add(new StageOutPhase(stageFile, stage.getTargetURI(), stage.getUsernamePassword()));
 
 			if (stage.isDeleteOnTerminate())
 				cleanups.add(new CleanupPhase(stageFile));
 		}
 		if (MyProxyCertificate.isAvailable())
-			cleanups.add(new CleanupPhase(new File(getWorkingDirectory()
-					.toString() + GenesisIIConstants.myproxyFilenameSuffix)));
+			cleanups
+				.add(new CleanupPhase(new File(getWorkingDirectory().toString() + GenesisIIConstants.myproxyFilenameSuffix)));
 
 		for (DataStagingUnderstanding stage : _pureCleans)
-			cleanups.add(new CleanupPhase(
-					_fsManager.lookup(stage.getFilePath())));
+			cleanups.add(new CleanupPhase(_fsManager.lookup(stage.getFilePath())));
 
 		ret.addAll(cleanups);
 		return ret;
 	}
 
-	private void createCertificateFileonDisk() {
+	private void createCertificateFileonDisk()
+	{
 		try {
-			FileWriter fstream = new FileWriter(getWorkingDirectory()
-					.toString() + GenesisIIConstants.myproxyFilenameSuffix);
+			FileWriter fstream = new FileWriter(getWorkingDirectory().toString() + GenesisIIConstants.myproxyFilenameSuffix);
 			BufferedWriter out = new BufferedWriter(fstream);
 			out.write(MyProxyCertificate.getPEMString());
 			out.close();

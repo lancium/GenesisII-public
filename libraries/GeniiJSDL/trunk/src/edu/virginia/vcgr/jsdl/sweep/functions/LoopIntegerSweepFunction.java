@@ -32,7 +32,8 @@ import edu.virginia.vcgr.jsdl.sweep.SweepFunction;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class LoopIntegerSweepFunction implements SweepFunction, Serializable {
+public class LoopIntegerSweepFunction implements SweepFunction, Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	static final private int DEFAULT_STEP = 1;
@@ -52,7 +53,8 @@ public class LoopIntegerSweepFunction implements SweepFunction, Serializable {
 	@XmlElement(namespace = SweepConstants.SWEEP_FUNC_NS, name = "Exception", required = false, nillable = false)
 	private Set<Integer> _exceptions;
 
-	public LoopIntegerSweepFunction(int start, int end, int step) {
+	public LoopIntegerSweepFunction(int start, int end, int step)
+	{
 		_start = start;
 		_end = end;
 		_step = step;
@@ -60,35 +62,42 @@ public class LoopIntegerSweepFunction implements SweepFunction, Serializable {
 		_exceptions = new HashSet<Integer>();
 	}
 
-	public LoopIntegerSweepFunction(int start, int end) {
+	public LoopIntegerSweepFunction(int start, int end)
+	{
 		this(start, end, DEFAULT_STEP);
 	}
 
-	public LoopIntegerSweepFunction() {
+	public LoopIntegerSweepFunction()
+	{
 		this(0, 0);
 	}
 
-	final public int start() {
+	final public int start()
+	{
 		return _start;
 	}
 
-	final public int end() {
+	final public int end()
+	{
 		return _end;
 	}
 
-	final public int step() {
+	final public int step()
+	{
 		if (_step != null)
 			return _step.intValue();
 		else
 			return DEFAULT_STEP;
 	}
 
-	final public Set<Integer> exceptions() {
+	final public Set<Integer> exceptions()
+	{
 		return _exceptions;
 	}
 
 	@Override
-	final public int size() {
+	final public int size()
+	{
 		if (_size < 0) {
 			int count = 0;
 			int step = (_step == null) ? 1 : _step.intValue();
@@ -105,38 +114,41 @@ public class LoopIntegerSweepFunction implements SweepFunction, Serializable {
 	}
 
 	@Override
-	final public Iterator<Object> iterator() {
+	final public Iterator<Object> iterator()
+	{
 		return new LoopIterator();
 	}
 
-	private class LoopIterator implements Iterator<Object> {
+	private class LoopIterator implements Iterator<Object>
+	{
 		private int _nextValue;
 		private int _actualStep;
 		private Set<Integer> _actualExceptions;
 
-		private LoopIterator() {
+		private LoopIterator()
+		{
 			_nextValue = _start;
 			_actualStep = (_step == null) ? 1 : _step.intValue();
-			_actualExceptions = (_exceptions == null) ? new HashSet<Integer>()
-					: _exceptions;
+			_actualExceptions = (_exceptions == null) ? new HashSet<Integer>() : _exceptions;
 
 			while (_actualExceptions.contains(_nextValue) && _nextValue <= _end)
 				_nextValue += _actualStep;
 		}
 
 		@Override
-		final public boolean hasNext() {
+		final public boolean hasNext()
+		{
 			return _nextValue <= _end;
 		}
 
 		@Override
-		final public Object next() {
+		final public Object next()
+		{
 			Object ret = new Integer(_nextValue);
 
 			while (true) {
 				_nextValue += _actualStep;
-				if (_nextValue > _end
-						|| !_actualExceptions.contains(new Integer(_nextValue)))
+				if (_nextValue > _end || !_actualExceptions.contains(new Integer(_nextValue)))
 					break;
 			}
 
@@ -144,9 +156,9 @@ public class LoopIntegerSweepFunction implements SweepFunction, Serializable {
 		}
 
 		@Override
-		final public void remove() {
-			throw new UnsupportedOperationException(
-					"Not allowed to remove elements from this iterator.");
+		final public void remove()
+		{
+			throw new UnsupportedOperationException("Not allowed to remove elements from this iterator.");
 		}
 	}
 }

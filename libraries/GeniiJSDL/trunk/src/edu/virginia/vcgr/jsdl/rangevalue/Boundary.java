@@ -29,7 +29,8 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class Boundary implements Serializable {
+public class Boundary implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	static final public boolean DEFAULT_IS_EXCLUSIVE = false;
@@ -47,47 +48,57 @@ public class Boundary implements Serializable {
 	 * Default constructor for use with XML Unmarshalling only.
 	 */
 	@SuppressWarnings("unused")
-	private Boundary() {
+	private Boundary()
+	{
 		this(0.0);
 	}
 
-	public Boundary(double value, boolean isExclusive) {
+	public Boundary(double value, boolean isExclusive)
+	{
 		_value = value;
 		_isExclusive = isExclusive;
 	}
 
-	public Boundary(double value) {
+	public Boundary(double value)
+	{
 		this(value, DEFAULT_IS_EXCLUSIVE);
 	}
 
-	final public void isExclusive(boolean isExclusive) {
+	final public void isExclusive(boolean isExclusive)
+	{
 		_isExclusive = isExclusive;
 	}
 
-	final public boolean isExclusive() {
+	final public boolean isExclusive()
+	{
 		return _isExclusive;
 	}
 
-	final public double value() {
+	final public double value()
+	{
 		return _value;
 	}
 
-	final public void value(double newValue) {
+	final public void value(double newValue)
+	{
 		_value = newValue;
 	}
 
-	final public Map<QName, String> anyAttributes() {
+	final public Map<QName, String> anyAttributes()
+	{
 		return _anyAttributes;
 	}
 
-	final public boolean isCeiling(Number test) {
+	final public boolean isCeiling(Number test)
+	{
 		if (_isExclusive)
 			return test.doubleValue() < _value;
 		else
 			return test.doubleValue() <= _value;
 	}
 
-	final public boolean isFloor(Number test) {
+	final public boolean isFloor(Number test)
+	{
 		if (_isExclusive)
 			return test.doubleValue() > _value;
 		else

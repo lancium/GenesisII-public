@@ -7,16 +7,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-public class PostProtocols {
+public class PostProtocols
+{
 	static private Map<String, PostProtocol> _postProtocols = null;
 
-	synchronized static public OutputStream openPostProtocol(URI target) {
+	synchronized static public OutputStream openPostProtocol(URI target)
+	{
 		PostProtocol poster;
 
 		if (_postProtocols == null) {
 			_postProtocols = new HashMap<String, PostProtocol>();
-			ServiceLoader<PostProtocol> loader = ServiceLoader
-					.load(PostProtocol.class);
+			ServiceLoader<PostProtocol> loader = ServiceLoader.load(PostProtocol.class);
 			for (PostProtocol pp : loader) {
 				for (String protocol : pp.handledProtocols())
 					_postProtocols.put(protocol, pp);
@@ -28,9 +29,11 @@ public class PostProtocols {
 		}
 
 		if (poster == null) {
-			return new OutputStream() {
+			return new OutputStream()
+			{
 				@Override
-				public void write(int b) throws IOException {
+				public void write(int b) throws IOException
+				{
 					// do nothing
 				}
 			};

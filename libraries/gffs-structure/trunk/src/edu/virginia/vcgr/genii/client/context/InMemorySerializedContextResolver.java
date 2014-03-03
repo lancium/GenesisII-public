@@ -8,19 +8,23 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
-public class InMemorySerializedContextResolver implements IContextResolver {
+public class InMemorySerializedContextResolver implements IContextResolver
+{
 	private byte[] _storedContext;
 
-	public InMemorySerializedContextResolver() {
+	public InMemorySerializedContextResolver()
+	{
 		this(null);
 	}
 
-	private InMemorySerializedContextResolver(byte[] newData) {
+	private InMemorySerializedContextResolver(byte[] newData)
+	{
 		_storedContext = newData;
 	}
 
 	@Override
-	public ICallingContext load() throws IOException, FileNotFoundException {
+	public ICallingContext load() throws IOException, FileNotFoundException
+	{
 		if (_storedContext == null)
 			return null;
 
@@ -29,14 +33,13 @@ public class InMemorySerializedContextResolver implements IContextResolver {
 			ObjectInputStream ois = new ObjectInputStream(bais);
 			return (ICallingContext) ois.readObject();
 		} catch (ClassNotFoundException cnfe) {
-			throw new IOException("Couldn't find class for deserialization.",
-					cnfe);
+			throw new IOException("Couldn't find class for deserialization.", cnfe);
 		}
 	}
 
 	@Override
-	public void store(ICallingContext ctxt) throws FileNotFoundException,
-			IOException {
+	public void store(ICallingContext ctxt) throws FileNotFoundException, IOException
+	{
 		if (ctxt == null)
 			_storedContext = null;
 		else {
@@ -48,11 +51,11 @@ public class InMemorySerializedContextResolver implements IContextResolver {
 		}
 	}
 
-	public Object clone() {
+	public Object clone()
+	{
 		if (_storedContext == null)
 			return new InMemorySerializedContextResolver(null);
 
-		return new InMemorySerializedContextResolver(Arrays.copyOf(
-				_storedContext, _storedContext.length));
+		return new InMemorySerializedContextResolver(Arrays.copyOf(_storedContext, _storedContext.length));
 	}
 }

@@ -6,44 +6,53 @@ import java.util.ListIterator;
 
 import org.morgan.util.Pair;
 
-public class History {
+public class History
+{
 	static final public int DEFAULT_HISTORY_SIZE = 1024;
 
 	private int _historySize;
 	private LinkedList<String> _history = new LinkedList<String>();
 
-	public History(int historySize) {
+	public History(int historySize)
+	{
 		_historySize = historySize;
 	}
 
-	public History() {
+	public History()
+	{
 		this(DEFAULT_HISTORY_SIZE);
 	}
 
-	final public void addLine(String line) {
+	final public void addLine(String line)
+	{
 		_history.addFirst(line);
 		while (_history.size() > _historySize)
 			_history.removeLast();
 	}
 
-	final public HistoryIterator startIteration() {
+	final public HistoryIterator startIteration()
+	{
 		return new HistoryIteratorImpl(_history.listIterator());
 	}
 
-	final public HistorySearch startSearch() {
+	final public HistorySearch startSearch()
+	{
 		return new HistorySearchImpl(_history.iterator());
 	}
 
-	static private class HistoryIteratorImpl implements HistoryIterator {
+	static private class HistoryIteratorImpl implements HistoryIterator
+	{
 		private boolean _wasBackword = true;
 		private ListIterator<String> _listIterator;
 
-		private HistoryIteratorImpl(ListIterator<String> listIterator) {
+		private HistoryIteratorImpl(ListIterator<String> listIterator)
+		{
 			_listIterator = listIterator;
 		}
 
 		@Override
-		final public String searchBackword() {
+		final public String searchBackword()
+		{
 			if (!_wasBackword && _listIterator.hasNext())
 				_listIterator.next();
 
@@ -54,7 +63,8 @@ public class History {
 		}
 
 		@Override
-		final public String searchForward() {
+		final public String searchForward()
+		{
 			if (_wasBackword && _listIterator.hasPrevious())
 				_listIterator.previous();
 
@@ -65,19 +75,22 @@ public class History {
 		}
 	}
 
-	static private class HistorySearchImpl implements HistorySearch {
+	static private class HistorySearchImpl implements HistorySearch
+	{
 		private String _searchWord;
 		private String _currentLine;
 		private Iterator<String> _historyIterator;
 
-		private HistorySearchImpl(Iterator<String> historyIterator) {
+		private HistorySearchImpl(Iterator<String> historyIterator)
+		{
 			_searchWord = "";
 			_historyIterator = historyIterator;
 			_currentLine = null;
 		}
 
 		@Override
-		public Pair<String, String> addCharacter(char c) {
+		public Pair<String, String> addCharacter(char c)
+		{
 			_searchWord = _searchWord + c;
 			if (_currentLine != null && _currentLine.contains(_searchWord))
 				return toPair();
@@ -92,17 +105,20 @@ public class History {
 		}
 
 		@Override
-		public String getActualLine() {
+		public String getActualLine()
+		{
 			return _currentLine;
 		}
 
 		@Override
-		public String getSearchWord() {
+		public String getSearchWord()
+		{
 			return _searchWord;
 		}
 
 		@Override
-		public Pair<String, String> search() {
+		public Pair<String, String> search()
+		{
 			while (_historyIterator.hasNext()) {
 				_currentLine = _historyIterator.next();
 				if (_currentLine.contains(_searchWord))
@@ -113,18 +129,17 @@ public class History {
 		}
 
 		@Override
-		public String toString() {
-			return String.format("(reverse-i-search)`%s':  %s", _searchWord,
-					_currentLine);
+		public String toString()
+		{
+			return String.format("(reverse-i-search)`%s':  %s", _searchWord, _currentLine);
 		}
 
-		public Pair<String, String> toPair() {
-			StringBuilder first = new StringBuilder(String.format(
-					"(reverse-i-search)`%s':  ", _searchWord));
+		public Pair<String, String> toPair()
+		{
+			StringBuilder first = new StringBuilder(String.format("(reverse-i-search)`%s':  ", _searchWord));
 			int index = _currentLine.indexOf(_searchWord);
 			first.append(_currentLine.substring(0, index));
-			return new Pair<String, String>(first.toString(),
-					_currentLine.substring(index));
+			return new Pair<String, String>(first.toString(), _currentLine.substring(index));
 		}
 	}
 }

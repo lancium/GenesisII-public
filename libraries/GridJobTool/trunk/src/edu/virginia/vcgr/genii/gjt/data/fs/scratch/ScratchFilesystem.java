@@ -15,8 +15,8 @@ import edu.virginia.vcgr.jsdl.FileSystem;
 import edu.virginia.vcgr.jsdl.FileSystemType;
 import edu.virginia.vcgr.jsdl.GenesisIIConstants;
 
-public class ScratchFilesystem extends AbstractFilesystem implements
-		Externalizable {
+public class ScratchFilesystem extends AbstractFilesystem implements Externalizable
+{
 	static public final String COMMON_NAME = "Job Scratch";
 
 	static public final String JSDL_NAME = "SCRATCH";
@@ -27,65 +27,69 @@ public class ScratchFilesystem extends AbstractFilesystem implements
 	@XmlAttribute(name = "unique-identifier", required = true)
 	private String _uniqueIdentifier;
 
-	public ScratchFilesystem() {
+	public ScratchFilesystem()
+	{
 		super(FilesystemType.Scratch);
 	}
 
 	@Override
-	protected boolean editImpl(Window owner) {
-		String answer = (String) JOptionPane.showInputDialog(owner,
-				"Unique identifier for this scratch filesystem.",
-				"Scratch Filesystem Configuration",
-				JOptionPane.QUESTION_MESSAGE, null, null, _uniqueIdentifier);
+	protected boolean editImpl(Window owner)
+	{
+		String answer =
+			(String) JOptionPane.showInputDialog(owner, "Unique identifier for this scratch filesystem.",
+				"Scratch Filesystem Configuration", JOptionPane.QUESTION_MESSAGE, null, null, _uniqueIdentifier);
 		if (answer != null)
 			_uniqueIdentifier = answer;
 
 		return _uniqueIdentifier != null;
 	}
 
-	ScratchFilesystem(String uniqueIdentifier) {
+	ScratchFilesystem(String uniqueIdentifier)
+	{
 		super(FilesystemType.Scratch);
 
 		_uniqueIdentifier = uniqueIdentifier;
 	}
 
 	@Override
-	public String toString() {
-		return String.format("%s:  %s", filesystemType().toString(),
-				_uniqueIdentifier);
+	public String toString()
+	{
+		return String.format("%s:  %s", filesystemType().toString(), _uniqueIdentifier);
 	}
 
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(Object other)
+	{
 		if (other instanceof ScratchFilesystem) {
-			return ((ScratchFilesystem) other)._uniqueIdentifier
-					.equals(_uniqueIdentifier);
+			return ((ScratchFilesystem) other)._uniqueIdentifier.equals(_uniqueIdentifier);
 		}
 
 		return false;
 	}
 
 	@Override
-	public Object clone() {
+	public Object clone()
+	{
 		return new ScratchFilesystem(_uniqueIdentifier);
 	}
 
 	@Override
-	public void readExternal(ObjectInput in) throws IOException,
-			ClassNotFoundException {
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
+	{
 		_uniqueIdentifier = in.readUTF();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
+	public void writeExternal(ObjectOutput out) throws IOException
+	{
 		out.writeUTF(_uniqueIdentifier);
 	}
 
 	@Override
-	public FileSystem toJSDLFilesystem() {
+	public FileSystem toJSDLFilesystem()
+	{
 		FileSystem ret = new FileSystem("SCRATCH", FileSystemType.spool);
-		ret.anyAttributes().put(GenesisIIConstants.SCRATCH_UNIQUE_ID_ATTRIBUTE,
-				_uniqueIdentifier);
+		ret.anyAttributes().put(GenesisIIConstants.SCRATCH_UNIQUE_ID_ATTRIBUTE, _uniqueIdentifier);
 
 		return ret;
 

@@ -9,23 +9,21 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.cleanup.CleanupManager;
 
-public class ServerDatabaseConnectionPool extends DatabaseConnectionPool {
-	static private Log _logger = LogFactory
-			.getLog(ServerDatabaseConnectionPool.class);
+public class ServerDatabaseConnectionPool extends DatabaseConnectionPool
+{
+	static private Log _logger = LogFactory.getLog(ServerDatabaseConnectionPool.class);
 
 	static private final String _SERVER_SPECIAL_STRING = "${server-dir}";
 	static private int _poolInstances = 0;
 
-	public ServerDatabaseConnectionPool(Properties connectionProperties)
-			throws IllegalAccessException, ClassNotFoundException,
-			InstantiationException {
-		super(new DBPropertyNames(), connectionProperties,
-				_SERVER_SPECIAL_STRING);
+	public ServerDatabaseConnectionPool(Properties connectionProperties) throws IllegalAccessException, ClassNotFoundException,
+		InstantiationException
+	{
+		super(new DBPropertyNames(), connectionProperties, _SERVER_SPECIAL_STRING);
 		synchronized (ServerDatabaseConnectionPool.class) {
 			_poolInstances++;
 			if (_poolInstances != 1) {
-				_logger.error("We don't have exactly one connection pool instance -- we have "
-						+ _poolInstances);
+				_logger.error("We don't have exactly one connection pool instance -- we have " + _poolInstances);
 				System.exit(1);
 			}
 		}
@@ -34,8 +32,7 @@ public class ServerDatabaseConnectionPool extends DatabaseConnectionPool {
 			connection = acquire(false);
 			CleanupManager.doCleanups(connection);
 		} catch (Throwable cause) {
-			_logger.error("Unable to create connection for cleanup handlers.",
-					cause);
+			_logger.error("Unable to create connection for cleanup handlers.", cause);
 		} finally {
 			release(connection);
 		}
@@ -50,8 +47,7 @@ public class ServerDatabaseConnectionPool extends DatabaseConnectionPool {
 	// boolean succeeded = false;
 	//
 	// int maxSnooze = 4 * 1000; // in milliseconds.
-	// int eachSleep = 500; // number of milliseconds to snooze between lock
-	// attempts.
+	// int eachSleep = 500; // number of milliseconds to snooze between lock attempts.
 	// int attempts = (int) ((double) maxSnooze / (double) eachSleep + 1);
 	//
 	// for (int lcv = 0; lcv < attempts; lcv++) {
@@ -66,8 +62,7 @@ public class ServerDatabaseConnectionPool extends DatabaseConnectionPool {
 	// if (connection == null)
 	// connection = createConnection();
 	//
-	// ((DatabaseConnectionInterceptor)
-	// Proxy.getInvocationHandler(connection)).setAcquired();
+	// ((DatabaseConnectionInterceptor) Proxy.getInvocationHandler(connection)).setAcquired();
 	//
 	// succeeded = true;
 	// return connection;
@@ -86,8 +81,7 @@ public class ServerDatabaseConnectionPool extends DatabaseConnectionPool {
 	// }
 	// }
 	//
-	// _logger.error("Unable to acquire/create connections in " + maxSnooze /
-	// 1000 +
+	// _logger.error("Unable to acquire/create connections in " + maxSnooze / 1000 +
 	// " seconds.  Giving up.", lastException);
 	// throw lastException;
 	// }
@@ -102,8 +96,7 @@ public class ServerDatabaseConnectionPool extends DatabaseConnectionPool {
 	// public void release(Connection conn)
 	// {
 	// if (_logger.isTraceEnabled())
-	// _logger.trace("Releasing a database connection [" + get_connPool().size()
-	// + "].");
+	// _logger.trace("Releasing a database connection [" + get_connPool().size() + "].");
 	//
 	// if (conn == null)
 	// return;
@@ -121,16 +114,14 @@ public class ServerDatabaseConnectionPool extends DatabaseConnectionPool {
 	// }
 	//
 	// try {
-	// ((DatabaseConnectionInterceptor)
-	// Proxy.getInvocationHandler(conn)).getConnection().close();
+	// ((DatabaseConnectionInterceptor) Proxy.getInvocationHandler(conn)).getConnection().close();
 	// } catch (Throwable t) {
 	// _logger.error("Error closing the connection.", t);
 	// }
 	// } finally {
 	// get_lock().readLock().unlock();
 	//
-	// ((DatabaseConnectionInterceptor)
-	// Proxy.getInvocationHandler(conn)).setReleased();
+	// ((DatabaseConnectionInterceptor) Proxy.getInvocationHandler(conn)).setReleased();
 	// }
 	// }
 	// }
@@ -140,12 +131,10 @@ public class ServerDatabaseConnectionPool extends DatabaseConnectionPool {
 	// if (_logger.isTraceEnabled())
 	// _logger.trace("Creating a new database connection.");
 	//
-	// Connection conn = DriverManager.getConnection(get_connectString(),
-	// get_user(),
+	// Connection conn = DriverManager.getConnection(get_connectString(), get_user(),
 	// get_password());
 	// conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-	// return (Connection)
-	// Proxy.newProxyInstance(GenesisClassLoader.classLoaderFactory(), new
+	// return (Connection) Proxy.newProxyInstance(GenesisClassLoader.classLoaderFactory(), new
 	// Class[] { Connection.class },
 	// new DatabaseConnectionInterceptor(conn));
 	// }

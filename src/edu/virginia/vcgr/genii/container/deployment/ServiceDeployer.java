@@ -40,30 +40,33 @@ import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHoo
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-public class ServiceDeployer extends Thread {
+public class ServiceDeployer extends Thread
+{
 	static private final Log _logger = LogFactory.getLog(ServiceDeployer.class);
 
 	static private Pattern _WSDD_FILE_PATTERN = Pattern.compile("^.*\\.wsdd$");
 
-	static private Pattern _DEPLOYMENT_FILE_PATTERN = Pattern
-			.compile("^.*\\.gdb$");
+	static private Pattern _DEPLOYMENT_FILE_PATTERN = Pattern.compile("^.*\\.gdb$");
 
-	static private PatternFilenameFilter _FILTER = new PatternFilenameFilter(
-			new Pattern[] { _DEPLOYMENT_FILE_PATTERN, _WSDD_FILE_PATTERN });
+	static private PatternFilenameFilter _FILTER = new PatternFilenameFilter(new Pattern[] { _DEPLOYMENT_FILE_PATTERN,
+		_WSDD_FILE_PATTERN });
 
 	private AxisEngine _axisEngine;
 	private BarrieredWorkQueue _postStartupQueue;
 	private HierarchicalDirectory _watchDirectory;
 	private HashMap<String, DeploymentInformation> _deploymentInformation;
 
-	static private class PatternFilenameFilter implements FileFilter {
+	static private class PatternFilenameFilter implements FileFilter
+	{
 		private Pattern[] _patterns;
 
-		public PatternFilenameFilter(Pattern[] patterns) {
+		public PatternFilenameFilter(Pattern[] patterns)
+		{
 			_patterns = patterns;
 		}
 
-		public boolean accept(File pathname) {
+		public boolean accept(File pathname)
+		{
 			for (Pattern p : _patterns) {
 				if (p.matcher(pathname.getName()).matches())
 					return true;
@@ -73,27 +76,29 @@ public class ServiceDeployer extends Thread {
 		}
 	}
 
-	static private class DeploymentInformation {
+	static private class DeploymentInformation
+	{
 		static final int _MAX_ATTEMPTS = 10;
 		int _attempts;
 		ClassLoader _loader;
 
-		DeploymentInformation() {
+		DeploymentInformation()
+		{
 			_attempts = 0;
 			_loader = null;
 		}
 	}
 
-	static public void startServiceDeployer(AxisEngine axisEngine,
-			BarrieredWorkQueue postStartupQueue,
-			HierarchicalDirectory watchDirectory) {
-		ServiceDeployer sd = new ServiceDeployer(axisEngine, postStartupQueue,
-				watchDirectory);
+	static public void startServiceDeployer(AxisEngine axisEngine, BarrieredWorkQueue postStartupQueue,
+		HierarchicalDirectory watchDirectory)
+	{
+		ServiceDeployer sd = new ServiceDeployer(axisEngine, postStartupQueue, watchDirectory);
 		sd.setDaemon(true);
 		sd.start();
 	}
 
-	public void run() {
+	public void run()
+	{
 		while (true) {
 			boolean deployedOkay = attemptDeployment();
 			try {
@@ -106,8 +111,8 @@ public class ServiceDeployer extends Thread {
 		}
 	}
 
-	private ServiceDeployer(AxisEngine axisEngine,
-			BarrieredWorkQueue postStartupQueue, HierarchicalDirectory watchDir) {
+	private ServiceDeployer(AxisEngine axisEngine, BarrieredWorkQueue postStartupQueue, HierarchicalDirectory watchDir)
+	{
 		_postStartupQueue = postStartupQueue;
 		_axisEngine = axisEngine;
 		_watchDirectory = watchDir;
@@ -115,11 +120,9 @@ public class ServiceDeployer extends Thread {
 
 		boolean okay = attemptDeployment();
 		if (okay) {
-			_logger.debug("deployed successfully from constructor for "
-					+ this.getClass().getCanonicalName());
+			_logger.debug("deployed successfully from constructor for " + this.getClass().getCanonicalName());
 		} else {
-			_logger.debug("failed to deploy from constructor for "
-					+ this.getClass().getCanonicalName());
+			_logger.debug("failed to deploy from constructor for " + this.getClass().getCanonicalName());
 		}
 	}
 
@@ -130,42 +133,42 @@ public class ServiceDeployer extends Thread {
 	/**
 	 * returns the number of milliseconds since the computer booted.
 	 */
-	public static long millisSinceBoot() {
+	public static long millisSinceBoot()
+	{
 		return System.nanoTime() / 1000000;
 	}
 
 	/**
-	 * returns the number of milliseconds since the program started. this is
-	 * usually a much nicer number than the milliseconds since boot.
+	 * returns the number of milliseconds since the program started. this is usually a much nicer
+	 * number than the milliseconds since boot.
 	 */
-	public static long millisSinceAppStart() {
+	public static long millisSinceAppStart()
+	{
 		return millisSinceBoot() - _appStartMillis;
 	}
 
 	/**
-	 * returns true if the deployment succeeded and false if it failed. no
-	 * exceptions are allowed out of here.
+	 * returns true if the deployment succeeded and false if it failed. no exceptions are allowed
+	 * out of here.
 	 */
-	private boolean attemptDeployment() {
+	private boolean attemptDeployment()
+	{
 		try {
-			// First, find the files that are new that we haven't tried to load
-			// yet.
+			// First, find the files that are new that we haven't tried to load yet.
 			File[] files = _watchDirectory.listFiles(_FILTER);
 			if (files == null)
 				return false;
 
 			for (File file : files) {
 				if (!_deploymentInformation.containsKey(file.getName())) {
-					_deploymentInformation.put(file.getName(),
-							new DeploymentInformation());
+					_deploymentInformation.put(file.getName(), new DeploymentInformation());
 				}
 			}
 
 			// Now, go through the deployment information
 			for (String filename : _deploymentInformation.keySet()) {
 				String className = null;
-				DeploymentInformation info = _deploymentInformation
-						.get(filename);
+				DeploymentInformation info = _deploymentInformation.get(filename);
 				if (info._loader != null)
 					continue;
 
@@ -176,8 +179,7 @@ public class ServiceDeployer extends Thread {
 				}
 
 				if (++info._attempts > DeploymentInformation._MAX_ATTEMPTS) {
-					_logger.error("Unable to deploy file \""
-							+ file.getAbsolutePath() + "\".");
+					_logger.error("Unable to deploy file \"" + file.getAbsolutePath() + "\".");
 					info._attempts = -1;
 					continue;
 				}
@@ -185,10 +187,9 @@ public class ServiceDeployer extends Thread {
 				if (_DEPLOYMENT_FILE_PATTERN.matcher(file.getName()).matches()) {
 					JarFile jFile = null;
 					try {
-						URLClassLoader loader = new URLClassLoader(
-								new URL[] { file.toURI().toURL() }, Thread
-										.currentThread()
-										.getContextClassLoader());
+						URLClassLoader loader =
+							new URLClassLoader(new URL[] { file.toURI().toURL() }, Thread.currentThread()
+								.getContextClassLoader());
 
 						jFile = new JarFile(file);
 						Enumeration<JarEntry> entries = jFile.entries();
@@ -197,12 +198,10 @@ public class ServiceDeployer extends Thread {
 							JarEntry entry = entries.nextElement();
 							if (entry.isDirectory())
 								continue;
-							if (_WSDD_FILE_PATTERN.matcher(entry.getName())
-									.matches()) {
+							if (_WSDD_FILE_PATTERN.matcher(entry.getName()).matches()) {
 								className = attemptDeploy(jFile, entry);
 								if (className != null)
-									ClassUtils
-											.setClassLoader(className, loader);
+									ClassUtils.setClassLoader(className, loader);
 							}
 						}
 					} catch (ParserConfigurationException pce) {
@@ -240,21 +239,16 @@ public class ServiceDeployer extends Thread {
 					try {
 						Class<?> cl = info._loader.loadClass(className);
 						if (IServiceWithCleanupHook.class.isAssignableFrom(cl)) {
-							Constructor<?> cons = cl
-									.getConstructor(new Class[0]);
-							_logger.debug("constructing new instance of "
-									+ cl.toString());
-							IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons
-									.newInstance(new Object[0]);
-							// hmmm: the individual startup methods are what are
-							// super slow! how
+							Constructor<?> cons = cl.getConstructor(new Class[0]);
+							_logger.debug("constructing new instance of " + cl.toString());
+							IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons.newInstance(new Object[0]);
+							// hmmm: the individual startup methods are what are super slow! how
 							// odd.
 							long startedAt = millisSinceAppStart();
 							base.startup();
 							long finishedAt = millisSinceAppStart();
-							_logger.debug("deploying " + className + " took "
-									+ ((float) (finishedAt - startedAt))
-									/ 1000.0 + " seconds.");
+							_logger.debug("deploying " + className + " took " + ((float) (finishedAt - startedAt)) / 1000.0
+								+ " seconds.");
 							_postStartupQueue.enqueue(base);
 						}
 					} catch (NoSuchMethodException nsme) {
@@ -278,26 +272,21 @@ public class ServiceDeployer extends Thread {
 		}
 	}
 
-	private String attemptDeploy(Document element) throws IOException,
-			SAXException, ParserConfigurationException {
+	private String attemptDeploy(Document element) throws IOException, SAXException, ParserConfigurationException
+	{
 		String className = findClassName(element);
 		if (className == null)
 			return null;
 
-		element.getDocumentElement().setAttributeNS(
-				"http://vcgr.cs.virginia.edu/GenesisII/invoker", "genii:dumm",
-				"dummy-value");
+		element.getDocumentElement().setAttributeNS("http://vcgr.cs.virginia.edu/GenesisII/invoker", "genii:dumm",
+			"dummy-value");
 		element.normalizeDocument();
 		NodeList list = element.getDocumentElement().getChildNodes();
 		for (int lcv = 0; lcv < list.getLength(); lcv++) {
 			Node child = list.item(lcv);
-			if (child != null && child.getNodeType() == Node.ELEMENT_NODE
-					&& child.getNodeName().equals("service")) {
-				((Element) child).setAttributeNS(
-						"http://vcgr.cs.virginia.edu/GenesisII/invoker",
-						"dummy", "dummy-value");
-				String prefix = ((Element) child)
-						.lookupPrefix("http://vcgr.cs.virginia.edu/GenesisII/invoker");
+			if (child != null && child.getNodeType() == Node.ELEMENT_NODE && child.getNodeName().equals("service")) {
+				((Element) child).setAttributeNS("http://vcgr.cs.virginia.edu/GenesisII/invoker", "dummy", "dummy-value");
+				String prefix = ((Element) child).lookupPrefix("http://vcgr.cs.virginia.edu/GenesisII/invoker");
 				Attr attr = ((Element) child).getAttributeNode("provider");
 				attr.setNodeValue(prefix + ":GAroundInvoker");
 			}
@@ -306,8 +295,7 @@ public class ServiceDeployer extends Thread {
 		WSDDDocument wsdd = new WSDDDocument(element);
 		EngineConfiguration config = _axisEngine.getConfig();
 		if (config instanceof WSDDEngineConfiguration) {
-			WSDDDeployment deployment = ((WSDDEngineConfiguration) config)
-					.getDeployment();
+			WSDDDeployment deployment = ((WSDDEngineConfiguration) config).getDeployment();
 			wsdd.deploy(deployment);
 			_axisEngine.refreshGlobalOptions();
 		}
@@ -317,8 +305,8 @@ public class ServiceDeployer extends Thread {
 		return className;
 	}
 
-	private String attemptDeploy(JarFile jFile, JarEntry entry)
-			throws IOException, SAXException, ParserConfigurationException {
+	private String attemptDeploy(JarFile jFile, JarEntry entry) throws IOException, SAXException, ParserConfigurationException
+	{
 		InputStream in = null;
 		try {
 			in = jFile.getInputStream(entry);
@@ -331,17 +319,16 @@ public class ServiceDeployer extends Thread {
 
 	static private final String _WSDD_NS = "http://xml.apache.org/axis/wsdd/";
 
-	static private String findClassName(Document element) {
+	static private String findClassName(Document element)
+	{
 		int sLen;
-		NodeList serviceList = element.getElementsByTagNameNS(_WSDD_NS,
-				"service");
+		NodeList serviceList = element.getElementsByTagNameNS(_WSDD_NS, "service");
 		sLen = serviceList.getLength();
 		for (int lcv1 = 0; lcv1 < sLen; lcv1++) {
 			Node e = serviceList.item(lcv1);
 			if (e.getNodeType() != Node.ELEMENT_NODE)
 				continue;
-			NodeList nlist = ((Element) e).getElementsByTagNameNS(_WSDD_NS,
-					"parameter");
+			NodeList nlist = ((Element) e).getElementsByTagNameNS(_WSDD_NS, "parameter");
 			int len = nlist.getLength();
 			for (int lcv = 0; lcv < len; lcv++) {
 				Node child = nlist.item(lcv);

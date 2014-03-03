@@ -6,7 +6,8 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-class BooleanTextCellRenderer extends DefaultTableCellRenderer {
+class BooleanTextCellRenderer extends DefaultTableCellRenderer
+{
 	private static final long serialVersionUID = 0L;
 
 	private String _trueText;
@@ -14,8 +15,8 @@ class BooleanTextCellRenderer extends DefaultTableCellRenderer {
 	private Color _trueColor;
 	private Color _falseColor;
 
-	BooleanTextCellRenderer(String trueText, Color trueColor, String falseText,
-			Color falseColor) {
+	BooleanTextCellRenderer(String trueText, Color trueColor, String falseText, Color falseColor)
+	{
 		_trueText = trueText;
 		_trueColor = trueColor;
 
@@ -23,17 +24,20 @@ class BooleanTextCellRenderer extends DefaultTableCellRenderer {
 		_falseColor = falseColor;
 	}
 
-	BooleanTextCellRenderer(String trueText, String falseText) {
+	BooleanTextCellRenderer(String trueText, String falseText)
+	{
 		this(trueText, Color.green.darker(), falseText, Color.red.darker());
 	}
 
-	BooleanTextCellRenderer() {
+	BooleanTextCellRenderer()
+	{
 		this("True", Color.green.darker(), "False", Color.red.darker());
 	}
 
 	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value,
-			boolean isSelected, boolean hasFocus, int row, int column) {
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row,
+		int column)
+	{
 		String text;
 
 		Boolean bValue = (Boolean) value;
@@ -43,8 +47,7 @@ class BooleanTextCellRenderer extends DefaultTableCellRenderer {
 		else
 			text = _falseText;
 
-		super.getTableCellRendererComponent(table, text, isSelected, hasFocus,
-				row, column);
+		super.getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
 
 		if (bValue.booleanValue())
 			setForeground(_trueColor);

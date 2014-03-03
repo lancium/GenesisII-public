@@ -6,13 +6,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class MethodStatistics {
-	static private final long WINDOW_SIZE = TimeInterval.FIVE_MINUTES
-			.durationMS();
+public class MethodStatistics
+{
+	static private final long WINDOW_SIZE = TimeInterval.FIVE_MINUTES.durationMS();
 
 	private LinkedList<MethodDataPoint> _dataPoints = new LinkedList<MethodDataPoint>();
 
-	private void trim() {
+	private void trim()
+	{
 		long now = System.currentTimeMillis();
 		Iterator<MethodDataPoint> iter = _dataPoints.iterator();
 		while (iter.hasNext()) {
@@ -23,8 +24,8 @@ public class MethodStatistics {
 		}
 	}
 
-	public MethodDataPoint startMethod(Class<?> serviceClass,
-			Method serviceMethod) {
+	public MethodDataPoint startMethod(Class<?> serviceClass, Method serviceMethod)
+	{
 		MethodDataPoint dp = new MethodDataPoint(serviceClass, serviceMethod);
 
 		synchronized (_dataPoints) {
@@ -36,9 +37,10 @@ public class MethodStatistics {
 		return dp;
 	}
 
-	public Map<TimeInterval, MethodStatisticsReport> report() {
-		Map<TimeInterval, MethodStatisticsReport> report = new EnumMap<TimeInterval, MethodStatisticsReport>(
-				TimeInterval.class);
+	public Map<TimeInterval, MethodStatisticsReport> report()
+	{
+		Map<TimeInterval, MethodStatisticsReport> report =
+			new EnumMap<TimeInterval, MethodStatisticsReport>(TimeInterval.class);
 
 		for (TimeInterval ti : TimeInterval.values())
 			report.put(ti, new MethodStatisticsReport());

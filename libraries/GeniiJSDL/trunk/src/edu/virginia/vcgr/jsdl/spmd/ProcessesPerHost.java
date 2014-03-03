@@ -28,7 +28,8 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class ProcessesPerHost implements Serializable {
+public class ProcessesPerHost implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -41,22 +42,27 @@ public class ProcessesPerHost implements Serializable {
 	 * For use by XML Unmarshalling only.
 	 */
 	@SuppressWarnings("unused")
-	private ProcessesPerHost() {
+	private ProcessesPerHost()
+	{
 	}
 
-	public ProcessesPerHost(long value) {
+	public ProcessesPerHost(long value)
+	{
 		_value = value;
 	}
 
-	final public void value(long value) {
+	final public void value(long value)
+	{
 		_value = value;
 	}
 
-	final public long value() {
+	final public long value()
+	{
 		return _value;
 	}
 
-	final public Map<QName, String> anyAttributes() {
+	final public Map<QName, String> anyAttributes()
+	{
 		return _anyAttributes;
 	}
 }

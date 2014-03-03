@@ -5,32 +5,36 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
 /**
- * A simple data structure for bundling together information needed to call out
- * to a bes container and kill a job.
+ * A simple data structure for bundling together information needed to call out to a bes container
+ * and kill a job.
  * 
  * @author mmm2a
  */
-public class KillInformation {
+public class KillInformation
+{
 	private ICallingContext _callingContext;
 	private EndpointReferenceType _jobEndpoint;
 	private EndpointReferenceType _besEndpoint;
 
-	public KillInformation(ICallingContext callingContext,
-			EndpointReferenceType jobEndpoint, EndpointReferenceType besEndpoint) {
+	public KillInformation(ICallingContext callingContext, EndpointReferenceType jobEndpoint, EndpointReferenceType besEndpoint)
+	{
 		_callingContext = callingContext;
 		_jobEndpoint = jobEndpoint;
 		_besEndpoint = besEndpoint;
 	}
 
-	public ICallingContext getCallingContext() {
+	public ICallingContext getCallingContext()
+	{
 		return _callingContext;
 	}
 
-	public EndpointReferenceType getJobEndpoint() {
+	public EndpointReferenceType getJobEndpoint()
+	{
 		return _jobEndpoint;
 	}
 
-	public EndpointReferenceType getBESEndpoint() {
+	public EndpointReferenceType getBESEndpoint()
+	{
 		return _besEndpoint;
 	}
 }

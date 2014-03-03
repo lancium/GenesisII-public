@@ -26,7 +26,8 @@ import edu.virginia.vcgr.genii.security.acl.X509PatternAclEntry;
 import edu.virginia.vcgr.genii.security.credentials.X509Identity;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
-public class ChmodTool extends BaseGridTool {
+public class ChmodTool extends BaseGridTool
+{
 	static final private String _DESCRIPTION = "config/tooldocs/description/dchmod";
 	static final private String _USAGE = "config/tooldocs/usage/uchmod";
 	static final private String _MANPAGE = "config/tooldocs/man/chmod";
@@ -40,44 +41,51 @@ public class ChmodTool extends BaseGridTool {
 	private String _pattern;
 	private boolean _recursive;
 
-	public ChmodTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.SECURITY);
+	public ChmodTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.SECURITY);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "username" })
-	public void setUsername(String arg) {
+	public void setUsername(String arg)
+	{
 		_username = arg;
 	}
 
 	@Option({ "password" })
-	public void setPassword(String arg) {
+	public void setPassword(String arg)
+	{
 		_password = arg;
 	}
 
 	@Option({ "hashedpass" })
-	public void setHashedpass(String arg) {
+	public void setHashedpass(String arg)
+	{
 		_hashedpass = arg;
 	}
 
 	@Option({ "everyone" })
-	public void setEveryone() {
+	public void setEveryone()
+	{
 		_everyone = true;
 	}
 
 	@Option({ "pattern" })
-	public void setPattern(String arg) {
+	public void setPattern(String arg)
+	{
 		_pattern = arg;
 	}
 
 	@Option({ "recursive", "R" })
-	public void setRecursive() {
+	public void setRecursive()
+	{
 		_recursive = true;
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		boolean haveUsername = (_username != null);
 		boolean havePassword = (_password != null || _hashedpass != null);
 		if (haveUsername != havePassword)
@@ -92,7 +100,8 @@ public class ChmodTool extends BaseGridTool {
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		boolean isRecursive = _recursive;
 		String modeString = getArgument(1);
 		String certificate = null;
@@ -100,35 +109,29 @@ public class ChmodTool extends BaseGridTool {
 			certificate = getArgument(2);
 
 		/*
-		 * Create an AclEntry that represents "everyone", or
-		 * "username/password", or a certificate read from a local file or a
-		 * grid file, or a certificate read from the metadata of a resource.
+		 * Create an AclEntry that represents "everyone", or "username/password", or a certificate
+		 * read from a local file or a grid file, or a certificate read from the metadata of a
+		 * resource.
 		 */
 		AclEntry newEntry = null;
 		if (_everyone) {
 			newEntry = null;
 		} else if (_username != null) {
 			if (_password != null)
-				newEntry = new UsernamePasswordIdentity(_username, _password,
-						true);
+				newEntry = new UsernamePasswordIdentity(_username, _password, true);
 			else
-				newEntry = new UsernamePasswordIdentity(_username, _hashedpass,
-						false);
+				newEntry = new UsernamePasswordIdentity(_username, _hashedpass, false);
 		} else {
-			X509Identity identity = AclAuthZClientTool
-					.downloadIdentity(new GeniiPath(certificate));
+			X509Identity identity = AclAuthZClientTool.downloadIdentity(new GeniiPath(certificate));
 			if (_pattern == null)
 				newEntry = identity;
 			else
-				newEntry = new X509PatternAclEntry(identity, new X500Principal(
-						_pattern));
+				newEntry = new X509PatternAclEntry(identity, new X500Principal(_pattern));
 		}
 
-		Collection<GeniiPath.PathMixIn> paths = GeniiPath
-				.pathExpander(getArgument(0));
+		Collection<GeniiPath.PathMixIn> paths = GeniiPath.pathExpander(getArgument(0));
 		if (paths == null) {
-			String msg = "Path does not exist or is not accessible: "
-					+ getArgument(0);
+			String msg = "Path does not exist or is not accessible: " + getArgument(0);
 			stdout.println(msg);
 			_logger.warn(msg);
 			return 1;
@@ -151,13 +154,12 @@ public class ChmodTool extends BaseGridTool {
 			return 1;
 	}
 
-	static private void chmod(RNSPath pathRNS, String modeString,
-			AclEntry newEntry, boolean isRecursive) throws Throwable {
+	static private void chmod(RNSPath pathRNS, String modeString, AclEntry newEntry, boolean isRecursive) throws Throwable
+	{
 		TypeInformation currentType = new TypeInformation(pathRNS.getEndpoint());
 		if (isRecursive && currentType.isRNS()) {
 			/*
-			 * only check that we can list a directory's contents when doing a
-			 * recursive chmod.
+			 * only check that we can list a directory's contents when doing a recursive chmod.
 			 */
 			if (_logger.isDebugEnabled())
 				_logger.debug("found RNS to traverse at " + pathRNS);
@@ -166,15 +168,13 @@ public class ChmodTool extends BaseGridTool {
 			try {
 				entries = pathRNS.listContents();
 			} catch (Throwable e) {
-				_logger.warn("failed to list contents on " + pathRNS
-						+ ", error is: " + e.getMessage());
+				_logger.warn("failed to list contents on " + pathRNS + ", error is: " + e.getMessage());
 			}
 			ArrayList<RNSPath> subdirs = new ArrayList<RNSPath>();
 
 			if (entries != null) {
 				for (RNSPath entry : entries) {
-					TypeInformation type = new TypeInformation(
-							entry.getEndpoint());
+					TypeInformation type = new TypeInformation(entry.getEndpoint());
 					if (type.isRNS()) {
 						subdirs.add(entry);
 					} else if (type.isByteIO()) {
@@ -189,8 +189,8 @@ public class ChmodTool extends BaseGridTool {
 
 		}
 
-		GenesisIIBaseRP rp = (GenesisIIBaseRP) ResourcePropertyManager
-				.createRPInterface(pathRNS.getEndpoint(), GenesisIIBaseRP.class);
+		GenesisIIBaseRP rp =
+			(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(pathRNS.getEndpoint(), GenesisIIBaseRP.class);
 		AuthZConfig config = rp.getAuthZConfig();
 		if (config == null)
 			config = AclAuthZClientTool.getEmptyAuthZConfig();
@@ -205,15 +205,15 @@ public class ChmodTool extends BaseGridTool {
 	}
 
 	@Override
-	public void addArgument(String argument) throws ToolException {
+	public void addArgument(String argument) throws ToolException
+	{
 		if (_setter == null)
 			_setter = new OptionSetter(this);
 		Class<? extends ITool> toolClass = getClass();
 		if (argument.startsWith("--"))
 			handleLongOptionFlag(toolClass, argument.substring(2));
 		else if (argument.startsWith("-")) {
-			if (argument.charAt(1) == 'r' || argument.charAt(1) == 'w'
-					|| argument.charAt(1) == 'x') {
+			if (argument.charAt(1) == 'r' || argument.charAt(1) == 'w' || argument.charAt(1) == 'x') {
 				_arguments.add(argument);
 			} else {
 				handleShortOptionFlag(toolClass, argument.substring(1));

@@ -8,29 +8,36 @@ import java.util.PriorityQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class SimpleAlarmManager implements Runnable {
+public class SimpleAlarmManager implements Runnable
+{
 	static private Log _logger = LogFactory.getLog(SimpleAlarmManager.class);
 
-	static private class AlarmEntry {
+	static private class AlarmEntry
+	{
 		private Date _occurrance;
 		private Runnable _worker;
 
-		public AlarmEntry(Date occurrance, Runnable worker) {
+		public AlarmEntry(Date occurrance, Runnable worker)
+		{
 			_occurrance = occurrance;
 			_worker = worker;
 		}
 
-		public Date getOccurance() {
+		public Date getOccurance()
+		{
 			return _occurrance;
 		}
 
-		public Runnable getWorker() {
+		public Runnable getWorker()
+		{
 			return _worker;
 		}
 	}
 
-	static private class OccuranceComparator implements Comparator<AlarmEntry> {
-		public int compare(AlarmEntry o1, AlarmEntry o2) {
+	static private class OccuranceComparator implements Comparator<AlarmEntry>
+	{
+		public int compare(AlarmEntry o1, AlarmEntry o2)
+		{
 			Date o1o = o1.getOccurance();
 			Date o2o = o2.getOccurance();
 
@@ -43,17 +50,18 @@ public class SimpleAlarmManager implements Runnable {
 		}
 	}
 
-	private PriorityQueue<AlarmEntry> _alarms = new PriorityQueue<AlarmEntry>(
-			32, new OccuranceComparator());
+	private PriorityQueue<AlarmEntry> _alarms = new PriorityQueue<AlarmEntry>(32, new OccuranceComparator());
 
-	public SimpleAlarmManager() {
+	public SimpleAlarmManager()
+	{
 		Thread th = new Thread(this);
 		th.setDaemon(false);
 		th.setName("Simple Alarm Manager Thread");
 		th.start();
 	}
 
-	public void addAlarm(Runnable worker, Date occurance) {
+	public void addAlarm(Runnable worker, Date occurance)
+	{
 		AlarmEntry entry = new AlarmEntry(occurance, worker);
 
 		synchronized (_alarms) {
@@ -62,7 +70,8 @@ public class SimpleAlarmManager implements Runnable {
 		}
 	}
 
-	public void run() {
+	public void run()
+	{
 		AlarmEntry entry;
 		Date entryOccurance;
 		long timeLeft;
@@ -79,8 +88,7 @@ public class SimpleAlarmManager implements Runnable {
 
 					entry = _alarms.peek();
 					entryOccurance = entry.getOccurance();
-					timeLeft = entryOccurance.getTime()
-							- System.currentTimeMillis();
+					timeLeft = entryOccurance.getTime() - System.currentTimeMillis();
 					if (timeLeft > 0) {
 						_alarms.wait(timeLeft);
 						continue;
@@ -98,8 +106,7 @@ public class SimpleAlarmManager implements Runnable {
 				while (true) {
 					entry = _alarms.peek();
 					entryOccurance = entry.getOccurance();
-					timeLeft = entryOccurance.getTime()
-							- System.currentTimeMillis();
+					timeLeft = entryOccurance.getTime() - System.currentTimeMillis();
 					if (timeLeft > 0)
 						break;
 					elapsedEntries.add(_alarms.remove());

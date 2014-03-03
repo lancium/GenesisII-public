@@ -12,7 +12,8 @@ import java.util.Collection;
  * the items are propagated to appropriate caches if the relevant method in manager interface is
  * invoked.
  */
-public interface CacheableItemsGenerator {
+public interface CacheableItemsGenerator
+{
 
 	boolean isSupported(Class<?>... argumentTypes);
 

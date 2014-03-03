@@ -5,20 +5,20 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.jsdl.personality.common.CommonPosixLikeHPCApplicationFacet;
 
-class ForkExecHPCApplicationFacet extends CommonPosixLikeHPCApplicationFacet {
+class ForkExecHPCApplicationFacet extends CommonPosixLikeHPCApplicationFacet
+{
 	private FilesystemManager _fsManager;
 	private BESWorkingDirectory _workingDirectory;
 
-	public ForkExecHPCApplicationFacet(FilesystemManager fsManager,
-			BESWorkingDirectory workingDirectory) {
+	public ForkExecHPCApplicationFacet(FilesystemManager fsManager, BESWorkingDirectory workingDirectory)
+	{
 		_fsManager = fsManager;
 		_workingDirectory = workingDirectory;
 	}
 
 	@Override
-	public Object createFacetUnderstanding(Object parentUnderstanding)
-			throws JSDLException {
-		return new ForkExecApplicationUnderstanding(_fsManager,
-				_workingDirectory);
+	public Object createFacetUnderstanding(Object parentUnderstanding) throws JSDLException
+	{
+		return new ForkExecApplicationUnderstanding(_fsManager, _workingDirectory);
 	}
 }

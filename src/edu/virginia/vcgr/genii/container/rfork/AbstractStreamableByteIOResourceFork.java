@@ -5,45 +5,45 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public abstract class AbstractStreamableByteIOResourceFork extends
-		AbstractByteIOResourceFork implements StreamableByteIOResourceFork {
+public abstract class AbstractStreamableByteIOResourceFork extends AbstractByteIOResourceFork implements
+	StreamableByteIOResourceFork
+{
 	static final private String POSITION_PROPERTY_FORMAT_STRING = "edu.virginia.vcgr.genii.rfork.sbyteio.position.%s";
 	static final private String DIRTY_PROPERTY_FORMAT_STRING = "edu.virginia.vcgr.genii.rfork.sbyteio.dirty.%s";
 
-	protected AbstractStreamableByteIOResourceFork(ResourceForkService service,
-			String forkPath) {
+	protected AbstractStreamableByteIOResourceFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
-	protected void setPosition(long newPosition) {
+	protected void setPosition(long newPosition)
+	{
 		try {
 			ResourceKey rKey = getService().getResourceKey();
-			rKey.dereference().setProperty(
-					String.format(POSITION_PROPERTY_FORMAT_STRING,
-							getForkPath()), new Long(newPosition));
+			rKey.dereference()
+				.setProperty(String.format(POSITION_PROPERTY_FORMAT_STRING, getForkPath()), new Long(newPosition));
 		} catch (Exception re) {
 			throw new RuntimeException("Unable to get resource property.", re);
 		}
 	}
 
-	protected void setDirty() {
+	protected void setDirty()
+	{
 		try {
 			ResourceKey rKey = getService().getResourceKey();
-			rKey.dereference().setProperty(
-					String.format(DIRTY_PROPERTY_FORMAT_STRING, getForkPath()),
-					new Boolean(true));
+			rKey.dereference().setProperty(String.format(DIRTY_PROPERTY_FORMAT_STRING, getForkPath()), new Boolean(true));
 		} catch (Exception re) {
 			throw new RuntimeException("Unable to get resource property.", re);
 		}
 	}
 
 	@Override
-	public long getPosition() {
+	public long getPosition()
+	{
 		try {
 			ResourceKey rKey = getService().getResourceKey();
-			Long position = (Long) rKey.dereference().getProperty(
-					String.format(POSITION_PROPERTY_FORMAT_STRING,
-							getForkPath()));
+			Long position =
+				(Long) rKey.dereference().getProperty(String.format(POSITION_PROPERTY_FORMAT_STRING, getForkPath()));
 			if (position == null)
 				return 0L;
 			return position.longValue();
@@ -54,17 +54,19 @@ public abstract class AbstractStreamableByteIOResourceFork extends
 
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	public void destroy() throws ResourceException {
+	public void destroy() throws ResourceException
+	{
 		super.destroy();
 	}
 
-	protected boolean isDirty() {
+	protected boolean isDirty()
+	{
 		boolean ret = false;
 
 		try {
 			ResourceKey rKey = getService().getResourceKey();
-			Boolean dirty = (Boolean) rKey.dereference().getProperty(
-					String.format(DIRTY_PROPERTY_FORMAT_STRING, getForkPath()));
+			Boolean dirty =
+				(Boolean) rKey.dereference().getProperty(String.format(DIRTY_PROPERTY_FORMAT_STRING, getForkPath()));
 			if (dirty == null)
 				ret = false;
 			else

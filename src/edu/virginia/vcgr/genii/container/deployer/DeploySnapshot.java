@@ -6,23 +6,27 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class DeploySnapshot implements Iterable<DeployFacet> {
+public class DeploySnapshot implements Iterable<DeployFacet>
+{
 	private SortedSet<DeployFacet> _facets;
 
-	static private class DeployFacetComparator implements
-			Comparator<DeployFacet> {
-		public int compare(DeployFacet arg0, DeployFacet arg1) {
+	static private class DeployFacetComparator implements Comparator<DeployFacet>
+	{
+		public int compare(DeployFacet arg0, DeployFacet arg1)
+		{
 			return arg0.getComponentID().compareTo(arg1.getComponentID());
 		}
 	}
 
-	public DeploySnapshot(Collection<DeployFacet> facets) {
+	public DeploySnapshot(Collection<DeployFacet> facets)
+	{
 		_facets = new TreeSet<DeployFacet>(new DeployFacetComparator());
 
 		_facets.addAll(facets);
 	}
 
-	public boolean equals(DeploySnapshot other) {
+	public boolean equals(DeploySnapshot other)
+	{
 		if (_facets.size() != other._facets.size())
 			return false;
 
@@ -40,11 +44,13 @@ public class DeploySnapshot implements Iterable<DeployFacet> {
 		return true;
 	}
 
-	public boolean equals(Object other) {
+	public boolean equals(Object other)
+	{
 		return equals((DeploySnapshot) other);
 	}
 
-	public int hashCode() {
+	public int hashCode()
+	{
 		int result = 0;
 		Iterator<DeployFacet> iter = _facets.iterator();
 
@@ -56,7 +62,8 @@ public class DeploySnapshot implements Iterable<DeployFacet> {
 		return result;
 	}
 
-	public Iterator<DeployFacet> iterator() {
+	public Iterator<DeployFacet> iterator()
+	{
 		return _facets.iterator();
 	}
 }

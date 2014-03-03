@@ -7,31 +7,32 @@ import java.io.IOException;
 
 import org.morgan.util.configuration.ConfigurationException;
 
-public class TrashTransferable implements Transferable {
+public class TrashTransferable implements Transferable
+{
 	static final private String FLAVOR_PATTERN = "%s;class=\"%s\"";
 
 	static final DataFlavor TRASH_TRANSFER_FLAVOR;
 
 	static {
 		try {
-			TRASH_TRANSFER_FLAVOR = new DataFlavor(String.format(
-					FLAVOR_PATTERN, DataFlavor.javaJVMLocalObjectMimeType,
+			TRASH_TRANSFER_FLAVOR =
+				new DataFlavor(String.format(FLAVOR_PATTERN, DataFlavor.javaJVMLocalObjectMimeType,
 					TrashCanEntryWrapper[].class.getName()));
 		} catch (ClassNotFoundException cnfe) {
-			throw new ConfigurationException(
-					"Unable to create trash can data flavor.", cnfe);
+			throw new ConfigurationException("Unable to create trash can data flavor.", cnfe);
 		}
 	}
 
 	private TrashCanEntryWrapper[] _wrappers;
 
-	TrashTransferable(TrashCanEntryWrapper[] wrappers) {
+	TrashTransferable(TrashCanEntryWrapper[] wrappers)
+	{
 		_wrappers = wrappers;
 	}
 
 	@Override
-	public Object getTransferData(DataFlavor flavor)
-			throws UnsupportedFlavorException, IOException {
+	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
+	{
 		if (flavor.equals(TRASH_TRANSFER_FLAVOR))
 			return _wrappers;
 
@@ -39,12 +40,14 @@ public class TrashTransferable implements Transferable {
 	}
 
 	@Override
-	public DataFlavor[] getTransferDataFlavors() {
+	public DataFlavor[] getTransferDataFlavors()
+	{
 		return new DataFlavor[] { TRASH_TRANSFER_FLAVOR };
 	}
 
 	@Override
-	public boolean isDataFlavorSupported(DataFlavor flavor) {
+	public boolean isDataFlavorSupported(DataFlavor flavor)
+	{
 		return flavor.equals(TRASH_TRANSFER_FLAVOR);
 	}
 }

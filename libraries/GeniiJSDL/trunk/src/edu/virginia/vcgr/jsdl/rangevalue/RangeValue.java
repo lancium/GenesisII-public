@@ -33,9 +33,9 @@ import edu.virginia.vcgr.jsdl.JSDLConstants;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_upperBoundedRange", "_lowerBoundedRange", "_exacts",
-		"_ranges" })
-public class RangeValue implements Serializable, Matchable {
+@XmlType(propOrder = { "_upperBoundedRange", "_lowerBoundedRange", "_exacts", "_ranges" })
+public class RangeValue implements Serializable, Matchable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -53,39 +53,47 @@ public class RangeValue implements Serializable, Matchable {
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "Range", required = false)
 	private List<Range> _ranges;
 
-	public RangeValue() {
+	public RangeValue()
+	{
 		_upperBoundedRange = null;
 		_lowerBoundedRange = null;
 		_exacts = new LinkedList<Exact>();
 		_ranges = new LinkedList<Range>();
 	}
 
-	final public void upperBoundedRange(Boundary boundary) {
+	final public void upperBoundedRange(Boundary boundary)
+	{
 		_upperBoundedRange = boundary;
 	}
 
-	final public Boundary upperBoundedRange() {
+	final public Boundary upperBoundedRange()
+	{
 		return _upperBoundedRange;
 	}
 
-	final public void lowerBoundedRange(Boundary boundary) {
+	final public void lowerBoundedRange(Boundary boundary)
+	{
 		_lowerBoundedRange = boundary;
 	}
 
-	final public Boundary lowerBoundedRange() {
+	final public Boundary lowerBoundedRange()
+	{
 		return _lowerBoundedRange;
 	}
 
-	final public List<Exact> exacts() {
+	final public List<Exact> exacts()
+	{
 		return _exacts;
 	}
 
-	final public List<Range> ranges() {
+	final public List<Range> ranges()
+	{
 		return _ranges;
 	}
 
 	@Override
-	final public boolean matches(Number number) {
+	final public boolean matches(Number number)
+	{
 		if (_upperBoundedRange != null && _upperBoundedRange.isCeiling(number))
 			return true;
 		if (_lowerBoundedRange != null && _lowerBoundedRange.isFloor(number))
@@ -104,7 +112,8 @@ public class RangeValue implements Serializable, Matchable {
 		return false;
 	}
 
-	final public Map<QName, String> anyAttributes() {
+	final public Map<QName, String> anyAttributes()
+	{
 		return _anyAttributes;
 	}
 }

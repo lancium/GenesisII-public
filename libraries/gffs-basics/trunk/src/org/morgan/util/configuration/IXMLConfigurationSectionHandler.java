@@ -16,11 +16,11 @@ package org.morgan.util.configuration;
 import org.w3c.dom.Node;
 
 /**
- * The interface that a user implements to parse a section from an XML
- * configuration file.
+ * The interface that a user implements to parse a section from an XML configuration file.
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public interface IXMLConfigurationSectionHandler {
+public interface IXMLConfigurationSectionHandler
+{
 	public Object parse(Node n) throws ConfigurationException;
 }

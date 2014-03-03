@@ -15,7 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
-class ProgressMonitorDialog extends JDialog {
+class ProgressMonitorDialog extends JDialog
+{
 	static final long serialVersionUID = 0L;
 
 	private Window _parent;
@@ -23,7 +24,8 @@ class ProgressMonitorDialog extends JDialog {
 	private Future<?> _taskFuture = null;
 	private JLabel _subTitle = new JLabel(" ");
 
-	private void updateSubTitle(String subTitle) {
+	private void updateSubTitle(String subTitle)
+	{
 		if (!SwingUtilities.isEventDispatchThread()) {
 			SwingUtilities.invokeLater(new UpdateSubTitleWorker(subTitle));
 			return;
@@ -35,7 +37,8 @@ class ProgressMonitorDialog extends JDialog {
 		_subTitle.setText(subTitle);
 	}
 
-	ProgressMonitorDialog(Window owner, String title, String subTitle) {
+	ProgressMonitorDialog(Window owner, String title, String subTitle)
+	{
 		super(owner, title);
 		_parent = owner;
 
@@ -45,30 +48,31 @@ class ProgressMonitorDialog extends JDialog {
 		JProgressBar progressBar = new JProgressBar(0, 100);
 		progressBar.setIndeterminate(true);
 
-		content.add(_subTitle, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
-						5, 5, 5), 5, 5));
-		content.add(progressBar, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
-				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new CancelAction()), new GridBagConstraints(0,
-				2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(_subTitle, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(progressBar, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		updateSubTitle(subTitle);
 		setModalityType(ModalityType.MODELESS);
 	}
 
-	TaskProgressListener taskProgressListener() {
-		return new TaskProgressListener() {
+	TaskProgressListener taskProgressListener()
+	{
+		return new TaskProgressListener()
+		{
 			@Override
-			public void updateSubTitle(String subTitle) {
+			public void updateSubTitle(String subTitle)
+			{
 				ProgressMonitorDialog.this.updateSubTitle(subTitle);
 			}
 		};
 	}
 
-	void popup(Task<?> task, Future<?> taskFuture) {
+	void popup(Task<?> task, Future<?> taskFuture)
+	{
 		_task = task;
 		_taskFuture = taskFuture;
 		pack();
@@ -76,29 +80,35 @@ class ProgressMonitorDialog extends JDialog {
 		setVisible(true);
 	}
 
-	private class CancelAction extends AbstractAction {
+	private class CancelAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private CancelAction() {
+		private CancelAction()
+		{
 			super("Cancel");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)
+		{
 			_task.cancel();
 			_taskFuture.cancel(true);
 		}
 	}
 
-	private class UpdateSubTitleWorker implements Runnable {
+	private class UpdateSubTitleWorker implements Runnable
+	{
 		private String _subTitle;
 
-		private UpdateSubTitleWorker(String subTitle) {
+		private UpdateSubTitleWorker(String subTitle)
+		{
 			_subTitle = subTitle;
 		}
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			updateSubTitle(_subTitle);
 		}
 	}

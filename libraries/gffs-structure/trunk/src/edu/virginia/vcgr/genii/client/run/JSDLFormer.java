@@ -29,7 +29,8 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
-public class JSDLFormer {
+public class JSDLFormer
+{
 	private String _jobName = null;
 	private List<String> _commandLine = null;
 
@@ -42,10 +43,10 @@ public class JSDLFormer {
 	private Map<String, URI> _stageIn = new HashMap<String, URI>();
 	private Map<String, URI> _stageOut = new HashMap<String, URI>();
 
-	public JSDLFormer(String jobName, List<String> commandLine) {
+	public JSDLFormer(String jobName, List<String> commandLine)
+	{
 		if (commandLine == null || commandLine.size() == 0)
-			throw new IllegalArgumentException(
-					"\"commandLine\" parameter cannot be null or empty.");
+			throw new IllegalArgumentException("\"commandLine\" parameter cannot be null or empty.");
 
 		if (jobName == null) {
 			jobName = commandLine.get(0);
@@ -61,76 +62,79 @@ public class JSDLFormer {
 		_commandLine = new ArrayList<String>(commandLine);
 	}
 
-	public JSDLFormer(List<String> commandLine) {
+	public JSDLFormer(List<String> commandLine)
+	{
 		this(null, commandLine);
 	}
 
-	public void redirectStdout(String targetFileName) {
+	public void redirectStdout(String targetFileName)
+	{
 		_stdout = targetFileName;
 	}
 
-	public void redirectStderr(String targetFileName) {
+	public void redirectStderr(String targetFileName)
+	{
 		_stderr = targetFileName;
 	}
 
-	public void redirectStdin(String sourceFileName) {
+	public void redirectStdin(String sourceFileName)
+	{
 		_stdin = sourceFileName;
 	}
 
-	public Map<String, String> environment() {
+	public Map<String, String> environment()
+	{
 		return _environmentVariables;
 	}
 
-	public Map<String, URI> inDataStages() {
+	public Map<String, URI> inDataStages()
+	{
 		return _stageIn;
 	}
 
-	public Map<String, URI> outDataStages() {
+	public Map<String, URI> outDataStages()
+	{
 		return _stageOut;
 	}
 
-	public JobDefinition_Type formJSDL() {
+	public JobDefinition_Type formJSDL()
+	{
 		JobIdentification_Type jobIdentification;
 		Application_Type application;
 		DataStaging_Type[] dataStages;
 		POSIXApplication_Type posixApplication;
 
-		jobIdentification = new JobIdentification_Type(_jobName,
-				"Automatically generated JSDL document by Genesis II system.",
-				null, null, null);
+		jobIdentification =
+			new JobIdentification_Type(_jobName, "Automatically generated JSDL document by Genesis II system.", null, null,
+				null);
 
 		posixApplication = createPOSIXApplication();
-		application = new Application_Type(_commandLine.get(0), null, null,
-				AnyHelper.toAnyArray(posixApplication));
-		application.get_any()[0].setQName(new QName(
-				GenesisIIConstants.JSDL_POSIX_NS, "POSIXApplication"));
+		application = new Application_Type(_commandLine.get(0), null, null, AnyHelper.toAnyArray(posixApplication));
+		application.get_any()[0].setQName(new QName(GenesisIIConstants.JSDL_POSIX_NS, "POSIXApplication"));
 
 		dataStages = createDataStages();
 
-		return new JobDefinition_Type(new JobDescription_Type(
-				jobIdentification, application, null, dataStages, null), null,
-				null);
+		return new JobDefinition_Type(new JobDescription_Type(jobIdentification, application, null, dataStages, null), null,
+			null);
 	}
 
-	public void writeJSDL(OutputStream out) throws IOException {
+	public void writeJSDL(OutputStream out) throws IOException
+	{
 		JobDefinition_Type jobDef = formJSDL();
 		Writer writer = new OutputStreamWriter(out);
-		ObjectSerializer.serialize(writer, jobDef, new QName(
-				GenesisIIConstants.GENESISII_NS, "jsdl-document"));
+		ObjectSerializer.serialize(writer, jobDef, new QName(GenesisIIConstants.GENESISII_NS, "jsdl-document"));
 		writer.flush();
 	}
 
-	private POSIXApplication_Type createPOSIXApplication() {
+	private POSIXApplication_Type createPOSIXApplication()
+	{
 		FileName_Type executable = new FileName_Type(_commandLine.get(0));
 		Argument_Type[] arguments = new Argument_Type[_commandLine.size() - 1];
 		for (int lcv = 0; lcv < arguments.length; lcv++)
 			arguments[lcv] = new Argument_Type(_commandLine.get(lcv + 1));
-		FileName_Type stdin = (_stdin != null) ? new FileName_Type(_stdin)
-				: null;
-		FileName_Type stdout = (_stdout != null) ? new FileName_Type(_stdout)
-				: null;
-		FileName_Type stderr = (_stderr != null) ? new FileName_Type(_stderr)
-				: null;
+		FileName_Type stdin = (_stdin != null) ? new FileName_Type(_stdin) : null;
+		FileName_Type stdout = (_stdout != null) ? new FileName_Type(_stdout) : null;
+		FileName_Type stderr = (_stderr != null) ? new FileName_Type(_stderr) : null;
 
 		Environment_Type[] envOverload = null;
 
@@ -138,38 +142,32 @@ public class JSDLFormer {
 			envOverload = new Environment_Type[_environmentVariables.size()];
 			int lcv = 0;
 			for (String key : _environmentVariables.keySet()) {
-				Environment_Type env = new Environment_Type(
-						_environmentVariables.get(key));
+				Environment_Type env = new Environment_Type(_environmentVariables.get(key));
 				env.setName(new NCName(key));
 				envOverload[lcv++] = env;
 			}
 		}
 
-		return new POSIXApplication_Type(executable, arguments, stdin, stdout,
-				stderr, null, envOverload, null, null, null, null, null, null,
-				null, null, null, null, null, null, null, null, null, null);
+		return new POSIXApplication_Type(executable, arguments, stdin, stdout, stderr, null, envOverload, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null, null);
 	}
 
-	private DataStaging_Type[] createDataStages() {
+	private DataStaging_Type[] createDataStages()
+	{
 		HashMap<String, DataStaging_Type> stages = new HashMap<String, DataStaging_Type>();
 		// Here is Andrew's first "code"
 		for (String stage : _stageIn.keySet()) {
-			stages.put(stage, new DataStaging_Type(stage, null,
-					CreationFlagEnumeration.overwrite, Boolean.TRUE,
-					new SourceTarget_Type(_stageIn.get(stage), null), null,
-					null, null));
+			stages.put(stage, new DataStaging_Type(stage, null, CreationFlagEnumeration.overwrite, Boolean.TRUE,
+				new SourceTarget_Type(_stageIn.get(stage), null), null, null, null));
 		}
 
 		for (String stage : _stageOut.keySet()) {
 			DataStaging_Type stageElement = stages.get(stage);
 			if (stageElement == null) {
-				stages.put(stage, new DataStaging_Type(stage, null,
-						CreationFlagEnumeration.overwrite, Boolean.TRUE, null,
-						new SourceTarget_Type(_stageOut.get(stage), null),
-						null, null));
+				stages.put(stage, new DataStaging_Type(stage, null, CreationFlagEnumeration.overwrite, Boolean.TRUE, null,
+					new SourceTarget_Type(_stageOut.get(stage), null), null, null));
 			} else {
-				stageElement.setTarget(new SourceTarget_Type(_stageOut
-						.get(stage), null));
+				stageElement.setTarget(new SourceTarget_Type(_stageOut.get(stage), null));
 			}
 		}
 

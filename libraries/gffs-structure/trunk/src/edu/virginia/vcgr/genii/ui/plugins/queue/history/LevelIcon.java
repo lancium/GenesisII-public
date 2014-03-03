@@ -7,7 +7,8 @@ import javax.swing.Icon;
 
 import edu.virginia.vcgr.genii.client.history.HistoryEventLevel;
 
-public class LevelIcon {
+public class LevelIcon
+{
 	static final private int SIZE = 16;
 
 	static public Map<HistoryEventLevel, Icon> ICON_MAP;
@@ -19,16 +20,17 @@ public class LevelIcon {
 			ICON_MAP.put(level, iconForLevel(level));
 	}
 
-	static public Icon iconForLevel(HistoryEventLevel level) {
+	static public Icon iconForLevel(HistoryEventLevel level)
+	{
 		switch (level) {
-		case Error:
-			return IconFactory.createErrorIcon(SIZE);
+			case Error:
+				return IconFactory.createErrorIcon(SIZE);
 
-		case Warning:
-			return IconFactory.createWarningIcon(SIZE);
+			case Warning:
+				return IconFactory.createWarningIcon(SIZE);
 
-		default:
-			return IconFactory.createEmptyIcon(SIZE);
+			default:
+				return IconFactory.createEmptyIcon(SIZE);
 		}
 	}
 }

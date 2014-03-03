@@ -31,7 +31,8 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class Environment implements Serializable {
+public class Environment implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -48,38 +49,46 @@ public class Environment implements Serializable {
 	 * Used for XML deserialization only.
 	 */
 	@SuppressWarnings("unused")
-	private Environment() {
+	private Environment()
+	{
 	}
 
-	public Environment(String name, String value) {
+	public Environment(String name, String value)
+	{
 		name(name);
 		_value = value;
 	}
 
-	public Environment(String name) {
+	public Environment(String name)
+	{
 		this(name, null);
 	}
 
-	final public void name(String name) {
+	final public void name(String name)
+	{
 		if (name == null)
 			throw new IllegalArgumentException("Name cannot be null.");
 
 		_name = name;
 	}
 
-	final public String name() {
+	final public String name()
+	{
 		return _name;
 	}
 
-	final public void value(String value) {
+	final public void value(String value)
+	{
 		_value = value;
 	}
 
-	final public String value() {
+	final public String value()
+	{
 		return _value;
 	}
 
-	final public Map<QName, String> anyAttributes() {
+	final public Map<QName, String> anyAttributes()
+	{
 		return _anyAttributes;
 	}
 }

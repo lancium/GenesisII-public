@@ -13,16 +13,18 @@ import org.ggf.jsdl.JobIdentification_Type;
  * 
  * @author mmm2a
  */
-public class QueueUtils {
+public class QueueUtils
+{
 	/**
-	 * We occassionally need to convert a date object into a calendar object
-	 * (SOAP uses calendars, everyone else uses dates).
+	 * We occassionally need to convert a date object into a calendar object (SOAP uses calendars,
+	 * everyone else uses dates).
 	 * 
 	 * @param d
 	 *            THe date to convert
 	 * @return The new calendar instance of the date.
 	 */
-	static public Calendar convert(Date d) {
+	static public Calendar convert(Date d)
+	{
 		if (d == null)
 			return null;
 
@@ -32,7 +34,8 @@ public class QueueUtils {
 		return c;
 	}
 
-	static public String getJobName(JobDefinition_Type jsdl) {
+	static public String getJobName(JobDefinition_Type jsdl)
+	{
 		if (jsdl != null) {
 			JobDescription_Type desc = jsdl.getJobDescription();
 			if (desc != null) {

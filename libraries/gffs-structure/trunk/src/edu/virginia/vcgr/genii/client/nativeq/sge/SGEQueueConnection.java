@@ -32,15 +32,15 @@ import edu.virginia.vcgr.genii.client.nativeq.execution.ParsingExecutionEngine;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.ResourceConstraints;
 
-public class SGEQueueConnection extends
-		ScriptBasedQueueConnection<SGEQueueConfiguration> {
+public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfiguration>
+{
 	static private Log _logger = LogFactory.getLog(SGEQueueConnection.class);
 
 	static final public long DEFAULT_CACHE_WINDOW = 1000L * 30;
-	static final public URI SGE_MANAGER_TYPE = URI
-			.create("http://vcgr.cs.virginia.edu/genesisII/nativeq/sge");
+	static final public URI SGE_MANAGER_TYPE = URI.create("http://vcgr.cs.virginia.edu/genesisII/nativeq/sge");
 
-	static private String toWallTimeFormat(double value) {
+	static private String toWallTimeFormat(double value)
+	{
 		long total = (long) value;
 		long seconds = total % 60;
 		total /= 60;
@@ -65,15 +65,12 @@ public class SGEQueueConnection extends
 	private List<String> _qstatStart;
 	private List<String> _qdelStart;
 
-	SGEQueueConnection(ResourceOverrides resourceOverrides,
-			CmdLineManipulatorConfiguration cmdLineManipulatorConf,
-			File workingDirectory, NativeQueueConfiguration nativeQueueConfig,
-			SGEQueueConfiguration sgeConfig, String queueName,
-			List<String> qsubStart, List<String> qstatStart,
-			List<String> qdelStart, JobStateCache statusCache)
-			throws NativeQueueException {
-		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf,
-				nativeQueueConfig, sgeConfig);
+	SGEQueueConnection(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf,
+		File workingDirectory, NativeQueueConfiguration nativeQueueConfig, SGEQueueConfiguration sgeConfig, String queueName,
+		List<String> qsubStart, List<String> qstatStart, List<String> qdelStart, JobStateCache statusCache)
+		throws NativeQueueException
+	{
+		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf, nativeQueueConfig, sgeConfig);
 
 		_statusCache = statusCache;
 
@@ -92,7 +89,8 @@ public class SGEQueueConnection extends
 	}
 
 	@Override
-	public void cancel(JobToken token) throws NativeQueueException {
+	public void cancel(JobToken token) throws NativeQueueException
+	{
 		List<String> commandLine = new LinkedList<String>();
 		commandLine.addAll(_qdelStart);
 
@@ -104,10 +102,11 @@ public class SGEQueueConnection extends
 		execute(builder);
 	}
 
-	private class BulkSGEStatusFetcher implements BulkStatusFetcher {
+	private class BulkSGEStatusFetcher implements BulkStatusFetcher
+	{
 		@Override
-		public Map<JobToken, NativeQueueState> getStateMap()
-				throws NativeQueueException {
+		public Map<JobToken, NativeQueueState> getStateMap() throws NativeQueueException
+		{
 			Map<JobToken, NativeQueueState> ret = new HashMap<JobToken, NativeQueueState>();
 
 			List<String> commandLine = new LinkedList<String>();
@@ -119,15 +118,12 @@ public class SGEQueueConnection extends
 
 			ProcessBuilder builder = new ProcessBuilder(commandLine);
 			String result = execute(builder);
-			Map<String, String> stateMap = SGEJobStatusParser
-					.parseStatus(result);
+			Map<String, String> stateMap = SGEJobStatusParser.parseStatus(result);
 			for (String tokenString : stateMap.keySet()) {
 				SGEJobToken token = new SGEJobToken(tokenString);
-				SGEQueueState state = SGEQueueState.fromStateString(stateMap
-						.get(tokenString));
+				SGEQueueState state = SGEQueueState.fromStateString(stateMap.get(tokenString));
 				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Putting %s[%s]\n", token,
-							state));
+					_logger.debug(String.format("Putting %s[%s]\n", token, state));
 				ret.put(token, state);
 			}
 
@@ -136,63 +132,54 @@ public class SGEQueueConnection extends
 	}
 
 	@Override
-	public NativeQueueState getStatus(JobToken token)
-			throws NativeQueueException {
-		NativeQueueState state = _statusCache.get(token,
-				new BulkSGEStatusFetcher(), DEFAULT_CACHE_WINDOW);
+	public NativeQueueState getStatus(JobToken token) throws NativeQueueException
+	{
+		NativeQueueState state = _statusCache.get(token, new BulkSGEStatusFetcher(), DEFAULT_CACHE_WINDOW);
 		if (state == null)
 			state = SGEQueueState.fromStateString("finished");
 		return state;
 	}
 
 	@Override
-	protected void generateQueueHeaders(PrintStream script,
-			File workingDirectory, ApplicationDescription application)
-			throws NativeQueueException, IOException {
+	protected void generateQueueHeaders(PrintStream script, File workingDirectory, ApplicationDescription application)
+		throws NativeQueueException, IOException
+	{
 		super.generateQueueHeaders(script, workingDirectory, application);
 
 		if (application.getSPMDVariation() != null) {
-			throw new NativeQueueException(
-					"SPMD not supported on SGE at the moment.");
+			throw new NativeQueueException("SPMD not supported on SGE at the moment.");
 		}
 
-		ResourceConstraints resourceConstraints = application
-				.getResourceConstraints();
+		ResourceConstraints resourceConstraints = application.getResourceConstraints();
 		if (resourceConstraints != null) {
-			Double totalPhyscialMemory = resourceConstraints
-					.getTotalPhysicalMemory();
-			if ((totalPhyscialMemory != null)
-					&& (!totalPhyscialMemory.equals(Double.NaN)))
+			Double totalPhyscialMemory = resourceConstraints.getTotalPhysicalMemory();
+			if ((totalPhyscialMemory != null) && (!totalPhyscialMemory.equals(Double.NaN)))
 				script.format("#$ -l mf=%d\n", totalPhyscialMemory.longValue());
 
 			Double wallclockTime = resourceConstraints.getWallclockTimeLimit();
 			if (wallclockTime != null && !wallclockTime.equals(Double.NaN))
-				script.format("#$ -l h_rt=%s\n",
-						toWallTimeFormat(wallclockTime));
+				script.format("#$ -l h_rt=%s\n", toWallTimeFormat(wallclockTime));
 		}
 	}
 
 	@Override
-	protected List<String> generateApplicationBody(PrintStream script,
-			File workingDirectory, ApplicationDescription application)
-			throws NativeQueueException, IOException {
+	protected List<String>
+		generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
+			throws NativeQueueException, IOException
+	{
 		URI variation = application.getSPMDVariation();
 		if (variation != null) {
-			throw new NativeQueueException(
-					"SPMD not supported in SGE at the moment.");
+			throw new NativeQueueException("SPMD not supported in SGE at the moment.");
 		} else
-			return super.generateApplicationBody(script, workingDirectory,
-					application);
+			return super.generateApplicationBody(script, workingDirectory, application);
 	}
 
-	static final private Pattern JOB_TOKEN_PATTERN = Pattern
-			.compile("^.*Your job ([a-zA-Z0-9.]+)\\s+.*$");
+	static final private Pattern JOB_TOKEN_PATTERN = Pattern.compile("^.*Your job ([a-zA-Z0-9.]+)\\s+.*$");
 
 	@Override
-	public JobToken submit(ApplicationDescription application)
-			throws NativeQueueException {
-		Pair<File, List<String>> submissionReturn = generateSubmitScript(
-				getWorkingDirectory(), application);
+	public JobToken submit(ApplicationDescription application) throws NativeQueueException
+	{
+		Pair<File, List<String>> submissionReturn = generateSubmitScript(getWorkingDirectory(), application);
 
 		List<String> command = new LinkedList<String>();
 
@@ -217,41 +204,34 @@ public class SGEQueueConnection extends
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(getWorkingDirectory());
 
-		Map<Pattern, List<Matcher>> matches = ParsingExecutionEngine
-				.executeAndParse(builder, JOB_TOKEN_PATTERN);
+		Map<Pattern, List<Matcher>> matches = ParsingExecutionEngine.executeAndParse(builder, JOB_TOKEN_PATTERN);
 		List<Matcher> matchers = matches.get(JOB_TOKEN_PATTERN);
 		if (matchers == null || matchers.size() < 1)
-			throw new NativeQueueException(
-					"qsub didn't result in a job ticket number being output.");
+			throw new NativeQueueException("qsub didn't result in a job ticket number being output.");
 		if (matchers.size() > 1)
-			throw new NativeQueueException(
-					"qsub resulted in multiple job ticket numbers being output.");
+			throw new NativeQueueException("qsub resulted in multiple job ticket numbers being output.");
 
-		return new SGEJobToken(matchers.get(0).group(1).trim(),
-				submissionReturn.second());
+		return new SGEJobToken(matchers.get(0).group(1).trim(), submissionReturn.second());
 	}
 
 	@Override
-	public int getExitCode(JobToken token) throws NativeQueueException {
+	public int getExitCode(JobToken token) throws NativeQueueException
+	{
 		BufferedReader reader = null;
 
 		try {
-			reader = new BufferedReader(new FileReader(new File(
-					getWorkingDirectory(), QUEUE_SCRIPT_RESULT_FILENAME)));
+			reader = new BufferedReader(new FileReader(new File(getWorkingDirectory(), QUEUE_SCRIPT_RESULT_FILENAME)));
 			String line = reader.readLine();
 			if (line == null) {
 				StreamUtils.close(reader);
-				throw new NativeQueueException(
-						"Unable to determine application exit status.");
+				throw new NativeQueueException("Unable to determine application exit status.");
 			}
 			StreamUtils.close(reader);
 			return Integer.parseInt(line.trim());
 		} catch (FileNotFoundException ioe) {
-			throw new NativeQueueException(
-					"Application doesn't appear to have exited.", ioe);
+			throw new NativeQueueException("Application doesn't appear to have exited.", ioe);
 		} catch (IOException ioe) {
-			throw new NativeQueueException(
-					"Unable to determine application exit status.", ioe);
+			throw new NativeQueueException("Unable to determine application exit status.", ioe);
 		}
 	}
 }

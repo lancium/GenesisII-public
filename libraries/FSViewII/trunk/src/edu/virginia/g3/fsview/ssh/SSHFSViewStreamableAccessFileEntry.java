@@ -10,24 +10,26 @@ import com.jcraft.jsch.SftpATTRS;
 import edu.virginia.g3.fsview.AbstractFSViewStreamableFileEntry;
 import edu.virginia.g3.fsview.FSViewDirectoryEntry;
 
-final class SSHFSViewStreamableAccessFileEntry extends
-		AbstractFSViewStreamableFileEntry<SSHFSViewSession> {
+final class SSHFSViewStreamableAccessFileEntry extends AbstractFSViewStreamableFileEntry<SSHFSViewSession>
+{
 	private SftpATTRS _attrs;
 	private String _sshPath;
 
 	@Override
-	final protected OutputStream openOutpuStreamImpl() throws IOException {
+	final protected OutputStream openOutpuStreamImpl() throws IOException
+	{
 		return typedSession().openOutputStream(_sshPath);
 	}
 
 	@Override
-	final protected boolean canWriteImpl() {
+	final protected boolean canWriteImpl()
+	{
 		return (_attrs.getPermissions() & 0222) > 0;
 	}
 
-	SSHFSViewStreamableAccessFileEntry(SSHFSViewSession session,
-			FSViewDirectoryEntry parentEntry, String entryName, String sshPath,
-			SftpATTRS attrs) {
+	SSHFSViewStreamableAccessFileEntry(SSHFSViewSession session, FSViewDirectoryEntry parentEntry, String entryName,
+		String sshPath, SftpATTRS attrs)
+	{
 		super(SSHFSViewSession.class, session, parentEntry, entryName);
 
 		_sshPath = sshPath;
@@ -35,22 +37,26 @@ final class SSHFSViewStreamableAccessFileEntry extends
 	}
 
 	@Override
-	final public InputStream openInputStream() throws IOException {
+	final public InputStream openInputStream() throws IOException
+	{
 		return typedSession().openInputStream(_sshPath);
 	}
 
 	@Override
-	final public boolean canRead() {
+	final public boolean canRead()
+	{
 		return (_attrs.getPermissions() & 0444) > 0;
 	}
 
 	@Override
-	final public Long size() {
+	final public Long size()
+	{
 		return _attrs.getSize();
 	}
 
 	@Override
-	final public Calendar lastAccessed() {
+	final public Calendar lastAccessed()
+	{
 		long last = _attrs.getATime() * 1000L;
 		Calendar ret = Calendar.getInstance();
 		ret.setTimeInMillis(last);
@@ -58,7 +64,8 @@ final class SSHFSViewStreamableAccessFileEntry extends
 	}
 
 	@Override
-	final public Calendar lastModified() {
+	final public Calendar lastModified()
+	{
 		long last = _attrs.getMTime() * 1000L;
 		Calendar ret = Calendar.getInstance();
 		ret.setTimeInMillis(last);

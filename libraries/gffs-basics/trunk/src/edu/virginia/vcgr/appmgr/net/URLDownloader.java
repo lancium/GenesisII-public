@@ -10,11 +10,13 @@ import java.net.URLConnection;
 
 import edu.virginia.vcgr.appmgr.io.IOUtils;
 
-public abstract class URLDownloader {
+public abstract class URLDownloader
+{
 	static final private int CONNECTION_TIMEOUT = 1000 * 8;
 	static final private int READ_TIMEOUT = 1000 * 8;
 
-	static public InputStream connect(URL url) throws IOException {
+	static public InputStream connect(URL url) throws IOException
+	{
 		URLConnection connection = url.openConnection();
 		connection.setConnectTimeout(CONNECTION_TIMEOUT);
 		connection.setReadTimeout(READ_TIMEOUT);
@@ -22,7 +24,8 @@ public abstract class URLDownloader {
 		return connection.getInputStream();
 	}
 
-	static public void download(URL source, File target) throws IOException {
+	static public void download(URL source, File target) throws IOException
+	{
 		InputStream in = null;
 		OutputStream out = null;
 

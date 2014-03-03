@@ -8,30 +8,34 @@ import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
-public class SimpleNamespaceContext implements NamespaceContext,
-		PrefixResolver, NamespaceResolver {
+public class SimpleNamespaceContext implements NamespaceContext, PrefixResolver, NamespaceResolver
+{
 	private NamespaceContext _parent = null;
 
 	private String _defaultNS = null;
 	private Map<String, String> _ns2pre = new HashMap<String, String>();
 	private Map<String, String> _pre2ns = new HashMap<String, String>();
 
-	public SimpleNamespaceContext(NamespaceContext parent) {
+	public SimpleNamespaceContext(NamespaceContext parent)
+	{
 		_parent = parent;
 	}
 
-	public SimpleNamespaceContext() {
+	public SimpleNamespaceContext()
+	{
 		this(null);
 	}
 
-	final public void setDefaultNS(String defaultNS) {
+	final public void setDefaultNS(String defaultNS)
+	{
 		if (defaultNS == null)
 			throw new IllegalArgumentException("defaultNS cannot be null.");
 
 		_defaultNS = defaultNS;
 	}
 
-	final public void associate(String prefix, String namespace) {
+	final public void associate(String prefix, String namespace)
+	{
 		if (prefix == null)
 			throw new IllegalArgumentException("Prefix cannot be null.");
 
@@ -44,19 +48,18 @@ public class SimpleNamespaceContext implements NamespaceContext,
 		}
 
 		if (prefix.equals(XMLConstants.XML_NS_PREFIX))
-			throw new IllegalArgumentException(
-					"Prefix cannot be the XML NS prefix.");
+			throw new IllegalArgumentException("Prefix cannot be the XML NS prefix.");
 
 		if (prefix.equals(XMLConstants.XMLNS_ATTRIBUTE))
-			throw new IllegalArgumentException(
-					"Prefix cannot be the XMLNS attribute prefix.");
+			throw new IllegalArgumentException("Prefix cannot be the XMLNS attribute prefix.");
 
 		_ns2pre.put(namespace, prefix);
 		_pre2ns.put(prefix, namespace);
 	}
 
 	@Override
-	final public String getNamespaceURI(String prefix) {
+	final public String getNamespaceURI(String prefix)
+	{
 		if (prefix == null)
 			throw new IllegalArgumentException("Prefix cannot be null.");
 
@@ -85,7 +88,8 @@ public class SimpleNamespaceContext implements NamespaceContext,
 	}
 
 	@Override
-	final public String getPrefix(String namespaceURI) {
+	final public String getPrefix(String namespaceURI)
+	{
 		if (namespaceURI == null)
 			throw new IllegalArgumentException("namespaceURI cannot be null.");
 
@@ -106,7 +110,8 @@ public class SimpleNamespaceContext implements NamespaceContext,
 	}
 
 	@Override
-	final public Iterator<String> getPrefixes(String namespaceURI) {
+	final public Iterator<String> getPrefixes(String namespaceURI)
+	{
 		if (namespaceURI == null)
 			throw new IllegalArgumentException("NamespaceURI cannot be null.");
 
@@ -135,7 +140,8 @@ public class SimpleNamespaceContext implements NamespaceContext,
 		return prefixes.iterator();
 	}
 
-	final public SimpleNamespaceContext deriveNewContext() {
+	final public SimpleNamespaceContext deriveNewContext()
+	{
 		return new SimpleNamespaceContext(this);
 	}
 }

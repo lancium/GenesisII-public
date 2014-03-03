@@ -42,62 +42,54 @@ import edu.virginia.vcgr.jsdl.JSDLConstants;
 import edu.virginia.vcgr.jsdl.JSDLUtility;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 
-public class JSDLUtils extends JNIContainerBaseClass {
+public class JSDLUtils extends JNIContainerBaseClass
+{
 	static private Log _logger = LogFactory.getLog(JSDLUtils.class);
 
-	static public CPUArchitecture_Type getLocalCPUArchitecture() {
+	static public CPUArchitecture_Type getLocalCPUArchitecture()
+	{
 		String arch = System.getProperty("os.arch");
 		if (arch != null) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Determined that the local CPU Type is \"" + arch
-						+ "\".");
+				_logger.debug("Determined that the local CPU Type is \"" + arch + "\".");
 			if (arch.equals(ProcessorArchitectureEnumeration._x86))
-				return new CPUArchitecture_Type(
-						ProcessorArchitectureEnumeration.x86, null);
+				return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.x86, null);
 			else if (arch.equals("i386"))
-				return new CPUArchitecture_Type(
-						ProcessorArchitectureEnumeration.x86, null);
+				return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.x86, null);
 			else if (arch.equals(ProcessorArchitectureEnumeration._x86_64))
-				return new CPUArchitecture_Type(
-						ProcessorArchitectureEnumeration.x86, null);
-			// this clause was added because we often are told the arch is
-			// amd64, but the
+				return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.x86, null);
+			// this clause was added because we often are told the arch is amd64, but the
 			// arch enum from the org.ggf.jsdl spec doesn't have that listed.
 			else if (arch.equals("amd64"))
-				return new CPUArchitecture_Type(
-						ProcessorArchitectureEnumeration.x86, null);
+				return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.x86, null);
 		}
 
-		return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.other,
-				null);
+		return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.other, null);
 	}
 
-	static public OperatingSystem_Type getLocalOperatingSystem() {
-		return new OperatingSystem_Type(getLocalOperatingSystemType(),
-				System.getProperty("os.version"), null, null);
+	static public OperatingSystem_Type getLocalOperatingSystem()
+	{
+		return new OperatingSystem_Type(getLocalOperatingSystemType(), System.getProperty("os.version"), null, null);
 
 	}
 
-	static public OperatingSystemType_Type getLocalOperatingSystemType() {
+	static public OperatingSystemType_Type getLocalOperatingSystemType()
+	{
 		OperatingSystemType os = OperatingSystemType.getCurrent();
 
 		if (_logger.isDebugEnabled())
-			_logger.debug("Determined that the local OS Type is \"" + os
-					+ "\".");
-		if (os.equals(OperatingSystemType.Windows_7)
-				|| os.equals(OperatingSystemType.Windows_VISTA)
-				|| os.equals(OperatingSystemType.Windows_8)) {
+			_logger.debug("Determined that the local OS Type is \"" + os + "\".");
+		if (os.equals(OperatingSystemType.Windows_7) || os.equals(OperatingSystemType.Windows_VISTA)
+			|| os.equals(OperatingSystemType.Windows_8)) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Considering " + os
-						+ " as roughly equivalent to XP.");
+				_logger.debug("Considering " + os + " as roughly equivalent to XP.");
 			os = OperatingSystemType.Windows_XP;
 		}
-		return new OperatingSystemType_Type(
-				OperatingSystemTypeEnumeration.fromString(os.name()), null);
+		return new OperatingSystemType_Type(OperatingSystemTypeEnumeration.fromString(os.name()), null);
 	}
 
-	static public boolean satisfiesRange(double value,
-			RangeValue_Type rangeValue) {
+	static public boolean satisfiesRange(double value, RangeValue_Type rangeValue)
+	{
 		Boundary_Type boundaryType;
 		Boolean bool;
 
@@ -177,8 +169,8 @@ public class JSDLUtils extends JNIContainerBaseClass {
 		return false;
 	}
 
-	static public boolean satisfiesOS(OperatingSystem_Type myOS,
-			OperatingSystem_Type targetOS) {
+	static public boolean satisfiesOS(OperatingSystem_Type myOS, OperatingSystem_Type targetOS)
+	{
 		OperatingSystemType_Type myType = myOS.getOperatingSystemType();
 		OperatingSystemType_Type targetType = targetOS.getOperatingSystemType();
 
@@ -186,8 +178,7 @@ public class JSDLUtils extends JNIContainerBaseClass {
 			if (myType == null)
 				return false;
 
-			if (!targetType.getOperatingSystemName().equals(
-					myType.getOperatingSystemName()))
+			if (!targetType.getOperatingSystemName().equals(myType.getOperatingSystemName()))
 				return false;
 
 			String myVersion = myOS.getOperatingSystemVersion();
@@ -204,20 +195,17 @@ public class JSDLUtils extends JNIContainerBaseClass {
 		return true;
 	}
 
-	static public JobDefinition convert(JobDefinition_Type axisType)
-			throws ResourceException, JAXBException {
-		Element element = ObjectSerializer.toElement(axisType, new QName(
-				JSDLConstants.JSDL_NS, "JobDefinition"));
-		return (JobDefinition) JSDLUtility.JSDLContext.createUnmarshaller()
-				.unmarshal(element);
+	static public JobDefinition convert(JobDefinition_Type axisType) throws ResourceException, JAXBException
+	{
+		Element element = ObjectSerializer.toElement(axisType, new QName(JSDLConstants.JSDL_NS, "JobDefinition"));
+		return (JobDefinition) JSDLUtility.JSDLContext.createUnmarshaller().unmarshal(element);
 	}
 
-	static public JobDefinition_Type convert(JobDefinition jaxbType)
-			throws JAXBException, IOException {
+	static public JobDefinition_Type convert(JobDefinition jaxbType) throws JAXBException, IOException
+	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		JSDLUtility.JSDLContext.createMarshaller().marshal(jaxbType, baos);
 		baos.close();
-		return ObjectDeserializer.fromBytes(JobDefinition_Type.class,
-				baos.toByteArray());
+		return ObjectDeserializer.fromBytes(JobDefinition_Type.class, baos.toByteArray());
 	}
 }

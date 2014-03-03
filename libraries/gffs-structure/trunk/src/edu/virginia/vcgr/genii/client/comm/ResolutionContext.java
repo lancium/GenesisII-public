@@ -17,7 +17,8 @@ import java.rmi.RemoteException;
 import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 
-public class ResolutionContext {
+public class ResolutionContext
+{
 	private EndpointReferenceType _origEPR;
 	private boolean _triedOriginalEPR;
 	private boolean _rebindAllowed;
@@ -25,40 +26,43 @@ public class ResolutionContext {
 	private int _knownEndpoints;
 	private int _endpointCount;
 
-	public ResolutionContext(EndpointReferenceType origEPR,
-			boolean rebindAllowed) {
+	public ResolutionContext(EndpointReferenceType origEPR, boolean rebindAllowed)
+	{
 		_origEPR = origEPR;
 		_rebindAllowed = rebindAllowed;
 		// We know about the original EPR.
 		_knownEndpoints = 1;
 	}
 
-	public EndpointReferenceType getOriginalEPR() {
+	public EndpointReferenceType getOriginalEPR()
+	{
 		return _origEPR;
 	}
 
-	public boolean rebindAllowed() {
+	public boolean rebindAllowed()
+	{
 		return _rebindAllowed;
 	}
 
-	public boolean triedOriginalEPR() {
+	public boolean triedOriginalEPR()
+	{
 		return _triedOriginalEPR;
 	}
 
-	public void setTriedOriginalEPR() {
+	public void setTriedOriginalEPR()
+	{
 		_triedOriginalEPR = true;
 	}
 
-	public EndpointReferenceType resolve() throws RemoteException {
-		// If this is the first call to resolve(), then resolve the original
-		// EPR.
+	public EndpointReferenceType resolve() throws RemoteException
+	{
+		// If this is the first call to resolve(), then resolve the original EPR.
 		if (_resolvedEPR == null) {
 			_resolvedEPR = ResolverUtils.resolve(_origEPR);
 			_knownEndpoints++;
 			return _resolvedEPR;
 		}
-		// The client has already tried origEPR and resolvedEPR, and neither
-		// worked.
+		// The client has already tried origEPR and resolvedEPR, and neither worked.
 		// Are there more endpoints to resolve?
 		if (_endpointCount == 0) {
 			_endpointCount = ResolverUtils.getEndpointCount(_origEPR);

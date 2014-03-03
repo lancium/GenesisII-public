@@ -7,32 +7,37 @@ import javax.swing.Icon;
 import edu.virginia.vcgr.genii.gjt.gui.GuiConstants;
 
 public enum ShapeIcons {
-	Plus(Shapes.Plus.shape()), Minus(Shapes.Minus.shape()), UpArrow(
-			Shapes.UpArrow.shape()), RightArrow(Shapes.RightArrow.shape()), DownArrow(
-			Shapes.DownArrow.shape()), LeftArrow(Shapes.LeftArrow.shape());
+	Plus(Shapes.Plus.shape()),
+	Minus(Shapes.Minus.shape()),
+	UpArrow(Shapes.UpArrow.shape()),
+	RightArrow(Shapes.RightArrow.shape()),
+	DownArrow(Shapes.DownArrow.shape()),
+	LeftArrow(Shapes.LeftArrow.shape());
 
 	private Icon _normalIcon;
 	private Icon _rolloverIcon;
 	private Icon _disabledIcon;
 
-	private ShapeIcons(Shape shape) {
-		_normalIcon = new ShapeIcon(shape,
-				GuiConstants.SIMPLE_ICON_BUTTON_COLOR, 0);
-		_rolloverIcon = new ShapeIcon(shape,
-				GuiConstants.SIMPLE_ICON_BUTTON_HIGHLIGHT_COLOR, 0);
+	private ShapeIcons(Shape shape)
+	{
+		_normalIcon = new ShapeIcon(shape, GuiConstants.SIMPLE_ICON_BUTTON_COLOR, 0);
+		_rolloverIcon = new ShapeIcon(shape, GuiConstants.SIMPLE_ICON_BUTTON_HIGHLIGHT_COLOR, 0);
 		_disabledIcon = Icons.createGrayedIcon(_normalIcon);
 
 	}
 
-	public Icon normalIcon() {
+	public Icon normalIcon()
+	{
 		return _normalIcon;
 	}
 
-	public Icon rolloverIcon() {
+	public Icon rolloverIcon()
+	{
 		return _rolloverIcon;
 	}
 
-	public Icon disabledIcon() {
+	public Icon disabledIcon()
+	{
 		return _disabledIcon;
 	}
 }

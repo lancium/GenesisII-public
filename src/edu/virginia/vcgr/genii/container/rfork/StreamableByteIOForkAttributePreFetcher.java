@@ -5,34 +5,38 @@ import java.util.Calendar;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.byteio.StreamableByteIOAttributePreFetcher;
 
-public class StreamableByteIOForkAttributePreFetcher extends
-		StreamableByteIOAttributePreFetcher<IResource> {
+public class StreamableByteIOForkAttributePreFetcher extends StreamableByteIOAttributePreFetcher<IResource>
+{
 	private StreamableByteIOResourceFork _fork;
 
-	public StreamableByteIOForkAttributePreFetcher(IResource resource,
-			StreamableByteIOResourceFork fork) {
+	public StreamableByteIOForkAttributePreFetcher(IResource resource, StreamableByteIOResourceFork fork)
+	{
 		super(resource);
 
 		_fork = fork;
 	}
 
 	@Override
-	protected Calendar getAccessTime() throws Throwable {
+	protected Calendar getAccessTime() throws Throwable
+	{
 		return _fork.accessTime();
 	}
 
 	@Override
-	protected Calendar getCreateTime() throws Throwable {
+	protected Calendar getCreateTime() throws Throwable
+	{
 		return _fork.createTime();
 	}
 
 	@Override
-	protected Calendar getModificationTime() throws Throwable {
+	protected Calendar getModificationTime() throws Throwable
+	{
 		return _fork.modificationTime();
 	}
 
 	@Override
-	protected Long getSize() throws Throwable {
+	protected Long getSize() throws Throwable
+	{
 		return _fork.size();
 	}
 }

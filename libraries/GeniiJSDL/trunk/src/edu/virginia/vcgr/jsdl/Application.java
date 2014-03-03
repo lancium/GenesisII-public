@@ -32,9 +32,9 @@ import edu.virginia.vcgr.jsdl.spmd.SPMDConstants;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_applicationName", "_applicationVersion",
-		"_description", "_application" })
-public class Application extends CommonJSDLElement implements Serializable {
+@XmlType(propOrder = { "_applicationName", "_applicationVersion", "_description", "_application" })
+public class Application extends CommonJSDLElement implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "ApplicationName")
@@ -47,54 +47,68 @@ public class Application extends CommonJSDLElement implements Serializable {
 	private String _description;
 
 	@XmlElements({
-			@XmlElement(namespace = JSDLConstants.JSDL_POSIX_NS, name = "POSIXApplication", required = false, nillable = false, type = POSIXApplication.class),
-			@XmlElement(namespace = HPCConstants.HPCPA_NS, name = "HPCProfileApplication", required = false, nillable = false, type = HPCProfileApplication.class),
-			@XmlElement(namespace = SPMDConstants.JSDL_SPMD_NS, name = "SPMDApplication", required = false, nillable = false, type = SPMDApplication.class) })
+		@XmlElement(namespace = JSDLConstants.JSDL_POSIX_NS, name = "POSIXApplication", required = false, nillable = false,
+			type = POSIXApplication.class),
+		@XmlElement(namespace = HPCConstants.HPCPA_NS, name = "HPCProfileApplication", required = false, nillable = false,
+			type = HPCProfileApplication.class),
+		@XmlElement(namespace = SPMDConstants.JSDL_SPMD_NS, name = "SPMDApplication", required = false, nillable = false,
+			type = SPMDApplication.class) })
 	private ApplicationBase _application;
 
-	public Application(ApplicationBase application, String name, String version) {
+	public Application(ApplicationBase application, String name, String version)
+	{
 		_application = application;
 		_applicationName = name;
 		_applicationVersion = version;
 	}
 
-	public Application(ApplicationBase application) {
+	public Application(ApplicationBase application)
+	{
 		this(application, null, null);
 	}
 
-	public Application() {
+	public Application()
+	{
 		this(null);
 	}
 
-	final public void application(ApplicationBase application) {
+	final public void application(ApplicationBase application)
+	{
 		_application = application;
 	}
 
-	final public ApplicationBase application() {
+	final public ApplicationBase application()
+	{
 		return _application;
 	}
 
-	final public void applicationName(String name) {
+	final public void applicationName(String name)
+	{
 		_applicationName = name;
 	}
 
-	final public String applicationName() {
+	final public String applicationName()
+	{
 		return _applicationName;
 	}
 
-	final public void applicationVersion(String version) {
+	final public void applicationVersion(String version)
+	{
 		_applicationVersion = version;
 	}
 
-	final public String applicationVersion() {
+	final public String applicationVersion()
+	{
 		return _applicationVersion;
 	}
 
-	final public void description(String description) {
+	final public void description(String description)
+	{
 		_description = description;
 	}
 
-	final public String description() {
+	final public String description()
+	{
 		return _description;
 	}
 }

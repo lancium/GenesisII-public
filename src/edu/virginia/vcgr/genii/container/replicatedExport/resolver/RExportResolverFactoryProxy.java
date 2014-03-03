@@ -30,20 +30,17 @@ import edu.virginia.vcgr.genii.replicatedExport.resolver.InvalidWSNameFaultType;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverFactoryPortType;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 
-public class RExportResolverFactoryProxy implements IResolverFactoryProxy {
+public class RExportResolverFactoryProxy implements IResolverFactoryProxy
+{
 	@Override
-	public EndpointReferenceType createResolver(
-			EndpointReferenceType targetEPR, Properties params,
-			MessageElement[] creationProps) throws RemoteException,
-			ResourceException, InvalidWSNameFaultType {
-		RExportResolverFactoryPortType resolverFactoryService = ClientUtils
-				.createProxy(
-						RExportResolverFactoryPortType.class,
-						EPRUtils.makeEPR(Container
-								.getServiceURL("RExportResolverFactoryPortType")));
-		CreateResolverResponseType resp = resolverFactoryService
-				.createResolver(new CreateResolverRequestType(targetEPR,
-						creationProps));
+	public EndpointReferenceType createResolver(EndpointReferenceType targetEPR, Properties params,
+		MessageElement[] creationProps) throws RemoteException, ResourceException, InvalidWSNameFaultType
+	{
+		RExportResolverFactoryPortType resolverFactoryService =
+			ClientUtils.createProxy(RExportResolverFactoryPortType.class,
+				EPRUtils.makeEPR(Container.getServiceURL("RExportResolverFactoryPortType")));
+		CreateResolverResponseType resp =
+			resolverFactoryService.createResolver(new CreateResolverRequestType(targetEPR, creationProps));
 		if (resp == null)
 			return null;
 		return resp.getResolution_EPR();

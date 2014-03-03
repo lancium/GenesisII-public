@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.machine;
 
-public interface MachineInterrogator {
+public interface MachineInterrogator
+{
 	public boolean canDetermineUserLoggedIn();
 
 	public boolean isUserLoggedIn();

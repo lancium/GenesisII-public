@@ -1,9 +1,11 @@
 package org.morgan.inject;
 
-public class LazyInjectionResolver implements MInjectResolver {
+public class LazyInjectionResolver implements MInjectResolver
+{
 	private LazyInjectionResolverHandler _handler;
 
-	public LazyInjectionResolver(LazyInjectionResolverHandler handler) {
+	public LazyInjectionResolver(LazyInjectionResolverHandler handler)
+	{
 		if (handler == null)
 			throw new IllegalArgumentException("Handler cannot be null.");
 
@@ -11,15 +13,14 @@ public class LazyInjectionResolver implements MInjectResolver {
 	}
 
 	@Override
-	final public boolean handles(MInject injectionInformation,
-			Class<?> injectionTarget) {
-		return (injectionInformation.name().isEmpty() && injectionTarget
-				.isAssignableFrom(_handler.valueType()));
+	final public boolean handles(MInject injectionInformation, Class<?> injectionTarget)
+	{
+		return (injectionInformation.name().isEmpty() && injectionTarget.isAssignableFrom(_handler.valueType()));
 	}
 
 	@Override
-	final public <Type> Type resolve(MInject injectionInformation,
-			Class<Type> injectionTarget) throws InjectionException {
+	final public <Type> Type resolve(MInject injectionInformation, Class<Type> injectionTarget) throws InjectionException
+	{
 		return injectionTarget.cast(_handler.value());
 	}
 }

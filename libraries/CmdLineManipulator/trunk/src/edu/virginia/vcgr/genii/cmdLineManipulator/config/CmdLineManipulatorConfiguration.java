@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.HashSet;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public class CmdLineManipulatorConfiguration implements Serializable,
-		CmdLineManipulatorConstants {
+public class CmdLineManipulatorConfiguration implements Serializable, CmdLineManipulatorConstants
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = NAMESPACE, name = "manipulator-variation", required = true, nillable = false)
@@ -23,19 +23,23 @@ public class CmdLineManipulatorConfiguration implements Serializable,
 	@XmlElement(namespace = NAMESPACE, name = "call-chain", required = true, nillable = false)
 	private CallChainConfiguration _callChain = new CallChainConfiguration();
 
-	final public Set<VariationConfiguration> variationSet() {
+	final public Set<VariationConfiguration> variationSet()
+	{
 		return _variationSet;
 	}
 
-	final public void variationSet(Set<VariationConfiguration> newVarSet) {
+	final public void variationSet(Set<VariationConfiguration> newVarSet)
+	{
 		_variationSet = newVarSet;
 	}
 
-	final public List<String> callChain() {
+	final public List<String> callChain()
+	{
 		return _callChain.getCallChain();
 	}
 
-	final public void callChain(List<String> newChain) {
+	final public void callChain(List<String> newChain)
+	{
 		_callChain.setCallChain(newChain);
 	}
 }

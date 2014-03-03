@@ -14,13 +14,15 @@ import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemMap;
 import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemType;
 import edu.virginia.vcgr.genii.gjt.gui.icons.Icons;
 
-class StaticFilesystemAction extends AbstractAction {
+class StaticFilesystemAction extends AbstractAction
+{
 	static final long serialVersionUID = 0L;
 
 	private FilesystemMap _filesystemMap;
 	private FilesystemType _filesystemType;
 
-	private void configureButtonState() {
+	private void configureButtonState()
+	{
 		String name;
 		Icon icon;
 
@@ -38,8 +40,8 @@ class StaticFilesystemAction extends AbstractAction {
 		setEnabled(_filesystemType != FilesystemType.Default);
 	}
 
-	StaticFilesystemAction(FilesystemMap filesystemMap,
-			FilesystemType filesystemType) {
+	StaticFilesystemAction(FilesystemMap filesystemMap, FilesystemType filesystemType)
+	{
 		_filesystemMap = filesystemMap;
 		_filesystemType = filesystemType;
 
@@ -48,16 +50,16 @@ class StaticFilesystemAction extends AbstractAction {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		_filesystemMap.get(
-				SwingUtilities.getWindowAncestor((Component) e.getSource()),
-				_filesystemType);
+	public void actionPerformed(ActionEvent e)
+	{
+		_filesystemMap.get(SwingUtilities.getWindowAncestor((Component) e.getSource()), _filesystemType);
 	}
 
-	private class FilesystemListenerImpl implements FilesystemListener {
+	private class FilesystemListenerImpl implements FilesystemListener
+	{
 		@Override
-		public void filesystemDefined(FilesystemMap filesystemMap,
-				Filesystem newFilesystem) {
+		public void filesystemDefined(FilesystemMap filesystemMap, Filesystem newFilesystem)
+		{
 			if (newFilesystem.filesystemType() == _filesystemType)
 				configureButtonState();
 		}

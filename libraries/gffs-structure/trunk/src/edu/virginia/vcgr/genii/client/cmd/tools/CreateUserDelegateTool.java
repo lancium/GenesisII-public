@@ -26,12 +26,13 @@ import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 
 /**
- * This is almost the same tool as the create-user tool, except that it creates
- * a new IDP instance by delegating an existing credential to it.
+ * This is almost the same tool as the create-user tool, except that it creates a new IDP instance
+ * by delegating an existing credential to it.
  * 
  * @author mmm2a
  */
-public class CreateUserDelegateTool extends CreateUserTool {
+public class CreateUserDelegateTool extends CreateUserTool
+{
 	static final private String _DESCRIPTION = "config/tooldocs/description/dcreate-user-delegate";
 	static final private String _USAGE = "config/tooldocs/usage/ucreate-user-delegate";
 	static final private String _MANPAGE = "config/tooldocs/man/create-user-delegate";
@@ -41,9 +42,9 @@ public class CreateUserDelegateTool extends CreateUserTool {
 	/**
 	 * Construct a new create-user-delegate tool.
 	 */
-	public CreateUserDelegateTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false);
+	public CreateUserDelegateTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
@@ -54,20 +55,21 @@ public class CreateUserDelegateTool extends CreateUserTool {
 	 *            The new store type (one of WIN, JKS, PKCS12).
 	 */
 	@Option({ "storetype" })
-	public void setStoretype(String storeType) {
+	public void setStoretype(String storeType)
+	{
 		_storeType = storeType;
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		int numArgs = numArguments();
 		if (numArgs > 3)
 			throw new InvalidToolUsageException("Too many arguments.");
 
 		if (_storeType != null) {
-			if (!_storeType.equalsIgnoreCase("WIN")
-					&& !_storeType.equalsIgnoreCase("JKS")
-					&& !_storeType.equalsIgnoreCase("PKCS12"))
+			if (!_storeType.equalsIgnoreCase("WIN") && !_storeType.equalsIgnoreCase("JKS")
+				&& !_storeType.equalsIgnoreCase("PKCS12"))
 				throw new InvalidToolUsageException();
 
 		}
@@ -82,9 +84,9 @@ public class CreateUserDelegateTool extends CreateUserTool {
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
-		DialogProvider provider = DialogFactory.getProvider(stdout, stderr,
-				stdin, useGui());
+	protected int runCommand() throws Throwable
+	{
+		DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 		LinkedList<String> args = new LinkedList<String>(getArguments());
 
 		String sourceURI = null;
@@ -122,11 +124,10 @@ public class CreateUserDelegateTool extends CreateUserTool {
 			if (idpServiceRNS == null)
 				return 0;
 		} else {
-			NamespaceDefinitions nsd = Installation.getDeployment(
-					new DeploymentName()).namespace();
-			idpServiceRNS = RNSUtilities.findService(nsd.getRootContainer(),
-					"X509AuthnPortType", new PortType[] { WellKnownPortTypes
-							.X509_AUTHN_SERVICE_PORT_TYPE() }, idpServicePath);
+			NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
+			idpServiceRNS =
+				RNSUtilities.findService(nsd.getRootContainer(), "X509AuthnPortType",
+					new PortType[] { WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE() }, idpServicePath);
 		}
 
 		if (idpName == null) {
@@ -167,8 +168,8 @@ public class CreateUserDelegateTool extends CreateUserTool {
 	 * 
 	 * @throws DialogException
 	 */
-	private String getStoreTypeFromUser(DialogProvider wp)
-			throws DialogException, UserCancelException {
+	private String getStoreTypeFromUser(DialogProvider wp) throws DialogException, UserCancelException
+	{
 		ComboBoxDialog menu;
 
 		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
@@ -178,16 +179,12 @@ public class CreateUserDelegateTool extends CreateUserTool {
 		MenuItem win = new SimpleMenuItem("W", "WIN");
 
 		if (isWindows)
-			menu = wp.createComboBoxDialog("Store Type Selection",
-					"Source keystore format?", pkcs12, pkcs12, jks, win);
+			menu = wp.createComboBoxDialog("Store Type Selection", "Source keystore format?", pkcs12, pkcs12, jks, win);
 		else
-			menu = wp.createComboBoxDialog("Store Type Selection",
-					"Source keystore format?", pkcs12, pkcs12, jks);
+			menu = wp.createComboBoxDialog("Store Type Selection", "Source keystore format?", pkcs12, pkcs12, jks);
 
-		menu.setHelp(new TextContent(
-				"The source keystore format is the format of the keystore from",
-				"which to retrieve the certificate that will be delegate to",
-				"the new IDP instance."));
+		menu.setHelp(new TextContent("The source keystore format is the format of the keystore from",
+			"which to retrieve the certificate that will be delegate to", "the new IDP instance."));
 
 		menu.showDialog();
 		String answer = menu.getSelectedItem().toString();
@@ -204,15 +201,12 @@ public class CreateUserDelegateTool extends CreateUserTool {
 	 * 
 	 * @throws DialogException
 	 */
-	private String getSourceURIFromUser(DialogProvider wp)
-			throws DialogException, UserCancelException {
-		InputDialog input = wp.createInputDialog("Source URI",
-				"Source keystore URI?");
-		input.setHelp(new TextContent(
-				"The Source URI is the path to the source keystore from which",
-				"a certificate will be delegated."));
-		input.setInputValidator(new NonEmptyValidator(
-				"You must enter a source URI!"));
+	private String getSourceURIFromUser(DialogProvider wp) throws DialogException, UserCancelException
+	{
+		InputDialog input = wp.createInputDialog("Source URI", "Source keystore URI?");
+		input.setHelp(new TextContent("The Source URI is the path to the source keystore from which",
+			"a certificate will be delegated."));
+		input.setInputValidator(new NonEmptyValidator("You must enter a source URI!"));
 
 		while (true) {
 			input.showDialog();

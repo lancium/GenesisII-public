@@ -3,7 +3,8 @@ package edu.virginia.vcgr.genii.container.replicatedExport;
 import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
-class RExportEntry {
+class RExportEntry
+{
 	private String _dirId;
 	private String _name;
 	private EndpointReferenceType _entryReference;
@@ -14,9 +15,9 @@ class RExportEntry {
 	static public String _FILE_TYPE = "F";
 	static public String _DIR_TYPE = "D";
 
-	RExportEntry(String dirId, String name,
-			EndpointReferenceType entryReference, String id, String type,
-			MessageElement[] attributes) {
+	RExportEntry(String dirId, String name, EndpointReferenceType entryReference, String id, String type,
+		MessageElement[] attributes)
+	{
 		_dirId = dirId;
 		_name = name;
 		_entryReference = entryReference;
@@ -26,41 +27,50 @@ class RExportEntry {
 
 	}
 
-	public String getDirId() {
+	public String getDirId()
+	{
 		return _dirId;
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		return _name;
 	}
 
-	public EndpointReferenceType getEntryReference() {
+	public EndpointReferenceType getEntryReference()
+	{
 		return _entryReference;
 	}
 
-	public String getId() {
+	public String getId()
+	{
 		return _id;
 	}
 
-	public String getType() {
+	public String getType()
+	{
 		return _type;
 	}
 
-	public MessageElement[] getAttributes() {
+	public MessageElement[] getAttributes()
+	{
 		return _attributes;
 	}
 
-	public void setAttributes(MessageElement[] attributes) {
+	public void setAttributes(MessageElement[] attributes)
+	{
 		_attributes = attributes;
 	}
 
-	public boolean isDirectory() {
+	public boolean isDirectory()
+	{
 		if (_type != null && _type.equals(_DIR_TYPE))
 			return true;
 		return false;
 	}
 
-	public boolean isFile() {
+	public boolean isFile()
+	{
 		if (_type != null && _type.equals(_FILE_TYPE))
 			return true;
 		return false;

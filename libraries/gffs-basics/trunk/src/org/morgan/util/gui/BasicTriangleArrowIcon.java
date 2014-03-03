@@ -27,17 +27,18 @@ import javax.swing.JDialog;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public final class BasicTriangleArrowIcon implements Icon {
+public final class BasicTriangleArrowIcon implements Icon
+{
 	private int _dimension;
 	private Polygon _triangle;
 
-	public BasicTriangleArrowIcon(ArrowDirection direction, int sideLength) {
+	public BasicTriangleArrowIcon(ArrowDirection direction, int sideLength)
+	{
 		if (sideLength < 1)
 			throw new IllegalArgumentException("Side length must be positive.");
 
 		int halfLength = sideLength / 2;
-		int weirdDimension = (int) Math.sqrt(sideLength * sideLength
-				- halfLength * halfLength);
+		int weirdDimension = (int) Math.sqrt(sideLength * sideLength - halfLength * halfLength);
 		_dimension = sideLength;
 
 		_triangle = new Polygon();
@@ -61,7 +62,8 @@ public final class BasicTriangleArrowIcon implements Icon {
 		}
 	}
 
-	public void paintIcon(Component target, Graphics g, int x, int y) {
+	public void paintIcon(Component target, Graphics g, int x, int y)
+	{
 		g.setColor(target.getForeground());
 
 		g.translate(x, y);
@@ -69,15 +71,18 @@ public final class BasicTriangleArrowIcon implements Icon {
 		g.translate(-1 * x, -1 * y);
 	}
 
-	public int getIconWidth() {
+	public int getIconWidth()
+	{
 		return _dimension;
 	}
 
-	public int getIconHeight() {
+	public int getIconHeight()
+	{
 		return _dimension;
 	}
 
-	static public void main(String[] args) throws Exception {
+	static public void main(String[] args) throws Exception
+	{
 		JDialog dialog = new JDialog();
 		dialog.getContentPane().setLayout(new GridBagLayout());
 
@@ -85,29 +90,21 @@ public final class BasicTriangleArrowIcon implements Icon {
 		for (int line = 0; line < 4; line++) {
 			width = (int) (width * 1.8);
 			dialog.getContentPane().add(
-					new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT,
-							width)),
-					new GridBagConstraints(0, line, 1, 1, 1.0, 1.0,
-							GridBagConstraints.CENTER, GridBagConstraints.NONE,
-							new Insets(5, 5, 5, 5), 5, 5));
+				new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)),
+				new GridBagConstraints(0, line, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+					5, 5, 5, 5), 5, 5));
 			dialog.getContentPane().add(
-					new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT,
-							width)),
-					new GridBagConstraints(1, line, 1, 1, 1.0, 1.0,
-							GridBagConstraints.CENTER, GridBagConstraints.NONE,
-							new Insets(5, 5, 5, 5), 5, 5));
+				new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)),
+				new GridBagConstraints(1, line, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+					5, 5, 5, 5), 5, 5));
 			dialog.getContentPane().add(
-					new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT,
-							width)),
-					new GridBagConstraints(2, line, 1, 1, 1.0, 1.0,
-							GridBagConstraints.CENTER, GridBagConstraints.NONE,
-							new Insets(5, 5, 5, 5), 5, 5));
+				new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)),
+				new GridBagConstraints(2, line, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+					5, 5, 5, 5), 5, 5));
 			dialog.getContentPane().add(
-					new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT,
-							width)),
-					new GridBagConstraints(3, line, 1, 1, 1.0, 1.0,
-							GridBagConstraints.CENTER, GridBagConstraints.NONE,
-							new Insets(5, 5, 5, 5), 5, 5));
+				new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)),
+				new GridBagConstraints(3, line, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+					5, 5, 5, 5), 5, 5));
 		}
 
 		dialog.pack();

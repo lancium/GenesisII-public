@@ -7,38 +7,43 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.ui.EndpointType;
 
-final public class EndpointDescription {
+final public class EndpointDescription
+{
 	private TypeInformation _typeInformation;
 	private EndpointType _endpointType;
 	private boolean _isLocal;
 
-	public EndpointDescription(RNSPath path)
-			throws RNSPathDoesNotExistException {
+	public EndpointDescription(RNSPath path) throws RNSPathDoesNotExistException
+	{
 		this(path.getEndpoint());
 	}
 
-	public EndpointDescription(EndpointReferenceType epr) {
+	public EndpointDescription(EndpointReferenceType epr)
+	{
 		_typeInformation = new TypeInformation(epr);
 		_endpointType = EndpointType.determineType(_typeInformation);
 		_isLocal = EndpointType.isLocal(epr);
 	}
 
-	public EndpointDescription(TypeInformation typeInformation,
-			EndpointType endpointType, boolean isLocal) {
+	public EndpointDescription(TypeInformation typeInformation, EndpointType endpointType, boolean isLocal)
+	{
 		_typeInformation = typeInformation;
 		_endpointType = endpointType;
 		_isLocal = isLocal;
 	}
 
-	final public TypeInformation typeInformation() {
+	final public TypeInformation typeInformation()
+	{
 		return _typeInformation;
 	}
 
-	final public EndpointType endpointType() {
+	final public EndpointType endpointType()
+	{
 		return _endpointType;
 	}
 
-	final public boolean isLocal() {
+	final public boolean isLocal()
+	{
 		return _isLocal;
 	}
 }

@@ -25,40 +25,38 @@ import edu.virginia.vcgr.genii.client.rns.RNSIterable;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 
-public class QueueManager extends BaseGridTool {
+public class QueueManager extends BaseGridTool
+{
 	static private final String _DESCRIPTION = "config/tooldocs/description/dqmgr";
 	static private final String _USAGE = "config/tooldocs/usage/uqmgr";
 	static final private String _MANPAGE = "config/tooldocs/man/qmgr";
 
-	public QueueManager() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				true, ToolCategory.MISC);
+	public QueueManager()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), true, ToolCategory.MISC);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		stderr.println("This tool has been deprecated.  To access the queue manager GUI, please use the client-ui tool.");
 
 		if (stderr != null)
 			return 0;
 
 		GeniiPath path = new GeniiPath(getArgument(0));
-		EndpointReferenceType epr = RNSPath.getCurrent().lookup(path.path())
-				.getEndpoint();
+		EndpointReferenceType epr = RNSPath.getCurrent().lookup(path.path()).getEndpoint();
 		epr = ResourceForkUtils.stripResourceForkInformation(epr);
 
 		RNSPath tmp = new RNSPath(epr);
 		RNSPath resources = tmp.lookup("resources");
 
-		JAXBContext context = JAXBContext
-				.newInstance(CurrentResourceInformation.class);
+		JAXBContext context = JAXBContext.newInstance(CurrentResourceInformation.class);
 		Unmarshaller u = context.createUnmarshaller();
 
-		EnhancedRNSPortType rns = ClientUtils.createProxy(
-				EnhancedRNSPortType.class, resources.getEndpoint());
-		RNSIterable iterable = new RNSIterable(rns.lookup(null), null,
-				RNSConstants.PREFERRED_BATCH_SIZE);
+		EnhancedRNSPortType rns = ClientUtils.createProxy(EnhancedRNSPortType.class, resources.getEndpoint());
+		RNSIterable iterable = new RNSIterable(rns.lookup(null), null, RNSConstants.PREFERRED_BATCH_SIZE);
 		for (RNSEntryResponseType entry : iterable) {
 			RNSMetadataType mdt = entry.getMetadata();
 			MessageElement[] any = (mdt == null) ? null : mdt.get_any();
@@ -66,8 +64,7 @@ public class QueueManager extends BaseGridTool {
 				for (MessageElement e : any) {
 					QName name = e.getQName();
 					if (name.equals(QueueConstants.CURRENT_RESOURCE_INFORMATION_QNAME)) {
-						CurrentResourceInformation cri = u.unmarshal(e,
-								CurrentResourceInformation.class).getValue();
+						CurrentResourceInformation cri = u.unmarshal(e, CurrentResourceInformation.class).getValue();
 						stdout.format("%s:  %s\n", entry.getEntryName(), cri);
 						break;
 					}
@@ -82,9 +79,9 @@ public class QueueManager extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() != 1)
-			throw new InvalidToolUsageException(
-					"Command must contain the path to a grid queue.");
+			throw new InvalidToolUsageException("Command must contain the path to a grid queue.");
 	}
 }

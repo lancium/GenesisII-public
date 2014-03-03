@@ -7,26 +7,30 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 
-public class ExecutionManagerService extends AbstractContainerService {
-	static private Log _logger = LogFactory
-			.getLog(ExecutionManagerService.class);
+public class ExecutionManagerService extends AbstractContainerService
+{
+	static private Log _logger = LogFactory.getLog(ExecutionManagerService.class);
 
 	static final public String SERVICE_NAME = "Execution Manager Service";
 
-	public ExecutionManagerService() {
+	public ExecutionManagerService()
+	{
 		super(SERVICE_NAME);
 	}
 
 	@Override
-	protected void loadService() throws Throwable {
+	protected void loadService() throws Throwable
+	{
 		_logger.info("Execution Manager Service being loaded.");
 	}
 
 	@Override
-	protected void startService() throws Throwable {
+	protected void startService() throws Throwable
+	{
 		_logger.info("Execution Manager Service being started.");
 	}
 
-	public void launch(ICallingContext callingContext, JobRequest request) {
+	public void launch(ICallingContext callingContext, JobRequest request)
+	{
 	}
 }

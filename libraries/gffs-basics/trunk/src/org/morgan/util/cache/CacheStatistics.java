@@ -1,19 +1,23 @@
 package org.morgan.util.cache;
 
-public class CacheStatistics {
+public class CacheStatistics
+{
 	private long _misses;
 	private long _hits;
 
-	public CacheStatistics(long misses, long hits) {
+	public CacheStatistics(long misses, long hits)
+	{
 		_misses = misses;
 		_hits = hits;
 	}
 
-	public long getCacheMisses() {
+	public long getCacheMisses()
+	{
 		return _misses;
 	}
 
-	public long getCacheHits() {
+	public long getCacheHits()
+	{
 		return _hits;
 	}
 }

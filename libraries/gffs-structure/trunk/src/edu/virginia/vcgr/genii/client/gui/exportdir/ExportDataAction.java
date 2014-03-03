@@ -19,7 +19,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 
-class ExportDataAction extends AbstractAction {
+class ExportDataAction extends AbstractAction
+{
 	static final long serialVersionUID = 0L;
 
 	static final private String _EXPORT_DATA_BUTTON = "Export Data";
@@ -29,8 +30,8 @@ class ExportDataAction extends AbstractAction {
 	private String _TargetPath;
 	private Collection<IExportChangeListener> _listeners = new ArrayList<IExportChangeListener>();
 
-	public ExportDataAction(ExportDirDialog owner, String ContainerPath,
-			String TargetPath) {
+	public ExportDataAction(ExportDirDialog owner, String ContainerPath, String TargetPath)
+	{
 		super(_EXPORT_DATA_BUTTON);
 
 		_owner = owner;
@@ -38,36 +39,38 @@ class ExportDataAction extends AbstractAction {
 		_TargetPath = TargetPath;
 	}
 
-	public void addExportChangeListener(IExportChangeListener listener) {
+	public void addExportChangeListener(IExportChangeListener listener)
+	{
 		_listeners.add(listener);
 	}
 
-	public void removeExportChangeListener(IExportChangeListener listener) {
+	public void removeExportChangeListener(IExportChangeListener listener)
+	{
 		_listeners.remove(listener);
 	}
 
-	protected void fireExportChanged() {
+	protected void fireExportChanged()
+	{
 		for (IExportChangeListener listener : _listeners) {
 			listener.exportsUpdated();
 		}
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e)
+	{
 		ExportCreationDialog creation = null;
 		while (true) {
 			try {
 				if (creation == null) {
-					creation = new ExportCreationDialog(_owner, _ContainerPath,
-							_TargetPath);
+					creation = new ExportCreationDialog(_owner, _ContainerPath, _TargetPath);
 					creation.setModalityType(ModalityType.APPLICATION_MODAL);
 					creation.pack();
 					GuiUtils.centerComponent(creation);
 				}
 
 				creation.setVisible(true);
-				ExportCreationInformation creationInfo = creation
-						.getExportCreationInformation();
+				ExportCreationInformation creationInfo = creation.getExportCreationInformation();
 				if (creationInfo != null) {
 					createExport(creationInfo);
 				}
@@ -78,25 +81,20 @@ class ExportDataAction extends AbstractAction {
 		}
 	}
 
-	private void createExport(ExportCreationInformation creationInfo)
-			throws FileLockException, IOException, ExportException,
-			RNSException, CreationException, ResourceCreationFaultType,
-			RemoteException, InvalidToolUsageException {
+	private void createExport(ExportCreationInformation creationInfo) throws FileLockException, IOException, ExportException,
+		RNSException, CreationException, ResourceCreationFaultType, RemoteException, InvalidToolUsageException
+	{
 		String rnsPath = creationInfo.getRNSPath();
 		RNSPath rPath;
 		try {
-			rPath = ExportManipulator.createExport(
-					creationInfo.getContainerPath(),
-					creationInfo.getLocalPath(), rnsPath,
+			rPath =
+				ExportManipulator.createExport(creationInfo.getContainerPath(), creationInfo.getLocalPath(), rnsPath,
 					creationInfo.isLightWeight());
 		} catch (Exception cause) {
-			throw new ExportException(
-					"exception occurred; failed to create export", cause);
+			throw new ExportException("exception occurred; failed to create export", cause);
 		}
-		ExportDirState.addExport(
-				creationInfo.getContainerPath(),
-				new ExportDirInformation(rPath, new File(creationInfo
-						.getLocalPath())));
+		ExportDirState.addExport(creationInfo.getContainerPath(),
+			new ExportDirInformation(rPath, new File(creationInfo.getLocalPath())));
 		fireExportChanged();
 	}
 }

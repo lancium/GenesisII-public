@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.xscript;
 
-public interface XScriptConstants {
+public interface XScriptConstants
+{
 	static public final String XSCRIPT_NS = "http://vcgr.cs.virginia.edu/genii/xsh/script";
 
 	static public final String ENGINE_NAME = "XScript";

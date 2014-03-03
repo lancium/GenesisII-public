@@ -8,7 +8,8 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.common.security.AclEntryListType;
 
 @XmlRootElement(namespace = AclChangeContents.GENII_ACL_NAMESPACE, name = "AclContentsChangedContents")
-public class AclChangeContents extends NotificationMessageContents {
+public class AclChangeContents extends NotificationMessageContents
+{
 	static final long serialVersionUID = 0L;
 
 	static public final String GENII_ACL_NAMESPACE = "http://vcgr.cs.virginia.edu/genii/saml-acl";
@@ -17,8 +18,7 @@ public class AclChangeContents extends NotificationMessageContents {
 	private AclEntryListType _aclEntryList;
 
 	/**
-	 * aclEntryList[i] was given mode tagList[i], where the mode is "+" or "-"
-	 * on "r", "w", or "x".
+	 * aclEntryList[i] was given mode tagList[i], where the mode is "+" or "-" on "r", "w", or "x".
 	 */
 	@XmlElement(namespace = GENII_ACL_NAMESPACE, name = "tagList")
 	private String[] _tagList;
@@ -26,25 +26,29 @@ public class AclChangeContents extends NotificationMessageContents {
 	@XmlElement(namespace = GENII_ACL_NAMESPACE, name = "versionVector")
 	private VersionVector _versionVector;
 
-	protected AclChangeContents() {
+	protected AclChangeContents()
+	{
 	}
 
-	public AclChangeContents(AclEntryListType aclEntryList, String[] tagList,
-			VersionVector versionVector) {
+	public AclChangeContents(AclEntryListType aclEntryList, String[] tagList, VersionVector versionVector)
+	{
 		_aclEntryList = aclEntryList;
 		_tagList = tagList;
 		_versionVector = versionVector;
 	}
 
-	final public AclEntryListType aclEntryList() {
+	final public AclEntryListType aclEntryList()
+	{
 		return _aclEntryList;
 	}
 
-	final public String[] tagList() {
+	final public String[] tagList()
+	{
 		return _tagList;
 	}
 
-	final public VersionVector versionVector() {
+	final public VersionVector versionVector()
+	{
 		return _versionVector;
 	}
 }

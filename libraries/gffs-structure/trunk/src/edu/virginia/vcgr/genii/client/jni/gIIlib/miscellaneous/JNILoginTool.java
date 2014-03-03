@@ -13,14 +13,14 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 
-public class JNILoginTool extends JNILibraryBase {
+public class JNILoginTool extends JNILibraryBase
+{
 	static private Log _logger = LogFactory.getLog(JNILoginTool.class);
 
-	public static Boolean login(String keystorePath, String password,
-			String certPattern) {
+	public static Boolean login(String keystorePath, String password, String certPattern)
+	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("JNILoginTool::login(%s, %s, %s)",
-					keystorePath, password, certPattern));
+			_logger.trace(String.format("JNILoginTool::login(%s, %s, %s)", keystorePath, password, certPattern));
 
 		tryToInitialize();
 
@@ -28,14 +28,12 @@ public class JNILoginTool extends JNILibraryBase {
 		String[] args = { "login" };
 
 		try {
-			runner.runCommand(args, new OutputStreamWriter(System.out),
-					new OutputStreamWriter(System.err), new BufferedReader(
-							new InputStreamReader(System.in)));
+			runner.runCommand(args, new OutputStreamWriter(System.out), new OutputStreamWriter(System.err), new BufferedReader(
+				new InputStreamReader(System.in)));
 
 			// Checks to make sure login worked
 			ICallingContext callContext = ContextManager.getExistingContext();
-			TransientCredentials transientCredentials = TransientCredentials
-					.getTransientCredentials(callContext);
+			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 
 			if (transientCredentials != null && !transientCredentials.isEmpty())
 				return true;

@@ -17,31 +17,33 @@ import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierType;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 
-public class DefaultAttributeCache extends CommonCache {
-	static protected Log _logger = LogFactory
-			.getLog(DefaultAttributeCache.class);
+public class DefaultAttributeCache extends CommonCache
+{
+	static protected Log _logger = LogFactory.getLog(DefaultAttributeCache.class);
 
 	private TimedOutLRUCache<String, Collection<MessageElement>> cache;
 
-	public DefaultAttributeCache(int priorityLevel, int capacity,
-			long cacheLifeTime, boolean monitoingEnabled) {
+	public DefaultAttributeCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
+	{
 		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
-		cache = new TimedOutLRUCache<String, Collection<MessageElement>>(
-				capacity, cacheLifeTime);
+		cache = new TimedOutLRUCache<String, Collection<MessageElement>>(capacity, cacheLifeTime);
 	}
 
 	@Override
-	public boolean isRelevent(Object cacheKey, Class<?> typeOfItem) {
+	public boolean isRelevent(Object cacheKey, Class<?> typeOfItem)
+	{
 		throw new RuntimeException("this method is irrelevent to this cache");
 	}
 
 	@Override
-	public boolean supportRetrievalWithoutTarget() {
+	public boolean supportRetrievalWithoutTarget()
+	{
 		return false;
 	}
 
 	@Override
-	public Object getItem(Object cacheKey, Object target) {
+	public Object getItem(Object cacheKey, Object target)
+	{
 		String EPI = getEPI(target);
 		QName propertyName = (QName) cacheKey;
 		Collection<MessageElement> allProperties = cache.get(EPI);
@@ -60,8 +62,8 @@ public class DefaultAttributeCache extends CommonCache {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void putItem(Object cacheKey, Object target, Object value)
-			throws Exception {
+	public void putItem(Object cacheKey, Object target, Object value) throws Exception
+	{
 		String EPI = getEPI(target);
 		Collection<MessageElement> allProperties = cache.get(EPI);
 		if (allProperties == null) {
@@ -75,8 +77,7 @@ public class DefaultAttributeCache extends CommonCache {
 			if (value instanceof MessageElement) {
 				allProperties.add((MessageElement) value);
 			} else if (value instanceof Collection) {
-				allProperties
-						.addAll((Collection<? extends MessageElement>) value);
+				allProperties.addAll((Collection<? extends MessageElement>) value);
 			} else if (value instanceof MessageElement[]) {
 				allProperties.addAll(Arrays.asList((MessageElement[]) value));
 			}
@@ -85,13 +86,15 @@ public class DefaultAttributeCache extends CommonCache {
 	}
 
 	@Override
-	public void invalidateCachedItem(Object target) {
+	public void invalidateCachedItem(Object target)
+	{
 		String EPI = getEPI(target);
 		cache.remove(EPI);
 	}
 
 	@Override
-	public void invalidateCachedItem(Object cacheKey, Object target) {
+	public void invalidateCachedItem(Object cacheKey, Object target)
+	{
 		String EPI = getEPI(target);
 		QName propertyName = (QName) cacheKey;
 		Collection<MessageElement> allProperties = cache.get(EPI);
@@ -110,12 +113,14 @@ public class DefaultAttributeCache extends CommonCache {
 	}
 
 	@Override
-	public void invalidateEntireCache() {
+	public void invalidateEntireCache()
+	{
 		cache.clear();
 	}
 
 	@Override
-	public boolean targetTypeMatches(Object target) {
+	public boolean targetTypeMatches(Object target)
+	{
 		if (target instanceof EndpointReferenceType) {
 			WSName name = new WSName((EndpointReferenceType) target);
 			if (name.isValidWSName())
@@ -128,27 +133,31 @@ public class DefaultAttributeCache extends CommonCache {
 	}
 
 	@Override
-	public boolean cacheKeyMatches(Object cacheKey) {
+	public boolean cacheKeyMatches(Object cacheKey)
+	{
 		return (cacheKey instanceof QName);
 	}
 
 	@Override
-	public boolean itemTypeMatches(Class<?> itemType) {
+	public boolean itemTypeMatches(Class<?> itemType)
+	{
 		return itemType.equals(MessageElement.class);
 	}
 
 	@Override
-	public IdentifierType getCachedItemIdentifier() {
+	public IdentifierType getCachedItemIdentifier()
+	{
 		return null;
 	}
 
 	@Override
-	public void updateCacheLifeTimeOfItems(Object commonIdentifierForItems,
-			long newCacheLifeTime) {
+	public void updateCacheLifeTimeOfItems(Object commonIdentifierForItems, long newCacheLifeTime)
+	{
 		// do nothing
 	}
 
-	private String getEPI(Object target) {
+	private String getEPI(Object target)
+	{
 		if (target instanceof EndpointReferenceType) {
 			EndpointReferenceType epr = (EndpointReferenceType) target;
 			return new WSName(epr).toString();

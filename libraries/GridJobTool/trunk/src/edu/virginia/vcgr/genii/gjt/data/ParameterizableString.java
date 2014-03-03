@@ -6,32 +6,36 @@ import edu.virginia.vcgr.genii.gjt.data.variables.Clearable;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 
-public class ParameterizableString extends DefaultDataItem implements
-		Clearable, PostUnmarshallListener {
+public class ParameterizableString extends DefaultDataItem implements Clearable, PostUnmarshallListener
+{
 	@XmlAttribute(name = "value")
 	private String _value = "";
 
-	public ParameterizableString() {
+	public ParameterizableString()
+	{
 		set(null);
 	}
 
-	public ParameterizableString(ParameterizableBroker pBroker,
-			ModificationBroker mBroker) {
+	public ParameterizableString(ParameterizableBroker pBroker, ModificationBroker mBroker)
+	{
 		addParameterizableListener(pBroker);
 		addModificationListener(mBroker);
 
 		set(null);
 	}
 
-	public boolean isEmpty() {
+	public boolean isEmpty()
+	{
 		return _value.equals("");
 	}
 
-	public String get() {
+	public String get()
+	{
 		return _value;
 	}
 
-	public void set(String value) {
+	public void set(String value)
+	{
 		if (value == null)
 			value = "";
 
@@ -45,22 +49,23 @@ public class ParameterizableString extends DefaultDataItem implements
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return _value;
 	}
 
 	@Override
-	public void clear() {
+	public void clear()
+	{
 		set("");
 	}
 
 	@Override
-	public void postUnmarshall(ParameterizableBroker parameterBroker,
-			ModificationBroker modificationBroker) {
+	public void postUnmarshall(ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
+	{
 		/* Don't need to do this */
 		/*
-		 * addParameterizableListener(parameterBroker);
-		 * addModificationListener(modificationBroker);
+		 * addParameterizableListener(parameterBroker); addModificationListener(modificationBroker);
 		 */
 
 		fireParameterizableStringModified("", _value);

@@ -26,7 +26,8 @@ import edu.virginia.vcgr.genii.client.ApplicationBase;
  * 
  * @author Chris Koeritz
  */
-public class OSGiSupport {
+public class OSGiSupport
+{
 	static private Log _logger = LogFactory.getLog(OSGiSupport.class);
 
 	// OSGi framework management.
@@ -34,24 +35,21 @@ public class OSGiSupport {
 	static private String bundleDir;
 
 	/**
-	 * starts up the OSGi framework and loads the bundles required by our
-	 * application.
+	 * starts up the OSGi framework and loads the bundles required by our application.
 	 * 
 	 * @return true on success of loading bundles and startup
 	 */
-	static public Boolean setUpFramework() {
+	static public Boolean setUpFramework()
+	{
 		/*
-		 * we are trying to build both a user-specific and installation-specific
-		 * storage area for the OSGi bundles at run-time. this folder can get
-		 * "corrupted" if the installer has upgraded the installation, in that
-		 * eclipse equinox OSGi won't load. this can be solved manually by
-		 * cleaning out the storage area, but that's pretty crass. instead, we
-		 * will try to clean it out once, and if that fails, then we really do
-		 * need to fail.
+		 * we are trying to build both a user-specific and installation-specific storage area for
+		 * the OSGi bundles at run-time. this folder can get "corrupted" if the installer has
+		 * upgraded the installation, in that eclipse equinox OSGi won't load. this can be solved
+		 * manually by cleaning out the storage area, but that's pretty crass. instead, we will try
+		 * to clean it out once, and if that fails, then we really do need to fail.
 		 */
 		String username = System.getProperty("user.name");
-		URL url = OSGiSupport.class.getProtectionDomain().getCodeSource()
-				.getLocation();
+		URL url = OSGiSupport.class.getProtectionDomain().getCodeSource().getLocation();
 		File pathChow = new File(url.getPath());
 		if (_logger.isTraceEnabled())
 			_logger.trace("gotta path of: " + pathChow);
@@ -63,29 +61,23 @@ public class OSGiSupport {
 			_logger.trace("gotta chopped path of: " + justDir);
 		String tmpDir = System.getProperty("java.io.tmpdir");
 		tmpDir = tmpDir.replace('\\', '/');
-		File osgiStorageDir = new File(tmpDir + "/osgi-genII-" + username + "/"
-				+ justDir);
+		File osgiStorageDir = new File(tmpDir + "/osgi-genII-" + username + "/" + justDir);
 		if (_logger.isDebugEnabled())
-			_logger.debug("osgi storage area is: "
-					+ osgiStorageDir.getAbsolutePath());
+			_logger.debug("osgi storage area is: " + osgiStorageDir.getAbsolutePath());
 		osgiStorageDir.mkdirs();
 
-		// see if we're running under eclipse or know our installation
-		// directory.
-		String bundleSourcePath = ApplicationBase
-				.getEclipseTrunkFromEnvironment();
+		// see if we're running under eclipse or know our installation directory.
+		String bundleSourcePath = ApplicationBase.getEclipseTrunkFromEnvironment();
 		String saveDrive = ""; // only used for windows.
 		if (bundleSourcePath != null) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("install-dir-based startup bundle path: "
-						+ bundleSourcePath);
+				_logger.debug("install-dir-based startup bundle path: " + bundleSourcePath);
 			if (bundleSourcePath.charAt(1) == ':') {
 				// we have a dos path again, let's save the important bits.
 				saveDrive = bundleSourcePath.substring(0, 2);
 			}
 		} else {
-			// okay, that was a bust. see if we can intuit our location from
-			// living in a jar.
+			// okay, that was a bust. see if we can intuit our location from living in a jar.
 			bundleSourcePath = url.getPath();
 			if (_logger.isTraceEnabled())
 				_logger.trace("got source path as: " + bundleSourcePath);
@@ -94,8 +86,7 @@ public class OSGiSupport {
 				int lastSlash = bundleSourcePath.lastIndexOf("/");
 				bundleSourcePath = bundleSourcePath.substring(0, lastSlash);
 				if (_logger.isTraceEnabled())
-					_logger.trace("truncated path since inside jar: "
-							+ bundleSourcePath);
+					_logger.trace("truncated path since inside jar: " + bundleSourcePath);
 			}
 			if (bundleSourcePath.charAt(2) == ':') {
 				// this is most likely a DOS path.
@@ -107,8 +98,7 @@ public class OSGiSupport {
 			}
 			bundleSourcePath = bundleSourcePath.concat("/..");
 			if (_logger.isDebugEnabled())
-				_logger.debug("jar-intuited startup bundle path: "
-						+ bundleSourcePath);
+				_logger.debug("jar-intuited startup bundle path: " + bundleSourcePath);
 		}
 
 		bundleDir = bundleSourcePath + "/bundles";
@@ -120,8 +110,7 @@ public class OSGiSupport {
 		if (saveDrive.length() > 0) {
 			// concatenate drive letter if we had figured that out.
 			bundleDir = saveDrive + bundleDir;
-			// on windows we must make the case identical or eclipse has all
-			// sorts of problems from
+			// on windows we must make the case identical or eclipse has all sorts of problems from
 			// mismatches.
 			bundleDir = bundleDir.toLowerCase();
 		}
@@ -129,8 +118,7 @@ public class OSGiSupport {
 		Map<String, String> config = new HashMap<String, String>();
 
 		// Control where OSGi stores its persistent data:
-		config.put(Constants.FRAMEWORK_STORAGE,
-				osgiStorageDir.getAbsolutePath());
+		config.put(Constants.FRAMEWORK_STORAGE, osgiStorageDir.getAbsolutePath());
 
 		// Request OSGi to clean its storage area on startup
 		config.put(Constants.FRAMEWORK_STORAGE_CLEAN, "false");
@@ -140,23 +128,20 @@ public class OSGiSupport {
 			_logger.debug("using bundle source at: " + bundleDir);
 
 		/*
-		 * could enable this if we want a remote console to manage OSGi:
-		 * config.put("osgi.console", "4228");
+		 * could enable this if we want a remote console to manage OSGi: config.put("osgi.console",
+		 * "4228");
 		 */
 
 		ArrayList<Bundle> loadedBundles = new ArrayList<Bundle>();
 
-		BundleContext context = initializeFrameworkFactory(config,
-				loadedBundles);
+		BundleContext context = initializeFrameworkFactory(config, loadedBundles);
 		if (context == null) {
 			_logger.warn("first attempt to start OSGi failed; now retrying with a clean-up step.");
 			try {
 				FileUtils.deleteDirectory(osgiStorageDir);
 			} catch (IOException e) {
-				// if we can't clean up that directory, we can't fix this
-				// problem.
-				_logger.error("failed to clean up the OSGi storage area: "
-						+ osgiStorageDir.getAbsolutePath());
+				// if we can't clean up that directory, we can't fix this problem.
+				_logger.error("failed to clean up the OSGi storage area: " + osgiStorageDir.getAbsolutePath());
 				return false;
 			}
 			osgiStorageDir.mkdirs();
@@ -180,8 +165,7 @@ public class OSGiSupport {
 					bun.start();
 				}
 			} catch (Throwable e) {
-				_logger.error(
-						"failed to start bundle: " + bun.getSymbolicName(), e);
+				_logger.error("failed to start bundle: " + bun.getSymbolicName(), e);
 				return false;
 			}
 		}
@@ -190,13 +174,11 @@ public class OSGiSupport {
 	}
 
 	/**
-	 * a simple wrapper to try to get the framework running. if this fails, null
-	 * is returned.
+	 * a simple wrapper to try to get the framework running. if this fails, null is returned.
 	 */
-	static private BundleContext initializeFrameworkFactory(
-			Map<String, String> config, ArrayList<Bundle> loadedBundles) {
-		FrameworkFactory frameworkFactory = ServiceLoader
-				.load(FrameworkFactory.class).iterator().next();
+	static private BundleContext initializeFrameworkFactory(Map<String, String> config, ArrayList<Bundle> loadedBundles)
+	{
+		FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
 		_framework = frameworkFactory.newFramework(config);
 		try {
 			_framework.init();
@@ -214,8 +196,7 @@ public class OSGiSupport {
 				_logger.trace("loading bundle: " + bunName);
 			Bundle currentBundle = null;
 			try {
-				currentBundle = context.installBundle("file:" + bundleDir + "/"
-						+ bunName);
+				currentBundle = context.installBundle("file:" + bundleDir + "/" + bunName);
 			} catch (Throwable e) {
 				_logger.error("failed to load bundle: " + bunName, e);
 				shutDownFramework();
@@ -228,10 +209,10 @@ public class OSGiSupport {
 	}
 
 	/**
-	 * stops the OSGi framework, which should be invoked if and only if program
-	 * is shutting down.
+	 * stops the OSGi framework, which should be invoked if and only if program is shutting down.
 	 */
-	static public void shutDownFramework() {
+	static public void shutDownFramework()
+	{
 		if (_framework != null) {
 			try {
 				_framework.getBundleContext().getBundle(0).stop();

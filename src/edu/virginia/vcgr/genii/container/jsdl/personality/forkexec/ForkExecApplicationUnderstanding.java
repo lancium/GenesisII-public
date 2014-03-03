@@ -30,28 +30,24 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirector
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.JobUnderstandingContext;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.StringOrPath;
 
-class ForkExecApplicationUnderstanding extends
-		PosixLikeApplicationUnderstanding {
-	static private Log _logger = LogFactory
-			.getLog(ForkExecApplicationUnderstanding.class);
+class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
+{
+	static private Log _logger = LogFactory.getLog(ForkExecApplicationUnderstanding.class);
 
-	public ForkExecApplicationUnderstanding(FilesystemManager fsManager,
-			BESWorkingDirectory workingDirectory) {
+	public ForkExecApplicationUnderstanding(FilesystemManager fsManager, BESWorkingDirectory workingDirectory)
+	{
 		super(fsManager, workingDirectory);
 	}
 
 	@Override
-	public void addExecutionPhases(
-			BESConstructionParameters creationProperties,
-			Vector<ExecutionPhase> executionPlan,
-			Vector<ExecutionPhase> cleanupPhases,
-			JobUnderstandingContext jobContext) throws JSDLException {
+	public void addExecutionPhases(BESConstructionParameters creationProperties, Vector<ExecutionPhase> executionPlan,
+		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext) throws JSDLException
+	{
 		File fuseMountPoint = jobContext.getFuseMountPoint();
 
 		PassiveStreamRedirectionDescription redirection = getStreamRedirectionDescription();
 
-		Deployment deployment = Installation
-				.getDeployment(new DeploymentName());
+		Deployment deployment = Installation.getDeployment(new DeploymentName());
 		DeploymentName depName = deployment.getName();
 
 		FilesystemManager fsManager = getFilesystemManager();
@@ -59,20 +55,16 @@ class ForkExecApplicationUnderstanding extends
 		for (JSDLFileSystem fs : fsManager.getFileSystems()) {
 			if (fs instanceof DirBasedGridFileSystem) {
 				DirBasedGridFileSystem gfs = (DirBasedGridFileSystem) fs;
-				executionPlan.add(new SetupFUSEPhase(gfs.getMountPoint()
-						.getAbsolutePath(), gfs.getSandbox()));
-				cleanupPhases.add(new TeardownFUSEPhase(gfs.getMountPoint()
-						.getAbsolutePath()));
+				executionPlan.add(new SetupFUSEPhase(gfs.getMountPoint().getAbsolutePath(), gfs.getSandbox()));
+				cleanupPhases.add(new TeardownFUSEPhase(gfs.getMountPoint().getAbsolutePath()));
 			}
 		}
 
-		executionPlan.add(new PrepareApplicationPhase(fsManager,
-				getExecutable()));
+		executionPlan.add(new PrepareApplicationPhase(fsManager, getExecutable()));
 		Map<String, StringOrPath> env = getEnvironment();
 		env.put("GENII_DEPLOYMENT_NAME", new StringOrPath(depName.toString()));
 		env.put("GENII_USER_DIR", new StringOrPath(".genesisII-bes-state"));
-		_logger.info("rewrote GENII_USER_DIR to be: "
-				+ env.get("GENII_USER_DIR").toString(fsManager));
+		_logger.info("rewrote GENII_USER_DIR to be: " + env.get("GENII_USER_DIR").toString(fsManager));
 
 		Map<String, String> stringEnv = new HashMap<String, String>();
 		for (String key : env.keySet()) {
@@ -85,12 +77,8 @@ class ForkExecApplicationUnderstanding extends
 			stringArgs.add(sop.toString(fsManager));
 		}
 
-		executionPlan.add(new RunProcessPhase(fuseMountPoint,
-				getSPMDVariation(), getNumProcesses(),
-				getNumProcessesPerHost(), BESActivityServiceImpl
-						.getCommonDirectory(creationProperties), fsManager
-						.lookup(getExecutable()), stringArgs
-						.toArray(new String[0]), stringEnv, redirection,
-				creationProperties));
+		executionPlan.add(new RunProcessPhase(fuseMountPoint, getSPMDVariation(), getNumProcesses(), getNumProcessesPerHost(),
+			BESActivityServiceImpl.getCommonDirectory(creationProperties), fsManager.lookup(getExecutable()), stringArgs
+				.toArray(new String[0]), stringEnv, redirection, creationProperties));
 	}
 }

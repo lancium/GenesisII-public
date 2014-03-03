@@ -4,48 +4,55 @@ import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 
-public class StreamableByteIOFactoryAttributeHandlers extends
-		ByteIOAttributeHandlers {
+public class StreamableByteIOFactoryAttributeHandlers extends ByteIOAttributeHandlers
+{
 	static public final String STREAMABLE_BYTEIO_NS = "http://schemas.ggf.org/byteio/2005/10/streamable-access";
 
-	public StreamableByteIOFactoryAttributeHandlers(
-			StreamableByteIOFactoryResourceFork fork, AttributePackage pkg)
-			throws NoSuchMethodException {
+	public StreamableByteIOFactoryAttributeHandlers(StreamableByteIOFactoryResourceFork fork, AttributePackage pkg)
+		throws NoSuchMethodException
+	{
 		super(fork, pkg);
 	}
 
 	@Override
-	protected QName GetCreateTimeNamespace() {
+	protected QName GetCreateTimeNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "CreateTime");
 	}
 
 	@Override
-	protected QName GetModificationTimeNamespace() {
+	protected QName GetModificationTimeNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "ModificationTime");
 	}
 
 	@Override
-	protected QName GetAccessTimeNamespace() {
+	protected QName GetAccessTimeNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "AccessTime");
 	}
 
 	@Override
-	protected QName GetReadableNamespace() {
+	protected QName GetReadableNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "Readable");
 	}
 
 	@Override
-	protected QName GetSizeNamespace() {
+	protected QName GetSizeNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "Size");
 	}
 
 	@Override
-	protected QName GetTransferMechanismNamespace() {
+	protected QName GetTransferMechanismNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "TransferMechanism");
 	}
 
 	@Override
-	protected QName GetWriteableNamespace() {
+	protected QName GetWriteableNamespace()
+	{
 		return new QName(STREAMABLE_BYTEIO_NS, "Writeable");
 	}
 }

@@ -6,12 +6,12 @@ import edu.virginia.vcgr.genii.security.Describable;
 import edu.virginia.vcgr.genii.security.acl.AclEntry;
 
 /**
- * A user-principal identity. Can be used in access control lists for direct
- * comparison.
+ * A user-principal identity. Can be used in access control lists for direct comparison.
  * 
  * @author dmerrill
  */
-public interface Identity extends Externalizable, Describable, AclEntry {
+public interface Identity extends Externalizable, Describable, AclEntry
+{
 	public boolean placeInUMask();
 
 	public IdentityType getType();

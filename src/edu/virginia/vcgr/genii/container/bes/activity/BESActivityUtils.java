@@ -32,44 +32,46 @@ import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
-public class BESActivityUtils {
-	static private QName JOB_DEF_QNAME = new QName(
-			GenesisIIConstants.GENESISII_NS, "job-definition");
-	static private QName CONTAINER_ID_QNAME = new QName(
-			GenesisIIConstants.GENESISII_NS, "container-id");
+public class BESActivityUtils
+{
+	static private QName JOB_DEF_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "job-definition");
+	static private QName CONTAINER_ID_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "container-id");
 	BESConstants bconsts = new BESConstants();
 
 	static private Log _logger = LogFactory.getLog(BESActivityUtils.class);
 
-	static public class BESActivityInitInfo {
+	static public class BESActivityInitInfo
+	{
 		private String _containerID = null;
 		private JobDefinition_Type _jobDef = null;
 		private Subscribe _subscribe = null;
 
-		public BESActivityInitInfo(JobDefinition_Type jobDef,
-				String containerID, Subscribe subscribe) {
+		public BESActivityInitInfo(JobDefinition_Type jobDef, String containerID, Subscribe subscribe)
+		{
 			_containerID = containerID;
 			_jobDef = jobDef;
 			_subscribe = subscribe;
 		}
 
-		public JobDefinition_Type getJobDefinition() {
+		public JobDefinition_Type getJobDefinition()
+		{
 			return _jobDef;
 		}
 
-		public String getContainerID() {
+		public String getContainerID()
+		{
 			return _containerID;
 		}
 
-		public Subscribe getSubscribeRequest() {
+		public Subscribe getSubscribeRequest()
+		{
 			return _subscribe;
 		}
 	}
 
-	static public MessageElement[] createCreationProperties(
-			JobDefinition_Type jobDefinition, String containerID,
-			BESConstructionParameters nativeqProperties,
-			MessageElement subscribe) throws RemoteException {
+	static public MessageElement[] createCreationProperties(JobDefinition_Type jobDefinition, String containerID,
+		BESConstructionParameters nativeqProperties, MessageElement subscribe) throws RemoteException
+	{
 		Collection<MessageElement> ret = new LinkedList<MessageElement>();
 
 		ret.add(new MessageElement(JOB_DEF_QNAME, jobDefinition));
@@ -83,42 +85,34 @@ public class BESActivityUtils {
 		return ret.toArray(new MessageElement[0]);
 	}
 
-	static public BESActivityInitInfo extractCreationProperties(
-			GenesisHashMap properties) throws ResourceException {
+	static public BESActivityInitInfo extractCreationProperties(GenesisHashMap properties) throws ResourceException
+	{
 		JobDefinition_Type jobDef = null;
 		String containerID = null;
 		Subscribe subscribe = null;
 		BESConstants sbconsts = new BESConstants();
 
 		if (properties == null)
-			throw new IllegalArgumentException(
-					"Can't have a null creation properites parameter.");
+			throw new IllegalArgumentException("Can't have a null creation properites parameter.");
 
 		if (!properties.containsKey(JOB_DEF_QNAME))
-			throw new IllegalArgumentException(
-					"Couldn't find job definition document in creation properties.");
+			throw new IllegalArgumentException("Couldn't find job definition document in creation properties.");
 		if (!properties.containsKey(CONTAINER_ID_QNAME))
-			throw new IllegalArgumentException(
-					"Couldn't find container ID in creation properties.");
+			throw new IllegalArgumentException("Couldn't find container ID in creation properties.");
 
 		try {
-			MessageElement any = properties
-					.getAxisMessageElement(JOB_DEF_QNAME);
+			MessageElement any = properties.getAxisMessageElement(JOB_DEF_QNAME);
 			if (any == null) {
 				String msg = "failure in decoding properties for 'any' object";
 				_logger.error(msg);
 				throw new RuntimeException(msg);
 			}
-			jobDef = (JobDefinition_Type) ObjectDeserializer.toObject(any,
-					JobDefinition_Type.class);
-			containerID = properties.getAxisMessageElement(CONTAINER_ID_QNAME)
-					.getValue();
+			jobDef = (JobDefinition_Type) ObjectDeserializer.toObject(any, JobDefinition_Type.class);
+			containerID = properties.getAxisMessageElement(CONTAINER_ID_QNAME).getValue();
 
-			any = properties
-					.getAxisMessageElement(sbconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME);
+			any = properties.getAxisMessageElement(sbconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME);
 			if (any != null)
-				subscribe = (Subscribe) ObjectDeserializer.toObject(any,
-						Subscribe.class);
+				subscribe = (Subscribe) ObjectDeserializer.toObject(any, Subscribe.class);
 		} catch (Exception e) {
 			if (e instanceof ResourceException)
 				throw (ResourceException) e;

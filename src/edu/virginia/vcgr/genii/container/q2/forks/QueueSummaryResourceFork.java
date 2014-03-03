@@ -14,27 +14,31 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class QueueSummaryResourceFork extends
-		AbstractStreamableByteIOFactoryResourceFork {
-	public QueueSummaryResourceFork(ResourceForkService service, String forkPath) {
+public class QueueSummaryResourceFork extends AbstractStreamableByteIOFactoryResourceFork
+{
+	public QueueSummaryResourceFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void destroy() throws ResourceException {
+	public void destroy() throws ResourceException
+	{
 		super.destroy();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void modifyState(InputStream source) throws IOException {
+	public void modifyState(InputStream source) throws IOException
+	{
 		throw new IOException("Not allowed to modify the the queue summary.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void snapshotState(OutputStream sink) throws IOException {
+	public void snapshotState(OutputStream sink) throws IOException
+	{
 		ResourceKey rKey = getService().getResourceKey();
 		PrintStream ps = new PrintStream(sink);
 

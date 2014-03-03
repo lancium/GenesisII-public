@@ -22,40 +22,41 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
-public class GeniiBackend implements IBackend {
+public class GeniiBackend implements IBackend
+{
 	static private Log _logger = LogFactory.getLog(GeniiBackend.class);
 
 	private String _username;
 	private GeniiBackendConfiguration _configuration;
 
-	public GeniiBackend(GeniiBackendConfiguration configuration) {
+	public GeniiBackend(GeniiBackendConfiguration configuration)
+	{
 		_configuration = configuration;
 	}
 
 	@Override
-	public boolean authenticate(String username, String password)
-			throws FTPException {
+	public boolean authenticate(String username, String password) throws FTPException
+	{
 		_username = username;
 		return true;
 	}
 
 	@Override
-	public void cwd(String path) throws FTPException {
+	public void cwd(String path) throws FTPException
+	{
 		try {
-			RNSPath newPath = _configuration.getCallingContext()
-					.getCurrentPath()
-					.lookup(path, RNSPathQueryFlags.MUST_EXIST);
+			RNSPath newPath = _configuration.getCallingContext().getCurrentPath().lookup(path, RNSPathQueryFlags.MUST_EXIST);
 			_configuration.getCallingContext().setCurrentPath(newPath);
 		} catch (RNSException re) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Error trying to look up RNS path \"" + path
-						+ "\".", re);
+				_logger.debug("Error trying to look up RNS path \"" + path + "\".", re);
 			throw new PathDoesNotExistException(path);
 		}
 	}
 
 	@Override
-	public void delete(String entry) throws FTPException {
+	public void delete(String entry) throws FTPException
+	{
 		try {
 			RNSPath path = _configuration.getCallingContext().getCurrentPath();
 			path = path.lookup(entry, RNSPathQueryFlags.MUST_EXIST);
@@ -72,10 +73,10 @@ public class GeniiBackend implements IBackend {
 	}
 
 	@Override
-	public boolean exists(String entry) throws FTPException {
+	public boolean exists(String entry) throws FTPException
+	{
 		try {
-			_configuration.getCallingContext().getCurrentPath()
-					.lookup(entry, RNSPathQueryFlags.MUST_EXIST);
+			_configuration.getCallingContext().getCurrentPath().lookup(entry, RNSPathQueryFlags.MUST_EXIST);
 			return true;
 		} catch (Throwable t) {
 			return false;
@@ -83,25 +84,24 @@ public class GeniiBackend implements IBackend {
 	}
 
 	@Override
-	public String getGreeting() {
+	public String getGreeting()
+	{
 		return "Genesis II FTP Daemon";
 	}
 
 	@Override
-	public ListEntry[] list() throws FTPException {
+	public ListEntry[] list() throws FTPException
+	{
 		FilePermissions rwx = new FilePermissions(0x7, 0x7, 0x7);
 
 		try {
-			Collection<RNSPath> _paths = _configuration.getCallingContext()
-					.getCurrentPath().listContents();
+			Collection<RNSPath> _paths = _configuration.getCallingContext().getCurrentPath().listContents();
 			RNSPath[] paths = _paths.toArray(new RNSPath[0]);
 			ListEntry[] ret = new ListEntry[paths.length];
 			for (int lcv = 0; lcv < paths.length; lcv++) {
-				TypeInformation typeInfo = new TypeInformation(
-						paths[lcv].getEndpoint());
+				TypeInformation typeInfo = new TypeInformation(paths[lcv].getEndpoint());
 				if (typeInfo.isRNS()) {
-					ret[lcv] = new ListEntry(paths[lcv].getName(), new Date(),
-							0, _username, "genii", rwx, 1, true);
+					ret[lcv] = new ListEntry(paths[lcv].getName(), new Date(), 0, _username, "genii", rwx, 1, true);
 				} else if (typeInfo.isByteIO()) {
 					String typeDesc = typeInfo.getTypeDescription();
 
@@ -111,12 +111,11 @@ public class GeniiBackend implements IBackend {
 					} catch (NumberFormatException nfe) {
 					}
 
-					ret[lcv] = new ListEntry(paths[lcv].getName(), new Date(),
-							size, _username, "genii", rwx, 1, false);
+					ret[lcv] = new ListEntry(paths[lcv].getName(), new Date(), size, _username, "genii", rwx, 1, false);
 				} else {
 					RedirectFile rd = new RedirectFile(paths[lcv].getEndpoint());
-					ret[lcv] = new ListEntry(paths[lcv].getName() + ".html",
-							new Date(), rd.getSize(), _username, "genii",
+					ret[lcv] =
+						new ListEntry(paths[lcv].getName() + ".html", new Date(), rd.getSize(), _username, "genii",
 							new FilePermissions(0x5, 0x5, 0x5), 1, false);
 				}
 			}
@@ -130,11 +129,11 @@ public class GeniiBackend implements IBackend {
 	}
 
 	@Override
-	public String mkdir(String newDir) throws FTPException {
+	public String mkdir(String newDir) throws FTPException
+	{
 		try {
 			RNSPath path = _configuration.getCallingContext().getCurrentPath();
-			RNSPath newPath = path.lookup(newDir,
-					RNSPathQueryFlags.MUST_NOT_EXIST);
+			RNSPath newPath = path.lookup(newDir, RNSPathQueryFlags.MUST_NOT_EXIST);
 			newPath.mkdir();
 			return newPath.pwd();
 		} catch (RNSPathAlreadyExistsException ae) {
@@ -144,29 +143,29 @@ public class GeniiBackend implements IBackend {
 		} catch (RNSException re) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Unable to create a new RNS directory.", re);
-			throw new FTPException(451,
-					"Unknown error trying to create new RNS directory.");
+			throw new FTPException(451, "Unknown error trying to create new RNS directory.");
 		}
 	}
 
 	@Override
-	public String pwd() throws FTPException {
+	public String pwd() throws FTPException
+	{
 		return _configuration.getCallingContext().getCurrentPath().pwd();
 	}
 
 	@Override
-	public void removeDirectory(String directory) throws FTPException {
+	public void removeDirectory(String directory) throws FTPException
+	{
 		delete(directory);
 	}
 
 	@Override
-	public void rename(String oldEntry, String newEntry) throws FTPException {
+	public void rename(String oldEntry, String newEntry) throws FTPException
+	{
 		try {
 			RNSPath path = _configuration.getCallingContext().getCurrentPath();
-			RNSPath oldPath = path.lookup(oldEntry,
-					RNSPathQueryFlags.MUST_EXIST);
-			RNSPath newPath = path.lookup(newEntry,
-					RNSPathQueryFlags.MUST_NOT_EXIST);
+			RNSPath oldPath = path.lookup(oldEntry, RNSPathQueryFlags.MUST_EXIST);
+			RNSPath newPath = path.lookup(newEntry, RNSPathQueryFlags.MUST_NOT_EXIST);
 
 			newPath.link(oldPath.getEndpoint());
 			oldPath.unlink();
@@ -186,18 +185,16 @@ public class GeniiBackend implements IBackend {
 	}
 
 	@Override
-	public InputStream retrieve(String entry) throws FTPException {
+	public InputStream retrieve(String entry) throws FTPException
+	{
 		try {
-			RNSPath path = _configuration.getCallingContext().getCurrentPath()
-					.lookup(entry, RNSPathQueryFlags.DONT_CARE);
+			RNSPath path = _configuration.getCallingContext().getCurrentPath().lookup(entry, RNSPathQueryFlags.DONT_CARE);
 
 			if (!path.exists()) {
 				if (entry.endsWith(".html")) {
-					path = _configuration
-							.getCallingContext()
-							.getCurrentPath()
-							.lookup(entry.substring(0, entry.length() - 5),
-									RNSPathQueryFlags.MUST_EXIST);
+					path =
+						_configuration.getCallingContext().getCurrentPath()
+							.lookup(entry.substring(0, entry.length() - 5), RNSPathQueryFlags.MUST_EXIST);
 				} else
 					throw new PathDoesNotExistException(entry);
 			}
@@ -208,8 +205,7 @@ public class GeniiBackend implements IBackend {
 				return (new RedirectFile(path.getEndpoint())).getStream();
 		} catch (RNSPathDoesNotExistException dne) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Couldn't find \"" + entry + "\" to retrieve.",
-						dne);
+				_logger.debug("Couldn't find \"" + entry + "\" to retrieve.", dne);
 			throw new PathDoesNotExistException(entry);
 		} catch (Throwable cause) {
 			if (_logger.isDebugEnabled())
@@ -219,18 +215,16 @@ public class GeniiBackend implements IBackend {
 	}
 
 	@Override
-	public long size(String entry) throws FTPException {
+	public long size(String entry) throws FTPException
+	{
 		try {
-			RNSPath path = _configuration.getCallingContext().getCurrentPath()
-					.lookup(entry, RNSPathQueryFlags.DONT_CARE);
+			RNSPath path = _configuration.getCallingContext().getCurrentPath().lookup(entry, RNSPathQueryFlags.DONT_CARE);
 
 			if (!path.exists()) {
 				if (entry.endsWith(".html")) {
-					path = _configuration
-							.getCallingContext()
-							.getCurrentPath()
-							.lookup(entry.substring(0, entry.length() - 5),
-									RNSPathQueryFlags.MUST_EXIST);
+					path =
+						_configuration.getCallingContext().getCurrentPath()
+							.lookup(entry.substring(0, entry.length() - 5), RNSPathQueryFlags.MUST_EXIST);
 				} else
 					throw new PathDoesNotExistException(entry);
 			}
@@ -242,8 +236,7 @@ public class GeniiBackend implements IBackend {
 				return (new RedirectFile(path.getEndpoint())).getSize();
 		} catch (RNSPathDoesNotExistException dne) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Couldn't find \"" + entry
-						+ "\" to retrieve size.", dne);
+				_logger.debug("Couldn't find \"" + entry + "\" to retrieve size.", dne);
 			throw new PathDoesNotExistException(entry);
 		} catch (Throwable cause) {
 			if (_logger.isDebugEnabled())
@@ -253,7 +246,8 @@ public class GeniiBackend implements IBackend {
 	}
 
 	@Override
-	public OutputStream store(String entry) throws FTPException {
+	public OutputStream store(String entry) throws FTPException
+	{
 		try {
 			RNSPath path = _configuration.getCallingContext().getCurrentPath();
 			path = path.lookup(entry, RNSPathQueryFlags.DONT_CARE);

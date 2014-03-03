@@ -10,8 +10,10 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
-public class FSExceptions {
-	static public FSException translate(String message, Throwable cause) {
+public class FSExceptions
+{
+	static public FSException translate(String message, Throwable cause)
+	{
 		if (cause instanceof FSException)
 			return (FSException) cause;
 		else if (cause instanceof RNSPathAlreadyExistsException)

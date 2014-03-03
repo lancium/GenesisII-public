@@ -14,12 +14,13 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
-public class GeniiBackendConfiguration implements Cloneable {
+public class GeniiBackendConfiguration implements Cloneable
+{
 	private ICallingContext _callingContext;
 	private RNSPath _root;
 
-	private GeniiBackendConfiguration(ICallingContext callingContext,
-			RNSPath root) throws IOException {
+	private GeniiBackendConfiguration(ICallingContext callingContext, RNSPath root) throws IOException
+	{
 		_callingContext = callingContext;
 		_root = root;
 
@@ -28,9 +29,9 @@ public class GeniiBackendConfiguration implements Cloneable {
 		ContextManager.storeCurrentContext(_callingContext);
 	}
 
-	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout,
-			PrintWriter stderr, ICallingContext callingContext)
-			throws Throwable {
+	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout, PrintWriter stderr,
+		ICallingContext callingContext) throws Throwable
+	{
 		IContextResolver oldResolver = ContextManager.getResolver();
 		try {
 			IContextResolver newResolver = new InMemorySerializedContextResolver();
@@ -55,28 +56,31 @@ public class GeniiBackendConfiguration implements Cloneable {
 		}
 	}
 
-	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout,
-			PrintWriter stderr) throws Throwable {
+	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout, PrintWriter stderr) throws Throwable
+	{
 		this(stdin, stdout, stderr, ContextManager.getExistingContext());
 	}
 
-	public void setSandboxPath(String sandboxPath) throws RNSException {
+	public void setSandboxPath(String sandboxPath) throws RNSException
+	{
 		_root = _root.lookup(sandboxPath, RNSPathQueryFlags.MUST_EXIST);
 		_callingContext.setCurrentPath(_root);
 	}
 
-	public RNSPath getRoot() {
+	public RNSPath getRoot()
+	{
 		return _root;
 	}
 
-	public ICallingContext getCallingContext() {
+	public ICallingContext getCallingContext()
+	{
 		return _callingContext;
 	}
 
-	public Object clone() {
+	public Object clone()
+	{
 		try {
-			return new GeniiBackendConfiguration(
-					_callingContext.deriveNewContext(), _root);
+			return new GeniiBackendConfiguration(_callingContext.deriveNewContext(), _root);
 		} catch (IOException ioe) {
 			throw new RuntimeException("Unexpected internal exception.", ioe);
 		}

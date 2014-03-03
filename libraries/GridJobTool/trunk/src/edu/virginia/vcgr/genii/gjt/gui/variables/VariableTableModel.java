@@ -21,7 +21,8 @@ import edu.virginia.vcgr.genii.gjt.data.variables.VariableManager;
 import edu.virginia.vcgr.genii.gjt.data.variables.undef.UndefinedVariableDefinition;
 import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
 
-class VariableTableModel extends AbstractTableModel {
+class VariableTableModel extends AbstractTableModel
+{
 	static final long serialVersionUID = 0L;
 
 	private ModificationBroker _mBroker;
@@ -32,7 +33,8 @@ class VariableTableModel extends AbstractTableModel {
 
 	private JComponent _owner = null;
 
-	VariableTableModel(JobDocumentContext context) {
+	VariableTableModel(JobDocumentContext context)
+	{
 		_mBroker = context.getModificationBroker();
 
 		JobDocument document = context.jobDocument();
@@ -40,10 +42,8 @@ class VariableTableModel extends AbstractTableModel {
 
 		_variableHistory = new HashMap<String, VariableHistory>();
 
-		for (Map.Entry<String, VariableDefinition> entry : _documentVariables
-				.entrySet()) {
-			_variableHistory.put(entry.getKey(),
-					new VariableHistory(entry.getValue()));
+		for (Map.Entry<String, VariableDefinition> entry : _documentVariables.entrySet()) {
+			_variableHistory.put(entry.getKey(), new VariableHistory(entry.getValue()));
 		}
 
 		for (String variable : context.variableManager().variables()) {
@@ -54,48 +54,52 @@ class VariableTableModel extends AbstractTableModel {
 		_indices = new Vector<String>(_variableHistory.keySet());
 		Collections.sort(_indices);
 
-		context.variableManager().addVariableListener(
-				new VariableListenerImpl());
+		context.variableManager().addVariableListener(new VariableListenerImpl());
 	}
 
-	void setOwner(JComponent owner) {
+	void setOwner(JComponent owner)
+	{
 		_owner = owner;
 	}
 
 	@Override
-	public int getColumnCount() {
+	public int getColumnCount()
+	{
 		return 3;
 	}
 
 	@Override
-	public int getRowCount() {
+	public int getRowCount()
+	{
 		return _indices.size();
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
+	public Object getValueAt(int rowIndex, int columnIndex)
+	{
 		String variable = _indices.get(rowIndex);
 
 		switch (columnIndex) {
-		case 0:
-			return variable;
+			case 0:
+				return variable;
 
-		case 1:
-		case 2:
-			return _variableHistory.get(variable);
+			case 1:
+			case 2:
+				return _variableHistory.get(variable);
 		}
 
 		return null;
 	}
 
 	@Override
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
+	public boolean isCellEditable(int rowIndex, int columnIndex)
+	{
 		switch (columnIndex) {
-		case 0:
-			return false;
+			case 0:
+				return false;
 
-		case 1:
-			return true;
+			case 1:
+				return true;
 		}
 
 		String variable = _indices.get(rowIndex);
@@ -105,7 +109,8 @@ class VariableTableModel extends AbstractTableModel {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex)
+	{
 		String variable = _indices.get(rowIndex);
 		VariableHistory history = _variableHistory.get(variable);
 
@@ -113,9 +118,9 @@ class VariableTableModel extends AbstractTableModel {
 			VariableDefinitionType newType = (VariableDefinitionType) aValue;
 			VariableDefinition definition = history.getHistorical(newType);
 			if (definition == null) {
-				VariableDefinitionEditor<VariableDefinition> editor = (VariableDefinitionEditor<VariableDefinition>) newType
-						.editorFactory().createEditor(
-								SwingUtilities.getWindowAncestor(_owner));
+				VariableDefinitionEditor<VariableDefinition> editor =
+					(VariableDefinitionEditor<VariableDefinition>) newType.editorFactory().createEditor(
+						SwingUtilities.getWindowAncestor(_owner));
 				editor.pack();
 				editor.setModalityType(ModalityType.DOCUMENT_MODAL);
 				GUIUtils.centerComponent(editor);
@@ -136,9 +141,11 @@ class VariableTableModel extends AbstractTableModel {
 		}
 	}
 
-	private class VariableListenerImpl implements VariableListener {
+	private class VariableListenerImpl implements VariableListener
+	{
 		@Override
-		public void variableAdded(VariableManager manager, String variableName) {
+		public void variableAdded(VariableManager manager, String variableName)
+		{
 			_indices.add(variableName);
 			VariableHistory history = _variableHistory.get(variableName);
 			if (history == null) {
@@ -153,7 +160,8 @@ class VariableTableModel extends AbstractTableModel {
 		}
 
 		@Override
-		public void variableRemoved(VariableManager manager, String variableName) {
+		public void variableRemoved(VariableManager manager, String variableName)
+		{
 			int index = _indices.indexOf(variableName);
 			if (index >= 0) {
 				_indices.remove(index);

@@ -32,29 +32,30 @@ import edu.virginia.vcgr.genii.security.identity.IdentityType;
 import edu.virginia.vcgr.genii.security.x509.CertEntry;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
-public class KeystoreLoginTool extends BaseLoginTool {
+public class KeystoreLoginTool extends BaseLoginTool
+{
 	static private final String _DESCRIPTION = "config/tooldocs/description/dkeystoreLogin";
 	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/ukeystoreLogin";
 
 	static private Log _logger = LogFactory.getLog(KeystoreLoginTool.class);
 
-	protected KeystoreLoginTool(String description, String usage,
-			boolean isHidden) {
+	protected KeystoreLoginTool(String description, String usage, boolean isHidden)
+	{
 		super(description, usage, isHidden);
 	}
 
-	public KeystoreLoginTool() {
+	public KeystoreLoginTool()
+	{
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		overrideCategory(ToolCategory.SECURITY);
 	}
 
 	/**
-	 * Prompts the user to select an identity from the specified keystore,
-	 * delegating the selected credential to the delegatee.
+	 * Prompts the user to select an identity from the specified keystore, delegating the selected
+	 * credential to the delegatee.
 	 * 
-	 * If delegatee is null, the credential is delegated to the calling
-	 * context's current client key material, in which case it will be
-	 * self-renewing.
+	 * If delegatee is null, the credential is delegated to the calling context's current client key
+	 * material, in which case it will be self-renewing.
 	 * 
 	 * @param keystoreInput
 	 * @param callContext
@@ -62,9 +63,9 @@ public class KeystoreLoginTool extends BaseLoginTool {
 	 * @return
 	 * @throws Throwable
 	 */
-	protected ArrayList<NuCredential> doKeystoreLogin(
-			InputStream keystoreInput, ICallingContext callContext,
-			X509Certificate[] delegateeIdentity) throws Throwable {
+	protected ArrayList<NuCredential> doKeystoreLogin(InputStream keystoreInput, ICallingContext callContext,
+		X509Certificate[] delegateeIdentity) throws Throwable
+	{
 
 		ArrayList<NuCredential> retval = new ArrayList<NuCredential>();
 
@@ -75,8 +76,7 @@ public class KeystoreLoginTool extends BaseLoginTool {
 			handler = new GuiLoginHandler(stdout, stderr, stdin);
 		}
 
-		CertEntry certEntry = handler.selectCert(keystoreInput, _storeType,
-				_password, _aliasPatternFlag, _pattern);
+		CertEntry certEntry = handler.selectCert(keystoreInput, _storeType, _password, _aliasPatternFlag, _pattern);
 		if (certEntry == null) {
 			return null;
 		}
@@ -88,52 +88,41 @@ public class KeystoreLoginTool extends BaseLoginTool {
 			// force new credentials to be created with our preferred lifetime.
 			ClientUtils.invalidateCredentials(callContext);
 
-			String msg = "Replacing client tool identity with credentials for \""
-					+ certEntry._certChain[0].getSubjectDN().getName() + "\".";
+			String msg =
+				"Replacing client tool identity with credentials for \"" + certEntry._certChain[0].getSubjectDN().getName()
+					+ "\".";
 			stdout.println(msg);
 			_logger.info(msg);
 
-			KeyAndCertMaterial clientKeyMaterial = new KeyAndCertMaterial(
-					certEntry._certChain, certEntry._privateKey);
+			KeyAndCertMaterial clientKeyMaterial = new KeyAndCertMaterial(certEntry._certChain, certEntry._privateKey);
 			callContext.setActiveKeyAndCertMaterial(clientKeyMaterial);
 
 			// continue on to get a credential also.
 		}
 
-		String msg = "Acquiring credentials for \""
-				+ certEntry._certChain[0].getSubjectDN().getName() + "\".";
+		String msg = "Acquiring credentials for \"" + certEntry._certChain[0].getSubjectDN().getName() + "\".";
 		stdout.println(msg);
 		_logger.info(msg);
 
-		KeyAndCertMaterial clientKeyMaterial = ClientUtils
-				.checkAndRenewCredentials(callContext,
-						BaseGridTool.credsValidUntil(),
-						new SecurityUpdateResults());
+		KeyAndCertMaterial clientKeyMaterial =
+			ClientUtils.checkAndRenewCredentials(callContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 
 		if (delegateeIdentity == null) {
 			// Delegate the identity assertion to the temporary client identity.
-			TrustCredential assertion = new TrustCredential(
-					clientKeyMaterial._clientCertChain,
-					IdentityType.CONNECTION, certEntry._certChain,
-					IdentityType.USER,
-					new BasicConstraints(System.currentTimeMillis()
-							- SecurityConstants.CredentialGoodFromOffset,
-							_credentialValidMillis,
-							SecurityConstants.MaxDelegationDepth),
-					RWXCategory.FULL_ACCESS);
+			TrustCredential assertion =
+				new TrustCredential(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION, certEntry._certChain,
+					IdentityType.USER, new BasicConstraints(System.currentTimeMillis()
+						- SecurityConstants.CredentialGoodFromOffset, _credentialValidMillis,
+						SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 			assertion.signAssertion(certEntry._privateKey);
 			retval.add(assertion);
 
 		} else {
 			// create a static attribute delegated to the specified party
-			TrustCredential assertion = new TrustCredential(delegateeIdentity,
-					IdentityType.CONNECTION, certEntry._certChain,
-					IdentityType.USER,
-					new BasicConstraints(System.currentTimeMillis()
-							- SecurityConstants.CredentialGoodFromOffset,
-							_credentialValidMillis,
-							SecurityConstants.MaxDelegationDepth),
-					RWXCategory.FULL_ACCESS);
+			TrustCredential assertion =
+				new TrustCredential(delegateeIdentity, IdentityType.CONNECTION, certEntry._certChain, IdentityType.USER,
+					new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset,
+						_credentialValidMillis, SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 			assertion.signAssertion(certEntry._privateKey);
 			retval.add(assertion);
 		}
@@ -142,7 +131,8 @@ public class KeystoreLoginTool extends BaseLoginTool {
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		if (_storeType == null)
 			_storeType = "PKCS12";
 
@@ -178,8 +168,7 @@ public class KeystoreLoginTool extends BaseLoginTool {
 			return 0;
 
 		// insert the assertion into the calling context's transient creds
-		TransientCredentials transientCredentials = TransientCredentials
-				.getTransientCredentials(callContext);
+		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 		transientCredentials.addAll(creds);
 		ContextManager.storeCurrentContext(callContext);
 
@@ -187,15 +176,15 @@ public class KeystoreLoginTool extends BaseLoginTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		int numArgs = numArguments();
 		if (numArgs > 1)
 			throw new InvalidToolUsageException();
 
 		if (_durationString != null) {
 			try {
-				_credentialValidMillis = (long) new Duration(_durationString)
-						.as(DurationUnits.Milliseconds);
+				_credentialValidMillis = (long) new Duration(_durationString).as(DurationUnits.Milliseconds);
 			} catch (IllegalArgumentException pe) {
 				throw new ToolException("Invalid duration string given.", pe);
 			}

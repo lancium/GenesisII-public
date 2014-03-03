@@ -1,15 +1,17 @@
 package edu.virginia.g3.fsview;
 
-public class AnonymousAuthenticationInformation extends
-		AbstractFSViewAuthenticationInformation {
+public class AnonymousAuthenticationInformation extends AbstractFSViewAuthenticationInformation
+{
 	static final long serialVersionUID = 0L;
 
-	public AnonymousAuthenticationInformation() {
+	public AnonymousAuthenticationInformation()
+	{
 		super(FSViewAuthenticationInformationTypes.Anonymous);
 	}
 
 	@Override
-	final public String toString() {
+	final public String toString()
+	{
 		return "Anonymous";
 	}
 }

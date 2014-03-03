@@ -22,7 +22,8 @@ import java.util.Random;
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class RandomToken implements Serializable {
+public class RandomToken implements Serializable
+{
 	static final long serialVersionUID = 0;
 
 	static private final int _DEFAULT_NUMBER_OF_BYTES = 8;
@@ -30,40 +31,45 @@ public class RandomToken implements Serializable {
 
 	protected byte[] _token;
 
-	public RandomToken(int numBytes) {
+	public RandomToken(int numBytes)
+	{
 		if (numBytes <= 0)
-			throw new IllegalArgumentException(
-					"Must have a positive number of bytes.");
+			throw new IllegalArgumentException("Must have a positive number of bytes.");
 
 		_token = new byte[numBytes];
 		_defaultGenerator.nextBytes(_token);
 	}
 
-	public RandomToken(byte[] token) {
+	public RandomToken(byte[] token)
+	{
 		if (token == null || token.length == 0)
-			throw new IllegalArgumentException(
-					"token argument must be non-null with at least one element in it.");
+			throw new IllegalArgumentException("token argument must be non-null with at least one element in it.");
 
 		_token = token;
 	}
 
-	public RandomToken() {
+	public RandomToken()
+	{
 		this(_DEFAULT_NUMBER_OF_BYTES);
 	}
 
-	public byte[] getBytes() {
+	public byte[] getBytes()
+	{
 		return _token;
 	}
 
-	public boolean equals(RandomToken other) {
+	public boolean equals(RandomToken other)
+	{
 		return Arrays.equals(_token, other._token);
 	}
 
-	public boolean equals(Object other) {
+	public boolean equals(Object other)
+	{
 		return equals((RandomToken) other);
 	}
 
-	public int hashCode() {
+	public int hashCode()
+	{
 		int h = 0;
 
 		for (int lcv = 0; lcv < _token.length; lcv++) {
@@ -74,7 +80,8 @@ public class RandomToken implements Serializable {
 		return h;
 	}
 
-	public String toString(boolean capitalHex) {
+	public String toString(boolean capitalHex)
+	{
 		char alpha = (capitalHex ? 'A' : 'a');
 		StringBuffer buffer = new StringBuffer();
 		for (byte b : _token) {
@@ -94,7 +101,8 @@ public class RandomToken implements Serializable {
 		return buffer.toString();
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		return toString(false);
 	}
 }

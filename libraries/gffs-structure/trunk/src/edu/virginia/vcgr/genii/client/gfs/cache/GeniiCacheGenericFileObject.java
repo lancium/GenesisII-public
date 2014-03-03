@@ -9,7 +9,8 @@ import edu.virginia.vcgr.fsii.exceptions.FSException;
  * 
  * @author cbs6n
  */
-public interface GeniiCacheGenericFileObject {
+public interface GeniiCacheGenericFileObject
+{
 	public void close() throws FSException;
 
 	public void flush() throws FSException;

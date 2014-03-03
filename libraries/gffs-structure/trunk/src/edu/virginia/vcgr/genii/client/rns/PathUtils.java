@@ -15,8 +15,10 @@ package edu.virginia.vcgr.genii.client.rns;
 
 import java.util.Stack;
 
-class PathUtils {
-	static public String[] normalizePath(String currentPath, String path) {
+class PathUtils
+{
+	static public String[] normalizePath(String currentPath, String path)
+	{
 		String fullPath;
 
 		if (path.startsWith("/"))
@@ -28,7 +30,8 @@ class PathUtils {
 
 	}
 
-	static public String[] normalizePath(String path) {
+	static public String[] normalizePath(String path)
+	{
 		Stack<String> nPath = new Stack<String>();
 		String[] ret = path.split("/");
 		for (String s : ret) {
@@ -48,7 +51,8 @@ class PathUtils {
 		return ret;
 	}
 
-	static public String formPath(String[] pathElements) {
+	static public String formPath(String[] pathElements)
+	{
 		StringBuilder builder = new StringBuilder();
 		for (String element : pathElements) {
 			builder.append('/');
@@ -60,7 +64,8 @@ class PathUtils {
 		return builder.toString();
 	}
 
-	static private void print(String[] path) {
+	static private void print(String[] path)
+	{
 		System.out.print("{");
 		for (int lcv = 0; lcv < path.length; lcv++) {
 			if (lcv != 0)
@@ -70,7 +75,8 @@ class PathUtils {
 		System.out.println("}");
 	}
 
-	static public void main(String[] args) {
+	static public void main(String[] args)
+	{
 		print(normalizePath("/one/two/three", "../../../../../mark"));
 		print(normalizePath("/", "home/foobar"));
 		print(normalizePath("/one/two/three", "/home/foobar"));

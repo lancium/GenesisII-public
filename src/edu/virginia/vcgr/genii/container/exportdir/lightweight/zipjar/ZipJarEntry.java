@@ -21,8 +21,8 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportDir;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportEntry;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportFile;
 
-class ZipJarEntry extends AbstractVExportEntry implements VExportDir,
-		VExportFile {
+class ZipJarEntry extends AbstractVExportEntry implements VExportDir, VExportFile
+{
 	static private FSLockManager _lockManager = new FSLockManager();
 
 	private Map<String, Map<String, ZipEntry>> _directoryMap;
@@ -32,7 +32,8 @@ class ZipJarEntry extends AbstractVExportEntry implements VExportDir,
 	private ZipEntry _file;
 	private String _forkPath;
 
-	static private String getParent(String forkPath) {
+	static private String getParent(String forkPath)
+	{
 		int index = forkPath.lastIndexOf('/');
 		if (index < 0)
 			return "";
@@ -40,7 +41,8 @@ class ZipJarEntry extends AbstractVExportEntry implements VExportDir,
 		return forkPath.substring(0, index);
 	}
 
-	static private String getName(String forkPath) {
+	static private String getName(String forkPath)
+	{
 		int index = forkPath.lastIndexOf('/');
 		if (index < 0)
 			return forkPath;
@@ -48,38 +50,39 @@ class ZipJarEntry extends AbstractVExportEntry implements VExportDir,
 		return forkPath.substring(index + 1);
 	}
 
-	static private boolean isDirectory(
-			Map<String, Map<String, ZipEntry>> directoryMap, String path) {
+	static private boolean isDirectory(Map<String, Map<String, ZipEntry>> directoryMap, String path)
+	{
 		if (path.length() == 0)
 			return true;
 
 		return directoryMap.containsKey(path);
 	}
 
-	final private String formPath(String child) {
+	final private String formPath(String child)
+	{
 		if (_forkPath.length() == 0)
 			return child;
 
 		return String.format("%s/%s", _forkPath, child);
 	}
 
-	private Map<String, ZipEntry> getDirectory() throws IOException {
+	private Map<String, ZipEntry> getDirectory() throws IOException
+	{
 		if (_directory == null)
-			throw new IOException(String.format(
-					"Couldn't find directory \"%s\".", getName()));
+			throw new IOException(String.format("Couldn't find directory \"%s\".", getName()));
 		return _directory;
 	}
 
-	private ZipEntry getFile() throws IOException {
+	private ZipEntry getFile() throws IOException
+	{
 		if (_file == null)
-			throw new IOException(String.format("Couldn't find file \"%s\".",
-					getName()));
+			throw new IOException(String.format("Couldn't find file \"%s\".", getName()));
 		return _file;
 	}
 
-	ZipJarEntry(File zipFileTarget, ZipFile zipFile,
-			Map<String, Map<String, ZipEntry>> directoryMap, String forkPath)
-			throws IOException {
+	ZipJarEntry(File zipFileTarget, ZipFile zipFile, Map<String, Map<String, ZipEntry>> directoryMap, String forkPath)
+		throws IOException
+	{
 		super(getName(forkPath), isDirectory(directoryMap, forkPath));
 
 		_zipFile = zipFile;
@@ -92,26 +95,25 @@ class ZipJarEntry extends AbstractVExportEntry implements VExportDir,
 		else {
 			_directory = directoryMap.get(getParent(forkPath));
 			if (_directory == null)
-				throw new FileNotFoundException(String.format(
-						"Unable to find entry \"%s\".", forkPath));
+				throw new FileNotFoundException(String.format("Unable to find entry \"%s\".", forkPath));
 			_file = _directory.get(getName());
 		}
 	}
 
 	@Override
-	public boolean createFile(String newFileName) throws IOException {
-		throw new IOException(
-				"Not allowed to create new files inside of a Zip/Jar export.");
+	public boolean createFile(String newFileName) throws IOException
+	{
+		throw new IOException("Not allowed to create new files inside of a Zip/Jar export.");
 	}
 
 	@Override
-	public Collection<VExportEntry> list(String name) throws IOException {
+	public Collection<VExportEntry> list(String name) throws IOException
+	{
 		Collection<VExportEntry> entries = new LinkedList<VExportEntry>();
 		Map<String, ZipEntry> dir = getDirectory();
 		for (String entryName : dir.keySet()) {
 			if (name == null || name.equals(entryName)) {
-				entries.add(new ZipJarEntry(_zipFileTarget, _zipFile,
-						_directoryMap, formPath(entryName)));
+				entries.add(new ZipJarEntry(_zipFileTarget, _zipFile, _directoryMap, formPath(entryName)));
 			}
 		}
 
@@ -119,48 +121,52 @@ class ZipJarEntry extends AbstractVExportEntry implements VExportDir,
 	}
 
 	@Override
-	public boolean mkdir(String newDirName) throws IOException {
-		throw new IOException(
-				"Not allowed to make new directories inside of a Zip/Jar export.");
+	public boolean mkdir(String newDirName) throws IOException
+	{
+		throw new IOException("Not allowed to make new directories inside of a Zip/Jar export.");
 	}
 
 	@Override
-	public boolean remove(String entryName) throws IOException {
-		throw new IOException(
-				"Not allowed to remove entries from a Zip/Jar export.");
+	public boolean remove(String entryName) throws IOException
+	{
+		throw new IOException("Not allowed to remove entries from a Zip/Jar export.");
 	}
 
 	@Override
-	public Calendar accessTime() throws IOException {
+	public Calendar accessTime() throws IOException
+	{
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public void accessTime(Calendar c) throws IOException {
-		throw new IOException(
-				"Not allowed to modify entries in a Zip/Jar export.");
+	public void accessTime(Calendar c) throws IOException
+	{
+		throw new IOException("Not allowed to modify entries in a Zip/Jar export.");
 	}
 
 	@Override
-	public Calendar createTime() throws IOException {
+	public Calendar createTime() throws IOException
+	{
 		return Calendar.getInstance();
 	}
 
 	@Override
-	public Calendar modificationTime() throws IOException {
+	public Calendar modificationTime() throws IOException
+	{
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(getFile().getTime());
 		return c;
 	}
 
 	@Override
-	public void modificationTime(Calendar c) throws IOException {
-		throw new IOException(
-				"Not allowed to modify entries in a Zip/Jar export.");
+	public void modificationTime(Calendar c) throws IOException
+	{
+		throw new IOException("Not allowed to modify entries in a Zip/Jar export.");
 	}
 
 	@Override
-	public void read(long offset, ByteBuffer target) throws IOException {
+	public void read(long offset, ByteBuffer target) throws IOException
+	{
 		FSLock lock = null;
 
 		byte[] data = new byte[1024 * 8];
@@ -190,34 +196,38 @@ class ZipJarEntry extends AbstractVExportEntry implements VExportDir,
 	}
 
 	@Override
-	public boolean readable() throws IOException {
+	public boolean readable() throws IOException
+	{
 		return _zipFileTarget.canRead();
 	}
 
 	@Override
-	public long size() throws IOException {
+	public long size() throws IOException
+	{
 		return getFile().getSize();
 	}
 
 	@Override
-	public void truncAppend(long offset, ByteBuffer source) throws IOException {
-		throw new IOException(
-				"Not allowed to modify entries in a Zip/Jar export.");
+	public void truncAppend(long offset, ByteBuffer source) throws IOException
+	{
+		throw new IOException("Not allowed to modify entries in a Zip/Jar export.");
 	}
 
 	@Override
-	public boolean writable() throws IOException {
+	public boolean writable() throws IOException
+	{
 		return false;
 	}
 
 	@Override
-	public void write(long offset, ByteBuffer source) throws IOException {
-		throw new IOException(
-				"Not allowed to modify entries in a Zip/Jar export.");
+	public void write(long offset, ByteBuffer source) throws IOException
+	{
+		throw new IOException("Not allowed to modify entries in a Zip/Jar export.");
 	}
 
 	@Override
-	public Collection<VExportEntry> list() throws IOException {
+	public Collection<VExportEntry> list() throws IOException
+	{
 		return list(null);
 	}
 

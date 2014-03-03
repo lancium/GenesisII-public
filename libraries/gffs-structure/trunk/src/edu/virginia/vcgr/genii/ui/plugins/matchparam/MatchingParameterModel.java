@@ -10,57 +10,64 @@ import org.morgan.util.Pair;
 
 import edu.virginia.vcgr.genii.client.queue.MatchingParamEnum;
 
-class MatchingParameterModel extends AbstractTableModel {
+class MatchingParameterModel extends AbstractTableModel
+{
 	static final long serialVersionUID = 0L;
 
 	private Vector<Pair<String, String>> _originalParameters;
 	private Vector<Pair<String, String>> _parameters;
 
-	MatchingParameterModel(Collection<Pair<String, String>> parameters) {
+	MatchingParameterModel(Collection<Pair<String, String>> parameters)
+	{
 		_originalParameters = new Vector<Pair<String, String>>(parameters);
 		_parameters = new Vector<Pair<String, String>>(parameters);
 	}
 
-	final void addParameter(String name, String value) {
+	final void addParameter(String name, String value)
+	{
 		_parameters.add(new Pair<String, String>(name, value));
 		fireTableRowsInserted(_parameters.size() - 1, _parameters.size() - 1);
 	}
 
-	final void removeParameter(int row) {
+	final void removeParameter(int row)
+	{
 		_parameters.remove(row);
 		fireTableRowsDeleted(row, row);
 	}
 
-	final Collection<Pair<Pair<String, String>, MatchingParameterOperation>> generateOperations() {
-		Collection<Pair<Pair<String, String>, MatchingParameterOperation>> ret = new LinkedList<Pair<Pair<String, String>, MatchingParameterOperation>>();
+	final Collection<Pair<Pair<String, String>, MatchingParameterOperation>> generateOperations()
+	{
+		Collection<Pair<Pair<String, String>, MatchingParameterOperation>> ret =
+			new LinkedList<Pair<Pair<String, String>, MatchingParameterOperation>>();
 
 		for (Pair<String, String> original : _originalParameters) {
 			if (!_parameters.contains(original))
-				ret.add(new Pair<Pair<String, String>, MatchingParameterOperation>(
-						original, MatchingParameterOperation.Delete));
+				ret.add(new Pair<Pair<String, String>, MatchingParameterOperation>(original, MatchingParameterOperation.Delete));
 		}
 
 		for (Pair<String, String> newP : _parameters) {
 			if (!_originalParameters.contains(newP))
-				ret.add(new Pair<Pair<String, String>, MatchingParameterOperation>(
-						newP, MatchingParameterOperation.Add));
+				ret.add(new Pair<Pair<String, String>, MatchingParameterOperation>(newP, MatchingParameterOperation.Add));
 		}
 
 		return ret;
 	}
 
 	@Override
-	public int getColumnCount() {
+	public int getColumnCount()
+	{
 		return 3;
 	}
 
 	@Override
-	public int getRowCount() {
+	public int getRowCount()
+	{
 		return _parameters.size();
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
+	public Object getValueAt(int rowIndex, int columnIndex)
+	{
 		MatchingParamEnum matchType;
 		String name;
 		Pair<String, String> parameter = _parameters.get(rowIndex);
@@ -84,7 +91,8 @@ class MatchingParameterModel extends AbstractTableModel {
 	}
 
 	@Override
-	public String getColumnName(int column) {
+	public String getColumnName(int column)
+	{
 		if (column == 0)
 			return "Parameter Name";
 		else if (column == 1)
@@ -94,22 +102,22 @@ class MatchingParameterModel extends AbstractTableModel {
 	}
 
 	@Override
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
+	public boolean isCellEditable(int rowIndex, int columnIndex)
+	{
 		return true;
 	}
 
 	@Override
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex)
+	{
 		Pair<String, String> parm = _parameters.get(rowIndex);
 
 		if (columnIndex == 0)
-			parm = new Pair<String, String>(this.getValueAt(rowIndex, 2) + ":"
-					+ aValue.toString(), parm.second());
+			parm = new Pair<String, String>(this.getValueAt(rowIndex, 2) + ":" + aValue.toString(), parm.second());
 		else if (columnIndex == 1)
 			parm = new Pair<String, String>(parm.first(), aValue.toString());
 		else
-			parm = new Pair<String, String>(aValue.toString() + ":"
-					+ this.getValueAt(rowIndex, 0), parm.second());
+			parm = new Pair<String, String>(aValue.toString() + ":" + this.getValueAt(rowIndex, 0), parm.second());
 
 		_parameters.set(rowIndex, parm);
 

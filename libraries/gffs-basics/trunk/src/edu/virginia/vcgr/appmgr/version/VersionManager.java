@@ -9,7 +9,8 @@ import edu.virginia.vcgr.appmgr.io.IOUtils;
 
 // import edu.virginia.vcgr.appmgr.io.ScratchSpaceManager;
 
-public class VersionManager {
+public class VersionManager
+{
 	static private final String VERSION_FILENAME = "current-version.txt";
 	// static private final String LAST_UPDATED_FILENAME = "last-updated.dat";
 
@@ -54,19 +55,18 @@ public class VersionManager {
 	// _lastUpdated = lastUpdated;
 	// }
 
-	public Version getCurrentVersion() throws IOException {
+	public Version getCurrentVersion() throws IOException
+	{
 		if (_currentVersion == null) {
 			if (!_versionFile.exists())
 				_currentVersion = Version.EMPTY_VERSION;
 			else {
 				FileReader reader = null;
-				BufferedReader lineReader = new BufferedReader(
-						reader = new FileReader(_versionFile));
+				BufferedReader lineReader = new BufferedReader(reader = new FileReader(_versionFile));
 				try {
 					String line;
 					if ((line = lineReader.readLine()) == null)
-						throw new IOException(
-								"Corrupt version file:  Unexpected EOF.");
+						throw new IOException("Corrupt version file:  Unexpected EOF.");
 					_currentVersion = new Version(line.trim());
 				} finally {
 					lineReader.close();

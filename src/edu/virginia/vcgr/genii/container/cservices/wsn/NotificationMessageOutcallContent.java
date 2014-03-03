@@ -16,7 +16,8 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 
-public class NotificationMessageOutcallContent implements Serializable {
+public class NotificationMessageOutcallContent implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	private EndpointReferenceType _subscriptionReference;
@@ -24,15 +25,16 @@ public class NotificationMessageOutcallContent implements Serializable {
 	private EndpointReferenceType _publisher;
 	private NotificationMessageContents _contents;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
+	private void writeObject(ObjectOutputStream out) throws IOException
+	{
 		EPRUtils.serializeEPR(out, _subscriptionReference);
 		EPRUtils.serializeEPR(out, _publisher);
 		out.writeObject(_topic);
 		out.writeObject(_contents);
 	}
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
 		_subscriptionReference = EPRUtils.deserializeEPR(in);
 		_publisher = EPRUtils.deserializeEPR(in);
 		_topic = (TopicPath) in.readObject();
@@ -40,15 +42,15 @@ public class NotificationMessageOutcallContent implements Serializable {
 	}
 
 	@SuppressWarnings("unused")
-	private void readObjectNoData() throws ObjectStreamException {
+	private void readObjectNoData() throws ObjectStreamException
+	{
 		throw new StreamCorruptedException();
 	}
 
-	public NotificationMessageOutcallContent(
-			EndpointReferenceType subscriptionReference, TopicPath topic,
-			EndpointReferenceType publisher,
-			NotificationMessageContents contents,
-			AdditionalUserData additionalUserData) throws JAXBException {
+	public NotificationMessageOutcallContent(EndpointReferenceType subscriptionReference, TopicPath topic,
+		EndpointReferenceType publisher, NotificationMessageContents contents, AdditionalUserData additionalUserData)
+		throws JAXBException
+	{
 		_subscriptionReference = subscriptionReference;
 		_topic = topic;
 		_publisher = publisher;
@@ -56,19 +58,23 @@ public class NotificationMessageOutcallContent implements Serializable {
 		_contents.additionalUserData(additionalUserData);
 	}
 
-	final public EndpointReferenceType subscriptionReference() {
+	final public EndpointReferenceType subscriptionReference()
+	{
 		return _subscriptionReference;
 	}
 
-	final public TopicPath topic() {
+	final public TopicPath topic()
+	{
 		return _topic;
 	}
 
-	final public EndpointReferenceType publisher() {
+	final public EndpointReferenceType publisher()
+	{
 		return _publisher;
 	}
 
-	final public NotificationMessageContents contents() {
+	final public NotificationMessageContents contents()
+	{
 		return _contents;
 	}
 }

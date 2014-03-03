@@ -31,10 +31,9 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
-public class RByteIOResource extends BasicDBResource implements
-		IRByteIOResource {
-	static public QName FILE_PATH_PROPERTY = new QName(
-			GenesisIIConstants.GENESISII_NS, "file-path");
+public class RByteIOResource extends BasicDBResource implements IRByteIOResource
+{
+	static public QName FILE_PATH_PROPERTY = new QName(GenesisIIConstants.GENESISII_NS, "file-path");
 	static protected final String _INTERNAL_FILE_PATH_PROP_NAME = "edu.virginia.vcgr.genii.byteio.rbyteio.file-path";
 	static private final String _INTERNAL_CREATE_TIME_PROP_NAME = "edu.virginia.vcgr.genii.byteio.rbyteio.create-time";
 	static private final String _INTERNAL_ACCESS_TIME_PROP_NAME = "edu.virginia.vcgr.genii.byteio.rbyteio.access-time";
@@ -42,19 +41,18 @@ public class RByteIOResource extends BasicDBResource implements
 
 	static private Log _logger = LogFactory.getLog(RByteIOResource.class);
 
-	protected RByteIOResource(ResourceKey parentKey,
-			ServerDatabaseConnectionPool connectionPool) throws SQLException {
+	protected RByteIOResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
+	{
 		super(parentKey, connectionPool);
 	}
 
-	public File chooseFile(GenesisHashMap creationProperties)
-			throws ResourceException {
+	public File chooseFile(GenesisHashMap creationProperties) throws ResourceException
+	{
 		File userDir = Container.getConfigurationManager().getUserDirectory();
 		File file = null;
 		try {
 			if (creationProperties != null) {
-				org.apache.axis.message.MessageElement any = creationProperties
-						.getAxisMessageElement(FILE_PATH_PROPERTY);
+				org.apache.axis.message.MessageElement any = creationProperties.getAxisMessageElement(FILE_PATH_PROPERTY);
 				if (any != null) {
 					file = new File(userDir, any.getAsString());
 				}
@@ -76,7 +74,8 @@ public class RByteIOResource extends BasicDBResource implements
 		return file;
 	}
 
-	public File getCurrentFile() throws ResourceException {
+	public File getCurrentFile() throws ResourceException
+	{
 		String path = (String) getProperty(_INTERNAL_FILE_PATH_PROP_NAME);
 		if (path == null)
 			return chooseFile(null);
@@ -84,7 +83,8 @@ public class RByteIOResource extends BasicDBResource implements
 		return ByteIOFileCreator.getAbsoluteFile(userDir, path);
 	}
 
-	public void destroy() throws ResourceException {
+	public void destroy() throws ResourceException
+	{
 		try {
 			File myFile = getCurrentFile();
 			myFile.delete();
@@ -95,41 +95,50 @@ public class RByteIOResource extends BasicDBResource implements
 		super.destroy();
 	}
 
-	public String getFilePath() throws ResourceException {
+	public String getFilePath() throws ResourceException
+	{
 		return (String) getProperty(_INTERNAL_FILE_PATH_PROP_NAME);
 	}
 
-	public void setCreateTime(Calendar tm) throws ResourceException {
+	public void setCreateTime(Calendar tm) throws ResourceException
+	{
 		setProperty(_INTERNAL_CREATE_TIME_PROP_NAME, tm);
 	}
 
-	public Calendar getCreateTime() throws ResourceException {
+	public Calendar getCreateTime() throws ResourceException
+	{
 		return (Calendar) getProperty(_INTERNAL_CREATE_TIME_PROP_NAME);
 	}
 
-	public void setModTime(Calendar tm) throws ResourceException {
+	public void setModTime(Calendar tm) throws ResourceException
+	{
 		getCurrentFile().setLastModified(tm.getTimeInMillis());
 	}
 
-	public Calendar getModTime() throws ResourceException {
+	public Calendar getModTime() throws ResourceException
+	{
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(getCurrentFile().lastModified());
 		return c;
 	}
 
-	public void setAccessTime(Calendar tm) throws ResourceException {
+	public void setAccessTime(Calendar tm) throws ResourceException
+	{
 		setProperty(_INTERNAL_ACCESS_TIME_PROP_NAME, tm);
 	}
 
-	public Calendar getAccessTime() throws ResourceException {
+	public Calendar getAccessTime() throws ResourceException
+	{
 		return (Calendar) getProperty(_INTERNAL_ACCESS_TIME_PROP_NAME);
 	}
 
-	public void setBitmapFilePath(String path) throws ResourceException {
+	public void setBitmapFilePath(String path) throws ResourceException
+	{
 		setProperty(_INTERNAL_BITMAP_FILE_PATH_PROP_NAME, path);
 	}
 
-	public File getBitmapFile() throws ResourceException {
+	public File getBitmapFile() throws ResourceException
+	{
 		String path = (String) getProperty(_INTERNAL_BITMAP_FILE_PATH_PROP_NAME);
 		if (path == null)
 			return null;

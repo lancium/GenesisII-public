@@ -5,13 +5,13 @@ import org.apache.axis.types.URI;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 
 /**
- * An interface for all Simple transferers. This interface is basically a
- * convenient place to put some constants relevant to the Simple transfer
- * protocol.
+ * An interface for all Simple transferers. This interface is basically a convenient place to put
+ * some constants relevant to the Simple transfer protocol.
  * 
  * @author mmm2a
  */
-public interface SimpleByteIOTransferer {
+public interface SimpleByteIOTransferer
+{
 	static final public URI TRANSFER_PROTOCOL = ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI;
 
 	static final public int PREFERRED_READ_SIZE = 1024 * 1024 * 3 * ByteIOConstants.numThreads;

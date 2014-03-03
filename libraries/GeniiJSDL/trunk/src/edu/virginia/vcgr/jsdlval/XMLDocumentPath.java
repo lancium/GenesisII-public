@@ -22,7 +22,8 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface XMLDocumentPath extends Cloneable {
+public interface XMLDocumentPath extends Cloneable
+{
 	public QName currentElement();
 
 	public QName[] currentPath();

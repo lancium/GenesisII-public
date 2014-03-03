@@ -6,34 +6,29 @@ import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FromString {
-	static private Object fromString(String value, Class<?> targetType,
-			Set<Class<?>> attemptedConversions) {
+public class FromString
+{
+	static private Object fromString(String value, Class<?> targetType, Set<Class<?>> attemptedConversions)
+	{
 		if (targetType.equals(String.class))
 			return value;
 
 		if (targetType.equals(char.class) || targetType.equals(Character.class)) {
 			if (value.length() != 1)
-				throw new IllegalArgumentException(String.format(
-						"Cannot convert \"%s\" to a character.", value));
+				throw new IllegalArgumentException(String.format("Cannot convert \"%s\" to a character.", value));
 
 			return value.charAt(0);
-		} else if (targetType.equals(short.class)
-				|| targetType.equals(Short.class))
+		} else if (targetType.equals(short.class) || targetType.equals(Short.class))
 			return Short.parseShort(value);
-		else if (targetType.equals(int.class)
-				|| targetType.equals(Integer.class))
+		else if (targetType.equals(int.class) || targetType.equals(Integer.class))
 			return Integer.parseInt(value);
 		else if (targetType.equals(long.class) || targetType.equals(Long.class))
 			return Long.parseLong(value);
-		else if (targetType.equals(float.class)
-				|| targetType.equals(Float.class))
+		else if (targetType.equals(float.class) || targetType.equals(Float.class))
 			return Float.parseFloat(value);
-		else if (targetType.equals(double.class)
-				|| targetType.equals(Double.class))
+		else if (targetType.equals(double.class) || targetType.equals(Double.class))
 			return Double.parseDouble(value);
-		else if (targetType.equals(boolean.class)
-				|| targetType.equals(Boolean.class))
+		else if (targetType.equals(boolean.class) || targetType.equals(Boolean.class))
 			return Boolean.parseBoolean(value);
 		else if (targetType.equals(StringBuilder.class))
 			return new StringBuilder(value);
@@ -66,11 +61,11 @@ public class FromString {
 			}
 		}
 
-		throw new IllegalArgumentException(String.format(
-				"Don't know how to create a %s from a String.", targetType));
+		throw new IllegalArgumentException(String.format("Don't know how to create a %s from a String.", targetType));
 	}
 
-	static public Object fromString(String value, Class<?> targetType) {
+	static public Object fromString(String value, Class<?> targetType)
+	{
 		Set<Class<?>> attemptedConversions = new HashSet<Class<?>>();
 		attemptedConversions.add(targetType);
 		return fromString(value, targetType, attemptedConversions);

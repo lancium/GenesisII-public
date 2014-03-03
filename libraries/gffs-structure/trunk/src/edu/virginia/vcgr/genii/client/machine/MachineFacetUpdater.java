@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class MachineFacetUpdater {
+public class MachineFacetUpdater
+{
 	private long _userLoggedInCheckFrequency;
 	private long _screenSaverActiveCheckFrequency;
 
@@ -20,8 +21,8 @@ public class MachineFacetUpdater {
 
 	private Thread _updater = null;
 
-	public MachineFacetUpdater(long userLoggedInCheckFrequency,
-			long screenSaverActiveCheckFrequency) {
+	public MachineFacetUpdater(long userLoggedInCheckFrequency, long screenSaverActiveCheckFrequency)
+	{
 		_userLoggedInCheckFrequency = userLoggedInCheckFrequency;
 		_screenSaverActiveCheckFrequency = screenSaverActiveCheckFrequency;
 
@@ -30,24 +31,25 @@ public class MachineFacetUpdater {
 		if (_interrogator.canDetermineUserLoggedIn())
 			_lastUserLoggedInState = new Boolean(_interrogator.isUserLoggedIn());
 		if (_interrogator.canDetermineScreenSaverActive())
-			_lastScreenSaverActiveState = new Boolean(
-					_interrogator.isScreenSaverActive());
+			_lastScreenSaverActiveState = new Boolean(_interrogator.isScreenSaverActive());
 	}
 
-	protected void finalize() {
+	protected void finalize()
+	{
 		stop();
 	}
 
-	synchronized public void start() {
+	synchronized public void start()
+	{
 		if (_updater == null) {
-			_updater = new Thread(new AutoUpdater(),
-					"Machine State Auto Updater.");
+			_updater = new Thread(new AutoUpdater(), "Machine State Auto Updater.");
 			_updater.setDaemon(true);
 			_updater.start();
 		}
 	}
 
-	synchronized public void stop() {
+	synchronized public void stop()
+	{
 		if (_updater != null) {
 			_updater = null;
 			_updater.interrupt();
@@ -56,7 +58,8 @@ public class MachineFacetUpdater {
 		_updater = null;
 	}
 
-	public void addMachineListener(MachineListener listener) {
+	public void addMachineListener(MachineListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
@@ -88,13 +91,15 @@ public class MachineFacetUpdater {
 			listener.screenSaverActivated(fireValue);
 	}
 
-	public void removeMachineListener(MachineListener listener) {
+	public void removeMachineListener(MachineListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	private void fireUserLoggedIn(boolean loggedIn) {
+	private void fireUserLoggedIn(boolean loggedIn)
+	{
 		Collection<MachineListener> listeners;
 
 		synchronized (_listeners) {
@@ -106,7 +111,8 @@ public class MachineFacetUpdater {
 		}
 	}
 
-	private void fireScreenSaverActived(boolean screenSaverActivated) {
+	private void fireScreenSaverActived(boolean screenSaverActivated)
+	{
 		Collection<MachineListener> listeners;
 
 		synchronized (_listeners) {
@@ -118,7 +124,8 @@ public class MachineFacetUpdater {
 		}
 	}
 
-	public void updateUserLoggedInState() {
+	public void updateUserLoggedInState()
+	{
 		boolean doFire = false;
 		boolean fireValue = false;
 
@@ -139,7 +146,8 @@ public class MachineFacetUpdater {
 			fireUserLoggedIn(fireValue);
 	}
 
-	public void updateScreenSaverActiveState() {
+	public void updateScreenSaverActiveState()
+	{
 		boolean doFire = false;
 		boolean fireValue = false;
 
@@ -148,8 +156,7 @@ public class MachineFacetUpdater {
 				return;
 
 			boolean lastState = _lastScreenSaverActiveState.booleanValue();
-			_lastScreenSaverActiveState = new Boolean(
-					_interrogator.isScreenSaverActive());
+			_lastScreenSaverActiveState = new Boolean(_interrogator.isScreenSaverActive());
 
 			if (lastState != _lastScreenSaverActiveState.booleanValue()) {
 				doFire = true;
@@ -161,16 +168,19 @@ public class MachineFacetUpdater {
 			fireScreenSaverActived(fireValue);
 	}
 
-	public void update() {
+	public void update()
+	{
 		updateScreenSaverActiveState();
 		updateUserLoggedInState();
 	}
 
-	private class AutoUpdater implements Runnable {
+	private class AutoUpdater implements Runnable
+	{
 		private long _nextUserLoggedInUpdate;
 		private long _nextScreenSaverActiveUpdate;
 
-		public void run() {
+		public void run()
+		{
 			long currentTime;
 
 			boolean userLoggedInChecked = false;
@@ -200,14 +210,11 @@ public class MachineFacetUpdater {
 
 				currentTime = System.currentTimeMillis();
 				if (userLoggedInChecked)
-					_nextUserLoggedInUpdate = currentTime
-							+ _userLoggedInCheckFrequency;
+					_nextUserLoggedInUpdate = currentTime + _userLoggedInCheckFrequency;
 				if (screenSaverActiveChecked)
-					_nextScreenSaverActiveUpdate = currentTime
-							+ _screenSaverActiveCheckFrequency;
+					_nextScreenSaverActiveUpdate = currentTime + _screenSaverActiveCheckFrequency;
 
-				long nextUpdate = Math.min(_nextUserLoggedInUpdate,
-						_nextScreenSaverActiveUpdate);
+				long nextUpdate = Math.min(_nextUserLoggedInUpdate, _nextScreenSaverActiveUpdate);
 
 				long waitTime = (nextUpdate - currentTime);
 				if (waitTime > 0) {

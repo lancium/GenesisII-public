@@ -6,7 +6,8 @@ import java.util.Collection;
 
 // Warning: It is expected that any implementor of this interface is thread safe
 
-public interface CloudManager {
+public interface CloudManager
+{
 
 	// Returns true if can add number of resources indicated by count
 	public boolean spawnResources(int count) throws Exception;
@@ -63,14 +64,11 @@ public interface CloudManager {
 
 	public void setController(CloudController controller);
 
-	public boolean sendFileTo(String resourceID, String localPath,
-			String remotePath) throws Exception;
+	public boolean sendFileTo(String resourceID, String localPath, String remotePath) throws Exception;
 
-	public boolean recieveFileFrom(String resourceID, String localPath,
-			String remotePath) throws Exception;
+	public boolean recieveFileFrom(String resourceID, String localPath, String remotePath) throws Exception;
 
-	public int sendCommand(String resourceID, String command, OutputStream out,
-			OutputStream err) throws Exception;
+	public int sendCommand(String resourceID, String command, OutputStream out, OutputStream err) throws Exception;
 
 	boolean checkFile(String resourceID, String path) throws Exception;
 

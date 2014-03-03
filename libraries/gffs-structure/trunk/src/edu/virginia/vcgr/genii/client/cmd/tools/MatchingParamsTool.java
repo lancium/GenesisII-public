@@ -15,42 +15,41 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.client.queue.MatchingParamEnum;
 
-public class MatchingParamsTool extends BaseGridTool {
+public class MatchingParamsTool extends BaseGridTool
+{
 	static final private String _DESCRIPTION = "config/tooldocs/description/dmatching-params";
-	static final private LoadFileResource _USAGE = new LoadFileResource(
-			"config/tooldocs/usage/umatching-params");
+	static final private LoadFileResource _USAGE = new LoadFileResource("config/tooldocs/usage/umatching-params");
 	static final private String _MANPAGE = "config/tooldocs/man/matching-params";
 
 	static private final Pattern ADD_REMOVE_PATTERN = Pattern
-			.compile("^\\s*((?:add)|(?:remove))\\s*\\(([^),]+),([^)]+)\\)\\s*$");
+		.compile("^\\s*((?:add)|(?:remove))\\s*\\(([^),]+),([^)]+)\\)\\s*$");
 
 	private Collection<String> _targets = new LinkedList<String>();
 	private Collection<MatchingParameter> _adds = new LinkedList<MatchingParameter>();
 	private Collection<MatchingParameter> _removes = new LinkedList<MatchingParameter>();
 
-	private void verifyParameterName(String name)
-			throws InvalidToolUsageException {
+	private void verifyParameterName(String name) throws InvalidToolUsageException
+	{
 		try {
 			int index = name.indexOf(':');
 			if (index > 0)
 				MatchingParamEnum.valueOf(name.substring(0, index));
 		} catch (IllegalArgumentException e) {
-			throw new InvalidToolUsageException(
-					String.format(
-							"Matching parameter name %s is not valid (requirment indicator must be %s, or %s).",
-							name, MatchingParamEnum.requires,
-							MatchingParamEnum.supports));
+			throw new InvalidToolUsageException(String.format(
+				"Matching parameter name %s is not valid (requirment indicator must be %s, or %s).", name,
+				MatchingParamEnum.requires, MatchingParamEnum.supports));
 		}
 	}
 
-	public MatchingParamsTool() {
-		super(new LoadFileResource(_DESCRIPTION), _USAGE, false,
-				ToolCategory.ADMINISTRATION);
+	public MatchingParamsTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), _USAGE, false, ToolCategory.ADMINISTRATION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		RNSPath current = RNSPath.getCurrent();
 		MatchingParameter[] addParameters;
 		MatchingParameter[] removeParameters;
@@ -63,8 +62,7 @@ public class MatchingParamsTool extends BaseGridTool {
 
 		for (String target : _targets) {
 			for (RNSPath t : current.expand(target)) {
-				GeniiCommon stub = ClientUtils.createProxy(GeniiCommon.class,
-						t.getEndpoint());
+				GeniiCommon stub = ClientUtils.createProxy(GeniiCommon.class, t.getEndpoint());
 
 				if (addParameters.length > 0) {
 					stdout.format("Adding values to %s\n", t.pwd());
@@ -82,13 +80,15 @@ public class MatchingParamsTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (_targets.size() < 1)
 			throw new InvalidToolUsageException();
 	}
 
 	@Override
-	public void addArgument(String argument) throws ToolException {
+	public void addArgument(String argument) throws ToolException
+	{
 		Matcher matcher = ADD_REMOVE_PATTERN.matcher(argument);
 		if (matcher.matches()) {
 			String addRemove = matcher.group(1).trim();
@@ -102,13 +102,11 @@ public class MatchingParamsTool extends BaseGridTool {
 			else if (addRemove.equals("remove"))
 				_removes.add(new MatchingParameter(name, value));
 			else
-				throw new InvalidToolUsageException(
-						"Unknown error occurred in tool.");
+				throw new InvalidToolUsageException("Unknown error occurred in tool.");
 		} else {
 			GeniiPath gPath = new GeniiPath(argument);
 			if (gPath.pathType() != GeniiPathType.Grid)
-				throw new InvalidToolUsageException(
-						"<target> must be a grid path. ");
+				throw new InvalidToolUsageException("<target> must be a grid path. ");
 			_targets.add(argument);
 		}
 	}

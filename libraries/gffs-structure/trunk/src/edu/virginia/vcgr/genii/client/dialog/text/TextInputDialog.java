@@ -6,7 +6,8 @@ import edu.virginia.vcgr.genii.client.dialog.InputValidator;
 import edu.virginia.vcgr.genii.client.dialog.TextContent;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 
-public class TextInputDialog extends AbstractTextDialog implements InputDialog {
+public class TextInputDialog extends AbstractTextDialog implements InputDialog
+{
 	private String _defaultAnswer;
 	protected InputValidator _validator;
 	private String _hint;
@@ -14,7 +15,8 @@ public class TextInputDialog extends AbstractTextDialog implements InputDialog {
 	private boolean _hidden;
 	private String _answer;
 
-	protected String generateHint() {
+	protected String generateHint()
+	{
 		if (getHelp() != null) {
 			return "Hint:  You may enter \"Cancel\" to cancel this selection, or \"Help\" to get help.";
 		} else {
@@ -22,7 +24,8 @@ public class TextInputDialog extends AbstractTextDialog implements InputDialog {
 		}
 	}
 
-	TextInputDialog(String title, ConsolePackage pkg, String prompt) {
+	TextInputDialog(String title, ConsolePackage pkg, String prompt)
+	{
 		super(title, pkg);
 
 		_defaultAnswer = null;
@@ -32,38 +35,45 @@ public class TextInputDialog extends AbstractTextDialog implements InputDialog {
 		_hint = generateHint();
 	}
 
-	protected void setHidden(boolean isHidden) {
+	protected void setHidden(boolean isHidden)
+	{
 		_hidden = isHidden;
 	}
 
 	@Override
-	public void setHelp(TextContent helpContent) {
+	public void setHelp(TextContent helpContent)
+	{
 		super.setHelp(helpContent);
 
 		generateHint();
 	}
 
 	@Override
-	public void setDefaultAnswer(String defaultAnswer) {
+	public void setDefaultAnswer(String defaultAnswer)
+	{
 		_defaultAnswer = defaultAnswer;
 	}
 
 	@Override
-	public String getDefaultAnswer() {
+	public String getDefaultAnswer()
+	{
 		return _defaultAnswer;
 	}
 
 	@Override
-	public InputValidator getInputValidator() {
+	public InputValidator getInputValidator()
+	{
 		return _validator;
 	}
 
 	@Override
-	public void setInputValidator(InputValidator validator) {
+	public void setInputValidator(InputValidator validator)
+	{
 		_validator = validator;
 	}
 
-	protected void showContent() {
+	protected void showContent()
+	{
 		_package.stdout().println(_hint);
 		_package.stdout().print(_prompt);
 		if (_defaultAnswer != null)
@@ -73,7 +83,8 @@ public class TextInputDialog extends AbstractTextDialog implements InputDialog {
 	}
 
 	@Override
-	public void showDialog() throws DialogException, UserCancelException {
+	public void showDialog() throws DialogException, UserCancelException
+	{
 		while (true) {
 			_answer = null;
 
@@ -106,7 +117,8 @@ public class TextInputDialog extends AbstractTextDialog implements InputDialog {
 	}
 
 	@Override
-	public String getAnswer() {
+	public String getAnswer()
+	{
 		return _answer;
 	}
 }

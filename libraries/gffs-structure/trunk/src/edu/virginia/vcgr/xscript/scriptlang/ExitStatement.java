@@ -8,18 +8,19 @@ import edu.virginia.vcgr.xscript.ReturnFromFunctionException;
 import edu.virginia.vcgr.xscript.XScriptContext;
 import edu.virginia.vcgr.xscript.macros.MacroReplacer;
 
-public class ExitStatement implements ParseStatement {
+public class ExitStatement implements ParseStatement
+{
 	private String _exitCode;
 
-	public ExitStatement(String exitCode) {
+	public ExitStatement(String exitCode)
+	{
 		_exitCode = exitCode;
 	}
 
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException {
-		int exitCode = Integer.parseInt(MacroReplacer.replaceMacros(context,
-				_exitCode));
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
+	{
+		int exitCode = Integer.parseInt(MacroReplacer.replaceMacros(context, _exitCode));
 		throw new EarlyExitException(exitCode);
 	}
 }

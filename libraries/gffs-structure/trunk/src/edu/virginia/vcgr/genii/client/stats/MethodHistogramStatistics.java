@@ -8,24 +8,26 @@ import org.morgan.data.RelativeTimeRangeLabelDelegate;
 import org.morgan.data.TimeBasedHistogramSet;
 import org.morgan.data.TimeRange;
 
-public class MethodHistogramStatistics {
+public class MethodHistogramStatistics
+{
 	private int _activeMethods = 0;
-	private TimeBasedHistogramSet _histoData = new TimeBasedHistogramSet(1,
-			TimeUnit.MINUTES);
+	private TimeBasedHistogramSet _histoData = new TimeBasedHistogramSet(1, TimeUnit.MINUTES);
 
-	synchronized public void addActiveMethod() {
+	synchronized public void addActiveMethod()
+	{
 		_activeMethods++;
 		_histoData.addValue(_activeMethods);
 	}
 
-	synchronized public void removeActiveMethod() {
+	synchronized public void removeActiveMethod()
+	{
 		_activeMethods--;
 		_histoData.addValue(_activeMethods);
 	}
 
-	public Histogram<TimeRange> histogram() {
-		return _histoData.histogram(5, TimeUnit.SECONDS,
-				HistogramDataCombiners.MaximumCombiner,
-				new RelativeTimeRangeLabelDelegate(TimeUnit.SECONDS));
+	public Histogram<TimeRange> histogram()
+	{
+		return _histoData.histogram(5, TimeUnit.SECONDS, HistogramDataCombiners.MaximumCombiner,
+			new RelativeTimeRangeLabelDelegate(TimeUnit.SECONDS));
 	}
 }

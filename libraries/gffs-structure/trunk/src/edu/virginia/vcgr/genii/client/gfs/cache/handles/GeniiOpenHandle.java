@@ -3,7 +3,8 @@ package edu.virginia.vcgr.genii.client.gfs.cache.handles;
 import edu.virginia.vcgr.fsii.FilesystemStatStructure;
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 
-public abstract class GeniiOpenHandle<CacheObject> {
+public abstract class GeniiOpenHandle<CacheObject>
+{
 	CacheObject _cacheObject = null;
 	String[] _path = null;
 
@@ -27,11 +28,13 @@ public abstract class GeniiOpenHandle<CacheObject> {
 
 	public abstract boolean isDirectory();
 
-	public String[] getPath() {
+	public String[] getPath()
+	{
 		return _path;
 	}
 
-	public void invalidate() {
+	public void invalidate()
+	{
 		_cacheObject = null;
 	}
 }

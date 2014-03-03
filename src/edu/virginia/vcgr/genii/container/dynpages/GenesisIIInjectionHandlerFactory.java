@@ -10,21 +10,20 @@ import org.morgan.util.configuration.ConfigurationException;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
-public class GenesisIIInjectionHandlerFactory implements
-		ObjectInjectionHandlerFactory {
+public class GenesisIIInjectionHandlerFactory implements ObjectInjectionHandlerFactory
+{
 	private ServerDatabaseConnectionPool _connectionPool;
 
-	public GenesisIIInjectionHandlerFactory() {
-		_connectionPool = (ServerDatabaseConnectionPool) NamedInstances
-				.getServerInstances().lookup("connection-pool");
+	public GenesisIIInjectionHandlerFactory()
+	{
+		_connectionPool = (ServerDatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
 		if (_connectionPool == null)
-			throw new ConfigurationException(
-					"Unable to find named instance \"connection-pool\".");
+			throw new ConfigurationException("Unable to find named instance \"connection-pool\".");
 	}
 
 	@Override
-	public ObjectInjectionHandler createHandler(String target,
-			HttpServletRequest request) throws InjectionException {
+	public ObjectInjectionHandler createHandler(String target, HttpServletRequest request) throws InjectionException
+	{
 		return new GenesisIIInjectionHandler(_connectionPool);
 	}
 }

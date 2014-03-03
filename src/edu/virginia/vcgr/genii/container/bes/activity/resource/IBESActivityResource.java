@@ -20,7 +20,8 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 
-public interface IBESActivityResource extends IResource {
+public interface IBESActivityResource extends IResource
+{
 	static public final String FILESYSTEM_MANAGER = "edu.virginia.vcgr.genii.container.bes.activity.filesystem-manager";
 
 	static public final String FUSE_MOUNT_PROPERTY = "edu.virginia.vcgr.genii.container.bes.activity.fuse-mount-dir";

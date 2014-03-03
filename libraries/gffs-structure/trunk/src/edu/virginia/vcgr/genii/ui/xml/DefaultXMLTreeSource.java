@@ -14,17 +14,17 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
-public class DefaultXMLTreeSource implements XMLTreeSource {
-	static final private QName TEMP_URI_NAME = new QName("http://tempuri.org",
-			"temp");
+public class DefaultXMLTreeSource implements XMLTreeSource
+{
+	static final private QName TEMP_URI_NAME = new QName("http://tempuri.org", "temp");
 
 	private XMLEventReader _reader = null;
 	private QName _name = null;
 	private Object _object = null;
 	private MessageElement _me = null;
 
-	private XMLEventReader createReader(String string)
-			throws XMLStreamException {
+	private XMLEventReader createReader(String string) throws XMLStreamException
+	{
 		StringReader sReader = null;
 
 		XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -35,21 +35,25 @@ public class DefaultXMLTreeSource implements XMLTreeSource {
 		return factory.createXMLEventReader(sReader);
 	}
 
-	public DefaultXMLTreeSource(XMLEventReader reader) {
+	public DefaultXMLTreeSource(XMLEventReader reader)
+	{
 		_reader = reader;
 	}
 
-	public DefaultXMLTreeSource(Object obj) {
+	public DefaultXMLTreeSource(Object obj)
+	{
 		_name = TEMP_URI_NAME;
 		_object = obj;
 	}
 
-	public DefaultXMLTreeSource(MessageElement me) {
+	public DefaultXMLTreeSource(MessageElement me)
+	{
 		_me = me;
 	}
 
 	@Override
-	public XMLEventReader getReader() throws Throwable {
+	public XMLEventReader getReader() throws Throwable
+	{
 		if (_reader == null) {
 			StringWriter sWriter = null;
 

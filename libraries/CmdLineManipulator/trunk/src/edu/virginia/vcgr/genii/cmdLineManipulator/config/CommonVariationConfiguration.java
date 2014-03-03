@@ -15,8 +15,8 @@ import org.w3c.dom.Element;
 import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorConstants;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public class CommonVariationConfiguration implements Serializable,
-		CmdLineManipulatorConstants {
+public class CommonVariationConfiguration implements Serializable, CmdLineManipulatorConstants
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = NAMESPACE, name = "exec-command", required = false, nillable = false)
@@ -29,19 +29,23 @@ public class CommonVariationConfiguration implements Serializable,
 	@XmlAnyElement
 	private Collection<Element> _any = new ArrayList<Element>();
 
-	final public String execCmd() {
+	final public String execCmd()
+	{
 		return _execCommand;
 	}
 
-	final public void execCmd(String newCmd) {
+	final public void execCmd(String newCmd)
+	{
 		_execCommand = newCmd;
 	}
 
-	final public List<String> additionalArgs() {
+	final public List<String> additionalArgs()
+	{
 		return _additionalArgs;
 	}
 
-	final public void additionalArgs(List<String> newArgs) {
+	final public void additionalArgs(List<String> newArgs)
+	{
 		_additionalArgs = newArgs;
 	}
 

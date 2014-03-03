@@ -6,10 +6,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
 
-public class OSPath implements Iterable<File> {
+public class OSPath implements Iterable<File>
+{
 	private Collection<File> _paths = new LinkedList<File>();
 
-	public OSPath(String envVariable, String pathSeparator) {
+	public OSPath(String envVariable, String pathSeparator)
+	{
 		String value = System.getenv(envVariable);
 		if (value != null) {
 			String[] values = value.split(Pattern.quote(pathSeparator));
@@ -25,20 +27,24 @@ public class OSPath implements Iterable<File> {
 		}
 	}
 
-	public OSPath(String envVariable) {
+	public OSPath(String envVariable)
+	{
 		this(envVariable, File.pathSeparator);
 	}
 
 	@Override
-	final public Iterator<File> iterator() {
+	final public Iterator<File> iterator()
+	{
 		return _paths.iterator();
 	}
 
-	static public Iterable<File> osPath() {
+	static public Iterable<File> osPath()
+	{
 		return new OSPath("PATH");
 	}
 
-	static public Iterable<File> osLibraryPath() {
+	static public Iterable<File> osLibraryPath()
+	{
 		return new OSPath("LD_LIBRARY_PATH");
 	}
 }

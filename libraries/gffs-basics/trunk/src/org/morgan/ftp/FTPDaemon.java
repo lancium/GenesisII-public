@@ -9,7 +9,8 @@ import java.net.SocketAddress;
 import org.apache.log4j.Logger;
 import org.morgan.util.io.StreamUtils;
 
-public class FTPDaemon {
+public class FTPDaemon
+{
 	static private Logger _logger = Logger.getLogger(FTPDaemon.class);
 
 	private IBackendFactory _backendFactory;
@@ -20,8 +21,8 @@ public class FTPDaemon {
 
 	private Thread _serverThread = null;
 
-	public FTPDaemon(IBackendFactory backendFactory,
-			FTPConfiguration configuration) {
+	public FTPDaemon(IBackendFactory backendFactory, FTPConfiguration configuration)
+	{
 		_listenerManager = new FTPListenerManager();
 		_backendFactory = backendFactory;
 		_configuration = configuration;
@@ -31,19 +32,23 @@ public class FTPDaemon {
 		_listenerManager.addFTPListener(_vulture);
 	}
 
-	public int getPort() {
+	public int getPort()
+	{
 		return _configuration.getListenPort();
 	}
 
-	public void addFTPListener(FTPListener listener) {
+	public void addFTPListener(FTPListener listener)
+	{
 		_listenerManager.addFTPListener(listener);
 	}
 
-	public void removeFTPListener(FTPListener listener) {
+	public void removeFTPListener(FTPListener listener)
+	{
 		_listenerManager.removeFTPListener(listener);
 	}
 
-	synchronized public void start() throws FTPException, IOException {
+	synchronized public void start() throws FTPException, IOException
+	{
 		if (_serverSocket != null)
 			throw new FTPException("Server already running.");
 
@@ -56,7 +61,8 @@ public class FTPDaemon {
 		_serverThread.start();
 	}
 
-	synchronized public void stop() throws FTPException, IOException {
+	synchronized public void stop() throws FTPException, IOException
+	{
 		if (_serverSocket == null)
 			throw new FTPException("Server is not running.");
 
@@ -66,32 +72,33 @@ public class FTPDaemon {
 		StreamUtils.close(_vulture);
 	}
 
-	synchronized public boolean isRunning() {
+	synchronized public boolean isRunning()
+	{
 		return _serverSocket != null;
 	}
 
-	private class ServerThread implements Runnable {
-		public void run() {
+	private class ServerThread implements Runnable
+	{
+		public void run()
+		{
 			int nextSession = 0;
 
 			try {
 				while (true) {
 					Socket socket = _serverSocket.accept();
 					SocketAddress addr = socket.getRemoteSocketAddress();
-					if (!(addr instanceof InetSocketAddress)
-							|| !_configuration.connectionAllowed(addr)) {
+					if (!(addr instanceof InetSocketAddress) || !_configuration.connectionAllowed(addr)) {
 						_logger.error("Denied connection request from " + addr);
 
 						StreamUtils.close(socket);
 					} else {
-						FTPSession session = new FTPSession(_listenerManager,
-								_configuration, nextSession++,
+						FTPSession session =
+							new FTPSession(_listenerManager, _configuration, nextSession++,
 								_backendFactory.newBackendInstance(), socket);
 
 						_vulture.addSession(session);
 
-						Thread th = new Thread(session, "FTP Session ("
-								+ (nextSession - 1) + ") Thread");
+						Thread th = new Thread(session, "FTP Session (" + (nextSession - 1) + ") Thread");
 						th.setDaemon(true);
 						th.start();
 					}

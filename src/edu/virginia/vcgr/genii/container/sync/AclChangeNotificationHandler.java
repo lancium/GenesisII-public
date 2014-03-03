@@ -20,24 +20,22 @@ import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider
 import edu.virginia.vcgr.genii.security.RWXCategory;
 
 /**
- * This class can handle AclChange messages for all resource types. If the
- * current working context contains credentials with write access to the current
- * resource, then update the resource's ACLs as specified in the ChangeContents
- * message.
+ * This class can handle AclChange messages for all resource types. If the current working context
+ * contains credentials with write access to the current resource, then update the resource's ACLs
+ * as specified in the ChangeContents message.
  */
-public class AclChangeNotificationHandler extends
-		AbstractNotificationHandler<AclChangeContents> {
-	static private Log _logger = LogFactory
-			.getLog(AclChangeNotificationHandler.class);
+public class AclChangeNotificationHandler extends AbstractNotificationHandler<AclChangeContents>
+{
+	static private Log _logger = LogFactory.getLog(AclChangeNotificationHandler.class);
 
-	public AclChangeNotificationHandler() {
+	public AclChangeNotificationHandler()
+	{
 		super(AclChangeContents.class);
 	}
 
-	public String handleNotification(TopicPath topicPath,
-			EndpointReferenceType producerReference,
-			EndpointReferenceType subscriptionReference,
-			AclChangeContents contents) throws Exception {
+	public String handleNotification(TopicPath topicPath, EndpointReferenceType producerReference,
+		EndpointReferenceType subscriptionReference, AclChangeContents contents) throws Exception
+	{
 		VersionVector remoteVector = contents.versionVector();
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		IResource resource = rKey.dereference();
@@ -51,15 +49,12 @@ public class AclChangeNotificationHandler extends
 		IAuthZProvider authZHandler = AuthZProviders.getProvider(serviceName);
 		try {
 			resourceLock.lock();
-			VersionVector localVector = (VersionVector) resource
-					.getProperty(SyncProperty.VERSION_VECTOR_PROP_NAME);
-			MessageFlags flags = VersionedResourceUtils.validateNotification(
-					resource, localVector, remoteVector);
+			VersionVector localVector = (VersionVector) resource.getProperty(SyncProperty.VERSION_VECTOR_PROP_NAME);
+			MessageFlags flags = VersionedResourceUtils.validateNotification(resource, localVector, remoteVector);
 			if (flags.status != null)
 				return flags.status;
 			authZHandler.receiveAuthZConfig(contents, resource);
-			VersionedResourceUtils.updateVersionVector(resource, localVector,
-					remoteVector);
+			VersionedResourceUtils.updateVersionVector(resource, localVector, remoteVector);
 			// replay = flags.replay;
 		} finally {
 			resourceLock.unlock();

@@ -5,15 +5,18 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FileIOSource implements IOSource {
+public class FileIOSource implements IOSource
+{
 	private File _file;
 
-	public FileIOSource(File file) {
+	public FileIOSource(File file)
+	{
 		_file = file;
 	}
 
 	@Override
-	public InputStream open() throws IOException {
+	public InputStream open() throws IOException
+	{
 		return new FileInputStream(_file);
 	}
 }

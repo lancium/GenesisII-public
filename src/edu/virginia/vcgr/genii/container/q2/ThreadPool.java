@@ -8,13 +8,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A simple thread pool class. This class doesn't do anything fancy with
- * creating/timing out threads. It simply creates the number asked for and keeps
- * them alive.
+ * A simple thread pool class. This class doesn't do anything fancy with creating/timing out
+ * threads. It simply creates the number asked for and keeps them alive.
  * 
  * @author mmm2a
  */
-public class ThreadPool implements Closeable {
+public class ThreadPool implements Closeable
+{
 	static private Log _logger = LogFactory.getLog(ThreadPool.class);
 
 	volatile private boolean _closing = false;
@@ -35,10 +35,10 @@ public class ThreadPool implements Closeable {
 	 * @param maxSize
 	 *            The number of threads to allocate.
 	 */
-	public ThreadPool(int maxSize) {
+	public ThreadPool(int maxSize)
+	{
 		if (maxSize <= 0)
-			throw new IllegalArgumentException(
-					"maxSize MUST be greater than 0.");
+			throw new IllegalArgumentException("maxSize MUST be greater than 0.");
 
 		/*
 		 * Create all of the threads and start them running.
@@ -53,11 +53,13 @@ public class ThreadPool implements Closeable {
 		}
 	}
 
-	protected void finalize() throws Throwable {
+	protected void finalize() throws Throwable
+	{
 		close();
 	}
 
-	synchronized public void close() throws IOException {
+	synchronized public void close() throws IOException
+	{
 		if (_closing)
 			return;
 
@@ -73,7 +75,8 @@ public class ThreadPool implements Closeable {
 	 * @param job
 	 *            The Worker looking for a thread to run on.
 	 */
-	public void enqueue(OutcallHandler job) {
+	public void enqueue(OutcallHandler job)
+	{
 		synchronized (_queue) {
 			for (OutcallHandler handler : _queue)
 				if (handler.equals(job))
@@ -87,20 +90,23 @@ public class ThreadPool implements Closeable {
 		}
 	}
 
-	public int size() {
+	public int size()
+	{
 		synchronized (_queue) {
 			return _queue.size();
 		}
 	}
 
 	/**
-	 * This is the internal thread runner class. It's job is to wait for a
-	 * worker task to get enqueue, then run it and go back to sleep.
+	 * This is the internal thread runner class. It's job is to wait for a worker task to get
+	 * enqueue, then run it and go back to sleep.
 	 * 
 	 * @author mmm2a
 	 */
-	private class ThreadWorker implements Runnable {
-		public void run() {
+	private class ThreadWorker implements Runnable
+	{
+		public void run()
+		{
 			OutcallHandler job;
 
 			while (!_closing) {
@@ -119,8 +125,8 @@ public class ThreadPool implements Closeable {
 
 					try {
 						/*
-						 * Run the task. Make sure we catch all exceptions so
-						 * that the thread doesn't exit prematurely.
+						 * Run the task. Make sure we catch all exceptions so that the thread
+						 * doesn't exit prematurely.
 						 */
 						job.run();
 					} catch (Throwable cause) {

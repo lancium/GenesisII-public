@@ -18,7 +18,8 @@ import edu.virginia.vcgr.genii.client.security.axis.AclAuthZClientTool;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
-public class Security {
+public class Security
+{
 	static private Log _logger = LogFactory.getLog(Security.class);
 
 	static private final String SECURITY_DIRECTORY_NAME = "security";
@@ -31,32 +32,27 @@ public class Security {
 	private File _securityPropertiesFile;
 	private Properties _securityProperties;
 
-	Security(HierarchicalDirectory deploymentDirectory,
-			HierarchicalDirectory configurationDirectory) {
-		_securityDirectory = deploymentDirectory
-				.lookupDirectory(SECURITY_DIRECTORY_NAME);
-		_securityPropertiesFile = configurationDirectory
-				.lookupFile(SECURITY_PROPERTIES_FILE_NAME);
+	Security(HierarchicalDirectory deploymentDirectory, HierarchicalDirectory configurationDirectory)
+	{
+		_securityDirectory = deploymentDirectory.lookupDirectory(SECURITY_DIRECTORY_NAME);
+		_securityPropertiesFile = configurationDirectory.lookupFile(SECURITY_PROPERTIES_FILE_NAME);
 		_securityProperties = new Properties();
 
 		if (!_securityDirectory.exists())
 			throw new InvalidDeploymentException(deploymentDirectory.getName(),
-					"Couldn't find security directory in deployment.");
+				"Couldn't find security directory in deployment.");
 		if (!_securityPropertiesFile.exists())
-			throw new InvalidDeploymentException(deploymentDirectory.getName(),
-					"Couldn't find security properties file \""
-							+ SECURITY_PROPERTIES_FILE_NAME
-							+ " in deployment's configuration directory.");
+			throw new InvalidDeploymentException(deploymentDirectory.getName(), "Couldn't find security properties file \""
+				+ SECURITY_PROPERTIES_FILE_NAME + " in deployment's configuration directory.");
 
 		FileInputStream fin = null;
 		try {
 			fin = new FileInputStream(_securityPropertiesFile);
 			_securityProperties.load(fin);
 		} catch (IOException ioe) {
-			_logger.fatal(
-					"Unable to load security properties from deployment.", ioe);
+			_logger.fatal("Unable to load security properties from deployment.", ioe);
 			throw new InvalidDeploymentException(deploymentDirectory.getName(),
-					"Unable to load security properties from deployment.");
+				"Unable to load security properties from deployment.");
 		} finally {
 			StreamUtils.close(fin);
 		}
@@ -86,45 +82,46 @@ public class Security {
 	// return ret;
 	// }
 
-	public HierarchicalDirectory getSecurityDirectory() {
+	public HierarchicalDirectory getSecurityDirectory()
+	{
 		return _securityDirectory;
 	}
 
-	public File getSecurityFile(String filename) {
-		File toReturn = InstallationProperties.getInstallationProperties()
-				.getSecurityFile(filename);
+	public File getSecurityFile(String filename)
+	{
+		File toReturn = InstallationProperties.getInstallationProperties().getSecurityFile(filename);
 		if (toReturn == null)
 			toReturn = _securityDirectory.lookupFile(filename);
 		return toReturn;
 	}
 
-	public String getProperty(String propertyName) {
-		String toReturn = InstallationProperties.getInstallationProperties()
-				.getProperty(propertyName, null);
+	public String getProperty(String propertyName)
+	{
+		String toReturn = InstallationProperties.getInstallationProperties().getProperty(propertyName, null);
 		if (toReturn == null)
 			toReturn = getProperty(propertyName, null);
 		return toReturn;
 	}
 
-	public String getProperty(String propertyName, String def) {
-		String toReturn = InstallationProperties.getInstallationProperties()
-				.getProperty(propertyName, def);
+	public String getProperty(String propertyName, String def)
+	{
+		String toReturn = InstallationProperties.getInstallationProperties().getProperty(propertyName, def);
 		if (toReturn == null)
 			toReturn = _securityProperties.getProperty(propertyName, def);
 		return toReturn;
 	}
 
-	public String getSigningKeystoreFile() {
-		Security resourceIdSecProps = Installation.getDeployment(
-				new DeploymentName()).security();
-		String keyProp = resourceIdSecProps
-				.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
-		String keystoreLoc = Installation.getDeployment(new DeploymentName())
-				.security().getSecurityFile(keyProp).getAbsolutePath();
+	public String getSigningKeystoreFile()
+	{
+		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
+		String keyProp = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
+		String keystoreLoc =
+			Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyProp).getAbsolutePath();
 		return keystoreLoc;
 	}
 
-	public Identity getAdminIdentity() {
+	public Identity getAdminIdentity()
+	{
 		synchronized (Security.class) {
 			if (!_loadedAdministrator) {
 				_loadedAdministrator = true;
@@ -132,14 +129,10 @@ public class Security {
 				File file = getSecurityFile(ADMIN_CERTIFICATE_FILE);
 				if (file.exists()) {
 					try {
-						GeniiPath filePath = new GeniiPath("local:"
-								+ file.getAbsolutePath());
-						_administrator = AclAuthZClientTool
-								.downloadIdentity(filePath);
+						GeniiPath filePath = new GeniiPath("local:" + file.getAbsolutePath());
+						_administrator = AclAuthZClientTool.downloadIdentity(filePath);
 					} catch (Throwable cause) {
-						_logger.warn(
-								"Unable to get administrator certificate.",
-								cause);
+						_logger.warn("Unable to get administrator certificate.", cause);
 					}
 				}
 			}
@@ -148,17 +141,15 @@ public class Security {
 		}
 	}
 
-	public boolean isDeploymentAdministrator(ICallingContext callingContext) {
+	public boolean isDeploymentAdministrator(ICallingContext callingContext)
+	{
 		Identity adminIdentity = getAdminIdentity();
 		try {
 			if (adminIdentity != null) {
-				for (Identity id : KeystoreManager
-						.getCallerIdentities(callingContext)) {
+				for (Identity id : KeystoreManager.getCallerIdentities(callingContext)) {
 					if (adminIdentity.equals(id)) {
 						if (_logger.isTraceEnabled())
-							_logger.trace("found id matching admin cert: "
-									+ adminIdentity
-											.describe(VerbosityLevel.LOW));
+							_logger.trace("found id matching admin cert: " + adminIdentity.describe(VerbosityLevel.LOW));
 						return true;
 					}
 				}
@@ -168,18 +159,15 @@ public class Security {
 		}
 
 		// try again using any registered owner certificate.
-		Identity ownerCert = InstallationProperties.getInstallationProperties()
-				.getOwnerCertificate();
+		Identity ownerCert = InstallationProperties.getInstallationProperties().getOwnerCertificate();
 		if (ownerCert == null) {
 			return false;
 		}
 		try {
-			for (Identity id : KeystoreManager
-					.getCallerIdentities(callingContext)) {
+			for (Identity id : KeystoreManager.getCallerIdentities(callingContext)) {
 				if (ownerCert.equals(id)) {
 					if (_logger.isTraceEnabled())
-						_logger.trace("found id matching owner cert: "
-								+ ownerCert.describe(VerbosityLevel.LOW));
+						_logger.trace("found id matching owner cert: " + ownerCert.describe(VerbosityLevel.LOW));
 					return true;
 				}
 			}
@@ -189,13 +177,14 @@ public class Security {
 		return false;
 	}
 
-	static public boolean isAdministrator(ICallingContext callingContext) {
+	static public boolean isAdministrator(ICallingContext callingContext)
+	{
 		DeploymentName depName = new DeploymentName();
-		return Installation.getDeployment(depName).security()
-				.isDeploymentAdministrator(callingContext);
+		return Installation.getDeployment(depName).security().isDeploymentAdministrator(callingContext);
 	}
 
-	static public boolean isAdministrator() {
+	static public boolean isAdministrator()
+	{
 		try {
 			return isAdministrator(ContextManager.getExistingContext());
 		} catch (Throwable cause) {

@@ -16,16 +16,16 @@ import edu.virginia.vcgr.genii.gjt.data.xpath.XPathBuilder;
 import edu.virginia.vcgr.jsdl.DataStaging;
 import edu.virginia.vcgr.jsdl.sweep.SweepParameter;
 
-@XmlSeeAlso({ UndefinedStageData.class, GridStageData.class,
-		HttpStageData.class, MailtoStageData.class, FtpStageData.class,
-		ScpStageData.class })
-public interface StageData {
+@XmlSeeAlso({ UndefinedStageData.class, GridStageData.class, HttpStageData.class, MailtoStageData.class, FtpStageData.class,
+	ScpStageData.class })
+public interface StageData
+{
 	public StageProtocol protocol();
 
 	public void analyze(String filename, Analysis analysis);
 
-	public void generateAdditionalJSDL(DataStaging jsdlStaging,
-			XPathBuilder builder, Map<String, List<SweepParameter>> variables);
+	public void generateAdditionalJSDL(DataStaging jsdlStaging, XPathBuilder builder,
+		Map<String, List<SweepParameter>> variables);
 
 	public String getJSDLURI();
 

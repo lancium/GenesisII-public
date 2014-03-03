@@ -5,7 +5,8 @@ import java.io.IOException;
 
 import org.morgan.util.io.StreamUtils;
 
-public class FTPSessionState implements Closeable {
+public class FTPSessionState implements Closeable
+{
 	static final public int HISTORY_CAPACITY = 10;
 
 	private FTPListenerManager _listenerManager;
@@ -14,8 +15,8 @@ public class FTPSessionState implements Closeable {
 	private IBackend _backend;
 	private int _sessionID;
 
-	public FTPSessionState(FTPListenerManager listenerManager,
-			FTPConfiguration configuration, IBackend backend, int sessionID) {
+	public FTPSessionState(FTPListenerManager listenerManager, FTPConfiguration configuration, IBackend backend, int sessionID)
+	{
 		_listenerManager = listenerManager;
 		_commandHistory = new RollingCommandHistory(HISTORY_CAPACITY);
 		_backend = backend;
@@ -23,33 +24,40 @@ public class FTPSessionState implements Closeable {
 		_configuration = configuration;
 	}
 
-	protected void finalize() throws Throwable {
+	protected void finalize() throws Throwable
+	{
 		super.finalize();
 
 		close();
 	}
 
-	public FTPConfiguration getConfiguration() {
+	public FTPConfiguration getConfiguration()
+	{
 		return _configuration;
 	}
 
-	public RollingCommandHistory getHistory() {
+	public RollingCommandHistory getHistory()
+	{
 		return _commandHistory;
 	}
 
-	public IBackend getBackend() {
+	public IBackend getBackend()
+	{
 		return _backend;
 	}
 
-	public int getSessionID() {
+	public int getSessionID()
+	{
 		return _sessionID;
 	}
 
-	public FTPListenerManager getListenerManager() {
+	public FTPListenerManager getListenerManager()
+	{
 		return _listenerManager;
 	}
 
-	synchronized public void close() throws IOException {
+	synchronized public void close() throws IOException
+	{
 		_commandHistory.close();
 
 		if (_backend instanceof Closeable)

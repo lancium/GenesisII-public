@@ -8,18 +8,21 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 
-public class RNSNodeResolver implements Runnable {
+public class RNSNodeResolver implements Runnable
+{
 	static private Log _logger = LogFactory.getLog(RNSNodeResolver.class);
 
 	private RNSTreeModel _model;
 	private RNSTreeNode _parent;
 
-	public RNSNodeResolver(RNSTreeModel model, RNSTreeNode parent) {
+	public RNSNodeResolver(RNSTreeModel model, RNSTreeNode parent)
+	{
 		_model = model;
 		_parent = parent;
 	}
 
-	public void run() {
+	public void run()
+	{
 		try {
 			RNSPath target = _parent.getRNSPath();
 			Collection<RNSPath> entries = target.listContents();
@@ -28,8 +31,7 @@ public class RNSNodeResolver implements Runnable {
 			_parent.resolveChildren(_model, new RNSPath[0]);
 		} catch (Throwable t) {
 			_logger.warn("Error trying to resolve an RNS path.", t);
-			_parent.resolveChildrenError(_model,
-					"Lookup Error:  " + t.getLocalizedMessage());
+			_parent.resolveChildrenError(_model, "Lookup Error:  " + t.getLocalizedMessage());
 		}
 	}
 }

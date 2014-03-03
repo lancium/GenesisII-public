@@ -3,10 +3,12 @@ package org.morgan.inject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 
-class FieldInjectionPoint extends InjectionPoint {
+class FieldInjectionPoint extends InjectionPoint
+{
 	private Field _field;
 
-	FieldInjectionPoint(MInject injectionInformation, Field field) {
+	FieldInjectionPoint(MInject injectionInformation, Field field)
+	{
 		super(injectionInformation);
 
 		if (field == null)
@@ -16,8 +18,8 @@ class FieldInjectionPoint extends InjectionPoint {
 	}
 
 	@Override
-	final void inject(Object target, MInjectResolver resolver)
-			throws InjectionException {
+	final void inject(Object target, MInjectResolver resolver) throws InjectionException
+	{
 		Object value;
 
 		if (_injectionInformation.lazy()) {
@@ -25,10 +27,9 @@ class FieldInjectionPoint extends InjectionPoint {
 			if (types == null || types.length == 0)
 				types = new Class<?>[] { _field.getType() };
 
-			value = Proxy.newProxyInstance(FieldInjectionPoint.class
-					.getClassLoader(), types,
-					new LazyInjectionPointHandler(getInjectFactory(resolver),
-							_injectionInformation, _field.getType()));
+			value =
+				Proxy.newProxyInstance(FieldInjectionPoint.class.getClassLoader(), types, new LazyInjectionPointHandler(
+					getInjectFactory(resolver), _injectionInformation, _field.getType()));
 		} else
 			value = doResolve(resolver, _field.getType());
 
@@ -37,8 +38,7 @@ class FieldInjectionPoint extends InjectionPoint {
 				_field.setAccessible(true);
 				_field.set(target, value);
 			} catch (IllegalAccessException e) {
-				throw new InjectionException(String.format(
-						"Unable to inject value into field %s.", _field), e);
+				throw new InjectionException(String.format("Unable to inject value into field %s.", _field), e);
 			} finally {
 				_field.setAccessible(false);
 			}

@@ -29,7 +29,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPath.RNSPathApplyFunction;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
-public class LsTool extends BaseGridTool {
+public class LsTool extends BaseGridTool
+{
 	static final private String _DESCRIPTION = "config/tooldocs/description/dls";
 	static final private String _USAGE = "config/tooldocs/usage/uls";
 	static final private String _MANPAGE = "config/tooldocs/man/ls";
@@ -50,49 +51,57 @@ public class LsTool extends BaseGridTool {
 	static boolean enableCruftCollecting = false;
 	static ArrayList<RNSPath> _crufticleCollection = new ArrayList<RNSPath>();
 
-	public LsTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.DATA);
+	public LsTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option({ "long", "l" })
-	public void setLong() {
+	public void setLong()
+	{
 		_long = true;
 	}
 
 	@Option({ "all", "a" })
-	public void setAll() {
+	public void setAll()
+	{
 		_all = true;
 	}
 
 	@Option({ "directory", "d" })
-	public void setDirectory() {
+	public void setDirectory()
+	{
 		_directory = true;
 	}
 
 	@Option({ "recursive", "R" })
-	public void setRecursive() {
+	public void setRecursive()
+	{
 		_recursive = true;
 	}
 
 	@Option({ "epr", "e" })
-	public void setEpr() {
+	public void setEpr()
+	{
 		_epr = true;
 	}
 
 	@Option({ "multiline", "m" })
-	public void setMultiline() {
+	public void setMultiline()
+	{
 		_multiline = true;
 	}
 
 	@Option({ "cert-chain" })
-	public void setCert_chain() {
+	public void setCert_chain()
+	{
 		_certChain = true;
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		boolean isLong = _long;
 		boolean isAll = _all;
 		boolean isDirectory = _directory;
@@ -128,21 +137,18 @@ public class LsTool extends BaseGridTool {
 		}
 
 		// First, output the files specified on the command line.
-		// Second, output the immediate contents of the directories specified on
-		// the command line.
+		// Second, output the immediate contents of the directories specified on the command line.
 		// If given the -d option, then output directory names as file names.
 		ArrayList<RNSPath> dirs = new ArrayList<RNSPath>();
 		for (RNSPath path : targets) {
 			TypeInformation type = new TypeInformation(path.getEndpoint());
 			if (isDirectory || !type.isRNS()) {
-				printEntry(stdout, type, path, isLong, isAll, isEPR,
-						isMultiline, isCertChain);
+				printEntry(stdout, type, path, isLong, isAll, isEPR, isMultiline, isCertChain);
 			} else
 				dirs.add(path);
 		}
 		for (RNSPath path : dirs) {
-			listDirectory(stdout, null, path, isLong, isAll, isEPR,
-					isMultiline, isCertChain, isRecursive);
+			listDirectory(stdout, null, path, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
 		}
 
 		// Third, output the local files specified on the command line.
@@ -152,8 +158,7 @@ public class LsTool extends BaseGridTool {
 			File dir = new File(path);
 			if (!isDirectory && !dir.isFile()) {
 				String name = path;
-				while ((name.lastIndexOf("/") == name.length() - 1)
-						&& (name.length() > 1))
+				while ((name.lastIndexOf("/") == name.length() - 1) && (name.length() > 1))
 					name = name.substring(0, name.length() - 1);
 				if (name.length() > 1)
 					if (name.lastIndexOf("/") > 0)
@@ -176,11 +181,12 @@ public class LsTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 	}
 
-	static private void printLocalEntry(PrintWriter out, File path,
-			boolean isLong, boolean isAll) {
+	static private void printLocalEntry(PrintWriter out, File path, boolean isLong, boolean isAll)
+	{
 		String name = path.getName();
 		if (name.startsWith(".") && !isAll && (name.length() > 1))
 			return;
@@ -196,10 +202,9 @@ public class LsTool extends BaseGridTool {
 			out.println(name);
 	}
 
-	static private void printEntry(PrintWriter out, TypeInformation type,
-			RNSPath path, boolean isLong, boolean isAll, boolean isEPR,
-			boolean isMultiline, boolean isCertChain) throws RNSException,
-			ResourceException {
+	static private void printEntry(PrintWriter out, TypeInformation type, RNSPath path, boolean isLong, boolean isAll,
+		boolean isEPR, boolean isMultiline, boolean isCertChain) throws RNSException, ResourceException
+	{
 		String name = path.getName();
 		if (name.startsWith(".") && !isAll)
 			return;
@@ -216,14 +221,12 @@ public class LsTool extends BaseGridTool {
 		out.println(name);
 		if (isEPR) {
 			out.println("\t"
-					+ ObjectSerializer.toString(path.getEndpoint(), new QName(
-							GenesisIIConstants.GENESISII_NS, "endpoint"), false));
+				+ ObjectSerializer.toString(path.getEndpoint(), new QName(GenesisIIConstants.GENESISII_NS, "endpoint"), false));
 		}
 		if (isMultiline) {
 			EndpointReferenceType epr = path.getEndpoint();
 			out.println("address: " + epr.getAddress());
-			AddressingParameters aps = new AddressingParameters(
-					epr.getReferenceParameters());
+			AddressingParameters aps = new AddressingParameters(epr.getReferenceParameters());
 			out.println("resource-key: " + aps.getResourceKey());
 			WSName wsname = new WSName(epr);
 			out.println("endpointIdentifier: " + wsname.getEndpointIdentifier());
@@ -237,8 +240,7 @@ public class LsTool extends BaseGridTool {
 		}
 		if (isCertChain) {
 			try {
-				X509Certificate[] certs = EPRUtils.extractCertChain(path
-						.getEndpoint());
+				X509Certificate[] certs = EPRUtils.extractCertChain(path.getEndpoint());
 				if (certs == null || certs.length == 0)
 					out.println("No asscoiated certificates!");
 				else
@@ -251,7 +253,8 @@ public class LsTool extends BaseGridTool {
 		}
 	}
 
-	static public class DirLister implements RNSPathApplyFunction {
+	static public class DirLister implements RNSPathApplyFunction
+	{
 		PrintWriter _out;
 		ArrayList<String> _subdirs;
 		boolean _isLong;
@@ -260,9 +263,9 @@ public class LsTool extends BaseGridTool {
 		boolean _isMultiline;
 		boolean _isCertChain;
 
-		DirLister(PrintWriter out, ArrayList<String> subdirs, boolean isLong,
-				boolean isAll, boolean isEPR, boolean isMultiline,
-				boolean isCertChain) {
+		DirLister(PrintWriter out, ArrayList<String> subdirs, boolean isLong, boolean isAll, boolean isEPR,
+			boolean isMultiline, boolean isCertChain)
+		{
 			_out = out;
 			_subdirs = subdirs;
 			_isLong = isLong;
@@ -273,16 +276,15 @@ public class LsTool extends BaseGridTool {
 		}
 
 		@Override
-		public boolean applyToPath(RNSPath applyTo) throws RNSException {
+		public boolean applyToPath(RNSPath applyTo) throws RNSException
+		{
 			TypeInformation type = new TypeInformation(applyTo.getEndpoint());
 			try {
 				if (enableCruftCollecting)
 					_crufticleCollection.add(applyTo);
-				printEntry(_out, type, applyTo, _isLong, _isAll, _isEPR,
-						_isMultiline, _isCertChain);
+				printEntry(_out, type, applyTo, _isLong, _isAll, _isEPR, _isMultiline, _isCertChain);
 			} catch (ResourceException e) {
-				throw new RNSException(
-						"failed to print entry due to resource exception", e);
+				throw new RNSException("failed to print entry due to resource exception", e);
 			}
 			if (type.isRNS())
 				_subdirs.add(applyTo.getName());
@@ -290,10 +292,9 @@ public class LsTool extends BaseGridTool {
 		}
 	}
 
-	static private void listDirectory(PrintWriter out, String prefix,
-			RNSPath path, boolean isLong, boolean isAll, boolean isEPR,
-			boolean isMultiline, boolean isCertChain, boolean isRecursive)
-			throws RNSException, ResourceException {
+	static private void listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll,
+		boolean isEPR, boolean isMultiline, boolean isCertChain, boolean isRecursive) throws RNSException, ResourceException
+	{
 		String name = path.getName();
 		if (name == null)
 			name = "/";
@@ -302,16 +303,14 @@ public class LsTool extends BaseGridTool {
 		out.println(name + ":");
 
 		ArrayList<String> subdirs = new ArrayList<String>();
-		DirLister dl = new DirLister(out, subdirs, isLong, isAll, isEPR,
-				isMultiline, isCertChain);
+		DirLister dl = new DirLister(out, subdirs, isLong, isAll, isEPR, isMultiline, isCertChain);
 		path.applyToContents(dl);
 
 		out.println();
 		if (isRecursive) {
 			for (String entry : subdirs) {
 				RNSPath sub = new RNSPath(path, entry, null, false);
-				listDirectory(out, name, sub, isLong, isAll, isEPR,
-						isMultiline, isCertChain, isRecursive);
+				listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
 			}
 		}
 	}

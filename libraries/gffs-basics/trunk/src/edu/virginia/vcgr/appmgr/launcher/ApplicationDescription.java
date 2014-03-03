@@ -19,26 +19,19 @@ import edu.virginia.vcgr.appmgr.version.VersionManager;
 
 // import edu.virginia.vcgr.appmgr.version.VersionManager;
 
-public class ApplicationDescription {
+public class ApplicationDescription
+{
 	static final private String BASE_PROP_NAME = "edu.virginia.vcgr.appwatcher.";
 
-	static final private String DEPENDENT_PROPERTY = BASE_PROP_NAME
-			+ "dependent-properties-file";
+	static final private String DEPENDENT_PROPERTY = BASE_PROP_NAME + "dependent-properties-file";
 
-	static final private String PATCH_SIGNER_CERTIFICATE_PROPERTY_BASE = BASE_PROP_NAME
-			+ "patch-signer-certificate";
-	static final private String APPLICATION_NAME_PROPERTY = BASE_PROP_NAME
-			+ "application-name";
-	static final private String APPLICATION_DIRECTORY_PROPERTY = BASE_PROP_NAME
-			+ "application-directory";
-	// static final private String UPDATE_DIRECTORY_PROPERTY = BASE_PROP_NAME +
-	// "update-directory";
-	static final private String APPLICATION_URL_PROPERTY_BASE = BASE_PROP_NAME
-			+ "application-url";
-	static final private String JAR_DESCRIPTION_FILE_PROPERTY = BASE_PROP_NAME
-			+ "jar-description-file";
-	static final private String APPLICATION_CLASS_PROPERTY = BASE_PROP_NAME
-			+ "application-class";
+	static final private String PATCH_SIGNER_CERTIFICATE_PROPERTY_BASE = BASE_PROP_NAME + "patch-signer-certificate";
+	static final private String APPLICATION_NAME_PROPERTY = BASE_PROP_NAME + "application-name";
+	static final private String APPLICATION_DIRECTORY_PROPERTY = BASE_PROP_NAME + "application-directory";
+	// static final private String UPDATE_DIRECTORY_PROPERTY = BASE_PROP_NAME + "update-directory";
+	static final private String APPLICATION_URL_PROPERTY_BASE = BASE_PROP_NAME + "application-url";
+	static final private String JAR_DESCRIPTION_FILE_PROPERTY = BASE_PROP_NAME + "jar-description-file";
+	static final private String APPLICATION_CLASS_PROPERTY = BASE_PROP_NAME + "application-class";
 	static final private String FAKE_UPDATER_CLASS_VALUE = "edu.virginia.vcgr.appmgr.update.UpdaterClass";
 
 	// private Verifier _patchVerifier;
@@ -52,8 +45,8 @@ public class ApplicationDescription {
 	private String _applicationClassName;
 	private Boolean _updateDisabled = false;
 
-	static private HierarchicalProperties readPropertiesFile(File propFile)
-			throws FileNotFoundException, IOException {
+	static private HierarchicalProperties readPropertiesFile(File propFile) throws FileNotFoundException, IOException
+	{
 		HierarchicalProperties tmp = new HierarchicalProperties();
 		FileInputStream fin = null;
 
@@ -63,8 +56,7 @@ public class ApplicationDescription {
 
 			String dependentFile = tmp.getProperty(DEPENDENT_PROPERTY);
 			if (dependentFile != null) {
-				HierarchicalProperties parent = readPropertiesFile(new File(
-						dependentFile));
+				HierarchicalProperties parent = readPropertiesFile(new File(dependentFile));
 				tmp.setParent(parent);
 			}
 
@@ -74,42 +66,31 @@ public class ApplicationDescription {
 		}
 	}
 
-	private void initialize(String applicationClassName,
-			HierarchicalProperties properties) throws IOException,
-			CertificateException {
-		_applicationName = PropertyUtilities.getRequiredProperty(properties,
-				APPLICATION_NAME_PROPERTY);
-		_applicationDirectory = new File(PropertyUtilities.getRequiredProperty(
-				properties, APPLICATION_DIRECTORY_PROPERTY));
+	private void initialize(String applicationClassName, HierarchicalProperties properties) throws IOException,
+		CertificateException
+	{
+		_applicationName = PropertyUtilities.getRequiredProperty(properties, APPLICATION_NAME_PROPERTY);
+		_applicationDirectory = new File(PropertyUtilities.getRequiredProperty(properties, APPLICATION_DIRECTORY_PROPERTY));
 		if (!_applicationDirectory.exists())
-			throw new FileNotFoundException(String.format(
-					"Couldn't find application directory \"%s\".",
-					_applicationDirectory));
+			throw new FileNotFoundException(String.format("Couldn't find application directory \"%s\".", _applicationDirectory));
 
-		// _updateDirectory = new
-		// File(PropertyUtilities.getRequiredProperty(properties,
+		// _updateDirectory = new File(PropertyUtilities.getRequiredProperty(properties,
 		// UPDATE_DIRECTORY_PROPERTY));
-		// _scratchManager = new ScratchSpaceManager(new File(_updateDirectory,
-		// "scratch"));
+		// _scratchManager = new ScratchSpaceManager(new File(_updateDirectory, "scratch"));
 
-		_jarDescriptionFile = new File(PropertyUtilities.getRequiredProperty(
-				properties, JAR_DESCRIPTION_FILE_PROPERTY));
+		_jarDescriptionFile = new File(PropertyUtilities.getRequiredProperty(properties, JAR_DESCRIPTION_FILE_PROPERTY));
 		if (!_jarDescriptionFile.exists())
-			throw new FileNotFoundException(String.format(
-					"Couldn't find jar description file \"%s\".",
-					_jarDescriptionFile));
+			throw new FileNotFoundException(String.format("Couldn't find jar description file \"%s\".", _jarDescriptionFile));
 		_applicationClassName = applicationClassName;
 
 		if (_applicationClassName == null)
-			_applicationClassName = PropertyUtilities.getRequiredProperty(
-					properties, APPLICATION_CLASS_PROPERTY);
+			_applicationClassName = PropertyUtilities.getRequiredProperty(properties, APPLICATION_CLASS_PROPERTY);
 
 		_versionManager = new VersionManager(_updateDirectory);
 
 		_applicationDownloadURLs = new LinkedList<URL>();
 
-		for (String url : PropertyUtilities.getPropertyList(properties,
-				APPLICATION_URL_PROPERTY_BASE)) {
+		for (String url : PropertyUtilities.getPropertyList(properties, APPLICATION_URL_PROPERTY_BASE)) {
 			try {
 				_applicationDownloadURLs.add(new URL(url));
 			} catch (java.net.MalformedURLException ex) {
@@ -119,22 +100,21 @@ public class ApplicationDescription {
 		}
 
 		Collection<File> certificateFiles = new LinkedList<File>();
-		for (String certFile : PropertyUtilities.getPropertyList(properties,
-				PATCH_SIGNER_CERTIFICATE_PROPERTY_BASE))
+		for (String certFile : PropertyUtilities.getPropertyList(properties, PATCH_SIGNER_CERTIFICATE_PROPERTY_BASE))
 			certificateFiles.add(new File(certFile));
-		// _patchVerifier =
-		// VerifierFactory.createCertificateVerifier(certificateFiles.toArray(new
+		// _patchVerifier = VerifierFactory.createCertificateVerifier(certificateFiles.toArray(new
 		// File[0]));
 	}
 
-	public ApplicationDescription(String applicationClassName,
-			File propertiesFile) throws IOException, CertificateException {
+	public ApplicationDescription(String applicationClassName, File propertiesFile) throws IOException, CertificateException
+	{
 		HierarchicalProperties properties = readPropertiesFile(propertiesFile);
 		initialize(applicationClassName, properties);
 	}
 
-	public ApplicationDescription(String applicationClassName,
-			String propertiesFileName) throws IOException, CertificateException {
+	public ApplicationDescription(String applicationClassName, String propertiesFileName) throws IOException,
+		CertificateException
+	{
 		this(applicationClassName, new File(propertiesFileName));
 	}
 
@@ -143,40 +123,47 @@ public class ApplicationDescription {
 	// return _patchVerifier;
 	// }
 
-	public String getApplicationName() {
+	public String getApplicationName()
+	{
 		return _applicationName;
 	}
 
-	public File getApplicationDirectory() {
+	public File getApplicationDirectory()
+	{
 		return _applicationDirectory;
 	}
 
-	public boolean updateDisabled() {
+	public boolean updateDisabled()
+	{
 		return _updateDisabled;
 	}
 
-	public Collection<URL> getApplicationDownloadURLs() {
+	public Collection<URL> getApplicationDownloadURLs()
+	{
 		return _applicationDownloadURLs;
 	}
 
 	/*
-	 * public ScratchSpaceManager getScratchSpaceManager() { return
-	 * _scratchManager; }
+	 * public ScratchSpaceManager getScratchSpaceManager() { return _scratchManager; }
 	 */
 
-	public VersionManager getVersionManager() {
+	public VersionManager getVersionManager()
+	{
 		return _versionManager;
 	}
 
-	public File getJarDescriptionFile() {
+	public File getJarDescriptionFile()
+	{
 		return _jarDescriptionFile;
 	}
 
-	public String getApplicationClassName() {
+	public String getApplicationClassName()
+	{
 		return _applicationClassName;
 	}
 
-	public boolean isUpdateRequest() {
+	public boolean isUpdateRequest()
+	{
 		return _applicationClassName.equals(FAKE_UPDATER_CLASS_VALUE);
 	}
 }

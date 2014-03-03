@@ -1,4 +1,4 @@
 package edu.virginia.vcgr.genii.client.machine;
 
-class LinuxMachineActor extends CommonMachineActor {
-}
+class LinuxMachineActor extends CommonMachineActor
+{}

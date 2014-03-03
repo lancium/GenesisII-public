@@ -8,13 +8,14 @@ import edu.virginia.g3.fsview.FSViewAuthenticationInformationTypes;
 import edu.virginia.g3.fsview.authgui.AbstractAuthenticationInformationModel;
 import edu.virginia.g3.fsview.gui.AcceptabilityState;
 
-class DomainUsernamePasswordModel extends
-		AbstractAuthenticationInformationModel {
+class DomainUsernamePasswordModel extends AbstractAuthenticationInformationModel
+{
 	private String _domain;
 	private String _username;
 	private String _password;
 
-	DomainUsernamePasswordModel() {
+	DomainUsernamePasswordModel()
+	{
 		super(FSViewAuthenticationInformationTypes.DomainUsernamePassword);
 
 		domain("");
@@ -22,14 +23,16 @@ class DomainUsernamePasswordModel extends
 		password("");
 	}
 
-	final void domain(String domain) {
+	final void domain(String domain)
+	{
 		if (domain == null)
 			domain = "";
 
 		_domain = domain;
 	}
 
-	final void username(String username) {
+	final void username(String username)
+	{
 		if (username == null)
 			username = "";
 
@@ -38,7 +41,8 @@ class DomainUsernamePasswordModel extends
 		fireContentsChanged();
 	}
 
-	final void password(String password) {
+	final void password(String password)
+	{
 		if (password == null)
 			password = "";
 
@@ -48,22 +52,23 @@ class DomainUsernamePasswordModel extends
 	}
 
 	@Override
-	final public AcceptabilityState isAcceptable() {
+	final public AcceptabilityState isAcceptable()
+	{
 		if (_username.length() > 0)
 			return AcceptabilityState.accept(DomainUsernamePasswordModel.class);
 
-		return AcceptabilityState.deny(DomainUsernamePasswordModel.class,
-				"Username cannot be empty");
+		return AcceptabilityState.deny(DomainUsernamePasswordModel.class, "Username cannot be empty");
 	}
 
 	@Override
-	final public FSViewAuthenticationInformation wrap() {
-		return new DomainUsernamePassswordAuthenticationInformation(_domain,
-				_username, _password);
+	final public FSViewAuthenticationInformation wrap()
+	{
+		return new DomainUsernamePassswordAuthenticationInformation(_domain, _username, _password);
 	}
 
 	@Override
-	final public Component createGuiComponent() {
+	final public Component createGuiComponent()
+	{
 		return new DomainUsernamePasswordPanel(this);
 	}
 }

@@ -30,13 +30,13 @@ import edu.virginia.vcgr.jsdl.JobDefinition;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class BoundDocument {
+public class BoundDocument
+{
 	static private DocumentBuilder _builder;
 
 	static {
 		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(true);
 			_builder = factory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
@@ -49,23 +49,26 @@ public class BoundDocument {
 	private Node _document;
 	private JobDefinition _jobDefinition;
 
-	public BoundDocument(Binder<Node> binder, JobDefinition jobDefinition)
-			throws JAXBException {
+	public BoundDocument(Binder<Node> binder, JobDefinition jobDefinition) throws JAXBException
+	{
 		_binder = binder;
 		_jobDefinition = jobDefinition;
 		_document = _builder.newDocument();
 		_binder.marshal(_jobDefinition, _document);
 	}
 
-	final Binder<Node> binder() {
+	final Binder<Node> binder()
+	{
 		return _binder;
 	}
 
-	final Node document() {
+	final Node document()
+	{
 		return _document;
 	}
 
-	final JobDefinition jobDefinition() {
+	final JobDefinition jobDefinition()
+	{
 		return _jobDefinition;
 	}
 }

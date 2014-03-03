@@ -7,20 +7,24 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
-public class JobTool {
+public class JobTool
+{
 	static private Logger _logger = Logger.getLogger(JobTool.class);
 
-	static private class CountingJobToolListener implements JobToolListener {
+	static private class CountingJobToolListener implements JobToolListener
+	{
 		private int _open;
 		private JobToolListener _listener;
 
-		private CountingJobToolListener(int open, JobToolListener listener) {
+		private CountingJobToolListener(int open, JobToolListener listener)
+		{
 			_open = open;
 			_listener = listener;
 		}
 
 		@Override
-		synchronized public void jobWindowClosed() {
+		synchronized public void jobWindowClosed()
+		{
 			_listener.jobWindowClosed();
 
 			if (--_open <= 0)
@@ -28,12 +32,14 @@ public class JobTool {
 		}
 
 		@Override
-		public void allJobWindowsClosed() {
+		public void allJobWindowsClosed()
+		{
 			// Nothing to do
 		}
 	}
 
-	static public void main(String[] args) {
+	static public void main(String[] args)
+	{
 		Collection<File> files = new Vector<File>(args.length);
 		for (String filename : args)
 			files.add(new File(filename));
@@ -47,15 +53,13 @@ public class JobTool {
 		}
 	}
 
-	static public void launch(Collection<File> initialFiles,
-			JobDefinitionListener generationListener,
-			JobToolListener toolListener) throws IOException {
+	static public void launch(Collection<File> initialFiles, JobDefinitionListener generationListener,
+		JobToolListener toolListener) throws IOException
+	{
 		if (toolListener != null)
-			toolListener = new CountingJobToolListener(initialFiles.size(),
-					toolListener);
+			toolListener = new CountingJobToolListener(initialFiles.size(), toolListener);
 
-		JobApplicationContext appContext = new JobApplicationContext(
-				initialFiles, generationListener, toolListener);
+		JobApplicationContext appContext = new JobApplicationContext(initialFiles, generationListener, toolListener);
 		appContext.start();
 	}
 }

@@ -20,7 +20,8 @@ import java.util.ArrayList;
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class CommandLineFlavor {
+public class CommandLineFlavor
+{
 	static final public int INFINITE_LIMIT = -1;
 
 	private String _flavorName;
@@ -29,38 +30,42 @@ public class CommandLineFlavor {
 	private ArrayList<String> _requiredFlags = new ArrayList<String>();
 	private ArrayList<String> _requiredOptions = new ArrayList<String>();
 
-	public CommandLineFlavor(String flavorName, int minimumArgs, int maximumArgs) {
+	public CommandLineFlavor(String flavorName, int minimumArgs, int maximumArgs)
+	{
 		if (minimumArgs == INFINITE_LIMIT)
-			throw new IllegalArgumentException(
-					"Cannot have an infinite lower limit.");
+			throw new IllegalArgumentException("Cannot have an infinite lower limit.");
 
 		_flavorName = flavorName;
 		_minimumArguments = minimumArgs;
 		_maximumArguments = maximumArgs;
 	}
 
-	public CommandLineFlavor(String flavorName, int exactArgs) {
+	public CommandLineFlavor(String flavorName, int exactArgs)
+	{
 		this(flavorName, exactArgs, exactArgs);
 	}
 
-	public CommandLineFlavor(String flavorName) {
+	public CommandLineFlavor(String flavorName)
+	{
 		this(flavorName, 0, INFINITE_LIMIT);
 	}
 
-	public void addRequiredFlag(String flagName) {
+	public void addRequiredFlag(String flagName)
+	{
 		_requiredFlags.add(flagName);
 	}
 
-	public void addRequiredOption(String optionName) {
+	public void addRequiredOption(String optionName)
+	{
 		_requiredOptions.add(optionName);
 	}
 
-	public boolean matches(CommandLine cline) {
+	public boolean matches(CommandLine cline)
+	{
 		int numArgs = cline.numArguments();
 		if (numArgs < _minimumArguments)
 			return false;
-		if ((numArgs > _maximumArguments)
-				&& (_maximumArguments != INFINITE_LIMIT))
+		if ((numArgs > _maximumArguments) && (_maximumArguments != INFINITE_LIMIT))
 			return false;
 
 		for (String flag : _requiredFlags) {
@@ -76,7 +81,8 @@ public class CommandLineFlavor {
 		return true;
 	}
 
-	public String getFlavorName() {
+	public String getFlavorName()
+	{
 		return _flavorName;
 	}
 }

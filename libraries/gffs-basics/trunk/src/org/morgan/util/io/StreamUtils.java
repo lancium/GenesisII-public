@@ -27,11 +27,12 @@ import java.sql.Statement;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class StreamUtils {
+public class StreamUtils
+{
 	static private final int _DEFAULT_BUFFER_SIZE = 1024 * 512;
 
-	static public void copyStream(Reader reader, Writer writer)
-			throws IOException {
+	static public void copyStream(Reader reader, Writer writer) throws IOException
+	{
 		char[] data = new char[_DEFAULT_BUFFER_SIZE];
 		int read;
 
@@ -43,8 +44,8 @@ public class StreamUtils {
 		writer.flush();
 	}
 
-	static public DataTransferStatistics copyStream(InputStream in,
-			OutputStream out, boolean autoflush) throws IOException {
+	static public DataTransferStatistics copyStream(InputStream in, OutputStream out, boolean autoflush) throws IOException
+	{
 		DataTransferStatistics stats = DataTransferStatistics.startTransfer();
 
 		byte[] data = new byte[_DEFAULT_BUFFER_SIZE];
@@ -65,12 +66,13 @@ public class StreamUtils {
 		return stats.finishTransfer();
 	}
 
-	static public DataTransferStatistics copyStream(InputStream in,
-			OutputStream out) throws IOException {
+	static public DataTransferStatistics copyStream(InputStream in, OutputStream out) throws IOException
+	{
 		return copyStream(in, out, false);
 	}
 
-	static public void close(Closeable item) {
+	static public void close(Closeable item)
+	{
 		try {
 			if (item != null)
 				item.close();
@@ -78,7 +80,8 @@ public class StreamUtils {
 		}
 	}
 
-	static public void close(Statement stmt) {
+	static public void close(Statement stmt)
+	{
 		try {
 			if (stmt != null)
 				stmt.close();
@@ -86,7 +89,8 @@ public class StreamUtils {
 		}
 	}
 
-	static public void close(Connection conn) {
+	static public void close(Connection conn)
+	{
 		try {
 			if (conn != null)
 				conn.close();
@@ -94,7 +98,8 @@ public class StreamUtils {
 		}
 	}
 
-	static public void close(ResultSet rs) {
+	static public void close(ResultSet rs)
+	{
 		try {
 			if (rs != null)
 				rs.close();
@@ -102,7 +107,8 @@ public class StreamUtils {
 		}
 	}
 
-	static public void close(Socket socket) {
+	static public void close(Socket socket)
+	{
 		try {
 			if (socket != null)
 				socket.close();

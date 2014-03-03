@@ -6,14 +6,16 @@ import javax.xml.bind.annotation.XmlTransient;
 import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemType;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 
-public class StringFilesystemPair {
+public class StringFilesystemPair
+{
 	@XmlAttribute(name = "value", required = false)
 	private String _value;
 
 	@XmlAttribute(name = "filesystem-type", required = false)
 	private FilesystemType _filesystemType;
 
-	public StringFilesystemPair(String value, FilesystemType filesystemType) {
+	public StringFilesystemPair(String value, FilesystemType filesystemType)
+	{
 		_value = value;
 		_filesystemType = filesystemType;
 
@@ -21,31 +23,36 @@ public class StringFilesystemPair {
 			_filesystemType = FilesystemType.Default;
 	}
 
-	public StringFilesystemPair(String value) {
+	public StringFilesystemPair(String value)
+	{
 		this(value, null);
 	}
 
-	public StringFilesystemPair() {
+	public StringFilesystemPair()
+	{
 		this(null, null);
 	}
 
-	public void set(String value, ParameterizableBroker pBroker,
-			ModificationBroker mBroker) {
+	public void set(String value, ParameterizableBroker pBroker, ModificationBroker mBroker)
+	{
 		pBroker.fireParameterizableStringModified(_value, value);
 		_value = value;
 		mBroker.fireJobDescriptionModified();
 	}
 
 	@XmlTransient
-	public void setFilesystemType(FilesystemType filesystemType) {
+	public void setFilesystemType(FilesystemType filesystemType)
+	{
 		_filesystemType = filesystemType;
 	}
 
-	public String get() {
+	public String get()
+	{
 		return _value;
 	}
 
-	public FilesystemType getFilesystemType() {
+	public FilesystemType getFilesystemType()
+	{
 		return _filesystemType;
 	}
 }

@@ -24,24 +24,23 @@ import org.w3c.dom.NodeList;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 /**
- * Parses config sections of the form: &lt;mconf:classes&gt; &lt;mconf:class
- * name="name" [base="base class"]&gt;class&lt;/mconf:class&gt;
- * &lt;/mconf:classes&gt; Returns this in a HashMap&lt;String, Class&gt;
- * structure.
+ * Parses config sections of the form: &lt;mconf:classes&gt; &lt;mconf:class name="name"
+ * [base="base class"]&gt;class&lt;/mconf:class&gt; &lt;/mconf:classes&gt; Returns this in a
+ * HashMap&lt;String, Class&gt; structure.
  * 
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class ClassConfigurationSectionHandler implements
-		IXMLConfigurationSectionHandler {
+public class ClassConfigurationSectionHandler implements IXMLConfigurationSectionHandler
+{
 	static final public String CLASS_ELEMENT_NAME = "class";
 	static final public String CLASS_NAME_NAME = "name";
 	static final public String CLASS_BASE_CLASS_NAME = "base";
 
-	static public QName CLASS_ELEMENT_QNAME = new QName(
-			XMLConfiguration.NAMESPACE, CLASS_ELEMENT_NAME);
+	static public QName CLASS_ELEMENT_QNAME = new QName(XMLConfiguration.NAMESPACE, CLASS_ELEMENT_NAME);
 
-	public Object parse(Node n) throws ConfigurationException {
+	public Object parse(Node n) throws ConfigurationException
+	{
 		HashMap<String, Class<?>> ret = new HashMap<String, Class<?>>();
 
 		NodeList children = n.getChildNodes();
@@ -52,45 +51,37 @@ public class ClassConfigurationSectionHandler implements
 			if (child.getNodeType() == Node.ELEMENT_NODE) {
 				QName childQName = XMLConfiguration.getQName(child);
 				if (!childQName.equals(CLASS_ELEMENT_QNAME))
-					throw new ConfigurationException(
-							"Found element with unexpected QName of \""
-									+ childQName + "\".");
+					throw new ConfigurationException("Found element with unexpected QName of \"" + childQName + "\".");
 
 				NamedNodeMap attrs = child.getAttributes();
 				Node nameNode = attrs.getNamedItem(CLASS_NAME_NAME);
 				if (nameNode == null)
-					throw new ConfigurationException(
-							"Couldn't find name attribute.");
+					throw new ConfigurationException("Couldn't find name attribute.");
 				Node baseNode = attrs.getNamedItem(CLASS_BASE_CLASS_NAME);
 
 				Node textNode = child.getFirstChild();
 				if (textNode.getNodeType() != Node.TEXT_NODE)
-					throw new ConfigurationException(
-							"Found class node whose child was NOT a text node.");
+					throw new ConfigurationException("Found class node whose child was NOT a text node.");
 
-				String base = (baseNode != null) ? baseNode.getTextContent()
-						: null;
-				ret.put(nameNode.getTextContent(),
-						findClass(textNode.getTextContent(), base));
+				String base = (baseNode != null) ? baseNode.getTextContent() : null;
+				ret.put(nameNode.getTextContent(), findClass(textNode.getTextContent(), base));
 			}
 		}
 
 		return ret;
 	}
 
-	static protected Class<?> findClass(String className, String baseName)
-			throws ConfigurationException {
+	static protected Class<?> findClass(String className, String baseName) throws ConfigurationException
+	{
 		ClassLoader loader = GenesisClassLoader.classLoaderFactory();
 
 		try {
-			Class<?> base = (baseName == null) ? Object.class : loader
-					.loadClass(baseName);
+			Class<?> base = (baseName == null) ? Object.class : loader.loadClass(baseName);
 			Class<?> target = loader.loadClass(className);
 
 			if (!base.isAssignableFrom(target))
 				throw new ConfigurationException("Target class \"" + className
-						+ "\" is not derived off of (or does not implement) \""
-						+ base.getName() + "\".");
+					+ "\" is not derived off of (or does not implement) \"" + base.getName() + "\".");
 			return target;
 		} catch (ClassNotFoundException cnfe) {
 			throw new ConfigurationException(cnfe);

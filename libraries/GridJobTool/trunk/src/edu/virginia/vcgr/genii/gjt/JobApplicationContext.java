@@ -23,9 +23,9 @@ import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
 import edu.virginia.vcgr.genii.gjt.prefs.ToolPreferences;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 
-public class JobApplicationContext {
-	static private Logger _logger = Logger
-			.getLogger(JobApplicationContext.class);
+public class JobApplicationContext
+{
+	static private Logger _logger = Logger.getLogger(JobApplicationContext.class);
 
 	static private ProjectFileFilter pff = new ProjectFileFilter();
 	static private JSDLFileFilter jff = new JSDLFileFilter();
@@ -35,19 +35,17 @@ public class JobApplicationContext {
 	private JobDefinitionListener _generationListener;
 	private Collection<JobDocumentContext> _openDocuments = new LinkedList<JobDocumentContext>();
 
-	JobApplicationContext(Collection<File> initialFiles,
-			JobDefinitionListener generationListener,
-			JobToolListener toolListener) throws IOException {
+	JobApplicationContext(Collection<File> initialFiles, JobDefinitionListener generationListener, JobToolListener toolListener)
+		throws IOException
+	{
 		_preferences = new ToolPreferences();
 
 		if (OperatingSystemNames.getCurrentOperatingSystem() == OperatingSystemNames.MACOS) {
-			MacOSXGuiSetup.setupMacOSXGuiApplication("Grid Job Tool", true,
-					true, true, false);
+			MacOSXGuiSetup.setupMacOSXGuiApplication("Grid Job Tool", true, true, true, false);
 
 			Application.getApplication().setEnabledPreferencesMenu(true);
 			Application.getApplication().setEnabledAboutMenu(true);
-			Application.getApplication().addApplicationListener(
-					new MacOSXApplicationListener());
+			Application.getApplication().addApplicationListener(new MacOSXApplicationListener());
 		}
 
 		_fileChooser = new JFileChooser();
@@ -59,23 +57,22 @@ public class JobApplicationContext {
 
 		if (initialFiles != null && initialFiles.size() > 0) {
 			for (File initialFile : initialFiles)
-				_openDocuments.add(new JobDocumentContext(this, initialFile,
-						toolListener));
+				_openDocuments.add(new JobDocumentContext(this, initialFile, toolListener));
 		} else {
-			JobDocumentContext ctxt = new JobDocumentContext(this, null,
-					toolListener);
+			JobDocumentContext ctxt = new JobDocumentContext(this, null, toolListener);
 			ctxt.setInitial();
 			_openDocuments.add(ctxt);
 		}
 	}
 
-	void start() {
+	void start()
+	{
 		for (JobDocumentContext context : _openDocuments)
 			context.start();
 	}
 
-	File getDesiredFile(Component parentComponent, boolean isOpen,
-			boolean isGenerateTarget) {
+	File getDesiredFile(Component parentComponent, boolean isOpen, boolean isGenerateTarget)
+	{
 		_fileChooser.removeChoosableFileFilter(pff);
 		_fileChooser.removeChoosableFileFilter(jff);
 		_fileChooser.addChoosableFileFilter(isGenerateTarget ? jff : pff);
@@ -94,19 +91,23 @@ public class JobApplicationContext {
 		return null;
 	}
 
-	JobDefinitionListener getGenerationListener() {
+	JobDefinitionListener getGenerationListener()
+	{
 		return _generationListener;
 	}
 
-	public boolean willLaunch() {
+	public boolean willLaunch()
+	{
 		return _generationListener != null;
 	}
 
-	public ToolPreferences preferences() {
+	public ToolPreferences preferences()
+	{
 		return _preferences;
 	}
 
-	public void newDocument() {
+	public void newDocument()
+	{
 		try {
 			JobDocumentContext ctxt;
 			_openDocuments.add(ctxt = new JobDocumentContext(this, null, null));
@@ -117,41 +118,45 @@ public class JobApplicationContext {
 		}
 	}
 
-	public void openDocument(File source) {
+	public void openDocument(File source)
+	{
 		try {
 			JobDocumentContext ctxt;
 			ctxt = new JobDocumentContext(this, source, null);
-			if (_openDocuments.size() == 1
-					&& _openDocuments.iterator().next().isInitial()) {
+			if (_openDocuments.size() == 1 && _openDocuments.iterator().next().isInitial()) {
 				_openDocuments.iterator().next().close();
 				_openDocuments.clear();
 			}
 			_openDocuments.add(ctxt);
 			ctxt.start();
 		} catch (IOException ioe) {
-			JOptionPane.showMessageDialog(null, "Error opening project file.",
-					"Error Opening Project File", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Error opening project file.", "Error Opening Project File",
+				JOptionPane.ERROR_MESSAGE);
 			_logger.error("Unable to open project file.", ioe);
 		}
 	}
 
-	public void openDocument() {
+	public void openDocument()
+	{
 		File source = getDesiredFile(null, true, false);
 		if (source != null)
 			openDocument(source);
 	}
 
-	public void saveAll() {
+	public void saveAll()
+	{
 		for (JobDocumentContext context : _openDocuments)
 			context.save();
 	}
 
-	public void exit() {
+	public void exit()
+	{
 		for (JobDocumentContext jdc : _openDocuments)
 			jdc.close();
 	}
 
-	public void showPreferences() {
+	public void showPreferences()
+	{
 		PreferencesEditor editor = new PreferencesEditor(_preferences);
 		editor.setModalityType(ModalityType.APPLICATION_MODAL);
 		editor.pack();
@@ -159,7 +164,8 @@ public class JobApplicationContext {
 		editor.setVisible(true);
 	}
 
-	public void showAbout() {
+	public void showAbout()
+	{
 		AboutDialog dialog = new AboutDialog(null);
 		dialog.pack();
 		dialog.setModalityType(ModalityType.APPLICATION_MODAL);
@@ -167,63 +173,71 @@ public class JobApplicationContext {
 		dialog.setVisible(true);
 	}
 
-	private class MacOSXApplicationListener extends ApplicationAdapter {
+	private class MacOSXApplicationListener extends ApplicationAdapter
+	{
 		@Override
-		public void handleOpenFile(ApplicationEvent event) {
+		public void handleOpenFile(ApplicationEvent event)
+		{
 			try {
 				JobDocumentContext ctxt;
-				_openDocuments.add(ctxt = new JobDocumentContext(
-						JobApplicationContext.this, new File(event
-								.getFilename()), null));
+				_openDocuments.add(ctxt =
+					new JobDocumentContext(JobApplicationContext.this, new File(event.getFilename()), null));
 				ctxt.start();
 			} catch (IOException ioe) {
-				JOptionPane
-						.showMessageDialog(null, "Error opening project file.",
-								"Error Opening Project File",
-								JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Error opening project file.", "Error Opening Project File",
+					JOptionPane.ERROR_MESSAGE);
 				_logger.error("Unable to open project file.", ioe);
 			}
 		}
 
 		@Override
-		public void handlePreferences(ApplicationEvent event) {
+		public void handlePreferences(ApplicationEvent event)
+		{
 			showPreferences();
 		}
 
 		@Override
-		public void handleAbout(ApplicationEvent event) {
+		public void handleAbout(ApplicationEvent event)
+		{
 			showAbout();
 			event.setHandled(true);
 		}
 
 		@Override
-		public void handleQuit(ApplicationEvent event) {
+		public void handleQuit(ApplicationEvent event)
+		{
 			exit();
 		}
 	}
 
-	static private class ProjectFileFilter extends FileFilter {
+	static private class ProjectFileFilter extends FileFilter
+	{
 		@Override
-		public boolean accept(File f) {
+		public boolean accept(File f)
+		{
 			boolean ret = f.getName().endsWith(".gjp");
 			return ret;
 
 		}
 
 		@Override
-		public String getDescription() {
+		public String getDescription()
+		{
 			return "Grid Job Project (.gjp)";
 		}
 	}
 
-	static private class JSDLFileFilter extends FileFilter {
+	static private class JSDLFileFilter extends FileFilter
+	{
 		@Override
-		public boolean accept(File f) {
+		public boolean accept(File f)
+		{
 			return f.getName().endsWith(".jsdl");
 		}
 
 		@Override
-		public String getDescription() {
+		public String getDescription()
+		{
 			return "JSDL File (.jsdl)";
 		}
 	}

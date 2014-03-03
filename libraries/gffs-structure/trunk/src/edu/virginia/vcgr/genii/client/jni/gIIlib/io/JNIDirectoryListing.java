@@ -17,15 +17,14 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.DirectoryHandle;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
-public class JNIDirectoryListing extends JNILibraryBase {
+public class JNIDirectoryListing extends JNILibraryBase
+{
 	static private Log _logger = LogFactory.getLog(JNIDirectoryListing.class);
 
-	public static ArrayList<String> getDirectoryListing(Integer handle,
-			String target) {
+	public static ArrayList<String> getDirectoryListing(Integer handle, String target)
+	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format(
-					"JNIDirectoryListing::getDirectoryListing(%d, %s)", handle,
-					target));
+			_logger.trace(String.format("JNIDirectoryListing::getDirectoryListing(%d, %s)", handle, target));
 
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 		FilesystemHandle fsHandle;
@@ -54,8 +53,7 @@ public class JNIDirectoryListing extends JNILibraryBase {
 					continue;
 
 				ret.add(Integer.toString(FilesystemHandle.INVALID_HANDLE));
-				ret.add((stat.getEntryType() == FilesystemEntryType.DIRECTORY) ? "D"
-						: "F");
+				ret.add((stat.getEntryType() == FilesystemEntryType.DIRECTORY) ? "D" : "F");
 				ret.add(Long.toString(stat.getSize()));
 				ret.add(stat.getName());
 			}

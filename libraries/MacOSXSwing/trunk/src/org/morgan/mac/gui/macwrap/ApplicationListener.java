@@ -2,7 +2,8 @@ package org.morgan.mac.gui.macwrap;
 
 import java.util.EventListener;
 
-public interface ApplicationListener extends EventListener {
+public interface ApplicationListener extends EventListener
+{
 	public void handleAbout(ApplicationEvent event);
 
 	public void handleOpenApplication(ApplicationEvent event);

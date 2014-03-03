@@ -1,27 +1,33 @@
 package edu.virginia.vcgr.genii.client.stats;
 
-public class DBConnectionDataPoint implements DataPoint {
+public class DBConnectionDataPoint implements DataPoint
+{
 	private long _openTime;
 	private long _closeTime;
 
-	public DBConnectionDataPoint() {
+	public DBConnectionDataPoint()
+	{
 		_openTime = System.currentTimeMillis();
 		_closeTime = -1L;
 	}
 
-	public void markClosed() {
+	public void markClosed()
+	{
 		_closeTime = System.currentTimeMillis();
 	}
 
-	public boolean withinWindow(long currentTime, long windowSize) {
+	public boolean withinWindow(long currentTime, long windowSize)
+	{
 		return _openTime >= (currentTime - windowSize);
 	}
 
-	public boolean isClosed() {
+	public boolean isClosed()
+	{
 		return _closeTime >= 0L;
 	}
 
-	public long duration() {
+	public long duration()
+	{
 		return _closeTime - _openTime;
 	}
 }

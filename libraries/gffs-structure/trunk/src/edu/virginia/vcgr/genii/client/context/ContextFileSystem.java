@@ -42,18 +42,21 @@ import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
-public class ContextFileSystem {
+public class ContextFileSystem
+{
 	static private final int _DEFAULT_CACHE_SIZE = 128;
 
 	static private Log _logger = LogFactory.getLog(ContextFileSystem.class);
 
-	static private class FileContextPair {
+	static private class FileContextPair
+	{
 		public boolean updating;
 		public File filename;
 		public File transientFilename;
 		public ICallingContext context;
 
-		public FileContextPair(File _filename, File _transientFilename) {
+		public FileContextPair(File _filename, File _transientFilename)
+		{
 			filename = _filename;
 			transientFilename = _transientFilename;
 			context = null;
@@ -64,37 +67,30 @@ public class ContextFileSystem {
 
 	static private FileContextPair[] _cache = new FileContextPair[_DEFAULT_CACHE_SIZE];
 
-	static public ICallingContext load(File combinedFile)
-			throws FileNotFoundException, IOException {
+	static public ICallingContext load(File combinedFile) throws FileNotFoundException, IOException
+	{
 		InputStream fin = null;
 
 		try {
 			fin = new FileInputStream(combinedFile);
-			ContextType ct = (ContextType) ObjectDeserializer.deserialize(
-					new InputSource(fin), ContextType.class);
-			ICallingContext callContext = CallingContextUtilities
-					.setupCallingContextAfterCombinedExtraction(new CallingContextImpl(
-							ct));
+			ContextType ct = (ContextType) ObjectDeserializer.deserialize(new InputSource(fin), ContextType.class);
+			ICallingContext callContext =
+				CallingContextUtilities.setupCallingContextAfterCombinedExtraction(new CallingContextImpl(ct));
 
-			KeyAndCertMaterial keyAndCert = UnicoreContextWorkAround
-					.loadUnicoreContextDelegateeInformation();
+			KeyAndCertMaterial keyAndCert = UnicoreContextWorkAround.loadUnicoreContextDelegateeInformation();
 
 			callContext.setActiveKeyAndCertMaterial(keyAndCert);
 
 			/*
-			 * Retrieve and authenticate other accumulated message-level
-			 * credentials (e.g., GII delegated assertions, etc.)
+			 * Retrieve and authenticate other accumulated message-level credentials (e.g., GII
+			 * delegated assertions, etc.)
 			 */
 			@SuppressWarnings("unchecked")
-			ArrayList<NuCredential> bearerCredentials = (ArrayList<NuCredential>) callContext
-					.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
+			ArrayList<NuCredential> bearerCredentials =
+				(ArrayList<NuCredential>) callContext.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
 
-			/*
-			 * Finally add all of our callerIds to the calling-context's
-			 * outgoing credentials.
-			 */
-			TransientCredentials transientCredentials = TransientCredentials
-					.getTransientCredentials(callContext);
+			/* Finally add all of our callerIds to the calling-context's outgoing credentials. */
+			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 			for (NuCredential cred : bearerCredentials) {
 				transientCredentials.add(cred);
 			}
@@ -108,8 +104,8 @@ public class ContextFileSystem {
 		}
 	}
 
-	static public ICallingContext load(File filename, File transientFilename)
-			throws FileNotFoundException, IOException {
+	static public ICallingContext load(File filename, File transientFilename) throws FileNotFoundException, IOException
+	{
 		boolean myResponsibility = false;
 		FileContextPair pair;
 		int hashValue = filename.hashCode();
@@ -127,8 +123,7 @@ public class ContextFileSystem {
 				if (transientFilename == null) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("This process is now unable to store current calling "
-								+ "context credentials for the session statefile \""
-								+ filename + "\".");
+							+ "context credentials for the session statefile \"" + filename + "\".");
 				}
 			}
 		}
@@ -138,11 +133,7 @@ public class ContextFileSystem {
 				try {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Actively loading current calling context "
-								+ "credentials to session state from files \""
-								+ filename
-								+ "\", \""
-								+ transientFilename
-								+ "\"");
+							+ "credentials to session state from files \"" + filename + "\", \"" + transientFilename + "\"");
 					pair.context = loadContext(filename);
 					loadTransient(transientFilename, pair.context);
 				} finally {
@@ -154,37 +145,26 @@ public class ContextFileSystem {
 					try {
 						pair.wait();
 					} catch (InterruptedException ie) {
-						throw new IOException(
-								"Thread interrupted trying to load context.");
+						throw new IOException("Thread interrupted trying to load context.");
 					}
 				}
-				if (((pair.filename == null) && (filename != null))
-						|| ((pair.filename != null) && (filename == null))
-						|| ((pair.transientFilename != null) && (transientFilename == null))
-						|| ((pair.transientFilename == null) && (transientFilename != null))
-						|| (!pair.filename.equals(filename))
-						|| (!pair.transientFilename.equals(transientFilename))) {
+				if (((pair.filename == null) && (filename != null)) || ((pair.filename != null) && (filename == null))
+					|| ((pair.transientFilename != null) && (transientFilename == null))
+					|| ((pair.transientFilename == null) && (transientFilename != null)) || (!pair.filename.equals(filename))
+					|| (!pair.transientFilename.equals(transientFilename))) {
 
-					_logger.warn("Incorrectly loaded current calling context "
-							+ "credentials from unexpected source state.  "
-							+ "Loaded from: ("
-							+ pair.filename
-							+ ", "
-							+ pair.transientFilename
-							+ "), expected: ("
-							+ filename
-							+ ", "
-							+ transientFilename
-							+ ").  Please contact VCGR with this error message "
-							+ "at genesisII@virginia.edu");
+					_logger.warn("Incorrectly loaded current calling context " + "credentials from unexpected source state.  "
+						+ "Loaded from: (" + pair.filename + ", " + pair.transientFilename + "), expected: (" + filename + ", "
+						+ transientFilename + ").  Please contact VCGR with this error message " + "at genesisII@virginia.edu");
 				}
 			}
 			return pair.context;
 		}
 	}
 
-	static public void store(File filename, File transientFilename,
-			ICallingContext context) throws FileNotFoundException, IOException {
+	static public void store(File filename, File transientFilename, ICallingContext context) throws FileNotFoundException,
+		IOException
+	{
 		FileContextPair pair;
 		int hashValue = filename.hashCode();
 		if (hashValue < 0)
@@ -200,8 +180,7 @@ public class ContextFileSystem {
 				if (transientFilename == null) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("This process is now unable to store current "
-								+ "calling context credentials for the session "
-								+ "statefile \"" + filename + "\".");
+							+ "calling context credentials for the session " + "statefile \"" + filename + "\".");
 				}
 
 			}
@@ -212,10 +191,8 @@ public class ContextFileSystem {
 				storeContext(filename, context);
 				if (transientFilename != null) {
 					if (_logger.isDebugEnabled())
-						_logger.debug("Storing current calling context credentials to "
-								+ "session state in files "
-								+ pair.filename
-								+ ", " + pair.transientFilename);
+						_logger.debug("Storing current calling context credentials to " + "session state in files "
+							+ pair.filename + ", " + pair.transientFilename);
 
 					storeTransient(transientFilename, context);
 				}
@@ -228,8 +205,8 @@ public class ContextFileSystem {
 		}
 	}
 
-	static private ICallingContext loadContext(File filename)
-			throws FileNotFoundException, IOException {
+	static private ICallingContext loadContext(File filename) throws FileNotFoundException, IOException
+	{
 		FileLock lock = null;
 		RandomAccessFile raf = null;
 
@@ -251,8 +228,8 @@ public class ContextFileSystem {
 		}
 	}
 
-	static private void storeContext(File filename, ICallingContext context)
-			throws FileNotFoundException, IOException {
+	static private void storeContext(File filename, ICallingContext context) throws FileNotFoundException, IOException
+	{
 		FileLock lock = null;
 		RandomAccessFile raf = null;
 
@@ -276,8 +253,8 @@ public class ContextFileSystem {
 		}
 	}
 
-	static private void loadTransient(File filename, ICallingContext context)
-			throws FileNotFoundException, IOException {
+	static private void loadTransient(File filename, ICallingContext context) throws FileNotFoundException, IOException
+	{
 		FileLock lock = null;
 		RandomAccessFile raf = null;
 
@@ -287,15 +264,12 @@ public class ContextFileSystem {
 		try {
 			raf = new RandomAccessFile(filename, "rw");
 			lock = raf.getChannel().lock();
-			ObjectInputStream in = new ObjectInputStream(
-					new RAFInputStream(raf));
+			ObjectInputStream in = new ObjectInputStream(new RAFInputStream(raf));
 			context.deserializeTransientProperties(in);
 
-			if ((TransientCredentials.getTransientCredentials(context)
-					.isEmpty())) {
+			if ((TransientCredentials.getTransientCredentials(context).isEmpty())) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("Loaded empty calling context credentials from session statefile "
-							+ filename);
+					_logger.debug("Loaded empty calling context credentials from session statefile " + filename);
 			}
 		} finally {
 			if (lock != null)
@@ -308,8 +282,8 @@ public class ContextFileSystem {
 		}
 	}
 
-	static private void storeTransient(File filename, ICallingContext context)
-			throws FileNotFoundException, IOException {
+	static private void storeTransient(File filename, ICallingContext context) throws FileNotFoundException, IOException
+	{
 		FileLock lock = null;
 		RandomAccessFile raf = null;
 
@@ -317,8 +291,7 @@ public class ContextFileSystem {
 			raf = new RandomAccessFile(filename, "rw");
 			lock = raf.getChannel().lock();
 			raf.setLength(0);
-			ObjectOutputStream out = new ObjectOutputStream(
-					new RAFOutputStream(raf));
+			ObjectOutputStream out = new ObjectOutputStream(new RAFOutputStream(raf));
 			context.serializeTransientProperties(out);
 			out.flush();
 		} finally {

@@ -6,22 +6,27 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class ElementIterable implements Iterable<Element> {
+public class ElementIterable implements Iterable<Element>
+{
 	private NodeList _children;
 
-	public ElementIterable(NodeList children) {
+	public ElementIterable(NodeList children)
+	{
 		_children = children;
 	}
 
 	@Override
-	public Iterator<Element> iterator() {
+	public Iterator<Element> iterator()
+	{
 		return new ElementIterator();
 	}
 
-	private class ElementIterator implements Iterator<Element> {
+	private class ElementIterator implements Iterator<Element>
+	{
 		private int _next;
 
-		private int findNextElement(int start) {
+		private int findNextElement(int start)
+		{
 			for (int lcv = start; lcv < _children.getLength(); lcv++) {
 				if (_children.item(lcv).getNodeType() == Node.ELEMENT_NODE)
 					return lcv;
@@ -30,17 +35,20 @@ public class ElementIterable implements Iterable<Element> {
 			return _children.getLength();
 		}
 
-		private ElementIterator() {
+		private ElementIterator()
+		{
 			_next = findNextElement(0);
 		}
 
 		@Override
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			return _next < _children.getLength();
 		}
 
 		@Override
-		public Element next() {
+		public Element next()
+		{
 			if (_next >= _children.getLength())
 				return null;
 
@@ -50,9 +58,9 @@ public class ElementIterable implements Iterable<Element> {
 		}
 
 		@Override
-		public void remove() {
-			throw new RuntimeException(
-					"Not allowed to delete elements using the element iterator.");
+		public void remove()
+		{
+			throw new RuntimeException("Not allowed to delete elements using the element iterator.");
 		}
 	}
 }

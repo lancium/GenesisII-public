@@ -13,10 +13,11 @@ import edu.virginia.vcgr.genii.security.faults.AttributeInvalidException;
  * @author dmerrill
  * @author ckoeritz
  */
-public interface NuCredential extends Externalizable, Describable {
+public interface NuCredential extends Externalizable, Describable
+{
 	/**
-	 * Checks that the attribute time-valid with respect to the supplied date
-	 * and that any delegation depth limits are met by the credential.
+	 * Checks that the attribute time-valid with respect to the supplied date and that any
+	 * delegation depth limits are met by the credential.
 	 */
 	public void checkValidity(Date date) throws AttributeInvalidException;
 

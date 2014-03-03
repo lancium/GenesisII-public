@@ -9,13 +9,15 @@ import org.morgan.util.GUID;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
-public class Session {
+public class Session
+{
 	static private Log _logger = LogFactory.getLog(Session.class);
 
 	private GUID _sessionID;
 	private ICallingContext _ctxt;
 
-	private Session(ICallingContext originalCtxt) {
+	private Session(ICallingContext originalCtxt)
+	{
 		_sessionID = new GUID();
 
 		if (originalCtxt != null) {
@@ -30,19 +32,23 @@ public class Session {
 		}
 	}
 
-	public Session() {
+	public Session()
+	{
 		this(null);
 	}
 
-	public GUID getSessionID() {
+	public GUID getSessionID()
+	{
 		return _sessionID;
 	}
 
-	public Session duplicate() {
+	public Session duplicate()
+	{
 		return new Session((_ctxt == null) ? null : _ctxt.deriveNewContext());
 	}
 
-	public void setCallingContext(ICallingContext callingContext) {
+	public void setCallingContext(ICallingContext callingContext)
+	{
 		try {
 			ContextManager.storeCurrentContext(callingContext);
 			_ctxt = callingContext;

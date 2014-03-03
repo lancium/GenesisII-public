@@ -3,7 +3,8 @@ package edu.virginia.vcgr.genii.client.filesystems.email;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-public class ConnectConfig {
+public class ConnectConfig
+{
 	@XmlAttribute(name = "isSSL", required = false)
 	private boolean _isSSL = false;
 
@@ -22,27 +23,33 @@ public class ConnectConfig {
 	@XmlElement(namespace = "http://vcgr.cs.virginia.edu/filesystems/connect", name = "debug-on", required = false)
 	private boolean _debugOn = false;
 
-	final boolean isSSL() {
+	final boolean isSSL()
+	{
 		return _isSSL;
 	}
 
-	final String smtpServer() {
+	final String smtpServer()
+	{
 		return _smtpServer;
 	}
 
-	final int port() {
+	final int port()
+	{
 		return _port;
 	}
 
-	final String username() {
+	final String username()
+	{
 		return _username;
 	}
 
-	final String password() {
+	final String password()
+	{
 		return _password;
 	}
 
-	final boolean debugOn() {
+	final boolean debugOn()
+	{
 		return _debugOn;
 	}
 }

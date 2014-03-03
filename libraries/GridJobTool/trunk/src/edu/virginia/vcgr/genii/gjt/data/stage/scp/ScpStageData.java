@@ -6,7 +6,8 @@ import edu.virginia.vcgr.genii.gjt.data.analyze.Analysis;
 import edu.virginia.vcgr.genii.gjt.data.stage.AbstractUsernamePasswordStageData;
 import edu.virginia.vcgr.genii.gjt.data.stage.StageProtocol;
 
-public class ScpStageData extends AbstractUsernamePasswordStageData {
+public class ScpStageData extends AbstractUsernamePasswordStageData
+{
 	static final public int DEFAULT_SCP_PORT = 22;
 
 	@XmlAttribute(name = "host")
@@ -22,7 +23,8 @@ public class ScpStageData extends AbstractUsernamePasswordStageData {
 	private boolean _isSFTP = false;
 
 	@Override
-	protected void activateImpl() {
+	protected void activateImpl()
+	{
 		fireParameterizableStringModified("", _host);
 		fireParameterizableStringModified("", _path);
 
@@ -30,22 +32,26 @@ public class ScpStageData extends AbstractUsernamePasswordStageData {
 	}
 
 	@Override
-	protected void deactivateImpl() {
+	protected void deactivateImpl()
+	{
 		fireParameterizableStringModified("", _host);
 		fireParameterizableStringModified("", _path);
 
 		fireJobDescriptionModified();
 	}
 
-	ScpStageData() {
+	ScpStageData()
+	{
 		super(StageProtocol.scp);
 	}
 
-	final String host() {
+	final String host()
+	{
 		return _host;
 	}
 
-	final void host(String host) {
+	final void host(String host)
+	{
 		String old = _host;
 		_host = host;
 
@@ -53,11 +59,13 @@ public class ScpStageData extends AbstractUsernamePasswordStageData {
 		fireJobDescriptionModified();
 	}
 
-	final String path() {
+	final String path()
+	{
 		return _path;
 	}
 
-	final void path(String path) {
+	final void path(String path)
+	{
 		String old = _path;
 		_path = path;
 
@@ -65,30 +73,34 @@ public class ScpStageData extends AbstractUsernamePasswordStageData {
 		fireJobDescriptionModified();
 	}
 
-	final int port() {
+	final int port()
+	{
 		return _port;
 	}
 
-	final void port(int port) {
+	final void port(int port)
+	{
 		_port = port;
 
 		fireJobDescriptionModified();
 	}
 
-	final boolean isSFTP() {
+	final boolean isSFTP()
+	{
 		return _isSFTP;
 	}
 
-	final void isSFTP(boolean isSFTP) {
+	final void isSFTP(boolean isSFTP)
+	{
 		_isSFTP = isSFTP;
 
 		fireJobDescriptionModified();
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder(_isSFTP ? "sftp://"
-				: "scp://");
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder(_isSFTP ? "sftp://" : "scp://");
 
 		if (_host == null || _host.length() == 0)
 			builder.append("<unknown>");
@@ -107,25 +119,22 @@ public class ScpStageData extends AbstractUsernamePasswordStageData {
 	}
 
 	@Override
-	public void analyze(String filename, Analysis analysis) {
+	public void analyze(String filename, Analysis analysis)
+	{
 		super.analyze(filename, analysis);
 
 		if (_host == null || _host.length() == 0)
-			analysis.addError(
-					"Hostname for data stage \"%s\" must be specified.",
-					filename);
+			analysis.addError("Hostname for data stage \"%s\" must be specified.", filename);
 
 		if (_path == null || _path.length() == 0)
-			analysis.addError("Path for data stage \"%s\" must be specified.",
-					filename);
+			analysis.addError("Path for data stage \"%s\" must be specified.", filename);
 		else if (!_path.startsWith("/"))
-			analysis.addWarning(
-					"Path for data stage \"%s\" will be made absolute",
-					filename);
+			analysis.addWarning("Path for data stage \"%s\" will be made absolute", filename);
 	}
 
 	@Override
-	public String getJSDLURI() {
+	public String getJSDLURI()
+	{
 		return toString();
 	}
 }

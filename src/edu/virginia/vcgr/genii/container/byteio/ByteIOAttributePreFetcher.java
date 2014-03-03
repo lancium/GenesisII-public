@@ -13,10 +13,9 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 
-public abstract class ByteIOAttributePreFetcher<Type extends IResource> extends
-		DefaultGenesisIIAttributesPreFetcher<Type> {
-	static private Log _logger = LogFactory
-			.getLog(ByteIOAttributePreFetcher.class);
+public abstract class ByteIOAttributePreFetcher<Type extends IResource> extends DefaultGenesisIIAttributesPreFetcher<Type>
+{
+	static private Log _logger = LogFactory.getLog(ByteIOAttributePreFetcher.class);
 
 	protected abstract QName getTransferMechanismAttributeName();
 
@@ -36,23 +35,24 @@ public abstract class ByteIOAttributePreFetcher<Type extends IResource> extends
 
 	protected abstract Calendar getCreateTime() throws Throwable;
 
-	protected ByteIOAttributePreFetcher(Type resource) {
+	protected ByteIOAttributePreFetcher(Type resource)
+	{
 		super(resource);
 	}
 
-	protected void fillInSizeAttribute(Collection<MessageElement> attributes) {
+	protected void fillInSizeAttribute(Collection<MessageElement> attributes)
+	{
 		try {
 			Long size = getSize();
 			if (size != null)
-				attributes
-						.add(new MessageElement(getSizeAttributeName(), size));
+				attributes.add(new MessageElement(getSizeAttributeName(), size));
 		} catch (Throwable cause) {
 			_logger.warn("Unable to pre-fetch size attribute.", cause);
 		}
 	}
 
-	protected void fillInTransferMechanismsAttribute(
-			Collection<MessageElement> attributes) {
+	protected void fillInTransferMechanismsAttribute(Collection<MessageElement> attributes)
+	{
 		try {
 			URI[] xferMechs = TransferAgent.getTransferMechs();
 			if (xferMechs != null) {
@@ -63,50 +63,46 @@ public abstract class ByteIOAttributePreFetcher<Type extends IResource> extends
 				}
 			}
 		} catch (Throwable cause) {
-			_logger.warn("Unable to pre-fetch transfer mechanisms attribute.",
-					cause);
+			_logger.warn("Unable to pre-fetch transfer mechanisms attribute.", cause);
 		}
 	}
 
-	protected void fillInCalendarAttribute(
-			Collection<MessageElement> attributes, QName name, Calendar value) {
+	protected void fillInCalendarAttribute(Collection<MessageElement> attributes, QName name, Calendar value)
+	{
 		if (value != null)
 			attributes.add(new MessageElement(name, value));
 	}
 
-	protected void fillInAccessTimeAttribute(
-			Collection<MessageElement> attributes) {
+	protected void fillInAccessTimeAttribute(Collection<MessageElement> attributes)
+	{
 		try {
-			fillInCalendarAttribute(attributes, getAccessTimeAttributeName(),
-					getAccessTime());
+			fillInCalendarAttribute(attributes, getAccessTimeAttributeName(), getAccessTime());
 		} catch (Throwable cause) {
 			_logger.warn("Unable to pre-fetch access time attribute.", cause);
 		}
 	}
 
-	protected void fillInModificationTimeAttribute(
-			Collection<MessageElement> attributes) {
+	protected void fillInModificationTimeAttribute(Collection<MessageElement> attributes)
+	{
 		try {
-			fillInCalendarAttribute(attributes,
-					getModificationTimeAttributeName(), getModificationTime());
+			fillInCalendarAttribute(attributes, getModificationTimeAttributeName(), getModificationTime());
 		} catch (Throwable cause) {
-			_logger.warn("Unable to pre-fetch modification time attribute.",
-					cause);
+			_logger.warn("Unable to pre-fetch modification time attribute.", cause);
 		}
 	}
 
-	protected void fillInCreateTimeAttribute(
-			Collection<MessageElement> attributes) {
+	protected void fillInCreateTimeAttribute(Collection<MessageElement> attributes)
+	{
 		try {
-			fillInCalendarAttribute(attributes, getCreateTimeAttributeName(),
-					getCreateTime());
+			fillInCalendarAttribute(attributes, getCreateTimeAttributeName(), getCreateTime());
 		} catch (Throwable cause) {
 			_logger.warn("Unable to pre-fetch create time attribute.", cause);
 		}
 	}
 
 	@Override
-	protected void fillInAttributes(Collection<MessageElement> attributes) {
+	protected void fillInAttributes(Collection<MessageElement> attributes)
+	{
 		super.fillInAttributes(attributes);
 
 		fillInSizeAttribute(attributes);

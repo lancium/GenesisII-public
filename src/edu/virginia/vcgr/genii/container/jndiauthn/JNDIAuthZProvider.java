@@ -51,37 +51,37 @@ import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIde
 
 /**
  * 
- * NOTES: - The presence of a NULL certificate in the ACL indicates open access.
- * - A NULL ACL indicates no access
+ * NOTES: - The presence of a NULL certificate in the ACL indicates open access. - A NULL ACL
+ * indicates no access
  * 
  * @author dmerrill
  * 
  */
-public class JNDIAuthZProvider implements IAuthZProvider {
+public class JNDIAuthZProvider implements IAuthZProvider
+{
 
 	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec = new MessageLevelSecurityRequirements(
-			MessageLevelSecurityRequirements.SIGN
-					| MessageLevelSecurityRequirements.ENCRYPT);
+		MessageLevelSecurityRequirements.SIGN | MessageLevelSecurityRequirements.ENCRYPT);
 
 	static private Log _logger = LogFactory.getLog(JNDIAuthZProvider.class);
 	static private AclAuthZProvider _aclProvider = null;
 
-	public JNDIAuthZProvider() throws GeneralSecurityException, IOException {
+	public JNDIAuthZProvider() throws GeneralSecurityException, IOException
+	{
 		_aclProvider = new AclAuthZProvider();
 	}
 
 	/**
 	 * Not applicable for virtualized NIS identities
 	 */
-	public void setDefaultAccess(ICallingContext callingContext,
-			IResource resource, X509Certificate[] serviceCertChain)
-			throws AuthZSecurityException, ResourceException {
+	public void setDefaultAccess(ICallingContext callingContext, IResource resource, X509Certificate[] serviceCertChain)
+		throws AuthZSecurityException, ResourceException
+	{
 
 		JNDIResource jndiResource = (JNDIResource) resource;
 
 		if (!jndiResource.isIdpResource()) {
-			_aclProvider.setDefaultAccess(callingContext, resource,
-					serviceCertChain);
+			_aclProvider.setDefaultAccess(callingContext, resource, serviceCertChain);
 		}
 	}
 
@@ -89,13 +89,12 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 	 * Check that the caller has access to the given operation.
 	 */
 	@Override
-	public boolean checkAccess(
-			Collection<NuCredential> authenticatedCallerCredentials,
-			IResource resource, Class<?> serviceClass, Method operation) {
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
+		Class<?> serviceClass, Method operation)
+	{
 		JNDIResource jndiResource = (JNDIResource) resource;
 		if (!jndiResource.isIdpResource()) {
-			return _aclProvider.checkAccess(authenticatedCallerCredentials,
-					resource, serviceClass, operation);
+			return _aclProvider.checkAccess(authenticatedCallerCredentials, resource, serviceClass, operation);
 		}
 		if (!checkJndiAccess(jndiResource)) {
 			String idpName = "";
@@ -104,8 +103,7 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 			} catch (Throwable e) {
 				// ignore since just for diagnostics.
 			}
-			String errorText = "failure: permission denied on "
-					+ operation.getName() + " -- " + idpName;
+			String errorText = "failure: permission denied on " + operation.getName() + " -- " + idpName;
 			_logger.error(errorText);
 			return false;
 		}
@@ -116,32 +114,31 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 	 * Check that the caller has a type of access to the given resource.
 	 */
 	@Override
-	public boolean checkAccess(
-			Collection<NuCredential> authenticatedCallerCredentials,
-			IResource resource, RWXCategory category) {
+	public boolean
+		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
+	{
 		JNDIResource jndiResource = (JNDIResource) resource;
 		if (!jndiResource.isIdpResource()) {
-			_aclProvider.checkAccess(authenticatedCallerCredentials, resource,
-					category);
+			_aclProvider.checkAccess(authenticatedCallerCredentials, resource, category);
 			return true;
 		}
 		return checkJndiAccess(jndiResource);
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean checkJndiAccess(JNDIResource jndiResource) {
+	private boolean checkJndiAccess(JNDIResource jndiResource)
+	{
 		ICallingContext callingContext;
 		try {
 			callingContext = ContextManager.getExistingContext();
 		} catch (IOException e) {
-			_logger.error("failure in getting calling context in JNDIAuthZProvider: "
-					+ e.getMessage());
+			_logger.error("failure in getting calling context in JNDIAuthZProvider: " + e.getMessage());
 			return false;
 		}
 
 		// try each identity in the caller's credentials
-		ArrayList<NuCredential> callerCredentials = (ArrayList<NuCredential>) callingContext
-				.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
+		ArrayList<NuCredential> callerCredentials =
+			(ArrayList<NuCredential>) callingContext.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
 		for (NuCredential cred : callerCredentials) {
 			if (cred instanceof UsernamePasswordIdentity) {
 				try {
@@ -153,64 +150,51 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 					String queryUri = null;
 
 					switch (jndiResource.getStsType()) {
-					case NIS:
+						case NIS:
 
-						jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-								"com.sun.jndi.nis.NISCtxFactory");
-						providerUrl = "nis://"
-								+ jndiResource
-										.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME
-												.getLocalPart())
-								+ "/"
-								+ jndiResource
-										.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME
-												.getLocalPart());
-						jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
+							jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.nis.NISCtxFactory");
+							providerUrl =
+								"nis://" + jndiResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart())
+									+ "/" + jndiResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());
+							jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
 
-						InitialDirContext initialContext = new InitialDirContext(
-								jndiEnv);
-						queryUri = providerUrl + "/system/passwd/" + userName;
-						String[] attrIDs = { "userPassword" };
-						Attributes attrs = initialContext.getAttributes(
-								queryUri, attrIDs);
-						initialContext.close();
+							InitialDirContext initialContext = new InitialDirContext(jndiEnv);
+							queryUri = providerUrl + "/system/passwd/" + userName;
+							String[] attrIDs = { "userPassword" };
+							Attributes attrs = initialContext.getAttributes(queryUri, attrIDs);
+							initialContext.close();
 
-						Attribute passwordAttr = attrs.get("userPassword");
-						byte[] ypPasswordBytes = (byte[]) passwordAttr.get();
+							Attribute passwordAttr = attrs.get("userPassword");
+							byte[] ypPasswordBytes = (byte[]) passwordAttr.get();
 
-						String ypPassword = (new String(ypPasswordBytes, "UTF8"));
-						ypPassword = ypPassword.substring("{crypt}".length());
-						String utPassword = utIdentity.getPassword();
+							String ypPassword = (new String(ypPasswordBytes, "UTF8"));
+							ypPassword = ypPassword.substring("{crypt}".length());
+							String utPassword = utIdentity.getPassword();
 
-						if (UnixCrypt.crypt(utPassword, ypPassword).equals(
-								ypPassword)) {
-							return true;
-						}
-						break;
+							if (UnixCrypt.crypt(utPassword, ypPassword).equals(ypPassword)) {
+								return true;
+							}
+							break;
 
-					case LDAP:
-						jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-								"com.sun.jndi.ldap.LdapCtxFactory");
+						case LDAP:
+							jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 
-						_logger.error("failure: \"LDAP not implemented\" not applicable.");
-						return false;
+							_logger.error("failure: \"LDAP not implemented\" not applicable.");
+							return false;
 
-					default:
-						_logger.error("Unknown STS type.");
-						return false;
+						default:
+							_logger.error("Unknown STS type.");
+							return false;
 					}
 
 				} catch (NamingException e) {
-					_logger.error("failure due to naming exception in JNDIAuthZProvider: "
-							+ e.getMessage());
+					_logger.error("failure due to naming exception in JNDIAuthZProvider: " + e.getMessage());
 					return false;
 				} catch (UnsupportedEncodingException e) {
-					_logger.error("failure due to unsupported encoding: "
-							+ e.getMessage());
+					_logger.error("failure due to unsupported encoding: " + e.getMessage());
 					return false;
 				} catch (ResourceException e) {
-					_logger.error("failure due to resource exception: "
-							+ e.getMessage());
+					_logger.error("failure due to resource exception: " + e.getMessage());
 					return false;
 				}
 			}
@@ -219,9 +203,9 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 		return false;
 	}
 
-	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(
-			IResource resource) throws AuthZSecurityException,
-			ResourceException {
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource) throws AuthZSecurityException,
+		ResourceException
+	{
 
 		JNDIResource jndiResource = (JNDIResource) resource;
 
@@ -232,10 +216,9 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 		return _defaultMinMsgSec;
 	}
 
-	public AuthZConfig getAuthZConfig(IResource resource)
-			throws AuthZSecurityException, ResourceException {
-		if ((resource instanceof IJNDIResource)
-				&& ((IJNDIResource) resource).isIdpResource()) {
+	public AuthZConfig getAuthZConfig(IResource resource) throws AuthZSecurityException, ResourceException
+	{
+		if ((resource instanceof IJNDIResource) && ((IJNDIResource) resource).isIdpResource()) {
 			// we are a stateless IDP resource
 			return new AuthZConfig(null);
 		}
@@ -243,15 +226,14 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 		return _aclProvider.getAuthZConfig(resource);
 	}
 
-	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize)
-			throws AuthZSecurityException, ResourceException {
+	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize) throws AuthZSecurityException, ResourceException
+	{
 		return getAuthZConfig(resource);
 	}
 
-	public void setAuthZConfig(AuthZConfig config, IResource resource)
-			throws AuthZSecurityException, ResourceException {
-		if ((resource instanceof IJNDIResource)
-				&& ((IJNDIResource) resource).isIdpResource()) {
+	public void setAuthZConfig(AuthZConfig config, IResource resource) throws AuthZSecurityException, ResourceException
+	{
+		if ((resource instanceof IJNDIResource) && ((IJNDIResource) resource).isIdpResource()) {
 			// we are a stateless IDP resource
 			return;
 		}
@@ -259,20 +241,18 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 		_aclProvider.setAuthZConfig(config, resource);
 	}
 
-	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig,
-			IResource resource) throws AuthZSecurityException,
-			ResourceException {
-		if ((resource instanceof IJNDIResource)
-				&& ((IJNDIResource) resource).isIdpResource())
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource)
+		throws AuthZSecurityException, ResourceException
+	{
+		if ((resource instanceof IJNDIResource) && ((IJNDIResource) resource).isIdpResource())
 			return;
 		_aclProvider.sendAuthZConfig(oldConfig, newConfig, resource);
 	}
 
-	public void receiveAuthZConfig(NotificationMessageContents message,
-			IResource resource) throws ResourceException,
-			AuthZSecurityException {
-		if ((resource instanceof IJNDIResource)
-				&& ((IJNDIResource) resource).isIdpResource())
+	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource) throws ResourceException,
+		AuthZSecurityException
+	{
+		if ((resource instanceof IJNDIResource) && ((IJNDIResource) resource).isIdpResource())
 			return;
 		_aclProvider.receiveAuthZConfig(message, resource);
 	}

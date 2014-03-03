@@ -7,13 +7,14 @@ import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
 
-public class IOUtils {
+public class IOUtils
+{
 	static private Logger _logger = Logger.getLogger(IOUtils.class);
 
 	static final private int BUFFER_SIZE = 1024 * 8;
 
-	static public void copy(InputStream in, OutputStream out)
-			throws IOException {
+	static public void copy(InputStream in, OutputStream out) throws IOException
+	{
 		byte[] data = new byte[BUFFER_SIZE];
 		int read;
 
@@ -21,7 +22,8 @@ public class IOUtils {
 			out.write(data, 0, read);
 	}
 
-	static public void close(Closeable closeable) {
+	static public void close(Closeable closeable)
+	{
 		if (closeable != null) {
 			try {
 				closeable.close();

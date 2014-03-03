@@ -1,9 +1,10 @@
 package org.morgan.util.macro;
 
-class DefaultMacroConsumer extends AbstractEscapingMacroConsumer {
+class DefaultMacroConsumer extends AbstractEscapingMacroConsumer
+{
 	@Override
-	protected MacroConsumer consumeImpl(StringBuilder builder, Character c,
-			boolean escaped) {
+	protected MacroConsumer consumeImpl(StringBuilder builder, Character c, boolean escaped)
+	{
 		if (c != null) {
 			if (!escaped && c == '$')
 				return new PossibleMacroStartMacroConsumer(resolver());
@@ -17,7 +18,8 @@ class DefaultMacroConsumer extends AbstractEscapingMacroConsumer {
 		return this;
 	}
 
-	public DefaultMacroConsumer(MacroResolver resolver) {
+	public DefaultMacroConsumer(MacroResolver resolver)
+	{
 		super(resolver);
 	}
 }

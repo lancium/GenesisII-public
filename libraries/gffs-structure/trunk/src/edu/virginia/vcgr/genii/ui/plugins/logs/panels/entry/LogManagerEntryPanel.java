@@ -22,41 +22,48 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.logs.panels.LogManagerPanel;
 import edu.virginia.vcgr.genii.ui.plugins.logs.tree.LogPath;
 
-public class LogManagerEntryPanel extends LogManagerPanel implements
-		LazyLoadTabHandler {
+public class LogManagerEntryPanel extends LogManagerPanel implements LazyLoadTabHandler
+{
 	static final long serialVersionUID = 0L;
 
 	static final private Dimension TABLE_SIZE = new Dimension(700, 600);
 
-	private class PopupListener extends MouseAdapter {
+	private class PopupListener extends MouseAdapter
+	{
 		@Override
-		final public void mouseClicked(MouseEvent e) {
+		final public void mouseClicked(MouseEvent e)
+		{
 			if (e.isPopupTrigger())
 				popup(e);
 		}
 
 		@Override
-		final public void mousePressed(MouseEvent e) {
+		final public void mousePressed(MouseEvent e)
+		{
 			if (e.isPopupTrigger())
 				popup(e);
 		}
 
 		@Override
-		final public void mouseReleased(MouseEvent e) {
+		final public void mouseReleased(MouseEvent e)
+		{
 			if (e.isPopupTrigger())
 				popup(e);
 		}
 	}
 
-	private class RefreshAction extends AbstractAction {
+	private class RefreshAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private RefreshAction() {
+		private RefreshAction()
+		{
 			super("Refresh");
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			_model.refresh(_table, _selection);
 		}
 	}
@@ -67,14 +74,16 @@ public class LogManagerEntryPanel extends LogManagerPanel implements
 
 	private LogPath _selection = null;
 
-	private void popup(MouseEvent e) {
+	private void popup(MouseEvent e)
+	{
 		JPopupMenu popup = new JPopupMenu("Log Manager Popup");
 		popup.add(new RefreshAction());
 
 		popup.show(_table, e.getX(), e.getY());
 	}
 
-	public LogManagerEntryPanel(UIPluginContext context) throws RemoteException {
+	public LogManagerEntryPanel(UIPluginContext context) throws RemoteException
+	{
 		super(new GridBagLayout());
 
 		setName("Job Management");
@@ -88,28 +97,27 @@ public class LogManagerEntryPanel extends LogManagerPanel implements
 		_table.addMouseListener(new PopupListener());
 
 		_table.getActionMap().put("Refresh", new RefreshAction());
-		_table.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0x0),
-				"Refresh");
+		_table.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0x0), "Refresh");
 
 		JScrollPane pane = new JScrollPane(_table);
 
-		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-						5, 5, 5, 5), 5, 5));
-		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1,
-				1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
+		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+			5, 5, 5, 5), 5, 5));
+		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		setPreferredSize(TABLE_SIZE);
 	}
 
 	@Override
-	final public void load() {
+	final public void load()
+	{
 		_model.refresh(_table, null);
 	}
 
 	@Override
-	public void updateStatus(Collection<LogPath> descriptions) {
+	public void updateStatus(Collection<LogPath> descriptions)
+	{
 		for (LogPath selection : descriptions) {
 			_selection = selection;
 			_model.refresh(_table, selection);

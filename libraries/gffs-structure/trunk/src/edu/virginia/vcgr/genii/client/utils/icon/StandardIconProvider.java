@@ -18,53 +18,56 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-public class StandardIconProvider implements IconProvider {
+public class StandardIconProvider implements IconProvider
+{
 	static private final int DEFAULT_ICON_SIZE = 16;
 
 	private String _resourceName = null;
 	private int _iconSize;
 
-	public StandardIconProvider(String resourceName, int iconSize) {
-		_resourceName = String.format("%s%s",
-				GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
+	public StandardIconProvider(String resourceName, int iconSize)
+	{
+		_resourceName = String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
 		_iconSize = iconSize;
 		loadIcon();
 	}
 
-	public StandardIconProvider(String resourceName) {
-		_resourceName = String.format("%s%s",
-				GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
+	public StandardIconProvider(String resourceName)
+	{
+		_resourceName = String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
 		_iconSize = DEFAULT_ICON_SIZE;
 		loadIcon();
 	}
 
-	public InputStream openStream(String resourceName) {
+	public InputStream openStream(String resourceName)
+	{
 		return GenesisClassLoader.getSystemResourceAsStream(resourceName);
 	}
 
-	public Icon loadIcon() {
+	public Icon loadIcon()
+	{
 		InputStream in = null;
 
 		try {
 			in = openStream(_resourceName);
 			if (in == null)
-				throw new FileNotFoundException(String.format(
-						"Can't find resource %s.", _resourceName));
+				throw new FileNotFoundException(String.format("Can't find resource %s.", _resourceName));
 			return new ImageIcon(ImageIO.read(in));
 		} catch (IOException ioe) {
-			throw new ConfigurationException(String.format(
-					"Unable to read image from resource %s.", _resourceName),
-					ioe);
+			throw new ConfigurationException(String.format("Unable to read image from resource %s.", _resourceName), ioe);
 		} finally {
 			StreamUtils.close(in);
 		}
 	}
 
 	@Override
-	public Icon createIcon() {
-		return new Icon() {
+	public Icon createIcon()
+	{
+		return new Icon()
+		{
 			@Override
-			final public void paintIcon(Component c, Graphics g, int x, int y) {
+			final public void paintIcon(Component c, Graphics g, int x, int y)
+			{
 				final Color ICON_COLOR = Color.blue;
 
 				Graphics2D g2 = (Graphics2D) (g.create());
@@ -75,12 +78,14 @@ public class StandardIconProvider implements IconProvider {
 			}
 
 			@Override
-			final public int getIconWidth() {
+			final public int getIconWidth()
+			{
 				return _iconSize;
 			}
 
 			@Override
-			final public int getIconHeight() {
+			final public int getIconHeight()
+			{
 				return _iconSize;
 			}
 		};

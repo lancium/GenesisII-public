@@ -19,9 +19,11 @@ import junit.framework.TestSuite;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class AllTests {
+public class AllTests
+{
 
-	public static Test suite() {
+	public static Test suite()
+	{
 		TestSuite suite = new TestSuite("Test for org.morgan.util.test");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(VersionTest.class);

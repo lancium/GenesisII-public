@@ -8,22 +8,23 @@ import javax.swing.SwingUtilities;
 
 import edu.virginia.vcgr.genii.gjt.data.ParameterizableStringList;
 
-public class ParameterizableStringListEditor implements
-		DescribedFieldEditor<ParameterizableStringList> {
+public class ParameterizableStringListEditor implements DescribedFieldEditor<ParameterizableStringList>
+{
 	private String _title;
 	private String _prompt;
 
-	public ParameterizableStringListEditor(String title, String prompt) {
+	public ParameterizableStringListEditor(String title, String prompt)
+	{
 		_title = title;
 		_prompt = prompt;
 	}
 
 	@Override
-	public void edit(JComponent parentComponent,
-			ParameterizableStringList currentValue) {
-		ParameterizableStringListEditorDialog dialog = new ParameterizableStringListEditorDialog(
-				SwingUtilities.getWindowAncestor(parentComponent), _title,
-				_prompt, currentValue);
+	public void edit(JComponent parentComponent, ParameterizableStringList currentValue)
+	{
+		ParameterizableStringListEditorDialog dialog =
+			new ParameterizableStringListEditorDialog(SwingUtilities.getWindowAncestor(parentComponent), _title, _prompt,
+				currentValue);
 		dialog.setModalityType(ModalityType.DOCUMENT_MODAL);
 		dialog.pack();
 		GUIUtils.centerComponent(dialog);

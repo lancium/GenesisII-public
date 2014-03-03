@@ -9,14 +9,14 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FileHandle;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
-public class JNIClose extends JNILibraryBase {
+public class JNIClose extends JNILibraryBase
+{
 	static private Log _logger = LogFactory.getLog(JNIClose.class);
 
-	public static Boolean close(Integer handle, Boolean deleteOnClose) {
+	public static Boolean close(Integer handle, Boolean deleteOnClose)
+	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format(
-					"JNIClose::close(%d, deleteOnClose = %s)", handle,
-					deleteOnClose));
+			_logger.trace(String.format("JNIClose::close(%d, deleteOnClose = %s)", handle, deleteOnClose));
 
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 

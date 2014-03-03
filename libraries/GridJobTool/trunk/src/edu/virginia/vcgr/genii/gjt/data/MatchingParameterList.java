@@ -11,8 +11,9 @@ import edu.virginia.vcgr.genii.gjt.data.variables.Clearable;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 
-public class MatchingParameterList extends DefaultDataItem implements
-		Clearable, PostUnmarshallListener, Iterable<StringStringPair> {
+public class MatchingParameterList extends DefaultDataItem implements Clearable, PostUnmarshallListener,
+	Iterable<StringStringPair>
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlTransient
@@ -24,11 +25,12 @@ public class MatchingParameterList extends DefaultDataItem implements
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "value")
 	private Vector<StringStringPair> _items = new Vector<StringStringPair>();
 
-	public MatchingParameterList() {
+	public MatchingParameterList()
+	{
 	}
 
-	public MatchingParameterList(ParameterizableBroker pBroker,
-			ModificationBroker mBroker) {
+	public MatchingParameterList(ParameterizableBroker pBroker, ModificationBroker mBroker)
+	{
 		_pBroker = pBroker;
 		_mBroker = mBroker;
 
@@ -36,14 +38,16 @@ public class MatchingParameterList extends DefaultDataItem implements
 		addModificationListener(mBroker);
 	}
 
-	public void add(StringStringPair value) {
+	public void add(StringStringPair value)
+	{
 		_items.add(value);
 		fireParameterizableStringModified("", value.name());
 		fireParameterizableStringModified("", value.value());
 		fireJobDescriptionModified();
 	}
 
-	public void remove(int index) {
+	public void remove(int index)
+	{
 		StringStringPair item = _items.remove(index);
 		if (item != null) {
 			fireParameterizableStringModified(item.name(), "");
@@ -52,16 +56,19 @@ public class MatchingParameterList extends DefaultDataItem implements
 		}
 	}
 
-	public StringStringPair get(int index) {
+	public StringStringPair get(int index)
+	{
 		return _items.get(index);
 	}
 
-	public int size() {
+	public int size()
+	{
 		return _items.size();
 	}
 
 	@Override
-	public void clear() {
+	public void clear()
+	{
 		for (StringStringPair item : _items) {
 			fireParameterizableStringModified(item.name(), "");
 			fireParameterizableStringModified(item.value(), "");
@@ -73,27 +80,27 @@ public class MatchingParameterList extends DefaultDataItem implements
 		_items.clear();
 	}
 
-	public ParameterizableBroker getParameterizableBroker() {
+	public ParameterizableBroker getParameterizableBroker()
+	{
 		return _pBroker;
 	}
 
-	public ModificationBroker getModificationBroker() {
+	public ModificationBroker getModificationBroker()
+	{
 		return _mBroker;
 	}
 
 	@Override
-	public void postUnmarshall(ParameterizableBroker parameterBroker,
-			ModificationBroker modificationBroker) {
+	public void postUnmarshall(ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
+	{
 		_pBroker = parameterBroker;
 		_mBroker = modificationBroker;
 
 		/*
-		 * Don't need to do this because we derive off of a class that
-		 * automatically does it
+		 * Don't need to do this because we derive off of a class that automatically does it
 		 */
 		/*
-		 * addParameterizableListener(parameterBroker);
-		 * addModificationListener(modificationBroker);
+		 * addParameterizableListener(parameterBroker); addModificationListener(modificationBroker);
 		 */
 
 		for (StringStringPair item : _items) {
@@ -105,7 +112,8 @@ public class MatchingParameterList extends DefaultDataItem implements
 	}
 
 	@Override
-	public Iterator<StringStringPair> iterator() {
+	public Iterator<StringStringPair> iterator()
+	{
 		return Collections.unmodifiableList(_items).iterator();
 	}
 }

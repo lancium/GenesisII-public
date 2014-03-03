@@ -7,13 +7,16 @@ import edu.virginia.vcgr.genii.gjt.data.stage.StageData;
 import edu.virginia.vcgr.genii.gjt.data.stage.StageEditor;
 import edu.virginia.vcgr.genii.gjt.data.stage.StageProtocol;
 
-public class UndefinedStageFactory extends AbstractStageFactory {
+public class UndefinedStageFactory extends AbstractStageFactory
+{
 	@Override
-	public StageEditor<? extends StageData> createEditor(Window owner) {
+	public StageEditor<? extends StageData> createEditor(Window owner)
+	{
 		return null;
 	}
 
-	public UndefinedStageFactory() {
+	public UndefinedStageFactory()
+	{
 		super(StageProtocol.undefined);
 	}
 }

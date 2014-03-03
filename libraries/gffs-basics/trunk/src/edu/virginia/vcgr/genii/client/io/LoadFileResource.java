@@ -9,19 +9,22 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-public class LoadFileResource {
+public class LoadFileResource
+{
 	private String _resourcePath;
 
-	public LoadFileResource(String resourcePath) {
+	public LoadFileResource(String resourcePath)
+	{
 		_resourcePath = resourcePath;
 	}
 
-	public InputStream open() {
-		return GenesisClassLoader.classLoaderFactory().getResourceAsStream(
-				_resourcePath);
+	public InputStream open()
+	{
+		return GenesisClassLoader.classLoaderFactory().getResourceAsStream(_resourcePath);
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		StringWriter writer = new StringWriter();
 		InputStream in = null;
 		InputStreamReader reader = null;

@@ -31,7 +31,8 @@ import edu.virginia.vcgr.genii.ui.shell.history.HistorySearch;
 import edu.virginia.vcgr.genii.ui.shell.tokenizer.LineTokenizer;
 import edu.virginia.vcgr.genii.ui.shell.tokenizer.Token;
 
-public class CommandField extends JTextField {
+public class CommandField extends JTextField
+{
 	static final private int DEFAULT_COLUMNS = 75;
 
 	static final long serialVersionUID = 0L;
@@ -45,7 +46,8 @@ public class CommandField extends JTextField {
 	private JLabel _label;
 	private boolean _executing = false;
 
-	private String stripEscapesAndQuotes(String word) {
+	private String stripEscapesAndQuotes(String word)
+	{
 		StringBuilder builder = new StringBuilder();
 		for (int lcv = 0; lcv < word.length(); lcv++) {
 			char c = word.charAt(lcv);
@@ -64,7 +66,8 @@ public class CommandField extends JTextField {
 		return builder.toString();
 	}
 
-	private String insertEscapesOrQuotes(boolean preferQuotes, String word) {
+	private String insertEscapesOrQuotes(boolean preferQuotes, String word)
+	{
 		StringBuilder builder = new StringBuilder();
 		boolean needQuotes = false;
 
@@ -91,7 +94,8 @@ public class CommandField extends JTextField {
 		return builder.toString();
 	}
 
-	private String findCommonStart(String[] words) {
+	private String findCommonStart(String[] words)
+	{
 		String ret = words[0];
 
 		for (int lcv = 1; lcv < words.length; lcv++) {
@@ -105,8 +109,8 @@ public class CommandField extends JTextField {
 		return ret;
 	}
 
-	public CommandField(UIContext uiContext, JLabel label, Display display,
-			ExecutionContext executionContext, int columns) {
+	public CommandField(UIContext uiContext, JLabel label, Display display, ExecutionContext executionContext, int columns)
+	{
 		super(columns);
 
 		LoggingContext.adoptNewContext();
@@ -117,8 +121,7 @@ public class CommandField extends JTextField {
 		_executionContext = executionContext;
 		_logDB = DLogUtils.getDBConnector();
 
-		InputBindings inputBindings = uiContext.preferences()
-				.preferenceSet(ShellUIPreferenceSet.class).createBindings();
+		InputBindings inputBindings = uiContext.preferences().preferenceSet(ShellUIPreferenceSet.class).createBindings();
 
 		setDragEnabled(true);
 
@@ -126,14 +129,17 @@ public class CommandField extends JTextField {
 		addKeyListener(inputBindings);
 		inputBindings.addBindingActionListener(new FieldActioner());
 
-		addFocusListener(new FocusListener() {
+		addFocusListener(new FocusListener()
+		{
 			@Override
-			public void focusLost(FocusEvent e) {
+			public void focusLost(FocusEvent e)
+			{
 				// Nothing to do
 			}
 
 			@Override
-			public void focusGained(FocusEvent e) {
+			public void focusGained(FocusEvent e)
+			{
 				int position = getCaretPosition();
 				setCaretPosition(position);
 			}
@@ -142,18 +148,20 @@ public class CommandField extends JTextField {
 		LoggingContext.releaseCurrentLoggingContext();
 	}
 
-	public CommandField(UIContext uiContext, JLabel label, Display display,
-			ExecutionContext executionContext) {
+	public CommandField(UIContext uiContext, JLabel label, Display display, ExecutionContext executionContext)
+	{
 		this(uiContext, label, display, executionContext, DEFAULT_COLUMNS);
 	}
 
-	private class FieldActioner extends BindingActionAdapter {
+	private class FieldActioner extends BindingActionAdapter
+	{
 		private History _history = new History();
 		private HistoryIterator _historyIterator = null;
 		private HistorySearch _historySearch = null;
 
 		@Override
-		public void addCharacter(char c) {
+		public void addCharacter(char c)
+		{
 			Caret caret = getCaret();
 
 			if (_historySearch != null) {
@@ -167,8 +175,7 @@ public class CommandField extends JTextField {
 			} else {
 				String text = getText();
 				int position = caret.getDot();
-				setText(text.substring(0, position) + c
-						+ text.substring(position));
+				setText(text.substring(0, position) + c + text.substring(position));
 				getCaret().setDot(position + 1);
 
 				_historyIterator = null;
@@ -176,7 +183,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void backspace() {
+		public void backspace()
+		{
 			if (_historySearch != null) {
 				beep();
 				return;
@@ -189,8 +197,7 @@ public class CommandField extends JTextField {
 				beep();
 			else {
 				position--;
-				setText(text.substring(0, position)
-						+ text.substring(position + 1));
+				setText(text.substring(0, position) + text.substring(position + 1));
 				caret.setDot(position);
 			}
 
@@ -198,7 +205,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void backwardHistory() {
+		public void backwardHistory()
+		{
 			if (_historySearch != null) {
 				beep();
 				return;
@@ -217,12 +225,14 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void beep() {
+		public void beep()
+		{
 			Toolkit.getDefaultToolkit().beep();
 		}
 
 		@Override
-		public void clear() {
+		public void clear()
+		{
 			LineBasedReader reader = _reader;
 
 			if (reader != null) {
@@ -240,7 +250,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void delete() {
+		public void delete()
+		{
 			if (_historySearch != null) {
 				beep();
 				return;
@@ -252,8 +263,7 @@ public class CommandField extends JTextField {
 			if (position >= text.length())
 				beep();
 			else {
-				setText(text.substring(0, position)
-						+ text.substring(position + 1));
+				setText(text.substring(0, position) + text.substring(position + 1));
 				caret.setDot(position);
 			}
 
@@ -261,7 +271,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void end() {
+		public void end()
+		{
 			if (_historySearch != null) {
 				beep();
 				return;
@@ -272,7 +283,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void enter() {
+		public void enter()
+		{
 
 			setEditable(false);
 
@@ -295,8 +307,7 @@ public class CommandField extends JTextField {
 				}
 
 				if (line.equals("quit") || line.equals("exit")) {
-					SwingUtilities.windowForComponent(CommandField.this)
-							.dispose();
+					SwingUtilities.windowForComponent(CommandField.this).dispose();
 					return;
 				}
 
@@ -317,11 +328,9 @@ public class CommandField extends JTextField {
 				}
 
 				_uiContext
-						.progressMonitorFactory()
-						.createMonitor(CommandField.this, "Executing Command",
-								"Executing command.", 1000L,
-								new CommandExecutionTask(line, reader),
-								new CommandCompletionListener()).start();
+					.progressMonitorFactory()
+					.createMonitor(CommandField.this, "Executing Command", "Executing command.", 1000L,
+						new CommandExecutionTask(line, reader), new CommandCompletionListener()).start();
 
 				LoggingContext.releaseCurrentLoggingContext();
 			} else {
@@ -332,7 +341,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void forwardHistory() {
+		public void forwardHistory()
+		{
 			if (_historySearch != null) {
 				beep();
 				return;
@@ -351,7 +361,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void home() {
+		public void home()
+		{
 			if (_historySearch != null) {
 				beep();
 				return;
@@ -362,7 +373,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void left() {
+		public void left()
+		{
 			if (_historySearch != null) {
 				beep();
 				return;
@@ -377,7 +389,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void right() {
+		public void right()
+		{
 			if (_historySearch != null) {
 				beep();
 				return;
@@ -392,7 +405,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void complete() {
+		public void complete()
+		{
 			if (_historySearch != null) {
 				beep();
 				return;
@@ -436,15 +450,9 @@ public class CommandField extends JTextField {
 
 				setEnabled(false);
 				_uiContext
-						.progressMonitorFactory()
-						.createMonitor(
-								CommandField.this,
-								"Forming Completions",
-								"Forming completions.",
-								1000L,
-								new CompleterTask(completer, partial),
-								new CompletionFinisher(lastWord, right, words,
-										left)).start();
+					.progressMonitorFactory()
+					.createMonitor(CommandField.this, "Forming Completions", "Forming completions.", 1000L,
+						new CompleterTask(completer, partial), new CompletionFinisher(lastWord, right, words, left)).start();
 
 				LoggingContext.releaseCurrentLoggingContext();
 			}
@@ -453,7 +461,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void search() {
+		public void search()
+		{
 			Pair<String, String> pair;
 
 			if (_historySearch == null)
@@ -471,7 +480,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void stopSearch() {
+		public void stopSearch()
+		{
 			if (_historySearch != null) {
 				setText(_historySearch.getActualLine());
 				getCaret().setDot(0);
@@ -480,59 +490,61 @@ public class CommandField extends JTextField {
 		}
 	}
 
-	private class CompleterTask extends AbstractTask<String[]> {
+	private class CompleterTask extends AbstractTask<String[]>
+	{
 		private WordCompleter _completer;
 		private String _partial;
 		private LoggingContext _context;
 
-		private CompleterTask(WordCompleter completer, String partial) {
+		private CompleterTask(WordCompleter completer, String partial)
+		{
 			_completer = completer;
 			_partial = partial;
 			try {
-				_context = (LoggingContext) LoggingContext
-						.getCurrentLoggingContext().clone();
+				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				_context = new LoggingContext();
 			}
 		}
 
 		@Override
-		public String[] execute(TaskProgressListener progressListener)
-				throws Exception {
+		public String[] execute(TaskProgressListener progressListener) throws Exception
+		{
 			LoggingContext.assumeLoggingContext(_context);
 			return _completer.completions(_partial);
 		}
 
 		@Override
-		public boolean showProgressDialog() {
+		public boolean showProgressDialog()
+		{
 			return true;
 		}
 	}
 
-	private class CompletionFinisher implements
-			TaskCompletionListener<String[]> {
+	private class CompletionFinisher implements TaskCompletionListener<String[]>
+	{
 		private String _lastWord;
 		private String _right;
 		private Token[] _words;
 		private String _originalLeft;
 		private LoggingContext _context;
 
-		private CompletionFinisher(String lastWord, String right,
-				Token[] words, String originalLeft) {
+		private CompletionFinisher(String lastWord, String right, Token[] words, String originalLeft)
+		{
 			_lastWord = lastWord;
 			_right = right;
 			_words = words;
 			_originalLeft = originalLeft;
 			try {
-				_context = (LoggingContext) LoggingContext
-						.getCurrentLoggingContext().clone();
+				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				_context = new LoggingContext();
 			}
 		}
 
 		@Override
-		public void taskCancelled(Task<String[]> task) {
+		public void taskCancelled(Task<String[]> task)
+		{
 			setEnabled(true);
 			requestFocusInWindow();
 			_display.output().println("Completions cancelled.");
@@ -541,7 +553,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void taskCompleted(Task<String[]> task, String[] completions) {
+		public void taskCompleted(Task<String[]> task, String[] completions)
+		{
 			LoggingContext.assumeLoggingContext(_context);
 			String newWord;
 
@@ -552,8 +565,7 @@ public class CommandField extends JTextField {
 					Toolkit.getDefaultToolkit().beep();
 				} else {
 					if (completions.length == 1)
-						newWord = insertEscapesOrQuotes(
-								_lastWord.startsWith("\""), completions[0]);
+						newWord = insertEscapesOrQuotes(_lastWord.startsWith("\""), completions[0]);
 					else {
 						_display.start();
 						_display.header().println("Completions:\n");
@@ -561,9 +573,7 @@ public class CommandField extends JTextField {
 						for (String completion : completions)
 							_display.output().format("\t%s\n", completion);
 
-						newWord = insertEscapesOrQuotes(
-								_lastWord.startsWith("\""),
-								findCommonStart(completions));
+						newWord = insertEscapesOrQuotes(_lastWord.startsWith("\""), findCommonStart(completions));
 					}
 
 					StringBuilder builder = new StringBuilder();
@@ -586,7 +596,8 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void taskExcepted(Task<String[]> task, Throwable cause) {
+		public void taskExcepted(Task<String[]> task, Throwable cause)
+		{
 			setEnabled(true);
 			requestFocusInWindow();
 			_display.error().println("Unable to generate completions.");
@@ -595,60 +606,60 @@ public class CommandField extends JTextField {
 		}
 	}
 
-	private class CommandExecutionTask extends AbstractTask<Integer> {
+	private class CommandExecutionTask extends AbstractTask<Integer>
+	{
 		private String _line;
 		private LineBasedReader _reader;
 		private LoggingContext context;
 
-		private CommandExecutionTask(String line, LineBasedReader reader) {
+		private CommandExecutionTask(String line, LineBasedReader reader)
+		{
 			_line = line;
 			_reader = reader;
 			try {
-				context = (LoggingContext) LoggingContext
-						.getCurrentLoggingContext().clone();
+				context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				context = new LoggingContext();
 			}
 		}
 
 		@Override
-		public Integer execute(TaskProgressListener progressListener)
-				throws Exception {
+		public Integer execute(TaskProgressListener progressListener) throws Exception
+		{
 			LoggingContext.assumeLoggingContext(context);
 			_executionContext.executeCommand(_line, _display, _reader);
 			return null;
 		}
 
 		@Override
-		public boolean showProgressDialog() {
+		public boolean showProgressDialog()
+		{
 			return false;
 		}
 	}
 
-	private class CommandCompletionListener implements
-			TaskCompletionListener<Integer> {
+	private class CommandCompletionListener implements TaskCompletionListener<Integer>
+	{
 		private LoggingContext context;
 
-		private CommandCompletionListener() {
+		private CommandCompletionListener()
+		{
 			try {
-				context = (LoggingContext) LoggingContext
-						.getCurrentLoggingContext().clone();
+				context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
 			} catch (ContextException e) {
 				context = new LoggingContext();
 			}
 		}
 
-		private void finishCommand() {
+		private void finishCommand()
+		{
 			LoggingContext.assumeLoggingContext(context);
 			Closeable token = null;
 
 			try {
-				token = ContextManager.temporarilyAssumeContext(_uiContext
-						.callingContext());
-				_display.output()
-						.println("\nLog ID is " + DLogUtils.getRPCID());
-				_label.setText(UserPreferences.preferences().shellPrompt()
-						.toString());
+				token = ContextManager.temporarilyAssumeContext(_uiContext.callingContext());
+				_display.output().println("\nLog ID is " + DLogUtils.getRPCID());
+				_label.setText(UserPreferences.preferences().shellPrompt().toString());
 				_reader = null;
 				CommandField.this.requestFocusInWindow();
 				CommandField.this.setEditable(true);
@@ -660,18 +671,21 @@ public class CommandField extends JTextField {
 		}
 
 		@Override
-		public void taskCancelled(Task<Integer> task) {
+		public void taskCancelled(Task<Integer> task)
+		{
 			_display.output().println("Cancelled!");
 			finishCommand();
 		}
 
 		@Override
-		public void taskCompleted(Task<Integer> task, Integer result) {
+		public void taskCompleted(Task<Integer> task, Integer result)
+		{
 			finishCommand();
 		}
 
 		@Override
-		public void taskExcepted(Task<Integer> task, Throwable cause) {
+		public void taskExcepted(Task<Integer> task, Throwable cause)
+		{
 			_display.error().println("Task failed to execute!");
 			cause.printStackTrace(_display.error());
 			finishCommand();

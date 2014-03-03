@@ -28,7 +28,8 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class Exact implements Matchable {
+public class Exact implements Matchable
+{
 	static final long serialVersionUID = 0L;
 
 	static final public double DEFAULT_EPSILON = 0.0;
@@ -46,44 +47,53 @@ public class Exact implements Matchable {
 	 * Default constructor for use with XML Unmarshalling only.
 	 */
 	@SuppressWarnings("unused")
-	private Exact() {
+	private Exact()
+	{
 		this(0.0);
 	}
 
-	public Exact(double value, double epsilon) {
+	public Exact(double value, double epsilon)
+	{
 		_value = value;
 		_epsilon = epsilon;
 	}
 
-	public Exact(double value) {
+	public Exact(double value)
+	{
 		this(value, DEFAULT_EPSILON);
 	}
 
-	final public void epsilon(double epsilon) {
+	final public void epsilon(double epsilon)
+	{
 		_epsilon = epsilon;
 	}
 
-	final public double epsilon() {
+	final public double epsilon()
+	{
 		if (_epsilon == null)
 			return DEFAULT_EPSILON;
 
 		return _epsilon;
 	}
 
-	final public double value() {
+	final public double value()
+	{
 		return _value;
 	}
 
-	final public void value(double newValue) {
+	final public void value(double newValue)
+	{
 		_value = newValue;
 	}
 
-	final public Map<QName, String> anyAttributes() {
+	final public Map<QName, String> anyAttributes()
+	{
 		return _anyAttributes;
 	}
 
 	@Override
-	public boolean matches(Number number) {
+	public boolean matches(Number number)
+	{
 		double epsilon = (_epsilon == null) ? DEFAULT_EPSILON : _epsilon;
 
 		return Math.abs(number.doubleValue() - _value) <= epsilon;

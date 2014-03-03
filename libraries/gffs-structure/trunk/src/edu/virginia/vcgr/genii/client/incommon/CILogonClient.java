@@ -46,18 +46,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-public class CILogonClient {
+public class CILogonClient
+{
 
 	static private Log _logger = LogFactory.getLog(CILogonClient.class);
 
-	// Fields for holding some of the intermediate values that need to be
-	// compared and/or
+	// Fields for holding some of the intermediate values that need to be compared and/or
 	// passed around during the protocol
 	private Node _relayState = null;
 	private String _responseURL, _serviceURL;
 
-	// The parameters provided by the calling client, such as credentials and
-	// target IDP
+	// The parameters provided by the calling client, such as credentials and target IDP
 	private CILogonParameters _params;
 
 	// HttpClient objects used during the communication
@@ -69,38 +68,37 @@ public class CILogonClient {
 	// URL of the CILogon service
 	private final String CILogonURL = "https://ecp.cilogon.org/secure/getcert/";
 
-	// Basic constructor. Just copies in the parameters. Might skip this and
-	// make it
+	// Basic constructor. Just copies in the parameters. Might skip this and make it
 	// a static call, since there's only the one entry point anyway.
-	public CILogonClient(CILogonParameters params) {
+	public CILogonClient(CILogonParameters params)
+	{
 		_params = params;
 	}
 
 	// A couple of debugging utility functions.
-	private void debug(String o) {
+	private void debug(String o)
+	{
 		_logger.debug(o);
 		if (!_params.silent) {
 			_params.stdout.println(o);
-			_params.stdout
-					.println("-------------------------------------------");
+			_params.stdout.println("-------------------------------------------");
 		}
 	}
 
-	private void trace(String o) {
+	private void trace(String o)
+	{
 		_logger.trace(o);
 		if (!_params.silent && _params.verbose) {
 			_params.stdout.println(o);
-			_params.stdout
-					.println("-------------------------------------------");
+			_params.stdout.println("-------------------------------------------");
 		}
 	}
 
-	// This is the only entry point into the protocol. None of the other
-	// functions
+	// This is the only entry point into the protocol. None of the other functions
 	// are meant for external consumption.
-	// Final return value is a string containing the certificate, assuming
-	// success
-	public String call() throws IOException, URISyntaxException {
+	// Final return value is a string containing the certificate, assuming success
+	public String call() throws IOException, URISyntaxException
+	{
 		trace("");
 		String res1 = call1();
 		trace("-----First Call Response \n" + res1);
@@ -118,23 +116,27 @@ public class CILogonClient {
 
 	// //////// HTTP Calls /////////////////////////////
 
-	private String call1() throws IOException, URISyntaxException {
+	private String call1() throws IOException, URISyntaxException
+	{
 		HttpGet get = defaultGet(CILogonURL);
 		return makeCall(get);
 	}
 
-	private String call2(String query2) throws IOException, URISyntaxException {
+	private String call2(String query2) throws IOException, URISyntaxException
+	{
 		HttpPost post = defaultPost(_params.IDPUrl, query2);
 		return makeSecureCall(post, _params.username, _params.password);
 	}
 
-	private String call3(String query3) throws IOException, URISyntaxException {
+	private String call3(String query3) throws IOException, URISyntaxException
+	{
 		HttpPost post = defaultPost(_serviceURL, query3);
 		post.addHeader("Content-Type", "application/vnd.paos+xml");
 		return makeCall(post);
 	}
 
-	private String call4() throws IOException, URISyntaxException {
+	private String call4() throws IOException, URISyntaxException
+	{
 		HttpPost post = defaultPost(CILogonURL, null);
 
 		String randStr = UUID.randomUUID().toString();
@@ -143,8 +145,7 @@ public class CILogonClient {
 
 		formParams.add(new BasicNameValuePair("submit", "certreq"));
 		formParams.add(new BasicNameValuePair("CSRF", randStr));
-		formParams.add(new BasicNameValuePair("certlifetime", ""
-				+ _params.lifetime));
+		formParams.add(new BasicNameValuePair("certlifetime", "" + _params.lifetime));
 		formParams.add(new BasicNameValuePair("certreq", _params.csr));
 
 		post.setEntity(new UrlEncodedFormEntity(formParams, Consts.UTF_8));
@@ -166,23 +167,19 @@ public class CILogonClient {
 
 	// //// Post call processing ////////////////
 
-	private String processCall1(String res1) throws IOException {
+	private String processCall1(String res1) throws IOException
+	{
 		try {
-			DocumentBuilderFactory bFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory bFactory = DocumentBuilderFactory.newInstance();
 			bFactory.setNamespaceAware(true);
 			DocumentBuilder builder = bFactory.newDocumentBuilder();
 
 			// Use String reader
-			Document doc = builder
-					.parse(new InputSource(new StringReader(res1)));
-			Node header = doc.getElementsByTagNameNS(
-					"http://schemas.xmlsoap.org/soap/envelope/", "Header")
-					.item(0);
+			Document doc = builder.parse(new InputSource(new StringReader(res1)));
+			Node header = doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Header").item(0);
 
-			Node relayStateNode = doc.getElementsByTagNameNS(
-					"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp",
-					"RelayState").item(0);
+			Node relayStateNode =
+				doc.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp", "RelayState").item(0);
 			if (relayStateNode != null) {
 				trace("Capturing relayState data");
 				_relayState = relayStateNode;
@@ -191,10 +188,8 @@ public class CILogonClient {
 			}
 
 			if (res1.contains("responseConsumerURL")) {
-				int valueLocation = res1.indexOf("responseConsumerURL=\"")
-						+ "responseConsumerURL=\"".length();
-				_responseURL = res1.substring(valueLocation,
-						res1.indexOf("\"", valueLocation));
+				int valueLocation = res1.indexOf("responseConsumerURL=\"") + "responseConsumerURL=\"".length();
+				_responseURL = res1.substring(valueLocation, res1.indexOf("\"", valueLocation));
 				trace("ResponseConsumerURL = " + _responseURL);
 			}
 
@@ -202,17 +197,12 @@ public class CILogonClient {
 				trace("Found the header element(s)");
 				doc.getFirstChild().removeChild(header);
 			}
-			NodeList queryResult = doc.getElementsByTagNameNS(
-					"urn:oasis:names:tc:SAML:2.0:protocol", "AuthnRequest");
+			NodeList queryResult = doc.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:protocol", "AuthnRequest");
 			if (queryResult != null && queryResult.getLength() > 0) {
-				trace("Found the " + queryResult.getLength()
-						+ " Authn element(s)");
+				trace("Found the " + queryResult.getLength() + " Authn element(s)");
 
 				StringWriter writer = new StringWriter();
-				TransformerFactory
-						.newInstance()
-						.newTransformer()
-						.transform(new DOMSource(doc), new StreamResult(writer));
+				TransformerFactory.newInstance().newTransformer().transform(new DOMSource(doc), new StreamResult(writer));
 
 				// returns the document minus the headers
 				return writer.toString();
@@ -223,42 +213,33 @@ public class CILogonClient {
 		return null;
 	}
 
-	private String processCall2(String res2) throws IOException {
+	private String processCall2(String res2) throws IOException
+	{
 		try {
-			DocumentBuilderFactory bFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory bFactory = DocumentBuilderFactory.newInstance();
 			bFactory.setNamespaceAware(true);
 			DocumentBuilder builder = bFactory.newDocumentBuilder();
 
 			// Use String reader
-			Document doc = builder
-					.parse(new InputSource(new StringReader(res2)));
-			Node header = doc.getElementsByTagNameNS(
-					"http://schemas.xmlsoap.org/soap/envelope/", "Header")
-					.item(0);
+			Document doc = builder.parse(new InputSource(new StringReader(res2)));
+			Node header = doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Header").item(0);
 
 			if (header != null) {
 				trace("Found the header element(s)");
 			}
 			if (res2.contains("AssertionConsumerServiceURL")) {
-				int valueLocation = res2
-						.indexOf("AssertionConsumerServiceURL=\"")
-						+ "AssertionConsumerServiceURL=\"".length();
-				_serviceURL = res2.substring(valueLocation,
-						res2.indexOf("\"", valueLocation));
+				int valueLocation = res2.indexOf("AssertionConsumerServiceURL=\"") + "AssertionConsumerServiceURL=\"".length();
+				_serviceURL = res2.substring(valueLocation, res2.indexOf("\"", valueLocation));
 				trace("AssertionConsumerServiceURL = " + _serviceURL);
 				if (!_responseURL.equals(_serviceURL)) {
 					debug("Error, service URL and response URL do not match. Bailing out!");
-					throw new IOException(
-							"service URL and response URL do not match");
+					throw new IOException("service URL and response URL do not match");
 				}
 			}
 
-			NodeList queryResult = doc.getElementsByTagNameNS(
-					"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp", "Response");
+			NodeList queryResult = doc.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp", "Response");
 			if (queryResult != null && queryResult.getLength() > 0) {
-				trace("Found the " + queryResult.getLength()
-						+ " Response element(s)");
+				trace("Found the " + queryResult.getLength() + " Response element(s)");
 
 				if (_relayState != null) {
 					Node localRelayState = doc.importNode(_relayState, true);
@@ -267,10 +248,7 @@ public class CILogonClient {
 				}
 
 				StringWriter writer = new StringWriter();
-				TransformerFactory
-						.newInstance()
-						.newTransformer()
-						.transform(new DOMSource(doc), new StreamResult(writer));
+				TransformerFactory.newInstance().newTransformer().transform(new DOMSource(doc), new StreamResult(writer));
 
 				return writer.toString();
 			}
@@ -282,47 +260,42 @@ public class CILogonClient {
 
 	// ///// HttpClient abstraction methods ////////////
 
-	private HttpGet defaultGet(String site) {
+	private HttpGet defaultGet(String site)
+	{
 		HttpGet get = new HttpGet(site);
 		get.addHeader("Accept", "text/html; application/vnd.paos+xml");
-		get.addHeader(
-				"PAOS",
-				"ver=\"urn:liberty:paos:2003-08\";\"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp");
+		get.addHeader("PAOS", "ver=\"urn:liberty:paos:2003-08\";\"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp");
 		return get;
 	}
 
-	private HttpPost defaultPost(String site, String content)
-			throws UnsupportedEncodingException {
+	private HttpPost defaultPost(String site, String content) throws UnsupportedEncodingException
+	{
 		HttpPost post = new HttpPost(site);
 		if (content != null) {
 			HttpEntity entity = new StringEntity(content);
 			post.setEntity(entity);
 		}
 		post.addHeader("Accept", "text/html; application/vnd.paos+xml");
-		post.addHeader(
-				"PAOS",
-				"ver=\"urn:liberty:paos:2003-08\";\"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp");
+		post.addHeader("PAOS", "ver=\"urn:liberty:paos:2003-08\";\"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp");
 		return post;
 	}
 
-	private String makeCall(HttpRequestBase request)
-			throws ClientProtocolException, IOException {
+	private String makeCall(HttpRequestBase request) throws ClientProtocolException, IOException
+	{
 		if (_defaultContext == null) {
 			_defaultContext = HttpClientContext.create();
 			_defaultContext.setCookieStore(_cookieJar);
 		}
-		debug("Calling " + request.getMethod() + " on "
-				+ request.getURI().toString());
+		debug("Calling " + request.getMethod() + " on " + request.getURI().toString());
 		return makeCall(request, _defaultContext);
 	}
 
-	private String makeSecureCall(HttpPost request, String username,
-			String password) throws ClientProtocolException, IOException {
-		UsernamePasswordCredentials creds = new UsernamePasswordCredentials(
-				username, password);
+	private String makeSecureCall(HttpPost request, String username, String password) throws ClientProtocolException,
+		IOException
+	{
+		UsernamePasswordCredentials creds = new UsernamePasswordCredentials(username, password);
 		BasicCredentialsProvider provider = new BasicCredentialsProvider();
-		provider.setCredentials(new AuthScope(AuthScope.ANY_HOST,
-				AuthScope.ANY_PORT), creds);
+		provider.setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), creds);
 		HttpClientContext context = HttpClientContext.create();
 		context.setCredentialsProvider(provider);
 
@@ -330,31 +303,26 @@ public class CILogonClient {
 		for (int i = 1; i < password.length(); ++i) {
 			stars += "*";
 		}
-		debug("Calling " + request.getMethod() + " on "
-				+ request.getURI().toString() + " with username=" + username
-				+ " and password=" + password.charAt(0) + stars);
+		debug("Calling " + request.getMethod() + " on " + request.getURI().toString() + " with username=" + username
+			+ " and password=" + password.charAt(0) + stars);
 		return makeCall(request, context);
 	}
 
-	private String makeCall(HttpRequestBase request, HttpClientContext context)
-			throws ClientProtocolException, IOException {
+	private String makeCall(HttpRequestBase request, HttpClientContext context) throws ClientProtocolException, IOException
+	{
 		if (_client == null) {
-			RequestConfig config = RequestConfig.custom()
-					.setCookieSpec(CookieSpecs.BEST_MATCH).build();
-			_client = HttpClients.custom().setDefaultCookieStore(_cookieJar)
-					.setDefaultRequestConfig(config).build();
+			RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.BEST_MATCH).build();
+			_client = HttpClients.custom().setDefaultCookieStore(_cookieJar).setDefaultRequestConfig(config).build();
 		}
 
 		CloseableHttpResponse result = _client.execute(request, context);
 
 		if (result.getStatusLine().getStatusCode() >= 400) {
-			debug("Request failed: " + result.getStatusLine().getStatusCode()
-					+ ": " + result.getStatusLine().getReasonPhrase());
+			debug("Request failed: " + result.getStatusLine().getStatusCode() + ": " + result.getStatusLine().getReasonPhrase());
 			return null;
 		}
 
-		BufferedReader br = new BufferedReader(new InputStreamReader(result
-				.getEntity().getContent()));
+		BufferedReader br = new BufferedReader(new InputStreamReader(result.getEntity().getContent()));
 
 		String content = "";
 		String str = br.readLine();

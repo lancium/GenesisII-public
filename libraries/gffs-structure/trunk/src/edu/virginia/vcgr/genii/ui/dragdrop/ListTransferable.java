@@ -17,43 +17,44 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Implements a transferable object that understands URI lists as well as java
- * file lists. This is useful for implementing file drag and drop that will work
- * across different platforms (such as Gnome on Linux).
+ * Implements a transferable object that understands URI lists as well as java file lists. This is
+ * useful for implementing file drag and drop that will work across different platforms (such as
+ * Gnome on Linux).
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under
- *          the terms of the Apache License v2.0:
- *          http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under the terms of the
+ *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
 @SuppressWarnings("serial")
-public class ListTransferable extends Vector<Object> implements Transferable {
+public class ListTransferable extends Vector<Object> implements Transferable
+{
 	static private Log _logger = LogFactory.getLog(ListTransferable.class);
 
-	public ListTransferable() {
+	public ListTransferable()
+	{
 	}
 
-	public ListTransferable(Object initial) {
+	public ListTransferable(Object initial)
+	{
 		if (initial != null)
 			add(initial);
 	}
 
-	public ListTransferable(List<Object> initial) {
+	public ListTransferable(List<Object> initial)
+	{
 		if (initial != null)
 			addAll(initial);
 	}
 
 	/**
-	 * create a new flavor. this one understands URI lists, such as:
-	 * file:///home/fred/arf.txt\r\n file:///etc/inputrc\r\n
-	 * http://gruntose.com\r\n ...
+	 * create a new flavor. this one understands URI lists, such as: file:///home/fred/arf.txt\r\n
+	 * file:///etc/inputrc\r\n http://gruntose.com\r\n ...
 	 */
 	private static DataFlavor URIListFlavor;
 	static {
 		try {
-			URIListFlavor = new DataFlavor(
-					"text/uri-list;class=java.lang.String");
+			URIListFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
 		} catch (ClassNotFoundException e) {
 			_logger.error("should never happen", e);
 		}
@@ -61,8 +62,7 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 	private static DataFlavor AltURIListFlavor;
 	static {
 		try {
-			AltURIListFlavor = new DataFlavor(
-					"text/uri-list;representationclass=java.lang.String");
+			AltURIListFlavor = new DataFlavor("text/uri-list;representationclass=java.lang.String");
 		} catch (ClassNotFoundException e) {
 			_logger.error("should never happen", e);
 		}
@@ -71,39 +71,40 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 	/**
 	 * accessors for our special featured flavors of URI lists.
 	 */
-	public static DataFlavor getURIListFlavor1() {
+	public static DataFlavor getURIListFlavor1()
+	{
 		return URIListFlavor;
 	}
 
-	public static DataFlavor getURIListFlavor2() {
+	public static DataFlavor getURIListFlavor2()
+	{
 		return AltURIListFlavor;
 	}
 
 	/**
-	 * register the types of transfers that we understand. this is really only
-	 * the normal java file list and our new URI list.
+	 * register the types of transfers that we understand. this is really only the normal java file
+	 * list and our new URI list.
 	 */
-	protected ArrayList<DataFlavor> FLAVORS = new ArrayList<DataFlavor>(
-			Arrays.asList(DataFlavor.javaFileListFlavor, URIListFlavor,
-					AltURIListFlavor));
+	protected ArrayList<DataFlavor> FLAVORS = new ArrayList<DataFlavor>(Arrays.asList(DataFlavor.javaFileListFlavor,
+		URIListFlavor, AltURIListFlavor));
 
 	/**
-	 * a function that must be overridden by derived classes if they are not
-	 * initially seeding the vector of objects that we hold. the caller of this
-	 * function expects it will populate the vector held here with usable
-	 * objects.
+	 * a function that must be overridden by derived classes if they are not initially seeding the
+	 * vector of objects that we hold. the caller of this function expects it will populate the
+	 * vector held here with usable objects.
 	 */
-	public boolean loadDataJustInTime(DataFlavor flavor) {
+	public boolean loadDataJustInTime(DataFlavor flavor)
+	{
 		_logger.warn("base loadDataJustInTime.  derived class should have implemented this.");
 		return false;
 	}
 
 	/**
-	 * using the set of files that we've been handed, we can do transfers using
-	 * our two supported flavors.
+	 * using the set of files that we've been handed, we can do transfers using our two supported
+	 * flavors.
 	 */
-	public Object getTransferData(DataFlavor flavor)
-			throws UnsupportedFlavorException, java.io.IOException {
+	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, java.io.IOException
+	{
 		if (flavor == null)
 			return null;
 		if (size() == 0) {
@@ -115,8 +116,7 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 				return null;
 			}
 		}
-		// help from workaround at
-		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4899516
+		// help from workaround at http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4899516
 		if (_logger.isDebugEnabled())
 			_logger.debug("responding to flavor: " + flavor.toString());
 		if (flavor.equals(DataFlavor.javaFileListFlavor)) {
@@ -125,8 +125,7 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 			List<Object> data = new java.util.ArrayList<Object>();
 			data.addAll(this);
 			return data;
-		} else if (flavor.equals(URIListFlavor)
-				|| flavor.equals(AltURIListFlavor)) {
+		} else if (flavor.equals(URIListFlavor) || flavor.equals(AltURIListFlavor)) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("uri list flavor...");
 			StringBuilder data = new StringBuilder();
@@ -140,8 +139,7 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 					data.append((String) x + "\r\n");
 				} else {
 					if (_logger.isDebugEnabled())
-						_logger.debug("did not know how to handle type in transfer: "
-								+ x.toString());
+						_logger.debug("did not know how to handle type in transfer: " + x.toString());
 				}
 			}
 			if (_logger.isDebugEnabled())
@@ -157,14 +155,16 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 	/**
 	 * returns the list of all transfer flavors we understand.
 	 */
-	public DataFlavor[] getTransferDataFlavors() {
+	public DataFlavor[] getTransferDataFlavors()
+	{
 		return (DataFlavor[]) FLAVORS.toArray(new DataFlavor[FLAVORS.size()]);
 	}
 
 	/**
 	 * reports if a particular flavor is handled here.
 	 */
-	public boolean isDataFlavorSupported(DataFlavor flavor) {
+	public boolean isDataFlavorSupported(DataFlavor flavor)
+	{
 		if (flavor == null)
 			return false;
 		for (int i = 0; i < FLAVORS.size(); i++) {
@@ -178,37 +178,30 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 	}
 
 	/**
-	 * a helper method that can process transfer data from either a java file
-	 * list or a URI list.
+	 * a helper method that can process transfer data from either a java file list or a URI list.
 	 */
 	@SuppressWarnings("unchecked")
-	static public List<Object> extractData(Transferable tran) {
+	static public List<Object> extractData(Transferable tran)
+	{
 		if (tran == null)
 			return null;
 		if (tran.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("extractData seeing java files flavor.");
 			try {
-				return (List<Object>) tran
-						.getTransferData(DataFlavor.javaFileListFlavor);
+				return (List<Object>) tran.getTransferData(DataFlavor.javaFileListFlavor);
 			} catch (Throwable cause) {
-				_logger.error(
-						"extractData caught exception for java file list.",
-						cause);
+				_logger.error("extractData caught exception for java file list.", cause);
 				return null;
 			}
-		} else if (tran.isDataFlavorSupported(ListTransferable
-				.getURIListFlavor1())
-				|| tran.isDataFlavorSupported(ListTransferable
-						.getURIListFlavor2())) {
+		} else if (tran.isDataFlavorSupported(ListTransferable.getURIListFlavor1())
+			|| tran.isDataFlavorSupported(ListTransferable.getURIListFlavor2())) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("extractData seeing uri list flavor.");
 			try {
-				return textURIListToFileList((String) tran
-						.getTransferData(getURIListFlavor1()));
+				return textURIListToFileList((String) tran.getTransferData(getURIListFlavor1()));
 			} catch (Throwable cause) {
-				_logger.error("extractData caught exception for URI list.",
-						cause);
+				_logger.error("extractData caught exception for URI list.", cause);
 				return null;
 			}
 		}
@@ -220,17 +213,16 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 	 * translates the string in "data" into a list of Files.
 	 * 
 	 * @param data
-	 *            a string formatted with possibly multiple URIs separated by
-	 *            CRLF.
+	 *            a string formatted with possibly multiple URIs separated by CRLF.
 	 * @return a list of the files as java File objects. many thanks to
 	 *         http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4899516
 	 */
-	public static List<Object> textURIListToFileList(String data) {
+	public static List<Object> textURIListToFileList(String data)
+	{
 		if (data == null)
 			return null;
 		List<Object> list = new ArrayList<Object>(0);
-		for (StringTokenizer st = new StringTokenizer(data, "\r\n"); st
-				.hasMoreTokens();) {
+		for (StringTokenizer st = new StringTokenizer(data, "\r\n"); st.hasMoreTokens();) {
 			String s = st.nextToken();
 			if (s.startsWith("#")) {
 				// the line is a comment (as per the RFC 2483)
@@ -252,23 +244,20 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 	}
 
 	/**
-	 * This function will retrieve the file list from a standard file list
-	 * flavor.
+	 * This function will retrieve the file list from a standard file list flavor.
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<Object> processStandardFileList(Transferable tran) {
+	public static List<Object> processStandardFileList(Transferable tran)
+	{
 		if (tran == null)
 			return null;
 		if (_logger.isDebugEnabled())
 			_logger.debug("trying java file list flavor.");
 		try {
-			return (List<Object>) tran
-					.getTransferData(DataFlavor.javaFileListFlavor);
+			return (List<Object>) tran.getTransferData(DataFlavor.javaFileListFlavor);
 		} catch (Throwable cause) {
 			if (_logger.isDebugEnabled())
-				_logger.debug(
-						"failed to retrieve transfer data for standard java file list flavor.",
-						cause);
+				_logger.debug("failed to retrieve transfer data for standard java file list flavor.", cause);
 		}
 		return new ArrayList<Object>();
 	}
@@ -276,7 +265,8 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 	/**
 	 * checks if the transferable is appropriate to try to use as a java Reader.
 	 */
-	public static boolean checkReaderFlavor(Transferable tran) {
+	public static boolean checkReaderFlavor(Transferable tran)
+	{
 		if (tran == null)
 			return false;
 		DataFlavor[] flavors = tran.getTransferDataFlavors();
@@ -290,7 +280,8 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 	/**
 	 * Use a Reader to handle an incoming transferable.
 	 */
-	public static List<Object> processReaderFlavor(Transferable tran) {
+	public static List<Object> processReaderFlavor(Transferable tran)
+	{
 		if (tran == null)
 			return null;
 		if (_logger.isDebugEnabled())
@@ -316,7 +307,8 @@ public class ListTransferable extends Vector<Object> implements Transferable {
 
 	private static String ZERO_CHAR_STRING = "" + (char) 0;
 
-	public static List<Object> createFileArray(BufferedReader bReader) {
+	public static List<Object> createFileArray(BufferedReader bReader)
+	{
 		if (bReader == null)
 			return null;
 		try {

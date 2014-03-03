@@ -25,12 +25,13 @@ import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 /**
- * The scheduler class is another manager used by the queue that actively looks
- * for opportunities to match jobs to resources and then launches them.
+ * The scheduler class is another manager used by the queue that actively looks for opportunities to
+ * match jobs to resources and then launches them.
  * 
  * @author mmm2a
  */
-public class Scheduler implements Closeable {
+public class Scheduler implements Closeable
+{
 	static final private String IS_SCHEDULING_PROPERTY = "edu.virginia.vcgr.genii.container.q2.is-scheulding";
 
 	static private Log _logger = LogFactory.getLog(Scheduler.class);
@@ -47,23 +48,22 @@ public class Scheduler implements Closeable {
 	private JobManager _jobManager;
 	private BESManager _besManager;
 
-	private void loadIsSchedulingJobs() throws SQLException {
+	private void loadIsSchedulingJobs() throws SQLException
+	{
 		Connection connection = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			Boolean isSchedulingJobs = (Boolean) BasicDBResource.getProperty(
-					connection, _queueID, IS_SCHEDULING_PROPERTY);
-			_isSchedulingJobs = (isSchedulingJobs == null)
-					|| (isSchedulingJobs.booleanValue());
+			Boolean isSchedulingJobs = (Boolean) BasicDBResource.getProperty(connection, _queueID, IS_SCHEDULING_PROPERTY);
+			_isSchedulingJobs = (isSchedulingJobs == null) || (isSchedulingJobs.booleanValue());
 		} finally {
 			_connectionPool.release(connection);
 		}
 	}
 
-	public Scheduler(String queueID, SchedulingEvent schedulingEvent,
-			ServerDatabaseConnectionPool connectionPool, JobManager jobManager,
-			BESManager besManager) throws SQLException {
+	public Scheduler(String queueID, SchedulingEvent schedulingEvent, ServerDatabaseConnectionPool connectionPool,
+		JobManager jobManager, BESManager besManager) throws SQLException
+	{
 		_schedulingEvent = schedulingEvent;
 		_connectionPool = connectionPool;
 
@@ -79,11 +79,13 @@ public class Scheduler implements Closeable {
 		schedulerThread.start();
 	}
 
-	protected void finalize() throws Throwable {
+	protected void finalize() throws Throwable
+	{
 		close();
 	}
 
-	synchronized public void close() throws IOException {
+	synchronized public void close() throws IOException
+	{
 		if (_closed)
 			return;
 
@@ -95,11 +97,11 @@ public class Scheduler implements Closeable {
 	 * 
 	 * @throws ResourceException
 	 */
-	private void scheduleJobs() throws ResourceException {
+	private void scheduleJobs() throws ResourceException
+	{
 
 		if (!_isSchedulingJobs) {
-			_logger.info("Skipping a scheduling loop because the \""
-					+ "isScheduling\" property of the queue is turned off.");
+			_logger.info("Skipping a scheduling loop because the \"" + "isScheduling\" property of the queue is turned off.");
 			return;
 		}
 
@@ -108,27 +110,24 @@ public class Scheduler implements Closeable {
 
 		try {
 			/*
-			 * First, we have to find all bes managers that are availble to
-			 * accept jobs. In this case, available simply means that they are
-			 * responsive to communication and accepting activities and have
-			 * more then 0 slots allocated. It does NOT imply that the slots
+			 * First, we have to find all bes managers that are availble to accept jobs. In this
+			 * case, available simply means that they are responsive to communication and accepting
+			 * activities and have more then 0 slots allocated. It does NOT imply that the slots
 			 * aren't being used. We determine that later.
 			 */
 			synchronized (_besManager) {
 				/* Get all available resources */
-				Collection<BESData> availableResources = _besManager
-						.getAvailableBESs();
+				Collection<BESData> availableResources = _besManager.getAvailableBESs();
 
 				/*
-				 * If we didn't get any resources back, then there's no reason
-				 * to continue.
+				 * If we didn't get any resources back, then there's no reason to continue.
 				 */
 				if (availableResources.size() == 0)
 					return;
 
 				/*
-				 * Now we go through the list and get rid of all resources that
-				 * had no slots allocated.
+				 * Now we go through the list and get rid of all resources that had no slots
+				 * allocated.
 				 */
 				for (BESData data : availableResources) {
 					ResourceSlots rs = new ResourceSlots(data);
@@ -142,20 +141,18 @@ public class Scheduler implements Closeable {
 				return;
 
 			// We've left the synchronized block for BESs, so we have to keep in
-			// mind that they could dissapear out from under us during this
-			// time.
+			// mind that they could dissapear out from under us during this time.
 
 			synchronized (_jobManager) {
 				/*
-				 * If the job manager has no queued jobs, then we don't need to
-				 * continue.
+				 * If the job manager has no queued jobs, then we don't need to continue.
 				 */
 				if (!_jobManager.hasQueuedJobs())
 					return;
 
 				/*
-				 * Ask the job manager to remove all slots from the slot list
-				 * that are currently being used.
+				 * Ask the job manager to remove all slots from the slot list that are currently
+				 * being used.
 				 */
 				_jobManager.recordUsedSlots(slots);
 
@@ -172,13 +169,12 @@ public class Scheduler implements Closeable {
 				ResourceMatch match;
 
 				/*
-				 * We are now going to match as many jobs to as many slots as
-				 * possible. To make this as efficient as possible, we keep
-				 * track of the iterator and continually re-iterate until we go
-				 * through all the jobs waiting for a slot, or we run out of
-				 * resources to scheduling against. We are also going to keep
-				 * track of the next job that should be scheduled, but can't be
-				 * scheduled now (for exponential backoff purposes).
+				 * We are now going to match as many jobs to as many slots as possible. To make this
+				 * as efficient as possible, we keep track of the iterator and continually
+				 * re-iterate until we go through all the jobs waiting for a slot, or we run out of
+				 * resources to scheduling against. We are also going to keep track of the next job
+				 * that should be scheduled, but can't be scheduled now (for exponential backoff
+				 * purposes).
 				 */
 				Date now = new Date();
 				Date nextScheduledEvent = null;
@@ -201,12 +197,9 @@ public class Scheduler implements Closeable {
 					JobResourceRequirements requirements = null;
 
 					try {
-						requirements = queuedJob
-								.getResourceRequirements(_jobManager);
+						requirements = queuedJob.getResourceRequirements(_jobManager);
 					} catch (Throwable cause) {
-						_logger.warn(
-								"Error trying to get job resource requirements for matching.",
-								cause);
+						_logger.warn("Error trying to get job resource requirements for matching.", cause);
 						requirements = new JobResourceRequirements();
 					}
 
@@ -219,21 +212,18 @@ public class Scheduler implements Closeable {
 						slotIter = slots.values().iterator();
 
 						/* Try to find a match */
-						match = findSlot(matcher, queuedJob, requirements,
-								slotIter);
+						match = findSlot(matcher, queuedJob, requirements, slotIter);
 					} else {
 						/*
-						 * If we got here, then we already had an iterator from
-						 * before. Try to find a match with it.
+						 * If we got here, then we already had an iterator from before. Try to find
+						 * a match with it.
 						 */
-						match = findSlot(matcher, queuedJob, requirements,
-								slotIter);
+						match = findSlot(matcher, queuedJob, requirements, slotIter);
 
 						/*
-						 * If we couldn't find a match, it may have been the
-						 * case that we simply had already passed a potential
-						 * match with the iterator before getting here, so give
-						 * the iterator a new chance from the begining.
+						 * If we couldn't find a match, it may have been the case that we simply had
+						 * already passed a potential match with the iterator before getting here,
+						 * so give the iterator a new chance from the begining.
 						 */
 						if (match == null) {
 							/* If there are no slots available, we're done. */
@@ -241,26 +231,20 @@ public class Scheduler implements Closeable {
 								break;
 
 							/*
-							 * Create a new iterator and try to find a match
-							 * again.
+							 * Create a new iterator and try to find a match again.
 							 */
 							slotIter = slots.values().iterator();
-							match = findSlot(matcher, queuedJob, requirements,
-									slotIter);
+							match = findSlot(matcher, queuedJob, requirements, slotIter);
 						}
 					}
 
 					/*
-					 * If we found a match, then go ahead and add it to our
-					 * list.
+					 * If we found a match, then go ahead and add it to our list.
 					 */
 					if (match != null) {
-						HistoryContext history = queuedJob
-								.history(HistoryEventCategory.Scheduling);
+						HistoryContext history = queuedJob.history(HistoryEventCategory.Scheduling);
 						history.createDebugWriter("Job Matched to Resource")
-								.format("Job matched to resource %s.",
-										_besManager.getBESName(match.getBESID()))
-								.close();
+							.format("Job matched to resource %s.", _besManager.getBESName(match.getBESID())).close();
 						matches.add(match);
 					} else {
 						Counter c = jobCounts.get(requirements);
@@ -273,8 +257,7 @@ public class Scheduler implements Closeable {
 				_schedulingEvent.setScheduledEvent(nextScheduledEvent);
 
 				/*
-				 * OK, now that we have a list of matches, go ahead and try to
-				 * start the jobs.
+				 * OK, now that we have a list of matches, go ahead and try to start the jobs.
 				 */
 				Connection connection = null;
 				try {
@@ -290,12 +273,10 @@ public class Scheduler implements Closeable {
 				}
 			}
 		} finally {
-			for (Map.Entry<JobResourceRequirements, Counter> entry : jobCounts
-					.entrySet()) {
+			for (Map.Entry<JobResourceRequirements, Counter> entry : jobCounts.entrySet()) {
 				if (_logger.isDebugEnabled())
-					_logger.debug(String
-							.format("%d jobs failed to match any resources with requirements %s",
-									entry.getValue().get(), entry.getKey()));
+					_logger.debug(String.format("%d jobs failed to match any resources with requirements %s", entry.getValue()
+						.get(), entry.getKey()));
 			}
 		}
 	}
@@ -304,8 +285,7 @@ public class Scheduler implements Closeable {
 	 * Find a resource that matches the given job.
 	 * 
 	 * @param matcher
-	 *            A resource matcher that determines whether or not jobs match
-	 *            given resources.
+	 *            A resource matcher that determines whether or not jobs match given resources.
 	 * @param queuedJob
 	 *            The job to match against.
 	 * @param slots
@@ -313,30 +293,27 @@ public class Scheduler implements Closeable {
 	 * 
 	 * @return The match (if one was found), otherwise null.
 	 */
-	private ResourceMatch findSlot(ResourceMatcher matcher, JobData queuedJob,
-			JobResourceRequirements requirements, Iterator<ResourceSlots> slots) {
+	private ResourceMatch findSlot(ResourceMatcher matcher, JobData queuedJob, JobResourceRequirements requirements,
+		Iterator<ResourceSlots> slots)
+	{
 		if (requirements != null) {
 			while (slots.hasNext()) {
 				ResourceSlots rSlots = slots.next();
 
 				try {
-					if (matcher.matches(requirements,
-							_besManager.getBESInformation(rSlots.getBESID()))) {
+					if (matcher.matches(requirements, _besManager.getBESInformation(rSlots.getBESID()))) {
 						/* If there was a match, reserve the slot */
 						rSlots.reserveSlot();
 
 						/*
-						 * If we just reserved the last available slot, take it
-						 * out of the list.
+						 * If we just reserved the last available slot, take it out of the list.
 						 */
 						if (rSlots.slotsAvailable() <= 0)
 							slots.remove();
-						return new ResourceMatch(queuedJob.getJobID(),
-								rSlots.getBESID());
+						return new ResourceMatch(queuedJob.getJobID(), rSlots.getBESID());
 					}
 				} catch (Throwable cause) {
-					_logger.warn("Error trying to match job to resource.",
-							cause);
+					_logger.warn("Error trying to match job to resource.", cause);
 				}
 			}
 		}
@@ -345,15 +322,17 @@ public class Scheduler implements Closeable {
 	}
 
 	/**
-	 * This class is used by the scheduler to wait on scheduling opportunities
-	 * and the start a scheduling process.
+	 * This class is used by the scheduler to wait on scheduling opportunities and the start a
+	 * scheduling process.
 	 * 
 	 * @author mmm2a
 	 */
-	private class SchedulerWorker implements Runnable {
+	private class SchedulerWorker implements Runnable
+	{
 		private LoggingContext _loggingContext;
 
-		public SchedulerWorker() {
+		public SchedulerWorker()
+		{
 			try {
 				_loggingContext = LoggingContext.getCurrentLoggingContext();
 			} catch (ContextException e) {
@@ -361,16 +340,16 @@ public class Scheduler implements Closeable {
 			}
 		}
 
-		public void run() {
+		public void run()
+		{
 			LoggingContext.assumeLoggingContext(_loggingContext);
 
 			long startTime = 0L;
 
 			/*
-			 * A small hack, but go ahead and pre-notify ourselves that there
-			 * might be a scheduling opportunity. This bootstraps the scheduler
-			 * for when it is first loaded. If we just loaded state from the
-			 * database, this will start the scheduling process.
+			 * A small hack, but go ahead and pre-notify ourselves that there might be a scheduling
+			 * opportunity. This bootstraps the scheduler for when it is first loaded. If we just
+			 * loaded state from the database, this will start the scheduling process.
 			 */
 			_schedulingEvent.notifySchedulingEvent();
 
@@ -380,20 +359,17 @@ public class Scheduler implements Closeable {
 					_schedulingEvent.waitSchedulingEvent();
 					try {
 						/*
-						 * Now that we have an opportunity, go ahead and
-						 * schedule some jobs if we can.
+						 * Now that we have an opportunity, go ahead and schedule some jobs if we
+						 * can.
 						 */
 						startTime = System.currentTimeMillis();
 						scheduleJobs();
 					} catch (Throwable cause) {
-						_logger.warn(
-								"An exception occurred while scheduling new "
-										+ "jobs to run on the queue.", cause);
+						_logger.warn("An exception occurred while scheduling new " + "jobs to run on the queue.", cause);
 					} finally {
 						if (_logger.isDebugEnabled())
-							_logger.debug(String
-									.format("It took %d milliseconds to run the scheduling loop.",
-											(System.currentTimeMillis() - startTime)));
+							_logger.debug(String.format("It took %d milliseconds to run the scheduling loop.",
+								(System.currentTimeMillis() - startTime)));
 					}
 				} catch (InterruptedException ie) {
 					Thread.interrupted();
@@ -402,13 +378,13 @@ public class Scheduler implements Closeable {
 		}
 	}
 
-	public void storeIsScheduling(boolean isScheduling) throws SQLException {
+	public void storeIsScheduling(boolean isScheduling) throws SQLException
+	{
 		Connection connection = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			BasicDBResource.setProperty(connection, _queueID,
-					IS_SCHEDULING_PROPERTY, isScheduling);
+			BasicDBResource.setProperty(connection, _queueID, IS_SCHEDULING_PROPERTY, isScheduling);
 			_isSchedulingJobs = isScheduling;
 			if (_isSchedulingJobs)
 				_schedulingEvent.notifySchedulingEvent();
@@ -417,7 +393,8 @@ public class Scheduler implements Closeable {
 		}
 	}
 
-	final public boolean isSchedulingJobs() {
+	final public boolean isSchedulingJobs()
+	{
 		return _isSchedulingJobs;
 	}
 }

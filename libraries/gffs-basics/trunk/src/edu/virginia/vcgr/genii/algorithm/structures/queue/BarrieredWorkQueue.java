@@ -13,13 +13,15 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.algorithm.graph.DependencyGraph;
 import edu.virginia.vcgr.genii.algorithm.graph.GraphException;
 
-public class BarrieredWorkQueue {
+public class BarrieredWorkQueue
+{
 	static private Log _logger = LogFactory.getLog(BarrieredWorkQueue.class);
 
 	private LinkedList<IServiceWithCleanupHook> _workQueue = new LinkedList<IServiceWithCleanupHook>();
 	private boolean _released = false;
 
-	final private void run(IServiceWithCleanupHook runnable) {
+	final private void run(IServiceWithCleanupHook runnable)
+	{
 		try {
 			runnable.postStartup();
 		} catch (Throwable cause) {
@@ -27,7 +29,8 @@ public class BarrieredWorkQueue {
 		}
 	}
 
-	final public void enqueue(IServiceWithCleanupHook runnable) {
+	final public void enqueue(IServiceWithCleanupHook runnable)
+	{
 		boolean released;
 
 		synchronized (_workQueue) {
@@ -40,20 +43,18 @@ public class BarrieredWorkQueue {
 			run(runnable);
 	}
 
-	final public void release() throws GraphException {
+	final public void release() throws GraphException
+	{
 		synchronized (_workQueue) {
 			_released = true;
 		}
 
-		List<IServiceWithCleanupHook> sortedList = new ArrayList<IServiceWithCleanupHook>(
-				_workQueue);
+		List<IServiceWithCleanupHook> sortedList = new ArrayList<IServiceWithCleanupHook>(_workQueue);
 		Set<Class<?>> classList = new HashSet<Class<?>>();
 		for (IServiceWithCleanupHook icm : _workQueue)
 			classList.add(icm.getClass());
-		DependencyGraph dg = DependencyGraph.buildGraph(classList,
-				"postStartup", new Class<?>[0]);
-		Collections.sort(sortedList,
-				dg.createObjectComparator(IServiceWithCleanupHook.class));
+		DependencyGraph dg = DependencyGraph.buildGraph(classList, "postStartup", new Class<?>[0]);
+		Collections.sort(sortedList, dg.createObjectComparator(IServiceWithCleanupHook.class));
 		for (IServiceWithCleanupHook runnable : sortedList)
 			run(runnable);
 	}

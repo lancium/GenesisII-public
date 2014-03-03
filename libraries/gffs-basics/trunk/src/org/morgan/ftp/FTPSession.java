@@ -30,7 +30,8 @@ import org.morgan.ftp.cmd.TypeCommandHandler;
 import org.morgan.ftp.cmd.UserCommandHandler;
 import org.morgan.util.io.StreamUtils;
 
-public class FTPSession implements Runnable, Closeable {
+public class FTPSession implements Runnable, Closeable
+{
 	static private Logger _logger = Logger.getLogger(FTPSession.class);
 
 	private int _authAttemptCount = 0;
@@ -42,13 +43,15 @@ public class FTPSession implements Runnable, Closeable {
 
 	private IdleTimer _idleTimer = new IdleTimer();
 
-	private void addCommand(ICommand handler) {
+	private void addCommand(ICommand handler)
+	{
 		for (String verb : handler.getHandledVerbs()) {
 			_commands.put(verb, handler);
 		}
 	}
 
-	private void addCommands() throws NoSuchMethodException {
+	private void addCommands() throws NoSuchMethodException
+	{
 		addCommand(new ReflectiveCommand(UserCommandHandler.class, "USER"));
 		addCommand(new ReflectiveCommand(PassCommandHandler.class, "PASS"));
 		addCommand(new ReflectiveCommand(PASVCommandHandler.class, "PASV"));
@@ -68,14 +71,13 @@ public class FTPSession implements Runnable, Closeable {
 		addCommand(new ReflectiveCommand(DeleteCommandHandler.class, "DELE"));
 	}
 
-	FTPSession(FTPListenerManager manager, FTPConfiguration configuration,
-			int sessionID, IBackend backend, Socket socket) {
+	FTPSession(FTPListenerManager manager, FTPConfiguration configuration, int sessionID, IBackend backend, Socket socket)
+	{
 		_configuration = configuration;
 		_socket = socket;
 
 		_commands = new HashMap<String, ICommand>();
-		_sessionState = new FTPSessionState(manager, configuration, backend,
-				sessionID);
+		_sessionState = new FTPSessionState(manager, configuration, backend, sessionID);
 
 		try {
 			addCommands();
@@ -86,14 +88,16 @@ public class FTPSession implements Runnable, Closeable {
 		manager.fireSessionOpened(sessionID);
 	}
 
-	protected void finalize() throws Throwable {
+	protected void finalize() throws Throwable
+	{
 		super.finalize();
 
 		close();
 	}
 
 	@Override
-	public void run() {
+	public void run()
+	{
 		RollingCommandHistory history = _sessionState.getHistory();
 		FTPAction action;
 
@@ -104,8 +108,7 @@ public class FTPSession implements Runnable, Closeable {
 		Pattern verbExtractor = Pattern.compile("\\s*(\\w+)\\s*(.*)\\s*");
 
 		try {
-			reader = new BufferedReader(new InputStreamReader(
-					_socket.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
 			out = new FTPPrintStream(_socket.getOutputStream(), true);
 
 			out.println("220 " + _sessionState.getBackend().getGreeting());
@@ -140,16 +143,14 @@ public class FTPSession implements Runnable, Closeable {
 					}
 
 					try {
-						handler.handleCommand(_sessionState, verb, parameters,
-								out);
+						handler.handleCommand(_sessionState, verb, parameters, out);
 					} finally {
 						synchronized (history) {
 							action.complete();
 						}
 					}
 				} catch (AuthorizationFailedException ue) {
-					if (++_authAttemptCount >= _configuration
-							.getMissedAuthenticationsLimit()) {
+					if (++_authAttemptCount >= _configuration.getMissedAuthenticationsLimit()) {
 						_logger.info("Too many authentication failures...closing session.");
 
 						ConnectionCloseException cce = new ConnectionCloseException();
@@ -176,27 +177,30 @@ public class FTPSession implements Runnable, Closeable {
 
 			StreamUtils.close(this);
 
-			_sessionState.getListenerManager().fireSessionClosed(
-					_sessionState.getSessionID());
+			_sessionState.getListenerManager().fireSessionClosed(_sessionState.getSessionID());
 		}
 	}
 
-	public long getIdleTime() {
+	public long getIdleTime()
+	{
 		synchronized (_idleTimer) {
 			return _idleTimer.idleTime();
 		}
 	}
 
-	public int getSessionID() {
+	public int getSessionID()
+	{
 		return _sessionState.getSessionID();
 	}
 
-	public long getIdleTimeout() {
+	public long getIdleTimeout()
+	{
 		return _sessionState.getConfiguration().getIdleTimeoutSeconds() * 1000;
 	}
 
 	@Override
-	synchronized public void close() throws IOException {
+	synchronized public void close() throws IOException
+	{
 		StreamUtils.close(_sessionState);
 
 		if (_socket != null) {

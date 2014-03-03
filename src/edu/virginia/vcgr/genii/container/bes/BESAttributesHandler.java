@@ -58,7 +58,8 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
-public class BESAttributesHandler extends AbstractAttributeHandler {
+public class BESAttributesHandler extends AbstractAttributeHandler
+{
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(BESAttributesHandler.class);
 
@@ -66,153 +67,133 @@ public class BESAttributesHandler extends AbstractAttributeHandler {
 	static private final String _DEPLOYER_PROPERTY = "attribute:deployer";
 	static private BESConstants consts = new BESConstants();
 
-	public BESAttributesHandler(AttributePackage pkg)
-			throws NoSuchMethodException {
+	public BESAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
+	{
 		super(pkg);
 	}
 
 	@Override
-	protected void registerHandlers() throws NoSuchMethodException {
+	protected void registerHandlers() throws NoSuchMethodException
+	{
 		addHandler(consts.NAME_ATTR, "getNameAttr");
-		addHandler(consts.TOTAL_NUMBER_OF_ACTIVITIES_ATTR,
-				"getTotalNumberOfActivitiesAttr");
+		addHandler(consts.TOTAL_NUMBER_OF_ACTIVITIES_ATTR, "getTotalNumberOfActivitiesAttr");
 		addHandler(consts.ACTIVITY_REFERENCE_ATTR, "getActivityReferencesAttr");
-		addHandler(consts.DESCRIPTION_ATTR, "getDescriptionAttr",
-				"setDescriptionAttr");
+		addHandler(consts.DESCRIPTION_ATTR, "getDescriptionAttr", "setDescriptionAttr");
 		addHandler(consts.OPERATING_SYSTEM_ATTR, "getOperatingSystemAttr");
 		addHandler(consts.CPU_ARCHITECTURE_ATTR, "getCPUArchitectureAttr");
 		addHandler(consts.CPU_COUNT_ATTR, "getCPUCountAttr");
-		addHandler(consts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR,
-				"getIsAcceptingNewActivitiesAttr");
+		addHandler(consts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, "getIsAcceptingNewActivitiesAttr");
 		addHandler(consts.SPMD_PROVIDER_ATTR, "getSPMDProvidersAttr");
-		addHandler(consts.BES_POLICY_ATTR, "getBESPolicyAttr",
-				"setBESPolicyAttr");
-		addHandler(consts.BES_THRESHOLD_ATTR, "getBESThresholdAttr",
-				"setBESThresholdAttr");
+		addHandler(consts.BES_POLICY_ATTR, "getBESPolicyAttr", "setBESPolicyAttr");
+		addHandler(consts.BES_THRESHOLD_ATTR, "getBESThresholdAttr", "setBESThresholdAttr");
 		addHandler(consts.CPU_SPEED_ATTR, "getCPUSpeedAttr");
 		addHandler(consts.PHYSICAL_MEMORY_ATTR, "getPhysicalMemoryAttr");
 		addHandler(consts.VIRTUAL_MEMORY_ATTR, "getVirtualMemoryAttr");
-		addHandler(consts.DEPLOYER_EPR_ATTR, "getDeployersAttr",
-				"setDeployersAttr");
+		addHandler(consts.DEPLOYER_EPR_ATTR, "getDeployersAttr", "setDeployersAttr");
 		addHandler(consts.OGRSH_VERSIONS_ATTR, "getOGRSHVersionsAttr");
-		addHandler(consts.BES_WALLCLOCK_TIMELIMIT_ATTR,
-				"getWallclockTimeLimitAttr");
-		addHandler(consts.FILESYSTEM_SUPPORT_ATTR,
-				"getSupportedFilesystemsAttr");
+		addHandler(consts.BES_WALLCLOCK_TIMELIMIT_ATTR, "getWallclockTimeLimitAttr");
+		addHandler(consts.FILESYSTEM_SUPPORT_ATTR, "getSupportedFilesystemsAttr");
 	}
 
-	static public String getName() {
+	static public String getName()
+	{
 		return Hostname.getLocalHostname().toString();
 	}
 
-	static public int getTotalNumberOfActivities()
-			throws ResourceUnknownFaultType, ResourceException,
-			RemoteException, SQLException {
+	static public int getTotalNumberOfActivities() throws ResourceUnknownFaultType, ResourceException, RemoteException,
+		SQLException
+	{
 		return getActivityReferences().length;
 	}
 
-	static public EndpointReferenceType[] getActivityReferences()
-			throws ResourceUnknownFaultType, ResourceException,
-			RemoteException, SQLException {
+	static public EndpointReferenceType[] getActivityReferences() throws ResourceUnknownFaultType, ResourceException,
+		RemoteException, SQLException
+	{
 		return new EndpointReferenceType[0];
 	}
 
-	static public String[] getSupportedFilesystems() {
+	static public String[] getSupportedFilesystems()
+	{
 		Set<String> ret = FilesystemSupportDetection.supportedFilesystemTypes();
 		return ret.toArray(new String[ret.size()]);
 	}
 
-	static public String getDescription() throws ResourceException,
-			ResourceUnknownFaultType {
+	static public String getDescription() throws ResourceException, ResourceUnknownFaultType
+	{
 		IBESResource resource = null;
 
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		return (String) resource.getProperty(_DESCRIPTION_PROPERTY);
 	}
 
-	static public OperatingSystem_Type getOperatingSystem()
-			throws RemoteException {
+	static public OperatingSystem_Type getOperatingSystem() throws RemoteException
+	{
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
-		ConstructionParameters cParams = resource
-				.constructionParameters(GeniiBESServiceImpl.class);
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
 		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
 
-		OperatingSystemNames osType = besParams.getResourceOverrides()
-				.operatingSystemName();
-		String osVersion = besParams.getResourceOverrides()
-				.operatingSystemVersion();
+		OperatingSystemNames osType = besParams.getResourceOverrides().operatingSystemName();
+		String osVersion = besParams.getResourceOverrides().operatingSystemVersion();
 
 		OperatingSystem_Type ret = JSDLUtils.getLocalOperatingSystem();
 		if (osType != null)
-			ret.setOperatingSystemType(new OperatingSystemType_Type(
-					OperatingSystemTypeEnumeration.fromString(osType.name()),
-					null));
+			ret.setOperatingSystemType(new OperatingSystemType_Type(OperatingSystemTypeEnumeration.fromString(osType.name()),
+				null));
 		if (osVersion != null)
 			ret.setOperatingSystemVersion(osVersion);
 
 		return ret;
 	}
 
-	static public CPUArchitecture_Type getCPUArchitecture()
-			throws RemoteException {
+	static public CPUArchitecture_Type getCPUArchitecture() throws RemoteException
+	{
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
-		ConstructionParameters cParams = resource
-				.constructionParameters(GeniiBESServiceImpl.class);
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
 		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
-		ProcessorArchitecture override = besParams.getResourceOverrides()
-				.cpuArchitecture();
+		ProcessorArchitecture override = besParams.getResourceOverrides().cpuArchitecture();
 
 		if (override != null)
-			return new CPUArchitecture_Type(
-					ProcessorArchitectureEnumeration
-							.fromString(override.name()),
-					null);
+			return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.fromString(override.name()), null);
 
 		return JSDLUtils.getLocalCPUArchitecture();
 	}
 
-	static public int getCPUCount() throws RemoteException {
+	static public int getCPUCount() throws RemoteException
+	{
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
-		ConstructionParameters cParams = resource
-				.constructionParameters(GeniiBESServiceImpl.class);
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
 		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
 
 		Integer i = besParams.getResourceOverrides().cpuCount();
 		if (i != null)
 			return i.intValue();
 
-		return ManagementFactory.getOperatingSystemMXBean()
-				.getAvailableProcessors();
+		return ManagementFactory.getOperatingSystemMXBean().getAvailableProcessors();
 	}
 
-	static public Boolean getIsAcceptingNewActivities()
-			throws ResourceException, ResourceUnknownFaultType, RemoteException {
+	static public Boolean getIsAcceptingNewActivities() throws ResourceException, ResourceUnknownFaultType, RemoteException
+	{
 		IBESResource resource = null;
 
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		Boolean isAccepting = new Boolean(resource.isAcceptingNewActivities());
 
 		return isAccepting;
 	}
 
-	static public Collection<String> getSPMDProviders() throws RemoteException {
+	static public Collection<String> getSPMDProviders() throws RemoteException
+	{
 		return SPMDTranslatorFactories.listSPMDTranslatorFactories();
 	}
 
-	static public long getCPUSpeed() throws RemoteException {
+	static public long getCPUSpeed() throws RemoteException
+	{
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
-		ConstructionParameters cParams = resource
-				.constructionParameters(GeniiBESServiceImpl.class);
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
 		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
 
 		ClockSpeed cs = besParams.getResourceOverrides().cpuSpeed();
@@ -222,29 +203,25 @@ public class BESAttributesHandler extends AbstractAttributeHandler {
 		return SystemInfoUtils.getIndividualCPUSpeed();
 	}
 
-	static public Long getWallclockTimeLimit() throws ResourceUnknownFaultType,
-			ResourceException {
+	static public Long getWallclockTimeLimit() throws ResourceUnknownFaultType, ResourceException
+	{
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
-		ConstructionParameters cParams = resource
-				.constructionParameters(GeniiBESServiceImpl.class);
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
 		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
 
-		Duration duration = besParams.getResourceOverrides()
-				.wallclockTimeLimit();
+		Duration duration = besParams.getResourceOverrides().wallclockTimeLimit();
 		if (duration != null)
 			return (long) duration.as(DurationUnits.Seconds);
 
 		return null;
 	}
 
-	static public long getPhysicalMemory() throws RemoteException {
+	static public long getPhysicalMemory() throws RemoteException
+	{
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
-		ConstructionParameters cParams = resource
-				.constructionParameters(GeniiBESServiceImpl.class);
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
 		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
 		Size override = besParams.getResourceOverrides().physicalMemory();
 		if (override != null)
@@ -253,12 +230,11 @@ public class BESAttributesHandler extends AbstractAttributeHandler {
 		return SystemInfoUtils.getPhysicalMemory();
 	}
 
-	static public long getVirtualMemory() throws RemoteException {
+	static public long getVirtualMemory() throws RemoteException
+	{
 		IBESResource resource = null;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
-		ConstructionParameters cParams = resource
-				.constructionParameters(GeniiBESServiceImpl.class);
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
 		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
 		Size override = besParams.getResourceOverrides().virtualMemory();
 		if (override != null)
@@ -267,13 +243,12 @@ public class BESAttributesHandler extends AbstractAttributeHandler {
 		return SystemInfoUtils.getVirtualMemory();
 	}
 
-	public void setDescription(String description) throws ResourceException,
-			ResourceUnknownFaultType {
+	public void setDescription(String description) throws ResourceException, ResourceUnknownFaultType
+	{
 		IBESResource resource = null;
 
 		try {
-			resource = (IBESResource) ResourceManager.getCurrentResource()
-					.dereference();
+			resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 			resource.setProperty(_DESCRIPTION_PROPERTY, description);
 			resource.commit();
 		} finally {
@@ -282,13 +257,12 @@ public class BESAttributesHandler extends AbstractAttributeHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<EndpointReferenceType> getDeployers()
-			throws ResourceException, ResourceUnknownFaultType {
+	public Collection<EndpointReferenceType> getDeployers() throws ResourceException, ResourceUnknownFaultType
+	{
 		ArrayList<EndpointReferenceType> eprs = new ArrayList<EndpointReferenceType>();
 		IResource resource;
 		resource = ResourceManager.getCurrentResource().dereference();
-		Collection<byte[]> ret = (Collection<byte[]>) resource
-				.getProperty(_DEPLOYER_PROPERTY);
+		Collection<byte[]> ret = (Collection<byte[]>) resource.getProperty(_DEPLOYER_PROPERTY);
 		if (ret != null) {
 			for (byte[] bytes : ret)
 				eprs.add(EPRUtils.fromBytes(bytes));
@@ -297,8 +271,8 @@ public class BESAttributesHandler extends AbstractAttributeHandler {
 		return eprs;
 	}
 
-	public void setDeployers(Collection<EndpointReferenceType> deployers)
-			throws ResourceException, ResourceUnknownFaultType {
+	public void setDeployers(Collection<EndpointReferenceType> deployers) throws ResourceException, ResourceUnknownFaultType
+	{
 		ArrayList<byte[]> toStore = new ArrayList<byte[]>();
 		for (EndpointReferenceType deployer : deployers)
 			toStore.add(EPRUtils.toBytes(deployer));
@@ -309,68 +283,60 @@ public class BESAttributesHandler extends AbstractAttributeHandler {
 		resource.commit();
 	}
 
-	public MessageElement getIsAcceptingNewActivitiesAttr()
-			throws ResourceUnknownFaultType, ResourceException, RemoteException {
-		return new MessageElement(consts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR,
-				getIsAcceptingNewActivities());
+	public MessageElement getIsAcceptingNewActivitiesAttr() throws ResourceUnknownFaultType, ResourceException, RemoteException
+	{
+		return new MessageElement(consts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, getIsAcceptingNewActivities());
 	}
 
-	public MessageElement getBESPolicyAttr() throws ResourceUnknownFaultType,
-			ResourceException, RemoteException {
+	public MessageElement getBESPolicyAttr() throws ResourceUnknownFaultType, ResourceException, RemoteException
+	{
 		IBESResource resource;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		return resource.getPolicy().toMessageElement(consts.BES_POLICY_ATTR);
 	}
 
-	public void setBESPolicyAttr(MessageElement policy)
-			throws ResourceUnknownFaultType, ResourceException, RemoteException {
+	public void setBESPolicyAttr(MessageElement policy) throws ResourceUnknownFaultType, ResourceException, RemoteException
+	{
 		BESPolicy p = BESPolicy.fromMessageElement(policy);
 		IBESResource resource;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		resource.setPolicy(p);
 		resource.commit();
 	}
 
-	public MessageElement getBESThresholdAttr()
-			throws ResourceUnknownFaultType, ResourceException, RemoteException {
+	public MessageElement getBESThresholdAttr() throws ResourceUnknownFaultType, ResourceException, RemoteException
+	{
 		IBESResource resource;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
-		Integer threshold = (Integer) resource
-				.getProperty(IBESResource.THRESHOLD_DB_PROPERTY_NAME);
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		Integer threshold = (Integer) resource.getProperty(IBESResource.THRESHOLD_DB_PROPERTY_NAME);
 		return new MessageElement(consts.BES_THRESHOLD_ATTR, threshold);
 	}
 
-	public void setBESThresholdAttr(MessageElement policy)
-			throws ResourceUnknownFaultType, ResourceException, RemoteException {
-		Integer threshold = Integer.class.cast(ObjectDeserializer.toObject(
-				policy, Integer.class));
+	public void setBESThresholdAttr(MessageElement policy) throws ResourceUnknownFaultType, ResourceException, RemoteException
+	{
+		Integer threshold = Integer.class.cast(ObjectDeserializer.toObject(policy, Integer.class));
 
 		IBESResource resource;
-		resource = (IBESResource) ResourceManager.getCurrentResource()
-				.dereference();
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		resource.setProperty(IBESResource.THRESHOLD_DB_PROPERTY_NAME, threshold);
 		resource.commit();
 	}
 
-	public MessageElement getNameAttr() {
+	public MessageElement getNameAttr()
+	{
 		return new MessageElement(consts.NAME_ATTR, getName());
 	}
 
-	public MessageElement getTotalNumberOfActivitiesAttr()
-			throws ResourceException, ResourceUnknownFaultType,
-			RemoteException, SQLException {
-		return new MessageElement(consts.TOTAL_NUMBER_OF_ACTIVITIES_ATTR,
-				getTotalNumberOfActivities());
+	public MessageElement getTotalNumberOfActivitiesAttr() throws ResourceException, ResourceUnknownFaultType, RemoteException,
+		SQLException
+	{
+		return new MessageElement(consts.TOTAL_NUMBER_OF_ACTIVITIES_ATTR, getTotalNumberOfActivities());
 	}
 
-	public ArrayList<MessageElement> getSPMDProvidersAttr()
-			throws RemoteException {
+	public ArrayList<MessageElement> getSPMDProvidersAttr() throws RemoteException
+	{
 		Collection<String> spmdProviders = getSPMDProviders();
-		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(
-				spmdProviders.size());
+		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(spmdProviders.size());
 		for (String provider : spmdProviders) {
 			ret.add(new MessageElement(consts.SPMD_PROVIDER_ATTR, provider));
 		}
@@ -378,32 +344,30 @@ public class BESAttributesHandler extends AbstractAttributeHandler {
 		return ret;
 	}
 
-	public ArrayList<MessageElement> getActivityReferencesAttr()
-			throws ResourceException, ResourceUnknownFaultType,
-			RemoteException, SQLException {
+	public ArrayList<MessageElement> getActivityReferencesAttr() throws ResourceException, ResourceUnknownFaultType,
+		RemoteException, SQLException
+	{
 		EndpointReferenceType[] eprs = getActivityReferences();
-		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(
-				eprs.length);
+		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(eprs.length);
 		for (int lcv = 0; lcv < eprs.length; lcv++) {
-			ret.add(new MessageElement(consts.ACTIVITY_REFERENCE_ATTR,
-					eprs[lcv]));
+			ret.add(new MessageElement(consts.ACTIVITY_REFERENCE_ATTR, eprs[lcv]));
 		}
 
 		return ret;
 	}
 
-	public ArrayList<MessageElement> getOGRSHVersionsAttr() {
+	public ArrayList<MessageElement> getOGRSHVersionsAttr()
+	{
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
-		for (String version : Installation.getOGRSH().getInstalledVersions()
-				.keySet()) {
+		for (String version : Installation.getOGRSH().getInstalledVersions().keySet()) {
 			ret.add(new MessageElement(consts.OGRSH_VERSIONS_ATTR, version));
 		}
 
 		return ret;
 	}
 
-	public ArrayList<MessageElement> getDescriptionAttr()
-			throws ResourceException, ResourceUnknownFaultType {
+	public ArrayList<MessageElement> getDescriptionAttr() throws ResourceException, ResourceUnknownFaultType
+	{
 		ArrayList<MessageElement> result = new ArrayList<MessageElement>();
 		String desc = getDescription();
 		if (desc != null)
@@ -412,79 +376,78 @@ public class BESAttributesHandler extends AbstractAttributeHandler {
 		return result;
 	}
 
-	public void setDescriptionAttr(MessageElement element)
-			throws ResourceException, ResourceUnknownFaultType {
+	public void setDescriptionAttr(MessageElement element) throws ResourceException, ResourceUnknownFaultType
+	{
 		setDescription(element.getValue());
 	}
 
-	public MessageElement getOperatingSystemAttr() throws RemoteException {
-		return new MessageElement(consts.OPERATING_SYSTEM_ATTR,
-				getOperatingSystem());
+	public MessageElement getOperatingSystemAttr() throws RemoteException
+	{
+		return new MessageElement(consts.OPERATING_SYSTEM_ATTR, getOperatingSystem());
 	}
 
-	public MessageElement getCPUArchitectureAttr() throws RemoteException {
-		return new MessageElement(consts.CPU_ARCHITECTURE_ATTR,
-				getCPUArchitecture());
+	public MessageElement getCPUArchitectureAttr() throws RemoteException
+	{
+		return new MessageElement(consts.CPU_ARCHITECTURE_ATTR, getCPUArchitecture());
 	}
 
-	public MessageElement getCPUCountAttr() throws RemoteException {
+	public MessageElement getCPUCountAttr() throws RemoteException
+	{
 		return new MessageElement(consts.CPU_COUNT_ATTR, getCPUCount());
 	}
 
-	public MessageElement getCPUSpeedAttr() throws RemoteException {
+	public MessageElement getCPUSpeedAttr() throws RemoteException
+	{
 		return new MessageElement(consts.CPU_SPEED_ATTR, getCPUSpeed());
 	}
 
-	static public MessageElement getWallclockTimeLimitAttr()
-			throws ResourceUnknownFaultType, ResourceException {
+	static public MessageElement getWallclockTimeLimitAttr() throws ResourceUnknownFaultType, ResourceException
+	{
 		BESConstants sconsts = new BESConstants();
 		Long value = getWallclockTimeLimit();
 		if (value != null)
-			return new MessageElement(sconsts.BES_WALLCLOCK_TIMELIMIT_ATTR,
-					value);
+			return new MessageElement(sconsts.BES_WALLCLOCK_TIMELIMIT_ATTR, value);
 		return null;
 	}
 
-	public MessageElement getPhysicalMemoryAttr() throws RemoteException {
-		return new MessageElement(consts.PHYSICAL_MEMORY_ATTR,
-				getPhysicalMemory());
+	public MessageElement getPhysicalMemoryAttr() throws RemoteException
+	{
+		return new MessageElement(consts.PHYSICAL_MEMORY_ATTR, getPhysicalMemory());
 	}
 
-	public MessageElement getVirtualMemoryAttr() throws RemoteException {
-		return new MessageElement(consts.VIRTUAL_MEMORY_ATTR,
-				getVirtualMemory());
+	public MessageElement getVirtualMemoryAttr() throws RemoteException
+	{
+		return new MessageElement(consts.VIRTUAL_MEMORY_ATTR, getVirtualMemory());
 	}
 
-	public ArrayList<MessageElement> getDeployersAttr()
-			throws ResourceException, ResourceUnknownFaultType {
+	public ArrayList<MessageElement> getDeployersAttr() throws ResourceException, ResourceUnknownFaultType
+	{
 		ArrayList<MessageElement> deployers = new ArrayList<MessageElement>();
 		for (EndpointReferenceType deployer : getDeployers()) {
-			deployers
-					.add(new MessageElement(consts.DEPLOYER_EPR_ATTR, deployer));
+			deployers.add(new MessageElement(consts.DEPLOYER_EPR_ATTR, deployer));
 		}
 
 		return deployers;
 	}
 
-	public void setDeployersAttr(Collection<MessageElement> deployers)
-			throws ResourceException, ResourceUnknownFaultType {
+	public void setDeployersAttr(Collection<MessageElement> deployers) throws ResourceException, ResourceUnknownFaultType
+	{
 		Collection<EndpointReferenceType> deployerEPRs = new ArrayList<EndpointReferenceType>();
 
 		for (MessageElement deployerM : deployers) {
-			EndpointReferenceType deployer = ObjectDeserializer.toObject(
-					deployerM, EndpointReferenceType.class);
+			EndpointReferenceType deployer = ObjectDeserializer.toObject(deployerM, EndpointReferenceType.class);
 			deployerEPRs.add(deployer);
 		}
 
 		setDeployers(deployerEPRs);
 	}
 
-	static public ArrayList<MessageElement> getSupportedFilesystemsAttr() {
+	static public ArrayList<MessageElement> getSupportedFilesystemsAttr()
+	{
 		BESConstants sconsts = new BESConstants();
 
 		String[] supported = getSupportedFilesystems();
-		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(
-				supported.length);
+		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(supported.length);
 		for (String sup : supported)
 			ret.add(new MessageElement(sconsts.FILESYSTEM_SUPPORT_ATTR, sup));
 

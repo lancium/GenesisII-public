@@ -2,7 +2,8 @@ package edu.virginia.vcgr.genii.ui.xml;
 
 import java.io.IOException;
 
-public interface XMLFormatHandler {
+public interface XMLFormatHandler
+{
 	public void startElement() throws IOException;
 
 	public void startAttribute() throws IOException;

@@ -16,7 +16,8 @@ import edu.virginia.vcgr.genii.cloud.CloudController;
 import edu.virginia.vcgr.genii.cloud.VMStat;
 import edu.virginia.vcgr.genii.cloud.VMState;
 
-public class EC2TypicaController implements CloudController {
+public class EC2TypicaController implements CloudController
+{
 
 	private String _publicKey;
 	private String _secretKey;
@@ -30,9 +31,9 @@ public class EC2TypicaController implements CloudController {
 	private String _keyPair;
 	private int _backoff = 20;
 
-	public EC2TypicaController(String publicKey, String secretKey,
-			String endpoint, int port, boolean https, boolean euca,
-			String keyPair) {
+	public EC2TypicaController(String publicKey, String secretKey, String endpoint, int port, boolean https, boolean euca,
+		String keyPair)
+	{
 
 		_publicKey = publicKey;
 		_secretKey = secretKey;
@@ -44,8 +45,7 @@ public class EC2TypicaController implements CloudController {
 
 		// Security (SSL) for api calls to cloud temporarily disabled
 		// Possible for replay attacks but secret key not compromised
-		// Issue with Socket factory to be resolved in the future (mts5x -
-		// 1/2011)
+		// Issue with Socket factory to be resolved in the future (mts5x - 1/2011)
 		_secure = false;
 
 		if (_eucalyptus) {
@@ -57,9 +57,9 @@ public class EC2TypicaController implements CloudController {
 	}
 
 	@Override
-	public Collection<VMStat> spawnResources(int count) throws Exception {
-		LaunchConfiguration tConfig = new LaunchConfiguration(_imageID, count,
-				count);
+	public Collection<VMStat> spawnResources(int count) throws Exception
+	{
+		LaunchConfiguration tConfig = new LaunchConfiguration(_imageID, count, count);
 
 		tConfig.setInstanceType(_type);
 		tConfig.setKeyName(_keyPair);
@@ -76,8 +76,7 @@ public class EC2TypicaController implements CloudController {
 			} catch (EC2Exception e) {
 				if (retries < 3) {
 					retries++;
-					long sleep = (long) ((_backoff * 1000) * Math
-							.exp(.5 * retries));
+					long sleep = (long) ((_backoff * 1000) * Math.exp(.5 * retries));
 					Thread.sleep(sleep);
 				} else {
 					// Need to ensure this succeeds
@@ -88,8 +87,8 @@ public class EC2TypicaController implements CloudController {
 		}
 	}
 
-	private Collection<VMStat> updateState(ReservationDescription tDesc)
-			throws EC2Exception {
+	private Collection<VMStat> updateState(ReservationDescription tDesc) throws EC2Exception
+	{
 
 		List<VMStat> vmList = new ArrayList<VMStat>();
 		List<String> idList = new ArrayList<String>();
@@ -118,14 +117,16 @@ public class EC2TypicaController implements CloudController {
 		return vmList;
 	}
 
-	private void getVMData(Instance inst, VMStat vm) {
+	private void getVMData(Instance inst, VMStat vm)
+	{
 		vm.setHost(inst.getDnsName());
 		vm.setID(inst.getInstanceId());
 		vm.setState(parseState(inst.getState()));
 	}
 
 	// Add more states later
-	private VMState parseState(String state) {
+	private VMState parseState(String state)
+	{
 
 		if (state.equals("pending"))
 			return VMState.PENDING;
@@ -139,7 +140,9 @@ public class EC2TypicaController implements CloudController {
 
 	@Override
 	// Work on this make sure reliable? (persistent with exponential backoff?
-	public boolean killResources(Collection<VMStat> vms) throws Exception {
+		public
+		boolean killResources(Collection<VMStat> vms) throws Exception
+	{
 		List<String> idList = new ArrayList<String>();
 		for (VMStat tStat : vms) {
 			idList.add(tStat.getID());
@@ -155,8 +158,8 @@ public class EC2TypicaController implements CloudController {
 		return false;
 	}
 
-	private boolean killResources(ReservationDescription tDesc)
-			throws Exception {
+	private boolean killResources(ReservationDescription tDesc) throws Exception
+	{
 		List<String> idList = new ArrayList<String>();
 		for (Instance t : tDesc.getInstances()) {
 			idList.add(t.getInstanceId());
@@ -172,7 +175,8 @@ public class EC2TypicaController implements CloudController {
 	}
 
 	@Override
-	public boolean updateState(VMStat vm) throws Exception {
+	public boolean updateState(VMStat vm) throws Exception
+	{
 		String[] idArray = new String[1];
 		idArray[0] = vm.getID();
 
@@ -190,7 +194,8 @@ public class EC2TypicaController implements CloudController {
 	}
 
 	@Override
-	public boolean updateState(Collection<VMStat> vms) throws Exception {
+	public boolean updateState(Collection<VMStat> vms) throws Exception
+	{
 		List<String> idList = new ArrayList<String>();
 
 		for (VMStat vm : vms) {
@@ -225,7 +230,8 @@ public class EC2TypicaController implements CloudController {
 		return true;
 	}
 
-	private HashMap<String, VMStat> buildMap(Collection<VMStat> vms) {
+	private HashMap<String, VMStat> buildMap(Collection<VMStat> vms)
+	{
 		HashMap<String, VMStat> vmMap = new HashMap<String, VMStat>();
 
 		for (VMStat vm : vms) {
@@ -235,27 +241,30 @@ public class EC2TypicaController implements CloudController {
 		return vmMap;
 	}
 
-	public String get_imageID() {
+	public String get_imageID()
+	{
 		return _imageID;
 	}
 
-	public void set_imageID(String _imageID) {
+	public void set_imageID(String _imageID)
+	{
 		this._imageID = _imageID;
 	}
 
-	public void chooseInstanceType(int size) {
+	public void chooseInstanceType(int size)
+	{
 		switch (size) {
-		case 1:
-			_type = InstanceType.MEDIUM_HCPU;
-			break;
-		case 2:
-			_type = InstanceType.LARGE;
-			break;
-		case 3:
-			_type = InstanceType.XLARGE;
-			break;
-		default:
-			break;
+			case 1:
+				_type = InstanceType.MEDIUM_HCPU;
+				break;
+			case 2:
+				_type = InstanceType.LARGE;
+				break;
+			case 3:
+				_type = InstanceType.XLARGE;
+				break;
+			default:
+				break;
 		}
 	}
 

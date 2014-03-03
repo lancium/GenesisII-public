@@ -89,46 +89,43 @@ import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 
-public class AxisClientInvocationHandler implements InvocationHandler,
-		IFinalInvoker {
+public class AxisClientInvocationHandler implements InvocationHandler, IFinalInvoker
+{
 	private static final String STUB_CONFIGURED = "edu.virginia.vcgr.genii.client.security.stub-configured";
 
-	// hmmm: this really needs to be stored in a config file so users can change
-	// it!!!
+	// hmmm: this really needs to be stored in a config file so users can change it!!!
 	/*
-	 * the amount of time that any particular client request is allowed to take
-	 * before time expires. default was raised from 2 minutes to 6.
+	 * the amount of time that any particular client request is allowed to take before time expires.
+	 * default was raised from 2 minutes to 6.
 	 */
 	static private int _DEFAULT_CLIENT_REQUEST_TIMEOUT = 1000 * 60 * 6;
 
 	/**
-	 * We'll wait 16 seconds for a connection failure before it's considered TOO
-	 * long for the exponential back-off retry.
+	 * We'll wait 16 seconds for a connection failure before it's considered TOO long for the
+	 * exponential back-off retry.
 	 */
 	static private final long MAX_FAILURE_TIME_RETRY = 1000L * 16;
 
 	static private MessageLevelSecurityRequirements __minClientMessageSec = null;
 
 	/**
-	 * Class to wipe our loaded config stuff in the event the config manager
-	 * reloads.
+	 * Class to wipe our loaded config stuff in the event the config manager reloads.
 	 */
 	static {
-		ConfigurationManager
-				.addConfigurationUnloadListener(new ConfigUnloadListener());
+		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
 	}
 
-	public static class ConfigUnloadListener implements
-			ConfigurationUnloadedListener {
-		public void notifyUnloaded() {
+	public static class ConfigUnloadListener implements ConfigurationUnloadedListener
+	{
+		public void notifyUnloaded()
+		{
 			synchronized (ConfigurationManager.class) {
 				__minClientMessageSec = null;
 			}
 		}
 	}
 
-	static private Log _logger = LogFactory
-			.getLog(AxisClientInvocationHandler.class);
+	static private Log _logger = LogFactory.getLog(AxisClientInvocationHandler.class);
 
 	private EndpointReferenceType _epr;
 
@@ -151,19 +148,20 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 	// cache of signed, serialized delegation assertions
 	static private int VALIDATED_CERT_CACHE_SIZE = 32;
 	static private LRUCache<X509Certificate, Boolean> validatedCerts = new LRUCache<X509Certificate, Boolean>(
-			VALIDATED_CERT_CACHE_SIZE);
+		VALIDATED_CERT_CACHE_SIZE);
 
 	static Object _lock = new Object();
 
-	public AxisClientInvocationHandler(Class<?> locator,
-			EndpointReferenceType epr, ICallingContext callContext)
-			throws ResourceException, GenesisIISecurityException {
+	public AxisClientInvocationHandler(Class<?> locator, EndpointReferenceType epr, ICallingContext callContext)
+		throws ResourceException, GenesisIISecurityException
+	{
 		this(new Class[] { locator }, epr, callContext);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <HandlerClass> ArrayList<HandlerClass> getHandler(
-			SimpleChain handlerChain, Class<HandlerClass> handlerClass) {
+	private static <HandlerClass> ArrayList<HandlerClass>
+		getHandler(SimpleChain handlerChain, Class<HandlerClass> handlerClass)
+	{
 		ArrayList<HandlerClass> retval = new ArrayList<HandlerClass>();
 
 		if (handlerChain != null) {
@@ -181,40 +179,35 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 	/**
 	 * Retrieves the client's minimum allowable level of message security
 	 */
-	static private synchronized MessageLevelSecurityRequirements getMinClientMessageSec()
-			throws GeneralSecurityException {
+	static private synchronized MessageLevelSecurityRequirements getMinClientMessageSec() throws GeneralSecurityException
+	{
 		if (__minClientMessageSec != null) {
 			return __minClientMessageSec;
 		}
 
-		String minMessageSecurity = Installation
-				.getDeployment(new DeploymentName())
-				.security()
-				.getProperty(
-						KeystoreSecurityConstants.Client.MESSAGE_MIN_CONFIG_PROP);
+		String minMessageSecurity =
+			Installation.getDeployment(new DeploymentName()).security()
+				.getProperty(KeystoreSecurityConstants.Client.MESSAGE_MIN_CONFIG_PROP);
 
-		__minClientMessageSec = new MessageLevelSecurityRequirements(
-				minMessageSecurity);
+		__minClientMessageSec = new MessageLevelSecurityRequirements(minMessageSecurity);
 		return __minClientMessageSec;
 	}
 
-	public synchronized void configureSecurity(Stub stubInstance)
-			throws GenesisIISecurityException, GeneralSecurityException,
-			ResourceException {
+	public synchronized void configureSecurity(Stub stubInstance) throws GenesisIISecurityException, GeneralSecurityException,
+		ResourceException
+	{
 		if (stubInstance._getProperty(STUB_CONFIGURED) != null) {
 			return;
 		}
 		stubInstance._setProperty(STUB_CONFIGURED, STUB_CONFIGURED);
-		stubInstance._setProperty("attachments.implementation",
-				"org.apache.axis.attachments.AttachmentsImpl");
+		stubInstance._setProperty("attachments.implementation", "org.apache.axis.attachments.AttachmentsImpl");
 
 		X509Certificate[] chain = EPRUtils.extractCertChain(_epr);
 		if ((chain != null) && _logger.isTraceEnabled()) {
 			int which = 0;
 			for (X509Certificate cert : chain) {
 				if (_logger.isTraceEnabled())
-					_logger.trace("got chain[" + which++ + "] for epr as: "
-							+ cert.getSubjectDN());
+					_logger.trace("got chain[" + which++ + "] for epr as: " + cert.getSubjectDN());
 			}
 		}
 
@@ -228,15 +221,13 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 			minResourceSec = EPRUtils.extractMinMessageSecurity(_epr);
 		}
 
-		MessageLevelSecurityRequirements neededMsgSec = minClientMessageSec
-				.computeUnion(minResourceSec);
+		MessageLevelSecurityRequirements neededMsgSec = minClientMessageSec.computeUnion(minResourceSec);
 
 		// perform resource-AuthN as specified in the client config file
 		try {
 			if (chain == null) {
-				throw new GenesisIISecurityException("EPR for "
-						+ _epr.getAddress().toString()
-						+ " does not contain a certificate chain.");
+				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString()
+					+ " does not contain a certificate chain.");
 			}
 			_resourceCert = chain[0];
 
@@ -245,20 +236,14 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 					// make sure the epi's match
 					String certEpi = CertTool.getSN(chain[0]);
 					if (!certEpi.equals(epi.toString())) {
-						throw new GenesisIISecurityException("EPI for "
-								+ _epr.getAddress().toString() + " ("
-								+ epi.toString()
-								+ ") does not match that in the certificate ("
-								+ certEpi + ")");
+						throw new GenesisIISecurityException("EPI for " + _epr.getAddress().toString() + " (" + epi.toString()
+							+ ") does not match that in the certificate (" + certEpi + ")");
 					}
 
 					// run it through the trust manager
-					boolean okay = CertificateValidatorFactory.getValidator()
-							.validateIsTrustedResource(chain);
+					boolean okay = CertificateValidatorFactory.getValidator().validateIsTrustedResource(chain);
 					if (!okay)
-						throw new GeneralSecurityException(
-								"failed to validate cert chain: "
-										+ chain[0].getSubjectDN());
+						throw new GeneralSecurityException("failed to validate cert chain: " + chain[0].getSubjectDN());
 
 					// insert into valid certs cache
 					validatedCerts.put(_resourceCert, Boolean.TRUE);
@@ -270,30 +255,25 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 				// loud of a warning as we want to emit. otherwise we're just
 				// constantly complaining that the level was set to warn only.
 				if (_logger.isTraceEnabled())
-					_logger.trace("Cannot confirm trusted identity for "
-							+ _epr.getAddress().toString());
+					_logger.trace("Cannot confirm trusted identity for " + _epr.getAddress().toString());
 			} else {
-				throw new GenesisIISecurityException("EPR for "
-						+ _epr.getAddress().toString() + " is untrusted: "
-						+ e.getMessage(), e);
+				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString() + " is untrusted: "
+					+ e.getMessage(), e);
 			}
 		}
 
 		// prepare a message security datastructure for the message context
 		// if needed
-		MessageSecurity msgSecData = new MessageSecurity(neededMsgSec, chain,
-				epi);
+		MessageSecurity msgSecData = new MessageSecurity(neededMsgSec, chain, epi);
 		if (msgSecData != null) {
-			stubInstance._setProperty(CommConstants.MESSAGE_SEC_CALL_DATA,
-					msgSecData);
+			stubInstance._setProperty(CommConstants.MESSAGE_SEC_CALL_DATA, msgSecData);
 		}
 
 		try {
 			// configure the send handler(s), working backwards so as to set the
 			// last one that actually does work to serialize the message
-			ArrayList<ISecuritySendHandler> sendHandlers = getHandler(
-					(SimpleChain) _providerConfig.getGlobalRequest(),
-					ISecuritySendHandler.class);
+			ArrayList<ISecuritySendHandler> sendHandlers =
+				getHandler((SimpleChain) _providerConfig.getGlobalRequest(), ISecuritySendHandler.class);
 			boolean serializerFound = false;
 			for (int i = sendHandlers.size() - 1; i >= 0; i--) {
 				ISecuritySendHandler h = sendHandlers.get(i);
@@ -304,24 +284,21 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 			}
 
 			// configure the recv handler(s)
-			ArrayList<ISecurityRecvHandler> recvHandlers = getHandler(
-					(SimpleChain) _providerConfig.getGlobalResponse(),
-					ISecurityRecvHandler.class);
+			ArrayList<ISecurityRecvHandler> recvHandlers =
+				getHandler((SimpleChain) _providerConfig.getGlobalResponse(), ISecurityRecvHandler.class);
 			for (ISecurityRecvHandler h : recvHandlers) {
 				h.configure(_callContext);
 			}
 
 		} catch (Exception e) {
-			throw new ResourceException("Unable to create locator instance: "
-					+ e.getMessage(), e);
+			throw new ResourceException("Unable to create locator instance: " + e.getMessage(), e);
 		}
 	}
 
-	public AxisClientInvocationHandler(Class<?>[] locators,
-			EndpointReferenceType epr, ICallingContext callContext)
-			throws ResourceException, GenesisIISecurityException {
-		// hmmm: this would be a good place to use a shorter timeout on
-		// containers. check the role.
+	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext)
+		throws ResourceException, GenesisIISecurityException
+	{
+		// hmmm: this would be a good place to use a shorter timeout on containers. check the role.
 
 		try {
 
@@ -331,9 +308,7 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 				callContext = new CallingContextImpl(new ContextType());
 			}
 			_callContext = callContext.deriveNewContext();
-			_callContext.setSingleValueProperty(
-					GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY,
-					"true");
+			_callContext.setSingleValueProperty(GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY, "true");
 			_locators = locators;
 
 			// create the locator and add the methods
@@ -342,73 +317,61 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 				addMethods(locatorInstance, epr);
 			}
 		} catch (IOException ioe) {
-			throw new ResourceException("Error creating secure client stub: "
-					+ ioe.getMessage(), ioe);
+			throw new ResourceException("Error creating secure client stub: " + ioe.getMessage(), ioe);
 		}
 
 	}
 
-	private AxisClientInvocationHandler cloneHandlerForNewEPR(
-			EndpointReferenceType epr) throws ResourceException,
-			GenesisIISecurityException {
-		AxisClientInvocationHandler newHandler = new AxisClientInvocationHandler(
-				_locators, epr, _callContext);
+	private AxisClientInvocationHandler cloneHandlerForNewEPR(EndpointReferenceType epr) throws ResourceException,
+		GenesisIISecurityException
+	{
+		AxisClientInvocationHandler newHandler = new AxisClientInvocationHandler(_locators, epr, _callContext);
 		if (_outAttachments != null)
-			newHandler._outAttachments = new LinkedList<GeniiAttachment>(
-					_outAttachments);
+			newHandler._outAttachments = new LinkedList<GeniiAttachment>(_outAttachments);
 		newHandler._attachmentType = _attachmentType;
 		newHandler._parentHandler = this;
 		return newHandler;
 	}
 
-	private Object createLocatorInstance(Class<?> loc) throws ResourceException {
+	private Object createLocatorInstance(Class<?> loc) throws ResourceException
+	{
 		try {
-			Constructor<?> cons = loc
-					.getConstructor(org.apache.axis.EngineConfiguration.class);
+			Constructor<?> cons = loc.getConstructor(org.apache.axis.EngineConfiguration.class);
 			_providerConfig = new FileProvider("client-config.wsdd");
 			Object retval = cons.newInstance(_providerConfig);
 
 			return retval;
 		} catch (NoSuchMethodException nsme) {
-			throw new ResourceException("Class " + loc.getName()
-					+ " does not refer to a known locator class type.", nsme);
+			throw new ResourceException("Class " + loc.getName() + " does not refer to a known locator class type.", nsme);
 		} catch (Exception e) {
-			throw new ResourceException("Unable to create locator instance: "
-					+ e.getMessage(), e);
+			throw new ResourceException("Unable to create locator instance: " + e.getMessage(), e);
 		}
 	}
 
-	private void addMethods(Object locatorInstance, EndpointReferenceType epr)
-			throws MalformedURLException, ResourceException {
+	private void addMethods(Object locatorInstance, EndpointReferenceType epr) throws MalformedURLException, ResourceException
+	{
 		Method locatorPortTypeMethod;
 		URL url = null;
 		try {
-			if (epr.getAddress().get_value().toString()
-					.equals(WSName.UNBOUND_ADDRESS))
+			if (epr.getAddress().get_value().toString().equals(WSName.UNBOUND_ADDRESS))
 				if (_logger.isDebugEnabled())
 					_logger.debug("Processing unbound address in AxisClientInvocationHandler");
 			url = new URL(epr.getAddress().get_value().toString());
 		} catch (java.net.MalformedURLException mue) {
-			if (epr.getAddress().get_value().toString()
-					.equals(WSName.UNBOUND_ADDRESS))
+			if (epr.getAddress().get_value().toString().equals(WSName.UNBOUND_ADDRESS))
 				url = null;
 			else
 				throw mue;
 		}
 		try {
-			locatorPortTypeMethod = ClientUtils
-					.getLocatorPortTypeMethod(locatorInstance.getClass());
-			Stub stubInstance = (Stub) locatorPortTypeMethod.invoke(
-					locatorInstance, new Object[] { url });
+			locatorPortTypeMethod = ClientUtils.getLocatorPortTypeMethod(locatorInstance.getClass());
+			Stub stubInstance = (Stub) locatorPortTypeMethod.invoke(locatorInstance, new Object[] { url });
 
 			if (epr != null) {
-				stubInstance._setProperty(
-						CommConstants.TARGET_EPR_PROPERTY_NAME, epr);
+				stubInstance._setProperty(CommConstants.TARGET_EPR_PROPERTY_NAME, epr);
 			}
 			if (_callContext != null) {
-				stubInstance._setProperty(
-						CommConstants.CALLING_CONTEXT_PROPERTY_NAME,
-						_callContext);
+				stubInstance._setProperty(CommConstants.CALLING_CONTEXT_PROPERTY_NAME, _callContext);
 			}
 
 			// Use the return type to get the methods that this stub supports
@@ -419,9 +382,7 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 		} catch (InvocationTargetException ite) {
 			Throwable t = ite;
 			DetailedLogger dl = new DetailedLogger();
-			dl.detailed().info(
-					"addMethods partial handling for exception:"
-							+ ExceptionUtils.getStackTrace(t));
+			dl.detailed().info("addMethods partial handling for exception:" + ExceptionUtils.getStackTrace(t));
 			if (ite.getCause() != null)
 				t = ite.getCause();
 			if (t != null) {
@@ -438,14 +399,12 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 
 	static private InvocationInterceptorManager _manager = null;
 
-	synchronized static private InvocationInterceptorManager getManager() {
+	synchronized static private InvocationInterceptorManager getManager()
+	{
 		if (_manager == null) {
-			_manager = (InvocationInterceptorManager) ConfigurationManager
-					.getCurrentConfiguration()
-					.getClientConfiguration()
-					.retrieveSection(
-							new QName("http://vcgr.cs.virginia.edu/Genesis-II",
-									"client-pipeline"));
+			_manager =
+				(InvocationInterceptorManager) ConfigurationManager.getCurrentConfiguration().getClientConfiguration()
+					.retrieveSection(new QName("http://vcgr.cs.virginia.edu/Genesis-II", "client-pipeline"));
 		}
 
 		if (_manager == null) {
@@ -460,20 +419,18 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 	private static Integer inInvokeMethod = new Integer(0);
 
 	@Override
-	public Object invoke(Object target, Method m, Object[] params)
-			throws Throwable {
+	public Object invoke(Object target, Method m, Object[] params) throws Throwable
+	{
 		Object toReturn = null;
 		synchronized (inInvokeMethod) {
 			inInvokeMethod++;
 			if (inInvokeMethod > 1) {
-				_logger.debug("client invoke recursion level now at "
-						+ inInvokeMethod + ".");
+				_logger.debug("client invoke recursion level now at " + inInvokeMethod + ".");
 			}
 		}
 		try {
 			InvocationInterceptorManager mgr = getManager();
-			toReturn = mgr
-					.invoke(getTargetEPR(), _callContext, this, m, params);
+			toReturn = mgr.invoke(getTargetEPR(), _callContext, this, m, params);
 		} catch (Throwable t) {
 			String msg = "client failed to invoke";
 			_logger.error(msg, t);
@@ -482,15 +439,15 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 			synchronized (inInvokeMethod) {
 				inInvokeMethod--;
 				if (inInvokeMethod < 0) {
-					_logger.error("logic error; invoke tracker is at erroneous value!!: "
-							+ ProgramTools.showLastFewOnStack(7));
+					_logger.error("logic error; invoke tracker is at erroneous value!!: " + ProgramTools.showLastFewOnStack(7));
 				}
 			}
 		}
 		return toReturn;
 	}
 
-	static private boolean isConnectionException(Throwable cause) {
+	static private boolean isConnectionException(Throwable cause)
+	{
 		while (cause != null) {
 			if (cause instanceof ConnectException)
 				return true;
@@ -505,19 +462,17 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 	}
 
 	/**
-	 * added resolution code - 1/07 - jfk3w revamped resolution code 4/11/07 -
-	 * jfk3w.
+	 * added resolution code - 1/07 - jfk3w revamped resolution code 4/11/07 - jfk3w.
 	 */
-	public Object finalInvoke(Object obj, Method calledMethod,
-			Object[] arguments) throws Throwable {
+	public Object finalInvoke(Object obj, Method calledMethod, Object[] arguments) throws Throwable
+	{
 		EndpointReferenceType origEPR = getTargetEPR();
 		ResolutionContext context = null;
 		int baseDelay = 100;
 		int baseTwitter = 25;
 		int attempt = 0;
 		long startAttempt = 0L;
-		int timeout = (_timeout != null) ? _timeout.intValue()
-				: _DEFAULT_CLIENT_REQUEST_TIMEOUT;
+		int timeout = (_timeout != null) ? _timeout.intValue() : _DEFAULT_CLIENT_REQUEST_TIMEOUT;
 		TypeInformation type = null;
 
 		ResourceAccessMonitor.reportResourceUsage(origEPR);
@@ -528,16 +483,14 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 			context = new ResolutionContext(origEPR, (_parentHandler == null));
 			_inAttachments = null;
 			try {
-				return resolveAndInvoke(context, calledMethod, arguments,
-						timeout);
+				return resolveAndInvoke(context, calledMethod, arguments, timeout);
 			} catch (Throwable cause) {
 				if (!isConnectionException(cause)) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Unable to communicate with endpoint (not a retryable-exception).");
 					throw cause;
 				} else {
-					// Presumably, here I need to invalidate the cache for all
-					// entries that
+					// Presumably, here I need to invalidate the cache for all entries that
 					// belongs to that particular container.
 				}
 				if (type == null)
@@ -545,33 +498,24 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 				int maxAttempts = (type.isEpiResolver() ? 1 : 5);
 				if (attempt >= maxAttempts) {
 					if (_logger.isDebugEnabled())
-						_logger.debug("Unable to communicate with endpoint after "
-								+ attempt + " attempts.");
+						_logger.debug("Unable to communicate with endpoint after " + attempt + " attempts.");
 					throw cause;
 				}
-				// deltaCommunicate is the total amount of time spent on the
-				// attempt,
-				// including time spent talking to the resolver and each
-				// instance.
-				// If this single attempt took too long, then don't make another
-				// attempt.
-				long deltaCommunicate = System.currentTimeMillis()
-						- startAttempt;
+				// deltaCommunicate is the total amount of time spent on the attempt,
+				// including time spent talking to the resolver and each instance.
+				// If this single attempt took too long, then don't make another attempt.
+				long deltaCommunicate = System.currentTimeMillis() - startAttempt;
 				if (deltaCommunicate > MAX_FAILURE_TIME_RETRY) {
 					if (_logger.isDebugEnabled())
-						_logger.debug("Unable to communicate with endpoint after "
-								+ deltaCommunicate + " millis");
+						_logger.debug("Unable to communicate with endpoint after " + deltaCommunicate + " millis");
 					throw cause;
 				}
 				try {
-					// Sleep for a random period in the range of (-bt/2 ...
-					// +bt/2).
-					int twitter = (int) (Math.random() * baseTwitter)
-							- (baseTwitter >> 1);
+					// Sleep for a random period in the range of (-bt/2 ... +bt/2).
+					int twitter = (int) (Math.random() * baseTwitter) - (baseTwitter >> 1);
 					int sleepTime = baseDelay + twitter;
 					if (_logger.isDebugEnabled())
-						_logger.debug("Exponential backoff delay of "
-								+ sleepTime + " for an exception.");
+						_logger.debug("Exponential backoff delay of " + sleepTime + " for an exception.");
 					Thread.sleep(sleepTime);
 				} catch (InterruptedException ie) {
 					Thread.currentThread().isInterrupted();
@@ -588,16 +532,15 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 	/**
 	 * Send the message. If it fails, then resolve a replica and try again.
 	 * 
-	 * Possible sequence of events: 1. Send message to first instance. Catch
-	 * exception. 2. Ask resolver for second instance. 3. Send message to second
-	 * instance. Catch exception. 4. Ask resolver for next instance. 5. There
-	 * are no more instances, so resolve() throws an exception. Catch it. 6.
-	 * Throw the failure that was reported by the first instance back in step 1.
+	 * Possible sequence of events: 1. Send message to first instance. Catch exception. 2. Ask
+	 * resolver for second instance. 3. Send message to second instance. Catch exception. 4. Ask
+	 * resolver for next instance. 5. There are no more instances, so resolve() throws an exception.
+	 * Catch it. 6. Throw the failure that was reported by the first instance back in step 1.
 	 * Discard the exceptions from resolve() and from all other instances.
 	 */
-	private Object resolveAndInvoke(ResolutionContext context,
-			Method calledMethod, Object[] arguments, int timeout)
-			throws Throwable {
+	private Object resolveAndInvoke(ResolutionContext context, Method calledMethod, Object[] arguments, int timeout)
+		throws Throwable
+	{
 		AxisClientInvocationHandler handler = null;
 		boolean tryAgain = false;
 		Throwable firstException = null;
@@ -614,16 +557,14 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 				return handler.doInvoke(calledMethod, arguments, timeout);
 			} catch (Throwable throwable) {
 				DetailedLogger dl = new DetailedLogger();
-				dl.detailed().info(
-						"resolveAndInvoke partial handling for exception:"
-								+ ExceptionUtils.getStackTrace(throwable));
+				dl.detailed()
+					.info("resolveAndInvoke partial handling for exception:" + ExceptionUtils.getStackTrace(throwable));
 				if (throwable instanceof InvocationTargetException) {
 					if (throwable.getCause() != null)
 						throwable = throwable.getCause();
 				}
 				if (_logger.isDebugEnabled())
-					_logger.debug("doInvoke fault due to: "
-							+ throwable.getMessage());
+					_logger.debug("doInvoke fault due to: " + throwable.getMessage());
 				if ((throwable instanceof TryAgainFaultType) && (!tryAgain)) {
 					tryAgain = true;
 				} else {
@@ -632,33 +573,26 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 					tryAgain = false;
 
 					if (_logger.isDebugEnabled())
-						_logger.debug("faulting method: "
-								+ calledMethod.getName());
+						_logger.debug("faulting method: " + calledMethod.getName());
 
 					/*
-					 * Resetting the client cache as the original EPR holding
-					 * container might be down, which will invalidate existing
-					 * subscriptions and the notification broker.
+					 * Resetting the client cache as the original EPR holding container might be
+					 * down, which will invalidate existing subscriptions and the notification
+					 * broker.
 					 */
 					String methodName = calledMethod.getName();
-					if (!"destroy".equalsIgnoreCase(methodName)
-							&& !"createIndirectSubscriptions"
-									.equalsIgnoreCase(methodName)
-							&& !"createNotificationBrokerWithForwardingPort"
-									.equalsIgnoreCase(methodName)
-							&& !"getMessages".equalsIgnoreCase(methodName)
-							&& !"updateMode".equalsIgnoreCase(methodName)) {
+					if (!"destroy".equalsIgnoreCase(methodName) && !"createIndirectSubscriptions".equalsIgnoreCase(methodName)
+						&& !"createNotificationBrokerWithForwardingPort".equalsIgnoreCase(methodName)
+						&& !"getMessages".equalsIgnoreCase(methodName) && !"updateMode".equalsIgnoreCase(methodName)) {
 
 						/*
-						 * If the method is not the destroy method or any
-						 * notification management method only then cache has
-						 * been refreshed. Destroy method is ignored because
-						 * otherwise there is a chance of cycle formation as the
-						 * cache management system itself use WS-resources that
-						 * are destroyed with a cache refresh and invocation of
-						 * destroy on those resources can fail too. Meanwhile,
-						 * notification management methods are ignored to avoid
-						 * redundant cache refreshes.
+						 * If the method is not the destroy method or any notification management
+						 * method only then cache has been refreshed. Destroy method is ignored
+						 * because otherwise there is a chance of cycle formation as the cache
+						 * management system itself use WS-resources that are destroyed with a cache
+						 * refresh and invocation of destroy on those resources can fail too.
+						 * Meanwhile, notification management methods are ignored to avoid redundant
+						 * cache refreshes.
 						 */
 						CacheManager.resetCachingSystem();
 					}
@@ -667,8 +601,8 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 		}
 	}
 
-	protected Object doInvoke(Method calledMethod, Object[] arguments,
-			int timeout) throws Throwable {
+	protected Object doInvoke(Method calledMethod, Object[] arguments, int timeout) throws Throwable
+	{
 		_lastEndpointInfo = null;
 		MethodDescription methodDesc = new MethodDescription(calledMethod);
 		Stub stubInstance = (Stub) _portMethods.get(methodDesc);
@@ -682,15 +616,12 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 
 		if (_outAttachments != null) {
 			if (_attachmentType == AttachmentType.DIME)
-				stubInstance._setProperty(Call.ATTACHMENT_ENCAPSULATION_FORMAT,
-						Call.ATTACHMENT_ENCAPSULATION_FORMAT_DIME);
+				stubInstance._setProperty(Call.ATTACHMENT_ENCAPSULATION_FORMAT, Call.ATTACHMENT_ENCAPSULATION_FORMAT_DIME);
 			else
-				stubInstance._setProperty(Call.ATTACHMENT_ENCAPSULATION_FORMAT,
-						Call.ATTACHMENT_ENCAPSULATION_FORMAT_MTOM);
+				stubInstance._setProperty(Call.ATTACHMENT_ENCAPSULATION_FORMAT, Call.ATTACHMENT_ENCAPSULATION_FORMAT_MTOM);
 
 			for (GeniiAttachment outAttachment : _outAttachments) {
-				ByteArrayDataSource ds = new ByteArrayDataSource(
-						outAttachment.getData(), "application/octet-stream");
+				ByteArrayDataSource ds = new ByteArrayDataSource(outAttachment.getData(), "application/octet-stream");
 				String name = outAttachment.getName();
 				if (name != null)
 					ds.setName(name);
@@ -704,23 +635,19 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 		 * Set calling context so that the socket factory has access to it.
 		 */
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format(
-					"Starting an outcall for %s on thread [%x]%s.",
-					calledMethod.getName(), Thread.currentThread().getId(),
-					Thread.currentThread()));
+			_logger.trace(String.format("Starting an outcall for %s on thread [%x]%s.", calledMethod.getName(), Thread
+				.currentThread().getId(), Thread.currentThread()));
 		long start = System.currentTimeMillis();
 		VcgrSslSocketFactory.threadCallingContext.set(_callContext);
 		Object ret = calledMethod.invoke(stubInstance, arguments);
 		VcgrSslSocketFactory.threadCallingContext.set(null);
 		if (_logger.isTraceEnabled())
-			_logger.trace(String
-					.format("Finished an outcall for %s on thread [%x]%s (duration %d ms).",
-							calledMethod.getName(), Thread.currentThread()
-									.getId(), Thread.currentThread(),
-							System.currentTimeMillis() - start));
+			_logger.trace(String.format("Finished an outcall for %s on thread [%x]%s (duration %d ms).",
+				calledMethod.getName(), Thread.currentThread().getId(), Thread.currentThread(), System.currentTimeMillis()
+					- start));
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Outcall for '%s' took %d ms.",
-					calledMethod.getName(), System.currentTimeMillis() - start));
+			_logger.debug(String.format("Outcall for '%s' took %d ms.", calledMethod.getName(), System.currentTimeMillis()
+				- start));
 
 		Object[] inAttachments = stubInstance.getAttachments();
 		if (inAttachments != null)
@@ -738,8 +665,7 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 					if (text != null && text.equalsIgnoreCase("true"))
 						isGeniiEndpoint = true;
 				}
-			} else if (name
-					.equals(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION)) {
+			} else if (name.equals(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION)) {
 				org.w3c.dom.Node n = elem.getFirstChild();
 				if (n != null) {
 					String text = n.getNodeValue();
@@ -747,41 +673,34 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 						try {
 							endpointVersion = new Version(text);
 						} catch (Throwable cause) {
-							_logger.warn(
-									"Unable to parse version from soap header.",
-									cause);
+							_logger.warn("Unable to parse version from soap header.", cause);
 						}
 					}
 				}
-			} else if (name
-					.equals(NotificationBrokerConstants.MESSAGE_INDEX_QNAME)) {
+			} else if (name.equals(NotificationBrokerConstants.MESSAGE_INDEX_QNAME)) {
 				EndpointReferenceType target = getTargetEPR();
 				int messageIndex = Integer.parseInt(elem.getValue());
-				NotificationMessageIndexProcessor.processMessageIndexValue(
-						target, messageIndex);
+				NotificationMessageIndexProcessor.processMessageIndexValue(target, messageIndex);
 			}
 		}
 
-		_lastEndpointInfo = new GenesisIIEndpointInformation(isGeniiEndpoint,
-				endpointVersion);
+		_lastEndpointInfo = new GenesisIIEndpointInformation(isGeniiEndpoint, endpointVersion);
 		return ret;
 	}
 
-	private void setInAttachments(Object[] inAttachments) throws IOException,
-			SOAPException {
+	private void setInAttachments(Object[] inAttachments) throws IOException, SOAPException
+	{
 		Collection<GeniiAttachment> attachmentsList = new LinkedList<GeniiAttachment>();
 		for (Object nextAttachment : inAttachments) {
 			if (nextAttachment instanceof AttachmentPart) {
 				AttachmentPart part = (AttachmentPart) nextAttachment;
-				attachmentsList.add(new GeniiAttachment(GeniiAttachment
-						.extractData(part)));
+				attachmentsList.add(new GeniiAttachment(GeniiAttachment.extractData(part)));
 			} else {
 				_logger.warn("Received an attachment type that I don't know how to deal with.");
 			}
 		}
 
-		// set inbound attachments all the way up the stack of invocation
-		// handlers
+		// set inbound attachments all the way up the stack of invocation handlers
 		AxisClientInvocationHandler nextHandler = this;
 		while (nextHandler != null) {
 			if (attachmentsList.size() > 0)
@@ -793,17 +712,15 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 	}
 
 	/*
-	 * Try to resolve EPR (based on resolution context) and return a new
-	 * invocation handler for next invocation attempt. If resolution fails,
-	 * throw exception.
+	 * Try to resolve EPR (based on resolution context) and return a new invocation handler for next
+	 * invocation attempt. If resolution fails, throw exception.
 	 * 
 	 * WARNING: Contents of ResolutionContext may be changed during this call.
 	 */
-	protected AxisClientInvocationHandler resolve(ResolutionContext context)
-			throws NameResolutionFailedException {
+	protected AxisClientInvocationHandler resolve(ResolutionContext context) throws NameResolutionFailedException
+	{
 		EndpointReferenceType originalEPR = context.getOriginalEPR();
-		if ((!context.triedOriginalEPR())
-				&& (!EPRUtils.isUnboundEPR(originalEPR))) {
+		if ((!context.triedOriginalEPR()) && (!EPRUtils.isUnboundEPR(originalEPR))) {
 			context.setTriedOriginalEPR();
 			return this;
 		}
@@ -824,25 +741,24 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 		throw new NameResolutionFailedException();
 	}
 
-	protected AxisClientInvocationHandler makeNewHandler(
-			EndpointReferenceType resolvedEPR) {
+	protected AxisClientInvocationHandler makeNewHandler(EndpointReferenceType resolvedEPR)
+	{
 		try {
 			return cloneHandlerForNewEPR(resolvedEPR);
 		} catch (Throwable t) {
 			if (_logger.isDebugEnabled())
-				_logger.debug(
-						"Attempt to create new AxisClientInvocationHandle failed.",
-						t);
+				_logger.debug("Attempt to create new AxisClientInvocationHandle failed.", t);
 			return null;
 		}
 	}
 
-	public EndpointReferenceType getTargetEPR() {
+	public EndpointReferenceType getTargetEPR()
+	{
 		return _epr;
 	}
 
-	public void setOutAttachments(Collection<GeniiAttachment> attachments,
-			AttachmentType attachmentType) {
+	public void setOutAttachments(Collection<GeniiAttachment> attachments, AttachmentType attachmentType)
+	{
 		if (_parentHandler != null) {
 			if (_logger.isDebugEnabled())
 				_logger.warn("Tried to set outbound attachments on cloned AxisClientInvocationHandler.");
@@ -851,11 +767,13 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 		_attachmentType = attachmentType;
 	}
 
-	public void setTimeout(int timeoutMillis) {
+	public void setTimeout(int timeoutMillis)
+	{
 		_timeout = new Integer(timeoutMillis);
 	}
 
-	public Collection<GeniiAttachment> getInAttachments() {
+	public Collection<GeniiAttachment> getInAttachments()
+	{
 		if (_parentHandler != null) {
 			_logger.warn("Tried to get inbound attachments on cloned AxisClientInvocationHandler.");
 		}
@@ -865,7 +783,8 @@ public class AxisClientInvocationHandler implements InvocationHandler,
 		return res;
 	}
 
-	public GenesisIIEndpointInformation getLastEndpointInformation() {
+	public GenesisIIEndpointInformation getLastEndpointInformation()
+	{
 		return _lastEndpointInfo;
 	}
 }

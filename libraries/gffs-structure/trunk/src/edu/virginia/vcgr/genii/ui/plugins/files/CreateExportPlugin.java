@@ -28,18 +28,17 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
  * dialog.setVisible(true);
  */
 
-public class CreateExportPlugin extends AbstractCombinedUIMenusPlugin {
+public class CreateExportPlugin extends AbstractCombinedUIMenusPlugin
+{
 	static private Log _logger = LogFactory.getLog(CreateExportPlugin.class);
 
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType)
-			throws UIPluginException {
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
+	{
 		String ContainerPath = "/";
 		String TargetPath = "/";
-		Closeable contextToken = ContextManager
-				.temporarilyAssumeContext(context.uiContext().callingContext());
-		RNSPath path = context.endpointRetriever().getTargetEndpoints()
-				.iterator().next();
+		Closeable contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+		RNSPath path = context.endpointRetriever().getTargetEndpoints().iterator().next();
 		try {
 			EndpointReferenceType epr = path.getEndpoint();
 			EndpointDescription ep = new EndpointDescription(epr);
@@ -52,42 +51,33 @@ public class CreateExportPlugin extends AbstractCombinedUIMenusPlugin {
 				TargetPath = path.toString();
 			}
 
-			ExportDirDialog dialog = new ExportDirDialog(ContainerPath,
-					TargetPath);
+			ExportDirDialog dialog = new ExportDirDialog(ContainerPath, TargetPath);
 			dialog.pack();
 			GuiUtils.centerComponent(dialog);
 			dialog.setVisible(true);
 		} catch (RNSPathDoesNotExistException e) {
-			_logger.error(
-					"RNS path not found failure during export plugin operation.",
-					e);
+			_logger.error("RNS path not found failure during export plugin operation.", e);
 		} catch (FileLockException e) {
-			_logger.error(
-					"File Locked failure during export plugin operation.", e);
+			_logger.error("File Locked failure during export plugin operation.", e);
 		}
 		try {
 			if (contextToken != null)
 				contextToken.close();
 		} catch (IOException e) {
-			_logger.error(
-					"failed to close context after export plugin operation.", e);
+			_logger.error("failed to close context after export plugin operation.", e);
 		}
 	}
 
 	@Override
-	public boolean isEnabled(
-			Collection<EndpointDescription> selectedDescriptions) {
+	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
+	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
-		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS,
-		// but is it an RNS
+		// ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS
 		// and NOT (isContainer, isBES ...
 		// Perhaps should be even more selective,
-		TypeInformation tp = selectedDescriptions.iterator().next()
-				.typeInformation();
-		return ((tp.isRNS() || tp.isContainer()) && !(tp.isBESContainer()
-				|| tp.isQueue() || tp.isIDP()));
-		// return
-		// selectedDescriptions.iterator().next().typeInformation().isRNS();
+		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
+		return ((tp.isRNS() || tp.isContainer()) && !(tp.isBESContainer() || tp.isQueue() || tp.isIDP()));
+		// return selectedDescriptions.iterator().next().typeInformation().isRNS();
 	}
 }

@@ -5,9 +5,11 @@ import org.junit.Test;
 
 import edu.virginia.vcgr.genii.client.history.SequenceNumber;
 
-public class TestSequenceNumber {
+public class TestSequenceNumber
+{
 	@Test
-	public void testSimpleSequence() {
+	public void testSimpleSequence()
+	{
 		SequenceNumber a = new SequenceNumber();
 		SequenceNumber b = a.next();
 		SequenceNumber c = b.next();
@@ -25,7 +27,8 @@ public class TestSequenceNumber {
 	}
 
 	@Test
-	public void testCompoundSequences() {
+	public void testCompoundSequences()
+	{
 		SequenceNumber a = new SequenceNumber();
 		SequenceNumber c = a.next();
 		SequenceNumber b = new SequenceNumber();
@@ -44,7 +47,8 @@ public class TestSequenceNumber {
 	}
 
 	@Test
-	public void testStringParsing() {
+	public void testStringParsing()
+	{
 		SequenceNumber a = new SequenceNumber(); // 1
 		String aRep = a.toString();
 		SequenceNumber b = a.next(); // 2

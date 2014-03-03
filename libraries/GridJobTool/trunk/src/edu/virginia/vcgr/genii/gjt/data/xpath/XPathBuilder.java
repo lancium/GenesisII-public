@@ -4,52 +4,58 @@ import java.util.LinkedList;
 
 import edu.virginia.vcgr.jsdl.sweep.parameters.DocumentNodeSweepParameter;
 
-public class XPathBuilder {
+public class XPathBuilder
+{
 	private XPathAttributeNode _attribute = null;
 	private LinkedList<XPathNode> _nodes = new LinkedList<XPathNode>();
 
-	public void push(XPathNode newNode) {
+	public void push(XPathNode newNode)
+	{
 		clearAttribute();
 		_nodes.addLast(newNode);
 	}
 
-	public void setAttribute(XPathAttributeNode attribute) {
+	public void setAttribute(XPathAttributeNode attribute)
+	{
 		_attribute = attribute;
 	}
 
-	public void clearAttribute() {
+	public void clearAttribute()
+	{
 		setAttribute(null);
 	}
 
-	public XPathNode pop() {
+	public XPathNode pop()
+	{
 		clearAttribute();
 		return _nodes.removeLast();
 	}
 
-	public XPathNode peek() {
+	public XPathNode peek()
+	{
 		return _nodes.getLast();
 	}
 
-	public void resetCount() {
+	public void resetCount()
+	{
 		XPathNode top = peek();
 		if (!(top instanceof XPathIterableNode))
-			throw new IllegalStateException(String.format(
-					"Can't reset a XPathNode %s.", top));
+			throw new IllegalStateException(String.format("Can't reset a XPathNode %s.", top));
 
 		((XPathIterableNode) top).reset();
 	}
 
-	public void iterate() {
+	public void iterate()
+	{
 		XPathNode top = peek();
 		if (!(top instanceof XPathIterableNode))
-			throw new IllegalStateException(String.format(
-					"Can't iterate over XPathNode %s.", top));
+			throw new IllegalStateException(String.format("Can't iterate over XPathNode %s.", top));
 
 		((XPathIterableNode) top).next();
 	}
 
-	public DocumentNodeSweepParameter toSubstringParameter(int offset,
-			int length) {
+	public DocumentNodeSweepParameter toSubstringParameter(int offset, int length)
+	{
 		NamespacePrefixMap prefixMap = new NamespacePrefixMap();
 		StringBuilder builder = new StringBuilder();
 
@@ -59,8 +65,7 @@ public class XPathBuilder {
 		if (_attribute != null)
 			builder.append(String.format("@%s", _attribute.toString(prefixMap)));
 
-		return new DocumentNodeSweepParameter(String.format(
-				"substring(%s, %d, %d)", builder, offset, length),
-				prefixMap.getNamespaceBindings());
+		return new DocumentNodeSweepParameter(String.format("substring(%s, %d, %d)", builder, offset, length),
+			prefixMap.getNamespaceBindings());
 	}
 }

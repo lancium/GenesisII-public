@@ -42,114 +42,98 @@ import edu.virginia.vcgr.genii.security.credentials.NuCredential;
  * not protected information. We keep them in this class too to have a common place for attribute
  * retrievals.
  */
-public class CommonSTSAttributesHandler extends AbstractAttributeHandler {
+public class CommonSTSAttributesHandler extends AbstractAttributeHandler
+{
 
-	public CommonSTSAttributesHandler(AttributePackage pkg)
-			throws NoSuchMethodException {
+	public CommonSTSAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
+	{
 		super(pkg);
 	}
 
 	@Override
-	protected void registerHandlers() throws NoSuchMethodException {
+	protected void registerHandlers() throws NoSuchMethodException
+	{
 
-		addHandler(new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
-				ByteIOConstants.XFER_MECHS_ATTR_NAME), "getTransferMechsAttr");
+		addHandler(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME), "getTransferMechsAttr");
 		addHandler(SecurityConstants.NEW_IDP_NAME_QNAME, "getIDPNameAttr");
-		addHandler(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME,
-				"getDelegatedCredentials");
-		addHandler(SecurityConstants.CERTIFICATE_CHAIN_QNAME,
-				"getResourceCertificate");
-		addHandler(SecurityConstants.STORED_CALLING_CONTEXT_QNAME,
-				"getStoredCallingContext");
+		addHandler(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME, "getDelegatedCredentials");
+		addHandler(SecurityConstants.CERTIFICATE_CHAIN_QNAME, "getResourceCertificate");
+		addHandler(SecurityConstants.STORED_CALLING_CONTEXT_QNAME, "getStoredCallingContext");
 		addHandler(SecurityConstants.IDP_PRIVATE_KEY_QNAME, "getPrivateKey");
-		addHandler(GeniiDirPolicy.REPLICATION_POLICY_QNAME,
-				"getReplicationPolicyAttr", "setReplicationPolicyAttr");
+		addHandler(GeniiDirPolicy.REPLICATION_POLICY_QNAME, "getReplicationPolicyAttr", "setReplicationPolicyAttr");
 	}
 
-	public Collection<MessageElement> getTransferMechsAttr() {
+	public Collection<MessageElement> getTransferMechsAttr()
+	{
 
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
-		ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
-				ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
-		ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
-				ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				ByteIOConstants.TRANSFER_TYPE_DIME_URI));
-		ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
-				ByteIOConstants.XFER_MECHS_ATTR_NAME),
-				ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+		ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
+			ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
+		ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
+			ByteIOConstants.TRANSFER_TYPE_DIME_URI));
+		ret.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME),
+			ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
 		return ret;
 	}
 
-	public MessageElement getIDPNameAttr() throws IOException {
+	public MessageElement getIDPNameAttr() throws IOException
+	{
 		IResource resource = getResourceAfterAccessChecking("IDP Name");
-		String idpName = (String) resource
-				.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME
-						.getLocalPart());
+		String idpName = (String) resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart());
 		return new MessageElement(SecurityConstants.NEW_IDP_NAME_QNAME, idpName);
 	}
 
-	public MessageElement getDelegatedCredentials() throws IOException {
+	public MessageElement getDelegatedCredentials() throws IOException
+	{
 		IResource resource = getResourceAfterAccessChecking("Delegated Credentials");
-		NuCredential credential = (NuCredential) resource
-				.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME
-						.getLocalPart());
-		return new MessageElement(
-				SecurityConstants.IDP_STORED_CREDENTIAL_QNAME,
-				serializeObjectToString(credential));
+		NuCredential credential =
+			(NuCredential) resource.getProperty(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME.getLocalPart());
+		return new MessageElement(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME, serializeObjectToString(credential));
 	}
 
-	public MessageElement getStoredCallingContext() throws IOException {
+	public MessageElement getStoredCallingContext() throws IOException
+	{
 		IResource resource = getResourceAfterAccessChecking("Stored Calling Context");
-		ICallingContext callingContext = (ICallingContext) resource
-				.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
-		return new MessageElement(
-				SecurityConstants.STORED_CALLING_CONTEXT_QNAME,
-				callingContext.getSerialized());
+		ICallingContext callingContext = (ICallingContext) resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+		return new MessageElement(SecurityConstants.STORED_CALLING_CONTEXT_QNAME, callingContext.getSerialized());
 	}
 
-	public MessageElement getResourceCertificate() throws Throwable {
+	public MessageElement getResourceCertificate() throws Throwable
+	{
 		IResource resource = getResourceAfterAccessChecking("Resource Certificate");
-		Certificate[] certificate = (Certificate[]) resource
-				.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-		return new MessageElement(SecurityConstants.CERTIFICATE_CHAIN_QNAME,
-				serializeObjectToString(certificate));
+		Certificate[] certificate = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+		return new MessageElement(SecurityConstants.CERTIFICATE_CHAIN_QNAME, serializeObjectToString(certificate));
 	}
 
-	public MessageElement getPrivateKey() throws IOException {
+	public MessageElement getPrivateKey() throws IOException
+	{
 		IResource resource = getResourceAfterAccessChecking("Private Key");
-		PrivateKey privateKey = (PrivateKey) resource
-				.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
-		return new MessageElement(SecurityConstants.IDP_PRIVATE_KEY_QNAME,
-				serializeObjectToString(privateKey));
+		PrivateKey privateKey = (PrivateKey) resource.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
+		return new MessageElement(SecurityConstants.IDP_PRIVATE_KEY_QNAME, serializeObjectToString(privateKey));
 	}
 
-	public MessageElement getReplicationPolicyAttr()
-			throws ResourceUnknownFaultType, ResourceException {
+	public MessageElement getReplicationPolicyAttr() throws ResourceUnknownFaultType, ResourceException
+	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		IResource resource = (IResource) rKey.dereference();
-		String value = (String) resource
-				.getProperty(GeniiDirPolicy.REPLICATION_POLICY_QNAME
-						.getLocalPart());
+		String value = (String) resource.getProperty(GeniiDirPolicy.REPLICATION_POLICY_QNAME.getLocalPart());
 		if (value == null)
 			return null;
-		return new MessageElement(GeniiDirPolicy.REPLICATION_POLICY_QNAME,
-				value);
+		return new MessageElement(GeniiDirPolicy.REPLICATION_POLICY_QNAME, value);
 	}
 
-	public void setReplicationPolicyAttr(MessageElement element)
-			throws ResourceUnknownFaultType, ResourceException {
+	public void setReplicationPolicyAttr(MessageElement element) throws ResourceUnknownFaultType, ResourceException
+	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		IResource resource = (IResource) rKey.dereference();
 		String value = element.getValue();
 		if (resource.isServiceResource())
 			return;
-		resource.setProperty(
-				GeniiDirPolicy.REPLICATION_POLICY_QNAME.getLocalPart(), value);
+		resource.setProperty(GeniiDirPolicy.REPLICATION_POLICY_QNAME.getLocalPart(), value);
 	}
 
-	public static Object deserializeObjectFromString(String data)
-			throws IOException, ClassNotFoundException {
+	public static Object deserializeObjectFromString(String data) throws IOException, ClassNotFoundException
+	{
 		byte[] objectString = Base64.decodeBase64(data);
 		ByteArrayInputStream biStream = new ByteArrayInputStream(objectString);
 		ObjectInputStream oiStream = new ObjectInputStream(biStream);
@@ -159,13 +143,12 @@ public class CommonSTSAttributesHandler extends AbstractAttributeHandler {
 	}
 
 	/*
-	 * Some of the attributes such as certificate and private key are compound
-	 * objects that cannot be directly transmitted over the wire. So we have a
-	 * custom serializer method that convert the attributes to suitable form
-	 * (base 64 encoded strings).
+	 * Some of the attributes such as certificate and private key are compound objects that cannot
+	 * be directly transmitted over the wire. So we have a custom serializer method that convert the
+	 * attributes to suitable form (base 64 encoded strings).
 	 */
-	private String serializeObjectToString(Serializable object)
-			throws IOException {
+	private String serializeObjectToString(Serializable object) throws IOException
+	{
 		ByteArrayOutputStream boutStream = new ByteArrayOutputStream();
 		ObjectOutputStream ooutStream = new ObjectOutputStream(boutStream);
 		ooutStream.writeObject(object);
@@ -174,13 +157,13 @@ public class CommonSTSAttributesHandler extends AbstractAttributeHandler {
 		return new String(encodedBytes);
 	}
 
-	private IResource getResourceAfterAccessChecking(String attributeName)
-			throws ResourceUnknownFaultType, ResourceException, IOException {
+	private IResource getResourceAfterAccessChecking(String attributeName) throws ResourceUnknownFaultType, ResourceException,
+		IOException
+	{
 		ResourceKey resourceKey = ResourceManager.getCurrentResource();
 		IResource resource = resourceKey.dereference();
 		if (!ServerWSDoAllReceiver.checkAccess(resource, RWXCategory.WRITE)) {
-			String message = "Unauthorized access to the sensitive IDP attribute: "
-					+ attributeName;
+			String message = "Unauthorized access to the sensitive IDP attribute: " + attributeName;
 			throw new SecurityException(message);
 		}
 		return resource;

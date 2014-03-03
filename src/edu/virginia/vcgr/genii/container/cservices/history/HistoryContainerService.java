@@ -25,12 +25,11 @@ import edu.virginia.vcgr.genii.client.history.SequenceNumber;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 
-public class HistoryContainerService extends AbstractContainerService {
-	static private Log _logger = LogFactory
-			.getLog(HistoryContainerService.class);
+public class HistoryContainerService extends AbstractContainerService
+{
+	static private Log _logger = LogFactory.getLog(HistoryContainerService.class);
 
-	static final private long CLEANUP_INTERVAL = 1000L; // 1000L * 60 * 60; // 1
-														// hour.
+	static final private long CLEANUP_INTERVAL = 1000L; // 1000L * 60 * 60; // 1 hour.
 
 	static final public String SERVICE_NAME = "History Service";
 
@@ -38,9 +37,11 @@ public class HistoryContainerService extends AbstractContainerService {
 
 	static final private Object lock = new Object();
 
-	private class CleanupAlarmHandler implements AlarmHandler {
+	private class CleanupAlarmHandler implements AlarmHandler
+	{
 		@Override
-		public void alarmWentOff(AlarmToken token, Object userData) {
+		public void alarmWentOff(AlarmToken token, Object userData)
+		{
 			Connection connection = null;
 
 			try {
@@ -55,34 +56,34 @@ public class HistoryContainerService extends AbstractContainerService {
 				if (resourceId != null) {
 					deleteRecords(connection, resourceId);
 					HistoryDatabase.removeStaleRecord(resourceId, connection);
-					_logger.info(String.format(
-							"Deleting history for resource %s", resourceId));
+					_logger.info(String.format("Deleting history for resource %s", resourceId));
 				}
 
 				connection.commit(); // commits combined to 1 for performance
 
 			} catch (SQLException sqe) {
-				_logger.warn("Error trying to clean up dead history events.",
-						sqe);
+				_logger.warn("Error trying to clean up dead history events.", sqe);
 			} finally {
 				getConnectionPool().release(connection);
 			}
 		}
 	}
 
-	static private class HistoryEventTokenImpl implements HistoryEventToken {
+	static private class HistoryEventTokenImpl implements HistoryEventToken
+	{
 		static final long serialVersionUID = 0L;
 
 		private long _historyRecordID;
 
-		private HistoryEventTokenImpl(long historyRecordID) {
+		private HistoryEventTokenImpl(long historyRecordID)
+		{
 			_historyRecordID = historyRecordID;
 		}
 
 		@Override
-		final public SequenceNumber retrieve() throws SQLException {
-			HistoryContainerService service = ContainerServices
-					.findService(HistoryContainerService.class);
+		final public SequenceNumber retrieve() throws SQLException
+		{
+			HistoryContainerService service = ContainerServices.findService(HistoryContainerService.class);
 			HistoryEvent event = service.getEvent(_historyRecordID);
 			if (event != null)
 				return event.eventNumber();
@@ -91,41 +92,40 @@ public class HistoryContainerService extends AbstractContainerService {
 		}
 	}
 
-	static private class NullHistoryEventToken implements HistoryEventToken {
+	static private class NullHistoryEventToken implements HistoryEventToken
+	{
 		static final long serialVersionUID = 0L;
 
 		@Override
-		final public SequenceNumber retrieve() throws SQLException {
+		final public SequenceNumber retrieve() throws SQLException
+		{
 			return null;
 		}
 	}
 
 	private Map<String, SequenceNumber> _nextSequenceMap = new HashMap<String, SequenceNumber>();
 
-	private HistoryEvent getEvent(long historyRecordID) {
+	private HistoryEvent getEvent(long historyRecordID)
+	{
 		Connection connection = null;
 
 		try {
 			connection = getConnectionPool().acquire(true);
 			return HistoryDatabase.getEvent(connection, historyRecordID);
 		} catch (SQLException sqe) {
-			_logger.warn(
-					String.format(
-							"Error trying to get history event for history record id %d.",
-							historyRecordID), sqe);
+			_logger.warn(String.format("Error trying to get history event for history record id %d.", historyRecordID), sqe);
 			return null;
 		} finally {
 			getConnectionPool().release(connection);
 		}
 	}
 
-	private SequenceNumber nextSequenceNumber(Connection connection,
-			String resourceID) throws SQLException {
+	private SequenceNumber nextSequenceNumber(Connection connection, String resourceID) throws SQLException
+	{
 		synchronized (_nextSequenceMap) {
 			SequenceNumber next = _nextSequenceMap.get(resourceID);
 			if (next == null) {
-				next = HistoryDatabase.getNextLargestLevel1SequenceNumber(
-						connection, resourceID);
+				next = HistoryDatabase.getNextLargestLevel1SequenceNumber(connection, resourceID);
 			}
 
 			SequenceNumber newNext = next.next();
@@ -136,7 +136,8 @@ public class HistoryContainerService extends AbstractContainerService {
 	}
 
 	@Override
-	protected void loadService() throws Throwable {
+	protected void loadService() throws Throwable
+	{
 		_logger.info(String.format("Loading %s.", SERVICE_NAME));
 		Connection connection = null;
 
@@ -149,31 +150,29 @@ public class HistoryContainerService extends AbstractContainerService {
 	}
 
 	@Override
-	protected void startService() throws Throwable {
+	protected void startService() throws Throwable
+	{
 		_logger.info(String.format("Starting %s.", SERVICE_NAME));
 
-		InMemoryAlarmManager.MANAGER.addAlarm(new CleanupAlarmHandler(),
-				CLEANUP_INTERVAL);
+		InMemoryAlarmManager.MANAGER.addAlarm(new CleanupAlarmHandler(), CLEANUP_INTERVAL);
 	}
 
-	public HistoryContainerService() {
+	public HistoryContainerService()
+	{
 		super(SERVICE_NAME);
 	}
 
-	final public HistoryEventToken addRecord(String resourceID,
-			SequenceNumber number, HistoryEventCategory category,
-			HistoryEventLevel level, Map<String, String> properties,
-			HistoryEventSource eventSource, HistoryEventData eventData,
-			Calendar expirationTime) {
-		return addRecord(resourceID, number, null, category, level, properties,
-				eventSource, eventData, expirationTime);
+	final public HistoryEventToken addRecord(String resourceID, SequenceNumber number, HistoryEventCategory category,
+		HistoryEventLevel level, Map<String, String> properties, HistoryEventSource eventSource, HistoryEventData eventData,
+		Calendar expirationTime)
+	{
+		return addRecord(resourceID, number, null, category, level, properties, eventSource, eventData, expirationTime);
 	}
 
-	final public HistoryEventToken addRecord(String resourceID,
-			SequenceNumber number, Calendar createTimestamp,
-			HistoryEventCategory category, HistoryEventLevel level,
-			Map<String, String> properties, HistoryEventSource eventSource,
-			HistoryEventData eventData, Calendar expirationTime) {
+	final public HistoryEventToken addRecord(String resourceID, SequenceNumber number, Calendar createTimestamp,
+		HistoryEventCategory category, HistoryEventLevel level, Map<String, String> properties, HistoryEventSource eventSource,
+		HistoryEventData eventData, Calendar expirationTime)
+	{
 		Connection connection = null;
 
 		try {
@@ -182,17 +181,15 @@ public class HistoryContainerService extends AbstractContainerService {
 			if (number == null)
 				number = nextSequenceNumber(connection, resourceID);
 
-			long ret = HistoryDatabase.addRecord(connection, resourceID,
-					number, createTimestamp, category, level, properties,
+			long ret =
+				HistoryDatabase.addRecord(connection, resourceID, number, createTimestamp, category, level, properties,
 					eventSource, eventData, expirationTime);
 			connection.commit();
 			return new HistoryEventTokenImpl(ret);
 		} catch (SQLException sqe) {
 			if (!sqe.getSQLState().equals("23505"))
-				_logger.warn(String.format(
-						"Error trying to add history event record id.  "
-								+ "SQL error code is %s.", sqe.getSQLState()),
-						sqe);
+				_logger.warn(String.format("Error trying to add history event record id.  " + "SQL error code is %s.",
+					sqe.getSQLState()), sqe);
 
 			return new NullHistoryEventToken();
 		} finally {
@@ -200,7 +197,8 @@ public class HistoryContainerService extends AbstractContainerService {
 		}
 	}
 
-	final public void deleteRecords(String resourceID) {
+	final public void deleteRecords(String resourceID)
+	{
 		Connection connection = null;
 
 		try {
@@ -208,56 +206,49 @@ public class HistoryContainerService extends AbstractContainerService {
 			deleteRecords(connection, resourceID);
 			connection.commit();
 		} catch (SQLException sqe) {
-			_logger.warn(String.format(
-					"Error trying to delete history records for resource %s.",
-					resourceID), sqe);
+			_logger.warn(String.format("Error trying to delete history records for resource %s.", resourceID), sqe);
 		} finally {
 			getConnectionPool().release(connection);
 		}
 	}
 
-	final public void deleteRecords(Connection connection, String resourceID)
-			throws SQLException {
+	final public void deleteRecords(Connection connection, String resourceID) throws SQLException
+	{
 		HistoryDatabase.deleteRecords(connection, resourceID);
 	}
 
-	final public void deleteRecordsLike(Connection connection,
-			String likeConstant) {
+	final public void deleteRecordsLike(Connection connection, String likeConstant)
+	{
 		try {
 			HistoryDatabase.deleteRecordsLike(connection, likeConstant);
 		} catch (SQLException sqe) {
-			_logger.warn(
-					String.format(
-							"Error trying to delete history records for resource like %s.",
-							likeConstant), sqe);
+			_logger.warn(String.format("Error trying to delete history records for resource like %s.", likeConstant), sqe);
 		}
 	}
 
-	public Collection<HistoryEvent> getEvents(String resourceID) {
+	public Collection<HistoryEvent> getEvents(String resourceID)
+	{
 		Connection connection = null;
 
 		try {
 			connection = getConnectionPool().acquire(true);
 			return HistoryDatabase.getEvents(connection, resourceID);
 		} catch (SQLException sqe) {
-			_logger.warn(String.format(
-					"Error trying to get history events for resource %s.",
-					resourceID), sqe);
+			_logger.warn(String.format("Error trying to get history events for resource %s.", resourceID), sqe);
 			return new ArrayList<HistoryEvent>();
 		} finally {
 			getConnectionPool().release(connection);
 		}
 	}
 
-	public CloseableIterator<HistoryEvent> iterateEvents(String resourceID)
-			throws SQLException {
+	public CloseableIterator<HistoryEvent> iterateEvents(String resourceID) throws SQLException
+	{
 		CloseableIterator<HistoryEvent> iter;
 		Connection connection = null;
 
 		try {
 			connection = getConnectionPool().acquire(true);
-			iter = HistoryDatabase.iterateEvents(getConnectionPool(),
-					connection, resourceID);
+			iter = HistoryDatabase.iterateEvents(getConnectionPool(), connection, resourceID);
 			connection = null;
 			return iter;
 		} finally {
@@ -266,7 +257,8 @@ public class HistoryContainerService extends AbstractContainerService {
 		}
 	}
 
-	public void enqueue(String resourceID, Connection conn) throws SQLException {
+	public void enqueue(String resourceID, Connection conn) throws SQLException
+	{
 		HistoryDatabase.addStaleRecord(resourceID, conn);
 		conn.commit();
 
@@ -276,7 +268,8 @@ public class HistoryContainerService extends AbstractContainerService {
 		}
 	}
 
-	public void loadQueue(Connection connection) throws SQLException {
+	public void loadQueue(Connection connection) throws SQLException
+	{
 
 		synchronized (lock) {
 			HistoryDatabase.loadStaleHistory(connection, queue);

@@ -13,13 +13,14 @@ import javax.xml.stream.events.XMLEvent;
 
 import edu.virginia.vcgr.genii.ui.UIContext;
 
-class XMLTreeNodeDocumentRoot extends DefaultMutableTreeNode implements
-		XMLTreeNode {
+class XMLTreeNodeDocumentRoot extends DefaultMutableTreeNode implements XMLTreeNode
+{
 	static final long serialVersionUID = 0L;
 
 	private UIContext _context;
 
-	XMLTreeNodeDocumentRoot(UIContext context, String name, XMLTreeSource source) {
+	XMLTreeNodeDocumentRoot(UIContext context, String name, XMLTreeSource source)
+	{
 		super(name);
 
 		setAllowsChildren(true);
@@ -29,39 +30,45 @@ class XMLTreeNodeDocumentRoot extends DefaultMutableTreeNode implements
 		context.executor().submit(new XMLReaderAcquirer(source));
 	}
 
-	private class XMLReaderAcquirer implements Runnable {
+	private class XMLReaderAcquirer implements Runnable
+	{
 		private XMLTreeSource _source;
 
-		private XMLReaderAcquirer(XMLTreeSource source) {
+		private XMLReaderAcquirer(XMLTreeSource source)
+		{
 			_source = source;
 		}
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			try {
 				new XMLReaderAcquirerReporter(_source.getReader()).run();
 			} catch (Throwable cause) {
-				new XMLReaderAcquirerReporter(String.format(
-						"Unable to load XML document:  %s",
-						cause.getLocalizedMessage())).run();
+				new XMLReaderAcquirerReporter(String.format("Unable to load XML document:  %s", cause.getLocalizedMessage()))
+					.run();
 			}
 		}
 	}
 
-	private class XMLReaderAcquirerReporter implements Runnable {
+	private class XMLReaderAcquirerReporter implements Runnable
+	{
 		private String _errorMessage = null;
 		private XMLEventReader _reader = null;
 
-		private XMLReaderAcquirerReporter(String error) {
+		private XMLReaderAcquirerReporter(String error)
+		{
 			_errorMessage = error;
 		}
 
-		private XMLReaderAcquirerReporter(XMLEventReader reader) {
+		private XMLReaderAcquirerReporter(XMLEventReader reader)
+		{
 			_reader = reader;
 		}
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			if (!SwingUtilities.isEventDispatchThread()) {
 				SwingUtilities.invokeLater(this);
 				return;
@@ -77,15 +84,18 @@ class XMLTreeNodeDocumentRoot extends DefaultMutableTreeNode implements
 		}
 	}
 
-	private class XMLProcessor implements Runnable {
+	private class XMLProcessor implements Runnable
+	{
 		private XMLEventReader _reader;
 
-		private XMLProcessor(XMLEventReader reader) {
+		private XMLProcessor(XMLEventReader reader)
+		{
 			_reader = reader;
 		}
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			LinkedList<DefaultMutableTreeNode> nodeStack = new LinkedList<DefaultMutableTreeNode>();
 			DefaultMutableTreeNode root = null;
 
@@ -95,54 +105,48 @@ class XMLTreeNodeDocumentRoot extends DefaultMutableTreeNode implements
 				while (_reader.hasNext()) {
 					event = _reader.nextEvent();
 					switch (event.getEventType()) {
-					case XMLEvent.START_ELEMENT:
-						XMLElementTreeNode newNode = new XMLElementTreeNode(
-								event.asStartElement());
-						if (!nodeStack.isEmpty())
-							nodeStack.peek().add(newNode);
-						else
-							root = newNode;
+						case XMLEvent.START_ELEMENT:
+							XMLElementTreeNode newNode = new XMLElementTreeNode(event.asStartElement());
+							if (!nodeStack.isEmpty())
+								nodeStack.peek().add(newNode);
+							else
+								root = newNode;
 
-						nodeStack.push(newNode);
-						break;
+							nodeStack.push(newNode);
+							break;
 
-					case XMLEvent.CHARACTERS:
-						if (nodeStack.isEmpty()) {
-							new XMLProcessorResult(new XMLErrorTreeNode(
-									"Badly formed XML document")).run();
-							return;
-						}
+						case XMLEvent.CHARACTERS:
+							if (nodeStack.isEmpty()) {
+								new XMLProcessorResult(new XMLErrorTreeNode("Badly formed XML document")).run();
+								return;
+							}
 
-						String data = event.asCharacters().getData().trim();
-						if (data.length() > 0) {
-							XMLTextContentTreeNode newTNode = new XMLTextContentTreeNode(
-									event.asCharacters().getData());
-							nodeStack.peek().add(newTNode);
-						}
-						break;
+							String data = event.asCharacters().getData().trim();
+							if (data.length() > 0) {
+								XMLTextContentTreeNode newTNode = new XMLTextContentTreeNode(event.asCharacters().getData());
+								nodeStack.peek().add(newTNode);
+							}
+							break;
 
-					case XMLEvent.END_ELEMENT:
-						if (nodeStack.isEmpty()) {
-							new XMLProcessorResult(new XMLErrorTreeNode(
-									"Badly formed XML document")).run();
-							return;
-						}
+						case XMLEvent.END_ELEMENT:
+							if (nodeStack.isEmpty()) {
+								new XMLProcessorResult(new XMLErrorTreeNode("Badly formed XML document")).run();
+								return;
+							}
 
-						nodeStack.pop();
-						break;
+							nodeStack.pop();
+							break;
 					}
 				}
 
 				if (root == null)
-					new XMLProcessorResult(new XMLErrorTreeNode(
-							"Badly formed XML document")).run();
+					new XMLProcessorResult(new XMLErrorTreeNode("Badly formed XML document")).run();
 				else {
 					new XMLProcessorResult(root.children()).run();
 				}
 			} catch (Throwable cause) {
-				new XMLProcessorResult(new XMLErrorTreeNode(String.format(
-						"Unable to parse XML document:  %s",
-						cause.getLocalizedMessage()))).run();
+				new XMLProcessorResult(new XMLErrorTreeNode(String.format("Unable to parse XML document:  %s",
+					cause.getLocalizedMessage()))).run();
 			} finally {
 				if (_reader != null)
 					try {
@@ -153,26 +157,29 @@ class XMLTreeNodeDocumentRoot extends DefaultMutableTreeNode implements
 		}
 	}
 
-	private class XMLProcessorResult implements Runnable {
+	private class XMLProcessorResult implements Runnable
+	{
 		private Collection<DefaultMutableTreeNode> _nodes;
 
-		private XMLProcessorResult(DefaultMutableTreeNode node) {
+		private XMLProcessorResult(DefaultMutableTreeNode node)
+		{
 			_nodes = new Vector<DefaultMutableTreeNode>();
 			_nodes.add(node);
 		}
 
-		private XMLProcessorResult(Enumeration<?> children) {
+		private XMLProcessorResult(Enumeration<?> children)
+		{
 			_nodes = new ArrayList<DefaultMutableTreeNode>();
 
 			while (children.hasMoreElements()) {
-				DefaultMutableTreeNode next = (DefaultMutableTreeNode) children
-						.nextElement();
+				DefaultMutableTreeNode next = (DefaultMutableTreeNode) children.nextElement();
 				_nodes.add(next);
 			}
 		}
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			if (!SwingUtilities.isEventDispatchThread()) {
 				SwingUtilities.invokeLater(this);
 				return;
@@ -185,7 +192,8 @@ class XMLTreeNodeDocumentRoot extends DefaultMutableTreeNode implements
 	}
 
 	@Override
-	public String asString(String tabs) {
+	public String asString(String tabs)
+	{
 		StringBuilder builder = new StringBuilder();
 
 		for (int lcv = 0; lcv < getChildCount(); lcv++) {

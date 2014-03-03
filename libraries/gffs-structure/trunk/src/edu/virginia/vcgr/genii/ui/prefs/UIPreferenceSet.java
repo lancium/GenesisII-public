@@ -4,7 +4,8 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JPanel;
 
-public interface UIPreferenceSet {
+public interface UIPreferenceSet
+{
 	public String preferenceSetName();
 
 	public void load(Preferences uiPreferencesRoot);

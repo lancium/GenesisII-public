@@ -7,8 +7,10 @@ import javax.swing.JPanel;
 
 import edu.virginia.vcgr.genii.ui.plugins.logs.tree.LogPath;
 
-public abstract class LogManagerPanel extends JPanel {
-	public LogManagerPanel(GridBagLayout layout) {
+public abstract class LogManagerPanel extends JPanel
+{
+	public LogManagerPanel(GridBagLayout layout)
+	{
 		super(layout);
 	}
 

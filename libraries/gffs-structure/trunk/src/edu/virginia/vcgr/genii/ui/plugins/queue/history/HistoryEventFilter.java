@@ -8,13 +8,15 @@ import java.util.Set;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.history.HistoryEventLevel;
 
-class HistoryEventFilter {
+class HistoryEventFilter
+{
 	private Collection<HistoryEventFilterListener> _listeners = new LinkedList<HistoryEventFilterListener>();
 
 	private HistoryEventLevel _levelFilter;
 	private Set<HistoryEventCategory> _categoryFilter;
 
-	protected void fireFilterChanged() {
+	protected void fireFilterChanged()
+	{
 		Collection<HistoryEventFilterListener> listeners;
 
 		synchronized (_listeners) {
@@ -25,39 +27,45 @@ class HistoryEventFilter {
 			listener.filterChanged(this);
 	}
 
-	HistoryEventFilter(HistoryEventLevel defaultLevelFilter,
-			Set<HistoryEventCategory> defaultCategoryFilter) {
+	HistoryEventFilter(HistoryEventLevel defaultLevelFilter, Set<HistoryEventCategory> defaultCategoryFilter)
+	{
 		_levelFilter = defaultLevelFilter;
 		_categoryFilter = defaultCategoryFilter;
 	}
 
-	final void addFilterListener(HistoryEventFilterListener listener) {
+	final void addFilterListener(HistoryEventFilterListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	final void removeFilterListener(HistoryEventFilterListener listener) {
+	final void removeFilterListener(HistoryEventFilterListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	final void levelFilter(HistoryEventLevel newLevelFilter) {
+	final void levelFilter(HistoryEventLevel newLevelFilter)
+	{
 		_levelFilter = newLevelFilter;
 		fireFilterChanged();
 	}
 
-	final HistoryEventLevel levelFilter() {
+	final HistoryEventLevel levelFilter()
+	{
 		return _levelFilter;
 	}
 
-	final void categoryFilter(Set<HistoryEventCategory> newCategoryFilter) {
+	final void categoryFilter(Set<HistoryEventCategory> newCategoryFilter)
+	{
 		_categoryFilter = newCategoryFilter;
 		fireFilterChanged();
 	}
 
-	final Set<HistoryEventCategory> categoryFilter() {
+	final Set<HistoryEventCategory> categoryFilter()
+	{
 		return _categoryFilter;
 	}
 }

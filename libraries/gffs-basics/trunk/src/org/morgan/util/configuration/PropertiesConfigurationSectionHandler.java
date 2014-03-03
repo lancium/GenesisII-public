@@ -23,22 +23,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Parses a configuration section of the form: &lt;mconf:properties&gt;
- * &lt;mconf:property name="some-name" value="some-value"/&gt;*
- * &lt;/mconf:properties&gt;
+ * Parses a configuration section of the form: &lt;mconf:properties&gt; &lt;mconf:property
+ * name="some-name" value="some-value"/&gt;* &lt;/mconf:properties&gt;
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class PropertiesConfigurationSectionHandler implements
-		IXMLConfigurationSectionHandler {
+public class PropertiesConfigurationSectionHandler implements IXMLConfigurationSectionHandler
+{
 	static final public String PROPERTY_NAME = "property";
 	static final public String PROPERTY_NAME_NAME = "name";
 	static final public String PROPERTY_NAME_VALUE = "value";
 
-	static public QName PROPERTY_ELEMENT_QNAME = new QName(
-			XMLConfiguration.NAMESPACE, PROPERTY_NAME);
+	static public QName PROPERTY_ELEMENT_QNAME = new QName(XMLConfiguration.NAMESPACE, PROPERTY_NAME);
 
-	public Object parse(Node n) throws ConfigurationException {
+	public Object parse(Node n) throws ConfigurationException
+	{
 		Properties props = new Properties();
 
 		NodeList children = n.getChildNodes();
@@ -49,23 +48,18 @@ public class PropertiesConfigurationSectionHandler implements
 			if (child.getNodeType() == Node.ELEMENT_NODE) {
 				QName childQName = XMLConfiguration.getQName(child);
 				if (!childQName.equals(PROPERTY_ELEMENT_QNAME))
-					throw new ConfigurationException(
-							"Found element with unexpected QName of \""
-									+ childQName + "\".");
+					throw new ConfigurationException("Found element with unexpected QName of \"" + childQName + "\".");
 
 				NamedNodeMap attrs = child.getAttributes();
 				Node nameNode = attrs.getNamedItem(PROPERTY_NAME_NAME);
 				if (nameNode == null)
-					throw new ConfigurationException(
-							"Couldn't find name attribute.");
+					throw new ConfigurationException("Couldn't find name attribute.");
 				Node valueNode = attrs.getNamedItem(PROPERTY_NAME_VALUE);
 				if (valueNode == null)
-					throw new ConfigurationException(
-							"Couldn't find value attribute.");
+					throw new ConfigurationException("Couldn't find value attribute.");
 
-				props.setProperty(nameNode.getTextContent(), MacroUtils
-						.replaceMacros(System.getProperties(),
-								valueNode.getTextContent()));
+				props.setProperty(nameNode.getTextContent(),
+					MacroUtils.replaceMacros(System.getProperties(), valueNode.getTextContent()));
 			}
 		}
 

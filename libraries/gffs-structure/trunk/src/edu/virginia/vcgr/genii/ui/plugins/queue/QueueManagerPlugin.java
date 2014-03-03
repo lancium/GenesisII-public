@@ -20,10 +20,11 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 import edu.virginia.vcgr.genii.ui.plugins.queue.jobs.QueueManagerPanel;
 import edu.virginia.vcgr.genii.ui.plugins.queue.resources.ResourcesPanel;
 
-public class QueueManagerPlugin extends AbstractCombinedUIMenusPlugin {
+public class QueueManagerPlugin extends AbstractCombinedUIMenusPlugin
+{
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType)
-			throws UIPluginException {
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
+	{
 		try {
 			JFrame frame = new JFrame("Queue Manager");
 
@@ -32,15 +33,13 @@ public class QueueManagerPlugin extends AbstractCombinedUIMenusPlugin {
 
 			JTabbedPane tabbed = new JTabbedPane();
 			tabbed.addTab("Job Manager", new LazilyLoadedTab(qPanel, qPanel));
-			tabbed.addTab("Resource Manager", new LazilyLoadedTab(rPanel,
-					rPanel));
+			tabbed.addTab("Resource Manager", new LazilyLoadedTab(rPanel, rPanel));
 
 			Container container = frame.getContentPane();
 			container.setLayout(new GridBagLayout());
 
-			container.add(tabbed, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(5, 5, 5, 5), 5, 5));
+			container.add(tabbed, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.pack();
@@ -53,18 +52,16 @@ public class QueueManagerPlugin extends AbstractCombinedUIMenusPlugin {
 			else if (cause instanceof RuntimeException)
 				throw (RuntimeException) cause;
 			else
-				throw new UIPluginException("Unable to create QueueManager.",
-						cause);
+				throw new UIPluginException("Unable to create QueueManager.", cause);
 		}
 	}
 
 	@Override
-	final public boolean isEnabled(
-			Collection<EndpointDescription> selectedDescriptions) {
+	final public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
+	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
 
-		return selectedDescriptions.iterator().next().typeInformation()
-				.isQueue();
+		return selectedDescriptions.iterator().next().typeInformation().isQueue();
 	}
 }

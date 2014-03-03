@@ -12,26 +12,29 @@ import org.morgan.ftp.ICommand;
 import org.morgan.ftp.InternalException;
 import org.morgan.util.io.StreamUtils;
 
-public class PASVCommandHandler extends AbstractCommandHandler implements
-		Closeable {
+public class PASVCommandHandler extends AbstractCommandHandler implements Closeable
+{
 	static private Logger _logger = Logger.getLogger(PASVCommandHandler.class);
 
 	private DataChannelKey _dataChannel = null;
 
-	public PASVCommandHandler(ICommand command) {
+	public PASVCommandHandler(ICommand command)
+	{
 		super(command);
 	}
 
-	protected void finalize() throws Throwable {
+	protected void finalize() throws Throwable
+	{
 		close();
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb,
-			String parameters, PrintStream out) throws FTPException {
+	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
+		throws FTPException
+	{
 		try {
-			_dataChannel = DataChannelManager.acquireDataChannel(sessionState
-					.getConfiguration().getDataConnectionTimeoutSeconds());
+			_dataChannel =
+				DataChannelManager.acquireDataChannel(sessionState.getConfiguration().getDataConnectionTimeoutSeconds());
 
 			out.println("227 " + _dataChannel.getServerSocketDescription());
 		} catch (IOException ioe) {
@@ -40,11 +43,13 @@ public class PASVCommandHandler extends AbstractCommandHandler implements
 		}
 	}
 
-	synchronized public DataChannelKey getDataChannel() {
+	synchronized public DataChannelKey getDataChannel()
+	{
 		return _dataChannel;
 	}
 
-	synchronized public void close() {
+	synchronized public void close()
+	{
 		StreamUtils.close(_dataChannel);
 		_dataChannel = null;
 	}

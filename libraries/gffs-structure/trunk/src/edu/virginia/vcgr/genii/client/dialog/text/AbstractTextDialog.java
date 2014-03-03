@@ -3,13 +3,15 @@ package edu.virginia.vcgr.genii.client.dialog.text;
 import edu.virginia.vcgr.genii.client.dialog.Dialog;
 import edu.virginia.vcgr.genii.client.dialog.TextContent;
 
-abstract class AbstractTextDialog implements Dialog {
+abstract class AbstractTextDialog implements Dialog
+{
 	private TextContent _help;
 	private String _title;
 
 	protected ConsolePackage _package;
 
-	protected AbstractTextDialog(String title, ConsolePackage pkg) {
+	protected AbstractTextDialog(String title, ConsolePackage pkg)
+	{
 		_help = null;
 		_title = title;
 		_package = pkg;
@@ -36,12 +38,14 @@ abstract class AbstractTextDialog implements Dialog {
 	}
 
 	@Override
-	public TextContent getHelp() {
+	public TextContent getHelp()
+	{
 		return _help;
 	}
 
 	@Override
-	public void setHelp(TextContent helpContent) {
+	public void setHelp(TextContent helpContent)
+	{
 		_help = helpContent;
 	}
 }

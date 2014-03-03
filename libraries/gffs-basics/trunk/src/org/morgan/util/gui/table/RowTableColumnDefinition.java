@@ -2,7 +2,8 @@ package org.morgan.util.gui.table;
 
 import javax.swing.table.TableColumn;
 
-public interface RowTableColumnDefinition<RowType, ColumnType> {
+public interface RowTableColumnDefinition<RowType, ColumnType>
+{
 	public Class<ColumnType> columnType();
 
 	public ColumnType extract(RowType row);

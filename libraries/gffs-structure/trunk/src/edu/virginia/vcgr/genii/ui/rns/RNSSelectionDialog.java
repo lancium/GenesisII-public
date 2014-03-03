@@ -21,7 +21,8 @@ import org.morgan.utils.gui.ButtonPanel;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.ui.UIContext;
 
-final public class RNSSelectionDialog extends JDialog {
+final public class RNSSelectionDialog extends JDialog
+{
 	static final long serialVersionUID = 0L;
 
 	private OKAction _ok = new OKAction();
@@ -29,7 +30,8 @@ final public class RNSSelectionDialog extends JDialog {
 	private RNSSelectionFilter _filter;
 	private RNSFilledInTreeObject _selectedObject = null;
 
-	private RNSFilledInTreeObject getSelectedObject() {
+	private RNSFilledInTreeObject getSelectedObject()
+	{
 		TreePath selectedPath = _tree.getSelectionPath();
 		if (selectedPath != null) {
 			Object value = selectedPath.getLastPathComponent();
@@ -39,9 +41,8 @@ final public class RNSSelectionDialog extends JDialog {
 				if (value != null && value instanceof RNSFilledInTreeObject) {
 					RNSFilledInTreeObject fObj = (RNSFilledInTreeObject) value;
 					if (_filter != null) {
-						if (_filter.accept(fObj.path(), fObj.endpoint(),
-								fObj.typeInformation(), fObj.endpointType(),
-								fObj.isLocal()))
+						if (_filter.accept(fObj.path(), fObj.endpoint(), fObj.typeInformation(), fObj.endpointType(),
+							fObj.isLocal()))
 							return fObj;
 					} else
 						return fObj;
@@ -53,8 +54,8 @@ final public class RNSSelectionDialog extends JDialog {
 		return null;
 	}
 
-	public RNSSelectionDialog(Window owner, UIContext uiContext,
-			RNSSelectionFilter filter) throws RNSPathDoesNotExistException {
+	public RNSSelectionDialog(Window owner, UIContext uiContext, RNSSelectionFilter filter) throws RNSPathDoesNotExistException
+	{
 		super(owner);
 		setTitle("Grid Resource Selection");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -66,19 +67,14 @@ final public class RNSSelectionDialog extends JDialog {
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		_tree.getSelectionModel().setSelectionMode(
-				TreeSelectionModel.SINGLE_TREE_SELECTION);
-		_tree.getSelectionModel().addTreeSelectionListener(
-				new SelectionListenerImpl());
+		_tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		_tree.getSelectionModel().addTreeSelectionListener(new SelectionListenerImpl());
 
-		content.add(new JScrollPane(_tree), new GridBagConstraints(0, 0, 1, 1,
-				1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JScrollPane(_tree), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(ButtonPanel.createHorizontalButtonPanel(_ok,
-				new CancelAction()), new GridBagConstraints(0, 1, 1, 1, 1.0,
-				0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalButtonPanel(_ok, new CancelAction()), new GridBagConstraints(0, 1, 1, 1, 1.0,
+			0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
 		Dimension d = new Dimension(500, 500);
 		setMinimumSize(d);
@@ -86,13 +82,16 @@ final public class RNSSelectionDialog extends JDialog {
 		setSize(d);
 	}
 
-	final public RNSFilledInTreeObject selectedRNSPath() {
+	final public RNSFilledInTreeObject selectedRNSPath()
+	{
 		return _selectedObject;
 	}
 
-	private class SelectionListenerImpl implements TreeSelectionListener {
+	private class SelectionListenerImpl implements TreeSelectionListener
+	{
 		@Override
-		public void valueChanged(TreeSelectionEvent e) {
+		public void valueChanged(TreeSelectionEvent e)
+		{
 			RNSFilledInTreeObject selectedObject = getSelectedObject();
 			if (selectedObject == null) {
 				if (_tree.getSelectionCount() > 0)
@@ -103,31 +102,37 @@ final public class RNSSelectionDialog extends JDialog {
 		}
 	}
 
-	private class OKAction extends AbstractAction {
+	private class OKAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private OKAction() {
+		private OKAction()
+		{
 			super("Select");
 
 			setEnabled(false);
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			_selectedObject = getSelectedObject();
 			dispose();
 		}
 	}
 
-	private class CancelAction extends AbstractAction {
+	private class CancelAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private CancelAction() {
+		private CancelAction()
+		{
 			super("Cancel");
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			_selectedObject = null;
 			dispose();
 		}

@@ -21,25 +21,25 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLock;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
-public class BESState {
+public class BESState
+{
 	static final private String FILENAME = "bes-containers.txt";
 
 	static private Log _logger = LogFactory.getLog(BESState.class);
 
-	static private FileLock acquireLock(File installationFile)
-			throws FileLockException {
+	static private FileLock acquireLock(File installationFile) throws FileLockException
+	{
 		try {
-			return new FileLock(installationFile, 5,
-					GenesisIIConstants.DEFAULT_FILE_LOCK);
+			return new FileLock(installationFile, 5, GenesisIIConstants.DEFAULT_FILE_LOCK);
 		} catch (InterruptedException ie) {
 			throw new FileLockException("Unable to acquire file lock.", ie);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	static private Map<String, WSName> readState() {
-		File installationFile = new File(ConfigurationManager
-				.getCurrentConfiguration().getUserDirectory(), FILENAME);
+	static private Map<String, WSName> readState()
+	{
+		File installationFile = new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(), FILENAME);
 		FileLock lock = null;
 		FileInputStream fin = null;
 
@@ -50,11 +50,9 @@ public class BESState {
 			return (Map<String, WSName>) ois.readObject();
 		} catch (FileNotFoundException fnfe) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("No BES state to read....creating an empty one.",
-						fnfe);
+				_logger.debug("No BES state to read....creating an empty one.", fnfe);
 		} catch (Throwable cause) {
-			_logger.warn("Unable to read BES state....creating an empty one.",
-					cause);
+			_logger.warn("Unable to read BES state....creating an empty one.", cause);
 		} finally {
 			StreamUtils.close(fin);
 			StreamUtils.close(lock);
@@ -63,9 +61,9 @@ public class BESState {
 		return new HashMap<String, WSName>();
 	}
 
-	static private void writeState(Map<String, WSName> state) {
-		File installationFile = new File(ConfigurationManager
-				.getCurrentConfiguration().getUserDirectory(), FILENAME);
+	static private void writeState(Map<String, WSName> state)
+	{
+		File installationFile = new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(), FILENAME);
 		FileLock lock = null;
 		FileOutputStream fos = null;
 
@@ -83,18 +81,20 @@ public class BESState {
 		}
 	}
 
-	static public Map<String, WSName> knownBESContainers() {
+	static public Map<String, WSName> knownBESContainers()
+	{
 		return Collections.unmodifiableMap(readState());
 	}
 
-	static public void addKnownBESContainer(String path,
-			EndpointReferenceType container) {
+	static public void addKnownBESContainer(String path, EndpointReferenceType container)
+	{
 		Map<String, WSName> state = readState();
 		state.put(path, new WSName(container));
 		writeState(state);
 	}
 
-	static public void removeKnownBESContainer(String path) {
+	static public void removeKnownBESContainer(String path)
+	{
 		Map<String, WSName> state = readState();
 		state.remove(path);
 		writeState(state);

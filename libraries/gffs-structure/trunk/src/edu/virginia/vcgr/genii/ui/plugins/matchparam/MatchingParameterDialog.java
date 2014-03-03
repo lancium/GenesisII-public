@@ -31,7 +31,8 @@ import edu.virginia.vcgr.genii.ui.utils.ShapeIcons;
 import edu.virginia.vcgr.genii.ui.utils.SimpleIconButton;
 
 @SuppressWarnings("rawtypes")
-class MatchingParameterDialog extends JDialog {
+class MatchingParameterDialog extends JDialog
+{
 	static final long serialVersionUID = 0L;
 
 	private MatchingParameterModel _model;
@@ -39,10 +40,9 @@ class MatchingParameterDialog extends JDialog {
 	private boolean _committed = false;
 
 	@SuppressWarnings("unchecked")
-	MatchingParameterDialog(Component ownerComponent,
-			Collection<Pair<String, String>> parameters) {
-		super(SwingUtilities.getWindowAncestor(ownerComponent),
-				"Matching Parameters");
+	MatchingParameterDialog(Component ownerComponent, Collection<Pair<String, String>> parameters)
+	{
+		super(SwingUtilities.getWindowAncestor(ownerComponent), "Matching Parameters");
 
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
@@ -58,45 +58,41 @@ class MatchingParameterDialog extends JDialog {
 		comboBox.addItem(MatchingParamEnum.supports);
 		typeColumn.setCellEditor(new DefaultCellEditor(comboBox));
 
-		content.add(new JScrollPane(_table), new GridBagConstraints(0, 0, 1, 1,
-				1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(5, 5, 0, 5), 5, 5));
+		content.add(new JScrollPane(_table), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.BOTH, new Insets(5, 5, 0, 5), 5, 5));
 
 		MinusAction minusAction = new MinusAction();
-		JButton plusButton = new SimpleIconButton(ShapeIcons.Plus,
-				new PlusAction());
-		JButton minusButton = new SimpleIconButton(ShapeIcons.Minus,
-				minusAction);
+		JButton plusButton = new SimpleIconButton(ShapeIcons.Plus, new PlusAction());
+		JButton minusButton = new SimpleIconButton(ShapeIcons.Minus, minusAction);
 
 		_table.getSelectionModel().addListSelectionListener(minusAction);
 
-		content.add(ButtonPanel.createHorizontalButtonPanel(plusButton,
-				minusButton), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,
-						5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalButtonPanel(plusButton, minusButton), new GridBagConstraints(0, 1, 1, 1, 1.0,
+			0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 5, 5), 5, 5));
 
-		content.add(ButtonPanel.createHorizontalButtonPanel(new CommitAction(),
-				new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0,
-				0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalButtonPanel(new CommitAction(), new CancelAction()), new GridBagConstraints(0,
+			2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 
-	private class PlusAction extends AbstractAction {
+	private class PlusAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private PlusAction() {
+		private PlusAction()
+		{
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			String name = JOptionPane.showInputDialog(_table,
-					"What would you like to call the new matching parameter?",
+		public void actionPerformed(ActionEvent e)
+		{
+			String name =
+				JOptionPane.showInputDialog(_table, "What would you like to call the new matching parameter?",
 					"New Matching Parameter", JOptionPane.QUESTION_MESSAGE);
 			if (name != null && name.length() > 0) {
-				String value = JOptionPane.showInputDialog(_table,
-						String.format("What value should \"%s\" have?", name),
+				String value =
+					JOptionPane.showInputDialog(_table, String.format("What value should \"%s\" have?", name),
 						"New Matching Parameter", JOptionPane.QUESTION_MESSAGE);
 				if (value != null && value.length() > 0) {
 					_model.addParameter(name, value);
@@ -105,16 +101,18 @@ class MatchingParameterDialog extends JDialog {
 		}
 	}
 
-	private class MinusAction extends AbstractAction implements
-			ListSelectionListener {
+	private class MinusAction extends AbstractAction implements ListSelectionListener
+	{
 		static final long serialVersionUID = 0L;
 
-		private MinusAction() {
+		private MinusAction()
+		{
 			setEnabled(false);
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)
+		{
 			int[] rows = _table.getSelectedRows();
 			if (rows != null && rows.length > 0) {
 				for (int lcv = rows.length - 1; lcv >= 0; lcv--)
@@ -123,43 +121,49 @@ class MatchingParameterDialog extends JDialog {
 		}
 
 		@Override
-		public void valueChanged(ListSelectionEvent e) {
+		public void valueChanged(ListSelectionEvent e)
+		{
 			setEnabled(_table.getSelectedRowCount() > 0);
 		}
 	}
 
-	private class CommitAction extends AbstractAction {
+	private class CommitAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private CommitAction() {
+		private CommitAction()
+		{
 			super("Commit");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)
+		{
 			_committed = true;
 			dispose();
 		}
 	}
 
-	private class CancelAction extends AbstractAction {
+	private class CancelAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private CancelAction() {
+		private CancelAction()
+		{
 			super("Cancel");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)
+		{
 			dispose();
 		}
 	}
 
 	static Collection<Pair<Pair<String, String>, MatchingParameterOperation>> handleMatchingParameters(
-			Component ownerComponent,
-			Collection<Pair<String, String>> parameters) {
-		MatchingParameterDialog dialog = new MatchingParameterDialog(
-				ownerComponent, parameters);
+		Component ownerComponent, Collection<Pair<String, String>> parameters)
+	{
+		MatchingParameterDialog dialog = new MatchingParameterDialog(ownerComponent, parameters);
 		dialog.setModalityType(ModalityType.DOCUMENT_MODAL);
 
 		dialog.pack();

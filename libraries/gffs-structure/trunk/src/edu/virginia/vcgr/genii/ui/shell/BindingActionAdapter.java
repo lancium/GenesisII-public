@@ -1,78 +1,94 @@
 package edu.virginia.vcgr.genii.ui.shell;
 
-public class BindingActionAdapter implements BindingActionListener {
+public class BindingActionAdapter implements BindingActionListener
+{
 	@Override
-	public void addCharacter(char c) {
+	public void addCharacter(char c)
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void backspace() {
+	public void backspace()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void backwardHistory() {
+	public void backwardHistory()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void beep() {
+	public void beep()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void clear() {
+	public void clear()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void complete() {
+	public void complete()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void delete() {
+	public void delete()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void end() {
+	public void end()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void enter() {
+	public void enter()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void forwardHistory() {
+	public void forwardHistory()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void home() {
+	public void home()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void left() {
+	public void left()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void right() {
+	public void right()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void search() {
+	public void search()
+	{
 		// Do nothing
 	}
 
 	@Override
-	public void stopSearch() {
+	public void stopSearch()
+	{
 		// Do nothing
 	}
 }

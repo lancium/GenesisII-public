@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import edu.virginia.vcgr.genii.client.history.SequenceNumber;
 
-public interface HistoryEventToken extends Serializable {
+public interface HistoryEventToken extends Serializable
+{
 	public SequenceNumber retrieve() throws SQLException;
 }

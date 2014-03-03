@@ -16,17 +16,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 @SuppressWarnings("rawtypes")
-class TrashTransferHandler extends TransferHandler {
+class TrashTransferHandler extends TransferHandler
+{
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(TrashTransferHandler.class);
 
-	TrashTransferHandler() {
+	TrashTransferHandler()
+	{
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	protected Transferable createTransferable(JComponent c) {
+	protected Transferable createTransferable(JComponent c)
+	{
 		if (c instanceof JList) {
 			Object[] values = ((JList) c).getSelectedValues();
 			if (values == null)
@@ -44,38 +47,37 @@ class TrashTransferHandler extends TransferHandler {
 	}
 
 	@Override
-	protected void exportDone(JComponent source, Transferable data, int action) {
+	protected void exportDone(JComponent source, Transferable data, int action)
+	{
 		if (action == MOVE) {
 			try {
-				DefaultListModel model = (DefaultListModel) ((JList) source)
-						.getModel();
-				TrashCanEntryWrapper[] wrappers = (TrashCanEntryWrapper[]) data
-						.getTransferData(TrashTransferable.TRASH_TRANSFER_FLAVOR);
+				DefaultListModel model = (DefaultListModel) ((JList) source).getModel();
+				TrashCanEntryWrapper[] wrappers =
+					(TrashCanEntryWrapper[]) data.getTransferData(TrashTransferable.TRASH_TRANSFER_FLAVOR);
 				for (TrashCanEntryWrapper wrapper : wrappers)
 					model.removeElement(wrapper);
 			} catch (IOException ioe) {
-				throw new ConfigurationException(
-						"Unable to finish drag-and-drop.", ioe);
+				throw new ConfigurationException("Unable to finish drag-and-drop.", ioe);
 			} catch (UnsupportedFlavorException e) {
-				throw new ConfigurationException(
-						"Unable to finish drag-and-drop.", e);
+				throw new ConfigurationException("Unable to finish drag-and-drop.", e);
 			}
 		}
 	}
 
 	@Override
-	public int getSourceActions(JComponent c) {
+	public int getSourceActions(JComponent c)
+	{
 		return MOVE;
 	}
 
 	@Override
-	public boolean canImport(TransferSupport support) {
+	public boolean canImport(TransferSupport support)
+	{
 		if (!support.isDrop())
 			return false;
 
 		if (support.getComponent() instanceof JList) {
-			if (!support
-					.isDataFlavorSupported(TrashTransferable.TRASH_TRANSFER_FLAVOR))
+			if (!support.isDataFlavorSupported(TrashTransferable.TRASH_TRANSFER_FLAVOR))
 				return false;
 
 			if (support.getDropAction() == MOVE)
@@ -92,23 +94,22 @@ class TrashTransferHandler extends TransferHandler {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean importData(TransferSupport support) {
+	public boolean importData(TransferSupport support)
+	{
 		if (!support.isDrop())
 			return false;
 
 		if (support.getComponent() instanceof JList) {
-			if (!support
-					.isDataFlavorSupported(TrashTransferable.TRASH_TRANSFER_FLAVOR))
+			if (!support.isDataFlavorSupported(TrashTransferable.TRASH_TRANSFER_FLAVOR))
 				return false;
 
 			if (support.getDropAction() == MOVE) {
 				try {
-					TrashCanEntryWrapper[] wrappers = (TrashCanEntryWrapper[]) support
-							.getTransferable().getTransferData(
-									TrashTransferable.TRASH_TRANSFER_FLAVOR);
+					TrashCanEntryWrapper[] wrappers =
+						(TrashCanEntryWrapper[]) support.getTransferable().getTransferData(
+							TrashTransferable.TRASH_TRANSFER_FLAVOR);
 
-					ListModel lModel = ((JList) (support.getComponent()))
-							.getModel();
+					ListModel lModel = ((JList) (support.getComponent())).getModel();
 					DefaultListModel model = (DefaultListModel) lModel;
 					for (TrashCanEntryWrapper wrapper : wrappers)
 						model.addElement(wrapper);

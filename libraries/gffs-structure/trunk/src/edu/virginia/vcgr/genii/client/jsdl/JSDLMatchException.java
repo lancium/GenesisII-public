@@ -15,14 +15,17 @@ package edu.virginia.vcgr.genii.client.jsdl;
 
 import javax.xml.namespace.QName;
 
-public class JSDLMatchException extends JSDLException {
+public class JSDLMatchException extends JSDLException
+{
 	static final long serialVersionUID = 0;
 
-	public JSDLMatchException(String reason) {
+	public JSDLMatchException(String reason)
+	{
 		super(reason);
 	}
 
-	public JSDLMatchException(QName unsatisfiedElement) {
+	public JSDLMatchException(QName unsatisfiedElement)
+	{
 		super("Unable to satisfy \"" + unsatisfiedElement + "\" requirement.");
 	}
 }

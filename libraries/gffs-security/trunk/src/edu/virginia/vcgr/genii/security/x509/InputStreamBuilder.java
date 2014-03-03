@@ -19,7 +19,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 
-public class InputStreamBuilder extends Builder {
+public class InputStreamBuilder extends Builder
+{
 
 	// maximum times to try the callbackhandler if the password is wrong
 	static final int MAX_CALLBACK_TRIES = 3;
@@ -35,9 +36,9 @@ public class InputStreamBuilder extends Builder {
 
 	private Throwable oldException;
 
-	public InputStreamBuilder(String type, Provider provider,
-			InputStream input, ProtectionParameter protection,
-			AccessControlContext context) {
+	public InputStreamBuilder(String type, Provider provider, InputStream input, ProtectionParameter protection,
+		AccessControlContext context)
+	{
 		this.type = type;
 		this.provider = provider;
 		this.input = input;
@@ -45,16 +46,18 @@ public class InputStreamBuilder extends Builder {
 		this.context = context;
 	}
 
-	public synchronized KeyStore getKeyStore() throws KeyStoreException {
+	public synchronized KeyStore getKeyStore() throws KeyStoreException
+	{
 		if (keyStore != null) {
 			return keyStore;
 		}
 		if (oldException != null) {
-			throw new KeyStoreException(
-					"Previous KeyStore instantiation failed", oldException);
+			throw new KeyStoreException("Previous KeyStore instantiation failed", oldException);
 		}
-		PrivilegedExceptionAction<KeyStore> action = new PrivilegedExceptionAction<KeyStore>() {
-			public KeyStore run() throws Exception {
+		PrivilegedExceptionAction<KeyStore> action = new PrivilegedExceptionAction<KeyStore>()
+		{
+			public KeyStore run() throws Exception
+			{
 				if (protection instanceof CallbackHandlerProtection == false) {
 					return run0();
 				}
@@ -66,8 +69,7 @@ public class InputStreamBuilder extends Builder {
 					try {
 						return run0();
 					} catch (IOException e) {
-						if ((tries < MAX_CALLBACK_TRIES)
-								&& (e.getCause() instanceof UnrecoverableKeyException)) {
+						if ((tries < MAX_CALLBACK_TRIES) && (e.getCause() instanceof UnrecoverableKeyException)) {
 							continue;
 						}
 						throw e;
@@ -75,7 +77,8 @@ public class InputStreamBuilder extends Builder {
 				}
 			}
 
-			public KeyStore run0() throws Exception {
+			public KeyStore run0() throws Exception
+			{
 				KeyStore ks;
 				if (provider == null) {
 					ks = KeyStore.getInstance(type);
@@ -85,19 +88,15 @@ public class InputStreamBuilder extends Builder {
 				char[] password = null;
 				try {
 					if (protection instanceof PasswordProtection) {
-						password = ((PasswordProtection) protection)
-								.getPassword();
+						password = ((PasswordProtection) protection).getPassword();
 						keyProtection = protection;
 					} else {
-						CallbackHandler handler = ((CallbackHandlerProtection) protection)
-								.getCallbackHandler();
-						PasswordCallback callback = new PasswordCallback(
-								"Password for keystore", false);
+						CallbackHandler handler = ((CallbackHandlerProtection) protection).getCallbackHandler();
+						PasswordCallback callback = new PasswordCallback("Password for keystore", false);
 						handler.handle(new Callback[] { callback });
 						password = callback.getPassword();
 						if (password == null) {
-							throw new KeyStoreException("No password"
-									+ " provided");
+							throw new KeyStoreException("No password" + " provided");
 						}
 						callback.clearPassword();
 						keyProtection = new PasswordProtection(password);
@@ -112,23 +111,21 @@ public class InputStreamBuilder extends Builder {
 			}
 		};
 		try {
-			keyStore = (KeyStore) AccessController
-					.doPrivileged(action, context);
+			keyStore = (KeyStore) AccessController.doPrivileged(action, context);
 			return keyStore;
 		} catch (PrivilegedActionException e) {
 			oldException = e.getCause();
-			throw new KeyStoreException("KeyStore instantiation failed",
-					oldException);
+			throw new KeyStoreException("KeyStore instantiation failed", oldException);
 		}
 	}
 
-	public synchronized ProtectionParameter getProtectionParameter(String alias) {
+	public synchronized ProtectionParameter getProtectionParameter(String alias)
+	{
 		if (alias == null) {
 			throw new NullPointerException();
 		}
 		if (keyStore == null) {
-			throw new IllegalStateException(
-					"getKeyStore() must be called first");
+			throw new IllegalStateException("getKeyStore() must be called first");
 		}
 		return keyProtection;
 	}

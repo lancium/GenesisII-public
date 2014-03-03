@@ -31,7 +31,8 @@ import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.context.ContextType;
 
-public class RunJSDL extends BaseGridTool {
+public class RunJSDL extends BaseGridTool
+{
 
 	private String _type = "jsdl";
 
@@ -40,18 +41,20 @@ public class RunJSDL extends BaseGridTool {
 	static private final String _MANPAGE = "config/tooldocs/man/runJSDL";
 
 	@Option({ "type" })
-	public void setType(String type) {
+	public void setType(String type)
+	{
 		_type = type;
 	}
 
-	public RunJSDL() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.EXECUTION);
+	public RunJSDL()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.EXECUTION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();
 		if (callContext == null) {
@@ -64,19 +67,17 @@ public class RunJSDL extends BaseGridTool {
 		GeniiPath source = new GeniiPath(getArgument(1));
 
 		if (!source.exists())
-			throw new FileNotFoundException(String.format(
-					"Unable to find source file %s!", source));
+			throw new FileNotFoundException(String.format("Unable to find source file %s!", source));
 		if (!source.isFile())
-			throw new IOException(String.format(
-					"Source path %s is not a file!", source));
+			throw new IOException(String.format("Source path %s is not a file!", source));
 
 		in = source.openInputStream();
 
 		JobRequest tJob = null;
 
 		if (_type.equals("jsdl")) {
-			JobDefinition_Type jsdl = (JobDefinition_Type) ObjectDeserializer
-					.deserialize(new InputSource(in), JobDefinition_Type.class);
+			JobDefinition_Type jsdl =
+				(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
 			PersonalityProvider provider = new ExecutionProvider();
 			tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
 			in.close();
@@ -115,9 +116,7 @@ public class RunJSDL extends BaseGridTool {
 			// Execute
 			stdout.println("Executing");
 			submitScript.setExecutable(true, true);
-			new File(wDir.getAbsolutePath() + "/"
-					+ tJob.getExecutable().getTarget()).setExecutable(true,
-					true);
+			new File(wDir.getAbsolutePath() + "/" + tJob.getExecutable().getTarget()).setExecutable(true, true);
 			Runtime.getRuntime().exec(submitScript.getAbsolutePath()).waitFor();
 
 			// Stage Out
@@ -135,14 +134,15 @@ public class RunJSDL extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException();
 	}
 
-	private static void generateWrapperScript(OutputStream tStream,
-			File workingDir, File resourceUsage, JobRequest job, File tmpDir)
-			throws Exception {
+	private static void generateWrapperScript(OutputStream tStream, File workingDir, File resourceUsage, JobRequest job,
+		File tmpDir) throws Exception
+	{
 		try {
 
 			PrintStream ps = new PrintStream(tStream);
@@ -155,9 +155,8 @@ public class RunJSDL extends BaseGridTool {
 
 			ResourceOverrides overrides = new ResourceOverrides();
 
-			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(
-					tmpDir, overrides.operatingSystemName(),
-					overrides.cpuArchitecture());
+			ProcessWrapper wrapper =
+				ProcessWrapperFactory.createWrapper(tmpDir, overrides.operatingSystemName(), overrides.cpuArchitecture());
 
 			boolean first = true;
 
@@ -166,24 +165,18 @@ public class RunJSDL extends BaseGridTool {
 				execName = String.format("./%s", execName);
 
 			for (String element : wrapper.formCommandLine(
-					null,
-					null, // app.getEnvironment()
-					workingDir,
-					getRedirect(job.getStdinRedirect(), workingDir),
-					getRedirect(job.getStdoutRedirect(), workingDir),
-					getRedirect(job.getStderrRedirect(), workingDir),
-					resourceUsage,
-					execName,
-					getArguments(new String[job.getArguments().size()],
-							job.getArguments())))
+				null,
+				null, // app.getEnvironment()
+				workingDir, getRedirect(job.getStdinRedirect(), workingDir), getRedirect(job.getStdoutRedirect(), workingDir),
+				getRedirect(job.getStderrRedirect(), workingDir), resourceUsage, execName,
+				getArguments(new String[job.getArguments().size()], job.getArguments())))
 
 			{
 				if (!first)
 					ps.format(" ");
 				first = false;
 				if (element.contains(tmpDir.getAbsolutePath())) {
-					element = workingDir.getAbsolutePath()
-							+ element.substring(element.lastIndexOf("/"));
+					element = workingDir.getAbsolutePath() + element.substring(element.lastIndexOf("/"));
 				}
 				ps.format("\"%s\"", element);
 			}
@@ -196,15 +189,15 @@ public class RunJSDL extends BaseGridTool {
 		}
 	}
 
-	private static File getRedirect(FilesystemRelative<String> tPath,
-			File workingDir) {
+	private static File getRedirect(FilesystemRelative<String> tPath, File workingDir)
+	{
 		if (tPath == null)
 			return null;
 		return new File(workingDir.toString() + "/" + tPath.getTarget());
 	}
 
-	private static String[] getArguments(String[] args,
-			List<FilesystemRelative<String>> tArgs) {
+	private static String[] getArguments(String[] args, List<FilesystemRelative<String>> tArgs)
+	{
 		int i = 0;
 		for (FilesystemRelative<String> tArg : tArgs) {
 			args[i] = tArg.getTarget();

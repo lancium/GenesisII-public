@@ -12,12 +12,15 @@ import edu.virginia.vcgr.xscript.ReturnFromFunctionException;
 import edu.virginia.vcgr.xscript.XScriptContext;
 import edu.virginia.vcgr.xscript.macros.MacroReplacer;
 
-public class SwitchStatement implements ParseStatement {
-	static private class Case {
+public class SwitchStatement implements ParseStatement
+{
+	static private class Case
+	{
 		private String _casePattern;
 		private ParseStatement _innerStatement;
 
-		private Case(String casePattern, ParseStatement innerStatement) {
+		private Case(String casePattern, ParseStatement innerStatement)
+		{
 			_casePattern = casePattern;
 			_innerStatement = innerStatement;
 		}
@@ -27,31 +30,30 @@ public class SwitchStatement implements ParseStatement {
 	private Collection<Case> _cases = new LinkedList<Case>();
 	private ParseStatement _defaultStatement = null;
 
-	public SwitchStatement(String value) {
+	public SwitchStatement(String value)
+	{
 		_value = value;
 	}
 
-	public void addCase(String casePattern, ParseStatement innerStatement) {
+	public void addCase(String casePattern, ParseStatement innerStatement)
+	{
 		_cases.add(new Case(casePattern, innerStatement));
 	}
 
-	public void setDefault(ParseStatement innerStatement)
-			throws ScriptException {
+	public void setDefault(ParseStatement innerStatement) throws ScriptException
+	{
 		if (_defaultStatement != null)
-			throw new ScriptException(
-					"A case statement can only have one default statement.");
+			throw new ScriptException("A case statement can only have one default statement.");
 
 		_defaultStatement = innerStatement;
 	}
 
 	@Override
-	public Object evaluate(XScriptContext context) throws ScriptException,
-			EarlyExitException, ReturnFromFunctionException {
+	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
+	{
 		String value = MacroReplacer.replaceMacros(context, _value);
 		for (Case c : _cases) {
-			if (Pattern
-					.matches(MacroReplacer.replaceMacros(context,
-							c._casePattern), value))
+			if (Pattern.matches(MacroReplacer.replaceMacros(context, c._casePattern), value))
 				return c._innerStatement.evaluate(context);
 		}
 

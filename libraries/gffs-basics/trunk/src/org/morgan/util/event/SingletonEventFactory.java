@@ -16,14 +16,17 @@ package org.morgan.util.event;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class SingletonEventFactory implements IEventFactory {
+public class SingletonEventFactory implements IEventFactory
+{
 	private IEvent _event;
 
-	public SingletonEventFactory(IEvent event) {
+	public SingletonEventFactory(IEvent event)
+	{
 		_event = event;
 	}
 
-	public IEvent create() {
+	public IEvent create()
+	{
 		return _event;
 	}
 }

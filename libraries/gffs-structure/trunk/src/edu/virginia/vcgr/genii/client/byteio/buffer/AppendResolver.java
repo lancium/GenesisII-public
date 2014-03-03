@@ -3,7 +3,8 @@ package edu.virginia.vcgr.genii.client.byteio.buffer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public interface AppendResolver {
+public interface AppendResolver
+{
 	/**
 	 * Append a bunch of bytes to the end of a ByteIO.
 	 * 

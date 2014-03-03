@@ -4,7 +4,8 @@ import java.io.Closeable;
 
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 
-public interface FilesystemHandle extends Closeable {
+public interface FilesystemHandle extends Closeable
+{
 	/* Depositions */
 	static final public int SUPERSEDE = 0; // Delete + Create
 	static final public int OPEN = 1;

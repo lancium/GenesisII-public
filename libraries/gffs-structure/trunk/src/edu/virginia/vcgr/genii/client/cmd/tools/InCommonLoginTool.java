@@ -66,7 +66,8 @@ import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
-public class InCommonLoginTool extends BaseLoginTool {
+public class InCommonLoginTool extends BaseLoginTool
+{
 
 	private static final String _DESCRIPTION = "config/tooldocs/description/diclogin";
 	private static final String _USAGE = "config/tooldocs/usage/uiclogin";
@@ -85,46 +86,53 @@ public class InCommonLoginTool extends BaseLoginTool {
 	private CILogonParameters _params;
 
 	@Option({ "csr", "c" })
-	public void setCSR(String csrFile) {
+	public void setCSR(String csrFile)
+	{
 		_CSRFileName = csrFile;
 	}
 
 	@Option({ "key", "k" })
-	public void setKey(String keyFile) {
+	public void setKey(String keyFile)
+	{
 		_CSRKeyFileName = keyFile;
 	}
 
 	@Option({ "idp", "i" })
-	public void setIdpUrl(String url) {
+	public void setIdpUrl(String url)
+	{
 		_idpUrl = url;
 	}
 
 	@Option({ "silent", "s" })
-	public void setSilent(boolean silent) {
+	public void setSilent(boolean silent)
+	{
 		_silent = true;
 	}
 
 	@Option({ "verbose", "v" })
-	public void setVerbose(boolean verbose) {
+	public void setVerbose(boolean verbose)
+	{
 		_verbose = true;
 	}
 
 	@Option({ "lifetime", "l" })
-	public void setLifetime(int lifetime) {
+	public void setLifetime(int lifetime)
+	{
 		_lifetime = lifetime;
 		;
 	}
 
-	public InCommonLoginTool() {
+	public InCommonLoginTool()
+	{
 		super(_DESCRIPTION, _USAGE, false);
 		overrideCategory(ToolCategory.SECURITY);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected void verify() throws ToolException {
-		_params = getParams(_username, _password, _idpUrl, _CSRFileName,
-				_CSRKeyFileName);
+	protected void verify() throws ToolException
+	{
+		_params = getParams(_username, _password, _idpUrl, _CSRFileName, _CSRKeyFileName);
 
 		if (_params == null) {
 			throw new InvalidToolUsageException(usage());
@@ -135,14 +143,14 @@ public class InCommonLoginTool extends BaseLoginTool {
 	}
 
 	@Override
-	protected int runCommand() {
+	protected int runCommand()
+	{
 		ICallingContext callContext = null;
 		X509Certificate cert = null;
 		TransientCredentials transientCredentials = null;
 		String targetPath = null;
 		try {
-			// get the local identity's key material (or create one if
-			// necessary)
+			// get the local identity's key material (or create one if necessary)
 			callContext = ContextManager.getCurrentContext();
 			if (callContext == null) {
 				callContext = new CallingContextImpl(new ContextType());
@@ -157,60 +165,43 @@ public class InCommonLoginTool extends BaseLoginTool {
 			}
 
 			// Set the InCommon cert as the new session id
-			KeyAndCertMaterial clientKeyMaterial = new KeyAndCertMaterial(
-					new X509Certificate[] { cert }, _params.key);
+			KeyAndCertMaterial clientKeyMaterial = new KeyAndCertMaterial(new X509Certificate[] { cert }, _params.key);
 			callContext.setActiveKeyAndCertMaterial(clientKeyMaterial);
 			ContextManager.storeCurrentContext(callContext);
 
-			// TODO Needs to be adjusted after permanent policy location is
-			// determined.
+			// TODO Needs to be adjusted after permanent policy location is determined.
 			targetPath = "/users/incommon/" + _username;
 
-			// we're going to use the WS-TRUST token-issue operation to log in
-			// to a security tokens
+			// we're going to use the WS-TRUST token-issue operation to log in to a security tokens
 			// service.
-			RNSPath authnPath = callContext.getCurrentPath().lookup(targetPath,
-					RNSPathQueryFlags.MUST_EXIST);
+			RNSPath authnPath = callContext.getCurrentPath().lookup(targetPath, RNSPathQueryFlags.MUST_EXIST);
 			EndpointReferenceType epr = authnPath.getEndpoint();
 
-			// log in to the target STS using the InCommon cert as the base
-			// credential
-			ArrayList<NuCredential> creds = IDPLoginTool.doIdpLogin(epr,
-					_credentialValidMillis, clientKeyMaterial._clientCertChain);
+			// log in to the target STS using the InCommon cert as the base credential
+			ArrayList<NuCredential> creds =
+				IDPLoginTool.doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
 			if (creds != null) {
 				// insert the target credential into the calling context
-				transientCredentials = TransientCredentials
-						.getTransientCredentials(callContext);
+				transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 				transientCredentials.addAll(creds);
 			}
 
 			return 0;
 
 		} catch (GeneralSecurityException e) {
-			_logger.error(
-					"Can't set client session cert. See stack trace for details.",
-					e);
+			_logger.error("Can't set client session cert. See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
 		} catch (RNSPathDoesNotExistException e) {
-			_logger.error("Target STS path " + targetPath
-					+ " doesn't exist. See stack trace for details.", e);
+			_logger.error("Target STS path " + targetPath + " doesn't exist. See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
 		} catch (RNSPathAlreadyExistsException e) {
-			_logger.error(
-					"We should never get this exception... What did you do!?! See stack trace for details.",
-					e);
+			_logger.error("We should never get this exception... What did you do!?! See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
 		} catch (IOException e) {
-			_logger.error(
-					"Couldn't access calling context. See stack trace for details.",
-					e);
+			_logger.error("Couldn't access calling context. See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
 		} catch (Throwable e) {
-			_logger.error(
-					"Failed IDPLogin to "
-							+ targetPath
-							+ " or other general exception. See stack trace for details.",
-					e);
+			_logger.error("Failed IDPLogin to " + targetPath + " or other general exception. See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
 		} finally {
 			// save the current state of the calling context before quiting
@@ -218,9 +209,7 @@ public class InCommonLoginTool extends BaseLoginTool {
 				try {
 					ContextManager.storeCurrentContext(callContext);
 				} catch (IOException e) {
-					_logger.error(
-							"Couldn't access calling context. See stack trace for details.",
-							e);
+					_logger.error("Couldn't access calling context. See stack trace for details.", e);
 					stderr.println("Login failed, see logs for additional details.");
 				}
 			}
@@ -228,85 +217,68 @@ public class InCommonLoginTool extends BaseLoginTool {
 		return -1;
 	}
 
-	private X509Certificate callCILogon(CILogonParameters params) {
+	private X509Certificate callCILogon(CILogonParameters params)
+	{
 		CILogonClient client = new CILogonClient(params);
 		try {
 
 			String result = client.call();
 
 			CertificateFactory cf = CertificateFactory.getInstance("X.509");
-			X509Certificate cert = (X509Certificate) cf
-					.generateCertificate(IOUtils.toInputStream(result));
+			X509Certificate cert = (X509Certificate) cf.generateCertificate(IOUtils.toInputStream(result));
 			return cert;
 
 		} catch (IOException e) {
-			_logger.error(
-					"Couldn't complete InCommon call. See stack trace for details.",
-					e);
+			_logger.error("Couldn't complete InCommon call. See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
 		} catch (URISyntaxException e) {
-			_logger.error(
-					"Couldn't complete InCommon call. See stack trace for details.",
-					e);
+			_logger.error("Couldn't complete InCommon call. See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
 		} catch (CertificateException e) {
-			_logger.error(
-					"Couldn't convert resulting certificate. See stack trace for details.",
-					e);
+			_logger.error("Couldn't convert resulting certificate. See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
 		}
 		return null;
 	}
 
-	private CILogonParameters getParams(String username, String password,
-			String idpUrl, String csrFileName, String csrKeyFileName)
-			throws ToolException {
+	private CILogonParameters getParams(String username, String password, String idpUrl, String csrFileName,
+		String csrKeyFileName) throws ToolException
+	{
 		try {
-			if (username == null || password == null || idpUrl == null
-					|| csrFileName == null || csrKeyFileName == null) {
+			if (username == null || password == null || idpUrl == null || csrFileName == null || csrKeyFileName == null) {
 				return promptForParams();
 			} else {
-				CILogonParameters params = new CILogonParameters(idpUrl,
-						username, password, readFile(csrFileName),
-						parseKeyFile(csrKeyFileName).getPrivate(), stdout,
-						stderr);
+				CILogonParameters params =
+					new CILogonParameters(idpUrl, username, password, readFile(csrFileName), parseKeyFile(csrKeyFileName)
+						.getPrivate(), stdout, stderr);
 				return params;
 			}
 		} finally {
 		}
 	}
 
-	private CILogonParameters promptForParams() throws ToolException {
-		DialogProvider provider = DialogFactory.getProvider(stdout, stderr,
-				stdin, useGui());
+	private CILogonParameters promptForParams() throws ToolException
+	{
+		DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 
 		if (_idpUrl == null) {
 			// TODO get these from server instead of hard code
 			// list hosted at: https://cilogon.org/include/ecpidps.txt
 			try {
-				ComboBoxDialog idpDialog = provider
-						.createSingleListSelectionDialog(
-								"IDP Choice",
-								"Please choose IDP",
-								new SimpleMenuItem("ProtectNetwork",
-										"https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"),
-								new SimpleMenuItem("ProtectNetwork",
-										"https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"),
-								new SimpleMenuItem(
-										"LIGO Scientific Collaboration",
-										"https://login.ligo.org/idp/profile/SAML2/SOAP/ECP"),
-								new SimpleMenuItem("LTER Network",
-										"https://shib.lternet.edu/idp/profile/SAML2/SOAP/ECP"),
-								new SimpleMenuItem("University of Chicago",
-										"https://shibboleth2.uchicago.edu/idp/profile/SAML2/SOAP/ECP"),
-								new SimpleMenuItem(
-										"University of Illinois at Urbana-Champaign",
-										"https://shibboleth.illinois.edu/idp/profile/SAML2/SOAP/ECP"),
-								new SimpleMenuItem("University of Washington",
-										"https://idp.u.washington.edu/idp/profile/SAML2/SOAP/ECP"),
-								new SimpleMenuItem(
-										"University of Wisconsin-Madison",
-										"https://login.wisc.edu/idp/profile/SAML2/SOAP/ECP"));
+				ComboBoxDialog idpDialog =
+					provider.createSingleListSelectionDialog("IDP Choice", "Please choose IDP", new SimpleMenuItem(
+						"ProtectNetwork", "https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"),
+						new SimpleMenuItem("ProtectNetwork",
+							"https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
+							"LIGO Scientific Collaboration", "https://login.ligo.org/idp/profile/SAML2/SOAP/ECP"),
+						new SimpleMenuItem("LTER Network", "https://shib.lternet.edu/idp/profile/SAML2/SOAP/ECP"),
+						new SimpleMenuItem("University of Chicago",
+							"https://shibboleth2.uchicago.edu/idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
+							"University of Illinois at Urbana-Champaign",
+							"https://shibboleth.illinois.edu/idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
+							"University of Washington", "https://idp.u.washington.edu/idp/profile/SAML2/SOAP/ECP"),
+						new SimpleMenuItem("University of Wisconsin-Madison",
+							"https://login.wisc.edu/idp/profile/SAML2/SOAP/ECP"));
 				idpDialog.showDialog();
 
 				MenuItem response = idpDialog.getSelectedItem();
@@ -330,8 +302,7 @@ public class InCommonLoginTool extends BaseLoginTool {
 			throw new ToolException("Username dialog failed for some reason", e);
 		} catch (UserCancelException e) {
 			_logger.error("User cancelled the username request, bailing out", e);
-			throw new ToolException(
-					"Cannot continue without username, bailing out", e);
+			throw new ToolException("Cannot continue without username, bailing out", e);
 		} catch (ToolException e) {
 			_logger.error("Password dialog failed for some reason", e);
 			throw new ToolException("Password dialog failed for some reason", e);
@@ -358,48 +329,38 @@ public class InCommonLoginTool extends BaseLoginTool {
 			key = generateKeyPair();
 		}
 		if (csr == null || csr.equals("")) {
-			// they didn't have a csr file, or we didn't ask because we
-			// generated the keypair
+			// they didn't have a csr file, or we didn't ask because we generated the keypair
 			csr = generateCSR(key);
 		}
 
 		// now that everything is populated, ship it to the caller
-		return new CILogonParameters(_idpUrl, _username, _password, csr,
-				key.getPrivate(), stdout, stderr);
+		return new CILogonParameters(_idpUrl, _username, _password, csr, key.getPrivate(), stdout, stderr);
 	}
 
-	private String generateCSR(KeyPair keyPair) throws ToolException {
+	private String generateCSR(KeyPair keyPair) throws ToolException
+	{
 		String subject = "CN=ignore";
 		PKCS10CertificationRequest csr = null;
 		try {
-			AsymmetricKeyParameter privateKey = PrivateKeyFactory
-					.createKey(keyPair.getPrivate().getEncoded());
-			AlgorithmIdentifier signatureAlgorithm = new DefaultSignatureAlgorithmIdentifierFinder()
-					.find("SHA1WITHRSA");
-			AlgorithmIdentifier digestAlgorithm = new DefaultDigestAlgorithmIdentifierFinder()
-					.find("SHA-1");
-			ContentSigner signer = new BcRSAContentSignerBuilder(
-					signatureAlgorithm, digestAlgorithm).build(privateKey);
+			AsymmetricKeyParameter privateKey = PrivateKeyFactory.createKey(keyPair.getPrivate().getEncoded());
+			AlgorithmIdentifier signatureAlgorithm = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA1WITHRSA");
+			AlgorithmIdentifier digestAlgorithm = new DefaultDigestAlgorithmIdentifierFinder().find("SHA-1");
+			ContentSigner signer = new BcRSAContentSignerBuilder(signatureAlgorithm, digestAlgorithm).build(privateKey);
 
-			PKCS10CertificationRequestBuilder csrBuilder = new JcaPKCS10CertificationRequestBuilder(
-					new X500Name(subject), keyPair.getPublic());
+			PKCS10CertificationRequestBuilder csrBuilder =
+				new JcaPKCS10CertificationRequestBuilder(new X500Name(subject), keyPair.getPublic());
 			ExtensionsGenerator extensionsGenerator = new ExtensionsGenerator();
-			extensionsGenerator.addExtension(X509Extension.basicConstraints,
-					true, new BasicConstraints(true));
+			extensionsGenerator.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(true));
 			extensionsGenerator.addExtension(X509Extension.keyUsage, true,
-					new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign));
-			csrBuilder.addAttribute(
-					PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
-					extensionsGenerator.generate());
+				new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign));
+			csrBuilder.addAttribute(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, extensionsGenerator.generate());
 			csr = csrBuilder.build(signer);
 		} catch (IOException e) {
 			_logger.error("Problem generating CSR, see stack trace", e);
-			throw new ToolException(
-					"Couldn't generate a new CSR for the request", e);
+			throw new ToolException("Couldn't generate a new CSR for the request", e);
 		} catch (OperatorCreationException e) {
 			_logger.error("Problem generating CSR, see stack trace", e);
-			throw new ToolException(
-					"Couldn't generate a new CSR for the request", e);
+			throw new ToolException("Couldn't generate a new CSR for the request", e);
 		}
 
 		try {
@@ -414,7 +375,8 @@ public class InCommonLoginTool extends BaseLoginTool {
 		}
 	}
 
-	private String readFile(String fileName) throws ToolException {
+	private String readFile(String fileName) throws ToolException
+	{
 		String line = null;
 		String ret = "";
 		try {
@@ -425,12 +387,12 @@ public class InCommonLoginTool extends BaseLoginTool {
 			br.close();
 			return ret;
 		} catch (IOException e) {
-			throw new ToolException("Couldn't read contents of file "
-					+ fileName, e);
+			throw new ToolException("Couldn't read contents of file " + fileName, e);
 		}
 	}
 
-	private KeyPair generateKeyPair() {
+	private KeyPair generateKeyPair()
+	{
 		KeyPairGenerator keyGen;
 		try {
 			keyGen = KeyPairGenerator.getInstance("RSA");
@@ -445,38 +407,33 @@ public class InCommonLoginTool extends BaseLoginTool {
 		return keyPair;
 	}
 
-	private void promptForKeyFile() throws ToolException {
-		DialogProvider provider = DialogFactory.getProvider(stdout, stderr,
-				stdin, useGui());
+	private void promptForKeyFile() throws ToolException
+	{
+		DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 
 		InputDialog keyFileDialog;
 		try {
-			keyFileDialog = provider
-					.createInputDialog("KeyFile",
-							"Please enter keypair filename, or leave blank to generate one.");
+			keyFileDialog =
+				provider.createInputDialog("KeyFile", "Please enter keypair filename, or leave blank to generate one.");
 			keyFileDialog.showDialog();
 			_CSRKeyFileName = keyFileDialog.getAnswer();
 
 		} catch (DialogException e) {
-			_logger.error(
-					"Key File dialog threw an exception, see stack trace for details",
-					e);
-			throw new ToolException(
-					"Unexpected failure from Key file dialog, bailing out", e);
+			_logger.error("Key File dialog threw an exception, see stack trace for details", e);
+			throw new ToolException("Unexpected failure from Key file dialog, bailing out", e);
 		} catch (UserCancelException e) {
 			// Not a failure, just generate a new pair later
 		}
 	}
 
-	private boolean promptForCSRFile() throws ToolException {
-		DialogProvider provider = DialogFactory.getProvider(stdout, stderr,
-				stdin, useGui());
+	private boolean promptForCSRFile() throws ToolException
+	{
+		DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 
 		InputDialog csrFileDialog;
 		try {
-			csrFileDialog = provider
-					.createInputDialog("CSR File",
-							"Please enter CSR filename, or leave blank to generate one.");
+			csrFileDialog =
+				provider.createInputDialog("CSR File", "Please enter CSR filename, or leave blank to generate one.");
 			csrFileDialog.showDialog();
 			_CSRFileName = csrFileDialog.getAnswer();
 			return (_CSRFileName != null && !_CSRFileName.equals(""));
@@ -491,7 +448,8 @@ public class InCommonLoginTool extends BaseLoginTool {
 		return false;
 	}
 
-	private KeyPair parseKeyFile(String keyFile) throws ToolException {
+	private KeyPair parseKeyFile(String keyFile) throws ToolException
+	{
 		KeyPair key = null;
 
 		try {
@@ -499,8 +457,7 @@ public class InCommonLoginTool extends BaseLoginTool {
 			PEMKeyPair keyPair = (PEMKeyPair) parser.readObject();
 			parser.close();
 
-			key = new JcaPEMKeyConverter().setProvider("BC")
-					.getKeyPair(keyPair);
+			key = new JcaPEMKeyConverter().setProvider("BC").getKeyPair(keyPair);
 		} catch (IOException e) {
 			throw new ToolException("Failed to parse specified key file", e);
 		}

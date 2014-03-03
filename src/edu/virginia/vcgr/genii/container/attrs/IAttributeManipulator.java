@@ -25,17 +25,15 @@ import org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType;
 import org.oasis_open.docs.wsrf.rp_2.UnableToModifyResourcePropertyFaultType;
 import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesRequestFailedFaultType;
 
-public interface IAttributeManipulator {
+public interface IAttributeManipulator
+{
 	public QName getAttributeQName();
 
 	public boolean allowsSet();
 
-	public Collection<MessageElement> getAttributeValues()
-			throws ResourceUnknownFaultType, RemoteException;
+	public Collection<MessageElement> getAttributeValues() throws ResourceUnknownFaultType, RemoteException;
 
-	public void setAttributeValues(Collection<MessageElement> values)
-			throws ResourceUnknownFaultType, RemoteException,
-			InvalidResourcePropertyQNameFaultType,
-			UnableToModifyResourcePropertyFaultType,
-			UpdateResourcePropertiesRequestFailedFaultType;
+	public void setAttributeValues(Collection<MessageElement> values) throws ResourceUnknownFaultType, RemoteException,
+		InvalidResourcePropertyQNameFaultType, UnableToModifyResourcePropertyFaultType,
+		UpdateResourcePropertiesRequestFailedFaultType;
 }

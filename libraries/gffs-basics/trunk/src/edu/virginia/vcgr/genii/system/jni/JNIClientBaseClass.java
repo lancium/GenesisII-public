@@ -16,7 +16,8 @@ package edu.virginia.vcgr.genii.system.jni;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JNIClientBaseClass {
+public class JNIClientBaseClass
+{
 	static public final String VCGR_CLIENT_LIB_NAME = "VcgrClientLib";
 	static private Log _logger = LogFactory.getLog(JNIClientBaseClass.class);
 
@@ -24,8 +25,7 @@ public class JNIClientBaseClass {
 		try {
 			System.loadLibrary(VCGR_CLIENT_LIB_NAME);
 		} catch (UnsatisfiedLinkError e) {
-			_logger.warn("linking in library " + VCGR_CLIENT_LIB_NAME
-					+ " failed", e);
+			_logger.warn("linking in library " + VCGR_CLIENT_LIB_NAME + " failed", e);
 		}
 	}
 }

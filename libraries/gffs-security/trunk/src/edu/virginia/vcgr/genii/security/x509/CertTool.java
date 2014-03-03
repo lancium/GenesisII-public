@@ -62,7 +62,8 @@ import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
  * A simple example that generates an attribute certificate.
  */
 @SuppressWarnings("deprecation")
-public class CertTool {
+public class CertTool
+{
 	static private Log _logger = LogFactory.getLog(CertTool.class);
 
 	static boolean loaded = false;
@@ -75,9 +76,9 @@ public class CertTool {
 	/**
 	 * we generate the CA's certificate
 	 */
-	public static X509Certificate createMasterCert(String dn,
-			long validityMillis, PublicKey pubKey, PrivateKey privKey)
-			throws GeneralSecurityException {
+	public static X509Certificate createMasterCert(String dn, long validityMillis, PublicKey pubKey, PrivateKey privKey)
+		throws GeneralSecurityException
+	{
 		String issuer = dn;
 		String subject = dn;
 
@@ -86,13 +87,11 @@ public class CertTool {
 		//
 		X509V1CertificateGenerator v1CertGen = new X509V1CertificateGenerator();
 
-		v1CertGen.setSerialNumber(new BigInteger(SERIAL_NUM_BITS,
-				serialNumRandomness));
+		v1CertGen.setSerialNumber(new BigInteger(SERIAL_NUM_BITS, serialNumRandomness));
 		v1CertGen.setIssuerDN(new X509Principal(issuer));
 		v1CertGen.setNotBefore( // 15 minutes ago
-				new Date(System.currentTimeMillis() - (1000L * 60 * 15)));
-		v1CertGen.setNotAfter(new Date(System.currentTimeMillis()
-				+ validityMillis));
+			new Date(System.currentTimeMillis() - (1000L * 60 * 15)));
+		v1CertGen.setNotAfter(new Date(System.currentTimeMillis() + validityMillis));
 		v1CertGen.setSubjectDN(new X509Principal(subject));
 		v1CertGen.setPublicKey(pubKey);
 		v1CertGen.setSignatureAlgorithm("SHA1WithRSAEncryption");
@@ -109,8 +108,7 @@ public class CertTool {
 		// this is actually optional - but if you want to have control
 		// over setting the friendly name this is the way to do it...
 		//
-		bagAttr.setBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName,
-				new DERBMPString(getCN(cert)));
+		bagAttr.setBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName, new DERBMPString(getCN(cert)));
 
 		return cert;
 	}
@@ -118,22 +116,20 @@ public class CertTool {
 	/**
 	 * we generate an intermediate certificate signed by our CA
 	 */
-	public static X509Certificate createIntermediateCert(String dn,
-			long validityMillis, PublicKey pubKey, PrivateKey caPrivKey,
-			X509Certificate caCert) throws GeneralSecurityException {
+	public static X509Certificate createIntermediateCert(String dn, long validityMillis, PublicKey pubKey,
+		PrivateKey caPrivKey, X509Certificate caCert) throws GeneralSecurityException
+	{
 
 		//
 		// create the certificate - version 3
 		//
 		X509V3CertificateGenerator v3CertGen = new X509V3CertificateGenerator();
 
-		v3CertGen.setSerialNumber(new BigInteger(SERIAL_NUM_BITS,
-				serialNumRandomness));
+		v3CertGen.setSerialNumber(new BigInteger(SERIAL_NUM_BITS, serialNumRandomness));
 		v3CertGen.setIssuerDN(PrincipalUtil.getSubjectX509Principal(caCert));
 		v3CertGen.setNotBefore( // 24 hours ago
-				new Date(System.currentTimeMillis() - (1000L * 60 * 60 * 24)));
-		v3CertGen.setNotAfter(new Date(System.currentTimeMillis()
-				+ validityMillis));
+			new Date(System.currentTimeMillis() - (1000L * 60 * 60 * 24)));
+		v3CertGen.setNotAfter(new Date(System.currentTimeMillis() + validityMillis));
 		v3CertGen.setSubjectDN(new X509Principal(dn));
 		v3CertGen.setPublicKey(pubKey);
 		v3CertGen.setSignatureAlgorithm("SHA1WithRSAEncryption");
@@ -141,12 +137,9 @@ public class CertTool {
 		//
 		// extensions
 		//
-		v3CertGen.addExtension(X509Extensions.SubjectKeyIdentifier, false,
-				new SubjectKeyIdentifierStructure(pubKey));
-		v3CertGen.addExtension(X509Extensions.AuthorityKeyIdentifier, false,
-				new AuthorityKeyIdentifierStructure(caCert));
-		v3CertGen.addExtension(X509Extensions.BasicConstraints, true,
-				new BasicConstraints(true));
+		v3CertGen.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(pubKey));
+		v3CertGen.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(caCert));
+		v3CertGen.addExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(true));
 		X509Certificate cert = v3CertGen.generate(caPrivKey, "BC");
 
 		cert.checkValidity(new Date());
@@ -157,13 +150,13 @@ public class CertTool {
 		// this is actually optional - but if you want to have control
 		// over setting the friendly name this is the way to do it...
 		//
-		bagAttr.setBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName,
-				new DERBMPString(getCN(cert)));
+		bagAttr.setBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName, new DERBMPString(getCN(cert)));
 		return cert;
 	}
 
 	@SuppressWarnings("unchecked")
-	public static String getSN(X509Certificate cert) {
+	public static String getSN(X509Certificate cert)
+	{
 		X509Name dn = new X509Name(cert.getSubjectDN().toString());
 		Vector<DERObjectIdentifier> oids = dn.getOIDs();
 		Vector<String> values = dn.getValues();
@@ -180,7 +173,8 @@ public class CertTool {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static String getCN(X509Certificate cert) {
+	public static String getCN(X509Certificate cert)
+	{
 		X509Name dn = new X509Name(cert.getSubjectDN().toString());
 		Vector<DERObjectIdentifier> oids = dn.getOIDs();
 		Vector<String> values = dn.getValues();
@@ -197,12 +191,11 @@ public class CertTool {
 	}
 
 	/**
-	 * Construct a structure-of-arrays of distinguished-name fields and paired
-	 * values
+	 * Construct a structure-of-arrays of distinguished-name fields and paired values
 	 */
-	public static Map.Entry<List<DERObjectIdentifier>, List<String>> constructCommonDnFields(
-			String epi, ArrayList<String> newOrgs, ArrayList<String> newCNs,
-			String uid) throws GeneralSecurityException {
+	public static Map.Entry<List<DERObjectIdentifier>, List<String>> constructCommonDnFields(String epi,
+		ArrayList<String> newOrgs, ArrayList<String> newCNs, String uid) throws GeneralSecurityException
+	{
 		ArrayList<DERObjectIdentifier> fields = new ArrayList<DERObjectIdentifier>();
 		ArrayList<String> values = new ArrayList<String>();
 
@@ -227,18 +220,15 @@ public class CertTool {
 			}
 		}
 
-		return new AbstractMap.SimpleEntry<List<DERObjectIdentifier>, List<String>>(
-				fields, values);
+		return new AbstractMap.SimpleEntry<List<DERObjectIdentifier>, List<String>>(fields, values);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static X509Certificate[] createResourceCertChain(
-			CertCreationSpec certSpec,
-			Map.Entry<List<DERObjectIdentifier>, List<String>> additional_fields)
-			throws GeneralSecurityException {
+	public static X509Certificate[] createResourceCertChain(CertCreationSpec certSpec,
+		Map.Entry<List<DERObjectIdentifier>, List<String>> additional_fields) throws GeneralSecurityException
+	{
 		// replace the SN and the old CNs, if necessary
-		X509Name dn = new X509Name(certSpec.issuerChain[0].getSubjectDN()
-				.toString());
+		X509Name dn = new X509Name(certSpec.issuerChain[0].getSubjectDN().toString());
 		Vector<DERObjectIdentifier> oids = dn.getOIDs();
 		Vector<String> values = dn.getValues();
 
@@ -262,8 +252,8 @@ public class CertTool {
 
 		dn = new X509Name(oids, values);
 
-		X509Certificate newCert = CertTool.createIntermediateCert(
-				dn.toString(), certSpec.validityMillis, certSpec.newPublicKey,
+		X509Certificate newCert =
+			CertTool.createIntermediateCert(dn.toString(), certSpec.validityMillis, certSpec.newPublicKey,
 				certSpec.issuerPrivateKey, certSpec.issuerChain[0]);
 		X509Certificate[] newCertChain = new X509Certificate[certSpec.issuerChain.length + 1];
 		newCertChain[0] = newCert;
@@ -281,8 +271,9 @@ public class CertTool {
 	 * @param password
 	 * @return Returns the keystore loaded from the given location.
 	 */
-	public static KeyStore openStoreDirectPath(File location, String type,
-			char[] password) throws GeneralSecurityException, IOException {
+	public static KeyStore openStoreDirectPath(File location, String type, char[] password) throws GeneralSecurityException,
+		IOException
+	{
 		// try both providers (BC and the default SunJCE)
 		KeyStore ks = null;
 		InputStream keyStoreStream = null;
@@ -315,11 +306,11 @@ public class CertTool {
 	 * @param password
 	 * @return Returns the keystore loaded from the given location.
 	 */
-	public static KeyStore openStore(String location, String type,
-			char[] password) throws GeneralSecurityException, IOException {
+	public static KeyStore openStore(String location, String type, char[] password) throws GeneralSecurityException,
+		IOException
+	{
 		KeyStore ks = KeyStore.getInstance(type, "BC");
-		InputStream keyStoreStream = ClassLoader.getSystemClassLoader()
-				.getResourceAsStream(location);
+		InputStream keyStoreStream = ClassLoader.getSystemClassLoader().getResourceAsStream(location);
 		ks.load(keyStoreStream, password);
 		keyStoreStream.close();
 
@@ -327,59 +318,44 @@ public class CertTool {
 	}
 
 	/*
-	 * public static KeyPair generateKeyPair() throws GeneralSecurityException {
-	 * return generateKeyPair(RSA_KEYSIZE); }
+	 * public static KeyPair generateKeyPair() throws GeneralSecurityException { return
+	 * generateKeyPair(RSA_KEYSIZE); }
 	 */
-	public static KeyPair generateKeyPair(int keySize)
-			throws GeneralSecurityException {
+	public static KeyPair generateKeyPair(int keySize) throws GeneralSecurityException
+	{
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA", "BC");
 		keyGen.initialize(keySize);
 		return keyGen.generateKeyPair();
 	}
 
-	public static void usage() {
-		System.out
-				.println("\nUSAGE: "
-						+ CertTool.class.getName()
-						+ " <import | gen> <options>\n\n"
+	public static void usage()
+	{
+		System.out.println("\nUSAGE: " + CertTool.class.getName() + " <import | gen> <options>\n\n"
 
-						+ "import options:\n"
-						+ "  Notes: Reads an X.509 certificate from one store and optionally places\n"
-						+ "  it in another store as a trusted certificate.  If the output-store is not\n"
-						+ "  specified, then the certificate will be displayed to the console.\n\n"
-						+ "  -base64-cert-file=<cert file path> | \n\n"
-						+ "  -input-keystore=<keystore> \n"
-						+ "  -input-keystore-pass=<keystore password> \n"
-						+ "  -input-storetype=<storetype: PKCS12(default) | BKS> \n"
-						+ "  -input-alias=<alias> \n"
-						+ "[ -output-keystore=<keystore> \n"
-						+ "  -output-keystore-pass=<keystore password> \n"
-						+ "  -output-storetype=<storetype: PKCS12(default) | BKS> \n"
-						+ "  -output-alias=<trusted-alias> ] \n\n"
+		+ "import options:\n" + "  Notes: Reads an X.509 certificate from one store and optionally places\n"
+			+ "  it in another store as a trusted certificate.  If the output-store is not\n"
+			+ "  specified, then the certificate will be displayed to the console.\n\n"
+			+ "  -base64-cert-file=<cert file path> | \n\n" + "  -input-keystore=<keystore> \n"
+			+ "  -input-keystore-pass=<keystore password> \n" + "  -input-storetype=<storetype: PKCS12(default) | BKS> \n"
+			+ "  -input-alias=<alias> \n" + "[ -output-keystore=<keystore> \n"
+			+ "  -output-keystore-pass=<keystore password> \n" + "  -output-storetype=<storetype: PKCS12(default) | BKS> \n"
+			+ "  -output-alias=<trusted-alias> ] \n\n"
 
-						+ "gen options:\n"
-						+ "  Notes: Generates a new X.509 certificate and corresponding keypair.\n"
-						+ "  The input-keystore contains cert and key material for issuer.  If\n"
-						+ "  not specified, the generated certificate is self-signed.  If output-store\n"
-						+ "  is not specified, then the certificate and keys will be displayed to the\n"
-						+ "  console.\n\n"
+			+ "gen options:\n" + "  Notes: Generates a new X.509 certificate and corresponding keypair.\n"
+			+ "  The input-keystore contains cert and key material for issuer.  If\n"
+			+ "  not specified, the generated certificate is self-signed.  If output-store\n"
+			+ "  is not specified, then the certificate and keys will be displayed to the\n" + "  console.\n\n"
 
-						+ "-keysize=<rsa-keysize> \n"
-						+ "-dn=<distinguished name> \n"
-						+ "[ -validity=<days (default:12 years)> ]\n"
-						+ "[ -input-keystore=<keystore> \n"
-						+ "  -input-keystore-pass=<keystore password> \n"
-						+ "  -input-storetype=<storetype: PKCS12(default) | BKS> \n"
-						+ "  -input-alias=<alias> \n"
-						+ "  -input-entry-pass=<password> ] \n"
-						+ "[ -output-keystore=<keystore> \n"
-						+ "  -output-keystore-pass=<keystore password> \n"
-						+ "  -output-storetype=<storetype: PKCS12(default) | BKS> \n"
-						+ "  -output-alias=<alias> \n"
-						+ "  -output-entry-pass=<password> ]");
+			+ "-keysize=<rsa-keysize> \n" + "-dn=<distinguished name> \n" + "[ -validity=<days (default:12 years)> ]\n"
+			+ "[ -input-keystore=<keystore> \n" + "  -input-keystore-pass=<keystore password> \n"
+			+ "  -input-storetype=<storetype: PKCS12(default) | BKS> \n" + "  -input-alias=<alias> \n"
+			+ "  -input-entry-pass=<password> ] \n" + "[ -output-keystore=<keystore> \n"
+			+ "  -output-keystore-pass=<keystore password> \n" + "  -output-storetype=<storetype: PKCS12(default) | BKS> \n"
+			+ "  -output-alias=<alias> \n" + "  -output-entry-pass=<password> ]");
 	}
 
-	public static void main(String args[]) throws Exception {
+	public static void main(String args[]) throws Exception
+	{
 		SecurityUtilities.initializeSecurity();
 
 		boolean importCert = false;
@@ -477,8 +453,7 @@ public class CertTool {
 
 			// do import cert
 
-			if (((base64CertFile == null) && (inputKeyStore == null))
-					|| ((base64CertFile != null) && (inputKeyStore != null))) {
+			if (((base64CertFile == null) && (inputKeyStore == null)) || ((base64CertFile != null) && (inputKeyStore != null))) {
 				usage();
 				return;
 			}
@@ -490,8 +465,7 @@ public class CertTool {
 				System.out.println("Retrieving import cert...");
 				System.out.flush();
 
-				java.io.FileInputStream fin = new java.io.FileInputStream(
-						base64CertFile);
+				java.io.FileInputStream fin = new java.io.FileInputStream(base64CertFile);
 				CertificateFactory cf = CertificateFactory.getInstance("X.509");
 				cert = cf.generateCertificate(fin);
 
@@ -512,12 +486,10 @@ public class CertTool {
 					// no input alias: enumerate all aliases
 					Enumeration<String> aliases = ks.aliases();
 					while (aliases.hasMoreElements()) {
-						System.out
-								.println("---------------------------------------------------");
+						System.out.println("---------------------------------------------------");
 						String alias = aliases.nextElement();
 						System.out.println("Alias \"" + alias + "\":");
-						System.out
-								.println("---------------------------------------------------");
+						System.out.println("---------------------------------------------------");
 						cert = ks.getCertificate(alias);
 						System.out.println(cert.toString() + "\n");
 					}
@@ -540,8 +512,7 @@ public class CertTool {
 
 			// write the cert as a trusted cert, if necessary
 			if (outputKeyStore != null) {
-				System.out
-						.print("Writing trusted certificate entry to output keystore...");
+				System.out.print("Writing trusted certificate entry to output keystore...");
 				System.out.flush();
 				KeyStore ks = KeyStore.getInstance(outputStoreType, "BC");
 				File outFile = new File(outputKeyStore);
@@ -553,8 +524,7 @@ public class CertTool {
 					ks.load(null, outputKeyStorePass);
 				}
 
-				java.security.KeyStore.TrustedCertificateEntry entry = new java.security.KeyStore.TrustedCertificateEntry(
-						cert);
+				java.security.KeyStore.TrustedCertificateEntry entry = new java.security.KeyStore.TrustedCertificateEntry(cert);
 
 				ks.setEntry(outputAlias, entry, null);
 
@@ -585,8 +555,7 @@ public class CertTool {
 				// create a self-signed cert
 				System.out.print("Creating self-signed certificate... ");
 				System.out.flush();
-				cert = createMasterCert(dn, validity, keyPair.getPublic(),
-						keyPair.getPrivate());
+				cert = createMasterCert(dn, validity, keyPair.getPublic(), keyPair.getPrivate());
 				caCert = cert;
 				certChain = new X509Certificate[] { cert };
 				System.out.println("Done.");
@@ -600,10 +569,9 @@ public class CertTool {
 				fis.close();
 
 				// load the signing cert/private key and generate a client cert
-				PrivateKey caPrivKey = (PrivateKey) ks.getKey(inputAlias,
-						inputEntryPass);
-				java.security.cert.Certificate[] caCertChain = (java.security.cert.Certificate[]) ks
-						.getCertificateChain(inputAlias);
+				PrivateKey caPrivKey = (PrivateKey) ks.getKey(inputAlias, inputEntryPass);
+				java.security.cert.Certificate[] caCertChain =
+					(java.security.cert.Certificate[]) ks.getCertificateChain(inputAlias);
 
 				if ((caCertChain == null) || (caCertChain.length == 0)) {
 					System.err.println("No such issuing certificate alias");
@@ -615,8 +583,7 @@ public class CertTool {
 
 				System.out.print("Creating issuer-signed certificate...");
 				System.out.flush();
-				cert = createIntermediateCert(dn, validity,
-						keyPair.getPublic(), caPrivKey, caCert);
+				cert = createIntermediateCert(dn, validity, keyPair.getPublic(), caPrivKey, caCert);
 				System.out.println("Done.");
 
 				certChain = new X509Certificate[caCertChain.length + 1];
@@ -633,13 +600,11 @@ public class CertTool {
 			System.out.println("Done.");
 
 			if (outputKeyStore != null) {
-				System.out
-						.print("Writing new certificate and keypair to output keystore...");
+				System.out.print("Writing new certificate and keypair to output keystore...");
 				System.out.flush();
 				KeyStore ks = KeyStore.getInstance(outputStoreType, "BC");
 				ks.load(null, outputKeyStorePass);
-				ks.setKeyEntry(outputAlias, keyPair.getPrivate(),
-						outputEntryPass, certChain);
+				ks.setKeyEntry(outputAlias, keyPair.getPrivate(), outputEntryPass, certChain);
 
 				FileOutputStream fos = new FileOutputStream(outputKeyStore);
 				ks.store(fos, outputKeyStorePass);

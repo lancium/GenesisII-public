@@ -20,7 +20,8 @@ import java.util.regex.Pattern;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class ReplacementProperties extends Properties {
+public class ReplacementProperties extends Properties
+{
 	static private Pattern _VAR_PATTERN = Pattern.compile("\\$\\{([^}]*)}");
 
 	static final long serialVersionUID = 0;
@@ -28,25 +29,29 @@ public class ReplacementProperties extends Properties {
 	private Properties _firstOverride = null;
 	private Properties _secondOverride = null;
 
-	public ReplacementProperties() {
+	public ReplacementProperties()
+	{
 		this(null, null);
 	}
 
-	public ReplacementProperties(Properties firstOverride) {
+	public ReplacementProperties(Properties firstOverride)
+	{
 		this(firstOverride, null);
 	}
 
-	public ReplacementProperties(Properties firstOverride,
-			Properties secondOverride) {
+	public ReplacementProperties(Properties firstOverride, Properties secondOverride)
+	{
 		_firstOverride = firstOverride;
 		_secondOverride = secondOverride;
 	}
 
-	public String getProperty(String propertyName) {
+	public String getProperty(String propertyName)
+	{
 		return getProperty(propertyName, null);
 	}
 
-	public String getProperty(String propertyName, String def) {
+	public String getProperty(String propertyName, String def)
+	{
 		String result = null;
 
 		result = super.getProperty(propertyName);
@@ -70,8 +75,7 @@ public class ReplacementProperties extends Properties {
 			String value = getProperty(m.group(1));
 			if (value == null)
 				value = "";
-			result = result.substring(0, m.start()) + value
-					+ result.substring(m.end());
+			result = result.substring(0, m.start()) + value + result.substring(m.end());
 		}
 
 		return result;

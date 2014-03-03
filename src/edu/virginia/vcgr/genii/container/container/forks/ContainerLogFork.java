@@ -14,21 +14,24 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class ContainerLogFork extends AbstractRandomByteIOResourceFork {
-	private File getContainerLogFile() {
-		// the name LOGFILE is in synch with our log4j configuration file's
-		// appender name,
+public class ContainerLogFork extends AbstractRandomByteIOResourceFork
+{
+	private File getContainerLogFile()
+	{
+		// the name LOGFILE is in synch with our log4j configuration file's appender name,
 		// and must be kept in synch for this to continue working.
 		return new File(Log4jHelper.queryLog4jFile("LOGFILE"));
 	}
 
-	public ContainerLogFork(ResourceForkService service, String forkPath) {
+	public ContainerLogFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void read(long offset, ByteBuffer dest) throws IOException {
+	public void read(long offset, ByteBuffer dest) throws IOException
+	{
 		RandomAccessFile raf = null;
 		File containerLog = null;
 
@@ -45,37 +48,43 @@ public class ContainerLogFork extends AbstractRandomByteIOResourceFork {
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void truncAppend(long offset, ByteBuffer source) throws IOException {
+	public void truncAppend(long offset, ByteBuffer source) throws IOException
+	{
 		throw new IOException("TruncAppend not permitted on container.log");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void write(long offset, ByteBuffer source) throws IOException {
+	public void write(long offset, ByteBuffer source) throws IOException
+	{
 		throw new IOException("Write not permitted on container.log");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Calendar accessTime() {
+	public Calendar accessTime()
+	{
 		return Calendar.getInstance();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void accessTime(Calendar newTime) {
+	public void accessTime(Calendar newTime)
+	{
 		// Ignore
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Calendar createTime() {
+	public Calendar createTime()
+	{
 		return Calendar.getInstance();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Calendar modificationTime() {
+	public Calendar modificationTime()
+	{
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(getContainerLogFile().lastModified());
 		return c;
@@ -83,25 +92,29 @@ public class ContainerLogFork extends AbstractRandomByteIOResourceFork {
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void modificationTime(Calendar newTime) {
+	public void modificationTime(Calendar newTime)
+	{
 		// Ignore
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public boolean readable() {
+	public boolean readable()
+	{
 		return true;
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public long size() {
+	public long size()
+	{
 		return getContainerLogFile().length();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public boolean writable() {
+	public boolean writable()
+	{
 		return false;
 	}
 }

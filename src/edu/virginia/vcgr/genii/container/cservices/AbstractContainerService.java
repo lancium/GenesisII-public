@@ -7,22 +7,26 @@ import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
-public abstract class AbstractContainerService implements ContainerService {
+public abstract class AbstractContainerService implements ContainerService
+{
 	private boolean _started = false;
 	private String _serviceName;
 	private ExecutorService _executor = null;
 	private ServerDatabaseConnectionPool _connectionPool = null;
 	private ContainerServicesProperties _cservicesProperties = null;
 
-	protected AbstractContainerService(String serviceName) {
+	protected AbstractContainerService(String serviceName)
+	{
 		_serviceName = serviceName;
 	}
 
-	protected ExecutorService getExecutor() {
+	protected ExecutorService getExecutor()
+	{
 		return _executor;
 	}
 
-	protected ServerDatabaseConnectionPool getConnectionPool() {
+	protected ServerDatabaseConnectionPool getConnectionPool()
+	{
 		return _connectionPool;
 	}
 
@@ -31,9 +35,9 @@ public abstract class AbstractContainerService implements ContainerService {
 	protected abstract void loadService() throws Throwable;
 
 	@Override
-	final synchronized public void load(ExecutorService executor,
-			ServerDatabaseConnectionPool connectionPool,
-			ContainerServicesProperties cservicesProperties) throws Throwable {
+	final synchronized public void load(ExecutorService executor, ServerDatabaseConnectionPool connectionPool,
+		ContainerServicesProperties cservicesProperties) throws Throwable
+	{
 		_executor = executor;
 		_connectionPool = connectionPool;
 		_cservicesProperties = cservicesProperties;
@@ -42,34 +46,38 @@ public abstract class AbstractContainerService implements ContainerService {
 	}
 
 	@Override
-	public void setProperties(Properties properties) {
+	public void setProperties(Properties properties)
+	{
 		// By default, we ignore properties.
 	}
 
 	@Override
-	public String serviceName() {
+	public String serviceName()
+	{
 		return _serviceName;
 	}
 
 	@Override
-	final synchronized public void start() throws Throwable {
+	final synchronized public void start() throws Throwable
+	{
 		if (_connectionPool == null)
-			throw new ConfigurationException("Attempt to start service \""
-					+ _serviceName + "\" without datbase connection pool.");
+			throw new ConfigurationException("Attempt to start service \"" + _serviceName
+				+ "\" without datbase connection pool.");
 		if (_started)
-			throw new ConfigurationException("Service \"" + _serviceName
-					+ "\" has already been started.");
+			throw new ConfigurationException("Service \"" + _serviceName + "\" has already been started.");
 
 		startService();
 	}
 
 	@Override
-	public boolean started() {
+	public boolean started()
+	{
 		return _started;
 	}
 
 	@Override
-	public ContainerServicesProperties getContainerServicesProperties() {
+	public ContainerServicesProperties getContainerServicesProperties()
+	{
 		return _cservicesProperties;
 	}
 }

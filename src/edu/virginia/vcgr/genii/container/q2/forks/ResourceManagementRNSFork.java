@@ -16,16 +16,17 @@ import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class ResourceManagementRNSFork extends ReadOnlyRNSResourceFork {
-	public ResourceManagementRNSFork(ResourceForkService service,
-			String forkPath) {
+public class ResourceManagementRNSFork extends ReadOnlyRNSResourceFork
+{
+	public ResourceManagementRNSFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR,
-			String entryName) throws IOException {
+	public Iterable<InternalEntry> list(EndpointReferenceType exemplarEPR, String entryName) throws IOException
+	{
 		ResourceKey rKey = getService().getResourceKey();
 		Collection<LegacyEntryType> entries;
 		Collection<InternalEntry> ret;
@@ -35,9 +36,8 @@ public class ResourceManagementRNSFork extends ReadOnlyRNSResourceFork {
 			entries = mgr.listBESs(entryName);
 			ret = new ArrayList<InternalEntry>(entries.size());
 			for (LegacyEntryType entry : entries) {
-				ret.add(createInternalEntry(exemplarEPR, entry.getEntry_name(),
-						new ResourceManagementCmdFork(getService(),
-								formForkPath(entry.getEntry_name())).describe()));
+				ret.add(createInternalEntry(exemplarEPR, entry.getEntry_name(), new ResourceManagementCmdFork(getService(),
+					formForkPath(entry.getEntry_name())).describe()));
 			}
 
 			return ret;

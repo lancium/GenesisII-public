@@ -10,45 +10,51 @@ import edu.virginia.vcgr.genii.gjt.data.variables.Clearable;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 
-public class ParameterizableStringList extends DefaultDataItem implements
-		Clearable, PostUnmarshallListener, Iterable<String> {
+public class ParameterizableStringList extends DefaultDataItem implements Clearable, PostUnmarshallListener, Iterable<String>
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "value")
 	private Vector<String> _values = new Vector<String>();
 
-	public ParameterizableStringList() {
+	public ParameterizableStringList()
+	{
 	}
 
-	public ParameterizableStringList(ParameterizableBroker pBroker,
-			ModificationBroker mBroker) {
+	public ParameterizableStringList(ParameterizableBroker pBroker, ModificationBroker mBroker)
+	{
 		addParameterizableListener(pBroker);
 		addModificationListener(mBroker);
 	}
 
-	public void add(String value) {
+	public void add(String value)
+	{
 		_values.add(value);
 		fireParameterizableStringModified("", value);
 		fireJobDescriptionModified();
 	}
 
-	public void remove(String value) {
+	public void remove(String value)
+	{
 		if (_values.remove(value)) {
 			fireParameterizableStringModified(value, "");
 			fireJobDescriptionModified();
 		}
 	}
 
-	public String get(int index) {
+	public String get(int index)
+	{
 		return _values.get(index);
 	}
 
-	public int size() {
+	public int size()
+	{
 		return _values.size();
 	}
 
 	@Override
-	public void clear() {
+	public void clear()
+	{
 		for (String value : _values)
 			fireParameterizableStringModified(value, "");
 		if (_values.size() > 0)
@@ -58,12 +64,11 @@ public class ParameterizableStringList extends DefaultDataItem implements
 	}
 
 	@Override
-	public void postUnmarshall(ParameterizableBroker parameterBroker,
-			ModificationBroker modificationBroker) {
+	public void postUnmarshall(ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
+	{
 		/* SHouldn't need to do this */
 		/*
-		 * addParameterizableListener(parameterBroker);
-		 * addModificationListener(modificationBroker);
+		 * addParameterizableListener(parameterBroker); addModificationListener(modificationBroker);
 		 */
 
 		for (String value : _values)
@@ -73,7 +78,8 @@ public class ParameterizableStringList extends DefaultDataItem implements
 	}
 
 	@Override
-	public Iterator<String> iterator() {
+	public Iterator<String> iterator()
+	{
 		return Collections.unmodifiableList(_values).iterator();
 	}
 }

@@ -28,51 +28,56 @@ import junit.framework.TestCase;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class EventTest extends TestCase implements IEventHandler,
-		IEventDoneHandler {
+public class EventTest extends TestCase implements IEventHandler, IEventDoneHandler
+{
 	private EventManager _manager = null;
 	private Object _key = new Object();
 
-	static private class TestEvent extends DefaultEvent {
+	static private class TestEvent extends DefaultEvent
+	{
 		static final long serialVersionUID = 0;
 
 		private int _count;
 
-		public TestEvent(EventDescription desc) {
+		public TestEvent(EventDescription desc)
+		{
 			super(desc);
 
 			_count = 0;
 		}
 
-		public void inrement() {
+		public void inrement()
+		{
 			_count++;
 		}
 
-		public int getCount() {
+		public int getCount()
+		{
 			return _count;
 		}
 	}
 
-	protected void setUp() throws Exception {
+	protected void setUp() throws Exception
+	{
 		super.setUp();
 
 		_manager = new EventManager();
 	}
 
-	protected void tearDown() throws Exception {
+	protected void tearDown() throws Exception
+	{
 		_manager = null;
 
 		super.tearDown();
 	}
 
-	public void testEvents() throws EventException, InterruptedException {
-		EventDescription desc = _manager.registerEventDescription("my-event",
-				TestEvent.class);
+	public void testEvents() throws EventException, InterruptedException
+	{
+		EventDescription desc = _manager.registerEventDescription("my-event", TestEvent.class);
 
 		_manager.registerHandler(desc, this, 0);
 		_manager.registerHandler(desc, this, 10);
-		IEventHandlerToken tokenGamma = _manager.registerHandler(desc, this,
-				-10);
+		IEventHandlerToken tokenGamma = _manager.registerHandler(desc, this, -10);
 
 		IEventProgress progress;
 		TestEvent te = new TestEvent(desc);
@@ -111,9 +116,9 @@ public class EventTest extends TestCase implements IEventHandler,
 		TestCase.assertEquals(2, te.getCount());
 	}
 
-	public void testEventDoneHandler() throws Exception {
-		EventDescription desc = _manager.registerEventDescription("my-event2",
-				TestEvent.class);
+	public void testEventDoneHandler() throws Exception
+	{
+		EventDescription desc = _manager.registerEventDescription("my-event2", TestEvent.class);
 
 		_manager.registerHandler(desc, this, 0);
 		_manager.registerHandler(desc, this, 10);
@@ -130,13 +135,15 @@ public class EventTest extends TestCase implements IEventHandler,
 		TestCase.assertEquals(3, te._count);
 	}
 
-	public boolean handleEvent(IEvent event) {
+	public boolean handleEvent(IEvent event)
+	{
 		TestEvent te = (TestEvent) event;
 		te.inrement();
 		return true;
 	}
 
-	public void eventDoneCallback(IEventProgress prog) {
+	public void eventDoneCallback(IEventProgress prog)
+	{
 		synchronized (_key) {
 			_key.notifyAll();
 		}

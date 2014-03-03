@@ -10,15 +10,12 @@ import edu.virginia.vcgr.genii.gjt.data.fs.scratch.ScratchFilesystem;
 import edu.virginia.vcgr.genii.gjt.data.fs.scratch.ScratchFilesystemFactory;
 
 public enum FilesystemType {
-	Default(DefaultFilesystem.COMMON_NAME, DefaultFilesystem.JSDL_NAME,
-			DefaultFilesystem.DESCRIPTION, DefaultFilesystem.getIcon(),
-			new DefaultFilesystemFactory(), DefaultFilesystem.CAN_EDIT), Grid(
-			GridFilesystem.COMMON_NAME, GridFilesystem.JSDL_NAME,
-			GridFilesystem.DESCRIPTION, GridFilesystem.getIcon(),
-			new GridFilesystemFactory(), GridFilesystem.CAN_EDIT), Scratch(
-			ScratchFilesystem.COMMON_NAME, ScratchFilesystem.JSDL_NAME,
-			ScratchFilesystem.DESCRIPTION, ScratchFilesystem.getIcon(),
-			new ScratchFilesystemFactory(), ScratchFilesystem.CAN_EDIT);
+	Default(DefaultFilesystem.COMMON_NAME, DefaultFilesystem.JSDL_NAME, DefaultFilesystem.DESCRIPTION, DefaultFilesystem
+		.getIcon(), new DefaultFilesystemFactory(), DefaultFilesystem.CAN_EDIT),
+	Grid(GridFilesystem.COMMON_NAME, GridFilesystem.JSDL_NAME, GridFilesystem.DESCRIPTION, GridFilesystem.getIcon(),
+		new GridFilesystemFactory(), GridFilesystem.CAN_EDIT),
+	Scratch(ScratchFilesystem.COMMON_NAME, ScratchFilesystem.JSDL_NAME, ScratchFilesystem.DESCRIPTION, ScratchFilesystem
+		.getIcon(), new ScratchFilesystemFactory(), ScratchFilesystem.CAN_EDIT);
 
 	private String _commonName;
 	private String _jsdlName;
@@ -28,9 +25,9 @@ public enum FilesystemType {
 
 	private FilesystemFactory _factory;
 
-	private FilesystemType(String commonName, String jsdlName,
-			String description, Icon icon, FilesystemFactory factory,
-			boolean canEdit) {
+	private FilesystemType(String commonName, String jsdlName, String description, Icon icon, FilesystemFactory factory,
+		boolean canEdit)
+	{
 		_commonName = commonName;
 		_jsdlName = jsdlName;
 		_description = description;
@@ -39,27 +36,33 @@ public enum FilesystemType {
 		_canEdit = canEdit;
 	}
 
-	public String jsdlName() {
+	public String jsdlName()
+	{
 		return _jsdlName;
 	}
 
-	public String description() {
+	public String description()
+	{
 		return _description;
 	}
 
-	public FilesystemFactory factory() {
+	public FilesystemFactory factory()
+	{
 		return _factory;
 	}
 
-	public Icon icon() {
+	public Icon icon()
+	{
 		return _icon;
 	}
 
-	public boolean canEdit() {
+	public boolean canEdit()
+	{
 		return _canEdit;
 	}
 
-	public String toString(FilesystemMap map) {
+	public String toString(FilesystemMap map)
+	{
 		Filesystem filesystem = map.get(this);
 		if (filesystem != null)
 			return filesystem.toString();
@@ -68,7 +71,8 @@ public enum FilesystemType {
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return _commonName;
 	}
 }

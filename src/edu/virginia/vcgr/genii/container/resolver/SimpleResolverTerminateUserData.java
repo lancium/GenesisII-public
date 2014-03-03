@@ -10,7 +10,8 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public class SimpleResolverTerminateUserData extends AdditionalUserData {
+public class SimpleResolverTerminateUserData extends AdditionalUserData
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "targetEPI", required = true, nillable = false)
@@ -20,15 +21,18 @@ public class SimpleResolverTerminateUserData extends AdditionalUserData {
 	private int _targetID = -1;
 
 	@SuppressWarnings("unused")
-	private SimpleResolverTerminateUserData() {
+	private SimpleResolverTerminateUserData()
+	{
 	}
 
-	public SimpleResolverTerminateUserData(URI targetEPI, int targetID) {
+	public SimpleResolverTerminateUserData(URI targetEPI, int targetID)
+	{
 		_targetEPI = targetEPI.toString();
 		_targetID = targetID;
 	}
 
-	public URI getTargetEPI() {
+	public URI getTargetEPI()
+	{
 		try {
 			return new URI(_targetEPI);
 		} catch (Exception exception) {
@@ -36,7 +40,8 @@ public class SimpleResolverTerminateUserData extends AdditionalUserData {
 		}
 	}
 
-	public int getTargetID() {
+	public int getTargetID()
+	{
 		return _targetID;
 	}
 }

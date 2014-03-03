@@ -29,7 +29,8 @@ import edu.virginia.vcgr.genii.client.logging.DLogDatabase;
 import edu.virginia.vcgr.genii.client.logging.DLogUtils;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
-public class DLogHierarchySender extends WSDoAllReceiver {
+public class DLogHierarchySender extends WSDoAllReceiver
+{
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(DLogHierarchySender.class);
@@ -43,7 +44,8 @@ public class DLogHierarchySender extends WSDoAllReceiver {
 
 	private static final String TEMP_SESSION_RPC_ID = "TEMP_SESSION_RPC_ID";
 
-	private boolean isRequest() throws AxisFault {
+	private boolean isRequest() throws AxisFault
+	{
 		synchronized (this) {
 			if (_isRequest == null) {
 				AxisFault fault = null;
@@ -55,13 +57,11 @@ public class DLogHierarchySender extends WSDoAllReceiver {
 					else if (value.equals(_FLOW_SIDE_RESPONSE_VALUE))
 						_isRequest = Boolean.FALSE;
 					else
-						fault = new AxisFault(_FLOW_SIDE_KEY
-								+ " property not recognized.  Expected "
-								+ _FLOW_SIDE_REQUEST_VALUE + " or "
-								+ _FLOW_SIDE_RESPONSE_VALUE);
+						fault =
+							new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected " + _FLOW_SIDE_REQUEST_VALUE
+								+ " or " + _FLOW_SIDE_RESPONSE_VALUE);
 				} else {
-					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY
-							+ " parameter.");
+					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY + " parameter.");
 				}
 
 				if (fault != null)
@@ -72,17 +72,17 @@ public class DLogHierarchySender extends WSDoAllReceiver {
 		return _isRequest.booleanValue();
 	}
 
-	public DLogHierarchySender() {
+	public DLogHierarchySender()
+	{
 
 	}
 
-	static private String _WSA_NS = EndpointReferenceType.getTypeDesc()
-			.getXmlType().getNamespaceURI();
+	static private String _WSA_NS = EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI();
 	static private QName _WSA_TO_QNAME = new QName(_WSA_NS, "To");
 	static private QName _WSA_METADATA_QName = new QName(_WSA_NS, "Metadata");
 
-	private EndpointReferenceType extractEPR(MessageContext ctxt)
-			throws AxisFault {
+	private EndpointReferenceType extractEPR(MessageContext ctxt) throws AxisFault
+	{
 		Vector<MessageElement> refParams = new Vector<MessageElement>();
 		_logger.trace("DLog extracting EPR from header.");
 
@@ -100,22 +100,16 @@ public class DLogHierarchySender extends WSDoAllReceiver {
 			SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
 			QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
 			if (heName.equals(_WSA_METADATA_QName)) {
-				epr.setMetadata((MetadataType) ObjectDeserializer.toObject(he,
-						MetadataType.class));
+				epr.setMetadata((MetadataType) ObjectDeserializer.toObject(he, MetadataType.class));
 			} else if (heName.equals(_WSA_TO_QNAME)) {
-				epr.setAddress(new AttributedURIType(he.getFirstChild()
-						.getNodeValue()));
-				_logger.trace("DLog found target: \""
-						+ epr.getAddress().get_value() + "\".");
+				epr.setAddress(new AttributedURIType(he.getFirstChild().getNodeValue()));
+				_logger.trace("DLog found target: \"" + epr.getAddress().get_value() + "\".");
 			} else if (heName.equals(GenesisIIConstants.MYPROXY_QNAME)) {
-				MyProxyCertificate.setPEMFormattedCertificate(he
-						.getFirstChild().getNodeValue());
+				MyProxyCertificate.setPEMFormattedCertificate(he.getFirstChild().getNodeValue());
 			} else {
-				String isRefParam = he.getAttributeNS(_WSA_NS,
-						"IsReferenceParameter");
+				String isRefParam = he.getAttributeNS(_WSA_NS, "IsReferenceParameter");
 				if (isRefParam != null) {
-					if (isRefParam.equalsIgnoreCase("true")
-							|| isRefParam.equals("1")) {
+					if (isRefParam.equalsIgnoreCase("true") || isRefParam.equals("1")) {
 						he.removeAttribute("actor");
 						he.removeAttribute("mustUnderstand");
 						refParams.add(he);
@@ -125,14 +119,14 @@ public class DLogHierarchySender extends WSDoAllReceiver {
 		}
 
 		if (refParams.size() > 0) {
-			epr.setReferenceParameters(new ReferenceParametersType(
-					(MessageElement[]) refParams.toArray()));
+			epr.setReferenceParameters(new ReferenceParametersType((MessageElement[]) refParams.toArray()));
 		}
 
 		return epr;
 	}
 
-	public void invoke(MessageContext msgContext) throws AxisFault {
+	public void invoke(MessageContext msgContext) throws AxisFault
+	{
 		if (isRequest()) {
 			_logger.trace("Sending a request...");
 			if (database == null) {
@@ -144,27 +138,22 @@ public class DLogHierarchySender extends WSDoAllReceiver {
 				String tempID = new GUID().toString();
 				SOAPMessage msg = msgContext.getMessage();
 				msg.setProperty(TEMP_SESSION_RPC_ID, tempID);
-				byte[] bytes = msgContext.getRequestMessage()
-						.getSOAPPartAsBytes();
+				byte[] bytes = msgContext.getRequestMessage().getSOAPPartAsBytes();
 				EndpointReferenceType epr = extractEPR(msgContext);
 				String op = msgContext.getOperation().getName();
 				database.recordMeta1(tempID, bytes, epr, op);
 			} catch (SOAPException e) {
-				_logger.error(
-						"Problem retrieving SOAP body from request message", e);
+				_logger.error("Problem retrieving SOAP body from request message", e);
 			} catch (SQLException e) {
-				_logger.error("Problem putting request metadata into database",
-						e);
+				_logger.error("Problem putting request metadata into database", e);
 			} catch (IOException e) {
-				_logger.error(
-						"Couldn't serialize request message for database", e);
+				_logger.error("Couldn't serialize request message for database", e);
 			}
 		} else {
 			try {
 				SOAPMessage msg = msgContext.getMessage();
 				@SuppressWarnings("unchecked")
-				Iterator<SOAPHeaderElement> rpcids = msg.getSOAPHeader()
-						.getChildElements(GenesisIIConstants.RPC_ID_QNAME);
+				Iterator<SOAPHeaderElement> rpcids = msg.getSOAPHeader().getChildElements(GenesisIIConstants.RPC_ID_QNAME);
 
 				if (rpcids.hasNext()) {
 					String rpcid = rpcids.next().getValue();
@@ -176,24 +165,19 @@ public class DLogHierarchySender extends WSDoAllReceiver {
 					}
 					database.recordRPCID(rpcid);
 
-					String tempID = (String) msgContext.getRequestMessage()
-							.getProperty(TEMP_SESSION_RPC_ID);
-					byte[] bytes = msgContext.getResponseMessage()
-							.getSOAPPartAsBytes();
+					String tempID = (String) msgContext.getRequestMessage().getProperty(TEMP_SESSION_RPC_ID);
+					byte[] bytes = msgContext.getResponseMessage().getSOAPPartAsBytes();
 					database.recordMeta2(tempID, bytes, rpcid);
 				} else {
 					_logger.trace("Got a response, no RPCID included");
 				}
 
 			} catch (SOAPException e) {
-				_logger.error(
-						"Problem retrieving SOAP body from response message", e);
+				_logger.error("Problem retrieving SOAP body from response message", e);
 			} catch (SQLException e) {
-				_logger.error(
-						"Problem putting response metadata into database", e);
+				_logger.error("Problem putting response metadata into database", e);
 			} catch (IOException e) {
-				_logger.error(
-						"Couldn't serialize response message for database", e);
+				_logger.error("Couldn't serialize response message for database", e);
 			}
 		}
 	}

@@ -19,14 +19,16 @@ import edu.virginia.vcgr.genii.client.install.ContainerInformation;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
-class LocalContainerPanel extends JPanel {
+class LocalContainerPanel extends JPanel
+{
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(LocalContainerPanel.class);
 
 	private JRadioButton[] _buttons;
 
-	LocalContainerPanel(String def) {
+	LocalContainerPanel(String def)
+	{
 		super(new GridBagLayout());
 
 		boolean selectedOne = false;
@@ -58,20 +60,21 @@ class LocalContainerPanel extends JPanel {
 			_buttons[lcv] = new JRadioButton(containerName, selected);
 			group.add(_buttons[lcv]);
 
-			add(_buttons[lcv], new GridBagConstraints(0, lcv, 1, 1, 1.0, 1.0,
-					GridBagConstraints.WEST, GridBagConstraints.NONE,
-					new Insets(5, 5, 5, 5), 5, 5));
+			add(_buttons[lcv], new GridBagConstraints(0, lcv, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
 		}
 
 		if (!selectedOne && _buttons.length > 0)
 			_buttons[0].setSelected(true);
 	}
 
-	public boolean hasChoices() {
+	public boolean hasChoices()
+	{
 		return _buttons.length > 1;
 	}
 
-	public String getSelectedContainer() {
+	public String getSelectedContainer()
+	{
 		if (_buttons.length == 0)
 			return null;
 

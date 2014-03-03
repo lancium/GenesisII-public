@@ -27,7 +27,8 @@ import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
-public class StageDataTool extends BaseGridTool {
+public class StageDataTool extends BaseGridTool
+{
 
 	private String _type = "jsdl";
 	private String _direction = "in";
@@ -39,23 +40,26 @@ public class StageDataTool extends BaseGridTool {
 	static final private String _MANPAGE = "config/tooldocs/man/stageData";
 
 	@Option({ "type" })
-	public void setType(String type) {
+	public void setType(String type)
+	{
 		_type = type;
 	}
 
 	@Option({ "direction" })
-	public void setDirection(String direction) {
+	public void setDirection(String direction)
+	{
 		_direction = direction;
 	}
 
-	public StageDataTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				true, ToolCategory.DATA);
+	public StageDataTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), true, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();
@@ -69,19 +73,17 @@ public class StageDataTool extends BaseGridTool {
 		GeniiPath source = new GeniiPath(getArgument(1));
 
 		if (!source.exists())
-			throw new FileNotFoundException(String.format(
-					"Unable to find source file %s!", source));
+			throw new FileNotFoundException(String.format("Unable to find source file %s!", source));
 		if (!source.isFile())
-			throw new IOException(String.format(
-					"Source path %s is not a file!", source));
+			throw new IOException(String.format("Source path %s is not a file!", source));
 
 		in = source.openInputStream();
 
 		JobRequest tJob = null;
 
 		if (_type.equals("jsdl")) {
-			JobDefinition_Type jsdl = (JobDefinition_Type) ObjectDeserializer
-					.deserialize(new InputSource(in), JobDefinition_Type.class);
+			JobDefinition_Type jsdl =
+				(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
 			PersonalityProvider provider = new ExecutionProvider();
 			tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
 			in.close();
@@ -97,16 +99,13 @@ public class StageDataTool extends BaseGridTool {
 		if (tJob != null) {
 			if (_direction.equals("in")) {
 				for (ContainerDataStage tStage : tJob.getStageIns()) {
-					stageIN(wDir.getAbsolutePath() + "/" + tStage.getFileName(),
-							new URI(tStage.getSourceURI()),
-							tStage.getCredentials());
+					stageIN(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getSourceURI()),
+						tStage.getCredentials());
 				}
 			} else if (_direction.equals("out")) {
 				for (ContainerDataStage tStage : tJob.getStageOuts()) {
-					stageOUT(
-							wDir.getAbsolutePath() + "/" + tStage.getFileName(),
-							new URI(tStage.getTargetURI()),
-							tStage.getCredentials());
+					stageOUT(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getTargetURI()),
+						tStage.getCredentials());
 				}
 			} else {
 				stdout.println("Invalid direction");
@@ -118,7 +117,8 @@ public class StageDataTool extends BaseGridTool {
 		return 0;
 	}
 
-	private void stageIN(String target, URI source, UsernamePasswordIdentity upi) {
+	private void stageIN(String target, URI source, UsernamePasswordIdentity upi)
+	{
 		File fTarget = new File(target);
 		try {
 			URIManager.get(source, fTarget, upi);
@@ -128,8 +128,8 @@ public class StageDataTool extends BaseGridTool {
 		}
 	}
 
-	private void stageOUT(String source, URI target,
-			UsernamePasswordIdentity upi) {
+	private void stageOUT(String source, URI target, UsernamePasswordIdentity upi)
+	{
 		File fSource = new File(source);
 
 		if (!fSource.exists()) {
@@ -146,7 +146,8 @@ public class StageDataTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException();
 	}

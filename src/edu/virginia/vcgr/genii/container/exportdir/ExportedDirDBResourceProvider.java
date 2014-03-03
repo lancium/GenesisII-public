@@ -7,10 +7,11 @@ import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider;
 
-public class ExportedDirDBResourceProvider extends BasicDBResourceProvider {
-	protected IResourceFactory instantiateResourceFactory(
-			ServerDatabaseConnectionPool pool) throws SQLException,
-			ResourceException {
+public class ExportedDirDBResourceProvider extends BasicDBResourceProvider
+{
+	protected IResourceFactory instantiateResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException,
+		ResourceException
+	{
 		return new ExportedDirDBResourceFactory(pool);
 	}
 }

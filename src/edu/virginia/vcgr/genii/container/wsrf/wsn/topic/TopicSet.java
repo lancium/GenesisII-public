@@ -22,33 +22,36 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.WSNTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.xml.TopicForest;
 
-public class TopicSet {
+public class TopicSet
+{
 	static private Log _logger = LogFactory.getLog(TopicSet.class);
 
 	private Set<TopicPath> _topics = new HashSet<TopicPath>();
 
-	private void addAllTopics(TopicSet set) {
+	private void addAllTopics(TopicSet set)
+	{
 		_topics.addAll(set._topics);
 	}
 
-	private TopicSet() {
+	private TopicSet()
+	{
 	}
 
-	final public void addTopic(TopicPath topic) {
+	final public void addTopic(TopicPath topic)
+	{
 		_topics.add(topic);
 	}
 
-	final public PublisherTopic createPublisherTopic(TopicPath topicPath) {
+	final public PublisherTopic createPublisherTopic(TopicPath topicPath)
+	{
 		if (!_topics.contains(topicPath))
-			throw new IllegalArgumentException(String.format(
-					"Topic path %s has not been declared!", topicPath));
+			throw new IllegalArgumentException(String.format("Topic path %s has not been declared!", topicPath));
 
 		EndpointReferenceType source = null;
 
 		try {
-			source = (EndpointReferenceType) WorkingContext
-					.getCurrentWorkingContext().getProperty(
-							WorkingContext.EPR_PROPERTY_NAME);
+			source =
+				(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 		} catch (ContextException e) {
 			source = null;
 		}
@@ -56,7 +59,8 @@ public class TopicSet {
 		return new PublisherTopic(source, topicPath);
 	}
 
-	final public MessageElement describe(QName elementName) {
+	final public MessageElement describe(QName elementName)
+	{
 		QName root = elementName;
 
 		if (root == null)
@@ -74,13 +78,15 @@ public class TopicSet {
 		return ret;
 	}
 
-	final public Collection<TopicPath> knownTopics() {
+	final public Collection<TopicPath> knownTopics()
+	{
 		return Collections.unmodifiableCollection(_topics);
 	}
 
 	static private Map<Class<?>, TopicSet> _knownTopicSets = new HashMap<Class<?>, TopicSet>();
 
-	static private void forPublisher(TopicSet set, Class<?> publisher) {
+	static private void forPublisher(TopicSet set, Class<?> publisher)
+	{
 		if ((publisher == null) || publisher.equals(Object.class))
 			return;
 
@@ -101,14 +107,14 @@ public class TopicSet {
 					field.setAccessible(false);
 					set.addTopic(tp);
 				} catch (IllegalAccessException e) {
-					_logger.error(String.format(
-							"Unable to access topic field %s.", field), e);
+					_logger.error(String.format("Unable to access topic field %s.", field), e);
 				}
 			}
 		}
 	}
 
-	static public TopicSet forPublisher(Class<?> publisher) {
+	static public TopicSet forPublisher(Class<?> publisher)
+	{
 		TopicSet ret = null;
 
 		synchronized (_knownTopicSets) {

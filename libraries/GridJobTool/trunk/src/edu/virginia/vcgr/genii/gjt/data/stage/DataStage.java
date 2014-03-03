@@ -22,8 +22,8 @@ import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
 import edu.virginia.vcgr.jsdl.CreationFlag;
 
-public class DataStage extends DefaultDataItem implements
-		PostUnmarshallListener, Clearable {
+public class DataStage extends DefaultDataItem implements PostUnmarshallListener, Clearable
+{
 	@XmlTransient
 	private ParameterizableBroker _pBroker;
 
@@ -43,17 +43,18 @@ public class DataStage extends DefaultDataItem implements
 	private CreationFlag _creationFlag = CreationFlag.overwrite;
 
 	@XmlJavaTypeAdapter(SerializableStageDataAdapter.class)
-	private Map<StageProtocol, StageData> _history = new EnumMap<StageProtocol, StageData>(
-			StageProtocol.class);
+	private Map<StageProtocol, StageData> _history = new EnumMap<StageProtocol, StageData>(StageProtocol.class);
 
 	@XmlAttribute(name = "current-stage-protocol")
 	private StageProtocol _current = StageProtocol.undefined;
 
-	public DataStage() {
+	public DataStage()
+	{
 		_history.put(StageProtocol.undefined, new UndefinedStageData());
 	}
 
-	public DataStage(ParameterizableBroker pBroker, ModificationBroker mBroker) {
+	public DataStage(ParameterizableBroker pBroker, ModificationBroker mBroker)
+	{
 		this();
 
 		_pBroker = pBroker;
@@ -63,47 +64,54 @@ public class DataStage extends DefaultDataItem implements
 		addModificationListener(mBroker);
 	}
 
-	public FilesystemType filesystemType() {
+	public FilesystemType filesystemType()
+	{
 		return _filesystem;
 	}
 
-	public void filesystemType(FilesystemType newType) {
+	public void filesystemType(FilesystemType newType)
+	{
 		_filesystem = newType;
 		fireJobDescriptionModified();
 	}
 
-	public boolean deleteOnTerminate() {
+	public boolean deleteOnTerminate()
+	{
 		return _deleteOnTerminate;
 	}
 
-	public void deleteOnTerminate(boolean deleteOnTerminate) {
+	public void deleteOnTerminate(boolean deleteOnTerminate)
+	{
 		if (_deleteOnTerminate != deleteOnTerminate)
 			fireJobDescriptionModified();
 
 		_deleteOnTerminate = deleteOnTerminate;
 	}
 
-	public CreationFlag creationFlag() {
+	public CreationFlag creationFlag()
+	{
 		return _creationFlag;
 	}
 
-	public void creationFlag(CreationFlag creationFlag) {
+	public void creationFlag(CreationFlag creationFlag)
+	{
 		if (_creationFlag != creationFlag)
 			fireJobDescriptionModified();
 
 		_creationFlag = creationFlag;
 	}
 
-	public StageData current() {
+	public StageData current()
+	{
 		return _history.get(_current);
 	}
 
 	@SuppressWarnings("unchecked")
-	public StageData edit(Window owner) {
+	public StageData edit(Window owner)
+	{
 		StageData current = _history.get(_current);
 		if (current != null) {
-			StageEditor<StageData> editor = (StageEditor<StageData>) current
-					.protocol().factory().createEditor(owner);
+			StageEditor<StageData> editor = (StageEditor<StageData>) current.protocol().factory().createEditor(owner);
 			if (editor != null) {
 				editor.setInitialData(current);
 				editor.pack();
@@ -113,11 +121,9 @@ public class DataStage extends DefaultDataItem implements
 				current = editor.getStageData();
 				if (current != null) {
 					if (current instanceof Parameterizable)
-						((Parameterizable) current)
-								.addParameterizableListener(_pBroker);
+						((Parameterizable) current).addParameterizableListener(_pBroker);
 					if (current instanceof Modifyable)
-						((Modifyable) current)
-								.addModificationListener(_mBroker);
+						((Modifyable) current).addModificationListener(_mBroker);
 
 					current.activate();
 					_history.put(_current, current).deactivate();
@@ -129,11 +135,11 @@ public class DataStage extends DefaultDataItem implements
 		return null;
 	}
 
-	public StageData activate(Window owner, StageProtocol protocol) {
+	public StageData activate(Window owner, StageProtocol protocol)
+	{
 		StageData data = _history.get(protocol);
 		if (data == null) {
-			StageEditor<? extends StageData> editor = protocol.factory()
-					.createEditor(owner);
+			StageEditor<? extends StageData> editor = protocol.factory().createEditor(owner);
 			editor.setModalityType(ModalityType.DOCUMENT_MODAL);
 			editor.pack();
 			GUIUtils.centerComponent(editor);
@@ -141,8 +147,7 @@ public class DataStage extends DefaultDataItem implements
 			data = editor.getStageData();
 			if (data != null) {
 				if (data instanceof Parameterizable)
-					((Parameterizable) data)
-							.addParameterizableListener(_pBroker);
+					((Parameterizable) data).addParameterizableListener(_pBroker);
 				if (data instanceof Modifyable)
 					((Modifyable) data).addModificationListener(_mBroker);
 
@@ -162,11 +167,13 @@ public class DataStage extends DefaultDataItem implements
 			return null;
 	}
 
-	public String filename() {
+	public String filename()
+	{
 		return _filename;
 	}
 
-	public void filename(String filename) {
+	public void filename(String filename)
+	{
 		String old = _filename;
 		_filename = filename;
 
@@ -175,8 +182,8 @@ public class DataStage extends DefaultDataItem implements
 	}
 
 	@Override
-	public void postUnmarshall(ParameterizableBroker parameterBroker,
-			ModificationBroker modificationBroker) {
+	public void postUnmarshall(ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
+	{
 		_pBroker = parameterBroker;
 		_mBroker = modificationBroker;
 
@@ -188,7 +195,8 @@ public class DataStage extends DefaultDataItem implements
 	}
 
 	@Override
-	public void clear() {
+	public void clear()
+	{
 		fireParameterizableStringModified(_filename, "");
 
 		if (_current != null) {
@@ -198,7 +206,8 @@ public class DataStage extends DefaultDataItem implements
 		}
 	}
 
-	public void analyze(Analysis analysis) {
+	public void analyze(Analysis analysis)
+	{
 		if (_filename == null || _filename.isEmpty())
 			analysis.addError("Cannot have a data stage with no filename.");
 

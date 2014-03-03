@@ -11,13 +11,14 @@ import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.ui.rns.RNSIcons;
 
-public abstract class CredentialManagementAction extends AbstractAction
-		implements CredentialListener {
+public abstract class CredentialManagementAction extends AbstractAction implements CredentialListener
+{
 	static final long serialVersionUID = 0L;
 
 	protected CredentialManagementContext _context;
 
-	protected void resetTooltip() {
+	protected void resetTooltip()
+	{
 		StringWriter writer = new StringWriter();
 		PrintWriter pw = new PrintWriter(writer);
 		pw.println("<HTML><BODY>");
@@ -38,9 +39,9 @@ public abstract class CredentialManagementAction extends AbstractAction
 		putValue(Action.SHORT_DESCRIPTION, writer.toString());
 	}
 
-	protected CredentialManagementAction(CredentialManagementContext context) {
-		super("Credential Management", RNSIcons.RNSIconsFactory()
-				.getSecurityIcon());
+	protected CredentialManagementAction(CredentialManagementContext context)
+	{
+		super("Credential Management", RNSIcons.RNSIconsFactory().getSecurityIcon());
 
 		_context = context;
 		resetTooltip();
@@ -49,7 +50,8 @@ public abstract class CredentialManagementAction extends AbstractAction
 	}
 
 	@Override
-	final public void credentialsChanged(CredentialManagementContext context) {
+	final public void credentialsChanged(CredentialManagementContext context)
+	{
 		resetTooltip();
 	}
 }

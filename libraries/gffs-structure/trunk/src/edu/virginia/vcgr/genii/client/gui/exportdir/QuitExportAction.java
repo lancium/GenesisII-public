@@ -17,8 +17,8 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
-public class QuitExportAction extends AbstractAction implements
-		ListSelectionListener {
+public class QuitExportAction extends AbstractAction implements ListSelectionListener
+{
 	static final long serialVersionUID = 0L;
 	static private Log _logger = LogFactory.getLog(QuitExportAction.class);
 
@@ -27,7 +27,8 @@ public class QuitExportAction extends AbstractAction implements
 	private JTable _table;
 	private Collection<IExportChangeListener> _listeners = new ArrayList<IExportChangeListener>();
 
-	public QuitExportAction(JTable table) {
+	public QuitExportAction(JTable table)
+	{
 		super(_QUIT_EXPORT_BUTTON);
 
 		ListSelectionModel selectionModel = table.getSelectionModel();
@@ -36,22 +37,26 @@ public class QuitExportAction extends AbstractAction implements
 		_table = table;
 	}
 
-	public void addExportChangeListener(IExportChangeListener listener) {
+	public void addExportChangeListener(IExportChangeListener listener)
+	{
 		_listeners.add(listener);
 	}
 
-	public void removeExportChangeListener(IExportChangeListener listener) {
+	public void removeExportChangeListener(IExportChangeListener listener)
+	{
 		_listeners.remove(listener);
 	}
 
-	protected void fireExportsChanged() {
+	protected void fireExportsChanged()
+	{
 		for (IExportChangeListener listener : _listeners) {
 			listener.exportsUpdated();
 		}
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e)
+	{
 		int selectedRow = _table.getSelectedRow();
 		ExportTableModel model = (ExportTableModel) _table.getModel();
 
@@ -76,7 +81,8 @@ public class QuitExportAction extends AbstractAction implements
 	}
 
 	@Override
-	public void valueChanged(ListSelectionEvent e) {
+	public void valueChanged(ListSelectionEvent e)
+	{
 		setEnabled(!((ListSelectionModel) e.getSource()).isSelectionEmpty());
 	}
 }

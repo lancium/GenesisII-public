@@ -18,20 +18,20 @@ import edu.virginia.vcgr.genii.container.cleanup.CleanupContext;
 import edu.virginia.vcgr.genii.container.cleanup.wsnsubscription.WSNSubscriptionCleanupHandler;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
 
-public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
+public class BasicResourceCleanupHandler extends AbstractCleanupHandler
+{
 	@SuppressWarnings("unused")
-	static private Log _logger = LogFactory
-			.getLog(BasicResourceCleanupHandler.class);
+	static private Log _logger = LogFactory.getLog(BasicResourceCleanupHandler.class);
 
-	static private void cleanupSubscriptions(Connection connection,
-			String publisherKey) throws Throwable {
+	static private void cleanupSubscriptions(Connection connection, String publisherKey) throws Throwable
+	{
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = connection
-					.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions "
-							+ "WHERE publisherresourcekey = ?");
+			stmt =
+				connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions "
+					+ "WHERE publisherresourcekey = ?");
 			stmt.setString(1, publisherKey);
 			rs = stmt.executeQuery();
 
@@ -45,14 +45,14 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
 		}
 	}
 
-	static protected void removeRowsFromTable(Connection connection,
-			Triple<String, String, String> tableResourceTriple)
-			throws SQLException {
+	static protected void removeRowsFromTable(Connection connection, Triple<String, String, String> tableResourceTriple)
+		throws SQLException
+	{
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = connection.prepareStatement(String.format(
-					"DELETE FROM %s WHERE %s = ?", tableResourceTriple.first(),
+			stmt =
+				connection.prepareStatement(String.format("DELETE FROM %s WHERE %s = ?", tableResourceTriple.first(),
 					tableResourceTriple.second()));
 			stmt.setString(1, tableResourceTriple.third());
 			stmt.executeUpdate();
@@ -61,8 +61,8 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
 		}
 	}
 
-	static protected void validateEPRFromBlob(CleanupContext context,
-			String resourceID, Blob blob, boolean mustExist) {
+	static protected void validateEPRFromBlob(CleanupContext context, String resourceID, Blob blob, boolean mustExist)
+	{
 		if (blob == null && mustExist) {
 			context.addResource(resourceID, "Blob for EPR was null.");
 			return;
@@ -75,9 +75,9 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
 		return;
 	}
 
-	static protected <Type> Type validateBlobToXml(CleanupContext context,
-			String resourceID, Blob blob, Class<Type> type, boolean mustExist)
-			throws SQLException {
+	static protected <Type> Type validateBlobToXml(CleanupContext context, String resourceID, Blob blob, Class<Type> type,
+		boolean mustExist) throws SQLException
+	{
 		if (blob == null && mustExist) {
 			context.addResource(resourceID, "Blob for type %s was null.", type);
 			return null;
@@ -88,15 +88,14 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
 		} catch (IOException ioe) {
 			throw new SQLException("IO Exception thrown during BLOB read.", ioe);
 		} catch (Throwable cause) {
-			context.addResource(resourceID,
-					"Couldn't derserialize %s from blob:  %s", type, cause);
+			context.addResource(resourceID, "Couldn't derserialize %s from blob:  %s", type, cause);
 			return null;
 		}
 	}
 
-	static protected <Type> Type validateBlobToJavaSer(CleanupContext context,
-			String resourceID, Blob blob, Class<Type> type, boolean mustExist)
-			throws SQLException {
+	static protected <Type> Type validateBlobToJavaSer(CleanupContext context, String resourceID, Blob blob, Class<Type> type,
+		boolean mustExist) throws SQLException
+	{
 		if (blob == null && mustExist) {
 			context.addResource(resourceID, "Blob for type %s was null.", type);
 			return null;
@@ -105,9 +104,7 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
 		try {
 			Object obj = DBSerializer.fromBlob(blob);
 			if (obj != null && !(type.isAssignableFrom(obj.getClass()))) {
-				context.addResource(resourceID,
-						"Tried to deserialize to %s, but got %s.", type,
-						obj.getClass());
+				context.addResource(resourceID, "Tried to deserialize to %s, but got %s.", type, obj.getClass());
 			}
 
 			return type.cast(obj);
@@ -116,35 +113,30 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
 			if (cause == null || cause instanceof SQLException)
 				throw sqe;
 
-			context.addResource(
-					resourceID,
-					"Exception thrown while parsing Java serializeable from the database into %s:  %s",
-					type, cause);
+			context.addResource(resourceID, "Exception thrown while parsing Java serializeable from the database into %s:  %s",
+				type, cause);
 			return null;
 		} catch (Throwable cause) {
-			context.addResource(
-					resourceID,
-					"Exceptino thrown while parsing Java serializable from the database into %s:  %s",
-					type, cause);
+			context.addResource(resourceID, "Exceptino thrown while parsing Java serializable from the database into %s:  %s",
+				type, cause);
 			return null;
 		}
 	}
 
-	static protected void evaluatePropertiesTable(Connection connection,
-			CleanupContext context, String resourceID) throws SQLException {
+	static protected void evaluatePropertiesTable(Connection connection, CleanupContext context, String resourceID)
+		throws SQLException
+	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			stmt = connection
-					.prepareStatement("SELECT propvalue FROM properties WHERE resourceid = ?");
+			stmt = connection.prepareStatement("SELECT propvalue FROM properties WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
 			rs = stmt.executeQuery();
 
 			while (rs.next()) {
 				Blob blob = rs.getBlob(1);
-				validateBlobToJavaSer(context, resourceID, blob, Object.class,
-						false);
+				validateBlobToJavaSer(context, resourceID, blob, Object.class, false);
 			}
 		} finally {
 			StreamUtils.close(rs);
@@ -152,15 +144,14 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
 		}
 	}
 
-	static protected void evaluateResourcesTable(Connection connection,
-			CleanupContext context, String resourceID, boolean mustExist)
-			throws SQLException {
+	static protected void evaluateResourcesTable(Connection connection, CleanupContext context, String resourceID,
+		boolean mustExist) throws SQLException
+	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			stmt = connection
-					.prepareStatement("SELECT resourceid FROM resources WHERE resourceid = ?");
+			stmt = connection.prepareStatement("SELECT resourceid FROM resources WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
 
 			rs = stmt.executeQuery();
@@ -168,23 +159,21 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
 			boolean wasItThere = rs.next();
 
 			if (!wasItThere && mustExist)
-				context.addResource(resourceID,
-						"Resource missing from resources table.");
+				context.addResource(resourceID, "Resource missing from resources table.");
 		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}
 
-	static protected void evaluateResources2Table(Connection connection,
-			CleanupContext context, String resourceID, boolean mustExist)
-			throws SQLException {
+	static protected void evaluateResources2Table(Connection connection, CleanupContext context, String resourceID,
+		boolean mustExist) throws SQLException
+	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			stmt = connection
-					.prepareStatement("SELECT epr FROM resources2 WHERE resourceid = ?");
+			stmt = connection.prepareStatement("SELECT epr FROM resources2 WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
 
 			rs = stmt.executeQuery();
@@ -192,8 +181,7 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
 			boolean wasItThere = rs.next();
 
 			if (!wasItThere && mustExist)
-				context.addResource(resourceID,
-						"Resource missing from resources2 table.");
+				context.addResource(resourceID, "Resource missing from resources2 table.");
 			else if (wasItThere)
 				validateEPRFromBlob(context, resourceID, rs.getBlob(1), true);
 		} finally {
@@ -203,24 +191,19 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler {
 	}
 
 	@Override
-	protected void detectResourcesToCleanup(Connection connection,
-			CleanupContext context) {
+	protected void detectResourcesToCleanup(Connection connection, CleanupContext context)
+	{
 		// At the moment, we have nothing to detect.
 	}
 
 	@Override
-	public void enactCleanup(Connection connection, String resourceID)
-			throws Throwable {
-		removeRowsFromTable(connection, new Triple<String, String, String>(
-				"resources", "resourceid", resourceID));
-		removeRowsFromTable(connection, new Triple<String, String, String>(
-				"resources2", "resourceid", resourceID));
-		removeRowsFromTable(connection, new Triple<String, String, String>(
-				"properties", "resourceid", resourceID));
-		removeRowsFromTable(connection, new Triple<String, String, String>(
-				"persistedproperties", "resourceid", resourceID));
-		removeRowsFromTable(connection, new Triple<String, String, String>(
-				"matchingparams", "resourceid", resourceID));
+	public void enactCleanup(Connection connection, String resourceID) throws Throwable
+	{
+		removeRowsFromTable(connection, new Triple<String, String, String>("resources", "resourceid", resourceID));
+		removeRowsFromTable(connection, new Triple<String, String, String>("resources2", "resourceid", resourceID));
+		removeRowsFromTable(connection, new Triple<String, String, String>("properties", "resourceid", resourceID));
+		removeRowsFromTable(connection, new Triple<String, String, String>("persistedproperties", "resourceid", resourceID));
+		removeRowsFromTable(connection, new Triple<String, String, String>("matchingparams", "resourceid", resourceID));
 
 		HistoryContainerService service = new HistoryContainerService();
 		service.deleteRecords(connection, resourceID);

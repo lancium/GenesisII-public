@@ -13,7 +13,8 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 
-public class DeploymentManager {
+public class DeploymentManager
+{
 	static private Log _logger = LogFactory.getLog(DeploymentManager.class);
 
 	// 1 week
@@ -22,16 +23,13 @@ public class DeploymentManager {
 	static private File _baseDirectory;
 
 	static {
-		_baseDirectory = ConfigurationManager.getCurrentConfiguration()
-				.getUserDirectory();
+		_baseDirectory = ConfigurationManager.getCurrentConfiguration().getUserDirectory();
 		if (!_baseDirectory.exists())
 			_baseDirectory.mkdirs();
 		if (!_baseDirectory.exists())
-			throw new RuntimeException(
-					"Unable to create deployment directory: " + _baseDirectory);
+			throw new RuntimeException("Unable to create deployment directory: " + _baseDirectory);
 		if (!_baseDirectory.isDirectory())
-			throw new RuntimeException("Deployment path '" + _baseDirectory
-					+ "' does not seem to be a directory.");
+			throw new RuntimeException("Deployment path '" + _baseDirectory + "' does not seem to be a directory.");
 
 		DeployDatabase database = null;
 		try {
@@ -48,9 +46,9 @@ public class DeploymentManager {
 
 	static private HashMap<DeploySnapshot, String> _knownDeployments;
 
-	static public IDeployment createDeployment(String deploymentID,
-			IDeployerProvider provider, DeploySnapshot snapshot)
-			throws DeploymentException {
+	static public IDeployment createDeployment(String deploymentID, IDeployerProvider provider, DeploySnapshot snapshot)
+		throws DeploymentException
+	{
 		String instanceID;
 
 		while (true) {
@@ -85,8 +83,7 @@ public class DeploymentManager {
 			try {
 				if (instanceID.equals("")) {
 					targetDirectory = createNewDirectory();
-					instanceID = database.createDeployment(deploymentID,
-							targetDirectory.getName(), snapshot);
+					instanceID = database.createDeployment(deploymentID, targetDirectory.getName(), snapshot);
 					database.commit();
 
 					provider.deployApplication(targetDirectory);
@@ -98,12 +95,10 @@ public class DeploymentManager {
 						_knownDeployments.notifyAll();
 					}
 				} else {
-					targetDirectory = new File(_baseDirectory,
-							database.getDirectory(instanceID));
+					targetDirectory = new File(_baseDirectory, database.getDirectory(instanceID));
 				}
 			} catch (SQLException sqe) {
-				throw new DeploymentException("Unable to deploy application.",
-						sqe);
+				throw new DeploymentException("Unable to deploy application.", sqe);
 			}
 
 			// Now that we have a deployment instance ID, we need to create the
@@ -118,24 +113,20 @@ public class DeploymentManager {
 				// get cleaned up). For now, we're going to live with
 				database.updateCount(instanceID, 1);
 				database.commit();
-				return new DeploymentBundle(instanceID, targetDirectory,
-						provider.getReifier());
+				return new DeploymentBundle(instanceID, targetDirectory, provider.getReifier());
 			} catch (SQLException sqe) {
-				throw new DeploymentException("Unable to deploy application",
-						sqe);
+				throw new DeploymentException("Unable to deploy application", sqe);
 			}
 		} catch (SQLException sqe) {
-			throw new DeploymentException(
-					"Problem with the deployment database.", sqe);
+			throw new DeploymentException("Problem with the deployment database.", sqe);
 		} finally {
 			StreamUtils.close(database);
 		}
 	}
 
-	static private void cleanupStaleDeployments(DeployDatabase database)
-			throws SQLException {
-		Collection<DeploymentInformation> staleInfo = database
-				.retrieveStaleDeployments(_UNUSED_TIMEOUT_DAYS);
+	static private void cleanupStaleDeployments(DeployDatabase database) throws SQLException
+	{
+		Collection<DeploymentInformation> staleInfo = database.retrieveStaleDeployments(_UNUSED_TIMEOUT_DAYS);
 
 		for (DeploymentInformation info : staleInfo) {
 			database.setState(info.getInstanceID(), DeploymentState.PARTIAL);
@@ -149,7 +140,8 @@ public class DeploymentManager {
 		database.commit();
 	}
 
-	static private void removeDirectory(File dir) {
+	static private void removeDirectory(File dir)
+	{
 		for (File child : dir.listFiles()) {
 			if (child.isDirectory())
 				removeDirectory(child);
@@ -162,7 +154,8 @@ public class DeploymentManager {
 
 	static private Random _generator = new Random();
 
-	static private File createNewDirectory() {
+	static private File createNewDirectory()
+	{
 		while (true) {
 			int next = _generator.nextInt();
 			String name = String.format("dep-%d", next);
@@ -179,7 +172,8 @@ public class DeploymentManager {
 		}
 	}
 
-	static void decrementCount(String instanceID) throws DeploymentException {
+	static void decrementCount(String instanceID) throws DeploymentException
+	{
 		DeployDatabase database = null;
 
 		try {
@@ -187,8 +181,7 @@ public class DeploymentManager {
 			database.updateCount(instanceID, -1);
 			database.commit();
 		} catch (SQLException sqe) {
-			throw new DeploymentException("Unable to undeploy application.",
-					sqe);
+			throw new DeploymentException("Unable to undeploy application.", sqe);
 		} finally {
 			StreamUtils.close(database);
 		}

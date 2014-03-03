@@ -12,12 +12,13 @@ import edu.virginia.g3.fsview.FSViewDirectoryEntry;
 import edu.virginia.g3.fsview.FSViewEntry;
 import edu.virginia.g3.fsview.FSViewFactory;
 
-final class CifsFSViewSession extends AbstractFSViewSession {
+final class CifsFSViewSession extends AbstractFSViewSession
+{
 	private SmbFile _root;
 
-	CifsFSViewSession(FSViewFactory factory, URI fsRoot,
-			NtlmPasswordAuthentication authInfo, boolean readOnly)
-			throws IOException {
+	CifsFSViewSession(FSViewFactory factory, URI fsRoot, NtlmPasswordAuthentication authInfo, boolean readOnly)
+		throws IOException
+	{
 		super(factory, readOnly);
 
 		String fsRootString = fsRoot.toString();
@@ -26,12 +27,11 @@ final class CifsFSViewSession extends AbstractFSViewSession {
 		_root = new SmbFile(fsRootString, authInfo);
 
 		if (!_root.exists())
-			throw new FileNotFoundException(String.format(
-					"Can't find Samba file %s!", fsRoot));
+			throw new FileNotFoundException(String.format("Can't find Samba file %s!", fsRoot));
 	}
 
-	final FSViewEntry wrapSmbFile(FSViewDirectoryEntry parentEntry,
-			String entryName, SmbFile sambaFile) throws IOException {
+	final FSViewEntry wrapSmbFile(FSViewDirectoryEntry parentEntry, String entryName, SmbFile sambaFile) throws IOException
+	{
 		if (entryName != null) {
 			while (entryName.endsWith("/"))
 				entryName = entryName.substring(0, entryName.length() - 1);
@@ -40,16 +40,15 @@ final class CifsFSViewSession extends AbstractFSViewSession {
 		}
 
 		if (sambaFile.isDirectory()) {
-			return new CifsFSViewDirectoryEntry(this, parentEntry, entryName,
-					sambaFile);
+			return new CifsFSViewDirectoryEntry(this, parentEntry, entryName, sambaFile);
 		} else {
-			return new CifsFSViewRandomAccessFileEntry(this, parentEntry,
-					entryName, sambaFile);
+			return new CifsFSViewRandomAccessFileEntry(this, parentEntry, entryName, sambaFile);
 		}
 	}
 
 	@Override
-	final public FSViewEntry root() throws IOException {
+	final public FSViewEntry root() throws IOException
+	{
 		return wrapSmbFile(null, null, _root);
 	}
 }

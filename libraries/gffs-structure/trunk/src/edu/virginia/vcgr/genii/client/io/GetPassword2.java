@@ -2,9 +2,11 @@ package edu.virginia.vcgr.genii.client.io;
 
 import java.io.Console;
 
-public class GetPassword2 {
+public class GetPassword2
+{
 
-	static public String getPassword(String prompt) {
+	static public String getPassword(String prompt)
+	{
 		Console console = System.console();
 		char[] password = null;
 		if (console != null) {

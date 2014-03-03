@@ -15,7 +15,8 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-@XmlSchema(namespace = SPMDConstants.JSDL_SPMD_NS, xmlns = { @XmlNs(prefix = "jsdl-spmd", namespaceURI = SPMDConstants.JSDL_SPMD_NS) })
+@XmlSchema(namespace = SPMDConstants.JSDL_SPMD_NS, xmlns = { @XmlNs(prefix = "jsdl-spmd",
+	namespaceURI = SPMDConstants.JSDL_SPMD_NS) })
 package edu.virginia.vcgr.jsdl.spmd;
 
 import javax.xml.bind.annotation.XmlSchema;

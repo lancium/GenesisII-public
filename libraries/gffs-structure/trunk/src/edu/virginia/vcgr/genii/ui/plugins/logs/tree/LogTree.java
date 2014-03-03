@@ -28,51 +28,53 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 // import edu.virginia.vcgr.genii.ui.rns.DirectoryChangeListener;
 import edu.virginia.vcgr.genii.ui.utils.CommonKeyStrokes;
 
-public class LogTree extends JTree {
+public class LogTree extends JTree
+{
 
 	private DisplayByType _displayBy = DisplayByType.DISPLAY_BY_RPC_ID;
 
-	private class RefreshAction extends AbstractAction {
+	private class RefreshAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private RefreshAction() {
+		private RefreshAction()
+		{
 			super("Refresh");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)
+		{
 			TreePath[] paths = getSelectionPaths();
 			if (paths == null)
 				return;
 
 			for (TreePath path : getSelectionPaths())
-				((LogTreeNode) path.getLastPathComponent()).refresh(
-						LogTree.this, _displayBy);
+				((LogTreeNode) path.getLastPathComponent()).refresh(LogTree.this, _displayBy);
 		}
 	}
 
-	private class TreeWillExpandListenerImpl implements TreeWillExpandListener {
+	private class TreeWillExpandListenerImpl implements TreeWillExpandListener
+	{
 		@Override
-		public void treeWillCollapse(TreeExpansionEvent event)
-				throws ExpandVetoException {
+		public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException
+		{
 			TreePath path = event.getPath();
 			LogTreeNode node = (LogTreeNode) path.getLastPathComponent();
 			LogTreeObject obj = (LogTreeObject) node.getUserObject();
 			if (obj.objectType() == LogTreeObjectType.ENDPOINT_OBJECT)
-				_expandedNodes.remove(((LogFilledInTreeObject) obj).path()
-						.pwd());
+				_expandedNodes.remove(((LogFilledInTreeObject) obj).path().pwd());
 			node.collapse();
 		}
 
 		@Override
-		public void treeWillExpand(TreeExpansionEvent event)
-				throws ExpandVetoException {
+		public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException
+		{
 			TreePath path = event.getPath();
 			LogTreeNode node = (LogTreeNode) path.getLastPathComponent();
 			LogTreeObject obj = (LogTreeObject) node.getUserObject();
 			if (obj.objectType() == LogTreeObjectType.ENDPOINT_OBJECT)
-				_expandedNodes.put(((LogFilledInTreeObject) obj).path().pwd(),
-						node);
+				_expandedNodes.put(((LogFilledInTreeObject) obj).path().pwd(), node);
 			node.noteExpansion();
 			if (node.nodeState() == LogTreeNodeState.NEEDS_EXPANSION)
 				node.expand(LogTree.this, _displayBy);
@@ -87,24 +89,24 @@ public class LogTree extends JTree {
 	private RefreshAction _refreshAction = new RefreshAction();
 	private Map<String, LogTreeNode> _expandedNodes = new HashMap<String, LogTreeNode>();
 
-	public LogTree(UIPluginContext uiContext) throws Throwable {
+	public LogTree(UIPluginContext uiContext) throws Throwable
+	{
 		this(new LogTreeModel(uiContext));
 	}
 
-	private LogTree(LogTreeModel model) {
+	private LogTree(LogTreeModel model)
+	{
 		super(model);
 
 		DefaultTreeSelectionModel selectionModel = new DefaultTreeSelectionModel();
-		selectionModel
-				.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		setSelectionModel(selectionModel);
 
 		setCellRenderer(new LogTreeCellRenderer(model.appContext()));
 		setAutoscrolls(true);
 		setEditable(false);
 		setShowsRootHandles(true);
-		setExpandedState(
-				new TreePath(((LogTreeNode) model.getRoot()).getPath()), false);
+		setExpandedState(new TreePath(((LogTreeNode) model.getRoot()).getPath()), false);
 
 		addTreeWillExpandListener(new TreeWillExpandListenerImpl());
 
@@ -113,9 +115,11 @@ public class LogTree extends JTree {
 
 		setDragEnabled(false);
 
-		addMouseListener(new MouseAdapter() {
+		addMouseListener(new MouseAdapter()
+		{
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(MouseEvent e)
+			{
 				int selRow = getRowForLocation(e.getX(), e.getY());
 				TreePath selPath = getPathForLocation(e.getX(), e.getY());
 				if (selRow != -1) {
@@ -131,7 +135,8 @@ public class LogTree extends JTree {
 		this.expandRow(0);
 	}
 
-	private void fireLogTreePathClicked(int row, TreePath path) {
+	private void fireLogTreePathClicked(int row, TreePath path)
+	{
 		LogTreeNode node = (LogTreeNode) (path.getLastPathComponent());
 		LogTreeObject obj = (LogTreeObject) node.getUserObject();
 		if (obj.objectType() == LogTreeObjectType.ENDPOINT_OBJECT) {
@@ -140,7 +145,8 @@ public class LogTree extends JTree {
 		}
 	}
 
-	private void fireLogTreePathClicked(LogFilledInTreeObject fObj) {
+	private void fireLogTreePathClicked(LogFilledInTreeObject fObj)
+	{
 		LogTreeModel model = (LogTreeModel) getModel();
 
 		Collection<LogTreeListener> listeners;
@@ -150,11 +156,11 @@ public class LogTree extends JTree {
 		}
 
 		for (LogTreeListener listener : listeners)
-			listener.pathClicked(this, model.uiPluginContext().uiContext(),
-					fObj);
+			listener.pathClicked(this, model.uiPluginContext().uiContext(), fObj);
 	}
 
-	private void fireLogTreePathDoubleClicked(int row, TreePath path) {
+	private void fireLogTreePathDoubleClicked(int row, TreePath path)
+	{
 		LogTreeNode node = (LogTreeNode) (path.getLastPathComponent());
 		LogTreeObject obj = (LogTreeObject) node.getUserObject();
 		if (obj.objectType() == LogTreeObjectType.ENDPOINT_OBJECT) {
@@ -163,7 +169,8 @@ public class LogTree extends JTree {
 		}
 	}
 
-	private void fireLogTreePathDoubleClicked(LogFilledInTreeObject fObj) {
+	private void fireLogTreePathDoubleClicked(LogFilledInTreeObject fObj)
+	{
 		LogTreeModel model = (LogTreeModel) getModel();
 
 		Collection<LogTreeListener> listeners;
@@ -173,11 +180,11 @@ public class LogTree extends JTree {
 		}
 
 		for (LogTreeListener listener : listeners)
-			listener.pathDoubleClicked(this, model.uiPluginContext()
-					.uiContext(), fObj);
+			listener.pathDoubleClicked(this, model.uiPluginContext().uiContext(), fObj);
 	}
 
-	public void displayTreeBy(DisplayByType newDisplayBy) {
+	public void displayTreeBy(DisplayByType newDisplayBy)
+	{
 		if (newDisplayBy == null)
 			return;
 
@@ -185,32 +192,36 @@ public class LogTree extends JTree {
 			_displayBy = newDisplayBy;
 			// cause a refresh at the root if the displayType is changed
 
-			((LogTreeNode) this.getModel().getRoot()).refresh(LogTree.this,
-					_displayBy);
+			((LogTreeNode) this.getModel().getRoot()).refresh(LogTree.this, _displayBy);
 		}
 	}
 
-	public void addLogTreeListener(LogTreeListener listener) {
+	public void addLogTreeListener(LogTreeListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(listener);
 		}
 	}
 
-	public void removeLogTreeListener(LogTreeListener listener) {
+	public void removeLogTreeListener(LogTreeListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(listener);
 		}
 	}
 
-	private void setupActionMap(ActionMap aMap) {
+	private void setupActionMap(ActionMap aMap)
+	{
 		aMap.put(_refreshAction.getValue(Action.NAME), _refreshAction);
 	}
 
-	private void setupInputMap(InputMap iMap) {
+	private void setupInputMap(InputMap iMap)
+	{
 		iMap.put(CommonKeyStrokes.REFRESH, _refreshAction.getValue(Action.NAME));
 	}
 
-	public void setDisplayType(DisplayByType displayBy) {
+	public void setDisplayType(DisplayByType displayBy)
+	{
 		_displayBy = displayBy;
 	}
 }

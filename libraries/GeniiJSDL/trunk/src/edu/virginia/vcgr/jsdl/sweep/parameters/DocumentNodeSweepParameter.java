@@ -33,7 +33,8 @@ import edu.virginia.vcgr.jsdl.sweep.parameters.xpath.XPathTargetIdentifierFactor
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class DocumentNodeSweepParameter implements SweepParameter, Serializable {
+public class DocumentNodeSweepParameter implements SweepParameter, Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = SweepConstants.SWEEP_NS, name = "NamespaceBinding", required = false, nillable = false)
@@ -42,8 +43,8 @@ public class DocumentNodeSweepParameter implements SweepParameter, Serializable 
 	@XmlElement(namespace = SweepConstants.SWEEP_NS, name = "Match", required = true, nillable = false)
 	private String _matchExpression;
 
-	public DocumentNodeSweepParameter(String matchExpression,
-			NamespaceBinding... bindings) {
+	public DocumentNodeSweepParameter(String matchExpression, NamespaceBinding... bindings)
+	{
 		_matchExpression = matchExpression;
 		_bindings = new Vector<NamespaceBinding>(bindings.length);
 
@@ -51,27 +52,30 @@ public class DocumentNodeSweepParameter implements SweepParameter, Serializable 
 			_bindings.add(binding);
 	}
 
-	public DocumentNodeSweepParameter(String matchExpression,
-			List<NamespaceBinding> bindings) {
+	public DocumentNodeSweepParameter(String matchExpression, List<NamespaceBinding> bindings)
+	{
 		_matchExpression = matchExpression;
 		_bindings = new Vector<NamespaceBinding>(bindings);
 	}
 
-	public DocumentNodeSweepParameter() {
+	public DocumentNodeSweepParameter()
+	{
 		this(null);
 	}
 
-	final public List<NamespaceBinding> bindings() {
+	final public List<NamespaceBinding> bindings()
+	{
 		return _bindings;
 	}
 
-	final public String matchExpression() {
+	final public String matchExpression()
+	{
 		return _matchExpression;
 	}
 
 	@Override
-	final public SweepTargetIdentifier targetIdentifier() throws SweepException {
-		return XPathTargetIdentifierFactory.createIdentifier(
-				new NamespaceBindingsContext(_bindings), _matchExpression);
+	final public SweepTargetIdentifier targetIdentifier() throws SweepException
+	{
+		return XPathTargetIdentifierFactory.createIdentifier(new NamespaceBindingsContext(_bindings), _matchExpression);
 	}
 }

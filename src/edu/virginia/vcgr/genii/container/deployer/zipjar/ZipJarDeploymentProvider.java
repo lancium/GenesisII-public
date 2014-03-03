@@ -21,19 +21,19 @@ import edu.virginia.vcgr.genii.container.deployer.DeploySnapshot;
 import edu.virginia.vcgr.genii.container.deployer.IDeployerProvider;
 import edu.virginia.vcgr.genii.container.deployer.IJSDLReifier;
 
-public class ZipJarDeploymentProvider extends AbstractDeploymentProvider
-		implements IDeployerProvider {
+public class ZipJarDeploymentProvider extends AbstractDeploymentProvider implements IDeployerProvider
+{
 	private ZipJarDeploymentType _deploymentDescription;
 
-	public ZipJarDeploymentProvider(EndpointReferenceType depDescEPR,
-			ZipJarDeploymentType deploymentDescription) {
+	public ZipJarDeploymentProvider(EndpointReferenceType depDescEPR, ZipJarDeploymentType deploymentDescription)
+	{
 		super(depDescEPR);
 
 		_deploymentDescription = deploymentDescription;
 	}
 
-	public void deployApplication(File targetDirectory)
-			throws DeploymentException {
+	public void deployApplication(File targetDirectory) throws DeploymentException
+	{
 		ZipJarEnumeration zjType;
 		ZipInputStream in = null;
 		ZipEntry entry;
@@ -41,11 +41,9 @@ public class ZipJarDeploymentProvider extends AbstractDeploymentProvider
 		try {
 			zjType = _deploymentDescription.getSource().getPackageType();
 			if (zjType == ZipJarEnumeration.zip)
-				in = new ZipInputStream(
-						openSource(_deploymentDescription.getSource()));
+				in = new ZipInputStream(openSource(_deploymentDescription.getSource()));
 			else
-				in = new JarInputStream(
-						openSource(_deploymentDescription.getSource()));
+				in = new JarInputStream(openSource(_deploymentDescription.getSource()));
 
 			while ((entry = in.getNextEntry()) != null) {
 				File targetFile = new File(targetDirectory, entry.getName());
@@ -71,8 +69,7 @@ public class ZipJarDeploymentProvider extends AbstractDeploymentProvider
 			File cwd;
 			String relativeCWD = _deploymentDescription.getRelativeCwd();
 			if (relativeCWD != null) {
-				cwd = new File(targetDirectory,
-						_deploymentDescription.getRelativeCwd());
+				cwd = new File(targetDirectory, _deploymentDescription.getRelativeCwd());
 				cwd.mkdirs();
 			} else {
 				cwd = targetDirectory;
@@ -86,13 +83,14 @@ public class ZipJarDeploymentProvider extends AbstractDeploymentProvider
 		}
 	}
 
-	public IJSDLReifier getReifier() {
-		return new ZipJarJSDLReifier(_deploymentDescription.getBinaryName(),
-				_deploymentDescription.getRelativeCwd());
+	public IJSDLReifier getReifier()
+	{
+		return new ZipJarJSDLReifier(_deploymentDescription.getBinaryName(), _deploymentDescription.getRelativeCwd());
 	}
 
 	@Override
-	protected DeploySnapshot figureOutSnapshot() throws DeploymentException {
+	protected DeploySnapshot figureOutSnapshot() throws DeploymentException
+	{
 		ArrayList<DeployFacet> facets = new ArrayList<DeployFacet>();
 		facets.add(getDeploymentDescriptionFacet(_deploymentDescriptionEPR));
 

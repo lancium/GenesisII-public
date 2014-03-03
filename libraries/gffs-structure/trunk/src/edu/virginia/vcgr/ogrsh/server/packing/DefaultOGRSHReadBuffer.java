@@ -11,30 +11,29 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-public class DefaultOGRSHReadBuffer implements IOGRSHReadBuffer {
-	static private Log _logger = LogFactory
-			.getLog(DefaultOGRSHReadBuffer.class);
+public class DefaultOGRSHReadBuffer implements IOGRSHReadBuffer
+{
+	static private Log _logger = LogFactory.getLog(DefaultOGRSHReadBuffer.class);
 
 	private ByteBuffer _source;
 
-	private Class<?> findClass(String className) throws IOException {
+	private Class<?> findClass(String className) throws IOException
+	{
 		try {
 			return GenesisClassLoader.classLoaderFactory().loadClass(className);
 		} catch (ClassNotFoundException cnfe) {
 			_logger.error("Can't deserialize type \"" + className + "\".", cnfe);
-			throw new IOException("Can't deserialize type \"" + className
-					+ "\".");
+			throw new IOException("Can't deserialize type \"" + className + "\".");
 		}
 	}
 
-	private IPackable construct(Class<? extends IPackable> type)
-			throws IOException {
+	private IPackable construct(Class<? extends IPackable> type) throws IOException
+	{
 		Constructor<? extends IPackable> cons = null;
 
 		try {
 			try {
-				cons = type
-						.getConstructor(new Class[] { IOGRSHReadBuffer.class });
+				cons = type.getConstructor(new Class[] { IOGRSHReadBuffer.class });
 				return cons.newInstance(new Object[] { this });
 			} catch (NoSuchMethodException nsme) {
 				cons = type.getConstructor(new Class[0]);
@@ -43,37 +42,27 @@ public class DefaultOGRSHReadBuffer implements IOGRSHReadBuffer {
 				return packable;
 			}
 		} catch (NoSuchMethodException nsme) {
-			_logger.error("Unable to create instance of packable type \""
-					+ type.getName() + "\".", nsme);
-			throw new IOException(
-					"Unable to create instance of packable type \""
-							+ type.getName() + "\".");
+			_logger.error("Unable to create instance of packable type \"" + type.getName() + "\".", nsme);
+			throw new IOException("Unable to create instance of packable type \"" + type.getName() + "\".");
 		} catch (IllegalAccessException iae) {
-			_logger.error("Unable to create instance of packable type \""
-					+ type.getName() + "\".", iae);
-			throw new IOException(
-					"Unable to create instance of packable type \""
-							+ type.getName() + "\".");
+			_logger.error("Unable to create instance of packable type \"" + type.getName() + "\".", iae);
+			throw new IOException("Unable to create instance of packable type \"" + type.getName() + "\".");
 		} catch (InstantiationException ia) {
-			_logger.error("Unable to create instance of packable type \""
-					+ type.getName() + "\".", ia);
-			throw new IOException(
-					"Unable to create instance of packable type \""
-							+ type.getName() + "\".");
+			_logger.error("Unable to create instance of packable type \"" + type.getName() + "\".", ia);
+			throw new IOException("Unable to create instance of packable type \"" + type.getName() + "\".");
 		} catch (InvocationTargetException ite) {
-			_logger.error("Unable to create instance of packable type \""
-					+ type.getName() + "\".", ite);
-			throw new IOException(
-					"Unable to create instance of packable type \""
-							+ type.getName() + "\".");
+			_logger.error("Unable to create instance of packable type \"" + type.getName() + "\".", ite);
+			throw new IOException("Unable to create instance of packable type \"" + type.getName() + "\".");
 		}
 	}
 
-	public DefaultOGRSHReadBuffer(ByteBuffer source) {
+	public DefaultOGRSHReadBuffer(ByteBuffer source)
+	{
 		_source = source;
 	}
 
-	public String readUTF() throws IOException {
+	public String readUTF() throws IOException
+	{
 		int length = _source.getInt();
 		byte[] data = new byte[length];
 		_source.get(data);
@@ -81,7 +70,8 @@ public class DefaultOGRSHReadBuffer implements IOGRSHReadBuffer {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object readObject() throws IOException {
+	public Object readObject() throws IOException
+	{
 		String label = readUTF();
 		if (label.equals("null"))
 			return null;
@@ -95,8 +85,7 @@ public class DefaultOGRSHReadBuffer implements IOGRSHReadBuffer {
 			int len = _source.getInt();
 			label = readUTF();
 			Class<?> componentType = findClass(label);
-			Object[] ret = Object[].class.cast(Array.newInstance(componentType,
-					len));
+			Object[] ret = Object[].class.cast(Array.newInstance(componentType, len));
 			for (int lcv = 0; lcv < ret.length; lcv++) {
 				ret[lcv] = readObject();
 			}
@@ -125,10 +114,8 @@ public class DefaultOGRSHReadBuffer implements IOGRSHReadBuffer {
 		} else if (IPackable.class.isAssignableFrom(type)) {
 			return construct((Class<? extends IPackable>) type);
 		} else {
-			_logger.error("Don't know how to deserialize type \""
-					+ type.getName() + "\".");
-			throw new IOException("Don't know how to deserialize type \""
-					+ type.getName() + "\".");
+			_logger.error("Don't know how to deserialize type \"" + type.getName() + "\".");
+			throw new IOException("Don't know how to deserialize type \"" + type.getName() + "\".");
 		}
 	}
 }

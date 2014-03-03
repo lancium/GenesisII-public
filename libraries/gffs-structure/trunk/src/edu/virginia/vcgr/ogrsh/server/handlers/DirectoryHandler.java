@@ -42,23 +42,31 @@ import edu.virginia.vcgr.ogrsh.server.packing.IOGRSHWriteBuffer;
 import edu.virginia.vcgr.ogrsh.server.packing.IPackable;
 import edu.virginia.vcgr.ogrsh.server.util.StatUtils;
 
-public class DirectoryHandler {
+public class DirectoryHandler
+{
 	static private Log _logger = LogFactory.getLog(DirectoryHandler.class);
 
 	static private enum DirectoryEntryType {
-		UNKNOWN(0), DIRECTORY(4), REGULAR_FILE(8), BLOCK_DEVICE(6), LINK(10);
+		UNKNOWN(0),
+		DIRECTORY(4),
+		REGULAR_FILE(8),
+		BLOCK_DEVICE(6),
+		LINK(10);
 
 		private int _value;
 
-		private DirectoryEntryType(int value) {
+		private DirectoryEntryType(int value)
+		{
 			_value = value;
 		}
 
-		public int getValue() {
+		public int getValue()
+		{
 			return _value;
 		}
 
-		static DirectoryEntryType fromInt(int value) {
+		static DirectoryEntryType fromInt(int value)
+		{
 			if (value == UNKNOWN._value)
 				return UNKNOWN;
 			else if (value == DIRECTORY._value)
@@ -74,82 +82,84 @@ public class DirectoryHandler {
 		}
 	}
 
-	static private class DirectoryEntry implements IPackable {
+	static private class DirectoryEntry implements IPackable
+	{
 		private long _inode;
 		private DirectoryEntryType _entryType;
 		private String _entryName;
 
-		public DirectoryEntry(long inode, String entryName,
-				DirectoryEntryType entryType) {
+		public DirectoryEntry(long inode, String entryName, DirectoryEntryType entryType)
+		{
 			_inode = inode;
 			_entryName = entryName;
 			_entryType = entryType;
 		}
 
-		public void pack(IOGRSHWriteBuffer buffer) throws IOException {
+		public void pack(IOGRSHWriteBuffer buffer) throws IOException
+		{
 			buffer.writeObject(_inode);
 			buffer.writeObject(_entryName);
 			buffer.writeObject(_entryType.getValue());
 		}
 
-		public void unpack(IOGRSHReadBuffer buffer) throws IOException {
+		public void unpack(IOGRSHReadBuffer buffer) throws IOException
+		{
 			_inode = (Long) buffer.readObject();
 			_entryName = String.class.cast(buffer.readObject());
-			_entryType = DirectoryEntryType.fromInt((Integer) buffer
-					.readObject());
+			_entryType = DirectoryEntryType.fromInt((Integer) buffer.readObject());
 		}
 	}
 
-	static private class DirectorySession {
+	static private class DirectorySession
+	{
 		private Collection<DirectoryEntry> _entries;
 		private Iterator<DirectoryEntry> _currentIterator;
 
-		public DirectorySession(Collection<DirectoryEntry> entries) {
+		public DirectorySession(Collection<DirectoryEntry> entries)
+		{
 			_entries = entries;
 			_currentIterator = _entries.iterator();
 		}
 
-		public Iterator<DirectoryEntry> getIterator() {
+		public Iterator<DirectoryEntry> getIterator()
+		{
 			return _currentIterator;
 		}
 
-		public void rewind() {
+		public void rewind()
+		{
 			_currentIterator = _entries.iterator();
 		}
 	}
 
 	private HashMap<String, DirectorySession> _openSessions = new HashMap<String, DirectorySession>();
 
-	public DirectoryHandler() {
+	public DirectoryHandler()
+	{
 	}
 
 	@OGRSHOperation
-	public String opendir(String fullpath) throws OGRSHException {
+	public String opendir(String fullpath) throws OGRSHException
+	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Opening directory \"" + fullpath + "\".");
 
 		try {
 			RNSPath currentPath = RNSPath.getCurrent();
-			RNSPath full = currentPath.lookup(fullpath,
-					RNSPathQueryFlags.MUST_EXIST);
-			EnhancedRNSPortType dirPT = ClientUtils.createProxy(
-					EnhancedRNSPortType.class, full.getEndpoint());
-			RNSIterable iterable = new RNSIterable(dirPT.lookup(null), null,
-					RNSConstants.PREFERRED_BATCH_SIZE);
+			RNSPath full = currentPath.lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
+			EnhancedRNSPortType dirPT = ClientUtils.createProxy(EnhancedRNSPortType.class, full.getEndpoint());
+			RNSIterable iterable = new RNSIterable(dirPT.lookup(null), null, RNSConstants.PREFERRED_BATCH_SIZE);
 			LinkedList<DirectoryEntry> entries = new LinkedList<DirectoryEntry>();
 			for (RNSEntryResponseType et : iterable) {
 				String entryName = et.getEntryName();
 				TypeInformation ti = new TypeInformation(et.getEndpoint());
 				long st_ino = StatUtils.generateInodeNumber(ti.getEndpoint());
 				if (ti.isRNS()) {
-					entries.add(new DirectoryEntry(st_ino, entryName,
-							DirectoryEntryType.DIRECTORY));
+					entries.add(new DirectoryEntry(st_ino, entryName, DirectoryEntryType.DIRECTORY));
 				} else if (ti.isByteIO()) {
-					entries.add(new DirectoryEntry(st_ino, entryName,
-							DirectoryEntryType.REGULAR_FILE));
+					entries.add(new DirectoryEntry(st_ino, entryName, DirectoryEntryType.REGULAR_FILE));
 				} else {
-					entries.add(new DirectoryEntry(st_ino, entryName,
-							DirectoryEntryType.UNKNOWN));
+					entries.add(new DirectoryEntry(st_ino, entryName, DirectoryEntryType.UNKNOWN));
 				}
 			}
 			String key = new GUID().toString();
@@ -162,17 +172,18 @@ public class DirectoryHandler {
 	}
 
 	@OGRSHOperation
-	public int closedir(String dirSession) throws OGRSHException {
+	public int closedir(String dirSession) throws OGRSHException
+	{
 		_openSessions.remove(dirSession);
 		return 0;
 	}
 
 	@OGRSHOperation
-	public DirectoryEntry readdir(String dirSession) throws OGRSHException {
+	public DirectoryEntry readdir(String dirSession) throws OGRSHException
+	{
 		DirectorySession session = _openSessions.get(dirSession);
 		if (session == null)
-			throw new OGRSHException(OGRSHException.EBADF,
-					"Unknown directory session.");
+			throw new OGRSHException(OGRSHException.EBADF, "Unknown directory session.");
 		Iterator<DirectoryEntry> iter = session.getIterator();
 		if (iter.hasNext())
 			return iter.next();
@@ -180,27 +191,25 @@ public class DirectoryHandler {
 	}
 
 	@OGRSHOperation
-	public int rewinddir(String dirSession) throws OGRSHException {
+	public int rewinddir(String dirSession) throws OGRSHException
+	{
 		DirectorySession session = _openSessions.get(dirSession);
 		if (session == null)
-			throw new OGRSHException(OGRSHException.EBADF,
-					"Unknown directory session.");
+			throw new OGRSHException(OGRSHException.EBADF, "Unknown directory session.");
 		session.rewind();
 		return 0;
 	}
 
 	@OGRSHOperation
-	public int link(String oldPath, String newPath) throws OGRSHException {
+	public int link(String oldPath, String newPath) throws OGRSHException
+	{
 		if (_logger.isDebugEnabled())
-			_logger.debug("link'ing from \"" + oldPath + "\" to \"" + newPath
-					+ "\".");
+			_logger.debug("link'ing from \"" + oldPath + "\" to \"" + newPath + "\".");
 
 		try {
 			RNSPath currentPath = RNSPath.getCurrent();
-			RNSPath o = currentPath.lookup(oldPath,
-					RNSPathQueryFlags.MUST_EXIST);
-			RNSPath n = currentPath.lookup(newPath,
-					RNSPathQueryFlags.MUST_NOT_EXIST);
+			RNSPath o = currentPath.lookup(oldPath, RNSPathQueryFlags.MUST_EXIST);
+			RNSPath n = currentPath.lookup(newPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 			n.link(o.getEndpoint());
 			return 0;
 		} catch (Throwable cause) {
@@ -209,8 +218,8 @@ public class DirectoryHandler {
 	}
 
 	@OGRSHOperation
-	public int utimes(String fullpath, TimeValStructure accessTime,
-			TimeValStructure modTime) throws OGRSHException {
+	public int utimes(String fullpath, TimeValStructure accessTime, TimeValStructure modTime) throws OGRSHException
+	{
 		EndpointReferenceType epr = null;
 		GeniiCommon proxy = null;
 
@@ -219,48 +228,33 @@ public class DirectoryHandler {
 
 		try {
 			RNSPath currentPath = RNSPath.getCurrent();
-			RNSPath full = currentPath.lookup(fullpath,
-					RNSPathQueryFlags.MUST_EXIST);
+			RNSPath full = currentPath.lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
 			TypeInformation ti = new TypeInformation(full.getEndpoint());
 			if (!ti.isByteIO()) {
 				// Can't set times on non-byte-ios
-				throw new OGRSHException(OGRSHException.EROFS,
-						"Cannot change timestamps on non-files.");
+				throw new OGRSHException(OGRSHException.EROFS, "Cannot change timestamps on non-files.");
 			}
 
 			if (ti.isSByteIOFactory()) {
-				StreamableByteIOFactory proxy2 = ClientUtils.createProxy(
-						StreamableByteIOFactory.class, ti.getEndpoint());
+				StreamableByteIOFactory proxy2 = ClientUtils.createProxy(StreamableByteIOFactory.class, ti.getEndpoint());
 				epr = proxy2.openStream(null).getEndpoint();
 				ti = new TypeInformation(epr);
 				proxy = ClientUtils.createProxy(GeniiCommon.class, epr);
 			} else {
-				proxy = ClientUtils.createProxy(GeniiCommon.class,
-						full.getEndpoint());
+				proxy = ClientUtils.createProxy(GeniiCommon.class, full.getEndpoint());
 			}
 
-			String ns = (ti.isRByteIO() ? ByteIOConstants.RANDOM_BYTEIO_NS
-					: ByteIOConstants.STREAMABLE_BYTEIO_NS);
+			String ns = (ti.isRByteIO() ? ByteIOConstants.RANDOM_BYTEIO_NS : ByteIOConstants.STREAMABLE_BYTEIO_NS);
 
 			Calendar aTime = Calendar.getInstance();
 			Calendar mTime = Calendar.getInstance();
 
-			aTime.setTimeInMillis(accessTime.getSeconcds() * 1000L
-					+ accessTime.getMicroSeconds() / 1000L);
-			mTime.setTimeInMillis(modTime.getSeconcds() * 1000L
-					+ modTime.getMicroSeconds() / 1000L);
+			aTime.setTimeInMillis(accessTime.getSeconcds() * 1000L + accessTime.getMicroSeconds() / 1000L);
+			mTime.setTimeInMillis(modTime.getSeconcds() * 1000L + modTime.getMicroSeconds() / 1000L);
 
-			proxy.updateResourceProperties(new UpdateResourceProperties(
-					new UpdateType(
-							new MessageElement[] {
-									new MessageElement(
-											new QName(
-													ns,
-													ByteIOConstants.ACCESSTIME_ATTR_NAME),
-											aTime),
-									new MessageElement(new QName(ns,
-											ByteIOConstants.MODTIME_ATTR_NAME),
-											mTime) })));
+			proxy.updateResourceProperties(new UpdateResourceProperties(new UpdateType(new MessageElement[] {
+				new MessageElement(new QName(ns, ByteIOConstants.ACCESSTIME_ATTR_NAME), aTime),
+				new MessageElement(new QName(ns, ByteIOConstants.MODTIME_ATTR_NAME), mTime) })));
 
 			return 0;
 		} catch (OGRSHException oe) {
@@ -270,8 +264,7 @@ public class DirectoryHandler {
 		} finally {
 			if (epr != null) {
 				try {
-					GeniiCommon common = ClientUtils.createProxy(
-							GeniiCommon.class, epr);
+					GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, epr);
 					common.destroy(new Destroy());
 				} catch (Throwable t) {
 				}
@@ -280,14 +273,14 @@ public class DirectoryHandler {
 	}
 
 	@OGRSHOperation
-	public StatBuffer xstat(String fullpath) throws OGRSHException {
+	public StatBuffer xstat(String fullpath) throws OGRSHException
+	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("xstat'ing path \"" + fullpath + "\".");
 
 		try {
 			RNSPath currentPath = RNSPath.getCurrent();
-			RNSPath full = currentPath.lookup(fullpath,
-					RNSPathQueryFlags.MUST_EXIST);
+			RNSPath full = currentPath.lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
 			TypeInformation ti = new TypeInformation(full.getEndpoint());
 			return StatBuffer.fromTypeInformation(ti);
 		} catch (Throwable cause) {
@@ -296,16 +289,14 @@ public class DirectoryHandler {
 	}
 
 	@OGRSHOperation
-	public int chdir(String fullpath) throws OGRSHException {
+	public int chdir(String fullpath) throws OGRSHException
+	{
 		try {
 			ICallingContext ctxt = ContextManager.getExistingContext();
-			RNSPath path = ctxt.getCurrentPath().lookup(fullpath,
-					RNSPathQueryFlags.MUST_EXIST);
+			RNSPath path = ctxt.getCurrentPath().lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
 
 			if (!(new TypeInformation(path.getEndpoint()).isRNS()))
-				throw new OGRSHException("Path \"" + path.pwd()
-						+ "\" is not an RNS directory.",
-						OGRSHException.NOT_A_DIRECTORY);
+				throw new OGRSHException("Path \"" + path.pwd() + "\" is not an RNS directory.", OGRSHException.NOT_A_DIRECTORY);
 
 			ctxt.setCurrentPath(path);
 			ContextManager.storeCurrentContext(ctxt);
@@ -317,11 +308,11 @@ public class DirectoryHandler {
 	}
 
 	@OGRSHOperation
-	public int mkdir(String fullpath, int mode) throws OGRSHException {
+	public int mkdir(String fullpath, int mode) throws OGRSHException
+	{
 		try {
 			ICallingContext ctxt = ContextManager.getExistingContext();
-			RNSPath path = ctxt.getCurrentPath().lookup(fullpath,
-					RNSPathQueryFlags.MUST_NOT_EXIST);
+			RNSPath path = ctxt.getCurrentPath().lookup(fullpath, RNSPathQueryFlags.MUST_NOT_EXIST);
 			path.mkdir();
 		} catch (Throwable cause) {
 			throw new OGRSHException(cause);
@@ -331,17 +322,15 @@ public class DirectoryHandler {
 	}
 
 	@OGRSHOperation
-	public int rmdir(String fullpath) throws OGRSHException {
+	public int rmdir(String fullpath) throws OGRSHException
+	{
 		try {
 			RNSPath currentPath = RNSPath.getCurrent();
-			RNSPath full = currentPath.lookup(fullpath,
-					RNSPathQueryFlags.MUST_EXIST);
-			EnhancedRNSPortType dirPT = ClientUtils.createProxy(
-					EnhancedRNSPortType.class, full.getEndpoint());
+			RNSPath full = currentPath.lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
+			EnhancedRNSPortType dirPT = ClientUtils.createProxy(EnhancedRNSPortType.class, full.getEndpoint());
 			RNSLegacyProxy proxy = new RNSLegacyProxy(dirPT);
 			if (proxy.lookup().length != 0)
-				throw new OGRSHException(OGRSHException.DIRECTORY_NOT_EMPTY,
-						"Directory \"" + fullpath + "\" is not empty.");
+				throw new OGRSHException(OGRSHException.DIRECTORY_NOT_EMPTY, "Directory \"" + fullpath + "\" is not empty.");
 			full.delete();
 		} catch (Throwable cause) {
 			throw new OGRSHException(cause);
@@ -351,14 +340,12 @@ public class DirectoryHandler {
 	}
 
 	@OGRSHOperation
-	public int rename(String oldFullPath, String newFullPath)
-			throws OGRSHException {
+	public int rename(String oldFullPath, String newFullPath) throws OGRSHException
+	{
 		try {
 			RNSPath currentPath = RNSPath.getCurrent();
-			RNSPath o = currentPath.lookup(oldFullPath,
-					RNSPathQueryFlags.MUST_EXIST);
-			RNSPath n = currentPath.lookup(newFullPath,
-					RNSPathQueryFlags.MUST_NOT_EXIST);
+			RNSPath o = currentPath.lookup(oldFullPath, RNSPathQueryFlags.MUST_EXIST);
+			RNSPath n = currentPath.lookup(newFullPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 			n.link(o.getEndpoint());
 			o.unlink();
 		} catch (Throwable cause) {

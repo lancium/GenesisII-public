@@ -8,21 +8,22 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class GridUserEnvironment {
+public class GridUserEnvironment
+{
 	static private final String CALLING_CONTEXT_PROPERTY = "edu.virginia.vcgr.genii.client.context.grid-user-env";
 
 	static private Log _logger = LogFactory.getLog(GridUserEnvironment.class);
 
 	@SuppressWarnings("unchecked")
-	static public Map<String, String> getGridUserEnvironment() {
+	static public Map<String, String> getGridUserEnvironment()
+	{
 		Map<String, String> ret = null;
 		ICallingContext ctxt = null;
 
 		try {
 			ctxt = ContextManager.getCurrentContext();
 			if (ctxt != null)
-				ret = (Map<String, String>) ctxt
-						.getSingleValueProperty(CALLING_CONTEXT_PROPERTY);
+				ret = (Map<String, String>) ctxt.getSingleValueProperty(CALLING_CONTEXT_PROPERTY);
 		} catch (IOException ioe) {
 			_logger.warn("Unable to load grid user environment.", ioe);
 		}
@@ -37,14 +38,15 @@ public class GridUserEnvironment {
 		return ret;
 	}
 
-	static public void clearGridUserEnvironment() throws FileNotFoundException,
-			IOException {
+	static public void clearGridUserEnvironment() throws FileNotFoundException, IOException
+	{
 		ICallingContext ctxt = ContextManager.getExistingContext();
 		if (ctxt != null)
 			ctxt.removeProperty(CALLING_CONTEXT_PROPERTY);
 	}
 
-	static private String findVariable(String original, StringBuilder target) {
+	static private String findVariable(String original, StringBuilder target)
+	{
 		boolean escaped = false;
 		for (int lcv = 0; lcv < original.length(); lcv++) {
 			char c = original.charAt(lcv);
@@ -56,16 +58,16 @@ public class GridUserEnvironment {
 				target.append(c);
 			} else {
 				switch (c) {
-				case '\\':
-					escaped = true;
-					break;
+					case '\\':
+						escaped = true;
+						break;
 
-				case '$':
-					return original.substring(lcv);
+					case '$':
+						return original.substring(lcv);
 
-				default:
-					target.append(c);
-					break;
+					default:
+						target.append(c);
+						break;
 				}
 			}
 		}
@@ -75,8 +77,8 @@ public class GridUserEnvironment {
 		return "";
 	}
 
-	static private String handleVariable(String original, StringBuilder target,
-			Map<String, String> environment) {
+	static private String handleVariable(String original, StringBuilder target, Map<String, String> environment)
+	{
 		String variable = null;
 
 		if (original.length() > 1) {
@@ -111,8 +113,8 @@ public class GridUserEnvironment {
 		return original;
 	}
 
-	static public String replaceVariables(Map<String, String> environment,
-			String original) {
+	static public String replaceVariables(Map<String, String> environment, String original)
+	{
 		if (original == null)
 			return null;
 
@@ -126,12 +128,13 @@ public class GridUserEnvironment {
 		return result.toString();
 	}
 
-	static private void doTest(Map<String, String> env, String orig) {
-		System.out.format("\"%s\" -> \"%s\"\n", orig,
-				replaceVariables(env, orig));
+	static private void doTest(Map<String, String> env, String orig)
+	{
+		System.out.format("\"%s\" -> \"%s\"\n", orig, replaceVariables(env, orig));
 	}
 
-	static public void main(String[] args) {
+	static public void main(String[] args)
+	{
 		Map<String, String> test = new HashMap<String, String>();
 		test.put("NAME", "Mark");
 		test.put("AGE", "35");

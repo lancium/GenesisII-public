@@ -9,7 +9,8 @@ import org.w3c.dom.Element;
 
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-class WatchCallbackConfiguration {
+class WatchCallbackConfiguration
+{
 	@XmlAttribute(name = "call-limit", required = true)
 	private String _callLimit = null;
 
@@ -23,31 +24,33 @@ class WatchCallbackConfiguration {
 	private Collection<Element> _any = null;
 
 	/**
-	 * Returns the number of calls that can be made before the filter becomes
-	 * false again.
+	 * Returns the number of calls that can be made before the filter becomes false again.
 	 * 
 	 * @return The number of calls (or null if it's infinite)
 	 */
-	final Integer callLimit() {
+	final Integer callLimit()
+	{
 		if (_callLimit.equals("unbounded"))
 			return null;
 
 		return Integer.valueOf(_callLimit);
 	}
 
-	final boolean registerAntiCallback() {
+	final boolean registerAntiCallback()
+	{
 		return _registerAntiCallback;
 	}
 
 	@SuppressWarnings("unchecked")
-	final Class<? extends FilesystemWatchHandler> handlerClass()
-			throws ClassNotFoundException {
+	final Class<? extends FilesystemWatchHandler> handlerClass() throws ClassNotFoundException
+	{
 		ClassLoader loader = GenesisClassLoader.classLoaderFactory();
 		Class<?> cl = loader.loadClass(_handlerClassName);
 		return (Class<? extends FilesystemWatchHandler>) cl;
 	}
 
-	final Collection<Element> configurationContent() {
+	final Collection<Element> configurationContent()
+	{
 		return _any;
 	}
 }

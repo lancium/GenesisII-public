@@ -11,7 +11,8 @@ import javax.swing.text.StyledDocument;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class FileDisplayWidget extends JTextPane {
+public class FileDisplayWidget extends JTextPane
+{
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(FileDisplayWidget.class);
@@ -20,7 +21,8 @@ public class FileDisplayWidget extends JTextPane {
 	public Style UPDATING_STYLE = null;
 	public Style ERROR_STYLE = null;
 
-	private void createStyles(StyledDocument exemplar) {
+	private void createStyles(StyledDocument exemplar)
+	{
 		PLAIN_STYLE = exemplar.addStyle("Plain", null);
 
 		UPDATING_STYLE = exemplar.addStyle("Updating", PLAIN_STYLE);
@@ -32,14 +34,16 @@ public class FileDisplayWidget extends JTextPane {
 		StyleConstants.setForeground(ERROR_STYLE, Color.red);
 	}
 
-	public FileDisplayWidget() {
+	public FileDisplayWidget()
+	{
 		createStyles(getStyledDocument());
 
 		setFocusable(true);
 		setEditable(false);
 	}
 
-	public void clear() {
+	public void clear()
+	{
 		try {
 			StyledDocument doc = getStyledDocument();
 			doc.remove(0, doc.getLength());
@@ -48,7 +52,8 @@ public class FileDisplayWidget extends JTextPane {
 		}
 	}
 
-	public void append(Style style, String text) {
+	public void append(Style style, String text)
+	{
 		try {
 			StyledDocument doc = getStyledDocument();
 			doc.insertString(doc.getLength(), text, style);
@@ -58,7 +63,8 @@ public class FileDisplayWidget extends JTextPane {
 	}
 
 	@Override
-	public boolean getScrollableTracksViewportWidth() {
+	public boolean getScrollableTracksViewportWidth()
+	{
 		return false;
 	}
 }

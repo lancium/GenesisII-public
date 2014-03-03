@@ -20,14 +20,17 @@ package edu.virginia.vcgr.jsdl.sweep;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public class SweepException extends Exception {
+public class SweepException extends Exception
+{
 	static final long serialVersionUID = 0L;
 
-	public SweepException(String msg) {
+	public SweepException(String msg)
+	{
 		super(msg);
 	}
 
-	public SweepException(String msg, Throwable cause) {
+	public SweepException(String msg, Throwable cause)
+	{
 		super(msg, cause);
 	}
 }

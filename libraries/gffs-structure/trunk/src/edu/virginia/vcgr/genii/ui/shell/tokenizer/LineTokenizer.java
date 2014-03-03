@@ -2,8 +2,10 @@ package edu.virginia.vcgr.genii.ui.shell.tokenizer;
 
 import java.util.LinkedList;
 
-public class LineTokenizer {
-	static public Token[] tokenize(String str) {
+public class LineTokenizer
+{
+	static public Token[] tokenize(String str)
+	{
 		boolean insideQuotes = false;
 		Boolean spaceMode = null;
 		StringBuilder builder = new StringBuilder();
@@ -26,9 +28,8 @@ public class LineTokenizer {
 					builder.append(c);
 				} else {
 					if (spaceMode.booleanValue() != isSpace) {
-						tokens.add(spaceMode.booleanValue() ? Token
-								.createSpaceToken(builder.toString()) : Token
-								.createWordToken(builder.toString()));
+						tokens.add(spaceMode.booleanValue() ? Token.createSpaceToken(builder.toString()) : Token
+							.createWordToken(builder.toString()));
 						builder.setLength(0);
 						spaceMode = new Boolean(isSpace);
 					}
@@ -43,9 +44,8 @@ public class LineTokenizer {
 		}
 
 		if (spaceMode != null && builder.length() > 0) {
-			tokens.add(spaceMode.booleanValue() ? Token
-					.createSpaceToken(builder.toString()) : Token
-					.createWordToken(builder.toString()));
+			tokens.add(spaceMode.booleanValue() ? Token.createSpaceToken(builder.toString()) : Token.createWordToken(builder
+				.toString()));
 		}
 
 		if (tokens.size() == 0 || tokens.peekLast().isSpaceToken())
@@ -54,7 +54,8 @@ public class LineTokenizer {
 		return tokens.toArray(new Token[tokens.size()]);
 	}
 
-	static private void print(Token[] tokens) {
+	static private void print(Token[] tokens)
+	{
 		System.out.print("{");
 
 		for (int lcv = 0; lcv < tokens.length; lcv++) {
@@ -66,7 +67,8 @@ public class LineTokenizer {
 		System.out.println("}");
 	}
 
-	static public void main(String[] args) {
+	static public void main(String[] args)
+	{
 		print(tokenize("Mark Morgan was here."));
 		print(tokenize("Mark \"Morgan was\" here."));
 		print(tokenize("Mark \\\"Morgan was\" here."));

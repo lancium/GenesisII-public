@@ -2,7 +2,8 @@ package edu.virginia.vcgr.genii.client.stats;
 
 import java.io.Serializable;
 
-public class MethodStatisticsReportPoint implements Serializable {
+public class MethodStatisticsReportPoint implements Serializable
+{
 	static final long serialVersionUID = 0L;
 
 	private long _totalCallsStarted;
@@ -12,14 +13,15 @@ public class MethodStatisticsReportPoint implements Serializable {
 	private long _totalSuccessfullCallDuration;
 	private long _totalFailedCallDuration;
 
-	public String toString() {
-		return String
-				.format("Calls Started = %d, Calls Succeeded = %d, Calls Failed = %d, Failure Rate = %.2f%%, Average Duration = %d ms",
-						totalCallsStarted(), totalSucceeded(), totalFailed(),
-						failureRate() * 100, averageDuration());
+	public String toString()
+	{
+		return String.format(
+			"Calls Started = %d, Calls Succeeded = %d, Calls Failed = %d, Failure Rate = %.2f%%, Average Duration = %d ms",
+			totalCallsStarted(), totalSucceeded(), totalFailed(), failureRate() * 100, averageDuration());
 	}
 
-	public MethodStatisticsReportPoint() {
+	public MethodStatisticsReportPoint()
+	{
 		_totalCallsStarted = 0L;
 		_totalSucceeded = 0L;
 		_totalFailed = 0L;
@@ -28,7 +30,8 @@ public class MethodStatisticsReportPoint implements Serializable {
 		_totalFailedCallDuration = 0L;
 	}
 
-	void add(MethodDataPoint dp) {
+	void add(MethodDataPoint dp)
+	{
 		_totalCallsStarted++;
 
 		if (dp.isCompleted()) {
@@ -42,23 +45,28 @@ public class MethodStatisticsReportPoint implements Serializable {
 		}
 	}
 
-	public long totalCallsStarted() {
+	public long totalCallsStarted()
+	{
 		return _totalCallsStarted;
 	}
 
-	public long totalSucceeded() {
+	public long totalSucceeded()
+	{
 		return _totalSucceeded;
 	}
 
-	public long totalFailed() {
+	public long totalFailed()
+	{
 		return _totalFailed;
 	}
 
-	public long totalCompleted() {
+	public long totalCompleted()
+	{
 		return _totalFailed + _totalSucceeded;
 	}
 
-	public double failureRate() {
+	public double failureRate()
+	{
 		long completed = totalCompleted();
 		if (completed == 0)
 			return Double.NaN;
@@ -66,26 +74,28 @@ public class MethodStatisticsReportPoint implements Serializable {
 		return (double) _totalFailed / totalCompleted();
 	}
 
-	public long averageSuccessfullDuration() {
+	public long averageSuccessfullDuration()
+	{
 		if (_totalSucceeded == 0)
 			return -1L;
 
 		return _totalSuccessfullCallDuration / _totalSucceeded;
 	}
 
-	public long averageFailedDuration() {
+	public long averageFailedDuration()
+	{
 		if (_totalFailed == 0)
 			return -1L;
 
 		return _totalFailedCallDuration / _totalFailed;
 	}
 
-	public long averageDuration() {
+	public long averageDuration()
+	{
 		long div = totalCompleted();
 		if (div == 0)
 			return -1L;
 
-		return (_totalSuccessfullCallDuration + _totalFailedCallDuration)
-				/ (div);
+		return (_totalSuccessfullCallDuration + _totalFailedCallDuration) / (div);
 	}
 }

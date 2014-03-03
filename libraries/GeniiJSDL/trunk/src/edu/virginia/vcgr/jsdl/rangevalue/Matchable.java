@@ -20,6 +20,7 @@ package edu.virginia.vcgr.jsdl.rangevalue;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface Matchable {
+public interface Matchable
+{
 	public boolean matches(Number number);
 }

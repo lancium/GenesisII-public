@@ -20,18 +20,17 @@ import org.mortbay.resource.Resource;
 import edu.virginia.vcgr.genii.security.x509.TrustAllX509TrustManager;
 
 /**
- * A wrapper of the generic Jetty SslSocketConnector connector in which all
- * incoming connections are initially trusted.
+ * A wrapper of the generic Jetty SslSocketConnector connector in which all incoming connections are
+ * initially trusted.
  * 
- * (Authorization and trust-verification occur later during message-level
- * processing)
+ * (Authorization and trust-verification occur later during message-level processing)
  * 
  * @author dgm4d
  */
-public class TrustAllSslSocketConnector extends SslSocketConnector {
+public class TrustAllSslSocketConnector extends SslSocketConnector
+{
 
-	static private Log _logger = LogFactory
-			.getLog(TrustAllSslSocketConnector.class);
+	static private Log _logger = LogFactory.getLog(TrustAllSslSocketConnector.class);
 
 	private Password _password;
 	private Password _keyPassword;
@@ -40,40 +39,38 @@ public class TrustAllSslSocketConnector extends SslSocketConnector {
 	/**
 	 * Constructor.
 	 */
-	public TrustAllSslSocketConnector() {
+	public TrustAllSslSocketConnector()
+	{
 		super();
 	}
 
 	/* ------------------------------------------------------------ */
-	public void setPassword(String password) {
+	public void setPassword(String password)
+	{
 		_password = Password.getPassword(PASSWORD_PROPERTY, password, null);
 		super.setPassword(password);
 	}
 
 	/* ------------------------------------------------------------ */
-	public void setKeyPassword(String password) {
-		_keyPassword = Password.getPassword(KEYPASSWORD_PROPERTY, password,
-				null);
+	public void setKeyPassword(String password)
+	{
+		_keyPassword = Password.getPassword(KEYPASSWORD_PROPERTY, password, null);
 	}
 
 	/**
-	 * Overridden to insert a trust store that allows everyone access during SSL
-	 * handshake.
+	 * Overridden to insert a trust store that allows everyone access during SSL handshake.
 	 */
-	protected SSLServerSocketFactory createFactory() throws Exception {
+	protected SSLServerSocketFactory createFactory() throws Exception
+	{
 		KeyManager[] keyManagers = null;
 		InputStream keystoreInputStream = null;
 		if (getKeystore() != null)
-			keystoreInputStream = Resource.newResource(getKeystore())
-					.getInputStream();
+			keystoreInputStream = Resource.newResource(getKeystore()).getInputStream();
 		KeyStore keyStore = KeyStore.getInstance(getKeystoreType());
-		keyStore.load(keystoreInputStream, _password == null ? null : _password
-				.toString().toCharArray());
+		keyStore.load(keystoreInputStream, _password == null ? null : _password.toString().toCharArray());
 
-		KeyManagerFactory keyManagerFactory = KeyManagerFactory
-				.getInstance(getSslKeyManagerFactoryAlgorithm());
-		keyManagerFactory.init(keyStore, _keyPassword == null ? null
-				: _keyPassword.toString().toCharArray());
+		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(getSslKeyManagerFactoryAlgorithm());
+		keyManagerFactory.init(keyStore, _keyPassword == null ? null : _keyPassword.toString().toCharArray());
 		keyManagers = keyManagerFactory.getKeyManagers();
 
 		// use our trust-all trust manager
@@ -81,12 +78,12 @@ public class TrustAllSslSocketConnector extends SslSocketConnector {
 		TrustManager[] trustManagers = new TrustManager[1];
 		trustManagers[0] = trustAll;
 
-		SecureRandom secureRandom = getSecureRandomAlgorithm() == null ? null
-				: SecureRandom.getInstance(getSecureRandomAlgorithm());
+		SecureRandom secureRandom =
+			getSecureRandomAlgorithm() == null ? null : SecureRandom.getInstance(getSecureRandomAlgorithm());
 
-		SSLContext context = getProvider() == null ? SSLContext
-				.getInstance(getProtocol()) : SSLContext.getInstance(
-				getProtocol(), getProvider());
+		SSLContext context =
+			getProvider() == null ? SSLContext.getInstance(getProtocol()) : SSLContext
+				.getInstance(getProtocol(), getProvider());
 		SSLContext sslcontext = context;
 
 		SSLSessionContext sessionContext = sslcontext.getServerSessionContext();

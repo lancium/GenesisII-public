@@ -14,8 +14,8 @@ import edu.virginia.vcgr.genii.gjt.data.variables.Clearable;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 
-public class StageList extends DefaultDataItem implements Clearable,
-		PostUnmarshallListener, Iterable<DataStage> {
+public class StageList extends DefaultDataItem implements Clearable, PostUnmarshallListener, Iterable<DataStage>
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlTransient
@@ -27,10 +27,12 @@ public class StageList extends DefaultDataItem implements Clearable,
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "data-stage")
 	private Vector<DataStage> _stages = new Vector<DataStage>();
 
-	public StageList() {
+	public StageList()
+	{
 	}
 
-	public StageList(ParameterizableBroker pBroker, ModificationBroker mBroker) {
+	public StageList(ParameterizableBroker pBroker, ModificationBroker mBroker)
+	{
 		_pBroker = pBroker;
 		_mBroker = mBroker;
 
@@ -38,7 +40,8 @@ public class StageList extends DefaultDataItem implements Clearable,
 		addModificationListener(mBroker);
 	}
 
-	public DataStage add() {
+	public DataStage add()
+	{
 		DataStage newStage = new DataStage(_pBroker, _mBroker);
 		_stages.add(newStage);
 		fireJobDescriptionModified();
@@ -46,7 +49,8 @@ public class StageList extends DefaultDataItem implements Clearable,
 		return newStage;
 	}
 
-	public void remove(int index) {
+	public void remove(int index)
+	{
 		DataStage stage = _stages.remove(index);
 		if (stage != null) {
 			stage.clear();
@@ -54,16 +58,19 @@ public class StageList extends DefaultDataItem implements Clearable,
 		}
 	}
 
-	public DataStage get(int index) {
+	public DataStage get(int index)
+	{
 		return _stages.get(index);
 	}
 
-	public int size() {
+	public int size()
+	{
 		return _stages.size();
 	}
 
 	@Override
-	public void clear() {
+	public void clear()
+	{
 		for (DataStage stage : _stages)
 			stage.clear();
 
@@ -73,34 +80,35 @@ public class StageList extends DefaultDataItem implements Clearable,
 		_stages.clear();
 	}
 
-	public ParameterizableBroker getParameterizableBroker() {
+	public ParameterizableBroker getParameterizableBroker()
+	{
 		return _pBroker;
 	}
 
-	public ModificationBroker getModificationBroker() {
+	public ModificationBroker getModificationBroker()
+	{
 		return _mBroker;
 	}
 
 	@Override
-	public void postUnmarshall(ParameterizableBroker parameterBroker,
-			ModificationBroker modificationBroker) {
+	public void postUnmarshall(ParameterizableBroker parameterBroker, ModificationBroker modificationBroker)
+	{
 		_pBroker = parameterBroker;
 		_mBroker = modificationBroker;
 
 		/*
-		 * Don't need to do this because we derive off of a class that
-		 * automatically does it
+		 * Don't need to do this because we derive off of a class that automatically does it
 		 */
 		/*
-		 * addParameterizableListener(parameterBroker);
-		 * addModificationListener(modificationBroker);
+		 * addParameterizableListener(parameterBroker); addModificationListener(modificationBroker);
 		 */
 
 		fireJobDescriptionModified();
 	}
 
 	@Override
-	public Iterator<DataStage> iterator() {
+	public Iterator<DataStage> iterator()
+	{
 		return Collections.unmodifiableList(_stages).iterator();
 	}
 }

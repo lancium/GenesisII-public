@@ -11,17 +11,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
-public class ExecutionEngine {
+public class ExecutionEngine
+{
 	static private Log _logger = LogFactory.getLog(ExecutionEngine.class);
 
-	static private List<String> readOutput(byte[] data) throws IOException {
+	static private List<String> readOutput(byte[] data) throws IOException
+	{
 		BufferedReader reader = null;
 		String line;
 		List<String> result = new LinkedList<String>();
 
 		try {
-			reader = new BufferedReader(new InputStreamReader(
-					new ByteArrayInputStream(data)));
+			reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data)));
 			while ((line = reader.readLine()) != null) {
 				result.add(line);
 			}
@@ -32,7 +33,8 @@ public class ExecutionEngine {
 		}
 	}
 
-	static public String formatOutput(List<String> output) {
+	static public String formatOutput(List<String> output)
+	{
 		StringBuilder builder = new StringBuilder();
 		boolean seenFirst = false;
 
@@ -46,24 +48,22 @@ public class ExecutionEngine {
 		return builder.toString();
 	}
 
-	static public List<String> simpleMultilineExecute(String... command)
-			throws IOException {
+	static public List<String> simpleMultilineExecute(String... command) throws IOException
+	{
 		SimpleExecutionResults results = execute(command);
 		List<String> error = results.getError();
 
 		if (error.size() > 0)
-			_logger.warn("Got output on stderr from a simple execute:\n"
-					+ formatOutput(error));
+			_logger.warn("Got output on stderr from a simple execute:\n" + formatOutput(error));
 
 		if (results.getExitCode() != 0)
-			throw new IOException(String.format(
-					"Non-zero exit code (%d) from simple exec.",
-					results.getExitCode()));
+			throw new IOException(String.format("Non-zero exit code (%d) from simple exec.", results.getExitCode()));
 
 		return results.getOutput();
 	}
 
-	static public String simpleExecute(String... command) throws IOException {
+	static public String simpleExecute(String... command) throws IOException
+	{
 		List<String> output = simpleMultilineExecute(command);
 		if (output.size() > 0)
 			return output.get(0);
@@ -71,8 +71,8 @@ public class ExecutionEngine {
 		return "";
 	}
 
-	static public SimpleExecutionResults execute(String... command)
-			throws IOException {
+	static public SimpleExecutionResults execute(String... command) throws IOException
+	{
 		int exitCode;
 		StreamGatherer stdout = null;
 		StreamGatherer stderr = null;
@@ -93,13 +93,10 @@ public class ExecutionEngine {
 				}
 			}
 			if (_logger.isTraceEnabled())
-				_logger.trace("execution of '" + command + "' yields result: "
-						+ exitCode);
+				_logger.trace("execution of '" + command + "' yields result: " + exitCode);
 			if (exitCode != 0)
-				_logger.info("failure: execution of '" + command
-						+ "' yields result: " + exitCode);
-			return new SimpleExecutionResults(exitCode,
-					readOutput(stdout.getData()), readOutput(stderr.getData()));
+				_logger.info("failure: execution of '" + command + "' yields result: " + exitCode);
+			return new SimpleExecutionResults(exitCode, readOutput(stdout.getData()), readOutput(stderr.getData()));
 		} finally {
 			if (proc != null) {
 				try {

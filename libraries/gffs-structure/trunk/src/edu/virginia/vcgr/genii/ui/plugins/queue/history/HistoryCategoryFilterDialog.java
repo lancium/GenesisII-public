@@ -22,7 +22,8 @@ import org.morgan.utils.gui.GUIUtils;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.gjt.gui.util.ButtonPanel;
 
-class HistoryCategoryFilterDialog extends JDialog {
+class HistoryCategoryFilterDialog extends JDialog
+{
 	static final long serialVersionUID = 0L;
 
 	static final private int SELECTION_COLUMN_WIDTH = 64;
@@ -30,7 +31,8 @@ class HistoryCategoryFilterDialog extends JDialog {
 	private HistoryCategoryFilterModel _model;
 	private Set<HistoryEventCategory> _selectionSet = null;
 
-	private void prepareColumns(TableColumnModel columnModel) {
+	private void prepareColumns(TableColumnModel columnModel)
+	{
 		TableColumn selectionColumn = columnModel.getColumn(0);
 		TableColumn categoryColumn = columnModel.getColumn(1);
 
@@ -38,15 +40,15 @@ class HistoryCategoryFilterDialog extends JDialog {
 		selectionColumn.setPreferredWidth(SELECTION_COLUMN_WIDTH);
 		selectionColumn.setResizable(false);
 
-		categoryColumn.setCellRenderer(new DefaultTableCellRenderer() {
+		categoryColumn.setCellRenderer(new DefaultTableCellRenderer()
+		{
 			private static final long serialVersionUID = 0L;
 
 			@Override
-			public Component getTableCellRendererComponent(JTable table,
-					Object value, boolean isSelected, boolean hasFocus,
-					int row, int column) {
-				super.getTableCellRendererComponent(table, value, isSelected,
-						hasFocus, row, column);
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column)
+			{
+				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
 				HistoryEventCategory category = (HistoryEventCategory) value;
 				if (category != null)
@@ -57,7 +59,8 @@ class HistoryCategoryFilterDialog extends JDialog {
 		});
 	}
 
-	private HistoryCategoryFilterDialog(Window owner, HistoryEventFilter filter) {
+	private HistoryCategoryFilterDialog(Window owner, HistoryEventFilter filter)
+	{
 		super(owner);
 
 		setTitle("History Event Category Filter");
@@ -70,46 +73,49 @@ class HistoryCategoryFilterDialog extends JDialog {
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		content.add(new JScrollPane(table), new GridBagConstraints(0, 0, 1, 1,
-				1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(5, 5, 5, 5), 5, 5));
-		content.add(ButtonPanel.createHorizontalPanel(new OKAction(),
-				new CancelAction()), new GridBagConstraints(0, 1, 1, 1, 1.0,
-				0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JScrollPane(table), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalPanel(new OKAction(), new CancelAction()), new GridBagConstraints(0, 1, 1, 1,
+			1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
-	private class OKAction extends AbstractAction {
+	private class OKAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private OKAction() {
+		private OKAction()
+		{
 			super("OK");
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			_selectionSet = _model.getSelectionSet();
 			dispose();
 		}
 	}
 
-	private class CancelAction extends AbstractAction {
+	private class CancelAction extends AbstractAction
+	{
 		static final long serialVersionUID = 0L;
 
-		private CancelAction() {
+		private CancelAction()
+		{
 			super("Cancel");
 		}
 
 		@Override
-		final public void actionPerformed(ActionEvent e) {
+		final public void actionPerformed(ActionEvent e)
+		{
 			_selectionSet = null;
 			dispose();
 		}
 	}
 
-	static void modifyFilter(Window owner, HistoryEventFilter filter) {
-		HistoryCategoryFilterDialog dialog = new HistoryCategoryFilterDialog(
-				owner, filter);
+	static void modifyFilter(Window owner, HistoryEventFilter filter)
+	{
+		HistoryCategoryFilterDialog dialog = new HistoryCategoryFilterDialog(owner, filter);
 		dialog.setModalityType(ModalityType.DOCUMENT_MODAL);
 		dialog.pack();
 		GUIUtils.centerWindow(dialog);

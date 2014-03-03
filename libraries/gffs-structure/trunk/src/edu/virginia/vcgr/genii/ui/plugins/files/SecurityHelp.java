@@ -10,23 +10,22 @@ import edu.virginia.vcgr.genii.ui.plugins.MenuType;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 
-public class SecurityHelp extends AbstractCombinedUIMenusPlugin {
+public class SecurityHelp extends AbstractCombinedUIMenusPlugin
+{
 
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType)
-			throws UIPluginException {
-		GuiHelpAction.DisplayUrlHelp(HelpLinkConfiguration
-				.get_help_url(HelpLinkConfiguration.GENERAL_SECURITY_HELP));
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
+	{
+		GuiHelpAction.DisplayUrlHelp(HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.GENERAL_SECURITY_HELP));
 
 	}
 
 	@Override
-	public boolean isEnabled(
-			Collection<EndpointDescription> selectedDescriptions) {
+	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
+	{
 
 		return true;
-		// return (tp.isByteIO() && !(tp.isContainer() || tp.isBESContainer() ||
-		// tp.isQueue() ||
+		// return (tp.isByteIO() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() ||
 		// tp.isIDP()));
 	}
 }

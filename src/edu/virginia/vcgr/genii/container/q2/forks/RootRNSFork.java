@@ -6,13 +6,16 @@ import edu.virginia.vcgr.genii.container.common.forks.CommonRootRNSFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 
-public class RootRNSFork extends CommonRootRNSFork {
-	public RootRNSFork(ResourceForkService service, String forkPath) {
+public class RootRNSFork extends CommonRootRNSFork
+{
+	public RootRNSFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
 	@Override
-	protected void addEntries(Map<String, ResourceForkInformation> entries) {
+	protected void addEntries(Map<String, ResourceForkInformation> entries)
+	{
 		super.addEntries(entries);
 
 		addDefaultEntry("resources", ResourcesRNSFork.class);

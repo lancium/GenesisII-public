@@ -17,25 +17,26 @@ import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
-public class ContainerServicesProperties {
-	static private Log _logger = LogFactory
-			.getLog(ContainerServicesProperties.class);
+public class ContainerServicesProperties
+{
+	static private Log _logger = LogFactory.getLog(ContainerServicesProperties.class);
 
-	static private class ListenerBundle {
+	static private class ListenerBundle
+	{
 		private Pattern _filter;
 		private ContainerServicePropertyListener _listener;
 
-		private ListenerBundle(Pattern filter,
-				ContainerServicePropertyListener listener) {
+		private ListenerBundle(Pattern filter, ContainerServicePropertyListener listener)
+		{
 			if (listener == null)
-				throw new IllegalArgumentException(
-						"Container listener cannot be null.");
+				throw new IllegalArgumentException("Container listener cannot be null.");
 
 			_filter = filter;
 			_listener = listener;
 		}
 
-		public boolean equals(ListenerBundle bundle) {
+		public boolean equals(ListenerBundle bundle)
+		{
 			if (_filter == null) {
 				if (bundle._filter != null)
 					return false;
@@ -51,7 +52,8 @@ public class ContainerServicesProperties {
 		}
 
 		@Override
-		public boolean equals(Object other) {
+		public boolean equals(Object other)
+		{
 			if (other instanceof ListenerBundle)
 				return equals((ListenerBundle) other);
 
@@ -59,20 +61,17 @@ public class ContainerServicesProperties {
 		}
 	}
 
-	static private void prepareDatabase(
-			ServerDatabaseConnectionPool connectionPool) {
+	static private void prepareDatabase(ServerDatabaseConnectionPool connectionPool)
+	{
 		Connection connection = null;
 
 		try {
 			connection = connectionPool.acquire(false);
-			DatabaseTableUtils.createTables(connection, false,
-					"CREATE TABLE containerservicesproperties ("
-							+ "name VARCHAR(256) PRIMARY KEY, "
-							+ "value BLOB(2G) NOT NULL)");
+			DatabaseTableUtils.createTables(connection, false, "CREATE TABLE containerservicesproperties ("
+				+ "name VARCHAR(256) PRIMARY KEY, " + "value BLOB(2G) NOT NULL)");
 			connection.commit();
 		} catch (SQLException sqe) {
-			_logger.error("Cannot create container services properties table.",
-					sqe);
+			_logger.error("Cannot create container services properties table.", sqe);
 		} finally {
 			connectionPool.release(connection);
 		}
@@ -81,8 +80,8 @@ public class ContainerServicesProperties {
 	private ServerDatabaseConnectionPool _connectionPool;
 	private Collection<ListenerBundle> _listeners = new LinkedList<ListenerBundle>();
 
-	protected void firePropertyChanged(String propertyName,
-			Serializable newValue) {
+	protected void firePropertyChanged(String propertyName, Serializable newValue)
+	{
 		Collection<ContainerServicePropertyListener> listeners = new LinkedList<ContainerServicePropertyListener>();
 
 		synchronized (_listeners) {
@@ -101,46 +100,44 @@ public class ContainerServicesProperties {
 			try {
 				listener.propertyChanged(propertyName, newValue);
 			} catch (Throwable cause) {
-				_logger.error(
-						String.format(
-								"Container service property listener \"%s\" threw exception.",
-								listener), cause);
+				_logger.error(String.format("Container service property listener \"%s\" threw exception.", listener), cause);
 			}
 		}
 	}
 
-	public ContainerServicesProperties(
-			ServerDatabaseConnectionPool connectionPool) {
+	public ContainerServicesProperties(ServerDatabaseConnectionPool connectionPool)
+	{
 		_connectionPool = connectionPool;
 
 		prepareDatabase(_connectionPool);
 	}
 
-	public void addPropertyChangeListener(Pattern filter,
-			ContainerServicePropertyListener listener) {
+	public void addPropertyChangeListener(Pattern filter, ContainerServicePropertyListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.add(new ListenerBundle(filter, listener));
 		}
 	}
 
-	public void addPropertyChangeListener(
-			ContainerServicePropertyListener listener) {
+	public void addPropertyChangeListener(ContainerServicePropertyListener listener)
+	{
 		addPropertyChangeListener(null, listener);
 	}
 
-	public void removePropertyChangeListener(Pattern filter,
-			ContainerServicePropertyListener listener) {
+	public void removePropertyChangeListener(Pattern filter, ContainerServicePropertyListener listener)
+	{
 		synchronized (_listeners) {
 			_listeners.remove(new ListenerBundle(filter, listener));
 		}
 	}
 
-	public void removePropertyChangeListener(
-			ContainerServicePropertyListener listener) {
+	public void removePropertyChangeListener(ContainerServicePropertyListener listener)
+	{
 		removePropertyChangeListener(null, listener);
 	}
 
-	public void setProperty(String propertyName, Serializable newValue) {
+	public void setProperty(String propertyName, Serializable newValue)
+	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -152,8 +149,7 @@ public class ContainerServicesProperties {
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt = connection
-					.prepareStatement("SELECT name FROM containerservicesproperties WHERE name = ?");
+			stmt = connection.prepareStatement("SELECT name FROM containerservicesproperties WHERE name = ?");
 			stmt.setString(1, propertyName);
 			rs = stmt.executeQuery();
 
@@ -161,28 +157,20 @@ public class ContainerServicesProperties {
 				stmt.close();
 				stmt = null;
 
-				stmt = connection
-						.prepareStatement("UPDATE containerservicesproperties "
-								+ "SET value = ? WHERE name = ?");
-				stmt.setBlob(1, DBSerializer.toBlob(newValue,
-						"containerservicesproperties", "value"));
+				stmt = connection.prepareStatement("UPDATE containerservicesproperties " + "SET value = ? WHERE name = ?");
+				stmt.setBlob(1, DBSerializer.toBlob(newValue, "containerservicesproperties", "value"));
 				stmt.setString(2, propertyName);
 				if (stmt.executeUpdate() != 1)
-					throw new SQLException(
-							"Unable to update property in database.");
+					throw new SQLException("Unable to update property in database.");
 			} else {
 				stmt.close();
 				stmt = null;
 
-				stmt = connection
-						.prepareStatement("INSERT INTO containerservicesproperties (name, value) "
-								+ "VALUES (?, ?)");
+				stmt = connection.prepareStatement("INSERT INTO containerservicesproperties (name, value) " + "VALUES (?, ?)");
 				stmt.setString(1, propertyName);
-				stmt.setBlob(2, DBSerializer.toBlob(newValue,
-						"containerservicesproperties", "value"));
+				stmt.setBlob(2, DBSerializer.toBlob(newValue, "containerservicesproperties", "value"));
 				if (stmt.executeUpdate() != 1)
-					throw new SQLException(
-							"Unable to insert property into database.");
+					throw new SQLException("Unable to insert property into database.");
 			}
 
 			connection.commit();
@@ -196,19 +184,18 @@ public class ContainerServicesProperties {
 		}
 	}
 
-	public void removeProperty(String propertyName) {
+	public void removeProperty(String propertyName)
+	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection
-					.prepareStatement("DELETE FROM containerservicesproperties WHERE name = ?");
+			stmt = connection.prepareStatement("DELETE FROM containerservicesproperties WHERE name = ?");
 			stmt.setString(1, propertyName);
 
 			if (stmt.executeUpdate() != 1)
-				throw new SQLException(
-						"Unable to remove property from database.");
+				throw new SQLException("Unable to remove property from database.");
 
 			connection.commit();
 			firePropertyChanged(propertyName, null);
@@ -220,16 +207,15 @@ public class ContainerServicesProperties {
 		}
 	}
 
-	public Serializable getProperty(String propertyName) {
+	public Serializable getProperty(String propertyName)
+	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection
-					.prepareStatement("SELECT value FROM containerservicesproperties "
-							+ "WHERE name = ?");
+			stmt = connection.prepareStatement("SELECT value FROM containerservicesproperties " + "WHERE name = ?");
 			stmt.setString(1, propertyName);
 
 			rs = stmt.executeQuery();

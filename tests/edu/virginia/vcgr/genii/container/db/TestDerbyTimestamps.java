@@ -10,25 +10,30 @@ import java.util.Properties;
 import org.junit.Test;
 import org.morgan.util.io.StreamUtils;
 
-public class TestDerbyTimestamps {
+public class TestDerbyTimestamps
+{
 	static private ServerDatabaseConnectionPool _pool;
 
-	static public void setUp() throws Throwable {
+	static public void setUp() throws Throwable
+	{
 		createConnectionPool();
 		createTables();
 	}
 
-	public void tearDown() throws Throwable {
+	public void tearDown() throws Throwable
+	{
 		dropTables();
 	}
 
 	@Test
-	public void testNothing() {
+	public void testNothing()
+	{
 		// place holder til we resolve the startup issues here.
 	}
 
 	// @Test
-	public void notAtestDerbyTimeStamp() throws Throwable {
+	public void notAtestDerbyTimeStamp() throws Throwable
+	{
 		Connection conn = null;
 		PreparedStatement insertStmt = null;
 		PreparedStatement queryStmt = null;
@@ -36,16 +41,14 @@ public class TestDerbyTimestamps {
 
 		try {
 			conn = _pool.acquire(false);
-			insertStmt = conn
-					.prepareStatement("INSERT INTO test1 VALUES(?, CURRENT_TIMESTAMP)");
+			insertStmt = conn.prepareStatement("INSERT INTO test1 VALUES(?, CURRENT_TIMESTAMP)");
 			insertStmt.setInt(1, 0);
 			insertStmt.executeUpdate();
 			conn.commit();
 
-			queryStmt = conn
-					.prepareStatement("SELECT ts, CURRENT_TIMESTAMP, "
-							+ "{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND, CURRENT_TIMESTAMP, ts)} "
-							+ "FROM test1 WHERE ID = 0");
+			queryStmt =
+				conn.prepareStatement("SELECT ts, CURRENT_TIMESTAMP, "
+					+ "{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND, CURRENT_TIMESTAMP, ts)} " + "FROM test1 WHERE ID = 0");
 			rs = queryStmt.executeQuery();
 			rs.next();
 
@@ -53,8 +56,7 @@ public class TestDerbyTimestamps {
 			Timestamp current = rs.getTimestamp(2);
 			long diff = rs.getLong(3);
 
-			System.err.println("The difference between " + ts + " and "
-					+ current + " is " + diff);
+			System.err.println("The difference between " + ts + " and " + current + " is " + diff);
 		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(queryStmt);
@@ -63,13 +65,12 @@ public class TestDerbyTimestamps {
 		}
 	}
 
-	static void createConnectionPool() throws Throwable {
+	static void createConnectionPool() throws Throwable
+	{
 		Properties props = new Properties();
-		props.setProperty("edu.virginia.vcgr.genii.client.db.db-class-name",
-				"org.apache.derby.jdbc.EmbeddedDriver");
-		props.setProperty(
-				"edu.virginia.vcgr.genii.client.db.db-connect-string",
-				"jdbc:derby:/Users/morgan/test-database;create=true");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-class-name", "org.apache.derby.jdbc.EmbeddedDriver");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-connect-string",
+			"jdbc:derby:/Users/morgan/test-database;create=true");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.db-user", "sa");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.db-password", "");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.pool-size", "8");
@@ -77,15 +78,15 @@ public class TestDerbyTimestamps {
 		_pool = new ServerDatabaseConnectionPool(props);
 	}
 
-	static public void createTables() throws Throwable {
+	static public void createTables() throws Throwable
+	{
 		Connection conn = null;
 		Statement stmt = null;
 
 		try {
 			conn = _pool.acquire(false);
 			stmt = conn.createStatement();
-			stmt.executeUpdate("CREATE TABLE test1 (ID INTEGER PRIMARY KEY,"
-					+ "ts TIMESTAMP)");
+			stmt.executeUpdate("CREATE TABLE test1 (ID INTEGER PRIMARY KEY," + "ts TIMESTAMP)");
 			conn.commit();
 		} finally {
 			StreamUtils.close(stmt);
@@ -93,7 +94,8 @@ public class TestDerbyTimestamps {
 		}
 	}
 
-	static public void dropTables() throws Throwable {
+	static public void dropTables() throws Throwable
+	{
 		Connection conn = null;
 		Statement stmt = null;
 

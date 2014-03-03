@@ -13,11 +13,10 @@ import edu.virginia.vcgr.genii.client.gfs.cache.GeniiCacheManager;
 import edu.virginia.vcgr.genii.client.gfs.cache.handles.GeniiOpenFileHandle;
 
 /**
- * This class is responsible for caching all information obtained from RNS for a
- * file
+ * This class is responsible for caching all information obtained from RNS for a file
  */
-public class GeniiCachedFile extends GeniiCachedResource implements
-		GeniiCacheGenericFileObject {
+public class GeniiCachedFile extends GeniiCachedResource implements GeniiCacheGenericFileObject
+{
 
 	boolean dirty = false;
 
@@ -30,8 +29,8 @@ public class GeniiCachedFile extends GeniiCachedResource implements
 	// A list of handles that are referencing me
 	private ArrayList<GeniiOpenFileHandle> myHandles = new ArrayList<GeniiOpenFileHandle>();
 
-	public GeniiCachedFile(String[] path, OpenFlags flags, OpenModes modes,
-			Permissions permissions) throws FSException {
+	public GeniiCachedFile(String[] path, OpenFlags flags, OpenModes modes, Permissions permissions) throws FSException
+	{
 		super(path);
 		_fs = GeniiCacheManager.getInstance().get_fs();
 		_flags = flags;
@@ -42,11 +41,11 @@ public class GeniiCachedFile extends GeniiCachedResource implements
 	/**
 	 * Attach file handle to this cached file
 	 */
-	public synchronized void attach(GeniiOpenFileHandle fh) throws FSException {
+	public synchronized void attach(GeniiOpenFileHandle fh) throws FSException
+	{
 		if (!invalidated) {
 			// New permissions are stronger
-			if (fh.getMode() == OpenModes.READ_WRITE
-					&& (_currentMode == null || OpenModes.READ == _currentMode)) {
+			if (fh.getMode() == OpenModes.READ_WRITE && (_currentMode == null || OpenModes.READ == _currentMode)) {
 				long newFileID = _fs.open(_path, _flags, fh.getMode(), null);
 				_fs.close(_fileHandle);
 				_fileHandle = newFileID;
@@ -56,13 +55,10 @@ public class GeniiCachedFile extends GeniiCachedResource implements
 			if (fh.getFlags().isTruncate()) {
 				_fs.truncate(_path, 0);
 				_fs.flush(_fileHandle);
-				_statStructure = new FilesystemStatStructure(
-						_statStructure.getINode(), _statStructure.getName(),
-						_statStructure.getEntryType(), 0,
-						_statStructure.getCreated(),
-						_statStructure.getLastModified(),
-						_statStructure.getLastAccessed(),
-						_statStructure.getPermissions());
+				_statStructure =
+					new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(),
+						_statStructure.getEntryType(), 0, _statStructure.getCreated(), _statStructure.getLastModified(),
+						_statStructure.getLastAccessed(), _statStructure.getPermissions());
 			}
 			synchronized (myHandles) {
 				myHandles.add(fh);
@@ -73,7 +69,8 @@ public class GeniiCachedFile extends GeniiCachedResource implements
 		}
 	}
 
-	public synchronized void detatch(GeniiOpenFileHandle fh) {
+	public synchronized void detatch(GeniiOpenFileHandle fh)
+	{
 		myHandles.remove(fh);
 	}
 
@@ -82,7 +79,8 @@ public class GeniiCachedFile extends GeniiCachedResource implements
 	 * 
 	 * @param warnOnValidate
 	 */
-	public synchronized void invalidate() {
+	public synchronized void invalidate()
+	{
 		invalidated = true;
 		for (GeniiOpenFileHandle fh : myHandles) {
 			fh.invalidate();
@@ -91,18 +89,21 @@ public class GeniiCachedFile extends GeniiCachedResource implements
 	}
 
 	@Override
-	public synchronized void refresh() throws FSException {
+	public synchronized void refresh() throws FSException
+	{
 		flush();
 		_statStructure = _fs.stat(_path);
 	}
 
 	@Override
-	public synchronized void close() throws FSException {
+	public synchronized void close() throws FSException
+	{
 		_fs.close(_fileHandle);
 	}
 
 	@Override
-	public synchronized void flush() throws FSException {
+	public synchronized void flush() throws FSException
+	{
 		if (dirty) {
 			_fs.flush(_fileHandle);
 			dirty = false;
@@ -110,35 +111,34 @@ public class GeniiCachedFile extends GeniiCachedResource implements
 	}
 
 	@Override
-	public synchronized void read(long offset, ByteBuffer target)
-			throws FSException {
+	public synchronized void read(long offset, ByteBuffer target) throws FSException
+	{
 		_fs.read(_fileHandle, offset, target);
 	}
 
 	@Override
-	public synchronized void write(long offset, ByteBuffer source)
-			throws FSException {
+	public synchronized void write(long offset, ByteBuffer source) throws FSException
+	{
 		dirty = true;
 		_fs.write(_fileHandle, offset, source);
 		long newLength = offset + source.position();
 		if (newLength > _statStructure.getSize()) {
-			_statStructure = new FilesystemStatStructure(
-					_statStructure.getINode(), _statStructure.getName(),
-					_statStructure.getEntryType(), newLength,
-					_statStructure.getCreated(),
-					_statStructure.getLastModified(),
-					_statStructure.getLastAccessed(),
+			_statStructure =
+				new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(), _statStructure.getEntryType(),
+					newLength, _statStructure.getCreated(), _statStructure.getLastModified(), _statStructure.getLastAccessed(),
 					_statStructure.getPermissions());
 		}
 	}
 
 	@Override
-	public boolean isDirectory() {
+	public boolean isDirectory()
+	{
 		return false;
 	}
 
 	@Override
-	public synchronized void rename(String[] toPath) throws FSException {
+	public synchronized void rename(String[] toPath) throws FSException
+	{
 		flush();
 		close();
 		_fs.rename(_path, toPath);
@@ -147,13 +147,12 @@ public class GeniiCachedFile extends GeniiCachedResource implements
 	}
 
 	@Override
-	public synchronized void truncate(long newSize) throws FSException {
+	public synchronized void truncate(long newSize) throws FSException
+	{
 		_fs.truncate(_path, newSize);
-		_statStructure = new FilesystemStatStructure(_statStructure.getINode(),
-				_statStructure.getName(), _statStructure.getEntryType(),
-				newSize, _statStructure.getCreated(),
-				_statStructure.getLastModified(),
-				_statStructure.getLastAccessed(),
+		_statStructure =
+			new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(), _statStructure.getEntryType(),
+				newSize, _statStructure.getCreated(), _statStructure.getLastModified(), _statStructure.getLastAccessed(),
 				_statStructure.getPermissions());
 	}
 }

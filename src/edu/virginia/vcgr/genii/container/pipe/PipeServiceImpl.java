@@ -38,70 +38,69 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @ConstructionParametersType(PipeConstructionParameters.class)
-public class PipeServiceImpl extends GenesisIIBase implements PipePortType {
+public class PipeServiceImpl extends GenesisIIBase implements PipePortType
+{
 	static final private long DEFAULT_TIMEOUT_MS = 1000 * 30;
 
 	static private Map<String, PipeBuffer> _resource2BufferMap = new HashMap<String, PipeBuffer>();
 
-	private PipeBuffer createPipeBuffer(ResourceKey rKey)
-			throws ResourceException {
+	private PipeBuffer createPipeBuffer(ResourceKey rKey) throws ResourceException
+	{
 		IResource resource = rKey.dereference();
-		PipeConstructionParameters consParms = (PipeConstructionParameters) resource
-				.constructionParameters(PipeServiceImpl.class);
+		PipeConstructionParameters consParms =
+			(PipeConstructionParameters) resource.constructionParameters(PipeServiceImpl.class);
 		return new PipeBuffer(consParms.pipeSize());
 	}
 
-	private PipeBuffer pipeBuffer() throws ResourceUnknownFaultType,
-			ResourceException {
+	private PipeBuffer pipeBuffer() throws ResourceUnknownFaultType, ResourceException
+	{
 		PipeBuffer buffer;
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 
 		synchronized (_resource2BufferMap) {
 			buffer = _resource2BufferMap.get(rKey.getResourceKey());
 			if (buffer == null)
-				_resource2BufferMap.put(rKey.getResourceKey(),
-						buffer = createPipeBuffer(rKey));
+				_resource2BufferMap.put(rKey.getResourceKey(), buffer = createPipeBuffer(rKey));
 		}
 
 		return buffer;
 	}
 
-	private long getTimeoutMS() {
+	private long getTimeoutMS()
+	{
 		return DEFAULT_TIMEOUT_MS;
 	}
 
-	private void handleSeek(URI seekOrigin, long offset)
-			throws SeekNotPermittedFaultType {
-		if (seekOrigin == null
-				|| seekOrigin.equals(ByteIOConstants.SEEK_ORIGIN_CURRENT_URI))
+	private void handleSeek(URI seekOrigin, long offset) throws SeekNotPermittedFaultType
+	{
+		if (seekOrigin == null || seekOrigin.equals(ByteIOConstants.SEEK_ORIGIN_CURRENT_URI))
 			if (offset == 0)
 				return;
 
-		throw FaultManipulator.fillInFault(new SeekNotPermittedFaultType(null,
-				null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-						"Seek not permitted.") }, null));
+		throw FaultManipulator.fillInFault(new SeekNotPermittedFaultType(null, null, null, null,
+			new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Seek not permitted.") }, null));
 	}
 
 	@Override
-	protected void preDestroy() throws RemoteException, ResourceException {
+	protected void preDestroy() throws RemoteException, ResourceException
+	{
 		synchronized (_resource2BufferMap) {
-			_resource2BufferMap.remove(ResourceManager.getCurrentResource()
-					.getResourceKey());
+			_resource2BufferMap.remove(ResourceManager.getCurrentResource().getResourceKey());
 		}
 
 		super.preDestroy();
 	}
 
 	@Override
-	protected void setAttributeHandlers() throws NoSuchMethodException,
-			ResourceException, ResourceUnknownFaultType {
+	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
+	{
 		super.setAttributeHandlers();
 
 		new PipeAttributesHandler(getAttributePackage());
 	}
 
-	public PipeServiceImpl() throws RemoteException {
+	public PipeServiceImpl() throws RemoteException
+	{
 		super("PipePortType");
 
 		addImplementedPortType(PipeConstants.PIPE_PORT_TYPE());
@@ -109,19 +108,18 @@ public class PipeServiceImpl extends GenesisIIBase implements PipePortType {
 	}
 
 	@Override
-	public PortType getFinalWSResourceInterface() {
+	public PortType getFinalWSResourceInterface()
+	{
 		return PipeConstants.PIPE_PORT_TYPE();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public SeekReadResponse seekRead(SeekRead seekReadRequest)
-			throws RemoteException, ReadNotPermittedFaultType,
-			SeekNotPermittedFaultType, ResourceUnknownFaultType,
-			UnsupportedTransferFaultType, CustomFaultType {
+	public SeekReadResponse seekRead(SeekRead seekReadRequest) throws RemoteException, ReadNotPermittedFaultType,
+		SeekNotPermittedFaultType, ResourceUnknownFaultType, UnsupportedTransferFaultType, CustomFaultType
+	{
 		int numBytes = seekReadRequest.getNumBytes().intValue();
-		TransferInformationType xType = seekReadRequest
-				.getTransferInformation();
+		TransferInformationType xType = seekReadRequest.getTransferInformation();
 		PipeBuffer buffer = null;
 		ByteBuffer sink = ByteBuffer.allocate(numBytes);
 
@@ -143,16 +141,13 @@ public class PipeServiceImpl extends GenesisIIBase implements PipePortType {
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public SeekWriteResponse seekWrite(SeekWrite seekWriteRequest)
-			throws RemoteException, SeekNotPermittedFaultType,
-			ResourceUnknownFaultType, WriteNotPermittedFaultType,
-			UnsupportedTransferFaultType, CustomFaultType {
+	public SeekWriteResponse seekWrite(SeekWrite seekWriteRequest) throws RemoteException, SeekNotPermittedFaultType,
+		ResourceUnknownFaultType, WriteNotPermittedFaultType, UnsupportedTransferFaultType, CustomFaultType
+	{
 		PipeBuffer buffer;
-		TransferInformationType xType = seekWriteRequest
-				.getTransferInformation();
+		TransferInformationType xType = seekWriteRequest.getTransferInformation();
 
-		handleSeek(seekWriteRequest.getSeekOrigin(),
-				seekWriteRequest.getOffset());
+		handleSeek(seekWriteRequest.getSeekOrigin(), seekWriteRequest.getOffset());
 		byte[] data = TransferAgent.receiveData(xType);
 		ByteBuffer source = ByteBuffer.wrap(data);
 

@@ -15,17 +15,16 @@ import edu.virginia.vcgr.genii.client.queue.CurrentResourceInformation;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 
-class QueueResourceInformation {
+class QueueResourceInformation
+{
 	static private Unmarshaller _unmarshaller;
 
 	static {
 		try {
-			JAXBContext context = JAXBContext
-					.newInstance(CurrentResourceInformation.class);
+			JAXBContext context = JAXBContext.newInstance(CurrentResourceInformation.class);
 			_unmarshaller = context.createUnmarshaller();
 		} catch (JAXBException e) {
-			throw new RuntimeException(
-					"Unable to create Queue resource info unmarshaller.", e);
+			throw new RuntimeException("Unable to create Queue resource info unmarshaller.", e);
 		}
 	}
 
@@ -35,8 +34,8 @@ class QueueResourceInformation {
 	private EndpointReferenceType _resourceEPR;
 	private CurrentResourceInformation _resourceInfo = null;
 
-	QueueResourceInformation(UIPluginContext uiContext,
-			RNSEntryResponseType entry) throws JAXBException {
+	QueueResourceInformation(UIPluginContext uiContext, RNSEntryResponseType entry) throws JAXBException
+	{
 		_uiContext = uiContext;
 		_resourceName = entry.getEntryName();
 		_resourceEPR = entry.getEndpoint();
@@ -47,39 +46,43 @@ class QueueResourceInformation {
 			for (MessageElement e : any) {
 				QName name = e.getQName();
 				if (name.equals(QueueConstants.CURRENT_RESOURCE_INFORMATION_QNAME)) {
-					_resourceInfo = _unmarshaller.unmarshal(e,
-							CurrentResourceInformation.class).getValue();
+					_resourceInfo = _unmarshaller.unmarshal(e, CurrentResourceInformation.class).getValue();
 					break;
 				}
 			}
 		}
 
 		if (_resourceInfo == null)
-			throw new IllegalArgumentException(String.format(
-					"Resource %s has no resource information.", _resourceName));
+			throw new IllegalArgumentException(String.format("Resource %s has no resource information.", _resourceName));
 	}
 
-	final JComponent parent() {
+	final JComponent parent()
+	{
 		return _parent;
 	}
 
-	final void parent(JComponent parent) {
+	final void parent(JComponent parent)
+	{
 		_parent = parent;
 	}
 
-	final UIPluginContext uiContext() {
+	final UIPluginContext uiContext()
+	{
 		return _uiContext;
 	}
 
-	final EndpointReferenceType endpoint() {
+	final EndpointReferenceType endpoint()
+	{
 		return _resourceEPR;
 	}
 
-	final String name() {
+	final String name()
+	{
 		return _resourceName;
 	}
 
-	final CurrentResourceInformation resourceInformation() {
+	final CurrentResourceInformation resourceInformation()
+	{
 		return _resourceInfo;
 	}
 }

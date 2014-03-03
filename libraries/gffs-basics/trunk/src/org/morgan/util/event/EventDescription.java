@@ -18,47 +18,53 @@ import java.io.Serializable;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public class EventDescription implements Serializable {
+public class EventDescription implements Serializable
+{
 	static final long serialVersionUID = 0;
 
 	private Class<? extends IEvent> _requiredBase;
 	private String _eventName;
 	private boolean _stopOnException;
 
-	EventDescription(String eventName) {
+	EventDescription(String eventName)
+	{
 		this(eventName, IEvent.class, false);
 	}
 
-	EventDescription(String eventName, Class<? extends IEvent> requiredBase) {
+	EventDescription(String eventName, Class<? extends IEvent> requiredBase)
+	{
 		this(eventName, requiredBase, false);
 	}
 
-	EventDescription(String eventName, Class<? extends IEvent> requiredBase,
-			boolean stopOnException) {
+	EventDescription(String eventName, Class<? extends IEvent> requiredBase, boolean stopOnException)
+	{
 		if (eventName == null)
 			throw new IllegalArgumentException("Event Name cannot be null.");
 		if (requiredBase == null)
-			throw new IllegalArgumentException(
-					"Required base class cannot be null.");
+			throw new IllegalArgumentException("Required base class cannot be null.");
 
 		_eventName = eventName;
 		_requiredBase = requiredBase;
 		_stopOnException = stopOnException;
 	}
 
-	public boolean matchesRequiredBase(IEvent event) {
+	public boolean matchesRequiredBase(IEvent event)
+	{
 		return _requiredBase.isAssignableFrom(event.getClass());
 	}
 
-	public Class<? extends IEvent> getRequiredBaseClass() {
+	public Class<? extends IEvent> getRequiredBaseClass()
+	{
 		return _requiredBase;
 	}
 
-	public String getEventName() {
+	public String getEventName()
+	{
 		return _eventName;
 	}
 
-	public boolean getStopOnException() {
+	public boolean getStopOnException()
+	{
 		return _stopOnException;
 	}
 }

@@ -31,19 +31,21 @@ import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 @XmlRootElement(namespace = MappingConstants.GENII_NS, name = "arch-map")
-class ArchitectureMapping {
+class ArchitectureMapping
+{
 	@XmlElement(namespace = MappingConstants.GENII_NS, name = "arch-mapping", required = false, nillable = true)
 	private List<ArchitectureMappingElement> _mappings = new LinkedList<ArchitectureMappingElement>();
 
 	/**
 	 * For use only by XML unmarshalling.
 	 */
-	private ArchitectureMapping() {
+	private ArchitectureMapping()
+	{
 	}
 
-	Map<String, ProcessorArchitecture> mapping() {
-		Map<String, ProcessorArchitecture> map = new HashMap<String, ProcessorArchitecture>(
-				_mappings.size());
+	Map<String, ProcessorArchitecture> mapping()
+	{
+		Map<String, ProcessorArchitecture> map = new HashMap<String, ProcessorArchitecture>(_mappings.size());
 
 		for (ArchitectureMappingElement e : _mappings)
 			map.put(e.javaValue(), e.architecture());

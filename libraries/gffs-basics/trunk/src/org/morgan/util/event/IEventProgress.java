@@ -16,7 +16,8 @@ package org.morgan.util.event;
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
-public interface IEventProgress {
+public interface IEventProgress
+{
 	public IEvent getEvent();
 
 	public boolean completed();

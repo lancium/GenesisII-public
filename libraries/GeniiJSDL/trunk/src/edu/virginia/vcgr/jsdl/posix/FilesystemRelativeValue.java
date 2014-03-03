@@ -30,7 +30,8 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public abstract class FilesystemRelativeValue {
+public abstract class FilesystemRelativeValue
+{
 	static final long serialVersionUID = 0L;
 
 	@XmlAnyAttribute
@@ -43,31 +44,38 @@ public abstract class FilesystemRelativeValue {
 	@XmlValue
 	private String _value;
 
-	protected FilesystemRelativeValue(String value) {
+	protected FilesystemRelativeValue(String value)
+	{
 		set(value);
 	}
 
-	protected FilesystemRelativeValue() {
+	protected FilesystemRelativeValue()
+	{
 		this(null);
 	}
 
-	final public void set(String value) {
+	final public void set(String value)
+	{
 		_value = value;
 	}
 
-	final public String get() {
+	final public String get()
+	{
 		return _value;
 	}
 
-	final public void filesystemName(String filesystemName) {
+	final public void filesystemName(String filesystemName)
+	{
 		_filesystemName = filesystemName;
 	}
 
-	final public String filesystemName() {
+	final public String filesystemName()
+	{
 		return _filesystemName;
 	}
 
-	final public Map<QName, String> anyAttributes() {
+	final public Map<QName, String> anyAttributes()
+	{
 		return _anyAttributes;
 	}
 }

@@ -14,19 +14,19 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.acct.AccountingCredentialTypes;
 
-class CredentialModel extends AbstractTableModel {
+class CredentialModel extends AbstractTableModel
+{
 	static final long serialVersionUID = 0L;
 
 	private Vector<CredentialBundle> _bundles;
 
-	CredentialModel(Connection connection) throws SQLException {
+	CredentialModel(Connection connection) throws SQLException
+	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			stmt = connection
-					.prepareStatement("SELECT cid, credentialtype, credentialdesc "
-							+ "FROM xcgcredentials");
+			stmt = connection.prepareStatement("SELECT cid, credentialtype, credentialdesc " + "FROM xcgcredentials");
 			rs = stmt.executeQuery();
 
 			_bundles = new Vector<CredentialBundle>();
@@ -37,8 +37,7 @@ class CredentialModel extends AbstractTableModel {
 				} catch (Throwable cause) {
 				}
 
-				_bundles.add(new CredentialBundle(rs.getLong(1), type, rs
-						.getString(3)));
+				_bundles.add(new CredentialBundle(rs.getLong(1), type, rs.getString(3)));
 			}
 		} finally {
 			StreamUtils.close(rs);
@@ -47,68 +46,75 @@ class CredentialModel extends AbstractTableModel {
 	}
 
 	@Override
-	public int getColumnCount() {
+	public int getColumnCount()
+	{
 		return 2;
 	}
 
 	@Override
-	public int getRowCount() {
+	public int getRowCount()
+	{
 		return _bundles.size();
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
+	public Object getValueAt(int rowIndex, int columnIndex)
+	{
 		CredentialBundle bundle = _bundles.get(rowIndex);
 		switch (columnIndex) {
-		case 0:
-			return bundle.credentialType();
-		case 1:
-			return bundle;
+			case 0:
+				return bundle.credentialType();
+			case 1:
+				return bundle;
 		}
 
 		return null;
 	}
 
 	@Override
-	public Class<?> getColumnClass(int columnIndex) {
+	public Class<?> getColumnClass(int columnIndex)
+	{
 		switch (columnIndex) {
-		case 0:
-			return AccountingCredentialTypes.class;
-		case 1:
-			return CredentialBundle.class;
+			case 0:
+				return AccountingCredentialTypes.class;
+			case 1:
+				return CredentialBundle.class;
 		}
 
 		return null;
 	}
 
 	@Override
-	public String getColumnName(int column) {
+	public String getColumnName(int column)
+	{
 		switch (column) {
-		case 0:
-			return "Credential Type";
-		case 1:
-			return "Credential Description";
+			case 0:
+				return "Credential Type";
+			case 1:
+				return "Credential Description";
 		}
 
 		return null;
 	}
 
 	@Override
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
+	public boolean isCellEditable(int rowIndex, int columnIndex)
+	{
 		return columnIndex == 0;
 	}
 
 	@Override
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex)
+	{
 		if (columnIndex == 0) {
-			_bundles.get(rowIndex).credentialType(
-					(AccountingCredentialTypes) aValue);
+			_bundles.get(rowIndex).credentialType((AccountingCredentialTypes) aValue);
 
 			fireTableCellUpdated(rowIndex, columnIndex);
 		}
 	}
 
-	final Collection<CredentialBundle> dirtyBundles() {
+	final Collection<CredentialBundle> dirtyBundles()
+	{
 		Collection<CredentialBundle> ret = new LinkedList<CredentialBundle>();
 		for (CredentialBundle bundle : _bundles)
 			if (bundle.isDirty())

@@ -11,19 +11,21 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-public class CatTool extends BaseGridTool {
+public class CatTool extends BaseGridTool
+{
 	static final private String _DESCRIPTION = "config/tooldocs/description/dcat";
 	static final private String _USAGE = "config/tooldocs/usage/ucat";
 	static final private String _MANPAGE = "config/tooldocs/man/cat";
 
-	public CatTool() {
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE),
-				false, ToolCategory.DATA);
+	public CatTool()
+	{
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.DATA);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		for (int lcv = 0; lcv < numArguments(); lcv++)
 			cat(getArgument(lcv));
 
@@ -31,10 +33,12 @@ public class CatTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 	}
 
-	public void cat(String filePath) throws IOException {
+	public void cat(String filePath) throws IOException
+	{
 		char[] data = new char[ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE];
 		int read;
 		InputStream in = null;

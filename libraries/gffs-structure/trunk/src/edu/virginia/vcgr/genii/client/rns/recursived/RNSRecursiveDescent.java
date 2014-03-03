@@ -20,7 +20,8 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 
-public class RNSRecursiveDescent {
+public class RNSRecursiveDescent
+{
 	static private Log _logger = LogFactory.getLog(RNSRecursiveDescent.class);
 
 	static public int DEFAULT_ALLOWED_RETRIES = 0;
@@ -33,44 +34,51 @@ public class RNSRecursiveDescent {
 	private boolean _avoidCycles = true;
 	private RNSFilter _filter = null;
 
-	private RNSRecursiveDescent(int allowedRetries, int maximumDepth,
-			ICallingContext callingContext, boolean reversed) {
+	private RNSRecursiveDescent(int allowedRetries, int maximumDepth, ICallingContext callingContext, boolean reversed)
+	{
 		_allowedRetries = allowedRetries;
 		_maximumDepth = maximumDepth;
 		_callingContext = callingContext;
 		_reversed = reversed;
 	}
 
-	public int allowedRetries() {
+	public int allowedRetries()
+	{
 		return _allowedRetries;
 	}
 
-	public void setAllowedRetries(int allowedRetries) {
+	public void setAllowedRetries(int allowedRetries)
+	{
 		_allowedRetries = allowedRetries;
 	}
 
-	public boolean avoidCycles() {
+	public boolean avoidCycles()
+	{
 		return _avoidCycles;
 	}
 
-	public void setAvoidCycles(boolean avoidCycles) {
+	public void setAvoidCycles(boolean avoidCycles)
+	{
 		_avoidCycles = avoidCycles;
 	}
 
-	public int maximumDepth() {
+	public int maximumDepth()
+	{
 		return _maximumDepth;
 	}
 
-	public void setMaximumDepth(int maxDepth) {
+	public void setMaximumDepth(int maxDepth)
+	{
 		_maximumDepth = maxDepth;
 	}
 
-	public void setRNSFilter(RNSFilter filter) {
+	public void setRNSFilter(RNSFilter filter)
+	{
 		_filter = filter;
 	}
 
-	private RNSRecursiveDescentCallbackResult callCallback(RNSPath path,
-			RNSRecursiveDescentCallback callback) {
+	private RNSRecursiveDescentCallbackResult callCallback(RNSPath path, RNSRecursiveDescentCallback callback)
+	{
 		if (_filter != null) {
 			if (!_filter.matches(path))
 				return RNSRecursiveDescentCallbackResult.Continue;
@@ -84,8 +92,9 @@ public class RNSRecursiveDescent {
 		}
 	}
 
-	private RNSRecursiveDescentCallbackResult descend(Set<URI> visited,
-			RNSPath root, RNSRecursiveDescentCallback callback, int depth) {
+	private RNSRecursiveDescentCallbackResult descend(Set<URI> visited, RNSPath root, RNSRecursiveDescentCallback callback,
+		int depth)
+	{
 		int attempt = 0;
 		EndpointReferenceType epr = null;
 		WSName name = null;
@@ -157,8 +166,7 @@ public class RNSRecursiveDescent {
 
 					if (cause == null) {
 						for (RNSPath child : contents) {
-							result = descend(visited, child, callback,
-									depth + 1);
+							result = descend(visited, child, callback, depth + 1);
 							if (result == RNSRecursiveDescentCallbackResult.Halt)
 								return result;
 						}
@@ -173,14 +181,13 @@ public class RNSRecursiveDescent {
 		return RNSRecursiveDescentCallbackResult.Continue;
 	}
 
-	public void descend(RNSPath root, RNSRecursiveDescentCallback callback)
-			throws Throwable {
+	public void descend(RNSPath root, RNSRecursiveDescentCallback callback) throws Throwable
+	{
 		IContextResolver oldResolver = null;
 
 		try {
 			oldResolver = ContextManager.getResolver();
-			ContextManager.setResolver(new MemoryBasedContextResolver(
-					_callingContext));
+			ContextManager.setResolver(new MemoryBasedContextResolver(_callingContext));
 
 			Set<URI> visited = new HashSet<URI>();
 			descend(visited, root, callback, 0);
@@ -191,52 +198,52 @@ public class RNSRecursiveDescent {
 		}
 	}
 
-	public void asyncDescend(RNSPath root, RNSRecursiveDescentCallback callback) {
+	public void asyncDescend(RNSPath root, RNSRecursiveDescentCallback callback)
+	{
 		Thread thread = new Thread(new AsyncDescender(root, callback));
 		thread.setName("Asynchronous RNS Recursive Descender");
 		thread.setDaemon(true);
 		thread.start();
 	}
 
-	static public RNSRecursiveDescent createDescent(
-			ICallingContext callingContext) {
-		return new RNSRecursiveDescent(DEFAULT_ALLOWED_RETRIES,
-				DEFAULT_MAXIMUM_DEPTH, callingContext.deriveNewContext(), false);
+	static public RNSRecursiveDescent createDescent(ICallingContext callingContext)
+	{
+		return new RNSRecursiveDescent(DEFAULT_ALLOWED_RETRIES, DEFAULT_MAXIMUM_DEPTH, callingContext.deriveNewContext(), false);
 	}
 
-	static public RNSRecursiveDescent createDescent()
-			throws FileNotFoundException, IOException {
+	static public RNSRecursiveDescent createDescent() throws FileNotFoundException, IOException
+	{
 		return createDescent(ContextManager.getExistingContext());
 	}
 
-	static public RNSRecursiveDescent createReverseDescent(
-			ICallingContext callingContext) {
-		return new RNSRecursiveDescent(DEFAULT_ALLOWED_RETRIES,
-				DEFAULT_MAXIMUM_DEPTH, callingContext.deriveNewContext(), true);
+	static public RNSRecursiveDescent createReverseDescent(ICallingContext callingContext)
+	{
+		return new RNSRecursiveDescent(DEFAULT_ALLOWED_RETRIES, DEFAULT_MAXIMUM_DEPTH, callingContext.deriveNewContext(), true);
 	}
 
-	static public RNSRecursiveDescent createReverseDescent()
-			throws FileNotFoundException, IOException {
+	static public RNSRecursiveDescent createReverseDescent() throws FileNotFoundException, IOException
+	{
 		return createReverseDescent(ContextManager.getExistingContext());
 	}
 
-	private class AsyncDescender implements Runnable {
+	private class AsyncDescender implements Runnable
+	{
 		private RNSPath _root;
 		private RNSRecursiveDescentCallback _callback;
 
-		private AsyncDescender(RNSPath root,
-				RNSRecursiveDescentCallback callback) {
+		private AsyncDescender(RNSPath root, RNSRecursiveDescentCallback callback)
+		{
 			_root = root;
 			_callback = callback;
 		}
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			try {
 				descend(_root, _callback);
 			} catch (Throwable cause) {
-				_logger.warn("RNS Recursive Descent Callback threw exception.",
-						cause);
+				_logger.warn("RNS Recursive Descent Callback threw exception.", cause);
 			}
 		}
 	}

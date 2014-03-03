@@ -40,26 +40,25 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @StreamableFactoryConfiguration(notifyOnDestroy = false)
 @AdvertisedSize
-public class JobInformationFork extends
-		AbstractStreamableByteIOFactoryResourceFork {
+public class JobInformationFork extends AbstractStreamableByteIOFactoryResourceFork
+{
 	static private final String _FORMAT = "%1$-36s   %2$tH:%2$tM %2$tZ %2$td %2$tb %2$tY   %3$-4d   %4$s";
 
 	static private Pattern JOB_FORK_PATH_PATTERN = Pattern
-			.compile("\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}");
+		.compile("\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}");
 
-	static public String determineJobTicketFromForkPath(String forkPath)
-			throws RemoteException {
+	static public String determineJobTicketFromForkPath(String forkPath) throws RemoteException
+	{
 		Matcher matcher = JOB_FORK_PATH_PATTERN.matcher(forkPath);
 		if (!matcher.find())
-			throw new RemoteException(String.format(
-					"Can't find job ticket in fork path \"%s\"!", forkPath));
+			throw new RemoteException(String.format("Can't find job ticket in fork path \"%s\"!", forkPath));
 
 		return matcher.group();
 	}
 
-	static private void printJobInfo(PrintStream out, JobInformation jobInfo) {
-		out.println(String.format("%1$-36s   %2$-21s   %3$-4s   %4$-8s",
-				"Ticket", "Submit Time", "Tries", "State"));
+	static private void printJobInfo(PrintStream out, JobInformation jobInfo)
+	{
+		out.println(String.format("%1$-36s   %2$-21s   %3$-4s   %4$-8s", "Ticket", "Submit Time", "Tries", "State"));
 
 		String stateString = jobInfo.getScheduledOn();
 		if (stateString != null)
@@ -71,22 +70,19 @@ public class JobInformationFork extends
 		Calendar submitTime = jobInfo.getSubmitTime();
 		submitTime.setTimeZone(tz);
 
-		out.println(String.format(_FORMAT, jobInfo.getTicket(), submitTime,
-				jobInfo.getFailedAttempts(), stateString));
+		out.println(String.format(_FORMAT, jobInfo.getTicket(), submitTime, jobInfo.getFailedAttempts(), stateString));
 	}
 
-	static private void printJobInfo(PrintStream out,
-			ReducedJobInformation jobInfo) {
+	static private void printJobInfo(PrintStream out, ReducedJobInformation jobInfo)
+	{
 		if (jobInfo instanceof JobInformation) {
 			printJobInfo(out, (JobInformation) jobInfo);
 			return;
 		}
 
-		out.printf("%1$-36s   %2$-8s   %3$-30s\n", "Ticket", "State",
-				"Owner Identities");
+		out.printf("%1$-36s   %2$-8s   %3$-30s\n", "Ticket", "State", "Owner Identities");
 
-		out.printf("%1$-36s   %2$-8s", jobInfo.getTicket(),
-				jobInfo.getJobState());
+		out.printf("%1$-36s   %2$-8s", jobInfo.getTicket(), jobInfo.getJobState());
 		Collection<Identity> owners = jobInfo.getOwners();
 		if (owners.size() <= 0)
 			out.printf("\n");
@@ -103,25 +99,29 @@ public class JobInformationFork extends
 		}
 	}
 
-	public JobInformationFork(ResourceForkService service, String forkPath) {
+	public JobInformationFork(ResourceForkService service, String forkPath)
+	{
 		super(service, forkPath);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public void destroy() throws ResourceException {
+	public void destroy() throws ResourceException
+	{
 		super.destroy();
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public void modifyState(InputStream source) throws IOException {
+	public void modifyState(InputStream source) throws IOException
+	{
 		throw new IOException("Not allowed to modify the state of a job.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public void snapshotState(OutputStream sink) throws IOException {
+	public void snapshotState(OutputStream sink) throws IOException
+	{
 		boolean isMine = false;
 		String jobTicket = determineJobTicketFromForkPath(getForkPath());
 
@@ -133,24 +133,20 @@ public class JobInformationFork extends
 
 			if (getForkPath().startsWith("/jobs/mine")) {
 				isMine = true;
-				for (JobInformationType jit : mgr
-						.getJobStatus(new String[] { jobTicket })) {
+				for (JobInformationType jit : mgr.getJobStatus(new String[] { jobTicket })) {
 					JobTicket ticket = new JobTicket(jit.getJobTicket());
 					byte[][] owners = jit.getOwner();
 					Collection<Identity> identities;
 					try {
 						identities = QueueUtils.deserializeIdentities(owners);
 					} catch (Exception e) {
-						throw new RuntimeException(
-								"Unable to deserialize owner identities.", e);
+						throw new RuntimeException("Unable to deserialize owner identities.", e);
 					}
 
-					jInfo = new JobInformation(ticket, jit.getJobName(),
-							identities, QueueStates.fromQueueStateType(jit
-									.getJobStatus()), (int) jit.getPriority(),
-							jit.getSubmitTime(), jit.getStartTime(),
-							jit.getFinishTime(), jit.getAttempts().intValue(),
-							jit.getBesStatus(), jit.getScheduledOn());
+					jInfo =
+						new JobInformation(ticket, jit.getJobName(), identities, QueueStates.fromQueueStateType(jit
+							.getJobStatus()), (int) jit.getPriority(), jit.getSubmitTime(), jit.getStartTime(),
+							jit.getFinishTime(), jit.getAttempts().intValue(), jit.getBesStatus(), jit.getScheduledOn());
 				}
 			} else {
 				for (ReducedJobInformationType rjit : mgr.listJobs(jobTicket)) {
@@ -160,16 +156,12 @@ public class JobInformationFork extends
 						byte[][] ownerBytes = rjit.getOwner();
 						Collection<Identity> identities;
 						try {
-							identities = QueueUtils
-									.deserializeIdentities(ownerBytes);
+							identities = QueueUtils.deserializeIdentities(ownerBytes);
 						} catch (Exception e) {
-							throw new RuntimeException(
-									"Unable to deserialize owner identities.",
-									e);
+							throw new RuntimeException("Unable to deserialize owner identities.", e);
 						}
 
-						jInfo = new ReducedJobInformation(ticket, identities,
-								QueueStates.fromQueueStateType(state));
+						jInfo = new ReducedJobInformation(ticket, identities, QueueStates.fromQueueStateType(state));
 					}
 				}
 			}
@@ -187,8 +179,7 @@ public class JobInformationFork extends
 					jsdl = mgr.getJSDL(jobTicket);
 					if (jsdl != null) {
 						writer = new OutputStreamWriter(pStream);
-						ObjectSerializer.serialize(writer, jsdl, new QName(
-								GenesisIIConstants.JSDL_NS, "JobDefinition"));
+						ObjectSerializer.serialize(writer, jsdl, new QName(GenesisIIConstants.JSDL_NS, "JobDefinition"));
 					} else {
 						pStream.println("Can't find JSDL for job.");
 					}

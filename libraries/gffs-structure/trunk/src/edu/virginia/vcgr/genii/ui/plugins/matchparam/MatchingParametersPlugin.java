@@ -25,32 +25,28 @@ import edu.virginia.vcgr.genii.ui.plugins.MenuType;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 
-public class MatchingParametersPlugin extends AbstractCombinedUIMenusPlugin {
-	static private Log _logger = LogFactory
-			.getLog(MatchingParametersPlugin.class);
+public class MatchingParametersPlugin extends AbstractCombinedUIMenusPlugin
+{
+	static private Log _logger = LogFactory.getLog(MatchingParametersPlugin.class);
 
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType)
-			throws UIPluginException {
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
+	{
 		Collection<Pair<String, String>> parameters = new LinkedList<Pair<String, String>>();
 		Collection<Pair<Pair<String, String>, MatchingParameterOperation>> ops;
 
 		try {
-			EndpointReferenceType target = context.endpointRetriever()
-					.getTargetEndpoints().iterator().next().getEndpoint();
-			GenesisIIBaseRP rp = (GenesisIIBaseRP) ResourcePropertyManager
-					.createRPInterface(context.uiContext().callingContext(),
-							target, GenesisIIBaseRP.class);
+			EndpointReferenceType target = context.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint();
+			GenesisIIBaseRP rp =
+				(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(context.uiContext().callingContext(), target,
+					GenesisIIBaseRP.class);
 			for (MatchingParameter mp : rp.getMatchingParameter()) {
-				parameters.add(new Pair<String, String>(mp.getName(), mp
-						.getValue()));
+				parameters.add(new Pair<String, String>(mp.getName(), mp.getValue()));
 			}
 
-			ops = MatchingParameterDialog.handleMatchingParameters(
-					context.ownerComponent(), parameters);
+			ops = MatchingParameterDialog.handleMatchingParameters(context.ownerComponent(), parameters);
 			if (ops != null && ops.size() > 0) {
-				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-						target, context.uiContext().callingContext());
+				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, target, context.uiContext().callingContext());
 				Vector<MatchingParameter> adds = new Vector<MatchingParameter>();
 				Vector<MatchingParameter> deletes = new Vector<MatchingParameter>();
 
@@ -61,46 +57,36 @@ public class MatchingParametersPlugin extends AbstractCombinedUIMenusPlugin {
 					if (_logger.isDebugEnabled())
 						_logger.debug(operation.toString(parameter));
 					if (operation == MatchingParameterOperation.Add)
-						adds.add(new MatchingParameter(parameter.first(),
-								parameter.second()));
+						adds.add(new MatchingParameter(parameter.first(), parameter.second()));
 					else
-						deletes.add(new MatchingParameter(parameter.first(),
-								parameter.second()));
+						deletes.add(new MatchingParameter(parameter.first(), parameter.second()));
 				}
 
 				if (adds.size() > 0)
-					common.addMatchingParameter(adds
-							.toArray(new MatchingParameter[adds.size()]));
+					common.addMatchingParameter(adds.toArray(new MatchingParameter[adds.size()]));
 				if (deletes.size() > 0)
-					common.removeMatchingParameter(deletes
-							.toArray(new MatchingParameter[deletes.size()]));
+					common.removeMatchingParameter(deletes.toArray(new MatchingParameter[deletes.size()]));
 				((ResourcePropertyRefresher) rp).refreshResourceProperties();
 
-				JOptionPane
-						.showMessageDialog(
-								context.ownerComponent(),
-								"Please note that it may take a few minutes for the changes to show up.",
-								"Matching Parameters Notice",
-								JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(context.ownerComponent(),
+					"Please note that it may take a few minutes for the changes to show up.", "Matching Parameters Notice",
+					JOptionPane.INFORMATION_MESSAGE);
 			}
 		} catch (Throwable cause) {
-			ErrorHandler.handleError(context.uiContext(),
-					context.ownerComponent(), cause);
+			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
 		} finally {
 		}
 	}
 
 	@Override
-	public boolean isEnabled(
-			Collection<EndpointDescription> selectedDescriptions) {
+	public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
+	{
 		if (selectedDescriptions == null || selectedDescriptions.size() != 1)
 			return false;
 
-		TypeInformation typeInfo = selectedDescriptions.iterator().next()
-				.typeInformation();
+		TypeInformation typeInfo = selectedDescriptions.iterator().next().typeInformation();
 
-		// ASG: 09-13-2013 - Fixed this to check if the endpoint is a BES or
-		// BESContainer, not
+		// ASG: 09-13-2013 - Fixed this to check if the endpoint is a BES or BESContainer, not
 		// whether it had a container ID
 		// return typeInfo.getGenesisIIContainerID() != null;
 		return (typeInfo.isBES() || typeInfo.isBESContainer());

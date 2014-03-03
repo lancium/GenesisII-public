@@ -33,13 +33,14 @@ import edu.virginia.vcgr.genii.ui.plugins.logs.tree.LogTreeNode;
 import edu.virginia.vcgr.genii.ui.plugins.logs.tree.LogTreeObject;
 import edu.virginia.vcgr.genii.ui.plugins.logs.tree.LogTreeObjectType;
 
-public class DLogPlugin extends AbstractCombinedUIMenusPlugin {
+public class DLogPlugin extends AbstractCombinedUIMenusPlugin
+{
 	private LogTree _browserTree;
 	private JTabbedPane _tabbed;
 
 	@Override
-	protected void performMenuAction(UIPluginContext context, MenuType menuType)
-			throws UIPluginException {
+	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
+	{
 		try {
 			JFrame frame = new JFrame("Log Viewer");
 
@@ -51,26 +52,21 @@ public class DLogPlugin extends AbstractCombinedUIMenusPlugin {
 			panels.add(metaPanel);
 
 			_tabbed = new JTabbedPane();
-			_tabbed.addTab("Log Entries", new LazilyLoadedTab(entryPanel,
-					entryPanel));
-			_tabbed.addTab("Entry Metadata", new LazilyLoadedTab(metaPanel,
-					metaPanel));
+			_tabbed.addTab("Log Entries", new LazilyLoadedTab(entryPanel, entryPanel));
+			_tabbed.addTab("Entry Metadata", new LazilyLoadedTab(metaPanel, metaPanel));
 
 			_browserTree = new LogTree(context);
-			_browserTree.addTreeSelectionListener(new LogSelectionListener(
-					panels));
+			_browserTree.addTreeSelectionListener(new LogSelectionListener(panels));
 
-			JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-					true);
+			JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 			splitPane.setLeftComponent(new LogTreePanel(_browserTree));
 			splitPane.setRightComponent(_tabbed);
 
 			Container container = frame.getContentPane();
 			container.setLayout(new GridBagLayout());
 
-			container.add(splitPane, new GridBagConstraints(0, 0, 1, 1, 1.0,
-					1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(5, 5, 5, 5), 5, 5));
+			container.add(splitPane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.pack();
@@ -83,32 +79,33 @@ public class DLogPlugin extends AbstractCombinedUIMenusPlugin {
 			else if (cause instanceof RuntimeException)
 				throw (RuntimeException) cause;
 			else
-				throw new UIPluginException("Unable to create Log Manager.",
-						cause);
+				throw new UIPluginException("Unable to create Log Manager.", cause);
 		}
 	}
 
 	@Override
-	final public boolean isEnabled(
-			Collection<EndpointDescription> selectedDescriptions) {
+	final public boolean isEnabled(Collection<EndpointDescription> selectedDescriptions)
+	{
 		return true;
 	}
 
-	private class LogSelectionListener implements TreeSelectionListener {
+	private class LogSelectionListener implements TreeSelectionListener
+	{
 		private Collection<LogManagerPanel> _panels;
 
-		private LogSelectionListener(Collection<LogManagerPanel> panels) {
+		private LogSelectionListener(Collection<LogManagerPanel> panels)
+		{
 			_panels = panels;
 		}
 
 		@Override
-		public void valueChanged(TreeSelectionEvent e) {
+		public void valueChanged(TreeSelectionEvent e)
+		{
 			Collection<LogPath> descriptions = new LinkedList<LogPath>();
 			TreePath[] paths = _browserTree.getSelectionPaths();
 			if (paths != null) {
 				for (TreePath path : paths) {
-					LogTreeNode node = (LogTreeNode) path
-							.getLastPathComponent();
+					LogTreeNode node = (LogTreeNode) path.getLastPathComponent();
 					LogTreeObject obj = (LogTreeObject) node.getUserObject();
 					if (obj.objectType() == LogTreeObjectType.ENDPOINT_OBJECT) {
 						LogFilledInTreeObject fObj = (LogFilledInTreeObject) obj;

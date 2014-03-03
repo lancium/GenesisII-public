@@ -23,7 +23,8 @@ import edu.virginia.vcgr.genii.common.HistoryEventBundleType;
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsRequestType;
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
 
-public class ResourceHistoryTool extends BaseGridTool {
+public class ResourceHistoryTool extends BaseGridTool
+{
 	static final private String DESCRIPTION = "config/tooldocs/description/dresource-history";
 	static final private String USAGE = "config/tooldocs/usage/uresource-history";
 	static final private String _MANPAGE = "config/tooldocs/man/resource-history";
@@ -31,26 +32,25 @@ public class ResourceHistoryTool extends BaseGridTool {
 	private GeniiPath _store = null;
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException
+	{
 		if (numArguments() < 1 || numArguments() > 2)
-			throw new InvalidToolUsageException(
-					"Incorrect number of arguments.");
+			throw new InvalidToolUsageException("Incorrect number of arguments.");
 
 		GeniiPath path = new GeniiPath(getArgument(0));
 		if (path.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException(String.format(
-					"Path %s does not refer to a grid resource.", path));
+			throw new InvalidToolUsageException(String.format("Path %s does not refer to a grid resource.", path));
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
+	protected int runCommand() throws Throwable
+	{
 		OutputStream out = null;
 		List<HistoryEvent> events = new LinkedList<HistoryEvent>();
 
 		RNSPath path = RNSPath.getCurrent().lookup(getArgument(0));
 
-		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-				path.getEndpoint());
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, path.getEndpoint());
 
 		IterateHistoryEventsRequestType req;
 
@@ -59,17 +59,14 @@ public class ResourceHistoryTool extends BaseGridTool {
 		else
 			req = new IterateHistoryEventsRequestType();
 
-		IterateHistoryEventsResponseType resp = common
-				.iterateHistoryEvents(req);
+		IterateHistoryEventsResponseType resp = common.iterateHistoryEvents(req);
 
 		WSIterable<HistoryEventBundleType> iter = null;
 
 		try {
-			iter = WSIterable.axisIterable(HistoryEventBundleType.class,
-					resp.getResult(), 25);
+			iter = WSIterable.axisIterable(HistoryEventBundleType.class, resp.getResult(), 25);
 			for (HistoryEventBundleType bundle : iter)
-				events.add((HistoryEvent) DBSerializer.deserialize(bundle
-						.getData()));
+				events.add((HistoryEvent) DBSerializer.deserialize(bundle.getData()));
 		} finally {
 			StreamUtils.close(iter);
 		}
@@ -94,14 +91,15 @@ public class ResourceHistoryTool extends BaseGridTool {
 		return 0;
 	}
 
-	public ResourceHistoryTool() {
-		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE),
-				false, ToolCategory.EXECUTION);
+	public ResourceHistoryTool()
+	{
+		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), false, ToolCategory.EXECUTION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
 	@Option("dump")
-	public void store(String path) {
+	public void store(String path)
+	{
 		_store = new GeniiPath(path);
 	}
 }

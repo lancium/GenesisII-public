@@ -2,7 +2,8 @@ package org.morgan.util.gui.font;
 
 import java.awt.Font;
 
-public interface FontModel {
+public interface FontModel
+{
 	public Font selectedFont();
 
 	public int styleMask();

@@ -7,34 +7,36 @@ import edu.virginia.vcgr.fsii.FSFilesystem;
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
 
-abstract class AbstractFilesystemHandle implements FilesystemHandle {
-	static private Log _logger = LogFactory
-			.getLog(AbstractFilesystemHandle.class);
+abstract class AbstractFilesystemHandle implements FilesystemHandle
+{
+	static private Log _logger = LogFactory.getLog(AbstractFilesystemHandle.class);
 
 	protected String[] _path;
 	protected FSFilesystem _fs;
 
-	protected AbstractFilesystemHandle(FSFilesystem fs, String[] path) {
+	protected AbstractFilesystemHandle(FSFilesystem fs, String[] path)
+	{
 		_path = path;
 		_fs = fs;
 	}
 
 	@Override
-	public void delete() throws FSException {
+	public void delete() throws FSException
+	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("AbstractFilesystemHandle::delete(%s)",
-					UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
+				UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
 
 		_fs.unlink(_path);
 	}
 
 	@Override
-	public boolean renameTo(String[] target) {
+	public boolean renameTo(String[] target)
+	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format(
-					"AbstractFilesystemHandle::renameTo(%s, %s)",
-					UnixFilesystemPathRepresentation.INSTANCE.toString(_path),
-					UnixFilesystemPathRepresentation.INSTANCE.toString(target)));
+			_logger.trace(String.format("AbstractFilesystemHandle::renameTo(%s, %s)",
+				UnixFilesystemPathRepresentation.INSTANCE.toString(_path),
+				UnixFilesystemPathRepresentation.INSTANCE.toString(target)));
 
 		try {
 			_fs.rename(_path, target);

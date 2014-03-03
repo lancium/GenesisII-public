@@ -12,12 +12,13 @@ import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemMap;
 import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemType;
 
 @SuppressWarnings("rawtypes")
-class FilesystemComboBoxModel extends DefaultComboBoxModel {
+class FilesystemComboBoxModel extends DefaultComboBoxModel
+{
 	static final long serialVersionUID = 0L;
 
-	static private Vector<FilesystemType> getItems(FilesystemMap map) {
-		Vector<FilesystemType> types = new Vector<FilesystemType>(
-				FilesystemType.values().length);
+	static private Vector<FilesystemType> getItems(FilesystemMap map)
+	{
+		Vector<FilesystemType> types = new Vector<FilesystemType>(FilesystemType.values().length);
 		types.add(FilesystemType.Default);
 
 		for (FilesystemType type : FilesystemType.values()) {
@@ -28,11 +29,11 @@ class FilesystemComboBoxModel extends DefaultComboBoxModel {
 		return types;
 	}
 
-	private Set<FilesystemType> _knownSet = EnumSet
-			.noneOf(FilesystemType.class);
+	private Set<FilesystemType> _knownSet = EnumSet.noneOf(FilesystemType.class);
 
 	@SuppressWarnings("unchecked")
-	FilesystemComboBoxModel(FilesystemMap map) {
+	FilesystemComboBoxModel(FilesystemMap map)
+	{
 		super(getItems(map));
 
 		for (int lcv = 0; lcv < getSize(); lcv++) {
@@ -42,11 +43,12 @@ class FilesystemComboBoxModel extends DefaultComboBoxModel {
 		map.addFilesystemListener(new FilesystemListenerImpl());
 	}
 
-	private class FilesystemListenerImpl implements FilesystemListener {
+	private class FilesystemListenerImpl implements FilesystemListener
+	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public void filesystemDefined(FilesystemMap filesystemMap,
-				Filesystem newFilesystem) {
+		public void filesystemDefined(FilesystemMap filesystemMap, Filesystem newFilesystem)
+		{
 			if (_knownSet.contains(newFilesystem.filesystemType()))
 				return;
 
