@@ -16,8 +16,11 @@ public class ProgramTools
 	{
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		StringBuilder toReturn = new StringBuilder();
-		int startFrame = 3; // we don't start at the very first one or we show ourselves in the
-							// camera.
+		/*
+		 * don't start at the very first frame; we want to skip backwards to the direct caller of
+		 * this function.
+		 */
+		int startFrame = 3;
 		int endFrame = Math.min(howManyFrames + 3, elements.length - 1);
 		for (int i = startFrame; i < endFrame; i++) {
 			if (toReturn.length() != 0) {
@@ -35,7 +38,7 @@ public class ProgramTools
 	public static String getStackFrame(int which)
 	{
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-		// a little self-protection to avoid accessing missing parts of the array.
+		/* a little self-protection to avoid accessing missing parts of the array. */
 		if (which >= elements.length)
 			which = elements.length - 1;
 		return elements[which].toString();

@@ -25,7 +25,7 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 
 public class AuthZConfigCache extends CommonAttributeCache
 {
-	static protected Log _logger = LogFactory.getLog(AuthZConfigCache.class);
+	static private Log _logger = LogFactory.getLog(AuthZConfigCache.class);
 
 	private SingleResourcePropertyTranslator authZTranslator;
 	private SingleResourcePropertyTranslator permissionTranslator;

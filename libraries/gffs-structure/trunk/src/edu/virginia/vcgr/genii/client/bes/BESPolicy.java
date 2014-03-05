@@ -75,7 +75,7 @@ public class BESPolicy
 			ret.addChild(loggedIn);
 			ret.addChild(screenSaverInactive);
 		} catch (SOAPException se) {
-			throw new RuntimeException("Unexpected exception thrown while packageing policy.");
+			throw new RuntimeException("Unexpected exception thrown while packaging policy.");
 		}
 
 		return ret;

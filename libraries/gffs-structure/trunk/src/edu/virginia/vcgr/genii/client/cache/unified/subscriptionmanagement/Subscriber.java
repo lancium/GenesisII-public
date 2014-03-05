@@ -21,7 +21,6 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.LightweightNotificat
  */
 public class Subscriber
 {
-
 	private static Log _logger = LogFactory.getLog(Subscriber.class);
 
 	private static Subscriber subscriber;
@@ -97,7 +96,6 @@ public class Subscriber
 
 	private boolean isSubscribableTarget(EndpointReferenceType target)
 	{
-
 		// The target does not represent an implied GenesisII resource; subscription is pointless.
 		WSName wsName = new WSName(target);
 		if (!wsName.isValidWSName())

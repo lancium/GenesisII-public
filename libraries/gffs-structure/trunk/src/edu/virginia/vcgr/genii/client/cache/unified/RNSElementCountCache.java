@@ -4,14 +4,20 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rp.DefaultSingleResourcePropertyTranslator;
 import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
+import edu.virginia.vcgr.genii.web.xml.XMLStringPrinter;
 
 public class RNSElementCountCache extends CommonAttributeCache
 {
+	static private Log _logger = LogFactory.getLog(RNSElementCountCache.class);
+
 	private SingleResourcePropertyTranslator translator;
 	private TimedOutLRUCache<String, Integer> cache;
 

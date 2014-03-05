@@ -46,13 +46,12 @@ public class CacheManager
 					return null;
 				Object cachedItem = cache.getItem(cacheKey, target);
 
-				// hmmm: reduce logging visibility here.
-				if (_logger.isDebugEnabled()) {
+				if (_logger.isTraceEnabled()) {
 					String result = "cache miss";
 					if (cachedItem != null) {
 						result = "cache hit";
 					}
-					_logger.debug(result + " for " + cacheKey + " of type " + itemType.getCanonicalName());
+					_logger.trace(result + " for " + cacheKey + " of type " + itemType.getCanonicalName());
 				}
 
 				if (cachedItem == null)
@@ -123,10 +122,11 @@ public class CacheManager
 					Object cacheKey = item.getKey();
 					Object targetObject = item.getTarget();
 					Object value = item.getValue();
-					// hmmm: remove all logic error debugs when bug is fixed.
 					if (value == null) {
-						_logger.error("logic error cached value is null!!!  this is from a cacheable item!");
+						_logger.error("cached value is null from a cacheable item!");
 					} else {
+						if (_logger.isTraceEnabled())
+							_logger.trace("caching item of type " + value.getClass().getCanonicalName());
 						putItemInCache(targetObject, cacheKey, value);
 					}
 				}
@@ -149,18 +149,24 @@ public class CacheManager
 			throw new RuntimeException(msg);
 		}
 
+		if (_logger.isTraceEnabled()) {
+			String msg = "cache put: key type " + cacheKey.getClass().getCanonicalName() + " target ";
+			if (target != null)
+				msg = msg + "type " + target.getClass().getCanonicalName();
+			else
+				msg = msg + " is null ";
+			msg = msg + " value type " + value.getClass().getCanonicalName();
+			_logger.trace(msg);
+		}
+
 		if (CacheConfigurer.isCachingEnabled()) {
 			try {
 				CommonCache cache = findCacheForObject(target, cacheKey, value);
 				if (cache != null) {
 					cache.putItem(cacheKey, target, value);
-				} else {
-					if (_logger.isTraceEnabled())
-						_logger.trace("Cache: failed to cache item " + cacheKey);
 				}
 			} catch (Exception ex) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("failed to cache item", ex);
+				_logger.warn("could not cache item: " + ex.getLocalizedMessage(), ex);
 			}
 		}
 	}

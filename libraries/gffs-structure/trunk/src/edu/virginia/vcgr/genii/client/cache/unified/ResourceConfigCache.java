@@ -21,7 +21,7 @@ import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierT
  */
 public class ResourceConfigCache extends CommonCache
 {
-	static protected Log _logger = LogFactory.getLog(ResourceConfigCache.class);
+	static private Log _logger = LogFactory.getLog(ResourceConfigCache.class);
 
 	/*
 	 * Directory and file resource configuration caches are kept separate as we don't want to loose

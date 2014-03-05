@@ -7,8 +7,6 @@ import java.util.Map;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierType;
@@ -21,8 +19,6 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
  */
 public abstract class CommonAttributeCache extends CommonCache
 {
-	static protected Log _logger = LogFactory.getLog(CommonAttributeCache.class);
-
 	public CommonAttributeCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
 	{
 		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
@@ -121,7 +117,6 @@ public abstract class CommonAttributeCache extends CommonCache
 
 	protected Collection<String> getCacheKeysForLifetimeUpdateRequest(URI commonIdentifier)
 	{
-
 		WSResourceConfig commonConfig =
 			(WSResourceConfig) CacheManager.getItemFromCache(commonIdentifier, WSResourceConfig.class);
 		if (commonConfig == null)
@@ -151,8 +146,6 @@ public abstract class CommonAttributeCache extends CommonCache
 				}
 			}
 		}
-		if (_logger.isTraceEnabled())
-			_logger.trace("number of entries selected for update: " + cacheKeys.size());
 		return cacheKeys;
 	}
 }

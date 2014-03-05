@@ -19,7 +19,7 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 
 public class DefaultAttributeCache extends CommonCache
 {
-	static protected Log _logger = LogFactory.getLog(DefaultAttributeCache.class);
+	static private Log _logger = LogFactory.getLog(DefaultAttributeCache.class);
 
 	private TimedOutLRUCache<String, Collection<MessageElement>> cache;
 

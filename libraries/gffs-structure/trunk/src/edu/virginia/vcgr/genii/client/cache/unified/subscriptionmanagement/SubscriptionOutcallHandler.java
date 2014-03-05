@@ -36,7 +36,6 @@ import edu.virginia.vcgr.genii.notification.broker.SubscriptionFailedFaultType;
  */
 class SubscriptionOutcallHandler extends Thread
 {
-
 	private static Log _logger = LogFactory.getLog(SubscriptionOutcallHandler.class);
 
 	// This is not the correct solution. We have to adjust the sampling frequency based on

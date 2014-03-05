@@ -21,7 +21,7 @@ import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 
 public class ByteIORPCache extends CommonAttributeCache
 {
-	static protected Log _logger = LogFactory.getLog(ByteIORPCache.class);
+	static private Log _logger = LogFactory.getLog(ByteIORPCache.class);
 
 	/*
 	 * When a byteIO is blocked because of rapid write/append operations, we don't want to client to
