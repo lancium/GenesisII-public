@@ -31,7 +31,7 @@
                 <param>/home/${ARGV[2]}/${F}</param>
               </geniix:rm>
             </block>
-            <catch class="edu.virginia.vcgr.genii.client.rns.RNSException">
+            <catch class="java.lang.Exception">
               <try>
                 <block>
                   <geniix:rm>
@@ -39,7 +39,7 @@
                     <param>/home/${ARGV[2]}/${F}</param>
                   </geniix:rm>
                 </block>
-                <catch class="edu.virginia.vcgr.genii.client.rns.RNSException">
+                <catch class="java.lang.Exception">
                   <geniix:unlink>
                     <param>/home/${ARGV[2]}/${F}</param>
                   </geniix:unlink>

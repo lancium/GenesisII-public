@@ -53,8 +53,7 @@ function seek_variable()
   local find_var="$1"; shift
   local file="$1"; shift
   if [ -z "$find_var" -o -z "$file" -o ! -f "$file" ]; then
-    echo "seek_variable: needs two parameters, firstly a variable name, and"
-    echo "secondly a file where the variable's value will be sought."
+    echo -e "seek_variable: needs two parameters, firstly a variable name, and\nsecondly a file where the variable's value will be sought." 1>&2
     return 1
   fi
 

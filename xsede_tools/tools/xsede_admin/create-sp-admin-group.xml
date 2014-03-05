@@ -38,7 +38,7 @@ Script parameters are:
       <echo message="Error: group ${GROUP} already exists at ${GROUP_PATH}."/>
       <exit exitcode="1" />
     </block>
-    <catch class="edu.virginia.vcgr.genii.client.rns.RNSException"/>
+    <catch class="java.lang.Exception"/>
   </try>
 
   <echo message="Creating group ${GROUP}"/>

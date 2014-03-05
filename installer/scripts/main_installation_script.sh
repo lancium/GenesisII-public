@@ -34,6 +34,11 @@ ln -s $GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer $GENII_INS
 # clean up some older files.
 \rm -rf "$GENII_INSTALL_DIR/ApplicationWatcher" "$GENII_INSTALL_DIR/XCGContainer" "$GENII_INSTALL_DIR/lib/gffs-container.jar" 
 
+# set the permissions on our files properly.
+find $GENII_INSTALL_DIR -type d -exec chmod -c a+rx "{}" ';'
+find $GENII_INSTALL_DIR -type f -exec chmod -c a+r "{}" ';'
+find $GENII_INSTALL_DIR -type f -iname "*.sh" -exec chmod -c a+rx "{}" ';'
+
 ##############
 
 echo "Finished preparing installation for GenesisII GFFS."

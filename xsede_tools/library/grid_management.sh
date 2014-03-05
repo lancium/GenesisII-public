@@ -404,7 +404,7 @@ function show_count()
   local phrase="$1"; shift
   local file="$1"; shift
   echo -ne "| $phrase\t"
-  echo -ne "$(grep -i "$phrase" "$file" | wc -l)\t"
+  echo -ne "$(grep -i "$phrase" "$file"* | wc -l)\t"
 }
 
 # makes a report of successes and failures found in the container and client logs.
@@ -417,7 +417,7 @@ function check_logs_for_errors()
   local file="$(get_container_logfile "$DEP_NAME")"
   if [ -f "$file" ]; then
     echo "Log File: $file"
-    for i in grant fail warn error; do
+    for i in fail warn error grant; do
       show_count "$i" "$file"
     done
     echo "|"

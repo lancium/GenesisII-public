@@ -25,7 +25,7 @@ fi
 backup_file="$1"; shift
 
 if [ -z "$backup_file" ]; then
-  backup_file="$(\pwd)/gffs_state_backup_$(hostname)_$(date_stringer).zip"
+  backup_file="$(\pwd)/gffs_state_backup_$(hostname)_$(USER)_$(date_stringer).zip"
 else
   if [ "${backup_file:0:1}" != "/" ]; then
     # if it's not an absolute path, assume they mean wherever they are.

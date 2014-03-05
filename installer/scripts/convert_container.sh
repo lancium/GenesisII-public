@@ -68,9 +68,10 @@ function print_instructions()
   echo "there will be problems finding the right settings to run the container."
   echo "This can be accomplished by, for example, adding the variables to ~/.profile"
   echo "or ~/.bashrc like so:"
-  echo "   export GENII_INSTALL_DIR=\$HOME/GenesisII"
-  echo "For this script, the GENII_INSTALL_DIR should point at the newer"
-  echo "installation that has been installed (either interactive or RPM/DEB)."
+  echo "   export GENII_INSTALL_DIR=/opt/genesis2"
+  echo "Note that for the conversion process, the GENII_INSTALL_DIR should point"
+  echo "at the _newer_ installation that has been installed by the administrator"
+  echo "(and that install can be either interactive or RPM/DEB based)."
   echo
   echo "The script requires the older installation directory as a parameter."
   echo "It is alright for this directory to be the same as the new GENII_INSTALL_DIR"
