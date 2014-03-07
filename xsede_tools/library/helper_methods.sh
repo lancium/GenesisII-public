@@ -73,71 +73,62 @@ fan_out_directories()
 }
 ##############
 
-# copied from open source codebase at: http://feistymeow.org
-# locates a process given a search pattern to match in the process list.
-function psfind() {
-  mkdir $TEST_TEMP/grid_logs &>/dev/null
-  local PID_DUMP="$(mktemp "$TEST_TEMP/grid_logs/zz_pidlist.XXXXXX")"
-  local PIDS_SOUGHT=()
-  local patterns=($*)
-  if [ "$OS" == "Windows_NT" ]; then
-    # needs to be a windows format filename for 'type' to work.
-    if [ ! -d c:/tmp ]; then
-      mkdir c:/tmp
-    fi
-    # windows7 magical mystery tour lets us create a file c:\\tmp_pids.txt, but then it's not really there
-    # in the root of drive c: when we look for it later.  hoping to fix that problem by using a subdir, which
-    # also might be magical thinking from windows perspective.
-    tmppid=c:\\tmp\\pids.txt
-    # we have abandoned all hope of relying on ps on windows.  instead
-    # we use wmic to get full command lines for processes.
-    # this does not exist on windows home edition.  we are hosed if that's
-    # what they insist on testing on.
-    wmic /locale:ms_409 PROCESS get processid,commandline </dev/null >"$tmppid"
-    local flag='/c'
-    if [ ! -z "$(uname -a | grep "^MING" )" ]; then
-      flag='//c'
-    fi
-    # we 'type' the file to get rid of the unicode result from wmic.
-    cmd $flag type "$tmppid" >$PID_DUMP
-    \rm "$tmppid"
-    local CR='
+  # copied from open source codebase at: http://feistymeow.org
+  # locates a process given a search pattern to match in the process list.
+  function psfind() {
+    local -a patterns=("${@}")
+    mkdir $TEST_TEMP/grid_logs &>/dev/null
+    local PID_DUMP="$(mktemp "$TEST_TEMP/grid_logs/zz_pidlist.XXXXXX")"
+    local PIDS_SOUGHT=()
+    if [ "$OS" == "Windows_NT" ]; then
+      # needs to be a windows format filename for 'type' to work.
+      if [ ! -d c:/tmp ]; then
+        mkdir c:/tmp
+      fi
+      # windows7 magical mystery tour lets us create a file c:\\tmp_pids.txt, but then it's not really there
+      # in the root of drive c: when we look for it later.  hoping to fix that problem by using a subdir, which
+      # also might be magical thinking from windows perspective.
+      tmppid=c:\\tmp\\pids.txt
+      # we have abandoned all hope of relying on ps on windows.  instead
+      # we use wmic to get full command lines for processes.
+      # this does not exist on windows home edition.  we are hosed if that's
+      # what they insist on testing on.
+      wmic /locale:ms_409 PROCESS get processid,commandline </dev/null >"$tmppid"
+      local flag='/c'
+      if [ ! -z "$(uname -a | grep "^MING" )" ]; then
+        flag='//c'
+      fi
+      # we 'type' the file to get rid of the unicode result from wmic.
+      cmd $flag type "$tmppid" >$PID_DUMP
+      \rm "$tmppid"
+      local CR='
 '  # embedded carriage return.
-    local appropriate_pattern="s/^.*  *\([0-9][0-9]*\)[ $CR]*\$/\1/p"
-    for i in "${patterns[@]}"; do
-      PIDS_SOUGHT+=$(cat $PID_DUMP \
-        | grep -i "$i" \
-        | sed -n -e "$appropriate_pattern")
-      if [ ${#PIDS_SOUGHT[*]} -ne 0 ]; then
-        # we want to bail as soon as we get matches, because on the same
-        # platform, the same set of patterns should work to find all
-        # occurrences of the genesis java.
-        break;
-      fi
-    done
-  else
-    /bin/ps $extra_flags wux >$PID_DUMP
-    # pattern to use for peeling off the process numbers.
-    local appropriate_pattern='s/^[-a-zA-Z_0-9][-a-zA-Z_0-9]*  *\([0-9][0-9]*\).*$/\1/p'
-    # remove the first line of the file, search for the pattern the
-    # user wants to find, and just pluck the process ids out of the
-    # results.
-    for i in "${patterns[@]}"; do
-      PIDS_SOUGHT=$(cat $PID_DUMP \
-        | sed -e '1d' \
-        | grep -i "$i" \
-        | sed -n -e "$appropriate_pattern")
-      if [ ${#PIDS_SOUGHT[*]} -ne 0 ]; then
-        # we want to bail as soon as we get matches, because on the same
-        # platform, the same set of patterns should work to find all
-        # occurrences of the genesis java.
-        break;
-      fi
-    done
-  fi
-  if [ ! -z "$PIDS_SOUGHT" ]; then echo "$PIDS_SOUGHT"; fi
-  /bin/rm $PID_DUMP
-}
+      local appropriate_pattern="s/^.*  *\([0-9][0-9]*\)[ $CR]*\$/\1/p"
+      local -a PIDS_SOUGHT
+      for i in "${patterns[@]}"; do
+        PIDS_SOUGHT+=($(cat $PID_DUMP \
+          | grep -i "$i" \
+          | sed -n -e "$appropriate_pattern"))
+      done
+    else
+      /bin/ps $extra_flags wux >$PID_DUMP
+      # pattern to use for peeling off the process numbers.
+      local appropriate_pattern='s/^[-a-zA-Z_0-9][-a-zA-Z_0-9]*  *\([0-9][0-9]*\).*$/\1/p'
+      # remove the first line of the file, search for the pattern the
+      # user wants to find, and just pluck the process ids out of the
+      # results.
+      local -a PIDS_SOUGHT
+cat $PID_DUMP >~/junklog.txt
+      for i in "${patterns[@]}"; do
+        PIDS_SOUGHT+=($(cat $PID_DUMP \
+          | sed -e '1d' \
+          | grep -i "$i" \
+          | sed -n -e "$appropriate_pattern"))
+      done
+    fi
+    if [ ${#PIDS_SOUGHT[*]} -ne 0 ]; then echo ${PIDS_SOUGHT[*]}; fi
+    /bin/rm $PID_DUMP
+  }
 
 #######
 

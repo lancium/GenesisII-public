@@ -29,6 +29,7 @@ testQueueResourcesExist()
 testRunningSynchronousJobs()
 {
   for i in $available_resources; do
+    echo "Submitting jobs on resource $(basename $i)..."
     grid run --jsdl=local:$GENERATED_JSDL_FOLDER/ls-single-job.jsdl $i
     assertEquals "Submitting single '/bin/ls' job on $i" 0 $?
 
@@ -40,6 +41,7 @@ testRunningSynchronousJobs()
 
     grid cp "$RNSPATH/cat.out" local:"$TEST_TEMP/cat.out"
     assertEquals "Copying stage out file after job completion" 0 $?
+    echo "Done with resource $(basename $i)."
   done
 }
 

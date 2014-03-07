@@ -144,8 +144,9 @@ public class CacheManager
 	public static void putItemInCache(Object target, Object cacheKey, Object value)
 	{
 		if (value == null) {
-			String msg = "logic problem in putItemInCache: value to cache is null.";
+			String msg = "value to cache is null; ignoring request to cache it.";
 			_logger.error(msg);
+			return;
 		}
 
 		if (_logger.isTraceEnabled()) {
