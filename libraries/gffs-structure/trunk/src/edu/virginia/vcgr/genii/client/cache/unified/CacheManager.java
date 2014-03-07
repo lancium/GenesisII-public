@@ -146,7 +146,6 @@ public class CacheManager
 		if (value == null) {
 			String msg = "logic problem in putItemInCache: value to cache is null.";
 			_logger.error(msg);
-			throw new RuntimeException(msg);
 		}
 
 		if (_logger.isTraceEnabled()) {
