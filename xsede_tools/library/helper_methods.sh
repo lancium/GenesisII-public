@@ -79,20 +79,18 @@ fan_out_directories()
     local -a patterns=("${@}")
     mkdir $TEST_TEMP/grid_logs &>/dev/null
     local PID_DUMP="$(mktemp "$TEST_TEMP/grid_logs/zz_pidlist.XXXXXX")"
-    local PIDS_SOUGHT=()
+    local -a PIDS_SOUGHT=()
     if [ "$OS" == "Windows_NT" ]; then
       # needs to be a windows format filename for 'type' to work.
       if [ ! -d c:/tmp ]; then
         mkdir c:/tmp
       fi
-      # windows7 magical mystery tour lets us create a file c:\\tmp_pids.txt, but then it's not really there
-      # in the root of drive c: when we look for it later.  hoping to fix that problem by using a subdir, which
-      # also might be magical thinking from windows perspective.
+      # windows7 magical mystery tour lets us create a file c:\\tmp_pids.txt, but then it's not
+      # really there in the root of drive c: when we look for it later.  hoping to fix that
+      # problem by using a subdir, which also might be magical thinking from windows perspective.
       tmppid=c:\\tmp\\pids.txt
-      # we have abandoned all hope of relying on ps on windows.  instead
-      # we use wmic to get full command lines for processes.
-      # this does not exist on windows home edition.  we are hosed if that's
-      # what they insist on testing on.
+      # we have abandoned all hope of relying on ps on windows.  instead we use wmic to get full
+      # command lines for processes.
       wmic /locale:ms_409 PROCESS get processid,commandline </dev/null >"$tmppid"
       local flag='/c'
       if [ ! -z "$(uname -a | grep "^MING" )" ]; then
@@ -104,7 +102,6 @@ fan_out_directories()
       local CR='
 '  # embedded carriage return.
       local appropriate_pattern="s/^.*  *\([0-9][0-9]*\)[ $CR]*\$/\1/p"
-      local -a PIDS_SOUGHT
       for i in "${patterns[@]}"; do
         PIDS_SOUGHT+=($(cat $PID_DUMP \
           | grep -i "$i" \
@@ -117,8 +114,6 @@ fan_out_directories()
       # remove the first line of the file, search for the pattern the
       # user wants to find, and just pluck the process ids out of the
       # results.
-      local -a PIDS_SOUGHT
-cat $PID_DUMP >~/junklog.txt
       for i in "${patterns[@]}"; do
         PIDS_SOUGHT+=($(cat $PID_DUMP \
           | sed -e '1d' \
@@ -126,7 +121,12 @@ cat $PID_DUMP >~/junklog.txt
           | sed -n -e "$appropriate_pattern"))
       done
     fi
-    if [ ${#PIDS_SOUGHT[*]} -ne 0 ]; then echo ${PIDS_SOUGHT[*]}; fi
+    if [ ${#PIDS_SOUGHT[*]} -ne 0 ]; then
+      local PIDS_SOUGHT2=$(printf -- '%s\n' ${PIDS_SOUGHT[@]} | sort | uniq)
+      PIDS_SOUGHT=()
+      PIDS_SOUGHT=${PIDS_SOUGHT2[*]}
+      echo ${PIDS_SOUGHT[*]}
+    fi
     /bin/rm $PID_DUMP
   }
 
