@@ -69,7 +69,8 @@ function create_bootstrap_signing_certificate()
 function create_bootstrap_trusted_pfx()
 {
   local dirname="$1"; shift
-  for certfile in $dirname/*.cer; do
+  for certfile in $dirname/*.cer* $dirname/*.0 $dirname/*.pem; do
+    if [ ! -f $certfile ]; then continue; fi
     local output_alias=$(basename "$certfile" .cer)
     echo -e "Adding '$(basename $certfile)' to store with alias: $output_alias"
     run_any_command $CERTO import "-output-keystore='$dirname/trusted.pfx'" -output-keystore-pass=trusted "-base64-cert-file='$certfile'" "-output-alias='$output_alias'"

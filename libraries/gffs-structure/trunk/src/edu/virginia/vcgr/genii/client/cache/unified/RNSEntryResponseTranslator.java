@@ -66,7 +66,8 @@ public class RNSEntryResponseTranslator implements CacheableItemsGenerator
 					if (entryEPR != null) {
 						itemList.add(eprItem);
 					} else {
-						_logger.warn("ignoring RNSEntryResponse with null EPR, has path: " + childRNSPath);
+						if (_logger.isDebugEnabled())
+							_logger.debug("ignoring RNSEntryResponse with null EPR, has path: " + childRNSPath);
 					}
 					if (entryConfig != null) {
 						entryConfig.addRNSPath(childRNSPath);

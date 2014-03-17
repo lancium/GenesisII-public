@@ -276,7 +276,8 @@ PORT=$PORT\n\
       # we only include the trusted certificates from trusted_certs, as well as the
       # newly created CA cert for signing resources on the root, and the secure runnable
       # certificate for patching(?).
-      for CERT_FILE in $GENERATED_CERTS/*.cer; do
+      for CERT_FILE in $GENERATED_CERTS/*.cer* $GENERATED_CERTS/*.0 $GENERATED_CERTS/*.pem; do
+        if [ ! -f $CERT_FILE ]; then continue; fi
         echo -e "\nAdding certificate '$CERT_FILE' to trust store.\n"
         OUTPUT_ALIAS=$(basename "$CERT_FILE" .cer)
         echo $OUTPUT_ALIAS

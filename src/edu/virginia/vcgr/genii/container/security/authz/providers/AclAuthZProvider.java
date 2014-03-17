@@ -94,7 +94,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	 */
 	static private X509Certificate[] _defaultInitialResourceOwners = null;
 
-	public AclAuthZProvider() throws GeneralSecurityException, IOException
+	public AclAuthZProvider() throws AuthZSecurityException, IOException
 	{
 		if (_defaultInitialResourceOwners == null) {
 			Collection<File> ownerFiles = InstallationProperties.getInstallationProperties().getDefaultOwnerFiles();
@@ -120,13 +120,18 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 							_logger.debug("adding " + ownerFile + " as container owner certificate file.");
 						X509Certificate ownerCert = _defaultCertCache.get(ownerFile.getName());
 						if (ownerCert == null) {
-							CertificateFactory cf = CertificateFactory.getInstance("X.509");
-							FileInputStream fin = null;
 							try {
-								ownerCert = (X509Certificate) cf.generateCertificate(fin = new FileInputStream(ownerFile));
-								_defaultCertCache.put(ownerFile.getName(), ownerCert);
-							} finally {
-								StreamUtils.close(fin);
+								CertificateFactory cf = CertificateFactory.getInstance("X.509");
+								FileInputStream fin = null;
+								// strange extra exception block eliminates stream close complaints.
+								try {
+									ownerCert = (X509Certificate) cf.generateCertificate(fin = new FileInputStream(ownerFile));
+									_defaultCertCache.put(ownerFile.getName(), ownerCert);
+								} finally {
+									StreamUtils.close(fin);
+								}
+							} catch (GeneralSecurityException e) {
+								throw new AuthZSecurityException(e.getLocalizedMessage(), e);
 							}
 						}
 						ownerCerts.add(ownerCert);
@@ -266,8 +271,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		if (!checkAccess(authenticatedCallerCredentials, resource, category)) {
 			String msg = "denying access for operation: " + operation.getName();
 			String asset = ResourceManager.getResourceName(resource);
-			msg = msg.concat("on " + asset + " at " + ProgramTools.showLastFewOnStack(4));
-			_logger.error(msg);
+			msg = msg.concat(" on '" + asset + "' at " + ProgramTools.showLastFewOnStack(7));
+			_logger.info(msg);
 			return false;
 		}
 		return true;
