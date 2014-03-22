@@ -40,6 +40,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 
+@SuppressWarnings("deprecation")
 public class ServerWSDoAllSender extends WSDoAllSender
 {
 	static final long serialVersionUID = 0L;

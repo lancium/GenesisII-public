@@ -45,6 +45,7 @@ import edu.virginia.vcgr.genii.client.rns.filters.Filter;
 import edu.virginia.vcgr.genii.client.rns.filters.FilterFactory;
 import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 
@@ -64,6 +65,9 @@ public class RNSPath implements Serializable, Cloneable
 
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
 
+	private static CriticalPathFromRootCache _rnsCacher = new CriticalPathFromRootCache();
+	// hmmm: deploy this differently when it supports commoncache interface
+
 	private RNSPath _parent;
 	private String _nameFromParent;
 	private EndpointReferenceType _cachedEPR;
@@ -72,7 +76,7 @@ public class RNSPath implements Serializable, Cloneable
 	static public interface RNSPathApplyFunction
 	{
 		// if the apply iteration should stop, then the derived method should return false.
-		public boolean applyToPath(RNSPath applyTo) throws RNSException;
+		public boolean applyToPath(RNSPath applyTo) throws RNSException, AuthZSecurityException;
 	}
 
 	/**
@@ -117,6 +121,12 @@ public class RNSPath implements Serializable, Cloneable
 		return epr;
 	}
 
+	//hmmm: temporary!  only needed until we make the cache based on common cache.
+	public static CriticalPathFromRootCache tempGetCPFRC()
+	{
+		return _rnsCacher;
+	}
+	
 	private EndpointReferenceType resolveOptional()
 	{
 		try {
@@ -125,7 +135,7 @@ public class RNSPath implements Serializable, Cloneable
 				EndpointReferenceType parent = _parent.resolveOptional();
 				if (parent != null) {
 					RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parent, EnhancedRNSPortType.class));
-					RNSEntryResponseType[] entries = proxy.lookup(_nameFromParent);
+					RNSEntryResponseType[] entries = proxy.lookup(getName());
 					if (entries != null && entries.length == 1) {
 						_cachedEPR = entries[0].getEndpoint();
 						storeResourceConfigInCache();
@@ -378,7 +388,7 @@ public class RNSPath implements Serializable, Cloneable
 
 		RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parentEndpoint, EnhancedRNSPortType.class));
 		try {
-			_cachedEPR = proxy.add(_nameFromParent);
+			_cachedEPR = proxy.add(getName());
 			_attemptedResolve = true;
 			storeResourceConfigInCache();
 		} catch (RemoteException re) {
@@ -432,7 +442,7 @@ public class RNSPath implements Serializable, Cloneable
 
 		RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parentEPR, EnhancedRNSPortType.class));
 		try {
-			_cachedEPR = proxy.createFile(_nameFromParent);
+			_cachedEPR = proxy.createFile(getName());
 			_attemptedResolve = true;
 			storeResourceConfigInCache();
 			return _cachedEPR;
@@ -836,7 +846,7 @@ public class RNSPath implements Serializable, Cloneable
 
 		RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parentEPR, EnhancedRNSPortType.class));
 		try {
-			_cachedEPR = proxy.add(_nameFromParent, epr);
+			_cachedEPR = proxy.add(getName(), epr);
 			_attemptedResolve = true;
 			storeResourceConfigInCache();
 		} catch (RemoteException re) {
@@ -865,7 +875,7 @@ public class RNSPath implements Serializable, Cloneable
 		removeEPRFromCache();
 		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
 		try {
-			proxy.remove(_nameFromParent);
+			proxy.remove(getName());
 			_cachedEPR = null;
 			_attemptedResolve = true;
 		} catch (RemoteException re) {
@@ -899,7 +909,7 @@ public class RNSPath implements Serializable, Cloneable
 
 			EnhancedRNSPortType rpt = createProxy(parentEPR, EnhancedRNSPortType.class);
 			RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
-			proxy.remove(_nameFromParent);
+			proxy.remove(getName());
 			_cachedEPR = null;
 			_attemptedResolve = true;
 		} catch (RemoteException re) {

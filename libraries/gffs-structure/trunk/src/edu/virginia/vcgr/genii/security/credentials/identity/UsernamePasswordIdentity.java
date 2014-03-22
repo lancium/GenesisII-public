@@ -11,6 +11,7 @@ import org.apache.axis.message.MessageElement;
 import org.w3c.dom.Element;
 
 import edu.virginia.vcgr.genii.algorithm.encryption.BCrypt;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.XMLCompatible;
 import edu.virginia.vcgr.genii.security.acl.AclEntry;
@@ -53,7 +54,7 @@ public class UsernamePasswordIdentity implements Identity, NuCredential, XMLComp
 			_password = password;
 	}
 
-	public UsernamePasswordIdentity(MessageElement secToken) throws GeneralSecurityException
+	public UsernamePasswordIdentity(MessageElement secToken) throws AuthZSecurityException
 	{
 		_userName = WSSecurityUtils.getNameTokenFromUTSecTokenRef(secToken);
 		_password = WSSecurityUtils.getPasswordTokenFromUTSecTokenRef(secToken);
@@ -93,7 +94,11 @@ public class UsernamePasswordIdentity implements Identity, NuCredential, XMLComp
 	@Override
 	public Element convertToMessageElement() throws GeneralSecurityException
 	{
-		return WSSecurityUtils.makeUTSecTokenRef(_userName, _password);
+		try {
+			return WSSecurityUtils.makeUTSecTokenRef(_userName, _password);
+		} catch (AuthZSecurityException e) {
+			throw new GeneralSecurityException(e.getLocalizedMessage(), e);
+		}
 	}
 
 	@Override

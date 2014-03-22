@@ -2,7 +2,7 @@
 
 ##Author: Vanamala Venkataswamy
 
-if [ -z "$XSEDE_TEST_ROOT" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
+if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
 source $XSEDE_TEST_ROOT/library/establish_environment.sh
 
 which make

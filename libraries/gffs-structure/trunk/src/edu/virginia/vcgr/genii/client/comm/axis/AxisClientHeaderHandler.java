@@ -15,7 +15,6 @@
 package edu.virginia.vcgr.genii.client.comm.axis;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,6 +53,7 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.invoke.handlers.MyProxyCertificate;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
@@ -312,7 +312,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 			// update any stale creds
 			try {
 				ClientUtils.checkAndRenewCredentials(callContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
-			} catch (GeneralSecurityException e) {
+			} catch (AuthZSecurityException e) {
 				throw new GenesisIISecurityException("Could not prepare outgoing calling context: " + e.getMessage(), e);
 			}
 			// create a new derived calling context transient for the life of this call.

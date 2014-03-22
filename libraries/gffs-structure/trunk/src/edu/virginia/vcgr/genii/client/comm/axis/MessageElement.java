@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.comm.axis;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.Name;
@@ -341,10 +342,11 @@ public class MessageElement
 		return getReal().addTextNode(s);
 	}
 
-	public void appendChild(Node nodeRepresentation)
+	public Node appendChild(Node nodeRepresentation)
 	{
-		getReal().appendChild(nodeRepresentation);
+		Node toReturn = getReal().appendChild(nodeRepresentation);
 		_createdLocally = false;
+		return toReturn;
 	}
 
 	public QName getQName()
@@ -352,11 +354,17 @@ public class MessageElement
 		return getReal().getQName();
 	}
 
+	@SuppressWarnings("rawtypes")
+	public List getChildren()
+	{
+		return getReal().getChildren();
+	}
+
 	/**
 	 * slightly different from original which returns a List (without generic arguments); we switch
 	 * to an array automatically since we mainly use that.
 	 */
-	public org.apache.axis.message.MessageElement[] getChildren()
+	public org.apache.axis.message.MessageElement[] getOurChildren()
 	{
 		if (getReal().getChildren() == null)
 			return null;
@@ -518,9 +526,9 @@ public class MessageElement
 		getReal().addAttribute(nsPrefixSchemaXsi, uriDefaultSchemaXsi, string, string2);
 	}
 
-	public void addNamespaceDeclaration(String prefix, String ns) throws SOAPException
+	public SOAPElement addNamespaceDeclaration(String prefix, String ns) throws SOAPException
 	{
-		getReal().addNamespaceDeclaration(prefix, ns);
+		return getReal().addNamespaceDeclaration(prefix, ns);
 	}
 
 	public String getLocalName()
@@ -533,7 +541,7 @@ public class MessageElement
 		return getReal().getNamespaceURI();
 	}
 
-	public Object getAttributeValue(String string)
+	public String getAttributeValue(String string)
 	{
 		return getReal().getAttributeValue(string);
 	}

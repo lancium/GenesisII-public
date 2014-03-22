@@ -27,6 +27,7 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPath.RNSPathApplyFunction;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
 public class LsTool extends BaseGridTool
@@ -247,7 +248,7 @@ public class LsTool extends BaseGridTool
 					for (X509Certificate cert : certs) {
 						out.format("Certificate:  %s\n", cert);
 					}
-			} catch (GeneralSecurityException gse) {
+			} catch (AuthZSecurityException gse) {
 				out.println("Unable to acquire cert chain:  " + gse);
 			}
 		}

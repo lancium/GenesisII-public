@@ -101,6 +101,9 @@ if [ ! -z "$BADNESS" ]; then
   echo
   echo "----"
   echo "There were errors in setting up the xsede tests--see above messages."
-  unset XSEDE_TEST_ROOT GRITTY_TESTING_TOP_LEVEL SHUNIT_DIR BADNESS
+  unset XSEDE_TEST_SENTINEL XSEDE_TEST_ROOT GRITTY_TESTING_TOP_LEVEL SHUNIT_DIR BADNESS
+else
+  # if things were successful, we can finally set our indicator for the scripts to check.
+  export XSEDE_TEST_SENTINEL=initialized
 fi
 

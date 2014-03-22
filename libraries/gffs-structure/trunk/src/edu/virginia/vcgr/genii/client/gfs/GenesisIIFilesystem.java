@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.client.gfs;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
-import java.security.GeneralSecurityException;
 import java.util.Calendar;
 import java.util.Collection;
 
@@ -47,6 +46,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 import edu.virginia.vcgr.genii.security.identity.Identity;
@@ -159,7 +159,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 	}
 
 	public GenesisIIFilesystem(RNSPath root, String sandbox) throws IOException, RNSPathDoesNotExistException,
-		GeneralSecurityException
+		AuthZSecurityException
 	{
 		ICallingContext callingContext = ContextManager.getExistingContext();
 

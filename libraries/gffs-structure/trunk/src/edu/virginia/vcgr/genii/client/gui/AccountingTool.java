@@ -453,13 +453,13 @@ public class AccountingTool extends BaseGridTool
 		}
 
 		@Override
-		public void finish() throws Throwable
+		public void finish()
 		{
 			// Nothing to do here
 		}
 
 		@Override
-		public RNSRecursiveDescentCallbackResult handleRNSPath(RNSPath path) throws Throwable
+		public RNSRecursiveDescentCallbackResult handleRNSPath(RNSPath path)
 		{
 			_count.increment();
 			_exec.submit(new ThreadHandler(path));

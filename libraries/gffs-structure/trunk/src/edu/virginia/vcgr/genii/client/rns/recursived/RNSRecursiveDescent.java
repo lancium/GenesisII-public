@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.client.context.IContextResolver;
 import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 
@@ -181,7 +182,7 @@ public class RNSRecursiveDescent
 		return RNSRecursiveDescentCallbackResult.Continue;
 	}
 
-	public void descend(RNSPath root, RNSRecursiveDescentCallback callback) throws Throwable
+	public void descend(RNSPath root, RNSRecursiveDescentCallback callback) throws RNSException
 	{
 		IContextResolver oldResolver = null;
 

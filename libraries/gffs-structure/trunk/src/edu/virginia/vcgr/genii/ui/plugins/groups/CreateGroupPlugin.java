@@ -4,14 +4,17 @@ import java.util.Collection;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.IdpTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.RmTool;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamespaceDefinitions;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.utils.io.EmptyReader;
@@ -30,6 +33,8 @@ import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 
 public class CreateGroupPlugin extends AbstractCombinedUIMenusPlugin
 {
+	static private Log _logger = LogFactory.getLog(CreateGroupPlugin.class);
+
 	static private class RemoveTask implements Runnable
 	{
 		private String _path;
@@ -45,9 +50,13 @@ public class CreateGroupPlugin extends AbstractCombinedUIMenusPlugin
 			RmTool tool = new RmTool();
 			try {
 				tool.addArgument(_path);
-				tool.run(new EmptyWriter(), new EmptyWriter(), new EmptyReader());
+				int retVal = tool.run(new EmptyWriter(), new EmptyWriter(), new EmptyReader());
+				if (retVal != 0)
+					_logger.error("failure in remove task: return value=" + retVal);
+			} catch (ToolException e) {
+				// issue already printed by BaseGridTool.
 			} catch (Throwable cause) {
-				// Just ignore for now
+				_logger.error("failure in remove task: " + cause.getMessage(), cause);
 			}
 		}
 	}
@@ -137,15 +146,17 @@ public class CreateGroupPlugin extends AbstractCombinedUIMenusPlugin
 
 				sourcePath = null;
 				return true;
+			} catch (ToolException e) {
+				// issue already printed by BaseGridTool.
 			} catch (Throwable cause) {
 				if (cause instanceof Exception)
 					throw (Exception) cause;
-
 				throw new RuntimeException("Unable to create group.", cause);
 			} finally {
 				if (sourcePath != null)
 					_context.uiContext().executor().equals(new RemoveTask(sourcePath));
 			}
+			return false;
 		}
 	}
 

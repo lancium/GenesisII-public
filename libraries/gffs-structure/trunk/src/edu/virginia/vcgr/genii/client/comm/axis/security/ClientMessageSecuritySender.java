@@ -13,31 +13,30 @@
  */
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
-import org.apache.ws.axis.security.WSDoAllSender;
-import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.components.crypto.AbstractCrypto;
-
-import edu.virginia.vcgr.genii.client.comm.*;
-import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
-
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-
 import java.io.IOException;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+
+import org.apache.axis.AxisFault;
+import org.apache.axis.MessageContext;
+import org.apache.ws.axis.security.WSDoAllSender;
+import org.apache.ws.security.WSEncryptionPart;
+import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.AbstractCrypto;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
+
+import edu.virginia.vcgr.genii.client.comm.CommConstants;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
+import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 /**
  * Client-side X.509 message-level security handler for outgoing (request) messages.
@@ -71,7 +70,8 @@ public class ClientMessageSecuritySender extends WSDoAllSender implements ISecur
 	/**
 	 * Configures the Send handler. Returns whether or not this handler is to perform any actions
 	 */
-	public boolean configure(ICallingContext callContext, MessageSecurity msgSecData) throws GeneralSecurityException
+	@Override
+	public boolean configure(ICallingContext callContext, MessageSecurity msgSecData) throws AuthZSecurityException
 	{
 
 		_messageSec = msgSecData;

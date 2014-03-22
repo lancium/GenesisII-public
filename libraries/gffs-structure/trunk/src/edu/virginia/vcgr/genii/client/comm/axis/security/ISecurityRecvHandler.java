@@ -15,7 +15,7 @@
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import java.security.GeneralSecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 /**
  * Interface for GII message receive-handlers
@@ -28,9 +28,6 @@ public interface ISecurityRecvHandler extends org.apache.axis.Handler
 
 	/**
 	 * Configures the Receive handler.
-	 * 
-	 * @param callContext
-	 * @throws GeneralSecurityException
 	 */
-	public void configure(ICallingContext callContext) throws GeneralSecurityException;
+	public void configure(ICallingContext callContext) throws AuthZSecurityException;
 }

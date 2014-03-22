@@ -37,6 +37,7 @@ import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.genii.algorithm.structures.queue.BarrieredWorkQueue;
 import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHook;
+import edu.virginia.vcgr.genii.algorithm.time.TimeHelpers;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
@@ -124,27 +125,6 @@ public class ServiceDeployer extends Thread
 		} else {
 			_logger.debug("failed to deploy from constructor for " + this.getClass().getCanonicalName());
 		}
-	}
-
-	// hmmm: move these useful funcs.
-
-	public static long _appStartMillis = millisSinceBoot();
-
-	/**
-	 * returns the number of milliseconds since the computer booted.
-	 */
-	public static long millisSinceBoot()
-	{
-		return System.nanoTime() / 1000000;
-	}
-
-	/**
-	 * returns the number of milliseconds since the program started. this is usually a much nicer
-	 * number than the milliseconds since boot.
-	 */
-	public static long millisSinceAppStart()
-	{
-		return millisSinceBoot() - _appStartMillis;
 	}
 
 	/**
@@ -244,9 +224,9 @@ public class ServiceDeployer extends Thread
 							IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons.newInstance(new Object[0]);
 							// hmmm: the individual startup methods are what are super slow! how
 							// odd.
-							long startedAt = millisSinceAppStart();
+							long startedAt = TimeHelpers.millisSinceAppStart();
 							base.startup();
-							long finishedAt = millisSinceAppStart();
+							long finishedAt = TimeHelpers.millisSinceAppStart();
 							_logger.debug("deploying " + className + " took " + ((float) (finishedAt - startedAt)) / 1000.0
 								+ " seconds.");
 							_postStartupQueue.enqueue(base);

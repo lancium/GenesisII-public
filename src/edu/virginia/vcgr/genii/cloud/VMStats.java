@@ -49,7 +49,7 @@ public class VMStats
 			}
 
 		} catch (SOAPException se) {
-			throw new RuntimeException("Unexpected exception thrown while packageing policy.");
+			throw new RuntimeException("Unexpected exception thrown while packaging policy.");
 		}
 
 		return ret;

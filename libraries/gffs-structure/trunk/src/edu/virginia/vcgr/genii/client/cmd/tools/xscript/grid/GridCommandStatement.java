@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import javax.script.ScriptException;
 
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
+import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.xscript.EarlyExitException;
 import edu.virginia.vcgr.xscript.ParseStatement;
 import edu.virginia.vcgr.xscript.ReturnFromFunctionException;
@@ -40,12 +41,8 @@ public class GridCommandStatement implements ParseStatement
 		try {
 			return new CommandLineRunner()
 				.runCommand(cLine, context.getWriter(), context.getErrorWriter(), context.getReader());
-		} catch (ScriptException se) {
-			throw se;
-		} catch (EarlyExitException eee) {
-			throw eee;
-		} catch (ReturnFromFunctionException rffe) {
-			throw rffe;
+		} catch (ToolException se) {
+			throw new ScriptException(se);
 		} catch (RuntimeException re) {
 			throw re;
 		} catch (Exception cause) {

@@ -23,6 +23,7 @@ import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescent;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallback;
@@ -128,13 +129,13 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements E
 			descent.asyncDescend(new RNSPath(myEPR), new RNSRecursiveDescentCallback()
 			{
 				@Override
-				public void finish() throws Throwable
+				public void finish() throws RNSException
 				{
 					// do nothing
 				}
 
 				@Override
-				public RNSRecursiveDescentCallbackResult handleRNSPath(RNSPath path) throws Throwable
+				public RNSRecursiveDescentCallbackResult handleRNSPath(RNSPath path) throws RNSException
 				{
 					return RNSRecursiveDescentCallbackResult.Continue;
 				}

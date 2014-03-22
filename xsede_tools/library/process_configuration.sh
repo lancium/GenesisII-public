@@ -12,7 +12,7 @@
 # variables into the current environment.
 define_and_export_variables()
 {
-  if [ -z "$XSEDE_TEST_ROOT" ]; then echo Please run prepare_tests.sh before testing.; return 3; fi
+  if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; return 3; fi
 
   # create our output folder so we can store logs and temporaries.
   mkdir -p "$TEST_TEMP" &>/dev/null

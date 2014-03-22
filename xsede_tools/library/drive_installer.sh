@@ -19,7 +19,7 @@ cd $WORKDIR
 # force the installer to do a console-based login.
 unset DISPLAY
 
-if [ -z "$GENII_INSTALL_DIR" -o -z "$TEST_TEMP" -o -z "$XSEDE_TEST_ROOT" ]; then
+if [ -z "$GENII_INSTALL_DIR" -o -z "$TEST_TEMP" -o -z "$XSEDE_TEST_SENTINEL" ]; then
   echo This script needs to have had the XSEDE test environment loaded already.
   echo It expects the following to be defined:
   echo -e "\tTEST_TEMP\n\tGENII_INSTALL_DIR\n\tXSEDE_TEST_ROOT"

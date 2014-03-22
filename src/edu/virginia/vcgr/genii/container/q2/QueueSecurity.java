@@ -49,7 +49,7 @@ public class QueueSecurity
 					SecurityUtilities.GROUP_TOKEN_PATTERN);
 			else
 				return KeystoreManager.getCallerIdentities(callingContext);
-		} catch (GeneralSecurityException gse) {
+		} catch (AuthZSecurityException gse) {
 			throw new AuthZSecurityException("Unable to load current context.", gse);
 		} catch (IOException ioe) {
 			throw new AuthZSecurityException("Unable to load current context.", ioe);

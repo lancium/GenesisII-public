@@ -14,7 +14,6 @@
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 
 import javax.security.auth.callback.Callback;
@@ -31,6 +30,7 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
@@ -66,7 +66,7 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements ISecurit
 	/**
 	 * Configures the Send handler. Returns whether or not this handler is to perform any actions
 	 */
-	public boolean configure(ICallingContext callContext, MessageSecurity msgSecData) throws GeneralSecurityException
+	public boolean configure(ICallingContext callContext, MessageSecurity msgSecData) throws AuthZSecurityException
 	{
 		_utIdentity = null;
 
@@ -76,7 +76,7 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements ISecurit
 		for (NuCredential cred : credentials) {
 			if (cred instanceof UsernamePasswordIdentity) {
 				if (_utIdentity != null) {
-					throw new GeneralSecurityException("Cannot have more than one username-token credential");
+					throw new AuthZSecurityException("Cannot have more than one username-token credential");
 				}
 				_utIdentity = (UsernamePasswordIdentity) cred;
 			}

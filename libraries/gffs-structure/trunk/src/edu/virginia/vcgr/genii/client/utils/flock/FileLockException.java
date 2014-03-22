@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.client.utils.flock;
 
-public class FileLockException extends Exception
+import java.io.IOException;
+
+public class FileLockException extends IOException
 {
 	static final long serialVersionUID = 0L;
 

@@ -24,7 +24,6 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +38,7 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.algorithm.encryption.Base64;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.context.ContextNameValuePairType;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
@@ -195,7 +195,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public synchronized void setActiveKeyAndCertMaterial(KeyAndCertMaterial clientKeyMaterial) throws GeneralSecurityException
+	public synchronized void setActiveKeyAndCertMaterial(KeyAndCertMaterial clientKeyMaterial) throws AuthZSecurityException
 	{
 		// this transient property always gets put in the top parent context
 		if (_parent != null) {
@@ -206,7 +206,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public synchronized KeyAndCertMaterial getActiveKeyAndCertMaterial() throws GeneralSecurityException
+	public synchronized KeyAndCertMaterial getActiveKeyAndCertMaterial() throws AuthZSecurityException
 	{
 		KeyAndCertMaterial toReturn = (KeyAndCertMaterial) getTransientProperty(CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA);
 		if (toReturn == null) {

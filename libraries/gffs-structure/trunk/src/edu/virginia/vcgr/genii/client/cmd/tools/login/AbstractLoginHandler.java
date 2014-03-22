@@ -48,7 +48,7 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 	}
 
 	private void addEntriesFromFile(Collection<CertEntry> entries, InputStream storeInput, String storeType, String password)
-		throws GeneralSecurityException, IOException
+		throws AuthZSecurityException, IOException
 	{
 		KeyStore specifiedKs = null;
 
@@ -64,17 +64,25 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 		KeyStore.Builder builder =
 			new InputStreamBuilder(storeType, null, storeInput, new KeyStore.CallbackHandlerProtection(this),
 				AccessController.getContext());
-		specifiedKs = builder.getKeyStore();
+		try {
+			specifiedKs = builder.getKeyStore();
+		} catch (KeyStoreException e) {
+			throw new AuthZSecurityException("keystore issue: " + e.getLocalizedMessage(), e);
+		}
 
 		if (specifiedKs != null) {
-			Enumeration<String> aliases = specifiedKs.aliases();
-			while (aliases.hasMoreElements()) {
-				String alias = aliases.nextElement();
-				Certificate[] aliasCertChain = specifiedKs.getCertificateChain(alias);
-				if (aliasCertChain == null)
-					continue;
+			try {
+				Enumeration<String> aliases = specifiedKs.aliases();
+				while (aliases.hasMoreElements()) {
+					String alias = aliases.nextElement();
+					Certificate[] aliasCertChain = specifiedKs.getCertificateChain(alias);
+					if (aliasCertChain == null)
+						continue;
 
-				entries.add(new CertEntry(aliasCertChain, alias, specifiedKs));
+					entries.add(new CertEntry(aliasCertChain, alias, specifiedKs));
+				}
+			} catch (KeyStoreException e) {
+				throw new AuthZSecurityException("keystore issue: " + e.getLocalizedMessage(), e);
 			}
 		}
 	}
@@ -98,7 +106,7 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 	}
 
 	protected Collection<CertEntry> retrieveCertEntries(InputStream storeInput, String storeType, String password)
-		throws GeneralSecurityException, IOException
+		throws AuthZSecurityException, IOException
 	{
 		ArrayList<CertEntry> list = new ArrayList<CertEntry>();
 
@@ -112,7 +120,7 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 	}
 
 	public CertEntry selectCert(InputStream storeInput, String storeType, String password, boolean isAliasPattern,
-		String entryPattern) throws GeneralSecurityException, IOException
+		String entryPattern) throws AuthZSecurityException, IOException
 	{
 
 		Collection<CertEntry> entries = retrieveCertEntries(storeInput, storeType, password);
@@ -164,6 +172,10 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 				try {
 					entry._privateKey = (PrivateKey) entry._keyStore.getKey(entry._alias, passwordChars.toCharArray());
 					break;
+				} catch (KeyStoreException e) {
+					throw new AuthZSecurityException("keystore issue: " + e.getLocalizedMessage(), e);
+				} catch (NoSuchAlgorithmException e) {
+					throw new AuthZSecurityException("missing keystore algorithm: " + e.getLocalizedMessage(), e);
 				} catch (UnrecoverableKeyException uke) {
 					if (_password != null) {
 						passwordChars = _password;

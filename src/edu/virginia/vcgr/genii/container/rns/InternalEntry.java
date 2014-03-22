@@ -21,16 +21,14 @@ public class InternalEntry
 	private String _name;
 	private EndpointReferenceType _entryReference;
 	private MessageElement[] _attributes;
-
-	// added by ak3ka
-	private boolean _isExists;
+	private boolean _doesExist; // added by ak3ka.
 
 	public InternalEntry(String name, EndpointReferenceType entryReference, MessageElement[] attributes, boolean isExists)
 	{
 		_name = name;
 		_entryReference = entryReference;
 		_attributes = attributes;
-		_isExists = isExists;
+		_doesExist = isExists;
 	}
 
 	public InternalEntry(String name, EndpointReferenceType entryReference, MessageElement[] attributes)
@@ -65,7 +63,7 @@ public class InternalEntry
 
 	public boolean isExistent()
 	{
-		return _isExists;
+		return _doesExist;
 	}
 
 }

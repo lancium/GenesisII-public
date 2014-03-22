@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
 import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 import edu.virginia.vcgr.genii.client.utils.exec.SimpleExecutionResults;
 import fuse.Filesystem;
@@ -27,7 +28,7 @@ public class GeniiFuse
 
 	static public GeniiFuseConnection mountGenesisII(File mountPoint, String[] additionalArguments,
 		ICallingContext callingContext, String sandbox, int uid, boolean daemon) throws IOException, RemoteException,
-		RNSException, GeneralSecurityException
+		RNSException, AuthZSecurityException
 	{
 		if (!mountPoint.exists())
 			throw new FileNotFoundException(String.format("Unable to locate mount point \"%s\".", mountPoint.getAbsolutePath()));

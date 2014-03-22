@@ -66,7 +66,7 @@ public class JNDIAuthZProvider implements IAuthZProvider
 	static private Log _logger = LogFactory.getLog(JNDIAuthZProvider.class);
 	static private AclAuthZProvider _aclProvider = null;
 
-	public JNDIAuthZProvider() throws GeneralSecurityException, IOException
+	public JNDIAuthZProvider() throws AuthZSecurityException, IOException
 	{
 		_aclProvider = new AclAuthZProvider();
 	}

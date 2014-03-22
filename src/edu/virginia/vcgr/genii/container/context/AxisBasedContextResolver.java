@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -151,20 +150,20 @@ public class AxisBasedContextResolver implements IContextResolver
 
 		// place the resource's key material in the transient calling context
 		// so that it may be properly used for outgoing messages
-		try {
-			PrivateKey privateKey = (PrivateKey) resource.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
-			if (privateKey != null) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("Using resource's own private key: " + ResourceManager.getCurrentResource().getServiceName());
-			}
-			Certificate[] targetCertChain = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-			if ((targetCertChain != null) && (targetCertChain.length > 0)) {
-				retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) targetCertChain,
-					(privateKey != null) ? privateKey : Container.getContainerPrivateKey()));
-			}
-		} catch (GeneralSecurityException e) {
-			throw new ResourceException(e.getMessage(), e);
+		// try {
+		PrivateKey privateKey = (PrivateKey) resource.getProperty(IResource.PRIVATE_KEY_PROPERTY_NAME);
+		if (privateKey != null) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Using resource's own private key: " + ResourceManager.getCurrentResource().getServiceName());
 		}
+		Certificate[] targetCertChain = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+		if ((targetCertChain != null) && (targetCertChain.length > 0)) {
+			retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) targetCertChain,
+				(privateKey != null) ? privateKey : Container.getContainerPrivateKey()));
+		}
+		// } catch (GeneralSecurityException e) {
+		// throw new AuthZSecurityException(e.getMessage(), e);
+		// }
 
 		workingContext.setProperty(WorkingContext.CURRENT_CONTEXT_KEY, retval);
 

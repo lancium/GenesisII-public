@@ -17,8 +17,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.ws.addressing.EndpointReferenceType;
 
-import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
-
 import edu.virginia.vcgr.genii.client.byteio.RandomByteIOInputStream;
 import edu.virginia.vcgr.genii.client.byteio.RandomByteIOOutputStream;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
@@ -35,12 +33,12 @@ public class ConcurrentCopyMachine implements Runnable
 	static private Log _logger = LogFactory.getLog(ConcurrentCopyMachine.class);
 
 	Semaphore semaphore;
-	Mutex mutex;
+	Object mutex;
 	String sourceIn;
 	String targetIn;
 	RNSPath logLocation;
 
-	public ConcurrentCopyMachine(String sourceIn, String targetIn, RNSPath logLocation, Semaphore semaphore, Mutex mutex)
+	public ConcurrentCopyMachine(String sourceIn, String targetIn, RNSPath logLocation, Semaphore semaphore, Object mutex)
 	{
 		this.semaphore = semaphore;
 		this.mutex = mutex;
@@ -90,39 +88,39 @@ public class ConcurrentCopyMachine implements Runnable
 
 		DocumentBuilder dBuilder = null;
 		Document doc = null;
-
-		NodeList nl = null;
-		try {
-			mutex.acquire();
-			dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			doc = dBuilder.parse(new RandomByteIOInputStream(logLocation.getEndpoint()));
-			doc.getDocumentElement().normalize();
-			nl = doc.getElementsByTagName(sanitizedKey);
-		} catch (Throwable e) {
-			_logger.error("caught exception while parsing log", e);
-		}
 		int transferred = 0;
-		if (nl == null || nl.getLength() == 0) {
-			Element record = doc.createElement(sanitizedKey);
-			record.setAttribute("bytes", "0");
-			// record.appendChild(doc.createTextNode("0"));
-			doc.getDocumentElement().appendChild(record);
 
+		synchronized (mutex) {
+			NodeList nl = null;
 			try {
-				TransformerFactory transformerFactory = TransformerFactory.newInstance();
-				Transformer transformer = transformerFactory.newTransformer();
-				DOMSource source = new DOMSource(doc);
-				StreamResult result = new StreamResult(new RandomByteIOOutputStream(logLocation.getEndpoint()));
-				transformer.transform(source, result);
-			} catch (Exception e) {
-				_logger.error("caught exception while writing log", e);
+				dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+				doc = dBuilder.parse(new RandomByteIOInputStream(logLocation.getEndpoint()));
+				doc.getDocumentElement().normalize();
+				nl = doc.getElementsByTagName(sanitizedKey);
+			} catch (Throwable e) {
+				_logger.error("caught exception while parsing log", e);
 			}
+			if (nl == null || nl.getLength() == 0) {
+				Element record = doc.createElement(sanitizedKey);
+				record.setAttribute("bytes", "0");
+				// record.appendChild(doc.createTextNode("0"));
+				doc.getDocumentElement().appendChild(record);
 
-			nl = doc.getElementsByTagName(sanitizedKey);
+				try {
+					TransformerFactory transformerFactory = TransformerFactory.newInstance();
+					Transformer transformer = transformerFactory.newTransformer();
+					DOMSource source = new DOMSource(doc);
+					StreamResult result = new StreamResult(new RandomByteIOOutputStream(logLocation.getEndpoint()));
+					transformer.transform(source, result);
+				} catch (Exception e) {
+					_logger.error("caught exception while writing log", e);
+				}
+
+				nl = doc.getElementsByTagName(sanitizedKey);
+			}
+			Element n = (Element) nl.item(0);
+			transferred = Integer.parseInt(n.getAttribute("bytes"));
 		}
-		Element n = (Element) nl.item(0);
-		transferred = Integer.parseInt(n.getAttribute("bytes"));
-		mutex.release();
 
 		int blockSize = 65536;// 64 KB
 		while (transferred < fileSize) {
@@ -153,27 +151,28 @@ public class ConcurrentCopyMachine implements Runnable
 			}
 
 			transferred += data.length;
-			try {
-				mutex.acquire();
-				doc = dBuilder.parse(new RandomByteIOInputStream(logLocation.getEndpoint()));
-				nl = doc.getElementsByTagName(sanitizedKey);
-			} catch (Throwable e) {
-				_logger.error("caught exception while finding tag", e);
-			}
-			n = (Element) nl.item(0);
-			n.setAttribute("bytes", "" + transferred);
+			synchronized (mutex) {
+				NodeList nl = null;
+				try {
+					doc = dBuilder.parse(new RandomByteIOInputStream(logLocation.getEndpoint()));
+					nl = doc.getElementsByTagName(sanitizedKey);
+				} catch (Throwable e) {
+					_logger.error("caught exception while finding tag", e);
+				}
+				Element n = (Element) nl.item(0);
+				n.setAttribute("bytes", "" + transferred);
 
-			try {
-				TransformerFactory transformerFactory = TransformerFactory.newInstance();
-				Transformer transformer = transformerFactory.newTransformer();
-				DOMSource source = new DOMSource(doc);
-				StreamResult result = new StreamResult(new RandomByteIOOutputStream(logLocation.getEndpoint()));
-				transformer.transform(source, result);
-			} catch (Exception e) {
-				_logger.error("caught exception while writing log", e);
-			}
+				try {
+					TransformerFactory transformerFactory = TransformerFactory.newInstance();
+					Transformer transformer = transformerFactory.newTransformer();
+					DOMSource source = new DOMSource(doc);
+					StreamResult result = new StreamResult(new RandomByteIOOutputStream(logLocation.getEndpoint()));
+					transformer.transform(source, result);
+				} catch (Exception e) {
+					_logger.error("caught exception while writing log", e);
+				}
 
-			mutex.release();
+			}
 		}
 
 		semaphore.release();

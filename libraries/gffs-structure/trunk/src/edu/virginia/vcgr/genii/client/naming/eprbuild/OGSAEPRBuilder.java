@@ -10,6 +10,7 @@ import org.apache.axis.message.MessageElement;
 import org.morgan.util.configuration.ConfigurationException;
 import org.w3c.dom.Element;
 
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.security.axis.WSSecurityUtils;
 
 public class OGSAEPRBuilder extends WSNamingEPRBuilder
@@ -95,7 +96,7 @@ public class OGSAEPRBuilder extends WSNamingEPRBuilder
 		if (_certificateChain != null) {
 			try {
 				ret.add(WSSecurityUtils.makePkiPathSecTokenRef(_certificateChain, "RecipientMessageIdentity"));
-			} catch (GeneralSecurityException gse) {
+			} catch (AuthZSecurityException gse) {
 				throw new ConfigurationException("Unable to generate certificate chain metadata!", gse);
 			}
 		}

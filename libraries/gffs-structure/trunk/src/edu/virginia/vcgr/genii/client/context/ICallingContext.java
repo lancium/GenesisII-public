@@ -13,14 +13,14 @@
  */
 package edu.virginia.vcgr.genii.client.context;
 
-import java.io.*;
-import java.security.GeneralSecurityException;
-import java.util.*;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serializable;
+import java.util.Collection;
 
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
@@ -57,9 +57,9 @@ public interface ICallingContext
 	 */
 	public void setSingleValueProperty(String name, Serializable value);
 
-	public void setActiveKeyAndCertMaterial(KeyAndCertMaterial clientKeyMaterial) throws GeneralSecurityException;
+	public void setActiveKeyAndCertMaterial(KeyAndCertMaterial clientKeyMaterial) throws AuthZSecurityException;
 
-	public KeyAndCertMaterial getActiveKeyAndCertMaterial() throws GeneralSecurityException;
+	public KeyAndCertMaterial getActiveKeyAndCertMaterial() throws AuthZSecurityException;
 
 	public Serializable getTransientProperty(String name);
 

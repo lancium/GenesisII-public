@@ -186,15 +186,10 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 						entriesWithMissingResourceKeys.put(entryNameFromDB, entryEPR);
 					}
 				} else {
-					// hmmm: fix the comment here.
-					InternalEntry entry = new InternalEntry(entryName, null, null, false); // signifying
-																							// that
-																							// the
-																							// entry
-																							// name
-																							// does
-																							// not
-																							// exist
+					/*
+					 * nulls below signify that the entry name does not exist.
+					 */
+					InternalEntry entry = new InternalEntry(entryName, null, null, false);
 					ret.add(entry);
 				}
 			}
@@ -292,18 +287,16 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 
 			else {
 				if (rs.next()) {
+					// entry exists.
 					InMemoryIteratorEntry imie =
-						new InMemoryIteratorEntry(rs.getString(1), rs.getString(2), true, FileOrDir.UNKNOWN); // entry
-																												// exists
+						new InMemoryIteratorEntry(rs.getString(1), rs.getString(2), true, FileOrDir.UNKNOWN);
 					ret.add(imie);
 				}
 
 				else {
+					// entry does not exist.
 					InMemoryIteratorEntry imie =
-						new InMemoryIteratorEntry(rs.getString(1), new String(""), false, FileOrDir.UNKNOWN); // entry
-																												// does
-																												// not
-																												// exist
+						new InMemoryIteratorEntry(rs.getString(1), new String(""), false, FileOrDir.UNKNOWN);
 					ret.add(imie);
 				}
 

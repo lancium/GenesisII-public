@@ -13,35 +13,14 @@
  */
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.SOAPPart;
-import org.apache.ws.axis.security.WSDoAllReceiver;
-import org.apache.ws.security.SOAPConstants;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.Timestamp;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.components.crypto.AbstractCrypto;
-import org.apache.xml.security.utils.XMLUtils;
-import org.w3c.dom.Document;
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -50,13 +29,32 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 
+import org.apache.axis.AxisFault;
+import org.apache.axis.Message;
+import org.apache.axis.MessageContext;
+import org.apache.axis.SOAPPart;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.ws.axis.security.WSDoAllReceiver;
+import org.apache.ws.security.SOAPConstants;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.AbstractCrypto;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.message.token.Timestamp;
+import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.utils.XMLUtils;
+import org.w3c.dom.Document;
+
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.CommConstants;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Client-side X.509 message-level security handler for incoming (response) messages.
@@ -437,6 +435,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			WSSecurityEngineResult actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.SIGN);
 
 			if (actionResult != null) {
+				@SuppressWarnings("deprecation")
 				X509Certificate returnCert = actionResult.getCertificate();
 
 				if (returnCert != null) {
@@ -459,6 +458,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
 
 			if (actionResult != null) {
+				@SuppressWarnings("deprecation")
 				Timestamp timestamp = actionResult.getTimestamp();
 
 				if (timestamp != null) {

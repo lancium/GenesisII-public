@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.client;
 import java.io.File;
 import java.io.Reader;
 import java.io.Writer;
-import java.security.GeneralSecurityException;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
@@ -11,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
+import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.ConnectTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -21,6 +21,7 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
@@ -81,7 +82,7 @@ public class ApplicationBase
 	/**
 	 * Prepares the static configuration manager.
 	 */
-	static protected void prepareServerApplication() throws GeneralSecurityException
+	static protected void prepareServerApplication() throws AuthZSecurityException
 	{
 		LoggingContext.assumeNewLoggingContext();
 
@@ -180,13 +181,15 @@ public class ApplicationBase
 		try {
 			for (int i = 0; i < parameters.length; i++)
 				ct.addArgument(parameters[i]);
-			ct.run(output, error, input);
+			int retVal = ct.run(output, error, input);
+			if (retVal != 0)
+				_logger.error("grid connection failed with return value=" + retVal);
 		} catch (ReloadShellException e) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("got newly connected; reloading grid shell");
 			return GridStates.CONNECTION_GOOD_NOW;
 		} catch (Throwable e) {
-			_logger.error("failure during grid connection: " + e.getMessage(), e);
+			// issue already printed by BaseGridTool.
 		}
 		return GridStates.CONNECTION_FAILED;
 	}

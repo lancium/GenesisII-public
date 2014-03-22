@@ -1,12 +1,16 @@
 package edu.virginia.vcgr.ogrsh.server;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
-import java.security.GeneralSecurityException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +21,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.KeystoreLoginTool;
 import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.ogrsh.server.comm.CommUtils;
 import edu.virginia.vcgr.ogrsh.server.comm.InvocationMatcher;
 import edu.virginia.vcgr.ogrsh.server.comm.OGRSHOperation;
@@ -225,7 +230,7 @@ public class OGRSHConnection implements Runnable
 		} catch (ClassNotFoundException cnfe) {
 			throw new OGRSHException(OGRSHException.EXCEPTION_CORRUPTED_REQUEST,
 				"The stored calling context appears to be corrupt.");
-		} catch (GeneralSecurityException gse) {
+		} catch (AuthZSecurityException gse) {
 			throw new OGRSHException(OGRSHException.PERMISSION_DENIED, "Unable to initialize key and cert material.");
 		} catch (MalformedURLException mue) {
 			throw new OGRSHException(OGRSHException.MALFORMED_URL, "The URL \"" + storedContextURL + "\" is malformed.");
@@ -248,7 +253,7 @@ public class OGRSHConnection implements Runnable
 			_mySession.setCallingContext(ctxt);
 			ctxt.getActiveKeyAndCertMaterial();
 			return 0;
-		} catch (GeneralSecurityException gse) {
+		} catch (AuthZSecurityException gse) {
 			throw new OGRSHException(OGRSHException.PERMISSION_DENIED, "Unable to initialize key and cert material.");
 		} catch (MalformedURLException mue) {
 			throw new OGRSHException(OGRSHException.MALFORMED_URL, "The URL \"" + rootRNSUrl + "\" is malformed.");
@@ -278,12 +283,13 @@ public class OGRSHConnection implements Runnable
 			return tool.run(new PrintWriter(System.out), new PrintWriter(System.err), new BufferedReader(new InputStreamReader(
 				System.in)));
 		} catch (ToolException te) {
-			// This shouldn't happen
-			_logger.error("Unexpected login exception.", te);
-			throw new OGRSHException("Unexpected login exception.", te);
+			String msg = "Unexpected login exception: " + te.getLocalizedMessage();
+			_logger.error(msg, te);
+			throw new OGRSHException(msg, te);
 		} catch (Throwable t) {
-			_logger.warn("Unable to log in to grid from OGRSH.", t);
-			throw new OGRSHException("Unable to log in to grid.", t);
+			String msg = "Unabled to log into grid from OGRSH: " + t.getLocalizedMessage();
+			_logger.error(msg, t);
+			throw new OGRSHException(msg, t);
 		}
 	}
 }

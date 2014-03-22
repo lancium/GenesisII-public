@@ -253,7 +253,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 							null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String
 								.format("Entry" + " %s does not exist!", dName)) }, null, dName)), dName);
 
-					return (MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp));
+					return MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp);
 				}
 			}
 
@@ -290,7 +290,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 			new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
 				Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey, service)), null, ie.getName());
 
-		return (MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp));
+		return MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp);
 
 	}
 

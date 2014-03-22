@@ -103,14 +103,14 @@ public class ObjectDeserializer
 			try {
 				return (Type) elem.getValueAsType(elem.getType(), javaClass);
 			} catch (Exception e) {
-				throw new ResourceException("Generic Deserialization Error.", e);
+				throw new ResourceException("Generic Deserialization Error from getValueAsType", e);
 			}
 		} else {
 			ObjectDeserializationContext deserializer = new ObjectDeserializationContext(elem, javaClass);
 			try {
 				deserializer.parse();
 			} catch (Exception e) {
-				throw new ResourceException("Generic Deserialization Error.", e);
+				throw new ResourceException("Generic Deserialization Error from deserializer parse", e);
 			}
 
 			return (Type) deserializer.getValue();

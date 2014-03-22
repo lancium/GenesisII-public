@@ -1,11 +1,12 @@
 package edu.virginia.vcgr.genii.container.invoker;
 
-import java.security.GeneralSecurityException;
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.stats.MethodDataPoint;
 import edu.virginia.vcgr.genii.client.stats.MethodHistogramStatistics;
@@ -15,7 +16,8 @@ public class DatabaseHandler implements IAroundInvoker
 {
 	static private Log _logger = LogFactory.getLog(DatabaseHandler.class);
 
-	public Object invoke(InvocationContext invocationContext) throws Exception
+	public Object invoke(InvocationContext invocationContext) throws AuthZSecurityException, SubscriptionFailedFaultType,
+		IOException
 	{
 		Object result;
 		boolean succeeded = false;
@@ -23,15 +25,15 @@ public class DatabaseHandler implements IAroundInvoker
 		if (invocationContext == null) {
 			String msg = "failure: got a null invocation context!";
 			_logger.error(msg);
-			throw new GeneralSecurityException(msg);
+			throw new AuthZSecurityException(msg);
 		} else if (invocationContext.getTarget() == null) {
 			String msg = "failure: got a null target in the invocation context!";
 			_logger.error(msg);
-			throw new GeneralSecurityException(msg);
+			throw new AuthZSecurityException(msg);
 		} else if (invocationContext.getMethod() == null) {
 			String msg = "failure: got a null method in the invocation context!";
 			_logger.error(msg);
-			throw new GeneralSecurityException(msg);
+			throw new AuthZSecurityException(msg);
 		}
 
 		MethodDataPoint mdp =
@@ -51,7 +53,7 @@ public class DatabaseHandler implements IAroundInvoker
 			} else {
 				_logger.error("exception occurred in dbhandler invoke: " + e.getMessage(), e);
 			}
-			throw e;
+			throw new IOException(e.getLocalizedMessage(), e);
 		} finally {
 			mhs.removeActiveMethod();
 

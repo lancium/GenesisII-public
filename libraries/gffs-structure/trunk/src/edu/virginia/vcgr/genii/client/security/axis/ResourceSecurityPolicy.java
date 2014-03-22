@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.client.security.axis;
 
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 
@@ -22,8 +21,7 @@ public final class ResourceSecurityPolicy
 	private Acl _acl;
 	private X509Identity _identity;
 
-	public ResourceSecurityPolicy(EndpointReferenceType epr) throws ResourcePropertyException, AuthZSecurityException,
-		GeneralSecurityException
+	public ResourceSecurityPolicy(EndpointReferenceType epr) throws ResourcePropertyException, AuthZSecurityException
 	{
 		_propertyManager = (GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(epr, GenesisIIBaseRP.class);
 		AuthZConfig config = _propertyManager.getAuthZConfig();

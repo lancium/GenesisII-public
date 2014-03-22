@@ -7,7 +7,7 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd $WORKDIR
 
-if [ -z "$XSEDE_TEST_ROOT" ]; then
+if [ -z "$XSEDE_TEST_SENTINEL" ]; then
   source ../../prepare_tests.sh ../../prepare_tests.sh 
 fi
 source $XSEDE_TEST_ROOT/library/establish_environment.sh

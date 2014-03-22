@@ -15,7 +15,7 @@
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import java.security.GeneralSecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 /**
  * Interface for GII message send-handlers
@@ -34,6 +34,6 @@ public interface ISecuritySendHandler extends org.apache.axis.Handler
 	/**
 	 * Configures the Send handler. Returns whether or not this handler is to perform any actions
 	 */
-	public boolean configure(ICallingContext callContext, MessageSecurity msgSecData) throws GeneralSecurityException;
+	public boolean configure(ICallingContext callContext, MessageSecurity msgSecData) throws AuthZSecurityException;
 
 }

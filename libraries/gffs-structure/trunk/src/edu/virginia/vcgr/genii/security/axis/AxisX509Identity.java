@@ -5,6 +5,7 @@ import java.security.GeneralSecurityException;
 import org.apache.axis.message.MessageElement;
 import org.w3c.dom.Element;
 
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.security.XMLCompatible;
 import edu.virginia.vcgr.genii.security.credentials.X509Identity;
 
@@ -23,7 +24,7 @@ public class AxisX509Identity implements XMLCompatible
 		_realId = toOutput;
 	}
 
-	public AxisX509Identity(MessageElement secRef) throws GeneralSecurityException
+	public AxisX509Identity(MessageElement secRef) throws AuthZSecurityException
 	{
 		_realId.setIdentity(WSSecurityUtils.getChainFromPkiPathSecTokenRef(secRef));
 	}
@@ -37,6 +38,10 @@ public class AxisX509Identity implements XMLCompatible
 	@Override
 	public Element convertToMessageElement() throws GeneralSecurityException
 	{
-		return (Element) WSSecurityUtils.makePkiPathSecTokenRef(_realId.getOriginalAsserter());
+		try {
+			return (Element) WSSecurityUtils.makePkiPathSecTokenRef(_realId.getOriginalAsserter());
+		} catch (AuthZSecurityException e) {
+			throw new GeneralSecurityException(e.getLocalizedMessage(), e);
+		}
 	}
 }

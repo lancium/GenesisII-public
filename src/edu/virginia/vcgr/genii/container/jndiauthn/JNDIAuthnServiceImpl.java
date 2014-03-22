@@ -77,6 +77,7 @@ import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
@@ -269,7 +270,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 	}
 
 	protected RequestSecurityTokenResponseType formatResponse(X509Certificate[] delegateToChain, Date created, Date expiry)
-		throws GeneralSecurityException, SOAPException, ConfigurationException, RemoteException
+		throws AuthZSecurityException, SOAPException, ConfigurationException, RemoteException
 	{
 
 		if (delegateToChain != null) {
@@ -279,7 +280,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		return formatIdentity();
 	}
 
-	protected RequestSecurityTokenResponseType formatIdentity() throws GeneralSecurityException, SOAPException,
+	protected RequestSecurityTokenResponseType formatIdentity() throws AuthZSecurityException, SOAPException,
 		ConfigurationException, RemoteException
 	{
 
@@ -312,7 +313,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 	}
 
 	protected RequestSecurityTokenResponseType
-		formatDelegateToken(X509Certificate[] delegateToChain, Date created, Date expiry) throws GeneralSecurityException,
+		formatDelegateToken(X509Certificate[] delegateToChain, Date created, Date expiry) throws AuthZSecurityException,
 			SOAPException, ConfigurationException, RemoteException
 	{
 		if (_logger.isDebugEnabled())
@@ -332,7 +333,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 			callingContext = ContextManager.getExistingContext();
 			resourceKeyMaterial = callingContext.getActiveKeyAndCertMaterial();
 		} catch (IOException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		}
 
 		AxisCredentialWallet creds = new AxisCredentialWallet();
@@ -356,7 +357,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		if (xup == null) {
 			String msg = "unknown type of credential; cannot upscale to XMLCompatible: " + tc.toString();
 			_logger.error(msg);
-			throw new GeneralSecurityException(msg);
+			throw new AuthZSecurityException(msg);
 		}
 
 		// Add TokenType element
@@ -478,7 +479,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		try {
 			// add the local token
 			responseArray.add(formatResponse(delegateToChain, created, expiry));
-		} catch (GeneralSecurityException e) {
+		} catch (AuthZSecurityException e) {
 			throw new WSSecurityException(e.getMessage(), e);
 		} catch (SOAPException se) {
 			throw new AxisFault(se.getLocalizedMessage(), se);
@@ -555,11 +556,11 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 			}
 
 		} catch (ResourceException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		} catch (NamingException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		} catch (ConfigurationException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		}
 	}
 

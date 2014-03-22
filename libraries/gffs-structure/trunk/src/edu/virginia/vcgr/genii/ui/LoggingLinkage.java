@@ -55,6 +55,8 @@ public class LoggingLinkage implements ILoggingRecipient
 		@SuppressWarnings("unchecked")
 		public void addWithCause(int index, Object element, Throwable cause)
 		{
+			if (cause == null)
+				cause = new Exception("");
 			causes.add(cause);
 			super.add(index, element);
 		}

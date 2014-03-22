@@ -2273,7 +2273,7 @@ public class JobManager implements Closeable
 					hWriter.close();
 
 					isPermanent = true;
-					throw new GeneralSecurityException("A job's credentials expired so we can't make "
+					throw new AuthZSecurityException("A job's credentials expired so we can't make "
 						+ "any further progress on it.  Failing it.");
 				}
 

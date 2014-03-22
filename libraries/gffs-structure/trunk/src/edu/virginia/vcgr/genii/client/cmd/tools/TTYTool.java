@@ -5,16 +5,20 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.tty.TTYConstants;
-import edu.virginia.vcgr.genii.client.tty.TTYException;
 import edu.virginia.vcgr.genii.client.tty.TTYWatcher;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
@@ -62,8 +66,7 @@ public class TTYTool extends BaseGridTool
 		throw new InvalidToolUsageException();
 	}
 
-	public void watch(String path) throws RNSException, ToolException, TTYException, FileNotFoundException, RemoteException,
-		IOException
+	public void watch(String path) throws RNSException, ToolException, FileNotFoundException, RemoteException, IOException
 	{
 		RNSPath rPath = lookup(new GeniiPath(path), RNSPathQueryFlags.MUST_EXIST);
 		TypeInformation tInfo = new TypeInformation(rPath.getEndpoint());
@@ -75,7 +78,7 @@ public class TTYTool extends BaseGridTool
 			EPRUtils.toBytes(rPath.getEndpoint()));
 	}
 
-	public void unwatch() throws TTYException, IOException
+	public void unwatch() throws ToolException, IOException
 	{
 		TTYWatcher.unwatch();
 		ContextManager.getExistingContext().removeProperty(TTYConstants.TTY_CALLING_CONTEXT_PROPERTY);

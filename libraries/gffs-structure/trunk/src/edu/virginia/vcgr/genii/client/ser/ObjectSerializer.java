@@ -61,8 +61,6 @@ public class ObjectSerializer
 	public static SOAPElement toSOAPElement(Object obj, QName name, boolean nillable) throws ResourceException
 	{
 		if (obj instanceof org.apache.axis.message.MessageElement) {
-			_logger.debug("seeing axis message element for soap.");
-
 			org.apache.axis.message.MessageElement element = (org.apache.axis.message.MessageElement) obj;
 			if (name == null || name.equals(element.getQName())) {
 				return element;
@@ -70,8 +68,6 @@ public class ObjectSerializer
 				throw new ResourceException("Not Implemented.");
 			}
 		} else if (obj instanceof Element) {
-			_logger.debug("seeing basic element for soap.");
-
 			Element element = (Element) obj;
 			if (name == null
 				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(
@@ -95,8 +91,6 @@ public class ObjectSerializer
 		}
 		if (obj == null && nillable) {
 			try {
-				_logger.debug("seeing null object for soap!");
-
 				messageElement.addAttribute(Constants.NS_PREFIX_SCHEMA_XSI, Constants.URI_DEFAULT_SCHEMA_XSI, "nil", "true");
 			} catch (Exception e) {
 				throw new ResourceException("Generic Serialization Error.", e);
@@ -123,9 +117,6 @@ public class ObjectSerializer
 				Element element = null;
 				try {
 					element = AnyHelper.toElement(messageElement);
-
-					_logger.debug("created from axis msg element for toElem.");
-
 				} catch (Exception e) {
 					throw new ResourceException("Generic Serialization Error.", e);
 				}
@@ -138,9 +129,6 @@ public class ObjectSerializer
 			if (name == null
 				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(
 					element.getNamespaceURI()))) {
-
-				_logger.debug("created from basic element for toElem.");
-
 				return element;
 			} else {
 				throw new ResourceException("Not Implemented.");
@@ -185,9 +173,9 @@ public class ObjectSerializer
 	public static void serialize(Writer writer, Object obj, QName name, boolean nillable) throws ResourceException
 	{
 		SOAPElement soapElement = ObjectSerializer.toSOAPElement(obj, name, nillable);
-
 		if (soapElement == null) {
-			_logger.error("caught a null soap element trying to serialize!");
+			_logger.error("caught failure in object serializer which created a null soap element!");
+			return;
 		}
 		try {
 			AnyHelper.write(writer, (org.apache.axis.message.MessageElement) soapElement);

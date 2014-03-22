@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -120,6 +119,7 @@ import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
@@ -695,7 +695,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 					context.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) constructionParameters
 						.get(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM), Container.getContainerPrivateKey()));
 					rKey.dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, context);
-				} catch (GeneralSecurityException gse) {
+				} catch (AuthZSecurityException gse) {
 					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
 						new BaseFaultTypeDescription[] {
 							new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
@@ -790,7 +790,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				context.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) constructionParameters
 					.get(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM), Container.getContainerPrivateKey()));
 				rKey.dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, context);
-			} catch (GeneralSecurityException gse) {
+			} catch (AuthZSecurityException gse) {
 				throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
 					new BaseFaultTypeDescription[] {
 						new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),

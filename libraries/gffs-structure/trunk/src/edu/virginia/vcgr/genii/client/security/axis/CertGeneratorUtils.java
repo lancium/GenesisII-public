@@ -1,10 +1,8 @@
 package edu.virginia.vcgr.genii.client.security.axis;
 
 import java.io.IOException;
-
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;

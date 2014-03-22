@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.security.axis;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 
 import javax.xml.namespace.QName;
@@ -19,6 +18,7 @@ import org.apache.ws.security.message.token.X509Security;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 /**
  * Operations for converting popular token types to/from MessageElements
@@ -41,27 +41,27 @@ public class WSSecurityUtils
 	public static final String USERNAME_TOKEN_URI =
 		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#UsernameToken";
 
-	static public String getNameTokenFromUTSecTokenRef(MessageElement wseTokenRef) throws GeneralSecurityException
+	static public String getNameTokenFromUTSecTokenRef(MessageElement wseTokenRef) throws AuthZSecurityException
 	{
 		try {
 			UsernameToken bstToken = new UsernameToken(wseTokenRef);
 			return bstToken.getName();
 		} catch (WSSecurityException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		}
 	}
 
-	static public String getPasswordTokenFromUTSecTokenRef(MessageElement wseTokenRef) throws GeneralSecurityException
+	static public String getPasswordTokenFromUTSecTokenRef(MessageElement wseTokenRef) throws AuthZSecurityException
 	{
 		try {
 			UsernameToken bstToken = new UsernameToken(wseTokenRef);
 			return bstToken.getPassword();
 		} catch (WSSecurityException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		}
 	}
 
-	static public MessageElement makeUTSecTokenRef(String username, String password) throws GeneralSecurityException
+	static public MessageElement makeUTSecTokenRef(String username, String password) throws AuthZSecurityException
 	{
 		try {
 			MessageElement userElem = new MessageElement(WSConstants.WSSE_NS, "Username");
@@ -73,7 +73,7 @@ public class WSSecurityUtils
 			token.addChild(passElem);
 			return token;
 		} catch (Exception e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class WSSecurityUtils
 		return elem;
 	}
 
-	static public X509Certificate[] getChainFromPkiPathSecTokenRef(MessageElement wseTokenRef) throws GeneralSecurityException
+	static public X509Certificate[] getChainFromPkiPathSecTokenRef(MessageElement wseTokenRef) throws AuthZSecurityException
 	{
 		MessageElement element = acquireChildSecurityElement(wseTokenRef, "Embedded");
 		if (element != null) {
@@ -103,27 +103,27 @@ public class WSSecurityUtils
 					PKIPathSecurity bstToken = new PKIPathSecurity(element);
 					return bstToken.getX509Certificates(false, new GIIBouncyCrypto());
 				} catch (GenesisIISecurityException e) {
-					throw new GeneralSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException(e.getMessage(), e);
 				} catch (WSSecurityException e) {
-					throw new GeneralSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException(e.getMessage(), e);
 				} catch (IOException e) {
-					throw new GeneralSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException(e.getMessage(), e);
 				} catch (CredentialException e) {
-					throw new GeneralSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException(e.getMessage(), e);
 				}
 			}
 		}
 
-		throw new GeneralSecurityException("Message element does not contain a PKIPath certificate chain");
+		throw new AuthZSecurityException("Message element does not contain a PKIPath certificate chain");
 	}
 
-	static public MessageElement makePkiPathSecTokenRef(X509Certificate[] certChain) throws GeneralSecurityException
+	static public MessageElement makePkiPathSecTokenRef(X509Certificate[] certChain) throws AuthZSecurityException
 	{
 		return makePkiPathSecTokenRef(certChain, null);
 	}
 
 	static public MessageElement makePkiPathSecTokenRef(X509Certificate[] certChain, String wsuId)
-		throws GeneralSecurityException
+		throws AuthZSecurityException
 	{
 		try {
 			MessageElement binaryToken = new MessageElement(BinarySecurity.TOKEN_BST);
@@ -143,19 +143,19 @@ public class WSSecurityUtils
 
 			return wseTokenRef;
 		} catch (GenesisIISecurityException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		} catch (WSSecurityException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		} catch (SOAPException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		} catch (IOException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		} catch (CredentialException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		}
 	}
 
-	static public X509Certificate getX509v3FromSecTokenRef(MessageElement wseTokenRef) throws GeneralSecurityException
+	static public X509Certificate getX509v3FromSecTokenRef(MessageElement wseTokenRef) throws AuthZSecurityException
 	{
 		MessageElement element =
 			wseTokenRef.getChildElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
@@ -166,20 +166,20 @@ public class WSSecurityUtils
 					X509Security bstToken = new X509Security(element);
 					return bstToken.getX509Certificate(new GIIBouncyCrypto());
 				} catch (GenesisIISecurityException e) {
-					throw new GeneralSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException(e.getMessage(), e);
 				} catch (WSSecurityException e) {
-					throw new GeneralSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException(e.getMessage(), e);
 				} catch (IOException e) {
-					throw new GeneralSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException(e.getMessage(), e);
 				} catch (CredentialException e) {
-					throw new GeneralSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException(e.getMessage(), e);
 				}
 			}
 		}
-		throw new GeneralSecurityException("Message element does not contain a certificate");
+		throw new AuthZSecurityException("Message element does not contain a certificate");
 	}
 
-	static public MessageElement makeX509v3TokenRef(X509Certificate cert) throws GeneralSecurityException
+	static public MessageElement makeX509v3TokenRef(X509Certificate cert) throws AuthZSecurityException
 	{
 		try {
 			MessageElement binaryToken = new MessageElement(BinarySecurity.TOKEN_BST);
@@ -197,9 +197,9 @@ public class WSSecurityUtils
 			return wseTokenRef;
 
 		} catch (WSSecurityException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		} catch (SOAPException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
+			throw new AuthZSecurityException(e.getMessage(), e);
 		}
 	}
 }

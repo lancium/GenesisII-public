@@ -11,8 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.DataTransferStatistics;
 import org.morgan.util.io.StreamUtils;
 
-import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
-
 import edu.virginia.vcgr.genii.client.cmd.tools.MkdirTool;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
@@ -29,7 +27,7 @@ public class CopyMachine
 {
 	static private Log _logger = LogFactory.getLog(CopyMachine.class);
 	static private Semaphore semaphore = new Semaphore(8);
-	static private Mutex mutex = new Mutex();
+	static private Object mutex = new Object();
 
 	private String _source;
 	private String _target;

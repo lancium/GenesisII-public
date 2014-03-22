@@ -19,6 +19,7 @@ import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,10 +46,12 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
 import edu.virginia.vcgr.genii.security.faults.AttributeExpiredException;
+import edu.virginia.vcgr.genii.security.faults.AttributeInvalidException;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
@@ -93,7 +96,7 @@ public class ClientUtils
 	/**
 	 * Retrieves the client's minimum allowable level of message security
 	 */
-	static public synchronized int getClientRsaKeyLength() throws GeneralSecurityException
+	static public synchronized int getClientRsaKeyLength() throws AuthZSecurityException
 	{
 		if (__clientRsaKeyLength != null) {
 			return __clientRsaKeyLength;
@@ -115,13 +118,24 @@ public class ClientUtils
 	/**
 	 * Generates transient key and certificate material to be used for outgoing message security.
 	 */
-	private static KeyAndCertMaterial generateKeyAndCertMaterial(long timeout, TimeUnit units) throws GeneralSecurityException
+	private static KeyAndCertMaterial generateKeyAndCertMaterial(long timeout, TimeUnit units) throws AuthZSecurityException
 	{
-		KeyPair keyPair = CertTool.generateKeyPair(getClientRsaKeyLength());
-		X509Certificate[] clientCertChain =
-			{ CertTool.createMasterCert(
-				"C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=Client Cert " + (new GUID()).toString(),
-				TimeUnit.MILLISECONDS.convert(timeout, units), keyPair.getPublic(), keyPair.getPrivate()) };
+		KeyPair keyPair;
+		try {
+			keyPair = CertTool.generateKeyPair(getClientRsaKeyLength());
+		} catch (GeneralSecurityException e) {
+			throw new AuthZSecurityException("failure generating keypair: " + e.getLocalizedMessage(), e);
+		}
+		X509Certificate[] clientCertChain = null;
+		try {
+			clientCertChain =
+				new X509Certificate[] { CertTool.createMasterCert(
+					"C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=Client Cert " + (new GUID()).toString(),
+					TimeUnit.MILLISECONDS.convert(timeout, units), keyPair.getPublic(), keyPair.getPrivate()) };
+		} catch (GeneralSecurityException e) {
+			throw new AuthZSecurityException("failure generating keypair: " + e.getLocalizedMessage(), e);
+
+		}
 		return new KeyAndCertMaterial(clientCertChain, keyPair.getPrivate());
 	}
 
@@ -133,16 +147,15 @@ public class ClientUtils
 	 *            The calling context containing the
 	 * @return The client's key and cert material, re-generated if necessary. (Upon refresh, all
 	 *         previous attributes will be renewed if possible, discarded otherwise)
-	 * @throws GeneralSecurityException
 	 */
 	public static KeyAndCertMaterial checkAndRenewCredentials(ICallingContext callContext, Date validUntil,
-		SecurityUpdateResults results) throws GeneralSecurityException
+		SecurityUpdateResults results) throws AuthZSecurityException
 	{
 		if (callContext == null) {
 			// we never had any client identity.
 			String msg = "No calling-context in which to store credentials.";
 			_logger.warn(msg);
-			throw new CertificateExpiredException(msg);
+			throw new AuthZSecurityException(msg);
 		}
 
 		boolean updated = false;
@@ -161,11 +174,13 @@ public class ClientUtils
 			} else if (ConfigurationManager.getCurrentConfiguration().isClientRole()) {
 				throw new CertificateExpiredException("Client role with no certificate.");
 			}
+		} catch (CertificateNotYetValidException e) {
+			throw new AuthZSecurityException("certificate is not yet valid: " + e.getLocalizedMessage(), e);
 		} catch (CertificateExpiredException e) {
 			if (!ConfigurationManager.getCurrentConfiguration().isClientRole()) {
 				// We're a resource operating inside this container with
 				// a specific identity that has now expired.
-				throw e;
+				throw new AuthZSecurityException("certificate is no longer valid: " + e.getLocalizedMessage(), e);
 			} else {
 				// We're in the client role, meaning we can generate our own new client identity.
 
@@ -209,7 +224,12 @@ public class ClientUtils
 				cred.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
 			} catch (AttributeExpiredException e) {
 				updated = true;
-				_logger.warn("Discarding credential " + cred, e);
+				_logger.warn("Discarding expired credential " + cred, e);
+				itr.remove();
+				results.noteRemovedCredential(cred);
+			} catch (AttributeInvalidException e) {
+				updated = true;
+				_logger.warn("Discarding invalid credential " + cred, e);
 				itr.remove();
 				results.noteRemovedCredential(cred);
 			}
@@ -231,18 +251,18 @@ public class ClientUtils
 	 * Throws out any current credentials. This will ensure that the next call to
 	 * checkAndRenewCredentials() causes a new TLS certificate to be created.
 	 */
-	public static void invalidateCredentials(ICallingContext callContext) throws GeneralSecurityException
+	public static void invalidateCredentials(ICallingContext callContext) throws AuthZSecurityException
 	{
 		if (callContext == null) {
 			// we never had any client identity.
 			String msg = "No calling-context in which to store credentials.";
 			_logger.warn(msg);
-			throw new CertificateExpiredException(msg);
+			throw new AuthZSecurityException(msg);
 		}
 		if (!ConfigurationManager.getCurrentConfiguration().isClientRole()) {
 			String msg = "attempting to adjust context as non-client!";
 			_logger.warn(msg);
-			throw new GeneralSecurityException(msg);
+			throw new AuthZSecurityException(msg);
 		}
 
 		// whack any current key and certificate.

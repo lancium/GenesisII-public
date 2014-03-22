@@ -10,11 +10,11 @@ public class InvalidToolUsageException extends ToolException
 
 	public InvalidToolUsageException()
 	{
-		super(_INVALID_USAGE_MSG + "...  caller was " + ProgramTools.getStackFrame(1));
+		super(_INVALID_USAGE_MSG + "...  call chain was " + ProgramTools.showLastFewOnStack(7));
 	}
 
 	public InvalidToolUsageException(String additionalMessage)
 	{
-		super(_INVALID_USAGE_MSG + ": " + additionalMessage + "...  caller was " + ProgramTools.getStackFrame(1));
+		super(_INVALID_USAGE_MSG + ": " + additionalMessage + "...  call chain was " + ProgramTools.showLastFewOnStack(7));
 	}
 }

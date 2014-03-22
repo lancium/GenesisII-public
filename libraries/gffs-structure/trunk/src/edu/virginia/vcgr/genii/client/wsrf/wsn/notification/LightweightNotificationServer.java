@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -185,15 +186,23 @@ public class LightweightNotificationServer
 		stop();
 	}
 
-	final public void start() throws Exception
+	final public void start() throws ToolException
 	{
-		_httpServer.start();
+		try {
+			_httpServer.start();
+		} catch (Exception e) {
+			throw new ToolException("failure to start https server: " + e.getLocalizedMessage(), e);
+		}
 	}
 
-	final public void stop() throws Exception
+	final public void stop() throws ToolException
 	{
 		if (_httpServer.isStarted()) {
-			_httpServer.stop();
+			try {
+				_httpServer.stop();
+			} catch (Exception e) {
+				throw new ToolException("failure stopping https server: " + e.getLocalizedMessage(), e);
+			}
 			synchronized (_subscriptions) {
 				for (Subscription subscription : _subscriptions)
 					subscription.cancel();

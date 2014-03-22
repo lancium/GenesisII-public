@@ -69,6 +69,7 @@ import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
 import edu.virginia.vcgr.genii.client.jsdl.range.RangeFactory;
 import edu.virginia.vcgr.genii.client.jsdl.spmd.SPMDConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
@@ -800,7 +801,7 @@ public class JSDLInterpreter
 							if (childName.equals(HPCConstants.USERNAME_TOKEN_QNAME)) {
 								try {
 									facet.consumeUsernamePassword(understanding, new UsernamePasswordIdentity(elem));
-								} catch (GeneralSecurityException cause) {
+								} catch (AuthZSecurityException cause) {
 									throw new InvalidJSDLException("Unable to understand credential element.", cause);
 								}
 							} else {

@@ -175,7 +175,7 @@ public class ActivityState implements Serializable, Cloneable
 		if (_isSuspended)
 			anyC.add(new MessageElement(_SUSPEND_STATE_ELEMENT_QNAME));
 
-		return new ActivityStatusType((anyC.size() > 0) ? anyC.toArray(new MessageElement[0]) : null,
+		return new ActivityStatusType((anyC.size() == 0) ? anyC.toArray(new MessageElement[0]) : null,
 			ActivityStateEnumeration.fromValue(_besState));
 	}
 

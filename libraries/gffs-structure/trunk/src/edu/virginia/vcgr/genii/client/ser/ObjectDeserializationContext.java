@@ -18,7 +18,8 @@ import org.apache.axis.encoding.Deserializer;
 import org.apache.axis.message.EnvelopeHandler;
 import org.apache.axis.message.SOAPHandler;
 import org.apache.axis.utils.XMLUtils;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -27,6 +28,8 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public class ObjectDeserializationContext extends DeserializationContext
 {
+	static private Log _logger = LogFactory.getLog(ObjectDeserializationContext.class);
+
 	private Deserializer topDeserializer = null;
 
 	public ObjectDeserializationContext(org.apache.axis.message.MessageElement element) throws ResourceException

@@ -578,7 +578,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			}
 		}
 
-		return (MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp));
+		return MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp);
 	}
 
 	@Override

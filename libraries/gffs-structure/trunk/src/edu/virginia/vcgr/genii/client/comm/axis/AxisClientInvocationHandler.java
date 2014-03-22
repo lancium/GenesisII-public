@@ -83,6 +83,8 @@ import edu.virginia.vcgr.genii.client.notification.NotificationBrokerConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.DetailedLogger;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
@@ -179,7 +181,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	/**
 	 * Retrieves the client's minimum allowable level of message security
 	 */
-	static private synchronized MessageLevelSecurityRequirements getMinClientMessageSec() throws GeneralSecurityException
+	static private synchronized MessageLevelSecurityRequirements getMinClientMessageSec() throws AuthZSecurityException
 	{
 		if (__minClientMessageSec != null) {
 			return __minClientMessageSec;
@@ -243,7 +245,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					// run it through the trust manager
 					boolean okay = CertificateValidatorFactory.getValidator().validateIsTrustedResource(chain);
 					if (!okay)
-						throw new GeneralSecurityException("failed to validate cert chain: " + chain[0].getSubjectDN());
+						throw new AuthZSecurityException("failed to validate cert chain: " + chain[0].getSubjectDN());
 
 					// insert into valid certs cache
 					validatedCerts.put(_resourceCert, Boolean.TRUE);

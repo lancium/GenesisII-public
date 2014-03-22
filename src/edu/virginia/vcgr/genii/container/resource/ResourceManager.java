@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.container.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -223,7 +222,7 @@ public class ResourceManager
 					MessageElement wseTokenRef = WSSecurityUtils.makePkiPathSecTokenRef(certChain, "RecipientMessageIdentity");
 					metaDataAny.add(wseTokenRef);
 				}
-			} catch (GeneralSecurityException e) {
+			} catch (AuthZSecurityException e) {
 				throw new ResourceException(e.getMessage(), e);
 			} catch (IOException e) {
 				throw new ResourceException(e.getMessage(), e);

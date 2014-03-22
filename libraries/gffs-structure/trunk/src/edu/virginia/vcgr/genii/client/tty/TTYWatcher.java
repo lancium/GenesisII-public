@@ -11,6 +11,7 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
+import edu.virginia.vcgr.genii.client.cmd.ToolException;
 
 public class TTYWatcher
 {
@@ -19,19 +20,19 @@ public class TTYWatcher
 	static private WatcherThread _watcherThread = null;
 
 	synchronized static public void watch(PrintWriter stdout, PrintWriter stderr, EndpointReferenceType tty)
-		throws TTYException, RemoteException, FileNotFoundException, IOException
+		throws ToolException, RemoteException, FileNotFoundException, IOException
 	{
 		if (_watcherThread != null)
-			throw new TTYException("Already watching a tty object.");
+			throw new ToolException("Already watching a tty object.");
 
 		_watcherThread = new WatcherThread(stdout, stderr, tty);
 		_watcherThread.start();
 	}
 
-	synchronized static public void unwatch() throws TTYException
+	synchronized static public void unwatch() throws ToolException
 	{
 		if (_watcherThread == null)
-			throw new TTYException("Not currently watching a tty object.");
+			throw new ToolException("Not currently watching a tty object.");
 
 		_watcherThread.close();
 		_watcherThread = null;

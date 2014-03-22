@@ -3,32 +3,33 @@ package edu.virginia.vcgr.genii.client.naming;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
-import org.apache.axis.types.URI;
-import org.apache.axis.types.URI.MalformedURIException;
-
 import java.net.URL;
+import java.security.cert.X509Certificate;
 import java.sql.Blob;
-import javax.sql.rowset.serial.SerialBlob;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.security.cert.X509Certificate;
-import java.security.GeneralSecurityException;
-
+import javax.sql.rowset.serial.SerialBlob;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI;
+import org.apache.axis.types.URI.MalformedURIException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.SePartsType;
+import org.w3.www.ns.ws_policy.Policy;
+import org.w3.www.ns.ws_policy.PolicyAttachment;
+import org.w3.www.ns.ws_policy.PolicyReference;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
@@ -42,15 +43,13 @@ import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.BlobLimits;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.axis.WSSecurityUtils;
-
-import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.*;
-import org.w3.www.ns.ws_policy.*;
 
 public class EPRUtils
 {
@@ -140,7 +139,7 @@ public class EPRUtils
 		return null;
 	}
 
-	static public X509Certificate[] extractCertChain(EndpointReferenceType epr) throws GeneralSecurityException
+	static public X509Certificate[] extractCertChain(EndpointReferenceType epr) throws AuthZSecurityException
 	{
 
 		MetadataType mdt = epr.getMetadata();
@@ -170,7 +169,7 @@ public class EPRUtils
 	}
 
 	static public MessageLevelSecurityRequirements extractMinMessageSecurity(EndpointReferenceType epr)
-		throws GeneralSecurityException
+		throws AuthZSecurityException
 	{
 
 		MetadataType mdt = epr.getMetadata();

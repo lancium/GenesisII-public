@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class KeystoreManager
 	/**
 	 * Creates a KeyStore for use in verifying resource identities.
 	 */
-	static public KeyStore getResourceTrustStore() throws GeneralSecurityException
+	static public KeyStore getResourceTrustStore() throws AuthZSecurityException
 	{
 		synchronized (_trustLock) {
 			if (_resourceTrustStore != null) {
@@ -104,11 +105,12 @@ public class KeystoreManager
 			synchronized (_trustLock) {
 				_resourceTrustStore = trustStore;
 			}
-
+		} catch (GeneralSecurityException e) {
+			throw new AuthZSecurityException("Could not load TrustManager: " + e.getLocalizedMessage(), e);
 		} catch (ConfigurationException e) {
-			throw new GeneralSecurityException("Could not load TrustManager: " + e.getMessage(), e);
+			throw new AuthZSecurityException("Could not load TrustManager: " + e.getMessage(), e);
 		} catch (IOException e) {
-			throw new GeneralSecurityException("Could not load TrustManager: " + e.getMessage(), e);
+			throw new AuthZSecurityException("Could not load TrustManager: " + e.getMessage(), e);
 		}
 		if (_logger.isTraceEnabled()) {
 			_logger.trace("trust store for resources:\n" + SecurityUtilities.showTrustStore(trustStore));
@@ -197,22 +199,24 @@ public class KeystoreManager
 		return trustStore;
 	}
 
-	static public final X509Certificate[] decodeCertificateChain(CertificateChainType certChain)
-		throws GeneralSecurityException
+	static public final X509Certificate[] decodeCertificateChain(CertificateChainType certChain) throws AuthZSecurityException
 	{
 		int numCerts = certChain.getCount();
 		X509Certificate[] certs = new X509Certificate[numCerts];
 
-		CertificateFactory cf = CertificateFactory.getInstance("X.509");
-		for (int i = 0; i < numCerts; i++) {
-			byte[] encoded = certChain.getCertificate(i);
-			certs[i] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encoded));
+		try {
+			CertificateFactory cf = CertificateFactory.getInstance("X.509");
+			for (int i = 0; i < numCerts; i++) {
+				byte[] encoded = certChain.getCertificate(i);
+				certs[i] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encoded));
+			}
+		} catch (CertificateException e) {
+			throw new AuthZSecurityException(e.getLocalizedMessage(), e);
 		}
 		return certs;
 	}
 
-	static public Collection<Identity> getCallerIdentities(ICallingContext callingContext) throws AuthZSecurityException,
-		GeneralSecurityException
+	static public Collection<Identity> getCallerIdentities(ICallingContext callingContext) throws AuthZSecurityException
 	{
 		try {
 			Collection<Identity> ret = new ArrayList<Identity>();

@@ -51,6 +51,7 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSOperations;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.sync.SyncProperty;
 import edu.virginia.vcgr.genii.client.sync.VersionVector;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
@@ -460,7 +461,7 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		 * stored-calling-context does not have all the necessary authentication information those
 		 * calls may fail.
 		 */
-		private void postProcessStoredCallingContext(IRNSResource resource) throws ResourceException, GeneralSecurityException
+		private void postProcessStoredCallingContext(IRNSResource resource) throws ResourceException, AuthZSecurityException
 		{
 
 			// update key and certificate materials
