@@ -5,25 +5,35 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 public class DownloadCertificateTool extends BaseGridTool
 {
+	static private Log _logger = LogFactory.getLog(DownloadCertificateTool.class);
+
 	static private final String USAGE = "config/tooldocs/usage/udownload-certificate";
 	static private final String DESCRIPTION = "config/tooldocs/description/ddownload-certificate";
 
@@ -45,7 +55,8 @@ public class DownloadCertificateTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)
@@ -74,6 +85,14 @@ public class DownloadCertificateTool extends BaseGridTool
 			}
 			if (in != null)
 				writeFile(in, new File(localPath.path()));
+		} catch (CertificateEncodingException e) {
+			String msg = "a creation exception occurred during the operation: " + e.getLocalizedMessage();
+			_logger.error(msg, e);
+			throw new AuthZSecurityException(msg, e);
+		} catch (AuthZSecurityException e) {
+			String msg = "a security exception occurred during the operation: " + e.getLocalizedMessage();
+			_logger.error(msg, e);
+			throw new AuthZSecurityException(msg, e);
 		} finally {
 			StreamUtils.close(in);
 		}

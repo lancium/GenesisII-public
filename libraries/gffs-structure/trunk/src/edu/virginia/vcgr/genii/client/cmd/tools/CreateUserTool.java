@@ -2,9 +2,13 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.algorithm.time.TimeHelpers;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -19,10 +23,14 @@ import edu.virginia.vcgr.genii.client.dialog.validators.ChainedInputValidator;
 import edu.virginia.vcgr.genii.client.dialog.validators.ContainsTextValidator;
 import edu.virginia.vcgr.genii.client.dialog.validators.NonEmptyValidator;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.resource.PortType;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
 
@@ -35,6 +43,8 @@ import edu.virginia.vcgr.genii.security.identity.IdentityType;
  */
 public class CreateUserTool extends BaseGridTool
 {
+	static private Log _logger = LogFactory.getLog(CreateUserTool.class);
+
 	protected String _loginName = null;
 	protected String _password = null;
 	protected String _durationString = null;
@@ -104,7 +114,9 @@ public class CreateUserTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException, DialogException
 	{
 		DialogProvider twp = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 
@@ -175,10 +187,14 @@ public class CreateUserTool extends BaseGridTool
 	 *            The path to the IDP service to use.
 	 * @param idpName
 	 *            The new name to give the IDP instance inside the IDP service.
+	 * @throws ToolException
+	 * @throws ReloadShellException
+	 * @throws AuthZSecurityException
 	 * 
 	 * @throws Throwable
 	 */
-	protected void enactCreation(String storeType, String sourcePath, String idpServicePath, String idpName) throws Throwable
+	protected void enactCreation(String storeType, String sourcePath, String idpServicePath, String idpName)
+		throws RNSException, ToolException, ReloadShellException, AuthZSecurityException
 	{
 		IdpTool idpTool = new IdpTool();
 		if (storeType != null)
@@ -193,7 +209,12 @@ public class CreateUserTool extends BaseGridTool
 		idpTool.addArgument(idpName);
 		if (_duration != null)
 			idpTool.setValidDuration(_durationString);
-		idpTool.run(stdout, stderr, stdin);
+		int retVal = idpTool.run(stdout, stderr, stdin);
+		if (retVal != 0) {
+			String msg = "failure during IDP creation: return value=" + retVal;
+			_logger.error(msg);
+			throw new AuthZSecurityException(msg);
+		}
 
 		stdout.println(String.format("\tLifetime:     %.2f days / %.2f years.",
 			TimeHelpers.millisToDays(BaseGridTool.getValidMillis()), TimeHelpers.millisToYears(BaseGridTool.getValidMillis())));
@@ -207,17 +228,28 @@ public class CreateUserTool extends BaseGridTool
 			chmodTool.addArgument("--username=" + _loginName);
 			chmodTool.addArgument("--password=" + _password);
 
-			chmodTool.run(stdout, stderr, stdin);
+			retVal = chmodTool.run(stdout, stderr, stdin);
+			if (retVal != 0) {
+				String msg = "failure during chmod: return value=" + retVal;
+				// no logging here, since exc. handler will print the error.
+				throw new AuthZSecurityException(msg);
+			}
+
 		} catch (Throwable cause) {
 			// Couldn't chmod the object, try to clean up
-			stderr.println("Unable to set permissions on newly created idp " + "instance.  Attempting to clean up.");
+			String msg = "Unable to set permissions on newly created idp instance.  Attempting to clean up.";
+			stderr.println(msg);
 
 			RmTool rm = new RmTool();
 			rm.setForce();
 			rm.addArgument(fullPath);
-			rm.run(stdout, stderr, stdin);
+			retVal = rm.run(stdout, stderr, stdin);
+			if (retVal != 0) {
+				String msg2 = "failure during cleanup rm: return value=" + retVal;
+				_logger.error(msg2);
+			}
 
-			throw cause;
+			throw new ToolException(msg + ": " + cause.getLocalizedMessage(), cause);
 		}
 	}
 

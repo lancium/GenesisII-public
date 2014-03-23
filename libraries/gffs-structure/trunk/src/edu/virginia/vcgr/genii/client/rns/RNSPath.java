@@ -121,12 +121,12 @@ public class RNSPath implements Serializable, Cloneable
 		return epr;
 	}
 
-	//hmmm: temporary!  only needed until we make the cache based on common cache.
+	// hmmm: temporary! only needed until we make the cache based on common cache.
 	public static CriticalPathFromRootCache tempGetCPFRC()
 	{
 		return _rnsCacher;
 	}
-	
+
 	private EndpointReferenceType resolveOptional()
 	{
 		try {
@@ -188,9 +188,9 @@ public class RNSPath implements Serializable, Cloneable
 			storeResourceConfigInCache();
 		}
 
-		// hmmm: super noisy object creation tracing.
-		if (_logger.isTraceEnabled())
-			_logger.trace("++ creating RNSPath for path: " + pwd());
+		// hmmm: fix super noisy object creation tracing.
+		if (_logger.isDebugEnabled())
+			_logger.debug("++ creating RNSPath for path: " + pwd());
 	}
 
 	/**
@@ -207,8 +207,8 @@ public class RNSPath implements Serializable, Cloneable
 	public void finalize()
 	{
 		// hmmm: super noisy object creation tracing.
-		if (_logger.isTraceEnabled())
-			_logger.trace("-- cleaning RNSPath at path: " + pwd());
+		if (_logger.isDebugEnabled())
+			_logger.debug("-- cleaning RNSPath at path: " + pwd());
 	}
 
 	/**
@@ -271,16 +271,29 @@ public class RNSPath implements Serializable, Cloneable
 	 * 
 	 * @return A slash separated string representing the full grid path to this entry.
 	 */
+	private String _lastPwd = null;
+
 	public String pwd()
 	{
-		if (_parent == null)
-			return "/";
+		if (_lastPwd != null)
+			return _lastPwd;
+		String tempCompare = _lastPwd;
 
-		String parent = _parent.pwd();
-		if (parent == "/")
-			return parent + _nameFromParent;
+		if (_parent == null) {
+			_lastPwd = "/";
+		} else {
+			String parent = _parent.pwd();
+			if (parent.equals("/"))
+				_lastPwd = parent + getName();
+			else
+				_lastPwd = parent + "/" + getName();
+		}
 
-		return parent + "/" + _nameFromParent;
+		if ((tempCompare != null) && !tempCompare.equals(_lastPwd)) {
+			_logger.error("created a different last pwd !!!!  this approach cannot work right!!!");
+		}
+
+		return _lastPwd;
 	}
 
 	/**
@@ -471,37 +484,36 @@ public class RNSPath implements Serializable, Cloneable
 	public RNSPath lookup(String path)
 	{
 		try {
-			return lookup(path, RNSPathQueryFlags.DONT_CARE);
-		} catch (RNSPathDoesNotExistException rpdnee) {
-			_logger.error("This exception shouldn't have happened.", rpdnee);
-		} catch (RNSPathAlreadyExistsException rpdnee) {
-			_logger.error("This exception shouldn't have happened.", rpdnee);
+			return _rnsCacher.lookupPath(path, RNSPathQueryFlags.DONT_CARE);
+		} catch (RNSPathDoesNotExistException e) {
+			_logger.error("unexpected exception: " + e.getLocalizedMessage(), e);
+		} catch (RNSPathAlreadyExistsException e) {
+			_logger.error("unexpected exception: " + e.getLocalizedMessage(), e);
 		}
-
 		return null;
 	}
 
 	/**
-	 * Similar to lookup above, this operation looks up a new RNSPath entry at a given query path.
-	 * This operation however takes a flag which can specify whether or not to return directories
-	 * that don't actually exist.
-	 * 
-	 * @param path
-	 *            The RNS path to lookup.
-	 * @param queryFlag
-	 *            A flag indicating whether or not to fault if the entry exists/does not exist.
-	 * 
-	 * @return The RNSPath entry that was found/indicated.
-	 * @throws RNSPathDoesNotExistException
-	 * @throws RNSPathAlreadyExistsException
+	 * looks up the path without asking the cache about it first. this is necessary so the cache can
+	 * avoid invoking its own lookup.
 	 */
 	public RNSPath lookup(String path, RNSPathQueryFlags queryFlag) throws RNSPathDoesNotExistException,
 		RNSPathAlreadyExistsException
 	{
+		return _rnsCacher.lookupPath(path, queryFlag);
+	}
+
+	/**
+	 * this looks up a new RNSPath entry at a given query path without asking the cache about it
+	 * first. this is necessary so the cache can avoid invoking its own lookup. This operation
+	 * however takes a flag which can specify whether or not to return directories that don't
+	 * actually exist.
+	 */
+	public RNSPath lookupNoCaching(String path, RNSPathQueryFlags queryFlag) throws RNSPathDoesNotExistException,
+		RNSPathAlreadyExistsException
+	{
 		if (path == null)
 			throw new IllegalArgumentException("Cannot lookup a path which is null.");
-
-		// hmmm: this is the awesome place to just blast back an item from the CPFR cache.
 
 		String[] pathElements = PathUtils.normalizePath(pwd(), path);
 		ArrayList<RNSPath> arrayRep = new ArrayList<RNSPath>();
@@ -513,7 +525,7 @@ public class RNSPath implements Serializable, Cloneable
 				break;
 			if (lcv + 1 >= arrayRep.size())
 				break;
-			if (!pathElements[lcv].equals(arrayRep.get(lcv + 1)._nameFromParent))
+			if (!pathElements[lcv].equals(arrayRep.get(lcv + 1).getName()))
 				break;
 			lcv++;
 		}
@@ -920,6 +932,7 @@ public class RNSPath implements Serializable, Cloneable
 	private void removeEPRFromCache()
 	{
 		CacheManager.removeItemFromCache(pwd(), EndpointReferenceType.class);
+		RNSPath.tempGetCPFRC().invalidate(pwd());
 	}
 
 	/*
@@ -942,6 +955,7 @@ public class RNSPath implements Serializable, Cloneable
 			CacheManager.putItemInCache(wsName.getEndpointIdentifier(), resourceConfig);
 		}
 		CacheManager.putItemInCache(pwd(), _cachedEPR);
+		tempGetCPFRC().add(this);
 	}
 
 	/**

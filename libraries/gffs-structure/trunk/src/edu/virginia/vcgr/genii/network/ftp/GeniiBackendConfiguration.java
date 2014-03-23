@@ -72,7 +72,7 @@ public class GeniiBackendConfiguration implements Cloneable
 			_callingContext = newResolver.load();
 		} catch (FileNotFoundException e) {
 			throw new IOException(e.getLocalizedMessage(), e);
-		} catch (Throwable e) {
+		} catch (ToolException e) {
 			// print nothing since BaseGridTool already did.
 			throw new AuthZSecurityException(e.getLocalizedMessage(), e);
 		} finally {

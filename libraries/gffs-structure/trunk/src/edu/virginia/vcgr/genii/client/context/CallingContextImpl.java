@@ -234,8 +234,6 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	@Override
 	public synchronized void setCurrentPath(RNSPath newPath)
 	{
-		// hmmm: this is never EVER invoked. how does the path ever get set in the context?
-
 		_logger.debug("current path being set to: " + (newPath == null ? "null" : newPath.toString()));
 		setSingleValueProperty(CURRENT_PATH_KEY, newPath);
 	}

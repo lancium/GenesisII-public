@@ -13,8 +13,10 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -23,6 +25,8 @@ import edu.virginia.vcgr.genii.client.rcreate.ResourceCreator;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 
@@ -61,7 +65,9 @@ public class CreateResourceTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException
 	{
 		EndpointReferenceType epr;
 		String serviceLocation = getArgument(0);
@@ -89,7 +95,7 @@ public class CreateResourceTool extends BaseGridTool
 			throw new InvalidToolUsageException();
 	}
 
-	private ConstructionParameters getConstructionProperties() throws IOException, JAXBException
+	private ConstructionParameters getConstructionProperties() throws IOException
 	{
 		InputStream in = null;
 
@@ -97,6 +103,8 @@ public class CreateResourceTool extends BaseGridTool
 			try {
 				in = _constructionProperties.openInputStream();
 				return ConstructionParameters.deserializeConstructionParameters(in);
+			} catch (JAXBException e) {
+				throw new IOException("JAXB error: " + e.getLocalizedMessage(), e);
 			} finally {
 				StreamUtils.close(in);
 			}
@@ -144,9 +152,6 @@ public class CreateResourceTool extends BaseGridTool
 	{
 		if (shortDescription != null)
 			cParams.humanName(shortDescription);
-
-		MessageElement me = cParams.serializeToMessageElement();
-
-		return createInstance(service, optTargetName, new MessageElement[] { me });
+		return createInstance(service, optTargetName, new MessageElement[] { cParams.serializeToMessageElement() });
 	}
 }

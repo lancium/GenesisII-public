@@ -1,14 +1,20 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.util.Map;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.stats.DatabaseStatisticsReport;
 import edu.virginia.vcgr.genii.client.stats.MethodStatisticsReport;
@@ -32,7 +38,8 @@ public class ContainerStatsTool extends BaseGridTool
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, ClassNotFoundException
 	{
 		RNSPath container = lookup(new GeniiPath(getArgument(0)), RNSPathQueryFlags.MUST_EXIST);
 

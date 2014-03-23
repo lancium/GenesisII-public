@@ -188,7 +188,7 @@ public class ApplicationBase
 			if (_logger.isDebugEnabled())
 				_logger.debug("got newly connected; reloading grid shell");
 			return GridStates.CONNECTION_GOOD_NOW;
-		} catch (Throwable e) {
+		} catch (ToolException e) {
 			// issue already printed by BaseGridTool.
 		}
 		return GridStates.CONNECTION_FAILED;

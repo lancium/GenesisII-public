@@ -137,14 +137,13 @@ public class AxisBasedContextResolver implements IContextResolver
 			retval = resourceContext.deriveNewContext(ct);
 		}
 
-		// hmmm: remove this logging.
 		CallingContextImpl trendy = (CallingContextImpl) retval;
-		String currpath = "NULL!  it's NULL!!!!";
-		if (trendy.getCurrentPath() != null)
-			currpath = trendy.getCurrentPath().toString();
-
-		if (_logger.isTraceEnabled())
+		if (_logger.isTraceEnabled()) {
+			String currpath = "NULL!  it's NULL!!!!";
+			if (trendy.getCurrentPath() != null)
+				currpath = trendy.getCurrentPath().toString();
 			_logger.trace("thread " + Thread.currentThread().getId() + ": has current RNSPath of " + currpath);
+		}
 
 		retval = CallingContextUtilities.setupCallingContextAfterCombinedExtraction(retval);
 
@@ -161,9 +160,6 @@ public class AxisBasedContextResolver implements IContextResolver
 			retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) targetCertChain,
 				(privateKey != null) ? privateKey : Container.getContainerPrivateKey()));
 		}
-		// } catch (GeneralSecurityException e) {
-		// throw new AuthZSecurityException(e.getMessage(), e);
-		// }
 
 		workingContext.setProperty(WorkingContext.CURRENT_CONTEXT_KEY, retval);
 

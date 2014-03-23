@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -27,15 +28,20 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.client.naming.eprbuild.GenesisIIEPRBuilder;
 import edu.virginia.vcgr.genii.client.resource.PortType;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
@@ -121,17 +127,35 @@ final public class MintEprTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
-		GenesisIIEPRBuilder eprFactory = new GenesisIIEPRBuilder(new URI(getArgument(0)));
+		GenesisIIEPRBuilder eprFactory;
+		try {
+			eprFactory = new GenesisIIEPRBuilder(new URI(getArgument(0)));
+		} catch (URISyntaxException e) {
+			String msg = "failed to create URI: " + e.getLocalizedMessage();
+			throw new ToolException(msg, e);
+		}
 
-		for (Element e : getReferenceParameters())
-			eprFactory.addReferenceParameters(e);
+		try {
+			for (Element e : getReferenceParameters())
+				eprFactory.addReferenceParameters(e);
+		} catch (Throwable e) {
+			String msg = "failed to get reference parameters: " + e.getLocalizedMessage();
+			throw new ToolException(msg, e);
+		}
 
 		eprFactory.addPortTypes(_portTypes.toArray(new PortType[_portTypes.size()]));
 
-		if (_epi != null)
-			eprFactory.epi(new URI(_epi));
+		if (_epi != null) {
+			try {
+				eprFactory.epi(new URI(_epi));
+			} catch (URISyntaxException e) {
+				String msg = "failed to create URI: " + e.getLocalizedMessage();
+				throw new ToolException(msg, e);
+			}
+		}
 
 		if (!_epiResolvers.isEmpty()) {
 			for (GeniiPath path : _epiResolvers)
@@ -147,7 +171,13 @@ final public class MintEprTool extends BaseGridTool
 			eprFactory.containerID(_containerID);
 
 		if (_certificateChain != null) {
-			X509Certificate[] certChain = readCertChainFromFile(_certificateChain);
+			X509Certificate[] certChain;
+			try {
+				certChain = readCertChainFromFile(_certificateChain);
+			} catch (CertificateException e) {
+				String msg = "failed to read certificate chain from file: " + e.getLocalizedMessage();
+				throw new ToolException(msg, e);
+			}
 			eprFactory.certificateChain(certChain);
 		}
 

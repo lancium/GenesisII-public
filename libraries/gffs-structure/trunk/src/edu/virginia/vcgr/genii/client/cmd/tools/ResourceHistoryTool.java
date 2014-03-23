@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -9,14 +10,20 @@ import java.util.List;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.iterator.WSIterable;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.HistoryEventBundleType;
@@ -43,7 +50,9 @@ public class ResourceHistoryTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException
 	{
 		OutputStream out = null;
 		List<HistoryEvent> events = new LinkedList<HistoryEvent>();

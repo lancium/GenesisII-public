@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
-import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -61,6 +60,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
@@ -188,7 +188,7 @@ public class InCommonLoginTool extends BaseLoginTool
 
 			return 0;
 
-		} catch (GeneralSecurityException e) {
+		} catch (AuthZSecurityException e) {
 			_logger.error("Can't set client session cert. See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
 		} catch (RNSPathDoesNotExistException e) {

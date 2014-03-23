@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -10,15 +11,21 @@ import org.oasis_open.docs.wsrf.rp_2.SetResourceProperties;
 import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 
 import edu.virginia.vcgr.genii.client.cmd.ExceptionHandlerManager;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.container.ContainerConstants;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.container.VCGRContainerPortType;
 import edu.virginia.vcgr.genii.client.gpath.*;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 
 public class SetContainerServicePropertiesTool extends BaseGridTool
 {
@@ -65,12 +72,12 @@ public class SetContainerServicePropertiesTool extends BaseGridTool
 		SetResourceProperties ret =
 			new SetResourceProperties(null, elements.size() == 0 ? null : new UpdateType(
 				elements.toArray(new MessageElement[0])), null);
-
 		return ret;
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
 	{
 		SetResourceProperties request = generateSetRequest();
 

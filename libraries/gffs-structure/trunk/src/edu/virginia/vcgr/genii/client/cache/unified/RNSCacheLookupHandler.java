@@ -277,6 +277,7 @@ public class RNSCacheLookupHandler
 
 		for (String entryPath : matchedEntries.keySet()) {
 			CacheManager.removeItemFromCache(entryPath, EndpointReferenceType.class);
+			RNSPath.tempGetCPFRC().invalidate(entryPath);
 		}
 	}
 

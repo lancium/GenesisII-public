@@ -80,6 +80,10 @@ public class CriticalPathFromRootCache
 		{
 			synchronized (_tierEntries) {
 				RNSPath found = _tierEntries.get(path);
+				
+				//hmmm: cache is disabled!!!!
+				boolean turnedOff = true;
+		if (turnedOff) found = null; //temp
 				if (found != null) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("CPFRC hit: " + path);
@@ -87,7 +91,7 @@ public class CriticalPathFromRootCache
 				} else {
 					if (_logger.isDebugEnabled())
 						_logger.debug("CPFRC miss: " + path);
-					found = RNSPath.getCurrent().lookup(path, RNSPathQueryFlags.DONT_CARE);
+					found = RNSPath.getCurrent().lookupNoCaching(path, RNSPathQueryFlags.DONT_CARE);
 					int pathDepth = calculateTier(path);
 					if (pathDepth != getDepth()) {
 						_logger.error("ignoring erroneous attempt to cache a path at wrong depth: our depth is " + _depth
@@ -249,7 +253,7 @@ public class CriticalPathFromRootCache
 		int tier = calculateTier(path);
 		// bail if we don't even cache at this level, but still return the path object.
 		if (!appropriateDepth(tier)) {
-			return RNSPath.getCurrent().lookup(path, queryFlag);
+			return RNSPath.getCurrent().lookupNoCaching(path, queryFlag);
 		}
 		PathsOnTier tierRecord = tierRecords.get(tier);
 		return tierRecord.findPath(path);

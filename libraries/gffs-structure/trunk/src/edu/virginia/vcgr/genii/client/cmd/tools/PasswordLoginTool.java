@@ -1,6 +1,9 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
+
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.login.AbstractLoginHandler;
 import edu.virginia.vcgr.genii.client.cmd.tools.login.GuiLoginHandler;
@@ -9,8 +12,12 @@ import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
@@ -62,7 +69,8 @@ public class PasswordLoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();

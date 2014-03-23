@@ -1,8 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +15,9 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -27,6 +29,7 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPath.RNSPathApplyFunction;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
@@ -49,7 +52,7 @@ public class LsTool extends BaseGridTool
 	// hmmm: fix this as soon as leak tracking is done!
 
 	// do not enable this unless you want LsTool to accumulate memory forever.
-	static boolean enableCruftCollecting = false;
+	static boolean enableCruftCollecting = true;
 	static ArrayList<RNSPath> _crufticleCollection = new ArrayList<RNSPath>();
 
 	public LsTool()
@@ -101,7 +104,8 @@ public class LsTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		boolean isLong = _long;
 		boolean isAll = _all;
@@ -204,7 +208,7 @@ public class LsTool extends BaseGridTool
 	}
 
 	static private void printEntry(PrintWriter out, TypeInformation type, RNSPath path, boolean isLong, boolean isAll,
-		boolean isEPR, boolean isMultiline, boolean isCertChain) throws RNSException, ResourceException
+		boolean isEPR, boolean isMultiline, boolean isCertChain) throws RNSException, ResourceException, AuthZSecurityException
 	{
 		String name = path.getName();
 		if (name.startsWith(".") && !isAll)
@@ -277,7 +281,7 @@ public class LsTool extends BaseGridTool
 		}
 
 		@Override
-		public boolean applyToPath(RNSPath applyTo) throws RNSException
+		public boolean applyToPath(RNSPath applyTo) throws RNSException, AuthZSecurityException
 		{
 			TypeInformation type = new TypeInformation(applyTo.getEndpoint());
 			try {
@@ -310,7 +314,8 @@ public class LsTool extends BaseGridTool
 		out.println();
 		if (isRecursive) {
 			for (String entry : subdirs) {
-				RNSPath sub = new RNSPath(path, entry, null, false);
+				RNSPath sub = path.lookup(path.pwd() + "/" + entry);
+				// new RNSPath(path, entry, null, false);
 				listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
 			}
 		}

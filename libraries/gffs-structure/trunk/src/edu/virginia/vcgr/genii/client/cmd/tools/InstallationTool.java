@@ -1,12 +1,20 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.install.ContainerInformation;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 public class InstallationTool extends BaseGridTool
 {
@@ -21,7 +29,9 @@ public class InstallationTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException, DialogException
 	{
 		HashMap<String, ContainerInformation> runningContainers = InstallationState.getRunningContainers();
 		for (String deploymentName : runningContainers.keySet()) {

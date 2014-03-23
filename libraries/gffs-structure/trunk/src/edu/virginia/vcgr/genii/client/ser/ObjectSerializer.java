@@ -25,8 +25,6 @@ import javax.xml.soap.SOAPElement;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
-// hmmm: fix extra loggings that got added here.
-
 /**
  * Converts Java Objects to DOM Elements and SOAP Elements. The objects must be compliant with the
  * Axis Bean model, i.e. generated using the WSDL2Java tool from an XML Schema definition or must be

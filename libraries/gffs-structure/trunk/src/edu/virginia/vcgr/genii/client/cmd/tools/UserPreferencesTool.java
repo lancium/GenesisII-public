@@ -1,10 +1,12 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 
 import edu.virginia.vcgr.genii.client.cmd.DebugExceptionHandler;
 import edu.virginia.vcgr.genii.client.cmd.IExceptionHandler;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.SimpleExceptionHandler;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.ShellPrompt;
@@ -23,6 +25,10 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.dialog.YesNoDialog;
 import edu.virginia.vcgr.genii.client.dialog.YesNoSelection;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +48,9 @@ public class UserPreferencesTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException, DialogException
 	{
 		DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 

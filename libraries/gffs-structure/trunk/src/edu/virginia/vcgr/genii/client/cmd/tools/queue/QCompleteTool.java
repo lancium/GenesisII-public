@@ -1,16 +1,22 @@
 package edu.virginia.vcgr.genii.client.cmd.tools.queue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.gpath.*;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.cmd.tools.Option;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 
 public class QCompleteTool extends BaseGridTool
 {
@@ -32,7 +38,8 @@ public class QCompleteTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)

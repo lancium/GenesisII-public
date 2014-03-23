@@ -11,6 +11,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -18,6 +19,7 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamespaceDefinitions;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
@@ -34,12 +36,15 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
+import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.exportdir.ExportedRootPortType;
 import edu.virginia.vcgr.genii.exportdir.QuitExport;
 import edu.virginia.vcgr.genii.exportdir.QuitExportResponse;
 import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 
 public class ExportTool extends BaseGridTool
 {
@@ -104,7 +109,9 @@ public class ExportTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException
 	{
 		int numArgs = numArguments();
 		if (_create) {
@@ -207,7 +214,12 @@ public class ExportTool extends BaseGridTool
 		} else {
 			String ContainerPath = null;
 			String TargetPath = null;
-			ExportDirDialog dialog = new ExportDirDialog(ContainerPath, TargetPath);
+			ExportDirDialog dialog;
+			try {
+				dialog = new ExportDirDialog(ContainerPath, TargetPath);
+			} catch (FileLockException e) {
+				throw new ToolException("failure to lock files: " + e.getLocalizedMessage(), e);
+			}
 			dialog.pack();
 			GuiUtils.centerComponent(dialog);
 			dialog.setVisible(true);

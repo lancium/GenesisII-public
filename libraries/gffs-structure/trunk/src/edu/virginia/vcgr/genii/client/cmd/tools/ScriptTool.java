@@ -21,13 +21,19 @@ import javax.script.ScriptException;
 
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.xscript.jsr.Grid;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.PathVariable;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 public class ScriptTool extends BaseGridTool
 {
@@ -125,7 +131,8 @@ public class ScriptTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
 	{
 		Reader reader = null;
 		int lcv;
@@ -203,9 +210,9 @@ public class ScriptTool extends BaseGridTool
 		} catch (ScriptException se) {
 			Throwable cause = se.getCause();
 			if (cause != null)
-				throw cause;
+				throw new ToolException(cause.getLocalizedMessage(), cause);
 
-			throw se;
+			throw new ToolException(se.getLocalizedMessage(), se);
 		} finally {
 			StreamUtils.close(reader);
 		}

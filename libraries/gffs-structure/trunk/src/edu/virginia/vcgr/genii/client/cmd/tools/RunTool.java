@@ -41,12 +41,15 @@ import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESUtils;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.deployer.AppDeployerConstants;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -54,8 +57,10 @@ import edu.virginia.vcgr.genii.client.rns.RNSIterable;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.run.JSDLFormer;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
@@ -212,7 +217,9 @@ public class RunTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException
 	{
 		LightweightNotificationServer server = null;
 
@@ -236,8 +243,9 @@ public class RunTool extends BaseGridTool
 
 			ActivityState state = checkStatus(path.getEndpoint());
 			stdout.println("Status:  " + state);
-			if (state.isFailedState())
+			if (state.isFailedState()) {
 				throw getError(path.getEndpoint());
+			}
 			return 0;
 		} else {
 			SubscribeRequest subscribeRequest = null;
@@ -286,7 +294,7 @@ public class RunTool extends BaseGridTool
 						lastState = _state;
 						stdout.println("Status:  " + lastState);
 						if (lastState.isFinalState()) {
-							Throwable error = null;
+							ToolException error = null;
 							if (lastState.isFailedState())
 								error = getError(activity);
 							GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, activity);
@@ -303,7 +311,11 @@ public class RunTool extends BaseGridTool
 					long waitTime = 10000 - diffTime;
 					if (waitTime < 1)
 						waitTime = 1;
-					_stateLock.wait(waitTime);
+					try {
+						_stateLock.wait(waitTime);
+					} catch (InterruptedException e) {
+						// nothing.
+					}
 					diffTime = System.currentTimeMillis() - startTime;
 					if (diffTime >= 10000) {
 						_state = checkStatus(besContainer, activity);
@@ -382,9 +394,8 @@ public class RunTool extends BaseGridTool
 	{
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, activity);
 		GetResourcePropertyResponse resp = common.getResourceProperty(aconsts.STATUS_ATTR);
-
-		MessageElement elem = (MessageElement) (resp.get_any()[0].getChildElements().next());
-		return new ActivityState(elem);
+		return new ActivityState(new MessageElement((org.apache.axis.message.MessageElement) resp.get_any()[0]
+			.getChildElements().next()));
 	}
 
 	static public ActivityState checkStatus(EndpointReferenceType besContainer, EndpointReferenceType activity)
@@ -582,7 +593,7 @@ public class RunTool extends BaseGridTool
 		return ret;
 	}
 
-	static private Throwable getError(EndpointReferenceType activity) throws RemoteException, IOException,
+	static private ToolException getError(EndpointReferenceType activity) throws RemoteException, IOException,
 		ClassNotFoundException
 	{
 		TypeInformation typeInfo = new TypeInformation(activity);
@@ -591,9 +602,9 @@ public class RunTool extends BaseGridTool
 			byte[] serializedFault = act.getError(null).getSerializedFault();
 			if (serializedFault == null)
 				throw new IOException("BES Activity in unknown state.");
-			return (Throwable) DBSerializer.deserialize(serializedFault);
+			return new ToolException("returned fault", (Throwable) DBSerializer.deserialize(serializedFault));
 		} else {
-			return new IOException("Activity not a standard Genesis II activity -- Error information unavailable!");
+			return new ToolException("Activity not a standard Genesis II activity -- Error information unavailable!");
 		}
 	}
 }

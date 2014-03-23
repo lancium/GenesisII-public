@@ -265,9 +265,6 @@ public class Container extends ApplicationBase
 			}
 		}
 
-		// hmmm: this is way afterwards now; previously it was before the container service obj list
-		// was populated.
-		// hmmm: trying this after all are created.
 		ServiceDeployer.startServiceDeployer(_axisServer, _postStartupWorkQueue,
 			Installation.getDeployment(new DeploymentName()).getServicesDirectory());
 

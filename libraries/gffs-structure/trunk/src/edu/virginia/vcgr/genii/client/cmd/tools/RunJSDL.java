@@ -10,29 +10,40 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelative;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.context.ContextType;
 
 public class RunJSDL extends BaseGridTool
 {
+	static private Log _logger = LogFactory.getLog(RunJSDL.class);
 
 	private String _type = "jsdl";
 
@@ -53,7 +64,9 @@ public class RunJSDL extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException, DialogException
 	{
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();
@@ -79,7 +92,11 @@ public class RunJSDL extends BaseGridTool
 			JobDefinition_Type jsdl =
 				(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
 			PersonalityProvider provider = new ExecutionProvider();
-			tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
+			try {
+				tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
+			} catch (JSDLException e) {
+				throw new ToolException("JSDL interpreter error: " + e.getLocalizedMessage(), e);
+			}
 			in.close();
 		} else if (_type.equals("binary")) {
 			ObjectInputStream oIn = new ObjectInputStream(in);
@@ -111,22 +128,35 @@ public class RunJSDL extends BaseGridTool
 			stageTool.addArgument(getArgument(0));
 			stageTool.addArgument(getArgument(1));
 			stageTool.setDirection("in");
-			stageTool.run(stdout, stderr, stdin);
+			int retVal = stageTool.run(stdout, stderr, stdin);
+			if (retVal != 0) {
+				String msg = "failure during stage-in: return value=" + retVal;
+				_logger.error(msg);
+				return retVal;
+			}
 
 			// Execute
 			stdout.println("Executing");
 			submitScript.setExecutable(true, true);
 			new File(wDir.getAbsolutePath() + "/" + tJob.getExecutable().getTarget()).setExecutable(true, true);
-			Runtime.getRuntime().exec(submitScript.getAbsolutePath()).waitFor();
+			try {
+				Runtime.getRuntime().exec(submitScript.getAbsolutePath()).waitFor();
+			} catch (InterruptedException e) {
+				// nothing.
+			}
 
 			// Stage Out
 			stdout.println("Staging Out");
 			stageTool.setDirection("out");
-			stageTool.run(stdout, stderr, stdin);
+			retVal = stageTool.run(stdout, stderr, stdin);
+			if (retVal != 0) {
+				String msg = "failure during stage-out: return value=" + retVal;
+				_logger.error(msg);
+				return retVal;
+			}
 
 			// Complete
 			stdout.println("Job Executed");
-
 		} else
 			stdout.println("Working directory must not already exist");
 
@@ -141,7 +171,7 @@ public class RunJSDL extends BaseGridTool
 	}
 
 	private static void generateWrapperScript(OutputStream tStream, File workingDir, File resourceUsage, JobRequest job,
-		File tmpDir) throws Exception
+		File tmpDir) throws ToolException
 	{
 		try {
 
@@ -185,7 +215,7 @@ public class RunJSDL extends BaseGridTool
 			ps.println("touch executePhase.complete");
 			ps.flush();
 		} catch (Exception e) {
-			throw e;
+			throw new ToolException("unexpected error while running JSDL: " + e.getLocalizedMessage(), e);
 		}
 	}
 

@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,10 +14,17 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.logging.DLogDatabase;
 import edu.virginia.vcgr.genii.client.logging.DLogUtils;
@@ -93,7 +101,9 @@ public class LogReaderTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException, DialogException
 	{
 		List<String> args = getArguments();
 		List<GeniiCommon> loggers = new LinkedList<GeniiCommon>();
@@ -165,13 +175,13 @@ public class LogReaderTool extends BaseGridTool
 		return 0;
 	}
 
-	private void printEntries(String rpcID, DLogDatabase db) throws SQLException, RemoteException
+	private void printEntries(String rpcID, DLogDatabase db) throws IOException, RemoteException
 	{
 		// for the local kind
 		printEntries(rpcID, db, 1);
 	}
 
-	private void printEntries(String rpcID, DLogDatabase db, int level) throws SQLException, RemoteException
+	private void printEntries(String rpcID, DLogDatabase db, int level) throws IOException, RemoteException
 	{
 		String indent = "";
 		for (int i = 0; i < level; ++i) {
@@ -179,7 +189,12 @@ public class LogReaderTool extends BaseGridTool
 		}
 
 		if (_rpcs) {
-			Map<String, Collection<RPCCallerType>> childIDs = db.selectChildren(rpcID);
+			Map<String, Collection<RPCCallerType>> childIDs;
+			try {
+				childIDs = db.selectChildren(rpcID);
+			} catch (SQLException e1) {
+				throw new IOException("sql error: " + e1.getLocalizedMessage(), e1);
+			}
 
 			if (childIDs != null && !childIDs.isEmpty()) {
 				for (String parent : childIDs.keySet()) {
@@ -217,7 +232,12 @@ public class LogReaderTool extends BaseGridTool
 			}
 		}
 		if (_entries) {
-			Collection<LogEntryType> logs = db.selectLogs(rpcID);
+			Collection<LogEntryType> logs;
+			try {
+				logs = db.selectLogs(rpcID);
+			} catch (SQLException e) {
+				throw new IOException("sql error: " + e.getLocalizedMessage(), e);
+			}
 			if (logs != null) {
 				for (LogEntryType entry : logs) {
 					stdout.println(indent + "-" + entry.getMessage());

@@ -7,9 +7,14 @@ import java.io.InputStreamReader;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 public class CatTool extends BaseGridTool
 {
@@ -24,7 +29,8 @@ public class CatTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		for (int lcv = 0; lcv < numArguments(); lcv++)
 			cat(getArgument(lcv));

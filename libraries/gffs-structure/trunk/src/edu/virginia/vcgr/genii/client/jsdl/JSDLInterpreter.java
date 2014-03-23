@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.jsdl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;

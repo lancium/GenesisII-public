@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.Collection;
 
 import edu.virginia.vcgr.genii.client.configuration.Security;

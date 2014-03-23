@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -9,12 +10,18 @@ import java.util.Date;
 import org.oasis_open.docs.wsrf.rl_2.SetTerminationTime;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -33,12 +40,17 @@ public class TerminationScheduleTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
 	{
 		int numArgs = numArguments();
 		Date targetTime = null;
 
-		targetTime = parseTargetTime(getArgument(numArgs - 1));
+		try {
+			targetTime = parseTargetTime(getArgument(numArgs - 1));
+		} catch (ParseException e) {
+			throw new ToolException("parsing error: " + e.getLocalizedMessage(), e);
+		}
 
 		for (int lcv = 0; lcv < (numArgs - 1); lcv++) {
 			RNSPath target = lookup(new GeniiPath(getArgument(lcv)), RNSPathQueryFlags.MUST_EXIST);

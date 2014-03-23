@@ -19,5 +19,5 @@ public interface ITool
 
 	public void addArgument(String argument) throws ToolException;
 
-	public int run(Writer out, Writer err, Reader in) throws Throwable;
+	public int run(Writer out, Writer err, Reader in) throws ReloadShellException, ToolException;
 }

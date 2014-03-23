@@ -12,23 +12,29 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.GeniiDirPolicy;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
-import edu.virginia.vcgr.genii.client.rns.GeniiDirPolicy;
 import edu.virginia.vcgr.genii.resolver.GeniiResolverPortType;
 import edu.virginia.vcgr.genii.resolver.UpdateResponseType;
 
@@ -86,10 +92,13 @@ public class ResolverTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		if (_query)
 			return runQuery();
+
+		// hmmm: need to ensure we remove the item from the new CPFRC.
 
 		RNSPath current = RNSPath.getCurrent();
 		String sourcePath = getArgument(0);
@@ -144,10 +153,12 @@ public class ResolverTool extends BaseGridTool
 			GeniiCommon dirService = ClientUtils.createProxy(GeniiCommon.class, sourceEPR);
 			MessageElement[] elementArr = new MessageElement[1];
 			elementArr[0] = new MessageElement(GeniiDirPolicy.RESOLVER_POLICY_QNAME, resolverEPR);
-			InsertResourceProperties insertReq = new InsertResourceProperties(new InsertType(elementArr));
+			InsertResourceProperties insertReq =
+				new InsertResourceProperties(new InsertType(elementArr));
 			dirService.insertResourceProperties(insertReq);
 		}
 		CacheManager.removeItemFromCache(sourceRNS.pwd(), EndpointReferenceType.class);
+		RNSPath.tempGetCPFRC().invalidate(sourceRNS.pwd());
 		CacheManager.putItemInCache(sourceRNS.pwd(), finalEPR);
 		if (sourceRNS.isRoot()) {
 			stdout.println("Added resolver to root directory.");
@@ -174,7 +185,7 @@ public class ResolverTool extends BaseGridTool
 		}
 	}
 
-	private int runQuery() throws Throwable
+	private int runQuery() throws RNSException, ResourceException, GenesisIISecurityException, ToolException
 	{
 		String sourcePath = getArgument(0);
 		RNSPath current = RNSPath.getCurrent();
@@ -187,7 +198,12 @@ public class ResolverTool extends BaseGridTool
 			if (inProgress)
 				stdout.println();
 			stdout.println("resolver: " + resolver.getEPR().getAddress());
-			EndpointReferenceType epr = ResolverUtils.resolve(resolver);
+			EndpointReferenceType epr;
+			try {
+				epr = ResolverUtils.resolve(resolver);
+			} catch (Throwable e) {
+				throw new ToolException("resolve method failed: " + e.getLocalizedMessage(), e);
+			}
 			stdout.println("address: " + epr.getAddress());
 			AddressingParameters aps = new AddressingParameters(epr.getReferenceParameters());
 			stdout.println("resource-key: " + aps.getResourceKey());

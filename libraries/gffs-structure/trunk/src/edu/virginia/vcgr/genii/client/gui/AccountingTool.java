@@ -23,6 +23,7 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.Option;
@@ -32,16 +33,21 @@ import edu.virginia.vcgr.genii.client.cmd.tools.login.GuiLoginHandler;
 import edu.virginia.vcgr.genii.client.cmd.tools.login.TextLoginHandler;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescent;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallback;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallbackResult;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.AccountingRecordType;
 import edu.virginia.vcgr.genii.container.CommitAccountingRecordsRequestType;
@@ -305,7 +311,8 @@ public class AccountingTool extends BaseGridTool
 	private Object _connect;
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath source = lookup(current, new GeniiPath(getArgument(0)));
@@ -315,9 +322,19 @@ public class AccountingTool extends BaseGridTool
 		_count = new Lock();
 		_connect = new Object();
 
-		collect(source.getEndpoint(), target.getEndpoint(), !_isNoCommit, _isRecursive);
+		try {
+			collect(source.getEndpoint(), target.getEndpoint(), !_isNoCommit, _isRecursive);
+		} catch (ClassNotFoundException e1) {
+			throw new ToolException(e1.getLocalizedMessage(), e1);
+		} catch (SQLException e1) {
+			throw new ToolException(e1.getLocalizedMessage(), e1);
+		}
 
-		_count.join();
+		try {
+			_count.join();
+		} catch (InterruptedException e) {
+			// nothing.
+		}
 
 		return 0;
 	}
@@ -363,7 +380,7 @@ public class AccountingTool extends BaseGridTool
 	}
 
 	public void collect(EndpointReferenceType source, EndpointReferenceType target, boolean doCommit, boolean isRecursive)
-		throws Throwable
+		throws ClassNotFoundException, IOException, SQLException, InvalidToolUsageException, RNSException
 	{
 		Connection targetConnection = null;
 
@@ -427,7 +444,7 @@ public class AccountingTool extends BaseGridTool
 	}
 
 	public void collect(RNSPath sourceDirectory, EndpointReferenceType target, boolean doCommit, boolean isRecursive)
-		throws Throwable
+		throws ClassNotFoundException, IOException, SQLException, InvalidToolUsageException, RNSException
 	{
 		RNSRecursiveDescent descent = RNSRecursiveDescent.createDescent();
 		descent.setAvoidCycles(true);
@@ -453,13 +470,13 @@ public class AccountingTool extends BaseGridTool
 		}
 
 		@Override
-		public void finish()
+		public void finish() throws RNSException
 		{
 			// Nothing to do here
 		}
 
 		@Override
-		public RNSRecursiveDescentCallbackResult handleRNSPath(RNSPath path)
+		public RNSRecursiveDescentCallbackResult handleRNSPath(RNSPath path) throws RNSException
 		{
 			_count.increment();
 			_exec.submit(new ThreadHandler(path));

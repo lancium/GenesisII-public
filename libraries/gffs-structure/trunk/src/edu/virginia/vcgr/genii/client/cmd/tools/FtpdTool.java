@@ -1,12 +1,22 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
+
 import org.morgan.ftp.FTPConfiguration;
 import org.morgan.ftp.FTPDaemon;
+import org.morgan.ftp.FTPException;
 import org.morgan.ftp.NetworkConstraint;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.network.ftp.GeniiBackendConfiguration;
 import edu.virginia.vcgr.genii.network.ftp.GeniiBackendFactory;
 
@@ -61,7 +71,9 @@ public class FtpdTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException, DialogException
 	{
 		String arg = getArgument(0);
 
@@ -72,7 +84,11 @@ public class FtpdTool extends BaseGridTool
 					return 1;
 				}
 
-				_daemon.stop();
+				try {
+					_daemon.stop();
+				} catch (FTPException e) {
+					throw new ToolException("failure to stop ftp daemon: " + e.getLocalizedMessage(), e);
+				}
 				_daemon = null;
 			}
 
@@ -111,7 +127,11 @@ public class FtpdTool extends BaseGridTool
 			}
 
 			_daemon = new FTPDaemon(new GeniiBackendFactory(backConf), conf);
-			_daemon.start();
+			try {
+				_daemon.start();
+			} catch (FTPException e) {
+				throw new ToolException("failure to start ftp daemon: " + e.getLocalizedMessage(), e);
+			}
 		}
 
 		stdout.format("FTP Daemon started on port %d\n", conf.getListenPort());

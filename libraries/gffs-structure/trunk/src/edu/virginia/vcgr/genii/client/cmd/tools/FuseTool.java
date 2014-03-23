@@ -1,17 +1,24 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.fuse.GeniiFuse;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import fuse.FuseException;
 
 public class FuseTool extends BaseGridTool
 {
@@ -64,7 +71,8 @@ public class FuseTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		if (_uid < 0) {
 			try {
@@ -82,7 +90,11 @@ public class FuseTool extends BaseGridTool
 		if (_isMount) {
 			GeniiFuse.mountGenesisII(new File(gPath.path()), new String[] { "-f", "-s" }, null, _sandbox, _uid, _daemon);
 		} else {
-			GeniiFuse.unmountGenesisII(new File(gPath.path()));
+			try {
+				GeniiFuse.unmountGenesisII(new File(gPath.path()));
+			} catch (FuseException e) {
+				throw new IOException("fuse error: " + e.getLocalizedMessage(), e);
+			}
 		}
 
 		return 0;

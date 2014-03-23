@@ -19,12 +19,14 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.Option;
 import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
@@ -35,6 +37,8 @@ import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 public class QSlotManagerTool extends BaseGridTool
 {
@@ -140,7 +144,8 @@ public class QSlotManagerTool extends BaseGridTool
 	// This is essentially your main() method, it loops for some time period
 	// periodically checking the jobs on a Queue and adjusting as needed
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		// timeout is the time to run the tool in hours, default is 24 hours
 		// runtime is the amount of time in minutes the program has been running so far
@@ -161,7 +166,12 @@ public class QSlotManagerTool extends BaseGridTool
 			while (runtime < TIMEOUT * 60) { // runtime (minutes) < TIMEOUT (hours)
 				stdout.println("Starting next loop...");
 				recycleSlots(manipulator);
-				Thread.sleep(POLLING_PERIOD * 60 * 1000); // POLLING_PERIOD minutes
+				try {
+					// snooze for POLLING_PERIOD minutes
+					Thread.sleep(POLLING_PERIOD * 60 * 1000);
+				} catch (InterruptedException e) {
+					// nothing.
+				}
 				runtime += POLLING_PERIOD;
 			}
 		}
@@ -283,7 +293,7 @@ public class QSlotManagerTool extends BaseGridTool
 	}
 
 	// This is the body of the main loop, separated out in case we use --runonce
-	private void recycleSlots(QueueManipulator manipulator) throws Throwable
+	private void recycleSlots(QueueManipulator manipulator) throws RemoteException
 	{
 		clearSlotStats();
 		rescheduleJobs(manipulator);

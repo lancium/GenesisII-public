@@ -2,11 +2,15 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.*;
+
+import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -16,13 +20,18 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.algorithm.time.TimeHelpers;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.*;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
@@ -61,7 +70,9 @@ public class IdpTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException
 	{
 		String idpServiceRelPath = null;
 		String newIdpName = null;
@@ -108,7 +119,13 @@ public class IdpTool extends BaseLoginTool
 				UsernamePasswordIdentity ut = new UsernamePasswordIdentity(_username, _password);
 
 				MessageElement delegatedIdentParm = new MessageElement(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME);
-				delegatedIdentParm.addChild((MessageElement) ut.convertToMessageElement());
+				try {
+					delegatedIdentParm.addChild((MessageElement) ut.convertToMessageElement());
+				} catch (SOAPException e) {
+					throw new ToolException("failure processing SOAP: " + e.getLocalizedMessage(), e);
+				} catch (GeneralSecurityException e) {
+					throw new AuthZSecurityException(e.getLocalizedMessage(), e);
+				}
 
 				constructionParms.add(delegatedIdentParm);
 			}
@@ -125,47 +142,51 @@ public class IdpTool extends BaseLoginTool
 			// create a new IDP that further delegates a delegated token
 
 			// log in
-
-			URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
-
-			KeystoreLoginTool tool = new KeystoreLoginTool();
-			BaseLoginTool.copyCreds(this, tool);
-
 			ArrayList<NuCredential> assertions = null;
-			GeniiPath tPath = new GeniiPath(_authnUri);
 
-			if (_authnUri == null) {
-				// Keystore login
-				assertions = tool.doKeystoreLogin(null, ContextManager.getExistingContext(), idpCertChain);
-			} else {
-				if (tPath.pathType() == GeniiPathType.Local) {
-					// Keystore Login
-					BufferedInputStream fis = new BufferedInputStream(new FileInputStream(tPath.path()));
-					try {
-						assertions = tool.doKeystoreLogin(fis, ContextManager.getExistingContext(), idpCertChain);
-					} finally {
-						fis.close();
-					}
+			try {
+				URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
 
+				KeystoreLoginTool tool = new KeystoreLoginTool();
+				BaseLoginTool.copyCreds(this, tool);
+
+				GeniiPath tPath = new GeniiPath(_authnUri);
+
+				if (_authnUri == null) {
+					// Keystore login
+					assertions = tool.doKeystoreLogin(null, ContextManager.getExistingContext(), idpCertChain);
 				} else {
-					RNSPath authnPath =
-						ContextManager.getExistingContext().getCurrentPath()
-							.lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
-					EndpointReferenceType epr = authnPath.getEndpoint();
-					TypeInformation type = new TypeInformation(epr);
-					if (type.isIDP()) {
-						// IDP Login
-						assertions = IDPLoginTool.doIdpLogin(epr, BaseGridTool._credentialValidMillis, idpCertChain);
-					} else if (type.isByteIO()) {
-						// log into keystore from rns path to keystore file
-						InputStream in = ByteIOStreamFactory.createInputStream(epr);
+					if (tPath.pathType() == GeniiPathType.Local) {
+						// Keystore Login
+						BufferedInputStream fis = new BufferedInputStream(new FileInputStream(tPath.path()));
 						try {
-							assertions = tool.doKeystoreLogin(in, ContextManager.getExistingContext(), idpCertChain);
+							assertions = tool.doKeystoreLogin(fis, ContextManager.getExistingContext(), idpCertChain);
 						} finally {
-							in.close();
+							fis.close();
+						}
+
+					} else {
+						RNSPath authnPath =
+							ContextManager.getExistingContext().getCurrentPath()
+								.lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
+						EndpointReferenceType epr = authnPath.getEndpoint();
+						TypeInformation type = new TypeInformation(epr);
+						if (type.isIDP()) {
+							// IDP Login
+							assertions = IDPLoginTool.doIdpLogin(epr, BaseGridTool._credentialValidMillis, idpCertChain);
+						} else if (type.isByteIO()) {
+							// log into keystore from rns path to keystore file
+							InputStream in = ByteIOStreamFactory.createInputStream(epr);
+							try {
+								assertions = tool.doKeystoreLogin(in, ContextManager.getExistingContext(), idpCertChain);
+							} finally {
+								in.close();
+							}
 						}
 					}
 				}
+			} catch (URISyntaxException e) {
+				throw new ToolException("failure in URI: " + e.getLocalizedMessage(), e);
 			}
 
 			if ((assertions == null) || (assertions.size() == 0)) {
@@ -181,10 +202,16 @@ public class IdpTool extends BaseLoginTool
 			if (xup == null) {
 				String msg = "unknown type of credential; cannot upscale to XMLCompatible: " + assertions.get(0).toString();
 				_logger.error(msg);
-				throw new GeneralSecurityException(msg);
+				throw new AuthZSecurityException(msg);
 			}
 
-			delegatedIdentParm.addChild((MessageElement) xup.convertToMessageElement());
+			try {
+				delegatedIdentParm.addChild((MessageElement) xup.convertToMessageElement());
+			} catch (SOAPException e) {
+				throw new AuthZSecurityException(e.getLocalizedMessage(), e);
+			} catch (GeneralSecurityException e) {
+				throw new AuthZSecurityException(e.getLocalizedMessage(), e);
+			}
 
 			constructionParms.add(delegatedIdentParm);
 		}

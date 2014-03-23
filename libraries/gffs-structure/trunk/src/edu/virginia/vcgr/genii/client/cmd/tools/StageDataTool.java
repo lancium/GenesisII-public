@@ -6,22 +6,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.ggf.jsdl.JobDefinition_Type;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.jsdl.ContainerDataStage;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.context.ContextType;
@@ -58,7 +66,9 @@ public class StageDataTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException
 	{
 
 		// get the local identity's key material (or create one if necessary)
@@ -85,7 +95,11 @@ public class StageDataTool extends BaseGridTool
 			JobDefinition_Type jsdl =
 				(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
 			PersonalityProvider provider = new ExecutionProvider();
-			tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
+			try {
+				tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
+			} catch (JSDLException e) {
+				throw new ToolException("jsdl error: " + e.getLocalizedMessage(), e);
+			}
 			in.close();
 		} else if (_type.equals("binary")) {
 			ObjectInputStream oIn = new ObjectInputStream(in);
@@ -99,13 +113,21 @@ public class StageDataTool extends BaseGridTool
 		if (tJob != null) {
 			if (_direction.equals("in")) {
 				for (ContainerDataStage tStage : tJob.getStageIns()) {
-					stageIN(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getSourceURI()),
-						tStage.getCredentials());
+					try {
+						stageIN(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getSourceURI()),
+							tStage.getCredentials());
+					} catch (URISyntaxException e) {
+						throw new ToolException("failure to create URI: " + e.getLocalizedMessage(), e);
+					}
 				}
 			} else if (_direction.equals("out")) {
 				for (ContainerDataStage tStage : tJob.getStageOuts()) {
-					stageOUT(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getTargetURI()),
-						tStage.getCredentials());
+					try {
+						stageOUT(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getTargetURI()),
+							tStage.getCredentials());
+					} catch (URISyntaxException e) {
+						throw new ToolException("failure to create URI: " + e.getLocalizedMessage(), e);
+					}
 				}
 			} else {
 				stdout.println("Invalid direction");

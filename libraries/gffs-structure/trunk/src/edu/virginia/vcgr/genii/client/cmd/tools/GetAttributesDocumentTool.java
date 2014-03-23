@@ -1,10 +1,12 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument;
@@ -13,10 +15,15 @@ import org.w3c.dom.NodeList;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
@@ -51,7 +58,8 @@ public class GetAttributesDocumentTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)
@@ -78,7 +86,11 @@ public class GetAttributesDocumentTool extends BaseGridTool
 		} else {
 			MessageElement document = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
 			for (MessageElement child : resp.get_any()) {
-				document.addChild(child);
+				try {
+					document.addChild(child);
+				} catch (SOAPException e) {
+					throw new ToolException("SOAP error: " + e.getLocalizedMessage(), e);
+				}
 			}
 			stdout.println(document);
 		}

@@ -1,10 +1,17 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
+
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.ui.ClientApplication;
 
 public class ClientApplicationUITool extends BaseGridTool
@@ -37,7 +44,8 @@ public class ClientApplicationUITool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		if (OperatingSystemType.getCurrent() == OperatingSystemType.MACOS)
 			setupMacOSProperties();
@@ -50,7 +58,11 @@ public class ClientApplicationUITool extends BaseGridTool
 		} else
 			ca.dispose();
 
-		ca.join();
+		try {
+			ca.join();
+		} catch (InterruptedException e) {
+			// nothing.
+		}
 
 		return 0;
 	}

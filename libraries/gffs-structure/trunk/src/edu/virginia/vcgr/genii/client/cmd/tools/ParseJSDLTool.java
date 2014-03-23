@@ -10,14 +10,20 @@ import org.ggf.jsdl.JobDefinition_Type;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
@@ -37,7 +43,8 @@ public class ParseJSDLTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 
 		// get the local identity's key material (or create one if necessary)
@@ -63,7 +70,12 @@ public class ParseJSDLTool extends BaseGridTool
 		JobDefinition_Type jsdl =
 			(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
 		PersonalityProvider provider = new ExecutionProvider();
-		JobRequest tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
+		JobRequest tJob;
+		try {
+			tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
+		} catch (JSDLException e) {
+			throw new ToolException("jsdl error: " + e.getLocalizedMessage(), e);
+		}
 
 		ObjectOutputStream oOut = new ObjectOutputStream(out);
 		oOut.writeObject(tJob);

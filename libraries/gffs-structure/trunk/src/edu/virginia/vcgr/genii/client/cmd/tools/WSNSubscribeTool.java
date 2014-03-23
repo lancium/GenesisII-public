@@ -1,17 +1,24 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
+
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.xml.SimpleNamespaceContext;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
@@ -64,14 +71,19 @@ public class WSNSubscribeTool extends BaseGridTool
 		}
 	}
 
-	private void subscribe(GeniiPath publisher) throws Exception
+	private void subscribe(GeniiPath publisher) throws RNSException, ToolException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath publisherPath = current.lookup(publisher.path());
 
 		LightweightNotificationServer server = LightweightNotificationServer.createStandardServer();
 		server.start();
-		LightweightSubscription result = server.subscribe(publisherPath.getEndpoint(), _filter, null, null);
+		LightweightSubscription result;
+		try {
+			result = server.subscribe(publisherPath.getEndpoint(), _filter, null, null);
+		} catch (SubscribeException e) {
+			throw new ToolException("subscription error: " + e.getLocalizedMessage(), e);
+		}
 		result.registerNotificationHandler(new NotificationHandlerImpl());
 
 		if (_subscriptionPath != null) {
@@ -80,7 +92,11 @@ public class WSNSubscribeTool extends BaseGridTool
 		}
 
 		while (true) {
-			Thread.sleep(1000L * 1000);
+			try {
+				Thread.sleep(1000L * 1000);
+			} catch (InterruptedException e) {
+				// nothing.
+			}
 		}
 	}
 
@@ -113,7 +129,8 @@ public class WSNSubscribeTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
 	{
 		GeniiPath publisher = new GeniiPath(getArgument(0));
 		if (publisher.pathType() != GeniiPathType.Grid)

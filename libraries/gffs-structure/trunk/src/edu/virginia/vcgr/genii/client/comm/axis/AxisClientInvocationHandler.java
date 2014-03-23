@@ -433,9 +433,23 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		try {
 			InvocationInterceptorManager mgr = getManager();
 			toReturn = mgr.invoke(getTargetEPR(), _callContext, this, m, params);
+		} catch (PermissionDeniedException e) {
+			_logger.info(e.getLocalizedMessage());
+			throw e;
+		} catch (GenesisIISecurityException e) {
+			_logger.info(e.getLocalizedMessage());
+			throw e;
 		} catch (Throwable t) {
-			String msg = "client failed to invoke";
-			_logger.error(msg, t);
+			String msg = "exception occurred during invoke";
+
+			String asset = edu.virginia.vcgr.genii.client.security.PermissionDeniedException.extractAssetDenied(t.getMessage());
+			String method = edu.virginia.vcgr.genii.client.security.PermissionDeniedException.extractMethodName(t.getMessage());
+			if ((method != null) && (asset != null)) {
+				msg = t.getLocalizedMessage() + "; permission denied on \"" + asset + "\" (in method \"" + method;
+				_logger.info(msg);
+			} else {
+				_logger.error(msg, t);
+			}
 			throw t;
 		} finally {
 			synchronized (inInvokeMethod) {

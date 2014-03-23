@@ -88,7 +88,6 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 						stmt.setLong(2, (long) lcv);
 						stmt.setBlob(3, DBSerializer.toBlob(ObjectSerializer.anyToBytes(new MessageElement[] { next }),
 							"iterators", "contents"));
-
 						stmt.addBatch();
 						lcv++;
 					}

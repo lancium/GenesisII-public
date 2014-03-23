@@ -17,7 +17,6 @@ package edu.virginia.vcgr.genii.container.jndiauthn;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;

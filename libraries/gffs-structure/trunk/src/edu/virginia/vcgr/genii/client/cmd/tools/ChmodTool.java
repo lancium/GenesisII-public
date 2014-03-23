@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -10,14 +12,19 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.cmd.ITool;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.security.axis.AclAuthZClientTool;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AxisAcl;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.security.acl.Acl;
@@ -100,7 +107,8 @@ public class ChmodTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		boolean isRecursive = _recursive;
 		String modeString = getArgument(1);
@@ -122,7 +130,12 @@ public class ChmodTool extends BaseGridTool
 			else
 				newEntry = new UsernamePasswordIdentity(_username, _hashedpass, false);
 		} else {
-			X509Identity identity = AclAuthZClientTool.downloadIdentity(new GeniiPath(certificate));
+			X509Identity identity;
+			try {
+				identity = AclAuthZClientTool.downloadIdentity(new GeniiPath(certificate));
+			} catch (GeneralSecurityException e) {
+				throw new AuthZSecurityException(e.getLocalizedMessage(), e);
+			}
 			if (_pattern == null)
 				newEntry = identity;
 			else
@@ -154,7 +167,8 @@ public class ChmodTool extends BaseGridTool
 			return 1;
 	}
 
-	static private void chmod(RNSPath pathRNS, String modeString, AclEntry newEntry, boolean isRecursive) throws Throwable
+	static private void chmod(RNSPath pathRNS, String modeString, AclEntry newEntry, boolean isRecursive) throws RNSException,
+		ResourcePropertyException, AuthZSecurityException
 	{
 		TypeInformation currentType = new TypeInformation(pathRNS.getEndpoint());
 		if (isRecursive && currentType.isRNS()) {

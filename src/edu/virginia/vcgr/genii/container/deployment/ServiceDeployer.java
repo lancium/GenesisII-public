@@ -222,8 +222,10 @@ public class ServiceDeployer extends Thread
 							Constructor<?> cons = cl.getConstructor(new Class[0]);
 							_logger.debug("constructing new instance of " + cl.toString());
 							IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons.newInstance(new Object[0]);
-							// hmmm: the individual startup methods are what are super slow! how
-							// odd.
+							/*
+							 * hmmm: the individual startup methods are what are super slow! how
+							 * odd.
+							 */
 							long startedAt = TimeHelpers.millisSinceAppStart();
 							base.startup();
 							long finishedAt = TimeHelpers.millisSinceAppStart();

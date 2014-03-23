@@ -15,17 +15,25 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.cmd.ITool;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.filters.FilterFactory;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 
@@ -76,6 +84,13 @@ public abstract class BaseGridTool implements ITool
 	{
 		this(readResource(descriptionResource), readResource(usageResource), isHidden);
 	}
+
+	protected abstract void verify() throws ToolException;
+
+	// hmmm: ugly, but true. the set returned here should be reduced.
+	protected abstract int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		GenesisIISecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException, DialogException;
 
 	protected boolean useGui()
 	{
@@ -130,43 +145,117 @@ public abstract class BaseGridTool implements ITool
 		_lastExit = newExitValue;
 	}
 
-	public final int run(Writer out, Writer err, Reader in) throws Throwable
+	@Override
+	public final int run(Writer out, Writer err, Reader in) throws ReloadShellException, ToolException
 	{
-		_logger.trace("entering into base grid tool run method...");
 		try {
 			stdout = (out instanceof PrintWriter) ? (PrintWriter) out : new PrintWriter(out, true);
 			stderr = (err instanceof PrintWriter) ? (PrintWriter) err : new PrintWriter(err, true);
 			stdin = (in instanceof BufferedReader) ? (BufferedReader) in : new BufferedReader(in);
-			try {
-				verify();
-				// set the last exit value based on actual return value.
-				_lastExit = runCommand();
-				return _lastExit;
-			} catch (InvalidToolUsageException itue) {
-				_logger.error("invalid tool usage: " + itue.getMessage());
-				stderr.print(itue.getLocalizedMessage());
-				stderr.print(usage());
-				stderr.println();
-				// set last exit to a failure value.
-				_lastExit = 1;
-				return _lastExit;
-			}
+			// check the parameters first.
+			verify();
+			// set the last exit value based on actual return value.
+			_lastExit = runCommand();
+		} catch (ClassNotFoundException e) {
+			String msg = "application error, missing class: " + e.getLocalizedMessage();
+			_logger.error(msg, e);
+			// stderr.print(msg);
+			// stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			throw new ToolException(e.getLocalizedMessage(), e);
+		} catch (DialogException e) {
+			String msg = "dialog reported problem: " + e.getLocalizedMessage();
+			_logger.error(msg, e);
+			// stderr.print(msg);
+			// stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			throw new ToolException(e.getLocalizedMessage(), e);
+		} catch (InvalidToolUsageException e) {
+			String msg = "invalid tool usage: " + e.getLocalizedMessage();
+			_logger.warn(msg);
+			stderr.print(msg);
+			stderr.print(usage());
+			stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			// this gets handled here, without forwarding the exception.
+		} catch (CreationException e) {
+			String msg = "a creation exception occurred during the operation: " + e.getLocalizedMessage();
+			_logger.error(msg, e);
+			// stderr.print(msg);
+			// stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			throw new ToolException(e.getLocalizedMessage(), e);
+		} catch (ResourcePropertyException e) {
+			String msg = "a resource property exception occurred: " + e.getLocalizedMessage();
+			_logger.error(msg, e);
+			// stderr.print(msg);
+			// stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (UserCancelException uce) {
 			// user cancellation is considered a success.
-			_logger.info("user cancelled operation: " + uce.getMessage());
+			_logger.info("user cancelled operation: " + uce.getLocalizedMessage());
 			_lastExit = 0;
-			return _lastExit;
-		} catch (Throwable t) {
-			// unexpected issue, so set last exit to a failure value.
-			_logger.info("caught exception in run.", t);
-			_lastExit = 1;
-			// re-throw the exception.
-			throw t;
+		} catch (RNSPathAlreadyExistsException e) {
+			String msg = "path already exists: " + e.getLocalizedMessage();
+			_logger.info(msg);
+			// stderr.print(msg);
+			// stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			throw new ToolException(e.getLocalizedMessage(), e);
+		} catch (RNSPathDoesNotExistException e) {
+			String msg = "path does not exist: " + e.getLocalizedMessage();
+			_logger.info(msg);
+			// stderr.print(msg);
+			// stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			throw new ToolException(e.getLocalizedMessage(), e);
+		} catch (PermissionDeniedException e) {
+			String operation = PermissionDeniedException.extractMethodName(e.getMessage());
+			String failedAsset = PermissionDeniedException.extractAssetDenied(e.getMessage());
+			String msg;
+			if ((operation != null) && (failedAsset != null))
+				msg =
+					e.getLocalizedMessage() + "; permission denied on \"" + failedAsset + "\" (in method \"" + operation
+						+ "\")";
+			else
+				msg = "an odd permission denied exception occurred: " + e.getLocalizedMessage();
+			_logger.info(msg);
+			// stderr.print(msg);
+			// stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			throw new ToolException(e.getLocalizedMessage(), e);
+		} catch (AuthZSecurityException e) {
+			String msg = "an authorization error occurred: " + e.getLocalizedMessage();
+			_logger.error(msg);
+			// stderr.print(msg);
+			// stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			throw new ToolException(e.getLocalizedMessage(), e);
+		} catch (RNSException e) {
+			String msg = "an RNS exception occurred: " + e.getLocalizedMessage();
+			_logger.error(msg);
+			// stderr.print(msg);
+			// stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			throw new ToolException(e.getLocalizedMessage(), e);
+		} catch (IOException e) {
+			String msg = "an I/O exception occurred: " + e.getLocalizedMessage();
+			_logger.error(msg);
+			// stderr.print(msg);
+			// stderr.print(usage());
+			// stderr.println();
+			_lastExit = 1; // set last exit to a failure value.
+			throw new ToolException(e.getLocalizedMessage(), e);
+		} catch (ReloadShellException e) {
+			// expected issue from certain commands, and we do need to forward this out.
+			throw e;
 		} finally {
 			stdout = null;
 			stderr = null;
 			stdin = null;
 		}
+		return _lastExit;
 	}
 
 	protected List<String> getArguments()
@@ -237,10 +326,6 @@ public abstract class BaseGridTool implements ITool
 	{
 		return "\nUsage:\n" + _usage;
 	}
-
-	protected abstract void verify() throws ToolException;
-
-	protected abstract int runCommand() throws Throwable;
 
 	static private String readResource(LoadFileResource resource)
 	{

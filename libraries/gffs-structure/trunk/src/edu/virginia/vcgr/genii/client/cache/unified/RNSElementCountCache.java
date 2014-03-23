@@ -7,12 +7,10 @@ import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rp.DefaultSingleResourcePropertyTranslator;
 import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
-import edu.virginia.vcgr.genii.web.xml.XMLStringPrinter;
 
 public class RNSElementCountCache extends CommonAttributeCache
 {
@@ -36,6 +34,8 @@ public class RNSElementCountCache extends CommonAttributeCache
 		Integer elementCount = cache.get(EPI);
 		if (elementCount == null)
 			return null;
+		if (_logger.isTraceEnabled())
+			_logger.trace("found cached element count for " + cacheKey + " with count=" + elementCount);
 		return new MessageElement(RNSConstants.ELEMENT_COUNT_QNAME, elementCount);
 	}
 

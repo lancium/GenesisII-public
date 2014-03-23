@@ -294,7 +294,7 @@ public class CacheManager
 				}
 			}
 		}
-		_logger.trace("could not find an appropriate cache for type: " + typeOfItem.getCanonicalName());
+		_logger.warn("could not find an appropriate cache for type: " + typeOfItem.getCanonicalName());
 		return null;
 	}
 }

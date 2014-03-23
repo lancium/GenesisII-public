@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -7,10 +8,12 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.WebContainerConstants;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.exec.WindowsExecutionEngine;
 import edu.virginia.vcgr.genii.client.exec.ExecutionTask;
 import edu.virginia.vcgr.genii.client.exec.install.windows.GenesisIIContainerService;
@@ -18,6 +21,9 @@ import edu.virginia.vcgr.genii.client.exec.install.windows.WindowsFirewall;
 import edu.virginia.vcgr.genii.client.exec.install.windows.WindowsRights;
 import edu.virginia.vcgr.genii.client.exec.install.windows.WindowsServices;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 public class ManageWindowsContainerServiceTool extends BaseGridTool
 {
@@ -68,7 +74,8 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		int result = 0;
 

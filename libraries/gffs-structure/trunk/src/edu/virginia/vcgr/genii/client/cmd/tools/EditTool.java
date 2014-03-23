@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
@@ -13,13 +14,19 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.externalapp.ApplicationDatabase;
 import edu.virginia.vcgr.externalapp.EditableFile;
 import edu.virginia.vcgr.externalapp.ExternalApplication;
+import edu.virginia.vcgr.externalapp.ExternalApplicationException;
 import edu.virginia.vcgr.externalapp.ExternalApplicationToken;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineFormer;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 public class EditTool extends BaseGridTool
 {
@@ -35,7 +42,8 @@ public class EditTool extends BaseGridTool
 	}
 
 	@Override
-	final protected int runCommand() throws Throwable
+	final protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		String arg = getArgument(0);
 
@@ -72,7 +80,7 @@ public class EditTool extends BaseGridTool
 
 	}
 
-	final public int editFile(GeniiPath path) throws Throwable
+	final public int editFile(GeniiPath path) throws ToolException, IOException
 	{
 		String mimeType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(new File(path.path()));
 
@@ -87,6 +95,8 @@ public class EditTool extends BaseGridTool
 			file = EditableFile.createEditableFile(path);
 			ExternalApplicationToken token = app.launch(file.file());
 			token.getResult();
+		} catch (ExternalApplicationException e) {
+			throw new ToolException("problem with external application: " + e.getLocalizedMessage(), e);
 		} finally {
 			file.close();
 		}
@@ -94,7 +104,7 @@ public class EditTool extends BaseGridTool
 		return 0;
 	}
 
-	final public int editCommand(String[] cLine) throws Throwable
+	final public int editCommand(String[] cLine) throws ToolException, IOException, RNSException, ReloadShellException
 	{
 		String mimeType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType("gridedit.txt");
 		ExternalApplication app = ApplicationDatabase.database().getExternalApplication(mimeType);
@@ -128,7 +138,11 @@ public class EditTool extends BaseGridTool
 			writer = null;
 
 			ExternalApplicationToken token;
-			token = app.launch(tmpFile);
+			try {
+				token = app.launch(tmpFile);
+			} catch (ExternalApplicationException e) {
+				throw new ToolException("problem with external application: " + e.getLocalizedMessage(), e);
+			}
 			File result = token.getResult();
 
 			if (result != null) {

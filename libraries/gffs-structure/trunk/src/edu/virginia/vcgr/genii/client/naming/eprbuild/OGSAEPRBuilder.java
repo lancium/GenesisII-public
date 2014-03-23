@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.client.naming.eprbuild;
 
 import java.net.URI;
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.LinkedList;

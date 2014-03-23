@@ -3,22 +3,24 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.context.ContextFileSystem;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSSpace;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 public class CreateRNSRootTool extends BaseGridTool
 {
@@ -62,7 +64,8 @@ public class CreateRNSRootTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		String filename = getArgument(0);
 
@@ -81,7 +84,7 @@ public class CreateRNSRootTool extends BaseGridTool
 			throw new InvalidToolUsageException("Protocol must be either http or https");
 	}
 
-	public void createRNSRoot(String filename, String baseURL) throws SAXException, ParserConfigurationException, IOException
+	public void createRNSRoot(String filename, String baseURL) throws IOException
 	{
 		RNSPath root = RNSSpace.createNewSpace(baseURL + "/EnhancedRNSPortType");
 		ICallingContext ctxt = ContextManager.bootstrap(root);

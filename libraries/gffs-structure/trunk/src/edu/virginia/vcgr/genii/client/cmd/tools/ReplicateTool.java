@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
@@ -14,25 +15,29 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.resource.IResource;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.GeniiDirPolicy;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.ResourceSecurityPolicy;
-
+import edu.virginia.vcgr.genii.client.sync.SyncProperty;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
-import edu.virginia.vcgr.genii.client.resource.IResource;
-import edu.virginia.vcgr.genii.client.rns.GeniiDirPolicy;
-import edu.virginia.vcgr.genii.client.sync.SyncProperty;
 
 public class ReplicateTool extends BaseGridTool
 {
@@ -77,7 +82,8 @@ public class ReplicateTool extends BaseGridTool
 	 * Create a replica of the given resource in the given container.
 	 */
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		if (_destroy) {
 			return destroyReplica();
@@ -174,8 +180,10 @@ public class ReplicateTool extends BaseGridTool
 	 * 
 	 * Recursive destroy replica is not supported because of the risk of destroying replicas on
 	 * other containers or unreplicated resources.
+	 * 
+	 * @throws ToolException
 	 */
-	private int destroyReplica() throws Throwable
+	private int destroyReplica() throws RNSException, AuthZSecurityException, ResourceException, ToolException
 	{
 		String replicaPath = getArgument(0);
 		RNSPath current = RNSPath.getCurrent();
@@ -187,9 +195,13 @@ public class ReplicateTool extends BaseGridTool
 		UpdateType update = new UpdateType(elementArr);
 		UpdateResourceProperties request = new UpdateResourceProperties(update);
 
-		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, replicaEPR);
-		common.updateResourceProperties(request);
-		common.destroy(new Destroy());
+		try {
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, replicaEPR);
+			common.updateResourceProperties(request);
+			common.destroy(new Destroy());
+		} catch (Throwable e) {
+			throw new ToolException("failure creating proxy: " + e.getLocalizedMessage(), e);
+		}
 
 		// Leave directory entry unchanged.
 		// In the ideal case, maybe the directory entry should be replaced with an

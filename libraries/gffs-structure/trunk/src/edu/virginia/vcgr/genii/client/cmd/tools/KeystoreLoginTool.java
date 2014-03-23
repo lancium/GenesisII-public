@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.login.AbstractLoginHandler;
 import edu.virginia.vcgr.genii.client.cmd.tools.login.GuiLoginHandler;
@@ -17,8 +19,12 @@ import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.context.ContextType;
@@ -64,7 +70,7 @@ public class KeystoreLoginTool extends BaseLoginTool
 	 * @throws Throwable
 	 */
 	protected ArrayList<NuCredential> doKeystoreLogin(InputStream keystoreInput, ICallingContext callContext,
-		X509Certificate[] delegateeIdentity) throws Throwable
+		X509Certificate[] delegateeIdentity) throws AuthZSecurityException, IOException
 	{
 
 		ArrayList<NuCredential> retval = new ArrayList<NuCredential>();
@@ -131,7 +137,8 @@ public class KeystoreLoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		if (_storeType == null)
 			_storeType = "PKCS12";

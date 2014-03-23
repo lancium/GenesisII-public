@@ -148,8 +148,6 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 		} else {
 			clazz = target.getClass();
 		}
-		// if (clazz == MessageElement.class)
-		// clazz = org.apache.axis.message.MessageElement.class;
 		if (_logger.isTraceEnabled())
 			_logger.trace("target class found: " + clazz.getCanonicalName());
 

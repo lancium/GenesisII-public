@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.net.SocketException;
-
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -15,18 +13,19 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.GeneralSecurityException;
-
 import java.util.Date;
 import java.util.Enumeration;
 
-import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
+import org.apache.axis.message.MessageElement;
 import org.bouncycastle.asn1.x509.X509Name;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -34,7 +33,9 @@ import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.CertGeneratorUtils;
 import edu.virginia.vcgr.genii.certGenerator.CertificateChainType;
 import edu.virginia.vcgr.genii.certGenerator.X509NameType;
@@ -45,6 +46,7 @@ import edu.virginia.vcgr.genii.certGenerator.GenerateX509V3CertificateChainRespo
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 
+@SuppressWarnings("deprecation")
 public class CertGeneratorTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION = "config/tooldocs/description/dcert-generator";
@@ -177,15 +179,23 @@ public class CertGeneratorTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException
 	{
 		int numArgs = numArguments();
 		if (_create_generator) {
 			_path_for_cert_generator_factory = getArgument(0);
 			if (numArgs > 1)
 				_path_for_cert_generator = getArgument(1);
-			createGenerator(_path_for_cert_generator_factory, _url, _path_for_cert_generator, _ks_path, _ks_password,
-				_ks_alias, _entry_password, _default_validity);
+			try {
+				createGenerator(_path_for_cert_generator_factory, _url, _path_for_cert_generator, _ks_path, _ks_password,
+					_ks_alias, _entry_password, _default_validity);
+			} catch (KeyStoreException e) {
+				throw new AuthZSecurityException("keystore issue: " + e.getLocalizedMessage(), e);
+			} catch (GeneralSecurityException e) {
+				throw new AuthZSecurityException("security exception: " + e.getLocalizedMessage(), e);
+			}
 		}
 
 		if (_gen_cert) {
@@ -194,9 +204,14 @@ public class CertGeneratorTool extends BaseGridTool
 			if (_keySize == null) {
 				_keySize = ClientUtils.getClientRsaKeyLength();
 			}
-			KeyPair newKeyPair = CertTool.generateKeyPair(_keySize);
-			X509Certificate[] certChain = createCert(newKeyPair, _path_for_cert_generator, _cn, _c, _st, _l, _o, _ou, _email);
-			storeCert(newKeyPair, certChain, _ks_path, _ks_password, _ks_alias, _entry_password);
+			try {
+				KeyPair newKeyPair = CertTool.generateKeyPair(_keySize);
+				X509Certificate[] certChain =
+					createCert(newKeyPair, _path_for_cert_generator, _cn, _c, _st, _l, _o, _ou, _email);
+				storeCert(newKeyPair, certChain, _ks_path, _ks_password, _ks_alias, _entry_password);
+			} catch (GeneralSecurityException e) {
+				throw new AuthZSecurityException(e.getLocalizedMessage(), e);
+			}
 		}
 
 		return 0;

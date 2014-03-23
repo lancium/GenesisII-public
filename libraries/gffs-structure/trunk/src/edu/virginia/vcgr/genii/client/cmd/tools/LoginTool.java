@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -11,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
@@ -20,9 +23,15 @@ import edu.virginia.vcgr.genii.client.configuration.NamespaceDefinitions;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.PathUtils;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
@@ -77,7 +86,9 @@ public class LoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException, DialogException
 	{
 
 		// get the local identity's key material (or create one if necessary)
@@ -92,17 +103,27 @@ public class LoginTool extends BaseLoginTool
 		if (numArguments() == 1) {
 			// If Specified
 			_authnUri = getArgument(0);
-			URI authnSource = PathUtils.pathToURI(_authnUri);
+			URI authnSource;
+			try {
+				authnSource = PathUtils.pathToURI(_authnUri);
+			} catch (URISyntaxException e) {
+				throw new ToolException("failure to convert path: " + e.getLocalizedMessage(), e);
+			}
 
 			if (!callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists())
-				throw new ToolException("Invalid IDP path specified.");
+				throw new ToolException("Invalid IDP path specified: " + authnSource.getSchemeSpecificPart());
 
 		} else {
 			// Check default paths
 			_authnUri = null;
 
 			for (String authURI : getDefaultIDPPaths(_username)) {
-				URI authnSource = PathUtils.pathToURI(authURI);
+				URI authnSource;
+				try {
+					authnSource = PathUtils.pathToURI(authURI);
+				} catch (URISyntaxException e) {
+					throw new ToolException("failure to convert path: " + e.getLocalizedMessage(), e);
+				}
 				if (callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists()) {
 					_authnUri = authURI;
 					break;
@@ -126,7 +147,12 @@ public class LoginTool extends BaseLoginTool
 
 			// we're going to use the WS-TRUST token-issue operation
 			// to log in to a security tokens service
-			URI authnSource = PathUtils.pathToURI(_authnUri);
+			URI authnSource;
+			try {
+				authnSource = PathUtils.pathToURI(_authnUri);
+			} catch (URISyntaxException e) {
+				throw new ToolException("failure to convert path: " + e.getLocalizedMessage(), e);
+			}
 			KeyAndCertMaterial clientKeyMaterial =
 				ClientUtils.checkAndRenewCredentials(callContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 

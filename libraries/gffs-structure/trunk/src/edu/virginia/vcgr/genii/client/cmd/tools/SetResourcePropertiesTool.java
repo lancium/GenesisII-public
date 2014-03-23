@@ -1,24 +1,34 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.axis.message.MessageElement;
 import org.oasis_open.docs.wsrf.rp_2.SetResourceProperties;
 import org.oasis_open.docs.wsrf.rp_2.UpdateType;
+import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 public class SetResourcePropertiesTool extends BaseGridTool
@@ -41,7 +51,8 @@ public class SetResourcePropertiesTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
 	{
 		GeniiPath target = new GeniiPath(getArgument(0));
 		GeniiPath rpFile = new GeniiPath(getArgument(1));
@@ -54,16 +65,24 @@ public class SetResourcePropertiesTool extends BaseGridTool
 			in = rpFile.openInputStream();
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(true);
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			MessageElement me = new MessageElement(builder.parse(in).getDocumentElement());
+			DocumentBuilder builder;
+			try {
+				builder = factory.newDocumentBuilder();
+			} catch (ParserConfigurationException e) {
+				throw new ToolException("parsing error: " + e.getLocalizedMessage(), e);
+			}
+			MessageElement me;
+			try {
+				me = new MessageElement(builder.parse(in).getDocumentElement());
+			} catch (SAXException e) {
+				throw new ToolException("parsing error: " + e.getLocalizedMessage(), e);
+			}
 			Collection<MessageElement> properties = new LinkedList<MessageElement>();
 			Iterator<?> iter = me.getChildElements();
 			while (iter.hasNext()) {
-				Object obj = iter.next();
-				if (obj instanceof MessageElement) {
-					me = (MessageElement) obj;
-					properties.add(me);
-				}
+				MessageElement obj = (MessageElement)iter.next();
+				me = (MessageElement) obj;
+				properties.add(me);
 			}
 
 			RNSPath targetPath = RNSPath.getCurrent().lookup(target.path(), RNSPathQueryFlags.MUST_EXIST);

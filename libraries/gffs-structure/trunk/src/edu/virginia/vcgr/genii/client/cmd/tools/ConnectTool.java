@@ -12,7 +12,12 @@ import edu.virginia.vcgr.genii.client.configuration.UserConfigUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
+import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
+import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.urls.URLUtilities;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
@@ -30,7 +35,8 @@ public class ConnectTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws Throwable
+	protected int runCommand() throws ReloadShellException, InvalidToolUsageException, PermissionDeniedException,
+		UserCancelException, RNSPathAlreadyExistsException, RNSPathDoesNotExistException, AuthZSecurityException, IOException
 	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		String connectURL = gPath.path();
