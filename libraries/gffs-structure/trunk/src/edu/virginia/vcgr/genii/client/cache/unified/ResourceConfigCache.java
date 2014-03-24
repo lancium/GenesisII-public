@@ -148,7 +148,7 @@ public class ResourceConfigCache extends CommonCache
 	@Override
 	public boolean itemTypeMatches(Class<?> itemType)
 	{
-		return (WSResourceConfig.class.equals(itemType));
+		return WSResourceConfig.class.equals(itemType);
 	}
 
 	/*

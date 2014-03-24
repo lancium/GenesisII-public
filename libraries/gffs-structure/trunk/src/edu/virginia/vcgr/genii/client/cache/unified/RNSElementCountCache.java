@@ -19,9 +19,9 @@ public class RNSElementCountCache extends CommonAttributeCache
 	private SingleResourcePropertyTranslator translator;
 	private TimedOutLRUCache<String, Integer> cache;
 
-	public RNSElementCountCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
+	public RNSElementCountCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoringEnabled)
 	{
-		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
+		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
 
 		cache = new TimedOutLRUCache<String, Integer>(capacity, cacheLifeTime);
 		translator = new DefaultSingleResourcePropertyTranslator();
