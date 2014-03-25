@@ -11,7 +11,6 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
 public class RNSAttributesHandler extends AbstractAttributeHandler
 {
-
 	public RNSAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
 	{
 		super(pkg);
