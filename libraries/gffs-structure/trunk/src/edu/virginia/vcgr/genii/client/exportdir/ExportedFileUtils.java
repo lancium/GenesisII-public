@@ -80,21 +80,20 @@ public class ExportedFileUtils
 		if (properties == null)
 			throw new IllegalArgumentException("Can't have a null creation properites parameter.");
 
-		org.apache.axis.message.MessageElement pathElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME));
+		MessageElement pathElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME));
 		if (pathElement == null)
 			throw new IllegalArgumentException("Couldn't find path in creation properties.");
 		path = pathElement.getValue();
 
-		org.apache.axis.message.MessageElement parentIDSElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
+		MessageElement parentIDSElement =
+			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
 		if (parentIDSElement == null)
 			throw new IllegalArgumentException("Couldn't find parentIds in creation properties.");
 		parentIds = parentIDSElement.getValue();
 
 		// get replication state
-		org.apache.axis.message.MessageElement replicationElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_));
+		MessageElement replicationElement =
+			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_));
 		if (replicationElement == null)
 			throw new IllegalArgumentException("Couldn't find replication indicator in export creation properties.");
 		isReplicated = replicationElement.getValue();

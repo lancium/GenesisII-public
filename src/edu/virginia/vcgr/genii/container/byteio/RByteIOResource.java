@@ -20,6 +20,7 @@ import java.util.Calendar;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,7 +53,7 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		File file = null;
 		try {
 			if (creationProperties != null) {
-				org.apache.axis.message.MessageElement any = creationProperties.getAxisMessageElement(FILE_PATH_PROPERTY);
+				MessageElement any = creationProperties.getMessageElement(FILE_PATH_PROPERTY);
 				if (any != null) {
 					file = new File(userDir, any.getAsString());
 				}

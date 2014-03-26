@@ -20,10 +20,9 @@ public class SimpleTopicQueryExpressionFactory implements TopicQueryExpressionFa
 		 * This is SO stupid, but somehow Apache Axis doesn't actually implement the correct
 		 * functionality.
 		 */
-		if (e instanceof org.apache.axis.message.MessageElement) {
+		if (e instanceof MessageElement) {
 			try {
-				MessageElement me = (MessageElement) e;
-				return createFromElement(me.getAsDOM());
+				return createFromElement(((MessageElement) e).getAsDOM());
 			} catch (TopicNotSupportedFaultType f) {
 				throw f;
 			} catch (Exception ee) {

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierType;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.NotificationBrokerDirectory;
@@ -29,7 +30,6 @@ public class CacheManager
 
 	public static Object getItemFromCache(Object target, Object cacheKey, Class<?> itemType)
 	{
-
 		if (CacheConfigurer.isCachingEnabled()) {
 			/*
 			 * Before accessing the cache, this tries to assess the freshness of cached information
@@ -294,7 +294,8 @@ public class CacheManager
 				}
 			}
 		}
-		_logger.warn("could not find an appropriate cache for type: " + typeOfItem.getCanonicalName());
+		_logger.warn("could not find an appropriate cache for key '" + cacheKey.toString() + "' type "
+			+ typeOfItem.getCanonicalName() + ", coming from: " + ProgramTools.showLastFewOnStack(20));
 		return null;
 	}
 }

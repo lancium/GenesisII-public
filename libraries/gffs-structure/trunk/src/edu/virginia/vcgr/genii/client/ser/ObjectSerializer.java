@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.apache.axis.Constants;
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
@@ -58,8 +59,8 @@ public class ObjectSerializer
 	 */
 	public static SOAPElement toSOAPElement(Object obj, QName name, boolean nillable) throws ResourceException
 	{
-		if (obj instanceof org.apache.axis.message.MessageElement) {
-			org.apache.axis.message.MessageElement element = (org.apache.axis.message.MessageElement) obj;
+		if (obj instanceof MessageElement) {
+			MessageElement element = (MessageElement) obj;
 			if (name == null || name.equals(element.getQName())) {
 				return element;
 			} else {
@@ -70,7 +71,7 @@ public class ObjectSerializer
 			if (name == null
 				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(
 					element.getNamespaceURI()))) {
-				return new org.apache.axis.message.MessageElement((Element) obj);
+				return new MessageElement((Element) obj);
 			} else {
 				throw new ResourceException("Not Implemented.");
 			}
@@ -109,8 +110,8 @@ public class ObjectSerializer
 
 	public static Element toElement(Object obj, QName name, boolean nillable) throws ResourceException
 	{
-		if (obj instanceof org.apache.axis.message.MessageElement) {
-			org.apache.axis.message.MessageElement messageElement = (org.apache.axis.message.MessageElement) obj;
+		if (obj instanceof MessageElement) {
+			MessageElement messageElement = (MessageElement) obj;
 			if (name == null || name.equals(messageElement.getQName())) {
 				Element element = null;
 				try {
@@ -133,8 +134,7 @@ public class ObjectSerializer
 			}
 		}
 
-		org.apache.axis.message.MessageElement messageElement =
-			(org.apache.axis.message.MessageElement) toSOAPElement(obj, name, nillable);
+		MessageElement messageElement = (MessageElement)toSOAPElement(obj, name, nillable);
 		try {
 			return AnyHelper.toElement(messageElement);
 		} catch (Exception e) {
@@ -154,8 +154,7 @@ public class ObjectSerializer
 
 	public static String toString(Object obj, QName name, boolean nillable) throws ResourceException
 	{
-		org.apache.axis.message.MessageElement messageElement =
-			(org.apache.axis.message.MessageElement) toSOAPElement(obj, name, nillable);
+		MessageElement messageElement = (MessageElement)toSOAPElement(obj, name, nillable);
 		try {
 			return AnyHelper.toString(messageElement);
 		} catch (Exception e) {
@@ -176,7 +175,7 @@ public class ObjectSerializer
 			return;
 		}
 		try {
-			AnyHelper.write(writer, (org.apache.axis.message.MessageElement) soapElement);
+			AnyHelper.write(writer, (MessageElement)soapElement);
 		} catch (Exception e) {
 			throw new ResourceException("Generic Serialization Error.", e);
 		}
@@ -204,7 +203,7 @@ public class ObjectSerializer
 		}
 	}
 
-	static public byte[] anyToBytes(org.apache.axis.message.MessageElement[] any) throws ResourceException
+	static public byte[] anyToBytes(MessageElement[] any) throws ResourceException
 	{
 		if (any == null)
 			return null;
@@ -215,7 +214,7 @@ public class ObjectSerializer
 		try {
 			oos = new ObjectOutputStream(baos = new ByteArrayOutputStream());
 			oos.writeInt(any.length);
-			for (org.apache.axis.message.MessageElement elem : any) {
+			for (MessageElement elem : any) {
 				oos.writeObject(elem.getAsDOM());
 			}
 

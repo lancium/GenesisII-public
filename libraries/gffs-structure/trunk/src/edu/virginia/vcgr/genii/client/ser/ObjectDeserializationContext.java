@@ -16,10 +16,9 @@ import org.apache.axis.Constants;
 import org.apache.axis.encoding.DeserializationContext;
 import org.apache.axis.encoding.Deserializer;
 import org.apache.axis.message.EnvelopeHandler;
+import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPHandler;
 import org.apache.axis.utils.XMLUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -28,8 +27,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public class ObjectDeserializationContext extends DeserializationContext
 {
-	static private Log _logger = LogFactory.getLog(ObjectDeserializationContext.class);
-
 	private Deserializer topDeserializer = null;
 
 	public ObjectDeserializationContext(org.apache.axis.message.MessageElement element) throws ResourceException
@@ -41,7 +38,6 @@ public class ObjectDeserializationContext extends DeserializationContext
 		throws ResourceException
 	{
 		super(Config.getContext(), new SOAPHandler());
-
 		init(element.getType(), javaClass);
 
 		String inputString = element.toString();
@@ -56,7 +52,6 @@ public class ObjectDeserializationContext extends DeserializationContext
 	public ObjectDeserializationContext(Element element, Class<?> javaClass) throws ResourceException
 	{
 		super(Config.getContext(), new SOAPHandler());
-
 		String typeAttr = element.getAttributeNS(Constants.URI_DEFAULT_SCHEMA_XSI, "type");
 
 		QName type = null;
@@ -121,7 +116,7 @@ public class ObjectDeserializationContext extends DeserializationContext
 		return (this.topDeserializer == null) ? null : this.topDeserializer.getValue();
 	}
 
-	public org.apache.axis.message.MessageElement getMessageElement()
+	public MessageElement getMessageElement()
 	{
 		if (this.topDeserializer == null || !(this.topDeserializer instanceof SOAPHandler)) {
 			return null;
@@ -131,7 +126,7 @@ public class ObjectDeserializationContext extends DeserializationContext
 
 	public QName getQName()
 	{
-		org.apache.axis.message.MessageElement element = getMessageElement();
+		MessageElement element = getMessageElement();
 		return (element == null) ? null : element.getQName();
 	}
 

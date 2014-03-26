@@ -80,6 +80,9 @@ public class DefaultAttributeCache extends CommonCache
 				allProperties.addAll((Collection<? extends MessageElement>) value);
 			} else if (value instanceof MessageElement[]) {
 				allProperties.addAll(Arrays.asList((MessageElement[]) value));
+			} else {
+				_logger.error("unknown type being cached; not a recognizable message element or collection of them.");
+				return;
 			}
 		}
 		cache.put(EPI, allProperties);

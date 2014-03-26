@@ -48,7 +48,6 @@ public class DefaultMultiResourcePropertyTranslator implements MultiResourceProp
 		for (Object o : obj) {
 			ret.add(_single.serialize(name, o));
 		}
-
 		return ret;
 	}
 }

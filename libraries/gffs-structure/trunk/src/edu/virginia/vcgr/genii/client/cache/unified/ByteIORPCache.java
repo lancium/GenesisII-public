@@ -90,7 +90,13 @@ public class ByteIORPCache extends CommonAttributeCache
 			return;
 
 		QName qName = (QName) cacheKey;
-		MessageElement element = (MessageElement) value;
+
+		MessageElement element = null;
+		if (!(value instanceof MessageElement)) {
+			_logger.error("unknown type being cached; not a recognizable message element.");
+			return;
+		}
+		element = (MessageElement) value;
 
 		if (qName.equals(ByteIOConstants.rsize) || qName.equals(ByteIOConstants.ssize)) {
 			Long fileSize = translator.deserialize(Long.class, element);

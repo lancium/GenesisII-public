@@ -71,8 +71,7 @@ public class RExportUtils
 			throw new IllegalArgumentException("Null creation properites parameter.");
 
 		// Get common EPI
-		org.apache.axis.message.MessageElement epiElement =
-			properties.getAxisMessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
+		MessageElement epiElement = properties.getMessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
 		try {
 			epi = ClientConstructionParameters.getEndpointIdentifierProperty(epiElement);
 		} catch (URI.MalformedURIException use) {
@@ -82,8 +81,7 @@ public class RExportUtils
 			throw new IllegalArgumentException("Can't find epi in creation properties.");
 
 		// Get local path of export
-		org.apache.axis.message.MessageElement pathElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_NAME));
+		MessageElement pathElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_NAME));
 		if (pathElement == null)
 			throw new IllegalArgumentException("Can't find local path in creation properties.");
 		path = pathElement.getValue();
@@ -92,8 +90,7 @@ public class RExportUtils
 			throw new IllegalArgumentException("Couldn't find path in creation properties.");
 
 		// Get list of container names - first name is location of primary
-		org.apache.axis.message.MessageElement parentIdsElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS));
+		MessageElement parentIdsElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS));
 		if (parentIdsElement == null)
 			throw new IllegalArgumentException("Can't find parentIds names in creation properties.");
 		parentIds = parentIdsElement.getValue();

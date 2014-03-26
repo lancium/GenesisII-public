@@ -101,16 +101,16 @@ public class BESActivityUtils
 			throw new IllegalArgumentException("Couldn't find container ID in creation properties.");
 
 		try {
-			MessageElement any = properties.getAxisMessageElement(JOB_DEF_QNAME);
+			MessageElement any = properties.getMessageElement(JOB_DEF_QNAME);
 			if (any == null) {
 				String msg = "failure in decoding properties for 'any' object";
 				_logger.error(msg);
 				throw new RuntimeException(msg);
 			}
 			jobDef = (JobDefinition_Type) ObjectDeserializer.toObject(any, JobDefinition_Type.class);
-			containerID = properties.getAxisMessageElement(CONTAINER_ID_QNAME).getValue();
+			containerID = properties.getMessageElement(CONTAINER_ID_QNAME).getValue();
 
-			any = properties.getAxisMessageElement(sbconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME);
+			any = properties.getMessageElement(sbconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME);
 			if (any != null)
 				subscribe = (Subscribe) ObjectDeserializer.toObject(any, Subscribe.class);
 		} catch (Exception e) {

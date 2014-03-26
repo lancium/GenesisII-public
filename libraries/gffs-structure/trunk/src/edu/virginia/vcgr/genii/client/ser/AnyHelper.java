@@ -8,26 +8,22 @@
  */
 package edu.virginia.vcgr.genii.client.ser;
 
-import java.io.Writer;
-import java.io.StringWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.List;
-
-import javax.xml.soap.SOAPElement;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.Text;
 import org.apache.axis.encoding.AnyContentType;
 import org.apache.axis.encoding.SerializationContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.xml.sax.InputSource;
-
-import org.w3c.dom.Element;
+import org.apache.xmlbeans.impl.soap.SOAPElement;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
@@ -216,8 +212,6 @@ public class AnyHelper
 		element.output(context);
 		writer.write('\n');
 	}
-
-	// ********* toString **********
 
 	/**
 	 * Converts a SOAP MessageElement to an XML String representation

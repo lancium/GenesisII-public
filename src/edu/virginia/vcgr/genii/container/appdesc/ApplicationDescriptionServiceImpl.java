@@ -77,13 +77,13 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 
 		IResource resource = rKey.dereference();
 
-		org.apache.axis.message.MessageElement elem;
+		MessageElement elem;
 
-		elem = creationParameters.getAxisMessageElement(ApplicationDescriptionCreator.APPLICATION_NAME_CREATION_PARAMETER);
+		elem = creationParameters.getMessageElement(ApplicationDescriptionCreator.APPLICATION_NAME_CREATION_PARAMETER);
 		if (elem != null)
 			resource.setProperty(APPLICATION_DESCRIPTION_PROPERTY_NAME, elem.getValue());
 
-		elem = creationParameters.getAxisMessageElement(ApplicationDescriptionCreator.APPLICATION_VERSION_CREATION_PARAMETER);
+		elem = creationParameters.getMessageElement(ApplicationDescriptionCreator.APPLICATION_VERSION_CREATION_PARAMETER);
 		if (elem != null) {
 			String value = elem.getValue();
 			if (value != null)

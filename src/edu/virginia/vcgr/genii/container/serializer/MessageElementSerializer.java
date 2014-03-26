@@ -2,10 +2,12 @@ package edu.virginia.vcgr.genii.container.serializer;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
+
 public class MessageElementSerializer
 {
-	public static org.apache.axis.message.MessageElement serialize(QName name, Object item)
+	public static MessageElement serialize(QName name, Object item)
 	{
-		return new org.apache.axis.message.MessageElement(name, item);
+		return new MessageElement(name, item);
 	}
 }

@@ -59,7 +59,6 @@ public class SubscribeRequest
 	{
 		if (_topicFilter == null)
 			return null;
-
 		return new FilterType(new MessageElement[] { _topicFilter.toTopicExpressionElement(TOPIC_EXPRESSION_QNAME,
 			TOPIC_NS_PREFIX_PATTERN) });
 	}

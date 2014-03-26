@@ -27,7 +27,6 @@ import edu.virginia.vcgr.genii.notification.broker.IndirectSubscriptionEntryType
  */
 public class SubscriptionDirectory
 {
-
 	// TODO: This should come from some properties file.
 	public static final long SUBSCRIPTION_TIMEOUT_INTERVAL = 30 * 60 * 1000L; // thirty minutes
 
@@ -36,10 +35,11 @@ public class SubscriptionDirectory
 	static final Map<String, SubscriptionReferenceList> SUBSCRIBED_RESOURCE_TO_SUBSCRIPTION_REFERENCE_MAP =
 		new ConcurrentHashMap<String, SubscriptionReferenceList>();
 
-	// This tracks the set of resources for which subscription requests have been failed previously.
-	// We adopt
-	// the pessimistic approach that if the subscription request fails for a resource once it is
-	// non-subscribable.
+	/*
+	 * This tracks the set of resources for which subscription requests have been failed previously.
+	 * We adopt the pessimistic approach that if the subscription request fails for a resource once
+	 * it is not subscribable.
+	 */
 	static final Set<String> UNSUBSCRIBABLE_RESOURCES = new HashSet<String>();
 
 	public static boolean isResourceAlreadySubscribed(EndpointReferenceType EPR)
@@ -122,7 +122,6 @@ public class SubscriptionDirectory
 
 	private static SubscriptionReferenceList createSubscriptionReferenceList(IndirectSubscriptionEntryType[] response)
 	{
-
 		SubscriptionReferenceList referenceList = new SubscriptionReferenceList();
 
 		for (IndirectSubscriptionEntryType entry : response) {

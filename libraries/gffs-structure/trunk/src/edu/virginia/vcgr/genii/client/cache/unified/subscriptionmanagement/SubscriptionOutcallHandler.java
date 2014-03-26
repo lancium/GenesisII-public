@@ -246,7 +246,6 @@ class SubscriptionOutcallHandler extends Thread
 
 	private class SubscriptionRequestSampler extends Thread
 	{
-
 		@Override
 		public void run()
 		{

@@ -32,13 +32,15 @@ public class DefaultSingleResourcePropertyTranslator implements SingleResourcePr
 			_logger.error("provided class type in clazz is null.");
 			return null;
 		}
-		if (!(element instanceof MessageElement)) {
-			_logger.error("SEEING THE WRONG TYPE OF OBJECT IN DESERIALIZE!!!!!");
-		}
 		_logger.debug("deserializing type " + clazz.getCanonicalName() + " from elem real type "
 			+ element.getClass().getCanonicalName());
 		try {
 			Object ob = ObjectDeserializer.toObject(element, clazz);
+			if (ob == null) {
+				_logger.error("deserialization problem for type " + clazz.getCanonicalName() + " from elem real type "
+					+ element.getClass().getCanonicalName());
+				return null;
+			}
 			_logger.debug("object type deserialized: " + ob.getClass().getCanonicalName());
 			Type toReturn = clazz.cast(ob);
 			_logger.debug("...now returning type " + toReturn.getClass().getCanonicalName());

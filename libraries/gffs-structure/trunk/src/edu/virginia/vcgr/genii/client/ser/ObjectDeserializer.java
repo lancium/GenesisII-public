@@ -16,6 +16,7 @@ import javax.xml.soap.SOAPElement;
 
 import org.apache.axis.description.TypeDesc;
 import org.apache.axis.encoding.AnyContentType;
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
@@ -94,11 +95,11 @@ public class ObjectDeserializer
 	@SuppressWarnings("unchecked")
 	public static <Type> Type toObject(SOAPElement element, Class<Type> javaClass) throws ResourceException
 	{
-		if (!(element instanceof org.apache.axis.message.MessageElement)) {
+		if (!(element instanceof MessageElement)) {
 			throw new ResourceException("Unsupported type.");
 		}
 
-		org.apache.axis.message.MessageElement elem = (org.apache.axis.message.MessageElement) element;
+		MessageElement elem = (MessageElement) element;
 		if (elem.getDeserializationContext() != null && !elem.isDirty()) {
 			try {
 				return (Type) elem.getValueAsType(elem.getType(), javaClass);
@@ -203,7 +204,7 @@ public class ObjectDeserializer
 		if (element == null || javaClass == null) {
 			throw new IllegalArgumentException();
 		}
-		if (!(element instanceof org.apache.axis.message.MessageElement)) {
+		if (!(element instanceof MessageElement)) {
 			throw new IllegalArgumentException();
 		}
 		TypeDesc desc = TypeDesc.getTypeDescForClass(javaClass);
@@ -246,7 +247,7 @@ public class ObjectDeserializer
 		}
 	}
 
-	static public org.apache.axis.message.MessageElement[] anyFromBytes(byte[] data) throws ResourceException
+	static public MessageElement[] anyFromBytes(byte[] data) throws ResourceException
 	{
 		if (data == null)
 			return null;
@@ -259,9 +260,9 @@ public class ObjectDeserializer
 			ois = new ObjectInputStream(bais);
 
 			int numElements = ois.readInt();
-			org.apache.axis.message.MessageElement[] ret = new org.apache.axis.message.MessageElement[numElements];
+			MessageElement[] ret = new MessageElement[numElements];
 			for (int lcv = 0; lcv < ret.length; lcv++) {
-				ret[lcv] = new org.apache.axis.message.MessageElement((Element) ois.readObject());
+				ret[lcv] = new MessageElement((Element) ois.readObject());
 			}
 
 			return ret;

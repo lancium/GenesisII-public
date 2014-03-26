@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,21 +41,15 @@ public class GenesisHashMap extends HashMap<QName, Object>
 		return super.put(name, o);
 	}
 
-	public org.apache.axis.message.MessageElement getAxisMessageElement(QName which)
+	public MessageElement getMessageElement(QName which)
 	{
 		Object toReturn = get(which);
 		if (toReturn == null)
 			return null; // nothing there.
-		if (toReturn instanceof org.apache.axis.message.MessageElement) {
-			return (org.apache.axis.message.MessageElement) toReturn;
-			/*
-			 * } else if (toReturn instanceof MessageElement) { // hmmm: should never hit this now,
-			 * unless we allow either type to be plopped in.
-			 * _logger.error("still seeing our message element wrapper in hash map."); return
-			 * ((MessageElement) toReturn).getReal();
-			 */
+		if (toReturn instanceof MessageElement) {
+			return (MessageElement) toReturn;
 		} else {
-			String msg = "type is not convertible to axis message element: " + which;
+			String msg = "type is not convertible to a message element: " + which;
 			_logger.error(msg);
 			throw new RuntimeException(msg);
 		}

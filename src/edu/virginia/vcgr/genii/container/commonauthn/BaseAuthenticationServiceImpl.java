@@ -164,7 +164,7 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (certificateOwnerEPR == null) {
 			MessageElement certificateOwner =
-				constructionParameters.getAxisMessageElement(STSConfigurationProperties.CERTIFICATE_OWNER_EPR);
+				constructionParameters.getMessageElement(STSConfigurationProperties.CERTIFICATE_OWNER_EPR);
 			if (certificateOwner != null) {
 				try {
 					certificateOwnerEPR = (EndpointReferenceType) certificateOwner.getObjectValue(EndpointReferenceType.class);
@@ -294,7 +294,7 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		EndpointReferenceType primaryEPR =
 			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		MessageElement isReplica =
-			constructionParameters.getAxisMessageElement(STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM);
+			constructionParameters.getMessageElement(STSConfigurationProperties.REPLICA_STS_CONSTRUCTION_PARAM);
 		boolean skipPostCreateOverride =
 			primaryEPR != null || (isReplica != null && "TRUE".equalsIgnoreCase(isReplica.getValue()));
 		return skipPostCreateOverride;

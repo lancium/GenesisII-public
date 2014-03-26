@@ -184,15 +184,14 @@ public class ExportedDirUtils
 			throw new IllegalArgumentException("Can't have a null export creation properites parameter.");
 
 		// get path
-		org.apache.axis.message.MessageElement pathElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME));
+		MessageElement pathElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME));
 		if (pathElement == null)
 			throw new IllegalArgumentException("Couldn't find path in export creation properties.");
 		path = pathElement.getValue();
 
 		// get parentIds
-		org.apache.axis.message.MessageElement parentIDSElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
+		MessageElement parentIDSElement =
+			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
 		if (parentIDSElement == null)
 			throw new IllegalArgumentException("Couldn't find parentIds in export creation properties.");
 		parentIds = parentIDSElement.getValue();
@@ -200,20 +199,18 @@ public class ExportedDirUtils
 			parentIds = "";
 
 		// get svn user
-		org.apache.axis.message.MessageElement svnUserElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_USERNAME));
+		MessageElement svnUserElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_USERNAME));
 		if (svnUserElement != null)
 			svnUser = svnUserElement.getValue();
 
 		// get svn pass
-		org.apache.axis.message.MessageElement svnPassElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_PASSWORD));
+		MessageElement svnPassElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_PASSWORD));
 		if (svnPassElement != null)
 			svnPass = svnPassElement.getValue();
 
 		// get svn revision
-		org.apache.axis.message.MessageElement svnRevisionElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_REVISION));
+		MessageElement svnRevisionElement =
+			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_REVISION));
 		try {
 			if (svnRevisionElement != null && svnRevisionElement.getValue() != null)
 				svnRevision = (Long) svnRevisionElement.getObjectValue(Long.class);
@@ -222,15 +219,15 @@ public class ExportedDirUtils
 		}
 
 		// get replication state
-		org.apache.axis.message.MessageElement replicationElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR));
+		MessageElement replicationElement =
+			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR));
 		if (replicationElement == null)
 			throw new IllegalArgumentException("Couldn't find replication indicator in export creation properties.");
 		isReplicated = replicationElement.getValue();
 
 		// get resolver service epr
-		org.apache.axis.message.MessageElement resolverServiceElement =
-			properties.getAxisMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR));
+		MessageElement resolverServiceElement =
+			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR));
 		if (resolverServiceElement == null)
 			throw new IllegalArgumentException("Couldn't find resolver service epr in export creation properties.");
 		try {

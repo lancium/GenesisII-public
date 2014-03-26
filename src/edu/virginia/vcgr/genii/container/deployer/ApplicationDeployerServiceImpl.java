@@ -93,10 +93,9 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 	{
 		IDeployment deployment = null;
 
-		org.apache.axis.message.MessageElement eprElem =
-			constructionParameters.getAxisMessageElement(DEPLOYMENT_CONSTRUCTION_PARAM);
+		MessageElement eprElem = constructionParameters.getMessageElement(DEPLOYMENT_CONSTRUCTION_PARAM);
 		if (eprElem == null)
-			throw new ResourceException("Unable to create deployment -- " + "application deployment description EPR not set.");
+			throw new ResourceException("Unable to create deployment; application deployment description EPR not set.");
 		EndpointReferenceType depDescEPR = ObjectDeserializer.toObject(eprElem, EndpointReferenceType.class);
 		DeploymentDocumentType deployDoc;
 

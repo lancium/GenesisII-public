@@ -43,8 +43,7 @@ public class ConcreteTopicQueryExpressionFactory implements TopicQueryExpression
 		 */
 		if (e instanceof MessageElement) {
 			try {
-				MessageElement me = (MessageElement) e;
-				return createFromElement(me.getAsDOM());
+				return createFromElement(((MessageElement) e).getAsDOM());
 			} catch (TopicNotSupportedFaultType f) {
 				throw f;
 			} catch (Exception ee) {

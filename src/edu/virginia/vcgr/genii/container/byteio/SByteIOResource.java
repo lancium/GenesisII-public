@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
+
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -23,8 +25,8 @@ public class SByteIOResource extends RByteIOResource implements ISByteIOResource
 
 	public File chooseFile(GenesisHashMap creationProperties) throws ResourceException
 	{
-		org.apache.axis.message.MessageElement fileAny;
-		org.apache.axis.message.MessageElement deleteAny;
+		MessageElement fileAny;
+		MessageElement deleteAny;
 		// String fileAny;
 		// Boolean deleteAny;
 		File file = null;
@@ -34,11 +36,11 @@ public class SByteIOResource extends RByteIOResource implements ISByteIOResource
 			if (creationProperties == null)
 				throw new ResourceException("StreamableByteIO Instances MUST have a file path.");
 
-			fileAny = creationProperties.getAxisMessageElement(FILE_PATH_PROPERTY);
+			fileAny = creationProperties.getMessageElement(FILE_PATH_PROPERTY);
 			// fileAny = (String)creationProperties.get(FILE_PATH_PROPERTY);
 			if (fileAny == null)
 				throw new ResourceException("StreamableByteIO Instances MUST have a file path " + "element creation property.");
-			deleteAny = creationProperties.getAxisMessageElement(MUST_DESTROY_PROPERTY);
+			deleteAny = creationProperties.getMessageElement(MUST_DESTROY_PROPERTY);
 			// deleteAny = (Boolean)creationProperties.get(MUST_DESTROY_PROPERTY);
 			if (deleteAny == null)
 				throw new ResourceException("StreamableByteIO Instances MUST have a must destroy "

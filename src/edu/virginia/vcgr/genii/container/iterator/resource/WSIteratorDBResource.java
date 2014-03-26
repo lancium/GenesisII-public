@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Pair;
 import org.morgan.util.io.StreamUtils;
 
@@ -33,6 +35,8 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class WSIteratorDBResource extends BasicDBResource implements WSIteratorResource
 {
+	static private Log _logger = LogFactory.getLog(WSIteratorDBResource.class);
+
 	static Map<String, InMemoryIteratorWrapper> mapper = new HashMap<String, InMemoryIteratorWrapper>();
 	static Map<String, Boolean> type = new HashMap<String, Boolean>();
 	static Object _lock = new Object();
@@ -196,8 +200,12 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 				if (entry != null) {
 
 					try {
-						MessageElement me = (MessageElement) meth.invoke(null, getConnection(), entry, commonObjs);
-						ret.add(new Pair<Long, MessageElement>((long) lcv, me));
+						Object obj = meth.invoke(null, getConnection(), entry, commonObjs);
+						if (obj instanceof MessageElement) {
+							ret.add(new Pair<Long, MessageElement>((long) lcv, (MessageElement) obj));
+						} else {
+							_logger.error("unknown type in list: " + obj.getClass().getCanonicalName());
+						}
 					}
 
 					catch (IllegalArgumentException e) {

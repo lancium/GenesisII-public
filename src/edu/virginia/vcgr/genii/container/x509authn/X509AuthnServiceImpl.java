@@ -323,7 +323,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		// determine the credential the idp will front.
 		NuCredential credential = null;
 		MessageElement encodedCredential =
-			constructionParameters.getAxisMessageElement(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME);
+			constructionParameters.getMessageElement(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME);
 
 		// get the IDP resource's db resource
 		IResource resource = rKey.dereference();

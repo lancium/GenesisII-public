@@ -74,7 +74,13 @@ public class AuthZConfigCache extends CommonAttributeCache
 		String EPI = wsEndpointIdenfierURI.toString();
 		long lifetime = getCacheLifeTime(wsEndpointIdenfierURI);
 		QName qName = (QName) cacheKey;
-		MessageElement element = (MessageElement) value;
+
+		MessageElement element = null;
+		if (!(value instanceof MessageElement)) {
+			_logger.error("unknown type being cached; not a recognizable message element.");
+			return;
+		}
+		element = (MessageElement) value;
 
 		if (qName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME)) {
 			Permissions permissions = permissionTranslator.deserialize(Permissions.class, element);

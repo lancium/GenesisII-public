@@ -74,9 +74,10 @@ public class AttributesUpdateNotificationsHandler
 		WSName byteIOName = new WSName(byteIOEndpoint);
 		URI wsEndpointIdentifier = byteIOName.getEndpointIdentifier();
 
-		// Remove size and modification time attributes from the cache, because these are the only
-		// two attributes that
-		// get affected by a blockade.
+		/*
+		 * Remove size and modification time attributes from the cache, because these are the only
+		 * two attributes that get affected by a blockade.
+		 */
 		CacheManager.removeItemFromCache(wsEndpointIdentifier,
 			new QName(nameSpaceForAttributes, ByteIOConstants.SIZE_ATTR_NAME), MessageElement.class);
 		CacheManager.removeItemFromCache(wsEndpointIdentifier, new QName(nameSpaceForAttributes,

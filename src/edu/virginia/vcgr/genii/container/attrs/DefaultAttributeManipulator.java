@@ -76,8 +76,15 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 				ArrayList<MessageElement> tmp = new ArrayList<MessageElement>(1);
 				tmp.add((MessageElement) ret);
 				return tmp;
-			} else
-				return (Collection<MessageElement>) ret;
+			} else {
+				if (ret instanceof Collection<?>) {
+					return (Collection<MessageElement>) ret;
+				} else {
+					String msg = "failure: unknown type in attribute";
+					_logger.error(msg);
+					throw new RuntimeException(msg);
+				}
+			}
 		} catch (InvocationTargetException ite) {
 			Throwable t = ite.getCause();
 			if (t == null)
