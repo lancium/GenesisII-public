@@ -80,7 +80,7 @@ public class SetResourcePropertiesTool extends BaseGridTool
 			Collection<MessageElement> properties = new LinkedList<MessageElement>();
 			Iterator<?> iter = me.getChildElements();
 			while (iter.hasNext()) {
-				MessageElement obj = (MessageElement)iter.next();
+				MessageElement obj = (MessageElement) iter.next();
 				me = (MessageElement) obj;
 				properties.add(me);
 			}

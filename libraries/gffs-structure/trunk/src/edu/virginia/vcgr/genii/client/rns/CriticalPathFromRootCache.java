@@ -80,10 +80,11 @@ public class CriticalPathFromRootCache
 		{
 			synchronized (_tierEntries) {
 				RNSPath found = _tierEntries.get(path);
-				
-				//hmmm: cache is disabled!!!!
+
+				// hmmm: cache is disabled!!!!
 				boolean turnedOff = true;
-		if (turnedOff) found = null; //temp
+				if (turnedOff)
+					found = null; // temp
 				if (found != null) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("CPFRC hit: " + path);

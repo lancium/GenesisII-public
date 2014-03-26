@@ -153,8 +153,7 @@ public class ResolverTool extends BaseGridTool
 			GeniiCommon dirService = ClientUtils.createProxy(GeniiCommon.class, sourceEPR);
 			MessageElement[] elementArr = new MessageElement[1];
 			elementArr[0] = new MessageElement(GeniiDirPolicy.RESOLVER_POLICY_QNAME, resolverEPR);
-			InsertResourceProperties insertReq =
-				new InsertResourceProperties(new InsertType(elementArr));
+			InsertResourceProperties insertReq = new InsertResourceProperties(new InsertType(elementArr));
 			dirService.insertResourceProperties(insertReq);
 		}
 		CacheManager.removeItemFromCache(sourceRNS.pwd(), EndpointReferenceType.class);

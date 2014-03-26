@@ -167,52 +167,40 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			} else if (element.getName().equals("RequestType")) {
 				// process RequestType element
 				try {
-					requestType = (RequestTypeOpenEnum) element
-							.getObjectValue(RequestTypeOpenEnum.class);
+					requestType = (RequestTypeOpenEnum) element.getObjectValue(RequestTypeOpenEnum.class);
 				} catch (Exception e) {
 				}
 			} else if (element.getName().equals("Lifetime")) {
 				// process LifeTime element
 				try {
-					lifetime = (LifetimeType) element
-							.getObjectValue(LifetimeType.class);
+					lifetime = (LifetimeType) element.getObjectValue(LifetimeType.class);
 				} catch (Exception e) {
 				}
 			} else if (element.getName().equals("DelegateTo")) {
 				// process DelegateTo element
 				DelegateToType dt = null;
 				try {
-					dt = (DelegateToType) element
-							.getObjectValue(DelegateToType.class);
+					dt = (DelegateToType) element.getObjectValue(DelegateToType.class);
 				} catch (Exception e) {
 				}
 				if (dt != null) {
 					for (MessageElement subElement : dt.get_any()) {
 						if (WSSecurityUtils.matchesSecurityToken(subElement)) {
-							subElement = WSSecurityUtils
-									.acquireChildSecurityElement(subElement,
-											"Embedded");
+							subElement = WSSecurityUtils.acquireChildSecurityElement(subElement, "Embedded");
 							if (subElement != null) {
-								subElement = subElement
-										.getChildElement(BinarySecurity.TOKEN_BST);
+								subElement = subElement.getChildElement(BinarySecurity.TOKEN_BST);
 								if (subElement != null) {
 									try {
-										if (subElement
-												.getAttributeValue("ValueType")
-												.equals(edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE)) {
-											X509Security bstToken = new X509Security(
-													subElement);
-											X509Certificate delegateTo = bstToken
-													.getX509Certificate(new GIIBouncyCrypto());
+										if (subElement.getAttributeValue("ValueType").equals(
+											edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE)) {
+											X509Security bstToken = new X509Security(subElement);
+											X509Certificate delegateTo = bstToken.getX509Certificate(new GIIBouncyCrypto());
 											delegateToChain = new X509Certificate[] { delegateTo };
 										} else {
 											if (delegateToChain == null) {
-												throw new AxisFault(
-														new QName(
-																"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-																"BadRequest"),
-														"Missing or unsupported DelegateTo security ValueType",
-														null, null);
+												throw new AxisFault(new QName(
+													"http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"),
+													"Missing or unsupported DelegateTo security ValueType", null, null);
 											}
 										}
 									} catch (GenesisIISecurityException e) {
@@ -522,10 +510,9 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 		MessageElement[] delegations = new MessageElement[] { new MessageElement(creds.convertToSOAPElement()) };
 
-		elements[1] = new MessageElement(new QName(
-				"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-				"RequestedSecurityToken"), new RequestedSecurityTokenType(
-				delegations));
+		elements[1] =
+			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
+				new RequestedSecurityTokenType(delegations));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		response.set_any(elements);

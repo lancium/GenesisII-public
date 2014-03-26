@@ -158,25 +158,27 @@ public class IDPLoginTool extends BaseLoginTool
 		// Add DelegateTo
 		if (delegateeIdentity != null) {
 			try {
-			MessageElement binaryToken = new MessageElement(BinarySecurity.TOKEN_BST);
-			binaryToken.setAttributeNS(null, "ValueType", edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE);
-			binaryToken.addTextNode("");
-			BinarySecurity bstToken = new X509Security(binaryToken);
-			((X509Security) bstToken).setX509Certificate(delegateeIdentity[0]);
+				MessageElement binaryToken = new MessageElement(BinarySecurity.TOKEN_BST);
+				binaryToken.setAttributeNS(null, "ValueType",
+					edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE);
+				binaryToken.addTextNode("");
+				BinarySecurity bstToken = new X509Security(binaryToken);
+				((X509Security) bstToken).setX509Certificate(delegateeIdentity[0]);
 
-			MessageElement embedded = new MessageElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
-			embedded.addChild(binaryToken);
+				MessageElement embedded =
+					new MessageElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+				embedded.addChild(binaryToken);
 
-			MessageElement wseTokenRef = new MessageElement(GenesisIIConstants.WSSE11_NS_SECURITY_QNAME);
-			wseTokenRef.addChild(embedded);
+				MessageElement wseTokenRef = new MessageElement(GenesisIIConstants.WSSE11_NS_SECURITY_QNAME);
+				wseTokenRef.addChild(embedded);
 
-			element =
-				new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "DelegateTo"),
-					new DelegateToType(new MessageElement[] { wseTokenRef }));
-			element.setType(DelegateToType.getTypeDesc().getXmlType());
-			elements.add(element);
-			if (_logger.isDebugEnabled())
-				_logger.debug("added security token reference");
+				element =
+					new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "DelegateTo"),
+						new DelegateToType(new MessageElement[] { wseTokenRef }));
+				element.setType(DelegateToType.getTypeDesc().getXmlType());
+				elements.add(element);
+				if (_logger.isDebugEnabled())
+					_logger.debug("added security token reference");
 			} catch (SOAPException e) {
 				throw new ToolException("IDP login error: " + e.getLocalizedMessage(), e);
 
