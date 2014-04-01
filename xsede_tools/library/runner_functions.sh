@@ -10,7 +10,7 @@
 function pick_grid_app()
 {
   if [ "$OS" == "Windows_NT" ]; then
-    dos_genii=$(echo $GENII_INSTALL_DIR | sed -e 's/\//\\/g')
+    dos_genii="$(echo "$GENII_INSTALL_DIR" | sed -e 's/\//\\/g')"
     if [ -f "$GENII_INSTALL_DIR/grid.exe" ]; then
       echo "$GENII_INSTALL_DIR/grid.exe"
     elif [ ! -z "$(uname -a | grep "^MING" )" ]; then
@@ -31,7 +31,7 @@ function pick_grid_app()
 # command's exit value.
 function grid()
 {
-  grid_base $(pick_grid_app) $*
+  grid_base \"$(pick_grid_app)\" $*
 }
 
 # a specialized grid launcher that invokes the fuse tool and saves the output.
@@ -39,14 +39,14 @@ function grid()
 function fuse()
 {
   local fuse_out="$(mktemp "$TEST_TEMP/grid_logs/out_fuse_$(date_string).XXXXXX")"
-  logged_grid "$fuse_out" $(pick_grid_app) fuse $* &
+  logged_grid "$fuse_out" "$(pick_grid_app)" fuse $* &
 }
 
 # a function that behaves like the normal grid command, except that it times the
 # processing that occurs from the command.
 function timed_grid()
 {
-  grid_base $(\which time) -p -o "$GRID_TIMING_FILE" $(pick_grid_app) $*
+  grid_base $(\which time) -p -o "$GRID_TIMING_FILE" "$(pick_grid_app)" $*
 }
 
 # this bails out if an error occurs.
@@ -61,7 +61,7 @@ function grid_chk()
 # into the grid command.  this allows using a here document as input to the command.
 function multi_grid()
 {
-  grid_base $(pick_grid_app)
+  grid_base \"$(pick_grid_app)\"
   retval=$?
   if [ $retval -ne 0 ]; then
     # we have to exit here since the command is operating as a sub-shell with the new

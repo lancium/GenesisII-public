@@ -5,12 +5,12 @@
 
 # standard start-up boilerplate.
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then
   source ../../prepare_tests.sh ../../prepare_tests.sh 
 fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 user="$1"; shift
 
@@ -20,7 +20,7 @@ if [ -z "$user" ]; then
   exit 1
 fi
 
-$GENII_INSTALL_DIR/grid script local:$XSEDE_TEST_ROOT/tools/xcg_admin/create-xsede-user.xml "$user"
-$GENII_INSTALL_DIR/grid chmod $SUBMIT_GROUP +x "$USERS_LOC/$user"
-$GENII_INSTALL_DIR/grid ln $SUBMIT_GROUP "$USERS_LOC/$user/$(basename $SUBMIT_GROUP)"
+"$GENII_INSTALL_DIR/grid" script local:"$XSEDE_TEST_ROOT/tools/xcg_admin/create-xsede-user.xml" "$user"
+"$GENII_INSTALL_DIR/grid" chmod $SUBMIT_GROUP +x "$USERS_LOC/$user"
+"$GENII_INSTALL_DIR/grid" ln $SUBMIT_GROUP "$USERS_LOC/$user/$(basename $SUBMIT_GROUP)"
 

@@ -7,11 +7,11 @@
 # Author: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
 export POSSIBLY_UNBUILT=true
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 ##hmmm: this is pretty general; move to the library.
 # connects to a host as a particular user and executes a command there.

@@ -7,12 +7,12 @@
 # Author: Vanamala Venkataswamy
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 export SHOWED_SETTINGS_ALREADY=true
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then
   source ../prepare_tests.sh ../prepare_tests.sh 
 fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 ##############
 
@@ -59,15 +59,15 @@ echo "[$(date)]"
 # container is already running or there's an existing user directory, it's an
 # oversight.
 echo "Cleaning out user directory '$GENII_USER_DIR'"
-bash $XSEDE_TEST_ROOT/library/zap_genesis_javas.sh
+bash "$XSEDE_TEST_ROOT/library/zap_genesis_javas.sh"
 \rm -rf "$GENII_USER_DIR" "$XSEDE_TEST_ROOT/"*.log "$XSEDE_TEST_ROOT/"*.log.*
 
 if [ $NAMESPACE == 'xsede' ]; then
   echo Copying xsede namespace properties into place.
-  cp $DEPLOYMENTS_ROOT/default/configuration/xsede-namespace.properties $DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/namespace.properties
+  cp "$DEPLOYMENTS_ROOT/default/configuration/xsede-namespace.properties" "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/namespace.properties"
 elif [ $NAMESPACE == 'xcg' ]; then
   echo Copying xcg namespace properties into place.
-  cp $DEPLOYMENTS_ROOT/default/configuration/xcg-namespace.properties $DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/namespace.properties
+  cp "$DEPLOYMENTS_ROOT/default/configuration/xcg-namespace.properties" "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/namespace.properties"
 else
   echo "Unknown namespace type--the NAMESPACE variable is unset or unknown"
   exit 1
@@ -128,7 +128,7 @@ check_if_failed Logging in as $new_admin_name
 # copy up the flag that shows this is *not* a useful, real, secure grid
 # and also let everyone read that file.
 multi_grid <<eof
-  cp local:$WORKDIR/a_bogus_grid.txt /
+  cp "local:$WORKDIR/a_bogus_grid.txt" /
   onerror Failed copy bogus grid file up to root directory.
   chmod /a_bogus_grid.txt +r --everyone
   onerror Failed to change permissions on bogus grid file.

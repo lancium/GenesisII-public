@@ -5,17 +5,17 @@
 # Author: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 export SHOWED_SETTINGS_ALREADY=true
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then
   source ../prepare_tests.sh ../prepare_tests.sh 
 fi
 # tell the test scripts not to require a GenesisII installation.
 export POSSIBLY_UNBUILT=yes
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 pushd "$XSEDE_TEST_ROOT/.." &>/dev/null
-justdir="$(basename $XSEDE_TEST_ROOT)"
+justdir="$(basename "$XSEDE_TEST_ROOT")"
 
 date_string="$(date +"%Y_%b_%e_%H%M" | sed -e 's/ //g')"
 

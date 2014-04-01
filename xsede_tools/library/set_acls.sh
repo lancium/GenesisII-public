@@ -94,7 +94,7 @@ fi
 
 # make sure they are not trying to de-pants their crucial data folders.
 forbidden_paths=(.globus .globusonline .secrets .ssh .subversion .ucc .Xauthority)
-targdirbase="$(basename $dirpath)"
+targdirbase="$(basename "$dirpath")"
 for i in ${forbidden_paths[@]}; do
   no_good=
   if [ "$targdirbase" == "$i" ]; then

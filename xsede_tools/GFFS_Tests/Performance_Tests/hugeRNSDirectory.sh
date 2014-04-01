@@ -3,10 +3,10 @@
 # Author: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 # the number of files to create in the RNS directory.
 MAX_FILES=20000
@@ -16,9 +16,9 @@ MAX_FILES=20000
 COPY_CHUNK=100
 
 # where we hook in the fuse mount.
-MOUNT_POINT=$WORKDIR/mount-hugeRNS
+MOUNT_POINT="$WORKDIR/mount-hugeRNS"
 # the user's home directory from fuse perspective.
-HOME_DIR=$MOUNT_POINT/$RNSPATH
+HOME_DIR="$MOUNT_POINT/$RNSPATH"
 
 BIGDIRNAME=huge_dir
  
@@ -31,7 +31,7 @@ oneTimeSetUp()
   # leverage our cleanup from tear down.
   oneTimeTearDown
 
-  mkdir $MOUNT_POINT
+  mkdir "$MOUNT_POINT"
 }
 
 testMounting()
@@ -39,27 +39,11 @@ testMounting()
   if ! fuse_supported; then return 0; fi
 
   echo "Mounting $MOUNT_POINT"
-  fuse --mount local:$MOUNT_POINT
+  fuse --mount local:"$MOUNT_POINT"
   sleep 30
 
-  test_fuse_mount $MOUNT_POINT
+  test_fuse_mount "$MOUNT_POINT"
   check_if_failed "Mounting grid to local directory"
-
-#old  checkMount="$(mount)"
-#old#echo checkmount is: $checkMount
-#old#echo mount point seeking is: $MOUNT_POINT
-#old  retval=1
-#old  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]; then retval=0; fi
-#old  assertEquals "Mounting to local directory" 0 $retval
-#old  if [ $retval == 0 ]; then
-#old    ls -l $MOUNT_POINT
-#old    assertEquals "Can list the fuse mounted directory" 0 $retval
-#old  else
-#old    rmdir $MOUNT_POINT
-#old    fail "Failed to mount the GFFS mount point, bailing."
-#old    exit 1
-#old  fi
-
 }
 
 # makes all of the files in the rns path.  we want this as a single
@@ -67,7 +51,7 @@ testMounting()
 copyFilesUp()
 {
   for (( i = 1 ; i <= $MAX_FILES; i++ )); do
-    echo blahHumbug$RANDOM$RANDOM >$HOME_DIR/$BIGDIRNAME/file_instance_$i.txt
+    echo blahHumbug$RANDOM$RANDOM >"$HOME_DIR/$BIGDIRNAME/file_instance_$i.txt"
     if [ $? -ne 0 ]; then
       return 1
     fi
@@ -81,7 +65,7 @@ testCreatingLargeDirectory()
   echo "Creating files starts at $(date)"
 
   # recreate our target directory in the grid.
-  mkdir $HOME_DIR/$BIGDIRNAME
+  mkdir "$HOME_DIR/$BIGDIRNAME"
   assertEquals "Making test folder $HOME_DIR/$BIGDIRNAME" 0 $?
 
   # make the files in the target directory.
@@ -130,10 +114,10 @@ oneTimeTearDown()
 {
   if ! fuse_supported; then return 0; fi
 
-  fusermount -u $MOUNT_POINT &>/dev/null
+  fusermount -u "$MOUNT_POINT" &>/dev/null
   sync ; sleep 2
-  if [ -d $MOUNT_POINT ]; then
-    rmdir $MOUNT_POINT
+  if [ -d "$MOUNT_POINT" ]; then
+    rmdir "$MOUNT_POINT"
   fi
 
   grid ls -d $RNSPATH/$BIGDIRNAME &>/dev/null
@@ -144,5 +128,5 @@ oneTimeTearDown()
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

@@ -9,14 +9,14 @@
 
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
-if [ -z $GENII_INSTALL_DIR ]; then
+if [ -z "$GENII_INSTALL_DIR" ]; then
   echo "export GENII_INSTALL_DIR before running the script."
   exit 1
 fi
 echo "GENII_INSTALL_DIR is set to $GENII_INSTALL_DIR"
-whoami=`$GENII_INSTALL_DIR/grid whoami | grep gffs-admins`
+whoami=`"$GENII_INSTALL_DIR/grid" whoami | grep gffs-admins`
 if [ $? -ne 0 ]; then
   echo "User must be member of gffs-admins group"
   exit 1
@@ -24,5 +24,5 @@ else
   echo "Confirmed user is member of gffs-admins"
 fi
 
-$GENII_INSTALL_DIR/grid script local:./link-grid-xcg.xml ./xcg-root-epr.xml
+"$GENII_INSTALL_DIR/grid" script local:./link-grid-xcg.xml ./xcg-root-epr.xml
 

@@ -14,12 +14,12 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 
 # pull in the xsede test base support.
-source $WORKDIR/../../prepare_tests.sh $WORKDIR/../../prepare_tests.sh
+source "$WORKDIR/../../prepare_tests.sh" "$WORKDIR/../../prepare_tests.sh"
 
 # if that didn't work, complain.
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
 # otherwise load the rest of the tool environment.
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 ####
 
@@ -46,7 +46,7 @@ bash create-one-cert.sh trusted_certs/tls-cert.pfx container Container
 # next, we grab a copy of context.xml from the genesis2 folder.
 # we want to include this in the package.
 #if [ ! -f context.xml ]; then
-  cp $GENII_INSTALL_DIR/context.xml .
+  cp "$GENII_INSTALL_DIR/context.xml" .
   if [ $? -ne 0 ]; then
     echo Failed to copy the context.xml from $GENII_INSTALL_DIR
     exit 1

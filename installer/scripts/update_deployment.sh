@@ -178,35 +178,6 @@ user_path="$(retrieve_compiler_variable genii.user-path)"
 
 ##############
 
-# grab some important certs that could have been updated.
-
-#no.
-
-#cp "$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted.pfx" "$LOCAL_CERTS_DIR"
-#if [ $? -ne 0 ]; then
-#  echo "Failed to copy the trust store into place; tried both new and old installers."
-#  echo "Tried copying '$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted.pfx' to '$LOCAL_CERTS_DIR'"
-#  exit 1
-#fi
-
-## create the trusted certs dir and copy in any from the installs.
-#echo Copying existing trusted certificates...
-#mkdir "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
-#cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted-certificates"/* "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
-#if [ $? -ne 0 ]; then
-#  echo no trusted certs found in new deployment. 
-#fi
-#
-## and now get the myproxy certs also.
-#echo Copying existing myproxy certificates...
-#mkdir "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
-#cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/myproxy-certs"/* "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
-#if [ $? -ne 0 ]; then
-#  echo no myproxy certs found in new deployment. 
-#fi
-
-##############
-
 # write any updated config values we were given.
 
 echo Writing configuration to installer file: $INSTALLER_FILE

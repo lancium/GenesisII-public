@@ -25,7 +25,7 @@ source prepare_tests.sh prepare_tests.sh
 
 # if that didn't work, complain.
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 which="$1"; shift
 verbosity="$1"; shift
@@ -165,18 +165,6 @@ done
 
 ##############
 
-#no # patch the grid client to increase its memory limit.
-### we have seen that 512M is not enough for the test suite.
-##pushd $GENII_INSTALL_DIR &>/dev/null
-### cygwin erroneously says "grid" exists if "grid.exe" exists.
-##if [ ! -f "grid.exe" ]; then
-##  if [ -f grid ]; then sed -i -e "s/-Xmx512[Mm]/-Xmx1G/" grid; chmod 755 grid; fi
-##  if [ -f grid.bat ]; then sed -i -e "s/-Xmx512[Mm]/-Xmx1G/" grid.bat; chmod 755 grid.bat; fi
-##fi
-##popd &>/dev/null
-
-##############
-
 create_work_area
 
 ##############
@@ -189,7 +177,7 @@ if [ ! -d "$REG_TEMP" ]; then
 fi
 
 # go to the top of the hierarchy.
-cd $XSEDE_TEST_ROOT
+cd "$XSEDE_TEST_ROOT"
 
 for ((test_iter=0; $test_iter < ${#FULL_TEST_SET[*]}; test_iter++)); do
   echo -e "\n======================================================================"
@@ -204,10 +192,10 @@ for ((test_iter=0; $test_iter < ${#FULL_TEST_SET[*]}; test_iter++)); do
   echo "==============" >>"$output_file"
 
   if [ $VERBOSE -ne 1 ]; then
-    bash $XSEDE_TEST_ROOT/${FULL_TEST_SET[$test_iter]} >>"$output_file" 2>&1
+    bash "$XSEDE_TEST_ROOT/${FULL_TEST_SET[$test_iter]}" >>"$output_file" 2>&1
     retval=$?
   else
-    bash $XSEDE_TEST_ROOT/${FULL_TEST_SET[$test_iter]} 2>&1 | tee -a "$output_file"
+    bash "$XSEDE_TEST_ROOT/${FULL_TEST_SET[$test_iter]}" 2>&1 | tee -a "$output_file"
     retval=${PIPESTATUS[0]}
   fi
 

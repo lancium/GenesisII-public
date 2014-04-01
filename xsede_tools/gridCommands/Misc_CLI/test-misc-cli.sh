@@ -7,10 +7,10 @@
 ## that runs the commands and associated options.
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 oneTimeSetUp()
 {
@@ -20,7 +20,7 @@ oneTimeSetUp()
 #BUGGY, works the first time,and then gives NULL Pointer exception
 xtestConnectCommand()
 {
-  grid script local:./gridCmd_connect.xml $RNSPATH $GENII_INSTALL_DIR
+  grid script local:./gridCmd_connect.xml $RNSPATH "$GENII_INSTALL_DIR"
   retval=$?
   assertEquals "Testing 'connect' command and its options" 0 $retval
   if [ $retval != 0 ]; then
@@ -69,5 +69,5 @@ oneTimeTearDown()
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

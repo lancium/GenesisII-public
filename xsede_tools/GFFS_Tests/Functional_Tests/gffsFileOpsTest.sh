@@ -4,12 +4,12 @@
 # Author: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
-MOUNT_POINT=$WORKDIR/mount-gffsFileOps
+MOUNT_POINT="$WORKDIR/mount-gffsFileOps"
 
 oneTimeSetUp()
 {
@@ -32,52 +32,38 @@ oneTimeSetUp()
   # clean up existing mount; we just try to unmount it without checking folder, since we sometimes
   # get a strange result of the folder being reported as non-existent, even though there's still
   # a dead fuse mount on it.
-  fusermount -u $MOUNT_POINT &>/dev/null
-  if [ -e $MOUNT_POINT ]; then
-	rmdir $MOUNT_POINT
+  fusermount -u "$MOUNT_POINT" &>/dev/null
+  if [ -e "$MOUNT_POINT" ]; then
+	rmdir "$MOUNT_POINT"
   fi 
 }
 
 testFuseMounting()
 {
   if ! fuse_supported; then return 0; fi
-  mkdir $MOUNT_POINT
+  mkdir "$MOUNT_POINT"
   echo Making new fuse mount.
-  fuse --mount local:$MOUNT_POINT
+  fuse --mount local:"$MOUNT_POINT"
   sleep 20
 
-  test_fuse_mount $MOUNT_POINT
+  test_fuse_mount "$MOUNT_POINT"
   check_if_failed "Mounting grid to local directory"
-
-#old  checkMount=`mount` 
-#old  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]
-#old  then
-#old	retval=0
-#old  else
-#old	echo "Mount failed...Bailing out"
-#old	exit 0
-#old  fi
-#old  assertEquals "mounting new directory with fuse locally" 0 $retval
-#old
-#old  echo Checking new fuse mount.
-#old  ls -l $MOUNT_POINT$RNSPATH
-#old  assertEquals "listing new fuse mounted directory" 0 $?
 }
 
 testFileOperations()
 {
   if ! fuse_supported; then return 0; fi
-  ./gffs_file_ops_test $MOUNT_POINT$RNSPATH
+  ./gffs_file_ops_test "${MOUNT_POINT}${RNSPATH}"
   assertEquals "File operations test" 0 $?
 }
 
 testRemovingFuseMount()
 {
   if ! fuse_supported; then return 0; fi
-  grid fuse --unmount local:$MOUNT_POINT
+  grid fuse --unmount local:"$MOUNT_POINT"
   assertEquals "Unmount grid mounted folder" 0 $?
   sleep 5
-  rmdir $MOUNT_POINT
+  rmdir "$MOUNT_POINT"
   assertEquals "Remove mounted folder" 0 $?
 }
 
@@ -89,5 +75,5 @@ oneTimeTearDown()
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

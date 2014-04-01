@@ -43,9 +43,9 @@ echo "** The container should currently be shut down! **"
 echo 
 
 echo Whacking the current GENII_USER_DIR: $GENII_USER_DIR
-\rm -rf $GENII_USER_DIR
+\rm -rf "$GENII_USER_DIR"
 
-if [ -e $GENII_USER_DIR ]; then
+if [ -e "$GENII_USER_DIR" ]; then
   echo The genesis state directory is still present in: $GENII_USER_DIR
   echo Please delete it manually since there is some issue with permissions.
   exit 1

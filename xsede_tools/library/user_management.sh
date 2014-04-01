@@ -128,7 +128,7 @@ function login_a_user()
     # a very simplistic check that some id got mapped to some certificate.
     local my_output="$(mktemp $TEST_TEMP/grid_logs/out_login_user.XXXXXX)"
     local grid_app="$(pick_grid_app)"
-    betterBeUs=$(raw_grid "$grid_app" whoami 2>&1 | grep '" -> "' &>"$my_output")
+    betterBeUs=$(raw_grid \"$grid_app\" whoami 2>&1 | grep '" -> "' &>"$my_output")
     retval=${PIPESTATUS[0]}
     rm -f "$my_output"
     assertEquals "Checking for non-vanilla credentials" 0 $retval
@@ -158,7 +158,7 @@ function create_user() {
     full_group="$GROUPS_LOC/$grp"
   fi
 
-  grid script local:$XSEDE_TEST_ROOT/library/create_one_user.xml "$STS_LOC" "$user" "$full_user" "$passwd" "$grp" "$full_group" "$HOMES_LOC" "$(dirname "$full_user")"
+  grid script "local:'$XSEDE_TEST_ROOT/library/create_one_user.xml'" "$STS_LOC" "$user" "$full_user" "$passwd" "$grp" "$full_group" "$HOMES_LOC" "$(dirname "$full_user")"
 }
 
 # creates a group in the grid.  this group is not expected to have any special
@@ -198,7 +198,7 @@ function give_create_perms()
 function listGroups()
 {
   local userpath=$1; shift
-  $GENII_INSTALL_DIR/grid ls $userpath | tail -n +2
+  "$GENII_INSTALL_DIR/grid" ls $userpath | tail -n +2
 }
 
 # safely clean out any groups listed under a user path.

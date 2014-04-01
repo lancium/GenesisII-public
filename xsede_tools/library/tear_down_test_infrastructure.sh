@@ -5,12 +5,12 @@
 # Author: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
-progname="$(basename $0)"
+progname="$(basename "$0")"
 
 if [ $# -lt 1 ]; then
   echo "$progname: This script needs a single parameter, which is the container"
@@ -41,7 +41,7 @@ testDeleteUsers()
     echo "Whacking user '$username'..."
     passwd="${MULTI_PASSWORD_LIST[$x]}"
     # now do the heavy lifting to get that user set up.
-    grid script local:$XSEDE_TEST_ROOT/library/delete_one_user.xml "$CONTAINERPATH" "$(basename $username)" "$username" "$SUBMIT_GROUP"
+    grid script "local:'$XSEDE_TEST_ROOT/library/delete_one_user.xml'" "$CONTAINERPATH" "$(basename $username)" "$username" "$SUBMIT_GROUP"
     assertEquals "Should delete user '$username' successfully" 0 $?
   done
 }
@@ -63,5 +63,5 @@ testLoginNormalUser()
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

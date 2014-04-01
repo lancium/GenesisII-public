@@ -4,10 +4,10 @@
 #mods: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 MOUNT_POINT="$WORKDIR/mount-gffsGridCommands"
 
@@ -16,8 +16,8 @@ oneTimeSetUp()
   sanity_test_and_init  # make sure test environment is good.
 
   # remove any previous mount point.
-  fusermount -u $MOUNT_POINT &>/dev/null
-  rmdir $MOUNT_POINT &>/dev/null
+  fusermount -u "$MOUNT_POINT" &>/dev/null
+  rmdir "$MOUNT_POINT" &>/dev/null
   # clean up directories the xml scripts want to create.
   grid rm -rf ${RNSPATH}/TestDir\* ${RNSPATH}/test-rns $RNSPATH/crumpet.txt &>/dev/null
   # remove the export if still present from interrupted prior test.
@@ -29,7 +29,7 @@ oneTimeSetUp()
 testNoFoolingAroundWithMount()
 {
   # create a new mount point.
-  mkdir $MOUNT_POINT
+  mkdir "$MOUNT_POINT"
   assertEquals "making mount directory at $MOUNT_POINT" 0 $?
 }
 
@@ -80,7 +80,7 @@ testBasicGridCLI() {
   if ! fuse_supported; then return 0; fi
   OUTFILE=$(mktemp $TEST_TEMP/gridCmdLine.XXXXXX)
   echo "Verbose run log is recorded in $OUTFILE"
-  grid script local:./gridCmdLine.xml $RNSPATH $MOUNT_POINT $CONTAINERPATH $EXPORTPATH
+  grid script local:./gridCmdLine.xml $RNSPATH "$MOUNT_POINT" $CONTAINERPATH $EXPORTPATH
   local retval=$?
   assertEquals "Testing basic grid command line" 0 $retval
   # make the actual copy for inspection later.
@@ -89,11 +89,11 @@ testBasicGridCLI() {
 
 oneTimeTearDown() {
   grid rm -rf $RNSPATH/test-rns &>/dev/null
-  fusermount -u $MOUNT_POINT &>/dev/null
-  rmdir $MOUNT_POINT 
+  fusermount -u "$MOUNT_POINT" &>/dev/null
+  rmdir "$MOUNT_POINT"
   \rm -f test1.txt
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

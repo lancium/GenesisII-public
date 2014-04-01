@@ -9,12 +9,12 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 
 # pull in the xsede test base support.
-source $WORKDIR/../../prepare_tests.sh $WORKDIR/../../prepare_tests.sh
+source "$WORKDIR/../../prepare_tests.sh" "$WORKDIR/../../prepare_tests.sh"
 
 # if that didn't work, complain.
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
 # otherwise load the rest of the tool environment.
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 ####
 
@@ -31,7 +31,7 @@ function date_stringer()
 ARCHIVE_NAME=$HOME/deployment_archive_with_keypairs_$(date_stringer).tar
 
 pushd ..
-tar -rf $ARCHIVE_NAME deployment_generator $GENII_INSTALL_DIR/context.xml --exclude=".svn"
+tar -rf $ARCHIVE_NAME deployment_generator "$GENII_INSTALL_DIR/context.xml" --exclude=".svn"
 if [ $? -ne 0 ]; then
   echo Failed to pack the deployment archive.
   exit 1

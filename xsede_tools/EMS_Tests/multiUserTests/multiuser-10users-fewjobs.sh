@@ -5,10 +5,10 @@
 # Author: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 SUBMIT_FLAG="$1"; shift
   # if the submit flag is BES, then the BES is submitted to directly.
@@ -63,7 +63,7 @@ testMultipleUserLaunch()
     log_file=$TEST_TEMP/user_log_10few_${i}_$(basename $user).log
     # launch the drone with the proper authentication info.
     echo "$(date): client $i will log to $log_file"
-    bash $WORKDIR/one-drone-submitter.sh "$(basename $user)" "$password" "$user" "$SUBMIT_FLAG" "$i" &>$log_file &
+    bash "$WORKDIR/one-drone-submitter.sh" "$(basename $user)" "$password" "$user" "$SUBMIT_FLAG" "$i" &>$log_file &
   done
 }
 
@@ -95,5 +95,5 @@ oneTimeTearDown()
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

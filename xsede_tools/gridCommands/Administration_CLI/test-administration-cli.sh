@@ -7,10 +7,10 @@
 ## that runs the commands and associated options.
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 oneTimeSetUp()
 {
@@ -19,7 +19,7 @@ oneTimeSetUp()
 
 testAttachHostCommand()
 {
-  grid script local:./gridCmd_attach-host.xml $RNSPATH
+  grid script local:./gridCmd_attach-host.xml "$RNSPATH"
   retval=$?
   assertEquals "Testing 'attach-host' command and its options" 0 $retval
   if [ $retval != 0 ]; then
@@ -31,7 +31,7 @@ testAttachHostCommand()
 
 testBESPolicyCommand()
 {
-  grid script local:./gridCmd_bes-policy.xml $RNSPATH $CONTAINERPATH
+  grid script local:./gridCmd_bes-policy.xml "$RNSPATH" "$CONTAINERPATH"
   retval=$?
   assertEquals "Testing 'bes-policy' command and its options" 0 $retval
   if [ $retval != 0 ]; then
@@ -42,7 +42,7 @@ testBESPolicyCommand()
 
 testGetAttributesCommand()
 {
-  grid script local:./gridCmd_get-attributes.xml $RNSPATH $CONTAINERPATH
+  grid script local:./gridCmd_get-attributes.xml "$RNSPATH" "$CONTAINERPATH"
   retval=$?
   assertEquals "Testing 'get-attributes' command and its options" 0 $retval
   if [ $retval != 0 ]; then
@@ -53,7 +53,7 @@ testGetAttributesCommand()
 
 testGetBESAttributesCommand()
 {
-  grid script local:./gridCmd_get-bes-attributes.xml $RNSPATH $CONTAINERPATH
+  grid script local:./gridCmd_get-bes-attributes.xml "$RNSPATH" "$CONTAINERPATH"
   retval=$?
   assertEquals "Testing 'get-bes-attributes' command and its options" 0 $retval
   if [ $retval != 0 ]; then
@@ -64,7 +64,7 @@ testGetBESAttributesCommand()
 
 testMatchingParamsCommand()
 {
-  grid script local:./gridCmd_matching-params.xml $RNSPATH $CONTAINERPATH
+  grid script local:./gridCmd_matching-params.xml "$RNSPATH" "$CONTAINERPATH"
   retval=$?
   assertEquals "Testing 'matching-params' command and its options" 0 $retval
   if [ $retval != 0 ]; then
@@ -104,5 +104,5 @@ oneTimeTearDown()
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

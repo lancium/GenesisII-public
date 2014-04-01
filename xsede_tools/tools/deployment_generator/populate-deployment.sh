@@ -5,12 +5,12 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 
 # pull in the xsede test base support.
-source $WORKDIR/../../prepare_tests.sh $WORKDIR/../../prepare_tests.sh
+source "$WORKDIR/../../prepare_tests.sh" "$WORKDIR/../../prepare_tests.sh"
 
 # if that didn't work, complain.
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
 # otherwise load the rest of the tool environment.
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 # a shorthand for the deployment directory.
 DEP_DIR="$GENII_INSTALL_DIR/deployments/$DEPLOYMENT_NAME"

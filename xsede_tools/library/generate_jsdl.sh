@@ -14,7 +14,6 @@ create_jsdl_from_templates()
   fi
   # patching user name in the jsdl input files...
   local FPATH=$RNSPATH
-#not needed: $(grep "^[^#]*RNSPATH" $XSEDE_TEST_ROOT/inputfile.txt | sed -e 's/RNSPATH=//')
   echo RNSPATH is $FPATH
   export REAL_LENGTH=$(expr length $FPATH)
 

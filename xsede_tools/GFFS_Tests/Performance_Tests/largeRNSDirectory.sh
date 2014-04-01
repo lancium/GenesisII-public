@@ -3,10 +3,10 @@
 # Author: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 # the number of files to create in the RNS directory.
 MAX_FILES=1000
@@ -16,9 +16,9 @@ MAX_FILES=1000
 COPY_CHUNK=100
 
 # where we hook in the fuse mount.
-export MOUNT_POINT=$WORKDIR/mount-largeRNS
+export MOUNT_POINT="$WORKDIR/mount-largeRNS"
 # the user's home directory from fuse perspective.
-export HOME_DIR=$MOUNT_POINT/$RNSPATH
+export HOME_DIR="$MOUNT_POINT/$RNSPATH"
 
 export BIGDIRNAME=huge_dir
  
@@ -31,7 +31,7 @@ oneTimeSetUp()
   # leverage our cleanup from tear down.
   oneTimeTearDown
 
-  mkdir $MOUNT_POINT
+  mkdir "$MOUNT_POINT"
 }
 
 testMounting()
@@ -39,10 +39,10 @@ testMounting()
   if ! fuse_supported; then return 0; fi
 
   echo "Mounting $MOUNT_POINT"
-  fuse --mount local:$MOUNT_POINT
+  fuse --mount local:"$MOUNT_POINT"
   sleep 30
 
-  test_fuse_mount $MOUNT_POINT
+  test_fuse_mount "$MOUNT_POINT"
   check_if_failed "Mounting grid to local directory"
 }
 
@@ -51,7 +51,7 @@ function copyFilesUp()
 {
   start_time="$(date +%s)"
   for (( i = 1 ; i <= $MAX_FILES; i++ )); do
-    echo blahHumbug$RANDOM$RANDOM >$HOME_DIR/$BIGDIRNAME/file_instance_$i.txt
+    echo blahHumbug$RANDOM$RANDOM >"$HOME_DIR/$BIGDIRNAME/file_instance_$i.txt"
     if [ $? -ne 0 ]; then
       echo "error"
       return 1
@@ -69,10 +69,10 @@ testCreatingLargeDirectory()
   echo "Creating files starts at $(date)"
 
   # clean up any prior version of the test directory.
-  \rm -rf $HOME_DIR/$BIGDIRNAME
+  \rm -rf "$HOME_DIR/$BIGDIRNAME"
 
   # recreate our target directory in the grid.
-  mkdir $HOME_DIR/$BIGDIRNAME
+  mkdir "$HOME_DIR/$BIGDIRNAME"
   assertEquals "Making test folder $HOME_DIR/$BIGDIRNAME" 0 $?
 
   # make the files in the target directory.
@@ -122,10 +122,10 @@ oneTimeTearDown()
 {
   if ! fuse_supported; then return 0; fi
 
-  fusermount -u $MOUNT_POINT &>/dev/null
+  fusermount -u "$MOUNT_POINT" &>/dev/null
   sync ; sleep 2
-  if [ -d $MOUNT_POINT ]; then
-    rmdir $MOUNT_POINT
+  if [ -d "$MOUNT_POINT" ]; then
+    rmdir "$MOUNT_POINT"
   fi
 
   grid ls -d $RNSPATH/$BIGDIRNAME &>/dev/null
@@ -136,5 +136,5 @@ oneTimeTearDown()
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

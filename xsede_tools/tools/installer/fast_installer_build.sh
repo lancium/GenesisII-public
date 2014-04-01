@@ -11,13 +11,13 @@
 # boilerplate code to get our directories and tools figured out...
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 export SHOWED_SETTINGS_ALREADY=true
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then
   source ../../prepare_tests.sh ../../prepare_tests.sh 
 fi
 export POSSIBLY_UNBUILT=true
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 ##############
 
@@ -45,7 +45,7 @@ fi
 
 # check for any stray keytabs that we absolutely do not want to include in
 # the installer package.
-if [ ! -z "$(find $DEPLOYMENTS_ROOT/default -iname "*keytab")" ]; then
+if [ ! -z "$(find "$DEPLOYMENTS_ROOT/default" -iname "*keytab")" ]; then
   echo "There is a keytab file present under the path:"
   echo "    $DEPLOYMENTS_ROOT/default"
   echo "It is not safe to build an installer with private kerberos keytabs"
@@ -162,7 +162,7 @@ function fix_endings()
 
 echo Building 64 bit Genesis...
 
-pushd $GENII_INSTALL_DIR
+pushd "$GENII_INSTALL_DIR"
 #ant clean
 #check_if_failed "ant clean failed"
 replace_compiler_variables

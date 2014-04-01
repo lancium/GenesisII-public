@@ -22,7 +22,6 @@ function save_and_switch_userdir()
   HOLD_USERDIR="$GENII_USER_DIR"
   # new kludge; save the logging config for this user dir.
   cp "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" "$HOLD_USERDIR"
-#echo "sasu: saving log props mentioning: $(cat "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" | grep "LOGFILE.File")"
   export GENII_USER_DIR="$new_dir"
   if [ ! -d "$GENII_USER_DIR" ]; then
     # it's handy for this directory to exist before we copy things into it.
@@ -30,9 +29,7 @@ function save_and_switch_userdir()
   fi
   if [ -f "$GENII_USER_DIR/genesisII.container.log4j.properties" ]; then
     cp "$GENII_USER_DIR/genesisII.container.log4j.properties" "$GENII_INSTALL_DIR/lib"
-#echo "sasu: copying in log props from new user dir $GENII_USER_DIR"
   fi
-#echo "sasu: currently using log props mentioning: $(cat "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" | grep "LOGFILE.File")"
 }
 
 # restores the previous user directory.  handles one level of rollback.
@@ -40,13 +37,10 @@ function restore_userdir()
 {
   # new kludge; save the logging config for the current user dir.
   cp "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" "$GENII_USER_DIR"
-#echo "ru: saving log props mentioning: $(cat "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" | grep "LOGFILE.File")"
   export GENII_USER_DIR="$HOLD_USERDIR"
   if [ -f "$GENII_USER_DIR/genesisII.container.log4j.properties" ]; then
-#echo "ru: copying in log props from restoring user dir $GENII_USER_DIR"
     cp "$GENII_USER_DIR/genesisII.container.log4j.properties" "$GENII_INSTALL_DIR/lib"
   fi
-#echo "ru: now using log props mentioning: $(cat "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" | grep "LOGFILE.File")"
 }
 
 ##############
@@ -82,14 +76,6 @@ function get_container_logfile()
   else
     extra="_${DEP_NAME}"
   fi
-#hmmm: this may not be right to remove yet, but we now have a real log file for mirror.
-#  if [ "$DEP_NAME" != "default" ]; then
-#    # this is kludgy, but we need to separate logging for mirror containers...
-#    # and right now we consider anything we'd launch which is not called
-#    # "default" to be a mirror container.
-#    echo "$TEST_TEMP/container_$(hostname)_${USER}$extra.log"
-#    return 0
-#  fi
   # log file for normal deployments.
   local logfile="$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties"
   if [ "$DEP_NAME" == "$BACKUP_DEPLOYMENT_NAME" ]; then
@@ -113,7 +99,7 @@ function get_container_logfile()
 # returns the standard location for the client log file.
 function get_client_logfile()
 {
-  to_return="$(grep log4j.appender.LOGFILE.File $GENII_INSTALL_DIR/lib/genesisII.client.log4j.properties | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
+  to_return="$(grep log4j.appender.LOGFILE.File "$GENII_INSTALL_DIR/lib/genesisII.client.log4j.properties" | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
   echo "$to_return"
 }
 
@@ -127,6 +113,7 @@ function launch_container()
 
   # move the log out of the way so we don't get fooled by old startup noise.
   containerlog="$(get_container_logfile "$DEP_NAME")"
+echo containerlog is: $containerlog
 
   # ensure that we have at least our scanning factor worth of lines in the buffer
   # that are not the restart phrase.
@@ -138,30 +125,30 @@ function launch_container()
   fi
 
   pushd "$GENII_INSTALL_DIR" &>/dev/null
+echo jumped to install dir: $GENII_INSTALL_DIR
 
   echo "Launching Genesis II container for deployment \"$DEP_NAME\"..."
   CONTAINERLOGFILE="$(get_container_logfile "$DEP_NAME")"
   echo "$DEP_NAME container log stored at: $CONTAINERLOGFILE"
-#  redirection=0
-#  if [ "$DEP_NAME" != "default" ]; then
-#    # if we're not a default deployment, we need to redirect output to save it.
-#    redirection=1
-#  fi
   extra_prefix=
   extra_suffix=
-  use_shell=bash
+  use_shell=/bin/bash
   runner="$GENII_INSTALL_DIR/runContainer.sh"
+echo first runner is $runner
   if [ ! -f "$runner" ]; then
-    runner=$GENII_INSTALL_DIR/GFFSContainer
+echo failed to find runner at: $runner
+    runner="$GENII_INSTALL_DIR/GFFSContainer"
     extra_suffix="start"
   fi
   if [ ! -f "$runner" ]; then
+echo failed to find runner at: $runner
     use_shell=
     runner="$GENII_INSTALL_DIR/wrapper-windows-x86-32.exe"
-    extra_suffix="$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/conf/wrapper.conf"
+    extra_suffix="'$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/conf/wrapper.conf'"
   fi
   if [ ! -f "$runner" ]; then
-    runner="$(echo $GENII_INSTALL_DIR/runContainer.bat | sed -e 's/\//\\\\/g')"
+echo failed to find runner at: $runner
+    runner="$(echo "$GENII_INSTALL_DIR/runContainer.bat" | sed -e 's/\//\\\\/g')"
     use_shell=cmd
     extra_suffix=
     if [ -f "$runner" ]; then
@@ -173,12 +160,10 @@ function launch_container()
     exit 1
   fi
 
-#echo "shell=$use_shell extra_prefix=$extra_prefix runner=$runner extra_suffix=$extra_suffix"
-#  if [ $redirection -eq 0 ]; then
-    $use_shell $extra_prefix $runner $extra_suffix $DEP_NAME &>/dev/null &
-#  else
-#    $use_shell $extra_prefix $runner $extra_suffix $DEP_NAME &>$CONTAINERLOGFILE &
-#  fi
+echo path is currently: $PATH
+echo "use shell is '$use_shell'"
+
+  $use_shell $extra_prefix "$runner" $extra_suffix $DEP_NAME &>/dev/null &
 
   # snooze to allow the container to get going.  the counter measures number of 10 second
   # sleeps to allow.
@@ -209,7 +194,7 @@ function save_grid_data()
   fi
   \rm -f "$backup_file"
 
-  bash $XSEDE_TEST_ROOT/library/backup_container_state.sh "$backup_file"
+  bash "$XSEDE_TEST_ROOT/library/backup_container_state.sh" "$backup_file"
   if [ $? -ne 0 ]; then echo "===> script failure backing up container state."; return 1; fi
 
   return 0
@@ -217,7 +202,7 @@ function save_grid_data()
 #older approach.
   # now grab up a copy of the normal state directory.
   # we need to zip it without a full path, so we can easily unzip it to the right place.
-  pushd $GENII_USER_DIR/.. &>/dev/null
+  pushd "$GENII_USER_DIR/.." &>/dev/null
   zip -r $HOME/bootstrap_save.zip "$(basename "$GENII_USER_DIR")" &>/dev/null
   popd &>/dev/null
   # zip the mirror container's state too, if there is one.
@@ -256,7 +241,7 @@ function isMirrorEnabled()
 function bootstrap_grid()
 {
   # go to the folder for these steps due to some squirreliness.
-  pushd $GENII_INSTALL_DIR &>/dev/null
+  pushd "$GENII_INSTALL_DIR" &>/dev/null
 
   # perform the basic setup of the grid, already canned for us.
   echo "Bootstrapping default grid configuration..."
@@ -264,22 +249,22 @@ function bootstrap_grid()
   bootstrap_file="$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/bootstrap.xml"
   if [ $NAMESPACE == 'xsede' ]; then
     echo -e "\n---- Choosing 'xsede' namespace for bootstrap ----"
-    cp "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/xsede-bootstrap.xml" $bootstrap_file
+    cp "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/xsede-bootstrap.xml" "$bootstrap_file"
   elif [ $NAMESPACE == 'xcg' ]; then
     echo -e "\n---- Choosing 'xcg' namespace for bootstrap ----"
-    cp "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/xcg-bootstrap.xml" $bootstrap_file
+    cp "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/xcg-bootstrap.xml" "$bootstrap_file"
   else
     echo "Unknown namespace type--the NAMESPACE variable is unset or unknown"
     exit 1
   fi
 
   # fix the bootstrap to point to the right deployments folder.
-  replace_phrase_in_file $bootstrap_file '${GENII_INSTALL_DIR}/deployments' "${DEPLOYMENTS_ROOT}"
+  replace_phrase_in_file "$bootstrap_file" '${GENII_INSTALL_DIR}/deployments' "${DEPLOYMENTS_ROOT}"
 
   # if possible, fix the password for the admin account.
-  replace_phrase_in_file $bootstrap_file "password=keys" "password=$ADMIN_ACCOUNT_PASSWD"
+  replace_phrase_in_file "$bootstrap_file" "password=keys" "password=$ADMIN_ACCOUNT_PASSWD"
 
-  grid_chk script "local:${bootstrap_file}"
+  grid_chk script "local:'${bootstrap_file}'"
 
   # jump back out of the install directory.  the deployment behaves
   # oddly if we aren't in there, but nothing else should require being in the install dir.

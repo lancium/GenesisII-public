@@ -42,7 +42,7 @@ define_and_export_variables()
         echo "export" $line >> $TEST_TEMP/env_file
       fi
     fi
-  done < $PARAMETER_FILE
+  done < "$PARAMETER_FILE"
 
   # now run the environment file to add those settings to our environment.
   chmod +x $TEST_TEMP/env_file
@@ -81,11 +81,11 @@ define_and_export_variables()
 
   # calculate the deployments directory if there's an override.
   if [ -e "$GENII_INSTALL_DIR/container.properties" ]; then
-    export DEPLOYMENTS_ROOT=$(sed -n -e 's/^edu.virginia.vcgr.genii.container.deployment-directory=\(.*\)/\1/p' < "$GENII_INSTALL_DIR/container.properties")
+    export DEPLOYMENTS_ROOT="$(sed -n -e 's/^edu.virginia.vcgr.genii.container.deployment-directory=\(.*\)/\1/p' < "$GENII_INSTALL_DIR/container.properties")"
 #    echo "calculated deployments root as: $DEPLOYMENTS_ROOT"
   fi
   if [ -z "$DEPLOYMENTS_ROOT" ]; then
-    export DEPLOYMENTS_ROOT=$GENII_INSTALL_DIR/deployments
+    export DEPLOYMENTS_ROOT="$GENII_INSTALL_DIR/deployments"
   fi
 
   # we will not do the file existence check if there's a chance that the code

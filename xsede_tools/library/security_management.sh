@@ -8,9 +8,9 @@
 
 # define the cert-tool appropriately for the platform.
 
-CERTO="bash $GENII_INSTALL_DIR/cert-tool"
+CERTO="bash \"$GENII_INSTALL_DIR/cert-tool\""
 if [ "$OS" == "Windows_NT" ]; then
-  CERTO="cmd /c $(echo $GENII_INSTALL_DIR | tr / \\\\)\\cert-tool.bat"
+  CERTO="cmd /c "$(echo $GENII_INSTALL_DIR | tr / \\\\)\\cert-tool.bat""
 fi
 
 ##############
@@ -57,7 +57,11 @@ function create_bootstrap_signing_certificate()
 
   local UBER_CA_PFX="$CA_PFX-base.pfx"
   local UBER_CA_ALIAS="base-key"
-  run_any_command $CERTO gen -dn="'C=US, ST=Virginia, L=Charlottesville, O=GENIITEST, OU=Genesis II, CN=skynet'" -output-storetype=PKCS12 "-output-entry-pass='$CA_PASSWORD'" -output-keystore=$UBER_CA_PFX "-output-keystore-pass='$CA_PASSWORD'" "-output-alias='$UBER_CA_ALIAS'" -keysize=2048
+
+echo uber ca pfx is $UBER_CA_PFX
+echo ca pfx is $CA_PFX
+
+  run_any_command "$CERTO" gen -dn="'C=US, ST=Virginia, L=Charlottesville, O=GENIITEST, OU=Genesis II, CN=skynet'" -output-storetype=PKCS12 "-output-entry-pass='$CA_PASSWORD'" "-output-keystore='$UBER_CA_PFX'" "-output-keystore-pass='$CA_PASSWORD'" "-output-alias='$UBER_CA_ALIAS'" -keysize=2048
   check_if_failed "generating base of CA keypair"
 
   # now create the real signing certificate, with full CA apparel.
@@ -69,11 +73,16 @@ function create_bootstrap_signing_certificate()
 function create_bootstrap_trusted_pfx()
 {
   local dirname="$1"; shift
-  for certfile in $dirname/*.cer* $dirname/*.0 $dirname/*.pem; do
-    if [ ! -f $certfile ]; then continue; fi
-    local output_alias=$(basename "$certfile" .cer)
-    echo -e "Adding '$(basename $certfile)' to store with alias: $output_alias"
-    run_any_command $CERTO import "-output-keystore='$dirname/trusted.pfx'" -output-keystore-pass=trusted "-base64-cert-file='$certfile'" "-output-alias='$output_alias'"
+echo dirname for create trusted pfx is: $dirname
+  for certfile in "$dirname"/*; do
+echo looking at certfile to add to trust store: $certfile
+    # skip non-files.
+    if [ ! -f "$certfile" ]; then continue; fi
+    # skip pfx files.
+    if [[ "$certfile" =~ .*\.pfx ]]; then continue; fi
+    local output_alias="$(basename "$certfile" .cer)"
+    echo -e "Adding '$(basename "$certfile")' to store with alias: $output_alias"
+    run_any_command "$CERTO" import "-output-keystore='$dirname/trusted.pfx'" -output-keystore-pass=trusted "-base64-cert-file='$certfile'" "-output-alias='$output_alias'"
     check_if_failed "adding certificate for $certfile"
   done
 }
@@ -100,15 +109,17 @@ function create_certificate_using_CA()
   local NEW_ALIAS="$1"; shift
   local CN_GIVEN="$1"; shift
 
+echo new pfx is $NEW_PFX
+echo the ca pfx is $THE_CA_PFX
+
   # first generate the private and public key into the pkcs12 archive.
   local dn="$(calculate_DN "$CN_GIVEN")"
-  echo -e "Creating $(basename $NEW_PFX) with alias $NEW_ALIAS and certificate DN:\n    $dn"
-  run_any_command $CERTO gen "'-dn=$dn'" -output-storetype=PKCS12 "-output-entry-pass='$NEW_PASS'" "-output-keystore=$NEW_PFX" "-output-keystore-pass='$NEW_PASS'" "-output-alias='$NEW_ALIAS'" "-input-keystore=$THE_CA_PFX" "-input-keystore-pass='$THE_CA_PASS'" -input-storetype=PKCS12 "-input-entry-pass='$THE_CA_PASS'" "-input-alias='$THE_CA_ALIAS'" -keysize=2048
+  echo -e "Creating $(basename "$NEW_PFX") with alias $NEW_ALIAS and certificate DN:\n    $dn"
+  run_any_command "$CERTO" gen "'-dn=$dn'" -output-storetype=PKCS12 "-output-entry-pass='$NEW_PASS'" "-output-keystore='$NEW_PFX'" "-output-keystore-pass='$NEW_PASS'" "-output-alias='$NEW_ALIAS'" "-input-keystore='$THE_CA_PFX'" "-input-keystore-pass='$THE_CA_PASS'" -input-storetype=PKCS12 "-input-entry-pass='$THE_CA_PASS'" "-input-alias='$THE_CA_ALIAS'" -keysize=2048
   check_if_failed "generating $NEW_PFX from $THE_CA_PFX"
   # and create its certificate file.
-#  local cert_file="$(echo $NEW_PFX | sed -e 's/\.pfx/\.cer/')"
-  local cert_file="$(dirname $NEW_PFX)/$(basename $NEW_PFX ".pfx").cer"
-  run_any_command $JAVA_HOME/bin/keytool -export -file "$cert_file" -keystore "$NEW_PFX" "-storepass '$NEW_PASS'" "-alias '$NEW_ALIAS'" -storetype PKCS12
+  local cert_file="$(dirname "$NEW_PFX")/$(basename "$NEW_PFX" ".pfx").cer"
+  run_any_command $JAVA_HOME/bin/keytool -export "-file '$cert_file'" "-keystore '$NEW_PFX'" "-storepass '$NEW_PASS'" "-alias '$NEW_ALIAS'" -storetype PKCS12
   check_if_failed "generating certificate file $cert_file for $NEW_PFX"
 }
 
@@ -116,22 +127,26 @@ function create_certificate_using_CA()
 
 function create_grid_certificates()
 {
-  pushd $GENII_INSTALL_DIR &>/dev/null
+  pushd "$GENII_INSTALL_DIR" &>/dev/null
 
   local SECURITY_DIR="$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/security"
+echo securit dir is $SECURITY_DIR
 
   local SIGNING_PFX="$SECURITY_DIR/signing-cert.pfx"
+echo signing pfx is $SIGNING_PFX
   local SIGNING_ALIAS="signing-cert"
   local SIGNING_PASSWD="signer"
 
   local ADMIN_PFX="$SECURITY_DIR/admin.pfx"
+echo admin pfx is $ADMIN_PFX
   local ADMIN_CER="$SECURITY_DIR/admin.cer"
   local ADMIN_PASSWD="$ADMIN_ACCOUNT_PASSWD"
 
   local OWNER_CER="$SECURITY_DIR/owner.cer"
+echo owner cer is $OWNER_CER
 
   # clean up any existing certificates.
-  \rm -f $SECURITY_DIR/*.pfx $SECURITY_DIR/*.cer
+  \rm -f "$SECURITY_DIR"/*.pfx "$SECURITY_DIR"/*.cer
 
   # fix the patch certificate, which doesn't exist yet, and the app-url.
   sed -i -e 's/^\(edu.virginia.vcgr.appwatcher.patch-signer-certificate.0=.*\)/#\1/' -e 's/^\(edu.virginia.vcgr.appwatcher.application-url.0=.*\)/#\1/' ext/genii-base-application.properties
@@ -142,7 +157,7 @@ function create_grid_certificates()
   check_if_failed "creating a signing certificate for bootstrap"
 
   # create the admin certificate.
-  create_certificate_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" $ADMIN_PFX "$ADMIN_PASSWD" skynet "skynet admin"
+  create_certificate_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" "$ADMIN_PFX" "$ADMIN_PASSWD" skynet "skynet admin"
   check_if_failed "creating skynet admin certificate using CA"
   cp "$ADMIN_CER" "$SECURITY_DIR/default-owners/admin.cer"
   check_if_failed "copying admin certificate into default-owners"
@@ -151,10 +166,10 @@ function create_grid_certificates()
   cp "$ADMIN_CER" "$SECURITY_DIR/default-owners/owner.cer"
   check_if_failed "copying admin certificate as owner.cer in default-owners"
 
-  create_certificate_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" $SECURITY_DIR/tls-cert.pfx tilly tls-cert "TLS certificate"
+  create_certificate_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" "$SECURITY_DIR/tls-cert.pfx" tilly tls-cert "TLS certificate"
   check_if_failed "creating TLS certificate using CA"
 
-  create_bootstrap_trusted_pfx $SECURITY_DIR
+  create_bootstrap_trusted_pfx "$SECURITY_DIR"
 
   popd &>/dev/null
 }
@@ -175,7 +190,7 @@ function get_root_privileges()
     adminpass="$ADMIN_ACCOUNT_PASSWD"
   fi
 
-  grid_chk keystoreLogin "--password=$adminpass" local:$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/security/admin.pfx
+  grid_chk keystoreLogin "--password='$adminpass'" "local:'$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/security/admin.pfx'"
 }
 
 ##############

@@ -14,7 +14,7 @@ if [ -z "$INSTALLER_TO_RUN" ]; then
 fi
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 # force the installer to do a console-based login.
 unset DISPLAY
@@ -66,7 +66,7 @@ grid_choice=1  # assume xsede for the moment.
 
 # start doing some major operations to get this installed.
 
-bash $XSEDE_TEST_ROOT/library/zap_genesis_javas.sh
+bash "$XSEDE_TEST_ROOT/library/zap_genesis_javas.sh"
 sleep 2
 echo Wiping out any previous version of install.
 \rm -rf "$GENII_USER_DIR" "$GENII_INSTALL_DIR"

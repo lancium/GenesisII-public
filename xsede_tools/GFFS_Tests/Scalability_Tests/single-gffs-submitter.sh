@@ -4,10 +4,10 @@
 # Author: Chris koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 # take the parms for which user to run as.
 user="$1"; shift
@@ -34,7 +34,7 @@ TEST_FAIL_COUNT=0
 #GFFS_CACHE_SNOOZE=30
 GFFS_CACHE_SNOOZE=0
 
-OUR_MOUNT_POINT=$WORKDIR/mount-single-gffs-submitter-$user
+OUR_MOUNT_POINT="$WORKDIR/mount-single-gffs-submitter-$user"
 
 ##############
 
@@ -75,26 +75,26 @@ if ! fuse_supported; then
   exit 0
 fi
 # cleanup prior mounts.
-fusermount -u $OUR_MOUNT_POINT &>/dev/null
-if [ -d $OUR_MOUNT_POINT ]; then
-  rmdir $OUR_MOUNT_POINT
+fusermount -u "$OUR_MOUNT_POINT" &>/dev/null
+if [ -d "$OUR_MOUNT_POINT" ]; then
+  rmdir "$OUR_MOUNT_POINT"
   if [ $? -ne 0 ]; then
     echo "Failed to remove our soon-to-be mount point, which already existed: $OUR_MOUNT_POINT"
     exit 1
   fi
 fi
 # mount the FS on local FS
-mkdir $OUR_MOUNT_POINT
+mkdir "$OUR_MOUNT_POINT"
 if [ $? -ne 0 ]; then
   echo "Failed to create our mount point at: $OUR_MOUNT_POINT"
 echo "here is the directory above that:"
-ls $(dirname $OUR_MOUNT_POINT)
+ls $(dirname "$OUR_MOUNT_POINT")
   exit 1
 fi
-fuse --mount local:$OUR_MOUNT_POINT
+fuse --mount local:"$OUR_MOUNT_POINT"
 sleep 30  # give process time to get mounted.
 
-test_fuse_mount $OUR_MOUNT_POINT
+test_fuse_mount "$OUR_MOUNT_POINT"
 check_if_failed "Mounting grid to local directory"
 
 # run the test a partially random number of times.
@@ -109,7 +109,7 @@ for (( i=0; i < $test_count; i++ )); do
 #      link's removal can lead to issues in the build.  plan to get past this is to
 #      implement links with reference counts.  at that point, we could return to
 #      a simpler, non-random path.
-BUILD_TARGET=$OUR_MOUNT_POINT/$RNSPATH/${user}_builds/temp_$RANDOM$RANDOM$RANDOM
+BUILD_TARGET="$OUR_MOUNT_POINT/$RNSPATH/${user}_builds/temp_$RANDOM$RANDOM$RANDOM"
 
 mkdir -p $BUILD_TARGET 
 if [ $? -ne 0 ]; then
@@ -196,9 +196,9 @@ fi
 done  # end of creating/deleting files
 
 # last step is to unhook the fuse mount, so we can be done with this user completely.
-if [ -d $OUR_MOUNT_POINT ]; then
-  fusermount -u $OUR_MOUNT_POINT
-  rmdir $OUR_MOUNT_POINT
+if [ -d "$OUR_MOUNT_POINT" ]; then
+  fusermount -u "$OUR_MOUNT_POINT"
+  rmdir "$OUR_MOUNT_POINT"
 fi
 
 # stop being the user.

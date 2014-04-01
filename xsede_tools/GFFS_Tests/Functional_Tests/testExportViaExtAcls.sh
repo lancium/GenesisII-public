@@ -6,10 +6,10 @@
 # Author: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 # this function takes a combined user and password, separated by a colon, and stores
 # the user and password in separate global variables for immediate use.
@@ -143,7 +143,7 @@ testGoodUsersProvided()
   # stay logged in as the admin for now; we will use that soon.
 
   # test logging in as unix flimsy.
-  run_any_command expect $XSEDE_TEST_ROOT/library/ssh_expecter.tcl $Flimsy $FlimsyPassword localhost "echo hello venus"
+  run_any_command expect "$XSEDE_TEST_ROOT/library/ssh_expecter.tcl" $Flimsy $FlimsyPassword localhost "echo hello venus"
   reval=$?
   # make sure we didn't experience a failure on the other side.
   grep YO_FAILURE $GRID_OUTPUT_FILE &>/dev/null
@@ -156,15 +156,15 @@ testGoodUsersProvided()
 
 testPreparePathBasicRights()
 {
-  run_any_command bash $XSEDE_TEST_ROOT/library/set_acls.sh "$Flimsy" "$LOCAL_PATH" "000"
+  run_any_command bash "$XSEDE_TEST_ROOT/library/set_acls.sh" "$Flimsy" "$LOCAL_PATH" "000"
   assertEquals "Revoking all rights for Flimsy account $Flimsy should work" 0 $?
-  run_any_command bash $XSEDE_TEST_ROOT/library/set_acls.sh "$Grantee" "$LOCAL_PATH" "rwx"
+  run_any_command bash "$XSEDE_TEST_ROOT/library/set_acls.sh" "$Grantee" "$LOCAL_PATH" "rwx"
   assertEquals "Adding all rights for Flimsy account $Flimsy should work" 0 $?
 }
 
 testCheckFlimsyCannotAccess()
 {
-  run_any_command expect $XSEDE_TEST_ROOT/library/ssh_expecter.tcl $Flimsy $FlimsyPassword localhost "echo hello venus >$LOCAL_PATH/gerkins.txt" "mkdir $LOCAL_PATH/grommet"
+  run_any_command expect "$XSEDE_TEST_ROOT/library/ssh_expecter.tcl" $Flimsy $FlimsyPassword localhost "echo hello venus >$LOCAL_PATH/gerkins.txt" "mkdir $LOCAL_PATH/grommet"
   reval=$?
   # make sure we didn't experience a failure on the other side.
   grep YO_FAILURE $GRID_OUTPUT_FILE &>/dev/null
@@ -262,7 +262,7 @@ testLicenseeCanAccess()
   assertEquals "Should be able to cleanup directory we just made" 0 $?
 
   # set up a file that we can check as the feeble user.
-  grid cp local:$XSEDE_TEST_ROOT/inputfile.txt grid:$EXPORTED_GRID_PATH
+  grid cp local:"$XSEDE_TEST_ROOT/inputfile.txt" grid:$EXPORTED_GRID_PATH
   assertEquals "Copying a file up to the folder should work" 0 $?
 }
 
@@ -326,5 +326,5 @@ oneTimeTearDown()
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

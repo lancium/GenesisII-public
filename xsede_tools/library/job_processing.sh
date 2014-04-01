@@ -14,7 +14,7 @@ compute_remaining_jobs()
 {
   local queue_path=$1
   local grid_app="$(pick_grid_app)"
-  remaining=$(raw_grid "$grid_app" qstat $queue_path | grep 'QUEUED\|RUNNING\|On' | wc | gawk '{print $1 }')
+  remaining=$(raw_grid \"$grid_app\" qstat $queue_path | grep 'QUEUED\|RUNNING\|On' | wc | gawk '{print $1 }')
   retval=${PIPESTATUS[0]}
   if [ $retval -ne 0 ]; then
     # the qstat call failed, and we want to send back an error signal.
@@ -27,7 +27,7 @@ compute_error_jobs()
 {
   local queue_path="$1"; shift
   local grid_app="$(pick_grid_app)"
-  echo $(raw_grid "$grid_app" qstat $queue_path | grep 'ERROR' | wc | gawk '{print $1 }')
+  echo $(raw_grid \"$grid_app\" qstat $queue_path | grep 'ERROR' | wc | gawk '{print $1 }')
 }
 
 show_error_jobs()
@@ -36,7 +36,7 @@ show_error_jobs()
   if [ "$(compute_error_jobs $queue_path)" != "0" ]; then
     echo "FAILURE: These jobs had errors:"
     local grid_app="$(pick_grid_app)"
-    raw_grid "$grid_app" qstat $queue_path | grep 'ERROR'
+    raw_grid \"$grid_app\" qstat $queue_path | grep 'ERROR'
     return 1
   else
     echo "SUCCESS: No jobs in an error state were seen."
@@ -301,7 +301,7 @@ echo "examining job $i"
       until [ $count -le 0 ]; do
 echo "seconds left: $count"
         sleep 10
-        jobStatus="$(raw_grid "$grid_app" qstat $QUEUE_PATH $i)"
+        jobStatus="$(raw_grid \"$grid_app\" qstat $QUEUE_PATH $i)"
         # stop waiting for a job if it's marked as finished.
         if [[ "$jobStatus" =~ .*FINISHED.* ]]; then
 echo "  saw job in finished state"

@@ -9,7 +9,7 @@
 # Author: Vanamala Venkataswamy
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 ##############
 
@@ -42,7 +42,7 @@ fi
 
 ##############
  
-grid script local:$XSEDE_TEST_ROOT/library/create_one_user.xml "$CONTAINERPATH" "$(basename $new_username)" "$new_username" "$new_password" "$(basename "$new_group")" "$new_group" "$home_path" "$(dirname "$new_username")"
+grid script "local:'$XSEDE_TEST_ROOT/library/create_one_user.xml'" "$CONTAINERPATH" "$(basename $new_username)" "$new_username" "$new_password" "$(basename "$new_group")" "$new_group" "$home_path" "$(dirname "$new_username")"
 check_if_failed user creation for $new_username
 
 # we would have bailed if there were an error during the creation process.

@@ -30,9 +30,8 @@ function check_if_failed()
 # and then runs all the other parameters as a command.
 function logged_command()
 {
-#echo logcmd pwd: $(\pwd)
-#echo logcmd args: "$@"
   local my_output="$1"; shift
+#  echo "logged_command args: $(printf -- "[%s] " "${@}")"
   eval "$@" >>"$my_output" 2>&1
   local retval=$?
   if [ $retval == 0 ]; then
@@ -97,7 +96,7 @@ function sanity_test_and_init()
     exit 1
   fi
   # establish this for shunit so tests do not have to run in current directory.
-  export SHUNIT_PARENT="$WORKDIR/$(basename $0)"
+  export SHUNIT_PARENT="$WORKDIR/$(basename "$0")"
 
   # show who we're logged in as.
 #  echo -e "\nCurrently logged in to the grid as:"
@@ -118,7 +117,7 @@ function sanity_test_and_init()
 ##############
 
 # read the inputfile.txt and generate environment variables for all the entries.
-source $XSEDE_TEST_ROOT/library/process_configuration.sh
+source "$XSEDE_TEST_ROOT/library/process_configuration.sh"
 define_and_export_variables
 check_if_failed Not all variables could be imported properly from the inputfile.txt.
 
@@ -164,13 +163,13 @@ if [ -z "$NORMAL_ACCOUNT_PASSWD" ]; then NORMAL_ACCOUNT_PASSWD="FOOP"; fi
 
 # now that we have the environment set up, we can pull in all the functions
 # for working on the grid.
-source $XSEDE_TEST_ROOT/library/helper_methods.sh
-source $XSEDE_TEST_ROOT/library/runner_functions.sh
-source $XSEDE_TEST_ROOT/library/generate_jsdl.sh
-source $XSEDE_TEST_ROOT/library/user_management.sh
-source $XSEDE_TEST_ROOT/library/job_processing.sh
-source $XSEDE_TEST_ROOT/library/grid_management.sh
-source $XSEDE_TEST_ROOT/library/security_management.sh
+source "$XSEDE_TEST_ROOT/library/helper_methods.sh"
+source "$XSEDE_TEST_ROOT/library/runner_functions.sh"
+source "$XSEDE_TEST_ROOT/library/generate_jsdl.sh"
+source "$XSEDE_TEST_ROOT/library/user_management.sh"
+source "$XSEDE_TEST_ROOT/library/job_processing.sh"
+source "$XSEDE_TEST_ROOT/library/grid_management.sh"
+source "$XSEDE_TEST_ROOT/library/security_management.sh"
 #source $XSEDE_TEST_ROOT/library/random_ids_manager.sh
 
 ##############

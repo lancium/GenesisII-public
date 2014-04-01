@@ -10,9 +10,9 @@
 eprfile="$1"
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
-if [ -z $GENII_INSTALL_DIR ]; then
+if [ -z "$GENII_INSTALL_DIR" ]; then
   echo "export GENII_INSTALL_DIR before running the script."
   exit 1
 fi
@@ -30,5 +30,5 @@ if [ -z "$eprfile"  ]; then
   exit 1
 fi
 
-$GENII_INSTALL_DIR/grid script local:./link-grid-act126.xml "$1"
+"$GENII_INSTALL_DIR/grid" script local:./link-grid-act126.xml "$1"
 

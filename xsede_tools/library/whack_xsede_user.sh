@@ -16,7 +16,7 @@ fi
 
 echo dropping user $user
 
-$GENII_INSTALL_DIR/grid >$noisefile <<eof
+"$GENII_INSTALL_DIR/grid" >$noisefile <<eof
   unlink /resources/xsede.org/containers/sts-1.xsede.org/Services/KerbAuthnPortType/$user
   onerror failed to remove kerberos port type entry for $user.
   unlink /users/xsede.org/$user

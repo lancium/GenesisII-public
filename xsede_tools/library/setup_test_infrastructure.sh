@@ -6,12 +6,12 @@
 # Author: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
-progname="$(basename $0)"
+progname="$(basename "$0")"
 
 if [ $# -lt 1 ]; then
   echo "$progname: This script needs a single parameter, which is the container"
@@ -38,14 +38,11 @@ else
   echo "No password provided, but it's only needed for bootstrapping."
 fi
 
-#oneTimeSetUp()
-#{
-#  sanity_test_and_init  # make sure test environment is good.
-#}
-
 # login the right power user that can create other user entries.
 testLoginAsAdmin()
 {
+echo got to first test in setup test infra
+
   if [ -z "$NON_INTERACTIVE" ]; then
     echo "[$(date)]"
     login_a_user admin
@@ -68,7 +65,7 @@ testGetTestUserEstablished()
     exit 1
   fi
 
-  bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$USERPATH" "$new_password" "$SUBMIT_GROUP" "$HOMES_LOC" "$(dirname "$USERPATH")"
+  bash "$XSEDE_TEST_ROOT/library/create-user-and-group.sh" "$USERPATH" "$new_password" "$SUBMIT_GROUP" "$HOMES_LOC" "$(dirname "$USERPATH")"
   assertEquals "Create user at '$USERPATH'" 0 $?
 
   multi_grid <<eof
@@ -91,7 +88,7 @@ testCreateUsers()
     echo "Creating user '$username'..."
     passwd="${MULTI_PASSWORD_LIST[$x]}"
     # now do the heavy lifting to get that user set up.
-    bash $XSEDE_TEST_ROOT/library/create-user-and-group.sh "$username" "$passwd" "$SUBMIT_GROUP" "$HOMES_LOC" "$(dirname "$username")"
+    bash "$XSEDE_TEST_ROOT/library/create-user-and-group.sh" "$username" "$passwd" "$SUBMIT_GROUP" "$HOMES_LOC" "$(dirname "$username")"
     assertEquals "Create user '$username'" 0 $?
     # also provide writability to the test user for staging job data.
     multi_grid <<eof
@@ -122,5 +119,5 @@ oneTimeTearDown()
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

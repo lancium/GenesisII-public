@@ -5,10 +5,10 @@
 #hmmm: this test doesn't seem to clean up after itself.  should be able to run repeatedly.
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 userName=$1;shift
 kerberosPassword=$1;shift
@@ -93,7 +93,7 @@ function testX509AuthnPortTypeReplication()
   sleep 45
 
   # shutdown the backup container
-  bash $XSEDE_TEST_ROOT/library/zap_genesis_javas.sh "$BACKUP_DEPLOYMENT_NAME"
+  bash "$XSEDE_TEST_ROOT/library/zap_genesis_javas.sh" "$BACKUP_DEPLOYMENT_NAME"
 
   # wait a few moments to ensure that backup container shutdown did happen 
   sleep 5
@@ -155,7 +155,7 @@ function testX509AuthnPortTypeReplication()
   sleep 45
 
   # again shutdown the backup container
-  bash $XSEDE_TEST_ROOT/library/zap_genesis_javas.sh "$BACKUP_DEPLOYMENT_NAME"
+  bash "$XSEDE_TEST_ROOT/library/zap_genesis_javas.sh" "$BACKUP_DEPLOYMENT_NAME"
 
   # login again to the user; this time one group credential should be missing
   # do some parsing of whoami to ensure that certificate count is as expected (Not Done)
@@ -228,7 +228,7 @@ function testKerberosPortTypeReplication()
   grid logout --all
 
   # shutdown the backup container 
-  bash $XSEDE_TEST_ROOT/library/zap_genesis_javas.sh "$BACKUP_DEPLOYMENT_NAME"
+  bash "$XSEDE_TEST_ROOT/library/zap_genesis_javas.sh" "$BACKUP_DEPLOYMENT_NAME"
 
   # login to the kerberos user
   grid_chk login --username=$userName --password=$kerberosPassword
@@ -280,5 +280,5 @@ echo whoaming:
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

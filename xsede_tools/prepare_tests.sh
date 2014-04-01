@@ -28,7 +28,7 @@ else
   # we assume they are managing this script more closely and do not need (or want) a bash sub-shell.
   NO_SUBSHELL=true
 fi
-GRITTY_TESTING_TOP_LEVEL=$(echo $GRITTY_TESTING_TOP_LEVEL | sed -e 's/\/cygdrive\/\(.\)/\1:/')
+GRITTY_TESTING_TOP_LEVEL="$(echo "$GRITTY_TESTING_TOP_LEVEL" | sed -e 's/\/cygdrive\/\(.\)/\1:/')"
 
 # the top-level directory for tests, i.e. the root of testing hierarchy.
 export XSEDE_TEST_ROOT="$GRITTY_TESTING_TOP_LEVEL"
@@ -40,9 +40,9 @@ export SHUNIT_DIR="$XSEDE_TEST_ROOT/shunit"
 export TMP
 if [ -z "$TMP" ]; then
   TMP="$HOME/tmp"
-  if [ ! -d "$TMP" ]; then mkdir $TMP; fi
+  if [ ! -d "$TMP" ]; then mkdir "$TMP"; fi
 fi
-TMP=$(echo $TMP | sed -e 's/\/cygdrive\/\(.\)/\1:/')
+TMP="$(echo "$TMP" | sed -e 's/\/cygdrive\/\(.\)/\1:/')"
 # TEST_TEMP is a folder where we can generate a collection of junk files.
 export TEST_TEMP="$TMP/xsede_test_output_${USER}"
 if [ ! -d "$TEST_TEMP" ]; then

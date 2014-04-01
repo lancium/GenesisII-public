@@ -4,10 +4,10 @@
 #mods: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 # where we will export a part of rns space from the grid.
 export TEST_AREA="$EXPORTPATH"
@@ -19,8 +19,8 @@ oneTimeSetUp()
   sanity_test_and_init  # make sure test environment is good.
 
   # remove any previous mount point.
-  fusermount -u $MOUNT_POINT &>/dev/null
-  if [ -e $MOUNT_POINT ]; then rmdir $MOUNT_POINT; fi
+  fusermount -u "$MOUNT_POINT" &>/dev/null
+  if [ -e "$MOUNT_POINT" ]; then rmdir "$MOUNT_POINT"; fi
   # take out prior exports too.
   grid ls ${RNSPATH}/export-local &>/dev/null
   if [ $? == 0 ]; then
@@ -35,7 +35,7 @@ oneTimeSetUp()
   rm -rf testDir
   grid rm -rf ${RNSPATH}/testDir &>/dev/null
   # create a new mount point.
-  mkdir $MOUNT_POINT
+  mkdir "$MOUNT_POINT"
   # create the export path, if we can.  this should be a pre-existing directory,
   # and this creation attempt will only work if we're doing a simple bootstrap test.
   if [ ! -d "$TEST_AREA" ]; then
@@ -63,21 +63,11 @@ testFuseMount () {
   if ! fuse_supported; then return 0; fi
   # Create a grid mount point, mount the grid
 echo mount point is $MOUNT_POINT
-  fuse --mount local:$MOUNT_POINT
+  fuse --mount local:"$MOUNT_POINT"
   sleep 20
 
-  test_fuse_mount $MOUNT_POINT
+  test_fuse_mount "$MOUNT_POINT"
   check_if_failed "Mounting grid to local directory"
-
-#old  checkMount=`mount`
-#oldecho checkmnt is $checkMount
-#old  if [[ "$checkMount" =~ .*$MOUNT_POINT.* ]]; then
-#old    retval=0
-#old  else
-#old    echo "Mount failed... Bailing out"
-#old    exit 0
-#old  fi
-#old  assertEquals "Fuse mounting grid to local $MOUNT_POINT dir" 0 $retval
 
   grid ls
   cat $GRID_OUTPUT_FILE
@@ -92,9 +82,9 @@ testFuseRecursiveCp() {
   if ! fuse_supported; then return 0; fi
   # Recursively copy files from $1 into the $2
   # Then ls -lR the directory and count the number of lines
-  time cp -rv testDir $MOUNT_POINT/$RNSPATH
+  time cp -rv testDir "$MOUNT_POINT/$RNSPATH"
   assertEquals "Recursively copying from testDir to $MOUNT_POINT/$RNSPATH" 0 $?
-  time ls -lR $MOUNT_POINT/$RNSPATH
+  time ls -lR "$MOUNT_POINT/$RNSPATH"
   assertEquals "Recursively listing the copied files in testDir to $MOUNT_POINT/$RNSPATh" 0 $?
 }
 
@@ -102,16 +92,16 @@ testFuseRecursiveCpOntoExport()
 {
   if ! fuse_supported; then return 0; fi
   # Recursively copy files from $1 into the $2
-  time cp -rv testDir $MOUNT_POINT/$RNSPATH/export-local
+  time cp -rv testDir "$MOUNT_POINT/$RNSPATH/export-local"
   assertEquals "Recursively copying from testDir to $MOUNT_POINT/$RNSPATH/export-local" 0 $?
   echo "Recursively listing the copied files in $MOUNT_POINT/$RNSPATH/export-local"
-  time ls -lR $MOUNT_POINT/$RNSPATH/export-local
+  time ls -lR "$MOUNT_POINT/$RNSPATH/export-local"
   assertEquals "directory copied to export was listable" 0 $?
 }
 
 notReady_testRecursiveCopyAndDeleteOnExport()
 {
-  grid cp -r local:$XSEDE_TEST_ROOT/EMS_Tests $RNSPATH/export-local
+  grid cp -r local:"$XSEDE_TEST_ROOT/EMS_Tests" $RNSPATH/export-local
   assertEquals "copy directory recursively to export path" 0 $?
   grid ls $RNSPATH/export-local/EMS_Tests/besFunctionality &>/dev/null
   assertEquals "directory is present on export path afterwards" 0 $?
@@ -135,12 +125,12 @@ testRemovingTestDir()
 }
 
 oneTimeTearDown() {
-  fusermount -u $MOUNT_POINT &>/dev/null
-  rmdir $MOUNT_POINT
+  fusermount -u "$MOUNT_POINT" &>/dev/null
+  rmdir "$MOUNT_POINT"
   rm -rf testDir
   grid export --quit $RNSPATH/export-local &>/dev/null
 }
 
 # load and run shUnit2
-source $SHUNIT_DIR/shunit2
+source "$SHUNIT_DIR/shunit2"
 

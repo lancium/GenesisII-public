@@ -22,22 +22,22 @@ source "$GENII_INSTALL_DIR/scripts/installation_helpers.sh"
 
 ##############
 
-replace_compiler_variables $GENII_INSTALL_DIR/RELEASE
-replace_compiler_variables $GENII_INSTALL_DIR/updates/current-version.txt
-replace_compiler_variables $GENII_INSTALL_DIR/container.properties
+replace_compiler_variables "$GENII_INSTALL_DIR/RELEASE"
+replace_compiler_variables "$GENII_INSTALL_DIR/updates/current-version.txt"
+replace_compiler_variables "$GENII_INSTALL_DIR/container.properties"
 
-replace_installdir_variables $GENII_INSTALL_DIR
+replace_installdir_variables "$GENII_INSTALL_DIR"
 
 # make a link for the Container startup script.
-ln -s $GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer $GENII_INSTALL_DIR
+ln -s "$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer" "$GENII_INSTALL_DIR"
 
 # clean up some older files.
 \rm -rf "$GENII_INSTALL_DIR/ApplicationWatcher" "$GENII_INSTALL_DIR/XCGContainer" "$GENII_INSTALL_DIR/lib/gffs-container.jar" 
 
 # set the permissions on our files properly.
-find $GENII_INSTALL_DIR -type d -exec chmod -c a+rx "{}" ';' &>/dev/null
-find $GENII_INSTALL_DIR -type f -exec chmod -c a+r "{}" ';' &>/dev/null
-find $GENII_INSTALL_DIR -type f -iname "*.sh" -exec chmod -c a+rx "{}" ';' &>/dev/null
+find "$GENII_INSTALL_DIR" -type d -exec chmod -c a+rx "{}" ';' &>/dev/null
+find "$GENII_INSTALL_DIR" -type f -exec chmod -c a+r "{}" ';' &>/dev/null
+find "$GENII_INSTALL_DIR" -type f -iname "*.sh" -exec chmod -c a+rx "{}" ';' &>/dev/null
 
 ##############
 

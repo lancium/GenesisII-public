@@ -21,11 +21,11 @@ function add_resolver_to_item()
 
 #hmmm: hide output from complaining failures where resolver already exists?
   
-  $GENII_INSTALL_DIR/grid resolver $resolver_parm_line $item /etc/resolvers/rootResolver 
+  "$GENII_INSTALL_DIR/grid" resolver $resolver_parm_line $item /etc/resolvers/rootResolver 
   # if it already had a resolver or we couldn't create one, we don't want
   # to replicate it.
   if [ $? -eq 0 ]; then
-    $GENII_INSTALL_DIR/grid replicate $replicate_parm_line $item /resources/xsede.org/containers/gffs-2.xsede.org
+    "$GENII_INSTALL_DIR/grid" replicate $replicate_parm_line $item /resources/xsede.org/containers/gffs-2.xsede.org
   fi
 }
 
@@ -34,7 +34,7 @@ function replicate_resource_hierarchy()
 {
   top_lev_file=$(mktemp /tmp/toplev.XXXXXX)
 
-  $GENII_INSTALL_DIR/grid ls $service_provider_path \
+  "$GENII_INSTALL_DIR/grid" ls $service_provider_path \
       | tail -n +2 >"$top_lev_file"
 
   echo "[$service_provider_path]"
@@ -45,7 +45,7 @@ function replicate_resource_hierarchy()
       mid_lev_file=$(mktemp /tmp/midlev.XXXXXX)
       outer_item="$service_provider_path/$top_level_item"
       echo "  [$outer_item]"
-      $GENII_INSTALL_DIR/grid ls $outer_item \
+      "$GENII_INSTALL_DIR/grid" ls $outer_item \
           | tail -n +2 >"$mid_lev_file"
       add_resolver_to_item "" "" $outer_item
       while read mid_level_item; do
@@ -65,7 +65,7 @@ function chmod_for_all()
 {
   path="$1"; shift
   errchk="$(mktemp /tmp/errchk.XXXXXX)"
-  $GENII_INSTALL_DIR/grid <<eof &>"$errchk"
+  "$GENII_INSTALL_DIR/grid" <<eof &>"$errchk"
     chmod $path +rwx $grid_identity
     onerror failed to give rights on $path to $grid_identity
     chmod $path +rwx /groups/xsede.org/gffs-admins
@@ -83,7 +83,7 @@ eof
 function create_resources_structure()
 {
   echo "Creating $service_provider_path"
-  $GENII_INSTALL_DIR/grid mkdir -p $service_provider_path
+  "$GENII_INSTALL_DIR/grid" mkdir -p $service_provider_path
   if [ $? -ne 0 ]; then
     echo "Failed to create top-level resource path: $service_provider_path"
     exit 1
@@ -92,27 +92,27 @@ function create_resources_structure()
   chmod_for_all $service_provider_path
 
   echo "Creating $service_provider_path/containers"
-  $GENII_INSTALL_DIR/grid mkdir -p $service_provider_path/containers
+  "$GENII_INSTALL_DIR/grid" mkdir -p $service_provider_path/containers
   chmod_for_all $service_provider_path/containers
 
   echo "Creating $service_provider_path/storage-containers"
-  $GENII_INSTALL_DIR/grid mkdir -p $service_provider_path/storage-containers
+  "$GENII_INSTALL_DIR/grid" mkdir -p $service_provider_path/storage-containers
   chmod_for_all $service_provider_path/storage-containers
 
   echo "Creating $service_provider_path/bes-containers"
-  $GENII_INSTALL_DIR/grid mkdir -p $service_provider_path/bes-containers
+  "$GENII_INSTALL_DIR/grid" mkdir -p $service_provider_path/bes-containers
   chmod_for_all $service_provider_path/bes-containers
 
   echo "Creating $service_provider_path/queues"
-  $GENII_INSTALL_DIR/grid mkdir -p $service_provider_path/queues
+  "$GENII_INSTALL_DIR/grid" mkdir -p $service_provider_path/queues
   chmod_for_all $service_provider_path/queues
 }
 
 function link_sp_container()
 {
   echo "Linking new container $service_provider_path/containers/$container_name"
-  $GENII_INSTALL_DIR/grid ln --service-url=$g2_url $service_provider_path/containers/$container_name
-  $GENII_INSTALL_DIR/grid ping $service_provider_path/containers/$container_name
+  "$GENII_INSTALL_DIR/grid" ln --service-url=$g2_url $service_provider_path/containers/$container_name
+  "$GENII_INSTALL_DIR/grid" ping $service_provider_path/containers/$container_name
   if [ $? != 0 ];then
     echo "Container could not be linked successfully"
   else
@@ -121,7 +121,7 @@ function link_sp_container()
 
   echo "Setting permissions for $grid_identity on $service_provider_path/containers/$container_name"
   chmod_for_all $service_provider_path/containers/$container_name
-  $GENII_INSTALL_DIR/grid script local:./configure_container_permissions.xml $service_provider_path/containers/$container_name $grid_identity
+  "$GENII_INSTALL_DIR/grid" script local:./configure_container_permissions.xml $service_provider_path/containers/$container_name $grid_identity
 }
 
 function create_unicore_bes()
@@ -145,23 +145,23 @@ function create_unicore_bes()
   fi
 
   echo "Linking new unicore bes $service_provider_path/bes-containers/$bes_name"
-  $GENII_INSTALL_DIR/grid mint-epr --link=$service_provider_path/bes-containers/$bes_name --certificate-chain=local:$certificate_path $u6_url
+  "$GENII_INSTALL_DIR/grid" mint-epr --link=$service_provider_path/bes-containers/$bes_name --certificate-chain=local:$certificate_path $u6_url
 }
 
 function create_queue_for_bes()
 {
   echo "Creating $service_provider_path/queues/$bes_name-queue queue resource" 
-  $GENII_INSTALL_DIR/grid create-resource $service_provider_path/containers/$container_name/Services/QueuePortType $service_provider_path/queues/$bes_name-queue
+  "$GENII_INSTALL_DIR/grid" create-resource $service_provider_path/containers/$container_name/Services/QueuePortType $service_provider_path/queues/$bes_name-queue
   chmod_for_all $service_provider_path/queues/$bes_name-queue
 
   echo "Linking $service_provider_path/bes-containers/$bes_name into $service_provider_path/queues/$bes_name-queue/resources/$bes_name "
-  $GENII_INSTALL_DIR/grid ln $service_provider_path/bes-containers/$bes_name $service_provider_path/queues/$bes_name-queue/resources/$bes_name
+  "$GENII_INSTALL_DIR/grid" ln $service_provider_path/bes-containers/$bes_name $service_provider_path/queues/$bes_name-queue/resources/$bes_name
 
   echo "Setting rx permissions on $service_provider_path/queues/$bes_name-queue for $grid_identity"
   chmod_for_all $service_provider_path/queues/$bes_name-queue
 
   echo "Setting queue slots to $num_slots for $bes_name-queue"
-  $GENII_INSTALL_DIR/grid qconfigure $service_provider_path/queues/$bes_name-queue $bes_name $num_slots
+  "$GENII_INSTALL_DIR/grid" qconfigure $service_provider_path/queues/$bes_name-queue $bes_name $num_slots
 }
 
 ##############
@@ -246,14 +246,14 @@ top_resources_path="/resources/xsede.org"
 # figure out where we are and test some preconditions.
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd $WORKDIR
+cd "$WORKDIR"
 
-if [ -z $GENII_USER_DIR ]; then
+if [ -z "$GENII_USER_DIR" ]; then
   echo "export GENII_USER_DIR before running the script."
   exit 1
 fi
 
-if [ -z $GENII_INSTALL_DIR ]; then
+if [ -z "$GENII_INSTALL_DIR" ]; then
   echo "export GENII_INSTALL_DIR before running the script."
   exit 1
 fi
@@ -387,7 +387,7 @@ echo "GENII_USER_DIR is set to $GENII_USER_DIR"
 echo "GENII_INSTALL_DIR is set to $GENII_INSTALL_DIR"
 echo "You are logged in as grid user:" 
 echo "----------------------"
-$GENII_INSTALL_DIR/grid whoami
+"$GENII_INSTALL_DIR/grid" whoami
 echo "----------------------"
 echo "SP tree is at: $service_provider_path"
 echo "Identity to give rights to is: $grid_identity"

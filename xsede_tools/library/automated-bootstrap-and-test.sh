@@ -63,7 +63,7 @@ function bail_on_fail()
   if [ $? -ne 0 ]; then
     echo "Failed previous step.  Now leaving test."
     # shut down any running containers if we can.
-    bash $GRITTY_TESTING_TOP_LEVEL/library/zap_genesis_javas.sh
+    bash "$GRITTY_TESTING_TOP_LEVEL/library/zap_genesis_javas.sh"
     exit 1
   fi
 }
@@ -72,9 +72,9 @@ function bail_on_fail()
 
 # need to fix up an input file to use for all our testing.
 
-INPUTFILE_FOR_JENKINS=$GRITTY_TESTING_TOP_LEVEL/examples/inputfile.jenkins
+INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/inputfile.jenkins"
 if [ "$NAMESPACE" == "xsede" ]; then
-  INPUTFILE_FOR_JENKINS=$GRITTY_TESTING_TOP_LEVEL/examples/inputfile.jenkins-xsede
+  INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/inputfile.jenkins-xsede"
 fi
 
 # give the build an input file it can use.  this one relies on our having set
@@ -84,14 +84,14 @@ sed -e "s/GENII_INSTALL_DIR=.*/GENII_INSTALL_DIR=\$GENII_INSTALL_DIR/" \
   -e "s/GENII_USER_DIR=.*/GENII_USER_DIR=\$GENII_USER_DIR/" \
   -e "s/BACKUP_USER_DIR=.*/BACKUP_USER_DIR=\$BACKUP_USER_DIR/" \
   < $INPUTFILE_FOR_JENKINS \
-  > $GRITTY_TESTING_TOP_LEVEL/inputfile.txt
+  > "$GRITTY_TESTING_TOP_LEVEL/inputfile.txt"
 bail_on_fail
 
 ##############
 
 # take out any existing container that's running.  we need to ensure the install folder
 # is not slathered with running processes.
-bash $GRITTY_TESTING_TOP_LEVEL/library/zap_genesis_javas.sh
+bash "$GRITTY_TESTING_TOP_LEVEL/library/zap_genesis_javas.sh"
 
 # clear out older build packages.
 \rm -f "$SCRIPT_TOP/GenesisII-"*.gz
@@ -100,11 +100,11 @@ bash $GRITTY_TESTING_TOP_LEVEL/library/zap_genesis_javas.sh
 \rm -f /tmp/Axis*.att
 
 # clean up any old logging gunk.
-\rm -rf $GRITTY_TESTING_TOP_LEVEL/logs
-mkdir $GRITTY_TESTING_TOP_LEVEL/logs
+\rm -rf "$GRITTY_TESTING_TOP_LEVEL/logs"
+mkdir "$GRITTY_TESTING_TOP_LEVEL/logs"
 
 # clean up log files left from previous runs.
-find $GRITTY_TESTING_TOP_LEVEL -iname "container.log*" -or -iname "grid-client.log*" -exec rm "{}" ';'
+find "$GRITTY_TESTING_TOP_LEVEL" -iname "container.log*" -or -iname "grid-client.log*" -exec rm "{}" ';'
 
 # make a directory for running the latest genesis build from.
 \rm -rf "$GENII_INSTALL_DIR"
@@ -141,7 +141,7 @@ fi
 popd &>/dev/null
 
 # patch all the paths so they point to the current genesis 2 location.
-bash $GRITTY_TESTING_TOP_LEVEL/library/genesis2_path_fixer.sh $GENII_INSTALL_DIR $WORKSPACE_DIR
+bash "$GRITTY_TESTING_TOP_LEVEL/library/genesis2_path_fixer.sh" "$GENII_INSTALL_DIR" "$WORKSPACE_DIR"
 
 ##############
 
@@ -170,29 +170,21 @@ done
 ################
 
 # get the test environment loaded up.
-source $GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh $GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh
+source "$GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh" "$GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh"
 
-source $XSEDE_TEST_ROOT/library/establish_environment.sh
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 ################
 # switch over the port used by the container before we start it.
-pushd $GENII_INSTALL_DIR &>/dev/null
+pushd "$GENII_INSTALL_DIR" &>/dev/null
 # if they didn't provide a different port, we will.
 if [ -z "$DIFFERENT_PORT" ]; then
   DIFFERENT_PORT=10402
 fi
-bash change-port.sh $DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME 18080 $DIFFERENT_PORT
+bash change-port.sh "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME" 18080 $DIFFERENT_PORT
   # we don't check for failure here, because a previous bootstrap may have
   # run against the same build, and we won't change those port numbers again.
 popd &>/dev/null
-################
-
-################
-##no. echo Patching runContainer.sh for memory limit...
-##pushd $GENII_INSTALL_DIR &>/dev/null
-##sed -i -e "s/-Xmx512M/-Xmx2G/" "runContainer.sh"
-##chmod 755 "runContainer.sh" 
-##popd &>/dev/null
 ################
 
 # clean up the current user directory and prior state.
@@ -210,10 +202,10 @@ bail_on_fail
 echo "Cleaning previous test run."
 \rm -rf $TEST_TEMP
 echo "Re-establishing temporary directories"
-source $GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh
+source "$GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh"
 
 echo "quick-start grid bootstrap commencing..."
-bash $XSEDE_TEST_ROOT/library/bootstrap_quick_start.sh
+bash "$XSEDE_TEST_ROOT/library/bootstrap_quick_start.sh"
 bail_on_fail
 
 # go through the full regression test suite now and see how it does.
@@ -224,13 +216,13 @@ bail_on_fail
 
 # stop our container again since we're done testing.
 echo "Stopping container."
-bash $GRITTY_TESTING_TOP_LEVEL/library/zap_genesis_javas.sh
+bash "$GRITTY_TESTING_TOP_LEVEL/library/zap_genesis_javas.sh"
 
 # clear out obnoxious axis file leakage, again.
 \rm -f /tmp/Axis*.att "$GENII_INSTALL_DIR/webapps/axis/WEB-INF/attachments"/Axis*.att
 
 # whack files that are too large.
-whack_list=$(find $GENII_USER_DIR -size +250M)
+whack_list=$(find "$GENII_USER_DIR" -size +250M)
 echo "Destroying overly large files in derby; possibly due to leftover copies?:"
 echo "$whack_list"
 \rm -f $whack_list
