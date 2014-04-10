@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Pair;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -90,7 +91,7 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 						MessageElement next = rest.next();
 						stmt.setString(1, getKey());
 						stmt.setLong(2, (long) lcv);
-						stmt.setBlob(3, DBSerializer.toBlob(ObjectSerializer.anyToBytes(new MessageElement[] { next }),
+						stmt.setBlob(3, DBSerializer.toBlob(ObjectSerializer.anyToBytes(Elementals.unitaryArray(next)),
 							"iterators", "contents"));
 						stmt.addBatch();
 						lcv++;

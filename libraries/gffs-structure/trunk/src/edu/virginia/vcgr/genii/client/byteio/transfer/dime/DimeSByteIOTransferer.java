@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.client.byteio.transfer.dime;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
-import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.UnsignedInt;
 import org.ggf.byteio.TransferInformationType;
@@ -16,6 +15,7 @@ import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
 import edu.virginia.vcgr.genii.client.byteio.transfer.AbstractByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.StreamableByteIOTransferer;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 
 /**
  * This class implements the DIME transfer protocol for the Streamable ByteIO case.
@@ -77,7 +77,7 @@ public class DimeSByteIOTransferer extends AbstractByteIOTransferer<StreamableBy
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.DIME);
 
 		TransferInformationType transType =
-			new TransferInformationType(new MessageElement[0], ByteIOConstants.TRANSFER_TYPE_DIME_URI);
+			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_DIME_URI);
 		SeekWrite seekWriteRequest = new SeekWrite(offset, seekOrigin, transType);
 
 		_clientStub.seekWrite(seekWriteRequest);

@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.container.notification;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 
-import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -11,6 +10,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.Container;
@@ -52,7 +52,7 @@ public class EnhancedNotificationBrokerFactoryServiceImpl extends GenesisIIBase 
 		try {
 			EndpointReferenceType brokerEndpoint =
 				new EnhancedNotificationBrokerServiceImpl().CreateEPR(
-					new MessageElement[] { cParams.serializeToMessageElement() },
+					Elementals.unitaryArray(cParams.serializeToMessageElement()),
 					Container.getServiceURL(EnhancedNotificationBrokerServiceImpl.PORT_NAME));
 			_logger.info("notification broker is created without any forwarding port");
 			return brokerEndpoint;
@@ -81,7 +81,7 @@ public class EnhancedNotificationBrokerFactoryServiceImpl extends GenesisIIBase 
 		try {
 			EndpointReferenceType brokerEndpoint =
 				new EnhancedNotificationBrokerServiceImpl().CreateEPR(
-					new MessageElement[] { cParams.serializeToMessageElement() },
+					Elementals.unitaryArray(cParams.serializeToMessageElement()),
 					Container.getServiceURL(EnhancedNotificationBrokerServiceImpl.PORT_NAME));
 
 			_logger.info("notification broker is created with a forwarding port.");

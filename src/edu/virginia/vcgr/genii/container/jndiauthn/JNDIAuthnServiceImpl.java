@@ -67,6 +67,7 @@ import org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
@@ -369,7 +370,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 
 		elements[1] =
 			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
-				new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
+				new RequestedSecurityTokenType(Elementals.unitaryArray(wseTokenRef)));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		response.set_any(elements);

@@ -102,6 +102,7 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHook;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
@@ -541,7 +542,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			cons.timeToLive(terminationTime.getTimeInMillis() - currentTime.getTimeInMillis());
 
 		EndpointReferenceType subscription =
-			new GeniiSubscriptionServiceImpl().CreateEPR(new MessageElement[] { cons.serializeToMessageElement() },
+			new GeniiSubscriptionServiceImpl().CreateEPR(Elementals.unitaryArray(cons.serializeToMessageElement()),
 				Container.getServiceURL("GeniiSubscriptionPortType"));
 
 		return new SubscribeResponse(subscription, currentTime, terminationTime, null);
@@ -1386,7 +1387,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 				if (consParms.remainingContents(tempObj))
 					iteratorEndpoint =
-						new WSIteratorServiceImpl().CreateEPR(new MessageElement[] { consParms.serializeToMessageElement() },
+						new WSIteratorServiceImpl().CreateEPR(Elementals.unitaryArray(consParms.serializeToMessageElement()),
 							Container.getServiceURL("WSIteratorPortType"));
 
 				return new IteratorInitializationType(iteratorEndpoint, batchElements);

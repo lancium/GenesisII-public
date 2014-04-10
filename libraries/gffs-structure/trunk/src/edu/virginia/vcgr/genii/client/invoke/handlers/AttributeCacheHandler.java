@@ -29,6 +29,7 @@ import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.cache.AttributeCache;
 import edu.virginia.vcgr.genii.client.cache.AttributeCacheFlushListener;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
@@ -273,9 +274,9 @@ public class AttributeCacheHandler
 		}
 
 		if (ret == null)
-			return new GetMultipleResourcePropertiesResponse(new MessageElement[0]);
+			return new GetMultipleResourcePropertiesResponse(Elementals.getEmptyArray());
 
-		return new GetMultipleResourcePropertiesResponse(ret.toArray(new MessageElement[0]));
+		return new GetMultipleResourcePropertiesResponse(Elementals.toArray(ret));
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
@@ -312,9 +313,9 @@ public class AttributeCacheHandler
 		}
 
 		if (ret == null)
-			return new GetResourcePropertyResponse(new MessageElement[0]);
+			return new GetResourcePropertyResponse(Elementals.getEmptyArray());
 
-		return new GetResourcePropertyResponse(ret.toArray(new MessageElement[0]));
+		return new GetResourcePropertyResponse(Elementals.toArray(ret));
 	}
 
 	private void cacheResponse(RNSEntryResponseType member)
