@@ -24,7 +24,7 @@ if [ $# -lt 1 ]; then
 fi
 
 export ADMIN_CONTAINER="$1"; shift
-echo "container location is $ADMIN_CONTAINER"
+#echo "container location is $ADMIN_CONTAINER"
 # override the variable in the input file, since we need to get this right.
 export CONTAINERPATH="$ADMIN_CONTAINER"
 
@@ -41,8 +41,6 @@ fi
 # login the right power user that can create other user entries.
 testLoginAsAdmin()
 {
-echo got to first test in setup test infra
-
   if [ -z "$NON_INTERACTIVE" ]; then
     echo "[$(date)]"
     login_a_user admin

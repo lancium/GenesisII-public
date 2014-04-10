@@ -113,7 +113,6 @@ function launch_container()
 
   # move the log out of the way so we don't get fooled by old startup noise.
   containerlog="$(get_container_logfile "$DEP_NAME")"
-echo containerlog is: $containerlog
 
   # ensure that we have at least our scanning factor worth of lines in the buffer
   # that are not the restart phrase.
@@ -125,7 +124,6 @@ echo containerlog is: $containerlog
   fi
 
   pushd "$GENII_INSTALL_DIR" &>/dev/null
-echo jumped to install dir: $GENII_INSTALL_DIR
 
   echo "Launching Genesis II container for deployment \"$DEP_NAME\"..."
   CONTAINERLOGFILE="$(get_container_logfile "$DEP_NAME")"
@@ -134,20 +132,20 @@ echo jumped to install dir: $GENII_INSTALL_DIR
   extra_suffix=
   use_shell=/bin/bash
   runner="$GENII_INSTALL_DIR/runContainer.sh"
-echo first runner is $runner
+#echo first runner is $runner
   if [ ! -f "$runner" ]; then
-echo failed to find runner at: $runner
+#echo failed to find runner at: $runner
     runner="$GENII_INSTALL_DIR/GFFSContainer"
     extra_suffix="start"
   fi
   if [ ! -f "$runner" ]; then
-echo failed to find runner at: $runner
+#echo failed to find runner at: $runner
     use_shell=
     runner="$GENII_INSTALL_DIR/wrapper-windows-x86-32.exe"
     extra_suffix="'$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/conf/wrapper.conf'"
   fi
   if [ ! -f "$runner" ]; then
-echo failed to find runner at: $runner
+#echo failed to find runner at: $runner
     runner="$(echo "$GENII_INSTALL_DIR/runContainer.bat" | sed -e 's/\//\\\\/g')"
     use_shell=cmd
     extra_suffix=
@@ -160,8 +158,11 @@ echo failed to find runner at: $runner
     exit 1
   fi
 
-echo path is currently: $PATH
-echo "use shell is '$use_shell'"
+#echo "path is currently: $PATH"
+#echo "decided runner is at: '$runner'"
+#echo "use shell is '$use_shell'"
+#echo "prefix is '$prefix'"
+#echo "suffix is '$extra_suffix'"
 
   $use_shell $extra_prefix "$runner" $extra_suffix $DEP_NAME &>/dev/null &
 

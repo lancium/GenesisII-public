@@ -196,7 +196,7 @@ testMovingFileFromMount()
   if ! fuse_supported; then return 0; fi
   # make sure this is out of the way before the move.
   \rm -rf "$TEST_TEMP/foondir"
-  mv "$TESTING_DIR $TEST_TEMP/foondir"
+  mv "$TESTING_DIR" "$TEST_TEMP/foondir"
   assertEquals "Testing 'mv $TESTING_DIR ./' from mounted dir to local dir" 0 $?
   # make sure it really showed up there.
   okay=1

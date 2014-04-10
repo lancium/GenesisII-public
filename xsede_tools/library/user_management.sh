@@ -64,7 +64,7 @@ function establish_identity()
   if [ -z "$user" -o -z "$password" ]; then
     echo establish_identity requires a user and password to become an identity.
   fi
-echo "establish_identity: idp_path is: $idp_path"
+#echo "establish_identity: idp_path is: $idp_path"
   # now toss any old creds.
   grid logout --all
   if [ "$BES_TYPE" = "Unicore" ]; then

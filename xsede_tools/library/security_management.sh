@@ -10,8 +10,10 @@
 
 CERTO="bash \"$GENII_INSTALL_DIR/cert-tool\""
 if [ "$OS" == "Windows_NT" ]; then
-  CERTO="cmd /c "$(echo $GENII_INSTALL_DIR | tr / \\\\)\\cert-tool.bat""
+  CERTO="cmd /c \"$(echo $GENII_INSTALL_DIR | tr / \\\\)\\cert-tool.bat\""
 fi
+
+#echo "CERTO is set to: '$CERTO'"
 
 ##############
 
@@ -58,10 +60,10 @@ function create_bootstrap_signing_certificate()
   local UBER_CA_PFX="$CA_PFX-base.pfx"
   local UBER_CA_ALIAS="base-key"
 
-echo uber ca pfx is $UBER_CA_PFX
-echo ca pfx is $CA_PFX
+#echo uber ca pfx is $UBER_CA_PFX
+#echo ca pfx is $CA_PFX
 
-  run_any_command "$CERTO" gen -dn="'C=US, ST=Virginia, L=Charlottesville, O=GENIITEST, OU=Genesis II, CN=skynet'" -output-storetype=PKCS12 "-output-entry-pass='$CA_PASSWORD'" "-output-keystore='$UBER_CA_PFX'" "-output-keystore-pass='$CA_PASSWORD'" "-output-alias='$UBER_CA_ALIAS'" -keysize=2048
+  run_any_command $CERTO gen -dn="'C=US, ST=Virginia, L=Charlottesville, O=GENIITEST, OU=Genesis II, CN=skynet'" -output-storetype=PKCS12 "-output-entry-pass='$CA_PASSWORD'" "-output-keystore='$UBER_CA_PFX'" "-output-keystore-pass='$CA_PASSWORD'" "-output-alias='$UBER_CA_ALIAS'" -keysize=2048
   check_if_failed "generating base of CA keypair"
 
   # now create the real signing certificate, with full CA apparel.
@@ -73,16 +75,16 @@ echo ca pfx is $CA_PFX
 function create_bootstrap_trusted_pfx()
 {
   local dirname="$1"; shift
-echo dirname for create trusted pfx is: $dirname
+#echo dirname for create trusted pfx is: $dirname
   for certfile in "$dirname"/*; do
-echo looking at certfile to add to trust store: $certfile
+#echo looking at certfile to add to trust store: $certfile
     # skip non-files.
     if [ ! -f "$certfile" ]; then continue; fi
     # skip pfx files.
     if [[ "$certfile" =~ .*\.pfx ]]; then continue; fi
     local output_alias="$(basename "$certfile" .cer)"
     echo -e "Adding '$(basename "$certfile")' to store with alias: $output_alias"
-    run_any_command "$CERTO" import "-output-keystore='$dirname/trusted.pfx'" -output-keystore-pass=trusted "-base64-cert-file='$certfile'" "-output-alias='$output_alias'"
+    run_any_command $CERTO import "-output-keystore='$dirname/trusted.pfx'" -output-keystore-pass=trusted "-base64-cert-file='$certfile'" "-output-alias='$output_alias'"
     check_if_failed "adding certificate for $certfile"
   done
 }
@@ -109,13 +111,13 @@ function create_certificate_using_CA()
   local NEW_ALIAS="$1"; shift
   local CN_GIVEN="$1"; shift
 
-echo new pfx is $NEW_PFX
-echo the ca pfx is $THE_CA_PFX
+#echo new pfx is $NEW_PFX
+#echo the ca pfx is $THE_CA_PFX
 
   # first generate the private and public key into the pkcs12 archive.
   local dn="$(calculate_DN "$CN_GIVEN")"
   echo -e "Creating $(basename "$NEW_PFX") with alias $NEW_ALIAS and certificate DN:\n    $dn"
-  run_any_command "$CERTO" gen "'-dn=$dn'" -output-storetype=PKCS12 "-output-entry-pass='$NEW_PASS'" "-output-keystore='$NEW_PFX'" "-output-keystore-pass='$NEW_PASS'" "-output-alias='$NEW_ALIAS'" "-input-keystore='$THE_CA_PFX'" "-input-keystore-pass='$THE_CA_PASS'" -input-storetype=PKCS12 "-input-entry-pass='$THE_CA_PASS'" "-input-alias='$THE_CA_ALIAS'" -keysize=2048
+  run_any_command $CERTO gen "'-dn=$dn'" -output-storetype=PKCS12 "-output-entry-pass='$NEW_PASS'" "-output-keystore='$NEW_PFX'" "-output-keystore-pass='$NEW_PASS'" "-output-alias='$NEW_ALIAS'" "-input-keystore='$THE_CA_PFX'" "-input-keystore-pass='$THE_CA_PASS'" -input-storetype=PKCS12 "-input-entry-pass='$THE_CA_PASS'" "-input-alias='$THE_CA_ALIAS'" -keysize=2048
   check_if_failed "generating $NEW_PFX from $THE_CA_PFX"
   # and create its certificate file.
   local cert_file="$(dirname "$NEW_PFX")/$(basename "$NEW_PFX" ".pfx").cer"
@@ -130,20 +132,20 @@ function create_grid_certificates()
   pushd "$GENII_INSTALL_DIR" &>/dev/null
 
   local SECURITY_DIR="$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/security"
-echo securit dir is $SECURITY_DIR
+#echo securit dir is $SECURITY_DIR
 
   local SIGNING_PFX="$SECURITY_DIR/signing-cert.pfx"
-echo signing pfx is $SIGNING_PFX
+#echo signing pfx is $SIGNING_PFX
   local SIGNING_ALIAS="signing-cert"
   local SIGNING_PASSWD="signer"
 
   local ADMIN_PFX="$SECURITY_DIR/admin.pfx"
-echo admin pfx is $ADMIN_PFX
+#echo admin pfx is $ADMIN_PFX
   local ADMIN_CER="$SECURITY_DIR/admin.cer"
   local ADMIN_PASSWD="$ADMIN_ACCOUNT_PASSWD"
 
   local OWNER_CER="$SECURITY_DIR/owner.cer"
-echo owner cer is $OWNER_CER
+#echo owner cer is $OWNER_CER
 
   # clean up any existing certificates.
   \rm -f "$SECURITY_DIR"/*.pfx "$SECURITY_DIR"/*.cer

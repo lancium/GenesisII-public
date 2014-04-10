@@ -100,7 +100,7 @@ function grid_base()
 function raw_grid()
 {
   # expects first parms to be the app/command to run.
-  "$@" 2>&1 | grep -v "Checking for updates\|Updates Disabled\|YourKit Java Profiler\|Current version is\|untoward for mooch"
+  $@ 2>&1 | grep -v "Checking for updates\|Updates Disabled\|YourKit Java Profiler\|Current version is\|untoward for mooch"
   return ${PIPESTATUS[0]}
 }
 

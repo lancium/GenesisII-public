@@ -16,7 +16,7 @@
 			</geniix:ls>
 	    	</block>
 		<catch class="java.lang.Exception">
-            		<gsh:echo message="Make sure ${CONTAINER} already exists in grid name space"/>
+            		<gsh:echo message="Make sure '${CONTAINER}' already exists in grid name space"/>
           	</catch>
         </try>
 	  
@@ -27,7 +27,7 @@
 			</geniix:ls>
 	    	</block>
 		<catch class="java.lang.Exception">
-            		<gsh:echo message="Make sure ${IDENTIRY} is a valid user/group"/>
+            		<gsh:echo message="Make sure '${IDENTITY}' is a valid user/group"/>
           	</catch>
         </try>
 

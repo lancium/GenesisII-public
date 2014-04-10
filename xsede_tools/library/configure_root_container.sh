@@ -14,6 +14,11 @@ if [ -z "$XSEDE_TEST_SENTINEL" ]; then
 fi
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
+# fix for windows testing to work properly.
+WORKDIR="$(unix_to_dos_path "$WORKDIR")"
+
+#echo WORKDIR is now $WORKDIR
+
 ##############
 
 new_admin_name="$1"; shift

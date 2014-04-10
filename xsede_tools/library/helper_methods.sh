@@ -79,7 +79,7 @@ fan_out_directories()
     local -a patterns=("${@}")
     mkdir $TEST_TEMP/grid_logs &>/dev/null
     local PID_DUMP="$(mktemp "$TEST_TEMP/grid_logs/zz_pidlist.XXXXXX")"
-    local -a PIDS_SOUGHT=()
+    local -a PIDS_SOUGHT
     if [ "$OS" == "Windows_NT" ]; then
       # needs to be a windows format filename for 'type' to work.
       if [ ! -d c:/tmp ]; then
@@ -99,9 +99,10 @@ fan_out_directories()
       # we 'type' the file to get rid of the unicode result from wmic.
       cmd $flag type "$tmppid" >$PID_DUMP
       \rm "$tmppid"
-      local CR='
-'  # embedded carriage return.
-      local appropriate_pattern="s/^.*  *\([0-9][0-9]*\)[ $CR]*\$/\1/p"
+#      local CR='
+#'  # embedded carriage return.
+#      local appropriate_pattern="s/^.*  *\([0-9][0-9]*\)[ $CR]*\$/\1/p"
+      local appropriate_pattern="s/^.*  *\([0-9][0-9]*\) *\$/\1/p"
       for i in "${patterns[@]}"; do
         PIDS_SOUGHT+=($(cat $PID_DUMP \
           | grep -i "$i" \
@@ -152,4 +153,26 @@ function test_fuse_mount()
 }
 
 #######
+
+# also borrowed from feisty meow scripts...  by consent of author (chris koeritz).
+
+  # switches from a /X/path form to an X:/ form.  this also processes cygwin paths.
+  function unix_to_dos_path() {
+    # we usually remove dos slashes in favor of forward slashes.
+    if [ ! -z "$SERIOUS_SLASH_TREATMENT" ]; then
+      # unless this flag is set, in which case we force dos slashes.
+      echo "$1" | sed -e 's/\\/\//g' | sed -e 's/\/cygdrive//' | sed -e 's/\/\([a-zA-Z]\)\/\(.*\)/\1:\/\2/' | sed -e 's/\//\\/g'
+    else
+      echo "$1" | sed -e 's/\\/\//g' | sed -e 's/\/cygdrive//' | sed -e 's/\/\([a-zA-Z]\)\/\(.*\)/\1:\/\2/'
+    fi
+  }
+  
+  # switches from an X:/ form to an /X/path form.
+  function dos_to_unix_path() {
+    # we always remove dos slashes in favor of forward slashes.
+    echo "$1" | sed -e 's/\\/\//g' | sed -e 's/\([a-zA-Z]\):\/\(.*\)/\/\1\/\2/'
+  }
+
+#######
+
 
