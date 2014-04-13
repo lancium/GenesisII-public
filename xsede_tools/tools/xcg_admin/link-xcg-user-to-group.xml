@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- links a given user to a given group -->
+
+<gsh:script
+  xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+  xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+  xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+
+<!--
+Inputs for the script:
+
+1.  user name (ex. johndoe)
+2.  group name (ex. gffs-amie)
+
+-->
+  <gsh:default name="USER" value="${ARGV[1]}"/>
+  <gsh:default name="USER_DIR" value="/users/xcg.virginia.edu"/>
+  <gsh:default name="USER_PATH" value="${USER_DIR}/${USER}"/>
+  <gsh:default name="GROUP" value="${ARGV[2]}"/>
+  <gsh:default name="GROUP_DIR" value="/groups/xcg.virginia.edu"/>
+  <gsh:default name="GROUP_PATH" value="${GROUP_DIR}/${GROUP}"/>
+
+  <try>
+    <block>
+      <geniix:ping>
+        <param>${USER_PATH}</param>
+        <param>></param>
+        <param>local:/dev/null</param>
+      </geniix:ping>
+    </block>
+    <catch class="java.lang.Exception">
+      <echo message="Could not find ${USER_PATH}."/>
+    </catch>
+  </try>
+
+        <try>
+          <block>
+            <geniix:ping>
+              <param>${GROUP_PATH}</param>
+              <param>></param>
+              <param>local:/dev/null</param>
+            </geniix:ping>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not find ${GROUP_PATH}."/>
+          </catch>
+        </try>
+
+        <try>
+          <block>
+            <geniix:chmod>
+              <param>${GROUP_PATH}</param>
+              <param>+rx</param>
+              <param>${USER_PATH}</param>
+            </geniix:chmod>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not give group access on ${GROUP_PATH} to user ${USER_PATH}."/>
+          </catch>
+        </try>
+
+        <!-- link the group name under the user's sts, so that they will try to log in. -->
+        <try>
+          <block>
+            <geniix:ln>
+              <param>${GROUP_PATH}</param>
+              <param>${USER_PATH}/${GROUP}</param>
+            </geniix:ln>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not link ${GROUP_PATH} to ${USER_PATH}/${GROUP}."/>
+          </catch>
+        </try>
+</gsh:script>
+
