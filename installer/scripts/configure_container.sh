@@ -101,7 +101,7 @@ function print_instructions()
   echo "$scriptname corbomite.cs.virginia.edu 23013 jones generate \\"
   echo "  Falmouth18"
   echo
-  echo "$scriptname fezzle.xsede.org 18843 ~/tlskey.pfx lincoln dqr891sb3 \\"
+  echo "$scriptname fezzle.xsede.org 18843 lincoln ~/tlskey.pfx dqr891sb3 \\"
   echo "  grezne12"
 }
 
@@ -366,6 +366,8 @@ if [ $? -ne 0 ]; then
   echo "There may be more information in: ~/.GenesisII/grid-client.log"
   exit 1
 fi
+echo "Connection to grid succeeded."
+echo
 
 # download the owner's certificate.
 echo "Downloading owner's certificate for user $GRID_USER_NAME..."

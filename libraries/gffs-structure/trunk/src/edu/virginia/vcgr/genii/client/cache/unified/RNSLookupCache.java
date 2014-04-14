@@ -190,7 +190,7 @@ public class RNSLookupCache extends CommonCache
 	 */
 	static public void main(String[] args) throws Throwable
 	{
-		Driver.loadClientState();
+		Driver.loadClientState(args);
 
 		RNSPath rooty = null;
 		RNSPath currentPath = null;

@@ -7,7 +7,7 @@ import edu.virginia.vcgr.genii.client.cmd.tools.GetUserDir;
 
 public class UserConfigUtils
 {
-	static private final String _USER_CONFIG_FILE_NAME = "user-config.xml";
+	static public final String _USER_CONFIG_FILE_NAME = "user-config.xml";
 
 	static public String getUserConfigFilePath() throws IOException
 	{

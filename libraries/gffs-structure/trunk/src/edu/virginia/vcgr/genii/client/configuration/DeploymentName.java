@@ -32,14 +32,18 @@ public class DeploymentName
 		return _deploymentName;
 	}
 
-	static private String figureOutDefaultDeploymentName()
+	static public String figureOutDefaultDeploymentName()
 	{
-		String deploymentName = System.getProperty(DEPLOYMENT_NAME_PROPERTY);
+		String deploymentName = null;
 
 		// jfk3w - added user config information - including user's deployment path
 		if (deploymentName == null)
 			deploymentName = System.getenv(DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE);
 
+		// cak: made the environment variable preeminent.
+		if (deploymentName == null)
+			deploymentName = System.getProperty(DEPLOYMENT_NAME_PROPERTY);
+		
 		if (deploymentName != null)
 			return deploymentName;
 

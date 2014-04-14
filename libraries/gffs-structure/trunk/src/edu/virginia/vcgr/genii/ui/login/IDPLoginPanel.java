@@ -17,8 +17,8 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.CdTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.IDPLoginTool;
-import edu.virginia.vcgr.genii.client.cmd.tools.LoginTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -98,7 +98,17 @@ final class IDPLoginPanel extends LoginPanel
 						clientKeyMaterial._clientCertChain);
 
 				// try to leave the user in the right current directory.
-				LoginTool.jumpToUserHomeIfExists(_username.getText());
+				// Changed by ASAG March 6, 2014
+				//LoginTool.jumpToUserHomeIfExists(_username.getText());
+				{
+					// Assumption is that user idp's are off /user and homes off /home
+					String userHome = path.getName().replaceFirst("user", "home");
+					try {
+						CdTool.chdir(userHome);
+					} catch (Throwable e) {
+					}
+				}
+
 
 				return creds;
 			} finally {

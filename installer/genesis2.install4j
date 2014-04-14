@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="5.1.9" transformSequenceNumber="4">
-  <directoryPresets config="/usr/lib/jvm/java-7-oracle/jre" />
+<install4j version="5.1.11" transformSequenceNumber="4">
+  <directoryPresets config="./scripts/update_install_location.sh" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -44,6 +44,7 @@
       <fileset name="Linux32 Only Files" id="3620" customizedId="" />
       <fileset name="Deployment Files" id="5992" customizedId="" />
       <fileset name="Careful lib folder" id="8166" customizedId="" />
+      <fileset name="xsede tools" id="8738" customizedId="" />
     </filesets>
     <roots>
       <root id="20" fileset="19" location="" />
@@ -52,6 +53,7 @@
       <root id="3621" fileset="3620" location="" />
       <root id="5993" fileset="5992" location="" />
       <root id="8167" fileset="8166" location="" />
+      <root id="8739" fileset="8738" location="" />
     </roots>
     <mountPoints>
       <mountPoint id="7606" root="" location="ext" mode="755" />
@@ -73,6 +75,7 @@
       <mountPoint id="7004" root="5993" location="deployments/${compiler:genii.new-deployment}" mode="755" />
       <mountPoint id="8168" root="8167" location="lib" mode="755" />
       <mountPoint id="8169" root="8167" location="lib/META-INF" mode="755" />
+      <mountPoint id="8740" root="8739" location="" mode="755" />
     </mountPoints>
     <entries>
       <fileEntry mountPoint="7606" file="../scripts/genii-base-application.properties" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
@@ -86,16 +89,18 @@
       <fileEntry mountPoint="7211" file="./scripts/convert_container.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="./scripts/installation_helpers.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="./scripts/update_deployment.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
-      <fileEntry mountPoint="7211" file="./scripts/build_deployment_rpm.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="./scripts/update_install_location.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="7211" file="./scripts/create_deployment_rpm.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="7211" file="./scripts/gen2deployment-2.7-1.spec" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <dirEntry mountPoint="34" file=".." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp" dirMode="755" overrideDirMode="true">
         <exclude>
           <entry location="tests" fileType="regular" />
+          <entry location="derby.log" fileType="regular" />
           <entry location="cert-tool" fileType="regular" />
+          <entry location="bin.ant" fileType="regular" />
           <entry location="readme.txt" fileType="regular" />
           <entry location="linux-cmd-wrapper" fileType="regular" />
           <entry location="build.properties" fileType="regular" />
-          <entry location="container.properties.example" fileType="regular" />
           <entry location=".project" fileType="regular" />
           <entry location="deployments/default" fileType="regular" />
           <entry location="grid" fileType="regular" />
@@ -107,19 +112,19 @@
           <entry location="ext/genii-container-application.properties" fileType="regular" />
           <entry location="ext/genii-client-application.properties" fileType="regular" />
           <entry location="JavaServiceWrapper" fileType="regular" />
-          <entry location="xsede_tools/inputfile.txt-xsede" fileType="regular" />
-          <entry location="xsede_tools/inputfile.txt-xcg" fileType="regular" />
-          <entry location="xsede_tools/inputfile.txt" fileType="regular" />
+          <entry location="xsede_tools" fileType="regular" />
           <entry location="unit-test-reports" fileType="regular" />
           <entry location="scripts" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
           <entry location="mappings.properties" fileType="regular" />
+          <entry location=".svn" fileType="regular" />
           <entry location="installer" fileType="regular" />
           <entry location="context.xml" fileType="regular" />
           <entry location=".settings" fileType="regular" />
           <entry location="src" fileType="regular" />
           <entry location="build.xml" fileType="regular" />
           <entry location=".classpath" fileType="regular" />
+          <entry location="container.properties" fileType="regular" />
           <entry location="runContainer.sh" fileType="regular" />
           <entry location="libraries" fileType="regular" />
           <entry location="change-port.sh" fileType="regular" />
@@ -382,6 +387,52 @@
           <entry location="genesisII.client.log4j.properties" fileType="regular" />
         </exclude>
       </dirEntry>
+      <dirEntry mountPoint="8740" file=".." overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp" dirMode="755" overrideDirMode="true">
+        <exclude>
+          <entry location="tests" fileType="regular" />
+          <entry location="derby.log" fileType="regular" />
+          <entry location="cert-tool" fileType="regular" />
+          <entry location="webapps" fileType="regular" />
+          <entry location="bin.ant" fileType="regular" />
+          <entry location="readme.txt" fileType="regular" />
+          <entry location="linux-cmd-wrapper" fileType="regular" />
+          <entry location="build.properties" fileType="regular" />
+          <entry location="container.properties.example" fileType="regular" />
+          <entry location=".project" fileType="regular" />
+          <entry location="deployments" fileType="regular" />
+          <entry location="dpages" fileType="regular" />
+          <entry location="fs_wrapper.sh" fileType="regular" />
+          <entry location="jni-libs" fileType="regular" />
+          <entry location="grid" fileType="regular" />
+          <entry location="current.version" fileType="regular" />
+          <entry location="build-initial.xml" fileType="regular" />
+          <entry location="lib" fileType="regular" />
+          <entry location="bin.eclipse" fileType="regular" />
+          <entry location="ext" fileType="regular" />
+          <entry location="JavaServiceWrapper" fileType="regular" />
+          <entry location="xsede_tools/inputfile.txt" fileType="regular" />
+          <entry location="unit-test-reports" fileType="regular" />
+          <entry location="current.deployment" fileType="regular" />
+          <entry location="eclipse" fileType="regular" />
+          <entry location="RELEASE" fileType="regular" />
+          <entry location="scripts" fileType="regular" />
+          <entry location="jar-desc.xml" fileType="regular" />
+          <entry location="mappings.properties" fileType="regular" />
+          <entry location=".svn" fileType="regular" />
+          <entry location="installer" fileType="regular" />
+          <entry location="License.txt" fileType="regular" />
+          <entry location="context.xml" fileType="regular" />
+          <entry location=".settings" fileType="regular" />
+          <entry location="src" fileType="regular" />
+          <entry location="build.xml" fileType="regular" />
+          <entry location=".classpath" fileType="regular" />
+          <entry location="container.properties" fileType="regular" />
+          <entry location="runContainer.sh" fileType="regular" />
+          <entry location="libraries" fileType="regular" />
+          <entry location="change-port.sh" fileType="regular" />
+          <entry location="bundles" fileType="regular" />
+        </exclude>
+      </dirEntry>
     </entries>
     <components>
       <component name="GenesisII Core" id="28" customizedId="" displayDescription="true" hideHelpButton="false" selected="true" changeable="false" downloadable="false" hidden="false">
@@ -395,10 +446,10 @@
           <entry location="dpages" fileType="regular" />
           <entry location="webapps" fileType="regular" />
           <entry location="eclipse" fileType="regular" />
-          <entry location="xsede_tools" fileType="regular" />
           <entry location="jni-libs" fileType="regular" />
           <entry location="RELEASE" fileType="regular" />
           <entry location="License.txt" fileType="regular" />
+          <entry location="fs_wrapper.sh" fileType="regular" />
           <entry location="current.deployment" fileType="regular" />
           <entry location="ext" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
@@ -418,6 +469,7 @@
           <entry location=".i4j_external_24/jni-lib" fileType="regular" />
           <entry location=".i4j_external_3621/jni-lib" fileType="regular" />
           <entry location=".i4j_fileset_8166" fileType="regular" />
+          <entry location=".i4j_fileset_8738" fileType="regular" />
         </include>
         <dependencies />
       </component>
@@ -479,9 +531,10 @@
       <component name="Ignored" id="6233" customizedId="" displayDescription="false" hideHelpButton="false" selected="true" changeable="true" downloadable="false" hidden="false">
         <description />
         <include all="false">
-          <entry location="deployments" fileType="regular" />
-          <entry location="jni-libs" fileType="regular" />
+          <entry location="updates" fileType="regular" />
           <entry location="eclipse" fileType="regular" />
+          <entry location="jni-libs" fileType="regular" />
+          <entry location="deployments" fileType="regular" />
         </include>
         <dependencies />
       </component>
@@ -926,7 +979,7 @@ return true;</string>
                   </java>
                 </serializedBean>
                 <initScript />
-                <visibilityScript />
+                <visibilityScript>context.getCompilerVariable("genii.isMac").equals("false")</visibilityScript>
               </formComponent>
             </formComponents>
           </screen>
@@ -4257,7 +4310,7 @@ return startService;</string>
     </linuxDeb>
   </mediaSets>
   <buildIds buildAll="false">
-    <mediaSet refId="2088" />
+    <mediaSet refId="3416" />
     <mediaSet refId="5991" />
   </buildIds>
   <buildOptions verbose="true" faster="false" disableSigning="false" debug="false" />

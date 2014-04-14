@@ -53,30 +53,6 @@ else
   CHECKOUT_DIR=
 fi
 
-# given a project name, we load it up with the jars it needs.
-function snag_dependencies()
-{
-  local projname="$1"; shift
-  # ugly dependency management section.
-#  if [ $projname == GridJobTool ]; then
-#    cp -v -f $TOPDIR/ext/GeniiJSDL.jar ./ext
-#  fi
-#  if [ $projname == gffs-webservices ]; then
-#    cp -v -f $TOPDIR/ext/gffs-basics.jar ./ext
-#  fi
-#  if [ $projname == gffs-security ]; then
-#    cp -v -f $TOPDIR/ext/gffs-basics.jar ./ext
-#  fi
-#  if [ $projname == gffs-structure ]; then
-#    cp -v -f $TOPDIR/ext/gffs-basics.jar $TOPDIR/ext/gffs-webservices.jar $TOPDIR/ext/gffs-security.jar $TOPDIR/ext/CmdLineManipulator.jar $TOPDIR/ext/fsview.jar $TOPDIR/ext/GeniiJSDL.jar $TOPDIR/ext/GeniiProcMgmt.jar $TOPDIR/ext/GridJobTool.jar ./ext
-#  fi
-
-#no longer copying.
-true
-
-  check_result "copying dependent jars for subproject $projname"
-}
-
 # loop over all the dependencies we want to have updated for the uber-build...
 # first tier is independent libraries, second tier is libs dependent on the
 # first tier, etc.
@@ -105,8 +81,6 @@ for subproject in \
     ant clean
     check_result "ant clean for $subproject"
   else
-    # copy in the jars that we depend on.
-    snag_dependencies "$subproject"
     ant build
     retval=$?
     if [ $retval -ne 0 -a $subproject == gffs-security ]; then
@@ -120,7 +94,7 @@ for subproject in \
     if [ $retval -ne 0 ]; then false; else true; fi
     check_result "ant build for $subproject"
     # publish the newly crafted jars into the main build's ext folder.
-    cp -v -f lib/*.jar $TOPDIR/ext
+    cp -v -f lib/*.jar "$TOPDIR/ext"
     check_result "publishing jar file produced by $subproject"
   fi
 

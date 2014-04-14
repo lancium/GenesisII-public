@@ -19,6 +19,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
@@ -87,8 +88,7 @@ public class SetResourcePropertiesTool extends BaseGridTool
 
 			RNSPath targetPath = RNSPath.getCurrent().lookup(target.path(), RNSPathQueryFlags.MUST_EXIST);
 			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, targetPath.getEndpoint());
-			common.setResourceProperties(new SetResourceProperties(null, new UpdateType(properties
-				.toArray(new MessageElement[properties.size()])), null));
+			common.setResourceProperties(new SetResourceProperties(null, new UpdateType(Elementals.toArray(properties)), null));
 			return 0;
 		} finally {
 			org.morgan.util.io.StreamUtils.close(in);

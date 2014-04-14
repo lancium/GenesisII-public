@@ -456,6 +456,52 @@ fi
 
 ##############
 
+# now see if they want the deployments dir copied.
+echo
+echo "You have the option of copying the installation's deployments directory"
+echo "into the container state directory.  This will save any specialized or"
+echo "modified deployment configuration for the container.  If your container"
+echo "uses the standard deployment provided by the installer (i.e., you haven't"
+echo "modified it and do not intend to), then this step is not needed."
+echo
+echo "Copy the installation deployments folder to the container's state directory? (y/N)"
+read line
+do_the_copy=
+if [ "$line" == "y" -o "$line" == "Y" ]; then
+  do_the_copy=true
+fi
+if [[ "$line" =~ [yY][eE][Ss] ]]; then
+  do_the_copy=true
+fi
+if [ ! -z "$do_the_copy" ]; then
+  echo "Copying the installation's deployment folder now..."
+  echo "from: '$OLD_DEPLOYMENT_DIR'"
+  echo "to: '$GENII_USER_DIR/deployments'"
+  # clean any existing folder out.
+  if [ -e "$GENII_USER_DIR/deployments" ]; then
+    \rm -rf "$GENII_USER_DIR/deployments"
+  fi
+  # do the copy.
+  cp -R "$OLD_DEPLOYMENT_DIR" "$GENII_USER_DIR/deployments"
+  if [ $? -ne 0 ]; then
+    echo Copying the old deployments folder failed.
+    exit 1
+  fi
+  save_def="$(mktemp -d "$GENII_USER_DIR/deployments/old-default.XXXXXX")"
+  mv "$GENII_USER_DIR/deployments/default" "$save_def"
+  if [ $? -ne 0 ]; then
+    echo "Moving the old deployment's default folder out of the way failed."
+    exit 1
+  fi
+  cp -R "$GENII_DEPLOYMENT_DIR/default" "$GENII_USER_DIR/deployments/default"
+  if [ $? -ne 0 ]; then
+    echo "Copying newer default deployment into place failed."
+    exit 1
+  fi
+fi
+
+##############
+
 # now do some heavy-weight operations where we actually use the gffs software.
 
 # get connected to the grid.
@@ -466,6 +512,8 @@ if [ $? -ne 0 ]; then
   echo "There may be more information in: ~/.GenesisII/grid-client.log"
   exit 1
 fi
+echo "Connection to grid succeeded."
+echo
 
 echo
 echo Done converting your container to a unified configuration.

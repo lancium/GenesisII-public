@@ -34,6 +34,9 @@ function print_instructions()
   echo "  /home/fred/my_deployments/xcg3"
   echo "and one might run a full command with these parameters:"
   echo "  bash $(basename $0) $HOME/my_deployments/xcg3 xcg3-grid"
+  echo
+  echo "Note: it is important to start with a clean $HOME/rpmbuild directory"
+  echo "before running this script."
 }
 
 if [ -z "$depdir" -o -z "$packname" ]; then

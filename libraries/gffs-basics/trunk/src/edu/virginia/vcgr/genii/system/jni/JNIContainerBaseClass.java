@@ -25,8 +25,10 @@ public class JNIContainerBaseClass
 	static public final String VCGR_CONTAINER_LIB_NAME = "VcgrContainerLib";
 
 	static {
+		_logger.debug("trying to load shared library: " + VCGR_CONTAINER_LIB_NAME);
 		try {
 			System.loadLibrary(VCGR_CONTAINER_LIB_NAME);
+			_logger.debug("loaded shared library: " + VCGR_CONTAINER_LIB_NAME);
 		} catch (UnsatisfiedLinkError e) {
 			OperatingSystemType os = OperatingSystemType.getCurrent();
 			if (os == OperatingSystemType.LINUX) {

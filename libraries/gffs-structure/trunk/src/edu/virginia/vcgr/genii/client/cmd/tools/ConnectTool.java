@@ -27,7 +27,7 @@ public class ConnectTool extends BaseGridTool
 	static private final String _DESCRIPTION = "config/tooldocs/description/dconnect";
 	static private final String _USAGE = "config/tooldocs/usage/uconnect";
 	static private final String _MANPAGE = "config/tooldocs/man/connect";
-
+	
 	public ConnectTool()
 	{
 		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false);

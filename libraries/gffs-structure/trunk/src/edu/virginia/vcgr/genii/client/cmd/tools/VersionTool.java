@@ -31,7 +31,7 @@ public class VersionTool extends BaseGridTool
 		Version v = ApplicationLauncher.getAppVersion();
 		String softwareName = ApplicationLauncher.getAppName();
 		if ((v == null) || (softwareName == null)) {
-			stdout.println("GenesisII version {source-code}");
+			stdout.println("GenesisII version {unspecified}");
 			stdout.flush();
 			return 0;
 		}

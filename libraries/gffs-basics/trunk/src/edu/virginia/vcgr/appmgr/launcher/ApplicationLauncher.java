@@ -36,21 +36,6 @@ public class ApplicationLauncher
 		System.exit(exitCode);
 	}
 
-	// static private void doUpdates(PrintStream log, ApplicationDescription appDesc)
-	// {
-	// boolean updatesEnabled = false;
-	// if (!updatesEnabled) {
-	// _logger.debug("Update mechanism disabled; deprecated feature.");
-	// return;
-	// }
-	// try {
-	// Updater updater = new Updater(appDesc);
-	// updater.doUpdates(log);
-	// } catch (Throwable cause) {
-	// _logger.error("Unable to patch system.  Continuing with old version.");
-	// }
-	// }
-
 	static private int runApplication(ApplicationDescription appDesc, String[] appArgs)
 	{
 		try {
@@ -103,30 +88,19 @@ public class ApplicationLauncher
 
 			ApplicationDescription appDesc = new ApplicationDescription(appClass, appDescFile);
 			_appNameFound = appDesc.getApplicationName();
+			
+			//hmmm: remove crap logging.
+			_logger.debug("dir here for install is: " + ApplicationDescription.getInstallationDirectory());
+			
+			_appVersionFound = appDesc.getVersionManager().getCurrentVersion();
+			
+			_logger.debug("ver found is: " + _appVersionFound);
+
+			
+			
 			ApplicationLauncherConsole console = new ApplicationLauncherConsoleImpl(appDesc);
 			_console.set(console);
 
-			// if (appDesc.updateDisabled())
-			// _logger.debug("Updates Disabled");
-			// else {
-			// long updateFrequency = Long.parseLong(System.getProperty(UPDATE_FREQUENCY_PROPERTY,
-			// "-1"));
-			// Version v = appDesc.getVersionManager().getCurrentVersion();
-			// _appVersionFound = v;
-			// if (!Version.EMPTY_VERSION.equals(v) || appDesc.isUpdateRequest()) {
-			// _logger.info(String.format("Current version is %s.", v));
-			// Calendar now = Calendar.getInstance();
-			// Calendar lastUpdated = appDesc.getVersionManager().getLastUpdated();
-			// if (updateFrequency < 0 || appDesc.isUpdateRequest()
-			// || (now.getTimeInMillis() - lastUpdated.getTimeInMillis()) > updateFrequency) {
-			// _logger.debug("Checking to see if updates exist.");
-			// doUpdates(System.out, appDesc);
-			// }
-			// }
-
-			// if (appDesc.isUpdateRequest())
-			// System.exit(0);
-			// }
 			int result = runApplication(appDesc, appArgs);
 			if (result != 0)
 				System.exit(result);
@@ -144,36 +118,6 @@ public class ApplicationLauncher
 		{
 			_appDesc = appDesc;
 		}
-
-		// @Override
-		// public boolean doUpdates(PrintStream log)
-		// {
-		// try {
-		// Version v = _appDesc.getVersionManager().getCurrentVersion();
-		//
-		// if (!Version.EMPTY_VERSION.equals(v)) {
-		// _logger.info(String.format("Current version is %s.", v));
-		// _logger.debug("Checking for updates.");
-		// ApplicationLauncher.doUpdates(log, _appDesc);
-		// }
-		//
-		// return true;
-		// } catch (IOException ioe) {
-		// _logger.error("Unable to update application...try again later.");
-		// return false;
-		// }
-		// }
-
-		// @Override
-		// public Calendar lastUpdated()
-		// {
-		// try {
-		// return _appDesc.getVersionManager().getLastUpdated();
-		// } catch (Throwable cause) {
-		// _logger.error("Unable to obtain last update time.", cause);
-		// return null;
-		// }
-		// }
 
 		@Override
 		public Version currentVersion()

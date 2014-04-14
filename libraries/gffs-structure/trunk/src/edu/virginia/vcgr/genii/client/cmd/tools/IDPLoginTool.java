@@ -33,6 +33,7 @@ import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.CallingContextUtilities;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -185,8 +186,7 @@ public class IDPLoginTool extends BaseLoginTool
 			}
 		}
 
-		MessageElement[] elemArray = new MessageElement[elements.size()];
-		request.set_any(elements.toArray(elemArray));
+		request.set_any(Elementals.toArray(elements));
 
 		// create a proxy to the remote idp and invoke it
 		X509AuthnPortType idp = ClientUtils.createProxy(X509AuthnPortType.class, idpEpr);

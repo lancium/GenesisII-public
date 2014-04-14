@@ -30,12 +30,12 @@ public class PathUtils
 
 		if (path.contains(":")) {
 			if (_logger.isTraceEnabled())
-				_logger.debug("path contained a colon, so doing a new URI: " + path);
+				_logger.trace("path contained a colon, so doing a new URI: " + path);
 			return new URI(path);
 		}
 
 		if (_logger.isTraceEnabled())
-			_logger.debug("normal approach just using bare path plus 'rns:' modifier for: " + path);
+			_logger.trace("normal approach just using bare path plus 'rns:' modifier for: " + path);
 		return new URI("rns:" + path);
 	}
 }

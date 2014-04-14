@@ -1,1 +1,1 @@
-
+Authenticates to an InCommon identity provider, and then inserts authentication information into the user's context.

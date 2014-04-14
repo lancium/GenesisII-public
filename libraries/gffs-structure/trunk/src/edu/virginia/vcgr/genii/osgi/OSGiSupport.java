@@ -2,9 +2,6 @@ package edu.virginia.vcgr.genii.osgi;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +16,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 
-import edu.virginia.vcgr.genii.client.ApplicationBase;
+import edu.virginia.vcgr.appmgr.launcher.ApplicationDescription;
 
 /**
  * provides the OSGi bundle loading and startup for the application.
@@ -32,7 +29,7 @@ public class OSGiSupport
 
 	// OSGi framework management.
 	static private Framework _framework;
-	static private String bundleDir;
+	static private String _bundleDir;
 
 	/**
 	 * starts up the OSGi framework and loads the bundles required by our application.
@@ -48,17 +45,28 @@ public class OSGiSupport
 		 * manually by cleaning out the storage area, but that's pretty crass. instead, we will try
 		 * to clean it out once, and if that fails, then we really do need to fail.
 		 */
+//hmmm: need to incorporate getInstallationDirectory method for lots of this.  still need to extract the drive letter on windoze.
 		String username = System.getProperty("user.name");
+		
+		String installDir = ApplicationDescription.getInstallationDirectory();
+
+		/*
 		URL url = OSGiSupport.class.getProtectionDomain().getCodeSource().getLocation();
 		File pathChow = new File(url.getPath());
-		if (_logger.isTraceEnabled())
-			_logger.trace("gotta path of: " + pathChow);
-		String justDir = pathChow.getParent().replace('/', '-');
-		// let's not forget ugly paths windows might hand us.
+		*/
+		File pathChow = new File(installDir);
+		if (_logger.isDebugEnabled())
+			_logger.debug("gotta path of: " + pathChow);
+		String justDir = pathChow.getAbsolutePath().replace('/', '-');
+		// let's not forget ugly paths windows and others might hand us.
+		//hmmm: isn't there a better way to do this?
 		justDir = justDir.replace('\\', '-');
 		justDir = justDir.replace(':', '-');
-		if (_logger.isTraceEnabled())
-			_logger.trace("gotta chopped path of: " + justDir);
+		justDir = justDir.replace(' ', '-');
+		justDir = justDir.replace('(', '-');
+		justDir = justDir.replace(')', '-');
+		if (_logger.isDebugEnabled())
+			_logger.debug("gotta chopped path of: " + justDir);
 		String tmpDir = System.getProperty("java.io.tmpdir");
 		tmpDir = tmpDir.replace('\\', '/');
 		File osgiStorageDir = new File(tmpDir + "/osgi-genII-" + username + "/" + justDir);
@@ -67,7 +75,25 @@ public class OSGiSupport
 		osgiStorageDir.mkdirs();
 
 		// see if we're running under eclipse or know our installation directory.
-		String bundleSourcePath = ApplicationBase.getEclipseTrunkFromEnvironment();
+		String bundleSourcePath = installDir + "/bundles";
+		
+		String saveDrive = ""; // only used for windows.
+		if (bundleSourcePath.charAt(1) == ':') {
+			// we have a dos path again, let's save the important bits.
+			saveDrive = bundleSourcePath.substring(0, 2);
+		} else if (bundleSourcePath.charAt(2) == ':') {
+			// this is most likely a DOS path.
+			if (bundleSourcePath.charAt(0) == '/') {
+				bundleSourcePath = bundleSourcePath.substring(1);
+				// keep track of the drive letter on windows.
+				saveDrive = bundleSourcePath.substring(0, 2);
+			}
+		}
+		
+		_logger.debug("after parsing, drive letter is '" + saveDrive + "' and path has become: " + bundleSourcePath);
+		
+		/*
+			//ApplicationDescription.getEclipseTrunkFromEnvironment();
 		String saveDrive = ""; // only used for windows.
 		if (bundleSourcePath != null) {
 			if (_logger.isDebugEnabled())
@@ -102,17 +128,16 @@ public class OSGiSupport
 		}
 
 		bundleDir = bundleSourcePath + "/bundles";
-		try {
-			bundleDir = new URI(bundleDir).normalize().getPath();
-		} catch (URISyntaxException e) {
-			_logger.warn("failure to normalize path to bundles.", e);
-		}
+		*/
+		
+		
+		_bundleDir = bundleSourcePath;
 		if (saveDrive.length() > 0) {
 			// concatenate drive letter if we had figured that out.
-			bundleDir = saveDrive + bundleDir;
+//old			_bundleDir = saveDrive + _bundleDir;
 			// on windows we must make the case identical or eclipse has all sorts of problems from
 			// mismatches.
-			bundleDir = bundleDir.toLowerCase();
+			_bundleDir = _bundleDir.toLowerCase();
 		}
 
 		Map<String, String> config = new HashMap<String, String>();
@@ -123,9 +148,9 @@ public class OSGiSupport
 		// Request OSGi to clean its storage area on startup
 		config.put(Constants.FRAMEWORK_STORAGE_CLEAN, "false");
 
-		config.put("osgi.install.area", bundleDir);
+		config.put("osgi.install.area", _bundleDir);
 		if (_logger.isDebugEnabled())
-			_logger.debug("using bundle source at: " + bundleDir);
+			_logger.debug("using bundle source at: " + _bundleDir);
 
 		/*
 		 * could enable this if we want a remote console to manage OSGi: config.put("osgi.console",
@@ -196,7 +221,7 @@ public class OSGiSupport
 				_logger.trace("loading bundle: " + bunName);
 			Bundle currentBundle = null;
 			try {
-				currentBundle = context.installBundle("file:" + bundleDir + "/" + bunName);
+				currentBundle = context.installBundle("file:" + _bundleDir + "/" + bunName);
 			} catch (Throwable e) {
 				_logger.error("failed to load bundle: " + bunName, e);
 				shutDownFramework();

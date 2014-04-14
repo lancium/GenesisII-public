@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -11,10 +12,14 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.ContainerProperties;
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
+import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
+import edu.virginia.vcgr.genii.client.configuration.NoSuchDeploymentException;
 import edu.virginia.vcgr.genii.client.configuration.ShellPrompt;
+import edu.virginia.vcgr.genii.client.configuration.UserConfigUtils;
 import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
 import edu.virginia.vcgr.genii.client.logging.DLogDatabase;
 import edu.virginia.vcgr.genii.client.logging.LoggingContext;
@@ -34,13 +39,23 @@ public class Driver extends ApplicationBase
 		System.out.println("Driver");
 	}
 
-	static public void loadClientState()
+	static public void loadClientState(String[] args)
 	{
 		LoggingContext.assumeNewLoggingContext();
 
 		if (!OSGiSupport.setUpFramework()) {
 			System.err.println("Exiting due to OSGi startup failure.");
 			System.exit(1);
+		}
+
+		if ((args.length > 1) && (args[0].equals("connect"))) {
+			_logger.info("adjusting deployment loading process since this is a connect command.");
+			String stateDir = InstallationProperties.getUserDir();
+			try {
+				new File(stateDir, UserConfigUtils._USER_CONFIG_FILE_NAME).delete();
+			} catch (Throwable t) {
+				_logger.debug("could not clean out user config xml file during driver startup.");
+			}
 		}
 
 		SecurityUtilities.initializeSecurity();
@@ -56,18 +71,31 @@ public class Driver extends ApplicationBase
 		// this should be unified with other ways of loading things; pretty sure we are not always
 		// handling this uniformly.
 		GridEnvironment.loadGridEnvironment();
-		String deploymentName = System.getenv("GENII_DEPLOYMENT_NAME");
-		if (deploymentName != null) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("Using Deployment \"" + deploymentName + "\".");
-			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deploymentName);
-		} else {
-			deploymentName = System.getProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY);
-			if ((deploymentName == null) || deploymentName.isEmpty())
-				deploymentName = "default";
-			if (_logger.isDebugEnabled())
-				_logger.debug("Using Deployment \"" + deploymentName + "\".");
+
+		String deploymentName = DeploymentName.figureOutDefaultDeploymentName();
+		DeploymentName depname = new DeploymentName(deploymentName);
+
+		try {
+			Deployment.getDeployment(new File(ContainerProperties.getContainerProperties().getDeploymentsDirectory()), depname);
+		} catch (Throwable t) {
+			_logger.warn("failed to load deployment '" + deploymentName + "'; trying default deployment.");
+			deploymentName = "default";
+			try {
+				depname = new DeploymentName(deploymentName);
+			} catch (Throwable t2) {
+				_logger.error("failed to load default deployment as a fallback.  failing startup of client.", t2);
+				throw new NoSuchDeploymentException(deploymentName);
+			}
 		}
+
+		/*
+		 * } else { deploymentName = System.getProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY); if
+		 * ((deploymentName == null) || deploymentName.isEmpty()) deploymentName = "default"; }
+		 */
+
+		System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deploymentName);
+		if (_logger.isDebugEnabled())
+			_logger.debug("Using Deployment \"" + deploymentName + "\".");
 
 		prepareClientApplication();
 
@@ -78,7 +106,7 @@ public class Driver extends ApplicationBase
 	static public void main(String[] args)
 	{
 		// first run through, go ahead and try to load the state.
-		loadClientState();
+		loadClientState(args);
 
 		// new for clients; try to handle memory better.
 		LowMemoryWarning.INSTANCE.addLowMemoryListener(new LowMemoryExitHandler(7));

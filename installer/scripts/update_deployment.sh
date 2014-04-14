@@ -188,6 +188,24 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.de
 
 ##############
 
+# fix the default deployment if there's a deployments folder in state dir.
+if [ -d "$GENII_USER_DIR/deployments" ]; then
+  save_def="$(mktemp "$GENII_USER_DIR/deployments/old-default.XXXXXX")"
+  mv "$GENII_USER_DIR/deployments/default" "$save_def"
+  if [ $? -ne 0 ]; then
+    echo "Moving the old deployment's default folder out of the way failed."
+    exit 1
+  fi
+  cp -R "$GENII_DEPLOYMENT_DIR/default" "$GENII_USER_DIR/deployments/default"
+  if [ $? -ne 0 ]; then
+    echo "Copying newer default deployment into place failed."
+    exit 1
+  fi
+  echo "Updated the state directory's default deployment from the new version."
+fi
+
+##############
+
 # get connected to the grid using the new deployment.
 echo Connecting to the grid...
 "$GENII_INSTALL_DIR/grid" connect "local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file" "$new_dep"
@@ -196,6 +214,8 @@ if [ $? -ne 0 ]; then
   echo "There may be more information in: ~/.GenesisII/grid-client.log"
   exit 1
 fi
+echo "Connection to grid succeeded."
+echo
 
 echo
 echo "Done updating your container's deployment to the one specified."

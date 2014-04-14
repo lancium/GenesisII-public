@@ -1,5 +1,8 @@
 package edu.virginia.vcgr.appmgr.version;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +25,12 @@ public class Version implements Comparable<Version>
 
 	public Version(String str)
 	{
-		Matcher matcher = VERSION_PATTERN.matcher(str);
+		parseString(str);
+	}
+	
+	public void parseString(String verString)
+	{
+		Matcher matcher = VERSION_PATTERN.matcher(verString);
 		if (!matcher.matches())
 			throw new IllegalArgumentException("Version string wasn't of the form ###.###.### Build ####");
 
@@ -32,6 +40,21 @@ public class Version implements Comparable<Version>
 		_buildNumber = Integer.parseInt(matcher.group(4));
 	}
 
+	public Version(File propFile)
+	{
+		Properties props = new Properties();
+		try {
+			FileInputStream fis = new FileInputStream(propFile);
+			props.load(fis);
+			String appVer = props.getProperty("genii.app-version");
+			String buildNum = props.getProperty("genii.build-number");
+			String formattedString = appVer + " Build " + buildNum;
+			parseString(formattedString);
+		} catch (Throwable t) {
+			throw new RuntimeException("failure to parse version from file: " + propFile, t);
+		}
+	}
+	
 	public boolean equals(Version other)
 	{
 		return compareTo(other) == 0;

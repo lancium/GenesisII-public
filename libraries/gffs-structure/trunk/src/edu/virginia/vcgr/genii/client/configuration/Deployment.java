@@ -203,7 +203,7 @@ public class Deployment
 		}
 	}
 
-	static Deployment getDeployment(File deploymentsDirectory, DeploymentName deploymentName)
+	public static Deployment getDeployment(File deploymentsDirectory, DeploymentName deploymentName)
 	{
 		Deployment ret;
 

@@ -1,15 +1,18 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -25,6 +28,7 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
+import edu.virginia.vcgr.genii.client.gui.HelpLinkConfiguration;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -52,6 +56,9 @@ public class LoginTool extends BaseLoginTool
 	static private final String _DESCRIPTION = "config/tooldocs/description/dlogin";
 	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/ulogin";
 	static final private String _MANPAGE = "config/tooldocs/man/login";
+	
+	private static Properties p = null;
+	static final String SEARCH_PATH = "SEARCH_PATH";
 
 	protected LoginTool(String description, String usage, boolean isHidden)
 	{
@@ -75,13 +82,38 @@ public class LoginTool extends BaseLoginTool
 		String constructedPath = constructPathFromLoginName(null, username);
 		if (constructedPath != null) {
 			idpList.add(nsd.getUsersDirectory() + "/" + constructedPath);
-			idpList.add(nsd.getUsersDirectory() + "/demo/" + constructedPath);
+			// idpList.add(nsd.getUsersDirectory() + "/demo/" + constructedPath);
 		}
-
+		
 		// Checks this lists of idp paths, in order,
 		// if one is not passed on the command line
 		idpList.add(nsd.getUsersDirectory() + "/" + username);
-		idpList.add(nsd.getUsersDirectory() + "/demo/" + username);
+		//idpList.add(nsd.getUsersDirectory() + "/demo/" + username);
+		
+		// Let's first load the LoginSearchPath properties file
+		if (p==null) {
+			p = new Properties();
+			InputStream in=HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/LoginSearchPath.properties");
+			try {
+				p.load(in);
+			}
+			catch (IOException e){
+				throw new RuntimeException(e);
+			}
+			finally {
+				StreamUtils.close(in);
+			}
+		}
+		// Then get the list of paths to search
+		String r=p.getProperty(SEARCH_PATH);
+		if (r==null) { throw new RuntimeException("Could not find config/LoginSearchPath.properties " + SEARCH_PATH); }
+		// ASG: 2014-02-11, Now grab the substrings and add them to the list
+		StringTokenizer tokenCollector = new StringTokenizer(r, ":");
+		while (tokenCollector.hasMoreTokens()) {
+			String pathname = tokenCollector.nextToken();
+			idpList.add(pathname + "/" + username);		
+		}
+
 		return idpList;
 	}
 
@@ -189,7 +221,15 @@ public class LoginTool extends BaseLoginTool
 		}
 
 		ContextManager.storeCurrentContext(callContext);
-		jumpToUserHomeIfExists(_username);
+		//jumpToUserHomeIfExists(_username);
+		{
+			// Assumption is that user idp's are off /user and homes off /home
+			String userHome = _authnUri.replaceFirst("users", "home");
+			try {
+				CdTool.chdir(userHome);
+			} catch (Throwable e) {
+			}
+		}
 
 		return 0;
 	}
@@ -210,7 +250,7 @@ public class LoginTool extends BaseLoginTool
 		}
 
 	}
-
+/*
 	public static void jumpToUserHomeIfExists(String loginName)
 	{
 
@@ -239,6 +279,8 @@ public class LoginTool extends BaseLoginTool
 		}
 	}
 
+*/
+	
 	public static String constructPathFromLoginName(String pathPrefix, String loginName)
 	{
 
