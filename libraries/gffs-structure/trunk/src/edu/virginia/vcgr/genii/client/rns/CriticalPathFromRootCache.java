@@ -25,6 +25,9 @@ public class CriticalPathFromRootCache
 {
 	static private Log _logger = LogFactory.getLog(CriticalPathFromRootCache.class);
 
+	//hmmm: remove this once this class is vetted.
+	static boolean _critPathCacheEnabled = false;
+	
 	/*
 	 * we cache at most 4 tiers of paths, where the root is a special case as the first tier. so
 	 * this would include paths such as /home/xsede.org/fred but not /home/xsede.org/fred/sandbox.
@@ -80,11 +83,6 @@ public class CriticalPathFromRootCache
 		{
 			synchronized (_tierEntries) {
 				RNSPath found = _tierEntries.get(path);
-
-				// hmmm: cache is disabled!!!!
-				boolean turnedOff = true;
-				if (turnedOff)
-					found = null; // temp
 				if (found != null) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("CPFRC hit: " + path);
@@ -113,11 +111,19 @@ public class CriticalPathFromRootCache
 		 */
 		public void addPath(String path, RNSPath rpath)
 		{
-			if (path == null) {
-				String msg = "failure in addPath: path is null.";
+			if ( (path == null) || (rpath == null)) {
+				// should never happen.
+				String msg = "failure in addPath: path or rns path is null.";
 				_logger.error(msg);
 				return; // skip it.
 			}
+			if (rpath.getCachedEPR() == null) {
+				// this can happen quite honestly, such as for new paths.
+				String msg = "addPath seeing rns path has a null EPR, ignoring.";
+				_logger.debug(msg);
+				return; // skip it.				
+			}
+
 			synchronized (_tierEntries) {
 				RNSPath found = _tierEntries.get(path);
 				if ((found != null) && (rpath != null)) {
@@ -142,15 +148,15 @@ public class CriticalPathFromRootCache
 	 */
 	public boolean appropriateDepth(String path)
 	{
-		return calculateTier(path) < MAX_TIERS_CACHED;
+		return _critPathCacheEnabled && (calculateTier(path) < MAX_TIERS_CACHED);
 	}
 
 	/**
-	 * alternative check for when the depth is already known. \
+	 * alternative check for when the depth is already known.
 	 */
 	public boolean appropriateDepth(int depth)
 	{
-		return depth < MAX_TIERS_CACHED;
+		return _critPathCacheEnabled && (depth < MAX_TIERS_CACHED);
 	}
 
 	public boolean isDir(RNSPath check)
@@ -245,6 +251,8 @@ public class CriticalPathFromRootCache
 			nextPlaceToLook = indy + 1;
 			slashesFound++;
 		}
+		_logger.debug("calculated tier depth of " + slashesFound + " for path " + path);
+		
 		return slashesFound;
 	}
 
