@@ -37,6 +37,7 @@ import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 import org.ws.addressing.ReferenceParametersType;
 
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription.ResolverType;
 
 public class WSName implements Comparable<WSName>, Serializable
@@ -292,7 +293,7 @@ public class WSName implements Comparable<WSName>, Serializable
 			}
 		}
 
-		MetadataType newMetadata = new MetadataType(newMetadataElements.toArray(new MessageElement[0]));
+		MetadataType newMetadata = new MetadataType(Elementals.toArray(newMetadataElements));
 		return new EndpointReferenceType(address, referenceParameters, newMetadata, any);
 	}
 

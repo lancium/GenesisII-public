@@ -43,7 +43,7 @@ testQueueSubmitSimple()
 
 testWaitForSimpleJobs()
 {
-  wait_for_all_pending_jobs $QUEUE_PATH
+  wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "No simple jobs should be left" 0 $?
 }
 
@@ -55,7 +55,7 @@ testQueueSubmitManyWithSleep()
 
 testWaitForSleepers()
 {
-  wait_for_all_pending_jobs $QUEUE_PATH
+  wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "No sleeping jobs should be left" 0 $?
 }
 
@@ -70,7 +70,7 @@ echo "ending submit... $(date)"
 
 testWaitForManyJobStatusSweep()
 {
-  wait_for_all_pending_jobs $QUEUE_PATH
+  wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "No parameter sweep jobs should be left" 0 $?
 }
 
@@ -85,7 +85,7 @@ echo "ending submit... $(date)"
 
 testWaitForManyJobScripted()
 {
-  wait_for_all_pending_jobs $QUEUE_PATH
+  wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "No scripted thousand jobs should be left" 0 $?
 }
 

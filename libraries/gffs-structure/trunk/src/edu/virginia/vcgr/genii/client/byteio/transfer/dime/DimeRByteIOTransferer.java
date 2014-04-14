@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.client.byteio.transfer.dime;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
-import org.apache.axis.message.MessageElement;
 import org.ggf.byteio.TransferInformationType;
 import org.ggf.rbyteio.Append;
 import org.ggf.rbyteio.RandomByteIOPortType;
@@ -16,6 +15,7 @@ import edu.virginia.vcgr.genii.client.byteio.transfer.AbstractByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.TransfererResolver;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 
 /**
  * This class implements the DIME transfer protocol for remote random ByteIOs.
@@ -47,7 +47,7 @@ public class DimeRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 
 		/* Create the SOAP body for the message */
 		TransferInformationType transType =
-			new TransferInformationType(new MessageElement[0], ByteIOConstants.TRANSFER_TYPE_DIME_URI);
+			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_DIME_URI);
 
 		_clientStub.append(new Append(transType));
 	}
@@ -86,7 +86,7 @@ public class DimeRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 
 		/* Create the SOAP message content for the out call */
 		TransferInformationType transType =
-			new TransferInformationType(new MessageElement[0], ByteIOConstants.TRANSFER_TYPE_DIME_URI);
+			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_DIME_URI);
 		_clientStub.truncAppend(new TruncAppend(offset, transType));
 	}
 
@@ -101,7 +101,7 @@ public class DimeRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 
 		/* Create the SOAP message content for the out call */
 		TransferInformationType transType =
-			new TransferInformationType(new MessageElement[0], ByteIOConstants.TRANSFER_TYPE_DIME_URI);
+			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_DIME_URI);
 		_clientStub.write(new Write(startOffset, bytesPerBlock, stride, transType));
 	}
 

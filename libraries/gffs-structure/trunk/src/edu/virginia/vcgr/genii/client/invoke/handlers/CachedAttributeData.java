@@ -11,6 +11,8 @@ import org.oasis_open.docs.wsrf.rp_2.GetMultipleResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
+
 public class CachedAttributeData
 {
 	private HashMap<QName, Collection<MessageElement>> _attrs = new HashMap<QName, Collection<MessageElement>>();
@@ -59,7 +61,7 @@ public class CachedAttributeData
 	@SuppressWarnings("unchecked")
 	public CachedAttributeData(MessageElement uberDoc)
 	{
-		this((MessageElement[]) uberDoc.getChildren().toArray(new MessageElement[0]), true);
+		this(Elementals.getOurChildren(uberDoc));
 	}
 
 	public CachedAttributeData(Collection<MessageElement> attrs)

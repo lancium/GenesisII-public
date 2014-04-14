@@ -17,6 +17,9 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
+import edu.virginia.vcgr.genii.container.exportdir.ExportType;
+import edu.virginia.vcgr.genii.container.exportdir.GFFSExportConfiguration;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoExportedDirUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
@@ -46,11 +49,38 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 		// if so, proceed with export creation
 		try {
 			// check if directory exists
-			if (!ExportedDirUtils.dirReadable(initInfo.getPath())) {
-				throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
-						+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
+			ExportType exportType = GFFSExportConfiguration.getExportType();
+			if (exportType == ExportType.SUDO) {
+				String osName = System.getProperty("os.name");
+				boolean isCompatibleOS = true;
+				if (osName.contains("Windows")) {
+					isCompatibleOS = false;
+				} else if (osName.contains("OS X") || osName.contains("")) {
+					//linux and mac
+					isCompatibleOS = true;
+				} else {
+					isCompatibleOS = false;
+				}
+				
+				if (!isCompatibleOS) {
+					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
+							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Sudo export "
+									+ "unsupported on this OS") }, null));
+				}
+				
+				if (!SudoExportedDirUtils.dirReadable(initInfo.getPath())) {
+					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
+							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
+								+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
+				}
+			} else {
+				if (!ExportedDirUtils.dirReadable(initInfo.getPath())) {
+					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
+							+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
+				}
 			}
+			
 		} catch (IOException ioe) {
 			throw new ResourceException("Could not determine if export localpath is readable.", ioe);
 		}

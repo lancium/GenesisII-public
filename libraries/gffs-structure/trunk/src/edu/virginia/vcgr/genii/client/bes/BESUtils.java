@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.apache.axis.message.MessageElement;
 import org.ggf.bes.factory.ActivityDocumentType;
 
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
 
 public class BESUtils
@@ -24,6 +25,6 @@ public class BESUtils
 		}
 		BESConstants bconsts = new BESConstants();
 		anyC.add(new MessageElement(bconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME, s.asRequestType()));
-		adt.set_any(anyC.toArray(new MessageElement[0]));
+		adt.set_any(Elementals.toArray(anyC));
 	}
 }

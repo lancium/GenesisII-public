@@ -36,6 +36,7 @@ import org.ws.addressing.MetadataType;
 import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -335,7 +336,7 @@ public class ResourceManager
 
 				// construct Meta Policy
 				Policy metaPolicy = new Policy();
-				metaPolicy.set_any(policyComponents.toArray(new MessageElement[0]));
+				metaPolicy.set_any(Elementals.toArray(policyComponents));
 
 				// construct AppliesTo
 				URI appliesToUri = new URI("urn:wsaaction:*");
@@ -454,11 +455,8 @@ public class ResourceManager
 
 		any.add(new MessageElement(ContainerConstants.CONTAINER_ID_METADATA_ELEMENT, Container.getContainerID().toString()));
 
-		// Add container key
-
-		MessageElement[] anyArray = new MessageElement[any.size()];
-		any.toArray(anyArray);
-		return new MetadataType(anyArray);
+		// Add container key.
+		return new MetadataType(Elementals.toArray(any));
 	}
 
 	/**

@@ -14,6 +14,8 @@ import org.apache.axis.types.URI;
 import org.xmlsoap.schemas.soap.envelope.Detail;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
+
 public class BESFaultManager
 {
 	static final public String FAULT_NS = "http://genii.virginia.edu/faults";
@@ -32,7 +34,7 @@ public class BESFaultManager
 			faultStrings.add(new MessageElement(FAULT_DETAIL_NAME, sWriter.toString()));
 		}
 
-		return new Detail(faultStrings.toArray(new MessageElement[0]));
+		return new Detail(Elementals.toArray(faultStrings));
 	}
 
 	static public Fault constructFault(Throwable... causes) throws RemoteException

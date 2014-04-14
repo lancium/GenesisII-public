@@ -14,6 +14,8 @@ import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
 
 public class ConfigurationManager
 {
+//	static private Log _logger = LogFactory.getLog(ConfigurationManager.class);
+
 	static public final String _USER_DIR_PROPERTY = "edu.virginia.vcgr.genii.client.configuration.user-dir";
 
 	static private final String _CLIENT_CONF_FILENAME = "client-config.xml";
@@ -35,7 +37,7 @@ public class ConfigurationManager
 	private Boolean _isClient = null;
 
 	private FilesystemManager _filesystemManager = null;
-
+	
 	static {
 		FileSystem_Type.getTypeDesc().getFieldByName("uniqueId")
 			.setXmlName(new QName("http://vcgr.cs.virginia.edu/genesisII/jsdl", "unique-id"));
@@ -73,7 +75,7 @@ public class ConfigurationManager
 			return _manager;
 		}
 	}
-
+	
 	/**
 	 * Creates a configuration manager. Can only be called once.
 	 * 
@@ -133,8 +135,9 @@ public class ConfigurationManager
 
 		System.setProperty(_USER_DIR_PROPERTY, _userDir.getAbsolutePath());
 
-		Deployment deployment = Installation.getDeployment(new DeploymentName());
 		try {
+			Deployment deployment = Installation.getDeployment(new DeploymentName());
+			
 			_clientConf = new XMLConfiguration(deployment.getConfigurationFile(_CLIENT_CONF_FILENAME));
 			_serverConf = new XMLConfiguration(deployment.getConfigurationFile(_SERVER_CONF_FILENAME));
 

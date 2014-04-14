@@ -47,6 +47,7 @@ import edu.virginia.vcgr.genii.client.cache.AttributeCacheFlushListener;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.RNSNotificationHandler;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.fuse.MetadataManager;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
@@ -172,7 +173,7 @@ public class AttributeCacheHandler2
 
 		Collection<MessageElement> result = findAttributes(target, getMultipleResourcePropertiesRequest);
 		if (result != null) {
-			return new GetMultipleResourcePropertiesResponse(result.toArray(new MessageElement[0]));
+			return new GetMultipleResourcePropertiesResponse(Elementals.toArray(result));
 		}
 
 		Object[] originalParameters = ctxt.getParams();
@@ -198,7 +199,7 @@ public class AttributeCacheHandler2
 		EndpointReferenceType target = ctxt.getTarget();
 		Collection<MessageElement> result = findAttribute(target, getResourcePropertyRequest);
 		if (result != null) {
-			return new GetResourcePropertyResponse(result.toArray(new MessageElement[0]));
+			return new GetResourcePropertyResponse(Elementals.toArray(result));
 		}
 		if (_logger.isTraceEnabled())
 			_logger.trace("Reqested resource property: " + getResourcePropertyRequest);
@@ -387,10 +388,14 @@ public class AttributeCacheHandler2
 				return null;
 			if (cachedValue instanceof MessageElement) {
 				result.add((MessageElement) cachedValue);
-			} else {
+			} else if (cachedValue instanceof Collection<?>) {
 				@SuppressWarnings("unchecked")
 				Collection<MessageElement> collection = (Collection<MessageElement>) cachedValue;
+				if (_logger.isDebugEnabled())
+					_logger.debug("possibly dangerous addition of collection assumed to be mess elems.");
 				result.addAll(collection);
+			} else {
+				_logger.error("unknown type being cached; not a recognizable message element.");
 			}
 		}
 		return result;

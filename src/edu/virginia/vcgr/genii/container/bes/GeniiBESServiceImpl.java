@@ -62,6 +62,7 @@ import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
@@ -424,18 +425,17 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			if (wallclockAttr != null)
 				any.add(wallclockAttr);
 			any.addAll(BESAttributesHandler.getSupportedFilesystemsAttr());
-			MessageElement[] resourceAny = any.toArray(new MessageElement[any.size()]);
 
 			return new GetFactoryAttributesDocumentResponseType(new FactoryResourceAttributesDocumentType(
 				new BasicResourceAttributesDocumentType(resourceName, BESAttributesHandler.getOperatingSystem(),
 					BESAttributesHandler.getCPUArchitecture(), new Double((double) BESAttributesHandler.getCPUCount()),
 					new Double((double) BESAttributesHandler.getCPUSpeed()), new Double(
 						(double) BESAttributesHandler.getPhysicalMemory()), new Double(
-						(double) BESAttributesHandler.getVirtualMemory()), resourceAny),
+						(double) BESAttributesHandler.getVirtualMemory()), Elementals.toArray(any)),
 				BESAttributesHandler.getIsAcceptingNewActivities(), BESAttributesHandler.getName(),
 				BESAttributesHandler.getDescription(), BESAttributesHandler.getTotalNumberOfActivities(),
 				BESAttributesHandler.getActivityReferences(), 0, null, namingProfiles, besExtensions, localResourceManagerType,
-				any.toArray(new MessageElement[any.size()])), null);
+				Elementals.toArray(any)), null);
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unexpected BES exception.", sqe);
 		}

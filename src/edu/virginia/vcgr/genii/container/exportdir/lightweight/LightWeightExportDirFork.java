@@ -19,6 +19,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.disk.DiskExportEntry;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoDiskExportEntry;
 import edu.virginia.vcgr.genii.container.iterator.FileOrDir;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
@@ -126,7 +127,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 	@Override
 	public boolean isInMemoryIterable() throws IOException
 	{
-		if (getTarget() instanceof DiskExportEntry)
+		VExportDir target = getTarget();
+		if (target instanceof DiskExportEntry || target instanceof SudoDiskExportEntry)
 			return true;
 
 		return false;

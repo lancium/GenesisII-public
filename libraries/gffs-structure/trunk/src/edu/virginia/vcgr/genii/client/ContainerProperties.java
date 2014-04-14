@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -13,6 +15,7 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 public class ContainerProperties extends Properties
 {
 	static final long serialVersionUID = 0L;
+	static private Log _logger = LogFactory.getLog(ContainerProperties.class);
 
 	static final private String CONTAINER_PROPERTIES_FILENAME = "container.properties";
 
@@ -92,11 +95,21 @@ public class ContainerProperties extends Properties
 	{
 		// use the environment variable first.
 		String toReturn = ApplicationBase.getDeploymentDirFromEnvironment();
+		if (toReturn == null) {
+			File checkLocalDir = new File(InstallationProperties.getUserDir(), "deployments");
+			if (checkLocalDir.exists() && checkLocalDir.isDirectory()) {
+				if (_logger.isTraceEnabled())
+					_logger.trace("found deployments folder in state directory: " + checkLocalDir);
+				toReturn = checkLocalDir.getAbsolutePath();
+			}
+		}
 		if (toReturn == null)
 			toReturn = getProperty(GENII_DEPLOYMENT_DIRECTORY_PROPERTY_NAME);
 		// well, nothing worked, so use a default based on the installation directory.
 		if (toReturn == null)
 			toReturn = new File(Installation.getInstallDirectory(), DEPLOYMENTS_DIRECTORY_NAME).getAbsolutePath();
+		if (_logger.isDebugEnabled())
+			_logger.debug("deployments folder calculated as: '" + toReturn + "'");
 		return toReturn;
 	}
 

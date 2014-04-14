@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.client.byteio.transfer.mtom;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
-import org.apache.axis.message.MessageElement;
 import org.ggf.byteio.TransferInformationType;
 import org.ggf.rbyteio.Append;
 import org.ggf.rbyteio.RandomByteIOPortType;
@@ -16,6 +15,7 @@ import edu.virginia.vcgr.genii.client.byteio.transfer.AbstractByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.TransfererResolver;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 
 /**
  * This class implements the MTOM transfer protocol for remote random ByteIOs.
@@ -45,7 +45,7 @@ public class MTOMRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.MTOM);
 
 		TransferInformationType transType =
-			new TransferInformationType(new MessageElement[0], ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
+			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
 		_clientStub.append(new Append(transType));
 	}
 
@@ -80,7 +80,7 @@ public class MTOMRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.MTOM);
 
 		TransferInformationType transType =
-			new TransferInformationType(new MessageElement[0], ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
+			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
 		_clientStub.truncAppend(new TruncAppend(offset, transType));
 	}
 
@@ -93,7 +93,7 @@ public class MTOMRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.MTOM);
 
 		TransferInformationType transType =
-			new TransferInformationType(new MessageElement[0], ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
+			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
 		_clientStub.write(new Write(startOffset, bytesPerBlock, stride, transType));
 	}
 

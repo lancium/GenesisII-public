@@ -38,6 +38,7 @@ public class InstallationProperties extends Properties
 {
 	static final long serialVersionUID = 0L;
 	static private Log _logger = LogFactory.getLog(InstallationProperties.class);
+	
 	// our singular instance of this class.
 	static private InstallationProperties _realInstallationProperties = null;
 

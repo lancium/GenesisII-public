@@ -41,7 +41,7 @@ testQueuePerformanceSubmission()
 
 testJobStatus()
 {
-  wait_for_all_pending_jobs $QUEUE_PATH
+  wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "No jobs should be left" 0 $?
 }
 

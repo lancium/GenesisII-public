@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.UnsignedInt;
 import org.ggf.byteio.TransferInformationType;
@@ -18,6 +17,7 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
 import edu.virginia.vcgr.genii.client.byteio.transfer.AbstractByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.StreamableByteIOTransferer;
+import org.apache.axis.message.MessageElement;
 
 /**
  * This class implements the Simple transfer protocol for the Streamable ByteIO case.

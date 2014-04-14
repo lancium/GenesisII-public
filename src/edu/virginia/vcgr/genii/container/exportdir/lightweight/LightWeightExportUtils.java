@@ -4,7 +4,12 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.virginia.vcgr.genii.client.resource.IResource;
+import edu.virginia.vcgr.genii.container.exportdir.ExportType;
+import edu.virginia.vcgr.genii.container.exportdir.GFFSExportConfiguration;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.disk.DiskExportRoot;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoDiskExportEntry;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoDiskExportRoot;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoExportUtils;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.zipjar.ZipJarExportRoot;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -46,10 +51,19 @@ public class LightWeightExportUtils
 				 */
 				{
 					File root = new File(rootDirString);
-					if (root.isDirectory())
-						return new DiskExportRoot(root);
-					else if (root.getName().endsWith(".jar") || root.getName().endsWith(".zip"))
-						vroot = new ZipJarExportRoot(root);
+					ExportType exportType = GFFSExportConfiguration.getExportType();
+
+					if (exportType == ExportType.SUDO) {
+						String username = SudoExportUtils.getLocalUser();
+						if (SudoDiskExportEntry.isDir(root, username)) {
+							return new SudoDiskExportRoot(root, username);
+						}
+					} else {
+						if (root.isDirectory())
+							return new DiskExportRoot(root);
+						else if (root.getName().endsWith(".jar") || root.getName().endsWith(".zip"))
+							vroot = new ZipJarExportRoot(root);
+					}
 				}
 
 				synchronized (LightWeightExportUtils.class) {

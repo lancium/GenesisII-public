@@ -63,6 +63,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -205,7 +206,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 						any.add(me);
 				}
 
-				mdt = new MetadataType(any.toArray(new MessageElement[any.size()]));
+				mdt = new MetadataType(Elementals.toArray(any));
 			}
 		}
 
@@ -419,7 +420,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		attributes.add(new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, getResourceKey().dereference()
 			.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME).toString()
 			+ ":fork-path:" + forkPath));
-		mdt.set_any(attributes.toArray(new MessageElement[0]));
+		mdt.set_any(Elementals.toArray(attributes));
 		return epr;
 	}
 
@@ -450,7 +451,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			GenesisIIConstants.GENESISII_NS, rif.forkClass().getSimpleName())));
 
 		return new EndpointReferenceType(epr.getAddress(), epr.getReferenceParameters(), new MetadataType(
-			mdtList.toArray(new MessageElement[0])), epr.get_any());
+			Elementals.toArray(mdtList)), epr.get_any());
 	}
 
 	@Override

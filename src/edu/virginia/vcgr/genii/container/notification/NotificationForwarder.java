@@ -13,6 +13,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.notification.NotificationBrokerConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.NotificationMessageHolder;
@@ -76,7 +77,7 @@ public class NotificationForwarder implements Runnable
 				brokerSpecificMessageElements.add(new MessageElement(NotificationBrokerConstants.MESSAGE_INDEX_QNAME,
 					messageIndexOfCurrentBroker));
 
-				notify.set_any(brokerSpecificMessageElements.toArray(new MessageElement[brokerSpecificMessageElements.size()]));
+				notify.set_any(Elementals.toArray(brokerSpecificMessageElements));
 
 				EndpointReferenceType forwardingPort = resource.getForwardingPort();
 				try {

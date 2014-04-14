@@ -21,6 +21,7 @@ import org.ws.addressing.MetadataType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineFormer;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.utils.instantiation.FromString;
 import edu.virginia.vcgr.genii.common.XMLCommandFunction;
 import edu.virginia.vcgr.genii.common.XMLCommandParameter;
@@ -244,6 +245,6 @@ public class CommandChannelManager
 			metadata.add(new MessageElement(GenesisIIConstants.COMMAND_FUNCTION_QNAME, function));
 		}
 
-		epr.setMetadata(new MetadataType(metadata.toArray(new MessageElement[metadata.size()])));
+		epr.setMetadata(new MetadataType(Elementals.toArray(metadata)));
 	}
 }

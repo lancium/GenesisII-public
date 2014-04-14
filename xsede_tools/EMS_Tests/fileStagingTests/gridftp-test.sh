@@ -36,7 +36,7 @@ testGRIDFTP()
     assertEquals "Submitting single cat job with file staging using GRIDFTP protocol" 0 $?
     grep -i "Job Submitted" $GRID_OUTPUT_FILE
   done
-  wait_for_all_pending_jobs $QUEUE_PATH
+  wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "Pending ftp jobs should complete without errors." 0 $?
 }
 

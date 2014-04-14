@@ -21,6 +21,7 @@ import org.w3.www.ns.ws_policy.Policy;
 import org.w3.www.ns.ws_policy.PolicyAttachment;
 import org.w3.www.ns.ws_policy.PolicyReference;
 
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 
 public class SecurityPolicy
@@ -29,7 +30,7 @@ public class SecurityPolicy
 	{
 		// construct Meta Policy
 		Policy metaPolicy = new Policy();
-		metaPolicy.set_any(policyReferences.toArray(new MessageElement[policyReferences.size()]));
+		metaPolicy.set_any(Elementals.toArray(policyReferences));
 
 		// construct AppliesTo
 		org.w3.www.ns.ws_policy.URI appliesToUri = new org.w3.www.ns.ws_policy.URI("urn:wsaaction:*");

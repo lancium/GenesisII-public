@@ -13,14 +13,15 @@
  */
 package edu.virginia.vcgr.genii.client.sysinfo;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
-import edu.virginia.vcgr.genii.client.sysinfo.ISystemInfoProvider;
-import edu.virginia.vcgr.genii.client.sysinfo.MacOSXProvider;
-import edu.virginia.vcgr.genii.client.sysinfo.ProcFilesystemProvider;
-import edu.virginia.vcgr.genii.client.sysinfo.WindowsProvider;
 
 public class SystemInfoUtils
 {
+	static private Log _logger = LogFactory.getLog(SystemInfoUtils.class);
+
 	static private ISystemInfoProvider _provider;
 	static {
 		OperatingSystemType osType = OperatingSystemType.getCurrent();
@@ -68,7 +69,12 @@ public class SystemInfoUtils
 
 	static public boolean getUserLoggedIn()
 	{
-		return getProvider().getUserLoggedIn();
+		try {
+			return getProvider().getUserLoggedIn();
+		} catch (Throwable t) {
+			_logger.warn("Problem calling windows provider for active user", t);
+			throw t;
+		}
 	}
 
 	static public boolean getScreenSaverActive()

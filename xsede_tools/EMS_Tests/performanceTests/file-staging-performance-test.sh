@@ -9,6 +9,9 @@ cd "$WORKDIR"
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
+# the file name we'll use for our large staging.
+HUGE_TEST_FILE=./randomhalfgig.dat
+
 oneTimeSetUp()
 {
   sanity_test_and_init  # make sure test environment is good.
@@ -22,8 +25,7 @@ oneTimeSetUp()
   echo "creating 5KB file..."
   dd if=/dev/urandom of=random5KB.dat bs=1 count=5120
 
-  HUGE_TEST_FILE=./randomhalfgig.dat
-  echo "creating half GB file, this may take a couple minutes..."
+  echo "creating large file for staging, this may take a couple minutes..."
   dd if=/dev/urandom of=$HUGE_TEST_FILE bs=1048576 count=512
 }
 
@@ -71,12 +73,25 @@ testJobStatus()
   if [ -z "$QUEUE_TRIES_ALLOWED" ]; then export QUEUE_TRIES_ALLOWED=$mins20; fi
   if [ $QUEUE_TRIES_ALLOWED -lt 90 ]; then export QUEUE_TRIES_ALLOWED=$mins20; fi
 
+  # just wait, without removing jobs, so we can test results.
   wait_for_all_pending_jobs $QUEUE_PATH
   assertEquals "No jobs should be left" 0 $?
 }
 
 testFileConsistency()
 {
+#  # sleep proportionally to size of big file, since we are seeing job stage out happens after
+#  # the job is marked as finished in the queue.
+#  filesize=$(ls -al $HUGE_TEST_FILE | awk '{print $5}' )
+##echo full file size is $filesize
+#  sleepytime=$(expr $filesize / 1024 / 1024 / 3 + 30)
+#  echo snoozing for $sleepytime seconds to await job stage outs.
+#  sleep $sleepytime
+#
+  echo contents of testing path after job is complete:
+  grid ls -al $RNSPATH
+  cat $GRID_OUTPUT_FILE
+
   grid cp $RNSPATH/random5KB.transferred local:./random5KB.transferred
   diff ./random5KB.dat ./random5KB.transferred
   assertEquals "Checking File consistency, local copy vs copy on grid namespace" 0 $?
@@ -85,6 +100,9 @@ testFileConsistency()
   diff $HUGE_TEST_FILE ./randomhalfgig.transferred
   assertEquals "Checking File consistency, local copy vs copy on grid namespace" 0 $?
   echo `date`": test ended"
+
+  # now clean out all the jobs.
+  wait_for_all_pending_jobs $QUEUE_PATH whack
 }
 
 oneTimeTearDown()

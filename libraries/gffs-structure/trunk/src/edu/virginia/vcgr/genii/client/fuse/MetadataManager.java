@@ -286,7 +286,9 @@ public class MetadataManager
 	private static MessageElement getAttributeFromCache(URI wsIdentifier, QName... names)
 	{
 		for (QName name : names) {
-			MessageElement element = (MessageElement) CacheManager.getItemFromCache(wsIdentifier, name, MessageElement.class);
+			MessageElement element =
+				(MessageElement) CacheManager
+					.getItemFromCache(wsIdentifier, name, org.apache.axis.message.MessageElement.class);
 			if (element != null)
 				return element;
 		}

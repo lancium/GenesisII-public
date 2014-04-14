@@ -20,6 +20,7 @@ import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.ResourceManagerType;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.queue.QueueConstructionParameters;
@@ -250,10 +251,10 @@ class QueueAsBESFactoryAttributesUtilities
 
 		BasicResourceAttributesDocumentType basicResourceAttributesDocument =
 			new BasicResourceAttributesDocumentType(machineName, operatingSystem(), cpuArchitecture(), cpuCount(), cpuSpeed(),
-				physicalMemory(), virtualMemory(), any.toArray(new MessageElement[any.size()]));
+				physicalMemory(), virtualMemory(), Elementals.toArray(any));
 
 		return new FactoryResourceAttributesDocumentType(basicResourceAttributesDocument, isAcceptingNewActivities,
 			machineName, machineName, totalNumberOfActivities, null, _allBESInformation.size(), null, namingProfiles,
-			besExtensions, localResourceManagerType, any.toArray(new MessageElement[any.size()]));
+			besExtensions, localResourceManagerType, Elementals.toArray(any));
 	}
 }

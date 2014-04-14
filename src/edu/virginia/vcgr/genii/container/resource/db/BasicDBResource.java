@@ -25,6 +25,7 @@ import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.IResource;
@@ -617,7 +618,7 @@ public class BasicDBResource implements IResource
 				stmt.setString(2, entry.getKey().toString());
 
 				Collection<MessageElement> any = entry.getValue();
-				stmt.setBlob(3, new SerialBlob(ObjectSerializer.anyToBytes(any.toArray(new MessageElement[any.size()]))));
+				stmt.setBlob(3, new SerialBlob(ObjectSerializer.anyToBytes(Elementals.toArray(any))));
 
 				stmt.addBatch();
 			}

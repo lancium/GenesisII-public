@@ -14,7 +14,10 @@ import edu.virginia.vcgr.genii.client.byteio.parallelByteIO.FastRead;
 import edu.virginia.vcgr.genii.client.byteio.parallelByteIO.FillerAndChecker;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
+import edu.virginia.vcgr.genii.client.byteio.transfer.dime.DimeByteIOTransferer;
+import edu.virginia.vcgr.genii.client.byteio.transfer.mtom.MTOMByteIOTransferer;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 
 /**
  * An implementation of the standard Java Input stream that reads from remote Random ByteIO
@@ -40,9 +43,6 @@ public class RandomByteIOInputStream extends InputStream
 	 *            The source ByteIO to read bytes from.
 	 * @param desiredTransferProtocol
 	 *            The desired transfer protocol to use when reading bytes.
-	 * 
-	 * @throws ConfigurationException
-	 * @throws RemoteException
 	 */
 	public RandomByteIOInputStream(EndpointReferenceType source, URI desiredTransferProtocol) throws RemoteException,
 		IOException
@@ -50,6 +50,28 @@ public class RandomByteIOInputStream extends InputStream
 
 		if (numThreads <= 1)
 			isMultiThreaded = false;
+		TypeInformation typeInfo = new TypeInformation(source);
+		// ASG: First figure out the max read size for the protocol, mtom, whatever
+		// If thre is no type info let's increase by 8
+		long maxSize=ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE * 8;
+		if (desiredTransferProtocol != null) {
+			if (desiredTransferProtocol.equals(ByteIOConstants.TRANSFER_TYPE_MTOM)) {
+				// keep in mind that preferred read size has a *numThreads
+				maxSize=MTOMByteIOTransferer.PREFERRED_READ_SIZE;
+			}
+			if (desiredTransferProtocol.equals(ByteIOConstants.TRANSFER_TYPE_DIME)) {
+				// keep in mind that preferred read size has a *numThreads
+				maxSize=DimeByteIOTransferer.PREFERRED_READ_SIZE;
+			}
+		}
+		// ASG: Then figure out how big the file is
+		long size=typeInfo.getByteIOSize();
+		
+		// ASG: Then if the file is smaller than a single read, don't bother doing anything in parallel
+		if (size <  maxSize) {
+			isMultiThreaded=false;
+			numThreads=1;
+		}
 
 		if (!isMultiThreaded) {
 			RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, source);

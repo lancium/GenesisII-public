@@ -26,7 +26,7 @@ import org.ggf.jsdl.posix.FileName_Type;
 import org.ggf.jsdl.posix.POSIXApplication_Type;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
 public class JSDLFormer
@@ -109,7 +109,7 @@ public class JSDLFormer
 				null);
 
 		posixApplication = createPOSIXApplication();
-		application = new Application_Type(_commandLine.get(0), null, null, AnyHelper.toAnyArray(posixApplication));
+		application = new Application_Type(_commandLine.get(0), null, null, Elementals.objectToArray(posixApplication));
 		application.get_any()[0].setQName(new QName(GenesisIIConstants.JSDL_POSIX_NS, "POSIXApplication"));
 
 		dataStages = createDataStages();

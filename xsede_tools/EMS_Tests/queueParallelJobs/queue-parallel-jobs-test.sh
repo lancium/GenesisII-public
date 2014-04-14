@@ -42,7 +42,7 @@ testQueueParallelJobsSubmission()
 testWaitingOnJobs()
 {
   if [ ! -z "$SPMD_VARIATION" ]; then
-    wait_for_all_pending_jobs $QUEUE_PATH
+    wait_for_all_pending_jobs $QUEUE_PATH whack
     assertEquals "No jobs should be left" 0 $?
   fi
 }

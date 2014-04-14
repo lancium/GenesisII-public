@@ -37,6 +37,7 @@ import org.ws.addressing.MetadataType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
@@ -126,7 +127,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 			for (MessageElement e : mdt.get_any())
 				tmp.add(e);
 			tmp.add(new MessageElement(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG, destroyOnClose));
-			mdt.set_any(tmp.toArray(new MessageElement[0]));
+			mdt.set_any(Elementals.toArray(tmp));
 		}
 
 		Date d = new Date();

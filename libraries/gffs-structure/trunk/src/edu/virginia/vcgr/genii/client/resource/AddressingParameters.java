@@ -19,6 +19,7 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.algorithm.encryption.Base64;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 
 public class AddressingParameters
 {
@@ -171,7 +172,7 @@ public class AddressingParameters
 		if (tmp.isEmpty())
 			return null;
 
-		return new ReferenceParametersType(tmp.toArray(new MessageElement[tmp.size()]));
+		return new ReferenceParametersType(Elementals.toArray(tmp));
 	}
 
 	public AddressingParameters stripResourceForkInformation()

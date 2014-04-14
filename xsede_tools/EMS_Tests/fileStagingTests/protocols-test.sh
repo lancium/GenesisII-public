@@ -36,7 +36,7 @@ testHTTP()
   	assertEquals "Submitting single cat job with file staging using HTTP protocol" 0 $?
   	grep -i "Job Submitted" $GRID_OUTPUT_FILE
   done
-  wait_for_all_pending_jobs $QUEUE_PATH
+  wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "Pending http jobs should complete without errors." 0 $?
 }
 
@@ -47,7 +47,7 @@ testFTP()
     assertEquals "Submitting single cat job with file staging using FTP protocol" 0 $?
     grep -i "Job Submitted" $GRID_OUTPUT_FILE
   done
-  wait_for_all_pending_jobs $QUEUE_PATH
+  wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "Pending ftp jobs should complete without errors." 0 $?
 }
 
@@ -58,7 +58,7 @@ testGFFS()
     assertEquals "Submitting single cat job with file staging from GFFS using OGSA BYTE/IO protocol" 0 $?
     grep -i "Job Submitted" $GRID_OUTPUT_FILE
   done
-  wait_for_all_pending_jobs $QUEUE_PATH
+  wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "Pending gffs jobs should complete without errors." 0 $?
 }
 
@@ -69,7 +69,7 @@ testSCP()
   	assertEquals "Submitting single cat job with file staging using SCP protocol" 0 $?
   	grep -i "Job Submitted" $GRID_OUTPUT_FILE
   done
-  wait_for_all_pending_jobs $QUEUE_PATH
+  wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "Pending scp jobs should complete without errors." 0 $?
 }
 
@@ -83,7 +83,7 @@ testSFTP()
       assertEquals "Submitting single cat job with file staging using the SFTP protocol" 0 $?
       grep -i "Job Submitted" $GRID_OUTPUT_FILE
     done
-    wait_for_all_pending_jobs $QUEUE_PATH
+    wait_for_all_pending_jobs $QUEUE_PATH whack
     assertEquals "Pending sftp jobs should complete without errors." 0 $?
   else
     echo "Skipping test as this protocol is not supported by this BES"
@@ -97,7 +97,7 @@ testMailTo()
       assertEquals "Submitting single cat job with file staging using the MAILTO protocol" 0 $?
       grep -i "Job Submitted" $GRID_OUTPUT_FILE
     done
-    wait_for_all_pending_jobs $QUEUE_PATH
+    wait_for_all_pending_jobs $QUEUE_PATH whack
     assertEquals "Pending mailto jobs should complete without errors." 0 $?
 
 }

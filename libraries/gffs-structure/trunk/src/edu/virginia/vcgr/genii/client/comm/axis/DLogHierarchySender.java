@@ -119,7 +119,7 @@ public class DLogHierarchySender extends WSDoAllReceiver
 		}
 
 		if (refParams.size() > 0) {
-			epr.setReferenceParameters(new ReferenceParametersType((MessageElement[]) refParams.toArray()));
+			epr.setReferenceParameters(new ReferenceParametersType(Elementals.toArray(refParams)));
 		}
 
 		return epr;

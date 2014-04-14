@@ -9,17 +9,24 @@
 
 # this first section of functions is related to jobs that have been submitted to a queue.
 
-# returns an integer for the count of jobs remaining in an unfinished state.
+# echoes an integer for the count of jobs remaining in an unfinished state.
 compute_remaining_jobs()
 {
   local queue_path=$1
   local grid_app="$(pick_grid_app)"
-  remaining=$(raw_grid \"$grid_app\" qstat $queue_path | grep 'QUEUED\|RUNNING\|On' | wc | gawk '{print $1 }')
+  outfile="$(mktemp "$TEST_TEMP/job_stats.XXXXXX")"
+  raw_grid "$grid_app" qstat $queue_path | tail -n +2 | sed -e '/^$/d' >$outfile
   retval=${PIPESTATUS[0]}
   if [ $retval -ne 0 ]; then
     # the qstat call failed, and we want to send back an error signal.
     remaining="-1"
+  else
+    # compute how many jobs are in a finished state, and subtract from total.
+    total_lines=$(wc -l $outfile | awk '{print $1}')
+    done_lines=$(grep 'ERROR\|FINISHED' $outfile | wc -l)
+    remaining=$(($total_lines - $done_lines))
   fi
+#wrong old way.  remaining=$(raw_grid \"$grid_app\" qstat $queue_path | grep 'QUEUED\|RUNNING\|On' | wc | gawk '{print $1 }')
   echo "$remaining"
 }
 
@@ -92,6 +99,13 @@ function cancel_all_in_queue()
 function wait_for_all_pending_jobs()
 {
   local queue_path=$1; shift
+  local whack_jobs=$1; shift
+
+  if [ ! -z "$whack_jobs" ]; then
+    echo Waiting for all jobs and removing them when finished.
+  else
+    echo Waiting for all jobs but leaving them in queue.
+  fi
 
   if [ -z "$QUEUE_SLEEP_DURATION" ]; then
     QUEUE_SLEEP_DURATION=120
@@ -137,7 +151,10 @@ function wait_for_all_pending_jobs()
     # update the tracking of the last count of items left.
     last_left=$left
     # try dropping any that are already complete, so we don't have to keep looking at them.
-    grid qcomplete $queue_path --all
+    if [ ! -z "$whack_jobs" ]; then
+echo AAA now whacking any completed jobs...
+      grid qcomplete $queue_path --all
+    fi
   done
   
   # don't try to calculate the error jobs when we already know we failed.

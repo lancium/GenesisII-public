@@ -22,6 +22,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -286,7 +287,7 @@ public class RPInvoker implements InvocationHandler
 		throws ResourcePropertyException
 	{
 		try {
-			_stub.updateResourceProperties(new UpdateResourceProperties(new UpdateType(values.toArray(new MessageElement[0]))));
+			_stub.updateResourceProperties(new UpdateResourceProperties(new UpdateType(Elementals.toArray(values))));
 			_propertiesCache.put(properties, values);
 		} catch (ResourceUnknownFaultType ruft) {
 			throw new ResourcePropertyException("Resource is unknown.", ruft);

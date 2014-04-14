@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis.message.MessageElement;
 import org.ggf.byteio.TransferInformationType;
 import org.ggf.rbyteio.Append;
 import org.ggf.rbyteio.RandomByteIOPortType;
@@ -17,6 +16,7 @@ import org.ggf.rbyteio.Write;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.transfer.AbstractByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
+import org.apache.axis.message.MessageElement;
 
 /**
  * This class implements the Simple transfer protocol for remote random ByteIOs.

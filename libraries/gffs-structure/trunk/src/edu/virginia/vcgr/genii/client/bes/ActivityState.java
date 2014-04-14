@@ -24,6 +24,7 @@ import org.apache.axis.message.MessageElement;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.ggf.bes.factory.ActivityStatusType;
 
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
@@ -175,7 +176,7 @@ public class ActivityState implements Serializable, Cloneable
 		if (_isSuspended)
 			anyC.add(new MessageElement(_SUSPEND_STATE_ELEMENT_QNAME));
 		// hmmm: was this exactly inverted from what we were expecting? fixed sense of null check.
-		return new ActivityStatusType((anyC.size() == 0) ? null : anyC.toArray(new MessageElement[0]),
+		return new ActivityStatusType((anyC.size() == 0) ? null : Elementals.toArray(anyC),
 			ActivityStateEnumeration.fromValue(_besState));
 	}
 

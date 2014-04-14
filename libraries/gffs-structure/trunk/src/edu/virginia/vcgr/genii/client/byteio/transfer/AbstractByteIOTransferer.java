@@ -4,13 +4,13 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
+import org.apache.axis.message.MessageElement;
 
 /**
  * An abstract base class that implements much of the common functionallity of a ByteIO transferer.

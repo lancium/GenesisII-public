@@ -14,6 +14,7 @@ import org.ggf.jsdl.hpcp.HPCProfileApplication_Type;
 import org.ggf.jsdl.posix.POSIXApplication_Type;
 
 import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.jsdl.hpc.HPCConstants;
 import edu.virginia.vcgr.genii.client.jsdl.posix.JSDLPosixConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -60,7 +61,7 @@ public abstract class AbstractReifier implements IJSDLReifier
 			if (elements.size() == 0)
 				elements.add(reifyPOSIXApplication(deployDirectory, new POSIXApplication_Type()));
 
-			application.set_any(elements.toArray(new MessageElement[0]));
+			application.set_any(Elementals.toArray(elements));
 			return application;
 		} catch (ResourceException re) {
 			throw new DeploymentException("Unable to re-ify JSDL.", re);

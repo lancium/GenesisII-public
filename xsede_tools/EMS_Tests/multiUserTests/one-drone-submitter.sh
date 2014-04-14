@@ -88,7 +88,7 @@ sleep 10  # snooze to allow jobs to begin to percolate through.
 echo "will wait for jobs $QUEUE_TRIES_ALLOWED times (at $QUEUE_SLEEP_DURATION seconds each)."
 
 # now gather up results from that run.
-wait_for_all_pending_jobs $QUEUE_PATH
+wait_for_all_pending_jobs $QUEUE_PATH whack
 if [ $? -ne 0 ]; then
   echo Failed while waiting for queue to clear after test runs.
   ((TEST_FAIL_COUNT++))

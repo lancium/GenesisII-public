@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -92,7 +93,7 @@ public class NotificationOutcallActor implements OutcallActor
 		}
 
 		Notify notify = new Notify(holders.toArray(new NotificationMessageHolderType[holders.size()]), null);
-		notify.set_any(messageElements.toArray(new MessageElement[messageElements.size()]));
+		notify.set_any(Elementals.toArray(messageElements));
 
 		GeniiCommon common =
 			ClientUtils.createProxy(GeniiCommon.class, target, (callingContext == null) ? _callingContext : callingContext);

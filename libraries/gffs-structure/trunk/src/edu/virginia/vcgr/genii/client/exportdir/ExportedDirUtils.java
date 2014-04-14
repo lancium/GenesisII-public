@@ -63,7 +63,7 @@ public class ExportedDirUtils
 		 * path; _parentIds = parentIds; _isReplicated = isReplicated; }
 		 */
 		public ExportedDirInitInfo(String path, String parentIds, String isReplicated, Long lastModified,
-			EndpointReferenceType resolverServiceEPR, String svnUser, String svnPass, Long svnRevision)
+				EndpointReferenceType resolverServiceEPR, String svnUser, String svnPass, Long svnRevision)
 		{
 			_path = path;
 			_parentIds = parentIds;
@@ -117,8 +117,8 @@ public class ExportedDirUtils
 	}
 
 	static public MessageElement[] createCreationProperties(String humanName, String path, String svnUser, String svnPass,
-		Long svnRevision, String parentIds, String isReplicated) throws RemoteException
-	{
+			Long svnRevision, String parentIds, String isReplicated) throws RemoteException
+			{
 		Collection<MessageElement> any = new Vector<MessageElement>(6);
 		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path));
 		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME), parentIds));
@@ -136,10 +136,10 @@ public class ExportedDirUtils
 		}
 
 		return any.toArray(new MessageElement[any.size()]);
-	}
+			}
 
 	static public MessageElement[] createReplicationCreationProperties(String path, String parentIds, String isReplicated,
-		EndpointReferenceType replicationServiceEPR)
+			EndpointReferenceType replicationServiceEPR)
 	{
 		MessageElement[] any = new MessageElement[5];
 		any[0] = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path);
@@ -161,12 +161,12 @@ public class ExportedDirUtils
 	 *            : Contains the processed creation parameters for export creation.
 	 */
 	static public void createResolverCreationProperties(Collection<MessageElement> resolverCreationParams,
-		ExportedDirInitInfo initInfo)
+			ExportedDirInitInfo initInfo)
 	{
 		resolverCreationParams.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), initInfo
-			.getPath()));
+				.getPath()));
 		resolverCreationParams.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
-			initInfo.getResolverFactoryEPR()));
+				initInfo.getResolverFactoryEPR()));
 	}
 
 	static public ExportedDirInitInfo extractCreationProperties(GenesisHashMap properties) throws ResourceException
@@ -244,10 +244,11 @@ public class ExportedDirUtils
 			throw new IllegalArgumentException("Couldn't find replication indicator in export creation properties.");
 
 		// get last modified time
+		//XXX: Handle sudo here!
 		lastModified = getLastModifiedTime(path);
 
 		return new ExportedDirInitInfo(path, parentIds, isReplicated, lastModified, resolverServiceEPR, svnUser, svnPass,
-			svnRevision);
+				svnRevision);
 	}
 
 	static public String createParentIdsString(String ancestorIdString, String parentId)

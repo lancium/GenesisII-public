@@ -20,6 +20,7 @@ import org.oasis_open.wsn.base.GetMessagesResponse;
 import org.oasis_open.wsn.base.NotificationMessageHolderType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.notification.NotificationBrokerConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.NotificationMessageHolder;
 import edu.virginia.vcgr.genii.container.cservices.wsn.NotificationMessageOutcallContent;
@@ -129,9 +130,7 @@ public class NotificationBrokerMessageManager
 			iteration++;
 			messageIndex++;
 		}
-
-		GetMessagesResponse response =
-			new GetMessagesResponse(holders, attributeList.toArray(new MessageElement[attributeList.size()]));
+		GetMessagesResponse response = new GetMessagesResponse(holders, Elementals.toArray(attributeList));
 		return response;
 	}
 

@@ -40,17 +40,6 @@ public class ObjectDeserializer
 	static private Log _logger = LogFactory.getLog(ObjectDeserializer.class);
 
 	/**
-	 * Converts a DOM Element object into a Java object. The type of the Java object will be
-	 * determined from the <i>xsi:type</i> attribute of the specified element. <br>
-	 * <b>Note:</b> This operation is slow as it converts the DOM Element into a string which then
-	 * is deserialized into a Java object.
-	 */
-	public static Object toObject(Element element) throws ResourceException
-	{
-		return toObject(element, null);
-	}
-
-	/**
 	 * Converts a DOM Element object into a Java object. <br>
 	 * <b>Note:</b> This operation is slow as it converts the DOM Element into a string which then
 	 * is deserialized into a Java object.
@@ -64,17 +53,6 @@ public class ObjectDeserializer
 			throw new ResourceException("Generic Deserialization Error.", e);
 		}
 		return deserializer.getValue();
-	}
-
-	/**
-	 * Converts a SOAPElement object into a Java object. The type of the Java object will be
-	 * determined from the <i>xsi:type</i> attribute of the specified element.
-	 * 
-	 * @see #toObject(SOAPElement, Class)
-	 */
-	public static Object toObject(SOAPElement element) throws ResourceException
-	{
-		return toObject(element, null);
 	}
 
 	/**

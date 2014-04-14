@@ -42,6 +42,5 @@ else
 	echo "qsub not available, cannot proceed. Exiting..."
 fi
 
-wait_for_all_pending_jobs
-
+wait_for_all_pending_jobs $QUEUE_PATH whack
 

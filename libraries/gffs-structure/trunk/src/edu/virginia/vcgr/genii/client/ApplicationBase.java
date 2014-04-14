@@ -30,11 +30,7 @@ import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 public class ApplicationBase
 {
-	static private Log _logger = LogFactory.getLog(ApplicationBase.class);
-
-	// the optional environment variable that points at the installation location.
-	// this becomes required if one is running the software under eclipse.
-	static public final String INSTALLATION_DIR_ENVIRONMENT_VARIABLE = "GENII_INSTALL_DIR";
+	public static Log _logger = LogFactory.getLog(ApplicationBase.class);
 
 	// the environment variable whose value points at our state directory.
 	static public final String USER_DIR_ENVIRONMENT_VARIABLE = "GENII_USER_DIR";
@@ -54,15 +50,6 @@ public class ApplicationBase
 	static public String getDeploymentDirFromEnvironment()
 	{
 		return System.getenv(DEPLOYMENT_DIR_ENVIRONMENT_VARIABLE);
-	}
-
-	/*
-	 * this provides a way for the osgi support to know we're running inside eclipse, which imposes
-	 * a different structure on the locations of files.
-	 */
-	static public String getEclipseTrunkFromEnvironment()
-	{
-		return System.getenv(INSTALLATION_DIR_ENVIRONMENT_VARIABLE);
 	}
 
 	static public void setupUserDir(File userdir)
