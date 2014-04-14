@@ -381,8 +381,7 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				filteredPropertyList.add(property);
 			}
 		}
-		return new GetResourcePropertyDocumentResponse(filteredPropertyList.toArray(new MessageElement[filteredPropertyList
-			.size()]));
+		return new GetResourcePropertyDocumentResponse(Elementals.toArray(filteredPropertyList));
 	}
 
 	public static class CommonSTSPropertiesRetriever implements STSResourcePropertiesRetriever

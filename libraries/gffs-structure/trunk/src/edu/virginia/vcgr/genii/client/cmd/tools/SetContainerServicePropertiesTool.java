@@ -71,8 +71,7 @@ public class SetContainerServicePropertiesTool extends BaseGridTool
 		addMessageElement(elements, ContainerConstants.PROPERTY_SCRATCH_SPACE_DIR, _scratchSpaceDir);
 
 		SetResourceProperties ret =
-			new SetResourceProperties(null, elements.size() == 0 ? null : new UpdateType(
-				elements.toArray(new MessageElement[0])), null);
+			new SetResourceProperties(null, elements.size() == 0 ? null : new UpdateType(Elementals.toArray(elements)), null);
 		return ret;
 	}
 

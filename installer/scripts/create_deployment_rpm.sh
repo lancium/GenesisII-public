@@ -107,7 +107,7 @@ echo -e "\
 echo This script replaces the installed container.properties file with the\n\
 echo $packname deployment override version of the file.  This requires a sudo\n\
 echo login at the prompt.\n\
-sudo cp /opt/genesis2/deployments/container.properties /opt/genesis2/container.properties.old\n\
+sudo cp /opt/genesis2/container.properties /opt/genesis2/container.properties.old\n\
 sudo cp /opt/genesis2/deployments/container.properties.${packname} /opt/genesis2/container.properties\n\
 echo If there were no errors, then the copy succeeded and the deployment override\n\
 echo is ready to use.\n\

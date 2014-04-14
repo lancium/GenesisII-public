@@ -1,1 +1,7 @@
+iclogin
 
+iclogin --username=<username> [--password=password>] 
+
+iclogin [--idp=<identity-provider-url>] 
+		[--username=<username> [--password=password>]] 
+		[--key=<keypair-file> [--csr=<certificate-signing-request-file>]]
