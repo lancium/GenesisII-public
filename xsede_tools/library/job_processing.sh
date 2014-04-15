@@ -152,7 +152,6 @@ function wait_for_all_pending_jobs()
     last_left=$left
     # try dropping any that are already complete, so we don't have to keep looking at them.
     if [ ! -z "$whack_jobs" ]; then
-echo AAA now whacking any completed jobs...
       grid qcomplete $queue_path --all
     fi
   done
@@ -311,17 +310,18 @@ function drain_my_jobs_out_of_queue()
     for i in ${SUBMISSION_POINT_JOB_LIST[*]}; do
       # we opt for a more subtle completion call per job, just as an alternative to
       # our more standard --all flag.
-echo "examining job $i"
+#echo "examining job $i"
       count=120
       retval=1
       local grid_app="$(pick_grid_app)"
       until [ $count -le 0 ]; do
-echo "seconds left: $count"
+#echo "seconds left: $count"
         sleep 10
-        jobStatus="$(raw_grid \"$grid_app\" qstat $QUEUE_PATH $i)"
+        jobStatus="$(raw_grid $grid_app qstat $QUEUE_PATH $i)"
+#echo qstat returned: $jobStatus
         # stop waiting for a job if it's marked as finished.
         if [[ "$jobStatus" =~ .*FINISHED.* ]]; then
-echo "  saw job in finished state"
+#echo "  saw job in finished state"
             count=-1
             grid qcomplete $QUEUE_PATH $i
             retval=$?
@@ -330,7 +330,7 @@ echo "  saw job in finished state"
         fi
         # also stop waiting on jobs in error state; we whack these.
         if [[ "$jobStatus" =~ .*ERROR.* ]]; then
-echo "  saw job in error state"
+#echo "  saw job in error state"
             count=-1
             grid qkill $QUEUE_PATH $i
             retval=$?
@@ -338,6 +338,7 @@ echo "  saw job in error state"
             if [ $retval -ne 0 ]; then break; fi
         fi
         count=$(( $count - 10 ))
+#echo count is now $count
       done
       assertEquals "requesting job $i complete." 0 $retval
     done
@@ -349,7 +350,7 @@ echo "  saw job in error state"
 
     # bail out if we have used up our iterations.
     iterations_left=$(( $iterations_left - 1 ))
-echo "outer loop has $iterations_left times left"
+#echo "outer loop has $iterations_left times left"
     if [ $iterations_left -le 0 ]; then
       # this counts as a failure.
       echo "Leaving drain_my_jobs_out_of_queue due to using up all allotted iterations."
