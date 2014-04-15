@@ -71,7 +71,7 @@ public class SystemInfoUtils
 	{
 		try {
 			return getProvider().getUserLoggedIn();
-		} catch (Throwable t) {
+		} catch (RuntimeException t) {
 			_logger.warn("Problem calling windows provider for active user", t);
 			throw t;
 		}

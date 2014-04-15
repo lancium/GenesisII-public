@@ -873,7 +873,10 @@ return true;</string>
                 </object>
               </java>
             </serializedBean>
-            <condition />
+            <condition>String ismac = context.getCompilerVariable("genii.isMac");
+if (ismac == null) return true;
+return ismac.equals("false");
+</condition>
             <validation />
             <preActivation />
             <postActivation />
@@ -979,7 +982,7 @@ return true;</string>
                   </java>
                 </serializedBean>
                 <initScript />
-                <visibilityScript>context.getCompilerVariable("genii.isMac").equals("false")</visibilityScript>
+                <visibilityScript />
               </formComponent>
             </formComponents>
           </screen>
