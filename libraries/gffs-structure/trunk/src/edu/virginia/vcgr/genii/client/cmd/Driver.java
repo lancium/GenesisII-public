@@ -132,16 +132,16 @@ public class Driver extends ApplicationBase
 				}
 				case CONNECTION_ALREADY_GOOD: {
 					// nothing was wrong, just proceed normally.
-					if (_logger.isDebugEnabled())
-						_logger.debug("grid connection was already present.");
+					if (_logger.isTraceEnabled())
+						_logger.trace("grid connection was already present.");
 					break;
 				}
 				default: // default should never be seen, but must be included as a case.
 				case CONNECTION_MEANS_UNKNOWN: {
 					// we are not going to get connected at this point. we don't know how. this had
 					// better be a bootstrap.
-					if (_logger.isDebugEnabled())
-						_logger.debug("steps for grid connection were not present; assuming bootstrap.");
+					if (_logger.isTraceEnabled())
+						_logger.trace("steps for grid connection were not present; assuming bootstrap.");
 					break;
 				}
 				case CONNECTION_GOOD_NOW: {

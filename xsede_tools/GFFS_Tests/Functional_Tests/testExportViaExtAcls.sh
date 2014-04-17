@@ -262,7 +262,7 @@ testLicenseeCanAccess()
   assertEquals "Should be able to cleanup directory we just made" 0 $?
 
   # set up a file that we can check as the feeble user.
-  grid cp local:"$XSEDE_TEST_ROOT/inputfile.txt" grid:$EXPORTED_GRID_PATH
+  grid cp local:"$XSEDE_TOOLS_CONFIG_FILE" grid:$EXPORTED_GRID_PATH
   assertEquals "Copying a file up to the folder should work" 0 $?
 }
 

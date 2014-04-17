@@ -8,8 +8,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.appmgr.version.Version;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-// import edu.virginia.vcgr.appmgr.update.Updater;
-
 public class ApplicationLauncher
 {
 	static private Log _logger = LogFactory.getLog(ApplicationLauncher.class);
@@ -88,16 +86,12 @@ public class ApplicationLauncher
 
 			ApplicationDescription appDesc = new ApplicationDescription(appClass, appDescFile);
 			_appNameFound = appDesc.getApplicationName();
-			
-			//hmmm: remove crap logging.
-			_logger.debug("dir here for install is: " + ApplicationDescription.getInstallationDirectory());
-			
+			if (_logger.isTraceEnabled())
+				_logger.trace("dir here for install is: " + ApplicationDescription.getInstallationDirectory());
 			_appVersionFound = appDesc.getVersionManager().getCurrentVersion();
-			
-			_logger.debug("ver found is: " + _appVersionFound);
+			if (_logger.isTraceEnabled())
+				_logger.trace("version found is: " + _appVersionFound);
 
-			
-			
 			ApplicationLauncherConsole console = new ApplicationLauncherConsoleImpl(appDesc);
 			_console.set(console);
 

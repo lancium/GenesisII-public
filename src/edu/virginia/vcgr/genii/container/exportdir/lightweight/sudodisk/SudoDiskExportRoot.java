@@ -24,7 +24,6 @@ public class SudoDiskExportRoot extends AbstractVExportRoot implements VExportRo
 		if (normalizedPath.length() == 0)
 			return new SudoDiskExportEntry(_root, _uname);
 
-		return new SudoDiskExportEntry(new File(_root, normalizedPath),
-				_uname);
+		return new SudoDiskExportEntry(new File(_root, normalizedPath), _uname);
 	}
 }

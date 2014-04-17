@@ -56,7 +56,7 @@ public class LoginTool extends BaseLoginTool
 	static private final String _DESCRIPTION = "config/tooldocs/description/dlogin";
 	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/ulogin";
 	static final private String _MANPAGE = "config/tooldocs/man/login";
-	
+
 	private static Properties p = null;
 	static final String SEARCH_PATH = "SEARCH_PATH";
 
@@ -84,34 +84,35 @@ public class LoginTool extends BaseLoginTool
 			idpList.add(nsd.getUsersDirectory() + "/" + constructedPath);
 			// idpList.add(nsd.getUsersDirectory() + "/demo/" + constructedPath);
 		}
-		
+
 		// Checks this lists of idp paths, in order,
 		// if one is not passed on the command line
 		idpList.add(nsd.getUsersDirectory() + "/" + username);
-		//idpList.add(nsd.getUsersDirectory() + "/demo/" + username);
-		
+		// idpList.add(nsd.getUsersDirectory() + "/demo/" + username);
+
 		// Let's first load the LoginSearchPath properties file
-		if (p==null) {
+		if (p == null) {
 			p = new Properties();
-			InputStream in=HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/LoginSearchPath.properties");
+			InputStream in =
+				HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/LoginSearchPath.properties");
 			try {
 				p.load(in);
-			}
-			catch (IOException e){
+			} catch (IOException e) {
 				throw new RuntimeException(e);
-			}
-			finally {
+			} finally {
 				StreamUtils.close(in);
 			}
 		}
 		// Then get the list of paths to search
-		String r=p.getProperty(SEARCH_PATH);
-		if (r==null) { throw new RuntimeException("Could not find config/LoginSearchPath.properties " + SEARCH_PATH); }
+		String r = p.getProperty(SEARCH_PATH);
+		if (r == null) {
+			throw new RuntimeException("Could not find config/LoginSearchPath.properties " + SEARCH_PATH);
+		}
 		// ASG: 2014-02-11, Now grab the substrings and add them to the list
 		StringTokenizer tokenCollector = new StringTokenizer(r, ":");
 		while (tokenCollector.hasMoreTokens()) {
 			String pathname = tokenCollector.nextToken();
-			idpList.add(pathname + "/" + username);		
+			idpList.add(pathname + "/" + username);
 		}
 
 		return idpList;
@@ -221,7 +222,7 @@ public class LoginTool extends BaseLoginTool
 		}
 
 		ContextManager.storeCurrentContext(callContext);
-		//jumpToUserHomeIfExists(_username);
+		// jumpToUserHomeIfExists(_username);
 		{
 			// Assumption is that user idp's are off /user and homes off /home
 			String userHome = _authnUri.replaceFirst("users", "home");
@@ -250,37 +251,27 @@ public class LoginTool extends BaseLoginTool
 		}
 
 	}
-/*
-	public static void jumpToUserHomeIfExists(String loginName)
-	{
 
-		if (loginName == null)
-			return;
+	/*
+	 * public static void jumpToUserHomeIfExists(String loginName) {
+	 * 
+	 * if (loginName == null) return;
+	 * 
+	 * List<String> candidateHomeDirs = new ArrayList<String>(); String constructedPathToHome =
+	 * constructPathFromLoginName(null, loginName);
+	 * 
+	 * NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
+	 * 
+	 * if (constructedPathToHome != null) { candidateHomeDirs.add(nsd.getHomesDirectory() + "/" +
+	 * constructedPathToHome); candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" +
+	 * constructedPathToHome); } candidateHomeDirs.add(nsd.getHomesDirectory() + "/" + loginName);
+	 * candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" + loginName);
+	 * candidateHomeDirs.add("rns:/");
+	 * 
+	 * for (String userHome : candidateHomeDirs) { try { CdTool.chdir(userHome); break; } catch
+	 * (Throwable e) { } } }
+	 */
 
-		List<String> candidateHomeDirs = new ArrayList<String>();
-		String constructedPathToHome = constructPathFromLoginName(null, loginName);
-
-		NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
-
-		if (constructedPathToHome != null) {
-			candidateHomeDirs.add(nsd.getHomesDirectory() + "/" + constructedPathToHome);
-			candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" + constructedPathToHome);
-		}
-		candidateHomeDirs.add(nsd.getHomesDirectory() + "/" + loginName);
-		candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" + loginName);
-		candidateHomeDirs.add("rns:/");
-
-		for (String userHome : candidateHomeDirs) {
-			try {
-				CdTool.chdir(userHome);
-				break;
-			} catch (Throwable e) {
-			}
-		}
-	}
-
-*/
-	
 	public static String constructPathFromLoginName(String pathPrefix, String loginName)
 	{
 

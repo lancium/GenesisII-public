@@ -53,24 +53,25 @@ public class RandomByteIOInputStream extends InputStream
 		TypeInformation typeInfo = new TypeInformation(source);
 		// ASG: First figure out the max read size for the protocol, mtom, whatever
 		// If thre is no type info let's increase by 8
-		long maxSize=ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE * 8;
+		long maxSize = ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE * 8;
 		if (desiredTransferProtocol != null) {
 			if (desiredTransferProtocol.equals(ByteIOConstants.TRANSFER_TYPE_MTOM)) {
 				// keep in mind that preferred read size has a *numThreads
-				maxSize=MTOMByteIOTransferer.PREFERRED_READ_SIZE;
+				maxSize = MTOMByteIOTransferer.PREFERRED_READ_SIZE;
 			}
 			if (desiredTransferProtocol.equals(ByteIOConstants.TRANSFER_TYPE_DIME)) {
 				// keep in mind that preferred read size has a *numThreads
-				maxSize=DimeByteIOTransferer.PREFERRED_READ_SIZE;
+				maxSize = DimeByteIOTransferer.PREFERRED_READ_SIZE;
 			}
 		}
 		// ASG: Then figure out how big the file is
-		long size=typeInfo.getByteIOSize();
-		
-		// ASG: Then if the file is smaller than a single read, don't bother doing anything in parallel
-		if (size <  maxSize) {
-			isMultiThreaded=false;
-			numThreads=1;
+		long size = typeInfo.getByteIOSize();
+
+		// ASG: Then if the file is smaller than a single read, don't bother doing anything in
+		// parallel
+		if (size < maxSize) {
+			isMultiThreaded = false;
+			numThreads = 1;
 		}
 
 		if (!isMultiThreaded) {

@@ -6,7 +6,8 @@ import java.util.Properties;
 
 import org.morgan.util.io.StreamUtils;
 
-public class GFFSExportConfiguration {
+public class GFFSExportConfiguration
+{
 
 	public static final String EXPORT_TYPE = "export.type";
 	public static final String EXPORT_TYPE_SUDO = "sudo";
@@ -26,15 +27,15 @@ public class GFFSExportConfiguration {
 				StreamUtils.close(in);
 			}
 		}
-		
+
 		String r = p.getProperty(EXPORT_TYPE);
 		if (r == null) {
 			return ExportType.DEFAULT;
 		}
 		if (r.equalsIgnoreCase("sudo"))
 			return ExportType.SUDO;
-	
+
 		return ExportType.DEFAULT;
 	}
-		
+
 }

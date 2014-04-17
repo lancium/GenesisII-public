@@ -56,11 +56,14 @@ if [ ! -d "$GENERATED_JSDL_FOLDER" ]; then
 fi
 
 # this is the main source of parameters for the tests.
-export PARAMETER_FILE="$XSEDE_TEST_ROOT/inputfile.txt"
-if [ ! -f "$PARAMETER_FILE" -a -z "$BADNESS" ]; then
+export XSEDE_TOOLS_CONFIG_FILE
+if [ -z "$XSEDE_TOOLS_CONFIG_FILE" ]; then
+  XSEDE_TOOLS_CONFIG_FILE="$XSEDE_TEST_ROOT/inputfile.txt"
+fi
+if [ ! -f "$XSEDE_TOOLS_CONFIG_FILE" -a -z "$BADNESS" ]; then
   echo "----"
   echo "This script requires that you prepare a customized file in:"
-  echo "    $PARAMETER_FILE"
+  echo "    $XSEDE_TOOLS_CONFIG_FILE"
   echo "with the details of your grid installation.  There is an example"
   echo "version called inputfile.example in the folder $XSEDE_TEST_ROOT"
   BADNESS=true

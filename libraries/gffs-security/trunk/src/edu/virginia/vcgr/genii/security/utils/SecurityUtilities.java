@@ -164,14 +164,14 @@ public class SecurityUtilities implements CertificateValidator
 					Certificate c = store.getCertificate(alias);
 					if (c instanceof X509Certificate) {
 						if (c.equals(certChain[0])) {
-							if (_logger.isDebugEnabled())
-								_logger.debug("found identical certificate in trust store under alias '" + alias + "'");
+							if (_logger.isTraceEnabled())
+								_logger.trace("found identical certificate in trust store under alias '" + alias + "'");
 							return true;
 						}
 						try {
 							certChain[0].verify(c.getPublicKey());
-							if (_logger.isDebugEnabled())
-								_logger.debug("found creator for " + certChain[0].getSubjectDN() + " in store under alias '"
+							if (_logger.isTraceEnabled())
+								_logger.trace("found creator for " + certChain[0].getSubjectDN() + " in store under alias '"
 									+ alias + "'");
 							return true;
 						} catch (Throwable e) {
@@ -203,12 +203,12 @@ public class SecurityUtilities implements CertificateValidator
 			tmf.init(trustParams);
 			X509TrustManager trustManager = (X509TrustManager) tmf.getTrustManagers()[0];
 			trustManager.checkClientTrusted(certChain, certChain[0].getPublicKey().getAlgorithm());
-			if (_logger.isDebugEnabled())
-				_logger.debug("validated cert with jdk ssl: " + certChain[0].getSubjectDN());
+			if (_logger.isTraceEnabled())
+				_logger.trace("validated cert with jdk ssl: " + certChain[0].getSubjectDN());
 			trustOkay = true;
 		} catch (Throwable e) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("could not validate this cert with jdk ssl against trust store: " + certChain[0].getSubjectDN()
+			if (_logger.isTraceEnabled())
+				_logger.trace("could not validate this cert with jdk ssl against trust store: " + certChain[0].getSubjectDN()
 					+ e.getMessage());
 		}
 		try {
@@ -216,13 +216,13 @@ public class SecurityUtilities implements CertificateValidator
 				InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(ks);
 				CommonX509TrustManager trustManager = new CommonX509TrustManager(validater);
 				trustManager.checkClientTrusted(certChain, certChain[0].getPublicKey().getAlgorithm());
-				if (_logger.isDebugEnabled())
-					_logger.debug("validated cert: " + certChain[0].getSubjectDN());
+				if (_logger.isTraceEnabled())
+					_logger.trace("validated cert: " + certChain[0].getSubjectDN());
 				trustOkay = true;
 			}
 		} catch (Throwable e) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("could not validate this cert with CANL against trust store: " + certChain[0].getSubjectDN(), e);
+			if (_logger.isTraceEnabled())
+				_logger.trace("could not validate this cert with CANL against trust store: " + certChain[0].getSubjectDN(), e);
 		}
 		return trustOkay;
 	}
@@ -376,8 +376,8 @@ public class SecurityUtilities implements CertificateValidator
 					certificateList.add(certificate);
 				}
 				fis.close();
-				if (_logger.isDebugEnabled())
-					_logger.debug("Loaded trusted certificate(s) from file: " + certificateFile.getName());
+				if (_logger.isTraceEnabled())
+					_logger.trace("Loaded trusted certificate(s) from file: " + certificateFile.getName());
 			} catch (Exception ex) {
 				_logger.warn("Failed to load certificates from file: " + certificateFile.getName(), ex);
 			}

@@ -361,7 +361,7 @@ function drain_my_jobs_out_of_queue()
 
 ##############
 
-# finds the resources that exist under the queue specified in inputfile.txt
+# finds the resources that exist under the queue specified in the config file
 # and echoes a space separated list of their names.  note that this will pay
 # attention to the BES_RESOURCE_OVERRIDE variable; if that is non-blank, then
 # the variable's value will be the only resource name returned.  (the

@@ -12,7 +12,7 @@ user_password="$1"; shift
 
 if [ -z "$user_password" ]; then
   echo "This script requires the user's password (for the USERPATH specified"
-  echo "in inputfile.txt)."
+  echo "in $XSEDE_TOOLS_CONFIG_FILE)."
   exit 1
 fi
 

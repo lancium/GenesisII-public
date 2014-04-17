@@ -13,7 +13,8 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
  * This is based on the belief that the root and other EPRs seldom change, so why do we create
  * RNSPath objects containing these all the time? Instead, these should come from the cache, and be
  * very quick to look up. This cache does have to be cleared for some EPR invalidating events, such
- * as the ConnectTool and when a resolver is added.
+ * as the ConnectTool and when a resolver is added. Note that this cache works on absolute paths
+ * only!
  * 
  * @author Chris Koeritz
  */
@@ -111,17 +112,17 @@ public class CriticalPathFromRootCache
 		 */
 		public void addPath(String path, RNSPath rpath)
 		{
-			if ( (path == null) || (rpath == null)) {
+			if (path == null) {
 				// should never happen.
-				String msg = "failure in addPath: path or rns path is null.";
+				String msg = "failure in addPath: path string is null.";
 				_logger.error(msg);
 				return; // skip it.
 			}
-			if (rpath.getCachedEPR() == null) {
+			if ((rpath != null) && (rpath.getCachedEPR() == null)) {
 				// this can happen quite honestly, such as for new paths.
 				String msg = "addPath seeing rns path has a null EPR, ignoring.";
 				_logger.debug(msg);
-				return; // skip it.				
+				return; // skip it.
 			}
 
 			synchronized (_tierEntries) {
@@ -172,6 +173,9 @@ public class CriticalPathFromRootCache
 
 	public void invalidate(String path)
 	{
+		if (path.charAt(0) != SEPARATOR)
+			throw new RuntimeException("this cache operates only on absolute paths, but got: " + path);
+
 		int tier = calculateTier(path);
 		// bail if we don't even cache at that level.
 		if (!appropriateDepth(tier))
@@ -187,7 +191,7 @@ public class CriticalPathFromRootCache
 		// bail if we don't even cache at this level.
 		if (!appropriateDepth(tier))
 			return;
-
+		_logger.debug("adding path at tier " + tier + ": " + newPath);
 		PathsOnTier tierRecord = tierRecords.get(tier);
 		tierRecord.addPath(newPath.pwd(), newPath);
 	}
@@ -252,18 +256,21 @@ public class CriticalPathFromRootCache
 			slashesFound++;
 		}
 		_logger.debug("calculated tier depth of " + slashesFound + " for path " + path);
-		
+
 		return slashesFound;
 	}
 
 	public RNSPath lookupPath(String path, RNSPathQueryFlags queryFlag) throws RNSPathDoesNotExistException,
 		RNSPathAlreadyExistsException
 	{
+		if (path.charAt(0) != SEPARATOR)
+			throw new RuntimeException("this cache operates only on absolute paths, but got: " + path);
 		int tier = calculateTier(path);
 		// bail if we don't even cache at this level, but still return the path object.
 		if (!appropriateDepth(tier)) {
 			return RNSPath.getCurrent().lookupNoCaching(path, queryFlag);
 		}
+		_logger.debug("attempt finding path at tier " + tier + ": " + path);
 		PathsOnTier tierRecord = tierRecords.get(tier);
 		return tierRecord.findPath(path);
 	}

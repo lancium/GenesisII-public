@@ -7,11 +7,12 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 
-public class SudoExportUtils {
+public class SudoExportUtils
+{
 
-	
-	private static String extractUsernameFromCallingContext() throws IOException{
-		
+	private static String extractUsernameFromCallingContext() throws IOException
+	{
+
 		// ** First get the calling context
 		ICallingContext callContext = ContextManager.getExistingContext();
 
@@ -27,34 +28,36 @@ public class SudoExportUtils {
 			// days, but maybe not in future
 			userName = Wallet.getFirstUserName();
 		}
-		
+
 		return userName;
 	}
 
 	/**
-	 * This function extracts the first username from calling context
-	 * and then looks at the gridmap file to return the corresponding
-	 * local username
+	 * This function extracts the first username from calling context and then looks at the gridmap
+	 * file to return the corresponding local username
+	 * 
 	 * @return
 	 * @throws IOException
 	 */
-	public static String getLocalUser() throws IOException{
+	public static String getLocalUser() throws IOException
+	{
 		String cc_uname = extractUsernameFromCallingContext();
-		if(cc_uname == null) {
+		if (cc_uname == null) {
 			return null;
 		}
-		
+
 		return (doGridMapping(cc_uname));
 	}
 
 	/**
-	 * This function must be augmented in the future to 
-	 * return the local username given the username from
-	 * the calling context
+	 * This function must be augmented in the future to return the local username given the username
+	 * from the calling context
+	 * 
 	 * @param cc_uname
 	 * @return
 	 */
-	public static String doGridMapping(String cc_uname) {
+	public static String doGridMapping(String cc_uname)
+	{
 		return "guest1";
 	}
 }

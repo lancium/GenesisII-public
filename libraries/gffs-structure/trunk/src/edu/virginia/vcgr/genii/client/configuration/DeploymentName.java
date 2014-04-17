@@ -43,7 +43,7 @@ public class DeploymentName
 		// cak: made the environment variable preeminent.
 		if (deploymentName == null)
 			deploymentName = System.getProperty(DEPLOYMENT_NAME_PROPERTY);
-		
+
 		if (deploymentName != null)
 			return deploymentName;
 

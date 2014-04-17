@@ -294,8 +294,9 @@ public class CacheManager
 				}
 			}
 		}
-		_logger.warn("could not find an appropriate cache for key '" + cacheKey.toString() + "' type "
-			+ typeOfItem.getCanonicalName() + ", coming from: " + ProgramTools.showLastFewOnStack(20));
+		if (_logger.isTraceEnabled())
+			_logger.trace("could not find an appropriate cache for key '" + cacheKey.toString() + "' type "
+				+ typeOfItem.getCanonicalName() + ", coming from: " + ProgramTools.showLastFewOnStack(20));
 		return null;
 	}
 }

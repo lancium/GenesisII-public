@@ -32,8 +32,9 @@ public class DefaultSingleResourcePropertyTranslator implements SingleResourcePr
 			_logger.error("provided class type in clazz is null.");
 			return null;
 		}
-		_logger.debug("deserializing type " + clazz.getCanonicalName() + " from elem real type "
-			+ element.getClass().getCanonicalName());
+		if (_logger.isTraceEnabled())
+			_logger.trace("deserializing type " + clazz.getCanonicalName() + " from elem real type "
+				+ element.getClass().getCanonicalName());
 		try {
 			Object ob = ObjectDeserializer.toObject(element, clazz);
 			if (ob == null) {
@@ -41,9 +42,11 @@ public class DefaultSingleResourcePropertyTranslator implements SingleResourcePr
 					+ element.getClass().getCanonicalName());
 				return null;
 			}
-			_logger.debug("object type deserialized: " + ob.getClass().getCanonicalName());
+			if (_logger.isTraceEnabled())
+				_logger.trace("object type deserialized: " + ob.getClass().getCanonicalName());
 			Type toReturn = clazz.cast(ob);
-			_logger.debug("...now returning type " + toReturn.getClass().getCanonicalName());
+			if (_logger.isTraceEnabled())
+				_logger.trace("...now returning type " + toReturn.getClass().getCanonicalName());
 			return toReturn;
 		} catch (ResourceException re) {
 			String msg =

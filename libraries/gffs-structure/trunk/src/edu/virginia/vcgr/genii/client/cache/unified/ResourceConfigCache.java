@@ -80,7 +80,8 @@ public class ResourceConfigCache extends CommonCache
 			_logger.error(msg);
 			throw new RuntimeException(msg);
 		}
-		_logger.debug("caching object of type " + value.getClass().getCanonicalName());
+		if (_logger.isTraceEnabled())
+			_logger.trace("caching object of type " + value.getClass().getCanonicalName());
 		WSResourceConfig newResourceConfig = (WSResourceConfig) value;
 		long lifetime = Math.max(cacheLifeTime, newResourceConfig.getMillisecondTimeLeftToCallbackExpiry());
 		TimedOutLRUCache<String, WSResourceConfig> cache =
@@ -216,12 +217,12 @@ public class ResourceConfigCache extends CommonCache
 		} else {
 			String searchedIdentifier = null;
 
-			// Instead of directly iterating over the keySet of the cache we replicate the keySet
-			// into
-			// another set and iterate over that. This is done to avoid misbehavior of the iterator
-			// due
-			// to the concurrent update made by the cache itself inside the cache.get(argument)
-			// method.
+			/*
+			 * Instead of directly iterating over the keySet of the cache we replicate the keySet
+			 * into another set and iterate over that. This is done to avoid misbehavior of the
+			 * iterator due to the concurrent update made by the cache itself inside the
+			 * cache.get(argument) method.
+			 */
 			final Set<String> cachedKeys = new HashSet<String>(cache.keySet());
 
 			for (String primaryIdentifier : cachedKeys) {

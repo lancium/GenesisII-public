@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Processing for the inputfile.txt which turns the variables listed in the
-# config file into exported variables in the environment.
+# Processes the XSEDE tools config file to turn variables listed in the
+# file into exported variables in the environment.
 #
 # Author: Chris Koeritz
 
@@ -42,7 +42,7 @@ define_and_export_variables()
         echo "export" $line >> $TEST_TEMP/env_file
       fi
     fi
-  done < "$PARAMETER_FILE"
+  done < "$XSEDE_TOOLS_CONFIG_FILE"
 
   # now run the environment file to add those settings to our environment.
   chmod +x $TEST_TEMP/env_file
@@ -97,7 +97,7 @@ define_and_export_variables()
       echo "by the GENII_INSTALL_DIR environment variable, which is currently defined as:"
       echo "  '$GENII_INSTALL_DIR'"
       echo "Please ensure that GenesisII is installed and that the GENII_INSTALL_DIR in"
-      echo "  '$XSEDE_TEST_ROOT/inputfile.txt'"
+      echo "  '$XSEDE_TOOLS_CONFIG_FILE'"
       echo "is correctly defined for the installation path."
       return 1
     fi

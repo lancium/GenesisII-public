@@ -134,7 +134,7 @@ public class ObjectSerializer
 			}
 		}
 
-		MessageElement messageElement = (MessageElement)toSOAPElement(obj, name, nillable);
+		MessageElement messageElement = (MessageElement) toSOAPElement(obj, name, nillable);
 		try {
 			return AnyHelper.toElement(messageElement);
 		} catch (Exception e) {
@@ -154,7 +154,7 @@ public class ObjectSerializer
 
 	public static String toString(Object obj, QName name, boolean nillable) throws ResourceException
 	{
-		MessageElement messageElement = (MessageElement)toSOAPElement(obj, name, nillable);
+		MessageElement messageElement = (MessageElement) toSOAPElement(obj, name, nillable);
 		try {
 			return AnyHelper.toString(messageElement);
 		} catch (Exception e) {
@@ -175,7 +175,7 @@ public class ObjectSerializer
 			return;
 		}
 		try {
-			AnyHelper.write(writer, (MessageElement)soapElement);
+			AnyHelper.write(writer, (MessageElement) soapElement);
 		} catch (Exception e) {
 			throw new ResourceException("Generic Serialization Error.", e);
 		}

@@ -22,7 +22,7 @@ oneTimeSetUp()
 testCopyEmptyDirectory()
 {
   mkdir ./zorba
-  cp ./README ./zorba
+  cp ./rnsBearTrap.sh ./zorba
   mkdir ./zorba/fruvil  # empty dir
   grid mkdir $RNSPATH/q
   assertEquals "making grid temporary dir should work" 0 $?
@@ -158,7 +158,7 @@ testSimpleLocalRemoval()
   assertEquals "remove same local directory" 0 $?
   grid mkdir $localpath/r
   assertEquals "make one local directory" 0 $?
-  grid cp local:./README $localpath/r/gumboot
+  grid cp local:./rnsBearTrap.sh $localpath/r/gumboot
   assertEquals "copy file into that local directory" 0 $?
   grid rm $localpath/r
   assertNotEquals "should not remove local directory with contents" 0 $?
@@ -176,7 +176,7 @@ testSimpleGridRemoval()
   assertEquals "remove same rns directory" 0 $?
   grid mkdir $RNSPATH/r
   assertEquals "make one rns directory" 0 $?
-  grid cp local:./README $RNSPATH/r/gumboot
+  grid cp local:./rnsBearTrap.sh $RNSPATH/r/gumboot
   assertEquals "copy file into that rns directory" 0 $?
   grid rm $RNSPATH/r
   assertNotEquals "should not remove rns directory with contents" 0 $?
@@ -193,7 +193,7 @@ testSimpleCopyToGrid()
   pushd garp &>/dev/null
   mkdir froon
   pushd froon &>/dev/null
-  cp ../../README razmo
+  cp ../../rnsBearTrap.sh razmo
   popd &>/dev/null; popd &>/dev/null
 
   grid cp -r local:./garp $RNSPATH

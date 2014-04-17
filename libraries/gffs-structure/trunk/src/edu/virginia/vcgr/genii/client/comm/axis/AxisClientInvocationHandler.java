@@ -49,7 +49,6 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
 import edu.virginia.vcgr.appmgr.version.Version;
-import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
@@ -417,19 +416,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		return _manager;
 	}
 
-	// tracks re-entry / recursion in invoke.
-	private static Integer inInvokeMethod = new Integer(0);
-
 	@Override
 	public Object invoke(Object target, Method m, Object[] params) throws Throwable
 	{
 		Object toReturn = null;
-		synchronized (inInvokeMethod) {
-			inInvokeMethod++;
-			if (inInvokeMethod > 1) {
-				_logger.debug("client invoke recursion level now at " + inInvokeMethod + ".");
-			}
-		}
 		try {
 			InvocationInterceptorManager mgr = getManager();
 			toReturn = mgr.invoke(getTargetEPR(), _callContext, this, m, params);
@@ -451,13 +441,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				_logger.error(msg, t);
 			}
 			throw t;
-		} finally {
-			synchronized (inInvokeMethod) {
-				inInvokeMethod--;
-				if (inInvokeMethod < 0) {
-					_logger.error("logic error; invoke tracker is at erroneous value!!: " + ProgramTools.showLastFewOnStack(7));
-				}
-			}
 		}
 		return toReturn;
 	}

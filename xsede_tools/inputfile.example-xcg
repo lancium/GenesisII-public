@@ -1,7 +1,7 @@
-# This is an example of "inputfile.txt", which provides configuration options
-# for the XSEDE tests.  For more information, see the GenesisII Omnibus for
-# the section called "The XSEDE Tests and GenesisII Testing" (at the website
-# http://genesis2.virginia.edu/wiki/Main/Documentation ).
+# This is an example of the configuration file for the XSEDE tests and tools.
+# For more information, refer to the Genesis II Omnibus reference's XSEDE
+# tests section:
+# http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm
 
 ##############
 

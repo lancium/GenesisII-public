@@ -65,6 +65,8 @@ public class RNSPath implements Serializable, Cloneable
 
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
 
+	static public char SEPARATOR = '/';
+
 	private static CriticalPathFromRootCache _rnsCacher = new CriticalPathFromRootCache();
 	// hmmm: deploy this differently when it supports commoncache interface
 
@@ -484,7 +486,13 @@ public class RNSPath implements Serializable, Cloneable
 	public RNSPath lookup(String path)
 	{
 		try {
-			return _rnsCacher.lookupPath(path, RNSPathQueryFlags.DONT_CARE);
+			String pathChewed = path;
+			if (path.charAt(0) != SEPARATOR) {
+				pathChewed = pwd() + SEPARATOR + path;
+			}
+			if (_logger.isDebugEnabled())
+				_logger.debug("looking up path: " + pathChewed);
+			return _rnsCacher.lookupPath(pathChewed, RNSPathQueryFlags.DONT_CARE);
 		} catch (RNSPathDoesNotExistException e) {
 			_logger.error("unexpected exception: " + e.getLocalizedMessage(), e);
 		} catch (RNSPathAlreadyExistsException e) {
@@ -500,7 +508,11 @@ public class RNSPath implements Serializable, Cloneable
 	public RNSPath lookup(String path, RNSPathQueryFlags queryFlag) throws RNSPathDoesNotExistException,
 		RNSPathAlreadyExistsException
 	{
-		return _rnsCacher.lookupPath(path, queryFlag);
+		String pathChewed = path;
+		if (path.charAt(0) != SEPARATOR) {
+			pathChewed = pwd() + SEPARATOR + path;
+		}
+		return _rnsCacher.lookupPath(pathChewed, queryFlag);
 	}
 
 	/**

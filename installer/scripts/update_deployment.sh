@@ -20,7 +20,13 @@ export LOCAL_CERTS_DIR="$GENII_USER_DIR/certs"
 
 # make sure we support using an altered deployment if that is configured.
 if [ -z "$GENII_DEPLOYMENT_DIR" ]; then
-  export GENII_DEPLOYMENT_DIR="$GENII_INSTALL_DIR/deployments"
+  if [ -d "$GENII_USER_DIR/deployments" ]; then
+    # use the personalized deployments folder in the state dir.
+    export GENII_DEPLOYMENT_DIR="$GENII_USER_DIR/deployments"
+  else
+    # fall back to the default.
+    export GENII_DEPLOYMENT_DIR="$GENII_INSTALL_DIR/deployments"
+  fi
 fi
 
 ##############
@@ -29,8 +35,7 @@ function print_instructions()
 {
   echo "This script can update a Genesis II GFFS container to use a different"
   echo "or newer deployment.  Updating to a newer deployment for the same exact grid"
-  echo "is the most common scenario; in this case, only the trust store and grid"
-  echo "certificates are synchronized.  If the deployment is for a totally different"
+  echo "is the most common scenario.  If the deployment is for a totally different"
   echo "grid, then updating to the new deployment is only appropriate when the"
   echo "container has no existing configuration and no links within the old"
   echo "deployment's grid; this is typically only done at the start of a container's"
@@ -39,7 +44,7 @@ function print_instructions()
   echo "Configuration type of container configuration."
   echo
   echo "The script requires that the GENII_INSTALL_DIR and GENII_USER_DIR are"
-  echo "established as environment variables prior to converting the container."
+  echo "established as environment variables prior to updating the container."
   echo "Those variables should be set and made persistent for the user account, or"
   echo "there will be problems finding the right settings to run the container."
   echo "This can be accomplished by, for example, adding the variables to ~/.profile"
@@ -48,11 +53,12 @@ function print_instructions()
   echo "For this script, the GENII_INSTALL_DIR should point at the newer"
   echo "installation that has been installed (either interactive or RPM/DEB)."
   echo
-  echo "The script requires the name of the deployment folder and the location of the"
+  echo "The script requires the name of the deployment folder and the name of the"
   echo "grid's context file as parameters.  The deployment name must exist under the"
-  echo "folder at '\$GENII_DEPLOYMENT_DIR' or (if that variable is not set) under the"
-  echo "folder at '\$GENII_INSTALL_DIR/deployments'.  It is okay if the deployment"
-  echo "name or context file has not changed.  The script synchronizes the specified"
+  echo "folder at '\$GENII_DEPLOYMENT_DIR' or under '\$GENII_USER_DIR/deployments',"
+  echo "or in '\$GENII_INSTALL_DIR/deployments'.  It is okay if the deployment"
+  echo "name or context file has not changed.  The context file must exist under"
+  echo "the named deployment folder.  The script synchronizes the specified"
   echo "deployment directory with the container's existing Unified Configuration."
   echo "For example:"
   echo
@@ -190,13 +196,13 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.de
 
 # fix the default deployment if there's a deployments folder in state dir.
 if [ -d "$GENII_USER_DIR/deployments" ]; then
-  save_def="$(mktemp "$GENII_USER_DIR/deployments/old-default.XXXXXX")"
+  save_def="$(mktemp -d "$GENII_USER_DIR/deployments/old-default.XXXXXX")"
   mv "$GENII_USER_DIR/deployments/default" "$save_def"
   if [ $? -ne 0 ]; then
     echo "Moving the old deployment's default folder out of the way failed."
     exit 1
   fi
-  cp -R "$GENII_DEPLOYMENT_DIR/default" "$GENII_USER_DIR/deployments/default"
+  cp -R "$GENII_INSTALL_DIR/deployments/default" "$GENII_USER_DIR/deployments/default"
   if [ $? -ne 0 ]; then
     echo "Copying newer default deployment into place failed."
     exit 1

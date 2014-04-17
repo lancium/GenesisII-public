@@ -27,7 +27,7 @@ public class Version implements Comparable<Version>
 	{
 		parseString(str);
 	}
-	
+
 	public void parseString(String verString)
 	{
 		Matcher matcher = VERSION_PATTERN.matcher(verString);
@@ -54,7 +54,7 @@ public class Version implements Comparable<Version>
 			throw new RuntimeException("failure to parse version from file: " + propFile, t);
 		}
 	}
-	
+
 	public boolean equals(Version other)
 	{
 		return compareTo(other) == 0;

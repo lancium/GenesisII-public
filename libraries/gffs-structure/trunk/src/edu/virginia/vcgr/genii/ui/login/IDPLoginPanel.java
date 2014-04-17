@@ -99,7 +99,7 @@ final class IDPLoginPanel extends LoginPanel
 
 				// try to leave the user in the right current directory.
 				// Changed by ASAG March 6, 2014
-				//LoginTool.jumpToUserHomeIfExists(_username.getText());
+				// LoginTool.jumpToUserHomeIfExists(_username.getText());
 				{
 					// Assumption is that user idp's are off /user and homes off /home
 					String userHome = path.getName().replaceFirst("user", "home");
@@ -108,7 +108,6 @@ final class IDPLoginPanel extends LoginPanel
 					} catch (Throwable e) {
 					}
 				}
-
 
 				return creds;
 			} finally {

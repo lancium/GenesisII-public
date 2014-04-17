@@ -60,8 +60,8 @@ create_jsdl_from_templates()
       if [ -z "$CYGWIN_BIN_PATH" ]; then
         echo The cygwin binary path is not defined.  On windows, this is required
         echo to patch the JSDL files so that the BES can find the cygwin binaries.
-        echo In inputfile.txt, please add the CYGWIN_BIN_PATH variable with a value
-        echo of the Cygwin tools bin directory.
+        echo In the XSEDE tools config file, please set the CYGWIN_BIN_PATH
+        echo variable to the Cygwin tools bin directory.
         exit 1
       fi
 #echo unmod path=$CYGWIN_BIN_PATH

@@ -15,124 +15,133 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 /**
  * This class contains all attributes of a stat operation
  */
-public class StatAttributes implements Serializable{
+public class StatAttributes implements Serializable
+{
 
-    private String _fileName;
-    private long _lastAccessTime; //in ms since epoch
-    private long _lastModifiedTime; // in ms 
-    private long _size;
-    private PathType _type;
-    
-    private static final long serialVersionUID = 1L;
+	private String _fileName;
+	private long _lastAccessTime; // in ms since epoch
+	private long _lastModifiedTime; // in ms
+	private long _size;
+	private PathType _type;
 
-    public StatAttributes(String fileName, FileTime lastAccessTime,
-            FileTime lastModifiedTime, long size, PathType type) {
-        _fileName = fileName;
-        _lastAccessTime = lastAccessTime.toMillis();
-        _lastModifiedTime = lastModifiedTime.toMillis();
-        _size = size;
-        _type = type;
-    }
+	private static final long serialVersionUID = 1L;
 
-    public String getFileName() {
-        return _fileName;
-    }
+	public StatAttributes(String fileName, FileTime lastAccessTime, FileTime lastModifiedTime, long size, PathType type)
+	{
+		_fileName = fileName;
+		_lastAccessTime = lastAccessTime.toMillis();
+		_lastModifiedTime = lastModifiedTime.toMillis();
+		_size = size;
+		_type = type;
+	}
 
-    public long getLastAccessTime() {
-        return _lastAccessTime;
-    }
+	public String getFileName()
+	{
+		return _fileName;
+	}
 
-    public long getLastModifiedTime() {
-        return _lastModifiedTime;
-    }
+	public long getLastAccessTime()
+	{
+		return _lastAccessTime;
+	}
 
-    public long getSize() {
-        return _size;
-    }
+	public long getLastModifiedTime()
+	{
+		return _lastModifiedTime;
+	}
 
-    public PathType getType() {
-        return _type;
-    }
+	public long getSize()
+	{
+		return _size;
+	}
 
-    public byte[] serialize() {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutput out = null;
-        byte[] serializedBuf = null;
-        try {
-            out = new ObjectOutputStream(bos);   
-            out.writeObject(this);
-            serializedBuf = bos.toByteArray();
-            return serializedBuf;
-        } catch (IOException e) {
-            return null;
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-            try {
-                bos.close();
-            } catch (IOException ex) {
-                // ignore close exception
-            }
-        }
-    }
+	public PathType getType()
+	{
+		return _type;
+	}
 
-    public static StatAttributes deserialize(byte[] response) {
-        if (response == null) {
-            return null;
-        }
+	public byte[] serialize()
+	{
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutput out = null;
+		byte[] serializedBuf = null;
+		try {
+			out = new ObjectOutputStream(bos);
+			out.writeObject(this);
+			serializedBuf = bos.toByteArray();
+			return serializedBuf;
+		} catch (IOException e) {
+			return null;
+		} finally {
+			try {
+				if (out != null) {
+					out.close();
+				}
+			} catch (IOException ex) {
+				// ignore close exception
+			}
+			try {
+				bos.close();
+			} catch (IOException ex) {
+				// ignore close exception
+			}
+		}
+	}
 
-        ByteArrayInputStream bis = new ByteArrayInputStream(response);
-        ObjectInput in = null;
-        try {
-            in = new ObjectInputStream(bis);
-            StatAttributes obj = (StatAttributes)in.readObject();
-            return obj;
-        } catch (ClassNotFoundException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
-        } finally {
-            try {
-                bis.close();
-            } catch (IOException ex) {
-            }
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ex) {
-            }
-        }
+	public static StatAttributes deserialize(byte[] response)
+	{
+		if (response == null) {
+			return null;
+		}
 
-    }
-    
-    public String toString() {
-        
-        StringBuilder sb = new StringBuilder();
-        sb.append(_fileName);
-        sb.append(",");
-        sb.append(_lastAccessTime);
-        sb.append(",");
-        sb.append(_lastModifiedTime);
-        sb.append(",");
-        sb.append(_size);
-        sb.append(",");
-        if (_type == PathType.FILE) {
-            sb.append("f");
-        } else if (_type == PathType.DIRECTORY) {
-            sb.append("d");
-        } else if (_type == PathType.LINK){
-            sb.append("l");
-        } else {
-            sb.append("o");
-        }
+		ByteArrayInputStream bis = new ByteArrayInputStream(response);
+		ObjectInput in = null;
+		try {
+			in = new ObjectInputStream(bis);
+			StatAttributes obj = (StatAttributes) in.readObject();
+			return obj;
+		} catch (ClassNotFoundException e) {
+			return null;
+		} catch (IOException e) {
+			return null;
+		} finally {
+			try {
+				bis.close();
+			} catch (IOException ex) {
+			}
+			try {
+				if (in != null) {
+					in.close();
+				}
+			} catch (IOException ex) {
+			}
+		}
 
-        return sb.toString();
-    }
-    
+	}
+
+	public String toString()
+	{
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(_fileName);
+		sb.append(",");
+		sb.append(_lastAccessTime);
+		sb.append(",");
+		sb.append(_lastModifiedTime);
+		sb.append(",");
+		sb.append(_size);
+		sb.append(",");
+		if (_type == PathType.FILE) {
+			sb.append("f");
+		} else if (_type == PathType.DIRECTORY) {
+			sb.append("d");
+		} else if (_type == PathType.LINK) {
+			sb.append("l");
+		} else {
+			sb.append("o");
+		}
+
+		return sb.toString();
+	}
+
 }

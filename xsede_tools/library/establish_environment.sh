@@ -116,10 +116,10 @@ function sanity_test_and_init()
 
 ##############
 
-# read the inputfile.txt and generate environment variables for all the entries.
+# read the config file and generate environment variables for all the entries.
 source "$XSEDE_TEST_ROOT/library/process_configuration.sh"
 define_and_export_variables
-check_if_failed Not all variables could be imported properly from the inputfile.txt.
+check_if_failed "Not all variables could be imported properly from the configuration file '$XSEDE_TOOLS_CONFIG_FILE'"
 
 ##############
 

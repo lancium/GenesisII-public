@@ -120,8 +120,8 @@ public class FilesystemManager
 						.handlerClass(), config.configurationContent()));
 				}
 
-				if (_logger.isDebugEnabled())
-					_logger.debug("constructor watching filesystem \"" + filesystemName + "\" with path "
+				if (_logger.isTraceEnabled())
+					_logger.trace("constructor watching filesystem \"" + filesystemName + "\" with path "
 						+ filesystem.filesystemRoot().getPath());
 				FilesystemWatcher watcher =
 					new FilesystemWatcher((long) watcherConfig.checkPeriod().as(DurationUnits.Milliseconds), filesystemName,
@@ -142,8 +142,8 @@ public class FilesystemManager
 		Collection<FilesystemWatchCallback> callbacks = new ArrayList<FilesystemWatchCallback>(1);
 		FilesystemWatchCallback callback = new FilesystemWatchCallback(callLimit, handler);
 		callbacks.add(callback);
-		if (_logger.isDebugEnabled())
-			_logger.debug("addWatch on filesystem " + filesystemName + " with object " + filesystem.toString());
+		if (_logger.isTraceEnabled())
+			_logger.trace("addWatch on filesystem " + filesystemName + " with object " + filesystem.toString());
 
 		FilesystemWatcher watcher =
 			new FilesystemWatcher(checkPeriodUnits.toMillis(checkPeriod), filesystemName, filesystem, filter, callbacks);

@@ -56,22 +56,23 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 				if (osName.contains("Windows")) {
 					isCompatibleOS = false;
 				} else if (osName.contains("OS X") || osName.contains("")) {
-					//linux and mac
+					// linux and mac
 					isCompatibleOS = true;
 				} else {
 					isCompatibleOS = false;
 				}
-				
+
 				if (!isCompatibleOS) {
-					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
+					throw FaultManipulator
+						.fillInFault(new ResourceCreationFaultType(null, null, null, null,
 							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Sudo export "
-									+ "unsupported on this OS") }, null));
+								+ "unsupported on this OS") }, null));
 				}
-				
+
 				if (!SudoExportedDirUtils.dirReadable(initInfo.getPath())) {
 					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
-								+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
+							+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
 				}
 			} else {
 				if (!ExportedDirUtils.dirReadable(initInfo.getPath())) {
@@ -80,7 +81,7 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 							+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
 				}
 			}
-			
+
 		} catch (IOException ioe) {
 			throw new ResourceException("Could not determine if export localpath is readable.", ioe);
 		}

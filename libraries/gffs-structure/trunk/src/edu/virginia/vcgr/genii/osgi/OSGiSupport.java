@@ -45,38 +45,39 @@ public class OSGiSupport
 		 * manually by cleaning out the storage area, but that's pretty crass. instead, we will try
 		 * to clean it out once, and if that fails, then we really do need to fail.
 		 */
-//hmmm: need to incorporate getInstallationDirectory method for lots of this.  still need to extract the drive letter on windoze.
+		// hmmm: need to incorporate getInstallationDirectory method for lots of this. still need to
+		// extract the drive letter on windoze.
 		String username = System.getProperty("user.name");
-		
+
 		String installDir = ApplicationDescription.getInstallationDirectory();
 
 		/*
-		URL url = OSGiSupport.class.getProtectionDomain().getCodeSource().getLocation();
-		File pathChow = new File(url.getPath());
-		*/
+		 * URL url = OSGiSupport.class.getProtectionDomain().getCodeSource().getLocation(); File
+		 * pathChow = new File(url.getPath());
+		 */
 		File pathChow = new File(installDir);
-		if (_logger.isDebugEnabled())
-			_logger.debug("gotta path of: " + pathChow);
+		if (_logger.isTraceEnabled())
+			_logger.trace("gotta path of: " + pathChow);
 		String justDir = pathChow.getAbsolutePath().replace('/', '-');
 		// let's not forget ugly paths windows and others might hand us.
-		//hmmm: isn't there a better way to do this?
+		// hmmm: isn't there a better way to do this?
 		justDir = justDir.replace('\\', '-');
 		justDir = justDir.replace(':', '-');
 		justDir = justDir.replace(' ', '-');
 		justDir = justDir.replace('(', '-');
 		justDir = justDir.replace(')', '-');
-		if (_logger.isDebugEnabled())
-			_logger.debug("gotta chopped path of: " + justDir);
+		if (_logger.isTraceEnabled())
+			_logger.trace("gotta chopped path of: " + justDir);
 		String tmpDir = System.getProperty("java.io.tmpdir");
 		tmpDir = tmpDir.replace('\\', '/');
 		File osgiStorageDir = new File(tmpDir + "/osgi-genII-" + username + "/" + justDir);
-		if (_logger.isDebugEnabled())
-			_logger.debug("osgi storage area is: " + osgiStorageDir.getAbsolutePath());
+		if (_logger.isTraceEnabled())
+			_logger.trace("osgi storage area is: " + osgiStorageDir.getAbsolutePath());
 		osgiStorageDir.mkdirs();
 
 		// see if we're running under eclipse or know our installation directory.
 		String bundleSourcePath = installDir + "/bundles";
-		
+
 		String saveDrive = ""; // only used for windows.
 		if (bundleSourcePath.charAt(1) == ':') {
 			// we have a dos path again, let's save the important bits.
@@ -89,52 +90,12 @@ public class OSGiSupport
 				saveDrive = bundleSourcePath.substring(0, 2);
 			}
 		}
-		
-		_logger.debug("after parsing, drive letter is '" + saveDrive + "' and path has become: " + bundleSourcePath);
-		
-		/*
-			//ApplicationDescription.getEclipseTrunkFromEnvironment();
-		String saveDrive = ""; // only used for windows.
-		if (bundleSourcePath != null) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("install-dir-based startup bundle path: " + bundleSourcePath);
-			if (bundleSourcePath.charAt(1) == ':') {
-				// we have a dos path again, let's save the important bits.
-				saveDrive = bundleSourcePath.substring(0, 2);
-			}
-		} else {
-			// okay, that was a bust. see if we can intuit our location from living in a jar.
-			bundleSourcePath = url.getPath();
-			if (_logger.isTraceEnabled())
-				_logger.trace("got source path as: " + bundleSourcePath);
-			if (bundleSourcePath.endsWith(".jar")) {
-				// we need to chop off the jar file part of the name.
-				int lastSlash = bundleSourcePath.lastIndexOf("/");
-				bundleSourcePath = bundleSourcePath.substring(0, lastSlash);
-				if (_logger.isTraceEnabled())
-					_logger.trace("truncated path since inside jar: " + bundleSourcePath);
-			}
-			if (bundleSourcePath.charAt(2) == ':') {
-				// this is most likely a DOS path.
-				if (bundleSourcePath.charAt(0) == '/') {
-					bundleSourcePath = bundleSourcePath.substring(1);
-					// keep track of the drive letter on windows.
-					saveDrive = bundleSourcePath.substring(0, 2);
-				}
-			}
-			bundleSourcePath = bundleSourcePath.concat("/..");
-			if (_logger.isDebugEnabled())
-				_logger.debug("jar-intuited startup bundle path: " + bundleSourcePath);
-		}
 
-		bundleDir = bundleSourcePath + "/bundles";
-		*/
-		
-		
+		if (_logger.isTraceEnabled())
+			_logger.trace("after parsing, drive letter is '" + saveDrive + "' and path has become: " + bundleSourcePath);
+
 		_bundleDir = bundleSourcePath;
 		if (saveDrive.length() > 0) {
-			// concatenate drive letter if we had figured that out.
-//old			_bundleDir = saveDrive + _bundleDir;
 			// on windows we must make the case identical or eclipse has all sorts of problems from
 			// mismatches.
 			_bundleDir = _bundleDir.toLowerCase();
@@ -149,8 +110,8 @@ public class OSGiSupport
 		config.put(Constants.FRAMEWORK_STORAGE_CLEAN, "false");
 
 		config.put("osgi.install.area", _bundleDir);
-		if (_logger.isDebugEnabled())
-			_logger.debug("using bundle source at: " + _bundleDir);
+		if (_logger.isTraceEnabled())
+			_logger.trace("using bundle source at: " + _bundleDir);
 
 		/*
 		 * could enable this if we want a remote console to manage OSGi: config.put("osgi.console",
