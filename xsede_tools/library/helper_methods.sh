@@ -137,18 +137,18 @@ fan_out_directories()
 function test_fuse_mount()
 {
   local mount_point="$1"; shift
-  local trunc_mount="$(basename "$(dirname $mount_point)")/$(basename "$mount_point")"
+  local trunc_mount="$(basename "$(dirname $mount_point)").$(basename "$mount_point")"
 
   checkMount="$(mount)"
-#echo checkmount is: $checkMount
-#echo mount point seeking is: $trunc_mount
+#echo "checkmount is: '$checkMount'"
+#echo "mount point seeking is: '$trunc_mount'"
   retval=1
-  if [[ "$checkMount" =~ .*$trunc_mount* ]]; then retval=0; fi
+  if [[ "$checkMount" =~ .*$trunc_mount.* ]]; then retval=0; fi
   if [ $retval -ne 0 ]; then
     echo "Finding mount point '$trunc_mount' failed."
     return 1
   fi
-  ls -l "$MOUNT_POINT" &>/dev/null
+  ls -l "$mount_point" &>/dev/null
   return $?
 }
 
