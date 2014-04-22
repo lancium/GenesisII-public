@@ -53,20 +53,21 @@ function links_supported()
   return $retval
 }
 
-# Create a test directory "testDir" with $1 subdirectories, each with
-# $2 subdirs, each with $3 files.
+# Create a test directory (in the first parameter) with $2 subdirectories,
+# each with $3 subdirs, each with $4 files.
 fan_out_directories()
 {
+  local dir_name="$1"; shift
   local top_count=$1; shift
   local mid_count=$1; shift
   local file_count=$1; shift
-  mkdir testDir
+  mkdir "$dir_name"
   for (( di=0 ; di<$top_count ; di++ )); do
-    mkdir testDir/sub$di
+    mkdir "$dir_name"/sub$di
     for (( dj=0 ; dj<$mid_count ; dj++ )); do
-      mkdir testDir/sub$di/sub$dj
+      mkdir "$dir_name"/sub$di/sub$dj
       for (( dk=0 ; dk<$file_count ; dk++ )); do
-        echo "file $di$dj$dk" > testDir/sub$di/sub$dj/file$di$dj$dk
+        echo "file $di$dj$dk" > "$dir_name"/sub$di/sub$dj/file$di$dj$dk
       done
     done
   done

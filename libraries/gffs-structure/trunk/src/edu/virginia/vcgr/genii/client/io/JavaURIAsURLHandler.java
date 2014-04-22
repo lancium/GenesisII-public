@@ -38,7 +38,8 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 
 	public boolean canWrite(String protocol)
 	{
-		if ((protocol != null) && protocol.equals("ftp"))
+		if (protocol != null)
+			//CAK: enabling http and https writes. && protocol.equals("ftp"))
 			return true;
 
 		return false;
