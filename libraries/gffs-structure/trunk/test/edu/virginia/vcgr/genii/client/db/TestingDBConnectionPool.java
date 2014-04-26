@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.db;
+package edu.virginia.vcgr.genii.client.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +9,8 @@ import java.util.Properties;
 import org.junit.Test;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
+
+import edu.virginia.vcgr.genii.client.db.NotTheServerDatabaseConnectionPool;
 
 // hmmm: this test class needs to move into gffs-structure to follow database connection pool.
 public class TestingDBConnectionPool

@@ -167,7 +167,7 @@ public class XmlUtils
 		uconn.setAllowUserInteraction(false);
 		uconn.setDefaultUseCaches(false);
 		uconn.setDoInput(true);
-		uconn.setDoOutput(false);
+		uconn.setDoOutput(true);
 		uconn.setInstanceFollowRedirects(true);
 		uconn.setUseCaches(false);
 

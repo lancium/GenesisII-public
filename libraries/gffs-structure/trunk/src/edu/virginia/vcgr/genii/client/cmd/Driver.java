@@ -67,9 +67,6 @@ public class Driver extends ApplicationBase
 			System.exit(1);
 		}
 
-		// hmmm: never even knew there was an environment variable override for the deployment name.
-		// this should be unified with other ways of loading things; pretty sure we are not always
-		// handling this uniformly.
 		GridEnvironment.loadGridEnvironment();
 
 		String deploymentName = DeploymentName.figureOutDefaultDeploymentName();

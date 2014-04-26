@@ -175,7 +175,6 @@ public class ActivityState implements Serializable, Cloneable
 			anyC.add(new MessageElement(new QName(_GENII_NS, _geniiState)));
 		if (_isSuspended)
 			anyC.add(new MessageElement(_SUSPEND_STATE_ELEMENT_QNAME));
-		// hmmm: was this exactly inverted from what we were expecting? fixed sense of null check.
 		return new ActivityStatusType((anyC.size() == 0) ? null : Elementals.toArray(anyC),
 			ActivityStateEnumeration.fromValue(_besState));
 	}

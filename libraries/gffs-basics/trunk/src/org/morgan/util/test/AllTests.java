@@ -27,7 +27,6 @@ public class AllTests
 		TestSuite suite = new TestSuite("Test for org.morgan.util.test");
 		// $JUnit-BEGIN$
 		suite.addTestSuite(VersionTest.class);
-		suite.addTestSuite(VersionListTest.class);
 		suite.addTestSuite(EventTest.class);
 		suite.addTestSuite(DefaultCompleterTest.class);
 		suite.addTestSuite(StupidTest.class);

@@ -254,8 +254,6 @@ public class Container extends ApplicationBase
 
 		CacheConfigurer.disableSubscriptionBasedCaching();
 
-		// hmmm: this is doing the startup which the service deployer also does. are we sure we're
-		// not fighting with ourselves?
 		for (IServiceWithCleanupHook service : containerServiceObjects) {
 			try {
 				service.startup();

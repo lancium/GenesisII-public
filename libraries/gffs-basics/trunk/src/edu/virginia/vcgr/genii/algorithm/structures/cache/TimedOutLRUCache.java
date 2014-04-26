@@ -106,7 +106,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 
 			// reset the node's lifespan, since it's just been hit.
 			node.setInvalidationDate(_defaultTimeoutMS);
-			// hmmm: add notion of max lifespan to enforce some rollover.
+			// hmmm: perhaps add a notion of max lifespan to enforce some rollover.
 
 			_lruList.insert(node);
 

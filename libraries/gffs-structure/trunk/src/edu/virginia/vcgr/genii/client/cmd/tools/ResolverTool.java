@@ -98,8 +98,6 @@ public class ResolverTool extends BaseGridTool
 		if (_query)
 			return runQuery();
 
-		// hmmm: need to ensure we remove the item from the new CPFRC.
-
 		RNSPath current = RNSPath.getCurrent();
 		String sourcePath = getArgument(0);
 		RNSPath sourceRNS = current.lookup(sourcePath, RNSPathQueryFlags.MUST_EXIST);
@@ -157,15 +155,16 @@ public class ResolverTool extends BaseGridTool
 			dirService.insertResourceProperties(insertReq);
 		}
 		CacheManager.removeItemFromCache(sourceRNS.pwd(), EndpointReferenceType.class);
-		RNSPath.tempGetCPFRC().invalidate(sourceRNS.pwd());
 		CacheManager.putItemInCache(sourceRNS.pwd(), finalEPR);
 		if (sourceRNS.isRoot()) {
 			stdout.println("Added resolver to root directory.");
-			// Store the new EPR in the client's calling context, so this client will see a
-			// root directory with a resolver element.
-			// Using the new EPR, the root directory can be replicated, and failover will work.
-			// Other existing clients will continue using the old root EPR, which still works
-			// as the root directory, but it does not support replication or failover.
+			/*
+			 * Store the new EPR in the client's calling context, so this client will see a root
+			 * directory with a resolver element. Using the new EPR, the root directory can be
+			 * replicated, and failover will work. Other existing clients will continue using the
+			 * old root EPR, which still works as the root directory, but it does not support
+			 * replication or failover.
+			 */
 			RNSPath rootPath = new RNSPath(finalEPR);
 			String pwd = RNSPath.getCurrent().pwd();
 			RNSPath currentPath = rootPath.lookup(pwd, RNSPathQueryFlags.MUST_EXIST);

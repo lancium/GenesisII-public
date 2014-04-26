@@ -67,9 +67,6 @@ public class RNSPath implements Serializable, Cloneable
 
 	static public char SEPARATOR = '/';
 
-	private static CriticalPathFromRootCache _rnsCacher = new CriticalPathFromRootCache();
-	// hmmm: deploy this differently when it supports commoncache interface
-
 	private RNSPath _parent;
 	private String _nameFromParent;
 	private EndpointReferenceType _cachedEPR;
@@ -79,6 +76,65 @@ public class RNSPath implements Serializable, Cloneable
 	{
 		// if the apply iteration should stop, then the derived method should return false.
 		public boolean applyToPath(RNSPath applyTo) throws RNSException, AuthZSecurityException;
+	}
+
+	/**
+	 * Construct a new RNS path based off of component information. While it is permitted for users
+	 * to call this constructor directly, in general it is recommended that RNSPath instances be
+	 * obtained through other mechanisms such as calls to RNSPath.getCurrent() and by looking up
+	 * entries within other directories.
+	 * 
+	 * @param parent
+	 *            The RNSPath for the parent under which this entry exists.
+	 * @param nameFromParent
+	 *            The name that this entry has inside of the parent directory.
+	 * @param cachedEPR
+	 *            The EPR of this entry (if it has one).
+	 * @param attemptedResolve
+	 *            Should we attempt to resolve the EPR of this entry if we don't have any EPR yet.
+	 */
+	public RNSPath(RNSPath parent, String nameFromParent, EndpointReferenceType cachedEPR, boolean attemptedResolve)
+	{
+		_parent = parent;
+		_nameFromParent = nameFromParent;
+		_cachedEPR = cachedEPR;
+		_attemptedResolve = attemptedResolve;
+
+		if ((_parent == null && _nameFromParent != null) || (_parent != null && _nameFromParent == null)) {
+			throw new IllegalArgumentException("The parent and the nameFromParent parameters must either "
+				+ "both be null, or both be non-null.");
+		}
+
+		if (_parent == null && _cachedEPR == null)
+			throw new IllegalArgumentException("Cannot have a null EPR for the root.");
+
+		if (_cachedEPR == null) {
+			_cachedEPR = (EndpointReferenceType) CacheManager.getItemFromCache(pwd(), EndpointReferenceType.class);
+		}
+		if (_cachedEPR != null) {
+			_attemptedResolve = true;
+			storeResourceConfigInCache();
+		}
+
+		if (_logger.isTraceEnabled())
+			_logger.debug("++ creating RNSPath for path: " + pwd());
+	}
+
+	/**
+	 * Create a new RNSPath which represents a new rooted RNS namespace at the given EPR.
+	 * 
+	 * @param root
+	 *            The EPR which represents the root of this new namespace.
+	 */
+	public RNSPath(EndpointReferenceType root)
+	{
+		this(null, null, root, true);
+	}
+
+	public void finalize()
+	{
+		if (_logger.isTraceEnabled())
+			_logger.debug("-- cleaning RNSPath at path: " + pwd());
 	}
 
 	/**
@@ -123,12 +179,6 @@ public class RNSPath implements Serializable, Cloneable
 		return epr;
 	}
 
-	// hmmm: temporary! only needed until we make the cache based on common cache.
-	public static CriticalPathFromRootCache tempGetCPFRC()
-	{
-		return _rnsCacher;
-	}
-
 	private EndpointReferenceType resolveOptional()
 	{
 		try {
@@ -150,67 +200,6 @@ public class RNSPath implements Serializable, Cloneable
 		}
 
 		return _cachedEPR;
-	}
-
-	/**
-	 * Construct a new RNS path based off of component information. While it is permitted for users
-	 * to call this constructor directly, in general it is recommended that RNSPath instances be
-	 * obtained through other mechanisms such as calls to RNSPath.getCurrent() and by looking up
-	 * entries within other directories.
-	 * 
-	 * @param parent
-	 *            The RNSPath for the parent under which this entry exists.
-	 * @param nameFromParent
-	 *            The name that this entry has inside of the parent directory.
-	 * @param cachedEPR
-	 *            The EPR of this entry (if it has one).
-	 * @param attemptedResolve
-	 *            Should we attempt to resolve the EPR of this entry if we don't have any EPR yet.
-	 */
-	public RNSPath(RNSPath parent, String nameFromParent, EndpointReferenceType cachedEPR, boolean attemptedResolve)
-	{
-		_parent = parent;
-		_nameFromParent = nameFromParent;
-		_cachedEPR = cachedEPR;
-		_attemptedResolve = attemptedResolve;
-
-		if ((_parent == null && _nameFromParent != null) || (_parent != null && _nameFromParent == null)) {
-			throw new IllegalArgumentException("The parent and the nameFromParent parameters must either "
-				+ "both be null, or both be non-null.");
-		}
-
-		if (_parent == null && _cachedEPR == null)
-			throw new IllegalArgumentException("Cannot have a null EPR for the root.");
-
-		if (_cachedEPR == null) {
-			_cachedEPR = (EndpointReferenceType) CacheManager.getItemFromCache(pwd(), EndpointReferenceType.class);
-		}
-		if (_cachedEPR != null) {
-			_attemptedResolve = true;
-			storeResourceConfigInCache();
-		}
-
-		// hmmm: fix super noisy object creation tracing.
-		if (_logger.isDebugEnabled())
-			_logger.debug("++ creating RNSPath for path: " + pwd());
-	}
-
-	/**
-	 * Create a new RNSPath which represents a new rooted RNS namespace at the given EPR.
-	 * 
-	 * @param root
-	 *            The EPR which represents the root of this new namespace.
-	 */
-	public RNSPath(EndpointReferenceType root)
-	{
-		this(null, null, root, true);
-	}
-
-	public void finalize()
-	{
-		// hmmm: super noisy object creation tracing.
-		if (_logger.isDebugEnabled())
-			_logger.debug("-- cleaning RNSPath at path: " + pwd());
 	}
 
 	/**
@@ -486,13 +475,9 @@ public class RNSPath implements Serializable, Cloneable
 	public RNSPath lookup(String path)
 	{
 		try {
-			String pathChewed = path;
-			if (path.charAt(0) != SEPARATOR) {
-				pathChewed = pwd() + SEPARATOR + path;
-			}
 			if (_logger.isDebugEnabled())
-				_logger.debug("looking up path: " + pathChewed);
-			return _rnsCacher.lookupPath(pathChewed, RNSPathQueryFlags.DONT_CARE);
+				_logger.debug("looking up path: " + path);
+			return lookup(path, RNSPathQueryFlags.DONT_CARE);
 		} catch (RNSPathDoesNotExistException e) {
 			_logger.error("unexpected exception: " + e.getLocalizedMessage(), e);
 		} catch (RNSPathAlreadyExistsException e) {
@@ -502,26 +487,9 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * looks up the path without asking the cache about it first. this is necessary so the cache can
-	 * avoid invoking its own lookup.
+	 * the "real" lookup function, which also specifies how the path should be located.
 	 */
 	public RNSPath lookup(String path, RNSPathQueryFlags queryFlag) throws RNSPathDoesNotExistException,
-		RNSPathAlreadyExistsException
-	{
-		String pathChewed = path;
-		if (path.charAt(0) != SEPARATOR) {
-			pathChewed = pwd() + SEPARATOR + path;
-		}
-		return _rnsCacher.lookupPath(pathChewed, queryFlag);
-	}
-
-	/**
-	 * this looks up a new RNSPath entry at a given query path without asking the cache about it
-	 * first. this is necessary so the cache can avoid invoking its own lookup. This operation
-	 * however takes a flag which can specify whether or not to return directories that don't
-	 * actually exist.
-	 */
-	public RNSPath lookupNoCaching(String path, RNSPathQueryFlags queryFlag) throws RNSPathDoesNotExistException,
 		RNSPathAlreadyExistsException
 	{
 		if (path == null)
@@ -944,7 +912,6 @@ public class RNSPath implements Serializable, Cloneable
 	private void removeEPRFromCache()
 	{
 		CacheManager.removeItemFromCache(pwd(), EndpointReferenceType.class);
-		RNSPath.tempGetCPFRC().invalidate(pwd());
 	}
 
 	/*
@@ -967,7 +934,6 @@ public class RNSPath implements Serializable, Cloneable
 			CacheManager.putItemInCache(wsName.getEndpointIdentifier(), resourceConfig);
 		}
 		CacheManager.putItemInCache(pwd(), _cachedEPR);
-		tempGetCPFRC().add(this);
 	}
 
 	/**

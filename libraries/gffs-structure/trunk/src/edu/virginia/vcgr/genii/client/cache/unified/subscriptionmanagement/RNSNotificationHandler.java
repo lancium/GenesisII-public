@@ -20,7 +20,6 @@ import edu.virginia.vcgr.genii.client.fuse.MetadataManager;
 import edu.virginia.vcgr.genii.client.fuse.UnixDirectory;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSContentChangeNotification;
 import edu.virginia.vcgr.genii.client.rns.RNSOperation;
@@ -166,7 +165,6 @@ public class RNSNotificationHandler
 				// Since we could not update the directory with the received information, we are
 				// removing directory from the cache.
 				CacheManager.removeItemFromCache(rnsPathOfPublisher, UnixDirectory.class);
-				RNSPath.tempGetCPFRC().invalidate(rnsPathOfPublisher);
 			}
 		}
 	}
@@ -205,7 +203,6 @@ public class RNSNotificationHandler
 
 				String pathForEntry = DirectoryManager.getPathForDirectoryEntry(rnsPathOfPublisher, affectedEntry);
 				CacheManager.removeItemFromCache(pathForEntry, EndpointReferenceType.class);
-				RNSPath.tempGetCPFRC().invalidate(pathForEntry);
 				CacheManager.removeItemFromCache(pathForEntry, UnixDirectory.class);
 
 				// Remove the resource configuration and attributes only when the removed entry is
@@ -304,7 +301,6 @@ public class RNSNotificationHandler
 				(EndpointReferenceType) CacheManager.getItemFromCache(oldEntryPath, EndpointReferenceType.class);
 			if (entryEPR != null) {
 				CacheManager.removeItemFromCache(oldEntryPath, EndpointReferenceType.class);
-				RNSPath.tempGetCPFRC().invalidate(oldEntryPath);
 				CacheManager.putItemInCache(newEntryPath, entryEPR);
 			}
 
@@ -331,7 +327,6 @@ public class RNSNotificationHandler
 		// removing all cached directories
 		for (String rnsPathString : resourceConfig.getRnsPaths()) {
 			CacheManager.removeItemFromCache(rnsPathString, UnixDirectory.class);
-			RNSPath.tempGetCPFRC().invalidate(rnsPathString);
 		}
 
 		// set blockade flag in resource configuration so that element count and directory cache
@@ -388,7 +383,6 @@ public class RNSNotificationHandler
 				String oldDescendantPath = entry.getKey();
 				String newDescendantPath = getNewDescendantPathFromOld(oldPathForEntry, oldDescendantPath, newPathForEntry);
 				CacheManager.removeItemFromCache(oldDescendantPath, EndpointReferenceType.class);
-				RNSPath.tempGetCPFRC().invalidate(oldDescendantPath);
 				CacheManager.putItemInCache(newDescendantPath, entry.getValue());
 			}
 		}
@@ -413,7 +407,6 @@ public class RNSNotificationHandler
 				String oldDescendantPath = entry.getKey();
 				String newDescendantPath = getNewDescendantPathFromOld(oldPathForEntry, oldDescendantPath, newPathForEntry);
 				CacheManager.removeItemFromCache(oldDescendantPath, UnixDirectory.class);
-				RNSPath.tempGetCPFRC().invalidate(oldDescendantPath);
 				CacheManager.putItemInCache(newDescendantPath, entry.getValue());
 			}
 		}
@@ -430,7 +423,6 @@ public class RNSNotificationHandler
 		if (matchingEPRs != null) {
 			for (Map.Entry<String, EndpointReferenceType> entry : matchingEPRs.entrySet()) {
 				CacheManager.removeItemFromCache(entry.getKey(), EndpointReferenceType.class);
-				RNSPath.tempGetCPFRC().invalidate(entry.getKey());
 			}
 		}
 

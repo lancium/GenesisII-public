@@ -45,16 +45,8 @@ public class OSGiSupport
 		 * manually by cleaning out the storage area, but that's pretty crass. instead, we will try
 		 * to clean it out once, and if that fails, then we really do need to fail.
 		 */
-		// hmmm: need to incorporate getInstallationDirectory method for lots of this. still need to
-		// extract the drive letter on windoze.
 		String username = System.getProperty("user.name");
-
 		String installDir = ApplicationDescription.getInstallationDirectory();
-
-		/*
-		 * URL url = OSGiSupport.class.getProtectionDomain().getCodeSource().getLocation(); File
-		 * pathChow = new File(url.getPath());
-		 */
 		File pathChow = new File(installDir);
 		if (_logger.isTraceEnabled())
 			_logger.trace("gotta path of: " + pathChow);
