@@ -240,7 +240,10 @@ public class LoginTool extends BaseLoginTool
 	{
 		int numArgs = numArguments();
 		if (numArgs > 1)
-			throw new InvalidToolUsageException();
+			throw new InvalidToolUsageException("This tool takes at most one argument.");
+		
+		if ((_username == null) || (_username.length() == 0))
+			throw new InvalidToolUsageException("The username cannot be blank.");
 
 		if (_durationString != null) {
 			try {

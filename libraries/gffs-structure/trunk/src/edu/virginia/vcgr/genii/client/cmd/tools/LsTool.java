@@ -306,8 +306,7 @@ public class LsTool extends BaseGridTool
 		out.println();
 		if (isRecursive) {
 			for (String entry : subdirs) {
-				RNSPath sub = path.lookup(path.pwd() + "/" + entry);
-				// new RNSPath(path, entry, null, false);
+				RNSPath sub = new RNSPath(path, entry, null, false);
 				listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
 			}
 		}
