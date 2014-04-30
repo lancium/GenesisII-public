@@ -162,7 +162,6 @@ public class ApplicationDescription
 	 * GENII_INSTALL_DIR if set, but it also can find the running location based on jar files. this
 	 * cannot use the properties to look up the path, because this function needs to operate before
 	 * anything else is loaded (for OSGi usage).
-	 * @return
 	 */
 	static public String getInstallationDirectory()
 	{

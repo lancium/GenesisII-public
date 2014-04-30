@@ -875,8 +875,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 		_logger.info("Initializing service: " + getClass().getName());
 
-		/* hmmm: this is the dog-slow place. what part of it is so slow?
-		 add printouts of millisecs elapsed. */
+		/*
+		 * hmmm: this is the dog-slow place. what part of it is so slow? add printouts of millisecs
+		 * elapsed.
+		 */
 
 		ResourceKey rKey = null;
 

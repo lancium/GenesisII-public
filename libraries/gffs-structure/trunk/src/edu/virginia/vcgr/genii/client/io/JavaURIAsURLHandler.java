@@ -16,15 +16,28 @@ package edu.virginia.vcgr.genii.client.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.HashMap;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandler
 {
+	static private Log _logger = LogFactory.getLog(JavaURIAsURLHandler.class);
+
 	static private final String[] _HANDLED_PROTOCOLS = new String[] { "http", "https", "ftp" };
+
+	// tracks http and https connections to allow proper closure on stage-out.
+	// hmmm: public member=not good; make this supported by a couple functions, maybe even move to
+	// own class.
+	public static HashMap<URI, HttpURLConnection> activeConns = new HashMap<URI, HttpURLConnection>();
 
 	public String[] getHandledProtocols()
 	{
@@ -39,9 +52,7 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 	public boolean canWrite(String protocol)
 	{
 		if (protocol != null)
-			//CAK: enabling http and https writes. && protocol.equals("ftp"))
 			return true;
-
 		return false;
 	}
 
@@ -75,7 +86,19 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 	{
 		try {
 			URL url = swizzleURICredentials(uri, credential).toURL();
-			return url.openConnection().getOutputStream();
+			if (_logger.isTraceEnabled())
+				_logger.trace("seeing an output url of: " + url);
+			URLConnection conn = url.openConnection();
+			if (conn instanceof HttpURLConnection) {
+				HttpURLConnection hconn = (HttpURLConnection) conn;
+				hconn.setDoOutput(true);
+				hconn.setRequestMethod("PUT");
+				activeConns.put(uri, hconn);
+			} else {
+				conn.setDoOutput(true);
+			}
+			conn.connect();
+			return conn.getOutputStream();
 		} catch (URISyntaxException use) {
 			throw new IOException("Unable to parse URI.", use);
 		}
@@ -87,7 +110,6 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 			if (proto.equals(protocol))
 				return true;
 		}
-
 		return false;
 	}
 }

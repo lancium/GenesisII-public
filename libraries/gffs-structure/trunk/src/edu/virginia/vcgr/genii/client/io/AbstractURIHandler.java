@@ -7,9 +7,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Random;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.DataTransferStatistics;
 import org.morgan.util.io.StreamUtils;
 
@@ -17,6 +20,8 @@ import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIde
 
 public abstract class AbstractURIHandler implements IURIHandler
 {
+	static private Log _logger = LogFactory.getLog(AbstractURIHandler.class);
+
 	static public final int NUM_RETRIES = 5;
 	static public final long BACKOFF = 8000L;
 
@@ -106,7 +111,18 @@ public abstract class AbstractURIHandler implements IURIHandler
 		try {
 			fin = new FileInputStream(source);
 			out = openOutputStream(target, credential);
-			return StreamUtils.copyStream(fin, out);
+
+			DataTransferStatistics toReturn = StreamUtils.copyStream(fin, out);
+			HttpURLConnection conn = JavaURIAsURLHandler.activeConns.get(target);
+			if (conn != null) {
+				String msg = conn.getResponseMessage();
+				_logger.debug("web server response: " + msg);
+				// disconnect so everything is flushed and completed.
+				conn.disconnect();
+				// clean out the connection info.
+				JavaURIAsURLHandler.activeConns.remove(target);
+			}
+			return toReturn;
 		} finally {
 			StreamUtils.close(fin);
 			StreamUtils.close(out);

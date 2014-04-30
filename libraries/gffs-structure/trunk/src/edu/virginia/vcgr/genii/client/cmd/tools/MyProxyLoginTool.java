@@ -49,10 +49,10 @@ public class MyProxyLoginTool extends BaseLoginTool
 	static public final String MYPROXY_HOST_PROP = "edu.virginia.vcgr.genii.client.myproxy.host";
 	static public final String MYPROXY_LIFETIME_PROP = "edu.virginia.vcgr.genii.client.myproxy.lifetime";
 
-	private String _host=null;
-	private Integer _port=0;
-	private Boolean _myProxyHost=false;
-		
+	private String _host = null;
+	private Integer _port = 0;
+	private Boolean _myProxyHost = false;
+
 	protected MyProxyLoginTool(String description, String usage, boolean isHidden)
 	{
 		super(description, usage, isHidden);
@@ -63,22 +63,23 @@ public class MyProxyLoginTool extends BaseLoginTool
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		overrideCategory(ToolCategory.SECURITY);
 	}
-	
-	@Option({ "host" , "h"})
+
+	@Option({ "host", "h" })
 	public void setName(String host)
 	{
 		_host = host;
-		_myProxyHost=true;
+		_myProxyHost = true;
 	}
+
 	@Option({ "port", "p" })
 	public void setPort(String port)
 	{
 		_port = Integer.parseInt(port);
 	}
-	
+
 	@Override
 	protected void verify() throws ToolException
-	{		
+	{
 		if ((_username == null) || (_username.length() == 0))
 			throw new InvalidToolUsageException("The username cannot be blank.");
 
@@ -115,7 +116,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 		mp.setPort(port);
 		mp.setHost(host);
-		if(_myProxyHost && (_port!=0)) {
+		if (_myProxyHost && (_port != 0)) {
 			mp.setPort(_port);
 			mp.setHost(_host);
 		}

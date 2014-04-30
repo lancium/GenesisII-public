@@ -350,12 +350,12 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("fast lookup(%s)", Arrays.toString(lookupRequest)));
 
-		// ASG 2014-03-25 Here is where we will put the code to check if an implicit 
+		// ASG 2014-03-25 Here is where we will put the code to check if an implicit
 		// parameter has been passed in the SOAP header, and if so, not include the EPR
 		// in the response entry, but include the EPI as Metadata.
 		// This same change will need to go into all lookup calls, for example in resource
 		// forks and exports.
-		
+
 		TimingSink tSink = TimingSink.sink();
 		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
 		List<InMemoryIteratorEntry> indices = new LinkedList<InMemoryIteratorEntry>();
@@ -430,9 +430,9 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 				RNSEntryResponseType entry = null;
 				// For now the end
 				entry =
-						new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
-								Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null)), null,
-								internalEntry.getName());
+					new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
+						Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null)), null,
+						internalEntry.getName());
 				resultEntries.add(entry);
 			}
 		}

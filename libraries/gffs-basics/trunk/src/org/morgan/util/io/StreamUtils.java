@@ -24,11 +24,16 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
 public class StreamUtils
 {
+	static private Log _logger = LogFactory.getLog(StreamUtils.class);
+
 	static private final int _DEFAULT_BUFFER_SIZE = 1024 * 512;
 
 	static public void copyStream(Reader reader, Writer writer) throws IOException
@@ -54,14 +59,17 @@ public class StreamUtils
 		while ((read = in.read(data)) >= 0) {
 			if (out != null) {
 				out.write(data, 0, read);
+				if (_logger.isTraceEnabled())
+					_logger.trace("writing " + read + " bytes.");
 				if (autoflush)
 					out.flush();
 				stats.transfer(read);
 			}
 		}
 
-		if (out != null)
+		if (out != null) {
 			out.flush();
+		}
 
 		return stats.finishTransfer();
 	}
