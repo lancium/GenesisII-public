@@ -226,11 +226,11 @@ function dump_important_variables()
   echo "hostname: '$CONTAINER_HOSTNAME_PROPERTY'"
   echo "port: '$CONTAINER_PORT_PROPERTY'"
   echo "tls cert file: '$TLS_KEYSTORE_FILE_PROPERTY'"
-  echo "tls key pass: '$TLS_KEY_PASSWORD_PROPERTY'"
-  echo "tls keystore pass: '$TLS_KEYSTORE_PASSWORD_PROPERTY'"
+#  echo "tls key pass: '$TLS_KEY_PASSWORD_PROPERTY'"
+#  echo "tls keystore pass: '$TLS_KEYSTORE_PASSWORD_PROPERTY'"
   echo "signing cert file: '$SIGNING_KEYSTORE_FILE_PROPERTY'"
-  echo "signing key pass: '$SIGNING_KEY_PASSWORD_PROPERTY'"
-  echo "signing keystore pass: '$SIGNING_KEYSTORE_PASSWORD_PROPERTY'"
+#  echo "signing key pass: '$SIGNING_KEY_PASSWORD_PROPERTY'"
+#  echo "signing keystore pass: '$SIGNING_KEYSTORE_PASSWORD_PROPERTY'"
   echo "signing key alias: '$SIGNING_KEY_ALIAS_PROPERTY'"
 }
 
