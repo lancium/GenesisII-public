@@ -631,21 +631,22 @@ public class JSDLEventGenerator
 			receiver.startJobDefinition(xmlPath, jobDef.id());
 			handleAnys(xmlPath, jobDef.any(), jobDef.anyAttributes(), receiver);
 
-			JobDescription jobDesc = jobDef.jobDescription();
-			if (jobDesc != null) {
-				xmlPath.push(xmlPath.formQNameFromPrevious("JobDescription"));
-				receiver.startJobDescription(xmlPath);
-				handleAnys(xmlPath, jobDesc.any(), jobDesc.anyAttributes(), receiver);
+			List<JobDescription> jobDescList = jobDef.jobDescription();
+			for (JobDescription jobDesc : jobDescList) {
+				if (jobDesc != null) {
+					xmlPath.push(xmlPath.formQNameFromPrevious("JobDescription"));
+					receiver.startJobDescription(xmlPath);
+					handleAnys(xmlPath, jobDesc.any(), jobDesc.anyAttributes(), receiver);
 
-				generateJobIdentificationEvents(xmlPath, jobDesc.jobIdentification(), receiver);
-				generateResourcesEvents(xmlPath, jobDesc.resources(), receiver);
-				generateApplicationEvents(xmlPath, jobDesc.application(), receiver);
-				generateDataStagingEvents(xmlPath, jobDesc.staging(), receiver);
+					generateJobIdentificationEvents(xmlPath, jobDesc.jobIdentification(), receiver);
+					generateResourcesEvents(xmlPath, jobDesc.resources(), receiver);
+					generateApplicationEvents(xmlPath, jobDesc.application(), receiver);
+					generateDataStagingEvents(xmlPath, jobDesc.staging(), receiver);
 
-				receiver.endJobDescription(xmlPath);
-				xmlPath.pop();
+					receiver.endJobDescription(xmlPath);
+					xmlPath.pop();
+				}
 			}
-
 			generateSweepEvents(xmlPath, jobDef.parameterSweeps(), receiver);
 
 			receiver.endJobDefinition(xmlPath);

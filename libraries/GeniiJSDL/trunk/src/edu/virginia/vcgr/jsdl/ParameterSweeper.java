@@ -60,7 +60,6 @@ public class ParameterSweeper
 		try {
 			Unmarshaller unmarshaller = JSDLUtility.JSDLContext.createUnmarshaller();
 			JobDefinition jobDef = (JobDefinition) unmarshaller.unmarshal(source);
-
 			System.out.format("Generating %d jobs from sweep file %s\n", SweepUtility.sweepSize(jobDef), source);
 			SweepUtility.performSweep(jobDef, new SweepListenerImpl(source, targetDir));
 		} catch (Throwable e) {

@@ -170,7 +170,8 @@ public class JobDocument implements PostUnmarshallListener
 
 		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_NS, "JobAnnotation"));
 		values = JSDLGenerator.generate(_jobAnnotations, builder, variables);
-		if (values != null) {
+
+		if (values != null && values.size() > 0) {
 			jobIdent.annotations().addAll(values);
 			modified = true;
 		}
@@ -178,7 +179,8 @@ public class JobDocument implements PostUnmarshallListener
 
 		builder.push(new DefaultXPathIterableNode(JSDLConstants.JSDL_NS, "JobProject"));
 		values = JSDLGenerator.generate(_jobProjects, builder, variables);
-		if (values != null) {
+
+		if (values != null && values.size() > 0) {
 			jobIdent.projects().addAll(values);
 			modified = true;
 		}
@@ -186,6 +188,7 @@ public class JobDocument implements PostUnmarshallListener
 
 		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "JobDescription"));
 		value = JSDLGenerator.generate(_jobDescription, builder, variables);
+
 		if (value != null) {
 			jobIdent.description(value);
 			modified = true;
@@ -989,7 +992,6 @@ public class JobDocument implements PostUnmarshallListener
 		EnumSet<FilesystemType> filesystemSet = EnumSet.noneOf(FilesystemType.class);
 
 		XPathBuilder builder = new XPathBuilder();
-
 		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "JobDefinition"));
 		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "JobDescription"));
 
@@ -1004,6 +1006,7 @@ public class JobDocument implements PostUnmarshallListener
 		builder.pop();
 
 		JobDefinition jobDef = new JobDefinition(jobDesc);
+
 		builder.pop();
 
 		Sweep root = null;
@@ -1035,7 +1038,6 @@ public class JobDocument implements PostUnmarshallListener
 		throws IOException
 	{
 		JobDocument result;
-
 		try {
 			JAXBContext context = JAXBContext.newInstance(JobDocument.class);
 			Unmarshaller unmarshaller = context.createUnmarshaller();

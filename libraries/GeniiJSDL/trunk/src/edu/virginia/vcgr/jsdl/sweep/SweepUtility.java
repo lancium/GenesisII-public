@@ -180,7 +180,6 @@ public class SweepUtility
 				else {
 					List<Sweep> copy = new Vector<Sweep>(_parameterSweeps);
 					_parameterSweeps.clear();
-
 					try {
 						DOMResult domResult = new DOMResult();
 						_context.createMarshaller().marshal(_jobDefinition, domResult);
