@@ -43,6 +43,17 @@ if [ -z "$installer_config" \
   exit 1
 fi
 
+# find the grid name that should be added to the installer binaries.
+simple_name=$(sed -n -e 's/genii.simple-name=\(.*\)/\1/p' "$INSTALLER_DIR/$installer_config")
+if [ -z "$simple_name" ]; then
+  echo
+  echo "Failed to find the grid's simple name in the config file."
+  echo "There should be an entry called genii.simple-name that defines this."
+  echo
+  exit 1
+fi
+echo "Building installers for grid named: $simple_name"
+
 # check for any stray keytabs that we absolutely do not want to include in
 # the installer package.
 if [ ! -z "$(find "$DEPLOYMENTS_ROOT/default" -iname "*keytab")" ]; then
@@ -171,10 +182,10 @@ check_if_failed "compiler variable replacement failed"
 #check_if_failed "ant build failed"
 popd
 
-build_installer 5991 genesis2-gffs-deb
-build_installer 3416 genesis2-gffs-linux64
-#build_installer 2088 genesis2-gffs-mac64
-build_installer 5987 genesis2-gffs-rpm
+build_installer 5991 "genesis2-gffs-amd64-${simple_name}-deb"
+build_installer 3416 "genesis2-gffs-linux-amd64-${simple_name}"
+build_installer 2088 "genesis2-gffs-macosx-amd64-${simple_name}"
+build_installer 5987 "genesis2-gffs-amd64-${simple_name}-rpm"
 
 ##############
 

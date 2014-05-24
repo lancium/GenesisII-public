@@ -15,9 +15,10 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
+// hmmm: fix non-sensical members at base. divide into different derived bases using taxonomy.
+
 public abstract class BaseLoginTool extends BaseGridTool
 {
-
 	static public final String PKCS12 = "PKCS12";
 	static public final String JKS = "JKS";
 	static public final String WINDOWS = "WIN";
@@ -45,6 +46,18 @@ public abstract class BaseLoginTool extends BaseGridTool
 	public void setStoretype(String storeType)
 	{
 		_storeType = storeType;
+	}
+
+	/*
+	 * flag that indicates that no password will be given, to support using only the TLS identity as
+	 * credential.
+	 */
+	boolean _bogusPassword = false;
+
+	@Option({ "noPassword" })
+	public void setNoPassword()
+	{
+		_bogusPassword = true;
 	}
 
 	@Option({ "password" })

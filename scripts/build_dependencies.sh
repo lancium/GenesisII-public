@@ -29,6 +29,7 @@ TRUNK_BUILD=
 
 # we support some flags on the command line:
 #   "clean" requests that we should clean the projects.
+#   "wipe" requests that we aggressively clean the projects.
 #   "trunk" means that we should expect that this script is in the trunk, and
 #      we will create a new subdirectory for the projects.
 while true; do
@@ -38,6 +39,9 @@ while true; do
     CLEAN_UP=true
   elif [ "$flag" == "trunk" ]; then
     TRUNK_BUILD=true
+  elif [ "$flag" == "wipe" ]; then
+    # we don't do anything extra beyond clean for wipe.
+    CLEAN_UP=true
   else
     false
     check_result "this script cannot use a flag of '$flag'"
@@ -88,6 +92,10 @@ for subproject in \
       echo "Failures in gffs-security often result from not having the unlimited JCE jar"
       echo "files installed in the jre/lib/security folder.  These are available at:"
       echo "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
+      echo
+      echo "Often the command that will correct this build problem is:"
+      echo "sudo cp $GENII_INSTALL_DIR/installer/unlimited_jce_java7/*jar /usr/lib/jvm/java-7-oracle/jre/lib/security/"
+      echo
       echo -e "=======\n"
     fi
     # re-enact the retval...

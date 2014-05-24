@@ -138,20 +138,36 @@
 		</javac>
 	</target>
 
+	<target name="wipe" depends="init, clean">
+
+		<exec executable="bash" failonerror="true">
+			<arg value="scripts/build_dependencies.sh"/>
+			<arg value="trunk"/>
+			<arg value="wipe"/>
+		</exec>
+
+		<!-- cleanup the default deployment to get rid of generated files. -->
+		<delete dir="${basedir}/deployments/default/services"/>
+		<delete>
+			<fileset dir="${basedir}/deployments/default" includes="**/*.cer"/>
+			<fileset dir="${basedir}/deployments/default" includes="**/*.pfx"/>
+		</delete>
+		<delete dir="${basedir}/deployments/backup"/>
+		<delete file="${basedir}/deployments/default/configuration/bootstrap.xml"/>
+		<delete file="${basedir}/deployments/default/configuration/namespace.properties"/>
+	</target>
+	
+
 	<target name="clean" depends="init">
+
 		<exec executable="bash" failonerror="true">
 			<arg value="scripts/build_dependencies.sh"/>
 			<arg value="trunk"/>
 			<arg value="clean"/>
 		</exec>
+
 		<delete dir="${wsdd.dir}"/>
 		<delete dir="${dpages.dir}"/>
-
-		<!-- clean up older bits. -->
-		<delete dir="${basedir}/genned-obj"/>
-		<delete dir="${basedir}/genned-src"/>
-		<delete dir="${basedir}/codegen"/>
-		<delete dir="${basedir}/simple-command"/>
 
 		<delete quiet="true" failonerror="false">
 			<fileset dir="${obj.dir}" includes="**/*" />
@@ -164,16 +180,6 @@
 		<delete dir="${basedir}/unit-test-reports"/>
 
 		<delete dir="${basedir}/webapps/axis/WEB-INF/attachments"/>
-
-		<!-- cleanup the default deployment to get rid of generated files. -->
-		<delete dir="${basedir}/deployments/default/services"/>
-		<delete>
-			<fileset dir="${basedir}/deployments/default" includes="**/*.cer"/>
-			<fileset dir="${basedir}/deployments/default" includes="**/*.pfx"/>
-		</delete>
-		<delete dir="${basedir}/deployments/backup"/>
-		<delete file="${basedir}/deployments/default/configuration/bootstrap.xml"/>
-		<delete file="${basedir}/deployments/default/configuration/namespace.properties"/>
 
 		<!-- whack assorted top-level files. -->
 		<delete file="${basedir}/cert-tool"/>

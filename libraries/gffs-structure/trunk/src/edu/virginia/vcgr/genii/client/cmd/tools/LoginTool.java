@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Properties;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
@@ -244,6 +245,18 @@ public class LoginTool extends BaseLoginTool
 
 		if ((_username == null) || (_username.length() == 0))
 			throw new InvalidToolUsageException("The username cannot be blank.");
+
+		if (_bogusPassword) {
+			if (_password != null) {
+				throw new ToolException("Cannot provide a password with noPassword option.");
+			}
+
+			// make sure we don't just always use the same string for the bogus password.
+			// hmmm: could randomize this better, with chars. would ensure the source data never had
+			// a recognizable piece in it.
+			int addedChaff = (new Random()).nextInt(1000000000) + 1;
+			_password = "bogus" + addedChaff;
+		}
 
 		if (_durationString != null) {
 			try {
