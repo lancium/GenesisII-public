@@ -16,12 +16,10 @@ parameters for this script are:
 	<gsh:default name="USER" value="${ARGV[1]}"/>
 	<gsh:default name="USER_DIR" value="/users/xsede.org"/>
 	<gsh:default name="USER_PATH" value="${USER_DIR}/${USER}"/>
-	<gsh:default name="USER_INC_PATH" value="/users/incommon.org/${USER}"/>
 	<gsh:default name="HOME_DIR" value="/home/xsede.org"/>
 	<gsh:default name="HOME_PATH" value="${HOME_DIR}/${USER}"/>
 	<gsh:default name="DELUSER_DIR" value="/users/deleted.xsede.org"/>
 	<gsh:default name="DELUSER_PATH" value="${DELUSER_DIR}/${USER}"/>
-	<gsh:default name="DELUSER_INC_PATH" value="/users/deleted.incommon.org/${USER}"/>
 	<gsh:default name="DELHOME_DIR" value="/home/deleted.xsede.org"/>
 	<gsh:default name="DELHOME_PATH" value="${DELHOME_DIR}/${USER}"/>
 
@@ -35,18 +33,4 @@ parameters for this script are:
 		<param>${DELHOME_PATH}</param>
 	</geniix:mv>
 
-
-	<try>
-		<block>
-			<geniix:mv>
-				<param>${USER_INC_PATH}</param>
-				<param>${DELUSER_INC_PATH}</param>
-			</geniix:mv>
-		</block>
-		<catch class="java.lang.Exception">
-			<echo message="Did not see an incommon.org folder for this user; ignoring it."/>
-		</catch>
-	</try>
-
 </gsh:script>
-
