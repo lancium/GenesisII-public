@@ -96,10 +96,11 @@
                 <gsh:param>--everyone</gsh:param>
         </geniix:chmod>
 
-	<gsh:echo message="Creating /users/incommon.org directory"></gsh:echo>
+	<gsh:echo message="Creating /users/incommon.org, /users/deleted.incommon.org directory"></gsh:echo>
         <geniix:mkdir>
                 <gsh:param>-p</gsh:param>
                 <gsh:param>/users/incommon.org</gsh:param>
+                <gsh:param>/users/deleted.incommon.org</gsh:param>
         </geniix:mkdir>
         <geniix:chmod>
                 <gsh:param>/users/incommon.org</gsh:param>
@@ -325,6 +326,18 @@
         </geniix:chmod>
 	<geniix:chmod>
 		<gsh:param>/users/deleted.xsede.org</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /users/deleted.incommon.org +rwx gffs-amie, gffs-users  -->
+	<geniix:chmod>
+		<gsh:param>/users/deleted.incommon.org</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/users/deleted.incommon.org</gsh:param>
                 <gsh:param>+rwx</gsh:param>
                 <gsh:param>/groups/xsede.org/gffs-amie</gsh:param>
         </geniix:chmod>
