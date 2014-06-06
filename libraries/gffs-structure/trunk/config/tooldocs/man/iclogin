@@ -17,4 +17,4 @@ Notes:
 
 iclogin uses the base login tool for the secondary credential acquisition, so all of the options for the base login tool are also available for iclogin with the same semantics, along with the additions listed herein.
 
-iclogin assumes that the STS for the secondary credential acquisition will be located at "/users/incommon/<username>", where <username> is the string provided in the "username" option or to the tool prompt.
+iclogin assumes that the STS for the secondary credential acquisition will be located at "/users/incommon.org/<username>", where <username> is the string provided in the "username" option or to the tool prompt.

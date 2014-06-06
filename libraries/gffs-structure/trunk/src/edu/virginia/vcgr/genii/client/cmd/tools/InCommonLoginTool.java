@@ -68,6 +68,7 @@ import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 public class InCommonLoginTool extends BaseLoginTool
 {
+	private static final String STANDARD_PREFIX = "/users/incommon.org/";
 
 	private static final String _DESCRIPTION = "config/tooldocs/description/diclogin";
 	private static final String _USAGE = "config/tooldocs/usage/uiclogin";
@@ -119,7 +120,6 @@ public class InCommonLoginTool extends BaseLoginTool
 	public void setLifetime(int lifetime)
 	{
 		_lifetime = lifetime;
-		;
 	}
 
 	public InCommonLoginTool()
@@ -170,10 +170,9 @@ public class InCommonLoginTool extends BaseLoginTool
 			ContextManager.storeCurrentContext(callContext);
 
 			// TODO Needs to be adjusted after permanent policy location is determined.
-			targetPath = "/users/incommon/" + _username;
+			targetPath = STANDARD_PREFIX + _username;
 
-			// we're going to use the WS-TRUST token-issue operation to log in to a security tokens
-			// service.
+			// we're going to use the WS-TRUST token-issue operation to log in to a security tokens service.
 			RNSPath authnPath = callContext.getCurrentPath().lookup(targetPath, RNSPathQueryFlags.MUST_EXIST);
 			EndpointReferenceType epr = authnPath.getEndpoint();
 
@@ -204,7 +203,7 @@ public class InCommonLoginTool extends BaseLoginTool
 			_logger.error("Failed IDPLogin to " + targetPath + " or other general exception. See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
 		} finally {
-			// save the current state of the calling context before quiting
+			// save the current state of the calling context before quitting
 			if (callContext != null) {
 				try {
 					ContextManager.storeCurrentContext(callContext);
@@ -244,16 +243,13 @@ public class InCommonLoginTool extends BaseLoginTool
 	private CILogonParameters getParams(String username, String password, String idpUrl, String csrFileName,
 		String csrKeyFileName) throws ToolException
 	{
-		try {
-			if (username == null || password == null || idpUrl == null || csrFileName == null || csrKeyFileName == null) {
-				return promptForParams();
-			} else {
-				CILogonParameters params =
-					new CILogonParameters(idpUrl, username, password, readFile(csrFileName), parseKeyFile(csrKeyFileName)
-						.getPrivate(), stdout, stderr);
-				return params;
-			}
-		} finally {
+		if (username == null || password == null || idpUrl == null || csrFileName == null || csrKeyFileName == null) {
+			return promptForParams();
+		} else {
+			CILogonParameters params =
+				new CILogonParameters(idpUrl, username, password, readFile(csrFileName), parseKeyFile(csrKeyFileName)
+					.getPrivate(), stdout, stderr);
+			return params;
 		}
 	}
 
