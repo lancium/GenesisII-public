@@ -33,8 +33,11 @@ public class RNSLookupCache extends CommonCache
 		int fileLookupCacheCapacity = capacity - directoryLookupCacheCapacity;
 
 		fileLookupCache = new TimedOutLRUCache<String, EndpointReferenceType>(fileLookupCacheCapacity, cacheLifeTime);
-
 		directoryLookupCache = new TimedOutLRUCache<String, EndpointReferenceType>(directoryLookupCacheCapacity, cacheLifeTime);
+
+		_logger.info("EPR cache size: " + capacity + ", lifetime: " + cacheLifeTime 
+					+ "ms, freshness monitored: " + Boolean.toString(monitoringEnabled));
+		_logger.info("Capacity is divided as 1:4 for storing directory and file EPRs respectively");
 	}
 
 	@Override

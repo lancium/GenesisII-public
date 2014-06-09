@@ -38,6 +38,10 @@ public class ResourceConfigCache extends CommonCache
 		directoryConfigCache = new TimedOutLRUCache<String, WSResourceConfig>(directoryLookupCacheCapacity, cacheLifeTime);
 		int fileLookupCacheCapacity = capacity - directoryLookupCacheCapacity;
 		fileConfigCache = new TimedOutLRUCache<String, WSResourceConfig>(fileLookupCacheCapacity, cacheLifeTime);
+		
+		_logger.info("ResourceConfig cache size: " + capacity + ", lifetime: " + cacheLifeTime 
+				+ "ms, freshness monitored: " + Boolean.toString(monitoringEnabled));
+		_logger.info("Capacity is divided as 1:9 for storing directory and file resource configs");
 	}
 
 	@Override

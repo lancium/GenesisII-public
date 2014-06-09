@@ -24,6 +24,7 @@ public class Deployment
 	static private final String WEB_CONTAINER_PROPERTIES_FILENAME = "web-container.properties";
 	static private final String REJUVENATION_PROPERTYIES_FILENAME = "rejuvenation.properties";
 	static private final String CLIENT_SOCKET_PROPERTIES_FILENAME = "client-socket.properties";
+	static private final String CLIENT_CACHE_PROPERTIES_FILENAME = "client-cache.properties";
 
 	static private Map<String, Deployment> _knownDeployments = new HashMap<String, Deployment>(4);
 
@@ -35,6 +36,7 @@ public class Deployment
 	private Properties _webContainerProperties;
 	private Properties _uriManagerProperties;
 	private Properties _rejuvenationProperties;
+	private Properties _clientCacheProperties;
 	private SocketConfigurer _clientSocketConfigurer;
 	private NamespaceDefinitions _namespace;
 
@@ -64,6 +66,7 @@ public class Deployment
 		_uriManagerProperties = loadURIManagerProperties(_deploymentDirectory.getName(), _configurationDirectory);
 		_clientSocketConfigurer = loadClientSocketConfigurer();
 		_rejuvenationProperties = loadRejuvenationProperties(_deploymentDirectory.getName(), _configurationDirectory);
+		_clientCacheProperties = loadClientCacheProperties(_deploymentDirectory.getName(), _configurationDirectory);
 	}
 
 	private SocketConfigurer loadClientSocketConfigurer()
@@ -140,6 +143,23 @@ public class Deployment
 			StreamUtils.close(fin);
 		}
 	}
+	
+	static private Properties loadClientCacheProperties(String deploymentName, HierarchicalDirectory configurationDirectory)
+	{
+		FileInputStream fin = null;
+		Properties ret = new Properties();
+
+		try {
+			fin = new FileInputStream(configurationDirectory.lookupFile(CLIENT_CACHE_PROPERTIES_FILENAME));
+			ret.load(fin);
+			return ret;
+		} catch (IOException ioe) {
+			_logger.error("Unable to load cache configuration properties. Caching will be disabled.", ioe);
+			return new Properties();
+		} finally {
+			StreamUtils.close(fin);
+		}
+	}
 
 	public HierarchicalDirectory getConfigurationDirectory()
 	{
@@ -189,6 +209,10 @@ public class Deployment
 	public Properties softwareRejuvenationProperties()
 	{
 		return _rejuvenationProperties;
+	}
+	
+	public Properties clientCacheProperties() {
+		return _clientCacheProperties;
 	}
 
 	public DeploymentName getName()

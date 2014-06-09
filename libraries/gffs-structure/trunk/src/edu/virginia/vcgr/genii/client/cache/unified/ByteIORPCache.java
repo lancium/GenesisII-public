@@ -41,9 +41,9 @@ public class ByteIORPCache extends CommonAttributeCache
 	private TimedOutLRUCache<String, Calendar> modTimeAttributeCache;
 	private TimedOutLRUCache<String, Calendar> accessTimeAttributeCache;
 
-	public ByteIORPCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
+	public ByteIORPCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoringEnabled)
 	{
-		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
+		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
 
 		sizeAttributeCache = new TimedOutLRUCache<String, Long>(capacity, cacheLifeTime);
 		modTimeAttributeCache = new TimedOutLRUCache<String, Calendar>(capacity, cacheLifeTime);
@@ -59,6 +59,9 @@ public class ByteIORPCache extends CommonAttributeCache
 		xferAttributeCache = new TimedOutLRUCache<String, Set<String>>(capacity, millisecondsInDay);
 
 		translator = new DefaultSingleResourcePropertyTranslator();
+		
+		_logger.info("ByteIO cache size: " + capacity + ", lifetime: " + cacheLifeTime 
+					+ "ms, freshness monitored: " + Boolean.toString(monitoringEnabled));
 	}
 
 	@Override

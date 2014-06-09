@@ -32,16 +32,23 @@ public class AuthZConfigCache extends CommonAttributeCache
 	private TimedOutLRUCache<String, Permissions> permissionCache;
 	private TimedOutLRUCache<String, AuthZConfig> authZCache;
 
-	public AuthZConfigCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
+	public AuthZConfigCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoringEnabled)
 	{
+ 
+		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
+		
+		int authZStorageCapacity = capacity / 10;
+		int permissionStrStorageCapacity = capacity - authZStorageCapacity;
 
-		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
-
-		authZCache = new TimedOutLRUCache<String, AuthZConfig>(capacity, cacheLifeTime);
-		permissionCache = new TimedOutLRUCache<String, Permissions>(capacity, cacheLifeTime);
+		authZCache = new TimedOutLRUCache<String, AuthZConfig>(authZStorageCapacity, cacheLifeTime);
+		permissionCache = new TimedOutLRUCache<String, Permissions>(permissionStrStorageCapacity, cacheLifeTime);
 
 		authZTranslator = new DefaultSingleResourcePropertyTranslator();
 		permissionTranslator = new PermissionsStringTranslator();
+		
+		_logger.info("Permission attr cache size: " + capacity + ", lifetime: " + cacheLifeTime 
+				+ "ms, freshness monitored: " + Boolean.toString(monitoringEnabled));
+		_logger.info("Capacity is divided as 1:9 for storing AuthZConfig and Permission Strings");
 	}
 
 	@Override

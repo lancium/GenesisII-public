@@ -27,6 +27,7 @@ import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 
 public class ApplicationBase
 {
@@ -93,6 +94,7 @@ public class ApplicationBase
 		ConfigurationManager configurationManager = ConfigurationManager.initializeConfiguration(userDir);
 		setupUserDir(configurationManager.getUserDirectory());
 		configurationManager.setRoleServer();
+		CacheConfigurer.initializeCaches();
 	}
 
 	/**
@@ -107,6 +109,7 @@ public class ApplicationBase
 		ConfigurationManager configurationManager = ConfigurationManager.initializeConfiguration(userDir);
 		setupUserDir(configurationManager.getUserDirectory());
 		configurationManager.setRoleClient();
+		CacheConfigurer.initializeCaches();
 	}
 
 	public enum GridStates {
