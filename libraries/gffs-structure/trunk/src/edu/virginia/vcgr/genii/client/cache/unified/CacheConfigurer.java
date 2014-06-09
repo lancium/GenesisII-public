@@ -182,7 +182,7 @@ public class CacheConfigurer
 			disableCaching();
 			enableCaching();
 		} catch (Exception ex) {
-			_logger.info("Exception occurred while resetting the cache management system " + ex.getMessage());
+			_logger.error("Exception occurred while resetting the cache management system " + ex.getMessage());
 		}
 	}
 }

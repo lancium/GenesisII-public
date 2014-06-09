@@ -46,9 +46,9 @@ public class AuthZConfigCache extends CommonAttributeCache
 		authZTranslator = new DefaultSingleResourcePropertyTranslator();
 		permissionTranslator = new PermissionsStringTranslator();
 		
-		_logger.info("Permission attr cache size: " + capacity + ", lifetime: " + cacheLifeTime 
+		_logger.debug("Permission attr cache size: " + capacity + ", lifetime: " + cacheLifeTime 
 				+ "ms, freshness monitored: " + Boolean.toString(monitoringEnabled));
-		_logger.info("Capacity is divided as 1:9 for storing AuthZConfig and Permission Strings");
+		_logger.debug("Capacity is divided as 1:9 for storing AuthZConfig and Permission Strings");
 	}
 
 	@Override

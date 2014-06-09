@@ -257,7 +257,7 @@ public class RNSCacheLookupHandler
 			ElementCountPropertyRetriever retriever = new ElementCountPropertyRetriever(target, currentContext);
 			retriever.start();
 		} catch (Exception e) {
-			_logger.info("could not retrieve calling context information", e);
+			_logger.error("could not retrieve calling context information", e);
 		}
 	}
 

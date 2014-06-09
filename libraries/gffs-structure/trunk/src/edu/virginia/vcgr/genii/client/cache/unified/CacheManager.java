@@ -70,7 +70,7 @@ public class CacheManager
 					return null;
 				}
 			} catch (Exception ex) {
-				_logger.info("problem while retrieving objects from the cache", ex);
+				_logger.error("problem while retrieving objects from the cache", ex);
 			}
 		}
 		return null;
@@ -266,7 +266,7 @@ public class CacheManager
 			NotificationBrokerDirectory.clearDirectory();
 			SubscriptionDirectory.clearDirectory();
 		} catch (Exception ex) {
-			_logger.info("Alarm: couldn't reset the caching system after a failure. "
+			_logger.error("Alarm: couldn't reset the caching system after a failure. "
 				+ "To avoid seeing, possibly, stale contents, " + "restart the grid client: " + ex.getMessage());
 		}
 	}
