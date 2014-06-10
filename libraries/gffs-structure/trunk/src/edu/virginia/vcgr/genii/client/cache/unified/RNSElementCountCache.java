@@ -25,9 +25,9 @@ public class RNSElementCountCache extends CommonAttributeCache
 
 		cache = new TimedOutLRUCache<String, Integer>(capacity, cacheLifeTime);
 		translator = new DefaultSingleResourcePropertyTranslator();
-		
-		_logger.debug("Dir-Size attr cache size: " + capacity + ", lifetime: " + cacheLifeTime 
-				+ "ms, freshness monitored: " + Boolean.toString(monitoringEnabled));
+
+		_logger.debug("Dir-Size attr cache size: " + capacity + ", lifetime: " + cacheLifeTime + "ms, freshness monitored: "
+			+ Boolean.toString(monitoringEnabled));
 	}
 
 	@Override

@@ -15,16 +15,16 @@ import edu.virginia.vcgr.genii.client.fuse.UnixDirectory;
 public class FuseDirCache extends CommonCache
 {
 	static private Log _logger = LogFactory.getLog(FuseDirCache.class);
-	
+
 	private TimedOutLRUCache<String, UnixDirectory> cache;
 
 	public FuseDirCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
 	{
 		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
 		cache = new TimedOutLRUCache<String, UnixDirectory>(capacity, cacheLifeTime);
-		
-		_logger.debug("Fuse directory cache size: " + capacity + ", lifetime: " + cacheLifeTime 
-				+ "ms, freshness monitored: " + Boolean.toString(monitoringEnabled));
+
+		_logger.debug("Fuse directory cache size: " + capacity + ", lifetime: " + cacheLifeTime + "ms, freshness monitored: "
+			+ Boolean.toString(monitoringEnabled));
 	}
 
 	@Override

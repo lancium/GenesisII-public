@@ -34,9 +34,9 @@ public class AuthZConfigCache extends CommonAttributeCache
 
 	public AuthZConfigCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoringEnabled)
 	{
- 
+
 		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
-		
+
 		int authZStorageCapacity = capacity / 10;
 		int permissionStrStorageCapacity = capacity - authZStorageCapacity;
 
@@ -45,9 +45,9 @@ public class AuthZConfigCache extends CommonAttributeCache
 
 		authZTranslator = new DefaultSingleResourcePropertyTranslator();
 		permissionTranslator = new PermissionsStringTranslator();
-		
-		_logger.debug("Permission attr cache size: " + capacity + ", lifetime: " + cacheLifeTime 
-				+ "ms, freshness monitored: " + Boolean.toString(monitoringEnabled));
+
+		_logger.debug("Permission attr cache size: " + capacity + ", lifetime: " + cacheLifeTime + "ms, freshness monitored: "
+			+ Boolean.toString(monitoringEnabled));
 		_logger.debug("Capacity is divided as 1:9 for storing AuthZConfig and Permission Strings");
 	}
 

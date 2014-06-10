@@ -59,9 +59,9 @@ public class ByteIORPCache extends CommonAttributeCache
 		xferAttributeCache = new TimedOutLRUCache<String, Set<String>>(capacity, millisecondsInDay);
 
 		translator = new DefaultSingleResourcePropertyTranslator();
-		
-		_logger.debug("ByteIO cache size: " + capacity + ", lifetime: " + cacheLifeTime 
-					+ "ms, freshness monitored: " + Boolean.toString(monitoringEnabled));
+
+		_logger.debug("ByteIO cache size: " + capacity + ", lifetime: " + cacheLifeTime + "ms, freshness monitored: "
+			+ Boolean.toString(monitoringEnabled));
 	}
 
 	@Override
