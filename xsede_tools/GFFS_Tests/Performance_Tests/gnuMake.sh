@@ -42,7 +42,7 @@ testMountingFuseDirectory()
   check_if_failed "Mounting grid to local directory"
 
   grid ls /
-  assertEquals "Simple check on root of filesystem on $MOUNT_POINT" 0 $retval
+  assertEquals "Simple check on root of filesystem on $MOUNT_POINT" 0 $?
 }
 
 testUnTarOnMountedDir()

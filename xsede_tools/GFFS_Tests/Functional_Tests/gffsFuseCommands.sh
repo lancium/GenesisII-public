@@ -47,7 +47,7 @@ testFuseMounting()
 
   # make sure we can clear out any previous junk.
   \rm -rf "$TESTING_DIR" "$TESTING_DIR_ALTERNATE"
-  assertEquals "Cleaning any prior folders under mount" 0 $retval
+  assertEquals "Cleaning any prior folders under mount" 0 $?
 }
 
 testChangingDirToMount()

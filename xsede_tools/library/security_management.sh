@@ -82,6 +82,8 @@ function create_bootstrap_trusted_pfx()
     if [ ! -f "$certfile" ]; then continue; fi
     # skip pfx files.
     if [[ "$certfile" =~ .*\.pfx ]]; then continue; fi
+    # skip keytab files.
+    if [[ "$certfile" =~ .*\.keytab ]]; then continue; fi
     local output_alias="$(basename "$certfile" .cer)"
     echo -e "Adding '$(basename "$certfile")' to store with alias: $output_alias"
     run_any_command $CERTO import "-output-keystore='$dirname/trusted.pfx'" -output-keystore-pass=trusted "-base64-cert-file='$certfile'" "-output-alias='$output_alias'"

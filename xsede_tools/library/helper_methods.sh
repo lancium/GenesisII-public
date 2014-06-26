@@ -141,15 +141,20 @@ function test_fuse_mount()
   local trunc_mount="$(basename "$(dirname $mount_point)").$(basename "$mount_point")"
 
   checkMount="$(mount)"
-#echo "checkmount is: '$checkMount'"
-#echo "mount point seeking is: '$trunc_mount'"
-  retval=1
-  if [[ "$checkMount" =~ .*$trunc_mount.* ]]; then retval=0; fi
+echo "checkmount is: '$checkMount'"
+echo "mount point seeking is: '$trunc_mount'"
+  local retval=1
+  if [[ "$checkMount" =~ .*$trunc_mount.* ]]; then
+echo found the mount in the list
+    retval=0
+  fi
   if [ $retval -ne 0 ]; then
     echo "Finding mount point '$trunc_mount' failed."
     return 1
   fi
-  ls -l "$mount_point" &>/dev/null
+echo dir has:
+  ls -l "$mount_point" 
+#&>/dev/null
   return $?
 }
 

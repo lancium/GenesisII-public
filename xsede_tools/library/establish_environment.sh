@@ -32,7 +32,7 @@ function logged_command()
 {
   local my_output="$1"; shift
 #  echo "logged_command args: $(printf -- "[%s] " "${@}")"
-  eval "$@" >>"$my_output" 2>&1
+  eval "${@}" >>"$my_output" 2>&1
   local retval=$?
   if [ $retval == 0 ]; then
     # good so far, but check for more subtle ways of failing; if there is
@@ -57,7 +57,7 @@ function logged_command()
 function run_any_command()
 {
   local my_output="$(mktemp $TEST_TEMP/grid_logs/out_run_any_cmd_$(date_string).XXXXXX)"
-  logged_command "$my_output" "$@"
+  logged_command "$my_output" "${@}"
   local retval=$?
   # make the external version of the log file available.  if we're multiplexing users,
   # this will be meaningless, which is why we used unique names above.

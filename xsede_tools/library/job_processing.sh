@@ -16,7 +16,7 @@ compute_remaining_jobs()
   local grid_app="$(pick_grid_app)"
   outfile="$(mktemp "$TEST_TEMP/job_stats.XXXXXX")"
   raw_grid "$grid_app" qstat $queue_path | tail -n +2 | sed -e '/^$/d' >$outfile
-  retval=${PIPESTATUS[0]}
+  local retval=${PIPESTATUS[0]}
   if [ $retval -ne 0 ]; then
     # the qstat call failed, and we want to send back an error signal.
     remaining="-1"
@@ -312,7 +312,7 @@ function drain_my_jobs_out_of_queue()
       # our more standard --all flag.
 #echo "examining job $i"
       count=120
-      retval=1
+      local retval=1
       local grid_app="$(pick_grid_app)"
       until [ $count -le 0 ]; do
 #echo "seconds left: $count"

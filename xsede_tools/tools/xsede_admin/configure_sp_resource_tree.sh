@@ -112,8 +112,8 @@ function link_sp_container()
 {
   echo "Linking new container $service_provider_path/containers/$container_name"
   "$GENII_INSTALL_DIR/grid" ln --service-url=$g2_url $service_provider_path/containers/$container_name
-  "$GENII_INSTALL_DIR/grid" ping $service_provider_path/containers/$container_name
-  if [ $? != 0 ];then
+  "$GENII_INSTALL_DIR/grid" ls $service_provider_path/containers/$container_name | grep "*resources filesystem-summary.txt Services container.log*" &>/dev/null
+  if [ $? -ne 0 ]; then
     echo "Container could not be linked successfully"
   else
     echo "Successfully linked $service_provider_path/containers/$container_name"

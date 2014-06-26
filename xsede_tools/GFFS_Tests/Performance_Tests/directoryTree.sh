@@ -13,6 +13,8 @@ source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 export TEST_AREA="$EXPORTPATH"
 # where we will fuse mount the grid locally.
 export MOUNT_POINT="$WORKDIR/mount-directoryTree"
+# the place in the grid where the exported directory will appear.
+export FULL_EXPORT_PATH="$RNSPATH/export-local"
 
 oneTimeSetUp()
 {
@@ -22,14 +24,15 @@ oneTimeSetUp()
   fusermount -u "$MOUNT_POINT" &>/dev/null
   if [ -e "$MOUNT_POINT" ]; then rmdir "$MOUNT_POINT"; fi
   # take out prior exports too.
-  grid ls ${RNSPATH}/export-local &>/dev/null
+  grid ls $FULL_EXPORT_PATH &>/dev/null
   if [ $? == 0 ]; then
-    grid export --quit ${RNSPATH}/export-local &>/dev/null
-    grid unlink ${RNSPATH}/export-local
+    grid export --quit $FULL_EXPORT_PATH
     if [ $? -ne 0 ]; then
-      echo "The grid unlink attempt on ${RNSPATH}/export-local failed although we"
+      echo "The grid unlink attempt on $FULL_EXPORT_PATH failed although we"
       echo "believe the file is present.  This is not a good sign."
     fi
+    # now clean it up regardless, if it's still there.
+    grid unlink $FULL_EXPORT_PATH &>/dev/null
   fi
   # trash any older test directories that were left lying around.
   rm -rf testDir
@@ -54,8 +57,8 @@ oneTimeSetUp()
 testCreateExport() {
   if ! fuse_supported; then return 0; fi
   # Create an export on the container from our test area.
-  grid export --create $CONTAINERPATH/Services/LightWeightExportPortType local:$TEST_AREA grid:$RNSPATH/export-local
-  assertEquals "Creating export on $CONTAINERPATH, local path $TEST_AREA, at $RNSPATH/export-local" 0 $?
+  grid export --create $CONTAINERPATH/Services/LightWeightExportPortType local:$TEST_AREA grid:$FULL_EXPORT_PATH
+  assertEquals "Creating export on $CONTAINERPATH, local path $TEST_AREA, at $FULL_EXPORT_PATH" 0 $?
   cat $GRID_OUTPUT_FILE
 }
 
@@ -92,18 +95,18 @@ testFuseRecursiveCpOntoExport()
 {
   if ! fuse_supported; then return 0; fi
   # Recursively copy files from $1 into the $2
-  time cp -rv testDir "$MOUNT_POINT/$RNSPATH/export-local"
-  assertEquals "Recursively copying from testDir to $MOUNT_POINT/$RNSPATH/export-local" 0 $?
-  echo "Recursively listing the copied files in $MOUNT_POINT/$RNSPATH/export-local"
-  time ls -lR "$MOUNT_POINT/$RNSPATH/export-local"
+  time cp -rv testDir "$MOUNT_POINT/$FULL_EXPORT_PATH"
+  assertEquals "Recursively copying from testDir to $MOUNT_POINT/$FULL_EXPORT_PATH" 0 $?
+  echo "Recursively listing the copied files in $MOUNT_POINT/$FULL_EXPORT_PATH"
+  time ls -lR "$MOUNT_POINT/$FULL_EXPORT_PATH"
   assertEquals "directory copied to export was listable" 0 $?
 }
 
 notReady_testRecursiveCopyAndDeleteOnExport()
 {
-  grid cp -r local:"$XSEDE_TEST_ROOT/EMS_Tests" $RNSPATH/export-local
+  grid cp -r local:"$XSEDE_TEST_ROOT/EMS_Tests" $FULL_EXPORT_PATH
   assertEquals "copy directory recursively to export path" 0 $?
-  grid ls $RNSPATH/export-local/EMS_Tests/besFunctionality &>/dev/null
+  grid ls $FULL_EXPORT_PATH/EMS_Tests/besFunctionality &>/dev/null
   assertEquals "directory is present on export path afterwards" 0 $?
   if [ -d $TEST_AREA/EMS_Tests/besFunctionality -a -d $TEST_AREA/EMS_Tests/besFunctionality ]; then
     true
@@ -111,9 +114,9 @@ notReady_testRecursiveCopyAndDeleteOnExport()
     false
   fi
   assertEquals "directories are present on real filesystem of export" 0 $?
-  grid rm -r $RNSPATH/export-local/EMS_Tests
+  grid rm -r $FULL_EXPORT_PATH/EMS_Tests
   assertEquals "remove copied directory from export path" 0 $?
-  grid ls $RNSPATH/export-local/EMS_Tests &>/dev/null
+  grid ls $FULL_EXPORT_PATH/EMS_Tests &>/dev/null
   assertNotEquals "directory really should be gone after removal" 0 $?
 }
 
@@ -128,7 +131,7 @@ oneTimeTearDown() {
   fusermount -u "$MOUNT_POINT" &>/dev/null
   rmdir "$MOUNT_POINT"
   rm -rf testDir
-  grid export --quit $RNSPATH/export-local &>/dev/null
+  grid export --quit $FULL_EXPORT_PATH &>/dev/null
 }
 
 # load and run shUnit2

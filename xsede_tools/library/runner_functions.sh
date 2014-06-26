@@ -31,7 +31,7 @@ function pick_grid_app()
 # command's exit value.
 function grid()
 {
-  grid_base \"$(pick_grid_app)\" $*
+  grid_base \"$(pick_grid_app)\" "${@}"
 }
 
 # a specialized grid launcher that invokes the fuse tool and saves the output.
@@ -62,7 +62,7 @@ function grid_chk()
 function multi_grid()
 {
   grid_base \"$(pick_grid_app)\"
-  retval=$?
+  local retval=$?
   if [ $retval -ne 0 ]; then
     # we have to exit here since the command is operating as a sub-shell with the new
     # input stream that the caller provides.
@@ -77,7 +77,7 @@ function multi_grid()
 function logged_grid()
 {
   local my_output="$1"; shift
-  logged_command "$my_output" raw_grid "$@"
+  logged_command "$my_output" raw_grid "${@}"
   local retval=$?
   # make the external version of the log file available.  if we're multiplexing users,
   # this will be meaningless, which is why we used unique names above.
@@ -90,7 +90,7 @@ function logged_grid()
 function grid_base()
 {
   local my_output="$(mktemp $TEST_TEMP/grid_logs/out_grid_base_$(date_string).XXXXXX)"
-  logged_grid $my_output $@
+  logged_grid $my_output "${@}"
   local retval=$?
   return $retval
 }
@@ -100,7 +100,7 @@ function grid_base()
 function raw_grid()
 {
   # expects first parms to be the app/command to run.
-  $@ 2>&1 | grep -v "Checking for updates\|Updates Disabled\|YourKit Java Profiler\|Current version is\|untoward for mooch"
+  "${@}" 2>&1 | grep -v "Checking for updates\|Updates Disabled\|YourKit Java Profiler\|Current version is\|untoward for mooch"
   return ${PIPESTATUS[0]}
 }
 
