@@ -10,6 +10,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Caret;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Pair;
 import org.morgan.util.io.StreamUtils;
 
@@ -33,6 +35,8 @@ import edu.virginia.vcgr.genii.ui.shell.tokenizer.Token;
 
 public class CommandField extends JTextField
 {
+	static private Log _logger = LogFactory.getLog(CommandField.class);
+
 	static final private int DEFAULT_COLUMNS = 75;
 
 	static final long serialVersionUID = 0L;
@@ -658,7 +662,9 @@ public class CommandField extends JTextField
 
 			try {
 				token = ContextManager.temporarilyAssumeContext(_uiContext.callingContext());
-				_display.output().println("\nLog ID is " + DLogUtils.getRPCID());
+				// hmmm: cak disabled due to complaint from andrew
+				// _display.output().println("\nLog ID is " + DLogUtils.getRPCID());
+				_logger.info("Log ID is " + DLogUtils.getRPCID());
 				_label.setText(UserPreferences.preferences().shellPrompt().toString());
 				_reader = null;
 				CommandField.this.requestFocusInWindow();

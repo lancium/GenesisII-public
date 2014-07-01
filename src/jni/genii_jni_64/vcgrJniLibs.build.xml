@@ -28,7 +28,7 @@
 
 		<javah outputFile="${src.dir}/jni/VcgrContainerLib/WindowsProvider.jh"
 			classpath="${basedir}/bin">
-			<class name="edu.virginia.vcgr.genii.container.sysinfo.WindowsProvider"/>
+			<class name="edu.virginia.vcgr.genii.client.sysinfo.WindowsProvider"/>
 		</javah>
 
 		<javah outputFile="${src.dir}/jni/VcgrContainerLib/WindowsProviderProcessManager.jh"

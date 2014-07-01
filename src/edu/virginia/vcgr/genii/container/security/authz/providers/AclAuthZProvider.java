@@ -106,13 +106,15 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 					Collection<X509Certificate> ownerCerts = new ArrayList<X509Certificate>(ownerFiles.size());
 
 					for (File ownerFile : ownerFiles) {
-						// skip files of the wrong type.
-						if (ownerFile.getName().endsWith(".pfx"))
+						/*
+						 * skip files of the wrong type. this is not a definitive list, but we have
+						 * seen problems with people storing these particular types in the default
+						 * owners folder.
+						 */
+						if (ownerFile.getName().endsWith(".pfx") || ownerFile.getName().endsWith(".txt")
+							|| ownerFile.getName().startsWith(".")) {
 							continue;
-						if (ownerFile.getName().endsWith(".txt"))
-							continue;
-						if (ownerFile.getName().startsWith("."))
-							continue;
+						}
 						// and skip directories, since they are not files...
 						if (ownerFile.isDirectory())
 							continue;
@@ -155,7 +157,6 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	public void setDefaultAccess(ICallingContext callingContext, IResource resource, X509Certificate[] serviceCertChain)
 		throws AuthZSecurityException, ResourceException
 	{
-
 		HashSet<Identity> defaultOwners = new HashSet<Identity>();
 
 		// Add desired authorized identities from incoming cred

@@ -169,7 +169,7 @@ public class CredentialWallet implements Externalizable, Describable
 			if ((temp != null) && (temp.contains("(USER)"))) {
 				// This is a USER assertion of the form A->B->C where A is a
 				// USER
-				// (USER) "grimshaw" -> something format string wiht verbosity
+				// (USER) "grimshaw" -> something format string with verbosity
 				// LOW
 				String t2[] = temp.split("\"");
 				if (t2.length < 3) {

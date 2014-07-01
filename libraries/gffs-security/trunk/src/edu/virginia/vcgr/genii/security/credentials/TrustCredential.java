@@ -328,13 +328,16 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		}
 	}
 
+	/**
+	 * seeks out the signature in the lower-level trust delegation object.
+	 */
 	public String locateDsigValue()
 	{
 		TrustDelegation deleg = getDelegation();
 		AssertionDocument ad = deleg.getXML();
 		org.w3c.dom.Document doc = (Document) ad.getDomNode();
 
-		// Find Signature element
+		// Find Signature element.
 		NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "SignatureValue");
 		if (nl.getLength() == 0) {
 			_logger.error("cannot find 'SignatureValue' element in assertion.");

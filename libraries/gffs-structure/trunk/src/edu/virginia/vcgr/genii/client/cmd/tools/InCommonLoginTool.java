@@ -172,7 +172,8 @@ public class InCommonLoginTool extends BaseLoginTool
 			// TODO Needs to be adjusted after permanent policy location is determined.
 			targetPath = STANDARD_PREFIX + _username;
 
-			// we're going to use the WS-TRUST token-issue operation to log in to a security tokens service.
+			// we're going to use the WS-TRUST token-issue operation to log in to a security tokens
+			// service.
 			RNSPath authnPath = callContext.getCurrentPath().lookup(targetPath, RNSPathQueryFlags.MUST_EXIST);
 			EndpointReferenceType epr = authnPath.getEndpoint();
 

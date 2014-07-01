@@ -10,6 +10,11 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
+
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -129,7 +134,7 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 					_identity[0].getNotBefore(), _identity[0].getNotAfter());
 
 			case MEDIUM:
-				return String.format("(" + _type.toString() + ") \"%s\" [%2$tF %2$tT, %3$tF %3$tT]",
+				return String.format("(" + _type.toString() + ") %s [%2$tF %2$tT, %3$tF %3$tT]",
 					X500PrincipalUtilities.describe(_identity[0].getSubjectX500Principal(), verbosity),
 					_identity[0].getNotBefore(), _identity[0].getNotAfter());
 
@@ -252,4 +257,25 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 		}
 		return true;
 	}
+
+	/**
+	 * returns a string with the openssl style one-line rdn representation for the certificate's subject.
+	 */
+	public static String getOpensslRdn(X509Certificate toShow)
+	{
+		try {
+			List<Rdn> rdnVersion = new LdapName(toShow.getSubjectX500Principal().toString()).getRdns();
+			// _logger.debug("broken into rdn form:");
+			StringBuilder toReturn = new StringBuilder();
+			for (Rdn rdn : rdnVersion) {
+				// _logger.debug("==> " + rdn);
+				toReturn.append("/" + rdn.toString());
+			}
+			return toReturn.toString();
+		} catch (InvalidNameException e) {
+			_logger.error("got invalid name exception for " + toShow, e);
+			return null;
+		}
+	}
+
 }

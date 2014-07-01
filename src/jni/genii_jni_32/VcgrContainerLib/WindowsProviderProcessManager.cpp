@@ -5,6 +5,8 @@
 #include <conio.h>
 #include <tlhelp32.h>
 
+extern "C" {
+
 //-----------------------------------------------------------------------------
 // This is a function designed to work as a callback for killing processes.
 // This method is in accordance with MS best practices for killing a process:
@@ -278,4 +280,6 @@ JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_processmanager
 	}
 
 	return false;
+}
+
 }

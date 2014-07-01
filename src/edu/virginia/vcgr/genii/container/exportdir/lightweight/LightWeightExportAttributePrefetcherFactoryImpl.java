@@ -19,7 +19,6 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 
 public class LightWeightExportAttributePrefetcherFactoryImpl implements AttributesPreFetcherFactory
 {
-
 	static private Log _logger = LogFactory.getLog(LightWeightExportAttributePrefetcherFactoryImpl.class);
 
 	@Override

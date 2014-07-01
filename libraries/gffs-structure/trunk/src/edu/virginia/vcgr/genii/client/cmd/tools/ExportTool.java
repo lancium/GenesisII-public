@@ -2,10 +2,13 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -36,6 +39,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
+import edu.virginia.vcgr.genii.client.security.WalletUtilities;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
@@ -48,6 +52,8 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 
 public class ExportTool extends BaseGridTool
 {
+	private static Log _logger = LogFactory.getLog(ExportTool.class);
+
 	static final private String _DESCRIPTION = "config/tooldocs/description/dexport";
 	static final private String _USAGE_RESOURCE = "config/tooldocs/usage/uexport";
 	static final private String _MANPAGE = "config/tooldocs/man/export";
@@ -59,6 +65,7 @@ public class ExportTool extends BaseGridTool
 	private String _svnUser = null;
 	private String _svnPass = null;
 	private Long _svnRevision = null;
+	private String _exportCreatorFilter = null;
 
 	public ExportTool()
 	{
@@ -108,12 +115,19 @@ public class ExportTool extends BaseGridTool
 		_svnRevision = Long.valueOf(revision);
 	}
 
+	@Option("creator")
+	public void setExportCreator(String filter)
+	{
+		_exportCreatorFilter = filter;
+	}
+
 	@Override
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
 		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
 		ClassNotFoundException
 	{
 		int numArgs = numArguments();
+
 		if (_create) {
 			/* get rns path for exported root and ensure does not exist */
 			String targetRNSName = null;
@@ -142,9 +156,16 @@ public class ExportTool extends BaseGridTool
 			/* get local directory path to be exported */
 			String localPath = getArgument(1);
 
+			ArrayList<String> owners = WalletUtilities.extractOwnersFromCredentials(_exportCreatorFilter);
+			if ((owners == null) || (owners.size() == 0)) {
+				String msg = "failed to determine the owners for the export.  failing request.";
+				_logger.error(msg);
+				throw new CreationException(msg);
+			}
+
 			EndpointReferenceType epr =
 				createExportedRoot(targetRNSName, exportServiceEPR, localPath, _svnUser, _svnPass, _svnRevision, targetRNSName,
-					_replicate);
+					_replicate, owners);
 
 			if (targetRNSName == null) {
 				stdout.println(ObjectSerializer.toString(epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint")));
@@ -152,7 +173,7 @@ public class ExportTool extends BaseGridTool
 
 			return 0;
 		} else if (_replicate) {
-			/* get rns path for exported root and ensure dne */
+			/* get rns path for exported root and ensure it does not exist. */
 			String targetRNSName = null;
 			if (numArgs == 4) {
 				GeniiPath gPath = new GeniiPath(getArgument(3));
@@ -232,6 +253,11 @@ public class ExportTool extends BaseGridTool
 	{
 		int numArgs = numArguments();
 
+		_logger.debug("args are:");
+		for (int i = 0; i < numArgs; i++) {
+			_logger.debug("#" + i + ": " + getArgument(i));
+		}
+
 		if (_create) {
 			if (_quit)
 				throw new InvalidToolUsageException("Only one of the options create or " + "quit can be specified.");
@@ -254,9 +280,9 @@ public class ExportTool extends BaseGridTool
 	}
 
 	static public EndpointReferenceType createExportedRoot(String humanName, EndpointReferenceType exportServiceEPR,
-		String localPath, String svnUser, String svnPass, Long svnRevision, String RNSPath, boolean isReplicated)
-		throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException,
-		InvalidToolUsageException
+		String localPath, String svnUser, String svnPass, Long svnRevision, String RNSPath, boolean isReplicated,
+		ArrayList<String> owners) throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException,
+		CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
 
@@ -271,7 +297,7 @@ public class ExportTool extends BaseGridTool
 
 		MessageElement[] createProps =
 			ExportedDirUtils.createCreationProperties(humanName, localPath, svnUser, svnPass, svnRevision, "",
-				replicationIndicator);
+				replicationIndicator, owners);
 
 		ICallingContext origContext = ContextManager.getExistingContext();
 		ICallingContext createContext = origContext.deriveNewContext();

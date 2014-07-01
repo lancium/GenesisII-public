@@ -105,9 +105,10 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			 */
 			boolean accessOkay = checkAccess(prunedCredentials, resource, RWXCategory.WRITE);
 			if (accessOkay) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("skipping kerberos authentication due to administrative access to resource.");
-				blurtCredentials("credentials that enabled kerberos authz skip are: ", prunedCredentials);
+				_logger.debug("skipping kerberos authentication due to administrative access to resource.");
+				if (_logger.isTraceEnabled()) {
+					blurtCredentials("credentials that enabled kerberos authz skip are: ", prunedCredentials);
+				}
 				return true;
 			}
 		} catch (Exception AclException) {

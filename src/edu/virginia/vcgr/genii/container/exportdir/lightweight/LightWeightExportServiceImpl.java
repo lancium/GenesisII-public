@@ -9,6 +9,8 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
+import edu.virginia.vcgr.genii.client.ExportProperties;
+import edu.virginia.vcgr.genii.client.ExportProperties.ExportMechanisms;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
@@ -17,9 +19,7 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
-import edu.virginia.vcgr.genii.container.exportdir.ExportType;
-import edu.virginia.vcgr.genii.container.exportdir.GFFSExportConfiguration;
-import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoExportedDirUtils;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoExportUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
@@ -45,12 +45,30 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 
 		ResourceKey key = super.createResource(creationParameters);
 		key.dereference().setProperty(LightWeightExportConstants.ROOT_DIRECTORY_PROPERTY_NAME, initInfo.getPath());
-		// ensure that local dir to be exported is readable
-		// if so, proceed with export creation
+
+		// set the owner info for the resource before we need it.
+		String primaryOwner = initInfo.getPrimaryOwnerDN();
+		if (primaryOwner != null) {
+			key.dereference().setProperty(LightWeightExportConstants.PRIMARY_OWNER_NAME, primaryOwner);
+			_logger.debug("setting primary owner to " + primaryOwner);
+		}
+
+		_logger.debug("testing primary owner just added, getting value="
+			+ key.dereference().getProperty(LightWeightExportConstants.PRIMARY_OWNER_NAME));
+
+		String secondaryOwner = initInfo.getSecondaryOwnerDN();
+		if (secondaryOwner != null) {
+			key.dereference().setProperty(LightWeightExportConstants.SECONDARY_OWNER_NAME, secondaryOwner);
+			_logger.debug("setting secondary owner to " + secondaryOwner);
+		}
+
+		/*
+		 * ensure that local dir to be exported is readable. if so, proceed with export creation.
+		 */
 		try {
-			// check if directory exists
-			ExportType exportType = GFFSExportConfiguration.getExportType();
-			if (exportType == ExportType.SUDO) {
+			// check if directory exists.
+			ExportMechanisms exportType = ExportProperties.getExportProperties().getExportMechanism();
+			if (exportType == ExportMechanisms.EXPORT_MECH_PROXYIO) {
 				String osName = System.getProperty("os.name");
 				boolean isCompatibleOS = true;
 				if (osName.contains("Windows")) {
@@ -69,7 +87,7 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 								+ "unsupported on this OS") }, null));
 				}
 
-				if (!SudoExportedDirUtils.dirReadable(initInfo.getPath())) {
+				if (!SudoExportUtils.dirReadable(initInfo.getPath(), key)) {
 					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
 						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
 							+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
@@ -105,7 +123,6 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 	public LightWeightExportServiceImpl() throws RemoteException
 	{
 		super("LightWeightExportPortType");
-
 		addImplementedPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE());
 		addImplementedPortType(WellKnownPortTypes.EXPORTED_LIGHTWEIGHT_ROOT_SERVICE_PORT_TYPE());
 	}

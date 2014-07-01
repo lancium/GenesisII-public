@@ -11,7 +11,6 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 // ASG This could be made faster by only doing getfile once and extracting everything.
 public class ExportedRandomByteIOForkAttributePrefetcher extends RandomByteIOAttributePreFetcher<IResource>
 {
-
 	private ResourceKey _rKey;
 	private String _forkPath;
 

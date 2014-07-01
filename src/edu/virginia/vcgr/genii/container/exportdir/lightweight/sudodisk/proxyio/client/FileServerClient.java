@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import edu.virginia.vcgr.genii.client.ExportProperties;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.utils.PathType;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.commons.Constants;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.mapping.Mapper;
@@ -27,7 +28,6 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 
 public class FileServerClient
 {
-
 	public static ReadResponse read(String path, long offset, long numBytes, byte[] nonce, int port)
 		throws UnknownHostException, IOException
 	{
@@ -420,6 +420,8 @@ public class FileServerClient
 		return dlr;
 	}
 
+	//hmmm: this is bunk; fix export properties now or we are doomed to wind that object through all the export functions.
+	
 	// Invoked to start the file server!
 	// returns the <nonce,port, serverprocess> where the server was started!
 	public static synchronized FileServerID start(String uname)
@@ -442,16 +444,15 @@ public class FileServerClient
 			}
 		}
 
+		/*
 		String install_dir_sys_prop = "edu.virginia.vcgr.genii.install-base-dir";
-
+*/
+		
 		List<String> cmd = new ArrayList<String>();
 		cmd.add("sudo");
 		cmd.add("-u");
 		cmd.add(uname);
-		cmd.add(System.getProperty(install_dir_sys_prop) + "/fs_wrapper.sh");
-
-		// cmd.add(Constants.FILE_SERVER_ROOT_PATH + "/fs_wrapper.sh");
-		// cmd.add(Constants.FILE_SERVER_ROOT_PATH);
+		cmd.add(ExportProperties.getExportProperties().getProxyIOLauncherFilePath());
 
 		Process p = null;
 		ProcessBuilder pb = new ProcessBuilder(cmd);

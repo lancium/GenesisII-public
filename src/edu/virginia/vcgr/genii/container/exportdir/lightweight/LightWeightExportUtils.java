@@ -3,9 +3,12 @@ package edu.virginia.vcgr.genii.container.exportdir.lightweight;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.virginia.vcgr.genii.client.ExportProperties;
+import edu.virginia.vcgr.genii.client.ExportProperties.ExportMechanisms;
 import edu.virginia.vcgr.genii.client.resource.IResource;
-import edu.virginia.vcgr.genii.container.exportdir.ExportType;
-import edu.virginia.vcgr.genii.container.exportdir.GFFSExportConfiguration;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.disk.DiskExportRoot;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoDiskExportEntry;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoDiskExportRoot;
@@ -14,10 +17,14 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.zipjar.ZipJarExpo
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
+//hmmm: seems like we need to gate the lookups on permissions here, so that we don't allow returning of paths that the current guy has no access to.
+
 public class LightWeightExportUtils
 {
+	static private Log _logger = LogFactory.getLog(LightWeightExportUtils.class);
+
 	static private String _lastRootDirString = null;
-	static private VExportRoot _lastExportRoot = null;
+	static private VExportRoot _lastExportRoot = null;	
 
 	static VExportRoot getRoot(ResourceKey myKey) throws IOException
 	{
@@ -39,24 +46,37 @@ public class LightWeightExportUtils
 				VExportRoot vroot = null;
 
 				// Temporarily disabled
-				/*
-				 * if (rootDirString.matches("^.+:.*$")) { // Handle SVN Long revision =
-				 * (Long)resource.getProperty(
-				 * LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME);
-				 * 
-				 * vroot = new SVNExportRoot(rootDirString, (String)resource.getProperty(
-				 * LightWeightExportConstants.SVN_USER_PROPERTY_NAME), (String)resource.getProperty(
-				 * LightWeightExportConstants.SVN_PASS_PROPERTY_NAME), revision); if (revision ==
-				 * null) return vroot; } else
-				 */
+				// if (rootDirString.matches("^.+:.*$")) {
+				// // Handle SVN
+				// Long revision = (Long)
+				// resource.getProperty(LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME);
+				//
+				// vroot =
+				// new SVNExportRoot(rootDirString,
+				// (String) resource.getProperty(LightWeightExportConstants.SVN_USER_PROPERTY_NAME),
+				// (String) resource.getProperty(LightWeightExportConstants.SVN_PASS_PROPERTY_NAME),
+				// revision);
+				// if (revision == null)
+				// return vroot;
+				// } else
+
 				{
 					File root = new File(rootDirString);
-					ExportType exportType = GFFSExportConfiguration.getExportType();
+					ExportMechanisms exportType = ExportProperties.getExportProperties().getExportMechanism();
+					if (exportType == ExportMechanisms.EXPORT_MECH_PROXYIO) {
+						// hmmm: temp! bad! need to find this from construction properties.
+						// hmmm: we have that class that can get all the props out; too bad we can't
+						// just get a couple props.
 
-					if (exportType == ExportType.SUDO) {
-						String username = SudoExportUtils.getLocalUser();
-						if (SudoDiskExportEntry.isDir(root, username)) {
-							return new SudoDiskExportRoot(root, username);
+						String unixUsername = SudoExportUtils.getExportOwnerUser(rKey);
+						if (unixUsername == null) {
+							String msg = "failure to determine the export owner name for a sudo-based export!";
+							_logger.error(msg);
+							throw new IOException(msg);
+
+						}
+						if (SudoDiskExportEntry.isDir(root, unixUsername)) {
+							return new SudoDiskExportRoot(root, unixUsername);
 						}
 					} else {
 						if (root.isDirectory())

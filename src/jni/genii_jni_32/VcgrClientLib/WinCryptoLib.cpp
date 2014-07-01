@@ -11,6 +11,8 @@
 #include <fcntl.h>
 #include <tchar.h>
 
+extern "C" {
+
 static const char* EXCEPTION_CLASS = 
 	"edu/virginia/vcgr/genii/client/security/wincrypto/WinCryptoException";
 static const char* BAD_CHAIN_EXCEPTION_CLASS = 
@@ -657,4 +659,6 @@ JNIEXPORT void JNICALL Java_edu_virginia_vcgr_genii_client_security_wincrypto_Wi
 	CertFreeCertificateContext(pCertContext);
 
 	return;
+}
+
 }

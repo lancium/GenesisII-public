@@ -6,6 +6,11 @@ target-path
 cert-file-path
     The path to the encoded X.509 certificate file representing the identity to be added/removed from the access control list(s). To indicate a local path, make sure to begin the pathname with 'local:'. 
 
+pattern
+    A set of name-value pairs to match within the DN of the certificate.  For example, one might add a pattern-based ACL that is rooted in the XSEDE MyProxy trust store for a user Jed Clampett.  The pattern for this would look like:
+        --pattern="CN=Jed Clampett"
+Multiple pattern components can be provided, separated by commas, e.g. --pattern="X=Y,Q=Z,R=M"
+
 identity-provider-path
     The RNS path to the Identity Provider resource (i.e., a WS-Trust Security Token Service) to be added/removed from the access control list(s). 
 

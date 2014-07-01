@@ -27,14 +27,11 @@ public class ByteIOFileCreator
 		uroot = baseDir;
 
 		// ** First get the calling context
-		// System.err.println("about to call getexistingcontext");
 		ICallingContext callContext = ContextManager.getExistingContext();
-		// System.err.println("called getexistingcontext");
 		// **Then get the credential wallet
 		CredentialWallet Wallet =
 			(CredentialWallet) callContext.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);
 		// **Then, get the list of USER names from the credential wallet
-		// System.err.println("called getwallet");
 		if (!Wallet.isEmpty()) {
 			// Then pick the first one
 			// Be careful - usernames may not always be unique - they are these

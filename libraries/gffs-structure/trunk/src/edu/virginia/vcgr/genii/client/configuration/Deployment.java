@@ -143,7 +143,7 @@ public class Deployment
 			StreamUtils.close(fin);
 		}
 	}
-	
+
 	static private Properties loadClientCacheProperties(String deploymentName, HierarchicalDirectory configurationDirectory)
 	{
 		FileInputStream fin = null;
@@ -210,8 +210,9 @@ public class Deployment
 	{
 		return _rejuvenationProperties;
 	}
-	
-	public Properties clientCacheProperties() {
+
+	public Properties clientCacheProperties()
+	{
 		return _clientCacheProperties;
 	}
 

@@ -31,11 +31,10 @@
 			</filelist>
 		</concat>
 
-<!--should not be needed?		<replace file="${lib.dir}/genesisII.container.log4j.properties"
-			token="%{INSTALL_PATH}" value="${basedir}" summary="no" />
-		<replace file="${lib.dir}/genesisII.client.log4j.properties"
-			token="%{INSTALL_PATH}" value="${basedir}" summary="no" />
--->
+		<copy file="${lib.dir}/export.properties.template"
+                        tofile="${lib.dir}/export.properties"/>
+                <replace file="${lib.dir}/export.properties"
+                        token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 
 	</target>
 	

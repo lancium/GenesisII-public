@@ -24,6 +24,9 @@ username
 password 
     Similar to username, the password option allows the user to specify a valid password for logging in. Also, just as in the case of the username option, if the target is an IDP service instance, then the password is used to authenticate to that service instance. If this isn't true, then the password becomes part of the username/password credential token. 
 
+noPassword
+    An alternative to providing a password that is used to login via the existing TLS credentials.  This can be used in conjunction with MyProxy or InCommon logins when the user identity has been given access rights via a pattern-based ACL.  This establishes a pattern with the user's CN (Common Name) as a filter, where the TLS identity's certificate is based on the MyProxy or InCommon server's CA certificate.
+
 Description:
 
 The login tool allows users of the Genesis II system to acquire a set of credentials that will the be used for authentication and authorization purposes. This tool is very flexible in terms of the types and sources of credentials that it can use. In the case where login has no parameters at all, the tool assumes a set of reasonable defaults and prompts the user for only a minimal set of values with which to log in. For most users, this version of the tool should suffice.

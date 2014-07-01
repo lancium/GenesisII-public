@@ -56,7 +56,6 @@ public class JobTool extends BaseGridTool
 
 	public JobTool()
 	{
-
 		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), false, ToolCategory.EXECUTION);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}

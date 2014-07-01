@@ -6,7 +6,7 @@
 # The installation location for the GenesisII package (client or container).
 # Update this if Genesis is installed elsewhere, e.g. the installation path on
 # Mac OSX is instead "/Applications/GenesisII".
-GENII_INSTALL_DIR="c:/Program Files (x86)/GenesisII
+GENII_INSTALL_DIR="c:/Program Files (x86)/GenesisII"
 
 # The name of the deployment to use.  Modern (2012 and onwards) installers
 # use the name "current_grid" for this.

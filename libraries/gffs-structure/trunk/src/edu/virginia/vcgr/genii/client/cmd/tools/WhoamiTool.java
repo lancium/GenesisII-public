@@ -29,6 +29,8 @@ public class WhoamiTool extends BaseGridTool
 	static final private String _MANPAGE = "config/tooldocs/man/whoami";
 
 	private VerbosityLevel _verbosity = VerbosityLevel.OFF;
+	// true if we want to show openssl one-line rdn format.
+	private boolean _oneLine = false;
 
 	@Option({ "verbosity" })
 	public void setVerbosity(String verbosityString) throws InvalidToolUsageException
@@ -36,6 +38,12 @@ public class WhoamiTool extends BaseGridTool
 		_verbosity = VerbosityLevel.valueOf(verbosityString);
 		if (_verbosity == null)
 			throw new InvalidToolUsageException();
+	}
+	
+	@Option({"oneline"})
+	public void setOneline()
+	{
+		_oneLine = true;
 	}
 
 	public WhoamiTool()
@@ -60,12 +68,20 @@ public class WhoamiTool extends BaseGridTool
 					new SecurityUpdateResults());
 
 			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callingContext);
-			stdout.format("Client Tool Identity: \n\t%s\n\n", (new X509Identity(clientKeyMaterial._clientCertChain,
+			stdout.format("Client Tool Identity: \n\t%s\n", (new X509Identity(clientKeyMaterial._clientCertChain,
 				IdentityType.CONNECTION)).describe(_verbosity));
+			if (_oneLine) {
+				stdout.format("\t%s\n", X509Identity.getOpensslRdn(clientKeyMaterial._clientCertChain[0]));				
+			}
+			stdout.format("\n");
 			if (!transientCredentials.isEmpty()) {
 				stdout.format("Additional Credentials: \n");
-				for (NuCredential cred : transientCredentials.getCredentials())
+				for (NuCredential cred : transientCredentials.getCredentials()) {
 					stdout.format("\t%s\n", cred.describe(_verbosity));
+					if (_oneLine) {
+						stdout.format("\t%s\n", X509Identity.getOpensslRdn(cred.getOriginalAsserter()[0]));				
+					}
+				}
 			}
 		}
 

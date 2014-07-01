@@ -27,6 +27,10 @@ export-root-url
 export-root-rns-path 
     The RNS path of an existing export root resource (one that has already been created) that the user wishes to terminate. 
 
+creator
+    This flag is only required if the user has multiple grid STS identities in their credential wallet.  The flag picks which of those identities will be listed as owning the export by providing a filter string.  The filter string does not have to be the full DN, but can be just a unique portion of the DN, such as the Common Name (CN).  The first DN that matches the filter will be selected, so it is important to filter wisely if the DNs are very similar.
+    Note that the DN is formatted using OpenSSL one-line RDN format, as is the Globus grid-mapfile format.
+
 Description:
 
 The export tool gives users the ability to create and terminate grid exports of existing data (please reference exporting for more information on exports in the grid). If no command line values are given, then export launches a graphical dialog to help maintain local exports. Note that the dialog only allows users to manipulate exports created through the dialog (in other words, one cannot create an export on the command line, and then terminate it through the dialog) and only works in environments where a container has been started (i.e., you cannot use the export dialog to create exports on a remote machine).

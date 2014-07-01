@@ -2,3 +2,13 @@ Description:
 
 The command whoami prints out the credentials of the currently logged in user.
 
+--verbosity=[LOW | MEDIUM | HIGH]
+    Shows the credentials with the requested level of verbosity.  HIGH
+verbosity will show all parameters for the credentials.  LOW just shows
+the subject names.
+
+--oneline
+    Enables printing the OpenSSL style 'oneline' RDN format for the subjects
+listed in the credentials.
+
+

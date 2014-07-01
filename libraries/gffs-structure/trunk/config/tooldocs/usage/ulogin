@@ -1,8 +1,6 @@
 login
 
 login [--validDuration=<duration-string>]
-	[--username=<username> [--password=<password>]] 
+	[--username=<username>] [--password=<password>] [--noPassword]
 	rns:<identity provider path>
-
-login --username=<username> [--password=<password>]
 

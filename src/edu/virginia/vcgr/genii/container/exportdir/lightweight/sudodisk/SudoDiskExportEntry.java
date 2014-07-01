@@ -42,6 +42,9 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 		if (!doesExist(_target, _uname))
 			throw new FileNotFoundException(String.format("Unable to locate file system entry \"%s\".", _target));
 	}
+	//hmmm: this is awful.  why have a class with a constructor where all the damned members are static?  that makes no sense.
+	
+	
 
 	/**
 	 * 
@@ -566,7 +569,6 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 
 	private static synchronized FileServerID startIfNecessary(String username) throws IOException
 	{
-
 		FileServerID fsid = FileServerClient.start(username);
 		if (fsid == null) {
 			throw new IOException("Unable to start proxy io server");

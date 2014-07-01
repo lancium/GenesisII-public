@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
+import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,10 +74,12 @@ public class ExportManipulator
 			throw new ResourceException("exception during export checking.", r);
 		}
 		// Now we have both the container path and the target path.
+		// hmmm: need to add in the owners of the export!
+		ArrayList<String> owners = null;
 		try {
 			EndpointReferenceType exEPR =
 				ExportTool.createExportedRoot(targetpath.toString(), servicepath.getEndpoint(), localPath, "", "", 0L,
-					targetpath.toString(), false);
+					targetpath.toString(), false, owners);
 			if (exEPR == null)
 				_logger.debug("created null EPR with createExportedRoot");
 		} catch (Exception r) {

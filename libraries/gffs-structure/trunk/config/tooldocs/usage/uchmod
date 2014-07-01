@@ -1,6 +1,6 @@
 To add/remove an X.509 identity:
 
-chmod <target-path> ( <[<+|->r][<+|->w][<+|->x]> | <octal-mode> ) <cert-file-path>
+chmod <target-path> ( <[<+|->r][<+|->w][<+|->x]> | <octal-mode> ) (--pattern="X") <cert-file-path>
 
 To add/remove a Identity Provider identity:
 

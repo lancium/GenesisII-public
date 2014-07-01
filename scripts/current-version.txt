@@ -1,1 +1,0 @@
-${compiler:genii.app-version} Build ${compiler:genii.build-number}

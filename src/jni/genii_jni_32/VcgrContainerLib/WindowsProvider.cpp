@@ -7,12 +7,14 @@
 
 #include "WindowsProvider.jh"
 
+extern "C" {
+
 /*
- * Class:     edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider
+ * Class:     edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider
  * Method:    getIndividualCPUSpeed
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getIndividualCPUSpeed (JNIEnv *env, jobject obj)
+JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider_getIndividualCPUSpeed (JNIEnv *env, jobject obj)
 {
 	unsigned long ret = 0;
 	LONG Result;
@@ -81,11 +83,11 @@ done:
 }
 
 /*
- * Class:     edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider
+ * Class:     edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider
  * Method:    getPhysicalMemory
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getPhysicalMemory (JNIEnv *env, jobject obj)
+JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider_getPhysicalMemory (JNIEnv *env, jobject obj)
 {
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -96,11 +98,11 @@ JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsPr
 }
 
 /*
- * Class:     edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider
+ * Class:     edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider
  * Method:    getPhysicalMemoryAvailable
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getPhysicalMemoryAvailable (JNIEnv *env, jobject obj)
+JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider_getPhysicalMemoryAvailable (JNIEnv *env, jobject obj)
 {
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -111,11 +113,11 @@ JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsPr
 }
 
 /*
- * Class:     edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider
+ * Class:     edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider
  * Method:    getVirtualMemory
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getVirtualMemory (JNIEnv *env, jobject obj)
+JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider_getVirtualMemory (JNIEnv *env, jobject obj)
 {
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -126,11 +128,11 @@ JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsPr
 }
 
 /*
- * Class:     edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider
+ * Class:     edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider
  * Method:    getVirtualMemoryAvailable
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getVirtualMemoryAvailable (JNIEnv *env, jobject obj)
+JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider_getVirtualMemoryAvailable (JNIEnv *env, jobject obj)
 {
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -157,11 +159,11 @@ JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsPr
 
 
 /*
- * Class:     edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider
+ * Class:     edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider
  * Method:    getScreenSaverActive
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getScreenSaverActive
+JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider_getScreenSaverActive
 (JNIEnv *env, jobject obj) {
 
 	jboolean ssActive = 0;
@@ -245,7 +247,7 @@ bool GetSessionData(PLUID session)
 //-----------------------------------------------------------------------------
 
 /*
- * Class:     edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider
+ * Class:     edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider
  * Method:    getUserLoggedIn
  * Signature: ()Z
  */
@@ -253,7 +255,7 @@ bool GetSessionData(PLUID session)
 /* We used to do it this way, but Microsoft escalated the security requirements for these OS
 calls to an eggregious level.
 
-JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getUserLoggedIn
+JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider_getUserLoggedIn
 (JNIEnv *env, jobject obj)
 {
   PLUID sessions;
@@ -286,7 +288,7 @@ JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_Window
 }
 */
 
-JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getUserLoggedIn
+JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_client_sysinfo_WindowsProvider_getUserLoggedIn
 (JNIEnv *env, jobject obj)
 {
 	HANDLE snapshot;
@@ -319,4 +321,6 @@ JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_Window
 
 	CloseHandle(snapshot);
 	return ret;
+}
+
 }

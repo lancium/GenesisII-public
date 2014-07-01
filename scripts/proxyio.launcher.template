@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# This script is responsible for launching the ProxyIO co-process that
+# implements the file management for sudo-based exports.
+
+java_app="${installer:sys.installationDir}/jre/bin/java"
+if [ ! -f "$java_app" ]; then
+  java_app="$JAVA_HOME/bin/java"
+  if [ ! -f "$java_app" ]; then
+    java_app="$(which java)"
+    if [ ! -f "$java_app" ]; then
+      echo "ERROR: could not deduce location of java from search path, JAVA_HOME or"
+      echo "the Genesis II GFFS installation directory."
+      exit 1
+    fi
+  fi
+fi
+
+"$java_app" -Xms1g -cp "${installer:sys.installationDir}/ext/gffs-container.jar" edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.server.Driver

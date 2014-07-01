@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.appmgr.launcher.ApplicationDescription;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -31,6 +32,10 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
  * installer design document. Many configuration items can now be overridden in the file called
  * "installation.properties" that lives in the state directory, which is managed by the new
  * container configuration scripts (see trunk/installer/scripts).
+ * 
+ * a note on usage: if the installation properties file is not found, many of the lookup functions
+ * below return null. the one exception to this pattern is the getUserDir function, which must
+ * always return a usable user state directory.
  * 
  * @author Chris Koeritz
  */
@@ -96,6 +101,22 @@ public class InstallationProperties extends Properties
 		return ret;
 	}
 
+	public File getExportPropertiesFile()
+	{
+		String stateDir = getUserDir();
+		File propsFile = new File(stateDir + "/" + ExportProperties.EXPORT_PROPERTIES_FILENAME);
+		if (!propsFile.exists()) {
+			propsFile =
+				new File(ApplicationDescription.getInstallationDirectory() + "/lib/" + ExportProperties.EXPORT_PROPERTIES_FILENAME);
+			if (!propsFile.exists()) {
+				_logger.error("could not find any " + ExportProperties.EXPORT_PROPERTIES_FILENAME
+					+ " file in state or installation directory.");
+				return null;
+			}
+		}
+		return propsFile;
+	}
+
 	public HierarchicalDirectory getLocalCertsDirectory()
 	{
 		String prop = getProperty(InstallationConstants.LOCAL_CERTS_DIRECTORY_PROPERTY);
@@ -126,7 +147,7 @@ public class InstallationProperties extends Properties
 
 	public Identity getOwnerCertificate()
 	{
-		// TODO: cache the owner certificate here.
+		// hmmm: cache the owner certificate here, since it doesn't change at runtime.
 		HierarchicalDirectory dir = getLocalCertsDirectory();
 		if (dir == null) {
 			_logger.warn("failure: in get owner cert, the default owners dir is null.");
@@ -169,7 +190,7 @@ public class InstallationProperties extends Properties
 	}
 
 	/**
-	 * The primary and recommended way to retrieve the user state directory.
+	 * The primary and recommended way to retrieve the user/container state directory.
 	 */
 	static public String getUserDir()
 	{

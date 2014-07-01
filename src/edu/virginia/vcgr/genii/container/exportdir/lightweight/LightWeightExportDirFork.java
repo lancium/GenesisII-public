@@ -40,7 +40,6 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 public class LightWeightExportDirFork extends AbstractRNSResourceFork implements RNSResourceFork, InMemoryIterableFork
 // , GeniiNoOutCalls
 {
-
 	final private VExportDir getTarget() throws IOException
 	{
 		return LightWeightExportUtils.getDirectory(getForkPath());
@@ -298,7 +297,6 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 	private static FileOrDir statify(String entryName, String forkPath, ResourceKey rKey) throws IOException
 	{
-
 		VExportDir dir = LightWeightExportUtils.getDirectory(forkPath, rKey);
 
 		for (VExportEntry dirEntry : dir.list(entryName)) {

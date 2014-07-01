@@ -23,7 +23,6 @@ source "$GENII_INSTALL_DIR/scripts/installation_helpers.sh"
 ##############
 
 replace_compiler_variables "$GENII_INSTALL_DIR/RELEASE"
-replace_compiler_variables "$GENII_INSTALL_DIR/updates/current-version.txt"
 replace_compiler_variables "$GENII_INSTALL_DIR/container.properties"
 
 replace_installdir_variables "$GENII_INSTALL_DIR"

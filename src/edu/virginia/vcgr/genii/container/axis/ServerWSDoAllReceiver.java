@@ -498,9 +498,11 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
 			MessageContext messageContext = (MessageContext) workingContext.getProperty(WorkingContext.MESSAGE_CONTEXT_KEY);
 
-			// Extract our calling context (any decryption should be
-			// over with). All GII message-level assertions and UT
-			// tokens should be within CALLER_CREDENTIALS_PROPERTY by now.
+			/*
+			 * Extract our calling context (any decryption should be over with). All GII
+			 * message-level assertions and UT tokens should be within CALLER_CREDENTIALS_PROPERTY
+			 * by now.
+			 */
 			ICallingContext callContext = ContextManager.getExistingContext();
 
 			/*
@@ -509,12 +511,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			 */
 			ArrayList<X509Certificate[]> authenticatedCertChains = new ArrayList<X509Certificate[]>();
 
-			// ensure that we aren't fooled by a malicious client into accepting their view of
-			// reality.
+			/*
+			 * ensure that we aren't fooled by a malicious client into accepting their view of
+			 * reality.
+			 */
 			callContext.removeProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
 
-			// Grab the client-hello authenticated SSL cert-chain (if there
-			// was one)
+			// Grab the client-hello authenticated SSL cert-chain (if there was one)
 			org.mortbay.jetty.Request req =
 				(org.mortbay.jetty.Request) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
 			Object transport = req.getConnection().getEndPoint().getTransport();
@@ -563,17 +566,20 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			 * targetKeyMaterial._clientCertChain; }
 			 */
 
-			// Retrieve the message-level cert-chains that have been
-			// recorded in the signature-Crypto instance. (Unfortunately
-			// this method is only called with the end-certificate; without
-			// the chain, it's impossible to trust X.509 proxy certs)
+			/*
+			 * Retrieve the message-level cert-chains that have been recorded in the
+			 * signature-Crypto instance. (Unfortunately this method is only called with the
+			 * end-certificate; without the chain, it's impossible to trust X.509 proxy certs).
+			 */
 			GIIBouncyCrypto sigCrypto = (GIIBouncyCrypto) messageContext.getProperty(SIG_CRYPTO_PROPERTY);
 			if (sigCrypto != null) {
 				authenticatedCertChains.addAll(sigCrypto.getLoadedCerts());
 			}
 
-			// Retrieve and authenticate other accumulated
-			// message-level credentials (e.g., GII delegated assertions, etc.)
+			/*
+			 * Retrieve and authenticate other accumulated message-level credentials (e.g., GII
+			 * delegated assertions, etc.)
+			 */
 			ArrayList<NuCredential> bearerCredentials =
 				(ArrayList<NuCredential>) callContext.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
 			Collection<NuCredential> authenticatedCallerCreds =
@@ -582,6 +588,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			// Finally add all of our callerIds to the calling-context's outgoing credentials.
 			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 			transientCredentials.addAll(authenticatedCallerCreds);
+			
+//hmmm: can the export methods access the transient credentials easily now that they're stored?  they should be able to.			
 
 			// Grab the operation method from the message context
 			org.apache.axis.description.OperationDesc desc = messageContext.getOperation();

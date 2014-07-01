@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.invoker;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +48,14 @@ public class DatabaseHandler implements IAroundInvoker
 			mdp.complete(true);
 			succeeded = true;
 			return result;
-		} catch (Exception e) {
+		} catch (Throwable e) {
+			if (e instanceof InvocationTargetException) {
+				// for invocation target problems, drop a level of reporting, since it is always useless.
+				Throwable cause = e.getCause();
+				if (cause instanceof Exception)
+					e = cause;
+			}
+			
 			if ((e.getCause() != null) && (e.getCause() instanceof SubscriptionFailedFaultType)) {
 				_logger.info("subscription exception in dbhandler, rethrowing: " + e.getCause().getMessage());
 			} else {

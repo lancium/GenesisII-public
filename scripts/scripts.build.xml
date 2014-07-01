@@ -167,8 +167,7 @@
 				</not>
 			</and>
     		</condition>
-		
-			
+
 		<copy file="${scripts.dir}/jar-desc.xml"
 			tofile="${basedir}/jar-desc.xml"/>
 		<replace file="${basedir}/jar-desc.xml"
@@ -203,6 +202,14 @@
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/ext/genii-certtool-application.properties"
 			token="\" value="\\" summary="no"/>
+
+		<copy file="${scripts.dir}/proxyio.launcher.template"
+			tofile="${basedir}/proxyio.launcher"/>
+		<replace file="${basedir}/proxyio.launcher"
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
+		<replace file="${basedir}/proxyio.launcher"
+			token="\" value="\\" summary="no"/>
+		<chmod file="${basedir}/proxyio.launcher" perm="ugo+rx"/>
 
 		<antcall target="build-script-win">
 			<param name="win-script-src-dir" value="${scripts.dir}"/>

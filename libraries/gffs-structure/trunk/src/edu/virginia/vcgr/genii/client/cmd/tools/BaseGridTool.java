@@ -88,9 +88,10 @@ public abstract class BaseGridTool implements ITool
 	protected abstract void verify() throws ToolException;
 
 	// hmmm: ugly, but true. the set returned here should be reduced.
-	protected abstract int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		GenesisIISecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException;
+	protected abstract int runCommand() throws ReloadShellException /* necessary */, ToolException /* necessary */,
+		UserCancelException /* necessary */, RNSException /* necessary */, GenesisIISecurityException,
+		IOException/* necessary */, ResourcePropertyException, CreationException, ClassNotFoundException/* necessary */,
+		DialogException;
 
 	protected boolean useGui()
 	{

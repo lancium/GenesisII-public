@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.exportdir;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -224,10 +225,12 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			String fullPath = ExportedFileUtils.createFullPath(_resource.getLocalPath(), name);
 			String parentIds = ExportedDirUtils.createParentIdsString(_resource.getParentIds(), _resource.getId());
 			String isReplicated = _resource.getReplicationState();
+			// hmmm: add in primary and secondary owner DN here!!!
+			ArrayList<String> owners = null;
 			newRef =
 				vcgrCreate(
 					new VcgrCreate(ExportedDirUtils.createCreationProperties(null, fullPath, null, null, null, parentIds,
-						isReplicated))).getEndpoint();
+						isReplicated, owners))).getEndpoint();
 
 			String newEntryId = (new GUID()).toString();
 			ExportedDirEntry newEntry =
