@@ -97,40 +97,42 @@
       <fileEntry mountPoint="7211" file="./scripts/gen2deployment-2.7-1.spec" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <dirEntry mountPoint="34" file=".." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp" dirMode="755" overrideDirMode="true">
         <exclude>
-          <entry location="tests" fileType="regular" />
-          <entry location="derby.log" fileType="regular" />
-          <entry location="cert-tool" fileType="regular" />
-          <entry location="bin.ant" fileType="regular" />
-          <entry location="readme.txt" fileType="regular" />
-          <entry location="linux-cmd-wrapper" fileType="regular" />
-          <entry location="build.properties" fileType="regular" />
-          <entry location=".project" fileType="regular" />
+          <entry location="build.xml" fileType="regular" />
+          <entry location="container.properties" fileType="regular" />
+          <entry location="jar-desc.xml" fileType="regular" />
           <entry location="deployments/default" fileType="regular" />
-          <entry location="grid" fileType="regular" />
-          <entry location="build-initial.xml" fileType="regular" />
-          <entry location="lib" fileType="regular" />
-          <entry location="bin.eclipse" fileType="regular" />
-          <entry location="ext/genii-base-application.properties" fileType="regular" />
           <entry location="ext/genii-certtool-application.properties" fileType="regular" />
           <entry location="ext/genii-container-application.properties" fileType="regular" />
+          <entry location="ext/genii-base-application.properties" fileType="regular" />
           <entry location="ext/genii-client-application.properties" fileType="regular" />
           <entry location="JavaServiceWrapper" fileType="regular" />
-          <entry location="xsede_tools" fileType="regular" />
-          <entry location="unit-test-reports" fileType="regular" />
-          <entry location="scripts" fileType="regular" />
-          <entry location="jar-desc.xml" fileType="regular" />
+          <entry location="cert-tool" fileType="regular" />
+          <entry location="derby.log" fileType="regular" />
+          <entry location="gffschown" fileType="regular" />
           <entry location="mappings.properties" fileType="regular" />
-          <entry location=".svn" fileType="regular" />
-          <entry location="installer" fileType="regular" />
-          <entry location="context.xml" fileType="regular" />
-          <entry location=".settings" fileType="regular" />
-          <entry location="src" fileType="regular" />
-          <entry location="build.xml" fileType="regular" />
-          <entry location=".classpath" fileType="regular" />
-          <entry location="container.properties" fileType="regular" />
-          <entry location="runContainer.sh" fileType="regular" />
+          <entry location="scripts" fileType="regular" />
+          <entry location="proxyio.launcher" fileType="regular" />
+          <entry location="lib" fileType="regular" />
+          <entry location="linux-cmd-wrapper" fileType="regular" />
+          <entry location="grid" fileType="regular" />
+          <entry location="bin.ant" fileType="regular" />
+          <entry location="unit-test-reports" fileType="regular" />
+          <entry location="xsede_tools" fileType="regular" />
           <entry location="libraries" fileType="regular" />
+          <entry location="build-initial.xml" fileType="regular" />
+          <entry location="context.xml" fileType="regular" />
+          <entry location="tests" fileType="regular" />
+          <entry location="build.properties" fileType="regular" />
+          <entry location="installer" fileType="regular" />
+          <entry location="src" fileType="regular" />
+          <entry location="bin.eclipse" fileType="regular" />
+          <entry location=".project" fileType="regular" />
           <entry location="change-port.sh" fileType="regular" />
+          <entry location="readme.txt" fileType="regular" />
+          <entry location=".svn" fileType="regular" />
+          <entry location="runContainer.sh" fileType="regular" />
+          <entry location=".settings" fileType="regular" />
+          <entry location=".classpath" fileType="regular" />
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="34" file="../scripts/jar-desc.xml" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
@@ -494,14 +496,11 @@
           <entry location="scripts" fileType="regular" />
           <entry location="RELEASE" fileType="regular" />
           <entry location="ext" fileType="regular" />
-          <entry location="proxyio.launcher" fileType="regular" />
           <entry location="webapps" fileType="regular" />
           <entry location="bundles" fileType="regular" />
           <entry location="jni-libs" fileType="regular" />
           <entry location="container.properties.example" fileType="regular" />
           <entry location="dpages" fileType="regular" />
-          <entry location="current.version" fileType="regular" />
-          <entry location="current.deployment" fileType="regular" />
           <entry location="License.txt" fileType="regular" />
           <entry location="eclipse" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
