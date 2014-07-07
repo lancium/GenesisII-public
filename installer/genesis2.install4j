@@ -107,7 +107,6 @@
           <entry location="ext/genii-client-application.properties" fileType="regular" />
           <entry location="JavaServiceWrapper" fileType="regular" />
           <entry location="cert-tool" fileType="regular" />
-          <entry location="derby.log" fileType="regular" />
           <entry location="gffschown" fileType="regular" />
           <entry location="mappings.properties" fileType="regular" />
           <entry location="scripts" fileType="regular" />
@@ -496,11 +495,14 @@
           <entry location="scripts" fileType="regular" />
           <entry location="RELEASE" fileType="regular" />
           <entry location="ext" fileType="regular" />
+          <entry location="proxyio.launcher" fileType="regular" />
           <entry location="webapps" fileType="regular" />
           <entry location="bundles" fileType="regular" />
           <entry location="jni-libs" fileType="regular" />
           <entry location="container.properties.example" fileType="regular" />
           <entry location="dpages" fileType="regular" />
+          <entry location="current.version" fileType="regular" />
+          <entry location="current.deployment" fileType="regular" />
           <entry location="License.txt" fileType="regular" />
           <entry location="eclipse" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
