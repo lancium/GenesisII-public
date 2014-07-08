@@ -110,7 +110,8 @@ public class InstallationProperties extends Properties
 		File propsFile = new File(stateDir + "/" + ExportProperties.EXPORT_PROPERTIES_FILENAME);
 		if (!propsFile.exists()) {
 			propsFile =
-				new File(ApplicationDescription.getInstallationDirectory() + "/lib/" + ExportProperties.EXPORT_PROPERTIES_FILENAME);
+				new File(ApplicationDescription.getInstallationDirectory() + "/lib/"
+					+ ExportProperties.EXPORT_PROPERTIES_FILENAME);
 			if (!propsFile.exists()) {
 				_logger.error("could not find any " + ExportProperties.EXPORT_PROPERTIES_FILENAME
 					+ " file in state or installation directory.");
@@ -129,7 +130,8 @@ public class InstallationProperties extends Properties
 		File propsFile = new File(stateDir + "/" + ExportProperties.EXPORT_RESTRICTIONS_FILENAME);
 		if (!propsFile.exists()) {
 			propsFile =
-				new File(ApplicationDescription.getInstallationDirectory() + "/lib/" + ExportProperties.EXPORT_RESTRICTIONS_FILENAME);
+				new File(ApplicationDescription.getInstallationDirectory() + "/lib/"
+					+ ExportProperties.EXPORT_RESTRICTIONS_FILENAME);
 			if (!propsFile.exists()) {
 				_logger.error("could not find any " + ExportProperties.EXPORT_RESTRICTIONS_FILENAME
 					+ " file in state or installation directory.");

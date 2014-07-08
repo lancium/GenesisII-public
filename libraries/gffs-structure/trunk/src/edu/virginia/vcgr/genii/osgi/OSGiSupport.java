@@ -50,15 +50,15 @@ public class OSGiSupport
 		File pathChow = new File(installDir);
 		if (_logger.isTraceEnabled())
 			_logger.trace("gotta path of: " + pathChow);
-		
+
 		// let's not forget ugly paths windows and others might hand us.
 		String justDir = pathChow.getAbsolutePath().replaceAll("[/\\: ()]", "-");
-			//= pathChow.getAbsolutePath().replace('/', '-');
-		//justDir = justDir.replace('\\', '-');
-		//justDir = justDir.replace(':', '-');
-		//justDir = justDir.replace(' ', '-');
-		//justDir = justDir.replace('(', '-');
-		//justDir = justDir.replace(')', '-');
+		// = pathChow.getAbsolutePath().replace('/', '-');
+		// justDir = justDir.replace('\\', '-');
+		// justDir = justDir.replace(':', '-');
+		// justDir = justDir.replace(' ', '-');
+		// justDir = justDir.replace('(', '-');
+		// justDir = justDir.replace(')', '-');
 		if (_logger.isTraceEnabled())
 			_logger.trace("gotta chopped path of: " + justDir);
 		String tmpDir = System.getProperty("java.io.tmpdir");

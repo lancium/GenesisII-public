@@ -28,7 +28,7 @@ public class ExportProperties
 	static public final String EXPORT_RESTRICTIONS_FILENAME = "gffs.exports";
 
 	private Properties _exportProps = null;
-	
+
 	static private ExportProperties _realExportProperties = null;
 
 	/**
@@ -152,7 +152,7 @@ public class ExportProperties
 	/*
 	 * the main informational functions follow. these all come from the export.properties file.
 	 */
-	
+
 	public ExportMechanisms getExportMechanism()
 	{
 		if (_exportProps == null) {

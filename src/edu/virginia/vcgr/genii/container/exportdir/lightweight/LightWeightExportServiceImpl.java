@@ -46,7 +46,7 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 		ResourceKey key = super.createResource(creationParameters);
 		key.dereference().setProperty(LightWeightExportConstants.ROOT_DIRECTORY_PROPERTY_NAME, initInfo.getPath());
 
-		// set the owner info for the resource before we need it.		
+		// set the owner info for the resource before we need it.
 		String owningUnixUser = SudoExportUtils.doGridMapping(initInfo.getPrimaryOwnerDN());
 		if (owningUnixUser == null) {
 			owningUnixUser = SudoExportUtils.doGridMapping(initInfo.getSecondaryOwnerDN());

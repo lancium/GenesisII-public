@@ -32,7 +32,7 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
-//hmmm: this class needs to use deep authorization model for checking on rights to things!
+// hmmm: this class needs to use deep authorization model for checking on rights to things!
 
 public class ExportedDirUtils
 {

@@ -588,8 +588,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			// Finally add all of our callerIds to the calling-context's outgoing credentials.
 			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 			transientCredentials.addAll(authenticatedCallerCreds);
-			
-//hmmm: can the export methods access the transient credentials easily now that they're stored?  they should be able to.			
+
+			// hmmm: can the export methods access the transient credentials easily now that they're
+			// stored? they should be able to.
 
 			// Grab the operation method from the message context
 			org.apache.axis.description.OperationDesc desc = messageContext.getOperation();

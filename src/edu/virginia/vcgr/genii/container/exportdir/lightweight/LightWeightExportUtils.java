@@ -17,14 +17,15 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.zipjar.ZipJarExpo
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-//hmmm: seems like we need to gate the lookups on permissions here, so that we don't allow returning of paths that the current guy has no access to.
+// hmmm: seems like we need to gate the lookups on permissions here, so that we don't allow
+// returning of paths that the current guy has no access to.
 
 public class LightWeightExportUtils
 {
 	static private Log _logger = LogFactory.getLog(LightWeightExportUtils.class);
 
 	static private String _lastRootDirString = null;
-	static private VExportRoot _lastExportRoot = null;	
+	static private VExportRoot _lastExportRoot = null;
 
 	static VExportRoot getRoot(ResourceKey myKey) throws IOException
 	{

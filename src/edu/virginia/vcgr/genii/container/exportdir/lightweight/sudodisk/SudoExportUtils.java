@@ -173,7 +173,7 @@ public class SudoExportUtils
 			chownFileToDeducedUser(localPath);
 		}
 	}
-	
+
 	/**
 	 * checks to see if regular or exported byteio files should be chowned to their unix user on
 	 * creation. if so, this function does the chown.

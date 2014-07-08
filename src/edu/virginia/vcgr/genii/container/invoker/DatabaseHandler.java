@@ -50,12 +50,13 @@ public class DatabaseHandler implements IAroundInvoker
 			return result;
 		} catch (Throwable e) {
 			if (e instanceof InvocationTargetException) {
-				// for invocation target problems, drop a level of reporting, since it is always useless.
+				// for invocation target problems, drop a level of reporting, since it is always
+				// useless.
 				Throwable cause = e.getCause();
 				if (cause instanceof Exception)
 					e = cause;
 			}
-			
+
 			if ((e.getCause() != null) && (e.getCause() instanceof SubscriptionFailedFaultType)) {
 				_logger.info("subscription exception in dbhandler, rethrowing: " + e.getCause().getMessage());
 			} else {

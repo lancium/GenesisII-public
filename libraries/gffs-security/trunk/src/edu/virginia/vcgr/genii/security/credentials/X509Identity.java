@@ -259,7 +259,8 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 	}
 
 	/**
-	 * returns a string with the openssl style one-line rdn representation for the certificate's subject.
+	 * returns a string with the openssl style one-line rdn representation for the certificate's
+	 * subject.
 	 */
 	public static String getOpensslRdn(X509Certificate toShow)
 	{

@@ -420,8 +420,9 @@ public class FileServerClient
 		return dlr;
 	}
 
-	//hmmm: this is bunk; fix export properties now or we are doomed to wind that object through all the export functions.
-	
+	// hmmm: this is bunk; fix export properties now or we are doomed to wind that object through
+	// all the export functions.
+
 	// Invoked to start the file server!
 	// returns the <nonce,port, serverprocess> where the server was started!
 	public static synchronized FileServerID start(String uname)
@@ -445,9 +446,9 @@ public class FileServerClient
 		}
 
 		/*
-		String install_dir_sys_prop = "edu.virginia.vcgr.genii.install-base-dir";
-*/
-		
+		 * String install_dir_sys_prop = "edu.virginia.vcgr.genii.install-base-dir";
+		 */
+
 		List<String> cmd = new ArrayList<String>();
 		cmd.add("sudo");
 		cmd.add("-u");

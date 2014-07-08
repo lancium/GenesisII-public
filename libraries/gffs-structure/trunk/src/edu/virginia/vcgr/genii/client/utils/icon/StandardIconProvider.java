@@ -31,21 +31,26 @@ public class StandardIconProvider implements IconProvider
 
 	public StandardIconProvider(String resourceName, int iconSize)
 	{
-		if (resourceName == null) _resourceName = null;
-		else _resourceName = String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
+		if (resourceName == null)
+			_resourceName = null;
+		else
+			_resourceName = String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
 		_iconSize = iconSize;
 	}
 
 	public StandardIconProvider(String resourceName)
 	{
-		if (resourceName == null) _resourceName = null;
-		else _resourceName = String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
+		if (resourceName == null)
+			_resourceName = null;
+		else
+			_resourceName = String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
 		_iconSize = DEFAULT_ICON_SIZE;
 	}
 
 	public InputStream openStream(String resourceName)
 	{
-		if (_resourceName == null) return null;
+		if (_resourceName == null)
+			return null;
 		return GenesisClassLoader.getSystemResourceAsStream(resourceName);
 	}
 
@@ -53,8 +58,9 @@ public class StandardIconProvider implements IconProvider
 	{
 		InputStream in = null;
 
-		if (_resourceName == null) return null;
-		
+		if (_resourceName == null)
+			return null;
+
 		try {
 			in = openStream(_resourceName);
 			if (in == null)

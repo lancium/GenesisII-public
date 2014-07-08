@@ -19,6 +19,7 @@ public class ExportRestrictionsList
 
 	/**
 	 * returns true if the path specified is actually a symbolic link.
+	 * 
 	 * @param path
 	 * @return
 	 */

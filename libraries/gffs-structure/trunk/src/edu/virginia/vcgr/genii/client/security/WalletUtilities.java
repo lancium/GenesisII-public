@@ -26,7 +26,7 @@ public class WalletUtilities
 	 * items. the first is the grid user who is creating the export (so this function only makes
 	 * sense to call at creation time!) and the second is any memorable TLS identity creating the
 	 * export. the second identity should not be populated if this is just a self-signed
-	 * certificate.  if the "justChooseFirst" parameter is true, then a missing filter will be
+	 * certificate. if the "justChooseFirst" parameter is true, then a missing filter will be
 	 * ignored when there is more than one USER credential and the first found will be returned.
 	 * note that the first user credential found is *not* necessarily the real owner.
 	 */
@@ -64,22 +64,21 @@ public class WalletUtilities
 		}
 
 		if ((allUsersFound.size() > 1) && (filter == null) && (justChooseFirst != true)) {
-			String msg =
-				"There are too many USER credentials to determine the owning user, and no filter was provided.";
+			String msg = "There are too many USER credentials to determine the owning user, and no filter was provided.";
 			_logger.error(msg);
 			throw new IOException(msg);
 		}
 
 		for (TrustCredential cred : allUsersFound) {
 			X509Certificate[] userIdentity = cred.getRootOfTrust().getIssuer();
-			String thisDN = X509Identity.getOpensslRdn(userIdentity[0]); 
-				//old userIdentity[0].getSubjectX500Principal().toString();
+			String thisDN = X509Identity.getOpensslRdn(userIdentity[0]);
+			// old userIdentity[0].getSubjectX500Principal().toString();
 			_logger.debug("found a listed user's DN as: " + thisDN);
-			
+
 			// we'll use this guy if there's only one listed, or if the filter is a match.
 			if ((allUsersFound.size() == 1) || justChooseFirst || ((filter != null) && (thisDN.contains(filter)))) {
 				toReturn.add(thisDN);
-				
+
 				// add the TLS identity if it's not just a self-signed throw-away.
 				if (cred.getRootOfTrust().getDelegateeType() == IdentityType.CONNECTION) {
 					X509Certificate[] tlsIdentity = cred.getRootOfTrust().getDelegatee();
