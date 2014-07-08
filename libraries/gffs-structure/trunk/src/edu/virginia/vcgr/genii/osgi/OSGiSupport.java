@@ -53,12 +53,6 @@ public class OSGiSupport
 
 		// let's not forget ugly paths windows and others might hand us.
 		String justDir = pathChow.getAbsolutePath().replaceAll("[/\\: ()]", "-");
-		// = pathChow.getAbsolutePath().replace('/', '-');
-		// justDir = justDir.replace('\\', '-');
-		// justDir = justDir.replace(':', '-');
-		// justDir = justDir.replace(' ', '-');
-		// justDir = justDir.replace('(', '-');
-		// justDir = justDir.replace(')', '-');
 		if (_logger.isTraceEnabled())
 			_logger.trace("gotta chopped path of: " + justDir);
 		String tmpDir = System.getProperty("java.io.tmpdir");
