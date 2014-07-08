@@ -26,9 +26,11 @@ public class WalletUtilities
 	 * items. the first is the grid user who is creating the export (so this function only makes
 	 * sense to call at creation time!) and the second is any memorable TLS identity creating the
 	 * export. the second identity should not be populated if this is just a self-signed
-	 * certificate.
+	 * certificate.  if the "justChooseFirst" parameter is true, then a missing filter will be
+	 * ignored when there is more than one USER credential and the first found will be returned.
+	 * note that the first user credential found is *not* necessarily the real owner.
 	 */
-	public static ArrayList<String> extractOwnersFromCredentials(String filter) throws IOException
+	public static ArrayList<String> extractOwnersFromCredentials(String filter, boolean justChooseFirst) throws IOException
 	{
 		ArrayList<String> toReturn = new ArrayList<String>();
 
@@ -42,7 +44,7 @@ public class WalletUtilities
 
 		// get the list of USER names from the credential wallet.
 		if (creds.size() == 0) {
-			_logger.error("The list of credentials is empty.  How can this be a valid export creation?");
+			_logger.error("The list of credentials is empty; cannot extract owner.");
 			return null;
 		}
 
@@ -61,9 +63,9 @@ public class WalletUtilities
 			}
 		}
 
-		if ((allUsersFound.size() > 1) && (filter == null)) {
+		if ((allUsersFound.size() > 1) && (filter == null) && (justChooseFirst != true)) {
 			String msg =
-				"There are too many USER credentials to determine the export's owning user, and no filter was provided.";
+				"There are too many USER credentials to determine the owning user, and no filter was provided.";
 			_logger.error(msg);
 			throw new IOException(msg);
 		}
@@ -75,7 +77,7 @@ public class WalletUtilities
 			_logger.debug("found a listed user's DN as: " + thisDN);
 			
 			// we'll use this guy if there's only one listed, or if the filter is a match.
-			if ((allUsersFound.size() == 1) || ((filter != null) && (thisDN.contains(filter)))) {
+			if ((allUsersFound.size() == 1) || justChooseFirst || ((filter != null) && (thisDN.contains(filter)))) {
 				toReturn.add(thisDN);
 				
 				// add the TLS identity if it's not just a self-signed throw-away.
@@ -101,7 +103,7 @@ public class WalletUtilities
 		}
 
 		if (_logger.isDebugEnabled()) {
-			_logger.debug("Found owners of export are:");
+			_logger.debug("Found owners of resource are:");
 			for (String dn : toReturn) {
 				_logger.debug("\t" + dn);
 			}

@@ -101,6 +101,9 @@ public class InstallationProperties extends Properties
 		return ret;
 	}
 
+	/**
+	 * returns the file with configuration items for byteio storage and exports.
+	 */
 	public File getExportPropertiesFile()
 	{
 		String stateDir = getUserDir();
@@ -110,6 +113,25 @@ public class InstallationProperties extends Properties
 				new File(ApplicationDescription.getInstallationDirectory() + "/lib/" + ExportProperties.EXPORT_PROPERTIES_FILENAME);
 			if (!propsFile.exists()) {
 				_logger.error("could not find any " + ExportProperties.EXPORT_PROPERTIES_FILENAME
+					+ " file in state or installation directory.");
+				return null;
+			}
+		}
+		return propsFile;
+	}
+
+	/**
+	 * returns the file that controls where exports may be created.
+	 */
+	public File getExportCreationRestrictionsFile()
+	{
+		String stateDir = getUserDir();
+		File propsFile = new File(stateDir + "/" + ExportProperties.EXPORT_RESTRICTIONS_FILENAME);
+		if (!propsFile.exists()) {
+			propsFile =
+				new File(ApplicationDescription.getInstallationDirectory() + "/lib/" + ExportProperties.EXPORT_RESTRICTIONS_FILENAME);
+			if (!propsFile.exists()) {
+				_logger.error("could not find any " + ExportProperties.EXPORT_RESTRICTIONS_FILENAME
 					+ " file in state or installation directory.");
 				return null;
 			}

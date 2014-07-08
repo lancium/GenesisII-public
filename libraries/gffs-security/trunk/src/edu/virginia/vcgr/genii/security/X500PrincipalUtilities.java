@@ -9,7 +9,7 @@ public class X500PrincipalUtilities
 {
 	static final private Pattern cnExtractor = Pattern.compile("^.*[cC][nN]=([^,]+),.*$");
 
-	static private String getCN(X500Principal principal)
+	static public String getCN(X500Principal principal)
 	{
 		Matcher matcher = cnExtractor.matcher(principal.getName(X500Principal.RFC1779));
 		if (!matcher.matches())

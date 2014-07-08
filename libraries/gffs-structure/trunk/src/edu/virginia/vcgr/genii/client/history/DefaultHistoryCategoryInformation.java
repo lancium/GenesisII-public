@@ -20,8 +20,9 @@ public class DefaultHistoryCategoryInformation implements HistoryCategoryInforma
 		_name = name;
 		_description = description;
 
-		if (iconProvider == null)
-			iconProvider = new StandardIconProvider("error.png");
+		if (iconProvider == null) {
+			iconProvider = new StandardIconProvider(null);
+		}
 
 		_iconProvider = iconProvider;
 	}

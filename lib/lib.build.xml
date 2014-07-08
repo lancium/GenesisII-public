@@ -36,6 +36,11 @@
                 <replace file="${lib.dir}/export.properties"
                         token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 
+		<copy file="${lib.dir}/gffs.exports.template"
+                        tofile="${lib.dir}/gffs.exports"/>
+                <replace file="${lib.dir}/gffs.exports"
+                        token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
+
 	</target>
 	
 	<target name="lib-setup" depends="log4j-properties" >

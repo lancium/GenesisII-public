@@ -8,6 +8,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,6 +22,7 @@ import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.security.Describable;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.X500PrincipalUtilities;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
 import eu.unicore.security.etd.TrustDelegation;
 
@@ -161,24 +163,59 @@ public class CredentialWallet implements Externalizable, Describable
 		return buffer.toString();
 	}
 
-	public String getFirstUserName()
+	public TrustCredential getFirstUserCredential()
 	{
 		for (TrustCredential assertion : assertionChains.values()) {
-			// see if the credential is a user cred
-			String temp = assertion.describe(VerbosityLevel.LOW);
-			if ((temp != null) && (temp.contains("(USER)"))) {
-				// This is a USER assertion of the form A->B->C where A is a
-				// USER
-				// (USER) "grimshaw" -> something format string with verbosity
-				// LOW
-				String t2[] = temp.split("\"");
-				if (t2.length < 3) {
-					// System.err.println("the split gave me this as the username: " + t2[1]);
-				} else
-					return t2[1];
+			// see if the credential is a user credential.
+
+			// _logger.debug("looking at credential: " +
+			// assertion.getRootOfTrust().describe(VerbosityLevel.HIGH));
+			// _logger.debug("cred user type is: " + assertion.getRootOfTrust().getIssuerType());
+
+			if (assertion.getRootOfTrust().getIssuerType() == IdentityType.USER) {
+				return assertion;
+			}
+
+			// _logger.debug("decided that one was NOT a user credential.  is this erroneous?");
+		}
+		return null;
+	}
+
+	public String getFirstUserName()
+	{
+		// hmmm: seems like we could avoid using describe here, and just pluck the CN out of the
+		// x509.
+		TrustCredential assertion = getFirstUserCredential();
+		if (assertion != null) {
+			/*
+			 * This is a USER assertion of the form A->B->... where A is a USER.
+			 */
+			String simplerName =
+				X500PrincipalUtilities.getCN(assertion.getRootOfTrust().getOriginalAsserter()[0].getSubjectX500Principal());
+			_logger.debug("YO: calculated alternate name for storage of: " + simplerName);
+
+			String temp = assertion.getRootOfTrust().describe(VerbosityLevel.LOW);
+			_logger.debug("got temp string from cred of: " + temp);
+			String t2[] = temp.split("\"");
+			if (t2.length < 3) {
+				_logger.debug("the split gave me this as the username: " + t2[1]);
+			} else {
+				return t2[1];
 			}
 		}
 		return null;
+	}
+
+	public static boolean chainsAreIntact(TrustCredential credential)
+	{
+		try {
+			credential.checkValidity(new Date());
+		} catch (Exception e) {
+			// looking bad.
+			return false;
+		}
+		// seems fine.
+		return true;
 	}
 
 	/**
@@ -212,6 +249,16 @@ public class CredentialWallet implements Externalizable, Describable
 					progressMade = true;
 				} else {
 					String priorDelegationId = delegation.getPriorDelegationId();
+					// make sure we're not operating on a wallet that's already been fully
+					// reattached.
+					if ((delegation.getPriorDelegation() != null) && chainsAreIntact(delegation)) {
+						// this one looks okay already, so we'll just add it.
+						_logger.debug("found complete credential during reassembly; adding directly.");
+						assertionChains.put(delegation.getId(), delegation);
+						delegationIterator.remove();
+						progressMade = true;
+						continue;
+					}
 					/*
 					 * we pull in the stranded prior delegation if we can find it. otherwise we
 					 * haven't gotten it off the wire or from serialization yet.

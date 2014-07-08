@@ -30,7 +30,7 @@ byteio.Storage=OwnedByGFFS
 
 # the launcher for the gffschown application, which is used for changing
 # ownership of the directories and files.
-export.GffsChownApp=${installer:sys.installationDir}/gffschown.sh
+export.GffsChownApp=${installer:sys.installationDir}/gffschown
 
 # the launcher for the sudo-based exports co-process.
 export.ProxyIOApp=${installer:sys.installationDir}/proxyio.launcher

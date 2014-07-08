@@ -66,7 +66,6 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		if (dir.createFile(newFileName)) {
 			String forkPath = formForkPath(newFileName);
 			ResourceForkService service = getService();
-
 			return service.createForkEPR(forkPath, new LightWeightExportFileFork(service, forkPath).describe());
 		}
 

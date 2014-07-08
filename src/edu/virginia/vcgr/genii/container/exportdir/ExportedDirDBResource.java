@@ -607,7 +607,7 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 						/* moved code to check if _dirServiceEPR set to constructor */
 						serviceEPR = _dirServiceEPR;
 						entryType = ExportedDirEntry._DIR_TYPE;
-						// hmmm: add in primary and secondary owner DN here!!!
+						// hmmm: add in export owner here!!!
 						ArrayList<String> owners = null;
 						creationProperties =
 							ExportedDirUtils.createCreationProperties(null, newPath, null, null, null, childrenParentIds,

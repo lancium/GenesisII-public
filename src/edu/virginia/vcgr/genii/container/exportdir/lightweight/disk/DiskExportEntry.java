@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.io.fslock.FSLock;
@@ -17,9 +19,12 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.AbstractVExportEn
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportDir;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportEntry;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportFile;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoExportUtils;
 
 public class DiskExportEntry extends AbstractVExportEntry implements VExportDir, VExportFile
 {
+	static private Log _logger = LogFactory.getLog(DiskExportEntry.class);
+
 	static private FSLockManager _lockManager = new FSLockManager();
 
 	private File _target;
@@ -30,14 +35,21 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 
 		_target = target;
 
-		if (!_target.exists())
+		if (!_target.exists()) {
 			throw new FileNotFoundException(String.format("Unable to locate file system entry \"%s\".", _target));
+		}
 	}
 
 	@Override
 	public boolean createFile(String newFileName) throws IOException
 	{
-		return new File(_target, newFileName).createNewFile();
+		File file = new File(_target, newFileName);
+		boolean toReturn = file.createNewFile();
+		if (toReturn) {
+			_logger.debug("will attempt to chown here on: " + newFileName);
+			SudoExportUtils.chownIfACLandChownEnabled(file);
+		}
+		return toReturn;
 	}
 
 	@Override

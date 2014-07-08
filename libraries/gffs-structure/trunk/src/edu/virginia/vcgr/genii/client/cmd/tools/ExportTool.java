@@ -156,7 +156,7 @@ public class ExportTool extends BaseGridTool
 			/* get local directory path to be exported */
 			String localPath = getArgument(1);
 
-			ArrayList<String> owners = WalletUtilities.extractOwnersFromCredentials(_exportCreatorFilter);
+			ArrayList<String> owners = WalletUtilities.extractOwnersFromCredentials(_exportCreatorFilter, false);
 			if ((owners == null) || (owners.size() == 0)) {
 				String msg = "failed to determine the owners for the export.  failing request.";
 				_logger.error(msg);

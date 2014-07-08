@@ -13,68 +13,6 @@ public class GffsExportConfiguration
 {
 	static private Log _logger = LogFactory.getLog(GffsExportConfiguration.class);
 
-	//hmmm: ripped from here...
-//	// export.type controls how the exports are done by the container.
-//	public static final String EXPORT_TYPE = "export.type";
-//	public static final String EXPORT_TYPE_SUDO = "sudo";
-//	public static final String EXPORT_TYPE_NORMAL = "normal";
-//	// the grid map file maps gffs grid users to local unix users.
-//	public static final String GRIDMAPFILE_LOCATION = "export.gridmapfile";
-
-//	private static Properties p = null;
-//
-//	private static void openProperties()
-//	{
-//		// ensure we only create the properties object once.
-//		synchronized (GffsExportConfiguration.class) {
-//			if (p == null) {
-//				p = new Properties();
-//				InputStream in = GffsExportConfiguration.class.getClassLoader().getResourceAsStream("export.properties");
-//				try {
-//					p.load(in);
-//				} catch (IOException e) {
-//					_logger.error("failure loading export properties", e);
-//					throw new RuntimeException(e);
-//				} finally {
-//					StreamUtils.close(in);
-//				}
-//			}
-//		}
-//	}
-//
-//	public static ExportType getExportType()
-//	{
-//		openProperties();
-//
-//		String r = p.getProperty(EXPORT_TYPE);
-//		if (r == null) {
-//			return ExportType.DEFAULT;
-//		}
-//		if (r.equalsIgnoreCase(EXPORT_TYPE_SUDO))
-//			return ExportType.SUDO;
-//		if (r.equalsIgnoreCase(EXPORT_TYPE_NORMAL))
-//			return ExportType.DEFAULT;
-//
-//		return ExportType.DEFAULT;
-//	}
-//
-//	public static String getGridMapFile()
-//	{
-//		openProperties();
-//
-//		return p.getProperty(GRIDMAPFILE_LOCATION);
-//	}
-//
-//	public static File openGridMapFile()
-//	{
-//		String fileName = getGridMapFile();
-//		if (fileName == null)
-//			return null;
-//		return new File(fileName);
-//	}
-//	
-//	//hmmm: down to here stopped ripping.
-
 	/**
 	 * consumes a line of text from a grid-mapfile and breaks it down into the DN specified and the
 	 * list of users associated with the DN.
@@ -146,9 +84,11 @@ public class GffsExportConfiguration
 	 */
 	public static GridMapUserList mapDistinguishedName(String DN)
 	{
-		// hmmm: add a cache! this really should not read the file each and every time.
-		// we don't expect the DN to user association to change during run time.
-		// so cache the values without time-out, and we won't have to read the file every time.
+		/*
+		 * hmmm: add a cache! this really should not read the file each and every time. so cache the
+		 * values without time-out, and we won't have to read the file every time. however, if the
+		 * grid map file changes, we should throw out all cached entries.
+		 */
 
 		File mapFile = ExportProperties.getExportProperties().openGridMapFile();
 		if (mapFile == null) {

@@ -217,6 +217,9 @@
 		<delete file="${lib.dir}/genesisII.container.log4j.properties"/>
 		<delete file="${lib.dir}/production.client.log4j.properties"/>
 		<delete file="${lib.dir}/production.container.log4j.properties"/>
+		<!-- clean out some generated config files. -->
+		<delete file="${lib.dir}/export.properties"/>
+		<delete file="${lib.dir}/gffs.exports"/>
 
 		<delete>
 			<fileset dir="${basedir}/ext"

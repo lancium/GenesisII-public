@@ -46,20 +46,15 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 		ResourceKey key = super.createResource(creationParameters);
 		key.dereference().setProperty(LightWeightExportConstants.ROOT_DIRECTORY_PROPERTY_NAME, initInfo.getPath());
 
-		// set the owner info for the resource before we need it.
-		String primaryOwner = initInfo.getPrimaryOwnerDN();
-		if (primaryOwner != null) {
-			key.dereference().setProperty(LightWeightExportConstants.PRIMARY_OWNER_NAME, primaryOwner);
-			_logger.debug("setting primary owner to " + primaryOwner);
+		// set the owner info for the resource before we need it.		
+		String owningUnixUser = SudoExportUtils.doGridMapping(initInfo.getPrimaryOwnerDN());
+		if (owningUnixUser == null) {
+			owningUnixUser = SudoExportUtils.doGridMapping(initInfo.getSecondaryOwnerDN());
 		}
-
-		_logger.debug("testing primary owner just added, getting value="
-			+ key.dereference().getProperty(LightWeightExportConstants.PRIMARY_OWNER_NAME));
-
-		String secondaryOwner = initInfo.getSecondaryOwnerDN();
-		if (secondaryOwner != null) {
-			key.dereference().setProperty(LightWeightExportConstants.SECONDARY_OWNER_NAME, secondaryOwner);
-			_logger.debug("setting secondary owner to " + secondaryOwner);
+		// now use the fruits of our efforts, if there were any.
+		if (owningUnixUser != null) {
+			key.dereference().setProperty(LightWeightExportConstants.EXPORT_OWNER_UNIX_NAME, owningUnixUser);
+			_logger.debug("setting export owner to " + owningUnixUser);
 		}
 
 		/*

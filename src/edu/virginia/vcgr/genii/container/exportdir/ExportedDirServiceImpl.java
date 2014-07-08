@@ -225,7 +225,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			String fullPath = ExportedFileUtils.createFullPath(_resource.getLocalPath(), name);
 			String parentIds = ExportedDirUtils.createParentIdsString(_resource.getParentIds(), _resource.getId());
 			String isReplicated = _resource.getReplicationState();
-			// hmmm: add in primary and secondary owner DN here!!!
+			// hmmm: add in export owner here!!!
 			ArrayList<String> owners = null;
 			newRef =
 				vcgrCreate(

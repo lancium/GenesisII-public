@@ -12,6 +12,8 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
@@ -20,6 +22,8 @@ import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 public class StandardIconProvider implements IconProvider
 {
+	static private Log _logger = LogFactory.getLog(StandardIconProvider.class);
+
 	static private final int DEFAULT_ICON_SIZE = 16;
 
 	private String _resourceName = null;
@@ -27,20 +31,21 @@ public class StandardIconProvider implements IconProvider
 
 	public StandardIconProvider(String resourceName, int iconSize)
 	{
-		_resourceName = String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
+		if (resourceName == null) _resourceName = null;
+		else _resourceName = String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
 		_iconSize = iconSize;
-		loadIcon();
 	}
 
 	public StandardIconProvider(String resourceName)
 	{
-		_resourceName = String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
+		if (resourceName == null) _resourceName = null;
+		else _resourceName = String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourceName);
 		_iconSize = DEFAULT_ICON_SIZE;
-		loadIcon();
 	}
 
 	public InputStream openStream(String resourceName)
 	{
+		if (_resourceName == null) return null;
 		return GenesisClassLoader.getSystemResourceAsStream(resourceName);
 	}
 
@@ -48,6 +53,8 @@ public class StandardIconProvider implements IconProvider
 	{
 		InputStream in = null;
 
+		if (_resourceName == null) return null;
+		
 		try {
 			in = openStream(_resourceName);
 			if (in == null)
@@ -63,6 +70,13 @@ public class StandardIconProvider implements IconProvider
 	@Override
 	public Icon createIcon()
 	{
+		try {
+			if (_resourceName != null) {
+				return loadIcon();
+			}
+		} catch (Exception e) {
+			_logger.error("failed to load icon resource: " + _resourceName);
+		}
 		return new Icon()
 		{
 			@Override
@@ -89,5 +103,6 @@ public class StandardIconProvider implements IconProvider
 				return _iconSize;
 			}
 		};
+
 	}
 }

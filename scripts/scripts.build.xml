@@ -113,6 +113,8 @@
 				<include name="windows-cmd-runner.bat"/>
 				<include name="VCGRContainerDaemon"/>
 				<include name="linux-cmd-wrapper"/>
+				<include name="gffschown"/>
+				<include name="proxyio.launcher"/>
 			</fileset>
 		</delete>
 	</target>
@@ -210,6 +212,14 @@
 		<replace file="${basedir}/proxyio.launcher"
 			token="\" value="\\" summary="no"/>
 		<chmod file="${basedir}/proxyio.launcher" perm="ugo+rx"/>
+
+		<copy file="${scripts.dir}/gffschown.template"
+			tofile="${basedir}/gffschown"/>
+		<replace file="${basedir}/gffschown"
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
+		<replace file="${basedir}/gffschown"
+			token="\" value="\\" summary="no"/>
+		<chmod file="${basedir}/gffschown" perm="ugo+rx"/>
 
 		<antcall target="build-script-win">
 			<param name="win-script-src-dir" value="${scripts.dir}"/>

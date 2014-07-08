@@ -24,6 +24,9 @@ public class ExportProperties
 	// the config file that this class reads is set here.
 	static public final String EXPORT_PROPERTIES_FILENAME = "export.properties";
 
+	// the config file for limiting where exports can be created.
+	static public final String EXPORT_RESTRICTIONS_FILENAME = "gffs.exports";
+
 	private Properties _exportProps = null;
 	
 	static private ExportProperties _realExportProperties = null;
@@ -149,12 +152,7 @@ public class ExportProperties
 	/*
 	 * the main informational functions follow. these all come from the export.properties file.
 	 */
-	// hmmm: be careful if we need to rename that export.properties file again.
-
-	// hmmm: throughout--need error reporting if not right flag.
-
-	// hmmm: throughout, warn that we return null on failure.
-
+	
 	public ExportMechanisms getExportMechanism()
 	{
 		if (_exportProps == null) {
@@ -174,11 +172,6 @@ public class ExportProperties
 		String r = _exportProps.getProperty(BYTEIO_IN_USERHOME_PROPERTY);
 		return r.equalsIgnoreCase("true");
 	}
-
-	// hmmm: if we implement this as per design, it may actually be required on client side.
-	// hoping to provide alternate approach.
-	//
-	// public File getGffsExportsFile()
 
 	public OwnershipForByteIO getByteIOStorage()
 	{
@@ -226,9 +219,6 @@ public class ExportProperties
 		}
 		return _exportProps.getProperty(EXPORT_GRIDMAPFILE_LOCATION_PROPERTY);
 	}
-
-	// hmmm: need to add a stat check that lets us know if the grid map file's changed since our last
-	// checking on it.
 
 	// dingy basement of support functions...
 

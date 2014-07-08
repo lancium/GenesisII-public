@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# this script provides chown support for the GFFS container.
+# it can be modified as necessary by system admins.
+# the first parameter is expected to be the unix user who will inherit file
+# ownership.  the second paramter is the path to the file.
+
+#DEBUG NOISE
+outfile=$(mktemp /tmp/gffschown-out-${USER}.XXXXXX)
+echo >>$outfile
+echo "hello, got to chowner script.  cmdline is:" >>$outfile
+echo $* >>$outfile
+echo "and user is $USER and home is $HOME" >>$outfile
+
+# ensure that the container can still access the file as needed.
+/bin/chmod g+rw "$2"
+
+# actually perform the chown operation.
+/bin/chown "$1" "$2"
+

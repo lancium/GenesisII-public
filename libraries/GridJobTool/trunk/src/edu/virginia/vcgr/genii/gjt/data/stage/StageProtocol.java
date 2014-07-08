@@ -10,7 +10,7 @@ import edu.virginia.vcgr.genii.gjt.data.stage.undef.UndefinedStageFactory;
 
 public enum StageProtocol {
 	undefined("undefined", new UndefinedStageFactory(), StageDirection.readAndWrite),
-	http("http", new HttpStageFactory(), StageDirection.read),
+	http("http", new HttpStageFactory(), StageDirection.readAndWrite),
 	grid("grid", new GridStageFactory(), StageDirection.readAndWrite),
 	ftp("ftp", new FtpStageFactory(), StageDirection.readAndWrite),
 	scp("scp/sftp", new ScpStageFactory(), StageDirection.readAndWrite),

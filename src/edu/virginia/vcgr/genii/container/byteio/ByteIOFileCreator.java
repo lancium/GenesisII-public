@@ -4,15 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoExportUtils;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 
 public class ByteIOFileCreator
 {
+	static private Log _logger = LogFactory.getLog(ByteIOFileCreator.class);
+
 	static private Random _directoryBalancer = new Random();
 	static private final int DISPERSION_LEVELS = 2;
 	static private final int DISPERSION_WIDTH = 32;
@@ -37,8 +42,12 @@ public class ByteIOFileCreator
 			// Be careful - usernames may not always be unique - they are these
 			// days, but maybe not in future
 			String userName = Wallet.getFirstUserName();
-			// System.err.println("The username is: " + userName);
-			baseDir = new GuaranteedDirectory(uroot, userName);
+			_logger.debug("username chosen for byteio file is: " + userName);
+			if (userName != null) {
+				baseDir = new GuaranteedDirectory(uroot, userName);
+			} else {
+				_logger.error("attempting to create a byteio file without any user credentials!");
+			}
 		}
 
 		String filePrefix = "rbyteio";
@@ -48,7 +57,10 @@ public class ByteIOFileCreator
 			int value = _directoryBalancer.nextInt(DISPERSION_WIDTH);
 			baseDir = new GuaranteedDirectory(baseDir, String.format("dir.%d", value));
 		}
-		return File.createTempFile(filePrefix, fileSuffix, baseDir);
+
+		File toReturn = File.createTempFile(filePrefix, fileSuffix, baseDir);
+		SudoExportUtils.chownIfChownToUserEnabled(toReturn);
+		return toReturn;
 	}
 
 	public static String getRelativePath(File userDir, File newFile)
