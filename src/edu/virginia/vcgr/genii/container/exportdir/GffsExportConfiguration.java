@@ -77,6 +77,14 @@ public class GffsExportConfiguration
 		return DN;
 	}
 
+	/*
+	 * hmmm: add a cache! this really should not read the file each and every time. so cache the
+	 * values without time-out, and we won't have to read the file every time. however, if the
+	 * grid map file changes, we should throw out all cached entries.
+	 */
+
+
+	
 	/**
 	 * reads the grid-mapfile to locate a particular DN.
 	 * 
@@ -84,12 +92,6 @@ public class GffsExportConfiguration
 	 */
 	public static GridMapUserList mapDistinguishedName(String DN)
 	{
-		/*
-		 * hmmm: add a cache! this really should not read the file each and every time. so cache the
-		 * values without time-out, and we won't have to read the file every time. however, if the
-		 * grid map file changes, we should throw out all cached entries.
-		 */
-
 		File mapFile = ExportProperties.getExportProperties().openGridMapFile();
 		if (mapFile == null) {
 			_logger.error("could not open the grid-mapfile; is it configured properly in export.properties?");

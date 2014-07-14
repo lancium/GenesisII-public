@@ -38,11 +38,9 @@ echo is executed to apply the changes.
 
 %clean
 echo at clean the rpm build root is ${RPM_BUILD_ROOT}
-#no. rm -rf ${RPM_BUILD_ROOT}/deployments
 
 %files
 %defattr(644,root,root,755)
-#%attr(755,root,root)
 /opt/genesis2/deployments
 
 %changelog

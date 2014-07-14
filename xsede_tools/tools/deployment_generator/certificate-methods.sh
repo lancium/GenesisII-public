@@ -126,7 +126,7 @@ function generate_all_certificates()
     echo "to that filename and edit it for your locale certificate information."
     return 1
   fi
-  source certificate-config.txt
+  #source certificate-config.txt
 
   ##############
 

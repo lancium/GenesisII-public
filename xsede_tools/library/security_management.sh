@@ -19,6 +19,38 @@ fi
 
 # certificate methods.
 
+# accumulates a DN string from the file passed as the first parameter.
+# the second parameter is used as the CN name.
+function accumulate_DN()
+{
+  local certfile="$1"; shift
+  local cn="$1"; shift
+  # check that we were given a config file.
+  if [ -z "$certfile" ]; then
+    echo "ERROR: no certificate file was provided."
+    return
+  fi
+  # make sure we don't get an empty CN. 
+  if [ -z "$cn" ]; then
+    cn="GenesisII Certificate"
+  fi
+  local DN_STRING=""
+  comment_regex="^[[:blank:]]*#"
+  while read line; do
+    if [[ "$line" =~ $comment_regex ]]; then
+      # skip a comment.
+      continue;
+    fi
+    if [[ "$line" =~ .*=.* ]]; then
+      # handle an assignment.
+      addin="$(echo "$line" | sed -e "s/^[[:blank:]]*//" -e "s/[[:blank:]]*$//" -e "s/\"//g")"
+      DN_STRING+="${addin}, "
+    fi
+  done < "$certfile"
+  DN_STRING+="CN=$cn"
+  echo "$DN_STRING"
+}
+
 # calculates the appropriate DN string for a collection of cert parts.
 # this requires one parameter for the CN name.
 function calculate_DN()
