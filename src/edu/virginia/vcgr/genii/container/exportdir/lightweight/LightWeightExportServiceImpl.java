@@ -64,6 +64,11 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 			// check if directory exists.
 			ExportMechanisms exportType = ExportProperties.getExportProperties().getExportMechanism();
 			if (exportType == ExportMechanisms.EXPORT_MECH_PROXYIO) {
+				// first complain if we didn't figure out the owner.
+				if (owningUnixUser == null) {
+					_logger.warn("export is in proxy IO mode, but could not determine owning user from grid-mapfile; this will not work properly.");
+				}
+				
 				String osName = System.getProperty("os.name");
 				boolean isCompatibleOS = true;
 				if (osName.contains("Windows")) {

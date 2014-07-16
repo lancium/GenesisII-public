@@ -156,7 +156,7 @@ public class SudoExportUtils
 		if (unixUser != null) {
 			chownFileToUser(localPath, unixUser);
 		} else {
-			_logger.debug("could not deduce owner from credentials for: " + localPath);
+			_logger.warn("chown attempt could not deduce owner from credentials for: " + localPath);
 		}
 	}
 
@@ -169,7 +169,7 @@ public class SudoExportUtils
 	public static void chownIfChownToUserEnabled(File localPath) throws IOException
 	{
 		if (ExportProperties.getExportProperties().getByteIOStorage() == OwnershipForByteIO.BYTEIO_CHOWNTOUSER) {
-			_logger.debug("into chown byteio storage on path: '" + localPath + "'");
+			_logger.debug("chown for byteio storage on path: '" + localPath + "'");
 			chownFileToDeducedUser(localPath);
 		}
 	}
@@ -183,7 +183,7 @@ public class SudoExportUtils
 	public static void chownIfACLandChownEnabled(File localPath) throws IOException
 	{
 		if (ExportProperties.getExportProperties().getExportMechanism() == ExportMechanisms.EXPORT_MECH_ACLANDCHOWN) {
-			_logger.debug("into chown byteio storage on path: '" + localPath + "'");
+			_logger.debug("chown for export on path: '" + localPath + "'");
 			chownFileToDeducedUser(localPath);
 		}
 	}
