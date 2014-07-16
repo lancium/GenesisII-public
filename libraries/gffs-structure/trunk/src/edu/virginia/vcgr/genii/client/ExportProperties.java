@@ -113,7 +113,8 @@ public class ExportProperties
 				return EXPORT_MECH_PROXYIO;
 			if (fromString.equalsIgnoreCase(EXPORT_MECH_ARCHIVE.toString()))
 				return EXPORT_MECH_ARCHIVE;
-			return null;
+			_logger.debug("returning default export mechanism.");
+			return EXPORT_MECH_ACL;
 		}
 	};
 
@@ -145,7 +146,8 @@ public class ExportProperties
 				return BYTEIO_GFFS_OWNED;
 			if (fromString.equalsIgnoreCase(BYTEIO_CHOWNTOUSER.toString()))
 				return BYTEIO_CHOWNTOUSER;
-			return null;
+			_logger.debug("returning default byteio ownership.");
+			return BYTEIO_GFFS_OWNED;
 		}
 	};
 
@@ -261,7 +263,11 @@ public class ExportProperties
 		String fileName = getGridMapFile();
 		if (fileName == null)
 			return null;
-		return new File(fileName);
+		File toReturn = new File(fileName);
+		if (!toReturn.exists()) {
+			toReturn = null;
+		}
+		return toReturn;
 	}
 
 }
