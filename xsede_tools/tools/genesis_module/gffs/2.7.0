@@ -2,12 +2,12 @@
 # XSEDE Genesis II GFFS Module.
 
 proc ModulesHelp { } {
-  puts stderr "The gffs modulefile defines the default paths and environment"
+  puts stderr "The GFFS module file defines the default paths and environment"
   puts stderr "variables for the XSEDE Genesis II GFFS Client."
 }
 
 set gvers 2.7.0
-set gpath /opt/GenesisII/$gvers
+set gpath /opt/genesis2
 
 prepend-path	PATH 			$gpath
 

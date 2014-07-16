@@ -25,8 +25,8 @@ byteio.InUserHome=false
 
 # controls how the byteio files are owned.  if this is set to ChownToUser, then
 # the gffs runs a script after the file is created to change its ownership.
-byteio.Storage=OwnedByGFFS 
-#byteio.Storage=ChownToUser 
+byteio.Storage=OwnedByGFFS
+#byteio.Storage=ChownToUser
 
 # the launcher for the gffschown application, which is used for changing
 # ownership of the directories and files.

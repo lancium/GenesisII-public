@@ -61,9 +61,11 @@ public class DownloadCertificateTool extends BaseGridTool
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		if (gPath.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException("<rns-path-to-idp> must be a grid path. ");
+		_logger.debug("path that certificate is being acquired for is: " + gPath);
 		GeniiPath localPath = new GeniiPath(getArgument(1));
 		if (localPath.pathType() != GeniiPathType.Local)
 			throw new InvalidToolUsageException("<target-local-file> must be a local path begining with 'local:' ");
+		_logger.debug("local path for certificate storage is: " + localPath);
 		RNSPath target = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
 		TypeInformation typeInfo = new TypeInformation(target.getEndpoint());
 
