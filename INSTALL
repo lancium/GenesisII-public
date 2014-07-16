@@ -1,0 +1,30 @@
+
+Installing Genesis II GFFS
+==========================
+
+Interactive Installation:
+
+    The interactive installer can be installed on Mac OS X and Windows by
+double-clicking the installer package.  On Linux, it can be installed using
+the 'bash' program, e.g.:
+
+  bash genesis2-gffs-xsede-2.7.542-linux-x86_64.script
+
+RPM Installation:
+
+    To configure your machine to use XSEDE’s RPM Yum repository and
+trust packages signed by XSEDE follow these instructions:
+
+  https://software.xsede.org/production/repo/repoconfig.txt 
+
+To install the Genesis II GFFS package from an RPM, issue this command:
+
+  rpm -Uvh genesis2-gffs-xsede-2.7.542-1-x86_64.rpm
+
+Other Installation Scenarios:
+
+Further information about installation can be found in the Genesis II Omnibus
+Reference available at:
+  http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm
+
+
