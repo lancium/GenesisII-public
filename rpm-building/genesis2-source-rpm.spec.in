@@ -1,0 +1,51 @@
+#
+# Spec file for the Genesis II SRPM.
+#
+
+# eliminate stripping of binaries.
+%global __os_install_post %{nil}
+
+Summary: Genesis II is an open source, standards based grid platform designed to support both high-throughput computing and secure data sharing.
+Name: genesis2-source
+Version: %VER%
+Release: %REL%
+License: Apache License version 2.0
+Group: Applications/Engineering
+URL: http://genesis2.virginia.edu/wiki/
+Vendor: Genesis II Team, University of Virginia
+Packager: Chris Koeritz <koeritz@virginia.edu>
+Prefix: /usr/local/genesis2-source
+BuildArch: noarch
+
+Source0: genesis2-source-%{version}.tar.gz
+Source1: BUILDME
+
+%description
+The Genesis II Project is intended to provide the grid user community with free, easy-to-use tools to leverage grid technology to fulfill their computation and data management needs. The platform is designed to support a wide range of potential application domains from simple data sharing to multi-platform, multi-organizational high-throughput computing.
+The Genesis II platform is an interoperable (via adherence to community standards), freely available, and flexible platform for developing and evaluating new grid technologies and models. Genesis II serves to vet and validate the standardization efforts within the OGF and OGSA standards communities. Grid research is a dynamic field of study, and many challenges remain. Particular areas that we focus on are data access, security (confidentiality, data integrity, access control, policy negotiation), dependability (availability, SLA’s, policy languages), and grid standards. 
+
+%prep
+%setup -q
+cp %SOURCE1 .
+tar -xf %SOURCE0
+echo RPM_BUILD_ROOT is $RPM_BUILD_ROOT 
+
+%build
+#ant clean
+#ant -Dbuild.targetArch=64 build
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT/usr/local/genesis2-source
+cp -Pr * $RPM_BUILD_ROOT/usr/local/genesis2-source
+
+%files
+%defattr(-, root, root)
+#not for us %config(noreplace) /usr/local/genesis2-source
+#%doc BUILDME
+
+%changelog
+* Wed Jul 16 2014 Chris Koeritz <koeritz@virginia.edu> 
+- Initial version of source rpm.
+
+

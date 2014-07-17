@@ -1,0 +1,36 @@
+
+Building Genesis II GFFS
+========================
+
+Prerequisites:
+
+  Ant, Java 1.7
+(cak should check the list for the rest!)
+
+Building from SRPM:
+
+  rpm something something
+(cak needs to fill in here)
+
+Building from tar bundle:
+
+  Preparation steps (same for both 32-bit and 64-bit versions):
+    export ANT_OPTS=-Xms512m -Xmx768m -XX:MaxPermSize=768m
+    mkdir genesis-trunk
+    cd genesis-trunk
+    tar -xf $HOME/genesis2-{version}.tar.gz   # path to the tar file may differ.
+    ant clean
+
+  Peforming a build for 32-bit version:
+    ant build
+
+  Peforming a build for 64-bit version:
+    ant -Dbuild.targetArch=64 build
+
+Further information about building can be found in the Genesis II Omnibus
+Reference available online at:
+  http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm
+A copy of this reference manual can also be found in the docs directory
+within the installation package.
+
+
