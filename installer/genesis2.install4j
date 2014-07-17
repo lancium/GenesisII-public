@@ -100,6 +100,7 @@
       <dirEntry mountPoint="34" file=".." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp" dirMode="755" overrideDirMode="true">
         <exclude>
           <entry location="tests" fileType="regular" />
+          <entry location="rpm-building" fileType="regular" />
           <entry location="derby.log" fileType="regular" />
           <entry location="gffschown" fileType="regular" />
           <entry location="cert-tool" fileType="regular" />
@@ -2187,6 +2188,7 @@ return userDir;
                                 <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
                                   <void property="labelText">
                                     <string>Please select an existing grid user to manage the new container.  This user will have full control over the container within the grid.
+If the user is on a non-standard path, then the full RNS path can be provided below.  The default users path is "${compiler:genii.user-path}".
 </string>
                                   </void>
                                 </object>

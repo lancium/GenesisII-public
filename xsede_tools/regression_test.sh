@@ -151,11 +151,11 @@ fi
 
 FULL_TEST_SET=()
 
-if [ $EMS_ENABLED -eq 1 ]; then
-  FULL_TEST_SET+=(${EMS_TESTS[*]})
-fi
 if [ $GFFS_ENABLED -eq 1 ]; then
   FULL_TEST_SET+=(${GFFS_TESTS[*]})
+fi
+if [ $EMS_ENABLED -eq 1 ]; then
+  FULL_TEST_SET+=(${EMS_TESTS[*]})
 fi
 
 echo Full set of tests:

@@ -34,7 +34,7 @@ public class SudoExportUtils
 		}
 
 		GridMapUserList users = GffsExportConfiguration.mapDistinguishedName(dnToFind);
-		if (users.size() > 0) {
+		if ((users != null) && (users.size() > 0)) {
 			// currently we always use the first user listed in the grid map.
 			return users.get(0);
 		} else {
@@ -56,7 +56,7 @@ public class SudoExportUtils
 		}
 		for (String user : dnsToFind) {
 			GridMapUserList users = GffsExportConfiguration.mapDistinguishedName(user);
-			if (users.size() > 0) {
+			if ((users != null) && (users.size() > 0)) {
 				// currently we always use the first user listed in the grid map.
 				return users.get(0);
 			}
