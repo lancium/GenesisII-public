@@ -79,12 +79,10 @@ public class GffsExportConfiguration
 
 	/*
 	 * hmmm: add a cache! this really should not read the file each and every time. so cache the
-	 * values without time-out, and we won't have to read the file every time. however, if the
-	 * grid map file changes, we should throw out all cached entries.
+	 * values without time-out, and we won't have to read the file every time. however, if the grid
+	 * map file changes, we should throw out all cached entries.
 	 */
 
-
-	
 	/**
 	 * reads the grid-mapfile to locate a particular DN.
 	 * 

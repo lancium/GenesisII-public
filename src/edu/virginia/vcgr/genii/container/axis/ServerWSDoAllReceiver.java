@@ -73,7 +73,6 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 import edu.virginia.vcgr.genii.network.NetworkConfigTools;
-import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
@@ -398,7 +397,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					// Check validity and verify integrity
 					assertion.checkValidity(new Date());
 				} catch (Throwable t) {
-					_logger.debug("caught exception testing certificate validity; dropping this credential: " + t.getMessage());
+					_logger.debug(
+						"caught exception testing certificate validity; dropping this credential: " + assertion.toString(), t);
 					continue; // no longer anything to check on that one; we don't want it.
 				}
 
@@ -422,18 +422,28 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 							retval.add(x509);
 						}
 					} else {
-						// downgrade this!
-						_logger.debug("did not get a pass through credential.");
+						_logger.trace("did not get a pass through credential.");
 					}
 				}
 
-				if (_logger.isTraceEnabled())
-					_logger.trace("credential to test has first delegatee: "
-						+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
-						+ assertion.getOriginalAsserter()[0].getSubjectDN());
+				/*
+				 * this section came from the days when we were always running on tls certificates
+				 * as the resource identities. it cannot be in place any more because it hinders the
+				 * new usage of trust delegations, which are not always from the connecting
+				 * identity, but which are still totally valid.
+				 */
+				/*
+				 * more recently, it is being investigated to see if it still causes the problems
+				 * noticed during the activity; it reports instead of booting the credential.
+				 */
+				boolean enable_old_credential_checking = true; // try the checking below?
+				boolean enable_credential_rejection = false; // react based on the checking results?
+				if (enable_old_credential_checking) {
+					if (_logger.isTraceEnabled())
+						_logger.trace("credential to test has first delegatee: "
+							+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
+							+ assertion.getOriginalAsserter()[0].getSubjectDN());
 
-				boolean enable_trust_checking_that_fails = false;
-				if (enable_trust_checking_that_fails) {
 					// Verify that the request message signer is the same as the
 					// one of the holder-of-key certificates.
 					boolean match = false;
@@ -448,13 +458,20 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 										+ " to be the same as incoming tls cert.");
 								match = true;
 								break;
-							} else if (CertificateValidatorFactory.getValidator().validateIsTrustedResource(
-								assertion.getOriginalAsserter()) == true) {
-								if (_logger.isTraceEnabled())
-									_logger
-										.trace("...allowed incoming message using resource trust store for original asserter.");
-								match = true;
-								break;
+								/*
+								 * disabled code: we are trying to validate that the credential
+								 * involves the current guy; this would just validate that the
+								 * credential originated on our grid (even if it were copied), which
+								 * is not sufficient.
+								 */
+								// } else if
+								// (CertificateValidatorFactory.getValidator().validateIsTrustedResource(
+								// assertion.getOriginalAsserter()) == true) {
+								// if (_logger.isDebugEnabled())
+								// _logger
+								// .debug("...allowed incoming message using resource trust store for original asserter.");
+								// match = true;
+								// break;
 							} else {
 								if (_logger.isTraceEnabled())
 									_logger.trace("...found them to be different.");
@@ -466,10 +483,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 					if (!match) {
 						String msg =
-							"credential failed to match incoming message sender: '" + assertion.describe(VerbosityLevel.HIGH)
+							"credential did not match incoming message sender: '" + assertion.describe(VerbosityLevel.HIGH)
 								+ "'";
-						_logger.error(msg);
-						throw new AuthZSecurityException(msg);
+						_logger.warn(msg);
+						if (enable_credential_rejection == true) {
+							// skip adding it.
+							continue;
+						}
 					}
 				}
 			}

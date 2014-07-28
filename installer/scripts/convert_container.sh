@@ -48,7 +48,6 @@ SIGNING_KEY_ALIAS_PROPERTY=Container
 # the container's signing cert will be stored here now.
 export LOCAL_SIGNING_CERT="$LOCAL_CERTS_DIR/$SIGNING_KEYSTORE_FILE_PROPERTY"
 
-# make sure we support using an altered deployment if that is configured.
 if [ -z "$GENII_DEPLOYMENT_DIR" ]; then
   export GENII_DEPLOYMENT_DIR="$GENII_INSTALL_DIR/deployments"
 fi
@@ -119,7 +118,6 @@ fi
 
 export OLD_DEPLOYMENT_DIR="$OLD_INSTALL/deployments"
 
-
 JAVA_PATH=$(which java)
 if [ -z "$JAVA_PATH" ]; then
   print_instructions
@@ -156,12 +154,6 @@ if [ ! -d "$GENII_USER_DIR" ]; then
   echo "that can be converted currently.  Is this the right directory?:"
   echo "  $GENII_USER_DIR"
   exit 1
-fi
-if [ ! -d "$LOCAL_CERTS_DIR" ]; then
-  mkdir "$LOCAL_CERTS_DIR"
-fi
-if [ ! -d "$LOCAL_CERTS_DIR/default-owners" ]; then
-  mkdir "$LOCAL_CERTS_DIR/default-owners"
 fi
 
 if [ ! -f "$INSTALLER_FILE" ]; then
@@ -308,7 +300,7 @@ file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 SIGNING_KEY_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"
 if [ -z "$SIGNING_KEY_PASSWORD_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
 
-# find the password for the signin keystore file itself.
+# find the password for the signing keystore file itself.
 var="edu.virginia.vcgr.genii.container.security.resource-identity.key-store-password"
 file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 SIGNING_KEYSTORE_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"
@@ -321,6 +313,84 @@ SIGNING_KEY_ALIAS_PROPERTY="$(seek_variable "$var" "$file")"
 if [ -z "$SIGNING_KEY_ALIAS_PROPERTY" ]; then complain_re_missing_deployment_variable; fi
 
 ##############
+
+# now see if they want the deployments dir copied.
+echo
+echo "You have the option of copying the installation's deployments directory"
+echo "into the container state directory.  This will save any specialized or"
+echo "modified deployment configuration for the container.  If your container"
+echo "uses the standard deployment provided by the installer (i.e., you haven't"
+echo "modified it and do not intend to), then this step is not needed."
+echo
+echo "Copy the installation deployments folder to the container's state directory? (y/N)"
+read line
+copy_deployments_folder=
+if [ "$line" == "y" -o "$line" == "Y" ]; then
+  copy_deployments_folder=true
+fi
+if [[ "$line" =~ [yY][eE][Ss] ]]; then
+  copy_deployments_folder=true
+fi
+if [ ! -z "$copy_deployments_folder" ]; then
+  echo "Copying the installation's deployment folder now..."
+  echo "from: '$OLD_DEPLOYMENT_DIR'"
+  echo "to: '$GENII_USER_DIR/deployments'"
+  # clean any existing folder out.
+  if [ -e "$GENII_USER_DIR/deployments" ]; then
+    \rm -rf "$GENII_USER_DIR/deployments"
+  fi
+  # do the copy.
+  cp -R "$OLD_DEPLOYMENT_DIR" "$GENII_USER_DIR/deployments"
+  if [ $? -ne 0 ]; then
+    echo Copying the old deployments folder failed.
+    exit 1
+  fi
+  save_def="$(mktemp -d "$GENII_USER_DIR/deployments/old-default.XXXXXX")"
+  mv "$GENII_USER_DIR/deployments/default" "$save_def"
+  if [ $? -ne 0 ]; then
+    echo "Moving the old deployment's default folder out of the way failed."
+    exit 1
+  fi
+  ln -s "$GENII_DEPLOYMENT_DIR/default" "$GENII_USER_DIR/deployments/default"
+  if [ $? -ne 0 ]; then
+    echo "Linking newer default deployment into place failed."
+    exit 1
+  fi
+
+  # get a copy of the context file into the new location.
+  cp "$GENII_DEPLOYMENT_DIR/$new_dep/$context_file" "$GENII_USER_DIR/deployments/$old_dep/$context_file"
+  if [ $? -ne 0 ]; then
+    echo "Copying context file into deployment folder failed."
+    exit 1
+  fi
+  # set deployment dir now that we know it's available.
+  export GENII_DEPLOYMENT_DIR="$GENII_USER_DIR/deployments"
+  # reset the deployment name to use the old name.
+  new_dep="$old_dep"
+
+fi
+
+
+##############
+
+if [ -z "$copy_deployments_folder" ]; then
+
+# first we'll make our storage folders.
+if [ ! -d "$LOCAL_CERTS_DIR" ]; then
+  mkdir "$LOCAL_CERTS_DIR"
+fi
+
+# snagging everything disabled; the local certs dir is intended for basic certs, like the
+# default-owners and tls and signing certificate, that are crucial to a container's own
+# identity.  sharing the installed trust store and myproxy-certs is generally desirable.
+# if a specialized install is desired, then copying the deployments directory into place is
+# the best approach, since that allows most container configuration to be overridden.
+#
+## sweep in everything first, to make sure we get myproxy-certs and trusted-certificates.
+#cp -R -n "$OLD_DEPLOYMENT_DIR/$old_dep/security"/* "$LOCAL_CERTS_DIR" 2>/dev/null
+#if [ ! -d "$LOCAL_CERTS_DIR/default-owners" ]; then
+#  mkdir "$LOCAL_CERTS_DIR/default-owners"
+#fi
 
 # get any existing kerberos settings.
 echo Copying kerberos keytabs and settings, if found.
@@ -335,6 +405,8 @@ if [ $? -ne 0 ]; then
   echo no kerberos settings found.
 fi
 
+fi  # not copying deployment.
+
 ##############
 
 echo "Calculated these values from existing deployment:"
@@ -347,6 +419,8 @@ dump_important_variables
 # one that is being reconfigured.  so let's replace the former values.
 
 echo Writing configuration to installer file: $INSTALLER_FILE
+
+if [ -z "$copy_deployments_folder" ]; then
 
 # host and port.
 
@@ -368,11 +442,15 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.se
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.container-alias=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.container-alias=$SIGNING_KEY_ALIAS_PROPERTY"
 
+fi  # not copying deployments folder.
+
 ##############
 
 # add in the values we provide defaults for; these can be overridden by people
 # if needed, although we will slam defaults back in there if they run the
-# configure container script again.
+# convert container script again.
+
+if [ -z "$copy_deployments_folder" ]; then
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.default-owners=.*" "edu.virginia.vcgr.genii.container.security.certs-dir=$LOCAL_CERTS_DIR"
 
@@ -383,6 +461,10 @@ replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.se
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store=$(basename $LOCAL_SIGNING_CERT)"
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type=.*" "edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type=PKCS12"
+
+fi  # not copying deployments folder.
+
+# deployment info gets hooked in with the latest information (even when we copied deployments).
 
 replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.gridInitCommand=.*" "edu.virginia.vcgr.genii.gridInitCommand=\"local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file\" \"$new_dep\""
 
@@ -408,6 +490,8 @@ replace_phrase_in_file "$WRAPPER_DIR/wrapper.conf" "wrapper.logfile=.*" "wrapper
 
 ##############
 
+if [ -z "$copy_deployments_folder" ]; then
+
 # set up the TLS certificate.
 echo "Copying TLS certificate for container..."
 cp -f "$TLS_KEYSTORE_FILE_PROPERTY" "$LOCAL_TLS_CERT"
@@ -426,12 +510,16 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+fi  # not copying deployments folder.
+
 ##############
 
 # create a service-url file for this container.
 echo "https://$CONTAINER_HOSTNAME_PROPERTY:$CONTAINER_PORT_PROPERTY/axis/services/VCGRContainerPortType" >"$GENII_USER_DIR/service-url.txt"
 
 ##############
+
+if [ -z "$copy_deployments_folder" ]; then
 
 # get the owner's certificate.
 echo "Copying owner certificate for container..."
@@ -454,51 +542,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-##############
-
-# now see if they want the deployments dir copied.
-echo
-echo "You have the option of copying the installation's deployments directory"
-echo "into the container state directory.  This will save any specialized or"
-echo "modified deployment configuration for the container.  If your container"
-echo "uses the standard deployment provided by the installer (i.e., you haven't"
-echo "modified it and do not intend to), then this step is not needed."
-echo
-echo "Copy the installation deployments folder to the container's state directory? (y/N)"
-read line
-do_the_copy=
-if [ "$line" == "y" -o "$line" == "Y" ]; then
-  do_the_copy=true
-fi
-if [[ "$line" =~ [yY][eE][Ss] ]]; then
-  do_the_copy=true
-fi
-if [ ! -z "$do_the_copy" ]; then
-  echo "Copying the installation's deployment folder now..."
-  echo "from: '$OLD_DEPLOYMENT_DIR'"
-  echo "to: '$GENII_USER_DIR/deployments'"
-  # clean any existing folder out.
-  if [ -e "$GENII_USER_DIR/deployments" ]; then
-    \rm -rf "$GENII_USER_DIR/deployments"
-  fi
-  # do the copy.
-  cp -R "$OLD_DEPLOYMENT_DIR" "$GENII_USER_DIR/deployments"
-  if [ $? -ne 0 ]; then
-    echo Copying the old deployments folder failed.
-    exit 1
-  fi
-  save_def="$(mktemp -d "$GENII_USER_DIR/deployments/old-default.XXXXXX")"
-  mv "$GENII_USER_DIR/deployments/default" "$save_def"
-  if [ $? -ne 0 ]; then
-    echo "Moving the old deployment's default folder out of the way failed."
-    exit 1
-  fi
-  cp -R "$GENII_DEPLOYMENT_DIR/default" "$GENII_USER_DIR/deployments/default"
-  if [ $? -ne 0 ]; then
-    echo "Copying newer default deployment into place failed."
-    exit 1
-  fi
-fi
+fi  # not copying deployments folder.
 
 ##############
 

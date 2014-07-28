@@ -130,11 +130,16 @@ public class MyProxyLoginTool extends BaseLoginTool
 		 * with either environment variable GLOBUS_LOCATION or X509_CERT_DIR
 		 */
 
-		File trustRoot =
-			new File(ContainerProperties.getContainerProperties().getDeploymentsDirectory() + "/"
-				+ Installation.getDeployment(new DeploymentName()).getName().toString() + "/security/myproxy-certs/");
+		// hmmm: this should use a configured name, which would allow us to store this anywhere!
+		// required for providing it based on absolute path.
+		File trustRoot = Installation.getDeployment(new DeploymentName()).security().getSecurityFile("myproxy-certs");
+		// = new File(ContainerProperties.getContainerProperties().getDeploymentsDirectory() + "/"
+		// + Installation.getDeployment(new DeploymentName()).getName().toString() +
+		// "/security/myproxy-certs/");
 
-		// Set trust root
+		_logger.debug("resolved myproxy-certs folder as: " + trustRoot);
+
+		// Set trust root.
 		System.setProperty("X509_CERT_DIR", trustRoot.getCanonicalPath());
 
 		try {

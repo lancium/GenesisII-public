@@ -81,7 +81,9 @@ function print_instructions()
   echo
   echo "(3) The grid user who will 'own' the container.  This must be an existing"
   echo "    user that the grid already knows.  XSEDE MyProxy and X509 identities"
-  echo "    are both supported."
+  echo "    are both supported.  This can be provided as just the simple user name if"
+  echo "    the user exists in this grid's standard namespace, but it also supports"
+  echo "    using an absolute RNS path to the user's STS location."
   echo
   echo "(4) A PFX file (in PKCS#12 format) for the container's TLS certificate"
   echo "    and private key.  This can be passed as 'generate' if the script should"
@@ -103,6 +105,9 @@ function print_instructions()
   echo
   echo "$scriptname fezzle.xsede.org 18843 lincoln ~/tlskey.pfx dqr891sb3 \\"
   echo "  grezne12"
+  echo
+  echo "$scriptname gffs.virginia.edu 19001 /users/gffs.eu/smith generate \\"
+  echo "  K@tn3ws8"
 }
 
 ##############
@@ -262,21 +267,26 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# copying trusted-certificates folder has been dropped since these should come from the install.
+# if it's desired to have a different trust store, then a copy of the installed deployments folder
+# can be made under the state directory.
+#
 # create the trusted certs dir and copy in any from the installs.
-echo Copying existing trusted certificates...
-mkdir "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
-cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted-certificates"/* "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
-if [ $? -ne 0 ]; then
-  echo no trusted certs found in new install.
-fi
+#echo Copying existing trusted certificates...
+#mkdir "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
+#cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/trusted-certificates"/* "$LOCAL_CERTS_DIR/trusted-certificates" 2>/dev/null
+#if [ $? -ne 0 ]; then
+#  echo no trusted certs found in new install.
+#fi
 
+# copying myproxy-certs has been dropped, since the default install should provide these effectively.
 # and now get the myproxy certs also.
-echo Copying existing myproxy certificates...
-mkdir "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
-cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/myproxy-certs"/* "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
-if [ $? -ne 0 ]; then
-  echo no myproxy certs found in new install.
-fi
+#echo Copying existing myproxy certificates...
+#mkdir "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
+#cp -R -n "$GENII_DEPLOYMENT_DIR/$new_dep/security/myproxy-certs"/* "$LOCAL_CERTS_DIR/myproxy-certs" 2>/dev/null
+#if [ $? -ne 0 ]; then
+#  echo no myproxy certs found in new install.
+#fi
 
 ##############
 
@@ -372,7 +382,13 @@ echo
 # download the owner's certificate.
 echo "Downloading owner's certificate for user $GRID_USER_NAME..."
 user_path=$(retrieve_compiler_variable genii.user-path)
-"$GENII_INSTALL_DIR/grid" download-certificate "$user_path/$GRID_USER_NAME" "local:$LOCAL_CERTS_DIR/owner.cer"
+target_path="$user_path/$GRID_USER_NAME"
+if [[ "$GRID_USER_NAME" =~ .*/.* ]]; then
+  # this path has a slash in it, so we allow for them to use non-standard
+  # owner path.
+  target_path="$GRID_USER_NAME"
+fi
+"$GENII_INSTALL_DIR/grid" download-certificate "$target_path" "local:$LOCAL_CERTS_DIR/owner.cer"
 if [ $? -ne 0 ]; then
   echo "Failed to download the certificate for grid user $GRID_USER_NAME."
   echo "There may be more information in: ~/.GenesisII/grid-client.log"

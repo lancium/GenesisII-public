@@ -3,8 +3,8 @@
 # This script allows a unified container configuration to be adapted to a
 # different deployment than it previously used.  This usually needs to be a
 # deployment that is compatible with the prior one, since moving a
-# container's configuration between grids is not supported (once the
-# container has some resources or has been linked to the old grid).
+# container's configuration between grids is not supported (not once the
+# container holds some resources or has been linked to a particular grid).
 
 ##############
 
@@ -202,9 +202,9 @@ if [ -d "$GENII_USER_DIR/deployments" ]; then
     echo "Moving the old deployment's default folder out of the way failed."
     exit 1
   fi
-  cp -R "$GENII_INSTALL_DIR/deployments/default" "$GENII_USER_DIR/deployments/default"
+  ln -s "$GENII_INSTALL_DIR/deployments/default" "$GENII_USER_DIR/deployments/default"
   if [ $? -ne 0 ]; then
-    echo "Copying newer default deployment into place failed."
+    echo "Linking newer default deployment into place failed."
     exit 1
   fi
   echo "Updated the state directory's default deployment from the new version."

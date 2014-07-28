@@ -30,6 +30,20 @@ replace_installdir_variables "$GENII_INSTALL_DIR"
 # make a link for the Container startup script.
 ln -s "$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer" "$GENII_INSTALL_DIR"
 
+# cannot package multiple binary formats in rpm, so this code won't work.
+# create the JNI directory for this platform.
+#if [ ! -d $GENII_INSTALL_DIR/jni-lib ]; then
+#  mkdir $GENII_INSTALL_DIR/jni-lib
+#fi
+#hostarch=$(arch)
+#if [ "$hostarch" == x86_64 ]; then
+#  cp -f $GENII_INSTALL_DIR/jni-libs/lin64/* $GENII_INSTALL_DIR/jni-lib/
+#elif [ "$hostarch" == x86_32 \
+#      -o "$hostarch" == i686 \
+#      -o "$hostarch" == i586 ]; then
+#  cp -f $GENII_INSTALL_DIR/jni-libs/lin32/* $GENII_INSTALL_DIR/jni-lib/
+#fi
+
 # clean up some older files.
 \rm -rf "$GENII_INSTALL_DIR/ApplicationWatcher" "$GENII_INSTALL_DIR/XCGContainer" "$GENII_INSTALL_DIR/lib/gffs-container.jar" 
 

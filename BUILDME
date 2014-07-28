@@ -1,0 +1,44 @@
+
+Building Genesis II GFFS
+========================
+
+Prerequisites:
+
+  Java 1.7 JDK (Oracle java recommended, available at http://www.oracle.com/technetwork/java/javase/downloads/index.html )
+  Unlimited JCE jars (documented at http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html )
+  RPM Installed for: ant ant-contrib ant-nodeps ant-jsch ant-trax ant-junit
+    (or Debian package for: ant)
+
+Building from source RPM (SRPM):
+
+(Where referenced below, {grid} and {version} should be replaced with
+the appropriate text from the software package being installed or rebuilt.)
+
+This will take the source rpm and produce a new RPM binary package:
+
+  rpmbuild --rebuild genesis-{grid}-{version}.rpm
+
+Building from tar bundle:
+
+  Preparation (same for both 32-bit and 64-bit versions):
+    export ANT_OPTS=-Xms512m -Xmx768m -XX:MaxPermSize=768m
+    tar -xf genesis2-{grid}-{version}.tar.gz
+    cd genesis2-{grid}-{version}
+    ant clean
+    # follow with either 32-bit or 64-bit build steps...
+
+  Peforming a build for 64-bit version:
+    ant -Dbuild.targetArch=64 build
+
+  Peforming a build for 32-bit version:
+    ant build
+
+More information:
+
+Further information about building can be found in the Genesis II Omnibus
+Reference.  This is available online at:
+  http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm
+A copy of this reference manual can also be found in the "docs" directory
+within the installation package.
+
+

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SPMDVariations>
-	<variation name="MPICH 1">http://www.schemas.ogf.org/jsdl/2007/02/jsdl-spmd/MPICH1</variation>
-	<variation name="MPICH 2">http://www.schemas.ogf.org/jsdl/2007/02/jsdl-spmd/MPICH2</variation>
+	<variation name="MPICH 1">http://www.ogf.org/jsdl/2007/02/jsdl-spmd/MPICH1</variation>
+	<variation name="MPICH 2">http://www.ogf.org/jsdl/2007/02/jsdl-spmd/MPICH2</variation>
 <!-- Other wellknown MPIs
 	<variation name="MPI">http://www.ogf/org/jsdl/2007/02/jsdl-spmd/MPI</variation>
 	<variation name="Grid MPI">http://www.ogf/org/jsdl/2007/02/jsdl-spmd/GridMPI</variation>

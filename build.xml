@@ -189,8 +189,6 @@
 		<delete file="${basedir}/jar-desc.xml"/>
 		<delete file="${basedir}/runContainer.sh"/>
 		<delete file="${basedir}/runContainer.bat"/>
-		<delete file="${basedir}/current.version"/>
-		<delete file="${basedir}/current.deployment"/>
 
 		<!-- clean out current jars that are generated. -->
 		<delete file="${ext.dir}/CmdLineManipulator.jar"/>

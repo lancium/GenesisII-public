@@ -15,8 +15,8 @@ APP_NAME="VCGRContainer"
 APP_LONG_NAME="VCGR Container"
 
 # Wrapper
-WRAPPER_CMD="%{INSTALL_PATH}/ext/JavaServiceWrapper/bin/wrapper"
-WRAPPER_CONF="%{INSTALL_PATH}/ext/JavaServiceWrapper/conf/runContainer.conf.linux"
+WRAPPER_CMD="${installer:sys.installationDir}/ext/JavaServiceWrapper/bin/wrapper"
+WRAPPER_CONF="${installer:sys.installationDir}/ext/JavaServiceWrapper/conf/runContainer.conf.linux"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.

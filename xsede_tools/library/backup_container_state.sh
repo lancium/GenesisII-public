@@ -43,6 +43,10 @@ if [ -z "$TMP" ]; then
 fi
 if [ ! -d "$TMP" ]; then
   mkdir "$TMP"
+  if [ ! -d "$TMP" ]; then
+    echo "There was a failure creating a local temporary directory at '$TMP'."
+    exit 1
+  fi
 fi
 
 ( pushd / ;

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+
+$WORKDIR/grid client-ui
+

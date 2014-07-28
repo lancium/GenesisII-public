@@ -4,7 +4,7 @@ GOTO :InstallService
 
 :InstallService
 echo "Installing Genesis II Service"
-ext\JavaServiceWrapper\bin\wrapper.exe -i "$INSTALL_PATH\ext\JavaServiceWrapper\conf\runContainer.conf" wrapper.ntservice.password.prompt=TRUE "set.LOCAL_JAVA_DIR=$INSTALL_PATH\Java\windows-i586\jre" "set.USER_NAME_STRING=%USERDOMAIN%\%USERNAME%" "set.GENII_INSTALL_DIR=$INSTALL_PATH"
+ext\JavaServiceWrapper\bin\wrapper.exe -i "${installer:sys.installationDir}\ext\JavaServiceWrapper\conf\runContainer.conf" wrapper.ntservice.password.prompt=TRUE "set.LOCAL_JAVA_DIR=${installer:sys.installationDir}\Java\windows-i586\jre" "set.USER_NAME_STRING=%USERDOMAIN%\%USERNAME%" "set.GENII_INSTALL_DIR=${installer:sys.installationDir}"
 if not errorlevel 1 GOTO :GrantServiceRights
 
 echo "Unable to install new service."

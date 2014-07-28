@@ -1,0 +1,173 @@
+#
+# Spec file for the Genesis II SRPM.
+#
+
+# eliminate stripping of binaries.
+%global __os_install_post %{nil}
+
+Summary: Genesis II is an open source, standards based grid platform designed to support both high-throughput computing and secure data sharing
+Name: genesis2
+Version: %VER%
+Release: %REL%
+License: ASL 2.0
+Group: Applications/Engineering
+URL: http://genesis2.virginia.edu/wiki/
+Vendor: Genesis II Team, University of Virginia
+Packager: Chris Koeritz <koeritz@virginia.edu>
+Prefix: /usr/local
+BuildArch: %ARCH%
+AutoReqProv: no
+
+Source0: genesis2-%{version}.tar.gz
+Source1: BUILDME
+
+Requires: expect java
+BuildRequires: ant ant-contrib ant-nodeps ant-jsch ant-trax ant-junit java
+
+%description
+The Genesis II Project is intended to provide the grid user community with free, easy-to-use tools to leverage grid technology to fulfill their computation and data management needs. The platform is designed to support a wide range of potential application domains from simple data sharing to multi-platform, multi-organizational high-throughput computing.
+The Genesis II platform is an interoperable (via adherence to community standards), freely available, and flexible platform for developing and evaluating new grid technologies and models. Genesis II serves to vet and validate the standardization efforts within the OGF and OGSA standards communities. Grid research is a dynamic field of study, and many challenges remain. Particular areas that we focus on are data access, security (confidentiality, data integrity, access control, policy negotiation), dependability (availability, SLA’s, policy languages), and grid standards. 
+
+%prep
+%setup -q
+
+%build
+echo "in RPM build step."
+echo RPM_BUILD_ROOT is $RPM_BUILD_ROOT 
+echo RPM_BUILD_DIR is $RPM_BUILD_DIR
+echo Preparing main RPM now.
+export GEN2_SOURCE_LOC="$RPM_BUILD_DIR/genesis2-%{version}"
+mkdir -p $GEN2_SOURCE_LOC
+echo pwd is $(pwd)
+export GENII_INSTALL_DIR=$(\pwd)
+BUILD_FLAGS=%BUILD_FLAGS%
+ant clean
+ant $BUILD_FLAGS build
+echo "finished building GFFS source"
+
+%install
+echo "in RPM install step."
+rm -rf $RPM_BUILD_ROOT
+export GEN2_SOURCE_LOC="$RPM_BUILD_DIR/genesis2-%{version}"
+export GEN2_BUILDOUT=$RPM_BUILD_ROOT/opt/genesis2
+mkdir -p $GEN2_BUILDOUT
+# copy the simpler globs into place.
+cp -rf $GEN2_SOURCE_LOC/INSTALL \
+  $GEN2_SOURCE_LOC/current.version \
+  $GEN2_SOURCE_LOC/current.deployment \
+  $GEN2_SOURCE_LOC/License.txt \
+  $GEN2_SOURCE_LOC/RELEASE \
+  $GEN2_SOURCE_LOC/bundles \
+  $GEN2_SOURCE_LOC/docs \
+  $GEN2_SOURCE_LOC/dpages \
+  $GEN2_SOURCE_LOC/eclipse \
+  $GEN2_SOURCE_LOC/ext \
+  $GEN2_SOURCE_LOC/installer/scripts \
+  $GEN2_SOURCE_LOC/lib \
+  $GEN2_SOURCE_LOC/webapps \
+  $GEN2_SOURCE_LOC/xsede_tools \
+  $GEN2_BUILDOUT
+
+# set up the application property files.
+cp -Rf $GEN2_SOURCE_LOC/scripts/genii-* $GEN2_BUILDOUT/ext
+
+# set up java service wrapper dirs.
+mkdir -p $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/bin $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/conf $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/lib
+cp $GEN2_SOURCE_LOC/JavaServiceWrapper/wrapper/conf/wrapper.conf \
+  $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/conf
+cp $GEN2_SOURCE_LOC/JavaServiceWrapper/wrapper/bin/GFFSContainer \
+  $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/bin
+cp $GEN2_SOURCE_LOC/JavaServiceWrapper/wrapper/lib/*.jar \
+  $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/lib
+chmod 755 $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/bin/GFFSContainer 
+
+# platform dependent pieces.
+mkdir $GEN2_BUILDOUT/jni-lib
+cp -R $GEN2_SOURCE_LOC/jni-libs/lin%PLATFORM_BITSIZE%/* $GEN2_BUILDOUT/jni-lib
+cp $GEN2_SOURCE_LOC/JavaServiceWrapper/wrapper/bin/wrapper-linux-x86-%PLATFORM_BITSIZE% $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/bin
+cp $GEN2_SOURCE_LOC/JavaServiceWrapper/wrapper/lib/libwrapper-linux-x86-%PLATFORM_BITSIZE%.so $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/lib
+
+# fix pattern for jni and write grid script.
+sed -e 's/%{GENII_JNI_PATH}/jni-lib/' \
+  -e 's/%{CLIENT_LOG4JCONFIG}/production.client.log4j.properties/' \
+  < $GEN2_SOURCE_LOC/scripts/grid >$GEN2_BUILDOUT/grid
+chmod 755 $GEN2_BUILDOUT/grid
+
+# copy the simple scripts and config files that are already ready.
+cp $GEN2_SOURCE_LOC/scripts/client-ui \
+  $GEN2_SOURCE_LOC/scripts/jar-desc.xml \
+  $GEN2_BUILDOUT
+chmod 755 $GEN2_BUILDOUT/client-ui
+
+# copy some others that require renaming.
+cp $GEN2_SOURCE_LOC/lib/gffs.exports.template $GEN2_BUILDOUT/lib/gffs.exports
+cp $GEN2_SOURCE_LOC/lib/export.properties $GEN2_BUILDOUT/lib/export.properties
+cp $GEN2_SOURCE_LOC/scripts/gffschown.template $GEN2_BUILDOUT/gffschown
+chmod 755 $GEN2_BUILDOUT/gffschown
+cp $GEN2_SOURCE_LOC/scripts/proxyio.launcher.template $GEN2_BUILDOUT/proxyio.launcher
+chmod 755 $GEN2_BUILDOUT/proxyio.launcher
+cp $GEN2_SOURCE_LOC/installer/data_files/container.properties $GEN2_BUILDOUT/container.properties
+
+# copy the right deployment into place.
+mkdir $GEN2_BUILDOUT/deployments
+cp -r $GEN2_SOURCE_LOC/deployments/default $GEN2_BUILDOUT/deployments
+cp -r $GEN2_SOURCE_LOC/installer/deployment_base/%DEPLOYMENT_SOURCE_NAME% $GEN2_BUILDOUT/deployments/%DEPLOYMENT_TARGET_NAME%
+# toss generated files that aren't applicable.
+rm -f $GEN2_BUILDOUT/deployments/default/configuration/bootstrap.xml \
+  $GEN2_BUILDOUT/deployments/default/security/default-owners/*.cer \
+  $GEN2_BUILDOUT/deployments/default/security/*.cer \
+  $GEN2_BUILDOUT/deployments/default/security/*.pfx
+
+#echo after pruning, security dir for default has:
+#ls -al $GEN2_BUILDOUT/deployments/default/security
+
+# toss some xsede tools denizens that shouldn't be conveyed.
+rm -rf $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/generated_certs \
+  $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/gridwide_certs \
+  $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/certificate-config.txt \
+  $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/passwords.txt \
+  $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/saved_deployment_info.txt \
+  $GEN2_BUILDOUT/xsede_tools/inputfile.txt 
+
+echo done with RPM install step.
+
+%post
+bash /opt/genesis2/scripts/software_post_install.sh
+
+%preun
+bash /opt/genesis2/scripts/software_pre_uninstall.sh
+
+%files
+%defattr(-, root, root)
+%doc /opt/genesis2/INSTALL
+%doc /opt/genesis2/License.txt
+%doc /opt/genesis2/RELEASE
+/opt/genesis2/JavaServiceWrapper
+/opt/genesis2/bundles
+/opt/genesis2/docs
+/opt/genesis2/deployments
+/opt/genesis2/dpages
+/opt/genesis2/eclipse
+/opt/genesis2/ext
+/opt/genesis2/jni-lib
+/opt/genesis2/lib
+/opt/genesis2/scripts
+/opt/genesis2/webapps
+/opt/genesis2/xsede_tools
+
+/opt/genesis2/client-ui
+/opt/genesis2/current.version
+/opt/genesis2/current.deployment
+/opt/genesis2/container.properties
+/opt/genesis2/gffschown
+/opt/genesis2/grid
+/opt/genesis2/jar-desc.xml
+/opt/genesis2/proxyio.launcher
+
+%changelog
+* Wed Jul 23 2014 Chris Koeritz <koeritz@virginia.edu> 
+- Very close to production ready version, supporting seemingly everything that install4j RPM did.
+* Wed Jul 16 2014 Chris Koeritz <koeritz@virginia.edu> 
+- Initial version of GFFS spec file, just for source rpm.
+
+

@@ -5,7 +5,7 @@
 		<copy file="${win-script-src-dir}/${win-script-base-name}.bat"
 			tofile="${basedir}/${win-script-base-name}.bat"/>
 		<replace file="${basedir}/${win-script-base-name}.bat"
-			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/${win-script-base-name}.bat"
 			token="$LOG4JCONFIG" value="genesisII.container.log4j.properties"
 			summary="no"/>
@@ -21,7 +21,7 @@
 		<copy file="${unix-script-src-dir}/${unix-script-base-name}"
 			tofile="${basedir}/${unix-script-base-name}"/>
 		<replace file="${basedir}/${unix-script-base-name}"
-			token="%{INSTALL_PATH}" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/${unix-script-base-name}"
 			token="%{LOG4JCONFIG}" value="genesisII.container.log4j.properties"
 			summary="no"/>
@@ -85,8 +85,8 @@
 	
 	<target name="set-jni-replace">
 		<replace file="${build-target-file}"
-					token="%{GENII_JNI_PATH}" value="${build-target-jni}"
-					summary="no"/>
+			token="%{GENII_JNI_PATH}" value="${build-target-jni}"
+			summary="no"/>
 	</target>
 		
 	

@@ -55,4 +55,10 @@ public class CommonResourcesFacet extends DefaultResourcesFacet
 		((CommonExecutionUnderstanding) currentUnderstanding).setWallclockTimeLimit(wallclockTimeLimit.describe()
 			.getUpperBound());
 	}
+
+	@Override
+	public void consumeTotalCPUCount(Object currentUnderstanding, RangeExpression totalCPUCount) throws JSDLException
+	{
+		((CommonExecutionUnderstanding) currentUnderstanding).setTotalCPUCount(totalCPUCount.describe().getUpperBound());
+	}
 }

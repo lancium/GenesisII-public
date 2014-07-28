@@ -167,6 +167,7 @@ public class KeystoreManager
 					File certificatesDirectory =
 						Installation.getDeployment(new DeploymentName()).security()
 							.getSecurityFile(trustedCertificatesDirectory);
+					_logger.debug("resolved trusted-certificates folder as: " + certificatesDirectory);
 					List<Certificate> certificateList = SecurityUtilities.loadCertificatesFromDirectory(certificatesDirectory);
 					if (certificateList != null && !certificateList.isEmpty()) {
 						if (trustStore == null) {

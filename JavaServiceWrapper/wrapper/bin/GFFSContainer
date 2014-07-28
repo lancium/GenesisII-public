@@ -34,6 +34,9 @@ export WRAPPER_ROOT_DIR="$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper"
 
 # try to find the wrapper configuration if we know where the state directory is.
 export WRAPPER_CONF_DIR
+if [ -z "$GENII_USER_DIR" ]; then
+  GENII_USER_DIR="$HOME/.genesisII-2.0"
+fi
 if [ ! -z "$GENII_USER_DIR" ]; then
   WRAPPER_CONF_DIR="$GENII_USER_DIR/wrapper"
   if [ ! -d "$WRAPPER_CONF_DIR" -o ! -f "$WRAPPER_CONF_DIR/wrapper.conf" ]; then

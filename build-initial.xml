@@ -4,6 +4,13 @@
 	<target name="init">
 		<mkdir dir="${obj.dir}"/>
 		<mkdir dir="${dpages.dir}"/>
+<!-- really bad idea; we can't overwrite if contents are correct.
+		<copy file="${basedir}/installer/current.version"
+                   tofile="${basedir}/current.version"/>
+		<copy file="${basedir}/installer/current.version"
+                   tofile="${basedir}/current.deployment"/>
+-->
+
 	</target>
 	
 </project>
