@@ -32,9 +32,9 @@ class ProgressNotifierDialog extends JDialog implements ProgressNotifier
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		if (task.isProgressIndeterminate())
+		if (task.isProgressIndeterminate()) {
 			_progressBar.setIndeterminate(true);
-		else {
+		} else {
 			_progressBar.setMinimum(task.getMinimumProgressValue());
 			_progressBar.setMaximum(task.getMaximumProgressValue());
 			updateProgress(initialProgress);
