@@ -21,9 +21,8 @@ AutoReqProv: no
 Source0: genesis2-%GRID%-%{version}.tar.gz
 Source1: BUILDME
 
-#temporarily disabled!!!
-#Requires: expect java
-#BuildRequires: ant ant-contrib ant-nodeps ant-jsch ant-trax ant-junit java
+Requires: expect java
+BuildRequires: ant ant-contrib ant-nodeps ant-jsch ant-trax ant-junit java
 
 %description
 The Genesis II Project is intended to provide the grid user community with free, easy-to-use tools to leverage grid technology to fulfill their computation and data management needs. The platform is designed to support a wide range of potential application domains from simple data sharing to multi-platform, multi-organizational high-throughput computing.
