@@ -452,8 +452,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 							_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
 						try {
 							if (assertion.findDelegateeInChain(callerCertChain[0]) >= 0) {
-								if (_logger.isDebugEnabled())
-									_logger.debug("...found delegatee at position "
+								if (_logger.isTraceEnabled())
+									_logger.trace("...found delegatee at position "
 										+ assertion.findDelegateeInChain(callerCertChain[0])
 										+ " to be the same as incoming tls cert.");
 								match = true;
@@ -467,9 +467,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 								// } else if
 								// (CertificateValidatorFactory.getValidator().validateIsTrustedResource(
 								// assertion.getOriginalAsserter()) == true) {
-								// if (_logger.isDebugEnabled())
+								// if (_logger.isTraceEnabled())
 								// _logger
-								// .debug("...allowed incoming message using resource trust store for original asserter.");
+								// .trace("...allowed incoming message using resource trust store for original asserter.");
 								// match = true;
 								// break;
 							} else {
@@ -483,9 +483,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 					if (!match) {
 						String msg =
-							"credential did not match incoming message sender: '" + assertion.describe(VerbosityLevel.HIGH)
-								+ "'";
-						_logger.warn(msg);
+							"WARN: credential did not match incoming message sender: '"
+								+ assertion.describe(VerbosityLevel.HIGH) + "'";
+						_logger.debug(msg);
 						if (enable_credential_rejection == true) {
 							// skip adding it.
 							continue;

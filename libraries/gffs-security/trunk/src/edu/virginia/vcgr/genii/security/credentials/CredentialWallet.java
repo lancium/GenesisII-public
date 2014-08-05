@@ -113,6 +113,10 @@ public class CredentialWallet implements Externalizable, Describable
 	 */
 	public void addCredential(TrustCredential assertion)
 	{
+		if (assertionChains.containsKey(assertion.getId())) {
+			_logger.error("attempt to add identical assertion to the wallet; ignoring.");
+			return;
+		}
 		if (assertion.getPriorDelegationId() != null) {
 			assertionChains.remove(assertion.getPriorDelegationId());
 		}
@@ -183,25 +187,25 @@ public class CredentialWallet implements Externalizable, Describable
 
 	public String getFirstUserName()
 	{
-		// hmmm: seems like we could avoid using describe here, and just pluck the CN out of the
-		// x509.
 		TrustCredential assertion = getFirstUserCredential();
 		if (assertion != null) {
 			/*
 			 * This is a USER assertion of the form A->B->... where A is a USER.
 			 */
-			String simplerName =
+			String userName =
 				X500PrincipalUtilities.getCN(assertion.getRootOfTrust().getOriginalAsserter()[0].getSubjectX500Principal());
-			_logger.debug("YO: calculated alternate name for storage of: " + simplerName);
+			_logger.debug("calculated user name for byteio storage: '" + userName + "'");
+			return userName;
 
-			String temp = assertion.getRootOfTrust().describe(VerbosityLevel.LOW);
-			_logger.debug("got temp string from cred of: " + temp);
-			String t2[] = temp.split("\"");
-			if (t2.length < 3) {
-				_logger.debug("the split gave me this as the username: " + t2[1]);
-			} else {
-				return t2[1];
-			}
+			// old code disabled.
+			// String temp = assertion.getRootOfTrust().describe(VerbosityLevel.LOW);
+			// _logger.debug("got temp string from cred of: " + temp);
+			// String t2[] = temp.split("\"");
+			// if (t2.length < 3) {
+			// _logger.debug("the split gave me this as the username: " + t2[1]);
+			// } else {
+			// return t2[1];
+			// }
 		}
 		return null;
 	}

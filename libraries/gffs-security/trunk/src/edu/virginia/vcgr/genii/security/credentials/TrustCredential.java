@@ -489,6 +489,19 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		toReturn.append(" -> " + new X509Identity(delegatee, _delegateeType).describe(verbosity));
 		return toReturn.toString();
 	}
+	
+	public String showIdChain()
+	{
+		StringBuilder toReturn = new StringBuilder();
+		if (priorDelegation != null) {
+			// prepend the original part of the chain.
+			toReturn.append(priorDelegation.showIdChain() + " ==> ");
+		} else {
+			// this is terminal delegation.
+			toReturn.append(id);
+		}
+		return toReturn.toString();		
+	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException

@@ -6,7 +6,7 @@
 %global __os_install_post %{nil}
 
 Summary: Genesis II is an open source, standards based grid platform designed to support both high-throughput computing and secure data sharing
-Name: genesis2
+Name: genesis2-%GRID%
 Version: %VER%
 Release: %REL%
 License: ASL 2.0
@@ -18,11 +18,12 @@ Prefix: /usr/local
 BuildArch: %ARCH%
 AutoReqProv: no
 
-Source0: genesis2-%{version}.tar.gz
+Source0: genesis2-%GRID%-%{version}.tar.gz
 Source1: BUILDME
 
-Requires: expect java
-BuildRequires: ant ant-contrib ant-nodeps ant-jsch ant-trax ant-junit java
+#temporarily disabled!!!
+#Requires: expect java
+#BuildRequires: ant ant-contrib ant-nodeps ant-jsch ant-trax ant-junit java
 
 %description
 The Genesis II Project is intended to provide the grid user community with free, easy-to-use tools to leverage grid technology to fulfill their computation and data management needs. The platform is designed to support a wide range of potential application domains from simple data sharing to multi-platform, multi-organizational high-throughput computing.
@@ -36,7 +37,7 @@ echo "in RPM build step."
 echo RPM_BUILD_ROOT is $RPM_BUILD_ROOT 
 echo RPM_BUILD_DIR is $RPM_BUILD_DIR
 echo Preparing main RPM now.
-export GEN2_SOURCE_LOC="$RPM_BUILD_DIR/genesis2-%{version}"
+export GEN2_SOURCE_LOC="$RPM_BUILD_DIR/genesis2-%GRID%-%{version}"
 mkdir -p $GEN2_SOURCE_LOC
 echo pwd is $(pwd)
 export GENII_INSTALL_DIR=$(\pwd)
@@ -48,8 +49,8 @@ echo "finished building GFFS source"
 %install
 echo "in RPM install step."
 rm -rf $RPM_BUILD_ROOT
-export GEN2_SOURCE_LOC="$RPM_BUILD_DIR/genesis2-%{version}"
-export GEN2_BUILDOUT=$RPM_BUILD_ROOT/opt/genesis2
+export GEN2_SOURCE_LOC="$RPM_BUILD_DIR/genesis2-%GRID%-%{version}"
+export GEN2_BUILDOUT=$RPM_BUILD_ROOT/opt/genesis2-%GRID%
 mkdir -p $GEN2_BUILDOUT
 # copy the simpler globs into place.
 cp -rf $GEN2_SOURCE_LOC/INSTALL \
@@ -132,37 +133,37 @@ rm -rf $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/generated_certs \
 echo done with RPM install step.
 
 %post
-bash /opt/genesis2/scripts/software_post_install.sh
+bash /opt/genesis2-%GRID%/scripts/software_post_install.sh
 
 %preun
-bash /opt/genesis2/scripts/software_pre_uninstall.sh
+bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
 
 %files
 %defattr(-, root, root)
-%doc /opt/genesis2/INSTALL
-%doc /opt/genesis2/License.txt
-%doc /opt/genesis2/RELEASE
-/opt/genesis2/JavaServiceWrapper
-/opt/genesis2/bundles
-/opt/genesis2/docs
-/opt/genesis2/deployments
-/opt/genesis2/dpages
-/opt/genesis2/eclipse
-/opt/genesis2/ext
-/opt/genesis2/jni-lib
-/opt/genesis2/lib
-/opt/genesis2/scripts
-/opt/genesis2/webapps
-/opt/genesis2/xsede_tools
+%doc /opt/genesis2-%GRID%/INSTALL
+%doc /opt/genesis2-%GRID%/License.txt
+%doc /opt/genesis2-%GRID%/RELEASE
+/opt/genesis2-%GRID%/JavaServiceWrapper
+/opt/genesis2-%GRID%/bundles
+/opt/genesis2-%GRID%/docs
+/opt/genesis2-%GRID%/deployments
+/opt/genesis2-%GRID%/dpages
+/opt/genesis2-%GRID%/eclipse
+/opt/genesis2-%GRID%/ext
+/opt/genesis2-%GRID%/jni-lib
+/opt/genesis2-%GRID%/lib
+/opt/genesis2-%GRID%/scripts
+/opt/genesis2-%GRID%/webapps
+/opt/genesis2-%GRID%/xsede_tools
 
-/opt/genesis2/client-ui
-/opt/genesis2/current.version
-/opt/genesis2/current.deployment
-/opt/genesis2/container.properties
-/opt/genesis2/gffschown
-/opt/genesis2/grid
-/opt/genesis2/jar-desc.xml
-/opt/genesis2/proxyio.launcher
+/opt/genesis2-%GRID%/client-ui
+/opt/genesis2-%GRID%/current.version
+/opt/genesis2-%GRID%/current.deployment
+/opt/genesis2-%GRID%/container.properties
+/opt/genesis2-%GRID%/gffschown
+/opt/genesis2-%GRID%/grid
+/opt/genesis2-%GRID%/jar-desc.xml
+/opt/genesis2-%GRID%/proxyio.launcher
 
 %changelog
 * Wed Jul 23 2014 Chris Koeritz <koeritz@virginia.edu> 

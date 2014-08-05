@@ -6,10 +6,11 @@ OPENSSL = /usr/bin/openssl
 
 RPMBUILD_TOPDIR = $(HOME)/genesis-rpmbuild
 
-VER = $(shell sed -n -e 's/genii.app-version=\(.*\)/\1/p' ../current.version)
-REL = $(shell sed -n -e 's/genii.release-number=\(.*\)/\1/p' ../current.version)
+VER = $(shell sed -n -e 's/genii.app-version=\(.*\)/\1/p' ../../current.version)
+REL = $(shell sed -n -e 's/genii.release-number=\(.*\)/\1/p' ../../current.version)
+GRID = $(shell sed -n -e 's/genii.simple-name=\(.*\)/\1/p' ../../current.deployment)
 
-BUNDLE_NAME = genesis2-$(VER)
+BUNDLE_NAME = genesis2-$(GRID)-$(VER)
 
 # the PLATFORM_ARCH variable comes from the environment and must be either x86_64 or i586 currently.
 
@@ -22,7 +23,11 @@ build-rpms: package-code
 	cp ../../BUILDME $(RPMBUILD_TOPDIR)/SOURCES/
 	cp -p $(BUNDLE_NAME).tar.gz $(RPMBUILD_TOPDIR)/SOURCES/
 	rm $(BUNDLE_NAME).tar.gz 
-	sed -e "s/%VER%/$(VER)/g" -e "s/%REL%/$(REL)/g" -e "s/%ARCH%/$(PLATFORM_ARCH)/g" \
+	sed \
+		-e "s/%VER%/$(VER)/g" \
+		-e "s/%REL%/$(REL)/g" \
+		-e "s/%GRID%/$(GRID)/g" \
+		-e "s/%ARCH%/$(PLATFORM_ARCH)/g" \
 		-e "s/%PLATFORM_BITSIZE%/$(PLATFORM_BITSIZE)/g" \
 		-e "s/%BUILD_FLAGS%/$(BUILD_FLAGS)/g" \
 		-e "s/%DEPLOYMENT_SOURCE_NAME%/$(DEPLOYMENT_SOURCE_NAME)/g" \

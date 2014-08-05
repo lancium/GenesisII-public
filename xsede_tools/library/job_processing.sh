@@ -311,12 +311,18 @@ function drain_my_jobs_out_of_queue()
       # we opt for a more subtle completion call per job, just as an alternative to
       # our more standard --all flag.
 #echo "examining job $i"
-      count=120
+
+      # we use the full combined allowed time for a single job to finish.
+      count=$(($QUEUE_SLEEP_DURATION * $QUEUE_TRIES_ALLOWED))
+      # but then we specify a different pause time, since this action of
+      # checking for the job status file is fast (compared to qstat).
+      local SNOOZY_INTERVAL=10
+
       local retval=1
       local grid_app="$(pick_grid_app)"
       until [ $count -le 0 ]; do
 #echo "seconds left: $count"
-        sleep 10
+        sleep $SNOOZY_INTERVAL
         jobStatus="$(raw_grid $grid_app qstat $QUEUE_PATH $i)"
 #echo qstat returned: $jobStatus
         # stop waiting for a job if it's marked as finished.
@@ -337,7 +343,7 @@ function drain_my_jobs_out_of_queue()
             # bail out if we see any error when asking it to complete.
             if [ $retval -ne 0 ]; then break; fi
         fi
-        count=$(( $count - 10 ))
+        count=$(( $count - $SNOOZY_INTERVAL ))
 #echo count is now $count
       done
       assertEquals "requesting job $i complete." 0 $retval
