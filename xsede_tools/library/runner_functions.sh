@@ -52,9 +52,9 @@ function timed_grid()
 # this bails out if an error occurs.
 function grid_chk()
 {
-  echo "    g> $*"
+  echo "    g> $*" | sed -e 's/password=[^ ]* /XXXX /g'
   grid $*
-  check_if_failed "'grid $*' exited with exit code $?"
+  check_if_failed "'grid ${1}...' exited with exit code $?"
 }
 
 # this function accepts a long stream of stuff from standard input which is passed

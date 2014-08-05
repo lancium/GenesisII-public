@@ -275,8 +275,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 							CredentialCache.getCachedCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain,
 								tlsKey._privateKey, restrictions, RWXCategory.FULL_ACCESS);
 						walletForResource.getRealCreds().addCredential(newerTC);
-						if (_logger.isTraceEnabled())
-							_logger.trace("made credential for pass-through connection: " + newerTC);
+						if (_logger.isDebugEnabled())
+							_logger.debug("made credential for pass-through connection: " + newerTC);
 					} else {
 						_logger.trace("ignoring pass-through credential that doesn't match client's last TLS certificate.");
 					}

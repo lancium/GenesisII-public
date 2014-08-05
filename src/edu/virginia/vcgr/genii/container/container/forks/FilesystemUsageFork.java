@@ -43,8 +43,10 @@ public class FilesystemUsageFork extends AbstractStreamableByteIOFactoryResource
 		for (String fsName : mgr.filesystems()) {
 			Filesystem fs = mgr.lookup(fsName);
 			FilesystemUsageInformation usageInfo = fs.currentUsage();
-			ps.format("Filesystem \"%s\" at %s:  %s (%.2f%%) space free.\n", fsName, fs.filesystemRoot(),
-				new Size(usageInfo.spaceUsable(), SizeUnits.Megabytes).toString(2), usageInfo.percentAvailable());
+			ps.format("Filesystem \"%s\" at %s:  %sG (%.2f%%) space free.\n", fsName, fs.filesystemRoot(),
+				new Size(usageInfo.spaceUsable(), SizeUnits.Gigabytes).toString(2), usageInfo.percentAvailable());
+			// hmmm: dividing is the wrong thing to do in size above, yes?
+			// /(1024*1024*1024)
 		}
 
 		ps.close();
