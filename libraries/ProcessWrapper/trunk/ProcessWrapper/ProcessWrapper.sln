@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcessWrapper", "ProcessWrapper\ProcessWrapper.vcproj", "{FA05C0EA-C520-43BC-BDE6-0955A50458A7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloWorldWin", "HelloWorldWin\HelloWorldWin.vcproj", "{918B92A0-0580-4052-9494-52E733A19115}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FA05C0EA-C520-43BC-BDE6-0955A50458A7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FA05C0EA-C520-43BC-BDE6-0955A50458A7}.Debug|Win32.Build.0 = Debug|Win32
+		{FA05C0EA-C520-43BC-BDE6-0955A50458A7}.Release|Win32.ActiveCfg = Release|Win32
+		{FA05C0EA-C520-43BC-BDE6-0955A50458A7}.Release|Win32.Build.0 = Release|Win32
+		{918B92A0-0580-4052-9494-52E733A19115}.Debug|Win32.ActiveCfg = Debug|Win32
+		{918B92A0-0580-4052-9494-52E733A19115}.Debug|Win32.Build.0 = Debug|Win32
+		{918B92A0-0580-4052-9494-52E733A19115}.Release|Win32.ActiveCfg = Release|Win32
+		{918B92A0-0580-4052-9494-52E733A19115}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

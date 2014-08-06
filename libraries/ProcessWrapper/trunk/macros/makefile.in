@@ -1,0 +1,14 @@
+BINDIR			=			$(PWRAPNATIVE)/bin/$(PWRAPOS)/$(PWRAPARCH)
+OBJDIR			=			$(PWRAPNATIVE)/obj/$(PWRAPOS)/$(PWRAPARCH)
+SRCDIR			=			$(PWRAPNATIVE)/src
+
+include $(PWRAPNATIVE)/macros/makefile.$(PWRAPOS).$(PWRAPARCH).in
+
+DEFINES			=			-DPWRAP_$(PWRAPOS) -DPWRAP_$(PWRAPARCH)
+
+CC				=			gcc
+CPP				=			g++
+CFLAGS			=			-Wall -g $(DEFINES) $(NATIVE_CFLAGS)
+CPPFLAGS		=			$(CFLAGS) $(NATIVE_CPPFLAGS)
+LFLAGS			=
+
