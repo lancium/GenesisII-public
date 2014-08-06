@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.uiuc.ncsa.MyProxy.MyProxyLogon;
-import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
@@ -130,8 +129,10 @@ public class MyProxyLoginTool extends BaseLoginTool
 		 * with either environment variable GLOBUS_LOCATION or X509_CERT_DIR
 		 */
 
-		// hmmm: this should use a configured name, which would allow us to store this anywhere!
-		// required for providing it based on absolute path.
+		/*
+		 * hmmm: this should use a configured name, which would allow us to store this anywhere!
+		 * that will be a requirement if we are to use an absolute path as desired by xsede.
+		 */
 		File trustRoot = Installation.getDeployment(new DeploymentName()).security().getSecurityFile("myproxy-certs");
 		// = new File(ContainerProperties.getContainerProperties().getDeploymentsDirectory() + "/"
 		// + Installation.getDeployment(new DeploymentName()).getName().toString() +

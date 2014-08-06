@@ -38,6 +38,10 @@ class GridStageEditor extends StageEditor<GridStageData>
 		content.add(_path, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
+		// content.add(new BrowseRNSPathAction(container,"Path to file", _path, "Another Path"),new
+		// GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+		// GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+
 		JButton okButton = new JButton(createDefaultOKAction());
 		getRootPane().setDefaultButton(okButton);
 		content.add(ButtonPanel.createHorizontalPanel(okButton, createDefaultCancelAction()), new GridBagConstraints(0, 3, 2,

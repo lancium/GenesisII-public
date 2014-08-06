@@ -8,6 +8,8 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.rbyteio.RandomByteIOPortType;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -53,6 +55,8 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 
 public class GenesisIIFilesystem implements FSFilesystem
 {
+	static private Log _logger = LogFactory.getLog(GenesisIIFilesystem.class);
+
 	private RNSPath _root;
 	private RNSPath _lastPath;
 	private Collection<Identity> _callerIdentities;
@@ -155,6 +159,9 @@ public class GenesisIIFilesystem implements FSFilesystem
 
 	FilesystemStatStructure stat(RNSPath target) throws RNSPathDoesNotExistException, FSException
 	{
+		FilesystemStatStructure statStructure = MetadataManager.retrieveStat(target.pwd());
+		if (statStructure != null)
+			return statStructure;
 		return stat(target.getName(), target.getEndpoint());
 	}
 
@@ -254,15 +261,33 @@ public class GenesisIIFilesystem implements FSFilesystem
 
 		try {
 			TypeInformation info = new TypeInformation(target.getEndpoint());
+			DirectoryHandle directoryHandle;
 			if (info.isEnhancedRNS()) {
+				_logger.trace("Using Short form for Enhanced-RNS handle.");
+				ICallingContext context = ContextManager.getCurrentContext();
+
+				context = ContextManager.getCurrentContext();
+				context.setSingleValueProperty("RNSShortForm", true);
+				// Due to a problem the the context resolver, we have explicitly store the context
+				// to make property
+				// update visible in the rest of the code.
+				ContextManager.storeCurrentContext(context);
 				EnhancedRNSPortType pt = ClientUtils.createProxy(EnhancedRNSPortType.class, target.getEndpoint());
-				RNSIterable entries = new RNSIterable(fullPath, pt.lookup(null), null, RNSConstants.PREFERRED_BATCH_SIZE);
-				return new EnhancedRNSHandle(this, entries);
+				RNSIterable entries = new RNSIterable(fullPath, pt.lookup(null), context, RNSConstants.PREFERRED_BATCH_SIZE);
+				directoryHandle = new EnhancedRNSHandle(this, entries, fullPath);
+				// For the similar problem, we have to do another store after removing the property
+				// to have the
+				// proper effect.
+				context.removeProperty("RNSShortForm");
+				ContextManager.storeCurrentContext(context);
+
 			} else if (info.isRNS()) {
-				return new DefaultRNSHandle(this, target.listContents());
+				directoryHandle = new DefaultRNSHandle(this, target.listContents(true));
 			} else {
 				throw new FSNotADirectoryException(String.format("Path %s is not a directory.", target.pwd()));
 			}
+			return directoryHandle;
+
 		} catch (Throwable cause) {
 			throw FSExceptions.translate("Unable to list directory contents.", cause);
 		}

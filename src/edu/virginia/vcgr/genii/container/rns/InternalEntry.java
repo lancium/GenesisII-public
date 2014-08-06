@@ -16,12 +16,25 @@ package edu.virginia.vcgr.genii.container.rns;
 import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
+
 public class InternalEntry
 {
 	private String _name;
 	private EndpointReferenceType _entryReference;
 	private MessageElement[] _attributes;
 	private boolean _doesExist; // added by ak3ka.
+	ResourceForkInformation _rif; // Added by ASG, May 11, 2014
+
+	public InternalEntry(String name, EndpointReferenceType entryReference, MessageElement[] attributes,
+		ResourceForkInformation rif, boolean isExists)
+	{
+		_name = name;
+		_entryReference = entryReference;
+		_attributes = attributes;
+		_doesExist = isExists;
+		_rif = rif;
+	}
 
 	public InternalEntry(String name, EndpointReferenceType entryReference, MessageElement[] attributes, boolean isExists)
 	{
@@ -29,11 +42,12 @@ public class InternalEntry
 		_entryReference = entryReference;
 		_attributes = attributes;
 		_doesExist = isExists;
+		_rif = null;
 	}
 
 	public InternalEntry(String name, EndpointReferenceType entryReference, MessageElement[] attributes)
 	{
-		this(name, entryReference, attributes, true);
+		this(name, entryReference, attributes, null, true);
 	}
 
 	public InternalEntry(String name, EndpointReferenceType entryReference)
@@ -59,6 +73,16 @@ public class InternalEntry
 	public MessageElement[] getAttributes()
 	{
 		return _attributes;
+	}
+
+	public ResourceForkInformation getResourceInformation()
+	{
+		return _rif;
+	}
+
+	public void setResourceInformation(ResourceForkInformation rif)
+	{
+		_rif = rif;
 	}
 
 	public boolean isExistent()

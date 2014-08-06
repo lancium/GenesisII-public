@@ -30,6 +30,8 @@ public class ResourcePathsWidget extends JComponent
 	private JTextField _localPath;
 	private JTextField _rnsPath;
 	private JTextField _containerPath;
+	private JLabel _containerLabel;
+	private JButton _containerButton;
 	private Collection<IInformationListener> _listeners = new ArrayList<IInformationListener>();
 
 	private JButton createLocalBrowseButton()
@@ -75,11 +77,11 @@ public class ResourcePathsWidget extends JComponent
 
 		if (getContainerPath) {
 			// Get RNS path of container on which the resource should reside
-			add(new JLabel(_CONTAINER_LABEL), new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+			add(_containerLabel = new JLabel(_CONTAINER_LABEL), new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 			add(_containerPath = new JTextField(ContainerPath), new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0,
 				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-			add(new JButton(new BrowseRNSPathAction(null, _BUTTON_LABEL, _containerPath, _BROWSE_CONTAINER)),
+			add(_containerButton = new JButton(new BrowseRNSPathAction(null, _BUTTON_LABEL, _containerPath, _BROWSE_CONTAINER)),
 				new GridBagConstraints(2, 2, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5,
 					5, 5, 5), 5, 5));
 		} else {
@@ -147,6 +149,26 @@ public class ResourcePathsWidget extends JComponent
 	{
 		_containerPath.setText(path);
 		;
+	}
+
+	public void disableContainerPath()
+	{
+		if (_containerPath != null)
+			_containerPath.setEnabled(false);
+		if (_containerButton != null)
+			_containerButton.setEnabled(false);
+		if (_containerLabel != null)
+			_containerLabel.setEnabled(false);
+	}
+
+	public void enableContainerPath()
+	{
+		if (_containerPath != null)
+			_containerPath.setEnabled(true);
+		if (_containerButton != null)
+			_containerButton.setEnabled(true);
+		if (_containerLabel != null)
+			_containerLabel.setEnabled(true);
 	}
 
 	public String getRNSPath()

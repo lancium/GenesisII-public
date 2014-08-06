@@ -382,6 +382,10 @@ public class RNSTree extends JTree implements EndpointRetriever
 		public void actionPerformed(ActionEvent e)
 		{
 			TreePath[] paths = getSelectionPaths();
+
+			TreePath path = paths[0];
+			path = path.getParentPath();
+
 			if (paths != null && paths.length > 0) {
 				int answer;
 

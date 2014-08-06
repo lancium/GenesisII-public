@@ -49,8 +49,8 @@ import eu.unicore.security.etd.TrustDelegation;
  * simulate the recursive credentials transferring, which is essential for our business logic, with
  * a linked list of trust delegation.
  * 
- * @author myanhaona
- * @author ckoeritz
+ * @author Muhammad Yanhaona
+ * @author Chris Koeritz
  */
 public class TrustCredential implements NuCredential, RWXAccessible
 {
@@ -304,6 +304,12 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	{
 		StringBuilder toReturn = new StringBuilder();
 		toReturn.append(describe(VerbosityLevel.HIGH));
+		
+		toReturn.append(" <id " + id.toString() + ">");
+		if (priorDelegationId != null) {
+			toReturn.append(" (prior-id " + priorDelegationId.toString() + ")");
+		}
+		
 		toReturn.append(" {mask ");
 		toReturn.append(accessMask.toString());
 		toReturn.append("}");
@@ -487,6 +493,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		}
 
 		toReturn.append(" -> " + new X509Identity(delegatee, _delegateeType).describe(verbosity));
+		
 		return toReturn.toString();
 	}
 	
@@ -637,29 +644,35 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		return attributeDescription.substring(valueStart + 1, valueEnd);
 	}
 
-	/**
-	 * tests that the credential is valid.
-	 */
-	@Override
-	public void checkValidity(Date date) throws AttributeInvalidException
+	public void checkValidityUber(Date date, boolean performLogging) throws AttributeInvalidException
 	{
 		if (!signed) {
 			String msg = "this assertion is not signed yet, and so therefore not valid.";
-			_logger.error(msg);
+			if (performLogging)
+				_logger.error(msg);
 			throw new AttributeInvalidException(msg);
 		}
 		// test that the delegation chain appears sound.
 		if (priorDelegation != null) {
 			if (!priorDelegation.getId().equals(priorDelegationId)) {
 				String msg = "the attached prior delegation has the wrong ID!: " + priorDelegation.toString();
-				_logger.error(msg);
+				if (performLogging)
+					_logger.error(msg);
 				throw new AttributeInvalidException(msg);
 			} else if (!priorDelegation.locateDsigValue().equals(priorDsig)) {
 				String msg = "the attached prior delegation has the wrong dsig!: " + priorDelegation.toString();
-				_logger.error(msg);
+				if (performLogging)
+					_logger.error(msg);
 				throw new AttributeInvalidException(msg);
 			}
 			priorDelegation.checkValidity(date);
+		} else {
+			if (priorDelegationId != null) {
+				String msg = "there is an id for the prior delegation but it is null!: " + priorDelegationId;
+				if (performLogging)
+					_logger.error(msg);
+				throw new AttributeInvalidException(msg);
+			}
 		}
 		// test our constraints.
 		getConstraints().checkValidity(getDelegationDepth(), date);
@@ -676,7 +689,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 						"the signature in TD and signature here do not match! deleg issuer="
 							+ delegation.getIssuerFromSignature()[0].getSubjectDN() + " vs. issuer here="
 							+ getIssuer()[0].getSubjectDN();
-					_logger.error(msg + " ...came in via: " + ProgramTools.showLastFewOnStack(5));
+					if (performLogging)
+						_logger.error(msg + " ...came in via: " + ProgramTools.showLastFewOnStack(5));
 					throw new AttributeInvalidException(msg);
 				}
 				delegation.isCorrectlySigned(getIssuer()[0].getPublicKey());
@@ -685,12 +699,22 @@ public class TrustCredential implements NuCredential, RWXAccessible
 			String msg =
 				"failed to validate signature on our TrustDelegation: " + e.getMessage() + "\n...testing on: " + toString()
 					+ " signed by " + getIssuer()[0].getSubjectDN();
-			_logger.error(msg + " ...came in via: " + ProgramTools.showLastFewOnStack(5));
+			if (performLogging)
+				_logger.error(msg + " ...came in via: " + ProgramTools.showLastFewOnStack(5));
 			throw new AttributeInvalidException(msg);
 		}
-		if (_logger.isTraceEnabled())
+		if (_logger.isTraceEnabled() && performLogging)
 			_logger.trace("successfully validated trust delegation assertion.");
 		this.properlySigned = true;
+	}
+
+	/**
+	 * tests that the credential is valid.
+	 */
+	@Override
+	public void checkValidity(Date date) throws AttributeInvalidException
+	{
+		checkValidityUber(date, true);
 	}
 
 	/**

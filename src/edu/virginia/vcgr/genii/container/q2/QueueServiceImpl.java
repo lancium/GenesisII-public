@@ -726,8 +726,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	 * LightWeightExportDirFork.java .
 	 */
 
-	public static MessageElement getIndexedContent(Connection connection, InMemoryIteratorEntry entry, Object[] queueManager)
-		throws ResourceException
+	public static MessageElement getIndexedContent(Connection connection, InMemoryIteratorEntry entry, Object[] queueManager,
+		boolean shortForm) throws ResourceException
 	{
 		if (queueManager == null || entry == null || connection == null)
 			throw new ResourceException("Unable to stat jobs in queue");

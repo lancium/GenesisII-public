@@ -27,7 +27,7 @@ public abstract class AbstractRNSResourceFork extends AbstractResourceFork imple
 		createInternalEntry(EndpointReferenceType exemplarEPR, String entryName, ResourceForkInformation rif)
 			throws ResourceUnknownFaultType, ResourceException
 	{
-		return new InternalEntry(entryName, getService().createForkEPR(formForkPath(entryName), rif), null);
+		return new InternalEntry(entryName, getService().createForkEPR(formForkPath(entryName), rif), null, rif, true);
 	}
 
 	protected String formForkPath(String entryName)

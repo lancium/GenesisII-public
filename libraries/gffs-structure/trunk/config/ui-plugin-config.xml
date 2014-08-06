@@ -165,5 +165,9 @@
 		<top-menu menu-name="Help" group="Basic File" item-name="Where are files and directories located?"/>
 	</plugin>
 
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.JobCreateHelp">
+		<top-menu menu-name="Help" group="Basic File" item-name="How do I create a job?"/>
+	</plugin>
+
 
 </plugins>

@@ -8,11 +8,13 @@ public class IterableSnapshot
 {
 	private Collection<InternalEntry> _returns;
 	private InMemoryIteratorWrapper _wrapper;
+	private String _dirPath = null;
 
-	public IterableSnapshot(Collection<InternalEntry> entries, InMemoryIteratorWrapper imiw)
+	public IterableSnapshot(Collection<InternalEntry> entries, InMemoryIteratorWrapper imiw, String dirPath)
 	{
 		_returns = entries;
 		_wrapper = imiw;
+		_dirPath = dirPath;
 	}
 
 	public Collection<InternalEntry> getReturns()
@@ -23,6 +25,11 @@ public class IterableSnapshot
 	public InMemoryIteratorWrapper getWrapper()
 	{
 		return _wrapper;
+	}
+
+	public String getDirPath()
+	{
+		return _dirPath;
 	}
 
 }

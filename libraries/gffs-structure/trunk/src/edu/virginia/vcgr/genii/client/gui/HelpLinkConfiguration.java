@@ -16,6 +16,7 @@ public class HelpLinkConfiguration
 	public static final String GENERAL_SECURITY_HELP = "general.security.help";
 	public static final String CREATE_DIRECTORY_HELP = "general.directory.help";
 	public static final String GENERAL_STORAGE_HELP = "general.storage.help";
+	public static final String JOB_CREATE_HELP = "job.create.help";
 
 	private static Properties p = null;
 

@@ -45,8 +45,6 @@ public class FilesystemUsageFork extends AbstractStreamableByteIOFactoryResource
 			FilesystemUsageInformation usageInfo = fs.currentUsage();
 			ps.format("Filesystem \"%s\" at %s:  %sG (%.2f%%) space free.\n", fsName, fs.filesystemRoot(),
 				new Size(usageInfo.spaceUsable(), SizeUnits.Gigabytes).toString(2), usageInfo.percentAvailable());
-			// hmmm: dividing is the wrong thing to do in size above, yes?
-			// /(1024*1024*1024)
 		}
 
 		ps.close();

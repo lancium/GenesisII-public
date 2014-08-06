@@ -24,18 +24,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSMetadataType;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -44,6 +51,9 @@ import edu.virginia.vcgr.genii.client.rns.filters.FilePatternFilterFactory;
 import edu.virginia.vcgr.genii.client.rns.filters.Filter;
 import edu.virginia.vcgr.genii.client.rns.filters.FilterFactory;
 import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
+import edu.virginia.vcgr.genii.client.rp.DefaultSingleResourcePropertyTranslator;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -72,10 +82,18 @@ public class RNSPath implements Serializable, Cloneable
 	private EndpointReferenceType _cachedEPR;
 	private boolean _attemptedResolve;
 
+	// 2 properties to cope with short RNS responses
+	private String _stringPortTypes;
+	private URI _resourceURI;
+
 	static public interface RNSPathApplyFunction
 	{
 		// if the apply iteration should stop, then the derived method should return false.
 		public boolean applyToPath(RNSPath applyTo) throws RNSException, AuthZSecurityException;
+
+		// this indicates if a an EPR is mandatory or not to apply the applyToPath function on an
+		// RNSPath
+		public boolean canWorkWithShortForm();
 	}
 
 	/**
@@ -713,11 +731,30 @@ public class RNSPath implements Serializable, Cloneable
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
 	 */
-	public Collection<RNSPath> listContents() throws RNSPathDoesNotExistException, RNSException
+	public Collection<RNSPath> listContents(boolean shortForm) throws RNSPathDoesNotExistException, RNSException
 	{
 		EndpointReferenceType me = resolveRequired();
+
+		// Note that calling context property for RNS-Short-Form in this case is set before creating
+		// the proxy.
+		// This is because when a call is coming from FUSE, we get a context resolver that cannot
+		// propagate
+		// property updates accurately across all the references of the calling context. For the
+		// same reason
+		// an explicit store is invoked after setting the property. As a general rule, doing context
+		// update before
+		// proxy creation is advisable to avoid similar unwanted problems.
+		ICallingContext context = null;
+		try {
+			context = ContextManager.getCurrentContext();
+			context.setSingleValueProperty("RNSShortForm", shortForm);
+			ContextManager.storeCurrentContext(context);
+			_logger.trace("RNS Short form set to true for listContents");
+		} catch (Exception e) {
+		}
+
 		EnhancedRNSPortType rpt = createProxy(me, EnhancedRNSPortType.class);
-		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
+		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt, context);
 		RNSIterable entries = null;
 
 		try {
@@ -725,7 +762,7 @@ public class RNSPath implements Serializable, Cloneable
 			LinkedList<RNSPath> ret = new LinkedList<RNSPath>();
 
 			for (RNSEntryResponseType entry : entries) {
-				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), true);
+				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), !shortForm);
 				ret.add(newEntry);
 			}
 
@@ -742,7 +779,22 @@ public class RNSPath implements Serializable, Cloneable
 			} catch (Exception e) {
 				_logger.warn("exception during attempt to close stream", e);
 			}
+			// remove the calling context property for short form
+			if (shortForm) {
+				try {
+					context = ContextManager.getCurrentContext();
+					context.removeProperty("RNSShortForm");
+					ContextManager.storeCurrentContext(context);
+				} catch (Exception e) {
+					_logger.error("Could not remove the short form request from the calling context", e);
+				}
+			}
 		}
+	}
+
+	public Collection<RNSPath> listContents() throws RNSPathDoesNotExistException, RNSException
+	{
+		return listContents(false);
 	}
 
 	/**
@@ -789,11 +841,27 @@ public class RNSPath implements Serializable, Cloneable
 		EnhancedRNSPortType rpt = createProxy(me, EnhancedRNSPortType.class);
 		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
 		RNSIterable entries = null;
+		SingleResourcePropertyTranslator translator = new DefaultSingleResourcePropertyTranslator();
+		boolean getShortForm = applier.canWorkWithShortForm();
 
 		try {
+			if (getShortForm) {
+				// setting the calling context property for short form
+				try {
+					ICallingContext context = ContextManager.getCurrentContext();
+					context.setSingleValueProperty("RNSShortForm", true);
+					ContextManager.storeCurrentContext(context);
+					_logger.trace("Short RNS form requested from Grid Client.");
+				} catch (Exception e) {
+					_logger.trace("could not set the short form");
+				}
+
+			}
+
 			entries = proxy.iterateList();
 			for (RNSEntryResponseType entry : entries) {
-				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), true);
+				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), !getShortForm);
+				newEntry.extractPortTypesAndURIFromMetadata(entry, translator);
 				boolean funcRet = applier.applyToPath(newEntry);
 				newEntry = null;
 				entry = null;
@@ -810,8 +878,74 @@ public class RNSPath implements Serializable, Cloneable
 			} catch (Exception e) {
 				_logger.warn("exception during attempt to close stream", e);
 			}
+
+			if (getShortForm) {
+				// remove the calling context property for short form
+				ICallingContext context;
+				try {
+					context = ContextManager.getCurrentContext();
+					context.removeProperty("RNSShortForm");
+					ContextManager.storeCurrentContext(context);
+				} catch (Exception e) {
+					_logger.error("Could not remove the short form request from the calling context", e);
+				}
+			}
 		}
 		return true;
+	}
+
+	/*
+	 * This method is used with RNS short entry responses to retrieve port-type and URI from
+	 * meta-data instead of from EPR. This is important as port-type information is used to control
+	 * recursive lookup and printing format in LS calls, and URI is needed to cache access.
+	 */
+	private void extractPortTypesAndURIFromMetadata(RNSEntryResponseType entry, SingleResourcePropertyTranslator translator)
+	{
+		RNSMetadataType metadataType = entry.getMetadata();
+
+		if (metadataType != null && metadataType.get_any() != null) {
+			for (MessageElement element : metadataType.get_any()) {
+				QName qName = element.getQName();
+
+				if (GenesisIIConstants.HUMAN_READABLE_PORT_TYPES_QNAME.equals(qName)) {
+					try {
+						_stringPortTypes = translator.deserialize(String.class, element);
+					} catch (ResourcePropertyException e) {
+						_logger.debug("Property translation error in string port-type: " + e.getMessage());
+					}
+				} else if (GenesisIIConstants.RESOURCE_URI_QNAME.equals(qName)) {
+					try {
+						_resourceURI = translator.deserialize(URI.class, element);
+					} catch (ResourcePropertyException e) {
+						_logger.debug("Property translation error in URI: " + e.getMessage());
+					}
+				}
+			}
+		}
+	}
+
+	// A method for bypassing access to EPR for port-type lookup whenever possible. This and the
+	// subsequent method
+	// is particularly useful for managing short RNS responses.
+	public boolean isRNS()
+	{
+		if (_stringPortTypes != null) {
+			return _stringPortTypes.contains("-RNS-");
+		} else {
+			resolveOptional();
+			return new TypeInformation(_cachedEPR).isRNS();
+		}
+	}
+
+	// A method for bypassing access to EPR for EPI retrieval whenever possible.
+	public URI getWSIdentifier()
+	{
+		if (_resourceURI != null)
+			return _resourceURI;
+		else {
+			resolveOptional();
+			return new WSName(_cachedEPR).getEndpointIdentifier();
+		}
 	}
 
 	/**

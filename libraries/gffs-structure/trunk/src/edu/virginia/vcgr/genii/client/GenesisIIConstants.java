@@ -93,6 +93,15 @@ public class GenesisIIConstants
 	static public final QName WSSE11_NS_SECURITY_QNAME = new QName(org.apache.ws.security.WSConstants.WSSE11_NS,
 		"SecurityTokenReference");
 
+	// three attributes to be used in short RNS Lookup and Iterate responses
+	static public final String HUMAN_READABLE_PORT_TYPES_ATTRIBUTE_NAME = "String-PortTypes";
+	static public final QName HUMAN_READABLE_PORT_TYPES_QNAME = new QName(GENESISII_NS,
+		HUMAN_READABLE_PORT_TYPES_ATTRIBUTE_NAME);
+	static public final String RESOURCE_URI_ATTRIBUTE_NAME = "Resource-URI";
+	static public final QName RESOURCE_URI_QNAME = new QName(GENESISII_NS, RESOURCE_URI_ATTRIBUTE_NAME);
+	static public final String CONTAINER_ID_ATTRIBUTE_NAME = "Container-ID";
+	static public final QName CONTAINER_ID_QNAME = new QName(GENESISII_NS, CONTAINER_ID_ATTRIBUTE_NAME);
+
 	// our old namespace for wss, which has been outdated by using newer wss4j library.
 	static public final String INTERMEDIATE_WSE_NS =
 		"http://docs.oasis-open.org/wss/2005/xx/oasis-2005xx-wss-wssecurity-secext-1.1.xsd";

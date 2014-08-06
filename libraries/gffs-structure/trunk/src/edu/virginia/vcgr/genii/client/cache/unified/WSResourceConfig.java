@@ -5,11 +5,19 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.axis.types.URI;
+import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSMetadataType;
+
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.SubscriptionDirectory;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rp.DefaultSingleResourcePropertyTranslator;
+import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 
 /*
  * This class maintains the mapping between the different views of a web services resource. This is
@@ -22,6 +30,8 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
  */
 public class WSResourceConfig
 {
+
+	private static SingleResourcePropertyTranslator translator = new DefaultSingleResourcePropertyTranslator();
 
 	public enum IdentifierType {
 		WS_ENDPOINT_IDENTIFIER,
@@ -62,6 +72,12 @@ public class WSResourceConfig
 	 */
 	private String containerId;
 
+	// A constructor to be used by the static CreateResourceConfigFromLookupResponse initializer
+	// service
+	private WSResourceConfig()
+	{
+	}
+
 	public WSResourceConfig(WSName wsName)
 	{
 		this.wsIdentifier = wsName.getEndpointIdentifier();
@@ -71,25 +87,47 @@ public class WSResourceConfig
 		} else {
 			type = ResourceType.FILE;
 		}
-		if (wsName.isValidWSName()) {
-			inodeNumber = wsIdentifier.toString().hashCode();
-
-			// It can happen that a subscribed resource's resource configuration got evicted from
-			// the
-			// cache due to overload. In future, if we create another configuration for the resource
-			// as we start reusing it (coming back to a previously visited directory, etc.) then we
-			// should retrieve the subscription related information to ensure that cache contents
-			// related
-			// to this resource are given appropriate lifetimes.
-			String EPI = wsName.getEndpointIdentifier().toString();
-			Date subscriptionTimeoutTime = SubscriptionDirectory.getSubscriptionTimeoutTime(EPI);
-			if (subscriptionTimeoutTime != null && subscriptionTimeoutTime.getTime() > System.currentTimeMillis()) {
-				hasRegisteredCallback = true;
-				callbackExpiryTime = subscriptionTimeoutTime;
-			}
+		if (this.wsIdentifier != null) {
+			setInodeAndSubscriptionInfo();
 		}
 		rnsPaths = new HashSet<String>(3);
 		containerId = CacheUtils.getContainerId(wsName);
+	}
+
+	public static WSResourceConfig CreateResourceConfigFromLookupResponse(RNSEntryResponseType entryResponse)
+	{
+
+		if (entryResponse.getEndpoint() != null) {
+			WSName wsName = new WSName(entryResponse.getEndpoint());
+			if (!wsName.isValidWSName())
+				return null;
+			return new WSResourceConfig(wsName);
+		}
+
+		WSResourceConfig resourceConfig = new WSResourceConfig();
+		resourceConfig.rnsPaths = new HashSet<String>(3);
+		try {
+			RNSMetadataType metadataType = entryResponse.getMetadata();
+			if (metadataType != null && metadataType.get_any() != null) {
+				for (MessageElement element : metadataType.get_any()) {
+					QName qName = element.getQName();
+					if (GenesisIIConstants.HUMAN_READABLE_PORT_TYPES_QNAME.equals(qName)) {
+						String portTypes = translator.deserialize(String.class, element);
+						if (portTypes.contains("-RNS-"))
+							resourceConfig.type = ResourceType.DIRECTORY;
+						else if (portTypes.contains("-ByteIO-"))
+							resourceConfig.type = ResourceType.FILE;
+					} else if (GenesisIIConstants.RESOURCE_URI_QNAME.equals(qName)) {
+						resourceConfig.wsIdentifier = translator.deserialize(URI.class, element);
+						resourceConfig.setInodeAndSubscriptionInfo();
+					} else if (GenesisIIConstants.CONTAINER_ID_QNAME.equals(qName)) {
+						resourceConfig.containerId = translator.deserialize(String.class, element);
+					}
+				}
+			}
+		} catch (Exception e) {
+		}
+		return (resourceConfig.type != null) ? resourceConfig : null;
 	}
 
 	public WSResourceConfig(WSName wsName, String rnsPath)
@@ -154,14 +192,12 @@ public class WSResourceConfig
 
 	public boolean isHasRegisteredCallback()
 	{
-
 		// A posterior update on the flag when a query about callback is made.
 		// This is done to ensure correctness as otherwise we would need something
 		// like a cronjob to reset the flags of cached configurations.
 		if ((callbackExpiryTime != null) && callbackExpiryTime.before(new Date())) {
 			hasRegisteredCallback = false;
 		}
-
 		return hasRegisteredCallback;
 	}
 
@@ -263,5 +299,24 @@ public class WSResourceConfig
 			}
 		}
 		return null;
+	}
+
+	private void setInodeAndSubscriptionInfo()
+	{
+		inodeNumber = wsIdentifier.toString().hashCode();
+
+		// It can happen that a subscribed resource's resource configuration got evicted from
+		// the
+		// cache due to overload. In future, if we create another configuration for the resource
+		// as we start reusing it (coming back to a previously visited directory, etc.) then we
+		// should retrieve the subscription related information to ensure that cache contents
+		// related
+		// to this resource are given appropriate lifetimes.
+		String EPI = wsIdentifier.toString();
+		Date subscriptionTimeoutTime = SubscriptionDirectory.getSubscriptionTimeoutTime(EPI);
+		if (subscriptionTimeoutTime != null && subscriptionTimeoutTime.getTime() > System.currentTimeMillis()) {
+			hasRegisteredCallback = true;
+			callbackExpiryTime = subscriptionTimeoutTime;
+		}
 	}
 }

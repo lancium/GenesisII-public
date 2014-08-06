@@ -22,9 +22,6 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork 
 		super(service, forkPath);
 	}
 
-	// hmmm: below are routines where we need to add security checks for any deeper constraints on
-	// items under the resource.
-
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public void read(long offset, ByteBuffer dest) throws IOException

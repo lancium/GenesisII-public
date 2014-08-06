@@ -6,12 +6,9 @@
 
 #NOTE: this is not working yet.  it was close before the installer changed a bunch.
 
-if [ -z "$OFFICIAL_DISTRIBUTION_DIR" ]; then
-  OFFICIAL_DISTRIBUTION_DIR="http://www.cs.virginia.edu/~mts5x/xsede/2_5_0"
-fi
-if [ -z "$INSTALLER_TO_RUN" ]; then
-  INSTALLER_TO_RUN="linux_container_2_5_0_x64.sh"
-fi
+
+#the distribution dir and installer name need to be env variables at the least,
+# and then default to proper places if that doesn't work.
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
@@ -34,7 +31,7 @@ if [ $# -lt 5 ]; then
   echo "(3) the port on which to run your container."
   echo "(4) the certificate keypair to use for login."
   echo "(5) the password for the keypair."
-#  echo "(n) the grid to connect to ('XSEDE' or 'XCG')."
+  echo "(6) the installer URL for downloading the genesis installer to run."
   exit 1
 fi
 
@@ -43,7 +40,9 @@ normal_password="$1"; shift
 port_num="$1"; shift
 keypair_path="$1"; shift
 keypair_password="$1"; shift
-#grid_name="$1"; shift
+installer_file="$1"; shift
+
+# do we need this?
 grid_name=XSEDE # for now
 
 if [ "$grid_name" != "XSEDE" -a "$grid_name" != "XCG" ]; then
@@ -80,11 +79,16 @@ echo "Changing to build area: $playground"
 pushd "$playground" &>/dev/null
 
 # first grab latest container installer.
-wget "$OFFICIAL_DISTRIBUTION_DIR/$INSTALLER_TO_RUN"
+wget "$installer_file"
+if [ $? -ne 0 ]; then
+  echo "Failed: could not download the installer file at:"
+  echo "  '$installer_file'"
+  exit 1
+fi
 
 # next install it with a bunch of console interaction...
 
-expect "$XSEDE_TEST_ROOT/library/installation_expecter.tcl" "$playground/$INSTALLER_TO_RUN" "$GENII_INSTALL_DIR" "$normal_account" "$normal_password" "$port_num" "$grid_choice" "$(hostname --fqdn)" "$keypair_path" "$keypair_password"
+expect "$XSEDE_TEST_ROOT/library/installation_expecter.tcl" "$playground/$(basename $installer_file)" "$GENII_INSTALL_DIR" "$normal_account" "$normal_password" "$port_num" "$grid_choice" "$(hostname --fqdn)" "$keypair_path" "$keypair_password"
 if [ $? -ne 0 ]; then
   echo An error was reported from the installation expect script.
   ((errors++))

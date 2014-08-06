@@ -40,6 +40,11 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 		}
 	}
 
+	public File getFileTarget()
+	{
+		return _target;
+	}
+
 	@Override
 	public boolean createFile(String newFileName) throws IOException
 	{

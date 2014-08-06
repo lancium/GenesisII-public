@@ -22,6 +22,7 @@ import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
 import edu.virginia.vcgr.genii.ui.plugins.MenuType;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
+import edu.virginia.vcgr.genii.ui.utils.LoggingTarget;
 
 public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 {
@@ -52,12 +53,16 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 						path = path.lookup(answer, RNSPathQueryFlags.MUST_NOT_EXIST);
 						linkPath = path;
 					} catch (RNSPathAlreadyExistsException r) {
+						String msg = "Indicated path " + answer + " already exists ";
 						JOptionPane.showMessageDialog(null, answer, "Indicated path already exists", JOptionPane.ERROR_MESSAGE);
 						answer = null;
+						LoggingTarget.logInfo(msg, r);
 					}
 					if (!path.getParent().exists()) {
+						String msg = "Parent directory " + path.getParent().toString() + " does not exist";
 						JOptionPane.showMessageDialog(null, answer, "Parent directory " + path.getParent().toString()
 							+ " does not exist!", JOptionPane.ERROR_MESSAGE);
+						LoggingTarget.logInfo(msg, null);
 						answer = null;
 					}
 				}

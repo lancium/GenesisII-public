@@ -43,9 +43,6 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 			throw new FileNotFoundException(String.format("Unable to locate file system entry \"%s\".", _target));
 	}
 
-	// hmmm: this is awful. why have a class with a constructor where all the damned members are
-	// static? that makes no sense.
-
 	/**
 	 * 
 	 * @param target

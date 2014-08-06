@@ -420,9 +420,6 @@ public class FileServerClient
 		return dlr;
 	}
 
-	// hmmm: this is bunk; fix export properties now or we are doomed to wind that object through
-	// all the export functions.
-
 	// Invoked to start the file server!
 	// returns the <nonce,port, serverprocess> where the server was started!
 	public static synchronized FileServerID start(String uname)

@@ -11,7 +11,7 @@ public interface RNSConstants
 	/*
 	 * the batching size for RNS iterators.
 	 */
-	static final public int PREFERRED_BATCH_SIZE = 250;
+	static final public int PREFERRED_BATCH_SIZE = 1000;
 
 	static final public QName ELEMENT_COUNT_QNAME = new QName(GENII_RNS_NS, "elementCount");
 }

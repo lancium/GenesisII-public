@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.iterator.resource;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Blob;
@@ -23,11 +24,14 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.LightWeightExportDirFork;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.iterator.WSIteratorConstructionParameters;
@@ -175,11 +179,30 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 		}
 
 		else {
+			// ---------------------------------------------------------------------------------------------------
+			// Checking if short form is requested by the client. Properly handling this attributes
+			// is Prof.'s
+			// responsibility. ASG
+			// ---------------------------------------------------------------------------------------------------
+			boolean ShortForm = false;
+			try {
+				ICallingContext context = ContextManager.getCurrentContext();
+				Object form = context.getSingleValueProperty("RNSShortForm");
+				if (form != null && Boolean.TRUE.equals(form)) {
+					ShortForm = true;
+					_logger.info("Short form attribute found to be set to true in the calling context");
+				}
+			} catch (Exception e) {
+				_logger.trace("could not get information about the short form");
+			}
+			// ---------------------------------------------------------------------------------------------------
+
 			firstElement = Math.max(firstElement, 0);
 			numElements = Math.max(numElements, 0);
 			List<InMemoryIteratorEntry> imieList = imiw.getIndices();
 			Object[] commonObjs = imiw.getCommonMembers();// loop-invariant
 			String invokee = imiw.getClassName();
+
 			Class<?> clazz;
 			Method meth;
 
@@ -187,7 +210,7 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 				clazz = Class.forName(invokee);
 				meth =
 					clazz.getMethod("getIndexedContent", new Class[] { Connection.class, InMemoryIteratorEntry.class,
-						Object[].class });
+						Object[].class, boolean.class });
 			} catch (ClassNotFoundException e) {
 				throw new ResourceException("Unable to retrieve entries!", e);
 			} catch (NoSuchMethodException e) {
@@ -196,12 +219,20 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 
 			int lastElement = Math.min(firstElement + numElements - 1, imieList.size() - 1);
 
+			if (invokee.indexOf("LightWeight") != -1) {
+				try {
+					return LightWeightExportDirFork.getEntries(imieList, firstElement, numElements, commonObjs, ShortForm);
+				} catch (IOException e) {
+					throw new ResourceException("Unable to retrieve entries!", e);
+				}
+			}
+
 			for (int lcv = firstElement; lcv <= lastElement; lcv++) {
 				InMemoryIteratorEntry entry = imieList.get(lcv);
 				if (entry != null) {
 
 					try {
-						Object obj = meth.invoke(null, getConnection(), entry, commonObjs);
+						Object obj = meth.invoke(null, getConnection(), entry, commonObjs, ShortForm);
 						if (obj instanceof MessageElement) {
 							ret.add(new Pair<Long, MessageElement>((long) lcv, (MessageElement) obj));
 						} else {

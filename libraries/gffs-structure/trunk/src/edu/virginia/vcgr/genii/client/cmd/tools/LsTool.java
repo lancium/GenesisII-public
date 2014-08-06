@@ -73,7 +73,7 @@ public class LsTool extends BaseGridTool
 		_directory = true;
 	}
 
-	@Option({ "recursive", "R" })
+	@Option({ "recursive", "R", "r" })
 	public void setRecursive()
 	{
 		_recursive = true;
@@ -142,12 +142,13 @@ public class LsTool extends BaseGridTool
 		for (RNSPath path : targets) {
 			TypeInformation type = new TypeInformation(path.getEndpoint());
 			if (isDirectory || !type.isRNS()) {
-				printEntry(stdout, type, path, isLong, isAll, isEPR, isMultiline, isCertChain);
+				printEntry(stdout, path, isLong, isAll, isEPR, isMultiline, isCertChain);
 			} else
 				dirs.add(path);
 		}
 		for (RNSPath path : dirs) {
 			listDirectory(stdout, null, path, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
+
 		}
 
 		// Third, output the local files specified on the command line.
@@ -201,13 +202,14 @@ public class LsTool extends BaseGridTool
 			out.println(name);
 	}
 
-	static private void printEntry(PrintWriter out, TypeInformation type, RNSPath path, boolean isLong, boolean isAll,
-		boolean isEPR, boolean isMultiline, boolean isCertChain) throws RNSException, ResourceException, AuthZSecurityException
+	static private void printEntry(PrintWriter out, RNSPath path, boolean isLong, boolean isAll, boolean isEPR,
+		boolean isMultiline, boolean isCertChain) throws RNSException, ResourceException, AuthZSecurityException
 	{
 		String name = path.getName();
 		if (name.startsWith(".") && !isAll)
 			return;
 		if (isLong) {
+			TypeInformation type = new TypeInformation(path.getEndpoint());
 			String typeDesc = type.getTypeDescription();
 			if (typeDesc != null) {
 				if (!type.isByteIO())
@@ -277,16 +279,22 @@ public class LsTool extends BaseGridTool
 		@Override
 		public boolean applyToPath(RNSPath applyTo) throws RNSException, AuthZSecurityException
 		{
-			TypeInformation type = new TypeInformation(applyTo.getEndpoint());
 			try {
-				printEntry(_out, type, applyTo, _isLong, _isAll, _isEPR, _isMultiline, _isCertChain);
+				printEntry(_out, applyTo, _isLong, _isAll, _isEPR, _isMultiline, _isCertChain);
 			} catch (ResourceException e) {
 				throw new RNSException("failed to print entry due to resource exception", e);
 			}
-			if (type.isRNS())
+			if (applyTo.isRNS())
 				_subdirs.add(applyTo.getName());
 			return true;
 		}
+
+		@Override
+		public boolean canWorkWithShortForm()
+		{
+			return !(_isLong || _isEPR || _isMultiline || _isCertChain);
+		}
+
 	}
 
 	static private void listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll,

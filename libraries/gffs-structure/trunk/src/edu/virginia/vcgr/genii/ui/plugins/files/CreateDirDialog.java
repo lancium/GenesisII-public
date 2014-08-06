@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -34,6 +35,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
+import edu.virginia.vcgr.genii.ui.utils.LoggingTarget;
 
 public class CreateDirDialog extends JDialog
 {
@@ -88,13 +90,32 @@ public class CreateDirDialog extends JDialog
 		// _selectNewContainer.isSelected()
 		container.add(_paths = new ResourcePathsWidget(false, true, _container_path, _target_path), new GridBagConstraints(0,
 			2, 2, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		_paths.disableContainerPath();
+
+		_keepWithParent.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				_paths.disableContainerPath();
+				// Execute when button is pressed
+				// System.out.println("You clicked the button");
+			}
+		});
+		_selectNewContainer.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				_paths.enableContainerPath();
+				// Execute when button is pressed
+				// System.out.println("You clicked the button");
+			}
+		});
 
 		ButtonGroup group = new ButtonGroup();
 		group.add(_keepWithParent);
 		group.add(_selectNewContainer);
 
 		CreateDirAction action = new CreateDirAction();
-
 		_paths.addInformationListener(action);
 		/*
 		 * container.add(new JButton(new QuitButton()), new GridBagConstraints(0, 3, 1, 1, 0.0, 1.0,
@@ -153,8 +174,12 @@ public class CreateDirDialog extends JDialog
 			}
 
 		}
-
-		return rnsPath != null && rnsPath.trim().length() > 0 && containerPath != null && containerPath.trim().length() > 0;
+		// ASG 2014-06-02 ASG changed logic so that we don't care about container path if
+		// selectNewContainr is false
+		return rnsPath != null
+			&& rnsPath.trim().length() > 0
+			&& ((_selectNewContainer.isSelected() && containerPath != null && containerPath.trim().length() > 0) || !_selectNewContainer
+				.isSelected());
 	}
 
 	private class CreateDirAction extends AbstractAction implements IInformationListener
@@ -186,18 +211,30 @@ public class CreateDirDialog extends JDialog
 						path = path.lookup(rnsPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 						linkPath = path;
 					} catch (RNSPathAlreadyExistsException r) {
+						String msg = "Indicated path " + rnsPath + " already exists ";
 						JOptionPane
 							.showMessageDialog(null, rnsPath, "Indicated path already exists", JOptionPane.ERROR_MESSAGE);
 						rnsPath = null;
+						LoggingTarget.logInfo(msg, r);
 						return;
 					} catch (RNSPathDoesNotExistException er) {
 						_logger.error("caught unexpected exception", er);
 						return;
 					}
 				}
+				// Why was there no else here?
+				else {
+					String msg = "Indicated path " + rnsPath + " already exists, must select a path that does not exist ";
+					JOptionPane.showMessageDialog(null, rnsPath, "Indicated path already exists", JOptionPane.ERROR_MESSAGE);
+					rnsPath = null;
+					LoggingTarget.logInfo(msg, null);
+					return;
+				}
 				if (!path.getParent().exists()) {
+					String msg = "Parent directory " + path.getParent().toString() + " does not exist";
 					JOptionPane.showMessageDialog(null, rnsPath, "Parent directory " + path.getParent().toString()
 						+ " does not exist!", JOptionPane.ERROR_MESSAGE);
+					LoggingTarget.logInfo(msg, null);
 					rnsPath = null;
 					return;
 				}
@@ -207,11 +244,11 @@ public class CreateDirDialog extends JDialog
 						path = path.lookup(containerPath, RNSPathQueryFlags.MUST_EXIST);
 						path = path.lookup(containerPath + "/Services/EnhancedRNSPortType", RNSPathQueryFlags.MUST_EXIST);
 					} catch (RNSPathDoesNotExistException r) {
-						// JOptionPane.showMessageDialog(null, containerPath,
-						// "Storage container path you selected does not exist or you do not have permission",
-						// JOptionPane.ERROR_MESSAGE);
-						// lets keep what they already typed and let them edit it instead
-						// containerPath = null;
+						String msg =
+							"Container " + path.getParent().toString() + " does not exist or you do not have permission";
+						JOptionPane.showMessageDialog(null, rnsPath, "Container" + path.getParent().toString()
+							+ " does not exist or you have no permission!", JOptionPane.ERROR_MESSAGE);
+						LoggingTarget.logInfo(msg, null);
 						return;
 					} catch (RNSPathAlreadyExistsException er) {
 					}
@@ -226,6 +263,7 @@ public class CreateDirDialog extends JDialog
 					} else {
 						JOptionPane.showMessageDialog(null, containerPath, "Storage container is not a container",
 							JOptionPane.ERROR_MESSAGE);
+						LoggingTarget.logInfo("The path " + containerPath + " is not a storage container!", null);
 						containerPath = null;
 					}
 				} else {
@@ -235,7 +273,7 @@ public class CreateDirDialog extends JDialog
 				setVisible(false);
 				_context.endpointRetriever().refresh();
 			} catch (Throwable cause) {
-				GuiUtils.displayError((Component) e.getSource(), "Export Creation Error", cause);
+				GuiUtils.displayError((Component) e.getSource(), "Directory Creation Error", cause);
 			}
 
 		}

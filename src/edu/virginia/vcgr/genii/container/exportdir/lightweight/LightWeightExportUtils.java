@@ -17,9 +17,6 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.zipjar.ZipJarExpo
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-// hmmm: seems like we need to gate the lookups on permissions here, so that we don't allow
-// returning of paths that the current guy has no access to.
-
 public class LightWeightExportUtils
 {
 	static private Log _logger = LogFactory.getLog(LightWeightExportUtils.class);
@@ -65,10 +62,6 @@ public class LightWeightExportUtils
 					File root = new File(rootDirString);
 					ExportMechanisms exportType = ExportProperties.getExportProperties().getExportMechanism();
 					if (exportType == ExportMechanisms.EXPORT_MECH_PROXYIO) {
-						// hmmm: temp! bad! need to find this from construction properties.
-						// hmmm: we have that class that can get all the props out; too bad we can't
-						// just get a couple props.
-
 						String unixUsername = SudoExportUtils.getExportOwnerUser(rKey);
 						if (unixUsername == null) {
 							String msg = "failure to determine the export owner name for a sudo-based export!";

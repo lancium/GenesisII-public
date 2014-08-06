@@ -1,1 +1,3 @@
 ls [-Rladem] [--long] [--all] [--directory] [--epr] [--recursive] [--multiline] [<target> *]
+ls [-Rrladem] [--long] [--all] [--directory] [--epr] [--recursive] [--multiline] [--cert-chain]
+

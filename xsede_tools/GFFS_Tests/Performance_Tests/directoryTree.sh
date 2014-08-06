@@ -78,7 +78,7 @@ echo mount point is $MOUNT_POINT
 
 testCreateDirectory () {
   if ! fuse_supported; then return 0; fi
-  fan_out_directories testDir 2 2 1
+  fan_out_directories testDir 3 6 3
 }
 
 testFuseRecursiveCp() {

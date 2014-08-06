@@ -21,8 +21,6 @@ public class SudoExportUtils
 {
 	static private Log _logger = LogFactory.getLog(SudoExportUtils.class);
 
-	// hmmm: this class needs to use same authorization scheme as the regular export utils.
-
 	/**
 	 * Returns the local Unix username given the username from the calling context.
 	 */
@@ -98,11 +96,6 @@ public class SudoExportUtils
 
 		return false;
 	}
-
-	/*
-	 * hmmm: creating a lot of byte io files could happen, which means maybe we *should* cache
-	 * recent entries of the gridmap file, but then flush them when the file changes!
-	 */
 
 	/**
 	 * changes ownership of a file (i.e., chowns it) to a specific unix user.

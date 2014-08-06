@@ -41,6 +41,8 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
@@ -217,7 +219,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 
 			MessageElement[] prefetchedAttributes = null;
 			AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();
-			prefetchedAttributes = Prefetcher.preFetch(entryReference, new MessageElement[] {}, factory, null, null);
+			prefetchedAttributes = Prefetcher.preFetch(entryReference, new MessageElement[] {}, factory, null, null, false);
 			RNSOperation operation = new RNSOperation(RNSOperation.OperationType.ENTRY_CREATE, filename);
 			notifyChangeInContent(operation, entryReference, prefetchedAttributes);
 
@@ -305,7 +307,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		}
 		MessageElement[] attributes = null;
 		AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();
-		attributes = Prefetcher.preFetch(entryReference, new MessageElement[] {}, factory, null, null);
+		attributes = Prefetcher.preFetch(entryReference, new MessageElement[] {}, factory, null, null, false);
 		RNSMetadataType returnedMetadata = RNSUtilities.createMetadata(entryReference, attributes);
 
 		fireRNSEntryAdded(vvr, name, entryReference);
@@ -361,6 +363,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		List<InMemoryIteratorEntry> indices = new LinkedList<InMemoryIteratorEntry>();
 		boolean isIndexedIterate = false;
 		int batchLimit = RNSConstants.PREFERRED_BATCH_SIZE;
+		boolean batchRequest = false;
 
 		try {
 			_resourceLock.lock();
@@ -372,6 +375,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 				// we will be building an iterator as number of entries > threshold.
 				if (_resource.retrieveOccurrenceCount() > batchLimit)
 					isIndexedIterate = true;
+				batchRequest = true;
 			}
 
 			else {
@@ -412,6 +416,24 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			_resourceLock.unlock();
 		}
 
+		// ---------------------------------------------------------------------------------------------------
+		// Checking if short form is requested by the client. Properly handling this attributes is
+		// Prof.'s
+		// responsibility.
+		// ---------------------------------------------------------------------------------------------------
+		boolean requestedShortForm = false;
+		try {
+			ICallingContext context = ContextManager.getCurrentContext();
+			Object form = context.getSingleValueProperty("RNSShortForm");
+			if (form != null && Boolean.TRUE.equals(form) && batchRequest) {
+				requestedShortForm = true;
+				_logger.info("Short form attribute found to be set to true in the calling context");
+			}
+		} catch (Exception e) {
+			_logger.trace("could not get information about the short form");
+		}
+		// ---------------------------------------------------------------------------------------------------
+
 		AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();
 
 		Collection<RNSEntryResponseType> resultEntries = new LinkedList<RNSEntryResponseType>();
@@ -428,11 +450,18 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			} else {
 				EndpointReferenceType epr = internalEntry.getEntryReference();
 				RNSEntryResponseType entry = null;
-				// For now the end
+
 				entry =
 					new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
-						Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null)), null,
-						internalEntry.getName());
+						Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null, requestedShortForm)),
+						null, internalEntry.getName());
+
+				// ---------------------------------------------------------------------------------------------
+				// Removing EPR from entry when short form is requested
+				if (requestedShortForm)
+					entry.setEndpoint(null);
+				// ---------------------------------------------------------------------------------------------
+
 				resultEntries.add(entry);
 			}
 		}
@@ -549,8 +578,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	 * If modifying: edit in WSIteratorDBResource.java and QueueServiceImpl.java and
 	 * LightWeightExportDirFork.java.
 	 */
-	public static MessageElement getIndexedContent(Connection connection, InMemoryIteratorEntry entry, Object[] obj)
-		throws ResourceException
+	public static MessageElement getIndexedContent(Connection connection, InMemoryIteratorEntry entry, Object[] obj,
+		boolean shortForm) throws ResourceException
 	{
 		if (connection == null || entry == null) // obj will be null as it is unused
 			throw new ResourceException("Unable to list directory contents");
@@ -580,9 +609,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 				AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();
 
 				EndpointReferenceType epr = ie.getEntryReference();
+				// ASG 4/30/2014, we need to come back and fix this so that the caller passes in
+				// whether shortForm
 				resp =
-					new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
-						Prefetcher.preFetch(epr, ie.getAttributes(), factory, null, null)), null, ie.getName());
+					new RNSEntryResponseType(shortForm ? null : epr, RNSUtilities.createMetadata(epr,
+						Prefetcher.preFetch(epr, ie.getAttributes(), factory, null, null, shortForm)), null, ie.getName());
 			}
 		}
 
