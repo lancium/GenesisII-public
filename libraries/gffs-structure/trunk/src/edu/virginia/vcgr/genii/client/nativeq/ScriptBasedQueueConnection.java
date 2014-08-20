@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.nativeq;
 
+import java.net.URI;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -187,6 +188,16 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			if (stderrRedirect == null && operatingSystemType == OperatingSystemNames.LINUX) {
 				stderrRedirect = new File(PATH_TO_DEV_NULL);
 			}
+
+			//VANA
+
+			URI variation = application.getSPMDVariation();
+			if (variation != null) {
+				stdoutRedirect = null;
+				stderrRedirect = null;
+			}
+
+			//VANA
 
 			CmdLineManipulatorUtils.addEnvProperties(jobProperties, application.getFuseMountPoint(),
 				application.getEnvironment(), workingDirectory, application.getStdinRedirect(workingDirectory), stdoutRedirect,

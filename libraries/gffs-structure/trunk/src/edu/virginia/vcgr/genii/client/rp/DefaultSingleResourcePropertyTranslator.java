@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axis.message.MessageElement;
 
+import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
@@ -39,7 +40,7 @@ public class DefaultSingleResourcePropertyTranslator implements SingleResourcePr
 			Object ob = ObjectDeserializer.toObject(element, clazz);
 			if (ob == null) {
 				_logger.error("deserialization problem for type " + clazz.getCanonicalName() + " from elem real type "
-					+ element.getClass().getCanonicalName());
+					+ element.getClass().getCanonicalName() + ", call stack is:\n" + ProgramTools.showLastFewOnStack(30));
 				return null;
 			}
 			if (_logger.isTraceEnabled())

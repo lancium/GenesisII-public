@@ -24,7 +24,7 @@ public class ProgramTools
 		int endFrame = Math.min(howManyFrames + 3, elements.length - 1);
 		for (int i = startFrame; i < endFrame; i++) {
 			if (toReturn.length() != 0) {
-				toReturn.append(" <- ");
+				toReturn.append("\n<= ");
 			}
 			toReturn.append(getStackFrame(i));
 		}

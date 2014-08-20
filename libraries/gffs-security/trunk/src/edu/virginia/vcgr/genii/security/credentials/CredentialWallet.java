@@ -251,7 +251,7 @@ public class CredentialWallet implements Externalizable, Describable
 		allCreds.putAll(assertionChains);
 		assertionChains.clear();
 
-		if (_logger.isDebugEnabled()) {
+		if (_logger.isTraceEnabled()) {
 			_logger.debug("this is list before reattach:");
 			_logger.debug(describeCredentialMap(allCreds, VerbosityLevel.HIGH));
 

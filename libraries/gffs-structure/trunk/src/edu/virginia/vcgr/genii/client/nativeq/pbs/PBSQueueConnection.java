@@ -225,6 +225,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 		generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
+		/* VANA commented the whole section
 		URI variation = application.getSPMDVariation();
 		if (variation != null) {
 			// temporarily set std redirects to null; these are written as pbs directives
@@ -244,7 +245,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 				application.setStderrRedirect(stderrRedirect.toString());
 
 			return finalCmdLine;
-		} else
+		} else */
 			return super.generateApplicationBody(script, workingDirectory, application);
 	}
 

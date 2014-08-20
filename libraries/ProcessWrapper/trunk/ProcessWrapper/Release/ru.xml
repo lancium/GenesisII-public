@@ -1,6 +1,0 @@
-<exit-results exit-code="0">
-	<user-time value="10014" units="MICROSECONDS"/>
-	<system-time value="20028" units="MICROSECONDS"/>
-	<wallclock-time value="936000" units="MICROSECONDS"/>
-	<maximum-rss>237568</maximum-rss>
-</exit-results>

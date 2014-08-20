@@ -78,6 +78,17 @@ function print_instructions()
   echo
   local scriptname="$(basename $0)"
   echo "$scriptname $HOME/GenesisII"
+  echo
+  echo "An additional parameter can be passed to skip the manual entry prompts;"
+  echo "if the second parameter contains 'stop', then any stray container processes"
+  echo "will automatically be stopped, and if it contains 'depcopy' then the existing"
+  echo "deployments folder will automatically be copied to the state directory."
+  echo "For example:"
+  echo
+  echo "$scriptname $HOME/GenesisII stop"
+  echo "$scriptname $HOME/GenesisII stop+depcopy"
+  echo "$scriptname $HOME/GenesisII depcopy"
+  echo
 }
 
 ##############
@@ -113,6 +124,24 @@ if [ -z "$OLD_INSTALL" ]; then
   print_instructions
   echo
   echo The older install location was not passed on the command line.
+  exit 1
+fi
+
+EXTRA_FLAGS="$1"; shift
+
+if [[ "$EXTRA_FLAGS" =~ stop ]]; then
+  STOP_CONTAINER=true
+  echo The script will automatically zap any Genesis Java processes.
+fi
+if [[ "$EXTRA_FLAGS" =~ depcopy ]]; then
+  COPY_DEPLOYMENTS=true
+  echo The script will automatically copy the deployments folder.
+fi
+
+if [ -z "$TMP" -o ! -d "$TMP" ]; then
+  echo "This script requires a valid temporary directory pointed at by the"
+  echo "'TMP' variable.  Please ensure that TMP is set to a directory where"
+  echo "temporary files can be created."
   exit 1
 fi
 
@@ -205,12 +234,48 @@ if [ -f "$OLD_INSTALL/XCGContainer" ]; then
 fi
 # and flip back to current day install.
 export GENII_INSTALL_DIR="$holdInst"
-##############
 
 if [ ! -z "$tried_stopping" ]; then
   echo Waiting for container to completely stop.
   sleep 5
 fi
+
+##############
+
+# now make sure we really think they're all stopped, and give the user the option
+# to force a shutdown of any containers we find running in their account.
+list_temp="$(mktemp $TMP/javaprocesses.XXXXXX)"
+bash "$GENII_INSTALL_DIR/xsede_tools/library/list_genesis_javas.sh" >"$list_temp"
+if [ -s "$list_temp" ]; then
+
+  if [ -z "$STOP_CONTAINER" ]; then
+    echo
+    echo "There are still Java processes running that we have identified as Genesis II"
+    echo "containers:"
+    cat "$list_temp"
+    echo "The conversion process may fail if the container being converted is"
+    echo "still running."
+    echo "Would you like these processes to be shut down automatically? (Y/n)"
+    read line
+  else
+    line=y
+  fi
+  stop_processes=
+  if [ -z "$line" -o "$line" == "y" -o "$line" == "Y" ]; then
+    stop_processes=true
+  fi
+  if [[ "$line" =~ [yY][eE][Ss] ]]; then
+    stop_processes=true
+  fi
+  if [ ! -z "$stop_processes" ]; then
+    echo "Stopping Genesis II Java processes..."
+    bash "$GENII_INSTALL_DIR/xsede_tools/library/zap_genesis_javas.sh" >"$list_temp"
+    echo "Processes have been stopped."
+    echo
+  fi
+fi
+
+##############
 
 if [ ! -d "$WRAPPER_DIR" ]; then
   mkdir "$WRAPPER_DIR"
@@ -315,15 +380,19 @@ if [ -z "$SIGNING_KEY_ALIAS_PROPERTY" ]; then complain_re_missing_deployment_var
 ##############
 
 # now see if they want the deployments dir copied.
-echo
-echo "You have the option of copying the installation's deployments directory"
-echo "into the container state directory.  This will save any specialized or"
-echo "modified deployment configuration for the container.  If your container"
-echo "uses the standard deployment provided by the installer (i.e., you haven't"
-echo "modified it and do not intend to), then this step is not needed."
-echo
-echo "Copy the installation deployments folder to the container's state directory? (y/N)"
-read line
+if [ -z "$COPY_DEPLOYMENTS" ]; then
+  echo
+  echo "You have the option of copying the installation's deployments directory"
+  echo "into the container state directory.  This will save any specialized or"
+  echo "modified deployment configuration for the container.  If your container"
+  echo "uses the standard deployment provided by the installer (i.e., you haven't"
+  echo "modified it and do not intend to), then this step is not needed."
+  echo
+  echo "Copy the installation deployments folder to the container's state directory? (y/N)"
+  read line
+else
+  line=y
+fi
 copy_deployments_folder=
 if [ "$line" == "y" -o "$line" == "Y" ]; then
   copy_deployments_folder=true
@@ -368,6 +437,9 @@ if [ ! -z "$copy_deployments_folder" ]; then
   # reset the deployment name to use the old name.
   new_dep="$old_dep"
 
+  # fix the server config if it still has the old database connection pool.
+  sed -i -e 's/\.DatabaseConnectionPool/.ServerDatabaseConnectionPool/' "$GENII_DEPLOYMENT_DIR/$new_dep/configuration/server-config.xml"
+
 fi
 
 
@@ -379,18 +451,6 @@ if [ -z "$copy_deployments_folder" ]; then
 if [ ! -d "$LOCAL_CERTS_DIR" ]; then
   mkdir "$LOCAL_CERTS_DIR"
 fi
-
-# snagging everything disabled; the local certs dir is intended for basic certs, like the
-# default-owners and tls and signing certificate, that are crucial to a container's own
-# identity.  sharing the installed trust store and myproxy-certs is generally desirable.
-# if a specialized install is desired, then copying the deployments directory into place is
-# the best approach, since that allows most container configuration to be overridden.
-#
-## sweep in everything first, to make sure we get myproxy-certs and trusted-certificates.
-#cp -R -n "$OLD_DEPLOYMENT_DIR/$old_dep/security"/* "$LOCAL_CERTS_DIR" 2>/dev/null
-#if [ ! -d "$LOCAL_CERTS_DIR/default-owners" ]; then
-#  mkdir "$LOCAL_CERTS_DIR/default-owners"
-#fi
 
 # get any existing kerberos settings.
 echo Copying kerberos keytabs and settings, if found.
@@ -548,8 +608,10 @@ fi  # not copying deployments folder.
 
 # now do some heavy-weight operations where we actually use the gffs software.
 
-# get connected to the grid.
 echo Connecting to the grid...
+# clean up any prior context information.
+rm -f "$GENII_USER_DIR/user-config.xml"
+# get connected to the grid.
 "$GENII_INSTALL_DIR/grid" connect "local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file" "$new_dep"
 if [ $? -ne 0 ]; then
   echo "Failed to connect to the grid!"

@@ -31,27 +31,29 @@ public class ByteIOFileCreator
 		baseDir = new GuaranteedDirectory(userDir, "rbyteio-data");
 		uroot = baseDir;
 
-		// ** First get the calling context
+		// First get the calling context.
 		ICallingContext callContext = ContextManager.getExistingContext();
-		// **Then get the credential wallet
+		// Then get the credential wallet.
 		CredentialWallet Wallet =
 			(CredentialWallet) callContext.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);
-		// **Then, get the list of USER names from the credential wallet
+		// Then, get the list of USER names from the credential wallet.
 		if (!Wallet.isEmpty()) {
-			// Then pick the first one
-			// Be careful - usernames may not always be unique - they are these
-			// days, but maybe not in future
+			/*
+			 * Then pick the first one, but be careful - usernames may not always be unique - they are these days, but maybe not
+			 * in future.
+			 */
 			String userName = Wallet.getFirstUserName();
 			_logger.debug("username chosen for byteio file is: " + userName);
 			if (userName != null) {
 				baseDir = new GuaranteedDirectory(uroot, userName);
 			} else {
-				_logger.error("attempting to create a byteio file without any user credentials!");
+				String msg = "failed attempting to create a byteio file without any user credentials.";
+				_logger.error(msg);
+				throw new IOException(msg);
 			}
 		}
 
 		String filePrefix = "rbyteio";
-		// if (fileName !=null) filePrefix=fileName+"-";
 		String fileSuffix = ".dat";
 		for (int lcv = 0; lcv < DISPERSION_LEVELS; lcv++) {
 			int value = _directoryBalancer.nextInt(DISPERSION_WIDTH);
