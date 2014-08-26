@@ -368,7 +368,7 @@ public class AttributeCacheHandler2
 	{
 		if (attributes != null) {
 			for (MessageElement element : attributes) {
-				CacheManager.putItemInCache(target, element.getQName(), element);
+				if (element.getValue() != null) CacheManager.putItemInCache(target, element.getQName(), element);
 			}
 		}
 	}
