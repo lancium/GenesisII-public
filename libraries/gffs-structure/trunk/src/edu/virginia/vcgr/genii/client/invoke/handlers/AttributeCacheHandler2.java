@@ -368,7 +368,10 @@ public class AttributeCacheHandler2
 	{
 		if (attributes != null) {
 			for (MessageElement element : attributes) {
-				if (element.getValue() != null) CacheManager.putItemInCache(target, element.getQName(), element);
+//				if (element.getValue() != null) 
+//hmmm: CAK: postponing problematic change for now.
+
+CacheManager.putItemInCache(target, element.getQName(), element);
 			}
 		}
 	}
