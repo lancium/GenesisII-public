@@ -67,19 +67,21 @@ function establish_identity()
 #echo "establish_identity: idp_path is: $idp_path"
   # now toss any old creds.
   grid logout --all
-  if [ "$BES_TYPE" = "Unicore" ]; then
-    # make sure we do the extra step for unicore authentication, if it seems
-    # needed.  this step has to be done inside one grid client activation to
-    # ensure the tool doesn't re-identify itself in between any steps.
-    multi_grid <<eof
-      logout --all
-      keystoreLogin --toolIdentity --password=$KEYSTORE_PASSWORD --validDuration=10years local:$KEYSTORE_FILE
-      login --username=${user} --password=${password} $idp_path
-eof
-  else
+#retired:  if [ "$BES_TYPE" = "Unicore" ]; then
+#retired:    # make sure we do the extra step for unicore authentication, if it seems
+#retired:    # needed.  this step has to be done inside one grid client activation to
+#retired:    # ensure the tool doesn't re-identify itself in between any steps.
+#retired:    multi_grid <<eof
+#retired:      logout --all
+#retired:      keystoreLogin --toolIdentity --password=$KEYSTORE_PASSWORD --validDuration=10years local:$KEYSTORE_FILE
+#retired:      login --username=${user} --password=${password} $idp_path
+#retired:eof
+#retired:  else
+
     # assert the new identity.  this is the big one that had better work.
     grid login --username=${user} --password=${password} $idp_path
-  fi
+
+#retired:  fi
 }
 
 # removes the separate user identity in terms of the running script.

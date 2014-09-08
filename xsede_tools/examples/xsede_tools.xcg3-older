@@ -1,5 +1,10 @@
-# this is the build script for running a bootstrap regression test on our jenkins server.
-# these items are generally used in all tests.
+# This is an example of the configuration file for the XSEDE tests and tools.
+# For more information, refer to the Genesis II Omnibus reference's XSEDE
+# tests section:
+# http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm
+
+# This file works with the older XCG namespace on the xcg3 grid.  That namespace may go
+# away soon though.
 
 ##############
 
@@ -8,11 +13,34 @@
 # The installation location for the GenesisII package (client or container).
 # Update this if Genesis is installed elsewhere, e.g. the installation path on
 # Mac OSX is instead "/Applications/GenesisII".
-GENII_INSTALL_DIR=replace
+#GENII_INSTALL_DIR=$HOME/GenesisII
+
+# The user state directory for Genesis.  If not set, the default will be used.
+# Note that this directory should never be put on an NFS or other mounted
+# location, or the grid software will run terribly slowly.
+#GENII_USER_DIR=$HOME/.genesisII-2.0
 
 # The name of the deployment to use.  Modern (2012 and onwards) installers
 # use the name "current_grid" for this.
-DEPLOYMENT_NAME=default
+DEPLOYMENT_NAME=current_grid
+# For a bootstrapped grid, the deployment should be "default".
+#DEPLOYMENT_NAME=default
+
+# The base user name is used for any paths below that refer to the user who
+# will be running the tools and tests.  This must be changed to your own grid
+# user account.
+BASE_USER=userX
+
+# The email variable is used for testing EMS stage-out to email.  This will be
+# the recipient of emails from the running job.  This should be set to a valid
+# email account where you can receive the test emails, if you plan on running
+# the EMS tests.
+EMAIL=userX@emailsomewhere.com
+
+# The queue name is expected to be found under the queue storage area in the
+# grid.  This should be just the queue's short name rather than a full path.
+# This should be changed to the specific queue that is under test.
+QUEUE_NAME=grid-queue
 
 # The namespace variable defines what template to use for the GFFS namespace.
 # The two choices currently available are 'xcg' and 'xsede'.  The older xcg
@@ -20,36 +48,40 @@ DEPLOYMENT_NAME=default
 # type has a /resources folder with many intermediate hierarchies for
 # containers, queues and so forth.
 #NAMESPACE=xcg
-NAMESPACE=xsede
+#NAMESPACE=xsede
 
-# The user state directory for Genesis.  If not set, the default will be used.
-# Note that this directory should never be put on an NFS or other mounted
-# location, or the grid software will run terribly slowly.
-GENII_USER_DIR=replace
-
-# userX below should be changed to your grid user's account.
-
-# The area in which to test.  Many junk files and directories are created
-# under this path, so it should be a directory without a lot of other
-# important files in it.  Note that this directory *must* be writable by
-# the grid user running the tests.
-RNSPATH=/home/xsede.org/userX/sandbox
-
-# Path to the user identity that will be running the tests.  This needs to be
-# a user that is already valid within the grid under test.  Most tests assume
-# that this user is already logged in.
-USERPATH=/users/xsede.org/userX
+# The folderspace variable is a parameter used within all paths in the grid.
+# For example, in the xsede grid, the main users directory is /users/xsede.org
+# and the resources directory is /resources/xsede.org.  This is where all
+# resources that are owned by the grid's central containers can be found.
+FOLDERSPACE=
 
 # Used for windows testing; provides the path to the binaries directory of cygwin.
 #CYGWIN_BIN_PATH=c:/cygwin/bin
 
 ##############
 
+# Note: most user configurable settings are above this area.  The area below
+# is fairly general for all grids (that we know of).
+
+##############
+
 #### GFFS settings...
+
+# The area in which to test.  Many junk files and directories are created
+# under this path, so it should be a directory without a lot of other
+# important files in it.  Note that this directory *must* be writable by
+# the grid user running the tests.
+RNSPATH=/home/$BASE_USER/sandbox
+
+# Path to the user identity that will be running the tests.  This needs to be
+# a user that is already valid within the grid under test.  Most tests assume
+# that this user is already logged in.
+USERPATH=/users/$BASE_USER
 
 # The main CONTAINERPATH is used for creating export directories in some of
 # the tests.  This container needs visibility of the EXPORTPATH below.
-CONTAINERPATH=/resources/xsede.org/containers/BootstrapContainer
+CONTAINERPATH=/containers/BootstrapContainer
 
 # REMOTE/LOCAL container paths are used for GFFS Performance Testing: the user
 # must have permissions to create files on these containers.  Note that the
@@ -58,8 +90,8 @@ CONTAINERPATH=/resources/xsede.org/containers/BootstrapContainer
 # away from the user.  The test will run very slowly over a low-speed WAN
 # though, so it's recommended that the remote container still have high
 # bandwidth available.
-REMOTE_CONTAINER=/resources/xsede.org/containers/BootstrapContainer
-LOCAL_CONTAINER=/resources/xsede.org/containers/BootstrapContainer
+REMOTE_CONTAINER=/containers/BootstrapContainer
+LOCAL_CONTAINER=/containers/BootstrapContainer
 
 #   This is a path to export to the grid from the local filesystem.  Be
 # careful because this is tricky; it must be a valid path that the container
@@ -72,22 +104,33 @@ LOCAL_CONTAINER=/resources/xsede.org/containers/BootstrapContainer
 # on that path for the container-running user id must match the desired export
 # permissions (e.g., container's unix user should have write access to the
 # export path if the export path would ever be written to *from* the grid).
-EXPORTPATH=/home/jenkins/.tmp/export-path
+EXPORTPATH=/home/xcg3root/export-path 
 
 ##############
 
 #### EMS settings...
 
 # The queue to be used for submitting jobs.
-QUEUE_PATH=/resources/xsede.org/queues/grid-queue
+QUEUE_PATH=/queues/grid-queue-xcg3
 
 # The group which has rights to submit jobs on the queue, plus possibly the
 # right to use any BES hooked to the queue.
-SUBMIT_GROUP=/groups/xsede.org/gffs-users
+SUBMIT_GROUP=/groups/uva-idp-group-2
 
 # This specifies what type of BES to test.  the options are either "Genesis"
 # or "Unicore" currently.
+#BES_TYPE=Unicore
 BES_TYPE=Genesis
+
+# The SPMD type needs to reflect the type of MPI in use on the BES or queue.
+# This depends on knowing the external configuration for the BES.  If this is
+# not set, then parallel tests will not be executed.
+# Disabled:
+SPMD_VARIATION=
+# OpenMPI:
+#SPMD_VARIATION="http://www.ogf.org/jsdl/2007/02/jsdl-spmd/OpenMPI"
+# MPICH2:
+#SPMD_VARIATION="http://www.ogf.org/jsdl/2007/02/jsdl-spmd/MPICH2"
 
 # If this is not blank, then it is used as the only BES to target in the queue's
 # resources.  This will not work if that resource does not exist on the queue.
@@ -111,12 +154,8 @@ FTP=("filestaging.xcg.virginia.edu" "upload" ftpsecure OolaMoophutz26)
 HTTP=("people.virginia.edu" "/~cak0l/stuff" barry SnackyCake)
 SCP=("filestaging.xcg.virginia.edu" "/srv/ftp/ftpsecure/upload" ftpsecure OolaMoophutz26)
 SFTP=("filestaging.xcg.virginia.edu" "/srv/ftp/ftpsecure/upload" ftpsecure OolaMoophutz26)
-#fix this reference for gridftp
-GRIDFTP=("people.virginia.edu" "/~cak0l/stuff" barry SnackyCake)
-
-# The stage-out to email test needs the recipient address.  (It uses SCP
-# parameters for the stage-in portion.)
-EMAIL=fred@gruntose.com
+# gridftp settings need to be customized for testing.
+GRIDFTP=("people.virginia.edu" "/home/userX/stuff" barry SnackyCake)
 
 ##############
 
@@ -127,7 +166,7 @@ EMAIL=fred@gruntose.com
 # and should provide the full path to the user location.
 # Also note that the password list must have the correct passwords for each account,
 # and must be in the same order as the account names.
-MULTI_USER_LIST=(/users/xsede.org/xsedetest-user1 /users/xsede.org/xsedetest-user2 /users/xsede.org/xsedetest-user3)
+MULTI_USER_LIST=(/users/xsedetest-user1 /users/xsedetest-user2 /users/xsedetest-user3)
 MULTI_PASSWORD_LIST=(eep1 eep2 eep3)
 
 ##############
@@ -138,24 +177,15 @@ MULTI_PASSWORD_LIST=(eep1 eep2 eep3)
 # to the $DEPLOYMENT_DIR container except for the port number,
 # set the container name and port number here, and run bootstrap_backup.sh.
 # The script will create the necessary configuration and deployment files.
-BACKUP_DEPLOYMENT_NAME=backup
-BACKUP_PORT_NUMBER=28000
+#BACKUP_DEPLOYMENT_NAME=backup
+#BACKUP_PORT_NUMBER=21003
 
 # The bootstrap script will link the container at localhost:backup_port
 # into the default container's RNS namespace under this name.
-BACKUP_CONTAINER=/resources/xsede.org/containers/backup
+#BACKUP_CONTAINER=/containers/backup
 
 # Set the location of the runtime directory of the second container.
-BACKUP_USER_DIR=replace
-
-##############
-
-#### less frequently used settings...
-
-# These items are only needed for Unicore EMS tests, where the current process
-# for logging in requires a keystore login first, and then a normal user login.
-#KEYSTORE_FILE=$HOME/my_key.pfx
-#KEYSTORE_PASSWORD=HopsAndMalt34
+#BACKUP_USER_DIR=$HOME/.backup-genesisII-2.0
 
 ##############
 

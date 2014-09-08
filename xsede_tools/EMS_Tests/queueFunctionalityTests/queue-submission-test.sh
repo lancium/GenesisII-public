@@ -6,7 +6,13 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
 
-if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
+source "../../prepare_tools.sh" "../../prepare_tools.sh"
+if [ -z "$TEST_TEMP" ]; then
+  echo The xsede tool suite could not be automatically located.
+  exit 1
+fi
+
+if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 oneTimeSetUp()

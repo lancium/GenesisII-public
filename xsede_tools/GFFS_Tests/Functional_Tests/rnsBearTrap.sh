@@ -5,7 +5,13 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
 
-if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
+source "../../prepare_tools.sh" "../../prepare_tools.sh"
+if [ -z "$TEST_TEMP" ]; then
+  echo The xsede tool suite could not be automatically located.
+  exit 1
+fi
+
+if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 oneTimeSetUp()
@@ -200,6 +206,15 @@ testSimpleCopyToGrid()
   assertEquals "copy directory up to rns" 0 $?
   grid cat $RNSPATH/garp/froon/razmo
   assertEquals "one copied file is accessible in rns" 0 $?
+
+#apparently we do not pass this test yet; the file does get copied.
+  # test copying a file onto itself.
+#  grid cp $RNSPATH/garp/froon/razmo $RNSPATH/garp/froon/razmo
+#  assertNotEquals "file cannot be copied onto itself" 0 $?
+
+  # test copying a directory onto itself.
+  grid cp $RNSPATH/garp/froon $RNSPATH/garp/froon
+  assertNotEquals "directory cannot be copied onto itself" 0 $?
 
   mkdir junk
   grid cp -r $RNSPATH/garp local:./junk

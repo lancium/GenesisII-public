@@ -385,6 +385,9 @@ function populate_deployment()
       echo "Unknown namespace type--the NAMESPACE variable is unset or unknown"
       exit 1
     fi
+
+    replace_phrase_in_file "$bootstrap_file" "FOLDERSPACE" "$FOLDERSPACE"
+    check_if_failed "fixing bootstrap for folderspace variable"
     replace_phrase_in_file "$bootstrap_file" "REPLACEDEPNAME" "$DEP_NAME"
     check_if_failed "fixing bootstrap for deployment name"
     replace_phrase_in_file "$bootstrap_file" "REPLACEPORT" "$PORT"

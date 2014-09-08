@@ -21,10 +21,10 @@ cd $REGRESSION_DIR
 
 TIME_START="$(date +"%s")"
 
-source prepare_tests.sh prepare_tests.sh
+source prepare_tools.sh prepare_tools.sh
 
 # if that didn't work, complain.
-if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
+if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 which="$1"; shift

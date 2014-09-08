@@ -72,9 +72,9 @@ function bail_on_fail()
 
 # need to fix up an input file to use for all our testing.
 
-INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/inputfile.jenkins"
+INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/xsede_tools.jenkins-xcg"
 if [ "$NAMESPACE" == "xsede" ]; then
-  INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/inputfile.jenkins-xsede"
+  INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/xsede_tools.jenkins-xsede"
 fi
 
 # give the build an input file it can use.  this one relies on our having set
@@ -84,7 +84,7 @@ sed -e "s/GENII_INSTALL_DIR=.*/GENII_INSTALL_DIR=\$GENII_INSTALL_DIR/" \
   -e "s/GENII_USER_DIR=.*/GENII_USER_DIR=\$GENII_USER_DIR/" \
   -e "s/BACKUP_USER_DIR=.*/BACKUP_USER_DIR=\$BACKUP_USER_DIR/" \
   < $INPUTFILE_FOR_JENKINS \
-  > "$GRITTY_TESTING_TOP_LEVEL/inputfile.txt"
+  > "$GRITTY_TESTING_TOP_LEVEL/xsede_tools.cfg"
 bail_on_fail
 
 ##############
@@ -170,7 +170,7 @@ done
 ################
 
 # get the test environment loaded up.
-source "$GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh" "$GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh"
+source "$GRITTY_TESTING_TOP_LEVEL/prepare_tools.sh" "$GRITTY_TESTING_TOP_LEVEL/prepare_tools.sh"
 
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
@@ -202,7 +202,7 @@ bail_on_fail
 echo "Cleaning previous test run."
 \rm -rf $TEST_TEMP
 echo "Re-establishing temporary directories"
-source "$GRITTY_TESTING_TOP_LEVEL/prepare_tests.sh"
+source "$GRITTY_TESTING_TOP_LEVEL/prepare_tools.sh"
 
 echo "quick-start grid bootstrap commencing..."
 bash "$XSEDE_TEST_ROOT/library/bootstrap_quick_start.sh"

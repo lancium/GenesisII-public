@@ -259,6 +259,16 @@ function bootstrap_grid()
     exit 1
   fi
 
+#shorter alternative to below under test.
+  replace_phrase_in_file "$bootstrap_file" "FOLDERSPACE" "$FOLDERSPACE"
+  check_if_failed "fixing bootstrap for folderspace variable"
+
+#  sed -i -e "s/FOLDERSPACE/$FOLDERSPACE/g" "$bootstrap_file"
+#  if [ $? -ne 0 ]; then
+#    echo "There was a problem replacing the FOLDERSPACE tag in the bootstrap script: '$bootstrap_file'"
+#    exit 1
+#  fi
+
   # fix the bootstrap to point to the right deployments folder.
   replace_phrase_in_file "$bootstrap_file" '${GENII_INSTALL_DIR}/deployments' "${DEPLOYMENTS_ROOT}"
 

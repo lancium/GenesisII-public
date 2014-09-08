@@ -14,10 +14,10 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 
 # pull in the xsede test base support.
-source "$WORKDIR/../../prepare_tests.sh" "$WORKDIR/../../prepare_tests.sh"
+source "$WORKDIR/../../prepare_tools.sh" "$WORKDIR/../../prepare_tools.sh"
 
 # if that didn't work, complain.
-if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 3; fi
+if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 # otherwise load the rest of the tool environment.
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 

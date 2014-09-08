@@ -6,7 +6,13 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
 
-if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tests.sh before testing.; exit 1; fi
+source "../../prepare_tools.sh" "../../prepare_tools.sh"
+if [ -z "$TEST_TEMP" ]; then
+  echo The xsede tool suite could not be automatically located.
+  exit 1
+fi
+
+if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 1; fi
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 # where we hook in the fuse mount.
@@ -96,12 +102,13 @@ testCreatingFileOnMount()
   echo "Hello \n Test File\n" > $TEST_TEMP/local-file.txt
   cp $TEST_TEMP/local-file.txt "$TESTING_DIR/grid-file.txt"
   assertEquals "Testing copy of local file to mounted grid folder." 0 $?
-  ls -l "$TESTING_DIR"
-  assertEquals "Checking contents of new file" 0 $?
+
   # give fuse process a chance to check it in...
-  sync
-  grid cat $GRID_TEST_DIR/grid-file.txt
-  assertEquals "Cat copied file grid-file.txt" 0 $?
+#  sync
+# is above sync still necessary??
+
+  diff "$TESTING_DIR/grid-file.txt" "$TEST_TEMP/local-file.txt"
+  assertEquals "Checking contents of new file" 0 $?
 }
 
 testCopyingFromMountToLocal()
@@ -110,8 +117,8 @@ testCopyingFromMountToLocal()
   echo "Testing 'cp' file from mounted dir to local dir"
   cp "$TESTING_DIR/grid-file.txt" "$TEST_TEMP/local-file1.txt"
   cat $TEST_TEMP/local-file1.txt
-  # let the fuse mount check in the change.
-  sync
+#  # let the fuse mount check in the change.
+#  sync
 }
 
 testCheckDiffsOnFiles()
@@ -175,18 +182,24 @@ testChmoddingFile()
   echo "ls before 'chmod' on test-file.txt"
   ls -l "$TESTING_DIR/test-file.txt"
   assertEquals "Checking ls for current file attributes" 0 $?
-  chmod -x "$TESTING_DIR/test-file.txt"
-  assertEquals "Testing 'chmod test-file.txt' on mounted dir" 0 $?
-  echo "ls after 'chmod' on test-file.txt"
-  ls -l "$TESTING_DIR/test-file.txt"
-  assertEquals "Checking ls after 'chmod' on test-file.txt" 0 $?
+  echo "more stuff into fuse mounted file" >>"$TESTING_DIR/test-file.txt"
+  assertEquals "Testing append on test file" 0 $?
+  chmod +x "$TESTING_DIR/test-file.txt"
+  assertEquals "Testing 'chmod +x test-file.txt' on mounted dir" 0 $?
+#disturbing: test -x works even though ls -al shows file is *not* executable.
+#  test -x "$TESTING_DIR/test-file.txt"
+# assertEquals "Checking executable status after 'chmod' on test-file.txt" 0 $?
+  ls -al "$TESTING_DIR/test-file.txt" | grep '^-rwx'
+  assertEquals "Checking executable status after 'chmod' on test-file.txt" 0 $?
+echo ls of it:
+ls -al "$TESTING_DIR/test-file.txt" 
 }
 
 testRemovingFile()
 {
   if ! fuse_supported; then return 0; fi
   \rm "$TESTING_DIR/test-file.txt"
-  assertEquals "Testing 'rm test-file.txt' form mounted dir" 0 $?
+  assertEquals "Testing 'rm test-file.txt' from mounted dir" 0 $?
   ls -l "$TESTING_DIR/"
   assertEquals "Testing ls on folder where file used to be" 0 $?
 }

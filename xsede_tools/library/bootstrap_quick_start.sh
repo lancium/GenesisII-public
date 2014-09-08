@@ -21,7 +21,7 @@ fi
 # set this variable so the prepare tests script doesn't start a subshell.
 GRITTY_TESTING_TOP_LEVEL="$XSEDE_TEST_ROOT"
 # pull this stuff in again, just in case all we were given was a test root.
-source "$XSEDE_TEST_ROOT/prepare_tests.sh"
+source "$XSEDE_TEST_ROOT/prepare_tools.sh"
 if [ -z "$TEST_TEMP" ]; then
   echo The auto-location feature failed to find the xsede tests
   exit 1

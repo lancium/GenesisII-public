@@ -248,8 +248,8 @@ function give_administrative_privileges()
   local bes_perms="$1"; shift
   local admin_group="$1"; shift
   if [ -z "$userpath" -o -z "$container" ]; then
-    echo "Error in give_administrative_privileges function--need to specify user path and"
-    echo "container name."
+    echo "Error in give_administrative_privileges function--need to specify user path"
+    echo "and container name."
     exit 1
   fi
   if [ "$(basename $container)" == "$container" ]; then
@@ -264,77 +264,79 @@ function give_administrative_privileges()
 
   # this is extra for the xsede namespace, so we can attain gffs-admins rights.
   if [ ! -z "$admin_group" -a "$NAMESPACE" == 'xsede' ]; then
-    local ADDITIONAL_GROUP_COMMAND1="chmod $GROUPS_LOC/gffs-admins +rwx $userpath"
-    local ADDITIONAL_GROUP_COMMAND2="onerror admin chmod for gffs-admins group membership failed."
-    local ADDITIONAL_GROUP_COMMAND3="ln $GROUPS_LOC/gffs-admins $userpath/gffs-admins"
-    local ADDITIONAL_GROUP_COMMAND4="onerror admin chmod for gffs-admins group membership failed."
-    local ADDITIONAL_GROUP_COMMAND5="chmod $GROUPS_LOC/gffs-amie +rwx $userpath"
-    local ADDITIONAL_GROUP_COMMAND6="onerror admin chmod for gffs-amie group membership failed."
-    local ADDITIONAL_GROUP_COMMAND7="ln $GROUPS_LOC/gffs-amie $userpath/gffs-amie"
-    local ADDITIONAL_GROUP_COMMAND8="onerror admin chmod for gffs-amie group membership failed."
-  fi
+    local MODERN_GROUP_COMMANDS="chmod $GROUPS_LOC/gffs-admins +rwx $userpath\n\
+onerror admin chmod for gffs-admins group membership failed.\n\
+ln $GROUPS_LOC/gffs-admins $userpath/gffs-admins\n\
+onerror admin chmod for gffs-admins group membership failed.\n\
+chmod $GROUPS_LOC/gffs-amie +rwx $userpath\n\
+onerror admin chmod for gffs-amie group membership failed.\n\
+ln $GROUPS_LOC/gffs-amie $userpath/gffs-amie\n\
+onerror admin chmod for gffs-amie group membership failed."
 
-  if [ ! -z "$queue_perms" ]; then
-    local QUEUE_CMD1="chmod $QUEUES_LOC/* +rwx $userpath"
-    local QUEUE_CMD2="onerror admin chmod for $QUEUES_LOC/* failed."
-  fi
+  fi  # if xsede namespace.
 
-  if [ ! -z "$bes_perms" ]; then
-    local BES_CMD1="chmod $BES_CONTAINERS_LOC/* +rwx $userpath"
-    local BES_CMD2="onerror admin chmod for $BES_CONTAINERS_LOC/* failed."
-  fi
+  if [ "$NAMESPACE" == 'xcg' ]; then
+    local OLDSCHOOL_PRIVILEGE_COMMANDS="\n\
+chmod \"/\" +rwx $userpath\n\
+onerror admin chmod for / failed.\n\
+echo working on container perms\n\
+chmod \"$CONTAINERS_LOC/*\" +rwx $userpath\n\
+onerror admin chmod for $CONTAINERS_LOC failed.\n\
+chmod \"$BOOTSTRAP_LOC/*\" +rwx $userpath\n\
+onerror admin chmod for $BOOTSTRAP_LOC/* failed.\n\
+chmod \"$BOOTSTRAP_LOC/Services/*\" +rwx $userpath\n\
+onerror admin chmod for $BOOTSTRAP_LOC/Services/* failed.\n\
+echo fixing users and groups and homes.\n\
+chmod -R \"$USERS_LOC\" +rwx $userpath\n\
+onerror admin chmod for $USERS_LOC failed.\n\
+chmod -R \"$GROUPS_LOC\" +rwx $userpath\n\
+onerror admin chmod for $GROUPS_LOC failed.\n\
+chmod -R \"$HOMES_LOC\" +rwx $userpath\n\
+onerror admin chmod for $HOMES_LOC/* failed."
 
-  multi_grid <<eof
-    echo working on $userpath
-    chmod "$userpath" +rwx "$userpath"
-    onerror admin chmod for $userpath failed.
-    chmod "/" +rwx $userpath
-    onerror admin chmod for / failed.
+    if [ ! -z "$queue_perms" ]; then
+      local QUEUE_CMDS="\n\
+echo working on queue holding area.\n\
+chmod \"$QUEUES_LOC\" +rwx $userpath\n\
+onerror admin chmod for $QUEUES_LOC failed.\n\
+chmod $QUEUES_LOC/* +rwx $userpath\n\
+onerror admin chmod for $QUEUES_LOC/* failed."
+    fi
 
-    echo working on container perms
-    chmod "$CONTAINERS_LOC/*" +rwx $userpath
-    onerror admin chmod for $CONTAINERS_LOC failed.
-    chmod "$BOOTSTRAP_LOC/*" +rwx $userpath
-    onerror admin chmod for $BOOTSTRAP_LOC/* failed.
-    chmod "$BOOTSTRAP_LOC/Services/*" +rwx $userpath
-    onerror admin chmod for $BOOTSTRAP_LOC/Services/* failed.
+    if [ ! -z "$bes_perms" ]; then
+      local BES_CMDS="\n\
+echo working on bes holding area.\n\
+chmod \"$BES_CONTAINERS_LOC\" +rwx $userpath\n\
+onerror admin chmod for $BES_CONTAINERS_LOC failed.\n\
+chmod $BES_CONTAINERS_LOC/* +rwx $userpath\n\
+onerror admin chmod for $BES_CONTAINERS_LOC/* failed."
+    fi
+  fi  # if xcg namespace.
 
-    echo working on queue holding area
-    chmod "$QUEUES_LOC" +rwx $userpath
-    onerror admin chmod for $QUEUES_LOC failed.
+  FULL_COMMAND_SET="$(mktemp $TEST_TEMP/admin_privs.XXXXXX)"
+  echo -e "\
+echo "giving administrative privileges to \"$userpath\"."\n\
+chmod "$userpath" +rwx "$userpath"\n\
+onerror reflexive admin chmod for $userpath failed.\n\
+\n\
+echo performing modern group membership steps.\n\
+$MODERN_GROUP_COMMANDS\n\
+\n\
+echo performing any old school admin configuration.\n\
+$OLDSCHOOL_PRIVILEGE_COMMANDS\n\
+\n\
+echo performing optional queue commands.\n\
+$QUEUE_CMDS\n\
+\n\
+echo performing optional bes commands.\n\
+$BES_CMDS\n\
+\n\
+echo end of admin privileges procedure." >"$FULL_COMMAND_SET"
 
-    echo performing optional queue commands
-    $QUEUE_CMD1
-    $QUEUE_CMD2
+#echo full cmds:
+#cat $FULL_COMMAND_SET
 
-    echo working on bes holding area
-    chmod "$BES_CONTAINERS_LOC" +rwx $userpath
-    onerror admin chmod for $BES_CONTAINERS_LOC failed.
-
-    echo performing optional bes commands
-    $BES_CMD1
-    $BES_CMD2
-
-    echo fixing users and groups and homes
-    chmod -R "$USERS_LOC" +rwx $userpath
-    onerror admin chmod for $USERS_LOC failed.
-    chmod -R "$GROUPS_LOC" +rwx $userpath
-    onerror admin chmod for $GROUPS_LOC failed.
-    chmod -R "$HOMES_LOC" +rwx $userpath
-    onerror admin chmod for $HOMES_LOC/* failed.
-
-    echo optional group membership steps
-    $ADDITIONAL_GROUP_COMMAND1
-    $ADDITIONAL_GROUP_COMMAND2
-    $ADDITIONAL_GROUP_COMMAND3
-    $ADDITIONAL_GROUP_COMMAND4
-    $ADDITIONAL_GROUP_COMMAND5
-    $ADDITIONAL_GROUP_COMMAND6
-    $ADDITIONAL_GROUP_COMMAND7
-    $ADDITIONAL_GROUP_COMMAND8
-
-    echo end of admin privileges procedure
-eof
+  multi_grid <"$FULL_COMMAND_SET"
   check_if_failed "Administrative steps failed for $userpath"
 }
 

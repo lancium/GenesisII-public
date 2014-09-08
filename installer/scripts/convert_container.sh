@@ -139,10 +139,8 @@ if [[ "$EXTRA_FLAGS" =~ depcopy ]]; then
 fi
 
 if [ -z "$TMP" -o ! -d "$TMP" ]; then
-  echo "This script requires a valid temporary directory pointed at by the"
-  echo "'TMP' variable.  Please ensure that TMP is set to a directory where"
-  echo "temporary files can be created."
-  exit 1
+  # if no TMP is defined, we'll go with the standard.
+  export TMP=/tmp
 fi
 
 export OLD_DEPLOYMENT_DIR="$OLD_INSTALL/deployments"

@@ -21,7 +21,7 @@ function replace_phrase_in_file()
   local file="$1"; shift
   local phrase="$1"; shift
   local replacement="$1"; shift
-  if [ -z "$file" -o -z "$phrase" -o -z "$replacement" ]; then
+  if [ -z "$file" -o -z "$phrase" ]; then
     echo "replace_phrase_in_file: needs a filename, a phrase to replace, and the"
     echo "text to replace that phrase with."
     return 1
