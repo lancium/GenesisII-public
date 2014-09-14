@@ -65,7 +65,7 @@ fi
 for subproject in \
 \
   CmdLineManipulator FSViewII GeniiJSDL GeniiProcessMgmt MacOSXSwing MNaming \
-  GridJobTool gffs-basics \
+  gffs-basics \
   gffs-webservices gffs-security \
   gffs-structure \
   DPage \

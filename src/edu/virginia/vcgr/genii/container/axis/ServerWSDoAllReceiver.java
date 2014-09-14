@@ -377,6 +377,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		ArrayList<X509Certificate[]> authenticatedCertChains, X509Certificate[] callerTLSCert, ICallingContext callContext)
 		throws AuthZSecurityException, GeneralSecurityException
 	{
+		_logger.debug("entered authBearCred with caller: " + callerTLSCert[0].getSubjectDN());
+		
 		HashSet<NuCredential> retval = new HashSet<NuCredential>();
 
 		// Add the authenticated certificate chains

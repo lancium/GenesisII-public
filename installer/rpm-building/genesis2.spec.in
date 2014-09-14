@@ -107,6 +107,8 @@ chmod 755 $GEN2_BUILDOUT/gffschown
 cp $GEN2_SOURCE_LOC/scripts/proxyio.launcher.template $GEN2_BUILDOUT/proxyio.launcher
 chmod 755 $GEN2_BUILDOUT/proxyio.launcher
 cp $GEN2_SOURCE_LOC/installer/data_files/container.properties $GEN2_BUILDOUT/container.properties
+cp $GEN2_SOURCE_LOC/scripts/cert-tool $GEN2_BUILDOUT/cert-tool
+chmod 755 $GEN2_BUILDOUT/cert-tool
 
 # copy the right deployment into place.
 mkdir $GEN2_BUILDOUT/deployments
@@ -127,7 +129,8 @@ rm -rf $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/generated_certs \
   $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/certificate-config.txt \
   $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/passwords.txt \
   $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/saved_deployment_info.txt \
-  $GEN2_BUILDOUT/xsede_tools/inputfile.txt 
+  $GEN2_BUILDOUT/xsede_tools/inputfile.txt \
+  $GEN2_BUILDOUT/xsede_tools/xsede_tools.cfg
 
 echo done with RPM install step.
 
@@ -155,6 +158,7 @@ bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
 /opt/genesis2-%GRID%/webapps
 /opt/genesis2-%GRID%/xsede_tools
 
+/opt/genesis2-%GRID%/cert-tool
 /opt/genesis2-%GRID%/client-ui
 /opt/genesis2-%GRID%/current.version
 /opt/genesis2-%GRID%/current.deployment

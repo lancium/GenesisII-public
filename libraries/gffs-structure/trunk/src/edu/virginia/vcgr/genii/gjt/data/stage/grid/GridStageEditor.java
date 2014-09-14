@@ -29,7 +29,7 @@ class GridStageEditor extends StageEditor<GridStageData>
 
 	GridStageEditor(Window owner)
 	{
-		super(owner, "Grid Data Stage Editor");
+		super(owner, "Grid Data Stage Editor  GROMPKIT");
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 

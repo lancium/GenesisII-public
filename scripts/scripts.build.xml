@@ -57,30 +57,35 @@
 		<antcall target="set-jni-replace">
 			<param name="build-target-jni" value="jni-libs/lin32"/>
 		</antcall>
+		<echo message="JNI chosen for 32 bit Linux platform." />
 	</target>
 	
 	<target name="jni-lin64" if="linux.64">
 		<antcall target="set-jni-replace">
 			<param name="build-target-jni" value="jni-libs/lin64"/>
 		</antcall>
+		<echo message="JNI chosen for 64 bit Linux platform." />
 	</target>
 	
 	<target name="jni-win32" if="windows.32">
 		<antcall target="set-jni-replace">
 			<param name="build-target-jni" value="jni-libs/win32"/>
 		</antcall>
+		<echo message="JNI chosen for 32 bit Windows platform." />
 	</target>
 	
 	<target name="jni-win64" if="windows.64">
 		<antcall target="set-jni-replace">
 			<param name="build-target-jni" value="jni-libs/win64"/>
 		</antcall>
+		<echo message="JNI chosen for 64 bit Windows platform." />
 	</target>
 	
 	<target name="jni-osx64" if="mac.scripts">
 		<antcall target="set-jni-replace">
 			<param name="build-target-jni" value="jni-libs/osx64"/>
 		</antcall>
+		<echo message="JNI chosen for 64 bit Mac OS-X platform." />
 	</target>
 	
 	<target name="set-jni-replace">
@@ -148,8 +153,18 @@
 		<condition property="linux.32">
 			<and>
 				<isset property="linux.scripts" />
+				<equals arg1="${build.targetArch}" arg2="32"/>
+			</and>
+		</condition>
+		
+		<condition property="linux.64">
+			<and>
+				<isset property="linux.scripts" />
 				<not>
 					<isset property="linux.64" />
+				</not>
+				<not>
+					<isset property="linux.32" />
 				</not>
 			</and>
     		</condition>
@@ -164,8 +179,18 @@
 		<condition property="windows.32">
 			<and>
 				<isset property="windows.scripts" />
+				<equals arg1="${build.targetArch}" arg2="32"/>
+			</and>
+		</condition>
+		
+		<condition property="windows.64">
+			<and>
+				<isset property="windows.scripts" />
 				<not>
 					<isset property="windows.64" />
+				</not>
+				<not>
+					<isset property="windows.32" />
 				</not>
 			</and>
     		</condition>

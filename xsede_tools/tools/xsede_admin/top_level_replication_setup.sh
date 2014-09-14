@@ -119,7 +119,7 @@ replicate /resources $MIRRORPATH
 replicate /groups $MIRRORPATH
 replicate /groups/xsede.org $MIRRORPATH
 replicate /home $MIRRORPATH
-replicate -p /home/xsede.org $MIRRORPATH
+replicate /home/xsede.org $MIRRORPATH
 replicate /users $MIRRORPATH
 replicate /users/xsede.org $MIRRORPATH
 eof

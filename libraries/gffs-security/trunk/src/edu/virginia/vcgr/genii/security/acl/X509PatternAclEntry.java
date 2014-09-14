@@ -25,9 +25,6 @@ import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.X500PrincipalUtilities;
 import edu.virginia.vcgr.genii.security.credentials.X509Identity;
 import edu.virginia.vcgr.genii.security.identity.Identity;
-import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
-import eu.emi.security.authn.x509.CommonX509TrustManager;
-import eu.emi.security.authn.x509.impl.InMemoryKeystoreCertChainValidator;
 
 /**
  * This ACL rule provides a chain of trust that callers must chain to, and, optionally, a pattern
@@ -51,7 +48,7 @@ public class X509PatternAclEntry implements AclEntry
 	protected X500Principal _userPattern;
 
 	// cache a trust manager upon first use.
-	transient protected CommonX509TrustManager _trustManagerCanl;
+//	transient protected CommonX509TrustManager _trustManagerCanl;
 	transient protected X509TrustManager _trustManagerJdk;
 
 	// cache an X509 pattern upon first use.
@@ -94,18 +91,18 @@ public class X509PatternAclEntry implements AclEntry
 			tmf.init(trustParams);
 			_trustManagerJdk = (X509TrustManager) tmf.getTrustManagers()[0];
 		}
-		if (_trustManagerCanl == null) {
-			// create an in-memory cert keystore for the trusted certs.
-			KeyStore ks = KeyStore.getInstance("JKS");
-			ks.load(null, null);
-
-			// add the trusted cert into the memory-keystore.
-			X509Certificate trustedCert = _trustRoot.getOriginalAsserter()[0];
-			ks.setCertificateEntry(trustedCert.getSubjectX500Principal().getName(), trustedCert);
-
-			InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(ks);
-			_trustManagerCanl = new CommonX509TrustManager(validater);
-		}
+//		if (_trustManagerCanl == null) {
+//			// create an in-memory cert keystore for the trusted certs.
+//			KeyStore ks = KeyStore.getInstance("JKS");
+//			ks.load(null, null);
+//
+//			// add the trusted cert into the memory-keystore.
+//			X509Certificate trustedCert = _trustRoot.getOriginalAsserter()[0];
+//			ks.setCertificateEntry(trustedCert.getSubjectX500Principal().getName(), trustedCert);
+//
+//			InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(ks);
+//			_trustManagerCanl = new CommonX509TrustManager(validater);
+//		}
 	}
 
 	protected boolean validateTrust(X509Identity user)
@@ -118,13 +115,14 @@ public class X509PatternAclEntry implements AclEntry
 		}
 		boolean trustOkay = false;
 		X509Certificate[] userCertChain = user.getOriginalAsserter();
-		try {
-			_trustManagerCanl.checkClientTrusted(userCertChain, userCertChain[0].getPublicKey().getAlgorithm());
-			trustOkay = true;
-		} catch (Throwable e) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("problem checking cert with canl: " + e.getMessage());
-		}
+//hmmm: canl trust checking is off.
+//		try {
+//			_trustManagerCanl.checkClientTrusted(userCertChain, userCertChain[0].getPublicKey().getAlgorithm());
+//			trustOkay = true;
+//		} catch (Throwable e) {
+//			if (_logger.isDebugEnabled())
+//				_logger.debug("problem checking cert with canl: " + e.getMessage());
+//		}
 		try {
 			if (!trustOkay) {
 				_trustManagerJdk.checkClientTrusted(userCertChain, userCertChain[0].getPublicKey().getAlgorithm());
@@ -137,14 +135,10 @@ public class X509PatternAclEntry implements AclEntry
 
 		if (!trustOkay) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("client not trusted by pattern acl, user[1 of " + userCertChain.length + "] chksum="
-					+ SecurityUtilities.getChecksum(userCertChain[0]) + " pubkey chksum="
-					+ SecurityUtilities.getChecksum(userCertChain[0].getPublicKey()) + " is " + userCertChain[0].toString());
+				_logger.debug("client not trusted by pattern acl, user[1 of " + userCertChain.length + "] for " + userCertChain[0].getSubjectDN());
 		} else {
 			if (_logger.isDebugEnabled())
-				_logger.debug("trust established by pattern acl for user[1 of " + userCertChain.length + "] chksum="
-					+ SecurityUtilities.getChecksum(userCertChain[0]) + " pubkey chksum="
-					+ SecurityUtilities.getChecksum(userCertChain[0].getPublicKey()) + " is " + userCertChain[0].toString());
+				_logger.debug("trust established by pattern acl for user[1 of " + userCertChain.length + "] for " + userCertChain[0].getSubjectDN());
 		}
 		return trustOkay;
 	}

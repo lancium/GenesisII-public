@@ -8,8 +8,13 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class HierarchicalDirectory
 {
+	static private Log _logger = LogFactory.getLog(HierarchicalDirectory.class);
+
 	private String _dirName;
 	private Vector<File> _dependentEntries;
 
@@ -35,6 +40,18 @@ public class HierarchicalDirectory
 	final public File lookupFile(String filename)
 	{
 		File file;
+		
+		/* hmmm: CAK, is this the only place we really need to modify?
+		 * it seems like if we catch the slash at front here, we just return it if it exists.
+		 */
+		
+		// handle absolute paths first.
+		if (filename.startsWith("/")) {
+			_logger.debug("found a path to lookup that is absolute: " + filename);
+			file =  new File(filename);
+			if (file.exists() && (file.isFile() || file.isDirectory()))
+				return file;
+		}
 
 		for (File dir : _dependentEntries) {
 			file = new File(dir, filename);

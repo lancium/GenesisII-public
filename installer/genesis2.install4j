@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.12" transformSequenceNumber="4">
-  <directoryPresets config="../ext/ntrights.exe" />
+  <directoryPresets config="../lib/export.properties.template" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.bitSize}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -70,7 +70,6 @@
       <mountPoint id="252" root="22" location="JavaServiceWrapper" mode="755" />
       <mountPoint id="38" root="24" location="jni-lib" mode="755" />
       <mountPoint id="253" root="24" location="JavaServiceWrapper" mode="755" />
-      <mountPoint id="1449" root="24" location="" mode="755" />
       <mountPoint id="3622" root="3621" location="jni-lib" mode="755" />
       <mountPoint id="3623" root="3621" location="JavaServiceWrapper" mode="755" />
       <mountPoint id="5994" root="5993" location="deployments" mode="755" />
@@ -87,6 +86,7 @@
       <fileEntry mountPoint="7606" file="../scripts/genii-client-application.properties" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="7606" file="../scripts/genii-container-application.properties" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="7606" file="../ext/ntrights.exe" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="7606" file="../scripts/genii-certtool-application.properties" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="3944" file="unlimited_jce_java7/US_export_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="3944" file="unlimited_jce_java7/local_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="7211" file="./scripts/main_installation_script.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
@@ -95,49 +95,52 @@
       <fileEntry mountPoint="7211" file="./scripts/installation_helpers.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="./scripts/update_deployment.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="./scripts/update_install_location.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
-      <fileEntry mountPoint="7211" file="./scripts/create_deployment_rpm.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="./scripts/gen2deployment-2.7-1.spec" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
-      <dirEntry mountPoint="34" file=".." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp" dirMode="755" overrideDirMode="true">
+      <dirEntry mountPoint="34" file=".." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp, *.fred" dirMode="755" overrideDirMode="true">
         <exclude>
-          <entry location="build.xml" fileType="regular" />
-          <entry location="container.properties" fileType="regular" />
-          <entry location="jar-desc.xml" fileType="regular" />
+          <entry location="tests" fileType="regular" />
+          <entry location="derby.log" fileType="regular" />
+          <entry location="gffschown" fileType="regular" />
+          <entry location="cert-tool" fileType="regular" />
+          <entry location="bin.ant" fileType="regular" />
+          <entry location="readme.txt" fileType="regular" />
+          <entry location="linux-cmd-wrapper" fileType="regular" />
+          <entry location="build.properties" fileType="regular" />
+          <entry location=".project" fileType="regular" />
           <entry location="deployments/default" fileType="regular" />
+          <entry location="grid" fileType="regular" />
+          <entry location="build-initial.xml" fileType="regular" />
+          <entry location="lib" fileType="regular" />
+          <entry location="bin.eclipse" fileType="regular" />
+          <entry location="ext/genii-base-application.properties" fileType="regular" />
           <entry location="ext/genii-certtool-application.properties" fileType="regular" />
           <entry location="ext/genii-container-application.properties" fileType="regular" />
-          <entry location="ext/genii-base-application.properties" fileType="regular" />
           <entry location="ext/genii-client-application.properties" fileType="regular" />
           <entry location="JavaServiceWrapper" fileType="regular" />
-          <entry location="cert-tool" fileType="regular" />
-          <entry location="derby.log" fileType="regular" />
-          <entry location="mappings.properties" fileType="regular" />
-          <entry location="scripts" fileType="regular" />
-          <entry location="lib" fileType="regular" />
-          <entry location="linux-cmd-wrapper" fileType="regular" />
-          <entry location="grid" fileType="regular" />
-          <entry location="bin.ant" fileType="regular" />
-          <entry location="unit-test-reports" fileType="regular" />
           <entry location="xsede_tools" fileType="regular" />
-          <entry location="libraries" fileType="regular" />
-          <entry location="build-initial.xml" fileType="regular" />
-          <entry location="context.xml" fileType="regular" />
-          <entry location="tests" fileType="regular" />
-          <entry location="build.properties" fileType="regular" />
-          <entry location="installer" fileType="regular" />
-          <entry location="src" fileType="regular" />
-          <entry location="bin.eclipse" fileType="regular" />
-          <entry location=".project" fileType="regular" />
-          <entry location="change-port.sh" fileType="regular" />
-          <entry location="readme.txt" fileType="regular" />
+          <entry location="unit-test-reports" fileType="regular" />
+          <entry location="scripts" fileType="regular" />
+          <entry location="jar-desc.xml" fileType="regular" />
+          <entry location="proxyio.launcher" fileType="regular" />
+          <entry location="mappings.properties" fileType="regular" />
           <entry location=".svn" fileType="regular" />
-          <entry location="runContainer.sh" fileType="regular" />
+          <entry location="installer" fileType="regular" />
+          <entry location="context.xml" fileType="regular" />
           <entry location=".settings" fileType="regular" />
-          <entry location="BUILDME" fileType="regular" />
+          <entry location="retired" fileType="regular" />
+          <entry location="src" fileType="regular" />
+          <entry location="build.xml" fileType="regular" />
           <entry location=".classpath" fileType="regular" />
+          <entry location="container.properties" fileType="regular" />
+          <entry location="BUILDME" fileType="regular" />
+          <entry location="runContainer.sh" fileType="regular" />
+          <entry location="libraries" fileType="regular" />
+          <entry location="change-port.sh" fileType="regular" />
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="34" file="../scripts/jar-desc.xml" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="34" file="./data_files/container.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="34" file="../scripts/cert-tool" overwriteMode="4" shared="false" fileMode="655" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <dirEntry mountPoint="35" file="../jni-libs/win32" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="win32" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude>
           <entry location=".svn" fileType="regular" />
@@ -312,7 +315,6 @@
           <entry location="wrapper/lib/libwrapper-hpux-ia-32.so" fileType="regular" />
         </exclude>
       </dirEntry>
-      <fileEntry mountPoint="1449" file="../scripts/XCG.plist" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <dirEntry mountPoint="3622" file="../jni-libs/lin32" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="lin32" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude>
           <entry location=".svn" fileType="regular" />
@@ -384,61 +386,20 @@
       <fileEntry mountPoint="8168" file="../lib/genesisII.container.log4j.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="8168" file="../lib/production.client.log4j.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="8168" file="../lib/production.container.log4j.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
-      <fileEntry mountPoint="8168" file="../lib/export.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <dirEntry mountPoint="8168" file="../lib" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" entryMode="direct" subDirectory="lib" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude>
           <entry location="genesisII.container.log4j.properties" fileType="regular" />
           <entry location="production.container.log4j.properties" fileType="regular" />
+          <entry location="gffs.exports" fileType="regular" />
           <entry location="genesisII.client.log4j.properties" fileType="regular" />
           <entry location="META-INF/mime.types" fileType="regular" />
           <entry location="export.properties" fileType="regular" />
           <entry location="production.client.log4j.properties" fileType="regular" />
         </exclude>
       </dirEntry>
-      <dirEntry mountPoint="8740" file=".." overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp" dirMode="755" overrideDirMode="true">
+      <dirEntry mountPoint="8740" file="../xsede_tools" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="subdir" subDirectory="xsede_tools" excludeSuffixes="*.fred" dirMode="755" overrideDirMode="false">
         <exclude>
-          <entry location="tests" fileType="regular" />
-          <entry location="derby.log" fileType="regular" />
-          <entry location="cert-tool" fileType="regular" />
-          <entry location="webapps" fileType="regular" />
-          <entry location="bin.ant" fileType="regular" />
-          <entry location="readme.txt" fileType="regular" />
-          <entry location="linux-cmd-wrapper" fileType="regular" />
-          <entry location="build.properties" fileType="regular" />
-          <entry location="container.properties.example" fileType="regular" />
-          <entry location=".project" fileType="regular" />
-          <entry location="deployments" fileType="regular" />
-          <entry location="dpages" fileType="regular" />
-          <entry location="fs_wrapper.sh" fileType="regular" />
-          <entry location="jni-libs" fileType="regular" />
-          <entry location="grid" fileType="regular" />
-          <entry location="current.version" fileType="regular" />
-          <entry location="build-initial.xml" fileType="regular" />
-          <entry location="lib" fileType="regular" />
-          <entry location="bin.eclipse" fileType="regular" />
-          <entry location="ext" fileType="regular" />
-          <entry location="JavaServiceWrapper" fileType="regular" />
-          <entry location="xsede_tools/inputfile.txt" fileType="regular" />
-          <entry location="unit-test-reports" fileType="regular" />
-          <entry location="current.deployment" fileType="regular" />
-          <entry location="eclipse" fileType="regular" />
-          <entry location="RELEASE" fileType="regular" />
-          <entry location="scripts" fileType="regular" />
-          <entry location="jar-desc.xml" fileType="regular" />
-          <entry location="mappings.properties" fileType="regular" />
-          <entry location=".svn" fileType="regular" />
-          <entry location="installer" fileType="regular" />
-          <entry location="License.txt" fileType="regular" />
-          <entry location="context.xml" fileType="regular" />
-          <entry location=".settings" fileType="regular" />
-          <entry location="src" fileType="regular" />
-          <entry location="build.xml" fileType="regular" />
-          <entry location=".classpath" fileType="regular" />
-          <entry location="container.properties" fileType="regular" />
-          <entry location="runContainer.sh" fileType="regular" />
-          <entry location="libraries" fileType="regular" />
-          <entry location="change-port.sh" fileType="regular" />
-          <entry location="bundles" fileType="regular" />
+          <entry location="xsede_tools.cfg" fileType="regular" />
         </exclude>
       </dirEntry>
       <dirEntry mountPoint="8977" file="../jni-libs/win64" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="win32" excludeSuffixes="" dirMode="755" overrideDirMode="false">
@@ -510,6 +471,7 @@
           <entry location="bundles" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
           <entry location="container.properties" fileType="regular" />
+          <entry location="cert-tool" fileType="regular" />
           <entry location="grid" fileType="launcher" />
           <entry location="client-ui" fileType="launcher" />
           <entry location=".i4j_external_20/jni-lib/libdbxml_java23.dll" fileType="regular" />
@@ -569,7 +531,6 @@
           <entry location=".i4j_external_20/JavaServiceWrapper" fileType="regular" />
           <entry location=".i4j_external_22/JavaServiceWrapper" fileType="regular" />
           <entry location=".i4j_external_24/JavaServiceWrapper" fileType="regular" />
-          <entry location=".i4j_external_24/XCG.plist" fileType="regular" />
           <entry location=".i4j_external_24/runContainer" fileType="launcher" />
           <entry location=".i4j_external_3621/JavaServiceWrapper" fileType="regular" />
           <entry location=".i4j_external_8976/JavaServiceWrapper" fileType="regular" />
@@ -1317,6 +1278,56 @@ return true;</string>
                   </java>
                 </serializedBean>
                 <beans>
+                  <action name="Create export.properties if doesn't exist" id="9687" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Failed to create export.properties from the template">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                          <void property="destinationFile">
+                            <object class="java.io.File">
+                              <string>lib/export.properties</string>
+                            </object>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="1">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>lib/export.properties.template</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                          <void property="overwriteMode">
+                            <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch export.properties" id="9688" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch export.properties">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="encoding">
+                            <string />
+                          </void>
+                          <void property="escapeForPropertyFile">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="1">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>lib/export.properties</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
                   <action name="Patch jar-desc.xml" id="46" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch jar-desc.xml">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
@@ -1353,6 +1364,27 @@ return true;</string>
                               <void index="0">
                                 <object class="java.io.File">
                                   <string>RELEASE</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch cert-tool" id="9526" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch cert-tool file.">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="1">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>cert-tool</string>
                                 </object>
                               </void>
                             </array>
@@ -1424,7 +1456,7 @@ return true;</string>
                             <array class="java.io.File" length="1">
                               <void index="0">
                                 <object class="java.io.File">
-                                  <string>ext/genii-update-application.properties</string>
+                                  <string>ext/genii-certtool-application.properties</string>
                                 </object>
                               </void>
                             </array>
@@ -1505,31 +1537,6 @@ return true;</string>
                       </java>
                     </serializedBean>
                     <condition />
-                  </action>
-                  <action name="Patch XCG.plist" id="1461" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch XCG.plist file for service installation.">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
-                          <void property="encoding">
-                            <string />
-                          </void>
-                          <void property="failIfNoReplacement">
-                            <boolean>true</boolean>
-                          </void>
-                          <void property="files">
-                            <array class="java.io.File" length="1">
-                              <void index="0">
-                                <object class="java.io.File">
-                                  <string>XCG.plist</string>
-                                </object>
-                              </void>
-                            </array>
-                          </void>
-                        </object>
-                      </java>
-                    </serializedBean>
-                    <condition>context.getCompilerVariable("genii.isMacOSX").equals("true") &amp;&amp;
-    context.getBooleanVariable("genii.hasContainer")</condition>
                   </action>
                   <action name="Patch container.properties" id="7431" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>

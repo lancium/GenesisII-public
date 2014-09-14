@@ -32,7 +32,6 @@
 	<classpathentry kind="lib" path="ext/jetty/jetty-util-6.1.26.jar"/>
 	<classpathentry kind="lib" path="ext/junit-4.11.jar"/>
 	<classpathentry kind="lib" path="ext/GeniiProcMgmt.jar"/>
-	<classpathentry kind="lib" path="ext/GridJobTool.jar"/>
 	<classpathentry kind="lib" path="ext/GeniiJSDL.jar"/>
 	<classpathentry kind="lib" path="ext/MorganUtilities.jar"/>
 	<classpathentry kind="lib" path="ext/CmdLineManipulator.jar"/>

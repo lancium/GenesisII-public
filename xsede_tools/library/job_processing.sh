@@ -26,8 +26,8 @@ compute_remaining_jobs()
     done_lines=$(grep 'ERROR\|FINISHED' $outfile | wc -l)
     remaining=$(($total_lines - $done_lines))
   fi
-#wrong old way.  remaining=$(raw_grid \"$grid_app\" qstat $queue_path | grep 'QUEUED\|RUNNING\|On' | wc | gawk '{print $1 }')
   echo "$remaining"
+  rm "$outfile"
 }
 
 compute_error_jobs()

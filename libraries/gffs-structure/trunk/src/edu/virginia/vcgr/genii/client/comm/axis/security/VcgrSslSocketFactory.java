@@ -96,6 +96,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 	public void notifyUnloaded()
 	{
 		try {
+			//hmmm: we need to install a different trust manager here for CRL checking.
+			
 			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 			KeyStore trustStore = KeystoreManager.getTlsTrustStore();
 			if (trustStore != null) {

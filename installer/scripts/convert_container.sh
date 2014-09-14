@@ -357,7 +357,7 @@ if [ ! -f "$SIGNING_KEYSTORE_FILE_PROPERTY" ]; then
   exit 1
 fi
 
-# find the password for the key in our signin keystore file.
+# find the password for the key in our signing keystore file.
 var="edu.virginia.vcgr.genii.container.security.resource-identity.key-password"
 file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/security.properties"
 SIGNING_KEY_PASSWORD_PROPERTY="$(seek_variable "$var" "$file")"

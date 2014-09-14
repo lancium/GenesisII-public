@@ -22,6 +22,8 @@ public interface KeystoreSecurityConstants
 			"edu.virginia.vcgr.genii.client.security.ssl.trust-store-password";
 		static public final String SSL_TRUSTED_CERTIFICATES_LOCATION_PROP =
 			"edu.virginia.vcgr.genii.client.security.ssl.trusted-certificates.location";
+		static public final String MYPROXY_CERTIFICATES_LOCATION_PROP =
+			"edu.virginia.vcgr.genii.client.security.ssl.myproxy-certificates.location";
 	}
 
 	public interface Container

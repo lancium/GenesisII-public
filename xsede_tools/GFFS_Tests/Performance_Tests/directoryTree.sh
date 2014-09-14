@@ -42,7 +42,7 @@ oneTimeSetUp()
   # create the export path, if we can.  this should be a pre-existing directory,
   # and this creation attempt will only work if we're doing a simple bootstrap test.
   if [ ! -d "$TEST_AREA" ]; then
-    echo "Note: we are creating an export path at $TEST_AREA.  This will succeed unless"
+    echo "Note: we are creating an export path at $TEST_AREA.  This will not succeed unless"
     echo "this is a simple bootstrap test or the container is local to the test machine."
     mkdir -p "$TEST_AREA"
     if [ $? -ne 0 ]; then

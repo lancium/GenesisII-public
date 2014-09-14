@@ -118,7 +118,7 @@ create_user "$new_admin_name" "$new_password" "$new_group"
 check_if_failed "creating user $new_admin_name"
 
 # power up the new admin guy.
-give_administrative_privileges "$new_admin_name" "${primary_hostname}" "" "" admin
+give_administrative_privileges "$new_admin_name" "${primary_hostname}" queues beses admin
 check_if_failed "granting admin privileges to $new_admin_name"
 
 # then log in as the new admin before doing anything else.  everything else is done as

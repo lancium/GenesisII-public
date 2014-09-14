@@ -158,9 +158,9 @@ public class ExportTool extends BaseGridTool
 
 			ArrayList<String> owners = WalletUtilities.extractOwnersFromCredentials(_exportCreatorFilter, false);
 			if ((owners == null) || (owners.size() == 0)) {
-				String msg = "failed to determine the owners for the export.  failing request.";
+				String msg = "failed to determine the owners for the export.";
 				_logger.error(msg);
-				throw new CreationException(msg);
+				//not failing this here. throw new CreationException(msg);
 			}
 
 			EndpointReferenceType epr =

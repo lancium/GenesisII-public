@@ -20,6 +20,8 @@ import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.InvalidDeploymentException;
+import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
+import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -91,6 +93,12 @@ public class MyProxyLoginTool extends BaseLoginTool
 		}
 	}
 
+	static private Security getSecurityProperties()
+	{
+		return Installation.getDeployment(new DeploymentName()).security();
+	}
+
+	
 	@Override
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
 		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
@@ -125,19 +133,15 @@ public class MyProxyLoginTool extends BaseLoginTool
 		mp.setPassphrase(pass);
 
 		/*
-		 * Myproxy trust root most likely want to make configurable in the future Can be overriden
-		 * with either environment variable GLOBUS_LOCATION or X509_CERT_DIR
+		 * Myproxy trust root can be overriden with either environment variable GLOBUS_LOCATION or X509_CERT_DIR,
+		 * although at our level we are defining the location in the security property file.
 		 */
-
-		/*
-		 * hmmm: this should use a configured name, which would allow us to store this anywhere!
-		 * that will be a requirement if we are to use an absolute path as desired by xsede.
-		 */
-		File trustRoot = Installation.getDeployment(new DeploymentName()).security().getSecurityFile("myproxy-certs");
-		// = new File(ContainerProperties.getContainerProperties().getDeploymentsDirectory() + "/"
-		// + Installation.getDeployment(new DeploymentName()).getName().toString() +
-		// "/security/myproxy-certs/");
-
+		String myProxyDirectory =
+			getSecurityProperties().getProperty(KeystoreSecurityConstants.Client.MYPROXY_CERTIFICATES_LOCATION_PROP);
+		// default to old location if the property is not set.
+		if (myProxyDirectory == null)
+			myProxyDirectory = "myproxy-certs";
+		File trustRoot = getSecurityProperties().getSecurityFile(myProxyDirectory);
 		_logger.debug("resolved myproxy-certs folder as: " + trustRoot);
 
 		// Set trust root.

@@ -5,17 +5,25 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PublicKey;
 import java.security.Security;
+import java.security.cert.CRL;
+import java.security.cert.CertStore;
+import java.security.cert.CertStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.X509CRL;
+import java.security.cert.X509CRLSelector;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -41,11 +49,8 @@ import org.morgan.util.io.StreamUtils;
 
 import sun.misc.BASE64Encoder;
 import sun.security.provider.X509Factory;
-
 import edu.virginia.vcgr.genii.security.CertificateValidator;
 import edu.virginia.vcgr.genii.security.identity.Identity;
-import eu.emi.security.authn.x509.CommonX509TrustManager;
-import eu.emi.security.authn.x509.impl.InMemoryKeystoreCertChainValidator;
 
 public class SecurityUtilities implements CertificateValidator
 {
@@ -191,8 +196,7 @@ public class SecurityUtilities implements CertificateValidator
 		KeyStore ks = store;
 		boolean trustOkay = false;
 		/*
-		 * TODO: may want to cache both types of trust managers in different caches, indexed by the
-		 * keystore.
+		 * TODO: may want to cache both types of trust managers in different caches, indexed by the keystore.
 		 */
 		try {
 			// create a trust manager from the trust store by trying jdk ssl support first.
@@ -207,23 +211,24 @@ public class SecurityUtilities implements CertificateValidator
 				_logger.trace("validated cert with jdk ssl: " + certChain[0].getSubjectDN());
 			trustOkay = true;
 		} catch (Throwable e) {
-			if (_logger.isTraceEnabled())
-				_logger.trace("could not validate this cert with jdk ssl against trust store: " + certChain[0].getSubjectDN()
+			if (_logger.isDebugEnabled())
+				_logger.debug("could not validate this cert with jdk ssl against trust store: " + certChain[0].getSubjectDN()
 					+ e.getMessage());
 		}
-		try {
-			if (!trustOkay) {
-				InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(ks);
-				CommonX509TrustManager trustManager = new CommonX509TrustManager(validater);
-				trustManager.checkClientTrusted(certChain, certChain[0].getPublicKey().getAlgorithm());
-				if (_logger.isTraceEnabled())
-					_logger.trace("validated cert: " + certChain[0].getSubjectDN());
-				trustOkay = true;
-			}
-		} catch (Throwable e) {
-			if (_logger.isTraceEnabled())
-				_logger.trace("could not validate this cert with CANL against trust store: " + certChain[0].getSubjectDN(), e);
-		}
+		// hmmm: canl trust checking is off.
+		// try {
+		// if (!trustOkay) {
+		// InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(ks);
+		// CommonX509TrustManager trustManager = new CommonX509TrustManager(validater);
+		// trustManager.checkClientTrusted(certChain, certChain[0].getPublicKey().getAlgorithm());
+		// if (_logger.isTraceEnabled())
+		// _logger.trace("validated cert with canl: " + certChain[0].getSubjectDN());
+		// trustOkay = true;
+		// }
+		// } catch (Throwable e) {
+		// if (_logger.isTraceEnabled())
+		// _logger.trace("could not validate this cert with CANL against trust store: " + certChain[0].getSubjectDN(), e);
+		// }
 		return trustOkay;
 	}
 
@@ -354,13 +359,41 @@ public class SecurityUtilities implements CertificateValidator
 		return ret;
 	}
 
+	// provides a way to filter out all but certificate files (ending in .cer or .0).
+	public static FilenameFilter certFilter = new FilenameFilter()
+	{
+		public boolean accept(File dir, String name)
+		{
+			String lowercaseName = name.toLowerCase();
+			if (lowercaseName.endsWith(".cer") || lowercaseName.endsWith(".0") || lowercaseName.endsWith(".crt")) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	};
+
+	// provides a way to filter out all but XSEDE crl files (ending in .r0).
+	public static FilenameFilter crlFilter = new FilenameFilter()
+	{
+		public boolean accept(File dir, String name)
+		{
+			String lowercaseName = name.toLowerCase();
+			if (lowercaseName.endsWith(".r0")) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	};
+
 	static public List<Certificate> loadCertificatesFromDirectory(File directory)
 	{
 		if (directory == null || !directory.isDirectory())
 			return Collections.emptyList();
 
 		List<Certificate> certificateList = new ArrayList<Certificate>();
-		File[] certificateFiles = directory.listFiles();
+		File[] certificateFiles = directory.listFiles(certFilter);
 
 		for (File certificateFile : certificateFiles) {
 			try {
@@ -383,15 +416,121 @@ public class SecurityUtilities implements CertificateValidator
 			}
 		}
 		if (_logger.isDebugEnabled())
-			_logger.debug("Loaded " + certificateFiles.length + " certificates from trusted directory.");
+			_logger.debug("Loaded " + certificateFiles.length + " certificates from: " + directory);
 
 		return certificateList;
+	}
+
+	static public X509Certificate loadCertificateFromString(String cert)
+	{
+		if (cert == null )
+			return null;
+
+			try {
+				InputStream is = new ByteArrayInputStream( cert.getBytes() );
+				BufferedInputStream bis = new BufferedInputStream(is);
+				CertificateFactory cf = CertificateFactory.getInstance("X.509");
+					Certificate certificate = cf.generateCertificate(bis);
+					return (X509Certificate)certificate;
+				
+			} catch (Exception ex) {
+				_logger.warn("Failed to load certificate from string", ex);
+			}
+		
+			return null;
+	}
+
+	
+	static public List<X509CRL> loadCRLsFromDirectory(File directory)
+	{
+		if (directory == null || !directory.isDirectory())
+			return Collections.emptyList();
+
+		List<X509CRL> crlList = new ArrayList<X509CRL>();
+		File[] crlFiles = directory.listFiles(crlFilter);
+
+		for (File crlFile : crlFiles) {
+			try {
+				// skip hidden files, i.e. those that start with a dot.
+				char testHidden = crlFile.getName().charAt(0);
+				if (testHidden == '.')
+					continue;
+				FileInputStream fis = new FileInputStream(crlFile);
+				BufferedInputStream bis = new BufferedInputStream(fis);
+
+				CertificateFactory cf = CertificateFactory.getInstance("X.509");
+				while (bis.available() > 0) {
+					X509CRL crl = (X509CRL) cf.generateCRL(bis);
+					crlList.add(crl);
+				}
+				fis.close();
+				if (_logger.isDebugEnabled())
+					_logger.debug("Loaded CRL(s) from file: " + crlFile.getName());
+			} catch (Exception ex) {
+				_logger.warn("Failed to load CRL from file: " + crlFile.getName(), ex);
+			}
+		}
+		if (_logger.isDebugEnabled())
+			_logger.debug("Loaded " + crlFiles.length + " CRL records from trusted directory.");
+
+		return crlList;
+	}
+
+	/** creates a CertStore object containing the CRLs provided in the list. */
+	static public CertStore createCertStoreFromCRLs(List<X509CRL> crlList)
+	{
+		CollectionCertStoreParameters params = new CollectionCertStoreParameters(crlList);
+			//Arrays.asList(chain));
+		CertStore certStore = null;
+		try {
+		certStore = CertStore.getInstance("Collection", params);
+		} catch (Exception e) {
+			_logger.warn("failed to create certificate store", e);
+		}
+		
+		return certStore;
+	}
+	
+	/**
+	 * returns true if the certificate has been revoked.  false is returned if the certificate has not been revoked or if its CRL was not found.
+	 */
+	static public boolean isCertRevoked(CertStore crls, X509Certificate cert)
+	{
+		X509CRLSelector selector = new X509CRLSelector(); 
+//doesn't help much.		selector.setCertificateChecking(cert);
+		selector.addIssuer(cert.getIssuerX500Principal());
+		Collection<? extends CRL> list = null;
+		try {
+			list = crls.getCRLs(selector);
+		} catch (CertStoreException e) {
+			_logger.warn("failed to get CRLs from CertStore", e);
+		}
+		if ((list != null) && !list.isEmpty()) {
+			_logger.debug("found a set of CRLs for this cert.");
+			for (CRL crl : list) {
+				_logger.debug("checking with crl: " + crl.toString());
+				if (crl.isRevoked(cert)) return true;
+			}
+		}
+		
+		return false;
+	}
+
+	/**
+	 * returns true if the certificate chain has been revoked.  false is returned if the certificate has not been revoked or if its CRL was not found.
+	 */
+	static public boolean isCertChainRevoked(CertStore crls, X509Certificate[] certs)
+	{
+		for (X509Certificate cert : certs) {
+			boolean revoked = isCertRevoked(crls, cert);
+			if (revoked) return true;  // bad news, this one was revoked.
+		}		
+		return false;
 	}
 
 	static public KeyStore createTrustStoreFromCertificates(String proposedTrustStoreType, String password,
 		List<Certificate> certificateList)
 	{
-
 		KeyStore trustStore = null;
 		char[] trustStorePassword = (password == null) ? "genesisII".toCharArray() : password.toCharArray();
 

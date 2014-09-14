@@ -3,7 +3,7 @@
 # varying portion for platform.
 export PLATFORM_ARCH=i586
 export PLATFORM_BITSIZE=32
-export BUILD_FLAGS=
+export BUILD_FLAGS='-Dbuild.targetArch=32'
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 

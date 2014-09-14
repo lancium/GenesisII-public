@@ -99,7 +99,7 @@ function create_bootstrap_signing_certificate()
   check_if_failed "generating base of CA keypair"
 
   # now create the real signing certificate, with full CA apparel.
-  create_certificate_using_CA "$UBER_CA_PFX" "$CA_PASSWORD" "$UBER_CA_ALIAS" "$CA_PFX" "$CA_PASSWORD" "$CA_ALIAS" "skynet"
+  create_pfx_using_CA "$UBER_CA_PFX" "$CA_PASSWORD" "$UBER_CA_ALIAS" "$CA_PFX" "$CA_PASSWORD" "$CA_ALIAS" "skynet"
   check_if_failed "generating signing keypair"
 }
 
@@ -123,14 +123,27 @@ function create_bootstrap_trusted_pfx()
   done
 }
 
+# creates the certificate file in DER format from a given PFX file.
+# parameters are: (1) certificate file to create. (2) pfx file to use as source.
+# (3) password for pfx file. (4) keypair alias within PFX file.
+function create_certificate_from_pfx()
+{
+  local cert_file="$1"; shift
+  local PFX="$1"; shift
+  local PASS="$1"; shift
+  local ALIAS="$1"; shift
+  run_any_command $JAVA_HOME/bin/keytool -export "-file '$cert_file'" "-keystore '$PFX'" "-storepass '$PASS'" "-alias '$ALIAS'" -storetype PKCS12
+  check_if_failed "generating certificate file $cert_file for $PFX"
+}
+
 # creates a new certificate based on an existing CA in pkcs12 format.
 # 1) pfx file to use as CA, 2) password for CA pfx, 3) alias for the ca key-pair,
 # 4) pfx file to generate, 5) password for new pfx, 6) alias for new key-pair,
 # 7) common name entry for new key-pair (CN).
-function create_certificate_using_CA()
+function create_pfx_using_CA()
 {
   if [ $# -lt 7 ]; then
-    echo "create_certificate_using_CA needs 7 parameters: the pfx file with the CA keypair,"
+    echo "create_pfx_using_CA needs 7 parameters: the pfx file with the CA keypair,"
     echo "the password for that file, the alias for the CA pfx, the new pfx file"
     echo "to generate using the CA, the password for the new pfx containing the new"
     echo "keypair, the alias for the new pfx, and the CN (common name) entry for the"
@@ -155,8 +168,9 @@ function create_certificate_using_CA()
   check_if_failed "generating $NEW_PFX from $THE_CA_PFX"
   # and create its certificate file.
   local cert_file="$(dirname "$NEW_PFX")/$(basename "$NEW_PFX" ".pfx").cer"
-  run_any_command $JAVA_HOME/bin/keytool -export "-file '$cert_file'" "-keystore '$NEW_PFX'" "-storepass '$NEW_PASS'" "-alias '$NEW_ALIAS'" -storetype PKCS12
-  check_if_failed "generating certificate file $cert_file for $NEW_PFX"
+  create_certificate_from_pfx "$cert_file" "$NEW_PFX" "$NEW_PASS" "$NEW_ALIAS"
+#  run_any_command $JAVA_HOME/bin/keytool -export "-file '$cert_file'" "-keystore '$NEW_PFX'" "-storepass '$NEW_PASS'" "-alias '$NEW_ALIAS'" -storetype PKCS12
+#  check_if_failed "generating certificate file $cert_file for $NEW_PFX"
 }
 
 ##############
@@ -184,6 +198,7 @@ function create_grid_certificates()
   # clean up any existing certificates.
   \rm -f "$SECURITY_DIR"/*.pfx "$SECURITY_DIR"/*.cer
 
+#this should no longer be needed!
   # fix the patch certificate, which doesn't exist yet, and the app-url.
   sed -i -e 's/^\(edu.virginia.vcgr.appwatcher.patch-signer-certificate.0=.*\)/#\1/' -e 's/^\(edu.virginia.vcgr.appwatcher.application-url.0=.*\)/#\1/' ext/genii-base-application.properties
   check_if_failed "patching application properties for bootstrap"
@@ -193,7 +208,7 @@ function create_grid_certificates()
   check_if_failed "creating a signing certificate for bootstrap"
 
   # create the admin certificate.
-  create_certificate_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" "$ADMIN_PFX" "$ADMIN_PASSWD" skynet "skynet admin"
+  create_pfx_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" "$ADMIN_PFX" "$ADMIN_PASSWD" skynet "skynet admin"
   check_if_failed "creating skynet admin certificate using CA"
   cp "$ADMIN_CER" "$SECURITY_DIR/default-owners/admin.cer"
   check_if_failed "copying admin certificate into default-owners"
@@ -202,7 +217,7 @@ function create_grid_certificates()
   cp "$ADMIN_CER" "$SECURITY_DIR/default-owners/owner.cer"
   check_if_failed "copying admin certificate as owner.cer in default-owners"
 
-  create_certificate_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" "$SECURITY_DIR/tls-cert.pfx" tilly tls-cert "TLS certificate"
+  create_pfx_using_CA "$SIGNING_PFX" "$SIGNING_PASSWD" "$SIGNING_ALIAS" "$SECURITY_DIR/tls-cert.pfx" tilly tls-cert "TLS certificate"
   check_if_failed "creating TLS certificate using CA"
 
   create_bootstrap_trusted_pfx "$SECURITY_DIR"
@@ -297,19 +312,15 @@ onerror admin chmod for $HOMES_LOC/* failed."
     if [ ! -z "$queue_perms" ]; then
       local QUEUE_CMDS="\n\
 echo working on queue holding area.\n\
-chmod \"$QUEUES_LOC\" +rwx $userpath\n\
-onerror admin chmod for $QUEUES_LOC failed.\n\
-chmod $QUEUES_LOC/* +rwx $userpath\n\
-onerror admin chmod for $QUEUES_LOC/* failed."
+chmod -R \"$QUEUES_LOC\" +rwx $userpath\n\
+onerror admin chmod for $QUEUES_LOC failed."
     fi
 
     if [ ! -z "$bes_perms" ]; then
       local BES_CMDS="\n\
 echo working on bes holding area.\n\
-chmod \"$BES_CONTAINERS_LOC\" +rwx $userpath\n\
-onerror admin chmod for $BES_CONTAINERS_LOC failed.\n\
-chmod $BES_CONTAINERS_LOC/* +rwx $userpath\n\
-onerror admin chmod for $BES_CONTAINERS_LOC/* failed."
+chmod -R \"$BES_CONTAINERS_LOC\" +rwx $userpath\n\
+onerror admin chmod for $BES_CONTAINERS_LOC failed."
     fi
   fi  # if xcg namespace.
 
@@ -338,6 +349,8 @@ echo end of admin privileges procedure." >"$FULL_COMMAND_SET"
 
   multi_grid <"$FULL_COMMAND_SET"
   check_if_failed "Administrative steps failed for $userpath"
+
+  rm "$FULL_COMMAND_SET"
 }
 
 ##############

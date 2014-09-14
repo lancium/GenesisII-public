@@ -31,7 +31,7 @@ Building from tar bundle:
     ant -Dbuild.targetArch=64 build
 
   Peforming a build for 32-bit version:
-    ant build
+    ant -Dbuild.targetArch=32 build
 
 More information:
 

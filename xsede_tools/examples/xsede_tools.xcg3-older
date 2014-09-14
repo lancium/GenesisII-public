@@ -47,7 +47,7 @@ QUEUE_NAME=grid-queue
 # namespace type has /containers at the top-level, and the xsede namespace
 # type has a /resources folder with many intermediate hierarchies for
 # containers, queues and so forth.
-#NAMESPACE=xcg
+NAMESPACE=xcg
 #NAMESPACE=xsede
 
 # The folderspace variable is a parameter used within all paths in the grid.
@@ -115,7 +115,7 @@ QUEUE_PATH=/queues/grid-queue-xcg3
 
 # The group which has rights to submit jobs on the queue, plus possibly the
 # right to use any BES hooked to the queue.
-SUBMIT_GROUP=/groups/uva-idp-group-2
+SUBMIT_GROUP=/groups/uva-idp-group
 
 # This specifies what type of BES to test.  the options are either "Genesis"
 # or "Unicore" currently.

@@ -368,10 +368,13 @@ public class AttributeCacheHandler2
 	{
 		if (attributes != null) {
 			for (MessageElement element : attributes) {
-//				if (element.getValue() != null) 
-//hmmm: CAK: postponing problematic change for now.
-
-CacheManager.putItemInCache(target, element.getQName(), element);
+				try {
+					if (element.getAsDOM().getChildNodes().getLength() != 0) {
+						CacheManager.putItemInCache(target, element.getQName(), element);
+					}
+				} catch (Exception e) {
+					_logger.debug("error occurred while calling getAsDom before caching.", e);
+				}
 			}
 		}
 	}
