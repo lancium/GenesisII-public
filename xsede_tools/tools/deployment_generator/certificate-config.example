@@ -1,4 +1,6 @@
 # These certificate elements should be changed to appropriate values.
+# The DN generated from these fields will be used for the grid's resource
+# signing certificate.
 
 # C is country.
 C="US"
@@ -9,5 +11,5 @@ L="Charlottesville"
 # O is organization.
 O="University of Virginia"
 # OU is organizational unit, e.g. department.
-OU="Genesis II"
+OU="GFFS Grid"
 
