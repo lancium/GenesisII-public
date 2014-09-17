@@ -54,6 +54,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 	private Double _totalPhysicalMemory = null;
 	private Double _wallclockTimeLimit = null;
 	private Double _totalCPUCount = null;
+	private Double _individualCPUCount = null;
 
 	private ApplicationUnderstanding _application = null;
 
@@ -166,6 +167,16 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 	public void setTotalCPUCount(Double totalCPUCount)
 	{
 		_totalCPUCount = totalCPUCount;
+	}
+
+	public Double getIndividualCPUCount()
+	{
+		return _individualCPUCount;
+	}
+
+	public void setIndividualCPUCount(Double individualCPUCount)
+	{
+		_individualCPUCount = individualCPUCount;
 	}
 
 	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties) throws JSDLException

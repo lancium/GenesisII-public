@@ -61,4 +61,10 @@ public class CommonResourcesFacet extends DefaultResourcesFacet
 	{
 		((CommonExecutionUnderstanding) currentUnderstanding).setTotalCPUCount(totalCPUCount.describe().getUpperBound());
 	}
+
+	@Override
+	public void consumeIndividualCPUCount(Object currentUnderstanding, RangeExpression individualCPUCount) throws JSDLException
+	{
+		((CommonExecutionUnderstanding) currentUnderstanding).setIndividualCPUCount(individualCPUCount.describe().getUpperBound());
+	}
 }
