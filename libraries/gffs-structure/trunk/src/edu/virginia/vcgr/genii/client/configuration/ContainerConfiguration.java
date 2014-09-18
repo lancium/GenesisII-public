@@ -142,7 +142,7 @@ public class ContainerConfiguration
 		String notSize = props.getProperty(_NOTIFICATION_POOL_SIZE, _NOTIFICATION_POOL_SIZE_DEFAULT);
 		_notificationPoolSize = Integer.parseInt(notSize);
 	}
-
+	
 	// returns the container TLS certificate for outgoing connections.
 	public static CertEntry getContainerTLSCert()
 	{
