@@ -49,12 +49,12 @@ export GENII_USER_DIR="$SCRIPT_TOP/genesis_user_dir"
 export BACKUP_USER_DIR="$SCRIPT_TOP/genesis_secondary_dir"
 export GENII_INSTALL_DIR="$SCRIPT_TOP/genesis_build"
 export NON_INTERACTIVE=true
-if [ -z "$JAVA_HOME" ]; then
-  echo The JAVA_HOME variable is not set, and this is required for proper
-  echo operation of the bootstrap process.  Please point this variable at
-  echo the local Java installation.
-  exit 3
-fi
+#if [ -z "$JAVA_HOME" ]; then
+#  echo The JAVA_HOME variable is not set, and this is required for proper
+#  echo operation of the bootstrap process.  Please point this variable at
+#  echo the local Java installation.
+#  exit 3
+#fi
 
 ##############
 
@@ -72,10 +72,7 @@ function bail_on_fail()
 
 # need to fix up an input file to use for all our testing.
 
-INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/xsede_tools.jenkins-xcg"
-if [ "$NAMESPACE" == "xsede" ]; then
-  INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/xsede_tools.jenkins-xsede"
-fi
+INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/xsede_tools.jenkins-xsede"
 
 # give the build an input file it can use.  this one relies on our having set
 # the crucial variables beforehand in the code above; they will percolate down

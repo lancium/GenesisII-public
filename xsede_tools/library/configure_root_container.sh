@@ -67,16 +67,17 @@ echo "Cleaning out user directory '$GENII_USER_DIR'"
 bash "$XSEDE_TEST_ROOT/library/zap_genesis_javas.sh"
 \rm -rf "$GENII_USER_DIR" "$XSEDE_TEST_ROOT/"*.log "$XSEDE_TEST_ROOT/"*.log.*
 
-if [ $NAMESPACE == 'xsede' ]; then
-  echo Copying xsede namespace properties into place.
-  cp "$DEPLOYMENTS_ROOT/default/configuration/xsede-namespace.properties" "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/namespace.properties"
-elif [ $NAMESPACE == 'xcg' ]; then
-  echo Copying xcg namespace properties into place.
-  cp "$DEPLOYMENTS_ROOT/default/configuration/xcg-namespace.properties" "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/namespace.properties"
-else
-  echo "Unknown namespace type--the NAMESPACE variable is unset or unknown"
-  exit 1
+namespace_file="$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/namespace.properties"
+echo Copying namespace properties into place.
+cp "$DEPLOYMENTS_ROOT/default/configuration/template-namespace.properties" "$namespace_file"
+
+if [ -z "$FOLDERSPACE" ]; then
+  echo "No FOLDERSPACE variable defined; defaulting to 'xsede.org'"
+  export FOLDERSPACE="xsede.org"
 fi
+
+replace_phrase_in_file "$namespace_file" "FOLDERSPACE" "$FOLDERSPACE"
+check_if_failed "fixing namespace properties for folderspace variable"
 
 ##############
 

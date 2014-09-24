@@ -24,4 +24,9 @@ public interface CertificateValidator
 	 * Verifies that the certificate is found rooted in the specified trust store.
 	 */
 	public boolean validateTrustedByKeystore(X509Certificate[] certChain, KeyStore store);
+	
+	/**
+	 * Required for communicating the grid-certificates directory to pattern-based trust stores.
+	 */
+	public String getGridCertificatesDir();
 }

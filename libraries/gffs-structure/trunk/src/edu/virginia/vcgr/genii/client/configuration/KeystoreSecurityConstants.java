@@ -15,6 +15,9 @@ public interface KeystoreSecurityConstants
 			"edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-type";
 		static public final String RESOURCE_IDENTITY_TRUST_STORE_PASSWORD_PROP =
 			"edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-password";
+		static public final String RESOURCE_TRUSTED_CERTIFICATES_LOCATION_PROP =
+			"edu.virginia.vcgr.genii.client.security.resource-identity.trusted-certificates.location";
+		
 		static public final String SSL_TRUST_STORE_LOCATION_PROP =
 			"edu.virginia.vcgr.genii.client.security.ssl.trust-store-location";
 		static public final String SSL_TRUST_STORE_TYPE_PROP = "edu.virginia.vcgr.genii.client.security.ssl.trust-store-type";
@@ -22,6 +25,8 @@ public interface KeystoreSecurityConstants
 			"edu.virginia.vcgr.genii.client.security.ssl.trust-store-password";
 		static public final String SSL_TRUSTED_CERTIFICATES_LOCATION_PROP =
 			"edu.virginia.vcgr.genii.client.security.ssl.trusted-certificates.location";
+		static public final String SSL_GRID_CERTIFICATES_LOCATION_PROP =
+			"edu.virginia.vcgr.genii.client.security.ssl.grid-certificates.location";
 		static public final String MYPROXY_CERTIFICATES_LOCATION_PROP =
 			"edu.virginia.vcgr.genii.client.security.ssl.myproxy-certificates.location";
 	}

@@ -47,13 +47,21 @@ if [ -z "$XSEDE_TEST_SENTINEL" ]; then
   source ../../prepare_tools.sh ../../prepare_tools.sh 
 fi
 
-source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
+#source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
+source "$XSEDE_TEST_ROOT/library/helper_methods.sh"
 
 # The mirror container needs to be linked in at the MIRRORPATH:
 $GENII_INSTALL_DIR/grid ln \
   --service-url=https://${replica_host}:${replica_port}/axis/services/VCGRContainerPortType \
   $MIRRORPATH 
 check_if_failed "Linking replica container into place at $MIRRORPATH"
+
+MIRROR_CHK_FILE="$(mktemp $TEST_TEMP/mirror-container-listing.XXXXXX)"
+$GENII_INSTALL_DIR/grid ls $MIRRORPATH >"$MIRROR_CHK_FILE"
+check_if_failed "Listing contents under $MIRRORPATH"
+grep "Services" "$MIRROR_CHK_FILE"
+check_if_failed "Testing container at $MIRRORPATH; container does not seem to be running!"
+rm "$MIRROR_CHK_FILE"
 
 # Give access to the rootResolver to everyone.
 $GENII_INSTALL_DIR/grid chmod $MIRRORPATH/Services/GeniiResolverPortType \
@@ -75,7 +83,7 @@ $GENII_INSTALL_DIR/grid resolver / /etc/resolvers/rootResolver
 check_if_failed "Adding a resolver to root of RNS"
 
 # Test that the resolver was added properly:
-RESOLVER_TMP_FILE="$(mktemp /tmp/gffs-resolver-output.XXXXXX)"
+RESOLVER_TMP_FILE="$(mktemp $TEST_TEMP/gffs-resolver-output.XXXXXX)"
 $GENII_INSTALL_DIR/grid resolver -q / >"$RESOLVER_TMP_FILE"
 check_if_failed "Testing resolver for root"
 echo Resolver information for root:
@@ -88,6 +96,7 @@ if [ ! -s "$RESOLVER_TMP_FILE" ]; then
   echo "restoring the root container from backup in order to try again."
   exit 1
 fi
+rm "$RESOLVER_TMP_FILE"
 
 # Register the top-level folders with the resolver.  This is a suggested
 # set for the XSEDE namespace definition.  Other folders can also be

@@ -3,6 +3,13 @@
 # Author: Chris Koeritz
 # Author: Vanamala Venkataswamy
 
+# we do not want to "exit" from this file at all, since it is used with the
+# bash source command and that will exit from the calling shell as well.
+# there is a variable below called BADNESS that indicates when errors
+# occurred during processing, and if it's not empty at the end of the script
+# then we will not set the test sentinel variable which other scripts
+# check.
+
 # make sure whether they have defined the top-level location for us.
 if [ ! -z "$1" ]; then
   # first attempt is to use the first parameter, if one is provided.  this should
@@ -33,6 +40,8 @@ GRITTY_TESTING_TOP_LEVEL="$(echo "$GRITTY_TESTING_TOP_LEVEL" | sed -e 's/\/cygdr
 # the top-level directory for tests, i.e. the root of testing hierarchy.
 export XSEDE_TEST_ROOT="$GRITTY_TESTING_TOP_LEVEL"
 
+source "$XSEDE_TEST_ROOT/library/helper_methods.sh"
+
 # where the shunit library resides.
 export SHUNIT_DIR="$XSEDE_TEST_ROOT/shunit"
 
@@ -61,25 +70,25 @@ if [ ! -d "$GENERATED_JSDL_FOLDER" ]; then
   mkdir -p "$GENERATED_JSDL_FOLDER"
 fi
 
-# this is the main source of parameters for the tests.
-export XSEDE_TOOLS_CONFIG_FILE
-if [ -z "$XSEDE_TOOLS_CONFIG_FILE" ]; then
-  # old default is used first if we don't have a setting for the config file.
-  XSEDE_TOOLS_CONFIG_FILE="$XSEDE_TEST_ROOT/inputfile.txt"
-fi
-if [ ! -f "$XSEDE_TOOLS_CONFIG_FILE" ]; then
-  # newer more rational config file name which also matches well with our
-  # environment variable...  but this file must exist or we're stumped.
-  XSEDE_TOOLS_CONFIG_FILE="$XSEDE_TEST_ROOT/xsede_tools.cfg"
-fi
-if [ ! -f "$XSEDE_TOOLS_CONFIG_FILE" -a -z "$BADNESS" ]; then
-  echo "----"
-  echo "This script requires that you prepare a customized file in:"
-  echo "    $XSEDE_TOOLS_CONFIG_FILE"
-  echo "with the details of your grid installation.  There are some example"
-  echo "config files in the folder '$XSEDE_TEST_ROOT/examples'."
-  BADNESS=true
-fi
+## this is the main source of parameters for the tests.
+#export XSEDE_TOOLS_CONFIG_FILE
+#if [ -z "$XSEDE_TOOLS_CONFIG_FILE" ]; then
+#  # old default is used first if we don't have a setting for the config file.
+#  XSEDE_TOOLS_CONFIG_FILE="$XSEDE_TEST_ROOT/inputfile.txt"
+#fi
+#if [ ! -f "$XSEDE_TOOLS_CONFIG_FILE" ]; then
+#  # newer more rational config file name which also matches well with our
+#  # environment variable...  but this file must exist or we're stumped.
+#  XSEDE_TOOLS_CONFIG_FILE="$XSEDE_TEST_ROOT/xsede_tools.cfg"
+#fi
+#if [ ! -f "$XSEDE_TOOLS_CONFIG_FILE" -a -z "$BADNESS" ]; then
+#  echo "----"
+#  echo "This script requires that you prepare a customized file in:"
+#  echo "    $XSEDE_TOOLS_CONFIG_FILE"
+#  echo "with the details of your grid installation.  There are some example"
+#  echo "config files in the folder '$XSEDE_TEST_ROOT/examples'."
+#  BADNESS=true
+#fi
 
 # uncomment this to enable extra output.
 export DEBUGGING=true
@@ -111,22 +120,6 @@ if [ -z "$NO_SUBSHELL" -a -z "$BADNESS" ]; then
   # sourced into a current environment.
   bash
 fi
-
-# displays the value of a variable in bash friendly format.
-# (donated by the feisty meow scripts at http://feistymeow.org)
-function var() {
-  while true; do
-    local varname="$1"; shift
-    if [ -z "$varname" ]; then
-      break
-    fi
-    if [ -z "${!varname}" ]; then
-      echo "$varname undefined"
-    else
-      echo "$varname=${!varname}"
-    fi
-  done
-}
 
 if [ ! -z "$BADNESS" ]; then
   echo

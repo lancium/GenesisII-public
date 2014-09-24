@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -15,9 +16,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.certGenerator.CertificateChainType;
+import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
@@ -77,8 +78,153 @@ public class KeystoreManager
 			if (_resourceTrustStore != null) {
 				return _resourceTrustStore;
 			}
+
+			KeyStore trustStore = null;
+
+			{
+				// first get the resource trust store file.
+				trustStore = loadResourceTrustStoreFromFile();
+			}
+
+			Security sslProps = getSSLProperties();
+
+			String trustStoreType =
+				sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
+					KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
+
+			{
+				// load the local certificates from the state directory. this is the only place those are found.
+				File localCertsDir = new File(InstallationProperties.getUserDir() + "/local-certificates");
+				trustStore = addCertificatesToKeystore(trustStore, localCertsDir, "local-certificates", trustStoreType);
+			}
+			
+			{
+				// load the trusted-certificates from the deployment, which is the only place these live.
+				String trustedCertificatesDirectory =
+					sslProps.getProperty(KeystoreSecurityConstants.Client.RESOURCE_TRUSTED_CERTIFICATES_LOCATION_PROP);
+				if (trustedCertificatesDirectory != null) {
+					File trustedCertsDir =
+						Installation.getDeployment(new DeploymentName()).security()
+							.getSecurityFile(trustedCertificatesDirectory);
+					trustStore = addCertificatesToKeystore(trustStore, trustedCertsDir, "trusted-certificates", trustStoreType);
+				}
+			}
+
+			if (trustStore == null) {
+				String msg =
+					"Complete failure to load resource trust store from file and no trusted certificates directories were found.";
+				_logger.warn(msg);
+				throw new SecurityException(msg);
+			}
+
+			_resourceTrustStore = trustStore;
+
+			if (_logger.isDebugEnabled()) {
+				_logger.debug("trust store for resources:\n" + SecurityUtilities.showTrustStore(trustStore));
+			}
+
+			return _resourceTrustStore;
+		}
+	}
+	
+	/**
+	 * returns the folder where we should load the grid-certificates, which should provide *.r0 files for CRL lists.
+	 */
+	static public String getGridCertsDir()
+	{
+		Security sslProps = getSSLProperties();
+
+		// if grid certs dir is absolute path, then we don't allow an override, as the host should be
+		// providing the CRL repository and that directory should be kept up to date.
+		String gridCertificatesDirectory =
+			sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_GRID_CERTIFICATES_LOCATION_PROP);
+		if (gridCertificatesDirectory== null) {
+			_logger.warn("no grid-certificates folder listed for property: " + KeystoreSecurityConstants.Client.SSL_GRID_CERTIFICATES_LOCATION_PROP );
+			return null;
+		}
+		boolean absolutePath = gridCertificatesDirectory.startsWith("/");
+		// if not an absolute path in config, then load the grid certificates from grid-certificates 
+		// in the state directory first, if that exists.  otherwise try loading it from the deployment.
+		String localGridCerts = InstallationProperties.getUserDir() + "/grid-certificates";
+		File gridCertsDir = new File(localGridCerts);
+		if (absolutePath || !gridCertsDir.isDirectory()) {
+			return Installation.getDeployment(new DeploymentName()).security()
+					.getSecurityFile(gridCertificatesDirectory).getAbsolutePath();
+		} else {
+			return localGridCerts;
 		}
 
+	}
+
+	/**
+	 * Creates a KeyStore for use in verifying container TLS identities.
+	 */
+	static public KeyStore getTlsTrustStore()
+	{
+		synchronized (_trustLock) {
+			if (_tlsTrustStore != null) {
+				return _tlsTrustStore;
+			}
+
+			Security sslProps = getSSLProperties();
+
+			KeyStore trustStore = null;
+			try {
+				trustStore = loadTLSTrustStoreFile();
+
+				String trustStoreType =
+					sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
+						KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
+
+				{
+					// load the local certificates from the state directory. this is the only place those are found.
+					File localCertsDir = new File(InstallationProperties.getUserDir() + "/local-certificates");
+					trustStore = addCertificatesToKeystore(trustStore, localCertsDir, "local-certificates", trustStoreType);
+				}
+
+				{
+					// load the trusted-certificates from the deployment, which is the only place these live.
+					String trustedCertificatesDirectory =
+						sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUSTED_CERTIFICATES_LOCATION_PROP);
+					if (trustedCertificatesDirectory != null) {
+						File trustedCertsDir =
+							Installation.getDeployment(new DeploymentName()).security()
+								.getSecurityFile(trustedCertificatesDirectory);
+						trustStore =
+							addCertificatesToKeystore(trustStore, trustedCertsDir, "trusted-certificates", trustStoreType);
+					}
+				}
+
+				{
+					// load the grid-wide certificates, which is where we support loading CRL lists also.
+					String gridCertificatesDirectory = getGridCertsDir();
+					if (gridCertificatesDirectory != null) {
+						File gridCertsDir = new File(gridCertificatesDirectory);
+						trustStore = addCertificatesToKeystore(trustStore, gridCertsDir, "grid-certificates", trustStoreType);
+					}
+				}
+
+			} catch (Exception ex) {
+				_logger.info("exception occurred in KeystoreManager notifyUnloaded while loading trust store", ex);
+			}
+
+			if (trustStore == null) {
+				String msg =
+					"Complete failure to load TLS trust store from file and no trusted certificates directories were found.";
+				_logger.warn(msg);
+				throw new SecurityException(msg);
+			}
+
+			_tlsTrustStore = trustStore;
+			if (_logger.isDebugEnabled()) {
+				_logger.debug("trust store for tls:\n" + SecurityUtilities.showTrustStore(trustStore));
+			}
+		}
+		return _tlsTrustStore;
+	}
+
+	static public KeyStore loadResourceTrustStoreFromFile() throws AuthZSecurityException
+	{
 		KeyStore trustStore = null;
 		try {
 			Security security = Installation.getDeployment(new DeploymentName()).security();
@@ -107,96 +253,95 @@ public class KeystoreManager
 			}
 		} catch (GeneralSecurityException e) {
 			throw new AuthZSecurityException("Could not load TrustManager: " + e.getLocalizedMessage(), e);
-		} catch (ConfigurationException e) {
-			throw new AuthZSecurityException("Could not load TrustManager: " + e.getMessage(), e);
+			// } catch (ConfigurationException e) {
+			// throw new AuthZSecurityException("Could not load TrustManager: " + e.getMessage(), e);
 		} catch (IOException e) {
 			throw new AuthZSecurityException("Could not load TrustManager: " + e.getMessage(), e);
 		}
-		if (_logger.isTraceEnabled()) {
-			_logger.trace("trust store for resources:\n" + SecurityUtilities.showTrustStore(trustStore));
-		}
+
 		return trustStore;
+
 	}
 
-	/**
-	 * Creates a KeyStore for use in verifying container TLS identities.
-	 */
-	static public KeyStore getTlsTrustStore()
+	static public KeyStore addCertificatesToKeystore(KeyStore ks, File certDirectory, String prefix, String trustStoreType)
 	{
-		synchronized (_trustLock) {
-			if (_tlsTrustStore != null) {
-				return _tlsTrustStore;
+		// counter for giving unique names to certificates in combined trust store.
+		int certificateIndex = 1;
+
+		if (ks != null) {
+			// always number past any possible existing number.
+			try {
+				certificateIndex = ks.size() + 1;
+			} catch (KeyStoreException e) {
+				_logger.warn("failed to test size of existing keystore file", e);
 			}
 		}
+
+		if (!certDirectory.isDirectory()) {
+			// no change.
+			return ks;
+		}
+
+		// Security sslProps = getSSLProperties();
+
+		try {
+			_logger.debug("found " + prefix + " certs folder in: " + certDirectory);
+			List<Certificate> certificateList = SecurityUtilities.loadCertificatesFromDirectory(certDirectory);
+			if (certificateList != null && !certificateList.isEmpty()) {
+				if (ks == null) {
+					// String trustStoreLoc =
+					// sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_LOCATION_PROP);
+					// String trustStoreType =
+					// sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
+					// KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
+					// String trustStorePass =
+					// sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_PASSWORD_PROP);
+
+					ks = SecurityUtilities.createTrustStoreFromCertificates(trustStoreType, null, certificateList);
+				} else {
+					for (Certificate certificate : certificateList) {
+						final String alias = prefix + "_" + certificateIndex;
+						ks.setCertificateEntry(alias, certificate);
+						certificateIndex++;
+					}
+				}
+			}
+		} catch (Throwable cause) {
+			_logger.warn("Trust store failed to load local certificates from directory: " + certDirectory, cause);
+		}
+		return ks;
+	}
+
+	static public KeyStore loadTLSTrustStoreFile()
+	{
+		Security sslProps = getSSLProperties();
+
+		// open the trust store file.
+		String trustStoreLoc = sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_LOCATION_PROP);
+		String trustStoreType =
+			sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
+				KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
+		String trustStorePass = sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_PASSWORD_PROP);
 
 		KeyStore trustStore = null;
-		try {
-			// open the trust store and init the trust manager factory, if possible
-			Security sslProps = getSSLProperties();
 
-			String trustStoreLoc = sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_LOCATION_PROP);
-			String trustStoreType =
-				sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
-					KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
-			String trustStorePass = sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_PASSWORD_PROP);
-
-			char[] trustStorePassChars = null;
-			if (trustStorePass != null) {
-				trustStorePassChars = trustStorePass.toCharArray();
-			}
-
-			if (trustStoreLoc != null) {
-				try {
-					trustStore =
-						CertTool.openStoreDirectPath(Installation.getDeployment(new DeploymentName()).security()
-							.getSecurityFile(trustStoreLoc), trustStoreType, trustStorePassChars);
-				} catch (Throwable cause) {
-					_logger.warn("Trust store failed to load from file " + trustStoreLoc
-						+ "; will attempt to load trusted certificates from directory.", cause);
-				}
-			}
-
-			String trustedCertificatesDirectory =
-				sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUSTED_CERTIFICATES_LOCATION_PROP);
-			if (trustedCertificatesDirectory == null) {
-				if (trustStore == null) {
-					_logger.warn("Complete failure to load trust store from file and no trusted certificate directory is set.");
-				}
-			} else {
-				try {
-					File certificatesDirectory =
-						Installation.getDeployment(new DeploymentName()).security()
-							.getSecurityFile(trustedCertificatesDirectory);
-					_logger.debug("resolved trusted-certificates folder as: " + certificatesDirectory);
-					List<Certificate> certificateList = SecurityUtilities.loadCertificatesFromDirectory(certificatesDirectory);
-					if (certificateList != null && !certificateList.isEmpty()) {
-						if (trustStore == null) {
-							trustStore =
-								SecurityUtilities.createTrustStoreFromCertificates(trustStoreType, trustStorePass,
-									certificateList);
-						} else {
-							int certificateIndex = 0;
-							for (Certificate certificate : certificateList) {
-								final String alias = "trusted_certificate_" + certificateIndex;
-								trustStore.setCertificateEntry(alias, certificate);
-								certificateIndex++;
-							}
-						}
-					}
-				} catch (Throwable cause) {
-					_logger.warn("Trust store failed to load trusted certificates from directory.", cause);
-				}
-			}
-		} catch (Exception ex) {
-			_logger.info("exception occurred in notifyUnloaded", ex);
+		char[] trustStorePassChars = null;
+		if (trustStorePass != null) {
+			trustStorePassChars = trustStorePass.toCharArray();
 		}
 
-		synchronized (_trustLock) {
-			_tlsTrustStore = trustStore;
+		if (trustStoreLoc != null) {
+			try {
+				trustStore =
+					CertTool.openStoreDirectPath(
+						Installation.getDeployment(new DeploymentName()).security().getSecurityFile(trustStoreLoc),
+						trustStoreType, trustStorePassChars);
+			} catch (Throwable cause) {
+				_logger.warn("Trust store failed to load from file " + trustStoreLoc
+					+ "; will attempt to load trusted certificates from directory.", cause);
+			}
 		}
-		if (_logger.isTraceEnabled()) {
-			_logger.trace("trust store for tls:\n" + SecurityUtilities.showTrustStore(trustStore));
-		}
+
 		return trustStore;
 	}
 
@@ -232,15 +377,13 @@ public class KeystoreManager
 
 			for (NuCredential cred : transientCredentials.getCredentials()) {
 				/*
-				 * If the cred is an Identity, then we simply add that identity to our identity
-				 * list.
+				 * If the cred is an Identity, then we simply add that identity to our identity list.
 				 */
 				if (cred instanceof Identity) {
 					ret.add((Identity) cred);
 				} else if (cred instanceof TrustCredential) {
 					/*
-					 * If the cred is a signed identity assertion, then we have to get the identity
-					 * out of the assertion.
+					 * If the cred is a signed identity assertion, then we have to get the identity out of the assertion.
 					 */
 					TrustCredential tc = (TrustCredential) cred;
 					X509Identity identityAttr = (X509Identity) tc.getRootIdentity();

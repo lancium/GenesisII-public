@@ -66,8 +66,8 @@ function print_instructions()
   echo "Those variables should be set and made persistent for the user account, or"
   echo "there will be problems finding the right settings to run the container."
   echo "This can be accomplished by, for example, adding the variables to ~/.profile"
-  echo "or ~/.bashrc like so:"
-  echo "   export GENII_INSTALL_DIR=/opt/genesis2"
+  echo "or ~/.bashrc like so (but using the actual install path):"
+  echo "   export GENII_INSTALL_DIR=/opt/genesis2-xsede"
   echo "Note that for the conversion process, the GENII_INSTALL_DIR should point"
   echo "at the _newer_ installation that has been installed by the administrator"
   echo "(and that install can be either interactive or RPM/DEB based)."
@@ -195,7 +195,9 @@ if [ ! -f "$INSTALLER_FILE" ]; then
 fi
 
 # stop any running container to be sure we aren't changing config
-# items while it's running.
+# items while it's running.  this is a bit duplicative because we're trying
+# to support converting a container where the install might be different
+# but could actually be an already upgraded folder in the same place.
 echo "Stopping any existing container before configuration proceeds..."
 if [ -d "$WRAPPER_DIR" ]; then
   # if the wrapper dir exists already, we need to whack it so we can have
@@ -212,12 +214,14 @@ fi
 if [ -f "$GENII_INSTALL_DIR/XCGContainer" ]; then
   "$GENII_INSTALL_DIR/XCGContainer" stop
   # clean up this older file.
-  \rm "$GENII_INSTALL_DIR/XCGContainer"
+  \mv "$GENII_INSTALL_DIR/XCGContainer" "$GENII_INSTALL_DIR/XCGContainer.old"
   tried_stopping=true
 fi
 
 ##############
-# swap back to old installation to try its stop methods.
+# swap back to old installation to try its stop methods.  we switch the
+# GENII_INSTALL_DIR variable to support the older install's scripts trying
+# to use it.
 holdInst="$GENII_INSTALL_DIR"
 export GENII_INSTALL_DIR="$OLD_INSTALL"
 if [ -f "$OLD_INSTALL/GFFSContainer" ]; then
@@ -227,7 +231,7 @@ fi
 if [ -f "$OLD_INSTALL/XCGContainer" ]; then
   "$OLD_INSTALL/XCGContainer" stop
   # clean up this older file.
-  \rm "$OLD_INSTALL/XCGContainer"
+  \mv "$OLD_INSTALL/XCGContainer" "$OLD_INSTALL/XCGContainer.old"
   tried_stopping=true
 fi
 # and flip back to current day install.
@@ -438,6 +442,17 @@ if [ ! -z "$copy_deployments_folder" ]; then
   # fix the server config if it still has the old database connection pool.
   sed -i -e 's/\.DatabaseConnectionPool/.ServerDatabaseConnectionPool/' "$GENII_DEPLOYMENT_DIR/$new_dep/configuration/server-config.xml"
 
+  # add the new grid-certificates config line if it's not present.
+  grep -q "edu.virginia.vcgr.genii.client.security.ssl.grid-certificates.location" "$GENII_DEPLOYMENT_DIR/$new_dep/configuration/security.properties"
+  if [ $? -ne 0 ]; then
+    # the security properties are missing the newer grid-certificates dir, so add that config line.
+    echo "edu.virginia.vcgr.genii.client.security.ssl.grid-certificates.location=grid-certificates" >>"$GENII_DEPLOYMENT_DIR/$new_dep/configuration/security.properties"
+    if [ ! -d "$GENII_DEPLOYMENT_DIR/$new_dep/security/grid-certificates" ]; then
+      # create the referenced folder; it really shouldn't be there yet if config was missing.
+      mkdir "$GENII_DEPLOYMENT_DIR/$new_dep/security/grid-certificates"
+    fi
+  fi
+
 fi
 
 
@@ -580,6 +595,10 @@ echo "https://$CONTAINER_HOSTNAME_PROPERTY:$CONTAINER_PORT_PROPERTY/axis/service
 if [ -z "$copy_deployments_folder" ]; then
 
 # get the owner's certificate.
+echo "Copying admin certificate for container if exists..."
+cp "$OLD_DEPLOYMENT_DIR/$old_dep/security/admin.cer" "$LOCAL_CERTS_DIR/admin.cer" 2>/dev/null
+#don't care if it did not exist since it is optional.
+
 echo "Copying owner certificate for container..."
 cp "$OLD_DEPLOYMENT_DIR/$old_dep/security/owner.cer" "$LOCAL_CERTS_DIR/owner.cer" 2>/dev/null
 if [ $? -ne 0 ]; then
@@ -591,6 +610,13 @@ if [ $? -ne 0 ]; then
     echo "  $OLD_DEPLOYMENT_DIR/$old_dep/security/owner.cer"
     echo "or an admin certificate should be at:"
     echo "  $OLD_DEPLOYMENT_DIR/$old_dep/security/admin.cer"
+    exit 1
+  fi
+fi
+if [ ! -d "$LOCAL_CERTS_DIR/default-owners" ]; then
+  mkdir "$LOCAL_CERTS_DIR/default-owners"
+  if [ $? -ne 0 ]; then
+    echo "Failed to create the default-owners folder in the local certs dir."
     exit 1
   fi
 fi

@@ -4,14 +4,9 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.PKIXBuilderParameters;
-import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.util.Vector;
 
-import javax.net.ssl.CertPathTrustManagerParameters;
-import javax.net.ssl.ManagerFactoryParameters;
-import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.x500.X500Principal;
 
@@ -21,10 +16,12 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 
+import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.X500PrincipalUtilities;
 import edu.virginia.vcgr.genii.security.credentials.X509Identity;
 import edu.virginia.vcgr.genii.security.identity.Identity;
+import edu.virginia.vcgr.genii.security.x509.RevocationAwareTrustManager;
 
 /**
  * This ACL rule provides a chain of trust that callers must chain to, and, optionally, a pattern
@@ -53,7 +50,7 @@ public class X509PatternAclEntry implements AclEntry
 
 	// cache an X509 pattern upon first use.
 	transient protected X509Principal _bcPattern;
-
+	
 	public X509PatternAclEntry(X509Identity trustRoot, X500Principal userPattern)
 	{
 		_userPattern = userPattern;
@@ -83,13 +80,15 @@ public class X509PatternAclEntry implements AclEntry
 			ks.setCertificateEntry(trustedCert.getSubjectX500Principal().getName(), trustedCert);
 
 			// create a trust manager from the key store.
-			PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(ks, new X509CertSelector());
-			pkixParams.setRevocationEnabled(false);
-			ManagerFactoryParameters trustParams = new CertPathTrustManagerParameters(pkixParams);
+//			PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(ks, new X509CertSelector());
+//			pkixParams.setRevocationEnabled(false);
+//			ManagerFactoryParameters trustParams = new CertPathTrustManagerParameters(pkixParams);
 
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
-			tmf.init(trustParams);
-			_trustManagerJdk = (X509TrustManager) tmf.getTrustManagers()[0];
+//			TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+//			tmf.init(trustParams);
+//			_trustManagerJdk = (X509TrustManager) tmf.getTrustManagers()[0];
+			_trustManagerJdk = new RevocationAwareTrustManager(ks,
+				 CertificateValidatorFactory.getValidator().getGridCertificatesDir());
 		}
 //		if (_trustManagerCanl == null) {
 //			// create an in-memory cert keystore for the trusted certs.

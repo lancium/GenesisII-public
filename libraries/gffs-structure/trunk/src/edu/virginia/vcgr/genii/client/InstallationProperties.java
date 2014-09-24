@@ -168,8 +168,8 @@ public class InstallationProperties extends Properties
 		return HierarchicalDirectory.openRootHierarchicalDirectory(new File(prop + "/"
 			+ InstallationConstants.OWNER_CERTS_DIRECTORY_NAME));
 	}
-
-	public Identity getOwnerCertificate()
+	
+	public File getOwnerCertFile()
 	{
 		// hmmm: cache the owner certificate here, since it doesn't change at runtime.
 		HierarchicalDirectory dir = getLocalCertsDirectory();
@@ -190,13 +190,18 @@ public class InstallationProperties extends Properties
 			_logger.warn("no owner certificate; the list of files in the owners cert dir is empty.");
 			return null;
 		}
+		return found[0];
+	}
 
+	public Identity getOwnerCertificate()
+	{
+		File found = getOwnerCertFile();
+		if (found == null) return null;
 		if (_logger.isTraceEnabled())
-			_logger.trace("found owner cert at " + found[0].getAbsolutePath());
-		File file = found[0];
-		if (file.exists()) {
+			_logger.trace("found owner cert at " + found.getAbsolutePath());
+		if (found.exists()) {
 			try {
-				GeniiPath filePath = new GeniiPath("local:" + file.getAbsolutePath());
+				GeniiPath filePath = new GeniiPath("local:" + found.getAbsolutePath());
 				return AclAuthZClientTool.downloadIdentity(filePath);
 			} catch (Throwable cause) {
 				_logger.warn("Unable to get administrator certificate.", cause);

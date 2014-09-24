@@ -80,7 +80,7 @@ public class ApplicationBase
 		}
 		SecurityUtilities.initializeSecurity();
 
-		CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
+		CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore(), KeystoreManager.getGridCertsDir()));
 
 		GridEnvironment.loadGridEnvironment();
 

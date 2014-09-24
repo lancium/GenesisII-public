@@ -15,55 +15,8 @@ export GRID_TIMING_FILE="$TEST_TEMP/grid_times.log"
 
 ##############
 
-# the really basic helper functions...
-
-# prints an error message (from parameters) and exits if the previous command failed.
-function check_if_failed()
-{
-  if [ $? -ne 0 ]; then
-    echo Step failed: $*
-    exit 1
-  fi
-}
-
-# takes a first parameter that is the name for a combined error and output log,
-# and then runs all the other parameters as a command.
-function logged_command()
-{
-  local my_output="$1"; shift
-#  echo "logged_command args: $(printf -- "[%s] " "${@}")"
-  eval "${@}" >>"$my_output" 2>&1
-  local retval=$?
-  if [ $retval == 0 ]; then
-    # good so far, but check for more subtle ways of failing; if there is
-    # an occurrence of our fail message in the output, that also indicates
-    # the command did not succeed.
-    grep "\[FAILURE\]" $my_output
-    # we do not want to see that phrase in the log.
-    if [ $? != 0 ]; then
-      return 0  # fine exit, can ignore log.
-    fi
-  fi
-  if [[ ! "$my_output" =~ .*fuse_output.* ]]; then
-    # this was a failure, so we need to see the log.
-    # fuse errors currently don't count since they are multifarious.
-    cat "$my_output"
-  fi
-  return 1
-}
-
-# runs an arbitrary command.  if the command fails, then the output from it is
-# displayed and an error code is returned.  otherwise the output is discarded.
-function run_any_command()
-{
-  local my_output="$(mktemp $TEST_TEMP/grid_logs/out_run_any_cmd_$(date_string).XXXXXX)"
-  logged_command "$my_output" "${@}"
-  local retval=$?
-  # make the external version of the log file available.  if we're multiplexing users,
-  # this will be meaningless, which is why we used unique names above.
-  \cp -f "$my_output" "$GRID_OUTPUT_FILE"
-  return $retval
-}
+# pull in the really basic helper functions...
+source "$XSEDE_TEST_ROOT/library/helper_methods.sh"
 
 ##############
 
@@ -116,6 +69,28 @@ function sanity_test_and_init()
 
 ##############
 
+# this is the main source of parameters for the tests.
+export XSEDE_TOOLS_CONFIG_FILE
+if [ -z "$XSEDE_TOOLS_CONFIG_FILE" ]; then
+  # old default is used first if we don't have a setting for the config file.
+  XSEDE_TOOLS_CONFIG_FILE="$XSEDE_TEST_ROOT/inputfile.txt"
+fi
+if [ ! -f "$XSEDE_TOOLS_CONFIG_FILE" ]; then
+  # newer more rational config file name which also matches well with our
+  # environment variable...  but this file must exist or we're stumped.
+  XSEDE_TOOLS_CONFIG_FILE="$XSEDE_TEST_ROOT/xsede_tools.cfg"
+fi
+if [ ! -f "$XSEDE_TOOLS_CONFIG_FILE" -a -z "$BADNESS" ]; then
+  echo "----"
+  echo "This script requires that you prepare a customized file in:"
+  echo "    $XSEDE_TOOLS_CONFIG_FILE"
+  echo "with the details of your grid installation.  There are some example"
+  echo "config files in the folder '$XSEDE_TEST_ROOT/examples'."
+  BADNESS=true
+fi
+
+##############
+
 # read the config file and generate environment variables for all the entries.
 source "$XSEDE_TEST_ROOT/library/process_configuration.sh"
 define_and_export_variables
@@ -163,7 +138,6 @@ if [ -z "$NORMAL_ACCOUNT_PASSWD" ]; then NORMAL_ACCOUNT_PASSWD="FOOP"; fi
 
 # now that we have the environment set up, we can pull in all the functions
 # for working on the grid.
-source "$XSEDE_TEST_ROOT/library/helper_methods.sh"
 source "$XSEDE_TEST_ROOT/library/runner_functions.sh"
 source "$XSEDE_TEST_ROOT/library/generate_jsdl.sh"
 source "$XSEDE_TEST_ROOT/library/user_management.sh"

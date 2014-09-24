@@ -16,6 +16,26 @@ if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before t
 # otherwise load the rest of the tool environment.
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
+# otherwise load the rest of the tool environment.
+source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
+
+##############
+
+# must be in synch with generator methods value.
+DEPLOYMENT_MEMORY_FILE=saved-deployment-info.txt
+
+if [ ! -f $DEPLOYMENT_MEMORY_FILE ]; then
+  echo "This does not appear to be a valid deployment folder, because the file"
+  echo "'saved-deployment-info.txt' is missing."
+  exit 1
+fi
+
+# get the variables we need to know about the deployment.
+source $DEPLOYMENT_MEMORY_FILE
+
+# build some variables we'll need for finding things.
+DEP_DIR="$GENII_INSTALL_DIR/deployments/$DEP_NAME"
+
 ####
 
 function date_stringer() 
@@ -31,7 +51,7 @@ function date_stringer()
 ARCHIVE_NAME=$HOME/deployment_archive_with_keypairs_$(date_stringer).tar
 
 pushd ..
-tar -rf $ARCHIVE_NAME deployment_generator "$GENII_INSTALL_DIR/context.xml" --exclude=".svn"
+tar -rf $ARCHIVE_NAME deployment_generator "$GENII_INSTALL_DIR/context.xml" "$DEP_DIR" --exclude=".svn"
 if [ $? -ne 0 ]; then
   echo Failed to pack the deployment archive.
   exit 1

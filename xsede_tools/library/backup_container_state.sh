@@ -15,17 +15,34 @@ function date_stringer()
 
 ##############
 
-if [ -z "$GENII_USER_DIR" -o -z "$GENII_INSTALL_DIR" ]; then
-  echo "This script requires two variables in the environment, the user state"
-  echo "directory (GENII_USER_DIR) and the genesis installation directory"
-  echo "(GENIII_INSTALL_DIR)."
+if [ -z "$GENII_INSTALL_DIR" ]; then
+  echo
+  echo "This script requires the genesis installation directory variable be"
+  echo "set in the environment (GENIII_INSTALL_DIR)."
+  exit 1
+fi
+
+if [ -z "$GENII_USER_DIR" ]; then
+  export GENII_USER_DIR="$HOME/.genesisII-2.0"
+  echo
+  echo "Note: GENII_USER_DIR variable was not set; assuming that the default user"
+  echo "directory is in use by this container ('$GENII_USER_DIR')."
+  echo
+fi
+
+# check that the state dir actually exists.
+if [ ! -d "$GENII_USER_DIR" ]; then
+  echo
+  echo "The GENII_USER_DIR variable points at a non-existent directory (currently"
+  echo "set to '$GENII_USER_DIR')."
+  echo "The script cannot continue."
   exit 1
 fi
 
 backup_file="$1"; shift
 
 if [ -z "$backup_file" ]; then
-  backup_file="$(\pwd)/gffs_state_backup_$(hostname)_$(USER)_$(date_stringer).zip"
+  backup_file="$(\pwd)/gffs_state_backup_$(hostname)_${USER}_$(date_stringer).tar.gz"
 else
   if [ "${backup_file:0:1}" != "/" ]; then
     # if it's not an absolute path, assume they mean wherever they are.
@@ -49,12 +66,17 @@ if [ ! -d "$TMP" ]; then
   fi
 fi
 
+# provide some extra files in case they're needed.
+rm -rf "$GENII_USER_DIR/breadcrumbs"
+mkdir "$GENII_USER_DIR/breadcrumbs"
+# we will ignore any missing files, since some may not exist.
+cp -R "$GENII_INSTALL_DIR/context.xml"* "$GENII_INSTALL_DIR/container.properties" "$GENII_INSTALL_DIR/xsede_tools"/*cfg "$GENII_INSTALL_DIR/deployments" "$GENII_INSTALL_DIR/xsede_tools/tools/deployment_generator" "$GENII_USER_DIR/breadcrumbs" 2>/dev/null
+
 ( pushd / ;
-zip -y -r $backup_file "$GENII_USER_DIR" "$GENII_INSTALL_DIR/deployments" "$GENII_INSTALL_DIR/context.xml"* "$GENII_INSTALL_DIR/container.properties" "$GENII_INSTALL_DIR/xsede_tools" -x "*/.svn/*" ;
+tar -czf $backup_file "$GENII_USER_DIR" ;
 popd ) >$TMP/zz_container_backup_$(date_stringer).log
 
-#hmmm: auto-restart
+#hmmm: auto-restart?
 
 echo "It is safe to start the container back up."
-
 

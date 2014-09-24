@@ -95,20 +95,24 @@ public class Security
 			Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyProp).getAbsolutePath();
 		return keystoreLoc;
 	}
+	
+	public File getAdminCertFile()
+	{
+		return getSecurityFile(ADMIN_CERTIFICATE_FILE);
+	}
 
 	public Identity getAdminIdentity()
 	{
 		synchronized (Security.class) {
 			if (!_loadedAdministrator) {
-				_loadedAdministrator = true;
-
-				File file = getSecurityFile(ADMIN_CERTIFICATE_FILE);
+				File file = getAdminCertFile();
 				if (file.exists()) {
 					try {
 						GeniiPath filePath = new GeniiPath("local:" + file.getAbsolutePath());
 						_administrator = AclAuthZClientTool.downloadIdentity(filePath);
+						_loadedAdministrator = true;
 					} catch (Throwable cause) {
-						_logger.warn("Unable to get administrator certificate.", cause);
+						_logger.warn("Unable to load administrator certificate.", cause);
 					}
 				}
 			}

@@ -4,7 +4,7 @@ queue-path
     The queue path is the RNS path to an existing queue on which the user wishes to terminate an existing job 
 
 job-ticket 
-    THe string job ticket returned by a successful qsub command. 
+    The string job ticket returned by a successful qsub command. 
 
 Description:
 

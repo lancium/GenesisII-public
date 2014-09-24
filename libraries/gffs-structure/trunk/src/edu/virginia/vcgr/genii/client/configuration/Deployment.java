@@ -161,6 +161,11 @@ public class Deployment
 		}
 	}
 
+	public HierarchicalDirectory getDeploymentTop()
+	{
+		return _deploymentDirectory;
+	}
+	
 	public HierarchicalDirectory getConfigurationDirectory()
 	{
 		return _configurationDirectory;

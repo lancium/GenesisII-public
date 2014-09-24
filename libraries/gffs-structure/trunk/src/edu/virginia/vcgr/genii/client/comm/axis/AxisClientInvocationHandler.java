@@ -243,8 +243,11 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 					// run it through the trust manager
 					boolean okay = CertificateValidatorFactory.getValidator().validateIsTrustedResource(chain);
-					if (!okay)
-						throw new AuthZSecurityException("failed to validate cert chain: " + chain[0].getSubjectDN());
+					if (!okay) {
+						String msg = "failed to validate cert chain: " + chain[0].getSubjectDN();
+						_logger.error(msg);
+						throw new AuthZSecurityException(msg);
+					}
 
 					// insert into valid certs cache
 					validatedCerts.put(_resourceCert, Boolean.TRUE);
@@ -254,7 +257,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			if (minClientMessageSec.isWarn()) {
 				// the security level is set to just warning, and this is as
 				// loud of a warning as we want to emit. otherwise we're just
-				// constantly complaining that the level was set to warn only.
+				// constantly complaining that the message security level was set to warn only.
 				if (_logger.isTraceEnabled())
 					_logger.trace("Cannot confirm trusted identity for " + _epr.getAddress().toString());
 			} else {

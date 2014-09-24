@@ -19,8 +19,10 @@ export SHOWED_SETTINGS_ALREADY=true
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then
   source ../prepare_tools.sh ../prepare_tools.sh 
 fi
-export POSSIBLY_UNBUILT=true
-source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
+#export POSSIBLY_UNBUILT=true
+#source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
+source "$XSEDE_TEST_ROOT/library/helper_methods.sh"
+source "$XSEDE_TEST_ROOT/library/grid_management.sh"
 
 # see if they gave us a matching pattern.
 export pattern="$1"; shift

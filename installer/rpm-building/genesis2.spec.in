@@ -96,12 +96,13 @@ chmod 755 $GEN2_BUILDOUT/grid
 # copy the simple scripts and config files that are already ready.
 cp $GEN2_SOURCE_LOC/scripts/client-ui \
   $GEN2_SOURCE_LOC/scripts/jar-desc.xml \
+  $GEN2_SOURCE_LOC/scripts/set_gffs_vars \
   $GEN2_BUILDOUT
 chmod 755 $GEN2_BUILDOUT/client-ui
 
 # copy some others that require renaming.
 cp $GEN2_SOURCE_LOC/lib/gffs.exports.template $GEN2_BUILDOUT/lib/gffs.exports
-cp $GEN2_SOURCE_LOC/lib/export.properties $GEN2_BUILDOUT/lib/export.properties
+cp $GEN2_SOURCE_LOC/lib/export.properties.template $GEN2_BUILDOUT/lib/export.properties
 cp $GEN2_SOURCE_LOC/scripts/gffschown.template $GEN2_BUILDOUT/gffschown
 chmod 755 $GEN2_BUILDOUT/gffschown
 cp $GEN2_SOURCE_LOC/scripts/proxyio.launcher.template $GEN2_BUILDOUT/proxyio.launcher
@@ -166,6 +167,7 @@ bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
 /opt/genesis2-%GRID%/gffschown
 /opt/genesis2-%GRID%/grid
 /opt/genesis2-%GRID%/jar-desc.xml
+/opt/genesis2-%GRID%/set_gffs_vars
 /opt/genesis2-%GRID%/proxyio.launcher
 
 %changelog

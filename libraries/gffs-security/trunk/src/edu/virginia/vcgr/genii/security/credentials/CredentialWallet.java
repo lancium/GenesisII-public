@@ -274,7 +274,8 @@ public class CredentialWallet implements Externalizable, Describable
 			while (delegationIterator.hasNext()) {
 				TrustCredential delegation = delegationIterator.next();
 				if (delegation.isTerminalDelegation()) {
-					_logger.debug("storing terminal delegation: " + delegation.describe(VerbosityLevel.HIGH));
+					if (_logger.isTraceEnabled())
+						_logger.trace("storing terminal delegation: " + delegation.describe(VerbosityLevel.HIGH));
 					assertionChains.put(delegation.getId(), delegation);
 					delegationIterator.remove();
 					progressMade = true;
@@ -284,8 +285,10 @@ public class CredentialWallet implements Externalizable, Describable
 					// make sure we're not operating on a wallet that's already been fully reattached.
 					if ((priorDelegationId != null) && (delegation.getPriorDelegation() != null) && chainsAreIntact(delegation)) {
 						// this one looks okay already, so we'll just add it.
-						_logger.debug("found complete credential during reassembly; adding directly: "
-							+ delegation.describe(VerbosityLevel.HIGH));
+						if (_logger.isTraceEnabled()) {
+							_logger.debug("found complete credential during reassembly; adding directly: "
+								+ delegation.describe(VerbosityLevel.HIGH));
+						}
 						assertionChains.put(delegation.getId(), delegation);
 						delegationIterator.remove();
 						progressMade = true;
@@ -302,8 +305,10 @@ public class CredentialWallet implements Externalizable, Describable
 							idsToWhack.add(delegation.getId());
 							try {
 								delegation.extendTrustChain(priorDelegation);
-								_logger.debug("extended trust chain for prior delegation: "
-									+ delegation.describe(VerbosityLevel.HIGH));
+								if (_logger.isTraceEnabled()) {
+									_logger.debug("extended trust chain for prior delegation: "
+										+ delegation.describe(VerbosityLevel.HIGH));
+								}
 								assertionChains.put(delegation.getId(), delegation);
 							} catch (Throwable e) {
 								_logger.info("problem with credential; discarding it");
@@ -335,7 +340,7 @@ public class CredentialWallet implements Externalizable, Describable
 		}
 		
 		for (String toToss : idsToWhack) {
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("removing consumed prior credential: " + toToss);
 			assertionChains.remove(toToss);
 		}

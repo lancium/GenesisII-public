@@ -18,17 +18,11 @@ source "$WORKDIR/../../prepare_tools.sh" "$WORKDIR/../../prepare_tools.sh"
 
 # if that didn't work, complain.
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
+
 # otherwise load the rest of the tool environment.
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 ####
-
-if [ -z "$NAMESPACE" ]; then
-  echo
-  echo "*** No NAMESPACE variable was defined..."
-  echo "The NAMESPACE environment variable must be set to either 'xsede' or 'xcg'."
-  exit 1
-fi
 
 function date_stringer() 
 { 
@@ -40,43 +34,56 @@ function date_stringer()
   date +"%Y$sep%m$sep%d$sep%H%M$sep%S" | tr -d '/\n/'
 }
 
-# first we'll make up a nice new tls certificate.
-bash create-one-cert.sh trusted_certs/tls-cert.pfx container Container
+####
 
-# next, we grab a copy of context.xml from the genesis2 folder.
-# we want to include this in the package.
-#if [ ! -f context.xml ]; then
-  cp "$GENII_INSTALL_DIR/context.xml" .
-  if [ $? -ne 0 ]; then
-    echo Failed to copy the context.xml from $GENII_INSTALL_DIR
-    exit 1
-  fi
-#fi
+# jump to where this script lives.
+cd "$WORKDIR"
 
-# now start packing up the deployment generator.
-ARCHIVE_NAME=$HOME/deployment_pack_$(date_stringer).tar
+# must be in synch with generator methods value.
+DEPLOYMENT_MEMORY_FILE=saved-deployment-info.txt
 
-pushd ..
-# first we'll add the few key-pairs we let people have...
-tar -cf $ARCHIVE_NAME deployment_generator/gridwide_certs/trusted.pfx deployment_generator/trusted_certs/tls-cert.*
-if [ $? -ne 0 ]; then
-  echo Failed to pack the trusted.pfx file.
+if [ ! -f $DEPLOYMENT_MEMORY_FILE ]; then
+  echo "This does not appear to be a valid deployment folder, because the file"
+  echo "'saved-deployment-info.txt' is missing."
   exit 1
 fi
-# get rid of the tls certificate; was only temporary for this package.
-rm deployment_generator/trusted_certs/tls-cert.*
 
-# then the rest of the deployment generator.
-tar -rf $ARCHIVE_NAME deployment_generator --exclude=".svn" --exclude="*/generated_certs" --exclude="*/passwords.txt" --exclude="*/*.pfx" --exclude="*/saved_deployment_info.txt"
+# get the variables we need to know about the deployment.
+source $DEPLOYMENT_MEMORY_FILE
+
+source generator-methods.sh
+
+# point a variable at the new deployment.
+DEP_DIR="$GENII_INSTALL_DIR/deployments/$DEP_NAME"
+
+# create our storage directory.
+rm -rf gridwide-certs
+check_if_failed "cleaning old gridwide-certs folder"
+mkdir gridwide-certs
+check_if_failed "making new gridwide-certs folder"
+cp -r "$DEP_DIR/security" gridwide-certs
+check_if_failed "copying security from new deployment"
+
+# grab a copy of context.xml from the genesis2 folder.
+cp "$GENII_INSTALL_DIR/context.xml" gridwide-certs
 if [ $? -ne 0 ]; then
-  echo Failed to pack the main portion of the deployment package.
+  echo Failed to copy the context.xml from $GENII_INSTALL_DIR
   exit 1
 fi
-gzip $ARCHIVE_NAME
+
+# start packing up the deployment generator files.
+ARCHIVE_NAME=$HOME/deployment_pack_$(date_stringer).tar.gz
+
+####
+
+tar -czf $ARCHIVE_NAME gridwide-certs --exclude=".svn" --exclude="passwords.txt" --exclude="bootstrap*xml" --exclude="admin.pfx" --exclude="tls-cert.pfx" --exclude="signing-cert*pfx"
 if [ $? -ne 0 ]; then
-  echo Failed to compress the deployment package.
+  echo Failed to pack up the deployment package.
   exit 1
 fi
-popd
 
+echo "Created deployment package for deployment '$DEP_NAME' in file:"
+echo $ARCHIVE_NAME
+
+rm -rf gridwide-certs
 

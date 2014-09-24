@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Loads GFFS variables for this particular installation location.
+
+export GENII_INSTALL_DIR="${installer:sys.installationDir}"
+
+source $GENII_INSTALL_DIR/xsede_tools/prepare_tools.sh $GENII_INSTALL_DIR/xsede_tools/prepare_tools.sh 
+
+

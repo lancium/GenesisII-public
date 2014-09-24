@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.12" transformSequenceNumber="4">
-  <directoryPresets config="../lib/export.properties.template" />
+  <directoryPresets config="../scripts/set_gffs_vars" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.bitSize}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -95,11 +95,9 @@
       <fileEntry mountPoint="7211" file="./scripts/installation_helpers.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="./scripts/update_deployment.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="./scripts/update_install_location.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
-      <fileEntry mountPoint="7211" file="./scripts/gen2deployment-2.7-1.spec" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <dirEntry mountPoint="34" file=".." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp, *.fred" dirMode="755" overrideDirMode="true">
         <exclude>
           <entry location="tests" fileType="regular" />
-          <entry location="derby.log" fileType="regular" />
           <entry location="gffschown" fileType="regular" />
           <entry location="cert-tool" fileType="regular" />
           <entry location="bin.ant" fileType="regular" />
@@ -133,6 +131,7 @@
           <entry location=".classpath" fileType="regular" />
           <entry location="container.properties" fileType="regular" />
           <entry location="BUILDME" fileType="regular" />
+          <entry location="set_gffs_vars" fileType="regular" />
           <entry location="runContainer.sh" fileType="regular" />
           <entry location="libraries" fileType="regular" />
           <entry location="change-port.sh" fileType="regular" />
@@ -140,7 +139,8 @@
       </dirEntry>
       <fileEntry mountPoint="34" file="../scripts/jar-desc.xml" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="34" file="./data_files/container.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="34" file="../scripts/cert-tool" overwriteMode="4" shared="false" fileMode="655" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="34" file="../scripts/cert-tool" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="34" file="../scripts/set_gffs_vars" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <dirEntry mountPoint="35" file="../jni-libs/win32" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="win32" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude>
           <entry location=".svn" fileType="regular" />
@@ -472,6 +472,7 @@
           <entry location="jar-desc.xml" fileType="regular" />
           <entry location="container.properties" fileType="regular" />
           <entry location="cert-tool" fileType="regular" />
+          <entry location="set_gffs_vars" fileType="regular" />
           <entry location="grid" fileType="launcher" />
           <entry location="client-ui" fileType="launcher" />
           <entry location=".i4j_external_20/jni-lib/libdbxml_java23.dll" fileType="regular" />
@@ -1373,6 +1374,30 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
+                  <action name="Patch set_gffs_vars" id="10003" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch set_gffs_vars">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="encoding">
+                            <string />
+                          </void>
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="1">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>set_gffs_vars</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
                   <action name="Patch cert-tool" id="9526" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch cert-tool file.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
@@ -1583,6 +1608,51 @@ return true;</string>
                           </void>
                           <void property="replacement">
                             <string>type="edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool"</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch security.properties if missing grid-certificates" id="9851" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                          <void property="script">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>
+
+try {
+    String secPropFileName ="deployments/${compiler:genii.new-deployment}/configuration/security.properties";
+    File secProp = new File(secPropFileName);
+    if (!secProp.exists()) {
+        Util.logInfo(null, "this is probably bad; cannot find security.properties file for deployment");
+        // we don't want to totally quit though...?
+        return true;
+    }
+
+    boolean gridCertsLineFound = false;
+    String line = null;
+    BufferedReader br = new BufferedReader(new FileReader(secProp));
+    while ( (line = br.readLine()) != null) {
+         if (line.matches("edu.virginia.vcgr.genii.client.security.ssl.grid-certificates.location")) {
+             gridCertsLineFound = true;
+         }
+    }
+    if (!gridCertsLineFound) {
+        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(secPropFileName, true)));
+        out.println("edu.virginia.vcgr.genii.client.security.ssl.grid-certificates.location=grid-certificates");
+    }
+    
+} catch(Exception e) {
+    Util.logInfo(null, "exception during security.properties editing");
+}
+
+return true;
+</string>
+                              </void>
+                            </object>
                           </void>
                         </object>
                       </java>
@@ -1972,18 +2042,6 @@ return true;</string>
                     <condition>File propFile = new File(context.getInstallationDirectory(), "container.properties");
 return propFile.exists();</condition>
                   </action>
-                  <action name="" id="1017" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
-                          <void property="percentValue">
-                            <int>100</int>
-                          </void>
-                        </object>
-                      </java>
-                    </serializedBean>
-                    <condition />
-                  </action>
                   <action name="" id="5121" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
@@ -2002,6 +2060,18 @@ return propFile.exists();</condition>
                           </void>
                           <void property="recursive">
                             <boolean>true</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="" id="1017" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
+                          <void property="percentValue">
+                            <int>100</int>
                           </void>
                         </object>
                       </java>

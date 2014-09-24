@@ -1,0 +1,41 @@
+Definitions:
+
+deployments-dir
+    The directory where the client or container is currently finding all of
+the grid deployment information.  This folder will generally have at least two
+subdirectories; one is named default and the other is usually the active
+deployment.
+
+deployment-name
+    The current active deployment's name.  This is usually a subdirectory
+under the deployments-dir.
+
+active-deployment-dir
+    The folder where all deployment information 
+
+security-dir
+    The currently configured directory for security assets, such as the
+installation's admin or TLS certificates, if they exist.  The trust store
+is also found under this folder.  If there is a local certificates directory,
+it is shown first and the deployment-based certificates directory is shown
+second.
+
+state-dir
+    The storage directory for container and client state.
+
+tls-keypair
+    The active TLS key and certificate PFX file for the container.
+
+owner-cert
+    The owner certificate for the container if it exists.
+
+admin-cert
+    The admin certificate for the container if it exists.
+
+Description:
+
+This tool shows configuration items as they have been resolved internally by
+the Genesis II software.  This can assist in checking that the configuration
+matches expectations.  It also frees users from needing to dredge through
+several configuration files to determine the configuration that's in effect.
+

@@ -47,5 +47,5 @@ The Genesis II Omnibus Reference (see above) describes how to configure
 containers based on RPM packages in Chapter D.8.
 + New container configuration is discussed in D.8.1.
 + Converting from an interactive installation is covered in D.8.2.
-
++ Converting from a source-based container is covered in D.8.7.
 

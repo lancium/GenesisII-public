@@ -131,7 +131,7 @@ function create_unicore_bes()
   which openssl > /dev/null
   certificate_path=""
   if [ $? == 0 ];then
-    echo -n|openssl s_client -connect $url_for_cert | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/$url_for_cert.cer
+    echo -n|openssl s_client -connect $url_for_cert 2> /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/$url_for_cert.cer
     if [ -s /tmp/$url_for_cert.cer ];then
       echo "Got certificate /tmp/$url_for_cert.cer "
       certificate_path=/tmp/$url_for_cert.cer

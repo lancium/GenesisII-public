@@ -48,31 +48,24 @@ define_and_export_variables()
   chmod +x $TEST_TEMP/env_file
   source $TEST_TEMP/env_file &>/dev/null
 
-  if [ -z "$NAMESPACE" ]; then
-    echo "No NAMESPACE variable was defined; using xcg as namespace type."
-    NAMESPACE=xcg
+  if [ -z "$FOLDERSPACE" ]; then
+    echo "No FOLDERSPACE variable was defined; using 'xsede.org' as default."
+    FOLDERSPACE="xsede.org"
   fi
 
   # this switchboard sets up the variables we will want to use for storage locations.
-  if [ $NAMESPACE == 'xsede' ]; then
-    BOOTSTRAP_LOC=/resources/xsede.org/containers/BootstrapContainer
-    STS_LOC=/resources/xsede.org/containers/sts-1.xsede.org
-    CONTAINERS_LOC=/resources/xsede.org/containers
-    USERS_LOC=/users/xsede.org
-    HOMES_LOC=/home/xsede.org
-    BES_CONTAINERS_LOC=/resources/xsede.org/containers
-    GROUPS_LOC=/groups/xsede.org
-    QUEUES_LOC=/resources/xsede.org/queues
-  elif [ $NAMESPACE == 'xcg' ]; then
-    BOOTSTRAP_LOC=/containers/BootstrapContainer
-    STS_LOC=/containers/BootstrapContainer
-    CONTAINERS_LOC=/containers
-    USERS_LOC=/users
-    HOMES_LOC=/home
-    BES_CONTAINERS_LOC=/bes-containers
-    GROUPS_LOC=/groups
-    QUEUES_LOC=/queues
+  BOOTSTRAP_LOC=/resources/$FOLDERSPACE/containers/BootstrapContainer
+  if [ "$FOLDERSPACE" == "xsede.org" ]; then
+     STS_LOC=/resources/$FOLDERSPACE/containers/sts-1.xsede.org
+  else
+     STS_LOC=$BOOTSTRAP_LOC
   fi
+  CONTAINERS_LOC=/resources/$FOLDERSPACE/containers
+  USERS_LOC=/users/$FOLDERSPACE
+  HOMES_LOC=/home/$FOLDERSPACE
+  BES_CONTAINERS_LOC=/resources/$FOLDERSPACE/containers
+  GROUPS_LOC=/groups/$FOLDERSPACE
+  QUEUES_LOC=/resources/$FOLDERSPACE/queues
 
   if [ -z "$GENII_USER_DIR" ]; then
     export GENII_USER_DIR="$HOME/.genesisII-2.0"

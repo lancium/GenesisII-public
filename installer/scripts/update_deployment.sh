@@ -48,8 +48,8 @@ function print_instructions()
   echo "Those variables should be set and made persistent for the user account, or"
   echo "there will be problems finding the right settings to run the container."
   echo "This can be accomplished by, for example, adding the variables to ~/.profile"
-  echo "or ~/.bashrc like so:"
-  echo "   export GENII_INSTALL_DIR=\$HOME/GenesisII"
+  echo "or ~/.bashrc like so (but using the actual path):"
+  echo "   export GENII_INSTALL_DIR=/opt/genesis2-xsede"
   echo "For this script, the GENII_INSTALL_DIR should point at the newer"
   echo "installation that has been installed (either interactive or RPM/DEB)."
   echo

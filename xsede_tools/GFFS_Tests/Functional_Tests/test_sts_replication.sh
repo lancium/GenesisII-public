@@ -84,10 +84,9 @@ function testX509AuthnPortTypeReplication()
   # give the user permission to the groups (updates of groups happening through the backup container)
   grid_chk chmod $GROUPS_LOC/replicatedGroup1 +r+x $USERS_LOC/replicatedUser
   grid_chk chmod $GROUPS_LOC/replicatedGroup2 +r+x $USERS_LOC/replicatedUser
-  if [ $NAMESPACE == 'xsede' ]; then
-    grid_chk chmod $GROUPS_LOC/gffs-users +r+x $USERS_LOC/replicatedUser
-    grid_chk ln $GROUPS_LOC/gffs-users $USERS_LOC/replicatedUser/gffs-users
-  fi
+
+  grid_chk chmod $GROUPS_LOC/gffs-users +r+x $USERS_LOC/replicatedUser
+  grid_chk ln $GROUPS_LOC/gffs-users $USERS_LOC/replicatedUser/gffs-users
 
   # give a few moment for updates to propagate into the replica
   sleep 45
@@ -219,10 +218,9 @@ function testKerberosPortTypeReplication()
   # create a home directory for the kerberos user and give him permission to it
   grid_chk mkdir $HOMES_LOC/$userName
   grid_chk chmod $HOMES_LOC/$userName +rwx $USERS_LOC/$userName
-  if [ $NAMESPACE == 'xsede' ]; then
-    grid_chk chmod $GROUPS_LOC/gffs-users +r+x $USERS_LOC/$userName
-    grid_chk ln $GROUPS_LOC/gffs-users $USERS_LOC/$userName/gffs-users
-  fi
+
+  grid_chk chmod $GROUPS_LOC/gffs-users +r+x $USERS_LOC/$userName
+  grid_chk ln $GROUPS_LOC/gffs-users $USERS_LOC/$userName/gffs-users
 
   # logout from the root account
   grid logout --all

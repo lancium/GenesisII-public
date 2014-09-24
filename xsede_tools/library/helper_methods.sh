@@ -12,6 +12,22 @@ function date_string()
   date +"%Y_%b_%e_%H%M_%S" | sed -e 's/ //g'
 }
 
+# displays the value of a variable in bash friendly format.
+# (donated by the feisty meow scripts at http://feistymeow.org)
+function var() {
+  while true; do
+    local varname="$1"; shift
+    if [ -z "$varname" ]; then
+      break
+    fi
+    if [ -z "${!varname}" ]; then
+      echo "$varname undefined"
+    else
+      echo "$varname=${!varname}"
+    fi
+  done
+}
+
 # given a file name and a phrase to look for, this replaces all instances of
 # it with a piece of replacement text.  note that slashes are okay in the two
 # text pieces, but we are using pound signs as the regular expression
@@ -27,6 +43,54 @@ function replace_phrase_in_file()
     return 1
   fi
   sed -i -e "s%$phrase%$replacement%g" "$file"
+}
+
+# prints an error message (from parameters) and exits if the previous command failed.
+function check_if_failed()
+{
+  if [ $? -ne 0 ]; then
+    echo Step failed: $*
+    exit 1
+  fi
+}
+
+# takes a first parameter that is the name for a combined error and output log,
+# and then runs all the other parameters as a command.
+function logged_command()
+{
+  local my_output="$1"; shift
+#  echo "logged_command args: $(printf -- "[%s] " "${@}")"
+  eval "${@}" >>"$my_output" 2>&1
+  local retval=$?
+  if [ $retval == 0 ]; then
+    # good so far, but check for more subtle ways of failing; if there is
+    # an occurrence of our fail message in the output, that also indicates
+    # the command did not succeed.
+    grep "\[FAILURE\]" $my_output
+    # we do not want to see that phrase in the log.
+    if [ $? != 0 ]; then
+      return 0  # fine exit, can ignore log.
+    fi
+  fi
+  if [[ ! "$my_output" =~ .*fuse_output.* ]]; then
+    # this was a failure, so we need to see the log.
+    # fuse errors currently don't count since they are multifarious.
+    cat "$my_output"
+  fi
+  return 1
+}
+
+# runs an arbitrary command.  if the command fails, then the output from it is
+# displayed and an error code is returned.  otherwise the output is discarded.
+function run_any_command()
+{
+  local my_output="$(mktemp $TEST_TEMP/grid_logs/out_run_any_cmd_$(date_string).XXXXXX)"
+  logged_command "$my_output" "${@}"
+  local retval=$?
+  # make the external version of the log file available.  if we're multiplexing users,
+  # this will be meaningless, which is why we used unique names above.
+  \cp -f "$my_output" "$GRID_OUTPUT_FILE"
+  return $retval
 }
 
 

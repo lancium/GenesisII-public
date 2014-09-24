@@ -78,6 +78,11 @@ public class Installation
 	{
 		return _installationDirectory;
 	}
+	
+	static public File getDeploymentsDirectory()
+	{
+		return _deploymentsDirectory;
+	}
 
 	static public Deployment getDeployment(DeploymentName depName)
 	{

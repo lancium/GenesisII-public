@@ -116,6 +116,11 @@ function create_bootstrap_trusted_pfx()
     if [[ "$certfile" =~ .*\.pfx ]]; then continue; fi
     # skip keytab files.
     if [[ "$certfile" =~ .*\.keytab ]]; then continue; fi
+
+
+if [[ ! "$certfile" =~ signing-cert.cer ]]; then continue; fi
+
+
     local output_alias="$(basename "$certfile" .cer)"
     echo -e "Adding '$(basename "$certfile")' to store with alias: $output_alias"
     run_any_command $CERTO import "-output-keystore='$dirname/trusted.pfx'" -output-keystore-pass=trusted "-base64-cert-file='$certfile'" "-output-alias='$output_alias'"
@@ -126,14 +131,15 @@ function create_bootstrap_trusted_pfx()
 # creates the certificate file in DER format from a given PFX file.
 # parameters are: (1) certificate file to create. (2) pfx file to use as source.
 # (3) password for pfx file. (4) keypair alias within PFX file.
-function create_certificate_from_pfx()
+function export_certificate_from_pfx()
 {
   local cert_file="$1"; shift
   local PFX="$1"; shift
   local PASS="$1"; shift
   local ALIAS="$1"; shift
-  run_any_command $JAVA_HOME/bin/keytool -export "-file '$cert_file'" "-keystore '$PFX'" "-storepass '$PASS'" "-alias '$ALIAS'" -storetype PKCS12
-  check_if_failed "generating certificate file $cert_file for $PFX"
+  echo "Exporting $cert_file from PFX $PFX"
+  run_any_command keytool -export "-file '$cert_file'" "-keystore '$PFX'" "-storepass '$PASS'" "-alias '$ALIAS'" -storetype PKCS12
+  check_if_failed "exporting certificate file $cert_file for $PFX"
 }
 
 # creates a new certificate based on an existing CA in pkcs12 format.
@@ -168,8 +174,8 @@ function create_pfx_using_CA()
   check_if_failed "generating $NEW_PFX from $THE_CA_PFX"
   # and create its certificate file.
   local cert_file="$(dirname "$NEW_PFX")/$(basename "$NEW_PFX" ".pfx").cer"
-  create_certificate_from_pfx "$cert_file" "$NEW_PFX" "$NEW_PASS" "$NEW_ALIAS"
-#  run_any_command $JAVA_HOME/bin/keytool -export "-file '$cert_file'" "-keystore '$NEW_PFX'" "-storepass '$NEW_PASS'" "-alias '$NEW_ALIAS'" -storetype PKCS12
+  export_certificate_from_pfx "$cert_file" "$NEW_PFX" "$NEW_PASS" "$NEW_ALIAS"
+#  run_any_command keytool -export "-file '$cert_file'" "-keystore '$NEW_PFX'" "-storepass '$NEW_PASS'" "-alias '$NEW_ALIAS'" -storetype PKCS12
 #  check_if_failed "generating certificate file $cert_file for $NEW_PFX"
 }
 
@@ -273,7 +279,7 @@ function give_administrative_privileges()
   # perms manually if it is not in "$BES_CONTAINERS_LOC/{shortContainerName}-bes".
 
   # this is extra for the xsede namespace, so we can attain gffs-admins rights.
-  if [ ! -z "$admin_group" -a "$NAMESPACE" == 'xsede' ]; then
+  if [ ! -z "$admin_group" ]; then
     local MODERN_GROUP_COMMANDS="chmod $GROUPS_LOC/gffs-admins +rwx $userpath\n\
 onerror admin chmod for gffs-admins group membership failed.\n\
 ln $GROUPS_LOC/gffs-admins $userpath/gffs-admins\n\
@@ -282,42 +288,7 @@ chmod $GROUPS_LOC/gffs-amie +rwx $userpath\n\
 onerror admin chmod for gffs-amie group membership failed.\n\
 ln $GROUPS_LOC/gffs-amie $userpath/gffs-amie\n\
 onerror admin chmod for gffs-amie group membership failed."
-
-  fi  # if xsede namespace.
-
-  if [ "$NAMESPACE" == 'xcg' ]; then
-    local OLDSCHOOL_PRIVILEGE_COMMANDS="\n\
-chmod \"/\" +rwx $userpath\n\
-onerror admin chmod for / failed.\n\
-echo working on container perms\n\
-chmod \"$CONTAINERS_LOC/*\" +rwx $userpath\n\
-onerror admin chmod for $CONTAINERS_LOC failed.\n\
-chmod \"$BOOTSTRAP_LOC/*\" +rwx $userpath\n\
-onerror admin chmod for $BOOTSTRAP_LOC/* failed.\n\
-chmod \"$BOOTSTRAP_LOC/Services/*\" +rwx $userpath\n\
-onerror admin chmod for $BOOTSTRAP_LOC/Services/* failed.\n\
-echo fixing users and groups and homes.\n\
-chmod -R \"$USERS_LOC\" +rwx $userpath\n\
-onerror admin chmod for $USERS_LOC failed.\n\
-chmod -R \"$GROUPS_LOC\" +rwx $userpath\n\
-onerror admin chmod for $GROUPS_LOC failed.\n\
-chmod -R \"$HOMES_LOC\" +rwx $userpath\n\
-onerror admin chmod for $HOMES_LOC/* failed."
-
-    if [ ! -z "$queue_perms" ]; then
-      local QUEUE_CMDS="\n\
-echo working on queue holding area.\n\
-chmod -R \"$QUEUES_LOC\" +rwx $userpath\n\
-onerror admin chmod for $QUEUES_LOC failed."
-    fi
-
-    if [ ! -z "$bes_perms" ]; then
-      local BES_CMDS="\n\
-echo working on bes holding area.\n\
-chmod -R \"$BES_CONTAINERS_LOC\" +rwx $userpath\n\
-onerror admin chmod for $BES_CONTAINERS_LOC failed."
-    fi
-  fi  # if xcg namespace.
+  fi
 
   FULL_COMMAND_SET="$(mktemp $TEST_TEMP/admin_privs.XXXXXX)"
   echo -e "\

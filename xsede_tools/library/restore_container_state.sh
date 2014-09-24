@@ -4,11 +4,18 @@
 #
 # Author: Chris Koeritz
 
-if [ -z "$GENII_USER_DIR" -o -z "$GENII_INSTALL_DIR" ]; then
-  echo "This script requires two variables in the environment, the user state"
-  echo "directory (GENII_USER_DIR) and the genesis installation directory"
-  echo "(GENIII_INSTALL_DIR)."
+if [ -z "$GENII_INSTALL_DIR" ]; then
+  echo "This script requires that the genesis installation directory variable"
+  echo "(GENII_INSTALL_DIR) is set in the shell environment."
   exit 1
+fi
+
+if [ -z "$GENII_USER_DIR" ]; then
+  export GENII_USER_DIR="$HOME/.genesisII-2.0"
+  echo
+  echo "Note: GENII_USER_DIR variable was not set; assuming that the default user"
+  echo "directory is in use by this container ('$GENII_USER_DIR')."
+  echo
 fi
 
 backup_file=$1; shift
@@ -58,8 +65,8 @@ fi
 #hmmm: will this always work?  maybe not if the state or install dir isn't under home?
 #      if it stores absolute paths, then it would still work.
 ( pushd /;
-unzip -o $backup_file ;
-popd ) >>$TMP/zz_container_backup_$(date_stringer).log
+tar -xf $backup_file ;
+popd ) >>$TMP/zz_container_restore_$(date_stringer).log
 
 #hmmm: auto-restart
 

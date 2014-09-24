@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 package edu.virginia.vcgr.genii.client.comm.axis.security;
@@ -30,7 +29,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,13 +48,14 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.security.x509.CertEntry;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.security.x509.RevocationAwareTrustManager;
 import edu.virginia.vcgr.genii.security.x509.SingleSSLX509KeyManager;
 
 /**
  * Wrapper for the generic SSLSocketFactory.
  * 
- * Selects the identity in the current calling context's client cert/key for use during SSL
- * handshake. For containers, the TLS certificate is chosen instead of resource certificates.
+ * Selects the identity in the current calling context's client cert/key for use during SSL handshake. For containers, the TLS
+ * certificate is chosen instead of resource certificates.
  * 
  * Allows us to re-read trust-stores when we detect changes in the client/server configuration.
  * 
@@ -96,14 +95,15 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 	public void notifyUnloaded()
 	{
 		try {
-			//hmmm: we need to install a different trust manager here for CRL checking.
-			
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+			// we install a trust manager here that understands CRL checking.
+			// TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
 			KeyStore trustStore = KeystoreManager.getTlsTrustStore();
 			if (trustStore != null) {
-				tmf.init(trustStore);
+				// tmf.init(trustStore);
 				synchronized (_sslSessionCache) {
-					_trustManagers = tmf.getTrustManagers();
+					_trustManagers = new TrustManager[1];
+					// _trustManagers = tmf.getTrustManagers();
+					_trustManagers[0] = new RevocationAwareTrustManager(trustStore, KeystoreManager.getGridCertsDir());
 				}
 			}
 		} catch (Exception ex) {
@@ -158,8 +158,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 					new SecurityUpdateResults());
 
 			/*
-			 * use only the container TLS cert rather than resource cert, unless we are acting as a
-			 * client.
+			 * use only the container TLS cert rather than resource cert, unless we are acting as a client.
 			 */
 			if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
 				CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
@@ -202,6 +201,11 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 				mgrs = _trustManagers;
 			}
 			sslcontext.init(kms, mgrs, null);
+
+			// hmmm: show which trust managers we have loaded. we want at least one of these to be our crl handling replacement.
+			for (TrustManager m : mgrs) {
+				_logger.debug("trust manager: " + m.toString() + " type: " + m.getClass().getCanonicalName());
+			}
 
 			sessionContext = sslcontext.getServerSessionContext();
 			if (sessionContext == null) {

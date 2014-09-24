@@ -1,0 +1,3 @@
+tell-config [deployment-name] [deployments-dir] [active-deployment-dir] \
+  [security-dir] [state-dir] [tls-keypair] [owner-cert] [admin-cert] 
+

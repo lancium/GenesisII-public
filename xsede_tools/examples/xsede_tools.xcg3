@@ -11,12 +11,6 @@
 # This section defines variables that are used throughout the tests.
 # Many of these need to change to suit your particular configuration.
 
-# The installation location for the GenesisII package (client or container).
-# This setting is not needed if the environment defines GENII_INSTALL_DIR.
-# Update this if Genesis is installed elsewhere, e.g. the installation path on
-# Mac OSX is instead "/Applications/GenesisII".
-#GENII_INSTALL_DIR=$HOME/GenesisII
-
 # The user state directory for Genesis.  If not set, the default will be used.
 # This setting is not needed if the environment defines GENII_USER_DIR.
 # This directory should never be stored on an NFS or other mounted location,
@@ -48,26 +42,18 @@ EMAIL=userX@emailsomewhere.com
 # This should be changed to the specific queue that is under test.
 QUEUE_NAME=grid-queue
 
-# The namespace variable defines what template to use for the GFFS namespace.
-# The two choices currently available are 'xcg' and 'xsede'.  The older xcg
-# namespace type has /containers at the top-level, and the xsede namespace
-# type has a /resources folder with many intermediate hierarchies for
-# containers, queues and so forth.
-#NAMESPACE=xcg
-NAMESPACE=xsede
-
-# The folderspace variable is a parameter used within all paths in the grid.
-# For example, in the xsede grid, the main users directory is /users/xsede.org
-# and the resources directory is /resources/xsede.org.  This is where all
-# resources that are owned by the grid's central containers can be found.
-FOLDERSPACE=xcg.virginia.edu
-
 # Used for windows testing; provides the path to the binaries directory of cygwin.
 #CYGWIN_BIN_PATH=c:/cygwin/bin
 
 ##############
 
 #### GFFS settings...
+
+# The folderspace variable is a parameter used within all paths in the grid.
+# For example, in the xsede grid, the main users directory is /users/xsede.org
+# and the resources directory is /resources/xsede.org.  This is where all
+# resources that are owned by the grid's central containers can be found.
+FOLDERSPACE=xcg.virginia.edu
 
 # The area in which to test.  Many junk files and directories are created
 # under this path, so it should be a directory without a lot of other

@@ -117,9 +117,9 @@
 				<include name="windows-start-wrapper.bat"/>
 				<include name="windows-cmd-runner.bat"/>
 				<include name="VCGRContainerDaemon"/>
-				<include name="linux-cmd-wrapper"/>
 				<include name="gffschown"/>
 				<include name="proxyio.launcher"/>
+				<include name="set_gffs_vars"/>
 			</fileset>
 		</delete>
 	</target>
@@ -200,6 +200,11 @@
 		<replace file="${basedir}/jar-desc.xml"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 
+		<copy file="${scripts.dir}/set_gffs_vars"
+			tofile="${basedir}/set_gffs_vars"/>
+		<replace file="${basedir}/set_gffs_vars"
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
+
 		<copy file="${scripts.dir}/genii-base-application.properties"
 			tofile="${basedir}/ext/genii-base-application.properties"/>
 		<replace file="${basedir}/ext/genii-base-application.properties"
@@ -269,10 +274,6 @@
 		<antcall target="build-script-win">
 			<param name="win-script-src-dir" value="${scripts.dir}"/>
 			<param name="win-script-base-name" value="windows-cmd-runner"/>
-		</antcall>
-		<antcall target="build-script-unix">
-			<param name="unix-script-src-dir" value="${scripts.dir}"/>
-			<param name="unix-script-base-name" value="linux-cmd-wrapper"/>
 		</antcall>
 	</target>
 

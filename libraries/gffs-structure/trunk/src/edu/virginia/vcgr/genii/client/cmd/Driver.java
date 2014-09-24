@@ -61,7 +61,7 @@ public class Driver extends ApplicationBase
 		SecurityUtilities.initializeSecurity();
 
 		try {
-			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore()));
+			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore(), KeystoreManager.getGridCertsDir()));
 		} catch (Throwable t) {
 			System.err.println("Security validation setup failure: " + t.getMessage());
 			System.exit(1);
