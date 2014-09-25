@@ -95,7 +95,7 @@ export DEBUGGING=true
 
 # turn this off in non-debugging mode.
 if [ ! -z "$DEBUGGING" -a -z "$SHOWED_SETTINGS_ALREADY" \
-    -a -z "$BADNESS" ]; then
+    -a -z "$BADNESS" -a "${TERM}" != "dumb" -a -z "$PBS_ENVIRONMENT" ]; then
   echo "==========================================================="
   echo "Tests are running from $XSEDE_TEST_ROOT"
   echo "Root of temporaries (TMP) is set to $TMP"

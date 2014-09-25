@@ -63,6 +63,8 @@ mkdir gridwide-certs
 check_if_failed "making new gridwide-certs folder"
 cp -r "$DEP_DIR/security" gridwide-certs
 check_if_failed "copying security from new deployment"
+cp "$DEP_DIR/configuration/myproxy.properties" gridwide-certs
+check_if_failed "copying myproxy.properties from new deployment"
 
 # grab a copy of context.xml from the genesis2 folder.
 cp "$GENII_INSTALL_DIR/context.xml" gridwide-certs

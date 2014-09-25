@@ -63,8 +63,7 @@ function replacefile #filename oldport newport
 	return 0
 }
 
-replacefile "$DEPLOYMENT_DIR/configuration/xcg-bootstrap.xml" $OLD_PORT $NEW_PORT
-replacefile "$DEPLOYMENT_DIR/configuration/xsede-bootstrap.xml" $OLD_PORT $NEW_PORT
+replacefile "$DEPLOYMENT_DIR/configuration/template-bootstrap.xml" $OLD_PORT $NEW_PORT
 replacefile "$DEPLOYMENT_DIR/configuration/server-config.xml" $OLD_PORT $NEW_PORT
 replacefile "$DEPLOYMENT_DIR/configuration/web-container.properties" $OLD_PORT $NEW_PORT
 # heuristic for second port opened.
