@@ -119,7 +119,7 @@ public class KeystoreManager
 
 			_resourceTrustStore = trustStore;
 
-			if (_logger.isDebugEnabled()) {
+			if (_logger.isTraceEnabled()) {
 				_logger.debug("trust store for resources:\n" + SecurityUtilities.showTrustStore(trustStore));
 			}
 
@@ -216,7 +216,7 @@ public class KeystoreManager
 			}
 
 			_tlsTrustStore = trustStore;
-			if (_logger.isDebugEnabled()) {
+			if (_logger.isTraceEnabled()) {
 				_logger.debug("trust store for tls:\n" + SecurityUtilities.showTrustStore(trustStore));
 			}
 		}

@@ -97,11 +97,12 @@ export DEBUGGING=true
 if [ ! -z "$DEBUGGING" -a -z "$SHOWED_SETTINGS_ALREADY" \
     -a -z "$BADNESS" -a "${TERM}" != "dumb" -a -z "$PBS_ENVIRONMENT" ]; then
   echo "==========================================================="
-  echo "Tests are running from $XSEDE_TEST_ROOT"
-  echo "Root of temporaries (TMP) is set to $TMP"
-  echo "Test temporaries (TEST_TEMP) are in $TEST_TEMP"
-  echo "SHUNIT_DIR set to $SHUNIT_DIR"
-#hmmm: fix that to be same as SHUNIT_PARENT as needed by shunit.
+  echo "Genesis II Tools and Tests are loaded."
+  var GENII_INSTALL_DIR GENII_USER_DIR XSEDE_TEST_ROOT XSEDE_TOOLS_CONFIG_FILE TMP TEST_TEMP
+#  echo "Tests are running from $XSEDE_TEST_ROOT"
+#  echo "Root of temporaries (TMP) is set to $TMP"
+#  echo "Test temporaries (TEST_TEMP) are in $TEST_TEMP"
+#  echo "SHUNIT_DIR set to $SHUNIT_DIR"
   echo "==========================================================="
 fi
 

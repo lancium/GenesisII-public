@@ -56,18 +56,24 @@ source generator-methods.sh
 # point a variable at the new deployment.
 DEP_DIR="$GENII_INSTALL_DIR/deployments/$DEP_NAME"
 
+export OUTDIR=deployment-info
+
 # create our storage directory.
-rm -rf gridwide-certs
-check_if_failed "cleaning old gridwide-certs folder"
-mkdir gridwide-certs
-check_if_failed "making new gridwide-certs folder"
-cp -r "$DEP_DIR/security" gridwide-certs
+rm -rf $OUTDIR
+check_if_failed "cleaning old $OUTDIR folder"
+mkdir $OUTDIR
+check_if_failed "making new $OUTDIR folder"
+cp -r "$DEP_DIR/security" $OUTDIR
 check_if_failed "copying security from new deployment"
-cp "$DEP_DIR/configuration/myproxy.properties" gridwide-certs
+mkdir $OUTDIR/configuration
+check_if_failed "creating config directory in output folder"
+cp "$DEP_DIR/configuration/myproxy.properties" $OUTDIR/configuration
 check_if_failed "copying myproxy.properties from new deployment"
+cp "$DEP_DIR/configuration/namespace.properties" $OUTDIR/configuration
+check_if_failed "copying namespace.properties from new deployment"
 
 # grab a copy of context.xml from the genesis2 folder.
-cp "$GENII_INSTALL_DIR/context.xml" gridwide-certs
+cp "$GENII_INSTALL_DIR/context.xml" $OUTDIR
 if [ $? -ne 0 ]; then
   echo Failed to copy the context.xml from $GENII_INSTALL_DIR
   exit 1
@@ -78,7 +84,7 @@ ARCHIVE_NAME=$HOME/deployment_pack_$(date_stringer).tar.gz
 
 ####
 
-tar -czf $ARCHIVE_NAME gridwide-certs --exclude=".svn" --exclude="passwords.txt" --exclude="bootstrap*xml" --exclude="admin.pfx" --exclude="tls-cert.pfx" --exclude="signing-cert*pfx"
+tar -czf $ARCHIVE_NAME $OUTDIR --exclude=".svn" --exclude="passwords.txt" --exclude="bootstrap*xml" --exclude="admin.pfx" --exclude="tls-cert.pfx" --exclude="signing-cert*pfx"
 if [ $? -ne 0 ]; then
   echo Failed to pack up the deployment package.
   exit 1
@@ -87,5 +93,5 @@ fi
 echo "Created deployment package for deployment '$DEP_NAME' in file:"
 echo $ARCHIVE_NAME
 
-rm -rf gridwide-certs
+rm -rf $OUTDIR
 

@@ -378,7 +378,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		throws AuthZSecurityException, GeneralSecurityException
 	{
 		_logger.debug("entered authBearCred with caller: " + callerTLSCert[0].getSubjectDN());
-		
+
 		HashSet<NuCredential> retval = new HashSet<NuCredential>();
 
 		// Add the authenticated certificate chains
@@ -407,12 +407,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				// discover when the sender trusts a credential, and include it if there's a
 				// matching pass through identity.
 				if (callerTLSCert[0].equals(assertion.getOriginalAsserter()[0])) {
-					if (_logger.isDebugEnabled())
+					if (_logger.isTraceEnabled())
 						_logger.debug("found an assertion matching the target TLS cert chain: " + assertion.toString());
 					X509Certificate passThrough =
 						(X509Certificate) callContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 					if (passThrough != null) {
-						if (_logger.isDebugEnabled())
+						if (_logger.isTraceEnabled())
 							_logger.debug("got a pass through cert, checking next: " + passThrough.getSubjectDN().toString());
 						if (assertion.getDelegatee()[0].equals(passThrough)) {
 							X509Certificate[] pt = new X509Certificate[1];
@@ -420,7 +420,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 							// found a matching pass-through identity, so allow the caller to act as
 							// this.
 							X509Identity x509 = new X509Identity(pt, IdentityType.CONNECTION);
-							_logger.debug("found matching pass-through identity for: " + x509.toString());
+							_logger.debug("adding matching pass-through identity for: " + x509.toString());
 							retval.add(x509);
 						}
 					} else {
@@ -428,72 +428,84 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					}
 				}
 
-				/*
-				 * this section came from the days when we were always running on tls certificates
-				 * as the resource identities. it cannot be in place any more because it hinders the
-				 * new usage of trust delegations, which are not always from the connecting
-				 * identity, but which are still totally valid.
-				 */
-				/*
-				 * more recently, it is being investigated to see if it still causes the problems
-				 * noticed during the activity; it reports instead of booting the credential.
-				 */
-				boolean enable_old_credential_checking = true; // try the checking below?
-				boolean enable_credential_rejection = false; // react based on the checking results?
-				if (enable_old_credential_checking) {
-					if (_logger.isTraceEnabled())
-						_logger.trace("credential to test has first delegatee: "
-							+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
-							+ assertion.getOriginalAsserter()[0].getSubjectDN());
+				// hmmm: this whole code block can go. we know it interferes with our ability to do
+				// group membership in the new
+				// tls model. we simply can't pass the pass-through credential without the fact that
+				// we've delegated to someone
+				// other than our tls cert being a problem (for this code). so it has to go.
+				boolean totally_disabled_scheduled_for_removal = true;
+				if (!totally_disabled_scheduled_for_removal) {
 
-					// Verify that the request message signer is the same as the
-					// one of the holder-of-key certificates.
-					boolean match = false;
-					for (X509Certificate[] callerCertChain : authenticatedCertChains) {
+					/*
+					 * this section came from the days when we were always running on tls
+					 * certificates as the resource identities. it cannot be in place any more
+					 * because it hinders the new usage of trust delegations, which are not always
+					 * from the connecting identity, but which are still totally valid.
+					 */
+					/*
+					 * more recently, it is being investigated to see if it still causes the
+					 * problems noticed during the activity; it reports instead of booting the
+					 * credential.
+					 */
+					boolean enable_old_credential_checking = true; // try the checking below?
+					boolean enable_credential_rejection = false; // react based on the checking
+																	// results?
+					if (enable_old_credential_checking) {
 						if (_logger.isTraceEnabled())
-							_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
-						try {
-							if (assertion.findDelegateeInChain(callerCertChain[0]) >= 0) {
-								if (_logger.isTraceEnabled())
-									_logger.trace("...found delegatee at position "
-										+ assertion.findDelegateeInChain(callerCertChain[0])
-										+ " to be the same as incoming tls cert.");
-								match = true;
-								break;
-								/*
-								 * disabled code: we are trying to validate that the credential
-								 * involves the current guy; this would just validate that the
-								 * credential originated on our grid (even if it were copied), which
-								 * is not sufficient.
-								 */
-								// } else if
-								// (CertificateValidatorFactory.getValidator().validateIsTrustedResource(
-								// assertion.getOriginalAsserter()) == true) {
-								// if (_logger.isTraceEnabled())
-								// _logger
-								// .trace("...allowed incoming message using resource trust store for original asserter.");
-								// match = true;
-								// break;
-							} else {
-								if (_logger.isTraceEnabled())
-									_logger.trace("...found them to be different.");
-							}
-						} catch (Throwable e) {
-							_logger.error("failure: exception thrown during holder of key checks", e);
-						}
-					}
+							_logger.trace("credential to test has first delegatee: "
+								+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
+								+ assertion.getOriginalAsserter()[0].getSubjectDN());
 
-					if (!match) {
-						String msg =
-							"WARN: credential did not match incoming message sender: '"
-								+ assertion.describe(VerbosityLevel.HIGH) + "'";
-						_logger.debug(msg);
-						if (enable_credential_rejection == true) {
-							// skip adding it.
-							continue;
+						// Verify that the request message signer is the same as the
+						// one of the holder-of-key certificates.
+						boolean match = false;
+						for (X509Certificate[] callerCertChain : authenticatedCertChains) {
+							if (_logger.isTraceEnabled())
+								_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
+							try {
+								if (assertion.findDelegateeInChain(callerCertChain[0]) >= 0) {
+									if (_logger.isTraceEnabled())
+										_logger.trace("...found delegatee at position "
+											+ assertion.findDelegateeInChain(callerCertChain[0])
+											+ " to be the same as incoming tls cert.");
+									match = true;
+									break;
+									/*
+									 * disabled code: we are trying to validate that the credential
+									 * involves the current guy; this would just validate that the
+									 * credential originated on our grid (even if it were copied),
+									 * which is not sufficient.
+									 */
+									// } else if
+									// (CertificateValidatorFactory.getValidator().validateIsTrustedResource(
+									// assertion.getOriginalAsserter()) == true) {
+									// if (_logger.isTraceEnabled())
+									// _logger
+									// .trace("...allowed incoming message using resource trust store for original asserter.");
+									// match = true;
+									// break;
+								} else {
+									if (_logger.isTraceEnabled())
+										_logger.trace("...found them to be different.");
+								}
+							} catch (Throwable e) {
+								_logger.error("failure: exception thrown during holder of key checks", e);
+							}
+						}
+
+						if (!match) {
+							String msg =
+								"WARN: credential did not match incoming message sender: '"
+									+ assertion.describe(VerbosityLevel.HIGH) + "'";
+							_logger.debug(msg);
+							if (enable_credential_rejection == true) {
+								// skip adding it.
+								continue;
+							}
 						}
 					}
 				}
+
 			}
 
 			retval.add(cred);

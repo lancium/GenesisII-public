@@ -26,6 +26,7 @@ GENII_USER_DIR - the location where the state directory for Genesis is\n\
 
 # Define the mirror container path variable.
 export MIRRORPATH=/resources/xsede.org/containers/gffs-2.xsede.org
+export REPLICATEDCONTEXTFILE=replicated-context.xml
 
 if [ -z "$replica_host" -o -z "$replica_port" ]; then
   print_instructions
@@ -40,6 +41,14 @@ if [ -z "$GENII_INSTALL_DIR" -o -z "$GENII_USER_DIR" ]; then
   exit 1
 fi
 
+echo
+echo "Will use the root replica container on '$replica_host'"
+echo "at port '$replica_port'"
+echo
+
+# clean out any previous context file.
+rm -f $HOME/$REPLICATEDCONTEXTFILE
+
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
 #export SHOWED_SETTINGS_ALREADY=true
@@ -51,6 +60,7 @@ fi
 source "$XSEDE_TEST_ROOT/library/helper_methods.sh"
 
 # The mirror container needs to be linked in at the MIRRORPATH:
+echo linking root replica container into grid.
 $GENII_INSTALL_DIR/grid ln \
   --service-url=https://${replica_host}:${replica_port}/axis/services/VCGRContainerPortType \
   $MIRRORPATH 
@@ -59,14 +69,18 @@ check_if_failed "Linking replica container into place at $MIRRORPATH"
 MIRROR_CHK_FILE="$(mktemp $TEST_TEMP/mirror-container-listing.XXXXXX)"
 $GENII_INSTALL_DIR/grid ls $MIRRORPATH >"$MIRROR_CHK_FILE"
 check_if_failed "Listing contents under $MIRRORPATH"
-grep "Services" "$MIRROR_CHK_FILE"
+grep -q "Services" "$MIRROR_CHK_FILE"
 check_if_failed "Testing container at $MIRRORPATH; container does not seem to be running!"
 rm "$MIRROR_CHK_FILE"
+
+echo root replica linked successfully.
 
 # Give access to the rootResolver to everyone.
 $GENII_INSTALL_DIR/grid chmod $MIRRORPATH/Services/GeniiResolverPortType \
   +rx --everyone
 check_if_failed "Giving everyone permission to the resolver port type"
+
+echo creating root resolver.
 
 # Create a resolver on the secondary container:
 $GENII_INSTALL_DIR/grid create-resource \
@@ -81,6 +95,8 @@ check_if_failed "Giving everyone permission on root resolver"
 # Add a resolver for the root folder in the namespace:
 $GENII_INSTALL_DIR/grid resolver / /etc/resolvers/rootResolver
 check_if_failed "Adding a resolver to root of RNS"
+
+echo checking root resolver.
 
 # Test that the resolver was added properly:
 RESOLVER_TMP_FILE="$(mktemp $TEST_TEMP/gffs-resolver-output.XXXXXX)"
@@ -101,6 +117,8 @@ rm "$RESOLVER_TMP_FILE"
 # Register the top-level folders with the resolver.  This is a suggested
 # set for the XSEDE namespace definition.  Other folders can also be
 # added to the resolver if needed. 
+
+echo establishing resolvers and replicas for top-level folders.
 
 $GENII_INSTALL_DIR/grid <<eof
 resolver /etc /etc/resolvers/rootResolver 
@@ -133,6 +151,10 @@ replicate /users $MIRRORPATH
 replicate /users/xsede.org $MIRRORPATH
 eof
 check_if_failed "Adding replicas for chosen top-level and second-level directories"
+
+echo 
+echo replicating groups that live on root container.
+
 # Replicate just the groups that live on the root container:
 $GENII_INSTALL_DIR/grid ls /groups/xsede.org \
   | tail -n +2 >$HOME/group_list
@@ -146,16 +168,21 @@ while read line; do \
     check_if_failed "Adding a replica for group $line"
   fi; \
 done < $HOME/group_list
+
+echo saving new replicated context.
+
 # Save a new context.xml containing the resolver listing (crucial):
 $GENII_INSTALL_DIR/grid logout --all
 $GENII_INSTALL_DIR/grid cd /
 check_if_failed "Changing to root of RNS"
-cp $GENII_USER_DIR/user-context.xml $HOME/replicated-context.xml
+cp $GENII_USER_DIR/user-context.xml $HOME/$REPLICATEDCONTEXTFILE
 check_if_failed "Copying new replicated context file into home directory"
 
-echo "There should now be a file called 'replicated-context.xml' in your home"
+echo
+echo "There should now be a file called '$REPLICATEDCONTEXTFILE' in your home"
 echo "directory.  This file should be conveyed to the Genesis II team so that"
 echo "they can build a new set of installers that include it; please send the"
 echo "file to xcghelp@cs.virginia.edu with a request for the installer to be"
 echo "updated to use it."
+echo
 

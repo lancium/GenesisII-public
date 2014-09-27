@@ -12,6 +12,6 @@ fi
 
 ##############
 
-\rm -f "$GENII_INSTALL_DIR/GFFSContainer"
-\rm -rf "$GENII_INSTALL_DIR/deployments"
+#\rm -f "$GENII_INSTALL_DIR/GFFSContainer"
+#\rm -rf "$GENII_INSTALL_DIR/deployments"
 

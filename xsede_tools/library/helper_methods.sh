@@ -142,11 +142,9 @@ fan_out_directories()
   # locates a process given a search pattern to match in the process list.
   function psfind() {
     local -a patterns=("${@}")
-    mkdir $TEST_TEMP/grid_logs &>/dev/null
-    local PID_DUMP="$(mktemp "$TEST_TEMP/grid_logs/zz_pidlist.XXXXXX")"
+    local PID_DUMP="$(mktemp "$TMP/zz_pidlist.XXXXXX")"
     local -a PIDS_SOUGHT
     if [ "$OS" == "Windows_NT" ]; then
-      # needs to be a windows format filename for 'type' to work.
       if [ ! -d c:/tmp ]; then
         mkdir c:/tmp
       fi
@@ -162,6 +160,7 @@ fan_out_directories()
         flag='//c'
       fi
       # we 'type' the file to get rid of the unicode result from wmic.
+      # needs to be a windows format filename for 'type' to work.
       cmd $flag type "$tmppid" >$PID_DUMP
       \rm "$tmppid"
 #      local CR='

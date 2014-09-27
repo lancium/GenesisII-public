@@ -115,8 +115,12 @@ public class AxisCredentialWallet
 		int delegationCount = trustDelegationList.getLength();
 		for (int index = 0; index < delegationCount; index++) {
 			Node node = trustDelegationList.item(index);
-			TrustCredential delegation = new TrustCredential(node);
-			detachedDelegations.put(delegation.getId(), delegation);
+			try {
+				TrustCredential delegation = new TrustCredential(node);
+				detachedDelegations.put(delegation.getId(), delegation);
+			} catch (Throwable t) {
+				_logger.error("failed to decode trust delegation from soap, dropping it.", t);
+			}
 		}
 		getRealCreds().getAssertionChains().clear();
 		getRealCreds().getAssertionChains().putAll(detachedDelegations);

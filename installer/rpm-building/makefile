@@ -4,7 +4,7 @@ RPMBUILD = /usr/bin/rpmbuild
 KEYTOOL = /usr/bin/keytool
 OPENSSL = /usr/bin/openssl
 
-RPMBUILD_TOPDIR = $(HOME)/genesis-rpmbuild
+RPMBUILD_TOPDIR := $(shell mktemp -d /tmp/genesis-rpmbuild.XXXXXX)
 
 VER = $(shell sed -n -e 's/genii.app-version=\(.*\)/\1/p' ../../current.version)
 REL = $(shell sed -n -e 's/genii.release-number=\(.*\)/\1/p' ../../current.version)
@@ -17,6 +17,8 @@ BUNDLE_NAME = genesis2-$(GRID)-$(VER)
 all: build-rpms
 
 build-rpms: package-code
+	@echo preparing to build genesis2 rpm.
+	@echo top level build dir is $(RPMBUILD_TOPDIR)
 	@echo ver is $(VER) and rel is $(REL) and platform arch is $(PLATFORM_ARCH)
 	@echo BUILD_FLAGS=$(BUILD_FLAGS) and PLATFORM_BITSIZE=$(PLATFORM_BITSIZE)
 	for i in BUILD BUILDROOT RPMS SOURCES SPECS SRPMS; do mkdir -p $(RPMBUILD_TOPDIR)/$$i; done
@@ -38,18 +40,16 @@ build-rpms: package-code
 	cp $(RPMBUILD_TOPDIR)/RPMS/*/* $(RPMBUILD_TOPDIR)/SRPMS/* $(HOME)/installer_products
 	rm -f $(HOME)/installer_products/md5sums
 	md5sum $(HOME)/installer_products/* >$(HOME)/installer_products/md5sums
+	rm -rf $(RPMBUILD_TOPDIR)
 
 # some ugly extra steps since the packager doesn't make a sub-dir inside tar file.
-package-code: clean
+package-code:
 	@if [ -z $(PLATFORM_ARCH) ]; then echo "The build platform environment variable is not set in 'PLATFORM_ARCH'."; exit 1; fi
+	rm -rf $(BUNDLE_NAME).tar.gz $(BUNDLE_NAME)
 	mkdir $(BUNDLE_NAME) 
 	bash ../../scripts/produce_build_package.sh $(shell pwd)/../../ $(TMP) "" $(BUNDLE_NAME)-temp
 	(cd $(BUNDLE_NAME); tar -xf $(TMP)/$(BUNDLE_NAME)-temp.tar.gz)
 	tar -czf $(BUNDLE_NAME).tar.gz $(BUNDLE_NAME)
 	cp $(BUNDLE_NAME).tar.gz $(HOME)/installer_products
 	rm -rf $(BUNDLE_NAME) $(TMP)/$(BUNDLE_NAME)-temp.tar.gz 
-
-clean:
-	rm -rf $(BUNDLE_NAME).tar.gz $(BUNDLE_NAME) $(RPMBUILD_TOPDIR)
-
 

@@ -419,7 +419,7 @@ public class SecurityUtilities implements CertificateValidator
 					certificateList.add(certificate);
 				}
 				fis.close();
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("Loaded trusted certificate(s) from file: " + certificateFile.getName());
 			} catch (Exception ex) {
 				_logger.warn("Failed to load certificates from file: " + certificateFile.getName(), ex);
@@ -554,14 +554,14 @@ public class SecurityUtilities implements CertificateValidator
 					crlList.add(crl);
 				}
 				fis.close();
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("Loaded CRL(s) from file: " + crlFile.getName());
 			} catch (Exception ex) {
 				_logger.warn("Failed to load CRL from file: " + crlFile.getName(), ex);
 			}
 		}
 		if (_logger.isDebugEnabled())
-			_logger.debug("Loaded " + crlFiles.length + " CRL records from trusted directory.");
+			_logger.debug("Loaded " + crlFiles.length + " CRL records from directory:" + directory);
 
 		return crlList;
 	}
@@ -572,7 +572,6 @@ public class SecurityUtilities implements CertificateValidator
 	static public CertStore createCertStoreFromCRLs(List<X509CRL> crlList)
 	{
 		CollectionCertStoreParameters params = new CollectionCertStoreParameters(crlList);
-		// Arrays.asList(chain));
 		CertStore certStore = null;
 		try {
 			certStore = CertStore.getInstance("Collection", params);
@@ -598,9 +597,10 @@ public class SecurityUtilities implements CertificateValidator
 			_logger.warn("failed to get CRLs from CertStore", e);
 		}
 		if ((list != null) && !list.isEmpty()) {
-			_logger.debug("found a set of CRLs for this cert.");
 			for (CRL crl : list) {
-				_logger.debug("checking with crl: " + crl.toString());
+				if (_logger.isTraceEnabled()) {
+					_logger.debug("checking with crl: " + crl.toString());
+				}
 				if (crl.isRevoked(cert)) {
 					String msg = "Certificate has been revoked: " + cert.getSubjectDN(); 
 					throw new CertificateException(msg);

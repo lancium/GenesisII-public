@@ -28,7 +28,8 @@ replace_compiler_variables "$GENII_INSTALL_DIR/container.properties"
 replace_installdir_variables "$GENII_INSTALL_DIR"
 
 # make a link for the Container startup script.
-ln -s "$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer" "$GENII_INSTALL_DIR"
+rm -f "$GENII_INSTALL_DIR/GFFSContainer"
+ln -s "$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer" "$GENII_INSTALL_DIR/GFFSContainer"
 
 # cannot package multiple binary formats in rpm, so this code won't work.
 # create the JNI directory for this platform.

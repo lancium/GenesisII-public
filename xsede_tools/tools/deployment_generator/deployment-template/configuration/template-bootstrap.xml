@@ -32,7 +32,7 @@
 	<geniix:keystoreLogin>
 		<gsh:param>--no-gui</gsh:param>
 		<gsh:param>--password=REPLACEADMINPASSWORD</gsh:param>
-		<gsh:param>--pattern=REPLACEADMINALIAS</gsh:param>
+<!--		<gsh:param>- -pattern=REPLACEADMINALIAS</gsh:param> -->
 		<gsh:param>--storetype=PKCS12</gsh:param>
 		<gsh:param>local:${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/REPLACEADMINPFX</gsh:param>
 	</geniix:keystoreLogin>

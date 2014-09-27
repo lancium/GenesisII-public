@@ -244,9 +244,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					// run it through the trust manager
 					boolean okay = CertificateValidatorFactory.getValidator().validateIsTrustedResource(chain);
 					if (!okay) {
-						String msg = "failed to validate cert chain: " + chain[0].getSubjectDN();
-						_logger.error(msg);
-						throw new AuthZSecurityException(msg);
+						// we throw an exception so that we can either bail out, or just warn about it.
+						// but we warn very quietly these days.
+						throw new AuthZSecurityException("failed to validate cert chain: " + chain[0].getSubjectDN());
 					}
 
 					// insert into valid certs cache

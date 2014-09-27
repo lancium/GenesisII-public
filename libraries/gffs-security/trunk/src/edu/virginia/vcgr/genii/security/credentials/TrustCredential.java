@@ -570,7 +570,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 				}
 			}
 		} catch (Exception e) {
-			throw new SecurityException("failure: an invalid trust delegation was found!", e);
+			throw new SecurityException("failure: an invalid trust delegation was found!  delegation has subject " + delegation.getSubjectDN() + ", custodian " + delegation.getCustodianDN() + ", and issuer " + delegation.getIssuerDN(), e);
 		}
 		this.delegation = delegation;
 		this.signed = true;

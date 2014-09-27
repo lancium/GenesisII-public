@@ -48,17 +48,25 @@ fi
 #source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 source "$XSEDE_TEST_ROOT/library/helper_methods.sh"
 
-# fill in rest.
+echo
+echo "primary sts is on '$sts1_host' at port '$sts1_port'"
+echo "secondary sts is on '$sts2_host' at port '$sts2_port'"
+echo
 
 export STS1PATH=/resources/xsede.org/containers/sts-1.xsede.org
 export STS2PATH=/resources/xsede.org/containers/sts-2.xsede.org
 
+echo unlinking the placeholder for sts-1.
+
 # if for some reason the original sts-1 has already been unlinked,
-# then try commenting out the following two lines.
+# then try adding the original link back in place with:
+# $GENII_INSTALL_DIR/grid ln /resources/xsede.org/containers/gffs-1.xsede.org  /resources/xsede.org/containers/sts-1.xsede.org
 $GENII_INSTALL_DIR/grid unlink $STS1PATH
 check_if_failed "Failed to unlink the sts-1 path at: $STS1PATH"
 
 ####
+
+echo linking the primary sts into the grid.
 
 $GENII_INSTALL_DIR/grid ln \
   --service-url=https://$sts1_host:$sts1_port/axis/services/VCGRContainerPortType \
@@ -69,9 +77,11 @@ check_if_failed "Failed to link the sts-1 path to container: $sts1_host"
 STS_CHK_FILE="$(mktemp $TEST_TEMP/sts-container-listing.XXXXXX)"
 $GENII_INSTALL_DIR/grid ls $STS1PATH >"$STS_CHK_FILE"
 check_if_failed "Listing contents under $STS1PATH"
-grep "Services" "$STS_CHK_FILE"
+grep -q "Services" "$STS_CHK_FILE"
 check_if_failed "Testing container at $STS1PATH; container does not seem to be running!"
 rm "$STS_CHK_FILE"
+
+echo linking the secondary sts into the grid.
 
 $GENII_INSTALL_DIR/grid ln \
   --service-url=https://$sts2_host:$sts2_port/axis/services/VCGRContainerPortType \
@@ -82,11 +92,13 @@ check_if_failed "Failed to link the sts-2 path to container: $sts2_host"
 STS_CHK_FILE="$(mktemp $TEST_TEMP/sts-container-listing.XXXXXX)"
 $GENII_INSTALL_DIR/grid ls $STS2PATH >"$STS_CHK_FILE"
 check_if_failed "Listing contents under $STS2PATH"
-grep "Services" "$STS_CHK_FILE"
+grep -q "Services" "$STS_CHK_FILE"
 check_if_failed "Testing container at $STS2PATH; container does not seem to be running!"
 rm "$STS_CHK_FILE"
 
 # enable permissions on the port types for authentication.
+
+echo setting permissions on primary sts.
 
 $GENII_INSTALL_DIR/grid chmod $STS1PATH/Services/X509AuthnPortType \
   +rx --everyone
@@ -98,6 +110,8 @@ $GENII_INSTALL_DIR/grid chmod \
   $STS1PATH/Services/EnhancedNotificationBrokerFactoryPortType +rx --everyone
 check_if_failed "Failed to chmod notification broker on $STS1PATH"
 
+echo setting permissions on secondary sts.
+
 # Repeated for secondary STS container:
 $GENII_INSTALL_DIR/grid chmod $STS2PATH/Services/X509AuthnPortType \
   +rx --everyone
@@ -108,6 +122,8 @@ check_if_failed "Failed to chmod KerbAuthnPortType on $STS2PATH"
 $GENII_INSTALL_DIR/grid chmod \
   $STS2PATH/Services/EnhancedNotificationBrokerFactoryPortType +rx --everyone
 check_if_failed "Failed to chmod notification broker on $STS2PATH"
+
+echo creating resolver on secondary sts for primary to use.
 
 # create the resolver for STS entries on the secondary STS container.
 $GENII_INSTALL_DIR/grid create-resource \
@@ -123,4 +139,5 @@ check_if_failed "Failed to chmod the STS resolver for use by everyone"
 echo
 echo "The STS1 and STS2 containers have been linked into the grid and have"
 echo "been configured to take over authentication duties for new accounts."
+echo
 
