@@ -168,6 +168,7 @@ while read line; do \
     check_if_failed "Adding a replica for group $line"
   fi; \
 done < $HOME/group_list
+rm $HOME/group_list
 
 echo saving new replicated context.
 

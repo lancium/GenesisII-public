@@ -118,6 +118,11 @@
                 <gsh:param>+r</gsh:param>
                 <gsh:param>--everyone</gsh:param>
         </geniix:chmod>
+        <geniix:chmod>
+                <gsh:param>/groups/FOLDERSPACE</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
 
         <gsh:echo message="Creating /home/FOLDERSPACE, /home/deleted.FOLDERSPACE directories"/>
         <geniix:mkdir>
