@@ -1261,6 +1261,9 @@ if (context.getCompilerVariable("genii.isWindows").equals("true"))
     if (machine.toUpperCase().contains(domain.toUpperCase()))
         domain = ".";
     context.setVariable("genii.wrapperdomain", domain);
+   
+   //com.install4j.api.Util.showMessage("user name is '"+ context.getVariable("genii.username") + "' and domain is '" +context.getVariable("genii.wrapperdomain") + "'");  
+
 }
 
 return true;</string>
@@ -3032,7 +3035,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch broken properties" id="1046" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
+                  <action name="Patch broken properties" id="1046" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="false" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
@@ -3056,7 +3059,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Re-patch wrapper.conf" id="1149" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Re-patch wrapper.conf" id="1149" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="false" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
@@ -3438,7 +3441,7 @@ return memory;</string>
                         </serializedBean>
                         <condition />
                       </action>
-                      <action name="Install Container Wrapper" id="1057" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to install container service; login or permissions problem">
+                      <action name="Install Container Wrapper" id="1057" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="4" errorMessage="Unable to install container service; login or permissions problem">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
