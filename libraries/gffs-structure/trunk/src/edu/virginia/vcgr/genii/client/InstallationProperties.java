@@ -120,7 +120,7 @@ public class InstallationProperties extends Properties
 		}
 		return propsFile;
 	}
-
+	
 	/**
 	 * returns the file that controls where exports may be created.
 	 */

@@ -1,8 +1,8 @@
 # makefile for the genesis GFFS source rpm.
 
 RPMBUILD = /usr/bin/rpmbuild
-KEYTOOL = /usr/bin/keytool
-OPENSSL = /usr/bin/openssl
+#KEYTOOL = /usr/bin/keytool
+#OPENSSL = /usr/bin/openssl
 
 RPMBUILD_TOPDIR := $(shell mktemp -d /tmp/genesis-rpmbuild.XXXXXX)
 

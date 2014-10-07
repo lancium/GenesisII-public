@@ -70,8 +70,6 @@ public class TreeTraverser<nodeType>
 	{
 		if ((path == null) || (_querier == null))
 			return PathOutcome.OUTCOME_NOTHING;
-		if (_logger.isDebugEnabled())
-			_logger.debug("into recursePath");
 		_depth = 0; // reset the depth now.
 		try {
 			PathOutcome ret = innerRecursePath(path);
@@ -95,8 +93,6 @@ public class TreeTraverser<nodeType>
 	{
 		if ((path == null) || (_querier == null))
 			return PathOutcome.OUTCOME_NOTHING;
-		if (_logger.isDebugEnabled())
-			_logger.debug("entered innerRecursePath on: " + path.toString());
 		_depth++; // increment depth because we are supposedly dipping down.
 		if (_depth > _maximumRecursionDepth) {
 			_depth--;
@@ -133,15 +129,14 @@ public class TreeTraverser<nodeType>
 		}
 
 		for (nodeType contained : _querier.getContents(path)) {
-			// if (_logger.isDebugEnabled()) _logger.debug("now operating on " +
-			// contained.toString());
 			if (_querier.isDirectory(contained)) {
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled()) {
 					_logger.debug("found dir, diving into: " + contained.toString());
+				}
 				try {
 					// dive into directories first, so we do depth first.
 					ret = innerRecursePath(contained);
-					if (_logger.isDebugEnabled())
+					if (_logger.isTraceEnabled())
 						_logger.debug("came back out of: " + contained.toString());
 					// continuable bouncing is fine, we just need to stop working on this path.
 					if (ret.differs(PathOutcome.OUTCOME_CONTINUABLE) && ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
@@ -155,7 +150,7 @@ public class TreeTraverser<nodeType>
 					return PathOutcome.OUTCOME_ERROR;
 				}
 			} else if (_querier.isFile(contained)) {
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("found file at: " + contained.toString());
 				if (_fileAct != null) {
 					ret = _fileAct.respond(contained);

@@ -100,7 +100,7 @@ public class PathDisposal
 	{
 		if ((path == null) || (querier == null))
 			return PathOutcome.OUTCOME_NOTHING;
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("trying to remove appropriately: " + path.toString());
 		PathOutcome ret = querier.checkPathSanity(path, b);
 		if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
@@ -118,11 +118,11 @@ public class PathDisposal
 			return ret;
 		}
 		GeniiPath gPath = new GeniiPath(path.pwd());
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("operating on " + path.pwd() + " from: " + path.toString());
 		if (gPath.isFile()) {
 			// this is not a directory, so we don't have to check for children.
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("removing normal rns file of: " + gPath.toString());
 			try {
 				path.delete();
@@ -131,8 +131,8 @@ public class PathDisposal
 				return PathOutcome.OUTCOME_NO_ACCESS;
 			}
 		} else if (gPath.isDirectory()) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("directory for " + gPath.toString());
+			if (_logger.isTraceEnabled())
+				_logger.debug("removing directory for " + gPath.toString());
 			// this is a directory, so make sure it's empty.
 			int size = 0;
 			try {
@@ -147,7 +147,7 @@ public class PathDisposal
 				_logger.warn(msg);
 				return PathOutcome.OUTCOME_NON_EMPTY;
 			}
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("whacking rns directory of: " + path.pwd());
 			// presumably we are good to go now; the directory is empty.
 			try {
@@ -176,8 +176,6 @@ public class PathDisposal
 	{
 		if (path == null)
 			return PathOutcome.OUTCOME_NOTHING;
-		if (_logger.isDebugEnabled())
-			_logger.debug("into rns recursive delete");
 		RNSPathHierarchyHelper helping = new RNSPathHierarchyHelper();
 		RemoveBouncerRNS ourBouncer = new RemoveBouncerRNS();
 		RNSRecurser zapper =
@@ -263,26 +261,26 @@ public class PathDisposal
 	{
 		if ((path == null) || (querier == null))
 			return PathOutcome.OUTCOME_NOTHING;
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("trying to remove appropriately: " + path);
 		PathOutcome ret = querier.checkPathSanity(path, b);
 		if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("operating on " + path);
 			return ret;
 		}
 
 		// / File gPath = new File(path);
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("operating on " + path);
 		if (path.isFile()) {
 			// this is not a directory, so we don't have to check for children.
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("removing normal file of: " + path);
 			path.delete();
 		} else {
-			if (_logger.isDebugEnabled())
-				_logger.debug("directory for " + path);
+			if (_logger.isTraceEnabled())
+				_logger.debug("removing directory for " + path);
 			// this is a directory, so make sure it's empty.
 			if (querier.getContents(path).size() != 0) {
 				// throw a fault, this is not right.
@@ -290,8 +288,8 @@ public class PathDisposal
 				_logger.warn(msg);
 				return PathOutcome.OUTCOME_NON_EMPTY;
 			}
-			if (_logger.isDebugEnabled())
-				_logger.debug("whacking javafile directory of: " + path);
+			if (_logger.isTraceEnabled())
+				_logger.debug("whacking directory of: " + path);
 			// presumably we are good to go now; the directory is empty.
 			path.delete();
 		}
@@ -306,8 +304,6 @@ public class PathDisposal
 	{
 		if (path == null)
 			return PathOutcome.OUTCOME_NOTHING;
-		if (_logger.isDebugEnabled())
-			_logger.debug("into javafile recursive delete");
 		JavaFileHierarchyHelper helping = new JavaFileHierarchyHelper();
 		RemoveBouncerJavaFile ourBouncer = new RemoveBouncerJavaFile();
 		JavaFileRecurser zapper =

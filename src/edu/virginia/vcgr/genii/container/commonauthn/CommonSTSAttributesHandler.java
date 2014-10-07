@@ -21,12 +21,11 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.GeniiDirPolicy;
-import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.rns.GeniiDirAttributeHandlers;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
@@ -42,7 +41,7 @@ import edu.virginia.vcgr.genii.security.credentials.NuCredential;
  * not protected information. We keep them in this class too to have a common place for attribute
  * retrievals.
  */
-public class CommonSTSAttributesHandler extends AbstractAttributeHandler
+public class CommonSTSAttributesHandler extends GeniiDirAttributeHandlers
 {
 
 	public CommonSTSAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
@@ -60,7 +59,8 @@ public class CommonSTSAttributesHandler extends AbstractAttributeHandler
 		addHandler(SecurityConstants.CERTIFICATE_CHAIN_QNAME, "getResourceCertificate");
 		addHandler(SecurityConstants.STORED_CALLING_CONTEXT_QNAME, "getStoredCallingContext");
 		addHandler(SecurityConstants.IDP_PRIVATE_KEY_QNAME, "getPrivateKey");
-		addHandler(GeniiDirPolicy.REPLICATION_POLICY_QNAME, "getReplicationPolicyAttr", "setReplicationPolicyAttr");
+//		addHandler(GeniiDirPolicy.REPLICATION_POLICY_QNAME, "getReplicationPolicyAttr", "setReplicationPolicyAttr");
+		super.registerHandlers();
 	}
 
 	public Collection<MessageElement> getTransferMechsAttr()
@@ -112,25 +112,26 @@ public class CommonSTSAttributesHandler extends AbstractAttributeHandler
 		return new MessageElement(SecurityConstants.IDP_PRIVATE_KEY_QNAME, serializeObjectToString(privateKey));
 	}
 
-	public MessageElement getReplicationPolicyAttr() throws ResourceUnknownFaultType, ResourceException
-	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		IResource resource = (IResource) rKey.dereference();
-		String value = (String) resource.getProperty(GeniiDirPolicy.REPLICATION_POLICY_QNAME.getLocalPart());
-		if (value == null)
-			return null;
-		return new MessageElement(GeniiDirPolicy.REPLICATION_POLICY_QNAME, value);
-	}
-
-	public void setReplicationPolicyAttr(MessageElement element) throws ResourceUnknownFaultType, ResourceException
-	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		IResource resource = (IResource) rKey.dereference();
-		String value = element.getValue();
-		if (resource.isServiceResource())
-			return;
-		resource.setProperty(GeniiDirPolicy.REPLICATION_POLICY_QNAME.getLocalPart(), value);
-	}
+	//hmmm: CAK: we're turning these off since genii dir attrib handler should implement.
+//	public MessageElement getReplicationPolicyAttr() throws ResourceUnknownFaultType, ResourceException
+//	{
+//		ResourceKey rKey = ResourceManager.getCurrentResource();
+//		IResource resource = (IResource) rKey.dereference();
+//		String value = (String) resource.getProperty(GeniiDirPolicy.REPLICATION_POLICY_QNAME.getLocalPart());
+//		if (value == null)
+//			return null;
+//		return new MessageElement(GeniiDirPolicy.REPLICATION_POLICY_QNAME, value);
+//	}
+//
+//	public void setReplicationPolicyAttr(MessageElement element) throws ResourceUnknownFaultType, ResourceException
+//	{
+//		ResourceKey rKey = ResourceManager.getCurrentResource();
+//		IResource resource = (IResource) rKey.dereference();
+//		String value = element.getValue();
+//		if (resource.isServiceResource())
+//			return;
+//		resource.setProperty(GeniiDirPolicy.REPLICATION_POLICY_QNAME.getLocalPart(), value);
+//	}
 
 	public static Object deserializeObjectFromString(String data) throws IOException, ClassNotFoundException
 	{

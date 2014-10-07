@@ -239,6 +239,43 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
+	 * Return the valid prefix of a path, as might be passed in lookup
+	 * For example, if the path is /home/xsede.org/andrew/dir1/fred and dir1 did not exist prefix would return
+	 * @return /home/xsede.org/andrew
+	 */
+	public String getValidPrefix(String pathString)
+
+	{
+			RNSPath path;
+			// Now we will work out the prefix that is good
+			String elements[] = pathString.split("/");
+			String goodPath="/";
+			path = RNSPath.getCurrent();
+			for (String s : elements) {
+				if (s == null || s.length() == 0)
+					continue;
+				String lastgood=goodPath;
+				goodPath=goodPath + s;
+				try {
+					path = path.lookup(goodPath, RNSPathQueryFlags.MUST_EXIST);
+					goodPath = goodPath+"/";
+				}
+				catch (RNSPathDoesNotExistException rr) {
+					goodPath=lastgood;
+					continue;
+				} catch (RNSPathAlreadyExistsException er) {
+				}
+			}
+			// Now there is a trailing "/", if so, we want to whack it
+			if (goodPath.length()!=1) {
+				// if the path is only "/" we don't want to get rid of the trailing "/"
+				goodPath= goodPath.substring(0,goodPath.length()-1);
+			}
+			return goodPath;
+	}
+		
+/**
+	
 	 * Retrieve the name of this entry as represented by the parent directory.
 	 * 
 	 * @return The name of this RNS entry.
@@ -596,7 +633,7 @@ public class RNSPath implements Serializable, Cloneable
 				}
 			} catch (RNSException rne) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("Skipping a directory in an RSNPath expansion which can't be expanded.", rne);
+					_logger.debug("Skipping a directory in an RSNPath expansion which can't be expanded: " + rne.getLocalizedMessage());
 			}
 		}
 
@@ -934,6 +971,20 @@ public class RNSPath implements Serializable, Cloneable
 		} else {
 			resolveOptional();
 			return new TypeInformation(_cachedEPR).isRNS();
+		}
+	}
+
+
+	// A method for bypassing access to EPR for port-type lookup whenever possible. This and the
+	// subsequent method
+	// is particularly useful for managing short RNS responses.
+	public boolean isByteIO()
+	{
+		if (_stringPortTypes != null) {
+			return _stringPortTypes.contains("-ByteIO-");
+		} else {
+			resolveOptional();
+			return new TypeInformation(_cachedEPR).isByteIO();
 		}
 	}
 

@@ -12,6 +12,8 @@ public abstract class StageEditor<GenericType extends StageData> extends JDialog
 	static final long serialVersionUID = 0L;
 
 	private boolean _cancelled = true;
+	
+	protected boolean _stageIn=false;
 
 	protected abstract GenericType getStageDataImpl();
 
@@ -25,6 +27,10 @@ public abstract class StageEditor<GenericType extends StageData> extends JDialog
 		return new CancelAction();
 	}
 
+	final protected void setStageIn() {
+		_stageIn=true;
+	}
+	
 	final protected void accept()
 	{
 		_cancelled = false;
@@ -41,7 +47,6 @@ public abstract class StageEditor<GenericType extends StageData> extends JDialog
 	{
 		super(owner);
 		setTitle(title);
-
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}
 

@@ -78,7 +78,7 @@ public class JavaFileHierarchyHelper implements TreeTraversalPathQuery<File>
 		} catch (Throwable cause) {
 			_logger.error("failed to list path contents for " + path.toString(), cause);
 		}
-		if (_logger.isDebugEnabled()) {
+		if (_logger.isTraceEnabled()) {
 			_logger.debug("returning an array with " + arr.size() + " elems:");
 			for (int i = 0; i < arr.size(); i++) {
 				_logger.debug("index " + i + ": " + arr.get(i).toString());

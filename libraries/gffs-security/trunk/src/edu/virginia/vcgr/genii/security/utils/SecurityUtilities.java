@@ -204,9 +204,6 @@ public class SecurityUtilities implements CertificateValidator
 	{
 		KeyStore ks = store;
 		boolean trustOkay = false;
-		/*
-		 * TODO: may want to cache both types of trust managers in different caches, indexed by the keystore.
-		 */
 		try {
 			// create a trust manager from the trust store by trying jdk ssl support first.
 			PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(ks, new X509CertSelector());

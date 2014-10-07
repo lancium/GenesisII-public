@@ -149,8 +149,8 @@ public class AlarmManager
 	/**
 	 * Add a new alarm to the system.
 	 * 
-	 * @param nextOccurance
-	 *            The date on which the next occurance of the alarm should take place. This value
+	 * @param nextOccurrence
+	 *            The date on which the next occurrence of the alarm should take place. This value
 	 *            MUST be non-null, but MAY be in the past (it will get executed eventually).
 	 * @param repeatIntervalMS
 	 *            This is the number of milliseconds between alarms. This value can be 0 or negative
@@ -170,7 +170,7 @@ public class AlarmManager
 	 *            Any user data (or null) to pass along for alarms.
 	 * @return An alarm identifier.
 	 */
-	public AlarmIdentifier addAlarm(Date nextOccurance, long repeatIntervalMS, ICallingContext callingContext,
+	public AlarmIdentifier addAlarm(Date nextOccurrence, long repeatIntervalMS, ICallingContext callingContext,
 		EndpointReferenceType targetEPR, String methodName, Serializable userData)
 	{
 		Connection conn = null;
@@ -201,7 +201,7 @@ public class AlarmManager
 			addStmt =
 				conn.prepareStatement("INSERT INTO alarmtable(" + "nextoccurance, repeatinterval, callingcontext, "
 					+ "target, methodname, userdata) " + "VALUES (?, ?, ?, ?, ?, ?)");
-			addStmt.setTimestamp(1, new Timestamp(nextOccurance.getTime()));
+			addStmt.setTimestamp(1, new Timestamp(nextOccurrence.getTime()));
 			addStmt.setLong(2, repeatIntervalMS);
 			addStmt.setBlob(3, DBSerializer.toBlob(callingContext, "alarmtable", "callingcontext"));
 			addStmt.setBlob(4, EPRUtils.toBlob(targetEPR, "alarmtable", "target"));
@@ -217,7 +217,7 @@ public class AlarmManager
 
 			long alarmid = rs.getLong(1);
 			synchronized (_alarms) {
-				_alarms.put(alarmid, nextOccurance);
+				_alarms.put(alarmid, nextOccurrence);
 				_alarms.notify();
 			}
 			conn.commit();

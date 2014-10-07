@@ -41,10 +41,6 @@ public class HierarchicalDirectory
 	{
 		File file;
 		
-		/* hmmm: CAK, is this the only place we really need to modify?
-		 * it seems like if we catch the slash at front here, we just return it if it exists.
-		 */
-		
 		// handle absolute paths first.
 		if (filename.startsWith("/")) {
 			_logger.debug("found a path to lookup that is absolute: " + filename);

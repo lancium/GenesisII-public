@@ -44,7 +44,7 @@ public class PerformanceLogger implements Closeable
 
 	public void log()
 	{
-		_ps.format("Ellapsed time is %d milliseconds.\n", (_stopTime - _startTime));
+		_ps.format("Elapsed time is %d milliseconds.\n", (_stopTime - _startTime));
 	}
 
 	@Override

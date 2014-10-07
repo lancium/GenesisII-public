@@ -97,11 +97,11 @@ public class RmTool extends BaseGridTool
 	/**
 	 * removes a path pointed at by a java File object.
 	 */
-	private PathOutcome rm(File path, boolean recursive, boolean force)
+	public PathOutcome rm(File path, boolean recursive, boolean force)
 	{
 		if (path == null)
 			return PathOutcome.OUTCOME_NOTHING;
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("entered into rm on Java File: path=" + path.toString() + " recurs=" + recursive + " force=" + force);
 		if (!path.exists()) {
 			if (force)
@@ -124,7 +124,7 @@ public class RmTool extends BaseGridTool
 	{
 		if ((currentPath == null) || (filePath == null))
 			return PathOutcome.OUTCOME_NOTHING;
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("entered into rm on RNSPath + String: currpath=" + currentPath.toString() + " filepath="
 				+ filePath.toString() + " recurs=" + recursive + " force=" + force);
 		for (RNSPath file : currentPath.expand(filePath)) {

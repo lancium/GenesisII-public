@@ -79,7 +79,7 @@ public class GffsExportConfiguration
 
 	/*
 	 * hmmm: add a cache! this really should not read the file each and every time. so cache the
-	 * values without time-out, and we won't have to read the file every time. however, if the grid
+	 * values without time-out, and we won't have to read it every time. however, if the grid
 	 * map file changes, we should throw out all cached entries.
 	 */
 

@@ -137,14 +137,6 @@ public class AxisBasedContextResolver implements IContextResolver
 			retval = resourceContext.deriveNewContext(ct);
 		}
 
-		CallingContextImpl trendy = (CallingContextImpl) retval;
-		if (_logger.isTraceEnabled()) {
-			String currpath = "NULL!  it's NULL!!!!";
-			if (trendy.getCurrentPath() != null)
-				currpath = trendy.getCurrentPath().toString();
-			_logger.trace("thread " + Thread.currentThread().getId() + ": has current RNSPath of " + currpath);
-		}
-
 		retval = CallingContextUtilities.setupCallingContextAfterCombinedExtraction(retval);
 
 		// place the resource's key material in the transient calling context
@@ -163,10 +155,6 @@ public class AxisBasedContextResolver implements IContextResolver
 		}
 
 		workingContext.setProperty(WorkingContext.CURRENT_CONTEXT_KEY, retval);
-
-		if (_logger.isTraceEnabled())
-			_logger.debug("container received a context:\n" + trendy.dumpContext());
-
 		return retval;
 	}
 

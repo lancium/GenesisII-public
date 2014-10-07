@@ -452,6 +452,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			} catch (IOException e) {
 				throw new AuthZSecurityException(e.getMessage(), e);
 			}
+			
 			// to be filled with a valid delegated credential, if possible.
 			TrustCredential newTC = null;
 			if (credential instanceof TrustCredential) {

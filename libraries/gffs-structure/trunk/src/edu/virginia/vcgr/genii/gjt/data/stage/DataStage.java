@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.gjt.data.stage;
 
-import java.awt.Window;
 import java.awt.Dialog.ModalityType;
+import java.awt.Window;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -47,18 +47,21 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 
 	@XmlAttribute(name = "current-stage-protocol")
 	private StageProtocol _current = StageProtocol.undefined;
+	
+	private boolean _stageIn=false;
 
 	public DataStage()
 	{
 		_history.put(StageProtocol.undefined, new UndefinedStageData());
 	}
 
-	public DataStage(ParameterizableBroker pBroker, ModificationBroker mBroker)
+	public DataStage(ParameterizableBroker pBroker, ModificationBroker mBroker, boolean stageIn)
 	{
 		this();
 
 		_pBroker = pBroker;
 		_mBroker = mBroker;
+		_stageIn=stageIn;
 
 		addParameterizableListener(pBroker);
 		addModificationListener(mBroker);
@@ -116,6 +119,7 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 				editor.setInitialData(current);
 				editor.pack();
 				editor.setModalityType(ModalityType.DOCUMENT_MODAL);
+				if (_stageIn) editor.setStageIn();
 				GUIUtils.centerComponent(editor);
 				editor.setVisible(true);
 				current = editor.getStageData();
@@ -143,6 +147,7 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 			editor.setModalityType(ModalityType.DOCUMENT_MODAL);
 			editor.pack();
 			GUIUtils.centerComponent(editor);
+			if (_stageIn) editor.setStageIn();
 			editor.setVisible(true);
 			data = editor.getStageData();
 			if (data != null) {

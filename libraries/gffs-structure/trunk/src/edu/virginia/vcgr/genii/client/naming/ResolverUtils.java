@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.rns.LookupResponseType;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ogf.schemas.naming._2006._08.naming.ResolveFailedWithReferralFaultType;
 import org.ws.addressing.EndpointReferenceType;
@@ -61,7 +62,50 @@ public class ResolverUtils
 		}
 	}
 
+	static public LookupResponseType getEndpointEntries(EndpointReferenceType originalEPR)
+	{
+		// 2014-10-04 ASG. Written to allow us to get this list of replicant EPRs.
+		WSName wsname = new WSName(originalEPR);
+		URI targetEPI = wsname.getEndpointIdentifier();
+		List<ResolverDescription> resolvers = wsname.getResolvers();
+		for (ResolverDescription resolver : resolvers) {
+			try {
+				// First lookup the particular EPI in this resolver
+				GeniiResolverPortType proxy = ClientUtils.createProxy(GeniiResolverPortType.class, resolver.getEPR());
+				String []EPItoLookup={targetEPI.toString()};	
+				LookupResponseType targetList = proxy.lookup(EPItoLookup);
+				// Now we have the EPR that represents the directory of instances of this EPI, lets look them up
+				proxy=ClientUtils.createProxy(GeniiResolverPortType.class, targetList.getEntryResponse(0).getEndpoint());
+				String [] pattern={};
+				targetList = proxy.lookup(pattern);
+				return targetList;
+			} catch (Exception exception) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("ResolverUtils.getEndpointCount: " + exception);
+			}
+		}
+		return null;
+	}
+	
+	static public int [] getEndpoints(EndpointReferenceType originalEPR) {
+		WSName wsname = new WSName(originalEPR);
+		URI targetEPI = wsname.getEndpointIdentifier();
+		List<ResolverDescription> resolvers = wsname.getResolvers();
+		for (ResolverDescription resolver : resolvers) {
+			try {
+				GeniiResolverPortType proxy = ClientUtils.createProxy(GeniiResolverPortType.class, resolver.getEPR());
+				int[] targetIDList = proxy.getEndpointCount(new CountRequestType(targetEPI));
+				return targetIDList;
+			} catch (Exception exception) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("ResolverUtils.getEndpointCount: " + exception);
+			}
+		}
+		return null;
+	}	
+	
 	static public int getEndpointCount(EndpointReferenceType originalEPR)
+	
 	{
 		WSName wsname = new WSName(originalEPR);
 		URI targetEPI = wsname.getEndpointIdentifier();

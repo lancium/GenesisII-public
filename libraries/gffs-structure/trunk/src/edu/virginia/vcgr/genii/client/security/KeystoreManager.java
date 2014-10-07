@@ -197,10 +197,19 @@ public class KeystoreManager
 
 				{
 					// load the grid-wide certificates, which is where we support loading CRL lists also.
+					
 					String gridCertificatesDirectory = getGridCertsDir();
+					_logger.debug("found the grid-certificates dir at: " + gridCertificatesDirectory);
 					if (gridCertificatesDirectory != null) {
-						File gridCertsDir = new File(gridCertificatesDirectory);
-						trustStore = addCertificatesToKeystore(trustStore, gridCertsDir, "grid-certificates", trustStoreType);
+						// need filelock here to ensure we don't get a partial directory.
+						ThreadAndProcessSynchronizer.acquireLock();		
+						try {
+							File gridCertsDir = new File(gridCertificatesDirectory);
+							trustStore = addCertificatesToKeystore(trustStore, gridCertsDir, "grid-certificates", trustStoreType);
+						} catch (Exception e) {
+							_logger.error("failed while adding grid-certificates to TLS trust store", e);
+						}
+						ThreadAndProcessSynchronizer.releaseLock();
 					}
 				}
 
@@ -223,6 +232,16 @@ public class KeystoreManager
 		return _tlsTrustStore;
 	}
 
+	/**
+	 * forgets the existing TLS trust store, which will cause it to be reloaded on next access.
+	 */
+	static public void dropTlsTrustStore()
+	{
+		synchronized (_trustLock) {
+			_tlsTrustStore = null;
+		}
+	}
+	
 	static public KeyStore loadResourceTrustStoreFromFile() throws AuthZSecurityException
 	{
 		KeyStore trustStore = null;

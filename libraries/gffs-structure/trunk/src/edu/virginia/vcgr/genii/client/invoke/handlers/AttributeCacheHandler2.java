@@ -397,7 +397,7 @@ public class AttributeCacheHandler2
 			} else if (cachedValue instanceof Collection<?>) {
 				@SuppressWarnings("unchecked")
 				Collection<MessageElement> collection = (Collection<MessageElement>) cachedValue;
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("possibly dangerous addition of collection assumed to be mess elems.");
 				result.addAll(collection);
 			} else {

@@ -304,12 +304,12 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	{
 		StringBuilder toReturn = new StringBuilder();
 		toReturn.append(describe(VerbosityLevel.HIGH));
-		
+
 		toReturn.append(" <id " + id.toString() + ">");
 		if (priorDelegationId != null) {
 			toReturn.append(" (prior-id " + priorDelegationId.toString() + ")");
 		}
-		
+
 		toReturn.append(" {mask ");
 		toReturn.append(accessMask.toString());
 		toReturn.append("}");
@@ -474,6 +474,18 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		} catch (Exception e) {
 			throw new SecurityException("failure: could not delegate trust properly!", e);
 		}
+
+		// hmmm: extra checking--test the signature we just made.
+		// try {
+		// boolean signedOkay = delegation.isCorrectlySigned(issuer[0].getPublicKey());
+		// if (!signedOkay) {
+		// _logger.error("failed checking signature just made for cred: " + toString() +
+		// " and last few frames are: "
+		// + ProgramTools.showLastFewOnStack(28));
+		// }
+		// } catch (Exception e) {
+		// _logger.error("exception checking signature just made for cred: " + toString(), e);
+		// }
 	}
 
 	@Override
@@ -493,10 +505,10 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		}
 
 		toReturn.append(" -> " + new X509Identity(delegatee, _delegateeType).describe(verbosity));
-		
+
 		return toReturn.toString();
 	}
-	
+
 	public String showIdChain()
 	{
 		StringBuilder toReturn = new StringBuilder();
@@ -507,7 +519,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 			// this is terminal delegation.
 			toReturn.append(id);
 		}
-		return toReturn.toString();		
+		return toReturn.toString();
 	}
 
 	@Override
@@ -570,7 +582,9 @@ public class TrustCredential implements NuCredential, RWXAccessible
 				}
 			}
 		} catch (Exception e) {
-			throw new SecurityException("failure: an invalid trust delegation was found!  delegation has subject " + delegation.getSubjectDN() + ", custodian " + delegation.getCustodianDN() + ", and issuer " + delegation.getIssuerDN(), e);
+			throw new SecurityException("failure: an invalid trust delegation was found!  delegation has subject "
+				+ delegation.getSubjectDN() + ", custodian " + delegation.getCustodianDN() + ", and issuer "
+				+ delegation.getIssuerDN(), e);
 		}
 		this.delegation = delegation;
 		this.signed = true;

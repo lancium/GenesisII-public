@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +27,7 @@ import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.client.security.UpdateGridCertsTool;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
@@ -34,6 +36,9 @@ public class Driver extends ApplicationBase
 {
 	static private Log _logger = LogFactory.getLog(Driver.class);
 
+	// how soon should the next check of the certificates occur.
+	static long _nextCertUpdateCheck = 0;
+	
 	static public void usage()
 	{
 		System.out.println("Driver");
@@ -61,7 +66,8 @@ public class Driver extends ApplicationBase
 		SecurityUtilities.initializeSecurity();
 
 		try {
-			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore(), KeystoreManager.getGridCertsDir()));
+			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore(),
+				KeystoreManager.getGridCertsDir()));
 		} catch (Throwable t) {
 			System.err.println("Security validation setup failure: " + t.getMessage());
 			System.exit(1);
@@ -110,11 +116,12 @@ public class Driver extends ApplicationBase
 
 		int lastExit = 0; // track the grid commands and how they returned.
 
+		ApplicationBase.GridStates gridOkay = GridStates.CONNECTION_MEANS_UNKNOWN;
 		if ((args.length > 1) && (args[0].equals("connect"))) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("not trying auto-connect as this is a connect command.");
 		} else {
-			ApplicationBase.GridStates gridOkay =
+			gridOkay =
 				establishGridConnection(new PrintWriter(System.out, true), new PrintWriter(System.err, true),
 					new InputStreamReader(System.in));
 			switch (gridOkay) {
@@ -152,15 +159,41 @@ public class Driver extends ApplicationBase
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-		if (args.length == 0 || (args.length == 1 && args[0].equals("shell")))
+		// we need to load the keystore before we update the certs, or we will have a deadlock.
+		KeystoreManager.getTlsTrustStore();
+
+		// update certificates if we have a valid connection.
+		if (gridOkay.equals(GridStates.CONNECTION_ALREADY_GOOD) || gridOkay.equals(GridStates.CONNECTION_GOOD_NOW)) {
+			try {
+				UpdateGridCertsTool.runGridCertificateUpdates();
+			} catch (Exception e) {
+				_logger.error("certificate update process failed", e);
+			}
+			_nextCertUpdateCheck = new Date().getTime() + UpdateGridCertsTool.UPDATER_SNOOZE_DURATION;						
+		}
+		
+		if (args.length == 0 || (args.length == 1 && args[0].equals("shell"))) {
 			while (true) {
+
+				if (new Date().getTime() >= _nextCertUpdateCheck) {
+					// time to update certificates if we have a valid connection.
+					if (gridOkay.equals(GridStates.CONNECTION_ALREADY_GOOD) || gridOkay.equals(GridStates.CONNECTION_GOOD_NOW)) {
+						try {
+							UpdateGridCertsTool.runGridCertificateUpdates();
+						} catch (Exception e) {
+							_logger.error("certificate update process failed", e);
+						}
+						_nextCertUpdateCheck = new Date().getTime() + UpdateGridCertsTool.UPDATER_SNOOZE_DURATION;						
+					}
+				}
+				
 				try {
 					lastExit = doShell(in);
 					break;
 				} catch (ReloadShellException e) {
 				}
 			}
-		else {
+		} else {
 			try {
 				doNonShell(in, args);
 			} catch (ReloadShellException re) {

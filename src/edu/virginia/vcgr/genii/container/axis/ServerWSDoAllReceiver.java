@@ -76,7 +76,6 @@ import edu.virginia.vcgr.genii.network.NetworkConfigTools;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
-import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
@@ -428,85 +427,11 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					}
 				}
 
-				// hmmm: this whole code block can go. we know it interferes with our ability to do
-				// group membership in the new
-				// tls model. we simply can't pass the pass-through credential without the fact that
-				// we've delegated to someone
-				// other than our tls cert being a problem (for this code). so it has to go.
-				boolean totally_disabled_scheduled_for_removal = true;
-				if (!totally_disabled_scheduled_for_removal) {
 
-					/*
-					 * this section came from the days when we were always running on tls
-					 * certificates as the resource identities. it cannot be in place any more
-					 * because it hinders the new usage of trust delegations, which are not always
-					 * from the connecting identity, but which are still totally valid.
-					 */
-					/*
-					 * more recently, it is being investigated to see if it still causes the
-					 * problems noticed during the activity; it reports instead of booting the
-					 * credential.
-					 */
-					boolean enable_old_credential_checking = true; // try the checking below?
-					boolean enable_credential_rejection = false; // react based on the checking
-																	// results?
-					if (enable_old_credential_checking) {
-						if (_logger.isTraceEnabled())
-							_logger.trace("credential to test has first delegatee: "
-								+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
-								+ assertion.getOriginalAsserter()[0].getSubjectDN());
-
-						// Verify that the request message signer is the same as the
-						// one of the holder-of-key certificates.
-						boolean match = false;
-						for (X509Certificate[] callerCertChain : authenticatedCertChains) {
-							if (_logger.isTraceEnabled())
-								_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
-							try {
-								if (assertion.findDelegateeInChain(callerCertChain[0]) >= 0) {
-									if (_logger.isTraceEnabled())
-										_logger.trace("...found delegatee at position "
-											+ assertion.findDelegateeInChain(callerCertChain[0])
-											+ " to be the same as incoming tls cert.");
-									match = true;
-									break;
-									/*
-									 * disabled code: we are trying to validate that the credential
-									 * involves the current guy; this would just validate that the
-									 * credential originated on our grid (even if it were copied),
-									 * which is not sufficient.
-									 */
-									// } else if
-									// (CertificateValidatorFactory.getValidator().validateIsTrustedResource(
-									// assertion.getOriginalAsserter()) == true) {
-									// if (_logger.isTraceEnabled())
-									// _logger
-									// .trace("...allowed incoming message using resource trust store for original asserter.");
-									// match = true;
-									// break;
-								} else {
-									if (_logger.isTraceEnabled())
-										_logger.trace("...found them to be different.");
-								}
-							} catch (Throwable e) {
-								_logger.error("failure: exception thrown during holder of key checks", e);
-							}
-						}
-
-						if (!match) {
-							String msg =
-								"WARN: credential did not match incoming message sender: '"
-									+ assertion.describe(VerbosityLevel.HIGH) + "'";
-							_logger.debug(msg);
-							if (enable_credential_rejection == true) {
-								// skip adding it.
-								continue;
-							}
-						}
-					}
+	
 				}
 
-			}
+			
 
 			retval.add(cred);
 		}

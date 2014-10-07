@@ -767,10 +767,10 @@ public class JobDocument implements PostUnmarshallListener
 			_processesPerHost = new SettableLong(parameterBroker, modificationBroker);
 
 		if (_stageIns == null)
-			_stageIns = new StageList(parameterBroker, modificationBroker);
+			_stageIns = new StageList(parameterBroker, modificationBroker, true);
 
 		if (_stageOuts == null)
-			_stageOuts = new StageList(parameterBroker, modificationBroker);
+			_stageOuts = new StageList(parameterBroker, modificationBroker, false);
 	}
 
 	public Map<String, VariableDefinition> variables()

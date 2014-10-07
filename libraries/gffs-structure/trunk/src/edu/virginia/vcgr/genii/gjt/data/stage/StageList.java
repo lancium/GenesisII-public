@@ -26,15 +26,18 @@ public class StageList extends DefaultDataItem implements Clearable, PostUnmarsh
 
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "data-stage")
 	private Vector<DataStage> _stages = new Vector<DataStage>();
+	
+	private boolean _stageIn=false;
 
 	public StageList()
 	{
 	}
 
-	public StageList(ParameterizableBroker pBroker, ModificationBroker mBroker)
+	public StageList(ParameterizableBroker pBroker, ModificationBroker mBroker, boolean stageIn)
 	{
 		_pBroker = pBroker;
 		_mBroker = mBroker;
+		_stageIn=stageIn;
 
 		addParameterizableListener(pBroker);
 		addModificationListener(mBroker);
@@ -42,7 +45,7 @@ public class StageList extends DefaultDataItem implements Clearable, PostUnmarsh
 
 	public DataStage add()
 	{
-		DataStage newStage = new DataStage(_pBroker, _mBroker);
+		DataStage newStage = new DataStage(_pBroker, _mBroker,_stageIn);
 		_stages.add(newStage);
 		fireJobDescriptionModified();
 
