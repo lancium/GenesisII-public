@@ -83,12 +83,13 @@ echo "Stopping the container and making a snapshot of the user directory..."
 bash "$XSEDE_TEST_ROOT/library/zap_genesis_javas.sh"
 
 #hmmm: could use a variable for where this file lives.
-save_grid_data $TMP/bootstrap_save.zip
+save_grid_data $TMP/bootstrap_save.tar.gz
 
 # launch the containers again to leave things going.
 launch_container_if_not_running "$DEPLOYMENT_NAME"
 if [ ! -z "$BACKUP_DEPLOYMENT_NAME" -a ! -z "$BACKUP_USER_DIR" ]; then
   save_and_switch_userdir "$BACKUP_USER_DIR"
+  save_grid_data $TMP/mirror_save.tar.gz
   launch_container_if_not_running "$BACKUP_DEPLOYMENT_NAME"
   restore_userdir
 fi

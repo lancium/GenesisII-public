@@ -85,6 +85,7 @@ function get_container_logfile()
     else
       # if we cannot find the actual log4j props, don't return a name that would be
       # the same as the main container log.
+#      echo $HOME/mirror-container.log
       return
     fi
   elif [ "$DEP_NAME" == "default" ]; then
@@ -199,24 +200,6 @@ function save_grid_data()
   if [ $? -ne 0 ]; then echo "===> script failure backing up container state."; return 1; fi
 
   return 0
-
-#older approach.
-  # now grab up a copy of the normal state directory.
-  # we need to zip it without a full path, so we can easily unzip it to the right place.
-  pushd "$GENII_USER_DIR/.." &>/dev/null
-  zip -r $HOME/bootstrap_save.zip "$(basename "$GENII_USER_DIR")" &>/dev/null
-  popd &>/dev/null
-  # zip the mirror container's state too, if there is one.
-  if [ ! -z "$BACKUP_USER_DIR" ]; then
-    pushd $BACKUP_USER_DIR/.. &>/dev/null
-    zip -r $HOME/bootstrap_save.zip "$(basename "$BACKUP_USER_DIR")" &>/dev/null
-    popd &>/dev/null
-  fi
-  # and back up the deployment info.
-  pushd "$DEPLOYMENTS_ROOT/.." &>/dev/null
-  zip -r $HOME/bootstrap_save.zip deployments &>/dev/null
-  popd &>/dev/null
-  \mv $HOME/bootstrap_save.zip "$backup_file"
 }
 
 ##############

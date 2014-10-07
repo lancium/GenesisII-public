@@ -48,17 +48,12 @@ function date_stringer()
   date +"%Y$sep%m$sep%d$sep%H%M$sep%S" | tr -d '/\n/'
 }
 
-ARCHIVE_NAME=$HOME/deployment_archive_with_keypairs_$(date_stringer).tar
+ARCHIVE_NAME=$HOME/deployment_archive_with_keypairs_$(date_stringer).tar.gz
 
 pushd ..
-tar -rf $ARCHIVE_NAME deployment_generator "$GENII_INSTALL_DIR/context.xml" "$DEP_DIR" --exclude=".svn"
+tar -czf $ARCHIVE_NAME deployment_generator "$GENII_INSTALL_DIR/context.xml" "$DEP_DIR" --exclude=".svn"
 if [ $? -ne 0 ]; then
   echo Failed to pack the deployment archive.
-  exit 1
-fi
-gzip $ARCHIVE_NAME
-if [ $? -ne 0 ]; then
-  echo Failed to compress the deployment archive.
   exit 1
 fi
 popd

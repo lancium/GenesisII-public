@@ -26,6 +26,11 @@ oneTimeSetUp()
     dd if=/dev/urandom of=random5MB.dat bs=1048576 count=5
   fi
 
+  # due to restricted size of VMs and other machines we need this test to work
+  # on, we have reduced the size from 5 gigabytes to 1 gigabyte.  this can be
+  # adjusted with the variables below.
+  #fileInMegs=5120
+  fileInMegs=1024
   HUGE_TEST_FILE=./random5GB.dat
   if [ ! -f "$HUGE_TEST_FILE" ]; then
     # to speed up continuous integration builds, we will re-use the following
@@ -36,8 +41,8 @@ oneTimeSetUp()
       echo "using a pre-constructed file for 5gigs example: $PREMADE_FILE" 
       HUGE_TEST_FILE="$PREMADE_FILE"
     else
-      echo "creating 5GB file, this may take a few minutes..."
-      dd if=/dev/urandom of=$HUGE_TEST_FILE bs=1048576 count=5120
+      echo "creating huge file, this may take a few minutes..."
+      dd if=/dev/urandom of=$HUGE_TEST_FILE bs=1048576 count=$fileInMegs
     fi
   fi
 
@@ -85,10 +90,10 @@ testLocalClientLocalData()
 
   #large file
   timed_grid cp local:$HUGE_TEST_FILE $RNSPATH/new-dir-local/random5GB.dat 
-  assertEquals "Timing - Transferring 5GB local file to $RNSPATH/new-dir-local on local container $LOCAL_CONTAINER" 0 $?
+  assertEquals "Timing - Transferring huge local file to $RNSPATH/new-dir-local on local container $LOCAL_CONTAINER" 0 $?
   sync
   real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
-  echo "Time taken to tranfer 5GB file : $real_time s"
+  echo "Time taken to tranfer huge file : $real_time s"
   actual_size=$(\ls -l $HUGE_TEST_FILE | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
 }
@@ -115,10 +120,10 @@ testLocalClientRemoteData()
 
   #large file
   timed_grid cp local:$HUGE_TEST_FILE $RNSPATH/new-dir-remote/random5GB.dat
-  assertEquals "Timing - Transferring 5GB local file to $RNSPATH/new-dir-remote on remote container $REMOTE_CONTAINER" 0 $?
+  assertEquals "Timing - Transferring huge local file to $RNSPATH/new-dir-remote on remote container $REMOTE_CONTAINER" 0 $?
   sync
   real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
-  echo "Time taken to tranfer 5GB file : $real_time s"
+  echo "Time taken to tranfer huge file : $real_time s"
   actual_size=$(\ls -l $HUGE_TEST_FILE | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
 }
@@ -146,10 +151,10 @@ testRemoteSrcAndDest()
 
   #large file
   timed_grid cp $RNSPATH/new-dir-local/random5GB.dat $RNSPATH/new-dir
-  assertEquals "Timing - Transferring 5GB local file to $RNSPATH/new-dir from local container $LOCAL_CONTAINER to remote container $REMOTE_CONTAINER" 0 $?
+  assertEquals "Timing - Transferring huge local file to $RNSPATH/new-dir from local container $LOCAL_CONTAINER to remote container $REMOTE_CONTAINER" 0 $?
   sync
   real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
-  echo "Time taken to tranfer 5GB file : $real_time s"
+  echo "Time taken to tranfer huge file : $real_time s"
   actual_size=$(\ls -l $HUGE_TEST_FILE | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
 }

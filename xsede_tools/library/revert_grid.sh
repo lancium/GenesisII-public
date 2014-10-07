@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # stops any running container, wipes out its configuration, and undoes a
-# supposedly pre-existing file called bootstrap_save.zip to get a saved
+# supposedly pre-existing file called bootstrap_save.tar.gz to get a saved
 # configuration back.  after that, the container is restarted.
+# also the mirror container configuration will be restored if a
+# mirror_save.tar.gz file is found.
 #
 # Author: Chris Koeritz
 
@@ -17,9 +19,9 @@ source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 #hmmm: need to use a variable to refer to location for save file.
 
-if [ ! -f "$TMP/bootstrap_save.zip" ]; then
+if [ ! -f "$TMP/bootstrap_save.tar.gz" ]; then
   echo This script will only succeed if a previous bootstrap quick start was done
-  echo and that made a file in $TMP/bootstrap_save.zip to revert from.
+  echo and that made a file in $TMP/bootstrap_save.tar.gz to revert from.
   exit 1
 fi
 
@@ -54,14 +56,21 @@ fi
 umask 077
 
 
-echo restoring saved grid from zip file.
-bash "$XSEDE_TEST_ROOT/library/restore_container_state.sh" "$TMP/bootstrap_save.zip" 
-if [ $? -ne 0 ]; then echo "===> script failure restoring container state, exiting."; exit 1;  fi
+echo restoring saved root container.
+bash "$XSEDE_TEST_ROOT/library/restore_container_state.sh" "$TMP/bootstrap_save.tar.gz" 
+if [ $? -ne 0 ]; then echo "===> script failure restoring root container state, exiting."; exit 1;  fi
 
 # start container up.
 launch_container_if_not_running "$DEPLOYMENT_NAME"
 if [ ! -z "$BACKUP_DEPLOYMENT_NAME" -a ! -z "$BACKUP_USER_DIR" ]; then
   save_and_switch_userdir "$BACKUP_USER_DIR"
+
+  echo restoring saved mirror container.
+  bash "$XSEDE_TEST_ROOT/library/restore_container_state.sh" "$TMP/mirror_save.tar.gz" 
+  if [ $? -ne 0 ]; then echo "===> script failure restoring mirror container state, exiting."; exit 1;  fi
+
+  cp "$BACKUP_USER_DIR"/genesisII.container.log4j.properties "$GENII_INSTALL_DIR/lib"
+
   launch_container_if_not_running "$BACKUP_DEPLOYMENT_NAME"
   restore_userdir
 fi

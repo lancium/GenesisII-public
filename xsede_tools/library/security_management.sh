@@ -138,7 +138,7 @@ function export_certificate_from_pfx()
   local PASS="$1"; shift
   local ALIAS="$1"; shift
   echo "Exporting $cert_file from PFX $PFX"
-  run_any_command keytool -export "-file '$cert_file'" "-keystore '$PFX'" "-storepass '$PASS'" "-alias '$ALIAS'" -storetype PKCS12
+  run_any_command "$JAVA_HOME/bin/keytool" -export "-file '$cert_file'" "-keystore '$PFX'" "-storepass '$PASS'" "-alias '$ALIAS'" -storetype PKCS12
   check_if_failed "exporting certificate file $cert_file for $PFX"
 }
 
