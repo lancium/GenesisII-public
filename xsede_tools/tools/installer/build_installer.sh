@@ -70,7 +70,7 @@ fi
 ##############
 
 OUTPUT_DIRECTORY=$HOME/installer_products
-\rm -rf $OUTPUT_DIRECTORY
+# too annoying: \rm -rf $OUTPUT_DIRECTORY
 mkdir $OUTPUT_DIRECTORY
 
 echo "Will build installers in $OUTPUT_DIRECTORY"
@@ -109,7 +109,6 @@ check_if_failed "ant build failed"
 popd
 
 build_installer 5991 "genesis2-gffs-amd64-${simple_name}-deb"
-#build_installer 5987 "genesis2-gffs-amd64-${simple_name}-rpm"
 build_installer 3416 "genesis2-gffs-linux-amd64-${simple_name}"
 build_installer 2088 "genesis2-gffs-macosx-amd64-${simple_name}"
 build_installer 8974 "genesis2-gffs-windows-amd64-${simple_name}"

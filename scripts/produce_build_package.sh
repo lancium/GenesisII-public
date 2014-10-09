@@ -32,7 +32,7 @@ if [ ! -z "$replacement_name" ]; then
   CREATED_FILENAME="$replacement_name"
 fi
 
-EXCLUDES=(--exclude=".svn" --exclude="*.class" --exclude="*.log" --exclude="*.log.*" --exclude="Gene*tar.gz")
+EXCLUDES=(--exclude=".svn" --exclude="*.class" --exclude="*.log" --exclude="*.log.*" --exclude="Gene*tar.gz" --exclude="*.fred")
 
 tar -czf "$storage_folder/${CREATED_FILENAME}${additional_tag}.tar.gz" * ${EXCLUDES[*]}
 

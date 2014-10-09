@@ -181,7 +181,9 @@ function replace_installdir_variables()
   local dir="$1"; shift
   local fname
 
-  for fname in $(find $dir -type f ! -iname "*.sh" -exec grep -l installer:sys.installationDir {} ';'); do
+  for fname in $(find "$dir/xsede_tools/tools/genesis_module" -type f) \
+    $(find $dir -type f ! -iname "*.sh" -exec grep -l installer:sys.installationDir {} ';') \
+    ; do
     local seeking="\${installer:sys.installationDir}"
     local replacement="$dir"
     replace_phrase_in_file "$fname" "$seeking" "$replacement"

@@ -1,4 +1,6 @@
 
+####
+
 To build the interactive and DEB installers for GenesisII, try:
 
   bash "$GENII_INSTALL_DIR/xsede_tools/tools/installer/build_installer.sh" X.config
@@ -6,6 +8,8 @@ To build the interactive and DEB installers for GenesisII, try:
 where X.config is the name of a GenesisII installer configuration file.  If
 you leave off 'X.config', then the script will list out all of the available
 configuration files.
+
+Creates the interactive install4j installers in $HOME/installer_products.
 
 ####
 
@@ -19,7 +23,9 @@ configuration for this file:
 %_signature gpg
 %_gpg_name  Chris Koeritz (XSEDE Key) <koeritz@virginia.edu>
 
+Creates the source tarball, source RPM and installer RPM packages in
+$HOME/installer_products.
+
 ####
 
-Both processes create their output in $HOME/installer_products.
 
