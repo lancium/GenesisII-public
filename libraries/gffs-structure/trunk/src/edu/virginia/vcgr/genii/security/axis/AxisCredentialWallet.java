@@ -124,7 +124,7 @@ public class AxisCredentialWallet
 		}
 		getRealCreds().getAssertionChains().clear();
 		getRealCreds().getAssertionChains().putAll(detachedDelegations);
-		getRealCreds().reattachDelegations(true);
+		getRealCreds().flexReattachDelegations(true);
 	}
 
 }
