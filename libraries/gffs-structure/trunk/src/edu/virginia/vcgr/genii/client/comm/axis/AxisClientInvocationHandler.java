@@ -385,8 +385,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 		} catch (InvocationTargetException ite) {
 			Throwable t = ite;
-			DetailedLogger dl = new DetailedLogger();
-			dl.detailed().info("addMethods partial handling for exception:" + ExceptionUtils.getStackTrace(t));
+			DetailedLogger.detailed().info("addMethods partial handling for exception:" + ExceptionUtils.getStackTrace(t));
 			if (ite.getCause() != null)
 				t = ite.getCause();
 			if (t != null) {
@@ -558,8 +557,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			try {
 				return handler.doInvoke(calledMethod, arguments, timeout);
 			} catch (Throwable throwable) {
-				DetailedLogger dl = new DetailedLogger();
-				dl.detailed()
+				 DetailedLogger.detailed()
 					.info("resolveAndInvoke partial handling for exception:" + ExceptionUtils.getStackTrace(throwable));
 				if (throwable instanceof InvocationTargetException) {
 					if (throwable.getCause() != null)

@@ -132,7 +132,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 						_maxCacheElements = 0;
 				}
 			} catch (Throwable cause) {
-				_logger.warn("Unable to lookup ssl-cache.properties configuration file.  Using default values!", cause);
+				_logger.warn("Unable to lookup ssl-cache.properties configuration file.  Using default values.", cause);
 			} finally {
 				StreamUtils.close(in);
 			}
@@ -149,9 +149,10 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 
 		try {
 			ICallingContext callingContext = threadCallingContext.get();
-			if (callingContext == null)
+			if (callingContext == null) {
 				throw new RuntimeException("We got a null calling context which " + "means that client invocation handler "
 					+ "didn't set it up correctly.");
+			}
 
 			KeyAndCertMaterial clientKeyMaterial =
 				ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(),

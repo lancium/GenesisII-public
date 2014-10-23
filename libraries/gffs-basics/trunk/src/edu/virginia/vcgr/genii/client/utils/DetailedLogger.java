@@ -21,11 +21,7 @@ public class DetailedLogger
 {
 	private static final Logger _logger = Logger.getLogger(DetailedLogger.class);
 
-	public DetailedLogger()
-	{
-	}
-
-	public Logger detailed()
+	static public Logger detailed()
 	{
 		return _logger;
 	}
