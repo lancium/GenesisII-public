@@ -30,11 +30,6 @@ public class UpdateGridCertsTool
 	// how frequently the updater process should attempt to run.
 	public static final int UPDATER_SNOOZE_DURATION = 1000 * 60 * 60; // one hour.
 
-//	// tracks the single thread running certificate updates, if there is one.
-//	static Thread _updaterThread = null;
-//	// sentinel for stopping the thread.
-//	static volatile boolean _stopTheThread = false;
-
 	/**
 	 * given the name of a certificate package, this will download it and install it into the state
 	 * directory in grid-certificates.
@@ -222,57 +217,5 @@ public class UpdateGridCertsTool
 
 		return toReturn;
 	}
-
-//	static public class UpdaterThread implements Runnable
-//	{
-//		public void run()
-//		{
-//			while (true) {
-//				runGridCertificateUpdates();
-//
-//				if (_stopTheThread) {
-//					return;
-//				}
-//
-//				try {
-//					Thread.sleep(UPDATER_THREAD_SNOOZE_DURATION);
-//				} catch (InterruptedException e) {
-//					if (_stopTheThread) {
-//						return;
-//					}
-//				}
-//			}
-//		}
-//	}
-//
-//	static public boolean startUpdaterThread()
-//	{
-//		if (_updaterThread != null) {
-//			_logger.error("the updater thread has already been started!");
-//			return false;
-//		}
-//		_stopTheThread = false;
-//		_updaterThread = new Thread(new UpdateGridCertsTool.UpdaterThread());
-//		_updaterThread.start();
-//		return true;
-//	}
-//
-//	static public void stopUpdaterThread()
-//	{
-//		if (_updaterThread == null) {
-//			_logger.error("the updater thread has not yet been started!");
-//			return;
-//		}
-//		_stopTheThread = true;
-//		_updaterThread.interrupt();
-//		while (_updaterThread.isAlive()) {
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException e) {
-//			}
-//			_updaterThread.interrupt();
-//		}
-//		_updaterThread = null;
-//	}
 
 }

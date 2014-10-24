@@ -55,6 +55,7 @@
                         </manifest>
 			<fileset dir="${obj.dir}">
 				<include name="org/morgan/**/*"/>
+				<include name="org/feistymeow/**/*"/>
 				<include name="edu/virginia/**/*"/>
 			</fileset>
 		</jar>

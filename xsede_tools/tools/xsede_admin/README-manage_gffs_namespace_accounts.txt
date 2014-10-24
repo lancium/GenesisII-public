@@ -4,6 +4,9 @@ Prerequisites:
 
    - Perl version 5.10.1 or greater
    - Perl modules: DBI, DBD::Pg, List::Compare, Config::Simple, Unix::Syslog
+   - gcc
+   - postgresql
+   - postgresql-devel
 
 One can either install appropriate packages for the Linux distribution in use or
 use the CPAN tool for downloading perl packages.
@@ -12,6 +15,9 @@ use the CPAN tool for downloading perl packages.
 
 Centos Dependencies:
 
+gcc
+postgresql
+postgresql-devel
 perl-DBI
 perl-DBD-Pg
 perl-List-Compare*
@@ -25,6 +31,9 @@ perl-Unix-Syslog
 
 Ubuntu Dependencies:
 
+gcc
+postgresql
+postgresql-devel
 libdbi-perl
 libdbd-pg-perl
 liblist-compare-perl
@@ -36,11 +45,7 @@ libunix-syslog-perl
 CPAN approach for loading Perl modules:
 
 sudo cpan
-> install DBI
-> install List::Compare
-> install Unix::Syslog
-> install Config::Simple
-> install DBD::Pg
+> install DBI List::Compare Unix::Syslog Config::Simple DBD::Pg
 
 -------
 

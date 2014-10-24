@@ -14,6 +14,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.log4j.Logger;
+
 import edu.virginia.vcgr.genii.gjt.util.ClassRelativeIOSource;
 import edu.virginia.vcgr.genii.gjt.util.FileIOSource;
 import edu.virginia.vcgr.genii.gjt.util.IOSource;
@@ -23,6 +25,8 @@ import edu.virginia.vcgr.genii.gjt.util.OverridenIOSource;
 @XmlRootElement(name = "SPMDVariations")
 class SPMDVariations
 {
+	static private Logger _logger = Logger.getLogger(SPMDVariations.class);
+
 	static final private String FILENAME = "spmd-variations.xml";
 
 	@XmlElement(name = "variation")
@@ -38,10 +42,11 @@ class SPMDVariations
 		return ret;
 	}
 
-	static SPMDVariations readVariations(File configuraitonDirectory) throws IOException, JAXBException
+	static SPMDVariations readVariations(File configurationDirectory) throws IOException, JAXBException
 	{
+		_logger.info("config dir for read variations is: " + configurationDirectory);
 		IOSource source =
-			new OverridenIOSource(new FileIOSource(new File(configuraitonDirectory, FILENAME)), new ClassRelativeIOSource(
+			new OverridenIOSource(new FileIOSource(new File(configurationDirectory, FILENAME)), new ClassRelativeIOSource(
 				SPMDVariations.class, FILENAME));
 		InputStream in = null;
 

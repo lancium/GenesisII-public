@@ -60,6 +60,9 @@
 			<fileset dir="${basedir}">
 				<include name="config/**/*"/>
 			</fileset>
+			<fileset dir="${basedir}/src">
+				<include name="edu/virginia/vcgr/genii/gjt/conf/*xml"/>
+			</fileset>
 		</jar>
 	</target>
 

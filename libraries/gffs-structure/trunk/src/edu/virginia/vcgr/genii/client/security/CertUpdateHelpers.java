@@ -53,57 +53,6 @@ public class CertUpdateHelpers
 		return toReturn;
 	}
 
-	/**
-	 * uses the FileChannel and FileLock support of nio to lock the file. the lock is held until the
-	 * returned FileChannel is closed or the program exits.
-	 */
-//	public static FileChannel lockConsistencyFile()
-//	{
-//		File lockFile = getConsistencyLockFile();
-//		_logger.debug("consistency file is: " + lockFile);
-//		FileSystem fs = FileSystems.getDefault();
-//		Path fp = fs.getPath(lockFile.getAbsolutePath());
-//		_logger.debug("path object for that file is: " + fp.toAbsolutePath());
-//		FileChannel fc = null;
-//		try {
-//			_logger.debug("about to try opening file");
-//			fc = FileChannel.open(fp, EnumSet.of(StandardOpenOption.CREATE, StandardOpenOption.WRITE));
-//			_logger.debug("opened consistency file okay");
-//		} catch (IOException e) {
-//			_logger.error("failed to open consistency lock file for cert update properties", e);
-//			return null;
-//		}
-//		try {
-//			_logger.debug("about to lock consistency file");
-//			fc.lock();
-//			_logger.debug("locked consistency file okay");
-//		} catch (IOException e) {
-//			_logger.error("failed to lock consistency lock for cert update properties", e);
-//			try {
-//				fc.close();
-//			} catch (Exception e2) {
-//			}
-//			return null;
-//		}
-//		return fc;
-//	}
-
-	/**
-	 * unlocks a lock held on a file.
-	 */
-//	public static void unlockConsistencyFile(FileChannel toUnlock)
-//	{
-//		if (toUnlock == null) {
-//			_logger.error("null passed in for FileChannel to unlock");
-//			return;
-//		}
-//		try {
-//			toUnlock.close();
-//		} catch (IOException e) {
-//			_logger.error("failed to close consistency lock file", e);
-//		}
-//	}
-
 	// service functions below.
 
 	/**
@@ -115,16 +64,6 @@ public class CertUpdateHelpers
 		File propsFile = new File(stateDir + "/" + UPDATE_GRID_CERTS_PROPERTY_FILE);
 		return propsFile;
 	}
-
-	/**
-	 * returns the file name of the consistency lock file that is used for upgrading certificates.
-	 */
-//	public static File getConsistencyLockFile()
-//	{
-//		String stateDir = InstallationProperties.getUserDir();
-//		File lockFile = new File(stateDir + "/" + CONSISTENCY_LOCK_FILE);
-//		return lockFile;
-//	}
 
 	/**
 	 * assuming the consistency lock is held, this reads the certificate update properties from the

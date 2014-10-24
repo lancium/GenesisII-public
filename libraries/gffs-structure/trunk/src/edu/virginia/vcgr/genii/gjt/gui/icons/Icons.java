@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.swing.GrayFilter;
@@ -19,7 +20,7 @@ import org.apache.log4j.Logger;
 
 import edu.virginia.vcgr.genii.gjt.util.IOUtils;
 
-public class Icons
+public class Icons extends edu.virginia.vcgr.genii.ui.Icons
 {
 	static private Logger _logger = Logger.getLogger(Icons.class);
 
@@ -31,15 +32,30 @@ public class Icons
 	static final private String FOLDER_48_48 = "folder-48x48.png";
 	static final private String SMALL_CHECK = "small-check.png";
 
-	static final public Icon EmptyAt16By16 = createEmptyIcon(new Dimension(16, 16));
-	static final public Icon CheckMarkAt16By16 = loadIcon(SMALL_CHECK);
-	static final public Icon YesFolderAt24By24 = loadIcon(YES_FOLDER_24_24);
-	static final public Icon NoFolderAt24By24 = loadIcon(NO_FOLDER_24_24);
-	static final public Icon FolderAt24By24 = loadIcon(FOLDER_24_24);
-	static final public Icon FolderAt48By48 = loadIcon(FOLDER_48_48);
+	static public Icon EmptyAt16By16 = createEmptyIcon(new Dimension(16, 16));
+	static public Icon CheckMarkAt16By16 = null;// loadIcon(SMALL_CHECK);
+	static public Icon YesFolderAt24By24 = null;// loadIcon(YES_FOLDER_24_24);
+	static public Icon NoFolderAt24By24 = null;// loadIcon(NO_FOLDER_24_24);
+	static public Icon FolderAt24By24 = null; //loadIcon(FOLDER_24_24);
+	static public Icon FolderAt48By48 = null; //loadIcon(FOLDER_48_48);
 
+	{
+		try {
+			CheckMarkAt16By16 = loadIcon(SMALL_CHECK);
+			YesFolderAt24By24 = loadIcon(YES_FOLDER_24_24);
+			NoFolderAt24By24 = loadIcon(NO_FOLDER_24_24);
+			FolderAt24By24 = loadIcon(FOLDER_24_24);
+			FolderAt48By48 = loadIcon(FOLDER_48_48);
+		} catch (IOException e) {
+			_logger.error("failure to load icons for grid job tool.", e);
+		}
+	}
+	
+	/*
 	static private Icon loadIcon(String iconName)
 	{
+		ImageIcon(loadImage(iconName));
+		/ *
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		InputStream in = null;
 
@@ -57,7 +73,9 @@ public class Icons
 			IOUtils.close(in);
 			IOUtils.close(baos);
 		}
+		* /
 	}
+	*/
 
 	static public Icon labelIcon(Icon original, String text)
 	{

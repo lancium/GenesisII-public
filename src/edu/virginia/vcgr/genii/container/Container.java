@@ -74,7 +74,6 @@ import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllSender;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
-import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 
 public class Container extends ApplicationBase
@@ -133,7 +132,7 @@ public class Container extends ApplicationBase
 			System.exit(1);
 		}
 
-		OSGiSupport.shutDownFramework();
+		// this is not the end; processes will keep going even after this function exits.
 	}
 
 	static public ConfigurationManager getConfigurationManager()
@@ -179,7 +178,6 @@ public class Container extends ApplicationBase
 		server = new Server();
 
 		if (_containerConfiguration.isSSL()) {
-
 			// Determine if we should accept self signed certificates
 			if (_containerConfiguration.trustSelfSigned()) {
 				socketConnector = new TrustAllSslSocketConnector();

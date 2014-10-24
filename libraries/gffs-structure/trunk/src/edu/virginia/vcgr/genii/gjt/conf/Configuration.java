@@ -28,7 +28,7 @@ public class Configuration
 	}
 
 	private Filter<OperatingSystemNames> _operatingSystemNamesFilter;
-	private Filter<ProcessorArchitecture> _proceesorArchitectureFilter;
+	private Filter<ProcessorArchitecture> _processorArchitectureFilter;
 	private Map<String, SPMDVariation> _spmdVariations;
 
 	private Configuration() throws IOException, JAXBException
@@ -38,12 +38,12 @@ public class Configuration
 		if (!confDirectory.exists())
 			confDirectory.mkdirs();
 		if (!confDirectory.exists())
-			throw new RuntimeException(String.format("Unable to find/create configuraiton directory %s.", confDirectory));
+			throw new RuntimeException(String.format("Unable to find/create configuration directory %s.", confDirectory));
 		if (!confDirectory.isDirectory())
-			throw new RuntimeException(String.format("Unable to find/create configuraiton directory %s.", confDirectory));
+			throw new RuntimeException(String.format("Unable to find/create configuration directory %s.", confDirectory));
 
 		_operatingSystemNamesFilter = new Filter<OperatingSystemNames>(confDirectory, OperatingSystemNames.class);
-		_proceesorArchitectureFilter = new Filter<ProcessorArchitecture>(confDirectory, ProcessorArchitecture.class);
+		_processorArchitectureFilter = new Filter<ProcessorArchitecture>(confDirectory, ProcessorArchitecture.class);
 		_spmdVariations = SPMDVariations.readVariations(confDirectory).variations();
 	}
 
@@ -54,7 +54,7 @@ public class Configuration
 
 	final public Filter<ProcessorArchitecture> processorArchitectureFilter()
 	{
-		return _proceesorArchitectureFilter;
+		return _processorArchitectureFilter;
 	}
 
 	final public Map<String, SPMDVariation> spmdVariations()
