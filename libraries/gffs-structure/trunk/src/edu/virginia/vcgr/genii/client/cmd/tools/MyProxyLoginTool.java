@@ -168,6 +168,10 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 		TransientCredentials.globalLogout(callContext);
 
+		// reset any previous pass-through credential.
+		callContext.removeProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
+		ContextManager.storeCurrentContext(callContext);
+
 		X509Certificate[] keyMat = new X509Certificate[1];
 		keyMat[0] = mp.getCertificate();
 
