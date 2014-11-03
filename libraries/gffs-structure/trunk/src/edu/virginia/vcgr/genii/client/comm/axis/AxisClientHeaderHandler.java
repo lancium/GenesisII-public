@@ -268,7 +268,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 					// won't propagate it.
 					X509Certificate lastTLS =
 						(X509Certificate) callingContext.getSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
-					if (lastTLS.equals(passThrough)) {
+					if (passThrough.equals(lastTLS)) {
 						X509Certificate passOn[] = new X509Certificate[1];
 						passOn[0] = passThrough;
 						TrustCredential newerTC =
@@ -278,7 +278,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 						if (_logger.isDebugEnabled())
 							_logger.debug("made credential for pass-through connection: " + newerTC);
 					} else {
-						_logger.trace("ignoring pass-through credential that doesn't match client's last TLS certificate.");
+						_logger.debug("ignoring pass-through credential that doesn't match client's last TLS certificate.");
 					}
 				}
 

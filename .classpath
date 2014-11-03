@@ -36,7 +36,6 @@
 	<classpathentry kind="lib" path="ext/MorganUtilities.jar"/>
 	<classpathentry kind="lib" path="ext/CmdLineManipulator.jar"/>
 	<classpathentry kind="lib" path="ext/svnkit.jar"/>
-	<classpathentry kind="lib" path="ext/MyProxyLogon.jar"/>
 	<classpathentry kind="lib" path="ext/typica.jar"/>
 	<classpathentry kind="lib" path="ext/fuse-j.jar"/>
 	<classpathentry kind="lib" path="ext/fsview.jar"/>

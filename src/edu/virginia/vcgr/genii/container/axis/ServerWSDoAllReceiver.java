@@ -412,7 +412,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 						(X509Certificate) callContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 					if (passThrough != null) {
 						if (_logger.isTraceEnabled())
-							_logger.debug("got a pass through cert, checking next: " + passThrough.getSubjectDN().toString());
+							_logger.debug("got a pass through cert, checking delegatee: " + passThrough.getSubjectDN().toString());
 						if (assertion.getDelegatee()[0].equals(passThrough)) {
 							X509Certificate[] pt = new X509Certificate[1];
 							pt[0] = passThrough;
@@ -427,11 +427,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					}
 				}
 
-
-	
-				}
-
-			
+			}
 
 			retval.add(cred);
 		}
