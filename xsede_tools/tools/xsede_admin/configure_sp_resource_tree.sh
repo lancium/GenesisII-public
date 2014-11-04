@@ -112,9 +112,9 @@ function link_sp_container()
 {
   echo "Linking new container $service_provider_path/containers/$container_name"
   "$GENII_INSTALL_DIR/grid" ln --service-url=$g2_url $service_provider_path/containers/$container_name
-  "$GENII_INSTALL_DIR/grid" ls $service_provider_path/containers/$container_name | grep "*resources filesystem-summary.txt Services container.log*" &>/dev/null
+  "$GENII_INSTALL_DIR/grid" ls $service_provider_path/containers/$container_name | grep -q "Services"
   if [ $? -ne 0 ]; then
-    echo "Container could not be linked successfully"
+    echo "** Container could not be linked successfully!!"
   else
     echo "Successfully linked $service_provider_path/containers/$container_name"
   fi
@@ -153,6 +153,10 @@ function create_queue_for_bes()
   echo "Creating $service_provider_path/queues/$bes_name-queue queue resource" 
   "$GENII_INSTALL_DIR/grid" create-resource $service_provider_path/containers/$container_name/Services/QueuePortType $service_provider_path/queues/$bes_name-queue
   chmod_for_all $service_provider_path/queues/$bes_name-queue
+
+  echo "Giving queue permissions on BES resource"
+  "$GENII_INSTALL_DIR/grid" chmod $service_provider_path/bes-containers/$bes_name +rx $service_provider_path/queues/$bes_name-queue &>/dev/null
+  # this might actually fail, if BES is unicore based.
 
   echo "Linking $service_provider_path/bes-containers/$bes_name into $service_provider_path/queues/$bes_name-queue/resources/$bes_name "
   "$GENII_INSTALL_DIR/grid" ln $service_provider_path/bes-containers/$bes_name $service_provider_path/queues/$bes_name-queue/resources/$bes_name

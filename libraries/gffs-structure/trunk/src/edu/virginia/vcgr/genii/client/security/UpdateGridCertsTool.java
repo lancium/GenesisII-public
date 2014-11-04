@@ -108,7 +108,7 @@ public class UpdateGridCertsTool
 		Properties props = CertUpdateHelpers.getCertUpdateProperties();
 		StringWriter writer = new StringWriter();
 		props.list(new PrintWriter(writer));
-		_logger.debug("loaded cert update props, got: " + writer.getBuffer().toString());
+		_logger.trace("loaded cert update props, got: " + writer.getBuffer().toString());
 
 		// validate that it is time for the update to occur.
 		long currTime = new Date().getTime();

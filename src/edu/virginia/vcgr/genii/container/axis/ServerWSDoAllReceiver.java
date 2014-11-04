@@ -406,12 +406,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				// discover when the sender trusts a credential, and include it if there's a
 				// matching pass through identity.
 				if (callerTLSCert[0].equals(assertion.getOriginalAsserter()[0])) {
-					if (_logger.isTraceEnabled())
+					if (_logger.isDebugEnabled())
 						_logger.debug("found an assertion matching the target TLS cert chain: " + assertion.toString());
 					X509Certificate passThrough =
 						(X509Certificate) callContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 					if (passThrough != null) {
-						if (_logger.isTraceEnabled())
+						if (_logger.isDebugEnabled())
 							_logger.debug("got a pass through cert, checking delegatee: " + passThrough.getSubjectDN().toString());
 						if (assertion.getDelegatee()[0].equals(passThrough)) {
 							X509Certificate[] pt = new X509Certificate[1];
@@ -421,6 +421,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 							X509Identity x509 = new X509Identity(pt, IdentityType.CONNECTION);
 							_logger.debug("adding matching pass-through identity for: " + x509.toString());
 							retval.add(x509);
+						} else {
+							_logger.debug("saying pass-through (1) not matching delegatee (2): '" + passThrough + "' vs. '"
+								+ assertion.getDelegatee()[0] + "'");
 						}
 					} else {
 						_logger.trace("did not get a pass through credential.");

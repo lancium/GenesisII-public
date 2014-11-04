@@ -21,7 +21,7 @@ import edu.virginia.vcgr.genii.client.InstallationProperties;
  */
 public class ThreadAndProcessSynchronizer
 {
-	static private Log _logger = LogFactory.getLog(CertUpdateHelpers.class);
+	static private Log _logger = LogFactory.getLog(ThreadAndProcessSynchronizer.class);
 
 	static volatile Object _threadSynchronizer = new Object();
 	static volatile FileChannel _fileLocker = null;
@@ -87,23 +87,19 @@ public class ThreadAndProcessSynchronizer
 	private static FileChannel lockConsistencyFile()
 	{
 		File lockFile = getConsistencyLockFile();
-		_logger.debug("consistency file is: " + lockFile);
+		_logger.trace("consistency file is: " + lockFile);
 		FileSystem fs = FileSystems.getDefault();
 		Path fp = fs.getPath(lockFile.getAbsolutePath());
-		_logger.debug("path object for that file is: " + fp.toAbsolutePath());
 		FileChannel fc = null;
 		try {
-			_logger.debug("about to try opening file");
 			fc = FileChannel.open(fp, EnumSet.of(StandardOpenOption.CREATE, StandardOpenOption.WRITE));
-			_logger.debug("opened consistency file okay");
 		} catch (IOException e) {
 			_logger.error("failed to open consistency lock file for cert update properties", e);
 			return null;
 		}
 		try {
-			_logger.debug("about to lock consistency file");
 			fc.lock();
-			_logger.debug("locked consistency file okay");
+			_logger.debug("locked consistency file.");
 		} catch (IOException e) {
 			_logger.error("failed to lock consistency lock for cert update properties", e);
 			try {
@@ -126,6 +122,7 @@ public class ThreadAndProcessSynchronizer
 		}
 		try {
 			toUnlock.close();
+			_logger.debug("unlocked consistency file.");
 		} catch (IOException e) {
 			_logger.error("failed to close consistency lock file", e);
 		}

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -80,6 +81,11 @@ public class XSEDELoginTool extends BaseLoginTool
 		// trying to use the myproxy creds! which is what we need!
 		BaseLoginTool.copyCreds(mpTool, lTool);
 		retVal = lTool.run(stdout, stderr, stdin);
+
+		// reset any pass-through credential that had been established during login.
+		callContext.removeProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
+		ContextManager.storeCurrentContext(callContext);
+
 		if (retVal != 0) {
 			String msg = "failure during login script: return value=" + retVal;
 			_logger.error(msg);

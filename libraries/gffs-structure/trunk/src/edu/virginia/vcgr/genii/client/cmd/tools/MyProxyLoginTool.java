@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
-import edu.uiuc.ncsa.MyProxy.MyProxyLogon;
+import edu.uiuc.ncsa.myproxy.MyProxyLogon;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
@@ -109,8 +111,18 @@ public class MyProxyLoginTool extends BaseLoginTool
 		aquirePassword();
 
 		String pass = new String(_password);
-
-		MyProxyLogon mp = new MyProxyLogon();
+		
+		Logger jdkLogger = Logger.getLogger(this.getClass().getName());
+		if (jdkLogger == null) {
+			_logger.debug("jdk logger is null; will be a problem for constructing logging facade.");
+		} else {
+			jdkLogger.setUseParentHandlers(false);
+		}
+		
+		MyLoggingFacade facade = new MyLoggingFacade(jdkLogger);
+		
+		MyProxyLogon mp = new MyProxyLogon(facade);
+//		MyProxyLogon mp = new MyProxyLogon();
 
 		// Load properties file
 		Properties myProxyProperties = loadMyProxyProperties();
@@ -133,7 +145,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 		mp.setPassphrase(pass);
 
 		/*
-		 * Myproxy trust root can be overriden with either environment variable GLOBUS_LOCATION or X509_CERT_DIR,
+		 * Myproxy trust root can be overridden with either environment variable GLOBUS_LOCATION or X509_CERT_DIR,
 		 * although at our level we are defining the location in the security property file.
 		 */
 		String myProxyDirectory =
@@ -150,7 +162,8 @@ public class MyProxyLoginTool extends BaseLoginTool
 		try {
 			mp.connect();
 		} catch (Exception e) {
-			stdout.println("Unable to login via myproxy");
+			String msg = "Unable to connect to myproxy server: ";
+			throw new AuthZSecurityException(msg + e.getLocalizedMessage(), e);
 		}
 
 		try {
@@ -174,7 +187,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 		X509Certificate[] keyMat = new X509Certificate[1];
 		keyMat[0] = mp.getCertificate();
-
+		
 		String msg =
 			"Replacing client tool identity with MyProxy credentials for \"" + keyMat[0].getSubjectDN().getName() + "\".";
 		stdout.println(msg);
@@ -182,9 +195,13 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 		KeyAndCertMaterial clientKeyMaterial = new KeyAndCertMaterial(keyMat, mp.getPrivateKey());
 		callContext.setActiveKeyAndCertMaterial(clientKeyMaterial);
-
+		
 		// add the pass through identity to the calling context.
 		callContext.setSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY, keyMat[0]);
+		if (_logger.isDebugEnabled())
+			_logger.debug("issuer for the new cert is: " + keyMat[0].getIssuerDN());
+		if (_logger.isTraceEnabled())
+			_logger.trace("adding myproxy TLS cert: " + keyMat[0]);
 
 		// update the saved context before we leave.
 		ContextManager.storeCurrentContext(callContext);

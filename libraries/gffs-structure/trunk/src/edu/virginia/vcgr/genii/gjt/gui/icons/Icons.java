@@ -7,18 +7,13 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.swing.GrayFilter;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import org.apache.log4j.Logger;
-
-import edu.virginia.vcgr.genii.gjt.util.IOUtils;
 
 public class Icons extends edu.virginia.vcgr.genii.ui.Icons
 {
@@ -33,11 +28,11 @@ public class Icons extends edu.virginia.vcgr.genii.ui.Icons
 	static final private String SMALL_CHECK = "small-check.png";
 
 	static public Icon EmptyAt16By16 = createEmptyIcon(new Dimension(16, 16));
-	static public Icon CheckMarkAt16By16 = null;// loadIcon(SMALL_CHECK);
-	static public Icon YesFolderAt24By24 = null;// loadIcon(YES_FOLDER_24_24);
-	static public Icon NoFolderAt24By24 = null;// loadIcon(NO_FOLDER_24_24);
-	static public Icon FolderAt24By24 = null; //loadIcon(FOLDER_24_24);
-	static public Icon FolderAt48By48 = null; //loadIcon(FOLDER_48_48);
+	static public Icon CheckMarkAt16By16 = null;
+	static public Icon YesFolderAt24By24 = null;
+	static public Icon NoFolderAt24By24 = null;
+	static public Icon FolderAt24By24 = null;
+	static public Icon FolderAt48By48 = null;
 
 	{
 		try {
@@ -51,32 +46,6 @@ public class Icons extends edu.virginia.vcgr.genii.ui.Icons
 		}
 	}
 	
-	/*
-	static private Icon loadIcon(String iconName)
-	{
-		ImageIcon(loadImage(iconName));
-		/ *
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		InputStream in = null;
-
-		try {
-			in = Icons.class.getResourceAsStream(iconName);
-			if (in == null)
-				throw new FileNotFoundException(String.format("Unable to load icon \"%s\".", iconName));
-			IOUtils.copy(in, baos);
-			baos.flush();
-			return new ImageIcon(baos.toByteArray());
-		} catch (Throwable cause) {
-			_logger.error(String.format("Unable to load icon \"%s\".", iconName), cause);
-			return null;
-		} finally {
-			IOUtils.close(in);
-			IOUtils.close(baos);
-		}
-		* /
-	}
-	*/
-
 	static public Icon labelIcon(Icon original, String text)
 	{
 		BufferedImage newImage =

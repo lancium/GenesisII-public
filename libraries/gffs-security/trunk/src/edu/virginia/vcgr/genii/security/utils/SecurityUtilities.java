@@ -30,6 +30,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -85,7 +86,7 @@ public class SecurityUtilities implements CertificateValidator
 	{
 		return _localResourceTrustStore;
 	}
-	
+
 	@Override
 	public String getGridCertificatesDir()
 	{
@@ -224,7 +225,8 @@ public class SecurityUtilities implements CertificateValidator
 		// hmmm: canl trust checking is off.
 		// try {
 		// if (!trustOkay) {
-		// InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(ks);
+		// InMemoryKeystoreCertChainValidator validater = new
+		// InMemoryKeystoreCertChainValidator(ks);
 		// CommonX509TrustManager trustManager = new CommonX509TrustManager(validater);
 		// trustManager.checkClientTrusted(certChain, certChain[0].getPublicKey().getAlgorithm());
 		// if (_logger.isTraceEnabled())
@@ -233,7 +235,8 @@ public class SecurityUtilities implements CertificateValidator
 		// }
 		// } catch (Throwable e) {
 		// if (_logger.isTraceEnabled())
-		// _logger.trace("could not validate this cert with CANL against trust store: " + certChain[0].getSubjectDN(), e);
+		// _logger.trace("could not validate this cert with CANL against trust store: " +
+		// certChain[0].getSubjectDN(), e);
 		// }
 		return trustOkay;
 	}
@@ -372,7 +375,7 @@ public class SecurityUtilities implements CertificateValidator
 		{
 			String lowercaseName = name.toLowerCase();
 			if (lowercaseName.endsWith(".cer") || lowercaseName.endsWith(".0") || lowercaseName.endsWith(".crt")
-				 || lowercaseName.endsWith(".der")|| lowercaseName.endsWith(".pem")) {
+				|| lowercaseName.endsWith(".der") || lowercaseName.endsWith(".pem")) {
 				return true;
 			} else {
 				return false;
@@ -449,16 +452,17 @@ public class SecurityUtilities implements CertificateValidator
 
 	static public X509Certificate[] loadCertificateChainFromStream(InputStream certs)
 	{
-		if (certs == null) return null;
+		if (certs == null)
+			return null;
 
-		List<X509Certificate> chain = new ArrayList<X509Certificate> ();
-		
+		List<X509Certificate> chain = new ArrayList<X509Certificate>();
+
 		try {
 			BufferedInputStream bis = new BufferedInputStream(certs);
 			while (bis.available() > 0) {
 				CertificateFactory cf = CertificateFactory.getInstance("X.509");
 				Certificate certificate = cf.generateCertificate(bis);
-				chain.add((X509Certificate)certificate);
+				chain.add((X509Certificate) certificate);
 			}
 			if (!chain.isEmpty()) {
 				X509Certificate[] chainAsArray = new X509Certificate[chain.size()];
@@ -470,21 +474,23 @@ public class SecurityUtilities implements CertificateValidator
 		}
 		return null;
 	}
-	
+
 	static public X509Certificate[] loadCertificateChainFromFile(File certsFile)
 	{
-		if (certsFile == null) return null;
-		if (!certsFile.isFile()) return null;
+		if (certsFile == null)
+			return null;
+		if (!certsFile.isFile())
+			return null;
 
-		List<X509Certificate> chain = new ArrayList<X509Certificate> ();
-		
+		List<X509Certificate> chain = new ArrayList<X509Certificate>();
+
 		try {
 			InputStream is = new FileInputStream(certsFile);
 			BufferedInputStream bis = new BufferedInputStream(is);
 			while (bis.available() > 0) {
 				CertificateFactory cf = CertificateFactory.getInstance("X.509");
 				Certificate certificate = cf.generateCertificate(bis);
-				chain.add((X509Certificate)certificate);
+				chain.add((X509Certificate) certificate);
 			}
 			if (!chain.isEmpty()) {
 				X509Certificate[] chainAsArray = new X509Certificate[chain.size()];
@@ -502,15 +508,15 @@ public class SecurityUtilities implements CertificateValidator
 		if (certChain == null)
 			return null;
 
-		List<X509Certificate> chain = new ArrayList<X509Certificate> ();
-		
+		List<X509Certificate> chain = new ArrayList<X509Certificate>();
+
 		try {
 			InputStream is = new ByteArrayInputStream(certChain.getBytes());
 			BufferedInputStream bis = new BufferedInputStream(is);
 			while (bis.available() > 0) {
 				CertificateFactory cf = CertificateFactory.getInstance("X.509");
 				Certificate certificate = cf.generateCertificate(bis);
-				chain.add((X509Certificate)certificate);
+				chain.add((X509Certificate) certificate);
 			}
 			if (!chain.isEmpty()) {
 				X509Certificate[] chainAsArray = new X509Certificate[chain.size()];
@@ -525,14 +531,14 @@ public class SecurityUtilities implements CertificateValidator
 	}
 
 	/**
-	 * finds all of the files named "*.r0" in the directory specified and attempts to load them into an array as X509CRL
-	 * (certificate revocation) objects.
+	 * finds all of the files named "*.r0" in the directory specified and attempts to load them into
+	 * an array as X509CRL (certificate revocation) objects.
 	 */
 	static public List<X509CRL> loadCRLsFromDirectory(File directory)
 	{
 		if (directory == null || !directory.isDirectory())
 			return Collections.emptyList();
-
+		
 		List<X509CRL> crlList = new ArrayList<X509CRL>();
 		File[] crlFiles = directory.listFiles(crlFilter);
 
@@ -542,23 +548,80 @@ public class SecurityUtilities implements CertificateValidator
 				char testHidden = crlFile.getName().charAt(0);
 				if (testHidden == '.')
 					continue;
-				FileInputStream fis = new FileInputStream(crlFile);
-				BufferedInputStream bis = new BufferedInputStream(fis);
+				ArrayList<X509CRL> intermediate = new ArrayList<X509CRL>();
+				{
+					FileInputStream fis = new FileInputStream(crlFile);
+					BufferedInputStream bis = new BufferedInputStream(fis);
 
-				CertificateFactory cf = CertificateFactory.getInstance("X.509");
-				while (bis.available() > 0) {
-					X509CRL crl = (X509CRL) cf.generateCRL(bis);
-					crlList.add(crl);
+					CertificateFactory cf = CertificateFactory.getInstance("X.509");
+					while (bis.available() > 0) {
+						X509CRL crl = (X509CRL) cf.generateCRL(bis);
+						intermediate.add(crl);
+					}
+					fis.close();
+					if (_logger.isTraceEnabled())
+						_logger.debug("Loaded CRL(s) from file: " + crlFile.getName());
 				}
-				fis.close();
-				if (_logger.isTraceEnabled())
-					_logger.debug("Loaded CRL(s) from file: " + crlFile.getName());
+
+				{
+					// we zap this to false if we find a problem with any crl we loaded from that file.
+					boolean okayToAdd = true;
+					
+					// verify crl is not stale.
+					for (X509CRL crl : intermediate) {
+						Date thisUpdate = crl.getThisUpdate();
+						if ( (thisUpdate != null) && (thisUpdate.after(new Date()))) {
+							_logger.warn("CRL last update date is in the future; ignoring " + crlFile);
+						}
+						Date nextUpdate = crl.getNextUpdate();
+						if ( (nextUpdate != null) && (nextUpdate.before(new Date()))) {
+							_logger.warn("CRL next update date is in the past; ignoring " + crlFile);
+						}
+					}
+					if (!okayToAdd) continue;  // ignore remainder of checks.
+					
+					// load the CA for this CRL file.
+					int indexExtension = crlFile.getAbsolutePath().lastIndexOf(".r0");
+					String caFilename = crlFile.getAbsolutePath().substring(0, indexExtension) + ".0";
+					File caFile = new File(caFilename);
+					if (!caFile.exists()) {
+						_logger.warn("CA file missing for CRL file: " + crlFile);
+						continue;
+					}
+					FileInputStream fis = new FileInputStream(caFile);
+					BufferedInputStream bis = new BufferedInputStream(fis);
+					CertificateFactory cf2 = CertificateFactory.getInstance("X.509");
+					Certificate ca = null;
+					while (bis.available() > 0) {
+						ca = cf2.generateCertificate(bis);
+						break;
+					}
+					fis.close();
+
+					// verify that the CA signed the CRL.
+					if ((ca != null) && (ca instanceof X509Certificate)) {
+						for (X509CRL crl : intermediate) {
+							try {
+								crl.verify(ca.getPublicKey());
+							} catch (Throwable t) {
+								_logger.warn("could not verify " + crlFile + " against CA file " + caFile);
+								okayToAdd = false;
+								break;
+							}
+					
+						}
+					}
+					if (okayToAdd) {
+						// now stuff all the pending crls into our big list.
+						crlList.addAll(intermediate);
+					}
+				}
 			} catch (Exception ex) {
 				_logger.warn("Failed to load CRL from file: " + crlFile.getName(), ex);
 			}
 		}
 		if (_logger.isDebugEnabled())
-			_logger.debug("Loaded " + crlFiles.length + " CRL records from directory:" + directory);
+			_logger.debug("Loaded " + crlList.size() + " CRL records from directory:" + directory);
 
 		return crlList;
 	}
@@ -580,8 +643,8 @@ public class SecurityUtilities implements CertificateValidator
 	}
 
 	/**
-	 * returns true if the certificate has been revoked. false is returned if the certificate has not been revoked or if its CRL
-	 * was not found.
+	 * returns true if the certificate has been revoked. false is returned if the certificate has
+	 * not been revoked or if its CRL was not found.
 	 */
 	static public void isCertRevoked(CertStore crls, X509Certificate cert) throws CertificateException
 	{
@@ -599,7 +662,7 @@ public class SecurityUtilities implements CertificateValidator
 					_logger.debug("checking with crl: " + crl.toString());
 				}
 				if (crl.isRevoked(cert)) {
-					String msg = "Certificate has been revoked: " + cert.getSubjectDN(); 
+					String msg = "Certificate has been revoked: " + cert.getSubjectDN();
 					throw new CertificateException(msg);
 				}
 			}
@@ -607,8 +670,8 @@ public class SecurityUtilities implements CertificateValidator
 	}
 
 	/**
-	 * returns true if the certificate chain has been revoked. false is returned if the certificate has not been revoked or if
-	 * its CRL was not found.
+	 * returns true if the certificate chain has been revoked. false is returned if the certificate
+	 * has not been revoked or if its CRL was not found.
 	 */
 	static public void isCertChainRevoked(CertStore crls, X509Certificate[] certs) throws CertificateException
 	{
