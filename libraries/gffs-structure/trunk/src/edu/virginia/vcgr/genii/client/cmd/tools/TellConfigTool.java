@@ -42,6 +42,10 @@ public class TellConfigTool extends BaseGridTool
 		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		int toReturn = 0;
+		
+		if (numArguments() == 0) {
+			stdout.println("No configuration item requested; try 'grid man tell-config'");
+		}
 
 		for (int i = 0; i < numArguments(); i++) {
 			String arg = getArgument(i);
