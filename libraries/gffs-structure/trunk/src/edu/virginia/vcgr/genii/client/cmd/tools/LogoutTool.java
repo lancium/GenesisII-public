@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -99,6 +100,8 @@ public class LogoutTool extends BaseGridTool
 				throw new IOException("No credentials matched the pattern \"" + _pattern + "\".");
 			}
 			ContextManager.storeCurrentContext(callContext);
+			// drop any notification brokers or other cached info after credential change.
+			CacheManager.resetCachingSystem();
 		} else {
 			while (true) {
 				ArrayList<NuCredential> credentials =
@@ -125,7 +128,12 @@ public class LogoutTool extends BaseGridTool
 					credentials.remove(which);
 					if (_logger.isDebugEnabled())
 						_logger.debug("Removing credential from current calling context credentials.");
+					
 					ContextManager.storeCurrentContext(callContext);
+					
+					// drop any notification brokers or other cached info after credential change.
+					CacheManager.resetCachingSystem();
+
 				} catch (Throwable t) {
 					stderr.println("Error getting login selection:  " + t.getLocalizedMessage());
 					break;

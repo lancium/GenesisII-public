@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
@@ -102,6 +103,8 @@ public class TransientCredentials implements Serializable
 		callingContext.removeTransientProperty(TransientCredentials.TRANSIENT_CRED_PROP_NAME);
 		if (_logger.isDebugEnabled())
 			_logger.debug("Clearing current calling context credentials.");
+		// drop any notification brokers or other cached info after credential change.
+		CacheManager.resetCachingSystem();
 	}
 
 	@Override

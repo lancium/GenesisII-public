@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -221,6 +222,9 @@ public class LoginTool extends BaseLoginTool
 			}
 
 		}
+
+		// drop any notification brokers or other cached info after credential change.
+		CacheManager.resetCachingSystem();
 
 		ContextManager.storeCurrentContext(callContext);
 		// jumpToUserHomeIfExists(_username);

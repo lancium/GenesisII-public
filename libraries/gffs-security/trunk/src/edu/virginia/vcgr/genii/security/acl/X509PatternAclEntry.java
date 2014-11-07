@@ -129,7 +129,7 @@ public class X509PatternAclEntry implements AclEntry
 			}
 		} catch (Throwable e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("problem checking cert with jdk: " + e.getMessage());
+				_logger.debug("cert check complained: " + e.getMessage());
 		}
 
 		if (!trustOkay) {
