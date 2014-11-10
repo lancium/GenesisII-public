@@ -229,6 +229,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				trustList = acl.executeAcl;
 				break;
 			case OPEN:
+				if (_logger.isDebugEnabled())
+					_logger.debug("giving access to identity due to OPEN permission: " + identity.describe(VerbosityLevel.HIGH));
 				return true;
 			case CLOSED:
 				return false;
@@ -241,16 +243,16 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			return false;
 		} else if (trustList.contains(null)) {
 			// ACL contains null (the wildcard certificate)
-			if (_logger.isTraceEnabled())
-				_logger.trace("passing ACL access check due to wildcard in trust list");
+			if (_logger.isDebugEnabled())
+				_logger.debug("passing ACL access check due to wildcard in trust list");
 			return true;
 		} else {
 			// go through the AclEntries
 			for (AclEntry entry : trustList) {
 				try {
 					if (entry.isPermitted(identity)) {
-						if (_logger.isTraceEnabled())
-							_logger.trace("passing ACL access check due to permission for identity");
+						if (_logger.isDebugEnabled())
+							_logger.debug("passing ACL access check due to permission for identity: " + identity.describe(VerbosityLevel.HIGH));
 						return true;
 					}
 				} catch (Exception e) {
@@ -268,7 +270,6 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		Class<?> serviceClass, Method operation)
 	{
 		RWXCategory category = RWXManager.lookup(serviceClass, operation);
-
 		if (!checkAccess(authenticatedCallerCredentials, resource, category)) {
 			String msg = "denying access for operation: " + operation.getName();
 			String asset = ResourceManager.getResourceName(resource);
@@ -302,7 +303,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		try {
 			ICallingContext callContext = ContextManager.getExistingContext();
 			Acl acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
-
+			
 			// pre-emptive check of wildcard access.
 			if ((acl == null) || checkAclAccess(null, category, acl)) {
 				if (_logger.isDebugEnabled())

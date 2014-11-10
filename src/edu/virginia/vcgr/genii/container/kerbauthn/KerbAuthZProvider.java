@@ -113,8 +113,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			}
 		} catch (Exception AclException) {
 			/*
-			 * we assume we will need the sequel of the function now, since regular ACLs didn't
-			 * work.
+			 * we assume we will need the sequel of the function now, since admin ACLs didn't work.
 			 */
 		}
 
@@ -171,29 +170,8 @@ public class KerbAuthZProvider extends AclAuthZProvider
 				String password = utIdentity.getPassword();
 
 				try {
-					// Acquire kdc-settings read lock
+					// Acquire kdc-settings read lock.
 					kdc_lock.readLock().lock();
-
-					// KDC config
-					Map<String, String> state = new HashMap<String, String>();
-					Map<String, String> options = new HashMap<String, String>();
-					options.put("useTicketCache", "false");
-					options.put("refreshKrb5Config", "true");
-
-					// fill in the keytab and principal if we have them.
-					if (keypr != null) {
-						_logger.info("Kerberos: authorizing against service principal '" + keypr._principal + "' for realm '"
-							+ realm + "'");
-						options.put("useKeyTab", "true");
-						File fullKeytabPath =
-							Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keypr._keytab);
-						if (_logger.isDebugEnabled())
-							_logger.debug("Kerberos keytab for realm " + realm + " is at path: "
-								+ fullKeytabPath.getAbsolutePath());
-						options.put("keyTab", fullKeytabPath.getAbsolutePath());
-						options.put("principal", keypr._principal);
-						options.put("doNotPrompt", "true");
-					}
 
 					if (!realm.equals(System.getProperty("java.security.krb5.realm"))
 						|| !kdc.equals(System.getProperty("java.security.krb5.kdc"))) {
@@ -212,15 +190,67 @@ public class KerbAuthZProvider extends AclAuthZProvider
 						kdc_lock.writeLock().unlock();
 					}
 
-					Krb5LoginModule loginCtx = new Krb5LoginModule();
+					// fill in the keytab and principal if we have them and authenticate the
+					// service.
+					if (keypr != null) {
+						// KDC config.
+						Map<String, String> state = new HashMap<String, String>();
+						Map<String, String> serverOptions = new HashMap<String, String>();
+						serverOptions.put("useTicketCache", "false");
+						serverOptions.put("refreshKrb5Config", "true");
 
-					Subject subject = new Subject();
-					loginCtx.initialize(subject, new LoginCallbackHandler(username, password), state, options);
-					loginCtx.login();
-					_logger.info("Success logging kerberos user " + username + " into realm " + realm);
+						_logger.info("Kerberos: authenticating with service principal '" + keypr._principal + "' for realm '"
+							+ realm + "'");
+						serverOptions.put("useKeyTab", "true");
+						File fullKeytabPath =
+							Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keypr._keytab);
+						if (_logger.isDebugEnabled())
+							_logger.debug("Kerberos keytab for realm " + realm + " is at path: "
+								+ fullKeytabPath.getAbsolutePath());
+						serverOptions.put("keyTab", fullKeytabPath.getAbsolutePath());
+						serverOptions.put("principal", keypr._principal);
+						serverOptions.put("doNotPrompt", "true");
+
+						try {
+							Krb5LoginModule serverLoginCtx = new Krb5LoginModule();
+							Subject serverSubject = new Subject();
+							// user and password apparently do not matter for server login.
+							serverLoginCtx.initialize(serverSubject, new LoginCallbackHandler("boink", "doink"), state,
+								serverOptions);
+							/*
+							 * ignoring always "true" return from login; will catch exception if
+							 * login failure.
+							 */
+							serverLoginCtx.login();
+							_logger.info("Success authenticating service principal '" + keypr._principal + "' into realm '"
+								+ realm + "'");
+						} catch (LoginException e) {
+							_logger.error("Failure authenticating service principal '" + keypr._principal + "' into realm '"
+								+ realm + "'");
+							return false;
+						}
+					}
+
+					Map<String, String> state = new HashMap<String, String>();
+					Map<String, String> userOptions = new HashMap<String, String>();
+					userOptions.put("useTicketCache", "false");
+					userOptions.put("refreshKrb5Config", "true");
+
+					// must always attempt to login as the user, regardless of existence of service principal.
+					_logger.info("authenticating user '" + username + "' against realm '" + realm + "'");
+					Krb5LoginModule userLoginCtx = new Krb5LoginModule();
+					Subject userSubject = new Subject();
+					userLoginCtx.initialize(userSubject, new LoginCallbackHandler(username, password), state, userOptions);
+					/*
+					 * ignoring always "true" return from login; will catch exception if login
+					 * failure.
+					 */
+					userLoginCtx.login();
+
+					_logger.info("Success logging kerberos user '" + username + "' into realm '" + realm + "'");
 					return true;
 				} catch (LoginException e) {
-					_logger.error("failure authenticating to Kerberos domain", e);
+					_logger.error("Failure logging kerberos user '" + username + "' into realm '" + realm + "'", e);
 					return false;
 				} finally {
 					// Release read lock

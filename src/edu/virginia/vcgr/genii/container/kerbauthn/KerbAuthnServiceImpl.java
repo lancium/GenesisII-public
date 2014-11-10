@@ -58,7 +58,6 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = RNSDBResourceProvider.class, defaultAuthZProvider = KerbAuthZProvider.class)
 public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implements KerbAuthnPortType
-// , BaggageAggregatable
 {
 	static private Log _logger = LogFactory.getLog(KerbAuthnServiceImpl.class);
 
@@ -155,28 +154,6 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		super.preDestroy();
 		preDestroy(_resource);
 	}
-
-	/*
-	 * @Override public ArrayList<RequestSecurityTokenResponseType>
-	 * aggregateBaggageTokens(RequestSecurityTokenType request) throws java.rmi.RemoteException {
-	 * ArrayList<RequestSecurityTokenResponseType> gatheredResponses = new
-	 * ArrayList<RequestSecurityTokenResponseType>(); Collection<InternalEntry> entries =
-	 * _resource.retrieveEntries(null);
-	 * 
-	 * for (InternalEntry entry : entries) { try { EndpointReferenceType idpEpr =
-	 * entry.getEntryReference();
-	 * 
-	 * // create a proxy to the remote idp and invoke it X509AuthnPortType idp =
-	 * ClientUtils.createProxy(X509AuthnPortType.class, idpEpr); RequestSecurityTokenResponseType[]
-	 * responses = idp.requestSecurityToken2(request);
-	 * 
-	 * if (responses != null) { for (RequestSecurityTokenResponseType response : responses) {
-	 * gatheredResponses.add(response); } } } catch (Exception e) {
-	 * _logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(),
-	 * e); } }
-	 * 
-	 * return gatheredResponses; }
-	 */
 
 	@RWXMapping(RWXCategory.EXECUTE)
 	public RequestSecurityTokenResponseType[] requestSecurityToken2(RequestSecurityTokenType request)
