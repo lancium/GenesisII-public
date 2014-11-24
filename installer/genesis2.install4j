@@ -1635,10 +1635,12 @@ try {
              gridCertsLineFound = true;
          }
     }
+    br.close();
     if (!gridCertsLineFound) {
-        Util.logInfo(null, "adding missing grid-certs line in security.properties");
-        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(secPropFileName, true)));
+        PrintWriter out = new PrintWriter(new FileWriter(secPropFileName, true));
         out.println("edu.virginia.vcgr.genii.client.security.ssl.grid-certificates.location=grid-certificates");
+        out.close();
+        Util.logInfo(null, "added missing grid-certs line in " + secPropFileName);
     }
     
 } catch(Exception e) {
