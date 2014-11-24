@@ -1622,7 +1622,7 @@ try {
     String secPropFileName ="deployments/${compiler:genii.new-deployment}/configuration/security.properties";
     File secProp = new File(secPropFileName);
     if (!secProp.exists()) {
-        Util.logInfo(null, "this is probably bad; cannot find security.properties file for deployment");
+        Util.logInfo(null, "this is probably bad; cannot find security.properties file for deployment, looking in: " + secPropFileName);
         // we don't want to totally quit though...?
         return true;
     }
@@ -1636,6 +1636,7 @@ try {
          }
     }
     if (!gridCertsLineFound) {
+        Util.logInfo(null, "adding missing grid-certs line in security.properties");
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(secPropFileName, true)));
         out.println("edu.virginia.vcgr.genii.client.security.ssl.grid-certificates.location=grid-certificates");
     }
@@ -2783,7 +2784,7 @@ return !signer.exists() || !tls.exists();
                           <formComponent name="Install Service" id="1021" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
-                                <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                                <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent" id="CheckboxComponent0">
                                   <void property="checkboxText">
                                     <string>Install Container as a Service?</string>
                                   </void>
