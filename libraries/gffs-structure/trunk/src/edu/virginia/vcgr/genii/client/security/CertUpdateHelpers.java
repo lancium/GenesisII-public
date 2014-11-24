@@ -26,20 +26,30 @@ public class CertUpdateHelpers
 	static final public String NEXT_UPDATE_PROPNAME = "NextUpdate";
 	static final public String LAST_UPDATE_PACKAGE_PROPNAME = "LastCertPackageName";
 
-	static final public Long DEFAULT_CERT_UPDATE_INTERVAL = new Long(24 * 60 * 60 * 1000);
+	// how frequently we update certificates on the client side, by default.
+	// this is currently every 12 hours.
+	static final public Long DEFAULT_CERT_UPDATE_INTERVAL = new Long(12 * 60 * 60 * 1000);
 
 	// the location in the grid where we expect to find certificate packages.
 	static final public String RNS_CERTS_FOLDER = "/etc/grid-security/certificates";
 
+	// filename used for consistency locking (when managing the certificate update properties).
+	static public final String CONSISTENCY_LOCK_FILE = "cert-consistency.lock";
+	
 	/**
 	 * returns the currently active certificate update properties. the user must lock the
-	 * consistency lock file before invoking this.
+	 * consistency lock file before invoking this to ensure a consistent property file exists.
 	 */
 	public static Properties getCertUpdateProperties()
 	{
 		File propFile = getUpdateGridCertsFile();
-		Properties props = readProperties(propFile);
-		return props;
+		try {
+			Properties props = readProperties(propFile);
+			return props;
+		} catch (Throwable t) {
+			_logger.error("failed reading the certificate update properties file");
+			return null;
+		}
 	}
 
 	/**

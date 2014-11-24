@@ -229,7 +229,7 @@ TIME_END="$(date +"%s")"
 duration="$(($TIME_END - $TIME_START))"
 # prepare to print duration in hours and minutes.
 minutes="$(($duration / 60))"
-hours="$(($duration / 60))"
+hours="$(($minutes / 60))"
 # grab out the hours we calculated from the minutes sum.
 minutes="$(($minutes - $hours * 60))"
 if (($minutes < 10)); then minutes="0$minutes"; fi

@@ -504,8 +504,6 @@ public class TestPKCS12
 		Assert.assertEquals(0, exceptionsSeen);
 
 		/*
-		 * switch this to CANL also, using CommonX509TrustManager
-		 * 
 		 * // load the trustmanager factory KeyStore store2 = KeyStore.getInstance("PKCS12", "BC");
 		 * store2.load(null, null); KeyStore.TrustedCertificateEntry entry = new
 		 * KeyStore.TrustedCertificateEntry(master); store2.setEntry("Bouncy Primary Certificate",

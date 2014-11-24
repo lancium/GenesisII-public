@@ -9,7 +9,7 @@ cd "$WORKDIR"
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
-MOUNT_POINT="$WORKDIR/mount-gffsGridCommands"
+MOUNT_POINT="$TEST_TEMP/mount-gffsGridCommands"
 
 oneTimeSetUp()
 {
@@ -56,13 +56,13 @@ testSimplestCopy()
   assertEquals "clean local test file mirror" 0 $retval
   grid cp local:$0 $RNSPATH/crumpet.txt
   assertEquals "copy local test file to grid" 0 $retval
-  grid cp $RNSPATH/crumpet.txt local:.
+  grid cp $RNSPATH/crumpet.txt local:$TEST_TEMP
   assertEquals "copy test file from grid back to local" 0 $retval
-  diff $0 crumpet.txt &>/dev/null
+  diff $0 $TEST_TEMP/crumpet.txt &>/dev/null
   assertEquals "check that local and grid file are same" 0 $retval
   grid rm $RNSPATH/crumpet.txt
   assertEquals "cleaned up grid file okay" 0 $retval
-  \rm crumpet.txt
+  \rm $TEST_TEMP/crumpet.txt
   assertEquals "cleaned up local file okay" 0 $retval
 }
 
@@ -80,7 +80,7 @@ testBasicGridCLI() {
   if ! fuse_supported; then return 0; fi
   OUTFILE=$(mktemp $TEST_TEMP/gridCmdLine.XXXXXX)
   echo "Verbose run log is recorded in $OUTFILE"
-  grid script local:./gridCmdLine.xml $RNSPATH "$MOUNT_POINT" $CONTAINERPATH $EXPORTPATH
+  grid script local:./gridCmdLine.xml "$RNSPATH" "$MOUNT_POINT" "$CONTAINERPATH" "$EXPORTPATH" "$TEST_TEMP"
   local retval=$?
   assertEquals "Testing basic grid command line" 0 $retval
   # make the actual copy for inspection later.

@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.cert.CertStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +48,7 @@ public class KeystoreManager
 	static private KeyStore _resourceTrustStore = null;
 	static private KeyStore _tlsTrustStore = null;
 	static private Object _trustLock = new Object();
+	static private CertStore _crlStore = null;
 
 	/**
 	 * Class to wipe our loaded config stuff in the event the config manager reloads.
@@ -61,6 +64,7 @@ public class KeystoreManager
 			synchronized (_trustLock) {
 				_resourceTrustStore = null;
 				_tlsTrustStore = null;
+				_crlStore = null;
 			}
 		}
 	}
@@ -93,13 +97,15 @@ public class KeystoreManager
 					KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
 
 			{
-				// load the local certificates from the state directory. this is the only place those are found.
+				// load the local certificates from the state directory. this is the only place
+				// those are found.
 				File localCertsDir = new File(InstallationProperties.getUserDir() + "/local-certificates");
 				trustStore = addCertificatesToKeystore(trustStore, localCertsDir, "local-certificates", trustStoreType);
 			}
-			
+
 			{
-				// load the trusted-certificates from the deployment, which is the only place these live.
+				// load the trusted-certificates from the deployment, which is the only place these
+				// live.
 				String trustedCertificatesDirectory =
 					sslProps.getProperty(KeystoreSecurityConstants.Client.RESOURCE_TRUSTED_CERTIFICATES_LOCATION_PROP);
 				if (trustedCertificatesDirectory != null) {
@@ -126,34 +132,64 @@ public class KeystoreManager
 			return _resourceTrustStore;
 		}
 	}
-	
+
 	/**
-	 * returns the folder where we should load the grid-certificates, which should provide *.r0 files for CRL lists.
+	 * retrieves the current CRL list from the grid certificates directory.
+	 */
+	static public CertStore getCRLStore()
+	{
+		synchronized (_trustLock) {
+			if (_crlStore != null) {
+				return _crlStore;
+			}
+
+			ThreadAndProcessSynchronizer.acquireLock(CertUpdateHelpers.CONSISTENCY_LOCK_FILE);
+			try {
+				String crlDirectory = getGridCertsDir();
+				if (crlDirectory != null) {
+					List<X509CRL> crls = SecurityUtilities.loadCRLsFromDirectory(new File(crlDirectory));
+					_crlStore = SecurityUtilities.createCertStoreFromCRLs(crls);
+				}
+			} catch (Exception e) {
+				_logger.error("failed while loading CRL entries", e);
+			}
+			ThreadAndProcessSynchronizer.releaseLock(CertUpdateHelpers.CONSISTENCY_LOCK_FILE);
+
+			return _crlStore;
+		}
+	}
+
+	/**
+	 * returns the folder where we should load the grid-certificates, which should provide *.r0
+	 * files for CRL lists.
 	 */
 	static public String getGridCertsDir()
 	{
 		Security sslProps = getSSLProperties();
 
-		// if grid certs dir is absolute path, then we don't allow an override, as the host should be
-		// providing the CRL repository and that directory should be kept up to date.
+		/*
+		 * if grid certs dir is absolute path, then we don't allow an override, as the host should
+		 * be providing the CRL repository and that directory should be kept up to date.
+		 */
 		String gridCertificatesDirectory =
 			sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_GRID_CERTIFICATES_LOCATION_PROP);
-		if (gridCertificatesDirectory== null) {
-			_logger.warn("no grid-certificates folder listed for property: " + KeystoreSecurityConstants.Client.SSL_GRID_CERTIFICATES_LOCATION_PROP );
+		if (gridCertificatesDirectory == null) {
+			_logger.warn("no grid-certificates folder listed for property: "
+				+ KeystoreSecurityConstants.Client.SSL_GRID_CERTIFICATES_LOCATION_PROP);
 			return null;
 		}
 		boolean absolutePath = gridCertificatesDirectory.startsWith("/");
-		// if not an absolute path in config, then load the grid certificates from grid-certificates 
-		// in the state directory first, if that exists.  otherwise try loading it from the deployment.
+		// if not an absolute path in config, then load the grid certificates from grid-certificates
+		// in the state directory first, if that exists. otherwise try loading it from the
+		// deployment.
 		String localGridCerts = InstallationProperties.getUserDir() + "/grid-certificates";
 		File gridCertsDir = new File(localGridCerts);
 		if (absolutePath || !gridCertsDir.isDirectory()) {
-			return Installation.getDeployment(new DeploymentName()).security()
-					.getSecurityFile(gridCertificatesDirectory).getAbsolutePath();
+			return Installation.getDeployment(new DeploymentName()).security().getSecurityFile(gridCertificatesDirectory)
+				.getAbsolutePath();
 		} else {
 			return localGridCerts;
 		}
-
 	}
 
 	/**
@@ -177,13 +213,15 @@ public class KeystoreManager
 						KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
 
 				{
-					// load the local certificates from the state directory. this is the only place those are found.
+					// load the local certificates from the state directory. this is the only place
+					// those are found.
 					File localCertsDir = new File(InstallationProperties.getUserDir() + "/local-certificates");
 					trustStore = addCertificatesToKeystore(trustStore, localCertsDir, "local-certificates", trustStoreType);
 				}
 
 				{
-					// load the trusted-certificates from the deployment, which is the only place these live.
+					// load the trusted-certificates from the deployment, which is the only place
+					// these live.
 					String trustedCertificatesDirectory =
 						sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUSTED_CERTIFICATES_LOCATION_PROP);
 					if (trustedCertificatesDirectory != null) {
@@ -196,20 +234,22 @@ public class KeystoreManager
 				}
 
 				{
-					// load the grid-wide certificates, which is where we support loading CRL lists also.
-					
+					// load the grid-wide certificates, which is where we support loading CRL lists
+					// also.
+
 					String gridCertificatesDirectory = getGridCertsDir();
 					_logger.debug("found the grid-certificates dir at: " + gridCertificatesDirectory);
 					if (gridCertificatesDirectory != null) {
 						// need filelock here to ensure we don't get a partial directory.
-						ThreadAndProcessSynchronizer.acquireLock();		
+						ThreadAndProcessSynchronizer.acquireLock(CertUpdateHelpers.CONSISTENCY_LOCK_FILE);
 						try {
 							File gridCertsDir = new File(gridCertificatesDirectory);
-							trustStore = addCertificatesToKeystore(trustStore, gridCertsDir, "grid-certificates", trustStoreType);
+							trustStore =
+								addCertificatesToKeystore(trustStore, gridCertsDir, "grid-certificates", trustStoreType);
 						} catch (Exception e) {
 							_logger.error("failed while adding grid-certificates to TLS trust store", e);
 						}
-						ThreadAndProcessSynchronizer.releaseLock();
+						ThreadAndProcessSynchronizer.releaseLock(CertUpdateHelpers.CONSISTENCY_LOCK_FILE);
 					}
 				}
 
@@ -233,15 +273,21 @@ public class KeystoreManager
 	}
 
 	/**
-	 * forgets the existing TLS trust store, which will cause it to be reloaded on next access.
+	 * forgets the existing TLS trust store and the CRL store, which will cause them to be reloaded
+	 * on next access.
 	 */
-	static public void dropTlsTrustStore()
+	static public void dropTrustStores()
 	{
+		// make sure we know to re-acquire these *before* other things do their reload of config.
 		synchronized (_trustLock) {
+			_resourceTrustStore = null;
 			_tlsTrustStore = null;
+			_crlStore = null;
 		}
+
+		ConfigurationManager.reloadConfiguration();
 	}
-	
+
 	static public KeyStore loadResourceTrustStoreFromFile() throws AuthZSecurityException
 	{
 		KeyStore trustStore = null;
@@ -273,7 +319,8 @@ public class KeystoreManager
 		} catch (GeneralSecurityException e) {
 			throw new AuthZSecurityException("Could not load TrustManager: " + e.getLocalizedMessage(), e);
 			// } catch (ConfigurationException e) {
-			// throw new AuthZSecurityException("Could not load TrustManager: " + e.getMessage(), e);
+			// throw new AuthZSecurityException("Could not load TrustManager: " + e.getMessage(),
+			// e);
 		} catch (IOException e) {
 			throw new AuthZSecurityException("Could not load TrustManager: " + e.getMessage(), e);
 		}
@@ -301,21 +348,11 @@ public class KeystoreManager
 			return ks;
 		}
 
-		// Security sslProps = getSSLProperties();
-
 		try {
 			_logger.debug("found " + prefix + " certs folder in: " + certDirectory);
 			List<Certificate> certificateList = SecurityUtilities.loadCertificatesFromDirectory(certDirectory);
 			if (certificateList != null && !certificateList.isEmpty()) {
 				if (ks == null) {
-					// String trustStoreLoc =
-					// sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_LOCATION_PROP);
-					// String trustStoreType =
-					// sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
-					// KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
-					// String trustStorePass =
-					// sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_PASSWORD_PROP);
-
 					ks = SecurityUtilities.createTrustStoreFromCertificates(trustStoreType, null, certificateList);
 				} else {
 					for (Certificate certificate : certificateList) {
@@ -396,13 +433,15 @@ public class KeystoreManager
 
 			for (NuCredential cred : transientCredentials.getCredentials()) {
 				/*
-				 * If the cred is an Identity, then we simply add that identity to our identity list.
+				 * If the cred is an Identity, then we simply add that identity to our identity
+				 * list.
 				 */
 				if (cred instanceof Identity) {
 					ret.add((Identity) cred);
 				} else if (cred instanceof TrustCredential) {
 					/*
-					 * If the cred is a signed identity assertion, then we have to get the identity out of the assertion.
+					 * If the cred is a signed identity assertion, then we have to get the identity
+					 * out of the assertion.
 					 */
 					TrustCredential tc = (TrustCredential) cred;
 					X509Identity identityAttr = (X509Identity) tc.getRootIdentity();

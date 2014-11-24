@@ -66,6 +66,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.ResourceLock;
 import edu.virginia.vcgr.genii.client.sync.SyncProperty;
 import edu.virginia.vcgr.genii.client.sync.VersionVector;
+import edu.virginia.vcgr.genii.client.utils.StatsLogger;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
@@ -180,7 +181,10 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 				_logger.debug("read: resource in error state");
 			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(), "bad replica");
 		}
-
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("RandomByteIO: Read from "+caller);
+		// End logging
 		int bytesPerBlock = read.getBytesPerBlock();
 		int numBlocks = read.getNumBlocks();
 		long startOffset = read.getStartOffset();
@@ -322,6 +326,10 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 				_logger.debug("write: resource in error state");
 			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(), "bad replica");
 		}
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("RandomByteIO: Write from "+caller);
+		// End logging
 		long startOffset = write.getStartOffset();
 		int bytesPerBlock = write.getBytesPerBlock();
 		long stride = write.getStride();
@@ -417,6 +425,10 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 				_logger.debug("truncAppend: resource in error state");
 			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(), "bad replica");
 		}
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("RandomByteIO: TruncAppend from "+caller);
+		// End logging
 		long startOffset = truncAppend.getOffset();
 		TransferInformationType transferInformation = truncAppend.getTransferInformation();
 		byte[] data = TransferAgent.receiveData(transferInformation);

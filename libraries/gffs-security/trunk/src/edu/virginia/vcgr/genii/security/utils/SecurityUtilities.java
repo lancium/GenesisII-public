@@ -52,20 +52,21 @@ import org.morgan.util.io.StreamUtils;
 import sun.misc.BASE64Encoder;
 import sun.security.provider.X509Factory;
 import edu.virginia.vcgr.genii.security.CertificateValidator;
+import edu.virginia.vcgr.genii.security.TrustStoreProvider;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
 public class SecurityUtilities implements CertificateValidator
 {
 	static private Log _logger = LogFactory.getLog(SecurityUtilities.class);
 
-	private KeyStore _localResourceTrustStore = null;
 	private static Boolean loadedSecurity = false;
-	private String _gridCertsDir = null;
+	TrustStoreProvider _tsp;
 
-	public SecurityUtilities(KeyStore localResourceTrustStore, String gridCertsDir)
+	public SecurityUtilities(TrustStoreProvider tsp)
 	{
-		_localResourceTrustStore = localResourceTrustStore;
-		_gridCertsDir = gridCertsDir;
+		if (tsp == null)
+			throw new RuntimeException("constructor given a null TrustStoreProvider");
+		_tsp = tsp;
 	}
 
 	/**
@@ -82,15 +83,9 @@ public class SecurityUtilities implements CertificateValidator
 	}
 
 	@Override
-	public KeyStore getResourceTrustStore()
+	public KeyStore getResourceTrustStore() throws Exception
 	{
-		return _localResourceTrustStore;
-	}
-
-	@Override
-	public String getGridCertificatesDir()
-	{
-		return _gridCertsDir;
+		return _tsp.getResourceTrustStore();
 	}
 
 	/**
@@ -106,9 +101,9 @@ public class SecurityUtilities implements CertificateValidator
 	 * Verifies that the certificate is found rooted in our local resource trust store.
 	 */
 	@Override
-	public boolean validateIsTrustedResource(X509Certificate[] certChain)
+	public boolean validateIsTrustedResource(X509Certificate[] certChain) throws Exception
 	{
-		return validateTrustedByKeystore(certChain, _localResourceTrustStore);
+		return validateTrustedByKeystore(certChain, getResourceTrustStore());
 	}
 
 	/**
@@ -222,22 +217,6 @@ public class SecurityUtilities implements CertificateValidator
 				_logger.debug("could not validate this cert with jdk ssl against trust store: " + certChain[0].getSubjectDN()
 					+ e.getMessage());
 		}
-		// hmmm: canl trust checking is off.
-		// try {
-		// if (!trustOkay) {
-		// InMemoryKeystoreCertChainValidator validater = new
-		// InMemoryKeystoreCertChainValidator(ks);
-		// CommonX509TrustManager trustManager = new CommonX509TrustManager(validater);
-		// trustManager.checkClientTrusted(certChain, certChain[0].getPublicKey().getAlgorithm());
-		// if (_logger.isTraceEnabled())
-		// _logger.trace("validated cert with canl: " + certChain[0].getSubjectDN());
-		// trustOkay = true;
-		// }
-		// } catch (Throwable e) {
-		// if (_logger.isTraceEnabled())
-		// _logger.trace("could not validate this cert with CANL against trust store: " +
-		// certChain[0].getSubjectDN(), e);
-		// }
 		return trustOkay;
 	}
 
@@ -572,10 +551,12 @@ public class SecurityUtilities implements CertificateValidator
 						Date thisUpdate = crl.getThisUpdate();
 						if ( (thisUpdate != null) && (thisUpdate.after(new Date()))) {
 							_logger.warn("CRL last update date is in the future; ignoring " + crlFile);
+							okayToAdd = false;
 						}
 						Date nextUpdate = crl.getNextUpdate();
 						if ( (nextUpdate != null) && (nextUpdate.before(new Date()))) {
-							_logger.warn("CRL next update date is in the past; ignoring " + crlFile);
+							_logger.warn("CRL next update date is in the past; needs new CRL " + crlFile);
+							// we keep this for now, since we don't want to be unprotected: okayToAdd = false;
 						}
 					}
 					if (!okayToAdd) continue;  // ignore remainder of checks.
@@ -756,6 +737,12 @@ public class SecurityUtilities implements CertificateValidator
 			_logger.error("problem encoding checksum.");
 			return -1;
 		}
+	}
+
+	@Override
+	public TrustStoreProvider getTrustStoreProvider()
+	{
+		return _tsp;
 	}
 
 }

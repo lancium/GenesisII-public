@@ -211,7 +211,7 @@ public class ReplicateTool extends BaseGridTool
 			}
 		}
 		else {
-			stdout.println("There are no replicas of resource"+ replicaPath);
+			stdout.println("There are no replicas of resource "+ replicaPath);
 		}
 		return 0;
 	}

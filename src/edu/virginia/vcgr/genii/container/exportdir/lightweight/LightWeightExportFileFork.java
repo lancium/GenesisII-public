@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.utils.StatsLogger;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.RandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
@@ -25,7 +27,12 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork 
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public void read(long offset, ByteBuffer dest) throws IOException
+	
 	{
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("LightWeightExport: File Read from "+caller);
+		// End logging
 		getTarget().read(offset, dest);
 	}
 
@@ -33,6 +40,10 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork 
 	@RWXMapping(RWXCategory.WRITE)
 	public void truncAppend(long offset, ByteBuffer source) throws IOException
 	{
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("LightWeightExport: File TruncAppend  from "+caller);
+		// End logging
 		getTarget().truncAppend(offset, source);
 	}
 
@@ -40,6 +51,10 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork 
 	@RWXMapping(RWXCategory.WRITE)
 	public void write(long offset, ByteBuffer source) throws IOException
 	{
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("LightWeightExport: File Write from "+caller);
+		// End logging
 		getTarget().write(offset, source);
 	}
 

@@ -20,35 +20,35 @@ oneTimeSetUp()
 
   # clean up some things that might have been left from earlier test.
   grid rm -rf $RNSPATH/a $RNSPATH/a1 $RNSPATH/a2 $RNSPATH/a4 $RNSPATH/q $RNSPATH/garp $RNSPATH/1 $RNSPATH/foo &>/dev/null
-  \rm -rf ./a1 ./foo ./crunchy ./a4.txt 
-  \rm ./zorba &>/dev/null
-  \rm -rf ./petunia &>/dev/null
+  \rm -rf $TEST_TEMP/a1 $TEST_TEMP/foo $TEST_TEMP/crunchy $TEST_TEMP/a4.txt 
+  \rm $TEST_TEMP/zorba &>/dev/null
+  \rm -rf $TEST_TEMP/petunia &>/dev/null
 }
 
 testCopyEmptyDirectory()
 {
-  mkdir ./zorba
-  cp ./rnsBearTrap.sh ./zorba
-  mkdir ./zorba/fruvil  # empty dir
+  mkdir $TEST_TEMP/zorba
+  cp ./rnsBearTrap.sh $TEST_TEMP/zorba
+  mkdir $TEST_TEMP/zorba/fruvil  # empty dir
   grid mkdir $RNSPATH/q
   assertEquals "making grid temporary dir should work" 0 $?
   # copy local to grid.
-  grid cp -r local:./zorba $RNSPATH/q
+  grid cp -r local:$TEST_TEMP/zorba $RNSPATH/q
   assertEquals "copy local tree with empty dir to grid should work" 0 $?
-  mkdir ./petunia
+  mkdir $TEST_TEMP/petunia
   # copy local to local.
-  grid cp -r local:./zorba local:./petunia
+  grid cp -r local:$TEST_TEMP/zorba local:$TEST_TEMP/petunia
   assertEquals "copy local tree with empty dir to local dir should work" 0 $?
-  \rm -rf ./zorba ./petunia
+  \rm -rf $TEST_TEMP/zorba $TEST_TEMP/petunia
   # check that nothing unexpected went wrong...
-  \mkdir ./zorba
+  \mkdir $TEST_TEMP/zorba
   assertEquals "making local dir again should work" 0 $?
   # copy grid to local.
-  grid cp -r $RNSPATH/q local:./zorba
+  grid cp -r $RNSPATH/q local:$TEST_TEMP/zorba
   assertEquals "copy grid tree with empty dir to local path should work" 0 $?
   grid rm -r $RNSPATH/q  
   assertEquals "cleaning up grid temporary dir should work" 0 $?
-  \rm -rf ./zorba 
+  \rm -rf $TEST_TEMP/zorba 
 }
 
 testProperHandlingGridPathType()
@@ -81,8 +81,8 @@ testProperHandlingGridPathType()
 
 testCopyingSimpleHierarchies()
 {
-  mkdir -p a1/b1/c1/d1
-  grid cp -r local:./a1 $RNSPATH/a2
+  mkdir -p $TEST_TEMP/a1/b1/c1/d1
+  grid cp -r local:$TEST_TEMP/a1 $RNSPATH/a2
   assertEquals "copying a1 to new hierarchy in grid should work" 0 $?
   grid ls $RNSPATH/a2/b1
   assertEquals "new hierarchy should start with b1 since dir was not pre-existing" 0 $?
@@ -90,13 +90,13 @@ testCopyingSimpleHierarchies()
   assertEquals "clean up a2 directory in grid" 0 $?
   grid mkdir $RNSPATH/a2
   assertEquals "pre-add a2 directory in grid" 0 $?
-  grid cp -r local:./a1 $RNSPATH/a2
+  grid cp -r local:$TEST_TEMP/a1 $RNSPATH/a2
   assertEquals "copying a1 to existing hierarchy in grid should work" 0 $?
   grid ls $RNSPATH/a2/a1
   assertEquals "new hierarchy should start with a1 since dir existed already" 0 $?
   grid rm -r $RNSPATH/a2
   assertEquals "clean up a2 directory in grid" 0 $?
-  \rm -rf a1  # clean up local path.
+  \rm -rf $TEST_TEMP/a1  # clean up local path.
 }
 
 testSalsFirstScenario()
@@ -119,8 +119,6 @@ testSalsSecondScenario()
 {
   grid mkdir $RNSPATH/1
   assertEquals "making the directory should work" 0 $?
-#  grid echo x \> $RNSPATH/1/file
-#hmmm: above has issues on windows platform, so we create the file by copying in.
   grid cp local:./$(basename $0) $RNSPATH/1/file
   assertEquals "creating a simple file in the directory should work" 0 $?
   grid ls $RNSPATH/1/file
@@ -151,7 +149,7 @@ testSalsThirdScenario()
 
 testSimpleLocalRemoval()
 {
-  local localpath="local:./foo"
+  local localpath="local:$TEST_TEMP/foo"
   grid mkdir $localpath
   assertEquals "make top-level local directory" 0 $?
   grid rm $localpath
@@ -195,14 +193,14 @@ testSimpleGridRemoval()
 testSimpleCopyToGrid()
 {
   # make a simple hierarchy to copy.
-  mkdir garp
-  pushd garp &>/dev/null
+  mkdir $TEST_TEMP/garp
+  pushd $TEST_TEMP/garp &>/dev/null
   mkdir froon
   pushd froon &>/dev/null
-  cp ../../rnsBearTrap.sh razmo
+  cp "$WORKDIR/rnsBearTrap.sh" razmo
   popd &>/dev/null; popd &>/dev/null
 
-  grid cp -r local:./garp $RNSPATH
+  grid cp -r local:$TEST_TEMP/garp $RNSPATH
   assertEquals "copy directory up to rns" 0 $?
   grid cat $RNSPATH/garp/froon/razmo
   assertEquals "one copied file is accessible in rns" 0 $?
@@ -216,19 +214,19 @@ testSimpleCopyToGrid()
   grid cp $RNSPATH/garp/froon $RNSPATH/garp/froon
   assertNotEquals "directory cannot be copied onto itself" 0 $?
 
-  mkdir junk
-  grid cp -r $RNSPATH/garp local:./junk
+  mkdir $TEST_TEMP/junk
+  grid cp -r $RNSPATH/garp local:$TEST_TEMP/junk
   assertEquals "copy back from rns to local" 0 $?
-  grid cat local:./junk/garp/froon/razmo
+  grid cat local:$TEST_TEMP/junk/garp/froon/razmo
   assertEquals "one copied file is accessible in local path" 0 $?
 
-  \rm -rf junk
+  \rm -rf $TEST_TEMP/junk
   assertEquals "cleanup junk hierarchy locally" 0 $?
 
   grid rm -r $RNSPATH/garp
   assertEquals "cleanup garp hierarchy in RNS" 0 $?
 
-  \rm -rf garp
+  \rm -rf $TEST_TEMP/garp
   assertEquals "cleanup garp hierarchy locally" 0 $?
 }
 
@@ -236,14 +234,17 @@ testLocalDirWithCycles()
 {
   if ! links_supported; then return 0; fi
   # avinash's specific case.
-  ln -s . ./zorba
+  pushd $TEST_TEMP &>/dev/null
+  ln -s $TEST_TEMP $TEST_TEMP/zorba
   mkdir ./petunia
   grid cp -r local:./zorba local:./petunia
   assertNotEquals "copy simple local path with cycle should bounce" 0 $?
   \rm ./zorba &>/dev/null
   \rm -rf ./petunia &>/dev/null
+  popd &>/dev/null
 
   # slightly more involved test.
+  pushd $TEST_TEMP &>/dev/null
   mkdir ./foo
   mkdir ./foo/bork
   mkdir ./foo/moop
@@ -264,6 +265,7 @@ testLocalDirWithCycles()
   grid rm -r local:./crunchy
   assertEquals "cleaning up local crunchy path should work" 0 $?
   \rm -r ./foo
+  popd &>/dev/null
 }
 
 testRecursiveRnsDeleteWithLinks()

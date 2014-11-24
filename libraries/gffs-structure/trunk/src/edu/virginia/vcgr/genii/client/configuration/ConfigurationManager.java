@@ -33,6 +33,9 @@ public class ConfigurationManager
 
 	// denotes type of configuration for this process
 	private Boolean _isClient = null;
+	
+	// only used for server role; tracks space available on file systems.
+	static private Thread _filesystemPollingThread = null;
 
 	private FilesystemManager _filesystemManager = null;
 
@@ -110,11 +113,19 @@ public class ConfigurationManager
 			if (_manager == null)
 				throw new RuntimeException("Cannot call reloadConfiguration() before initializing configuration manager first.");
 
-			// notify interested parties that they might want to unload
-			// any cached items from the configuration(s)
-			for (ConfigurationUnloadedListener listener : _unloadListeners) {
+			/*
+			 * notify interested parties that they might want to unload any cached items from the
+			 * configuration(s). we make a copy of the list here in case listeners are added during
+			 * the config reload.
+			 */
+			@SuppressWarnings("unchecked")
+			ArrayList<ConfigurationUnloadedListener> listenersCopy =
+				(ArrayList<ConfigurationUnloadedListener>) _unloadListeners.clone();
+			for (ConfigurationUnloadedListener listener : listenersCopy) {
 				listener.notifyUnloaded();
 			}
+			// drop that copy as soon as possible.
+			listenersCopy = null;
 
 			boolean isClient = _manager.isClientRole();
 			File userDirFile = _manager.getUserDirectory();
@@ -186,10 +197,12 @@ public class ConfigurationManager
 	public void setRoleServer()
 	{
 		setRole(Boolean.FALSE);
-
-		Thread th = new Thread(new FilesystemPoller(_filesystemManager), "Filesystem Polling Thread");
-		th.setDaemon(true);
-		th.start();
+		
+		if (_filesystemPollingThread == null) {
+			_filesystemPollingThread = new Thread(new FilesystemPoller(_filesystemManager), "Filesystem Polling Thread");
+			_filesystemPollingThread.setDaemon(true);
+			_filesystemPollingThread.start();
+		}
 	}
 
 	synchronized public XMLConfiguration getRoleSpecificConfiguration()

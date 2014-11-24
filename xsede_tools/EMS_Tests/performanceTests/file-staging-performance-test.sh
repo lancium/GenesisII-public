@@ -10,7 +10,7 @@ if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before t
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 # the file name we'll use for our large staging.
-HUGE_TEST_FILE=./randomhalfgig.dat
+HUGE_TEST_FILE=$TEST_TEMP/randomhalfgig.dat
 
 oneTimeSetUp()
 {
@@ -23,7 +23,7 @@ oneTimeSetUp()
   fi
 
   echo "creating 5KB file..."
-  dd if=/dev/urandom of=random5KB.dat bs=1 count=5120
+  dd if=/dev/urandom of=$TEST_TEMP/random5KB.dat bs=1 count=5120
 
   echo "creating large file for staging, this may take a couple minutes..."
   dd if=/dev/urandom of=$HUGE_TEST_FILE bs=1048576 count=512
@@ -37,7 +37,7 @@ testCopyFilesToGFFS()
   result=`expr $exitCode`
   assertEquals "Copied bash input file" 0 $exitCode
   echo "Copying 5KB file to GFFS"
-  grid cp local:./random5KB.dat grid:$RNSPATH
+  grid cp local:$TEST_TEMP/random5KB.dat grid:$RNSPATH
   exitCode=$?
   result=`expr $exitCode + $result`
   assertEquals "Copied 5KB file" 0 $exitCode
@@ -92,12 +92,12 @@ testFileConsistency()
   grid ls -al $RNSPATH
   cat $GRID_OUTPUT_FILE
 
-  grid cp $RNSPATH/random5KB.transferred local:./random5KB.transferred
-  diff ./random5KB.dat ./random5KB.transferred
+  grid cp $RNSPATH/random5KB.transferred local:$TEST_TEMP/random5KB.transferred
+  diff $TEST_TEMP/random5KB.dat $TEST_TEMP/random5KB.transferred
   assertEquals "Checking File consistency, local copy vs copy on grid namespace" 0 $?
 
-  grid cp $RNSPATH/randomhalfgig.transferred local:./randomhalfgig.transferred
-  diff $HUGE_TEST_FILE ./randomhalfgig.transferred
+  grid cp $RNSPATH/randomhalfgig.transferred local:$TEST_TEMP/randomhalfgig.transferred
+  diff $HUGE_TEST_FILE $TEST_TEMP/randomhalfgig.transferred
   assertEquals "Checking File consistency, local copy vs copy on grid namespace" 0 $?
   echo `date`": test ended"
 
@@ -107,7 +107,7 @@ testFileConsistency()
 
 oneTimeTearDown()
 {
-  rm -f ./random5KB.* ./randomhalfgig.*
+  rm -f $TEST_TEMP/random5KB.* $TEST_TEMP/randomhalfgig.*
   grid rm $RNSPATH/random5KB.dat
   grid rm $RNSPATH/random5KB.transferred
   grid rm $RNSPATH/randomhalfgig.dat

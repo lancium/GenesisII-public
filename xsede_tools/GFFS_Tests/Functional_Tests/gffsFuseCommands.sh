@@ -16,7 +16,7 @@ if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before t
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 # where we hook in the fuse mount.
-MOUNT_POINT="$WORKDIR/mount-gffsFuseCommands"
+MOUNT_POINT="$TEST_TEMP/mount-gffsFuseCommands"
 # the user's home directory from fuse perspective.
 HOME_DIR="$MOUNT_POINT/$RNSPATH"
 # directories we create and manipulate during test.
@@ -241,7 +241,7 @@ testRemovingDirectory()
 testUnmountingFuseMount()
 {
   if ! fuse_supported; then return 0; fi
-  cd "$WORKDIR"  # get back off fuse mount.
+  cd "$WORKDIR"  # change dir off fuse mount.
   \rm $TEST_TEMP/local-file.txt $TEST_TEMP/local-file1.txt 
   grid fuse --unmount local:"$MOUNT_POINT"
   retval=$?

@@ -230,7 +230,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				break;
 			case OPEN:
 				if (_logger.isDebugEnabled())
-					_logger.debug("giving access to identity due to OPEN permission: " + identity.describe(VerbosityLevel.HIGH));
+					_logger.debug("giving access to identity due to OPEN permission: "
+						+ ((identity != null)? identity.describe(VerbosityLevel.HIGH) : "null"));
 				return true;
 			case CLOSED:
 				return false;
@@ -252,7 +253,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				try {
 					if (entry.isPermitted(identity)) {
 						if (_logger.isDebugEnabled())
-							_logger.debug("passing ACL access check due to permission for identity: " + identity.describe(VerbosityLevel.HIGH));
+							_logger.debug("passing ACL access check due to permission for identity: " 
+								+ ((identity != null)? identity.describe(VerbosityLevel.HIGH) : "null"));
 						return true;
 					}
 				} catch (Exception e) {

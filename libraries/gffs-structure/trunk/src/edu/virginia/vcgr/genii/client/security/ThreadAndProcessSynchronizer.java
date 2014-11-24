@@ -8,6 +8,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.EnumSet;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,31 +18,52 @@ import edu.virginia.vcgr.genii.client.InstallationProperties;
 /**
  * provides support for an interprocess file lock that is also thread safe, which is more complex
  * since java's FileLock objects do not properly handle multi-threading, even with separate FileLock
- * objects.  this currently only supports locking one specific consistency lock file.
+ * objects.
  */
 public class ThreadAndProcessSynchronizer
 {
 	static private Log _logger = LogFactory.getLog(ThreadAndProcessSynchronizer.class);
 
-	static volatile Object _threadSynchronizer = new Object();
-	static volatile FileChannel _fileLocker = null;
+	/**
+	 * Holds onto the information needed for locking files.
+	 */
+	static class SynchPackage
+	{
+		public String _lockFile = null;
+		public volatile FileChannel _fileLocker = null;
 
-	// filename used for consistency locking (when managing the certificate update properties).
-	static public final String CONSISTENCY_LOCK_FILE = "consistency.lock";
+		SynchPackage(String lockFile)
+		{
+			_lockFile = lockFile;
+		}
+	}
+
+	/*
+	 * holds onto records for all file locks, and also serves as the object our critical section is
+	 * based on.
+	 */
+	static volatile HashMap<String, SynchPackage> _lockRecords = new HashMap<String, SynchPackage>();
 
 	/**
 	 * locks the consistency lock file in a thread-safe and process-safe manner. any call to
 	 * acquireLock *must* be followed eventually by a call to releaseLock.
 	 */
-	static public void acquireLock()
+	static public void acquireLock(String lockFile)
 	{
 		while (true) {
-			synchronized (_threadSynchronizer) {
-				if (_fileLocker == null) {
+			synchronized (_lockRecords) {
+				SynchPackage found = _lockRecords.get(lockFile);
+				if (found == null) {
+					_logger.debug("acquireLock: creating new synch package for lock file: " + lockFile);
+					found = new SynchPackage(lockFile);
+					_lockRecords.put(lockFile, found);
+				}
+
+				if (found._fileLocker == null) {
 					// it seems that we can safely grab the lock, unless someone else has it.
-					FileChannel fc = lockConsistencyFile();
+					FileChannel fc = lockConsistencyFile(found);
 					if (fc != null) {
-						_fileLocker = fc;
+						found._fileLocker = fc;
 						return;
 					}
 				}
@@ -57,36 +79,45 @@ public class ThreadAndProcessSynchronizer
 	/**
 	 * unlocks the consistency lock file from a previously held lock.
 	 */
-	static public void releaseLock()
+	static public void releaseLock(String lockFile)
 	{
-		synchronized (_threadSynchronizer) {
-			if (_fileLocker == null) {
+		synchronized (_lockRecords) {
+			SynchPackage found = _lockRecords.get(lockFile);
+			if (found == null) {
+				String msg = "attempted release on lockfile that hasn't been locked first: " + lockFile;
+				_logger.error(msg);
+				throw new RuntimeException(msg);
+			}
+			if (found._fileLocker == null) {
 				String msg = "severe problem: a releaseLock was attempted with no existing lock";
 				_logger.error(msg);
 				throw new RuntimeException(msg);
 			}
-			unlockConsistencyFile(_fileLocker);
-			_fileLocker = null;
+			unlockConsistencyFile(found);
+			found._fileLocker = null;
 		}
 	}
 
 	/**
 	 * returns the file name of the consistency lock file that is used for upgrading certificates.
 	 */
-	private static File getConsistencyLockFile()
+	private static File getConsistencyLockFile(String lockFile)
 	{
+		if (lockFile.startsWith("/")) {
+			// this looks like an absolute path, so we use it directly.
+			return new File(lockFile);
+		}
 		String stateDir = InstallationProperties.getUserDir();
-		File lockFile = new File(stateDir + "/" + CONSISTENCY_LOCK_FILE);
-		return lockFile;
+		return new File(stateDir + "/" + lockFile);
 	}
 
 	/**
 	 * uses the FileChannel and FileLock support of nio to lock the file. the lock is held until the
 	 * returned FileChannel is closed or the program exits.
 	 */
-	private static FileChannel lockConsistencyFile()
+	private static FileChannel lockConsistencyFile(SynchPackage lockPack)
 	{
-		File lockFile = getConsistencyLockFile();
+		File lockFile = getConsistencyLockFile(lockPack._lockFile);
 		_logger.trace("consistency file is: " + lockFile);
 		FileSystem fs = FileSystems.getDefault();
 		Path fp = fs.getPath(lockFile.getAbsolutePath());
@@ -99,7 +130,8 @@ public class ThreadAndProcessSynchronizer
 		}
 		try {
 			fc.lock();
-			_logger.debug("locked consistency file.");
+			if (_logger.isTraceEnabled())
+				_logger.debug("locked consistency file '" + lockPack._lockFile + "'");
 		} catch (IOException e) {
 			_logger.error("failed to lock consistency lock for cert update properties", e);
 			try {
@@ -114,15 +146,17 @@ public class ThreadAndProcessSynchronizer
 	/**
 	 * unlocks a lock held on a file.
 	 */
-	private static void unlockConsistencyFile(FileChannel toUnlock)
+	private static void unlockConsistencyFile(SynchPackage lockPack)
 	{
+		FileChannel toUnlock = lockPack._fileLocker;
 		if (toUnlock == null) {
 			_logger.error("null passed in for FileChannel to unlock");
 			return;
 		}
 		try {
 			toUnlock.close();
-			_logger.debug("unlocked consistency file.");
+			if (_logger.isTraceEnabled())
+				_logger.debug("unlocked consistency file '" + lockPack._lockFile + "'");
 		} catch (IOException e) {
 			_logger.error("failed to close consistency lock file", e);
 		}

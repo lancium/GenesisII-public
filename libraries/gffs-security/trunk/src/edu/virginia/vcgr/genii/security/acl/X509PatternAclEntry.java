@@ -45,7 +45,6 @@ public class X509PatternAclEntry implements AclEntry
 	protected X500Principal _userPattern;
 
 	// cache a trust manager upon first use.
-//	transient protected CommonX509TrustManager _trustManagerCanl;
 	transient protected X509TrustManager _trustManagerJdk;
 
 	// cache an X509 pattern upon first use.
@@ -79,29 +78,8 @@ public class X509PatternAclEntry implements AclEntry
 			X509Certificate trustedCert = _trustRoot.getOriginalAsserter()[0];
 			ks.setCertificateEntry(trustedCert.getSubjectX500Principal().getName(), trustedCert);
 
-			// create a trust manager from the key store.
-//			PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(ks, new X509CertSelector());
-//			pkixParams.setRevocationEnabled(false);
-//			ManagerFactoryParameters trustParams = new CertPathTrustManagerParameters(pkixParams);
-
-//			TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
-//			tmf.init(trustParams);
-//			_trustManagerJdk = (X509TrustManager) tmf.getTrustManagers()[0];
-			_trustManagerJdk = new RevocationAwareTrustManager(ks,
-				 CertificateValidatorFactory.getValidator().getGridCertificatesDir());
+			_trustManagerJdk = new RevocationAwareTrustManager(CertificateValidatorFactory.getValidator().getTrustStoreProvider());
 		}
-//		if (_trustManagerCanl == null) {
-//			// create an in-memory cert keystore for the trusted certs.
-//			KeyStore ks = KeyStore.getInstance("JKS");
-//			ks.load(null, null);
-//
-//			// add the trusted cert into the memory-keystore.
-//			X509Certificate trustedCert = _trustRoot.getOriginalAsserter()[0];
-//			ks.setCertificateEntry(trustedCert.getSubjectX500Principal().getName(), trustedCert);
-//
-//			InMemoryKeystoreCertChainValidator validater = new InMemoryKeystoreCertChainValidator(ks);
-//			_trustManagerCanl = new CommonX509TrustManager(validater);
-//		}
 	}
 
 	protected boolean validateTrust(X509Identity user)
@@ -114,19 +92,9 @@ public class X509PatternAclEntry implements AclEntry
 		}
 		boolean trustOkay = false;
 		X509Certificate[] userCertChain = user.getOriginalAsserter();
-//hmmm: canl trust checking is off.
-//		try {
-//			_trustManagerCanl.checkClientTrusted(userCertChain, userCertChain[0].getPublicKey().getAlgorithm());
-//			trustOkay = true;
-//		} catch (Throwable e) {
-//			if (_logger.isDebugEnabled())
-//				_logger.debug("problem checking cert with canl: " + e.getMessage());
-//		}
 		try {
-			if (!trustOkay) {
-				_trustManagerJdk.checkClientTrusted(userCertChain, userCertChain[0].getPublicKey().getAlgorithm());
-				trustOkay = true;
-			}
+			_trustManagerJdk.checkClientTrusted(userCertChain, userCertChain[0].getPublicKey().getAlgorithm());
+			trustOkay = true;
 		} catch (Throwable e) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("cert check complained: " + e.getMessage());

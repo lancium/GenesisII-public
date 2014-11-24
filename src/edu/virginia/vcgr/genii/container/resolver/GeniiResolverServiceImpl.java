@@ -48,6 +48,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.ResourceLock;
 import edu.virginia.vcgr.genii.client.sync.SyncProperty;
 import edu.virginia.vcgr.genii.client.sync.VersionVector;
+import edu.virginia.vcgr.genii.client.utils.StatsLogger;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
@@ -202,6 +203,10 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 	 */
 	private EndpointReferenceType doResolve(URI targetEPI) throws RemoteException, ResolveFailedFaultType
 	{
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("GeniiResolver: Resolving an EPR from "+caller);
+		// End logging
 		fixMetadataInWorkingContext();
 		if (targetEPI == null) {
 			URI[] targetEPIList = _resource.getTargetEPIList();

@@ -27,6 +27,7 @@ import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.client.security.TrustStoreLinkage;
 import edu.virginia.vcgr.genii.client.security.UpdateGridCertsTool;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
@@ -38,7 +39,7 @@ public class Driver extends ApplicationBase
 
 	// how soon should the next check of the certificates occur.
 	static long _nextCertUpdateCheck = 0;
-	
+
 	static public void usage()
 	{
 		System.out.println("Driver");
@@ -66,8 +67,7 @@ public class Driver extends ApplicationBase
 		SecurityUtilities.initializeSecurity();
 
 		try {
-			CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore(),
-				KeystoreManager.getGridCertsDir()));
+			CertificateValidatorFactory.setValidator(new SecurityUtilities(new TrustStoreLinkage()));
 		} catch (Throwable t) {
 			System.err.println("Security validation setup failure: " + t.getMessage());
 			System.exit(1);
@@ -104,6 +104,25 @@ public class Driver extends ApplicationBase
 
 		// Set Trust Store Provider
 		java.security.Security.setProperty("ssl.SocketFactory.provider", VcgrSslSocketFactory.class.getName());
+	}
+
+	/*
+	 * checks the timer for certificate updates and runs the update process if it's time. on
+	 * startup, it's always time to try it.
+	 */
+	static private void checkCertUpdateTime(ApplicationBase.GridStates gridOkay)
+	{
+		if (new Date().getTime() >= _nextCertUpdateCheck) {
+			// time to update certificates if we have a valid connection.
+			if (gridOkay.equals(GridStates.CONNECTION_ALREADY_GOOD) || gridOkay.equals(GridStates.CONNECTION_GOOD_NOW)) {
+				try {
+					UpdateGridCertsTool.runGridCertificateUpdates();
+				} catch (Exception e) {
+					_logger.error("certificate update process failed", e);
+				}
+				_nextCertUpdateCheck = new Date().getTime() + UpdateGridCertsTool.UPDATER_SNOOZE_DURATION;
+			}
+		}
 	}
 
 	static public void main(String[] args)
@@ -162,31 +181,9 @@ public class Driver extends ApplicationBase
 		// we need to load the keystore before we update the certs, or we will have a deadlock.
 		KeystoreManager.getTlsTrustStore();
 
-		// update certificates if we have a valid connection.
-		if (gridOkay.equals(GridStates.CONNECTION_ALREADY_GOOD) || gridOkay.equals(GridStates.CONNECTION_GOOD_NOW)) {
-			try {
-				UpdateGridCertsTool.runGridCertificateUpdates();
-			} catch (Exception e) {
-				_logger.error("certificate update process failed", e);
-			}
-			_nextCertUpdateCheck = new Date().getTime() + UpdateGridCertsTool.UPDATER_SNOOZE_DURATION;						
-		}
-		
 		if (args.length == 0 || (args.length == 1 && args[0].equals("shell"))) {
 			while (true) {
-
-				if (new Date().getTime() >= _nextCertUpdateCheck) {
-					// time to update certificates if we have a valid connection.
-					if (gridOkay.equals(GridStates.CONNECTION_ALREADY_GOOD) || gridOkay.equals(GridStates.CONNECTION_GOOD_NOW)) {
-						try {
-							UpdateGridCertsTool.runGridCertificateUpdates();
-						} catch (Exception e) {
-							_logger.error("certificate update process failed", e);
-						}
-						_nextCertUpdateCheck = new Date().getTime() + UpdateGridCertsTool.UPDATER_SNOOZE_DURATION;						
-					}
-				}
-				
+				checkCertUpdateTime(gridOkay);
 				try {
 					lastExit = doShell(in);
 					break;
@@ -194,6 +191,7 @@ public class Driver extends ApplicationBase
 				}
 			}
 		} else {
+			checkCertUpdateTime(gridOkay);
 			try {
 				doNonShell(in, args);
 			} catch (ReloadShellException re) {
@@ -279,8 +277,11 @@ public class Driver extends ApplicationBase
 					ExceptionHandlerManager.getExceptionHandler().handleException(cause, new OutputStreamWriter(System.err));
 				if (toReturn != 0)
 					return toReturn;
-				lastExit = 1; // at least let them know we were displeased, if this is the last
-								// command in the loop.
+				/*
+				 * at least let them know we were displeased, if this is the last command in the
+				 * loop.
+				 */
+				lastExit = 1;
 			} finally {
 				// Get ready for the next time through
 				LoggingContext.releaseCurrentLoggingContext();

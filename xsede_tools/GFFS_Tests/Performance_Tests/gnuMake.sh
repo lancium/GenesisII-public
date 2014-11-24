@@ -15,7 +15,7 @@ fi
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
-MOUNT_POINT="$WORKDIR/mount-gnuMake"
+MOUNT_POINT="$TEST_TEMP/mount-gnuMake"
 MAKE_DIR_SUFFIX="${USER}_building"
 MAKE_DIR="$MOUNT_POINT/$RNSPATH/$MAKE_DIR_SUFFIX"
 

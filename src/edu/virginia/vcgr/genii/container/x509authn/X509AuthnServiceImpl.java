@@ -62,11 +62,13 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.utils.StatsLogger;
 import edu.virginia.vcgr.genii.container.commonauthn.BaseAuthenticationServiceImpl;
 import edu.virginia.vcgr.genii.container.commonauthn.ReplicaSynchronizer.STSResourcePropertiesRetriever;
 import edu.virginia.vcgr.genii.container.commonauthn.STSCertificationSpec;
@@ -438,7 +440,10 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		NuCredential credential = RNSContainerUtilities.loadRNSResourceCredential(resource);
 		AxisCredentialWallet creds = new AxisCredentialWallet();
 		_logger.debug("resource's credential is: " + credential.toString());
-
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("X509AuthnServiceImpl: authenticating "+ credential.getOriginalAsserter()[0].getSubjectDN() + " to client at " + caller);
+		// End logging
 		if (delegateToChain == null) {
 			_logger.debug("delegate to chain was null...  ignoring credential.");
 		} else {

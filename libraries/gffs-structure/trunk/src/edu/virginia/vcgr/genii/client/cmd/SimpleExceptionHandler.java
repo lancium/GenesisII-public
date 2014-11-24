@@ -8,11 +8,14 @@ import org.apache.axis.AxisFault;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.utils.DetailedLogger;
 
 public class SimpleExceptionHandler implements IExceptionHandler
 {
 	public static int performBaseExceptionHandling(Throwable cause, Writer eStream)
 	{
+		DetailedLogger.detailed().error("processing exception", cause);
+		
 		PrintWriter errorStream = new PrintWriter(eStream);
 
 		String tab = "";

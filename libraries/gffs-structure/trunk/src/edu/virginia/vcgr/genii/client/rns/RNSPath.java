@@ -239,43 +239,43 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Return the valid prefix of a path, as might be passed in lookup
-	 * For example, if the path is /home/xsede.org/andrew/dir1/fred and dir1 did not exist prefix would return
+	 * Return the valid prefix of a path, as might be passed in lookup For example, if the path is
+	 * /home/xsede.org/andrew/dir1/fred and dir1 did not exist prefix would return
+	 * 
 	 * @return /home/xsede.org/andrew
 	 */
 	public String getValidPrefix(String pathString)
 
 	{
-			RNSPath path;
-			// Now we will work out the prefix that is good
-			String elements[] = pathString.split("/");
-			String goodPath="/";
-			path = RNSPath.getCurrent();
-			for (String s : elements) {
-				if (s == null || s.length() == 0)
-					continue;
-				String lastgood=goodPath;
-				goodPath=goodPath + s;
-				try {
-					path = path.lookup(goodPath, RNSPathQueryFlags.MUST_EXIST);
-					goodPath = goodPath+"/";
-				}
-				catch (RNSPathDoesNotExistException rr) {
-					goodPath=lastgood;
-					continue;
-				} catch (RNSPathAlreadyExistsException er) {
-				}
+		RNSPath path;
+		// Now we will work out the prefix that is good
+		String elements[] = pathString.split("/");
+		String goodPath = "/";
+		path = RNSPath.getCurrent();
+		for (String s : elements) {
+			if (s == null || s.length() == 0)
+				continue;
+			String lastgood = goodPath;
+			goodPath = goodPath + s;
+			try {
+				path = path.lookup(goodPath, RNSPathQueryFlags.MUST_EXIST);
+				goodPath = goodPath + "/";
+			} catch (RNSPathDoesNotExistException rr) {
+				goodPath = lastgood;
+				continue;
+			} catch (RNSPathAlreadyExistsException er) {
 			}
-			// Now there is a trailing "/", if so, we want to whack it
-			if (goodPath.length()!=1) {
-				// if the path is only "/" we don't want to get rid of the trailing "/"
-				goodPath= goodPath.substring(0,goodPath.length()-1);
-			}
-			return goodPath;
+		}
+		// Now there is a trailing "/", if so, we want to whack it
+		if (goodPath.length() != 1) {
+			// if the path is only "/" we don't want to get rid of the trailing "/"
+			goodPath = goodPath.substring(0, goodPath.length() - 1);
+		}
+		return goodPath;
 	}
-		
-/**
-	
+
+	/**
+	 * 
 	 * Retrieve the name of this entry as represented by the parent directory.
 	 * 
 	 * @return The name of this RNS entry.
@@ -633,7 +633,8 @@ public class RNSPath implements Serializable, Cloneable
 				}
 			} catch (RNSException rne) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("Skipping a directory in an RSNPath expansion which can't be expanded: " + rne.getLocalizedMessage());
+					_logger.debug("Skipping a directory in an RSNPath expansion which can't be expanded: "
+						+ rne.getLocalizedMessage());
 			}
 		}
 
@@ -772,20 +773,23 @@ public class RNSPath implements Serializable, Cloneable
 	{
 		EndpointReferenceType me = resolveRequired();
 
-		// Note that calling context property for RNS-Short-Form in this case is set before creating
-		// the proxy.
-		// This is because when a call is coming from FUSE, we get a context resolver that cannot
-		// propagate
-		// property updates accurately across all the references of the calling context. For the
-		// same reason
-		// an explicit store is invoked after setting the property. As a general rule, doing context
-		// update before
-		// proxy creation is advisable to avoid similar unwanted problems.
+		/*
+		 * Note that calling context property for RNS-Short-Form in this case is set before creating
+		 * the proxy. This is because when a call is coming from FUSE, we get a context resolver
+		 * that cannot propagate property updates accurately across all the references of the
+		 * calling context. --old:For the same reason an explicit store is invoked after setting the
+		 * property.old:-- As a general rule, doing context update before proxy creation is advisable to
+		 * avoid similar unwanted problems.
+		 */
 		ICallingContext context = null;
 		try {
 			context = ContextManager.getCurrentContext();
 			context.setSingleValueProperty("RNSShortForm", shortForm);
-			ContextManager.storeCurrentContext(context);
+
+			// hmmm: this seems safer, since it will not interfere with other calling contexts about
+			// to be deserialized.
+			// ContextManager.storeCurrentContext(context);
+
 			_logger.trace("RNS Short form set to true for listContents");
 		} catch (Exception e) {
 		}
@@ -819,9 +823,13 @@ public class RNSPath implements Serializable, Cloneable
 			// remove the calling context property for short form
 			if (shortForm) {
 				try {
-					context = ContextManager.getCurrentContext();
+					// hmmm: don't reload; we have the context already: context =
+					// ContextManager.getCurrentContext();
 					context.removeProperty("RNSShortForm");
-					ContextManager.storeCurrentContext(context);
+
+					// hmmm: this seems safer, since it will not interfere with other calling
+					// contexts about to be deserialized.
+					// ContextManager.storeCurrentContext(context);
 				} catch (Exception e) {
 					_logger.error("Could not remove the short form request from the calling context", e);
 				}
@@ -880,14 +888,16 @@ public class RNSPath implements Serializable, Cloneable
 		RNSIterable entries = null;
 		SingleResourcePropertyTranslator translator = new DefaultSingleResourcePropertyTranslator();
 		boolean getShortForm = applier.canWorkWithShortForm();
+		ICallingContext context = null;
 
 		try {
 			if (getShortForm) {
 				// setting the calling context property for short form
 				try {
-					ICallingContext context = ContextManager.getCurrentContext();
+					context = ContextManager.getCurrentContext();
 					context.setSingleValueProperty("RNSShortForm", true);
-					ContextManager.storeCurrentContext(context);
+					// hmmm: also have taken out context storing here in applyContents.
+					// ContextManager.storeCurrentContext(context);
 					_logger.trace("Short RNS form requested from Grid Client.");
 				} catch (Exception e) {
 					_logger.trace("could not set the short form");
@@ -918,11 +928,11 @@ public class RNSPath implements Serializable, Cloneable
 
 			if (getShortForm) {
 				// remove the calling context property for short form
-				ICallingContext context;
+				// ICallingContext context;
 				try {
-					context = ContextManager.getCurrentContext();
+					// context = ContextManager.getCurrentContext();
 					context.removeProperty("RNSShortForm");
-					ContextManager.storeCurrentContext(context);
+					// ContextManager.storeCurrentContext(context);
 				} catch (Exception e) {
 					_logger.error("Could not remove the short form request from the calling context", e);
 				}
@@ -973,7 +983,6 @@ public class RNSPath implements Serializable, Cloneable
 			return new TypeInformation(_cachedEPR).isRNS();
 		}
 	}
-
 
 	// A method for bypassing access to EPR for port-type lookup whenever possible. This and the
 	// subsequent method

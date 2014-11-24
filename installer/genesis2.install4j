@@ -2163,7 +2163,7 @@ String owner = (String)context.getVariable("genii.owner-username");
 
 if ( (owner != null) &amp;&amp; (owner.indexOf('/') &gt;= 0 ) ) {
     // this one has a slash embedded in it, so we need to extract the first part of the path.
-    System.out.println("path does contain a slash: " + owner);
+    //System.out.println("path does contain a slash: " + owner);
     
     int lastSlash = owner.lastIndexOf('/');
     

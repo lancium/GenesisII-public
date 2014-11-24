@@ -12,7 +12,7 @@ public enum ToolCategory {
 	MISC(false, "Misc"),
 	INTERNAL(false, "Internal Use"),
 	EXECUTION(false, "Job/Execution"),
-	ANTIQUATED(false, "Antiquated"),
+//	ANTIQUATED(false, "Antiquated"),
 	GENERAL(false, "General"),
 	ADMINISTRATION(false, "Administration");
 

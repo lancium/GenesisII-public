@@ -16,7 +16,7 @@ MAX_FILES=1000
 COPY_CHUNK=100
 
 # where we hook in the fuse mount.
-export MOUNT_POINT="$WORKDIR/mount-largeRNS"
+export MOUNT_POINT="$TEST_TEMP/mount-largeRNS"
 # the user's home directory from fuse perspective.
 export HOME_DIR="$MOUNT_POINT/$RNSPATH"
 

@@ -49,7 +49,7 @@ public class CreateJndiStsTool extends BaseGridTool
 	public CreateJndiStsTool()
 	{
 		super(new LoadFileResource("config/tooldocs/description/dcreate-jndi-sts"), new LoadFileResource(
-			"config/tooldocs/usage/ucreate-jndi-sts-usage"), false, ToolCategory.ANTIQUATED);
+			"config/tooldocs/usage/ucreate-jndi-sts-usage"), false, ToolCategory.SECURITY);
 	}
 
 	@Option({ "jnditype" })

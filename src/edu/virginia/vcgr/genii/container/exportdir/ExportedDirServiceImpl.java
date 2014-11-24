@@ -37,6 +37,7 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.ResourceLock;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
+import edu.virginia.vcgr.genii.client.utils.StatsLogger;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
@@ -137,6 +138,12 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 
 			String fullPath = ExportedFileUtils.createFullPath(_resource.getLocalPath(), filename);
 			String parentIds = ExportedDirUtils.createParentIdsString(_resource.getParentIds(), _resource.getId());
+			
+			// 2014-11-05 ASG - adding logging
+
+			String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+			StatsLogger.logStats("LightWeightExport: Create file from "+caller);
+			// End logging
 
 			try {
 				if (!(new File(fullPath).createNewFile())) {

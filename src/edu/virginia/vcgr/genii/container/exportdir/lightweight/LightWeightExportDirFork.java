@@ -23,11 +23,13 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
+import edu.virginia.vcgr.genii.client.utils.StatsLogger;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.disk.DiskExportEntry;
@@ -75,6 +77,11 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR, String newFileName) throws IOException
 	{
 		VExportDir dir = getTarget();
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("LightWeightExport: File Create \"" + newFileName +  "\" in \"" + dir.getName() + "\" from "+caller);
+		// End logging
+
 		if (dir.createFile(newFileName)) {
 			String forkPath = formForkPath(newFileName);
 			ResourceForkService service = getService();
@@ -90,7 +97,10 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 	{
 		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
 		VExportDir dir = getTarget();
-
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("LightWeightExport: Dir List \"" + dir.getName() + "/"+ entryName + "\" from "+caller);
+		// End logging
 		for (VExportEntry dirEntry : dir.list(entryName)) {
 			String dName = dirEntry.getName();
 
@@ -116,6 +126,10 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR, String newDirectoryName) throws IOException
 	{
 		VExportDir dir = getTarget();
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("LightWeightExport: Dir Create \"" + dir.getName() +  "/" + newDirectoryName + "\" from "+caller);
+		// End logging
 		if (dir.mkdir(newDirectoryName)) {
 			String forkPath = formForkPath(newDirectoryName);
 			ResourceForkService service = getService();
@@ -131,6 +145,10 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 	public boolean remove(String entryName) throws IOException
 	{
 		VExportDir dir = getTarget();
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("LightWeightExport: Dir Delete " + dir.getName() + "/"+ entryName + " from "+caller);
+		// End logging
 		return dir.remove(entryName);
 	}
 

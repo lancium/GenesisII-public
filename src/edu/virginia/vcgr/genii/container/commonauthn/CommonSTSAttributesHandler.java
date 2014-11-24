@@ -112,27 +112,6 @@ public class CommonSTSAttributesHandler extends GeniiDirAttributeHandlers
 		return new MessageElement(SecurityConstants.IDP_PRIVATE_KEY_QNAME, serializeObjectToString(privateKey));
 	}
 
-	//hmmm: CAK: we're turning these off since genii dir attrib handler should implement.
-//	public MessageElement getReplicationPolicyAttr() throws ResourceUnknownFaultType, ResourceException
-//	{
-//		ResourceKey rKey = ResourceManager.getCurrentResource();
-//		IResource resource = (IResource) rKey.dereference();
-//		String value = (String) resource.getProperty(GeniiDirPolicy.REPLICATION_POLICY_QNAME.getLocalPart());
-//		if (value == null)
-//			return null;
-//		return new MessageElement(GeniiDirPolicy.REPLICATION_POLICY_QNAME, value);
-//	}
-//
-//	public void setReplicationPolicyAttr(MessageElement element) throws ResourceUnknownFaultType, ResourceException
-//	{
-//		ResourceKey rKey = ResourceManager.getCurrentResource();
-//		IResource resource = (IResource) rKey.dereference();
-//		String value = element.getValue();
-//		if (resource.isServiceResource())
-//			return;
-//		resource.setProperty(GeniiDirPolicy.REPLICATION_POLICY_QNAME.getLocalPart(), value);
-//	}
-
 	public static Object deserializeObjectFromString(String data) throws IOException, ClassNotFoundException
 	{
 		byte[] objectString = Base64.decodeBase64(data);

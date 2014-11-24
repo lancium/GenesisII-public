@@ -78,5 +78,5 @@ popd ) >$TMP/zz_container_backup_$(date_stringer).log
 
 #hmmm: auto-restart?
 
-echo "It is safe to start the container back up."
+echo "It is safe to start the container now."
 

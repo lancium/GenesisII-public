@@ -84,13 +84,11 @@ public class LoginTool extends BaseLoginTool
 		String constructedPath = constructPathFromLoginName(null, username);
 		if (constructedPath != null) {
 			idpList.add(nsd.getUsersDirectory() + "/" + constructedPath);
-			// idpList.add(nsd.getUsersDirectory() + "/demo/" + constructedPath);
 		}
 
 		// Checks this lists of idp paths, in order,
 		// if one is not passed on the command line
 		idpList.add(nsd.getUsersDirectory() + "/" + username);
-		// idpList.add(nsd.getUsersDirectory() + "/demo/" + username);
 
 		// Let's first load the LoginSearchPath properties file
 		if (p == null) {

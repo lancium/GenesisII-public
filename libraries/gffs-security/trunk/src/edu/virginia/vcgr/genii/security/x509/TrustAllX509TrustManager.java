@@ -44,6 +44,7 @@ public class TrustAllX509TrustManager implements X509TrustManager
 	 * Return an array of certificate authority certificates which are trusted for authenticating
 	 * peers.
 	 */
+	@Override
 	public X509Certificate[] getAcceptedIssuers()
 	{
 		return new X509Certificate[0];
@@ -54,6 +55,7 @@ public class TrustAllX509TrustManager implements X509TrustManager
 	 * path to a trusted root and return if it can be validated and is trusted for client SSL
 	 * authentication based on the authentication type.
 	 */
+	@Override
 	public void checkClientTrusted(X509Certificate chain[], String authType) throws CertificateException
 	{
 		_logger.debug("seeing client: " + chain[0].getSubjectDN());
@@ -64,6 +66,7 @@ public class TrustAllX509TrustManager implements X509TrustManager
 	 * path to a trusted root and return if it can be validated and is trusted for server SSL
 	 * authentication based on the authentication type
 	 */
+	@Override
 	public void checkServerTrusted(X509Certificate chain[], String authType) throws CertificateException
 	{
 		_logger.debug("seeing server: " + chain[0].getSubjectDN());

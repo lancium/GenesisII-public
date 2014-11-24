@@ -8,6 +8,8 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
 
 import edu.virginia.vcgr.genii.algorithm.encryption.BCrypt;
@@ -29,6 +31,7 @@ import edu.virginia.vcgr.genii.security.identity.IdentityType;
 public class UsernamePasswordIdentity implements Identity, NuCredential, XMLCompatible
 {
 	static public final long serialVersionUID = 0L;
+	static private Log _logger = LogFactory.getLog(UsernamePasswordIdentity.class);
 
 	protected String _userName;
 	protected String _password;
@@ -172,6 +175,8 @@ public class UsernamePasswordIdentity implements Identity, NuCredential, XMLComp
 		if (!BCrypt.checkpw(((UsernamePasswordIdentity) identity)._password, _password)) {
 			return false;
 		}
+		_logger.debug("user is permitted on ACL due to valid password: " + ((UsernamePasswordIdentity)identity)._userName );
+		
 		return true;
 	}
 

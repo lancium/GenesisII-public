@@ -16,14 +16,14 @@ oneTimeSetUp()
 {
   sanity_test_and_init  # make sure test environment is good.
 
-  if [ ! -f random5KB.dat ]; then
+  if [ ! -f $TEST_TEMP/random5KB.dat ]; then
     echo "creating 5KB file..."
-    dd if=/dev/urandom of=random5KB.dat bs=1 count=5120
+    dd if=/dev/urandom of=$TEST_TEMP/random5KB.dat bs=1 count=5120
   fi
  
-  if [ ! -f random5MB.dat ]; then
+  if [ ! -f $TEST_TEMP/random5MB.dat ]; then
     echo "creating 5MB file..."
-    dd if=/dev/urandom of=random5MB.dat bs=1048576 count=5
+    dd if=/dev/urandom of=$TEST_TEMP/random5MB.dat bs=1048576 count=5
   fi
 
   # due to restricted size of VMs and other machines we need this test to work
@@ -31,7 +31,7 @@ oneTimeSetUp()
   # adjusted with the variables below.
   #fileInMegs=5120
   fileInMegs=1024
-  HUGE_TEST_FILE=./random5GB.dat
+  HUGE_TEST_FILE=$TEST_TEMP/random5GB.dat
   if [ ! -f "$HUGE_TEST_FILE" ]; then
     # to speed up continuous integration builds, we will re-use the following
     # file if it's already available.  only defect is if it isn't actually 5
@@ -71,21 +71,21 @@ testMakingContainerDirectories()
 testLocalClientLocalData()
 {
   #small file
-  timed_grid cp local:./random5KB.dat $RNSPATH/new-dir-local
+  timed_grid cp local:$TEST_TEMP/random5KB.dat $RNSPATH/new-dir-local
   assertEquals "Timing - Transferring 5KB local file to $RNSPATH/new-dir-local on local container $LOCAL_CONTAINER" 0 $?
   sync
   real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
   echo "Time taken to tranfer 5KB file : $real_time s"
-  actual_size=$(\ls -l ./random5KB.dat | awk '{print $5}')
+  actual_size=$(\ls -l $TEST_TEMP/random5KB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
 
   #medium file
-  timed_grid cp local:./random5MB.dat $RNSPATH/new-dir-local
+  timed_grid cp local:$TEST_TEMP/random5MB.dat $RNSPATH/new-dir-local
   assertEquals "Timing - Transferring 5MB local file to $RNSPATH/new-dir-local on local container $LOCAL_CONTAINER" 0 $?
   sync
   real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
   echo "Time taken to tranfer 5MB file : $real_time s"
-  actual_size=$(\ls -l ./random5MB.dat | awk '{print $5}')
+  actual_size=$(\ls -l $TEST_TEMP/random5MB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
 
   #large file
@@ -101,21 +101,21 @@ testLocalClientLocalData()
 testLocalClientRemoteData()
 {
   #small file
-  timed_grid cp local:./random5KB.dat $RNSPATH/new-dir-remote
+  timed_grid cp local:$TEST_TEMP/random5KB.dat $RNSPATH/new-dir-remote
   assertEquals "Timing - Transferring 5KB local file to $RNSPATH/new-dir-remote on remote container $REMOTE_CONTAINER" 0 $?
   sync
   real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
   echo "Time taken to tranfer 5KB file : $real_time s"
-  actual_size=$(\ls -l ./random5KB.dat | awk '{print $5}')
+  actual_size=$(\ls -l $TEST_TEMP/random5KB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
 
   #medium sized file
-  timed_grid cp local:./random5MB.dat $RNSPATH/new-dir-remote
+  timed_grid cp local:$TEST_TEMP/random5MB.dat $RNSPATH/new-dir-remote
   assertEquals "Timing - Transferring 5MB local file to $RNSPATH/new-dir-remote on remote container $REMOTE_CONTAINER" 0 $?
   sync
   real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
   echo "Time taken to tranfer 5MB file : $real_time s"
-  actual_size=$(\ls -l ./random5MB.dat | awk '{print $5}')
+  actual_size=$(\ls -l $TEST_TEMP/random5MB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
 
   #large file
@@ -137,7 +137,7 @@ testRemoteSrcAndDest()
   sync
   real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
   echo "Time taken to tranfer 5KB file : $real_time s"
-  actual_size=$(\ls -l ./random5KB.dat | awk '{print $5}')
+  actual_size=$(\ls -l $TEST_TEMP/random5KB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
 
   #medium file
@@ -146,7 +146,7 @@ testRemoteSrcAndDest()
   sync
   real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
   echo "Time taken to tranfer 5MB file : $real_time s"
-  actual_size=$(\ls -l ./random5MB.dat | awk '{print $5}')
+  actual_size=$(\ls -l $TEST_TEMP/random5MB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
 
   #large file
@@ -171,9 +171,9 @@ testCleanupDirectories()
 
 oneTimeTearDown()
 {
-  rm random5KB.dat random5MB.dat
+  rm $TEST_TEMP/random5KB.dat $TEST_TEMP/random5MB.dat
   # only delete the 5gig file if we made a new one.
-  if [ -f random5GB.dat ]; then rm random5GB.dat; fi
+  if [ -f $TEST_TEMP/random5GB.dat ]; then rm $TEST_TEMP/random5GB.dat; fi
 }
 
 # load and run shUnit2

@@ -21,7 +21,8 @@ AutoReqProv: no
 Source0: genesis2-%GRID%-%{version}.tar.gz
 Source1: BUILDME
 
-Requires: expect java
+Requires: expect fuse fuse-libs java
+
 BuildRequires: ant ant-contrib ant-nodeps ant-jsch ant-trax ant-junit java
 
 %description
@@ -79,13 +80,14 @@ cp $GEN2_SOURCE_LOC/JavaServiceWrapper/wrapper/bin/GFFSContainer \
   $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/bin
 cp $GEN2_SOURCE_LOC/JavaServiceWrapper/wrapper/lib/*.jar \
   $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/lib
-chmod 755 $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/bin/GFFSContainer 
+chmod a+rx $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/bin/GFFSContainer 
 
 # platform dependent pieces.
 mkdir $GEN2_BUILDOUT/jni-lib
 cp -R $GEN2_SOURCE_LOC/jni-libs/lin%PLATFORM_BITSIZE%/* $GEN2_BUILDOUT/jni-lib
 cp $GEN2_SOURCE_LOC/JavaServiceWrapper/wrapper/bin/wrapper-linux-x86-%PLATFORM_BITSIZE% $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/bin
 cp $GEN2_SOURCE_LOC/JavaServiceWrapper/wrapper/lib/libwrapper-linux-x86-%PLATFORM_BITSIZE%.so $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/lib
+chmod a+rx $GEN2_BUILDOUT/jni-lib/* $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/bin/* $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/lib/*
 
 # fix pattern for jni and write grid script.
 sed -e 's/%{GENII_JNI_PATH}/jni-lib/' \

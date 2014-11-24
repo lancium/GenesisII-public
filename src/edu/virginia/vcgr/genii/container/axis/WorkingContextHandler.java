@@ -14,9 +14,12 @@
 
 package edu.virginia.vcgr.genii.container.axis;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
+import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
@@ -93,6 +96,13 @@ public class WorkingContextHandler extends BasicHandler
 			throw new AxisFault("Couldn't find \"" + WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY
 				+ "\" property in message context.");
 		}
+		
+		// 2014-11-05 ASG - code added to place calling host dns/ip into working context
+		HttpServletRequest req = (HttpServletRequest)ctxt.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+		String host = req.getRemoteHost();
+		newContext.setProperty(WorkingContext.CALLING_HOST, host);
+		// ASG end of updates
+		
 		newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
 
 		newContext.setProperty(WorkingContext.TARGETED_SERVICE_NAME, EPRUtils.extractServiceName(epr));

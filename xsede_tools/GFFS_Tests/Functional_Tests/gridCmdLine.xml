@@ -7,6 +7,7 @@
 <gsh:define name="localMountPoint" source="${ARGV[2]}"/>
 <gsh:define name="containerPath" source="${ARGV[3]}"/>
 <gsh:define name="exportPath" source="${ARGV[4]}"/>
+<gsh:define name="TEST_TEMP" source="${ARGV[5]}"/>
 
 <gsh:echo message="Testing 'mkdir' command"/>
 <geniix:mkdir>
@@ -209,12 +210,12 @@
 <gsh:echo message="Testing 'cp' command - from grid namespace to local directory"/>
 <geniix:cp>
         <gsh:param>grid:${rnsPath}/TestDir/test2.txt</gsh:param>
-        <gsh:param>local:./test1.txt</gsh:param>
+        <gsh:param>local:${TEST_TEMP}/test1.txt</gsh:param>
 </geniix:cp>
 
 <gsh:echo message="Testing 'cp' command - from local directory to grid namespace"/>
 <geniix:cp>
-        <gsh:param>local:./test1.txt</gsh:param>
+        <gsh:param>local:${TEST_TEMP}/test1.txt</gsh:param>
         <gsh:param>grid:${rnsPath}/TestDir/test3.txt</gsh:param>
 </geniix:cp>
 

@@ -33,6 +33,7 @@ import org.apache.axis.transport.http.AxisServletBase;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.feistymeow.process.ethread;
 import org.morgan.dpage.DynamicPageLoader;
 import org.morgan.dpage.ScratchSpaceManager;
 import org.morgan.util.GUID;
@@ -67,6 +68,7 @@ import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
@@ -87,6 +89,8 @@ public class Container extends ApplicationBase
 
 	static private X509Certificate[] _containerCertChain;
 	static private PrivateKey _containerPrivateKey;
+
+	static private CrlInvigoratorThread _crlInvigorator = null;
 
 	// Default to 1 year
 	static private long _defaultCertificateLifetime = 1000L * 60L * 60L * 24L * 365L;
@@ -125,6 +129,13 @@ public class Container extends ApplicationBase
 
 			_logger.info("Container Started");
 			AlarmManager.initializeAlarmManager();
+
+			/*
+			 * add a periodic drop of the TLS trust store and CRL records, to accommodate updated
+			 * grid-certificates folder.
+			 */
+			_crlInvigorator = new CrlInvigoratorThread();
+			_crlInvigorator.start();
 
 			_postStartupWorkQueue.release();
 		} catch (Throwable t) {
@@ -609,5 +620,25 @@ public class Container extends ApplicationBase
 		} catch (Throwable cause) {
 			_logger.warn("Unable to load dynamic pages.", cause);
 		}
+	}
+
+	private static class CrlInvigoratorThread extends ethread
+	{
+		// how frequently we reload the trust stores and CRLs.  currently every 6 hours.
+		static long SNOOZE_TIME_BETWEEN_TRUST_STORE_RELOAD = new Long(6 * 60 * 60 * 1000);
+			
+		CrlInvigoratorThread()
+		{
+			super(SNOOZE_TIME_BETWEEN_TRUST_STORE_RELOAD);
+		}
+
+		@Override
+		public boolean performActivity()
+		{
+			_logger.info("periodic reload of trust stores and CRLs occurring now.");
+			KeystoreManager.dropTrustStores();
+			return true;
+		}
+
 	}
 }

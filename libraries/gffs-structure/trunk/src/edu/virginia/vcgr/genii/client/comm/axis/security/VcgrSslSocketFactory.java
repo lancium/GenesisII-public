@@ -46,6 +46,7 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.client.security.TrustStoreLinkage;
 import edu.virginia.vcgr.genii.security.x509.CertEntry;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.security.x509.RevocationAwareTrustManager;
@@ -86,28 +87,31 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 
 	public VcgrSslSocketFactory()
 	{
-		// reset cached key/trust stores
 		notifyUnloaded();
-		// add a hook for notifications in the future.
-		ConfigurationManager.addConfigurationUnloadListener(this);
+		loadTrustManager();
+	}
+	
+	@Override
+	public void notifyUnloaded()
+	{
+		synchronized (_sslSessionCache) {
+			_sslSessionCache.clear();
+		}	
 	}
 
-	public void notifyUnloaded()
+	public void loadTrustManager()
 	{
 		try {
 			// we install a trust manager here that understands CRL checking.
-			// TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
 			KeyStore trustStore = KeystoreManager.getTlsTrustStore();
 			if (trustStore != null) {
-				// tmf.init(trustStore);
 				synchronized (_sslSessionCache) {
 					_trustManagers = new TrustManager[1];
-					// _trustManagers = tmf.getTrustManagers();
-					_trustManagers[0] = new RevocationAwareTrustManager(trustStore, KeystoreManager.getGridCertsDir());
+					_trustManagers[0] = new RevocationAwareTrustManager(new TrustStoreLinkage());
 				}
 			}
 		} catch (Exception ex) {
-			_logger.info("exception occurred in notifyUnloaded", ex);
+			_logger.info("exception occurred in loadTrustManager", ex);
 		}
 	}
 
@@ -203,9 +207,11 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			}
 			sslcontext.init(kms, mgrs, null);
 
-			// hmmm: show which trust managers we have loaded. we want at least one of these to be our crl handling replacement.
-			for (TrustManager m : mgrs) {
-				_logger.debug("trust manager: " + m.toString() + " type: " + m.getClass().getCanonicalName());
+			// show which trust managers we have loaded. we want at least one of these to be our crl handling replacement.
+			if (_logger.isDebugEnabled()) {
+				for (TrustManager m : mgrs) {
+					_logger.debug("trust manager: " + m.toString() + " type: " + m.getClass().getCanonicalName());
+				}
 			}
 
 			sessionContext = sslcontext.getServerSessionContext();

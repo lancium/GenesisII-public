@@ -12,7 +12,7 @@ source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 # where we will export a part of rns space from the grid.
 export TEST_AREA="$EXPORTPATH"
 # where we will fuse mount the grid locally.
-export MOUNT_POINT="$WORKDIR/mount-directoryTree"
+export MOUNT_POINT="$TEST_TEMP/mount-directoryTree"
 # the place in the grid where the exported directory will appear.
 export FULL_EXPORT_PATH="$RNSPATH/export-local"
 
@@ -35,7 +35,7 @@ oneTimeSetUp()
     grid unlink $FULL_EXPORT_PATH &>/dev/null
   fi
   # trash any older test directories that were left lying around.
-  rm -rf testDir
+  rm -rf $TEST_TEMP/testDir
   grid rm -rf ${RNSPATH}/testDir &>/dev/null
   # create a new mount point.
   mkdir "$MOUNT_POINT"
@@ -78,14 +78,14 @@ echo mount point is $MOUNT_POINT
 
 testCreateDirectory () {
   if ! fuse_supported; then return 0; fi
-  fan_out_directories testDir 3 6 3
+  fan_out_directories $TEST_TEMP/testDir 3 6 3
 }
 
 testFuseRecursiveCp() {
   if ! fuse_supported; then return 0; fi
   # Recursively copy files from $1 into the $2
   # Then ls -lR the directory and count the number of lines
-  time cp -rv testDir "$MOUNT_POINT/$RNSPATH"
+  time cp -rv $TEST_TEMP/testDir "$MOUNT_POINT/$RNSPATH"
   assertEquals "Recursively copying from testDir to $MOUNT_POINT/$RNSPATH" 0 $?
   time ls -lR "$MOUNT_POINT/$RNSPATH"
   assertEquals "Recursively listing the copied files in testDir to $MOUNT_POINT/$RNSPATh" 0 $?
@@ -95,7 +95,7 @@ testFuseRecursiveCpOntoExport()
 {
   if ! fuse_supported; then return 0; fi
   # Recursively copy files from $1 into the $2
-  time cp -rv testDir "$MOUNT_POINT/$FULL_EXPORT_PATH"
+  time cp -rv $TEST_TEMP/testDir "$MOUNT_POINT/$FULL_EXPORT_PATH"
   assertEquals "Recursively copying from testDir to $MOUNT_POINT/$FULL_EXPORT_PATH" 0 $?
   echo "Recursively listing the copied files in $MOUNT_POINT/$FULL_EXPORT_PATH"
   time ls -lR "$MOUNT_POINT/$FULL_EXPORT_PATH"
@@ -124,13 +124,16 @@ testRemovingTestDir()
 {
   if ! fuse_supported; then return 0; fi
   grid rm -r ${RNSPATH}/testDir
-  assertEquals "cleaning up test directory" 0 $?
+  assertEquals "cleaning up test directory in RNS" 0 $?
+#turn these on once we identify issues in this test on 126 test vms.
+#  rm -rf "$MOUNT_POINT/$FULL_EXPORT_PATH"
+#  assertEquals "cleaning up test directory in exported path" 0 $?
 }
 
 oneTimeTearDown() {
   fusermount -u "$MOUNT_POINT" &>/dev/null
   rmdir "$MOUNT_POINT"
-  rm -rf testDir
+  rm -rf $TEST_TEMP/testDir
   grid export --quit $FULL_EXPORT_PATH &>/dev/null
 }
 

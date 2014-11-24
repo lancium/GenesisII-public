@@ -28,6 +28,7 @@ public class WorkingContext implements Closeable, Cloneable
 	static public final String MESSAGE_CONTEXT_KEY = "message-context-key";
 	static public final String CERT_CHAIN_KEY = "cert-chain-key";
 	static public final String EPI_KEY = "epi-key";
+	static public final String CALLING_HOST = "calling-host";
 
 	static private ThreadLocal<Stack<WorkingContext>> _currentWorkingContext = new ThreadLocal<Stack<WorkingContext>>();
 

@@ -59,6 +59,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSOperations;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.sync.SyncProperty;
 import edu.virginia.vcgr.genii.client.sync.VersionVector;
+import edu.virginia.vcgr.genii.client.utils.StatsLogger;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
@@ -193,6 +194,10 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 		String filename = createFile.getFilename();
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("EnhancedRNSPortType: File Create \"" + filename + "\" from "+caller);
+		// End logging
 		try {
 			// TODO - rather than building a list of all the files in the directory and seeing if
 			// this one is there - just check if is there
@@ -260,6 +265,10 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 
 		RNSEntryResponseType[] ret = new RNSEntryResponseType[addRequest.length];
 		for (int lcv = 0; lcv < ret.length; lcv++) {
+			// 2014-11-05 ASG - adding logging
+			String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+			StatsLogger.logStats("EnhancedRNSPortType: Dir link \"" + addRequest[lcv].getEntryName() + "\" from "+caller);
+			// End logging
 			try {
 				ret[lcv] = add(addRequest[lcv]);
 			} catch (BaseFaultType bft) {
@@ -278,7 +287,10 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	protected RNSEntryResponseType add(RNSEntryType entry) throws RemoteException
 	{
 		EndpointReferenceType entryReference;
-
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("EnhancedRNSPortType: Create link " + "\"" + entry.getEntryName() + "\"" + " from "+caller);
+		// End logging
 		if (entry == null || entry.getEntryName() == null) {
 			// Pure factory operation
 			VcgrCreateResponse response = vcgrCreate(new VcgrCreate());
@@ -352,6 +364,10 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("fast lookup(%s)", Arrays.toString(lookupRequest)));
 
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("EnhancedRNSPortType: Dir List from "+caller);
+		// End logging
 		// ASG 2014-03-25 Here is where we will put the code to check if an implicit
 		// parameter has been passed in the SOAP header, and if so, not include the EPR
 		// in the response entry, but include the EPI as Metadata.
@@ -491,13 +507,20 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("remove(%s)", Arrays.toString(removeRequest)));
+		// 2014-11-05 ASG - adding logging
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
 
+		// End logging
 		List<String> removed = new LinkedList<String>();
 		Collection<String> tmp;
 		VersionVector vvr;
 		try {
 			_resourceLock.lock();
+			
 			for (String request : removeRequest) {
+				// 2014-11-05 ASG - adding logging
+				StatsLogger.logStats("EnhancedRNSPortType: Dir Remove  " + "\"" + request + "\"" + "  from "+caller);
+				// End logging
 				tmp = _resource.removeEntries(request);
 				if (tmp != null)
 					removed.addAll(tmp);

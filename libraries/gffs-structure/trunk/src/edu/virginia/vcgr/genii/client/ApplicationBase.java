@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.GuaranteedDirectory;
 
+import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.ConnectTool;
@@ -20,14 +21,13 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.client.security.TrustStoreLinkage;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
-import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 
 public class ApplicationBase
 {
@@ -80,7 +80,7 @@ public class ApplicationBase
 		}
 		SecurityUtilities.initializeSecurity();
 
-		CertificateValidatorFactory.setValidator(new SecurityUtilities(KeystoreManager.getResourceTrustStore(), KeystoreManager.getGridCertsDir()));
+		CertificateValidatorFactory.setValidator(new SecurityUtilities(new TrustStoreLinkage()));
 
 		GridEnvironment.loadGridEnvironment();
 

@@ -20,6 +20,7 @@ oneTimeSetUp()
 
   echo "Copying necessary file to Grid namespace"
   grid cp local:./hostname.sh grid:$RNSPATH
+  grid cp local:./cat.sh grid:$RNSPATH
 
   grid rm -rf $RNSPATH/test-bes-async &>/dev/null
 }

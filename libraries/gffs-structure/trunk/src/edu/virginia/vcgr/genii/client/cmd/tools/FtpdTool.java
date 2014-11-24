@@ -36,7 +36,7 @@ public class FtpdTool extends BaseGridTool
 
 	public FtpdTool()
 	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE_RESOURCE), true, ToolCategory.ANTIQUATED);
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE_RESOURCE), true, ToolCategory.MISC);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 

@@ -295,8 +295,6 @@ public class ExportedDirUtils
 			throw new IllegalArgumentException("Couldn't find replication indicator in export creation properties.");
 
 		// get last modified time
-		// hmmm: Handle sudo here for getting last modification time! is that a new operation that's
-		// not implemented?
 		lastModified = getLastModifiedTime(path);
 
 		return new ExportedDirInitInfo(path, parentIds, isReplicated, lastModified, resolverServiceEPR, svnUser, svnPass,
