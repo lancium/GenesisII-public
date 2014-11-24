@@ -1619,7 +1619,7 @@ return true;</string>
                                 <string>
 
 try {
-    String secPropFileName = "${installer:sys.installationDir}/deployments/${compiler:genii.new-deployment}/configuration/security.properties";
+    String secPropFileName = context.getInstallationDirectory() +  "/deployments/${compiler:genii.new-deployment}/configuration/security.properties";
     File secProp = new File(secPropFileName);
     if (!secProp.exists()) {
         Util.logInfo(null, "this is probably bad; cannot find security.properties file for deployment, looking in: " + secPropFileName);
