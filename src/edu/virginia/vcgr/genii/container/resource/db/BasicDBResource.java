@@ -152,8 +152,9 @@ public class BasicDBResource implements IResource
 			rs = stmt.executeQuery();
 			if (!rs.next()) {
 				// the special key is not always found as a database resource.
-				if (_logger.isDebugEnabled() && !_resourceKey.contains(_SPECIAL_SERVICE_KEY_TEMPLATE))
+				if (_logger.isDebugEnabled() && !_resourceKey.contains(_SPECIAL_SERVICE_KEY_TEMPLATE)) {
 					_logger.debug("did not find resource '" + _resourceKey + "'.");
+				}
 				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
 					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Resource \"" + _resourceKey
 						+ "\" is unknown.") }, null));

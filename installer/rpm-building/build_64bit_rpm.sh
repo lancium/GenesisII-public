@@ -9,19 +9,24 @@ export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's work
 
 installer_config="$1"; shift
 
-if [ -z "$installer_config" ]; then
-  echo "This script requires the installer config file name to build the installer"
-  echo "targets properly.  The config file is expected to reside in the installer"
-  echo "directory.  For example:"
-  echo "    $(basename $0) act126-ops.config"
+export INSTALLER_DIR="$WORKDIR/.."
+
+##############
+
+if [ -z "$installer_config" \
+    -o ! -f "$INSTALLER_DIR/$installer_config" ]; then
+  echo
+  echo A valid installer config file needs to be passed on the command line.
+  echo
+  echo The available choices are:
+  pushd $INSTALLER_DIR &>/dev/null
+  ls -1 *.config
+  popd &>/dev/null
+  echo
   exit 1
 fi
 
-CONFIGFILE="$WORKDIR/../$installer_config"
-if [ ! -f "$CONFIGFILE" ]; then
-  echo "Failed to find installer config file: $CONFIGFILE"
-  exit 1
-fi
+CONFIGFILE="$INSTALLER_DIR/$installer_config"
 
 # make sure our output folder is there.
 if [ ! -d "$HOME/installer_products" ]; then

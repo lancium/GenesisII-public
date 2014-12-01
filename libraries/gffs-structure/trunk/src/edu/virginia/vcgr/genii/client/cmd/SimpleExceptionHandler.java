@@ -5,17 +5,18 @@ import java.io.PrintWriter;
 import java.io.Writer;
 
 import org.apache.axis.AxisFault;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
-import edu.virginia.vcgr.genii.client.utils.DetailedLogger;
 
 public class SimpleExceptionHandler implements IExceptionHandler
 {
+	static private Log _logger = LogFactory.getLog(SimpleExceptionHandler.class);
+	
 	public static int performBaseExceptionHandling(Throwable cause, Writer eStream)
 	{
-		DetailedLogger.detailed().error("processing exception", cause);
-		
 		PrintWriter errorStream = new PrintWriter(eStream);
 
 		String tab = "";
@@ -31,6 +32,7 @@ public class SimpleExceptionHandler implements IExceptionHandler
 					+ "-J flag first, e.g. grid.exe -J-Xmx1G\n");
 				errorStream.print(builder);
 				errorStream.flush();
+				_logger.error(builder, cause);
 				// re-throw to cause the grid client to exit.
 				throw new java.lang.OutOfMemoryError();
 			} else if (cause instanceof NullPointerException) {
@@ -62,6 +64,7 @@ public class SimpleExceptionHandler implements IExceptionHandler
 
 		errorStream.print(builder);
 		errorStream.flush();
+		_logger.error(builder, cause);
 
 		return toReturn;
 	}
