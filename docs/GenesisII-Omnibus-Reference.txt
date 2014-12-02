@@ -1,0 +1,16 @@
+
+Genesis II Omnibus Reference Manual:
+
+The official html version of the document is available at the following
+location:
+
+  http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm
+
+Other formats are available at:
+
+  http://genesis2.virginia.edu/wiki/Main/Documentation
+
+This document is also available via a subversion repository and can be
+downloaded with the following:
+
+  svn co svn://svn.xcg.virginia.edu:9002/XSEDEDOCS/trunk/omnibus

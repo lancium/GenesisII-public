@@ -187,6 +187,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			kms[0] = new SingleSSLX509KeyManager(clientKeyMaterial);
 
 			SSLContext sslcontext = SSLContext.getInstance("TLS");
+			_logger.debug("ssl context claims protocol is: " + sslcontext.getProtocol() + " protocol.");
 
 			SSLSessionContext sessionContext = sslcontext.getServerSessionContext();
 			if (sessionContext == null) {
