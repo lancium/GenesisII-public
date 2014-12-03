@@ -1,5 +1,20 @@
 package edu.virginia.vcgr.genii.web.xml;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -12,14 +27,6 @@ import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 import edu.virginia.vcgr.genii.text.TextHelper;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 
 /**
  * Takes a string with XML code and returns a string of nicely formatted XML.
@@ -80,4 +87,24 @@ public class XMLStringPrinter
 		return toReturn.toString();
 	}
 
+	public static String nodeToString(Node node, boolean omitXmlDeclare) {
+		if (node == null) return "null";
+		StringWriter sw = new StringWriter();
+		try {
+			Transformer t = TransformerFactory.newInstance().newTransformer();
+			if (omitXmlDeclare)
+				t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			// t.setOutputProperty(OutputKeys.INDENT, "yes");
+			t.transform(new DOMSource(node), new StreamResult(sw));
+		} catch (TransformerException te) {
+			_logger.error("nodeToString Transformer Exception", te);
+		}
+		return sw.toString();
+	}
+
+	/**
+	 * a simple dump of the current node and descendants, with no extra formatting.  good for comparing fouled-up bits of xml against each other.
+	 * 
+	 */
+	
 }

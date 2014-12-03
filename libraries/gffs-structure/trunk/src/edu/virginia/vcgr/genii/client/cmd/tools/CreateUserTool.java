@@ -47,7 +47,7 @@ public class CreateUserTool extends BaseGridTool
 
 	protected String _loginName = null;
 	protected String _password = null;
-	protected String _durationString = null;
+	protected String _durationString = "10years";
 	protected Duration _duration = null;
 
 	static final private String _DESCRIPTION = "config/tooldocs/description/dcreate-user";

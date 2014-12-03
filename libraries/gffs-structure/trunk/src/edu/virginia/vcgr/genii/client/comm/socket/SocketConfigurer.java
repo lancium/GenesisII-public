@@ -6,6 +6,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.SSLSocket;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -187,6 +189,13 @@ public class SocketConfigurer
 					_logger.debug(String.format("Setting Traffic Class to %s.", _trafficClass));
 				socket.setTrafficClass(_trafficClass.trafficClassBitVector());
 			}
+			
+			if (socket instanceof SSLSocket) {
+				// this change does fix the POODLE issue for our clients; clients
+				// will no longer negotiate down to SSLv3 afterwards.
+				((SSLSocket)socket).setEnabledProtocols(new String[] {"TLSv1"});
+			}
+			
 		} catch (SocketException se) {
 			_logger.warn("Unable to configure socket properties.", se);
 		}

@@ -73,6 +73,14 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 
 	static final private int SESSION_CACHE_SIZE_MAX = 256; // cak: reduced from 1000.
 
+	static {
+		// initializations to restrict types of TLS we will use.		
+		// this one is for https-client:
+		java.lang.System.setProperty("https.protocols", "TLSv1");
+		// evidence says this does not help for our case of the gffs client, but
+		// this does at least protect our normal web browsing from using SSLv3.
+	}
+	
 	// holds the maximum elements for the socket cache, rather than reading it from file every time.
 	static private Integer _maxCacheElements = -1;
 
