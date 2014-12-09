@@ -62,7 +62,7 @@
 	</geniix:ln>
 
 	<geniix:chmod>
-		<gsh:param>${BOOTSTRAP_CONTAINER}/Services/EnhancedNotificationBrokerFactoryPortType</gsh:param>
+		<gsh:param>${BOOT_SRVS}/EnhancedNotificationBrokerFactoryPortType</gsh:param>
 		<gsh:param>+rx</gsh:param>
 		<gsh:param>--everyone</gsh:param>
 	</geniix:chmod>
@@ -186,12 +186,12 @@
 
         <gsh:echo message="Setting access on authorization port types"/>
         <geniix:chmod>
-                <gsh:param>${BOOTSTRAP_CONTAINER}/Services/X509AuthnPortType</gsh:param>
+                <gsh:param>${BOOT_SRVS}/X509AuthnPortType</gsh:param>
                 <gsh:param>+rx</gsh:param>
                 <gsh:param>--everyone</gsh:param>
         </geniix:chmod>
         <geniix:chmod>
-                <gsh:param>${BOOTSTRAP_CONTAINER}/Services/KerbAuthnPortType</gsh:param>
+                <gsh:param>${BOOT_SRVS}/KerbAuthnPortType</gsh:param>
                 <gsh:param>+rx</gsh:param>
                 <gsh:param>--everyone</gsh:param>
         </geniix:chmod>
@@ -473,6 +473,7 @@
 		<gsh:param>/groups/FOLDERSPACE/gffs-users</gsh:param>
 	</geniix:chmod>
 
+        <gsh:echo message="Iterating through services to set permissions"/>
 	<gsh:foreach param-name="SERVICE"
 		source-rns="${BOOT_SRVS}">
 		<gsh:echo message="Setting security on ${SERVICE} in container ${BOOTSTRAP_CONTAINER}"/>
@@ -487,6 +488,18 @@
 			<gsh:param>/groups/FOLDERSPACE/gffs-users</gsh:param>
 		</geniix:chmod>
 	</gsh:foreach>
+
+        <gsh:echo message="Setting access on RNS and Export port types"/>
+	<geniix:chmod>
+                <gsh:param>${BOOT_SRVS}/EnhancedRNSPortType</gsh:param>
+                <gsh:param>+rx</gsh:param>
+                <gsh:param>/groups/FOLDERSPACE/gffs-users</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+                <gsh:param>${BOOT_SRVS}/LightWeightExportPortType</gsh:param>
+                <gsh:param>+rx</gsh:param>
+                <gsh:param>/groups/FOLDERSPACE/gffs-users</gsh:param>
+        </geniix:chmod>
 
 	<gsh:echo message="Creating Certificate Generator for containers using signing-cert.pfx."/>
 	<geniix:cert-generator>
