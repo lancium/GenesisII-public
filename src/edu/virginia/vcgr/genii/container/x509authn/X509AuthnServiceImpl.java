@@ -514,7 +514,16 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"), xup.getTokenType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
 
-		MessageElement[] delegations = new MessageElement[] { new MessageElement(creds.convertToSOAPElement()) };
+		SOAPHeaderElement elemConvert = creds.convertToSOAPElement();
+		
+		/*
+		 * CAK: this is where the second problem dives into problematic
+		 * conversion process (landing in xerces with DOM error). it turns out we were making an
+		 * extra copy of the message element that was already in axis form. that
+		 * was an undetected waste of cycles previously, but now is a deadly
+		 * namespace error. great fun.
+		 */
+		MessageElement[] delegations = new MessageElement[] { elemConvert };
 
 		elements[1] =
 			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),

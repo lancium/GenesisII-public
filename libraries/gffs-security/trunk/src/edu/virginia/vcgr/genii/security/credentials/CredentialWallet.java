@@ -102,8 +102,8 @@ public class CredentialWallet implements Externalizable, Describable
 			assertionChains.put(assertion.getId(), assertion);
 		} catch (Throwable e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("ignoring inappropriate extension for delegatee " + delegatee[0].getSubjectDN() + " on chain of "
-					+ priorDelegation.toString() + ", message was: " + e.getMessage());
+				_logger.debug("ignoring inappropriate extension for delegatee '" + delegatee[0].getSubjectDN() + "' on chain of '"
+					+ priorDelegation.toString() + "', message was: " + e.getMessage());
 			// we do not throw out the credential, because it may be a pass-through credential,
 			// which will not be delegatable.
 		}

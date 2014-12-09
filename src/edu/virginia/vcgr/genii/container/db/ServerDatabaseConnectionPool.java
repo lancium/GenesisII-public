@@ -38,6 +38,7 @@ public class ServerDatabaseConnectionPool extends DatabaseConnectionPool
 		}
 	}
 
+	//hmmm: clean this older implementation out.
 	// private Connection acquire() throws SQLException
 	// {
 	// SQLException lastException = null;
