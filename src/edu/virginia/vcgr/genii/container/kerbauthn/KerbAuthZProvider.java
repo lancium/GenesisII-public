@@ -204,6 +204,10 @@ public class KerbAuthZProvider extends AclAuthZProvider
 						serverOptions.put("useKeyTab", "true");
 						File fullKeytabPath =
 							Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keypr._keytab);
+						if (!(new File(fullKeytabPath.getAbsolutePath())).exists()) {
+							_logger.error("Failing authentication on kerberos because keytab file does not exist: " + fullKeytabPath.getAbsolutePath());
+							return false;
+						}
 						if (_logger.isDebugEnabled())
 							_logger.debug("Kerberos keytab for realm " + realm + " is at path: "
 								+ fullKeytabPath.getAbsolutePath());
