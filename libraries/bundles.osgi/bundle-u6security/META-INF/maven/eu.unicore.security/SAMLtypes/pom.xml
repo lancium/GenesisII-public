@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>eu.unicore.security</groupId>
+	<artifactId>SAMLtypes</artifactId>
+	<packaging>jar</packaging>
+	<version>1.2.1</version>
+	<name>SAMLtypes</name>
+	<parent>
+		<groupId>eu.unicore</groupId>
+		<artifactId>unicore-parent</artifactId>
+		<version>1.12</version>
+	</parent>
+
+	<scm>
+		<connection>scm:svn:https://svn.code.sf.net/p/unicore/svn/securityFramework/SAMLtypes/trunk</connection>
+		<developerConnection>scm:svn:https://svn.code.sf.net/p/unicore/svn/securityFramework/SAMLtypes/trunk</developerConnection>
+	</scm>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>xmlbeans</artifactId>
+			<version>2.6.0</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>unicore.eu</id>
+			<name>UNICORE repository</name>
+			<url>http://unicore-dev.zam.kfa-juelich.de/maven</url>
+		</repository>
+	</repositories>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8.1</version>
+				<configuration>
+					<excludePackageNames>xmlbeans.*</excludePackageNames>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xmlbeans-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>xmlbeans</goal>
+						</goals>
+					</execution>
+				</executions>
+				<inherited>true</inherited>
+				<configuration>
+					<schemaDirectory>src/main/schema/saml2</schemaDirectory>
+					<xmlConfigs>
+						<xmlConfig implementation="java.io.File">src/main/schema/xmlbeans_config.xsdconfig</xmlConfig>
+					</xmlConfigs>
+					<noUpa>false</noUpa>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

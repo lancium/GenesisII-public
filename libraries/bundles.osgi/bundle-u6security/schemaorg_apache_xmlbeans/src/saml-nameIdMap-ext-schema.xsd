@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<schema
+    targetNamespace="urn:vo:SAML:2.0:nameIdMap:ext"
+    xmlns:ext="urn:vo:SAML:2.0:nameIdMap:ext"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+    elementFormDefault="qualified"
+    attributeFormDefault="qualified">
+
+    <import namespace="urn:oasis:names:tc:SAML:2.0:assertion"
+        schemaLocation="saml-schema-assertion-2.0.xsd"/>
+
+    <complexType name="AlternativeNameIDEntryType">
+    	<choice>
+            <element ref="saml:NameID"/>
+            <element ref="saml:EncryptedID"/>
+    	</choice>
+    </complexType>
+
+    <complexType name="AlternativeNameIDsType">
+    	<sequence>
+            <element name="MappedNameID" type="ext:AlternativeNameIDEntryType" minOccurs="0"
+            		maxOccurs="unbounded"/>
+    	</sequence>
+    </complexType>
+    <element name="AlternativeNameIDs" type="ext:AlternativeNameIDsType"/>
+</schema>

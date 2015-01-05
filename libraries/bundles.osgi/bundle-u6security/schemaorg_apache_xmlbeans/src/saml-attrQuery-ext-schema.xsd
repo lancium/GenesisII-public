@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<schema targetNamespace="urn:vo:SAML:2.0:attribute:ext"
+	xmlns:ext="urn:vo:SAML:2.0:attribute:ext"
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+	elementFormDefault="qualified" attributeFormDefault="qualified">
+
+	<import namespace="urn:oasis:names:tc:SAML:2.0:assertion"
+		schemaLocation="saml-schema-assertion-2.0.xsd" />
+
+
+	<complexType name="RequestedGroupScopeType">
+		<sequence>
+			<element name="Group" type="string" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+	<element name="RequestedGroupScope"
+		type="ext:RequestedGroupScopeType" />
+
+	<element name="RequestedAttributeDataType" type="string" />
+	<attributeGroup name="BaseVOAttributesGroup">
+		<attribute name="scope" type="string" use="optional" />
+		<attribute name="scopeType" type="string" use="optional" />
+	</attributeGroup>
+
+	<complexType name="ScopedStringAttributeValueType">
+		<simpleContent>
+			<extension base="string">
+				<attributeGroup ref="ext:BaseVOAttributesGroup" />
+			</extension>
+		</simpleContent>
+	</complexType>
+</schema>

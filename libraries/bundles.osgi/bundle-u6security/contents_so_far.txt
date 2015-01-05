@@ -1,0 +1,8 @@
+/home/fred/new_unicore_deps/
+/home/fred/new_unicore_deps/in_bundle
+/home/fred/new_unicore_deps/in_bundle/xmlsec-1.5.1.jar
+/home/fred/new_unicore_deps/in_bundle/samly2-2.1.0.jar
+/home/fred/new_unicore_deps/in_bundle/canl-2.0.0.jar
+/home/fred/new_unicore_deps/in_bundle/securityLibrary-4.0.4.jar
+/home/fred/new_unicore_deps/in_bundle/SAMLtypes-1.2.1.jar
+/home/fred/new_unicore_deps/in_bundle/xmlbeans-2.6.0.jar
