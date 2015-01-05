@@ -41,6 +41,13 @@ fi
 # the certificates package storage area in the grid.
 gridcertsdir="/etc/grid-security/certificates"
 
+# first we get out of that directory if we were possibly there.
+"$GENII_INSTALL_DIR/grid" cd /
+if [ $? -ne 0 ]; then
+  echo "There was a problem changing directories to the root.  Is the grid up?"
+  exit 1
+fi
+
 # test that the directory exists.
 tempoutfile="$(mktemp /tmp/lsgridcert.XXXXXX)"
 "$GENII_INSTALL_DIR/grid" ls "$gridcertsdir" | sed -e '/^$/d' 2>/dev/null >"$tempoutfile"  
@@ -58,13 +65,26 @@ if [ ${PIPESTATUS[0]} -ne 0 ]; then
   "$GENII_INSTALL_DIR/grid" chmod /etc/grid-security +r --everyone
   if [ $? -ne 0 ]; then
     permfail
-    echo "There was a problem chmodding the /etc/grid-security directory."
+    echo "There was a problem chmodding the /etc/grid-security directory for everyone."
     exit 1
   fi
   "$GENII_INSTALL_DIR/grid" chmod /etc/grid-security/certificates +r --everyone
   if [ $? -ne 0 ]; then
     permfail
-    echo "There was a problem chmodding the /etc/grid-security/certificates directory."
+    echo "There was a problem chmodding the /etc/grid-security/certificates directory for everyone."
+    exit 1
+  fi
+  # make the hierarchy writable by admins.
+  "$GENII_INSTALL_DIR/grid" chmod /etc/grid-security +wx /groups/xsede.org/gffs-admins
+  if [ $? -ne 0 ]; then
+    permfail
+    echo "There was a problem chmodding the /etc/grid-security directory for gffs-admins."
+    exit 1
+  fi
+  "$GENII_INSTALL_DIR/grid" chmod /etc/grid-security/certificates +wx /groups/xsede.org/gffs-admins
+  if [ $? -ne 0 ]; then
+    permfail
+    echo "There was a problem chmodding the /etc/grid-security/certificates directory for gffs-admins"
     exit 1
   fi
 
@@ -165,7 +185,14 @@ fi
 "$GENII_INSTALL_DIR/grid" chmod "/etc/grid-security/certificates/*" +r --everyone
 if [ $? -ne 0 ]; then
   permfail
-  echo "There was a problem chmodding the contents of the $gridcertsdir directory."
+  echo "There was a problem chmodding the contents of the $gridcertsdir directory for everyone."
+  exit 1
+fi
+# give admins full control over all of these files.
+"$GENII_INSTALL_DIR/grid" chmod "/etc/grid-security/certificates/*" +wx /groups/xsede.org/gffs-admins
+if [ $? -ne 0 ]; then
+  permfail
+  echo "There was a problem chmodding the contents of the $gridcertsdir directory for gffs-admins."
   exit 1
 fi
 

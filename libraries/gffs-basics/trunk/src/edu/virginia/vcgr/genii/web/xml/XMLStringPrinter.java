@@ -63,7 +63,9 @@ public class XMLStringPrinter
 	 * consumes the xml text in "xmlString" and attempts to return a w3c document object that
 	 * represents the contents.
 	 */
-	private static Document parseXML(String xmlString) throws ParserConfigurationException, SAXException, IOException
+	// hmmm: this seems like a bad place for this function, or we have a badly named class here.
+	// xmlstring utilities instead?
+	public static Document parseXML(String xmlString) throws ParserConfigurationException, SAXException, IOException
 	{
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = dbf.newDocumentBuilder();
@@ -87,8 +89,14 @@ public class XMLStringPrinter
 		return toReturn.toString();
 	}
 
-	public static String nodeToString(Node node, boolean omitXmlDeclare) {
-		if (node == null) return "null";
+	/**
+	 * a simple dump of the current node and descendants, with no extra formatting. good for
+	 * comparing fouled-up bits of xml against each other.
+	 */
+	public static String nodeToString(Node node, boolean omitXmlDeclare)
+	{
+		if (node == null)
+			return "null";
 		StringWriter sw = new StringWriter();
 		try {
 			Transformer t = TransformerFactory.newInstance().newTransformer();
@@ -102,9 +110,4 @@ public class XMLStringPrinter
 		return sw.toString();
 	}
 
-	/**
-	 * a simple dump of the current node and descendants, with no extra formatting.  good for comparing fouled-up bits of xml against each other.
-	 * 
-	 */
-	
 }

@@ -251,8 +251,9 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		ArrayList<RequestSecurityTokenResponseType> responseArray = new ArrayList<RequestSecurityTokenResponseType>();
 
 		try {
-			// add the local token
-			responseArray.add(delegateCredential(theThis, resource, delegateToChain, created, expiry));
+			// add the local token.
+			RequestSecurityTokenResponseType response = delegateCredential(theThis, resource, delegateToChain, created, expiry);
+			responseArray.add(response);
 
 			// add the listed tokens.
 			if (theThis instanceof BaggageAggregatable) {

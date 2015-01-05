@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,7 +34,8 @@ import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.faults.AttributeInvalidException;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
 import eu.unicore.samly2.elements.SAMLAttribute;
-import eu.unicore.security.dsig.DSigException;
+import eu.unicore.samly2.exceptions.SAMLValidationException;
+import eu.unicore.samly2.trust.SimpleTrustChecker;
 import eu.unicore.security.etd.DelegationRestrictions;
 import eu.unicore.security.etd.ETDApi;
 import eu.unicore.security.etd.ETDImpl;
@@ -54,7 +54,7 @@ import eu.unicore.security.etd.TrustDelegation;
  */
 public class TrustCredential implements NuCredential, RWXAccessible
 {
-	static public final long serialVersionUID = 42L;
+	static public final long serialVersionUID = 50L;
 
 	private static Log _logger = LogFactory.getLog(TrustCredential.class);
 
@@ -327,7 +327,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 			throw new SecurityException("failure: an attempt to create a trust delegation chain without signed content.");
 		}
 		synchronized (delegation) {
-			chain.add(delegation.getXML());
+			chain.add(delegation.getXMLBeanDoc());
 		}
 		if (priorDelegation != null) {
 			priorDelegation.getXMLChain(chain);
@@ -340,7 +340,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	public String locateDsigValue()
 	{
 		TrustDelegation deleg = getDelegation();
-		AssertionDocument ad = deleg.getXML();
+		AssertionDocument ad = deleg.getXMLBeanDoc();
 		org.w3c.dom.Document doc = (Document) ad.getDomNode();
 
 		// Find Signature element.
@@ -475,17 +475,30 @@ public class TrustCredential implements NuCredential, RWXAccessible
 			throw new SecurityException("failure: could not delegate trust properly!", e);
 		}
 
-		// hmmm: extra checking--test the signature we just made.
-		// try {
-		// boolean signedOkay = delegation.isCorrectlySigned(issuer[0].getPublicKey());
-		// if (!signedOkay) {
-		// _logger.error("failed checking signature just made for cred: " + toString() +
-		// " and last few frames are: "
-		// + ProgramTools.showLastFewOnStack(28));
-		// }
-		// } catch (Exception e) {
-		// _logger.error("exception checking signature just made for cred: " + toString(), e);
-		// }
+		boolean superNoisyDebug = false;
+		if (superNoisyDebug) {
+			// extra checking--test the signature we just made.
+			try {
+				SimpleTrustChecker stc = new SimpleTrustChecker(
+						delegation.getIssuerFromSignature()[0], true);
+				stc.checkTrust(delegation.getXMLBeanDoc());
+				_logger.debug("SUCCESS checking trust delegation just made.");
+			} catch (Exception e) {
+				_logger.error(
+						"exception checking signature just made for cred: "
+								+ toString() + " and last few frames are: "
+								+ ProgramTools.showLastFewOnStack(28), e);
+			}
+			
+			 AssertionDocument doc = delegation.getXMLBeanDoc();
+			 try {
+				 TrustCredential newcred = new TrustCredential(doc.getDomNode());
+				 _logger.info("SUCCESS again in creating trust cred from dom node: " + newcred.describe(VerbosityLevel.LOW));
+			 } catch (Exception e) {
+				 _logger.error("failed to create new trust cred from domnode although original was good");
+			 }
+		}
+		 
 	}
 
 	@Override
@@ -572,14 +585,14 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	/**
 	 * regenerates a trust credential from the Unicore form.
 	 */
+	@SuppressWarnings("deprecation")
 	private void constructFromTrustDelegation(TrustDelegation delegation)
 	{
 		try {
 			synchronized (delegation) {
-				PublicKey publicKeyOfIssuer = delegation.getIssuerFromSignature()[0].getPublicKey();
-				if (!delegation.isCorrectlySigned(publicKeyOfIssuer)) {
-					throw new SecurityException("failure: trust delegation hasn't been signed properly!");
-				}
+				//PublicKey publicKeyOfIssuer = delegation.getIssuerFromSignature()[0].getPublicKey();
+				SimpleTrustChecker stc = new SimpleTrustChecker(delegation.getIssuerFromSignature()[0], false);
+				stc.checkTrust(delegation.getXMLBeanDoc());
 			}
 		} catch (Exception e) {
 			throw new SecurityException("failure: an invalid trust delegation was found!  delegation has subject "
@@ -604,7 +617,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	private void retrieveAttributesFromDelegation()
 	{
 		synchronized (delegation) {
-			AttributeStatementType[] attributes = delegation.getAttributes();
+			AttributeStatementType[] attributes = delegation.getXMLBeanDoc().getAssertion().getAttributeStatementArray();
 			if (attributes != null) {
 				for (AttributeStatementType attributeStmt : attributes) {
 					for (AttributeType attribute : attributeStmt.getAttributeArray()) {
@@ -707,9 +720,10 @@ public class TrustCredential implements NuCredential, RWXAccessible
 						_logger.error(msg + " ...came in via: " + ProgramTools.showLastFewOnStack(5));
 					throw new AttributeInvalidException(msg);
 				}
-				delegation.isCorrectlySigned(getIssuer()[0].getPublicKey());
+				SimpleTrustChecker stc = new SimpleTrustChecker(delegation.getIssuerFromSignature()[0], true);
+				stc.checkTrust(delegation.getXMLBeanDoc());
 			}
-		} catch (DSigException e) {
+		} catch (SAMLValidationException e) {
 			String msg =
 				"failed to validate signature on our TrustDelegation: " + e.getMessage() + "\n...testing on: " + toString()
 					+ " signed by " + getIssuer()[0].getSubjectDN();

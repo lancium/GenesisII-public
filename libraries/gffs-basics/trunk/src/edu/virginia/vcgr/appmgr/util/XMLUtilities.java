@@ -9,6 +9,8 @@ import org.xml.sax.SAXException;
 
 public class XMLUtilities
 {
+	//hmmm: consolidate this down into the gffs basics xml utils stuff.
+
 	static public QName getQName(Node node)
 	{
 		return new QName(node.getNamespaceURI(), node.getLocalName());

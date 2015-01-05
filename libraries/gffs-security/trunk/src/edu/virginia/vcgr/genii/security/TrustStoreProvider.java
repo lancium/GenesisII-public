@@ -4,6 +4,7 @@ import java.security.KeyStore;
 import java.security.cert.CertStore;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
+import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 public interface TrustStoreProvider
 {
@@ -26,4 +27,9 @@ public interface TrustStoreProvider
 	 * Allows hooking into the configuration unload alerts, to reconfigure object.
 	 */
 	public void addConfigurationUnloadListener(ConfigurationUnloadedListener listener);
+	
+	/**
+	 * Provides a view of the container's active key and cert material.
+	 */
+	public KeyAndCertMaterial getContainerKey();
 }

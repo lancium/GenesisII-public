@@ -210,6 +210,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 		X509Certificate[] resourceCertChain = msgSecData._resourceCertChain;
 		KeyAndCertMaterial clientKeyAndCertificate = callingContext.getActiveKeyAndCertMaterial();
+		if (clientKeyAndCertificate == null) {
+			_logger.error("no active key and cert material available: not performing delegation");
+			return;
+		}
 
 		long beginTime = System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset;
 		long endTime = System.currentTimeMillis() + SecurityConstants.CredentialExpirationMillis;

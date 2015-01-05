@@ -16,6 +16,7 @@ package edu.virginia.vcgr.genii.client.context;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.NotSerializableException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
@@ -319,13 +320,16 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	{
 		try {
 			_transientProperties.putAll((HashMap<String, Serializable>) in.readObject());
-
 			if (in.readBoolean()) {
 				// read in another set from the parent
 				deserializeTransientProperties(in);
 			}
+		} catch (InvalidClassException e) {
+			_logger.warn("could not load transient properties; old serialization found: " + e.getMessage());
+			// we drop the exception on the floor; it's expected after unicore7 update.
 		} catch (ClassNotFoundException e) {
-			throw new IOException(e.getMessage());
+			_logger.error("failure loading transient properties:", e);
+			throw new IOException(e.getLocalizedMessage(), e);
 		}
 	}
 

@@ -115,6 +115,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			if (trustStore != null) {
 				synchronized (_sslSessionCache) {
 					_trustManagers = new TrustManager[1];
+					// container key not used at this level.
 					_trustManagers[0] = new RevocationAwareTrustManager(new TrustStoreLinkage());
 				}
 			}

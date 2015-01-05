@@ -67,6 +67,7 @@ public class Driver extends ApplicationBase
 		SecurityUtilities.initializeSecurity();
 
 		try {
+			// container key not used on client side.
 			CertificateValidatorFactory.setValidator(new SecurityUtilities(new TrustStoreLinkage()));
 		} catch (Throwable t) {
 			System.err.println("Security validation setup failure: " + t.getMessage());

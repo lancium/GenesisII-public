@@ -69,6 +69,7 @@ import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
+import edu.virginia.vcgr.genii.client.security.TrustStoreLinkage;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
@@ -76,7 +77,9 @@ import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllSender;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
+import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
+import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 public class Container extends ApplicationBase
 {
@@ -124,7 +127,7 @@ public class Container extends ApplicationBase
 			WSDDProvider.registerProvider(GAroundInvokerFactory.PROVIDER_QNAME, new GAroundInvokerFactory());
 
 			runContainer();
-
+			
 			ContainerIDFile.containerID(getContainerID());
 
 			_logger.info("Container Started");
@@ -183,6 +186,10 @@ public class Container extends ApplicationBase
 
 		initializeIdentitySecurity(getConfigurationManager().getContainerConfiguration());
 
+		// set our container key to allow for recovery from older serialization.
+		TrustStoreLinkage tsl = (TrustStoreLinkage)CertificateValidatorFactory.getValidator().getTrustStoreProvider(); 
+		tsl.setContainerKey(new KeyAndCertMaterial(Container.getContainerCertChain(), Container.getContainerPrivateKey()));
+		
 		_containerConfiguration = new ContainerConfiguration(getConfigurationManager());
 		ContainerConfiguration.setTheContainerConfig(_containerConfiguration);
 

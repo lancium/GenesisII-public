@@ -48,7 +48,7 @@ public class AxisTrustCredential implements XMLCompatible
 		Node nodeRepresentation = null;
 		synchronized (_realCred.getDelegation()) {
 			MessageElement template = new MessageElement(BinarySecurity.TOKEN_BST);
-			nodeRepresentation = AxisCredentialWallet.convertToAxis(template, _realCred.getDelegation().getXML());
+			nodeRepresentation = AxisCredentialWallet.convertToAxis(template, _realCred.getDelegation().getXMLBeanDoc());
 		}
 		MessageElement securityToken = new MessageElement(BinarySecurity.TOKEN_BST);
 		securityToken.appendChild(nodeRepresentation);
@@ -63,7 +63,7 @@ public class AxisTrustCredential implements XMLCompatible
 			_logger.error("failure to create MessageElement: " + e.getMessage());
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
-
+		
 		return wseTokenRef;
 	}
 }

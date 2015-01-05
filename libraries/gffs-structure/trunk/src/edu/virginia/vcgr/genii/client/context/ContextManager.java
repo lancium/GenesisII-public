@@ -63,7 +63,9 @@ public class ContextManager
 	// this function locates the current calling context, which could actually be null.
 	static public ICallingContext getCurrentContext() throws FileNotFoundException, IOException
 	{
-		return getResolver().load();
+		IContextResolver res = getResolver();
+		//_logger.debug("type of resolver here is: " + res.getClass().getCanonicalName());
+		return res.load();
 	}
 
 	static public void storeCurrentContext(ICallingContext context) throws FileNotFoundException, IOException

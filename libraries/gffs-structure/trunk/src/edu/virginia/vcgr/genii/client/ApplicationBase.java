@@ -44,6 +44,8 @@ public class ApplicationBase
 	// translated into the value of the user state directory variable (see above).
 	static public final String USER_DIR_PROPERTY_VALUE = "env-GENII_USER_DIR";
 
+	static TrustStoreLinkage _containerLinkage = null;
+	
 	/**
 	 * a simple search for the deployment directory in the environment variables. this does not have
 	 * a default value implemented here, and must fall-back to a default elsewhere.
@@ -66,7 +68,7 @@ public class ApplicationBase
 			}
 		}
 	}
-
+	
 	/**
 	 * Prepares the static configuration manager.
 	 */
@@ -79,8 +81,10 @@ public class ApplicationBase
 			System.exit(1);
 		}
 		SecurityUtilities.initializeSecurity();
+		
+		_containerLinkage = new TrustStoreLinkage();
 
-		CertificateValidatorFactory.setValidator(new SecurityUtilities(new TrustStoreLinkage()));
+		CertificateValidatorFactory.setValidator(new SecurityUtilities(_containerLinkage));
 
 		GridEnvironment.loadGridEnvironment();
 
