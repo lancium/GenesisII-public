@@ -50,6 +50,6 @@ package-code:
 	bash ../../scripts/produce_build_package.sh $(shell pwd)/../../ $(TMP) "" $(BUNDLE_NAME)-temp
 	(cd $(BUNDLE_NAME); tar -xf $(TMP)/$(BUNDLE_NAME)-temp.tar.gz)
 	tar -czf $(BUNDLE_NAME).tar.gz $(BUNDLE_NAME)
-	cp $(BUNDLE_NAME).tar.gz $(HOME)/installer_products
+	cp $(BUNDLE_NAME).tar.gz $(HOME)/installer_products/$(BUNDLE_NAME)-source.tar.gz 
 	rm -rf $(BUNDLE_NAME) $(TMP)/$(BUNDLE_NAME)-temp.tar.gz 
 
