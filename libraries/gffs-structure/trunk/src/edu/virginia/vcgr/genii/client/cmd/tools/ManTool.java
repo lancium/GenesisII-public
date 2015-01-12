@@ -57,6 +57,8 @@ public class ManTool extends BaseGridTool
 
 	protected static void printManPage(ToolDescription description, PrintWriter out) throws ToolException
 	{
+		out.println(description.getToolDescription());
+		out.println();
 		out.println(description.getUsage());
 		out.println();
 		if (description.getManPage() == null)

@@ -103,6 +103,10 @@ build_installer 8972 "genesis2-gffs-linux-powerpc-${simple_name}"
 
 ##############
 
+# get the version file up there for reference.
+cp "$GENII_INSTALL_DIR/current.version" "$OUTPUT_DIRECTORY"
+cp "$GENII_INSTALL_DIR/current.deployment" "$OUTPUT_DIRECTORY"
+
 fix_endings
 
 generate_md5sums
