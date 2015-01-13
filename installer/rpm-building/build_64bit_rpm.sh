@@ -10,6 +10,7 @@ export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's work
 installer_config="$1"; shift
 
 export INSTALLER_DIR="$WORKDIR/.."
+export GENII_INSTALL_DIR="$INSTALLER_DIR/.."
 
 ##############
 
@@ -29,21 +30,26 @@ fi
 CONFIGFILE="$INSTALLER_DIR/$installer_config"
 
 # make sure our output folder is there.
-if [ ! -d "$HOME/installer_products" ]; then
-  mkdir "$HOME/installer_products"
+OUTPUT_DIRECTORY="$HOME/installer_products"
+if [ ! -d "$OUTPUT_DIRECTORY" ]; then
+  mkdir "$OUTPUT_DIRECTORY"
 fi
 
 # set up a couple of installer files that the build doesn't know about.
-cp ../current.version ../../current.version
+cp $INSTALLER_DIR/current.version $GENII_INSTALL_DIR/current.version
 if [ $? -ne 0 ]; then
   echo "failed to copy version file up for packaging."
   exit 1
 fi
-cp $CONFIGFILE ../../current.deployment
+cp $CONFIGFILE $GENII_INSTALL_DIR/current.deployment
 if [ $? -ne 0 ]; then
   echo "failed to copy deployment file up for packaging."
   exit 1
 fi
+
+# get the version files up in the output area for reference.
+cp "$GENII_INSTALL_DIR/current.version" "$OUTPUT_DIRECTORY"
+cp "$GENII_INSTALL_DIR/current.deployment" "$OUTPUT_DIRECTORY"
 
 # calculate some values from the config file.
 export DEPLOYMENT_SOURCE_NAME=$(basename $(sed -n -e 's/genii.deployment-source=\(.*\)/\1/p' <$CONFIGFILE) )
