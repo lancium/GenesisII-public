@@ -1,8 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +16,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityDocumentType;
 import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
@@ -28,6 +30,9 @@ import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSMetadataType;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
@@ -44,8 +49,12 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.deployer.AppDeployerConstants;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
@@ -72,18 +81,15 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityStateChangedContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.client.gpath.*;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import org.oasis_open.docs.wsrf.rl_2.Destroy;
-import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
-
 import edu.virginia.vcgr.genii.deployer.ApplicationDeployerPortType;
 import edu.virginia.vcgr.genii.deployer.CreateDeploymentRequestType;
 import edu.virginia.vcgr.genii.deployer.ReifyJSDLRequestType;
+import edu.virginia.vcgr.genii.security.TransientCredentials;
 
 public class RunTool extends BaseGridTool
 {
+	static private Log _logger = LogFactory.getLog(RunTool.class);
+
 	static private Pattern _STAGE_PATTERN = Pattern.compile("([^\\/]+)\\/(.+)$");
 
 	static private final String _DESCRIPTION = "config/tooldocs/description/drun";
@@ -440,6 +446,19 @@ public class RunTool extends BaseGridTool
 	public EndpointReferenceType submitJob(JobDefinition_Type jobDef, EndpointReferenceType besContainer,
 		SubscribeRequest subscribeRequest) throws ResourceException, RNSException, RemoteException
 	{
+		if (_logger.isDebugEnabled()) {
+			TransientCredentials transientCredentials = null;		
+			try {
+				ICallingContext callContext = ContextManager.getExistingContext();
+				transientCredentials = TransientCredentials.getTransientCredentials(callContext);
+			} catch (Exception e) {
+				_logger.error("failure to load credentials for printing in submitJob");
+			}
+			if (transientCredentials != null) {
+				_logger.debug("submitting job with these credentials:\n" + transientCredentials.toString());
+			}
+		}
+		
 		GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, besContainer);
 
 		jobDef = deployAndReify(bes, jobDef);
@@ -454,7 +473,6 @@ public class RunTool extends BaseGridTool
 
 		CreateActivityResponseType response = bes.createActivity(createActivityRequest);
 		return response.getActivityIdentifier();
-
 	}
 
 	static private EndpointReferenceType getBESContainer(RNSPath besOrSchedPath) throws RNSPathDoesNotExistException,

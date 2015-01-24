@@ -40,8 +40,8 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
-import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
+import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -184,7 +184,7 @@ public class ClientUtils
 			} else {
 				// We're in the client role, meaning we can generate our own new client identity.
 
-				_logger.warn("Renewing client tool identity until " + validUntil);
+				_logger.debug("Renewing client tool identity until " + validUntil);
 				/*
 				 * old rule: We create an identity for either 24 hours, or until the valid duration
 				 * expires (which ever is longer) + 10 seconds of slop for in transit time outs.
@@ -205,8 +205,7 @@ public class ClientUtils
 				while (itr.hasNext()) {
 					NuCredential cred = itr.next();
 					if (cred instanceof TrustCredential) {
-						_logger.warn("Discarding delegated credential " + cred);
-						_logger.debug("Removing stale non-renewable credential from current calling context credentials.");
+						_logger.debug("Discarding delegated credential " + cred);
 						itr.remove();
 						results.noteRemovedCredential(cred);
 					}
@@ -224,12 +223,12 @@ public class ClientUtils
 				cred.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
 			} catch (AttributeExpiredException e) {
 				updated = true;
-				_logger.warn("Discarding expired credential " + cred, e);
+				_logger.debug("Discarding expired credential " + cred, e);
 				itr.remove();
 				results.noteRemovedCredential(cred);
 			} catch (AttributeInvalidException e) {
 				updated = true;
-				_logger.warn("Discarding invalid credential " + cred, e);
+				_logger.debug("Discarding invalid credential " + cred, e);
 				itr.remove();
 				results.noteRemovedCredential(cred);
 			}
@@ -424,7 +423,6 @@ public class ClientUtils
 		Long timeout = _TIMEOUTS.get();
 		if (timeout != null)
 			factory.setTimeout(face, timeout.intValue());
-
 		return face;
 	}
 

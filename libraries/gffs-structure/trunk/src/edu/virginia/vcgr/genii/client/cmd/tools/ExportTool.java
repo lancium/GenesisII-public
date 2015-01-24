@@ -66,6 +66,7 @@ public class ExportTool extends BaseGridTool
 	private String _svnPass = null;
 	private Long _svnRevision = null;
 	private String _exportCreatorFilter = null;
+	private boolean _forcingCreator = false;
 
 	public ExportTool()
 	{
@@ -119,6 +120,12 @@ public class ExportTool extends BaseGridTool
 	public void setExportCreator(String filter)
 	{
 		_exportCreatorFilter = filter;
+	}
+	
+	@Option("force")
+	public void setForcingCreator()
+	{
+		_forcingCreator = true;
 	}
 
 	@Override

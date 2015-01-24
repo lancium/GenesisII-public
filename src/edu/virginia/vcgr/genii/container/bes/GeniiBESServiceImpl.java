@@ -288,7 +288,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 			throw new NotAcceptingNewActivitiesFaultType(null);
 		}
-
+		
 		if (_localActivityServiceEPR == null) {
 			// only need to make this epr from scratch once (which involves
 			// a get-attr rpc to the service to get its full epr)

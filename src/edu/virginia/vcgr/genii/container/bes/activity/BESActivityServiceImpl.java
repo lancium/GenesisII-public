@@ -42,7 +42,6 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
-import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
@@ -55,7 +54,6 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
@@ -185,15 +183,8 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 				// for a print statement.
 			}
 			
-			/*
-			 * drop the preferred identity from the context for the BES, since this object was not
-			 * known to unicore 6 version of gffs jars.
-			 */
-			ICallingContext derivedContext = ContextManager.getExistingContext().deriveNewContext();
-			PreferredIdentity.removeFromContext(derivedContext);
-
 			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners,
-				derivedContext, workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
+				ContextManager.getExistingContext(), workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
 
 			//hmmm: set this back to trace level.
 			if (_logger.isDebugEnabled()) {				

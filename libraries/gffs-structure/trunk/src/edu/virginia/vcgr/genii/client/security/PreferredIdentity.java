@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.client.security;
 
-import java.io.Serializable;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +24,8 @@ import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
  * a data capsule for the preferred identity feature. this is what we can lookup in the calling
  * context to find out whether the user has a preferred identity set or not.
  */
-public class PreferredIdentity implements Serializable
+public class PreferredIdentity
 {
-	private static final long serialVersionUID = 1L;
-
 	static private Log _logger = LogFactory.getLog(PreferredIdentity.class);
 
 	static public final String PREFERRED_IDENTITY_PROPERTY_NAME = "PreferredIdentity";
@@ -172,9 +169,9 @@ public class PreferredIdentity implements Serializable
 			return null;
 		try {
 			Object prefChunk = context.getSingleValueProperty(PREFERRED_IDENTITY_PROPERTY_NAME);
-			if ((prefChunk != null) && (prefChunk instanceof PreferredIdentity)) {
+			if ((prefChunk != null) && (prefChunk instanceof String)) {
 				_logger.debug("found preferred identity blob in calling context:" + prefChunk.toString());
-				return (PreferredIdentity) prefChunk;
+				return PreferredIdentity.decodePrefId((String)prefChunk);
 			} else {
 				_logger
 					.debug("got something called a preferred identity in calling context, but it's the wrong type of object!");
@@ -184,6 +181,46 @@ public class PreferredIdentity implements Serializable
 			_logger.debug("found no preferred identity in calling context");
 			return null;
 		}
+	}
+	
+	/**
+	 * returns the encoded form of the preferred identity for putting into the context.
+	 */
+	public String encodePrefId()
+	{
+		StringBuilder toReturn = new StringBuilder();
+		toReturn.append("fix=" + _fixateIdentity + ",dn=" + _identityString + ":");
+		return toReturn.toString();
+	}
+	
+	static public PreferredIdentity decodePrefId(String encoded)
+	{
+		String fail = "decoding failure for PreferredIdentity: ";
+		if (!encoded.startsWith("fix=")) {
+			_logger.error(fail + "fixation flag missing");
+			return null;
+		}
+		// chop fix= off of string.
+		encoded = encoded.substring(4);
+		int commaPosn = encoded.indexOf(","); 
+		if (commaPosn < 0) {
+			_logger.error(fail + "missing separator after fixation flag");
+			return null;
+		}
+		String justFixated = encoded.substring(0, commaPosn);
+		_logger.debug("got fixation flag of: " + justFixated);
+		boolean fixated = Boolean.valueOf(justFixated);
+		encoded = encoded.substring(commaPosn + 1);
+		if (!encoded.startsWith("dn=")) {
+			_logger.error(fail + "DN flag missing for identity string");
+			return null;
+		}
+		// skip dn= bit
+		encoded = encoded.substring(3);
+		// remainder is identity DN.
+		String ident = encoded;
+		
+		return new PreferredIdentity(ident, fixated);
 	}
 
 	/**
@@ -197,8 +234,11 @@ public class PreferredIdentity implements Serializable
 
 		try {
 			removeFromContext(context);
+			
+			String encoded = newIdentity.encodePrefId();
+			
 			// pop in the new version.
-			context.setSingleValueProperty(PREFERRED_IDENTITY_PROPERTY_NAME, newIdentity);
+			context.setSingleValueProperty(PREFERRED_IDENTITY_PROPERTY_NAME, encoded);
 			ContextManager.storeCurrentContext(context);
 		} catch (Exception e) {
 			_logger.debug("could not store preferred identity in calling context", e);
