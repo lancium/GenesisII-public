@@ -57,15 +57,7 @@ public class ConfigurationManager
 	/**
 	 * Gets the default configuration directory, which is one directory below wherever directory is
 	 * indicated by the install-dir system property.
-	 * 
-	 * @return
 	 */
-	/*
-	 * jfk3w - 10/4/07. Looks wrong and could not find a reference to it. Commented out to test if
-	 * really needed... static protected String getDefaultConfigDir() { return getInstallDir() +
-	 * "/configuration"; }
-	 */
-
 	static public ConfigurationManager getCurrentConfiguration()
 	{
 		synchronized (ConfigurationManager.class) {

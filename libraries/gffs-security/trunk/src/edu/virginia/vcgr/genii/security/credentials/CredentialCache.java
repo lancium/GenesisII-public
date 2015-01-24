@@ -90,6 +90,14 @@ public class CredentialCache
 				if (_logger.isTraceEnabled())
 					_logger.trace("credential chain cache miss--created new delegation.");
 				credentialChains.put(seek, delegation);
+								
+				boolean paranoidChecking = false;
+				if (paranoidChecking) {
+					boolean worked = TrustCredential.paranoidSerializationCheck(delegation);
+					if (!worked) {
+						_logger.error("failed paranoid serialization check!  see logging in prior lines.");
+					}
+				}				
 			}
 
 			return delegation;

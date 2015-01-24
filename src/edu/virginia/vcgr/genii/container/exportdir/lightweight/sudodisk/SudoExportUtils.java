@@ -144,6 +144,8 @@ public class SudoExportUtils
 	 */
 	public static void chownFileToDeducedUser(File localPath) throws IOException
 	{
+//hmmm: this case needs to be re-examined!  use preferred id?
+		
 		ArrayList<String> users = WalletUtilities.extractOwnersFromCredentials(null, true);
 		String unixUser = SudoExportUtils.doGridMapping(users);
 		if (unixUser != null) {

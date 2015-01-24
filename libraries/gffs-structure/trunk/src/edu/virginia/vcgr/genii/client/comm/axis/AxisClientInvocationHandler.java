@@ -72,6 +72,7 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
 import edu.virginia.vcgr.genii.client.invoke.InvocationInterceptorManager;
@@ -87,6 +88,7 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.DetailedLogger;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
+import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 
@@ -244,7 +246,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					// run it through the trust manager
 					boolean okay = CertificateValidatorFactory.getValidator().validateIsTrustedResource(chain);
 					if (!okay) {
-						// we throw an exception so that we can either bail out, or just warn about it.
+						/*
+						 * we throw an exception so that we can either bail out, or just warn about
+						 * it.
+						 */
 						// but we warn very quietly these days.
 						throw new AuthZSecurityException("failed to validate cert chain: " + chain[0].getSubjectDN());
 					}
@@ -255,9 +260,11 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 		} catch (Exception e) {
 			if (minClientMessageSec.isWarn()) {
-				// the security level is set to just warning, and this is as
-				// loud of a warning as we want to emit. otherwise we're just
-				// constantly complaining that the message security level was set to warn only.
+				/*
+				 * the security level is set to just warning, and this is as loud of a warning as we
+				 * want to emit. otherwise we're just constantly complaining that the message
+				 * security level was set to warn only.
+				 */
 				if (_logger.isTraceEnabled())
 					_logger.trace("Cannot confirm trusted identity for " + _epr.getAddress().toString());
 			} else {
@@ -266,16 +273,17 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 		}
 
-		// prepare a message security datastructure for the message context
-		// if needed
+		/* prepare a message security datastructure for the message context if needed. */
 		MessageSecurity msgSecData = new MessageSecurity(neededMsgSec, chain, epi);
 		if (msgSecData != null) {
 			stubInstance._setProperty(CommConstants.MESSAGE_SEC_CALL_DATA, msgSecData);
 		}
 
 		try {
-			// configure the send handler(s), working backwards so as to set the
-			// last one that actually does work to serialize the message
+			/*
+			 * configure the send handler(s), working backwards so as to set the last one that
+			 * actually does work to serialize the message.
+			 */
 			ArrayList<ISecuritySendHandler> sendHandlers =
 				getHandler((SimpleChain) _providerConfig.getGlobalRequest(), ISecuritySendHandler.class);
 			boolean serializerFound = false;
@@ -302,7 +310,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext)
 		throws ResourceException, GenesisIISecurityException
 	{
-		// hmmm: this would be a good place to use a shorter timeout on containers. check the role.
+		// hmmm: this would be a good place to use a shorter timeout on containers.
 
 		try {
 
@@ -442,6 +450,19 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			} else {
 				_logger.error(msg, t);
 			}
+
+			if (_logger.isDebugEnabled()) {
+				ICallingContext context;
+				try {
+					context = ContextManager.getCurrentContext();
+					TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
+					_logger.error("failed invoke has these creds in call context: " + tc.toString());
+				} catch (Exception e2) {
+					String msg2 = "could not load calling context to inspect credentials for failed IDP.";
+					_logger.error(msg2, e2);
+				}
+			}
+
 			throw t;
 		}
 		return toReturn;
@@ -557,8 +578,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			try {
 				return handler.doInvoke(calledMethod, arguments, timeout);
 			} catch (Throwable throwable) {
-				 DetailedLogger.detailed()
-					.info("resolveAndInvoke partial handling for exception:" + ExceptionUtils.getStackTrace(throwable));
+				DetailedLogger.detailed().info(
+					"resolveAndInvoke partial handling for exception:" + ExceptionUtils.getStackTrace(throwable));
 				if (throwable instanceof InvocationTargetException) {
 					if (throwable.getCause() != null)
 						throwable = throwable.getCause();

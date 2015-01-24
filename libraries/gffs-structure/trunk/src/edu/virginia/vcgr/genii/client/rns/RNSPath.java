@@ -778,8 +778,8 @@ public class RNSPath implements Serializable, Cloneable
 		 * the proxy. This is because when a call is coming from FUSE, we get a context resolver
 		 * that cannot propagate property updates accurately across all the references of the
 		 * calling context. --old:For the same reason an explicit store is invoked after setting the
-		 * property.old:-- As a general rule, doing context update before proxy creation is advisable to
-		 * avoid similar unwanted problems.
+		 * property.old:-- As a general rule, doing context update before proxy creation is
+		 * advisable to avoid similar unwanted problems.
 		 */
 		ICallingContext context = null;
 		try {
@@ -823,12 +823,11 @@ public class RNSPath implements Serializable, Cloneable
 			// remove the calling context property for short form
 			if (shortForm) {
 				try {
-					// hmmm: don't reload; we have the context already: context =
-					// ContextManager.getCurrentContext();
 					context.removeProperty("RNSShortForm");
-
-					// hmmm: this seems safer, since it will not interfere with other calling
-					// contexts about to be deserialized.
+					/*
+					 * hmmm: this seems safer, since it will not interfere with other calling
+					 * contexts about to be deserialized.
+					 */
 					// ContextManager.storeCurrentContext(context);
 				} catch (Exception e) {
 					_logger.error("Could not remove the short form request from the calling context", e);

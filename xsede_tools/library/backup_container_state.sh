@@ -74,7 +74,7 @@ cp -R "$GENII_INSTALL_DIR/context.xml"* "$GENII_INSTALL_DIR/container.properties
 
 ( pushd / ;
 tar -czf $backup_file "$GENII_USER_DIR" ;
-popd ) >$TMP/zz_container_backup_$(date_stringer).log
+popd ) >$TMP/zz_container_backup_${USER}.log
 
 #hmmm: auto-restart?
 

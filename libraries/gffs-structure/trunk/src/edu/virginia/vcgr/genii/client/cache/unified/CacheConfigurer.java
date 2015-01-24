@@ -172,8 +172,12 @@ public class CacheConfigurer
 		SUBSCRIPTION_BASED_CACHING_ENABLED = true;
 		initializeCaches();
 		initializeGenerators();
-		if (_logger.isDebugEnabled())
-			_logger.debug("Caching has been enabled");
+		if (_logger.isDebugEnabled()) {
+			if (CACHING_ENABLED)
+				_logger.debug("Caching has been enabled");
+			else
+				_logger.debug("Caching is still disabled");
+		}
 	}
 
 	public static Collection<CommonCache> getCaches()

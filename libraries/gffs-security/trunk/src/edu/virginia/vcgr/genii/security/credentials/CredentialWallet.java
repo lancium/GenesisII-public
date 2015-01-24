@@ -34,15 +34,23 @@ import eu.unicore.security.etd.TrustDelegation;
  * deserialized or built from soap headers, in which case the reattachDelegations method can put
  * things right.
  * 
- * @author myanhaona
  * @author ckoeritz
+ * @author myanhaona
  */
 public class CredentialWallet implements Externalizable, Describable
 {
+	/*
+	 * this is the auto-generated serial UID that we have to use, since the class did not initially
+	 * have a serialization id. do not change this.*
+	 */
 	static public final long serialVersionUID = 2636486491170348968L;
 
 	private static Log _logger = LogFactory.getLog(CredentialWallet.class);
 
+	/*
+	 * changing this value causes all existing (stored) calling contexts to be invalidated. this
+	 * mainly affects existing jobs in a queue or on a BES.
+	 */
 	private final Long secretishCode = 177619762176L;
 
 	/**
@@ -88,9 +96,10 @@ public class CredentialWallet implements Externalizable, Describable
 
 	/**
 	 * This method delegates trust to a new delegatee using an existing trust credential, which
-	 * increases the length of the delegation chain by one element.
+	 * increases the length of the delegation chain by one element. The credential is returned, but
+	 * it's also automatically added to this credential wallet.
 	 */
-	public void delegateTrust(X509Certificate[] delegatee, IdentityType delegateeType, X509Certificate[] issuer,
+	public TrustCredential delegateTrust(X509Certificate[] delegatee, IdentityType delegateeType, X509Certificate[] issuer,
 		PrivateKey issuerPrivateKey, BasicConstraints restrictions, EnumSet<RWXCategory> accessCategories,
 		TrustCredential priorDelegation)
 	{
@@ -103,15 +112,16 @@ public class CredentialWallet implements Externalizable, Describable
 			}
 			assertionChains.remove(priorDelegation.getId());
 			assertionChains.put(assertion.getId(), assertion);
+			return assertion;
 		} catch (Throwable e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("ignoring inappropriate extension for delegatee '" + delegatee[0].getSubjectDN()
-					+ "' on chain of '" + priorDelegation.toString() + "', message was: " + e.getMessage());
-			/*
-			 * we do not throw out the credential, because it may be a pass-through credential,
-			 * which will not be delegatable.
-			 */
+				_logger.debug("* dropping inappropriate extension for delegatee:\n" + delegatee[0].getSubjectDN()
+					+ "\n...on chain of...\n" + priorDelegation.toString() + "\nexception message: " + e.getMessage());
+
+			// stomp this errant credential.
+			assertionChains.remove(priorDelegation.getId());
 		}
+		return null;
 	}
 
 	/**
@@ -173,7 +183,7 @@ public class CredentialWallet implements Externalizable, Describable
 		return buffer.toString();
 	}
 
-	public String describeCredentialMap(Map<String, TrustCredential> toShow, VerbosityLevel verbosity)
+	public static String describeCredentialMap(Map<String, TrustCredential> toShow, VerbosityLevel verbosity)
 	{
 		StringBuilder buffer = new StringBuilder();
 		for (TrustCredential assertion : toShow.values()) {
@@ -182,7 +192,7 @@ public class CredentialWallet implements Externalizable, Describable
 		return buffer.toString();
 	}
 
-	public String showIdChains(Map<String, TrustCredential> toShow, VerbosityLevel verbosity)
+	public static String showIdChains(Map<String, TrustCredential> toShow, VerbosityLevel verbosity)
 	{
 		StringBuilder buffer = new StringBuilder();
 		for (TrustCredential assertion : toShow.values()) {
@@ -246,16 +256,16 @@ public class CredentialWallet implements Externalizable, Describable
 	 */
 	public void flexReattachDelegations(boolean removeInvalid)
 	{
-		Map<String, TrustCredential> allCreds = new HashMap<String, TrustCredential>();
-		allCreds.putAll(assertionChains);
+		Map<String, TrustCredential> credentialsToConsume = new HashMap<String, TrustCredential>();
+		credentialsToConsume.putAll(assertionChains);
 		assertionChains.clear();
 
 		if (_logger.isTraceEnabled()) {
 			_logger.debug("this is list before reattach:");
-			_logger.debug(describeCredentialMap(allCreds, VerbosityLevel.HIGH));
+			_logger.debug(describeCredentialMap(credentialsToConsume, VerbosityLevel.HIGH));
 
 			_logger.debug("these are ids involved before reattach:");
-			_logger.debug(showIdChains(allCreds, VerbosityLevel.HIGH));
+			_logger.debug(showIdChains(credentialsToConsume, VerbosityLevel.HIGH));
 		}
 
 		/*
@@ -265,13 +275,13 @@ public class CredentialWallet implements Externalizable, Describable
 		ArrayList<String> idsToWhack = new ArrayList<String>();
 
 		// construct delegation chain from the map of detached delegations collected above
-		while (!allCreds.isEmpty()) {
+		while (!credentialsToConsume.isEmpty()) {
 			/*
 			 * if we don't actually change the remaining detached set, then this stays false, and we
 			 * know we will not make more progress.
 			 */
 			boolean progressMade = false;
-			Iterator<TrustCredential> delegationIterator = allCreds.values().iterator();
+			Iterator<TrustCredential> delegationIterator = credentialsToConsume.values().iterator();
 
 			while (delegationIterator.hasNext()) {
 				TrustCredential delegation = delegationIterator.next();
@@ -308,7 +318,7 @@ public class CredentialWallet implements Externalizable, Describable
 							 * credential wallets. instead we choose to wait until the end before
 							 * removing the consumed prior delegations.
 							 */
-							idsToWhack.add(delegation.getId());
+							idsToWhack.add(priorDelegationId);
 							try {
 								delegation.extendTrustChain(priorDelegation);
 								if (_logger.isTraceEnabled()) {
@@ -316,10 +326,10 @@ public class CredentialWallet implements Externalizable, Describable
 										+ delegation.describe(VerbosityLevel.HIGH));
 								}
 								assertionChains.put(delegation.getId(), delegation);
+								delegationIterator.remove();
 							} catch (Throwable e) {
 								_logger.info("problem with credential; discarding it");
 							}
-							delegationIterator.remove();
 							progressMade = true;
 							break;
 						}
@@ -329,9 +339,9 @@ public class CredentialWallet implements Externalizable, Describable
 			if (!progressMade) {
 				if (_logger.isDebugEnabled()) {
 					_logger.debug("this is what remains in FAILURE case:");
-					_logger.debug(describeCredentialMap(allCreds, VerbosityLevel.HIGH));
+					_logger.debug(describeCredentialMap(credentialsToConsume, VerbosityLevel.HIGH));
 					_logger.debug("these are ids involved for FAILURE case:");
-					_logger.debug(showIdChains(allCreds, VerbosityLevel.HIGH));
+					_logger.debug(showIdChains(credentialsToConsume, VerbosityLevel.HIGH));
 				}
 
 				String msg = "failure; there are missing links in the encoded SAML credentials!";
@@ -340,23 +350,53 @@ public class CredentialWallet implements Externalizable, Describable
 			}
 		}
 
-		if (removeInvalid) {
-			// finally, remove all credentials that are invalid/expired.
-			removeInvalidCredentials();
-		}
-
+		/*
+		 * remove the credentials that were linked into larger chains during the above processing.
+		 */
 		for (String toToss : idsToWhack) {
 			if (_logger.isTraceEnabled())
 				_logger.debug("removing consumed prior credential: " + toToss);
 			assertionChains.remove(toToss);
 		}
 
+		if (removeInvalid) {
+			// finally, remove all credentials that are invalid/expired.
+			removeInvalidCredentials();
+		}
+	}
+
+	/**
+	 * tests that an xml version of a trust delegation can be reparsed into a valid object.
+	 */
+	private static boolean testXmlDump(String xmlDump)
+	{
+		// checking what we just did before storing it.
+		try {
+			AssertionDocument ad = AssertionDocument.Factory.parse(xmlDump);
+			boolean valid = ad.validate();
+
+			if (!valid) {
+				String msg = "FAILED to validate assertion document created just now!";
+				_logger.error(msg);
+				throw new RuntimeException(msg);
+			}
+
+			// now the ultimate test; get the trust credential back again.
+			TrustDelegation tedious = new TrustDelegation(ad);
+			TrustCredential newCred = new TrustCredential(tedious);
+			newCred.checkValidity(new Date());
+			_logger.debug("SUCCESS deserializing newly created serialization.");
+			return true;
+		} catch (Throwable e) {
+			_logger.error("parsing failure of xml string dump", e);
+			return false;
+		}
 	}
 
 	/*
 	 * This is serialization based on xml text coming from the unicore trust delegations, as opposed
 	 * to the old scheme of relying on the unicore serialization process (which has changed
-	 * drastically).
+	 * drastically since activity 126 and is expected to continue to change or be removed).
 	 */
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException
@@ -365,13 +405,15 @@ public class CredentialWallet implements Externalizable, Describable
 		for (TrustCredential trustDelegation : assertionChains.values())
 			howManyTotal += trustDelegation.getDelegationDepth();
 		if (howManyTotal == 0) {
-			_logger.warn("writeExternal failed to encode any credentials during wallet serialization.");
+			_logger.warn("writeExternal saw no credentials to write during wallet serialization.");
 			return;
 		}
 		try {
 			out.writeInt(howManyTotal);
 		} catch (Throwable e) {
-			_logger.error("writeExternal failed to serialize an int.  an int!");
+			String msg = "writeExternal failed to serialize an int.  an int!";
+			_logger.error(msg, e);
+			throw new IOException(msg, e);
 		}
 
 		int addedAny = 0;
@@ -383,44 +425,39 @@ public class CredentialWallet implements Externalizable, Describable
 			while (curr != null) {
 				addedAny++;
 
+				if (_logger.isTraceEnabled())
+					_logger.debug("writing assertion #" + addedAny);
+
 				try {
 					/*
 					 * new implementation for serializing the trust delegations from unicore. pretty
 					 * much just the xml text with an ad hoc version identifier.
 					 */
+					if (_logger.isTraceEnabled())
+						_logger.debug("writing assertion #" + addedAny + ": wrote sentinel");
+
 					out.writeLong(secretishCode);
 					TrustDelegation td = curr.getDelegation();
 					String xmlDump = td.getXMLBeanDoc().xmlText();
 
 					boolean superNoisyDebug = false;
 					if (superNoisyDebug) {
-						// checking what we just did before storing it.
-						try {
-							AssertionDocument ad = AssertionDocument.Factory.parse(xmlDump);
-							boolean valid = ad.validate();
-
-							if (!valid) {
-								String msg = "FAILED to validate assertion document created just now!";
-								_logger.error(msg);
-								throw new RuntimeException(msg);
-							}
-
-							// now the ultimate test; get the trust credential back again.
-							TrustDelegation tedious = new TrustDelegation(ad);
-							TrustCredential newCred = new TrustCredential(tedious);
-							newCred.checkValidity(new Date());
-							_logger.debug("SUCCESS deserializing newly created serialization.");
-
-						} catch (Exception e) {
-							String msg = "FAILED to parse the dumped xml string we JUST created!!!";
-							_logger.error(msg, e);
-							// what now??? can't keep going, we know this won't work.
-							throw new RuntimeException(msg, e);
+						boolean worked = testXmlDump(xmlDump);
+						if (!worked) {
+							_logger
+								.error("validation of xml dump that was just created from TrustDelegation failed to be parsed back into object.");
 						}
 					}
 
-					// just write the string as utf-8.
-					out.writeUTF(xmlDump);
+					/*
+					 * just write the string as an object. this works well. our prior implementation
+					 * using writeUTF/readUTF was found to be unreliable.
+					 */
+					out.writeObject(xmlDump);
+
+					if (_logger.isTraceEnabled())
+						_logger.debug("writing assertion #" + addedAny + ": wrote " + xmlDump.length() + " byte string");
+
 				} catch (IOException e) {
 					_logger.error("failed to serialize assertion: " + e.getMessage());
 				}
@@ -428,8 +465,15 @@ public class CredentialWallet implements Externalizable, Describable
 				curr = curr.getPriorDelegation();
 			}
 		}
+
+		 // and a last sentinel, for good luck.
+//		 out.writeLong(secretishCode);
+//		 _logger.debug("wrote final sentinel");
+		 
+		 out.flush();
+
 		if (_logger.isTraceEnabled())
-			_logger.trace("serialized " + addedAny + " credentials.");
+			_logger.debug("serialized " + addedAny + " credentials.");
 		if (_logger.isTraceEnabled())
 			_logger.trace("serialization track: " + ProgramTools.showLastFewOnStack(6));
 		if (addedAny != howManyTotal) {
@@ -455,24 +499,40 @@ public class CredentialWallet implements Externalizable, Describable
 		} catch (Throwable e) {
 			_logger.info("not loading any credentials as there was no count stored.");
 		}
+
+		if (_logger.isTraceEnabled())
+			_logger.debug("going to read in " + assertionsToRead + " assertions.");
+
 		for (int i = 0; i < assertionsToRead; i++) {
+			if (_logger.isTraceEnabled())
+				_logger.debug("reading assertion #" + (i + 1));
+
 			try {
 				/*
-				 * new way we serialize trust delegations; we do not use their serialization code,
-				 * since it changes out from under us. instead we're dumping the trust delegation to
-				 * text and using that, plus our not so secret code below that lets us know if we're
+				 * new way we serialize trust delegations; we do not use unicore serialization code,
+				 * since it can change (and has). instead we're dumping the trust delegation to text
+				 * and using that, plus our not so secret code below that lets us know if we're
 				 * deserializing the right version of delegations.
 				 */
-				long codeForNewSerialization = in.readLong();					
+				long codeForNewSerialization = in.readLong();
 				if (codeForNewSerialization != secretishCode) {
-					_logger.warn("old school trust delegation serialization found or other corruption, wrong code was: "
+					_logger.warn("old school trust delegation serialization found, or other corruption, wrong code was: "
 						+ codeForNewSerialization);
-					// how would this happen?  we're hosed here too since we expect more credential data following.
+					// how would this happen? we're hosed here too since we expect more credential
+					// data following.
 					continue;
 				}
 
+				if (_logger.isTraceEnabled())
+					_logger.debug("reading assertion #" + (i + 1) + ": read proper sentinel");
+
 				// we recreate the trust delegation from unicore via xml text.
-				String xmlString = in.readUTF();
+
+				// using simple object serialization on the string works fine.
+				String xmlString = (String) in.readObject();
+				
+				if (_logger.isTraceEnabled())
+					_logger.debug("reading assertion #" + (i + 1) + ": read string with " + xmlString.length() + " bytes");
 
 				AssertionDocument ad = AssertionDocument.Factory.parse(xmlString);
 				boolean valid = ad.validate();
@@ -484,6 +544,10 @@ public class CredentialWallet implements Externalizable, Describable
 
 				TrustDelegation td = new TrustDelegation(ad);
 				TrustCredential newCred = new TrustCredential(td);
+
+				if (_logger.isTraceEnabled())
+					_logger.debug("fluffed out credential: " + newCred.describe(VerbosityLevel.HIGH));
+
 				this.addCredential(newCred);
 			} catch (Exception e) {
 				_logger.warn("probable old school trust delegation serialization threw error: " + e.getLocalizedMessage());
@@ -491,6 +555,16 @@ public class CredentialWallet implements Externalizable, Describable
 			}
 
 		}
+
+		// removed since changes serialization structure contract with existing 149.
+		// long finalCode = in.readLong();
+		// if (finalCode != secretishCode) {
+		// _logger.warn("old school trust delegation serialization found or other corruption, wrong code was: "
+		// + finalCode);
+		// // how would this happen?
+		// }
+		// _logger.debug("read final sentinel.");
+
 		flexReattachDelegations(false);
 	}
 }

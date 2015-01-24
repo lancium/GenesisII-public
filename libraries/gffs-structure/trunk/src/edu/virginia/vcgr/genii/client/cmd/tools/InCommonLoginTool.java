@@ -60,6 +60,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
@@ -168,6 +169,21 @@ public class InCommonLoginTool extends BaseLoginTool
 			KeyAndCertMaterial clientKeyMaterial = new KeyAndCertMaterial(new X509Certificate[] { cert }, _params.key);
 			callContext.setActiveKeyAndCertMaterial(clientKeyMaterial);
 			ContextManager.storeCurrentContext(callContext);
+
+			/*
+			 * hmmm: adding a preferred identity for the incommon TLS cert seems like the right
+			 * idea, similar to myproxy login before xsede login. may need to discuss if this is
+			 * generally the 'right' user to associate with.
+			 */
+			// handle establishing a preferred identity, if that's not set as fixated.
+			if (!PreferredIdentity.fixatedInCurrent()) {
+				// the identity wasn't fixated, or it doesn't exist, so we can set preferred
+				// identity here.
+				PreferredIdentity newIdentity =
+					new PreferredIdentity(PreferredIdentity.getDnString(clientKeyMaterial._clientCertChain[0]), false);
+				PreferredIdentity.setInContext(callContext, newIdentity);
+				_logger.debug("preferred identity set in incommon login: " + newIdentity.toString());
+			}
 
 			// TODO Needs to be adjusted after permanent policy location is determined.
 			targetPath = STANDARD_PREFIX + _username;

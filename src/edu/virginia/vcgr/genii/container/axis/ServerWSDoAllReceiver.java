@@ -76,6 +76,7 @@ import edu.virginia.vcgr.genii.network.NetworkConfigTools;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
@@ -321,7 +322,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	 */
 	protected Crypto loadDecryptionCrypto(RequestData reqData) throws WSSecurityException
 	{
-
 		AbstractCrypto crypto = null;
 		try {
 			// create an in-memory keystore for the server's key material
@@ -348,7 +348,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			crypto.setKeyStore(keyStore);
 
 			return crypto;
-
 		} catch (BaseFaultType bft) {
 			BaseFaultTypeDescription[] desc = bft.getDescription();
 			if (desc != null && desc.length >= 1)
@@ -366,17 +365,15 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 	/**
 	 * Authenticate any holder-of-key (i.e., signed) bearer credentials using the given
-	 * authenticated certificate-chains.
-	 * 
-	 * Returns a cumulative collection identities composed from both the bearer- and authenticated-
-	 * credentials
-	 * 
+	 * authenticated certificate-chains. Returns a cumulative collection identities composed from
+	 * both the bearer- and authenticated- credentials
 	 */
 	public static Collection<NuCredential> authenticateBearerCredentials(ArrayList<NuCredential> bearerCredentials,
 		ArrayList<X509Certificate[]> authenticatedCertChains, X509Certificate[] callerTLSCert, ICallingContext callContext)
 		throws AuthZSecurityException, GeneralSecurityException
 	{
-		_logger.debug("entered authBearCred with caller: " + callerTLSCert[0].getSubjectDN());
+		if (_logger.isDebugEnabled())
+			_logger.debug("entered authBearCred with caller: " + callerTLSCert[0].getSubjectDN());
 
 		HashSet<NuCredential> retval = new HashSet<NuCredential>();
 
@@ -403,8 +400,60 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					continue; // no longer anything to check on that one; we don't want it.
 				}
 
-				// discover when the sender trusts a credential, and include it if there's a
-				// matching pass through identity.
+				// Verify that the request message signer is the same as the
+				// one of the holder-of-key certificates.
+				boolean match = false;
+				if (_logger.isTraceEnabled())
+					_logger.trace("credential to test has first delegatee: "
+						+ assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN() + "\n...and original issuer: "
+						+ assertion.getOriginalAsserter()[0].getSubjectDN());
+				for (X509Certificate[] callerCertChain : authenticatedCertChains) {
+					if (_logger.isTraceEnabled())
+						_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
+					try {
+						if (assertion.findDelegateeInChain(callerCertChain[0]) >= 0) {
+							if (_logger.isTraceEnabled())
+								_logger.trace("...found delegatee at position "
+									+ assertion.findDelegateeInChain(callerCertChain[0])
+									+ " to be the same as incoming tls cert.");
+							match = true;
+							break;
+							/*
+							 * disabled code: we are trying to validate that the credential involves
+							 * the current guy; this would just validate that the credential
+							 * originated on our grid (even if it were copied), which is not
+							 * sufficient.
+							 */
+							// } else if
+							// (CertificateValidatorFactory.getValidator().validateIsTrustedResource(
+							// assertion.getOriginalAsserter()) == true) {
+							// if (_logger.isTraceEnabled())
+							// _logger
+							// .trace("...allowed incoming message using resource trust store for original asserter.");
+							// match = true;
+							// break;
+						} else {
+							if (_logger.isTraceEnabled())
+								_logger.trace("...found them to be different.");
+						}
+					} catch (Throwable e) {
+						_logger.error("failure: exception thrown during holder of key checks", e);
+					}
+				}
+
+				if (!match) {
+					String msg =
+						"WARN: credential did not match incoming message sender: '" + assertion.describe(VerbosityLevel.HIGH)
+							+ "'";
+					_logger.debug(msg);
+					// skip adding it.
+					continue;
+				}
+
+				/*
+				 * discover when the sender trusts a credential, and include it if there's a
+				 * matching pass through identity.
+				 */
 				if (callerTLSCert[0].equals(assertion.getOriginalAsserter()[0])) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("found an assertion matching the target TLS cert chain: " + assertion.toString());
@@ -412,7 +461,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 						(X509Certificate) callContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 					if (passThrough != null) {
 						if (_logger.isDebugEnabled())
-							_logger.debug("got a pass through cert, checking delegatee: " + passThrough.getSubjectDN().toString());
+							_logger.debug("got a pass through cert, checking delegatee: "
+								+ passThrough.getSubjectDN().toString());
 						if (assertion.getDelegatee()[0].equals(passThrough)) {
 							X509Certificate[] pt = new X509Certificate[1];
 							pt[0] = passThrough;
@@ -433,6 +483,14 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			}
 
 			retval.add(cred);
+		}
+
+		if (_logger.isTraceEnabled()) {
+			String dumpedCreds = "";
+			for (NuCredential cred : retval) {
+				dumpedCreds.concat(cred.describe(VerbosityLevel.HIGH) + "\n");
+			}
+			_logger.debug("before leaving authbearcred credential set is:\n" + dumpedCreds);
 		}
 
 		return retval;
@@ -493,6 +551,10 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 						clientIP = ((InetSocketAddress) addr).getAddress().getHostAddress();
 					}
 					if (ips.contains(clientIP) == true) {
+						/*
+						 * hmmm: do we ever see this logging happen? outcalls from self might still
+						 * have non-localhost IP.
+						 */
 						if (_logger.isDebugEnabled())
 							_logger.debug("startup: allowing client on local address: " + clientIP);
 					} else {
@@ -543,12 +605,18 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			Collection<NuCredential> authenticatedCallerCreds =
 				authenticateBearerCredentials(bearerCredentials, authenticatedCertChains, clientSslCertChain, callContext);
 
+			if (_logger.isTraceEnabled()) {
+				String dumpedCreds = "";
+				for (NuCredential cred : authenticatedCallerCreds) {
+					dumpedCreds.concat(cred.describe(VerbosityLevel.HIGH) + "\n");
+				}
+
+				_logger.debug("performauthz: full authenticated credential set is:\n" + dumpedCreds);
+			}
+
 			// Finally add all of our callerIds to the calling-context's outgoing credentials.
 			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 			transientCredentials.addAll(authenticatedCallerCreds);
-
-			// hmmm: can the export methods access the transient credentials easily now that they're
-			// stored? they should be able to.
 
 			// Grab the operation method from the message context
 			org.apache.axis.description.OperationDesc desc = messageContext.getOperation();

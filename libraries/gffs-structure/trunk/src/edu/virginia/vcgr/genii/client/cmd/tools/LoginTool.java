@@ -253,11 +253,11 @@ public class LoginTool extends BaseLoginTool
 				throw new ToolException("Cannot provide a password with noPassword option.");
 			}
 
-			// make sure we don't just always use the same string for the bogus password.
-			// hmmm: could randomize this better, with chars. would ensure the source data never had
-			// a recognizable piece in it.
-			int addedChaff = (new Random()).nextInt(1000000000) + 1;
-			_password = "bogus" + addedChaff;
+			/*
+			 * don't always use the same string for the bogus password. it's already bogus and
+			 * should just never be right, but using a simple constant string seemed wrong.
+			 */
+			_password = "bogus" + ((new Random()).nextInt(1000000000) + 1) + "-" + ((new Random()).nextInt(1000000000) + 1);
 		}
 
 		if (_durationString != null) {

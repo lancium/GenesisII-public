@@ -160,15 +160,11 @@ public abstract class BaseGridTool implements ITool
 		} catch (ClassNotFoundException e) {
 			String msg = "application error, missing class: " + e.getLocalizedMessage();
 			_logger.error(msg, e);
-			// stderr.print(msg);
-			// stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (DialogException e) {
 			String msg = "dialog reported problem: " + e.getLocalizedMessage();
 			_logger.error(msg, e);
-			// stderr.print(msg);
-			// stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (InvalidToolUsageException e) {
@@ -182,15 +178,11 @@ public abstract class BaseGridTool implements ITool
 		} catch (CreationException e) {
 			String msg = "a creation exception occurred during the operation: " + e.getLocalizedMessage();
 			_logger.error(msg, e);
-			// stderr.print(msg);
-			// stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (ResourcePropertyException e) {
 			String msg = "a resource property exception occurred: " + e.getLocalizedMessage();
 			_logger.error(msg, e);
-			// stderr.print(msg);
-			// stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (UserCancelException uce) {
@@ -200,15 +192,11 @@ public abstract class BaseGridTool implements ITool
 		} catch (RNSPathAlreadyExistsException e) {
 			String msg = "path already exists: " + e.getLocalizedMessage();
 			_logger.info(msg);
-			// stderr.print(msg);
-			// stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (RNSPathDoesNotExistException e) {
 			String msg = "path does not exist: " + e.getLocalizedMessage();
 			_logger.info(msg);
-			// stderr.print(msg);
-			// stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (PermissionDeniedException e) {
@@ -222,30 +210,21 @@ public abstract class BaseGridTool implements ITool
 			else
 				msg = "an odd permission denied exception occurred: " + e.getLocalizedMessage();
 			_logger.info(msg);
-			// stderr.print(msg);
-			// stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (AuthZSecurityException e) {
 			String msg = "an authorization error occurred: " + e.getLocalizedMessage();
 			_logger.error(msg);
-			// stderr.print(msg);
-			// stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (RNSException e) {
 			String msg = "an RNS exception occurred: " + e.getLocalizedMessage();
 			_logger.error(msg);
-			// stderr.print(msg);
-			// stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (IOException e) {
 			String msg = "an I/O exception occurred: " + e.getLocalizedMessage();
 			_logger.error(msg);
-			// stderr.print(msg);
-			// stderr.print(usage());
-			// stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
 		} catch (ReloadShellException e) {

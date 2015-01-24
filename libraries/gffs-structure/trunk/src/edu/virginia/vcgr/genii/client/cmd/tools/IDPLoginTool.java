@@ -43,6 +43,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.PathUtils;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
@@ -52,6 +53,7 @@ import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.axis.AxisCredentialWallet;
+import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
@@ -203,6 +205,21 @@ public class IDPLoginTool extends BaseLoginTool
 				}
 				retval.addAll(newAssertions);
 			}
+
+			/*
+			 * set the preferred identity based on any new USER credential that was found, but only
+			 * if there is no current preferred identity.
+			 */
+			if (!PreferredIdentity.existsInCurrent()) {
+				CredentialWallet tempWallet = new CredentialWallet(retval);
+				TrustCredential firstUser = tempWallet.getFirstUserCredential();
+				if (firstUser != null) {
+					PreferredIdentity newIdentity = new PreferredIdentity(PreferredIdentity.getDnString(firstUser.getOriginalAsserter()[0]), false);
+					_logger.debug("setting preferred identity at login time with: " + newIdentity.toString());
+					PreferredIdentity.setInContext(callContext, newIdentity);
+				}				
+			}
+			
 		}
 
 		return retval;
@@ -212,7 +229,6 @@ public class IDPLoginTool extends BaseLoginTool
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
 		AuthZSecurityException, IOException, ResourcePropertyException
 	{
-
 		_authnUri = getArgument(0);
 		URI authnSource;
 		try {

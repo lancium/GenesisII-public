@@ -294,6 +294,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	{
 		if (!creationParameters.containsKey(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM))
 			creationParameters.put(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, WSName.generateNewEPI());
+		
+		//hmmm: isn't this supposed to use the epr construction properties file instead?
+		
 		if (!(this instanceof GeniiNoOutCalls)) {
 
 			CertCreationSpec spec = getChildCertSpec();
@@ -785,6 +788,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		EndpointReferenceType epr =
 			ResourceManager.createEPR(rKey, targetAddress.toString(), getImplementedPortTypes(rKey), getMasterType(rKey));
 
+		//hmmm:  isn't this supposed to check eprconstruction properties instead of base classes?
+		
 		if (!(this instanceof GeniiNoOutCalls)) {
 			try {
 				CallingContextImpl context = new CallingContextImpl((CallingContextImpl) null);

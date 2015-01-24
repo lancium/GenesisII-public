@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
 import edu.virginia.vcgr.genii.security.credentials.X509Identity;
@@ -47,7 +48,7 @@ public class TransientCredentials implements Serializable
 			if (cred instanceof Identity) {
 				if (cred instanceof X509Identity) {
 					if (_logger.isTraceEnabled())
-						_logger.trace("ignoring bare x509 identity.");
+						_logger.debug("ignoring bare x509 identity: " + cred.describe(VerbosityLevel.HIGH));
 					return;
 				}
 				// this is probably okay; may be username/password identity or x509 identity.
@@ -58,7 +59,7 @@ public class TransientCredentials implements Serializable
 			}
 		}
 		if (_logger.isTraceEnabled())
-			_logger.trace("storing cred into transient set: " + cred.toString() + " via " + ProgramTools.showLastFewOnStack(6));
+			_logger.debug("storing cred into transient set: " + cred.toString() + " via " + ProgramTools.showLastFewOnStack(6));
 		_credentials.add(cred);
 	}
 
@@ -100,6 +101,16 @@ public class TransientCredentials implements Serializable
 
 	public static synchronized void globalLogout(ICallingContext callingContext)
 	{
+		// clear out the preferred identity unless it's fixated.
+		PreferredIdentity current = PreferredIdentity.getFromContext(callingContext);
+		if (current != null) {
+			if (!current.getFixateIdentity()) {
+				PreferredIdentity.removeFromContext(callingContext);
+				if (_logger.isDebugEnabled())
+					_logger.debug("Removed preferred identity from context.");
+			}
+		}
+		// toss the transient credentials.
 		callingContext.removeTransientProperty(TransientCredentials.TRANSIENT_CRED_PROP_NAME);
 		if (_logger.isDebugEnabled())
 			_logger.debug("Clearing current calling context credentials.");

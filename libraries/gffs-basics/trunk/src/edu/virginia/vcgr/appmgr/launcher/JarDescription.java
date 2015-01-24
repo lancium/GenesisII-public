@@ -26,7 +26,7 @@ import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.appmgr.io.IOUtils;
 import edu.virginia.vcgr.appmgr.util.ElementIterable;
-import edu.virginia.vcgr.appmgr.util.XMLUtilities;
+import edu.virginia.vcgr.genii.web.xml.XMLUtilities;
 
 public class JarDescription
 {

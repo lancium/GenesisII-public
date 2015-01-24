@@ -42,6 +42,7 @@ import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
@@ -88,7 +89,9 @@ import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
+import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
 import edu.virginia.vcgr.genii.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
@@ -136,6 +139,21 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				}
 			} catch (Exception e) {
 				_logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
+
+				if (_logger.isTraceEnabled()) {
+					ICallingContext context;
+					try {
+						context = ContextManager.getCurrentContext();
+						TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
+						_logger.error("calling context has these creds for failed IDP retrieval: "
+							+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
+					} catch (Exception e2) {
+						String msg = "could not load calling context to inspect credentials for failed IDP.";
+						_logger.error(msg, e2);
+					}
+
+				}
+
 			}
 		}
 		return gatheredResponses;

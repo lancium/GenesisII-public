@@ -75,6 +75,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
@@ -185,6 +186,11 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners,
 				ContextManager.getExistingContext(), workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
 
+			//hmmm: set this back to trace level.
+			if (_logger.isDebugEnabled()) {				
+				_logger.debug("after creating job, context has these creds:\n" + TransientCredentials.getTransientCredentials(ContextManager.getExistingContext()).toString());
+			}
+			
 			Calendar future = Calendar.getInstance();
 			future.setTimeInMillis(System.currentTimeMillis() + BES_ACTIVITY_LIFETIME);
 			_logger

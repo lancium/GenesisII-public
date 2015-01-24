@@ -59,6 +59,7 @@ import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.axis.AxisCredentialWallet;
 import edu.virginia.vcgr.genii.security.credentials.BasicConstraints;
 import edu.virginia.vcgr.genii.security.credentials.CredentialCache;
@@ -172,10 +173,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 					for (MessageElement elem : any) {
 						SOAPHeaderElement she = new SOAPHeaderElement(elem);
 
-						// dgm4d: Haxx for problem where resource keys go missing:
-						// Basically we have resource keys occasionally set
-						// as MessageElement.objectValue, which isn't deep-copied
-						// from "elem" during the SOAPHeaderElement construction.
+						/* dgm4d: Haxx for problem where resource keys go missing:
+						 Basically we have resource keys occasionally set
+						 as MessageElement.objectValue, which isn't deep-copied
+						 from "elem" during the SOAPHeaderElement construction. */
 						if ((elem.getObjectValue() != null) && ((she.getChildren() == null) || (she.getChildren().isEmpty()))) {
 							she.setObjectValue(elem.getObjectValue());
 						}
@@ -232,62 +233,123 @@ public class AxisClientHeaderHandler extends BasicHandler
 		for (TrustCredential trustDelegation : wallet.getCredentials()) {
 			walletForResource.getRealCreds().addCredential(trustDelegation);
 			foundAny = true;
+
+			boolean handledThisAlready = false;
+
 			if (resourceCertChain == null) {
 				if (_logger.isTraceEnabled())
 					_logger.trace("no resource cert chain; using bare credentials.");
 			} else {
+
 				try {
-					walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
-						clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
-						accessCategories, trustDelegation);
+
+					if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
+						/*
+						 * in the server role, we first delegate from the source resource to our tls
+						 * cert and thence to the target resource.
+						 */
+						CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
+						if (tlsKey != null) {
+							// first delegate from the credential's resource to our tls cert.
+							TrustCredential newCred =
+								walletForResource.getRealCreds().delegateTrust(tlsKey._certChain, IdentityType.CONNECTION,
+									clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
+									restrictions, accessCategories, trustDelegation);
+							if (newCred == null) {
+								_logger.debug("failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
+									+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
+								continue;
+							}
+
+							// then delegate from the tls cert to the remote resource.
+							walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
+								tlsKey._certChain, tlsKey._privateKey, restrictions, accessCategories, newCred);
+
+							handledThisAlready = true;
+						} else {
+							_logger.error("failed to find a tls certificate for delegating in the outcall");
+						}
+
+					}
+
+					// if no delegation step performed at some point above, do it here.
+					if (!handledThisAlready) {
+						if (_logger.isTraceEnabled())
+							_logger.debug("outcall, normal trust delegation by: "
+								+ clientKeyAndCertificate._clientCertChain[0].getSubjectDN());
+
+						// in the client role here, so just delegate to the resource.
+						walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
+							clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
+							accessCategories, trustDelegation);
+
+					}
+
 				} catch (Throwable e) {
 					_logger.error("failed to delegate trust", e);
 				}
 			}
 		}
 
+		// server additions after all the credentials (if any) have been handled above.
 		if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
-			/*
-			 * the idea here is that all we need is one assurance that the resource trusts this
-			 * outgoing connection and that therefore the recipient should also.
-			 */
 			CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
-			if (tlsKey != null) {
-				// this credential says that the resource trusts the tls connection cert.
-				TrustCredential newTC =
-					CredentialCache.getCachedCredential(tlsKey._certChain, IdentityType.CONNECTION,
-						clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
-						RWXCategory.FULL_ACCESS);
-				walletForResource.getRealCreds().addCredential(newTC);
-				if (_logger.isTraceEnabled())
-					_logger.trace("made credential for connection: " + newTC);
-				foundAny = true;
+			if (tlsKey == null) {
+				_logger.error("failed to find a TLS certificate to delegate to for outcall");
+			} else {
+				/*
+				 * possible extra credential 1:
+				 * the idea here is that we need at least one assurance that the source resource trusts this
+				 * tls certificate and therefore the recipient should also.  we only add this certificate if 
+				 * we didn't already add other credentials delegated to the tls cert.
+				 */
+				if (!foundAny) {
+					// this credential says that the resource trusts the tls connection cert.
+					TrustCredential newTC =
+						CredentialCache.getCachedCredential(tlsKey._certChain, IdentityType.CONNECTION,
+							clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
+							RWXCategory.FULL_ACCESS);
+					walletForResource.getRealCreds().addCredential(newTC);
+					if (_logger.isTraceEnabled())
+						_logger.debug("made extra credential for connection: " + newTC);
+					foundAny = true;
+				}
 
-				// this credential says that the tls connection cert trusts a pass-through tls
-				// identity, if any.
+				/* 
+				 *  possible extra credential 2:
+				 * this credential says that the tls connection cert trusts a pass-through tls
+				 identity, if any. 
+				 this identity is used for matching the original tls session cert who requested the identity
+				 against possible patterns in the ACL; otherwise we can't join groups designated by myproxy CA or other
+				 CA certs. 
+				 
+				 */
 				X509Certificate passThrough =
 					(X509Certificate) callingContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 				if (passThrough != null) {
-					// verify that this cert matches the last TLS we saw from the client, or we
-					// won't propagate it.
+					/* verify that this cert matches the last TLS we saw from the client, or we
+					 won't propagate it. */
 					X509Certificate lastTLS =
 						(X509Certificate) callingContext.getSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
-					if (passThrough.equals(lastTLS)) {
+					if (!passThrough.equals(lastTLS)) {					
+						_logger.warn("ignoring pass-through credential that doesn't match client's last TLS certificate.");
+					} else {
 						X509Certificate passOn[] = new X509Certificate[1];
 						passOn[0] = passThrough;
 						TrustCredential newerTC =
 							CredentialCache.getCachedCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain,
 								tlsKey._privateKey, restrictions, RWXCategory.FULL_ACCESS);
-						walletForResource.getRealCreds().addCredential(newerTC);
-						if (_logger.isDebugEnabled())
-							_logger.debug("made credential for pass-through connection: " + newerTC);
-					} else {
-						_logger.debug("ignoring pass-through credential that doesn't match client's last TLS certificate.");
+						if (newerTC == null) {
+								_logger.error("failed to create credential for pass-through connection for: " + passOn[0].getSubjectDN());
+						} else {
+							walletForResource.getRealCreds().addCredential(newerTC);
+							foundAny = true;
+							if (_logger.isDebugEnabled())
+								_logger.debug("made credential for pass-through connection: " + newerTC);
+						}
+					
 					}
 				}
-
-			} else {
-				_logger.error("failed to find a tls certificate to delegate to for outcall");
 			}
 		}
 
@@ -328,8 +390,12 @@ public class AxisClientHeaderHandler extends BasicHandler
 		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 		if (transientCredentials != null) {
 			for (NuCredential cred : transientCredentials.getCredentials()) {
-				if (cred instanceof TrustCredential)
+				if (cred instanceof TrustCredential) {
 					wallet.addCredential((TrustCredential) cred);
+
+					if (_logger.isTraceEnabled())
+						_logger.debug("loading cred for outgoing wallet: " + cred.describe(VerbosityLevel.HIGH));
+				}
 			}
 		}
 

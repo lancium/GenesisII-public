@@ -19,7 +19,8 @@ public class SecurityConstants
 	static public final long defaultCredentialExpirationMillis = oneDayInMs * 32L;
 
 	// maximum number of delegations we accept in a delegation chain.
-	static public final int MaxDelegationDepth = 10;
+	//cak: upped to 14 due to changes in delegation chains.
+	static public final int MaxDelegationDepth = 14;
 
 	// Secure addressing constants...
 

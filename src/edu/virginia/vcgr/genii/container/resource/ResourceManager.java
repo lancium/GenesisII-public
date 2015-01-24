@@ -228,6 +228,9 @@ public class ResourceManager
 			} catch (IOException e) {
 				throw new ResourceException(e.getMessage(), e);
 			}
+		} else {
+			if (_logger.isDebugEnabled())
+				_logger.debug("not putting an x509 into EPR for class: " + serviceName);
 		}
 	}
 

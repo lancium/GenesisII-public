@@ -22,9 +22,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 
+import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
@@ -70,6 +72,10 @@ public class ContextManager
 
 	static public void storeCurrentContext(ICallingContext context) throws FileNotFoundException, IOException
 	{
+		if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
+			_logger.error("saving calling context on server side; do we really want to???  backtrace:\n" + ProgramTools.showLastFewOnStack(15));
+		}
+		
 		getResolver().store(context);
 	}
 

@@ -1,0 +1,15 @@
+Definitions:
+
+Credential Wallet
+    A collection of credentials that have been acquired.  These can be holder of key credentials used for TLS connections, grid identity assertions, and longer SAML assertions.
+
+USER credential
+    A stored authentication object (as a SAML assertion) that denotes a grid user.  These can be found in a credential wallet for a client and are provided to GFFS containers during authorization requests.
+
+CONNECTION credential
+    A stored authentication object based on an x509 certificate that the GFFS client holds the key to (if temporarily).  These are also found in credential wallets, but are used by the GFFS client during TLS communication with a GFFS container to (1) establish TLS identity and (2) secure the communication link.
+
+Description:
+
+This tool sets the "preferred identity" for the grid user in the GFFS client.  This identity can be used, after vetting against the current credentials in the user's wallet, to assign ownership for exports and random byte-IO files.  Whether the preferred identity is used at all depends on container configuration for lightweight exports and ownership of files.
+

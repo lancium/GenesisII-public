@@ -389,6 +389,15 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 					newTC.extendTrustChain(wrapped);
 					newTC.signAssertion(privateKey);
 					credential = newTC;
+					
+					boolean paranoidChecking = false;
+					if (paranoidChecking) {
+						boolean worked = TrustCredential.paranoidSerializationCheck(newTC);
+						if (!worked) {
+							_logger.error("failed paranoid serialization check!  see logging in prior lines.");
+						}
+					}
+					
 				} else if (credential instanceof X509Identity) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("failure: seeing x509 identity to process from wire: " + credential.toString());

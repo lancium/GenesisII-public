@@ -1,8 +1,12 @@
 package edu.virginia.vcgr.genii.security.credentials;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -124,7 +128,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		this.id = new GUID().toString();
 		this.signed = false;
 		if (_logger.isTraceEnabled())
-			_logger.trace("created trust delegation: " + describe(VerbosityLevel.LOW));
+			_logger.debug("created trust delegation: " + describe(VerbosityLevel.LOW));
 	}
 
 	/**
@@ -380,9 +384,10 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		if (priorPortionOfChain == null)
 			throw new SecurityException("failure: an attempt to link a null credential.");
 
-		if (_logger.isTraceEnabled())
-			_logger.trace("linking trust delegations:\nthis one is:\n" + this.toString() + "\nand we will link to:\n"
+		if (_logger.isTraceEnabled()) {
+			_logger.debug("linking trust delegations:\nthis one is:\n" + this.toString() + "\nand we will link to:\n"
 				+ priorPortionOfChain.toString());
+		}
 
 		// check the length of chain to catch any attempt to over-extend it.
 		if (getDelegationDepth() + 1 > restrictions.getMaxDelegationDepth()) {
@@ -413,6 +418,13 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		this.priorDelegation = priorPortionOfChain;
 		this.priorDelegationId = priorChainId;
 		this.priorDsig = priorChainDsig;
+
+		if (_logger.isTraceEnabled()) {
+			String creationWord = "successful extension of trust";
+			if (signed)
+				creationWord = "successful reconstitution of chain";
+			_logger.debug(creationWord + ":\n" + this.describe(VerbosityLevel.HIGH));
+		}
 	}
 
 	/**
@@ -479,26 +491,23 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		if (superNoisyDebug) {
 			// extra checking--test the signature we just made.
 			try {
-				SimpleTrustChecker stc = new SimpleTrustChecker(
-						delegation.getIssuerFromSignature()[0], true);
+				SimpleTrustChecker stc = new SimpleTrustChecker(delegation.getIssuerFromSignature()[0], true);
 				stc.checkTrust(delegation.getXMLBeanDoc());
 				_logger.debug("SUCCESS checking trust delegation just made.");
 			} catch (Exception e) {
-				_logger.error(
-						"exception checking signature just made for cred: "
-								+ toString() + " and last few frames are: "
-								+ ProgramTools.showLastFewOnStack(28), e);
+				_logger.error("exception checking signature just made for cred: " + toString() + " and last few frames are: "
+					+ ProgramTools.showLastFewOnStack(28), e);
 			}
-			
-			 AssertionDocument doc = delegation.getXMLBeanDoc();
-			 try {
-				 TrustCredential newcred = new TrustCredential(doc.getDomNode());
-				 _logger.info("SUCCESS again in creating trust cred from dom node: " + newcred.describe(VerbosityLevel.LOW));
-			 } catch (Exception e) {
-				 _logger.error("failed to create new trust cred from domnode although original was good");
-			 }
+
+			AssertionDocument doc = delegation.getXMLBeanDoc();
+			try {
+				TrustCredential newcred = new TrustCredential(doc.getDomNode());
+				_logger.info("SUCCESS again in creating trust cred from dom node: " + newcred.describe(VerbosityLevel.LOW));
+			} catch (Exception e) {
+				_logger.error("failed to create new trust cred from domnode although original was good");
+			}
 		}
-		 
+
 	}
 
 	@Override
@@ -590,7 +599,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	{
 		try {
 			synchronized (delegation) {
-				//PublicKey publicKeyOfIssuer = delegation.getIssuerFromSignature()[0].getPublicKey();
+				// PublicKey publicKeyOfIssuer =
+				// delegation.getIssuerFromSignature()[0].getPublicKey();
 				SimpleTrustChecker stc = new SimpleTrustChecker(delegation.getIssuerFromSignature()[0], false);
 				stc.checkTrust(delegation.getXMLBeanDoc());
 			}
@@ -825,4 +835,89 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		// not found in there.
 		return -1;
 	}
+
+	/**
+	 * formats a list of credentials in a nice manner.
+	 */
+	public static String showCredentialList(List<NuCredential> toShow, VerbosityLevel verbosity)
+	{
+		StringBuilder buffer = new StringBuilder();
+		for (NuCredential assertion : toShow) {
+			buffer.append(assertion.describe(verbosity)).append("\n");
+		}
+		return buffer.toString();
+	}
+
+	/**
+	 * tests whether the trust credential can be serialized, then deserialized, and actually
+	 * recovered.
+	 */
+	static public boolean paranoidSerializationCheck(TrustCredential toCheck)
+	{
+		try {
+			toCheck.checkValidity(new Date());
+		} catch (Exception e) {
+			_logger.error("credential is not even valid in serialization check!");
+			return false;
+		}
+
+		// testing whether we get back full creds from write/read external.
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oo = null;
+		try {
+			oo = new ObjectOutputStream(baos);
+			CredentialWallet cw = new CredentialWallet();
+			cw.addCredential(toCheck);
+			cw.writeExternal(oo);
+			baos.flush();
+		} catch (IOException e) {
+			_logger.error("failure to serialize newly extended credential!", e);
+			return false;
+		}
+		if (oo != null) {
+			byte[] chunk = baos.toByteArray();
+			ByteArrayInputStream bais = new ByteArrayInputStream(chunk);
+			ObjectInputStream ois;
+			try {
+				ois = new ObjectInputStream(bais);
+				CredentialWallet reconstituted = new CredentialWallet();
+				reconstituted.readExternal(ois);
+				if (reconstituted.isEmpty())
+					throw new IOException("credential wallet is empty after reconstitution!");
+				if (reconstituted.getCredentials().size() > 1)
+					throw new IOException("credential wallet has too many credentials after reconstitution!");
+
+				if (_logger.isTraceEnabled()) {
+					_logger.debug("reconst wallet is:\n" + reconstituted.describe(VerbosityLevel.HIGH));
+				}
+
+				TrustCredential tc = reconstituted.getCredentials().get(0);
+
+				if (tc.getDelegationDepth() != toCheck.getDelegationDepth()) {
+					throw new IOException("reconstituted credential has wrong delegation depth!  reconst="
+						+ tc.getDelegationDepth() + ", orig=" + toCheck.getDelegationDepth());
+				}
+
+				if (!tc.getIssuer()[0].getSubjectDN().toString().equals(toCheck.getIssuer()[0].getSubjectDN().toString())) {
+					throw new IOException("issuer disagrees in reconstituted credential: original="
+						+ toCheck.getIssuer()[0].getSubjectDN() + " recons=" + tc.getIssuer()[0].getSubjectDN());
+				}
+
+				if (!tc.getDelegatee()[0].getSubjectDN().toString().equals(toCheck.getDelegatee()[0].getSubjectDN().toString())) {
+					throw new IOException("delegatee disagrees in reconstituted credential: original="
+						+ toCheck.getDelegatee()[0].getSubjectDN() + " recons=" + tc.getDelegatee()[0].getSubjectDN());
+				}
+
+				if (_logger.isDebugEnabled())
+					_logger.debug("reconstituted as: " + tc.describe(VerbosityLevel.HIGH));
+
+			} catch (Exception e) {
+				_logger.error("failure to deserialize newly extended credential!", e);
+				return false;
+			}
+
+		}
+		return true;
+	}
+
 }

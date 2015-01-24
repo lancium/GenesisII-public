@@ -29,7 +29,11 @@ export-root-rns-path
 
 creator
     This flag is only required if the user has multiple grid STS identities in their credential wallet.  The flag picks which of those identities will be listed as owning the export by providing a filter string.  The filter string does not have to be the full DN, but can be just a unique portion of the DN, such as the Common Name (CN).  The first DN that matches the filter will be selected, so it is important to filter wisely if the DNs are very similar.
-    Note that the DN is formatted using OpenSSL one-line RDN format, as is the Globus grid-mapfile format.
+    The DN is formatted using OpenSSL one-line RDN format, as is the Globus grid-mapfile format.  If you run 'identity --listAll', then all of your credentials will be listed in one-line format.
+    The DN specified in the creator flag is still evaluated on the container side; one cannot specify any user as the owner of the export unless one is an administrator and additionally uses the --force flag.
+
+force
+    This flag specifies that the creator value specified should be used without vetting against the local credential wallet.  This can be necessary when an administrator is creating an export for another uer.  The container will still require that the user creating the export has full administrative permissions on the lightweight export port type specified, or the export creation will fail.
 
 Description:
 

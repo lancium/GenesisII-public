@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.utils.xml.NodeIterable;
-import edu.virginia.vcgr.genii.client.utils.xml.XMLUtils;
+import edu.virginia.vcgr.genii.web.xml.XMLUtilities;
 
 /**
  * The PluginManager is the central point from which plugins are obtained. It is responsible for
@@ -124,8 +124,8 @@ public class PluginManager
 		throws PluginException, SAXException
 	{
 		/* First, get attributes from the element that describe the plugin */
-		String name = XMLUtils.getRequiredAttribute(pluginElement, PLUGIN_NAME_ATTR, null);
-		String implementingClass = XMLUtils.getRequiredAttribute(pluginElement, IMPLEMENTING_CLASS_ATTR, null);
+		String name = XMLUtilities.getRequiredAttribute(pluginElement, PLUGIN_NAME_ATTR, null);
+		String implementingClass = XMLUtilities.getRequiredAttribute(pluginElement, IMPLEMENTING_CLASS_ATTR, null);
 		IPlugin plugin = null;
 
 		/*
@@ -170,8 +170,8 @@ public class PluginManager
 							+ "\" does not appear to implement the IMenuPlugin interface.");
 
 					MainMenuDescriptor descriptor =
-						new MainMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtils.getRequiredAttribute(child, MENU_NAME_ATTR,
-							null), XMLUtils.getRequiredAttribute(child, MENU_LABEL_ATTR, null), XMLUtils.getRequiredAttribute(
+						new MainMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtilities.getRequiredAttribute(child, MENU_NAME_ATTR,
+							null), XMLUtilities.getRequiredAttribute(child, MENU_LABEL_ATTR, null), XMLUtilities.getRequiredAttribute(
 							child, MENU_GROUP_ATTR, null));
 
 					/*
@@ -204,8 +204,8 @@ public class PluginManager
 							+ "\" does not appear to implement the IMenuPlugin interface.");
 
 					ContextMenuDescriptor descriptor =
-						new ContextMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtils.getRequiredAttribute(child,
-							MENU_LABEL_ATTR, null), XMLUtils.getRequiredAttribute(child, MENU_GROUP_ATTR, null));
+						new ContextMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtilities.getRequiredAttribute(child,
+							MENU_LABEL_ATTR, null), XMLUtilities.getRequiredAttribute(child, MENU_GROUP_ATTR, null));
 
 					/* See if another plugin already registered the group */
 					Collection<ContextMenuDescriptor> group = contextMenuPlugins.get(descriptor.getMenuGroup());
@@ -224,8 +224,8 @@ public class PluginManager
 							+ "\" does not appear to implement the ITabPlugin interface.");
 
 					/* Just go ahead and add the tab plugin descriptor to the collection */
-					tabs.add(new TabPluginDescriptor(name, (ITabPlugin) plugin, XMLUtils.getRequiredAttribute(child,
-						TAB_NAME_ATTR, null), Integer.parseInt(XMLUtils.getRequiredAttribute(child, TAB_PRIORITY_ATTR, "0"))));
+					tabs.add(new TabPluginDescriptor(name, (ITabPlugin) plugin, XMLUtilities.getRequiredAttribute(child,
+						TAB_NAME_ATTR, null), Integer.parseInt(XMLUtilities.getRequiredAttribute(child, TAB_PRIORITY_ATTR, "0"))));
 				} else
 					throw new PluginException("Unrecognized element \"" + nodeName + " in plugin configuration.");
 			}

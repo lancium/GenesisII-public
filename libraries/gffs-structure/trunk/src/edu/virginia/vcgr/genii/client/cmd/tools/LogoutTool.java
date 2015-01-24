@@ -19,6 +19,7 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
@@ -54,6 +55,29 @@ public class LogoutTool extends BaseGridTool
 		_all = true;
 	}
 
+	/**
+	 * checks whether the credential "cred" is equivalent to the preferred identity or not. if it
+	 * is, then we toss out the current preferred identity unless it's fixated.
+	 */
+	public void removePreferredIdentityIfAppropriate(NuCredential cred)
+	{
+		// remove the preferred identity if this guy matches (and pref id is not fixated).
+		if (!PreferredIdentity.fixatedInCurrent()) {
+			PreferredIdentity current = PreferredIdentity.getCurrent();
+			
+			if (current.matchesIdentity(cred.getOriginalAsserter()[0])) {
+				/*
+				 * ouch, we have a match to the preferred identity. they just logged out of it, so
+				 * we need to drop it. if they don't have it in their credentials, it's worthless to
+				 * everyone.
+				 */
+				PreferredIdentity.dropCurrent();
+				_logger
+					.debug("dropping preferred identity found same as logged out credential: " + current.getIdentityString());
+			}
+		}
+	}
+
 	@Override
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
 		AuthZSecurityException, IOException, ResourcePropertyException
@@ -68,6 +92,7 @@ public class LogoutTool extends BaseGridTool
 			throw new IOException("There was no calling context to log out of.");
 		}
 		if (_all) {
+			// toss out all credentials, including TLS cert.
 			TransientCredentials.globalLogout(callContext);
 			callContext.setActiveKeyAndCertMaterial(null);
 			ContextManager.storeCurrentContext(callContext);
@@ -89,10 +114,13 @@ public class LogoutTool extends BaseGridTool
 
 				Matcher matcher = p.matcher(toMatch);
 				if (matcher.matches()) {
+					removePreferredIdentityIfAppropriate(cred);
+
 					itr.remove();
 					numMatched++;
-					if (_logger.isDebugEnabled())
-						_logger.debug("Removing credential from current calling context credentials.");
+					if (_logger.isDebugEnabled()) {
+						_logger.debug("Removed credential from current calling context credentials.");
+					}
 				}
 			}
 
@@ -125,12 +153,16 @@ public class LogoutTool extends BaseGridTool
 					if (which >= credentials.size()) {
 						stderr.println("Selection index must be between 0 and " + (credentials.size() - 1));
 					}
+
+					NuCredential cred = credentials.get(which);
+					removePreferredIdentityIfAppropriate(cred);
+
 					credentials.remove(which);
 					if (_logger.isDebugEnabled())
 						_logger.debug("Removing credential from current calling context credentials.");
-					
+
 					ContextManager.storeCurrentContext(callContext);
-					
+
 					// drop any notification brokers or other cached info after credential change.
 					CacheManager.resetCachingSystem();
 

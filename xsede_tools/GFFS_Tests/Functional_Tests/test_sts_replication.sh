@@ -261,7 +261,7 @@ function testCleaningUpKerb()
   restore_userdir
 
   # let some time to pass to allow propagation of user destroy from primary to the backup container
-  sleep 1m
+  sleep 2m
 
   # remove the kerberos user EPR from port-type directory 
   grid_chk rm -r $BACKUP_CONTAINER/Services/KerbAuthnPortType/$userName

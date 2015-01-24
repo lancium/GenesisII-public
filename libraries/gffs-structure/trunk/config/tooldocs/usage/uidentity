@@ -1,0 +1,20 @@
+identity --show
+  Lists the current preferred identity setting, if any exists.
+
+identity --listAll
+  Shows all Subject DNs that are available currently in the credential wallet.  These must either be USER or CONNECTION credentials.  These DN strings will work as values for the --exact flag.
+
+identity --reset
+  Cleans out the current value for preferred identity.  The preferred identity will be reacquired at next login (unless --fixate flag is used).
+
+identity [--fixate] --set --exact="identity string"
+  Sets the preferred identity to the exact "identity string" provided.  This must match an existing user credential DN exactly.
+
+identity [--fixate] --set --pattern="part of user identity"
+  Sets the preferred identity to a user credential already in the credential wallet that matches a pattern for some portion of the user identity.  This will fail and do nothing if there is no match found in credential wallet.  If a match is found, then the matching credential is displayed.
+
+--fixate flag:
+  When "--fixate" is added to a --set command, this causes the client to _not_ automatically re-assign the preferred identity at login/logout time.  This is intended as a feature for sophisticated users who intend to always use a particular grid identity for ownership; fixating the identity is usually not necessary.  In addition, a fixated preferred identity is still evaluated at the server-side by the container; a user cannot specify a preferred identity that does not exist in the credential wallet.  In cases where the preferred identity cannot be found by the container, the first USER credential is used instead.
+
+identity [--resolve]
+  Tests that the current preferred identity resolves against a credential in the current credential wallet.  If this fails, then attempts to use the preferred identity on the container side will also fail.

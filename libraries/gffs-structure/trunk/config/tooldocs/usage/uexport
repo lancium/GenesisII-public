@@ -2,7 +2,7 @@ export
 
 export --create { <export-service-path> | --url <export-service-url> } 
 	[--svn-user=<svn-username>] [--svn-pass=<svn-pass>] [--svn-revision=<svn-revision>]
-	[--creator="<DN-filter-pattern>"]
+	[--creator="<DN-filter-pattern>"]  [--force]
 	<local-path> [new-rns-path]
 
 export --quit { <export-root-rns-path> | --url <export-root-url> }

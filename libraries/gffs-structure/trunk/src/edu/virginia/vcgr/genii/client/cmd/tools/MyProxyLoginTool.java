@@ -32,6 +32,7 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
@@ -203,6 +204,14 @@ public class MyProxyLoginTool extends BaseLoginTool
 		if (_logger.isTraceEnabled())
 			_logger.trace("adding myproxy TLS cert: " + keyMat[0]);
 
+		// handle establishing a preferred identity, if that's not set as fixated.
+		if (!PreferredIdentity.fixatedInCurrent()) {
+			// the identity wasn't fixated, or it doesn't exist, so we can set preferred identity here.
+			PreferredIdentity newIdentity = new PreferredIdentity(PreferredIdentity.getDnString(keyMat[0]), false);
+			PreferredIdentity.setInContext(callContext, newIdentity);
+			_logger.debug("preferred identity set in myproxy login: " + newIdentity.toString());
+		}
+				
 		// update the saved context before we leave.
 		ContextManager.storeCurrentContext(callContext);
 
