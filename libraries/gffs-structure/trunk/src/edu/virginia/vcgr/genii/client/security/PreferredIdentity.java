@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.security;
 
+import java.io.Serializable;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +25,15 @@ import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
  * a data capsule for the preferred identity feature. this is what we can lookup in the calling
  * context to find out whether the user has a preferred identity set or not.
  */
-public class PreferredIdentity
+public class PreferredIdentity implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
+	/*
+	 * note: this class is serializable only for backwards compatibility; do not serialize it for
+	 * any purposes now-a-days.
+	 */
+
 	static private Log _logger = LogFactory.getLog(PreferredIdentity.class);
 
 	static public final String PREFERRED_IDENTITY_PROPERTY_NAME = "PreferredIdentity";
@@ -99,14 +107,15 @@ public class PreferredIdentity
 			return false;
 		return _identityString.equals(PreferredIdentity.getDnString(toCheck));
 	}
-	
+
 	/**
 	 * a helper method for getting the right type of DN out of the x509 certificate.
 	 */
 	public static String getDnString(X509Certificate target)
 	{
-		if (target == null) return null;
-		return X509Identity.getOpensslRdn(target);	
+		if (target == null)
+			return null;
+		return X509Identity.getOpensslRdn(target);
 	}
 
 	// static methods for managing current context...
@@ -171,7 +180,13 @@ public class PreferredIdentity
 			Object prefChunk = context.getSingleValueProperty(PREFERRED_IDENTITY_PROPERTY_NAME);
 			if ((prefChunk != null) && (prefChunk instanceof String)) {
 				_logger.debug("found preferred identity blob in calling context:" + prefChunk.toString());
-				return PreferredIdentity.decodePrefId((String)prefChunk);
+				return PreferredIdentity.decodePrefId((String) prefChunk);
+			} else if ((prefChunk != null) && (prefChunk instanceof PreferredIdentity)) {
+				/*
+				 * older school version. we will trust that it's still the right format. but next
+				 * time we store it, it goes in as a string.
+				 */
+				return (PreferredIdentity) prefChunk;
 			} else {
 				_logger
 					.debug("got something called a preferred identity in calling context, but it's the wrong type of object!");
@@ -182,7 +197,7 @@ public class PreferredIdentity
 			return null;
 		}
 	}
-	
+
 	/**
 	 * returns the encoded form of the preferred identity for putting into the context.
 	 */
@@ -192,7 +207,7 @@ public class PreferredIdentity
 		toReturn.append("fix=" + _fixateIdentity + ",dn=" + _identityString + ":");
 		return toReturn.toString();
 	}
-	
+
 	static public PreferredIdentity decodePrefId(String encoded)
 	{
 		String fail = "decoding failure for PreferredIdentity: ";
@@ -202,7 +217,7 @@ public class PreferredIdentity
 		}
 		// chop fix= off of string.
 		encoded = encoded.substring(4);
-		int commaPosn = encoded.indexOf(","); 
+		int commaPosn = encoded.indexOf(",");
 		if (commaPosn < 0) {
 			_logger.error(fail + "missing separator after fixation flag");
 			return null;
@@ -219,7 +234,7 @@ public class PreferredIdentity
 		encoded = encoded.substring(3);
 		// remainder is identity DN.
 		String ident = encoded;
-		
+
 		return new PreferredIdentity(ident, fixated);
 	}
 
@@ -234,9 +249,9 @@ public class PreferredIdentity
 
 		try {
 			removeFromContext(context);
-			
+
 			String encoded = newIdentity.encodePrefId();
-			
+
 			// pop in the new version.
 			context.setSingleValueProperty(PREFERRED_IDENTITY_PROPERTY_NAME, encoded);
 			ContextManager.storeCurrentContext(context);
@@ -285,8 +300,8 @@ public class PreferredIdentity
 		}
 
 		return toReturn;
-	}	
-	
+	}
+
 	/**
 	 * tries to locate a matching identity in the "creds" to the "pattern" provided. if no match is
 	 * found, then null is returned. note that the "creds" list must contain all identities that
