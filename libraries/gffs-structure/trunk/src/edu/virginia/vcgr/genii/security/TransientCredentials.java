@@ -127,7 +127,7 @@ public class TransientCredentials implements Serializable
 		for (NuCredential cred : _credentials) {
 			if (builder.length() != 0)
 				builder.append("\n");
-			builder.append(String.format("%d: ", index));
+			builder.append(String.format("#%d -- ", index));
 			builder.append(cred.toString());
 			index++;
 		}

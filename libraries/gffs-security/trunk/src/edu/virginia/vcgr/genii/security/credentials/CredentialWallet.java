@@ -455,6 +455,14 @@ public class CredentialWallet implements Externalizable, Describable
 					 */
 					out.writeObject(xmlDump);
 
+					/*
+					 * we no longer write the string like this:
+					 * 
+					 * out.writeUTF(xmlDump);
+					 * 
+					 * because it has been shown to be unreliable.
+					 */
+
 					if (_logger.isTraceEnabled())
 						_logger.debug("writing assertion #" + addedAny + ": wrote " + xmlDump.length() + " byte string");
 
@@ -466,11 +474,7 @@ public class CredentialWallet implements Externalizable, Describable
 			}
 		}
 
-		 // and a last sentinel, for good luck.
-//		 out.writeLong(secretishCode);
-//		 _logger.debug("wrote final sentinel");
-		 
-		 out.flush();
+		out.flush();
 
 		if (_logger.isTraceEnabled())
 			_logger.debug("serialized " + addedAny + " credentials.");
@@ -527,10 +531,32 @@ public class CredentialWallet implements Externalizable, Describable
 					_logger.debug("reading assertion #" + (i + 1) + ": read proper sentinel");
 
 				// we recreate the trust delegation from unicore via xml text.
+				String xmlString = "";
+				try {
+					// using simple object serialization on the string works fine...
+					xmlString = (String) in.readObject();
+				} catch (Exception e1) {
+					// unless it was written with the old school method, which we'll try now...
+					try {
+						/*
+						 * remedial try to get the credential read, by using the old school method
+						 * from prior implementation. we don't write anything like this now, but we
+						 * may still need to read the older version.
+						 */
+						xmlString = (String) in.readUTF();
+					} catch (Exception e2) {
+						/*
+						 * if we fail here also, then we will allow the parse to fail on a blank
+						 * string below and be reported through that channel, but we also want to
+						 * mention why this happened.
+						 */
+						_logger.error("readExternal, in responding to original exception (shown below)", e1);
+						_logger.error(
+							"(readExternal continued) failed reading by old method on second try (with new exception below)",
+							e2);
+					}
+				}
 
-				// using simple object serialization on the string works fine.
-				String xmlString = (String) in.readObject();
-				
 				if (_logger.isTraceEnabled())
 					_logger.debug("reading assertion #" + (i + 1) + ": read string with " + xmlString.length() + " bytes");
 
@@ -555,15 +581,6 @@ public class CredentialWallet implements Externalizable, Describable
 			}
 
 		}
-
-		// removed since changes serialization structure contract with existing 149.
-		// long finalCode = in.readLong();
-		// if (finalCode != secretishCode) {
-		// _logger.warn("old school trust delegation serialization found or other corruption, wrong code was: "
-		// + finalCode);
-		// // how would this happen?
-		// }
-		// _logger.debug("read final sentinel.");
 
 		flexReattachDelegations(false);
 	}
