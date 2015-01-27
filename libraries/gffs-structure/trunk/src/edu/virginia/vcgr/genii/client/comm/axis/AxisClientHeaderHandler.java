@@ -173,10 +173,11 @@ public class AxisClientHeaderHandler extends BasicHandler
 					for (MessageElement elem : any) {
 						SOAPHeaderElement she = new SOAPHeaderElement(elem);
 
-						/* dgm4d: Haxx for problem where resource keys go missing:
-						 Basically we have resource keys occasionally set
-						 as MessageElement.objectValue, which isn't deep-copied
-						 from "elem" during the SOAPHeaderElement construction. */
+						/*
+						 * dgm4d: Haxx for problem where resource keys go missing: Basically we have
+						 * resource keys occasionally set as MessageElement.objectValue, which isn't
+						 * deep-copied from "elem" during the SOAPHeaderElement construction.
+						 */
 						if ((elem.getObjectValue() != null) && ((she.getChildren() == null) || (she.getChildren().isEmpty()))) {
 							she.setObjectValue(elem.getObjectValue());
 						}
@@ -245,7 +246,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 					if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
 						/*
-						 * in the server role, we first delegate from the source resource to our tls
+						 * in the server role, we first delegate from the source resource to our container tls
 						 * cert and thence to the target resource.
 						 */
 						CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
@@ -256,8 +257,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 									clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
 									restrictions, accessCategories, trustDelegation);
 							if (newCred == null) {
-								_logger.debug("failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
-									+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
+								_logger
+									.debug("failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
+										+ trustDelegation
+										+ "\nbecause we received a null delegated assertion for our tls cert.");
 								continue;
 							}
 
@@ -298,10 +301,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 				_logger.error("failed to find a TLS certificate to delegate to for outcall");
 			} else {
 				/*
-				 * possible extra credential 1:
-				 * the idea here is that we need at least one assurance that the source resource trusts this
-				 * tls certificate and therefore the recipient should also.  we only add this certificate if 
-				 * we didn't already add other credentials delegated to the tls cert.
+				 * possible extra credential 1: the idea here is that we need at least one assurance
+				 * that the source resource trusts this tls certificate and therefore the recipient
+				 * should also. we only add this certificate if we didn't already add other
+				 * credentials delegated to the tls cert.
 				 */
 				if (!foundAny) {
 					// this credential says that the resource trusts the tls connection cert.
@@ -315,23 +318,23 @@ public class AxisClientHeaderHandler extends BasicHandler
 					foundAny = true;
 				}
 
-				/* 
-				 *  possible extra credential 2:
-				 * this credential says that the tls connection cert trusts a pass-through tls
-				 identity, if any. 
-				 this identity is used for matching the original tls session cert who requested the identity
-				 against possible patterns in the ACL; otherwise we can't join groups designated by myproxy CA or other
-				 CA certs. 
-				 
+				/*
+				 * possible extra credential 2: this credential says that the tls connection cert
+				 * trusts a pass-through tls identity, if any. this identity is used for matching
+				 * the original tls session cert who requested the identity against possible
+				 * patterns in the ACL; otherwise we can't join groups designated by myproxy CA or
+				 * other CA certs.
 				 */
 				X509Certificate passThrough =
 					(X509Certificate) callingContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 				if (passThrough != null) {
-					/* verify that this cert matches the last TLS we saw from the client, or we
-					 won't propagate it. */
+					/*
+					 * verify that this cert matches the last TLS we saw from the client, or we
+					 * won't propagate it.
+					 */
 					X509Certificate lastTLS =
 						(X509Certificate) callingContext.getSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
-					if (!passThrough.equals(lastTLS)) {					
+					if (!passThrough.equals(lastTLS)) {
 						_logger.warn("ignoring pass-through credential that doesn't match client's last TLS certificate.");
 					} else {
 						X509Certificate passOn[] = new X509Certificate[1];
@@ -340,14 +343,14 @@ public class AxisClientHeaderHandler extends BasicHandler
 							CredentialCache.getCachedCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain,
 								tlsKey._privateKey, restrictions, RWXCategory.FULL_ACCESS);
 						if (newerTC == null) {
-								_logger.error("failed to create credential for pass-through connection for: " + passOn[0].getSubjectDN());
+							_logger.error("failed to create credential for pass-through connection for: "
+								+ passOn[0].getSubjectDN());
 						} else {
 							walletForResource.getRealCreds().addCredential(newerTC);
 							foundAny = true;
 							if (_logger.isDebugEnabled())
 								_logger.debug("made credential for pass-through connection: " + newerTC);
 						}
-					
 					}
 				}
 			}

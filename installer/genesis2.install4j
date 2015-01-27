@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.12" transformSequenceNumber="4">
-  <directoryPresets config="../scripts/set_gffs_vars" />
+  <directoryPresets config="${compiler:genii.deployment-source}/context.xml" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.bitSize}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -27,8 +27,8 @@
       <variable name="genii.new-deployment" value="currant_urgh" description="" category="" />
       <variable name="genii.publisher" value="the-publisher" description="" category="" />
       <variable name="genii.publisher-url" value="wherethepublisheris.com" description="" category="" />
-      <variable name="genii.deployment-source" value="souffle/gazelle/perseus/this/needstobe/filledin" description="" category="" />
-      <variable name="genii.deployment-context" value="something context xml" description="" category="" />
+      <variable name="genii.deployment-source" value="deployment_base/gffs_eu" description="" category="" />
+      <variable name="genii.deployment-context" value="context.xml" description="" category="" />
       <variable name="genii.deployment-name" value="deployment-name-goes-here" description="" category="" />
       <variable name="genii.user-path" value="/fillin/users" description="" category="" />
       <variable name="genii.generate-certs" value="true" description="" category="" />
@@ -75,6 +75,8 @@
       <mountPoint id="5994" root="5993" location="deployments" mode="755" />
       <mountPoint id="5995" root="5993" location="deployments/default" mode="755" />
       <mountPoint id="7004" root="5993" location="deployments/${compiler:genii.new-deployment}" mode="755" />
+      <mountPoint id="10165" root="5993" location="deployments/${compiler:genii.new-deployment}/configuration" mode="755" />
+      <mountPoint id="10166" root="5993" location="deployments/${compiler:genii.new-deployment}/security" mode="755" />
       <mountPoint id="8168" root="8167" location="lib" mode="755" />
       <mountPoint id="8169" root="8167" location="lib/META-INF" mode="755" />
       <mountPoint id="8740" root="8739" location="" mode="755" />
@@ -380,6 +382,10 @@
       <dirEntry mountPoint="7004" file="${compiler:genii.deployment-source}" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude />
       </dirEntry>
+      <fileEntry mountPoint="7004" file="${compiler:genii.deployment-source}/${compiler:genii.deployment-context}" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="10165" file="${compiler:genii.deployment-source}/configuration/myproxy.properties" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="10165" file="${compiler:genii.deployment-source}/configuration/namespace.properties" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="10166" file="${compiler:genii.deployment-source}/security/trusted.pfx" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="8169" file="../lib/META-INF/mime.types" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <dirEntry mountPoint="8168" file="../lib" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" entryMode="direct" subDirectory="lib" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude>
@@ -3392,6 +3398,11 @@ return memory;</string>
                               <void property="wait">
                                 <boolean>true</boolean>
                               </void>
+                              <void property="workingDirectory">
+                                <object class="java.io.File">
+                                  <string>${installer:sys.installationDir}</string>
+                                </object>
+                              </void>
                             </object>
                           </java>
                         </serializedBean>
@@ -3424,6 +3435,11 @@ return memory;</string>
                               </void>
                               <void property="wait">
                                 <boolean>true</boolean>
+                              </void>
+                              <void property="workingDirectory">
+                                <object class="java.io.File">
+                                  <string>${installer:sys.installationDir}</string>
+                                </object>
                               </void>
                             </object>
                           </java>

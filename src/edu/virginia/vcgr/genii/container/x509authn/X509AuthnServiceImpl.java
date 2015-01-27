@@ -155,6 +155,16 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		return sharedSecurityTokenResponder(this, _resource, request);
 	}
 
+	/**
+	 * preconditions:
+	 * 
+	 * 1) the client has passed us an x509 session certificate that we will delegate to. this is the
+	 * delegatee of the credentials we'll build.
+	 * 
+	 * 2) the client has given us sufficient information to authenticate against the STS here; this
+	 * may be a password or the mere fact that they have a particular TLS cert.
+	 * 
+	 */
 	public static RequestSecurityTokenResponseType[] sharedSecurityTokenResponder(BaseAuthenticationServiceImpl theThis,
 		IRNSResource resource, RequestSecurityTokenType request) throws java.rmi.RemoteException
 	{
@@ -251,11 +261,17 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		ArrayList<RequestSecurityTokenResponseType> responseArray = new ArrayList<RequestSecurityTokenResponseType>();
 
 		try {
-			// add the local token.
+			/*
+			 * do the first authentication against this resource, which should be an STS, and decide
+			 * if the caller has the right to assume that identity.
+			 */
 			RequestSecurityTokenResponseType response = delegateCredential(theThis, resource, delegateToChain, created, expiry);
 			responseArray.add(response);
 
-			// add the listed tokens.
+			/*
+			 * aggregate the group identities or other things we find under the STS by attempting to
+			 * authenticate against each item found.
+			 */
 			if (theThis instanceof BaggageAggregatable) {
 				BaggageAggregatable bagger = (BaggageAggregatable) theThis;
 				responseArray.addAll(bagger.aggregateBaggageTokens(resource, request));
@@ -389,7 +405,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 					newTC.extendTrustChain(wrapped);
 					newTC.signAssertion(privateKey);
 					credential = newTC;
-					
+
 					boolean paranoidChecking = false;
 					if (paranoidChecking) {
 						boolean worked = TrustCredential.paranoidSerializationCheck(newTC);
@@ -397,14 +413,15 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 							_logger.error("failed paranoid serialization check!  see logging in prior lines.");
 						}
 					}
-					
+
 				} else if (credential instanceof X509Identity) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("failure: seeing x509 identity to process from wire: " + credential.toString());
 				}
 
 			} else {
-				// we're not an authentication proxy, so just store our identity.
+				// we're not an authentication proxy, so just store our
+				// identity.
 				IdentityType type = IdentityType.OTHER;
 				// Get Identity type from type name if we can.
 				String typeString = (String) constructionParameters.get(SecurityConstants.NEW_IDP_TYPE_QNAME);
@@ -441,6 +458,9 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 	}
 
+	/** 
+	 * builds the initial credential that the STS trusts the TLS cert that we were told to delegate to.
+	 */
 	public static RequestSecurityTokenResponseType delegateCredential(BaseAuthenticationServiceImpl theThis,
 		IRNSResource resource, X509Certificate[] delegateToChain, Date created, Date expiry) throws AuthZSecurityException,
 		SOAPException, ConfigurationException, RemoteException
@@ -453,7 +473,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		_logger.debug("resource's credential is: " + credential.toString());
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("X509AuthnServiceImpl: authenticating "+ credential.getOriginalAsserter()[0].getSubjectDN() + " to client at " + caller);
+		StatsLogger.logStats("X509AuthnServiceImpl: authenticating " + credential.getOriginalAsserter()[0].getSubjectDN()
+			+ " to client at " + caller);
 		// End logging
 		if (delegateToChain == null) {
 			_logger.debug("delegate to chain was null...  ignoring credential.");
@@ -468,7 +489,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			} catch (IOException e) {
 				throw new AuthZSecurityException(e.getMessage(), e);
 			}
-			
+
 			// to be filled with a valid delegated credential, if possible.
 			TrustCredential newTC = null;
 			if (credential instanceof TrustCredential) {
@@ -526,13 +547,12 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
 
 		SOAPHeaderElement elemConvert = creds.convertToSOAPElement();
-		
+
 		/*
-		 * CAK: this is where the second problem dives into problematic
-		 * conversion process (landing in xerces with DOM error). it turns out we were making an
-		 * extra copy of the message element that was already in axis form. that
-		 * was an undetected waste of cycles previously, but now is a deadly
-		 * namespace error. great fun.
+		 * CAK: this is where the second problem dives into problematic conversion process (landing
+		 * in xerces with DOM error). it turns out we were making an extra copy of the message
+		 * element that was already in axis form. that was an undetected waste of cycles previously,
+		 * but now is a deadly namespace error. great fun.
 		 */
 		MessageElement[] delegations = new MessageElement[] { elemConvert };
 

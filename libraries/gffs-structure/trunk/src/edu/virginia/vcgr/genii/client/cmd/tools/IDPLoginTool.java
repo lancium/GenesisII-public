@@ -61,7 +61,6 @@ import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 
 public class IDPLoginTool extends BaseLoginTool
 {
-
 	static private Log _logger = LogFactory.getLog(IDPLoginTool.class);
 
 	static private final String _DESCRIPTION = "config/tooldocs/description/dIDPLogin";
@@ -158,7 +157,10 @@ public class IDPLoginTool extends BaseLoginTool
 		element.setType(LifetimeType.getTypeDesc().getXmlType());
 		elements.add(element);
 
-		// Add DelegateTo
+		/*
+		 * add the x509 session certificate here that the container should delegate to so we can get
+		 * work done. this is our identity on the network.
+		 */
 		if (delegateeIdentity != null) {
 			try {
 				MessageElement binaryToken = new MessageElement(BinarySecurity.TOKEN_BST);
@@ -184,7 +186,6 @@ public class IDPLoginTool extends BaseLoginTool
 					_logger.debug("added security token reference");
 			} catch (SOAPException e) {
 				throw new ToolException("IDP login error: " + e.getLocalizedMessage(), e);
-
 			}
 		}
 
@@ -214,12 +215,13 @@ public class IDPLoginTool extends BaseLoginTool
 				CredentialWallet tempWallet = new CredentialWallet(retval);
 				TrustCredential firstUser = tempWallet.getFirstUserCredential();
 				if (firstUser != null) {
-					PreferredIdentity newIdentity = new PreferredIdentity(PreferredIdentity.getDnString(firstUser.getOriginalAsserter()[0]), false);
+					PreferredIdentity newIdentity =
+						new PreferredIdentity(PreferredIdentity.getDnString(firstUser.getOriginalAsserter()[0]), false);
 					_logger.debug("setting preferred identity at login time with: " + newIdentity.toString());
 					PreferredIdentity.setInContext(callContext, newIdentity);
-				}				
+				}
 			}
-			
+
 		}
 
 		return retval;
@@ -245,8 +247,10 @@ public class IDPLoginTool extends BaseLoginTool
 
 		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 
-		// we're going to use the WS-TRUST token-issue operation to log in to a security tokens
-		// service.
+		/*
+		 * we're going to use the WS-TRUST token-issue operation to log in to a security tokens
+		 * service.
+		 */
 		KeyAndCertMaterial clientKeyMaterial =
 			ClientUtils.checkAndRenewCredentials(callContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 		RNSPath authnPath =

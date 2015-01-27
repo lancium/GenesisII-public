@@ -299,6 +299,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MyProxyLoginTool</mconf:class>
 		<mconf:class name="xsedeLogin"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.XSEDELoginTool</mconf:class>
+		<mconf:class name="gffseuLogin"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GffsEuLoginTool</mconf:class>
 		<mconf:class name="resolver"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ResolverTool</mconf:class>
 		<mconf:class name="replicate"
