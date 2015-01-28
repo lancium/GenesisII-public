@@ -411,27 +411,14 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					if (_logger.isTraceEnabled())
 						_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
 					try {
-						if (assertion.findDelegateeInChain(callerCertChain[0]) >= 0) {
-							if (_logger.isTraceEnabled())
-								_logger.trace("...found delegatee at position "
-									+ assertion.findDelegateeInChain(callerCertChain[0])
+						int position = assertion.findDelegateeInChain(callerCertChain[0]);
+						if (position >= 0) {
+							if (_logger.isDebugEnabled())
+								_logger.debug("...found delegatee at position "
+									+ ((position == TrustCredential.TO_FIND_WAS_ISSUER) ? "{issuer}" : position)
 									+ " to be the same as incoming tls cert.");
 							match = true;
 							break;
-							/*
-							 * disabled code: we are trying to validate that the credential involves
-							 * the current guy; this would just validate that the credential
-							 * originated on our grid (even if it were copied), which is not
-							 * sufficient.
-							 */
-							// } else if
-							// (CertificateValidatorFactory.getValidator().validateIsTrustedResource(
-							// assertion.getOriginalAsserter()) == true) {
-							// if (_logger.isTraceEnabled())
-							// _logger
-							// .trace("...allowed incoming message using resource trust store for original asserter.");
-							// match = true;
-							// break;
 						} else {
 							if (_logger.isTraceEnabled())
 								_logger.trace("...found them to be different.");
@@ -443,8 +430,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 				if (!match) {
 					String msg =
-						"WARN: credential did not match incoming message sender: '" + assertion.describe(VerbosityLevel.HIGH)
-							+ "'";
+						"WARN: dropping credential which did not match incoming message sender: '"
+							+ assertion.describe(VerbosityLevel.HIGH) + "'";
 					_logger.debug(msg);
 					// skip adding it.
 					continue;

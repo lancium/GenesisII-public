@@ -816,13 +816,26 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		return new HashCodeBuilder(281, 31).append(id).toHashCode();
 	}
 
+
+	// sentinel value returned when findDelegateeInChain sees the certificate as the chain's issuer.
+	static public final int TO_FIND_WAS_ISSUER = 10000;
+
 	/**
 	 * returns the position of the certificate in the list of delegatees in the trust credential. 0
 	 * is the initial delegation. if the certificate is not found as a delegatee, then -1 is
-	 * returned.
+	 * returned. note that this will also return TO_FIND_WAS_ISSUER if the "toFind" certificate is
+	 * the actual issuer of the chain, meaning that the identity sought actually created the chain;
+	 * in this case it is crucial one does not take that returned index seriously, since one cannot
+	 * find it in a valid chain. this is in line with proving that the tls session cert for the
+	 * caller actually signed the message, although we only issue credentials like that in the pass
+	 * through case for authenticating based on the original tls session cert of the caller.
 	 */
 	public int findDelegateeInChain(X509Certificate toFind)
 	{
+		if (getOriginalAsserter()[0].equals(toFind)) {
+			// special case where the identity in question started the whole chain.
+			return TO_FIND_WAS_ISSUER;
+		}
 		int chainLength = this.getDelegationDepth();
 		TrustCredential curr = this;
 		while (curr != null) {
