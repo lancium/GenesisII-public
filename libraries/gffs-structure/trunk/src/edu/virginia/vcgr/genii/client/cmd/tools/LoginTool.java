@@ -225,6 +225,7 @@ public class LoginTool extends BaseLoginTool
 		CacheManager.resetCachingSystem();
 
 		ContextManager.storeCurrentContext(callContext);
+
 		// jumpToUserHomeIfExists(_username);
 		{
 			// Assumption is that user idp's are off /user and homes off /home

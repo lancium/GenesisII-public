@@ -1,11 +1,11 @@
 package edu.virginia.vcgr.genii.ui.plugins.files;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -37,7 +37,7 @@ public class CreateExportPlugin extends AbstractCombinedUIMenusPlugin
 	{
 		String ContainerPath = "/";
 		String TargetPath = "/";
-		Closeable contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+		Closeable assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 		RNSPath path = context.endpointRetriever().getTargetEndpoints().iterator().next();
 		try {
 			EndpointReferenceType epr = path.getEndpoint();
@@ -59,12 +59,8 @@ public class CreateExportPlugin extends AbstractCombinedUIMenusPlugin
 			_logger.error("RNS path not found failure during export plugin operation.", e);
 		} catch (FileLockException e) {
 			_logger.error("File Locked failure during export plugin operation.", e);
-		}
-		try {
-			if (contextToken != null)
-				contextToken.close();
-		} catch (IOException e) {
-			_logger.error("failed to close context after export plugin operation.", e);
+		} finally {
+			StreamUtils.close(assumedContextToken);
 		}
 	}
 

@@ -46,13 +46,11 @@ public class CreateFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
-		Closeable contextToken = null;
+		Closeable assumedContextToken = null;
 
 		while (true) {
-			contextToken = null;
-
 			try {
-				contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+				assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 
 				FSViewCreatorDialog dialog =
 					new FSViewCreatorDialog(SwingUtilities.getWindowAncestor(context.ownerComponent()));
@@ -96,7 +94,7 @@ public class CreateFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 			} catch (Throwable cause) {
 				ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
 			} finally {
-				StreamUtils.close(contextToken);
+				StreamUtils.close(assumedContextToken);
 			}
 		}
 	}

@@ -41,7 +41,8 @@ final public class LoginDialog extends JDialog
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		_tabbedPane.add(new IDPLoginPanel());
+		_tabbedPane.add(new IDPLoginPanel(true,"XSEDE User"));
+		_tabbedPane.add(new IDPLoginPanel(false,"Standard Grid User"));
 		_tabbedPane.add(new KeystoreLoginPanel());
 		_tabbedPane.add(new UsernamePasswordLoginPanel());
 

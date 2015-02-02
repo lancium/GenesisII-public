@@ -100,30 +100,25 @@ public class MyProxyLoginTool extends BaseLoginTool
 	{
 		return Installation.getDeployment(new DeploymentName()).security();
 	}
-
 	
-	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+	/**
+	 * assumes that the username and password have already been set.
+	 */
+	public int doMyproxyLogin(ICallingContext callContext) throws ReloadShellException, ToolException, UserCancelException, RNSException,
 		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
 		ClassNotFoundException, DialogException
-	{
-		// make sure username/password are set
-		aquireUsername();
-		aquirePassword();
-
+	{		
 		String pass = new String(_password);
-		
+
 		Logger jdkLogger = Logger.getLogger(this.getClass().getName());
 		if (jdkLogger == null) {
 			_logger.debug("jdk logger is null; will be a problem for constructing logging facade.");
 		} else {
 			jdkLogger.setUseParentHandlers(false);
 		}
-		
+
 		MyLoggingFacade facade = new MyLoggingFacade(jdkLogger);
-		
 		MyProxyLogon mp = new MyProxyLogon(facade);
-//		MyProxyLogon mp = new MyProxyLogon();
 
 		// Load properties file
 		Properties myProxyProperties = loadMyProxyProperties();
@@ -146,7 +141,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 		mp.setPassphrase(pass);
 
 		/*
-		 * Myproxy trust root can be overridden with either environment variable GLOBUS_LOCATION or X509_CERT_DIR,
+		 * Myproxy trust root can be overriden with either environment variable GLOBUS_LOCATION or X509_CERT_DIR,
 		 * although at our level we are defining the location in the security property file.
 		 */
 		String myProxyDirectory =
@@ -159,7 +154,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 		// Set trust root.
 		System.setProperty("X509_CERT_DIR", trustRoot.getCanonicalPath());
-
+	
 		try {
 			mp.connect();
 		} catch (Exception e) {
@@ -175,11 +170,10 @@ public class MyProxyLoginTool extends BaseLoginTool
 			throw new AuthZSecurityException("myproxy logon process got an exception: " + e.getLocalizedMessage(), e);
 		}
 
-		// get the local identity's key material (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext();
-		if (callContext == null)
-			callContext = new CallingContextImpl(new ContextType());
-
+		/*
+		 * clear any existing credentials because we want to replace our session cert with the
+		 * myproxy cert.
+		 */
 		TransientCredentials.globalLogout(callContext);
 
 		// reset any previous pass-through credential.
@@ -188,12 +182,13 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 		X509Certificate[] keyMat = new X509Certificate[1];
 		keyMat[0] = mp.getCertificate();
-		
+
 		String msg =
 			"Replacing client tool identity with MyProxy credentials for \"" + keyMat[0].getSubjectDN().getName() + "\".";
 		stdout.println(msg);
 		_logger.info(msg);
 
+		// store the new myproxy session cert.
 		KeyAndCertMaterial clientKeyMaterial = new KeyAndCertMaterial(keyMat, mp.getPrivateKey());
 		callContext.setActiveKeyAndCertMaterial(clientKeyMaterial);
 		
@@ -202,20 +197,37 @@ public class MyProxyLoginTool extends BaseLoginTool
 		if (_logger.isDebugEnabled())
 			_logger.debug("issuer for the new cert is: " + keyMat[0].getIssuerDN());
 		if (_logger.isTraceEnabled())
-			_logger.trace("adding myproxy TLS cert: " + keyMat[0]);
-
+			_logger.trace("adding myproxy TLS cert: " + keyMat[0]);		
+		
 		// handle establishing a preferred identity, if that's not set as fixated.
 		if (!PreferredIdentity.fixatedInCurrent()) {
 			// the identity wasn't fixated, or it doesn't exist, so we can set preferred identity here.
 			PreferredIdentity newIdentity = new PreferredIdentity(PreferredIdentity.getDnString(keyMat[0]), false);
 			PreferredIdentity.setInContext(callContext, newIdentity);
 			_logger.debug("preferred identity set in myproxy login: " + newIdentity.toString());
-		}
-				
+		}				
+		
 		// update the saved context before we leave.
 		ContextManager.storeCurrentContext(callContext);
-
 		return 0;
+	}
+	
+	@Override
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
+		ClassNotFoundException, DialogException
+	{
+		// make sure username/password are set
+		aquireUsername();
+		aquirePassword();
+
+		ICallingContext callContext = ContextManager.getCurrentContext();
+		if (callContext == null)
+			callContext = new CallingContextImpl(new ContextType());
+
+		int toReturn = doMyproxyLogin(callContext);
+
+		return toReturn;
 	}
 
 	static private Properties loadMyProxyProperties()

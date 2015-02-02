@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -35,15 +36,15 @@ public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 	{
 		String ContainerPath = "DEFAULT";
 		String TargetPath = "/";
-		// hmmm: contextToken is unused; should the context be reset after this call?
-		Closeable contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
-		RNSPath path = context.endpointRetriever().getTargetEndpoints().iterator().next();
+		Closeable assumedContextToken = null;
 		try {
-			EndpointReferenceType epr = path.getEndpoint();
+			assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+			RNSPath path = context.endpointRetriever().getTargetEndpoints().iterator().next();
+				EndpointReferenceType epr = path.getEndpoint();
+				
 			EndpointDescription ep = new EndpointDescription(epr);
 			TypeInformation tp = ep.typeInformation();
-			// First determine if we were called on a container, if not then
-			// it must be on an RNS
+			// First determine if we were called on a container, if not then it must be on an RNS.
 			if (tp.isContainer()) {
 				ContainerPath = path.toString();
 			} else {
@@ -59,10 +60,8 @@ public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 			e.printStackTrace();
 		} catch (FileLockException e) {
 			_logger.error("caught unexpected exception", e);
-		}
-
-		if (contextToken == null) {
-			// do nothing to quiet down the warning.
+		} finally {
+			StreamUtils.close(assumedContextToken);
 		}
 	}
 

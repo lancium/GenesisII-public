@@ -192,6 +192,10 @@ public class GeniiPath implements Serializable
 		// ASG September 28, 2013. The code only checked for '/', not '\' as we see in Windows
 		if (slash_posn < 0) // there was no '/'
 			slash_posn = basename.lastIndexOf('\\');
+/*hmmm: we actually just want to turn backslash into forward slash to avoid
+needing to compare everywhere in the code.  what about any GeniiPath creation / returning method
+does the replacement to be sure we never see it.  path() method could also validate this.
+*/
 		if (slash_posn >= 0)
 			basename = basename.substring(slash_posn + 1);
 		return basename;

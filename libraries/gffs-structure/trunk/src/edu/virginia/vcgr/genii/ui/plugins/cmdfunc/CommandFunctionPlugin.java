@@ -26,12 +26,11 @@ public class CommandFunctionPlugin extends AbstractCombinedUIMenusPlugin
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
-		Closeable contextToken = null;
+		Closeable assumedContextToken = null;
 		OutputStream out = null;
 
 		try {
-
-			contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+			assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 
 			Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 			RNSPath path = paths.iterator().next();
@@ -71,8 +70,8 @@ public class CommandFunctionPlugin extends AbstractCombinedUIMenusPlugin
 		} catch (Throwable cause) {
 			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
 		} finally {
+			StreamUtils.close(assumedContextToken);
 			StreamUtils.close(out);
-			StreamUtils.close(contextToken);
 		}
 	}
 

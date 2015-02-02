@@ -658,12 +658,14 @@ public class CommandField extends JTextField
 		private void finishCommand()
 		{
 			LoggingContext.assumeLoggingContext(context);
-			Closeable token = null;
+			Closeable assumedContextToken = null;
 
 			try {
-				token = ContextManager.temporarilyAssumeContext(_uiContext.callingContext());
-				// CAK: disabled due to complaint from andrew
+				assumedContextToken = ContextManager.temporarilyAssumeContext(_uiContext.callingContext());
+				
+				// CAK: disabled logging due to complaint from andrew
 				// _display.output().println("\nLog ID is " + DLogUtils.getRPCID());
+				
 				_logger.info("Log ID is " + DLogUtils.getRPCID());
 				_label.setText(UserPreferences.preferences().shellPrompt().toString());
 				_reader = null;
@@ -672,7 +674,7 @@ public class CommandField extends JTextField
 				_executing = false;
 
 			} finally {
-				StreamUtils.close(token);
+				StreamUtils.close(assumedContextToken);
 			}
 		}
 

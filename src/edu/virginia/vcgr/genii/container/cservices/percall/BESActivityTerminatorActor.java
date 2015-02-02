@@ -72,10 +72,10 @@ public class BESActivityTerminatorActor implements OutcallActor
 		if (_logger.isDebugEnabled())
 			_logger.debug("Persistent Outcall Actor attempting to kill a bes activity.");
 
-		Closeable token = null;
+		Closeable assumedContextToken = null;
 
 		try {
-			token = ContextManager.temporarilyAssumeContext(callingContext);
+			assumedContextToken = ContextManager.temporarilyAssumeContext(callingContext);
 
 			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, _activityEPR, callingContext);
 
@@ -134,7 +134,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 			_logger.warn("Tried to kill activity, but didn't get right number of response values back.");
 			return false;
 		} finally {
-			StreamUtils.close(token);
+			StreamUtils.close(assumedContextToken);
 		}
 	}
 

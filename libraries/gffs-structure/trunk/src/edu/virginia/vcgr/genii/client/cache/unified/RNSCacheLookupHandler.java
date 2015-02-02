@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.LookupResponseType;
 import org.ggf.rns.RNSEntryResponseType;
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
@@ -299,23 +300,23 @@ public class RNSCacheLookupHandler
 		@Override
 		public void run()
 		{
-
-			// Every cache management related thread that load or store information from the Cache
-			// should have
-			// unaccounted access to both CachedManager and RPCs to avoid getting mingled with Cache
-			// access and
-			// RPCs initiated by some user action. This is important to provide accurate statistics
-			// on per container
-			// resource usage.
+			/*
+			 * Every cache management related thread that load or store information from the Cache
+			 * should have unaccounted access to both CachedManager and RPCs to avoid getting
+			 * mingled with Cache access and RPCs initiated by some user action. This is important
+			 * to provide accurate statistics on per container resource usage.
+			 */
 			ResourceAccessMonitor.getUnaccountedAccessRight();
 
+			Closeable assumedContextToken = null;
 			try {
-				Closeable assumedContext = ContextManager.temporarilyAssumeContext(callingContext);
+				assumedContextToken = ContextManager.temporarilyAssumeContext(callingContext);
 				EnhancedRNSPortType portType = ClientUtils.createProxy(EnhancedRNSPortType.class, endpoint);
 				portType.getResourceProperty(RNSConstants.ELEMENT_COUNT_QNAME);
-				assumedContext.close();
 			} catch (Exception ex) {
 				// ignore
+			} finally {
+				StreamUtils.close(assumedContextToken);
 			}
 		}
 	}

@@ -413,7 +413,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					try {
 						int position = assertion.findDelegateeInChain(callerCertChain[0]);
 						if (position >= 0) {
-							if (_logger.isDebugEnabled())
+							if (_logger.isTraceEnabled())
 								_logger.debug("...found delegatee at position "
 									+ ((position == TrustCredential.TO_FIND_WAS_ISSUER) ? "{issuer}" : position)
 									+ " to be the same as incoming tls cert.");

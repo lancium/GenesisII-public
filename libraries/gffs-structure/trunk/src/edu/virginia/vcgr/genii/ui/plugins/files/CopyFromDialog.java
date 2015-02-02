@@ -59,10 +59,9 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 			return;
 		if (_logger.isDebugEnabled())
 			_logger.debug("CopyFromDialog performMenuAction called.");
-		Closeable contextToken = null;
-		contextToken = null;
+		Closeable assumedContextToken = null;
 		try {
-			contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+			assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 
 			_fileDialog.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			int retPick = _fileDialog.showOpenDialog(context.ownerComponent());
@@ -78,7 +77,7 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 		} catch (Throwable cause) {
 			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
 		} finally {
-			StreamUtils.close(contextToken);
+			StreamUtils.close(assumedContextToken);
 		}
 	}
 

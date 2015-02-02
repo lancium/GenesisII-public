@@ -518,12 +518,12 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		@Override
 		public void emitSweepInstance(JobDefinition jobDefinition) throws SweepException
 		{
-			Closeable token = null;
+			Closeable assumedContextToken = null;
 
 			try {
 				LoggingContext.assumeLoggingContext(_context);
 				WorkingContext.setCurrentWorkingContext(_workingContext);
-				token = ContextManager.temporarilyAssumeContext(_callingContext);
+				assumedContextToken = ContextManager.temporarilyAssumeContext(_callingContext);
 				synchronized (_tickets) {
 					_tickets.add(_queueManager.submitJob(_prioroity, JSDLUtils.convert(jobDefinition)));
 					_tickets.notifyAll();
@@ -539,7 +539,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			} catch (IOException e) {
 				throw new SweepException("Unable to submit job.", e);
 			} finally {
-				StreamUtils.close(token);
+				StreamUtils.close(assumedContextToken);
 				WorkingContext.setCurrentWorkingContext(null);
 			}
 		}

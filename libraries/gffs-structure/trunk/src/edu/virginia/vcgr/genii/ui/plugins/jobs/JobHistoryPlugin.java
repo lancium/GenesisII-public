@@ -37,10 +37,10 @@ public class JobHistoryPlugin extends AbstractCombinedUIMenusPlugin
 	{
 		Collection<HistoryEvent> events = null;
 		InputStream in = null;
-		Closeable token = null;
+		Closeable assumedContextToken = null;
 
 		try {
-			token = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+			assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 
 			Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 			if (paths != null && paths.size() == 1) {
@@ -69,8 +69,8 @@ public class JobHistoryPlugin extends AbstractCombinedUIMenusPlugin
 
 			return events;
 		} finally {
+			StreamUtils.close(assumedContextToken);
 			StreamUtils.close(in);
-			StreamUtils.close(token);
 		}
 	}
 

@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
@@ -100,12 +101,13 @@ class SubscriptionOutcallHandler extends Thread
 
 	private void createSubscription(PendingSubscription subscriptionRequest)
 	{
+		Closeable assumedContextToken = null;
 		try {
 			EndpointReferenceType newsSource = subscriptionRequest.getNewsSource();
 
 			if (!SubscriptionDirectory.isResourceAlreadySubscribed(newsSource)) {
 
-				Closeable assumedContext = ContextManager.temporarilyAssumeContext(callingContext);
+				assumedContextToken = ContextManager.temporarilyAssumeContext(callingContext);
 
 				NotificationBrokerWrapper brokerWrapper =
 					NotificationBrokerDirectory.getNotificationBrokerForEndpoint(newsSource, localEndpoint);
@@ -127,8 +129,6 @@ class SubscriptionOutcallHandler extends Thread
 
 				Date subscriptionExpiryTime = new Date(System.currentTimeMillis() + subscriptionDuration);
 				SubscriptionDirectory.notifySubscriptionCreation(newsSource, subscriptionExpiryTime, response);
-
-				assumedContext.close();
 			}
 		} catch (SubscriptionFailedFaultType e) {
 			String name = "null";
@@ -139,6 +139,8 @@ class SubscriptionOutcallHandler extends Thread
 		} catch (Exception e) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("indirect subscription request was denied.");
+		} finally {
+			StreamUtils.close(assumedContextToken);
 		}
 	}
 

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,8 +17,11 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.cmd.ITool;
+import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
@@ -32,9 +37,6 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
-import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
-import edu.virginia.vcgr.genii.client.dialog.DialogException;
-import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 
 public abstract class BaseGridTool implements ITool
@@ -145,14 +147,23 @@ public abstract class BaseGridTool implements ITool
 	{
 		_lastExit = newExitValue;
 	}
-
+	
+	public void establishStandardIO(Writer out, Writer err, Reader in)
+	{
+		if (out == null) out = new PrintWriter(new StringWriter());
+		if (err == null) err = new PrintWriter(new StringWriter());
+		if (in == null) in = new BufferedReader(new StringReader(""));
+		
+		stdout = (out instanceof PrintWriter) ? (PrintWriter) out : new PrintWriter(out, true);
+		stderr = (err instanceof PrintWriter) ? (PrintWriter) err : new PrintWriter(err, true);
+		stdin = (in instanceof BufferedReader) ? (BufferedReader) in : new BufferedReader(in);
+	}
+	
 	@Override
 	public final int run(Writer out, Writer err, Reader in) throws ReloadShellException, ToolException
 	{
 		try {
-			stdout = (out instanceof PrintWriter) ? (PrintWriter) out : new PrintWriter(out, true);
-			stderr = (err instanceof PrintWriter) ? (PrintWriter) err : new PrintWriter(err, true);
-			stdin = (in instanceof BufferedReader) ? (BufferedReader) in : new BufferedReader(in);
+			establishStandardIO(out, err, in);
 			// check the parameters first.
 			verify();
 			// set the last exit value based on actual return value.

@@ -380,10 +380,10 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 	 * it for us.
 	 */
 	{
-		Closeable contextToken = null;
+		Closeable assumedContextToken = null;
 
 		try {
-			ContextManager.temporarilyAssumeContext(context.callingContext());
+			assumedContextToken = ContextManager.temporarilyAssumeContext(context.callingContext());
 			ProgressMonitorFactory factory = context.progressMonitorFactory();
 
 			/*
@@ -402,7 +402,7 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 		} catch (Throwable cause) {
 			ErrorHandler.handleError(context, ownerComponent, cause);
 		} finally {
-			StreamUtils.close(contextToken);
+			StreamUtils.close(assumedContextToken);
 		}
 	}
 

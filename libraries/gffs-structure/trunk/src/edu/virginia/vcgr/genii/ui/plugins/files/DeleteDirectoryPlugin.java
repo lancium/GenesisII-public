@@ -31,15 +31,15 @@ public class DeleteDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
-		Closeable contextToken = null;
 		if (context == null)
 			return;
+		Closeable assumedContextToken = null;
 		if (_logger.isDebugEnabled())
 			_logger.debug("DeleteDirectoryPlugin performMenuAction called.");
 		while (true) {
-			contextToken = null;
 			try {
-				contextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+				assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+				
 				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 
 				RNSPath path = paths.iterator().next();
@@ -66,7 +66,7 @@ public class DeleteDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 			} catch (Throwable cause) {
 				ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
 			} finally {
-				StreamUtils.close(contextToken);
+				StreamUtils.close(assumedContextToken);
 			}
 		}
 	}

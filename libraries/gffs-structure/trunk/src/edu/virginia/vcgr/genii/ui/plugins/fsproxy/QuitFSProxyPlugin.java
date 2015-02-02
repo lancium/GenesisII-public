@@ -26,10 +26,10 @@ public class QuitFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
 		Collection<RNSPath> targets = context.endpointRetriever().getTargetEndpoints();
-		Closeable token = null;
+		Closeable assumedContextToken = null;
 
 		try {
-			token = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
+			assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 
 			for (RNSPath target : targets) {
 				try {
@@ -50,7 +50,7 @@ public class QuitFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 
 			context.endpointRetriever().refreshParent();
 		} finally {
-			StreamUtils.close(token);
+			StreamUtils.close(assumedContextToken);
 		}
 	}
 

@@ -184,7 +184,7 @@ public class ClientUtils
 			} else {
 				// We're in the client role, meaning we can generate our own new client identity.
 
-				_logger.debug("Renewing client tool identity until " + validUntil);
+				_logger.info("Renewing client tool identity until " + validUntil);
 				/*
 				 * old rule: We create an identity for either 24 hours, or until the valid duration
 				 * expires (which ever is longer) + 10 seconds of slop for in transit time outs.

@@ -26,13 +26,12 @@ public abstract class AbstractContextSwitchingTask<ResultType> extends AbstractT
 	@Override
 	final public ResultType execute(TaskProgressListener progressListener) throws Exception
 	{
-		Closeable token = null;
-
+		Closeable assumedContextToken = null;
 		try {
-			token = ContextManager.temporarilyAssumeContext(_context.callingContext());
+			assumedContextToken = ContextManager.temporarilyAssumeContext(_context.callingContext());
 			return executeInsideContext(progressListener);
 		} finally {
-			StreamUtils.close(token);
+			StreamUtils.close(assumedContextToken);
 		}
 	}
 }
