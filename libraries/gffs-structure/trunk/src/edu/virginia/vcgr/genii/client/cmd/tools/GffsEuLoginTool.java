@@ -83,11 +83,14 @@ public class GffsEuLoginTool extends BaseLoginTool
 		BaseLoginTool.copyCreds(mpTool, lTool);
 		retVal = lTool.run(stdout, stderr, stdin);
 
-		// reset any pass-through credential that had been established during login, since it's no
-		// longer needed.
+//hmmm: this seems to be the crucial fix for the grid shell logging in to work and be kept in context.
+		// reload current context.
+		callContext = ContextManager.getCurrentContext();
+
+		// reset any pass-through credential that had been established during login, since it's no longer needed.
 		callContext.removeProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 		ContextManager.storeCurrentContext(callContext);
-
+		
 		// drop any notification brokers or other cached info after credential change.
 		CacheManager.resetCachingSystem();
 
