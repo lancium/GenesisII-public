@@ -142,8 +142,8 @@ final class IDPLoginPanel extends LoginPanel
 
 					lt.doMyproxyLogin(context);
 
-					// System.out.println("before reloading have cert: " +
-					// clientKeyMaterial._clientCertChain[0].getSubjectDN());
+					if (_logger.isDebugEnabled())
+						_logger.debug("before reloading have cert: " + clientKeyMaterial._clientCertChain[0].getSubjectDN());
 
 					// reload the key material after myproxy changes it.
 					clientKeyMaterial =
@@ -160,8 +160,8 @@ final class IDPLoginPanel extends LoginPanel
 
 				EndpointReferenceType epr = path.getEndpoint();
 
-				// System.out.println("about to do idplogin with cert: " +
-				// clientKeyMaterial._clientCertChain[0].getSubjectDN());
+				if (_logger.isDebugEnabled())
+					_logger.debug("about to do idplogin with cert: " + clientKeyMaterial._clientCertChain[0].getSubjectDN());
 
 				// Do IDP login
 				ArrayList<NuCredential> creds =
