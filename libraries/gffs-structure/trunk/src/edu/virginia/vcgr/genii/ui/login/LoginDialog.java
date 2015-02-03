@@ -45,9 +45,12 @@ final public class LoginDialog extends JDialog
 		//hmmm: change ordering based on grid!
 		//hmmm: or better yet, reduce back to one login dialog.
 		
-		_tabbedPane.add(new IDPLoginPanel(ProxyTypes.NO_PROXY, "Standard Grid User"));
-		_tabbedPane.add(new IDPLoginPanel(ProxyTypes.XSEDE_MYPROXY, "XSEDE User"));
 		_tabbedPane.add(new IDPLoginPanel(ProxyTypes.LRZ_MYPROXY, "GFFS.EU User"));
+
+		_tabbedPane.add(new IDPLoginPanel(ProxyTypes.NO_PROXY, "Standard Grid User"));
+
+		_tabbedPane.add(new IDPLoginPanel(ProxyTypes.XSEDE_MYPROXY, "XSEDE User"));
+		
 		_tabbedPane.add(new KeystoreLoginPanel());
 		_tabbedPane.add(new UsernamePasswordLoginPanel());
 
