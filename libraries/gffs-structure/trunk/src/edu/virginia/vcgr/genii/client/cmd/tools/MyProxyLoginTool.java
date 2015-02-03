@@ -55,7 +55,6 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 	private String _host = null;
 	private Integer _port = 0;
-	private Boolean _myProxyHost = false;
 
 	protected MyProxyLoginTool(String description, String usage, boolean isHidden)
 	{
@@ -69,10 +68,9 @@ public class MyProxyLoginTool extends BaseLoginTool
 	}
 
 	@Option({ "host", "h" })
-	public void setName(String host)
+	public void setHost(String host)
 	{
 		_host = host;
-		_myProxyHost = true;
 	}
 
 	@Option({ "port", "p" })
@@ -120,20 +118,20 @@ public class MyProxyLoginTool extends BaseLoginTool
 		MyLoggingFacade facade = new MyLoggingFacade(jdkLogger);
 		MyProxyLogon mp = new MyProxyLogon(facade);
 
-		// Load properties file
 		Properties myProxyProperties = loadMyProxyProperties();
-
-		int port = Integer.parseInt(myProxyProperties.getProperty(MYPROXY_PORT_PROP));
-
-		String host = myProxyProperties.getProperty(MYPROXY_HOST_PROP);
-
 		int lifetime = Integer.parseInt(myProxyProperties.getProperty(MYPROXY_LIFETIME_PROP));
-
-		mp.setPort(port);
-		mp.setHost(host);
-		if (_myProxyHost && (_port != 0)) {
+		
+		if ((_host != null) && (_port != 0)) {			
 			mp.setPort(_port);
 			mp.setHost(_host);
+			_logger.debug("plugging in chosen parameters for host and port: host=" + _host + " port=" + _port);
+		} else {
+			// Load values from properties file
+			int port = Integer.parseInt(myProxyProperties.getProperty(MYPROXY_PORT_PROP));
+			String host = myProxyProperties.getProperty(MYPROXY_HOST_PROP);
+
+			mp.setPort(port);
+			mp.setHost(host);			
 		}
 
 		mp.setLifetime(lifetime);
@@ -154,7 +152,10 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 		// Set trust root.
 		System.setProperty("X509_CERT_DIR", trustRoot.getCanonicalPath());
-	
+
+		if (_logger.isDebugEnabled())
+			_logger.debug("myproxy login using host " + mp.getHost() + " and port " + mp.getPort());
+		
 		try {
 			mp.connect();
 		} catch (Exception e) {
