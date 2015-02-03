@@ -13,6 +13,8 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -39,6 +41,7 @@ import edu.virginia.vcgr.genii.ui.UIContext;
 final class IDPLoginPanel extends LoginPanel
 {
 	static final long serialVersionUID = 0L;
+	static private Log _logger = LogFactory.getLog(IDPLoginPanel.class);
 
 	// the kinds of proxies we know about.
 	public enum ProxyTypes {
@@ -101,9 +104,21 @@ final class IDPLoginPanel extends LoginPanel
 			ICallingContext context = uiContext.callingContext();
 			assumedContextToken = ContextManager.temporarilyAssumeContext(context);
 
-			RNSPath path = context.getCurrentPath().lookup(_rnsPath.getText(), RNSPathQueryFlags.DONT_CARE);
+			//hmmm: these are hard-coded paths here for xsede and gffs.eu!  this needs to be fixed, and probably just use the normal path picker.
+			
+			String stsLocation = _rnsPath.getText();
+			
+			// patch the paths to be the expected locations for xsede or gffs.eu.
+			if (_type == ProxyTypes.LRZ_MYPROXY) {
+				stsLocation = "/users/gffs.eu/lrz.de/" + _username.getText();
+			}
+			if (_type == ProxyTypes.XSEDE_MYPROXY) {
+				stsLocation = "/users/xsede.org/" + _username.getText();
+			}
+			
+			RNSPath path = context.getCurrentPath().lookup(stsLocation, RNSPathQueryFlags.DONT_CARE);
 			if (!path.exists()) {
-				JOptionPane.showMessageDialog(this, "No such user: grid path doesn't exist!", "Unknown User Path",
+				JOptionPane.showMessageDialog(this, "No such user: grid path doesn't exist!  (" + stsLocation + ")", "Unknown User Path",
 					JOptionPane.ERROR_MESSAGE);
 				return null;
 			}
