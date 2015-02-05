@@ -38,10 +38,7 @@ build-rpms: package-code
 		genesis2.spec.in >$(RPMBUILD_TOPDIR)/SPECS/genesis2.spec
 	$(RPMBUILD) --sign --define '_topdir $(RPMBUILD_TOPDIR)' --buildroot $(RPMBUILD_TOPDIR)/BUILDROOT -ba $(RPMBUILD_TOPDIR)/SPECS/genesis2.spec
 	cp $(RPMBUILD_TOPDIR)/RPMS/*/* $(RPMBUILD_TOPDIR)/SRPMS/* $(HOME)/installer_products
-	pushd $(HOME)/installer_products &>/dev/null
-	rm -f md5sums
-	md5sum * >$(HOME)/installer_products/md5sums
-	popd &>/dev/null
+	bash md5sum_generator.sh
 	rm -rf $(RPMBUILD_TOPDIR)
 
 # some ugly extra steps since the packager doesn't make a sub-dir inside tar file.
