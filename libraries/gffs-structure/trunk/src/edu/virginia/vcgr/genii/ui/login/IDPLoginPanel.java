@@ -2,10 +2,13 @@ package edu.virginia.vcgr.genii.ui.login;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -43,56 +46,102 @@ final class IDPLoginPanel extends LoginPanel
 	static final long serialVersionUID = 0L;
 	static private Log _logger = LogFactory.getLog(IDPLoginPanel.class);
 
-	// the kinds of proxies we know about.
-	public enum ProxyTypes {
-		NO_PROXY,
-		XSEDE_MYPROXY,
-		LRZ_MYPROXY
-	}
-
+	final public String DEFAULT_LRZ_USER_PATH = "/users/gffs.eu/lrz.de";
+	final public String DEFAULT_MYPROXY_USER_PATH = "/users/xsede.org";
+	
+	private String _currentStsPath = ""; 
 	private JTextField _username = new JTextField(16);
 	private JTextField _rnsPath = new JTextField(64);
 	private JPasswordField _password = new JPasswordField(16);
 	private ProxyTypes _type = ProxyTypes.NO_PROXY;
+	private JComboBox<String> _comboBox = new JComboBox<String>(ProxyTypes.getAllValues());
 
 	private String _proxyPort = null;
 	private String _proxyHost = null;
 
 	NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
+	
+	// the kinds of proxies we know about.
+	public enum ProxyTypes {
+		NO_PROXY("No Proxy"),
+		XSEDE_MYPROXY("XSEDE MyProxy"),
+		LRZ_MYPROXY("LRZ MyProxy");
+		
+		String _value = null;
+		
+		ProxyTypes(String value) {
+			_value = value;
+		}
+		
+		public String getValue() {
+			return _value;
+		}
+		
+		public static ProxyTypes parseString(String typeName)
+		{
+			if (NO_PROXY._value.equals(typeName)) {
+				return NO_PROXY;
+			} else if (XSEDE_MYPROXY._value.equals(typeName)) {
+				return XSEDE_MYPROXY;				
+			} else if (LRZ_MYPROXY._value.equals(typeName)) {
+				return LRZ_MYPROXY;
+			}
+			return null;
+		}
+		
+		public static String[] getAllValues() {
+			String [] toReturn = new String[3];
+			toReturn[0] = NO_PROXY.getValue();
+			toReturn[1] = XSEDE_MYPROXY.getValue();
+			toReturn[2] = LRZ_MYPROXY.getValue();
+			return toReturn;
+		}
+	}
 
-	IDPLoginPanel(ProxyTypes proxyType, String Title)
+	IDPLoginPanel(String Title)
 	{
 		// If xsede is true we are logging in an XSEDE user and we need to myproxy login first, AND
 		// we do not let them set the directory path
 		// setName("Standard Grid User");
 		setName(Title);
-		_type = proxyType;
 
 		_username.addCaretListener(new InternalCaretListener());
-		add(new JLabel("Username"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_username, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
-			new Insets(5, 5, 5, 5), 5, 5));
-		add(new JLabel("Password"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_password, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
-			new Insets(5, 5, 5, 5), 5, 5));
-		if ((_type != ProxyTypes.XSEDE_MYPROXY) && (_type != ProxyTypes.LRZ_MYPROXY)) {
-			add(new JLabel("Grid Path"), new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-			add(_rnsPath, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5), 5, 5));
-		}
+		
+		// add the drop down box with the types of proxies in it.
 
-		// set up the appropriate myproxy parameters.
-		if (_type == ProxyTypes.XSEDE_MYPROXY) {
-			_proxyPort = "7512";
-			_proxyHost = "myproxy.xsede.org";
-		}
-		if (_type == ProxyTypes.LRZ_MYPROXY) {
-			_proxyPort = "7512";
-			_proxyHost = "myproxy.lrz.de";
-		}
+		add(new JLabel("Proxy Setting"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(_comboBox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+
+		//hmmm: need to set based on grid!
+		_type = ProxyTypes.NO_PROXY;
+		setupAccordingToType(_type);
+		_comboBox.setSelectedIndex(0);
+		
+		// hmmm: also need to record the type in user prefs!!!
+		
+		_comboBox.addActionListener(new InternalActionListener());		
+		
+		add(new JLabel("Username"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(_username, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
+		add(new JLabel("Password"), new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(_password, new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
+		
+//		if ((_type != ProxyTypes.XSEDE_MYPROXY) && (_type != ProxyTypes.LRZ_MYPROXY)) {
+			add(new JLabel("Grid Path"), new GridBagConstraints(0, 3, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST,
+				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+			add(_rnsPath, new GridBagConstraints(1, 3, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+				new Insets(5, 5, 5, 5), 5, 5));
+//		}
+			
+			
+			
+			
 	}
 
 	@Override
@@ -109,10 +158,10 @@ final class IDPLoginPanel extends LoginPanel
 			String stsLocation = _rnsPath.getText();
 			
 			// patch the paths to be the expected locations for xsede or gffs.eu.
-			if (_type == ProxyTypes.LRZ_MYPROXY) {
+			if (_type.equals(ProxyTypes.LRZ_MYPROXY) ) {
 				stsLocation = "/users/gffs.eu/lrz.de/" + _username.getText();
 			}
-			if (_type == ProxyTypes.XSEDE_MYPROXY) {
+			if (_type.equals(ProxyTypes.XSEDE_MYPROXY) ) {
 				stsLocation = "/users/xsede.org/" + _username.getText();
 			}
 			
@@ -204,7 +253,49 @@ final class IDPLoginPanel extends LoginPanel
 		@Override
 		final public void caretUpdate(CaretEvent e)
 		{
-			_rnsPath.setText(nsd.getUsersDirectory() + "/" + _username.getText());
+			_rnsPath.setText(_currentStsPath + "/" + _username.getText());
 		}
+	}
+	
+	public void setupAccordingToType(ProxyTypes newType)
+	{
+		if (newType != null) {
+			// patch the paths to be the expected locations for xsede or gffs.eu.
+			_type = newType;
+			if (newType.equals(ProxyTypes.LRZ_MYPROXY) ) {
+				_currentStsPath = DEFAULT_LRZ_USER_PATH;
+				_proxyPort = "7512";
+				_proxyHost = "myproxy.lrz.de";
+			} else if (newType.equals(ProxyTypes.XSEDE_MYPROXY) ) {
+				_currentStsPath = DEFAULT_MYPROXY_USER_PATH;
+				_proxyPort = "7512";
+				_proxyHost = "myproxy.xsede.org";
+			} else if (newType.equals(ProxyTypes.NO_PROXY)) {
+				_currentStsPath = nsd.getUsersDirectory();
+				_proxyPort = null;
+				_proxyHost = null;
+			}
+		}
+		if (_currentStsPath != null) {
+			String user = _username.getText();
+			if (user == null)
+				user = "";
+			_rnsPath.setText(_currentStsPath + "/" + _username.getText());
+		}
+	}
+	
+	private class InternalActionListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			@SuppressWarnings("unchecked")
+			JComboBox<String> cb = (JComboBox<String>)e.getSource();
+	        String proxy = (String)cb.getSelectedItem();
+	        //updateLabel(proxy);
+			
+			ProxyTypes newType = ProxyTypes.parseString(proxy);
+			setupAccordingToType(newType);
+		}		
 	}
 }

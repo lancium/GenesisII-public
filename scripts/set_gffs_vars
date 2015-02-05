@@ -4,6 +4,8 @@
 
 export GENII_INSTALL_DIR="${installer:sys.installationDir}"
 
+export PATH=$PATH:$GENII_INSTALL_DIR
+
 if [ "${TERM}" != "dumb" -a -z "$PBS_ENVIRONMENT" ]; then
   source $GENII_INSTALL_DIR/xsede_tools/prepare_tools.sh $GENII_INSTALL_DIR/xsede_tools/prepare_tools.sh 
 fi

@@ -20,7 +20,6 @@ import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
-import edu.virginia.vcgr.genii.ui.login.IDPLoginPanel.ProxyTypes;
 
 final public class LoginDialog extends JDialog
 {
@@ -42,14 +41,7 @@ final public class LoginDialog extends JDialog
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		//hmmm: change ordering based on grid!
-		//hmmm: or better yet, reduce back to one login dialog.
-		
-		_tabbedPane.add(new IDPLoginPanel(ProxyTypes.LRZ_MYPROXY, "GFFS.EU User"));
-
-		_tabbedPane.add(new IDPLoginPanel(ProxyTypes.NO_PROXY, "Standard Grid User"));
-
-		_tabbedPane.add(new IDPLoginPanel(ProxyTypes.XSEDE_MYPROXY, "XSEDE User"));
+		_tabbedPane.add(new IDPLoginPanel("Grid User"));
 		
 		_tabbedPane.add(new KeystoreLoginPanel());
 		_tabbedPane.add(new UsernamePasswordLoginPanel());

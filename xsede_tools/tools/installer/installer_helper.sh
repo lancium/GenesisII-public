@@ -105,8 +105,10 @@ function fix_endings()
 # verify the installers.
 function generate_md5sums()
 {
-  rm -f $OUTPUT_DIRECTORY/md5sums
-  md5sum $OUTPUT_DIRECTORY/* >$OUTPUT_DIRECTORY/md5sums
+  rm -f "$OUTPUT_DIRECTORY"/md5sums
+  pushd "$OUTPUT_DIRECTORY" &>/dev/null
+  md5sum * >md5sums
+  popd &>/dev/null
 }
 
 
