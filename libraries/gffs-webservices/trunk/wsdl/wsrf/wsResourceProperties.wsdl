@@ -231,13 +231,17 @@ This document and the information contained herein is provided on an "AS IS" bas
   <wsdl:portType name="GetResourcePropertyDocument">
     <wsdl:operation name="GetResourcePropertyDocument">
       <wsdl:input name="GetResourcePropertyDocumentRequest"
-               message="wsrf-rpw:GetResourcePropertyDocumentRequest"/>
+               message="wsrf-rpw:GetResourcePropertyDocumentRequest"
+               wsa:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourcePropertyDocument/GetResourcePropertyDocumentRequest"/>
       <wsdl:output name="GetResourcePropertyDocumentResponse"
-               message="wsrf-rpw:GetResourcePropertyDocumentResponse"/>
+               message="wsrf-rpw:GetResourcePropertyDocumentResponse"
+               wsa:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourcePropertyDocument/GetResourcePropertyDocumentResponse"/>
       <wsdl:fault name="ResourceUnknownFault" 
-              message="wsrf-rw:ResourceUnknownFault"/>
+              message="wsrf-rw:ResourceUnknownFault"
+              wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
       <wsdl:fault name="ResourceUnavailableFault" 
-              message="wsrf-rw:ResourceUnavailableFault"/>
+              message="wsrf-rw:ResourceUnavailableFault"
+              wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
     </wsdl:operation>
   </wsdl:portType>
 
