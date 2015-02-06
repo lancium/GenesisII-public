@@ -117,7 +117,10 @@ final class IDPLoginPanel extends LoginPanel
 		//hmmm: need to set based on grid!
 		_type = ProxyTypes.NO_PROXY;
 		setupAccordingToType(_type);
-		_comboBox.setSelectedIndex(0);
+//0 is none
+//1 is xsede
+//2 is lrz
+		_comboBox.setSelectedIndex(1);
 		
 		// hmmm: also need to record the type in user prefs!!!
 		
