@@ -70,8 +70,9 @@ fi
 ##############
 
 OUTPUT_DIRECTORY=$HOME/installer_products
-# too annoying: \rm -rf $OUTPUT_DIRECTORY
-mkdir $OUTPUT_DIRECTORY
+if [ ! -d "$OUTPUT_DIRECTORY" ]; then
+  mkdir "$OUTPUT_DIRECTORY"
+fi
 
 echo "Will build installers in $OUTPUT_DIRECTORY"
 
