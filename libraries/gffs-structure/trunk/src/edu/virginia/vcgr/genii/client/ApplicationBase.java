@@ -141,10 +141,13 @@ public class ApplicationBase
 			_logger.error("failed to build calling context.");
 			return GridStates.CONNECTION_MEANS_UNKNOWN;
 		}
-
+		
+		//_logger.debug("in establish grid conn, context is: " + callContext.dumpContext());		
+		
 		RNSPath currdir = callContext.getCurrentPath();
-		if (currdir != null)
+		if (currdir != null) {
 			return GridStates.CONNECTION_ALREADY_GOOD;
+		}
 
 		String connectCmd = ContainerProperties.getContainerProperties().getConnectionCommand();
 		if (_logger.isDebugEnabled())

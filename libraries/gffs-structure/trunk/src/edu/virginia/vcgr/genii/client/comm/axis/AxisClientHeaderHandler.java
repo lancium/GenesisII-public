@@ -277,15 +277,19 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 					// if no delegation step performed at some point above, do it here.
 					if (!handledThisAlready) {
-						if (_logger.isTraceEnabled())
+						if (_logger.isDebugEnabled())
 							_logger.debug("outcall, normal trust delegation by: "
 								+ clientKeyAndCertificate._clientCertChain[0].getSubjectDN());
 
 						// in the client role here, so just delegate to the resource.
-						walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
+						TrustCredential newTC = walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
 							clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
 							accessCategories, trustDelegation);
 
+						if (newTC != null) {
+							if (_logger.isDebugEnabled())
+								_logger.debug("after delegation, cred for outcall is: " + newTC.describe(VerbosityLevel.HIGH));
+						}
 					}
 
 				} catch (Throwable e) {
