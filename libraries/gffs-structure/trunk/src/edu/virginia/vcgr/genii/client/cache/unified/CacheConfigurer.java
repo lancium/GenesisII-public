@@ -36,31 +36,24 @@ public class CacheConfigurer
 	private static final String RESOURCE_CONFIG_COUNT = "edu.virginia.vcgr.genii.client.cache.size.resource-config-cache";
 	private static final String RESOURCE_CONFIG_TIMOUT = "edu.virginia.vcgr.genii.client.cache.resource-config-cache-timeout";
 
-	// Some default values are kept with minimal caching to ensure that caching is not by default
-	// disabled if the
-	// property file is missing.
 	public static long DEFAULT_CACHE_TIMOUT_TIME = 30 * 1000L; // 30 seconds
-	// We keep old subscribed contents in the cache even if no polling is done for 4 minutes. This
-	// attribute
-	// is used with subscription based caching and when polling is used to make cached contents
-	// temporarily unaccessible
-	// if current polling interval is too long. The system changes from slow to rapid polling mode
-	// as soon as any activity
-	// from the client is detected.
+	/*
+	 * We keep old subscribed contents in the cache even if no polling is done for 4 minutes. This
+	 * attribute is used with subscription based caching and when polling is used to make cached
+	 * contents temporarily unaccessible if current polling interval is too long. The system changes
+	 * from slow to rapid polling mode as soon as any activity from the client is detected.
+	 */
 	public static long DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT = 30 * 1000L;
 	public static int DEFAULT_ATTRIBUTE_CACHE_SIZE = 1000;
 	public static int DEFAULT_EPR_CACHE_SIZE = 250;
-	private static boolean CACHING_ENABLED = true;
+	// cak: caching disabled by default to avoid unicore code trying to cache.
+	private static boolean CACHING_ENABLED = false;
 	private static boolean SUBSCRIPTION_BASED_CACHING_ENABLED = false;
-
-	private static List<CommonCache> LIST_OF_CACHES;
+	
+	private static List<CommonCache> LIST_OF_CACHES = new ArrayList<CommonCache>();
 
 	public static void initializeCaches()
 	{
-		if (LIST_OF_CACHES == null) {
-			LIST_OF_CACHES = new ArrayList<CommonCache>();
-		}
-
 		Deployment deployment = Installation.getDeployment(new DeploymentName());
 		Properties properties = deployment.clientCacheProperties();
 
