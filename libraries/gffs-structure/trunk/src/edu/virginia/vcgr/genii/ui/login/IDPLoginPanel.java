@@ -100,26 +100,20 @@ final class IDPLoginPanel extends LoginPanel
 
 	IDPLoginPanel(String Title)
 	{
-		// If xsede is true we are logging in an XSEDE user and we need to myproxy login first, AND
-		// we do not let them set the directory path
-		// setName("Standard Grid User");
 		setName(Title);
 
 		_username.addCaretListener(new InternalCaretListener());
 		
 		// add the drop down box with the types of proxies in it.
-
 		add(new JLabel("Proxy Setting"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		add(_comboBox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		//hmmm: need to set based on grid!
-		_type = ProxyTypes.NO_PROXY;
+		_type = ProxyTypes.XSEDE_MYPROXY;
 		setupAccordingToType(_type);
-//0 is none
-//1 is xsede
-//2 is lrz
+		// 0 is none, 1 is xsede, 2 is lrz, index must match setting above!
 		_comboBox.setSelectedIndex(1);
 		
 		// hmmm: also need to record the type in user prefs!!!

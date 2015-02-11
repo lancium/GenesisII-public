@@ -134,7 +134,7 @@ for targetarch in i386 x86_64; do
 #end big arch loop
 done
 
-pushd $TEMP_STORAGE &>/dev/null
+pushd "$TEMP_STORAGE" &>/dev/null
 # set permissions on the local files.
 find . -type f -exec chmod $DEFAULT_FILE_PERMS "{}" ';'
 rsync -vz -rp . $REPO_HOSTNAME:$DEV_RPM_BASE/ 2>&1 | grep -v 'failed to set permission'
@@ -143,4 +143,6 @@ popd &>/dev/null
 
 echo Rebuilding Yum repository at xsede...
 ssh -t $REPO_HOSTNAME /soft/repo-mgmt/bin/rebuild_yum_repositories.sh development
+
+\rm -rf "$TEMP_STORAGE"
 
