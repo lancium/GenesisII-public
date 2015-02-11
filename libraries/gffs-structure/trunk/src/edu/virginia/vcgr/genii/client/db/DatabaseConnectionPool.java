@@ -23,7 +23,8 @@ public class DatabaseConnectionPool
 	static protected final String _DB_POOL_SIZE_DEFAULT = "16";
 	/*hmmm: is 16 too large?  we get these horrid messages at times:
 	 ERROR 40XL1: A lock could not be obtained within the time requested
-	 trying 8 for now to see if alleviates problem a bit.
+	 tried 8 to see if alleviated the problem, but was still seeing the
+	 complaints.
 	 */
 
 	private GReadWriteLock _lock = new UnfairReadWriteLock();
