@@ -22,11 +22,11 @@
             </Source>
         </DataStaging>
         <DataStaging>
-            <FileName>hostname-nope.sh</FileName>
+            <FileName>hostname.sh</FileName>
             <CreationFlag>overwrite</CreationFlag>
             <DeleteOnTermination>true</DeleteOnTermination>
             <Source>
-                <URI>rns:PATH/hostname.sh</URI>
+                <URI>rns:PATH/non-existent-path-to-hostname.sh</URI>
             </Source>
         </DataStaging>
         <DataStaging>

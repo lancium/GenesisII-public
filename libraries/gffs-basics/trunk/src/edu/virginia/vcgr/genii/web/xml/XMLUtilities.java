@@ -1,10 +1,18 @@
 package edu.virginia.vcgr.genii.web.xml;
 
-import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.io.StringReader;
 
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class XMLUtilities
@@ -61,5 +69,17 @@ public class XMLUtilities
 		if (n.getNodeType() != Node.TEXT_NODE)
 			throw new SAXException(String.format("XML Element %s does not contain text.", getQName(e)));
 		return n.getTextContent();
+	}
+
+	/**
+	 * consumes the xml text in "xmlString" and attempts to return a w3c document object that
+	 * represents the contents.
+	 */
+	public static Document parseXML(String xmlString) throws ParserConfigurationException, SAXException, IOException
+	{
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = dbf.newDocumentBuilder();
+		InputSource source = new InputSource(new StringReader(xmlString));
+		return builder.parse(source);
 	}
 }

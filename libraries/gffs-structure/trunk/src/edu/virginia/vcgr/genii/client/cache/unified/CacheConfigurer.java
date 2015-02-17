@@ -51,6 +51,9 @@ public class CacheConfigurer
 	private static boolean SUBSCRIPTION_BASED_CACHING_ENABLED = false;
 	
 	private static List<CommonCache> LIST_OF_CACHES = new ArrayList<CommonCache>();
+	
+	// record when we show the cache stats and don't show them again in same run.
+	private static boolean advertisedConfig = false;
 
 	public static void initializeCaches()
 	{
@@ -60,19 +63,23 @@ public class CacheConfigurer
 		String cacheEnabled = properties.getProperty(CACHE_ENABLED);
 		if (cacheEnabled != null)
 			CACHING_ENABLED = Boolean.parseBoolean(cacheEnabled);
-		_logger.debug("Caching enabled: " + Boolean.toString(CACHING_ENABLED));
 		String subscriptionEnabled = properties.getProperty(SUBSCRIPTION_ENABLED);
 		if (subscriptionEnabled != null)
 			SUBSCRIPTION_BASED_CACHING_ENABLED = Boolean.parseBoolean(subscriptionEnabled);
-		_logger.debug("Subscription enabled: " + Boolean.toString(SUBSCRIPTION_BASED_CACHING_ENABLED));
 		String cacheTimeout = properties.getProperty(CACHE_TIMEOUT);
 		if (cacheTimeout != null)
 			DEFAULT_CACHE_TIMOUT_TIME = Integer.parseInt(cacheTimeout) * 1000L;
-		_logger.debug("Cache timeout: " + DEFAULT_CACHE_TIMOUT_TIME + "ms");
 		String validityPeriod = properties.getProperty(MAXIMUM_POLLING_DELAY);
 		if (validityPeriod != null)
 			DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT = Integer.parseInt(validityPeriod) * 1000L;
-		_logger.debug("Max polling delay: " + DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT + "ms");
+		
+		if (!advertisedConfig) {
+			advertisedConfig = true;
+			_logger.debug("Caching enabled: " + Boolean.toString(CACHING_ENABLED));
+			_logger.debug("Subscription enabled: " + Boolean.toString(SUBSCRIPTION_BASED_CACHING_ENABLED));
+			_logger.debug("Cache timeout: " + DEFAULT_CACHE_TIMOUT_TIME + "ms");
+			_logger.debug("Max polling delay: " + DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT + "ms");
+		}
 
 		if (CACHING_ENABLED) {
 			// setting the attribute caches

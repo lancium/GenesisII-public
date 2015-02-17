@@ -27,7 +27,6 @@ public class SudoExportUtils
 	public static String doGridMapping(String dnToFind)
 	{
 		if (dnToFind == null) {
-			_logger.error("attempted mapping of 'null' as the DN owning the export.  this is broken.");
 			return null;
 		}
 
@@ -49,7 +48,6 @@ public class SudoExportUtils
 	public static String doGridMapping(List<String> dnsToFind)
 	{
 		if (dnsToFind == null) {
-			_logger.error("attempted mapping of 'null' list as the DN owning the export.  this is broken.");
 			return null;
 		}
 		for (String user : dnsToFind) {
@@ -82,7 +80,7 @@ public class SudoExportUtils
 
 		String uname = getExportOwnerUser(key);
 		if (_logger.isDebugEnabled())
-			_logger.debug("using unix user '" + uname + "' for sudo-based export at: " + path);
+			_logger.debug("found unix user '" + uname + "' for sudo-based export at: " + path);
 		if (uname == null) {
 			String msg = "failed to find owner of sudo-based export on path: " + path;
 			_logger.error(msg);

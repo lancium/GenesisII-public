@@ -18,6 +18,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -37,7 +38,6 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.context.ContextType;
-import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 public class MyProxyLoginTool extends BaseLoginTool
@@ -175,7 +175,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 		 * clear any existing credentials because we want to replace our session cert with the
 		 * myproxy cert.
 		 */
-		TransientCredentials.globalLogout(callContext);
+		ClientUtils.invalidateCredentials(callContext);
 
 		// reset any previous pass-through credential.
 		callContext.removeProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);

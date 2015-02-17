@@ -708,9 +708,8 @@ public class SecurityUtilities implements CertificateValidator
 	}
 
 	/**
-	 * returns a checksum value across the encoded certificate.
+	 * returns a checksum value across the encoded certificate for debugging.
 	 */
-	//hmmm: need a more general checksum than this, and we don't even check certs this way these days.
 	public static long getChecksum(X509Certificate cert)
 	{
 		try {
@@ -725,7 +724,7 @@ public class SecurityUtilities implements CertificateValidator
 	}
 
 	/**
-	 * returns a checksum value across the encoded public key.
+	 * returns a checksum value across the encoded public key for debugging.
 	 */
 	public static long getChecksum(PublicKey pk)
 	{

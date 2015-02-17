@@ -13,6 +13,7 @@ import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
@@ -93,8 +94,7 @@ public class LogoutTool extends BaseGridTool
 		}
 		if (_all) {
 			// toss out all credentials, including TLS cert.
-			TransientCredentials.globalLogout(callContext);
-			callContext.setActiveKeyAndCertMaterial(null);
+			ClientUtils.invalidateCredentials(callContext);
 			ContextManager.storeCurrentContext(callContext);
 		} else if (_pattern != null) {
 			int flags = 0;

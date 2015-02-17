@@ -223,18 +223,18 @@ public class PreferredIdentity implements Serializable
 			return null;
 		}
 		String justFixated = encoded.substring(0, commaPosn);
-		_logger.debug("got fixation flag of: " + justFixated);
+		if (_logger.isDebugEnabled())
+			_logger.debug("got fixation flag of: " + justFixated);
 		boolean fixated = Boolean.valueOf(justFixated);
 		encoded = encoded.substring(commaPosn + 1);
 		if (!encoded.startsWith("dn=")) {
 			_logger.error(fail + "DN flag missing for identity string");
 			return null;
 		}
-		// skip dn= bit
-		encoded = encoded.substring(3);
-		// remainder is identity DN.
-		String ident = encoded;
-
+		// skip "dn=" bit and terminating colon, remainder is identity DN.
+		String ident = encoded.substring(3, encoded.length() - 1);
+		if (_logger.isDebugEnabled())
+			_logger.debug("decoded identity: '" + ident + "'");
 		return new PreferredIdentity(ident, fixated);
 	}
 

@@ -9,11 +9,16 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 
 public class FSClientTest
 {
+	/* these need to be changed to the local users that can run the test and to the right home root folder. */
+	static final String HOME_ROOT = "/home/";  // where home folders live.
+	static final String MY_USER_NAME = "fred";  // my user name that runs test.
+	static final String OTHER_USER_NAME = "drake";  // second user i can sudo as.
+	
 	public static void main(String[] args) throws Exception
 	{
 		DefaultResponse retVal;
 		DirListResponse dlr;
-		String uname = "guest1";
+		String uname = OTHER_USER_NAME;
 
 		FileServerID fsid = FileServerClient.start(uname);
 		if (fsid == null) {
@@ -23,7 +28,7 @@ public class FSClientTest
 		int port = fsid.getPort();
 		byte[] nonce = fsid.getNonce();
 
-		String dir1 = "/Users/avinash/foo";
+		String dir1 = HOME_ROOT + MY_USER_NAME + "/foo";
 		retVal = FileServerClient.mkdir(dir1, nonce, port);
 		dlr = FileServerClient.listlong(dir1, nonce, port);
 		dlr.disp();
@@ -37,16 +42,16 @@ public class FSClientTest
 		retVal = FileServerClient.isDir(dir2, nonce, port);
 
 		retVal = FileServerClient.canRead(dir1, nonce, port, PathType.DIRECTORY);
-		retVal = FileServerClient.canRead("/Users/guest1/foo", nonce, port, PathType.DIRECTORY);
-		retVal = FileServerClient.canRead("/Users/guest1/file1", nonce, port, PathType.FILE);
-		retVal = FileServerClient.canWrite("/Users/guest1/foo", nonce, port, PathType.DIRECTORY);
-		retVal = FileServerClient.canWrite("/Users/guest1/file1", nonce, port, PathType.FILE);
+		retVal = FileServerClient.canRead(HOME_ROOT + OTHER_USER_NAME + "/foo", nonce, port, PathType.DIRECTORY);
+		retVal = FileServerClient.canRead(HOME_ROOT + OTHER_USER_NAME + "/file1", nonce, port, PathType.FILE);
+		retVal = FileServerClient.canWrite(HOME_ROOT + OTHER_USER_NAME + "/foo", nonce, port, PathType.DIRECTORY);
+		retVal = FileServerClient.canWrite(HOME_ROOT + OTHER_USER_NAME + "/file1", nonce, port, PathType.FILE);
 
 		retVal = FileServerClient.exists(dir1, nonce, port, PathType.DIRECTORY);
 		retVal = FileServerClient.exists(dir1 + "asdas", nonce, port, PathType.DIRECTORY);
 
 		// creating file within foo
-		String text = "My name is ak3ka";
+		String text = "My name is shazam";
 		String filepath = dir1 + "/file1";
 		retVal = FileServerClient.creat(filepath, nonce, port);
 		if (retVal.getErrorCode() != 0) {

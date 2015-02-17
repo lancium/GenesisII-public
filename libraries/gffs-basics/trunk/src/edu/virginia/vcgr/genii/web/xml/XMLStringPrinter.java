@@ -1,13 +1,8 @@
 package edu.virginia.vcgr.genii.web.xml;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -20,8 +15,6 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
@@ -43,7 +36,7 @@ public class XMLStringPrinter
 	public static String format(String xmlString)
 	{
 		try {
-			final Document doc = parseXML(xmlString);
+			final Document doc = XMLUtilities.parseXML(xmlString);
 			OutputFormat format = new OutputFormat(doc);
 			format.setLineWidth(79);
 			format.setIndenting(true);
@@ -57,20 +50,6 @@ public class XMLStringPrinter
 			_logger.info(msg);
 			return msg;
 		}
-	}
-
-	/**
-	 * consumes the xml text in "xmlString" and attempts to return a w3c document object that
-	 * represents the contents.
-	 */
-	// hmmm: this seems like a bad place for this function, or we have a badly named class here.
-	// xmlstring utilities instead?
-	public static Document parseXML(String xmlString) throws ParserConfigurationException, SAXException, IOException
-	{
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = dbf.newDocumentBuilder();
-		InputSource source = new InputSource(new StringReader(xmlString));
-		return builder.parse(source);
 	}
 
 	/**

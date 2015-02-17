@@ -16,4 +16,5 @@ if [ ! -f "$java_app" ]; then
   fi
 fi
 
-"$java_app" -Xms1g -cp "${installer:sys.installationDir}/ext/gffs-container.jar" edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.server.Driver
+"$java_app" -Xms256m -Xmx1g -cp "${installer:sys.installationDir}/bundles/org.apache.commons.logging_1.1.1.v201101211721.jar:${installer:sys.installationDir}/ext/log4j-1.2.17.jar:${installer:sys.installationDir}/ext/gffs-basics.jar:${installer:sys.installationDir}/ext/gffs-container.jar:${installer:sys.installationDir}/ext/gffs-structure.jar:${installer:sys.installationDir}/ext/gffs-security.jar:${installer:sys.installationDir}/lib" "-Dlog4j.configuration=production.client.log4j.properties" "-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}" edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.server.Driver
+

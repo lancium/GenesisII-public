@@ -9,6 +9,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.io.fslock.FSLock;
 import edu.virginia.vcgr.genii.client.io.fslock.FSLockManager;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.AbstractVExportEntry;
@@ -28,6 +31,7 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 
 public class SudoDiskExportEntry extends AbstractVExportEntry implements VExportDir, VExportFile
 {
+	static private Log _logger = LogFactory.getLog(SudoDiskExportEntry.class);
 	static private FSLockManager _lockManager = new FSLockManager();
 
 	private File _target;
@@ -568,6 +572,7 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 	{
 		FileServerID fsid = FileServerClient.start(username);
 		if (fsid == null) {
+			_logger.error("failure to launch or connect to the proxy io server as user '" + username + "'");
 			throw new IOException("Unable to start proxy io server");
 		}
 		return fsid;

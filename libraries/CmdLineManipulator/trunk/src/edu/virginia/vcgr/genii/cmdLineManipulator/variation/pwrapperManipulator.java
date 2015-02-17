@@ -61,7 +61,7 @@ public class pwrapperManipulator extends AbstractCmdLineManipulator<PwrapperVari
 	@Override
 	protected void tweakCmdLine(Map<String, Object> jobProperties, Map<String, Object> manipProps, String varName)
 	{
-		_logger.debug("**Forming PWrapper Specific CmdLine");
+		_logger.debug("**Forming normal PWrapper Specific CmdLine");
 
 		// determine new executable
 		String newExec;

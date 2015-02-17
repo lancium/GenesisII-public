@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.ExportProperties;
-import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.utils.PathType;
-import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.commons.Constants;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.mapping.Mapper;
-import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.request.TruncAppendRequest;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.request.DefaultRequest;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.request.DefaultResponse;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.request.DirListRequest;
@@ -24,10 +24,15 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.request.ReadResponse;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.request.StatRequest;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.request.StatResponse;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.request.TruncAppendRequest;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.request.WriteRequest;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.commons.Constants;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.utils.PathType;
 
 public class FileServerClient
 {
+	static private Log _logger = LogFactory.getLog(FileServerClient.class);
+
 	public static ReadResponse read(String path, long offset, long numBytes, byte[] nonce, int port)
 		throws UnknownHostException, IOException
 	{
@@ -424,7 +429,6 @@ public class FileServerClient
 	// returns the <nonce,port, serverprocess> where the server was started!
 	public static synchronized FileServerID start(String uname)
 	{
-
 		// To Handle race!
 		FileServerID fsid = Mapper.getClientMapping(uname);
 
@@ -446,14 +450,26 @@ public class FileServerClient
 		 * String install_dir_sys_prop = "edu.virginia.vcgr.genii.install-base-dir";
 		 */
 
-		List<String> cmd = new ArrayList<String>();
-		cmd.add("sudo");
-		cmd.add("-u");
-		cmd.add(uname);
-		cmd.add(ExportProperties.getExportProperties().getProxyIOLauncherFilePath());
+		
+		//hmmm: this should use the sudo pwrapper?
+		
+		List<String> cmds = new ArrayList<String>();
+		cmds.add("sudo");
+		cmds.add("-n");  // non-interactive, don't break out for a password prompt.
+		cmds.add("-u");
+		cmds.add(uname);
+		cmds.add(ExportProperties.getExportProperties().getProxyIOLauncherFilePath());
 
+		if (_logger.isDebugEnabled()) {
+			_logger.debug("sudo export file server command line about to issue is:");
+			int line = 0;
+			for (String cmd: cmds) {
+				_logger.debug(line++ + "  " + cmd);
+			}
+		}
+		
 		Process p = null;
-		ProcessBuilder pb = new ProcessBuilder(cmd);
+		ProcessBuilder pb = new ProcessBuilder(cmds);
 
 		byte[] nonce = new byte[Constants.NONCE_SIZE];
 
@@ -461,9 +477,17 @@ public class FileServerClient
 			pb.redirectOutput(Redirect.PIPE);
 			p = pb.start();
 		} catch (Exception e) {
+			_logger.error("got exception from launching of proxy io process", e);
 			return null;
 		}
 
+		// slight pause to avoid jumping on server too quickly.
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			// ignored.
+		}
+		
 		BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 		BufferedOutputStream stdin = new BufferedOutputStream(p.getOutputStream());
@@ -474,6 +498,7 @@ public class FileServerClient
 			stdin.flush();
 		} catch (Exception ioe) {
 			// kill the bad process we created!
+			_logger.error("got exception writing to proxy io process, aborting it", ioe);
 			p.destroy();
 			return null;
 		}
@@ -483,6 +508,9 @@ public class FileServerClient
 			String line = stdout.readLine();
 			port = Integer.parseInt(line);
 
+			if (_logger.isDebugEnabled())
+				_logger.debug("port received from proxyio server is: " + port);
+			
 			if (port == 0) {
 				p.destroy();
 				return null;

@@ -4,6 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.server.response.DefaultResponse;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.utils.Conversions;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.utils.PathType;
@@ -12,11 +15,14 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 
 public class RequestHandler implements Runnable
 {
+	static private Log _logger = LogFactory.getLog(RequestHandler.class);
+	
 	private Socket socket;
 	private byte[] nonce = new byte[Constants.NONCE_SIZE];
 
 	RequestHandler(Socket sock, byte[] nonce)
 	{
+		_logger.info("request handler created on socket with port " + sock.getLocalPort());
 		this.socket = sock;
 		System.arraycopy(nonce, 0, this.nonce, 0, nonce.length);
 	}
@@ -37,6 +43,7 @@ public class RequestHandler implements Runnable
 			if (bytes_read == -1) {
 				DefaultResponse.send(socket, ErrorCode.NW_READ_ERROR_CODE,
 					ErrorCode.getErrorMsgFromErrorCode(ErrorCode.NW_READ_ERROR_CODE));
+				_logger.info("failed to read any bytes from client");
 				return;
 			}
 
@@ -44,9 +51,10 @@ public class RequestHandler implements Runnable
 			if (request == null) {
 				DefaultResponse.send(socket, ErrorCode.INVALID_REQ_ERROR_CODE,
 					ErrorCode.getErrorMsgFromErrorCode(ErrorCode.INVALID_REQ_ERROR_CODE));
-				// PSFileWriter.writeToFile("Bad request!");
+				_logger.info("Bad request, could not unmarshal!");
 				return;
 			}
+			_logger.info("request received: " + request.toString());
 
 			request.handle(socket);
 
@@ -54,14 +62,13 @@ public class RequestHandler implements Runnable
 		} catch (IOException e) {
 			DefaultResponse.send(socket, ErrorCode.NW_READ_ERROR_CODE,
 				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.NW_READ_ERROR_CODE));
-			// e.printStackTrace();
+			_logger.info("io exception caught in run", e);
 		} finally {
 			try {
 				bin.close();
 				socket.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
+				//ignored.
 			}
 
 		}
@@ -70,7 +77,6 @@ public class RequestHandler implements Runnable
 
 	private Request unmarshallStream(byte[] contents, int resp_size, BufferedInputStream bin)
 	{
-
 		/**
 		 * [16byte nonce]|[1byte f/d]|[1byte cmd]|[4byte pathname len]| [n bytes pathname]|[r/w req
 		 * arg(s) each 8 bytes] [4 byte write buflen for writes]| [write buf]
@@ -142,7 +148,7 @@ public class RequestHandler implements Runnable
 			}
 		}
 
-		// System.out.println("num bytes read = " + request.getNumBytesRead());
+		_logger.info("num bytes read = " + request.getNumBytesRead());
 		// System.out.println(new String(request.getWriteBuf()));
 
 		return request;

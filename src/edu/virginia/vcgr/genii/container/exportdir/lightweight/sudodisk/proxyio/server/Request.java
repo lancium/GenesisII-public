@@ -11,7 +11,6 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 
 public class Request
 {
-
 	private PathType _type;
 	private String _cmd;
 	private String _path;
@@ -43,7 +42,19 @@ public class Request
 		 */
 
 	}
-
+	
+	public String toString()
+	{
+		StringBuilder toReturn = new StringBuilder();
+		toReturn.append("type=");
+		toReturn.append(_type.toString());
+		toReturn.append(" cmd=");
+		toReturn.append(_cmd);
+		toReturn.append(" path=");
+		toReturn.append(_path);
+		return toReturn.toString();
+	}
+	
 	public int getWriteBufSize()
 	{
 		return _writeBufLen;

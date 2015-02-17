@@ -11,6 +11,7 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.ui.UIContext;
@@ -64,8 +65,7 @@ final public class CredentialManagementContext
 				"Logout All Confirmation", JOptionPane.YES_NO_OPTION);
 		if (response == JOptionPane.YES_OPTION) {
 			try {
-				TransientCredentials.globalLogout(_uiContext.callingContext());
-				_uiContext.callingContext().setActiveKeyAndCertMaterial(null);
+				ClientUtils.invalidateCredentials(_uiContext.callingContext());
 				fireCredentialsChanged();
 			} catch (Throwable cause) {
 				ErrorHandler.handleError(_uiContext, (JComponent) source, cause);

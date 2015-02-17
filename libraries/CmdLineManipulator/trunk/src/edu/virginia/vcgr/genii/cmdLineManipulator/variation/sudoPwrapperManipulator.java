@@ -51,12 +51,19 @@ public class sudoPwrapperManipulator extends AbstractCmdLineManipulator<SudoPwra
 
 		processManipulatorConfiguration(jobProperties, manipulatorConfig, variationName, manipProps);
 		tweakCmdLine(jobProperties, manipProps, variationName);
-		return formCommandLine(jobProperties);
+		List<String> cmds = formCommandLine(jobProperties);
+		if (_logger.isTraceEnabled()) {
+			_logger.debug("sudo pwrapper command line about to issue is:");
+			int line = 0;
+			for (String cmd: cmds) {
+				_logger.debug(line++ + "  " + cmd);
+			}
+		}
+		return cmds;
 	}
 
 	private void validateWrapper(Map<String, Object> jobProperties, String sudoPath)
 	{
-
 		_logger.debug("**Confirming PWrapper path is provided and SUDO bin path is accurate");
 
 		if (jobWrapperPath(jobProperties) == null) {
@@ -74,13 +81,12 @@ public class sudoPwrapperManipulator extends AbstractCmdLineManipulator<SudoPwra
 	@Override
 	protected void tweakCmdLine(Map<String, Object> jobProperties, Map<String, Object> manipProps, String varName)
 	{
-
-		_logger.debug("**Forming PWrapper Specific CmdLine");
+		_logger.debug("**Forming sudo PWrapper Specific CmdLine");
 
 		// list for new args
 		List<String> newArgs = new ArrayList<String>();
 
-		// add the job-submitter user args
+		// add the job-submitter user args.
 		newArgs.add("-u");
 		newArgs.add(String.format("%s", manipProps.get(SUDO_TARGET_USER)));
 

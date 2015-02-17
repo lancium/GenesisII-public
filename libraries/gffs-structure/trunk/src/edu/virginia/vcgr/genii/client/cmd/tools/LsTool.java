@@ -43,7 +43,7 @@ public class LsTool extends BaseGridTool
 
 	private boolean _long = false;
 	private boolean _all = false;
-	private boolean _directory = false;
+	private boolean _justDirectory = false;
 	private boolean _recursive = false;
 	private boolean _epr = false;
 	private boolean _certChain = false;
@@ -68,9 +68,9 @@ public class LsTool extends BaseGridTool
 	}
 
 	@Option({ "directory", "d" })
-	public void setDirectory()
+	public void setJustDirectory()
 	{
-		_directory = true;
+		_justDirectory = true;
 	}
 
 	@Option({ "recursive", "R", "r" })
@@ -103,7 +103,7 @@ public class LsTool extends BaseGridTool
 	{
 		boolean isLong = _long;
 		boolean isAll = _all;
-		boolean isDirectory = _directory;
+		boolean isJustDirectory = _justDirectory;
 		boolean isRecursive = _recursive;
 		boolean isEPR = _epr;
 		boolean isMultiline = _multiline;
@@ -141,14 +141,13 @@ public class LsTool extends BaseGridTool
 		ArrayList<RNSPath> dirs = new ArrayList<RNSPath>();
 		for (RNSPath path : targets) {
 			TypeInformation type = new TypeInformation(path.getEndpoint());
-			if (isDirectory || !type.isRNS()) {
+			if (isJustDirectory || !type.isRNS()) {
 				printEntry(stdout, path, isLong, isAll, isEPR, isMultiline, isCertChain);
 			} else
 				dirs.add(path);
 		}
 		for (RNSPath path : dirs) {
 			listDirectory(stdout, null, path, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
-
 		}
 
 		// Third, output the local files specified on the command line.
@@ -156,7 +155,7 @@ public class LsTool extends BaseGridTool
 			stdout.println("local:");
 		for (String path : locals) {
 			File dir = new File(path);
-			if (!isDirectory && !dir.isFile()) {
+			if (!isJustDirectory && !dir.isFile()) {
 				String name = path;
 				while ((name.lastIndexOf("/") == name.length() - 1) && (name.length() > 1))
 					name = name.substring(0, name.length() - 1);
@@ -167,7 +166,7 @@ public class LsTool extends BaseGridTool
 						name = path;
 				stdout.println(name + ":");
 			}
-			if (isDirectory || dir.isFile()) {
+			if (isJustDirectory || dir.isFile()) {
 				printLocalEntry(stdout, dir, isLong, isAll);
 			} else {
 				File[] files = dir.listFiles();

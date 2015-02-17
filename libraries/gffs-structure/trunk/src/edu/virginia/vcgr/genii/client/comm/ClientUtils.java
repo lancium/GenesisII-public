@@ -50,8 +50,6 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
-import edu.virginia.vcgr.genii.security.faults.AttributeExpiredException;
-import edu.virginia.vcgr.genii.security.faults.AttributeInvalidException;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
@@ -160,10 +158,11 @@ public class ClientUtils
 
 		boolean updated = false;
 		KeyAndCertMaterial retval = callContext.getActiveKeyAndCertMaterial();
-		ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
+		ArrayList<NuCredential> credentials = null;
 
 		// Ensure client identity is valid
 		try {
+			credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
 			if (retval != null) {
 				// check the time validity of our client identity
 				for (X509Certificate cert : retval._clientCertChain) {
@@ -200,37 +199,52 @@ public class ClientUtils
 				callContext.setActiveKeyAndCertMaterial(retval);
 				updated = true;
 
-				// Any delegated credentials must be discarded or renewed
-				Iterator<NuCredential> itr = credentials.iterator();
-				while (itr.hasNext()) {
-					NuCredential cred = itr.next();
-					if (cred instanceof TrustCredential) {
-						_logger.debug("Discarding delegated credential " + cred);
-						itr.remove();
-						results.noteRemovedCredential(cred);
+				try {
+					if (credentials != null) {
+						// *Any* delegated credentials must be discarded.
+						Iterator<NuCredential> itr = credentials.iterator();
+						while (itr.hasNext()) {
+							NuCredential cred = itr.next();
+							if (cred instanceof TrustCredential) {
+								itr.remove();
+								try {
+									if (_logger.isDebugEnabled()) {
+										_logger.debug("Discarding delegated credential " + cred);
+									}
+								} catch (Exception e2) {
+									// ignored; we just can't show it.
+								}
+								results.noteRemovedCredential(cred);
+							}
+						}
 					}
+				} catch (Exception e2) {
+					// badness in the credentials means dump them.
+					credentials = null;
+					TransientCredentials.globalLogout(callContext);
 				}
 			}
 		}
 
-		// remove stale credentials
-		Iterator<NuCredential> itr = credentials.iterator();
-		while (itr.hasNext()) {
-			NuCredential cred = itr.next();
-			try {
-				// (Check 10 seconds into the future so as to avoid the credential expiring
-				// in-flight).
-				cred.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
-			} catch (AttributeExpiredException e) {
-				updated = true;
-				_logger.debug("Discarding expired credential " + cred, e);
-				itr.remove();
-				results.noteRemovedCredential(cred);
-			} catch (AttributeInvalidException e) {
-				updated = true;
-				_logger.debug("Discarding invalid credential " + cred, e);
-				itr.remove();
-				results.noteRemovedCredential(cred);
+		if (credentials != null) {
+			// remove any stale credentials in the set.
+			Iterator<NuCredential> itr = credentials.iterator();
+			while (itr.hasNext()) {
+				NuCredential cred = itr.next();
+				try {
+					// (Check 10 seconds into the future so as to avoid the credential expiring
+					// in-flight).
+					cred.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
+				} catch (Exception e) {
+					updated = true;
+					itr.remove();
+					try {
+						_logger.debug("Discarding credential " + cred, e);
+						results.noteRemovedCredential(cred);
+					} catch (Exception t) {
+						// ignore if really fouled up; we already dropped it but cannot print it.
+					}
+				}
 			}
 		}
 

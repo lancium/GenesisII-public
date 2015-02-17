@@ -86,7 +86,6 @@ import edu.virginia.vcgr.genii.container.byteio.TransferAgent;
 import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.exportdir.lightweight.LightWeightExportDirFork;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
@@ -556,14 +555,13 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		Iterable<InternalEntry> entries = null;
 		InMemoryIteratorWrapper wrapper = null;
 		ResourceFork tFork = getResourceFork();
-		String dirPath = null;
 		if (!(tFork instanceof RNSResourceFork))
 			throw new RemoteException("Target fork does not implement RNS interface.");
 
 		RNSResourceFork fork = (RNSResourceFork) tFork;
 		AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();
 
-		if (_logger.isTraceEnabled()) {
+		if (_logger.isDebugEnabled()) {
 			StringBuilder tony = new StringBuilder();
 			if (lookupRequest == null) {
 				tony.append("null ");
@@ -572,11 +570,11 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 					tony.append(s + " ");
 				}
 			}
-			_logger.trace("looking up: " + tony.toString());
+			_logger.debug("looking up: " + tony.toString());
 		}
 
 		try {
-			/* Complete listing ! */
+			/* Complete listing. */
 			if (lookupRequest == null || lookupRequest.length == 0) {
 				timer = tSink.getTimer("Retrieve Entries");
 
@@ -588,17 +586,14 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 						IterableSnapshot snapshot = iFork.splitAndList(getExemplarEPR(), getResourceKey());
 						entries = snapshot.getReturns();
 						wrapper = snapshot.getWrapper();
-						dirPath = snapshot.getDirPath();
 					}
 				} else {
 					// Not in-memory iterable.
 					entries = fork.list(getExemplarEPR(), null);
 				}
 				timer.noteTime();
-			}
-
-			// Specific listing!
-			else {
+			} else {
+				/* Specific listing. */
 				boolean inMemoryIterable = false;
 				timer = tSink.getTimer("Retrieve Entries");
 
@@ -611,11 +606,9 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 					}
 
 					if (inMemoryIterable) {
-
 						IterableSnapshot snapshot = iFork.splitAndList(lookupRequest, getExemplarEPR(), getResourceKey());
 						entries = snapshot.getReturns();
 						wrapper = snapshot.getWrapper();
-						dirPath = snapshot.getDirPath();
 					}
 
 				}
@@ -630,11 +623,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 				timer.noteTime();
 			}
 
-			// ---------------------------------------------------------------------------------------------------
-			// Checking if short form is requested by the client. Properly handling this attributes
-			// is Prof.'s
-			// responsibility.
-			// ---------------------------------------------------------------------------------------------------
+			// Check if short form is requested by the client.
 			boolean requestedShortForm = false;
 			try {
 				ICallingContext context = ContextManager.getCurrentContext();
@@ -646,50 +635,34 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			} catch (Exception e) {
 				_logger.trace("could not get information about the short form");
 			}
-			// ---------------------------------------------------------------------------------------------------
 
 			Collection<RNSEntryResponseType> resultEntries = new LinkedList<RNSEntryResponseType>();
 			timer = tSink.getTimer("Prepare Entries");
 
-			// ASG: May 10, 2014, at Aumeister in English Garden.
-			// Instead of iterating, if it is a light weight, lets call
-			// public static Collection<Pair<Long, MessageElement>>
-			// getEntries(List<InMemoryIteratorEntry> imieList, int firstElement, int
-			// numElements,Object[] EprAndService, boolean shortForm) throws IOException {
-			// entries is an Iterable<InternalEntry> , we need to convert it into a
-			// List<InMemoryIteratorEngry>
-			if (fork.describe().forkClass().getCanonicalName().indexOf("LightWeight") != -1) {
-				resultEntries = LightWeightExportDirFork.getEntries(entries, getResourceKey(), requestedShortForm, dirPath);
-				// End of ASG Mat 10, 2014 changes
-			} else {
-
-				for (InternalEntry internalEntry : entries) {
-					if (internalEntry.isExistent()) {
-						EndpointReferenceType epr = internalEntry.getEntryReference();
-						RNSEntryResponseType entry =
-							new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr, Prefetcher.preFetch(epr,
-								internalEntry.getAttributes(), factory, null, null, requestedShortForm)), null,
-								internalEntry.getName());
-						// ---------------------------------------------------------------------------------------------
-						// Removing EPR from entry when short form is requested
-						if (requestedShortForm)
-							entry.setEndpoint(null);
-						// ---------------------------------------------------------------------------------------------
-						resultEntries.add(entry);
-					} else {
-						String name = internalEntry.getName();
-						RNSEntryResponseType entry =
-							new RNSEntryResponseType(null, null,
-								FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null, null,
-									new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry"
-										+ " %s does not exist!", name)) }, null, name)), name);
-						resultEntries.add(entry);
+			for (InternalEntry internalEntry : entries) {
+				if (internalEntry.isExistent()) {
+					EndpointReferenceType epr = internalEntry.getEntryReference();
+					RNSEntryResponseType entry =
+						new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
+							Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null, requestedShortForm)),
+							null, internalEntry.getName());
+					// Remove EPR from entry when short form is requested.
+					if (requestedShortForm) {
+						entry.setEndpoint(null);
 					}
+					resultEntries.add(entry);
+				} else {
+					String name = internalEntry.getName();
+					RNSEntryResponseType entry =
+						new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(
+							null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String
+								.format("Entry" + " %s does not exist!", name)) }, null, name)), name);
+					resultEntries.add(entry);
 				}
-				timer.noteTime();
-
-				timer = tSink.getTimer("Create Iterator");
 			}
+			timer.noteTime();
+			timer = tSink.getTimer("Create Iterator");
+
 			return RNSContainerUtilities.indexedTranslate(resultEntries, iteratorBuilder(RNSEntryResponseType.getTypeDesc()
 				.getXmlType()), wrapper);
 		} catch (IOException ioe) {
