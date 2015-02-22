@@ -8,17 +8,17 @@
 Note that the number of arguments required seems immense, but they allow specification of
 all the important parts of the user, home and group paths involved.  These are all necessary
 for setting up grid structure per organizational schemes as potentially required by our
-customers, be they universities, ngos, corporations, or what not.
+customers, be they universities, NGOs, corporations, or whatnot.
 
 Script arguments:
   1=container path (e.g. /containers/BootstrapContainer or /containers/geology/Forbinz).
-  2=user (e.g. joe).
-  3=user path (e.g. /users/joe or /users/toledo/joe etc.)
-  4=password.
+  2=user (e.g. userX).
+  3=full user path (e.g. /users/userX or /users/caltech/astro/userX etc.)
+  4=user's password.
   5=group (short name for group, such as cremora-idp-group).
   6=group path (full path to group, e.g. /groups/grange/tillingham).
-  7=root of home for user (e.g. allows /home/company/division/dept/userX and other arrangements).
-  8=root of user path for user (e.g. allows /users/caltech/astro/userX for structure).
+  7=root of home for the user (e.g. /home/company/division/dept, with userX as a new subdir).
+  8=root of user path for user (e.g. /users/caltech/astro, with userX as a new STS).
 -->
 
 <gsh:script
@@ -37,6 +37,7 @@ Script arguments:
         <try>
           <block>
             <geniix:mkdir>
+              <param>-p</param>
               <param>${ARGV[8]}</param>
             </geniix:mkdir>
           </block>
@@ -100,6 +101,7 @@ Script arguments:
         <try>
           <block>
             <geniix:mkdir>
+              <param>-p</param>
               <param>${ARGV[7]}</param>
             </geniix:mkdir>
           </block>

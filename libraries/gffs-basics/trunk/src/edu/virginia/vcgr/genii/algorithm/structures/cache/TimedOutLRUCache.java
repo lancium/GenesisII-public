@@ -7,7 +7,7 @@ import java.util.Set;
 
 /**
  * This cache attempt to efficiently handle cached items that may time out after a certain period of
- * time. It does this by maintaining 3 seperate data structures. The first is a HashMap which allows
+ * time. It does this by maintaining 3 separate data structures. The first is a HashMap which allows
  * for quick access to the cached data based off of the key. The second is a linked list which
  * maintains the LRU property of the items. The third is a list ordered by timeout so that items
  * that have timed out can be identified quickly (i.e., a straight traversal of this list). All data
