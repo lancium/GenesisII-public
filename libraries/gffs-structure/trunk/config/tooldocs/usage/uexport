@@ -7,9 +7,6 @@ export --create { <export-service-path> | --url <export-service-url> }
 
 export --quit { <export-root-rns-path> | --url <export-root-url> }
 
-export --replicate { <primary-container-name> <resolver-container-name> | --url <primary-machine-url> <resolver-machine-url> }
-       <primary-local-path> [new-rns-path]
-
 Example:
 
 export --create --creator="/CN=Dill Pickle" /containers/khandroma_jurgis/Services/LightWeightExportPortType local:/home/jurgis/xsede/code/trunk /src/GenesisII.trunk

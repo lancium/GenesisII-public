@@ -16,7 +16,6 @@ package edu.virginia.vcgr.genii.client.exportdir;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -45,14 +44,11 @@ public class ExportedDirUtils
 	static final public String _SVN_PASSWORD = "svn-pass";
 	static final public String _SVN_REVISION = "svn-revision";
 	/*
-	 * the primary owner of the export should be the grid user who creates the export. the secondary
-	 * owner is the TLS identity used to create it. the secondary owner may not matter, if it's a
-	 * simple self-signed tls certificate. but if it's the xsede TLS identity, we need to track that
-	 * as the export owner for interacting with pre-established xsede grid-mapfile files. the format
-	 * of these strings is just the DN of the respective users.
+	 * the primary owner of the export is the DN of the identity who creates the export. the format
+	 * of this string is just the DN of the respective user / group. there is no longer any
+	 * secondary owner for the export.
 	 */
 	static final public String _EXPORT_PRIMARY_OWNER = "primary-owner";
-	static final public String _EXPORT_SECONDARY_OWNER = "secondary-owner";
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(ExportedDirUtils.class);
@@ -68,15 +64,9 @@ public class ExportedDirUtils
 		private String _svnPass = null;
 		private Long _svnRevision = null;
 		private String _primaryOwner = null;
-		private String _secondaryOwner = null;
 
-		/*
-		 * public ExportedDirInitInfo(String path, String parentIds, String isReplicated) { _path =
-		 * path; _parentIds = parentIds; _isReplicated = isReplicated; }
-		 */
 		public ExportedDirInitInfo(String path, String parentIds, String isReplicated, Long lastModified,
-			EndpointReferenceType resolverServiceEPR, String svnUser, String svnPass, Long svnRevision, String primaryDN,
-			String secondaryDN)
+			EndpointReferenceType resolverServiceEPR, String svnUser, String svnPass, Long svnRevision, String primaryDN)
 		{
 			_path = path;
 			_parentIds = parentIds;
@@ -87,7 +77,6 @@ public class ExportedDirUtils
 			_svnPass = svnPass;
 			_svnRevision = svnRevision;
 			_primaryOwner = primaryDN;
-			_secondaryOwner = secondaryDN;
 		}
 
 		public String getPath()
@@ -119,12 +108,7 @@ public class ExportedDirUtils
 		{
 			return _primaryOwner;
 		}
-
-		public String getSecondaryOwnerDN()
-		{
-			return _secondaryOwner;
-		}
-
+		
 		public String svnUser()
 		{
 			return _svnUser;
@@ -142,7 +126,7 @@ public class ExportedDirUtils
 	}
 
 	static public MessageElement[] createCreationProperties(String humanName, String path, String svnUser, String svnPass,
-		Long svnRevision, String parentIds, String isReplicated, ArrayList<String> owners) throws RemoteException
+		Long svnRevision, String parentIds, String isReplicated, String owner) throws RemoteException
 	{
 		Collection<MessageElement> any = new Vector<MessageElement>(6);
 		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path));
@@ -153,11 +137,8 @@ public class ExportedDirUtils
 		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_USERNAME), svnUser));
 		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_PASSWORD), svnPass));
 		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_REVISION), svnRevision));
-		if (owners != null) {
-			if (owners.size() >= 1)
-				any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _EXPORT_PRIMARY_OWNER), owners.get(0)));
-			if (owners.size() >= 2)
-				any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _EXPORT_SECONDARY_OWNER), owners.get(1)));
+		if (owner != null) {
+			any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _EXPORT_PRIMARY_OWNER), owner));
 		}
 
 		if (humanName != null) {
@@ -211,7 +192,6 @@ public class ExportedDirUtils
 		String svnPass = null;
 		Long svnRevision = null;
 		String primaryDN = null;
-		String secondaryDN = null;
 
 		if (properties == null)
 			throw new IllegalArgumentException("Can't have a null export creation properites parameter.");
@@ -279,14 +259,6 @@ public class ExportedDirUtils
 		} catch (Exception e) {
 			throw new ResourceException("Unable to extract primary owner DN.", e);
 		}
-		MessageElement secondaryOwner =
-			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _EXPORT_SECONDARY_OWNER));
-		try {
-			if (secondaryOwner != null && secondaryOwner.getValue() != null)
-				secondaryDN = (String) secondaryOwner.getObjectValue(String.class);
-		} catch (Exception e) {
-			throw new ResourceException("Unable to extract secondary owner DN.", e);
-		}
 
 		// ensure all properties filled in
 		if (path == null)
@@ -298,7 +270,7 @@ public class ExportedDirUtils
 		lastModified = getLastModifiedTime(path);
 
 		return new ExportedDirInitInfo(path, parentIds, isReplicated, lastModified, resolverServiceEPR, svnUser, svnPass,
-			svnRevision, primaryDN, secondaryDN);
+			svnRevision, primaryDN);
 	}
 
 	static public String createParentIdsString(String ancestorIdString, String parentId)

@@ -464,7 +464,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 	}
 
 	/**
-	 * For each block that was completly overwritten with valid data, mark the block as valid.
+	 * For each block that was completely overwritten with valid data, mark the block as valid.
 	 */
 	private void updateBitmap(long firstByte, int size, long fileSize) throws ResourceException, IOException
 	{

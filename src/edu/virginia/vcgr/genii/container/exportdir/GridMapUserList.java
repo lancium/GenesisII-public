@@ -15,4 +15,19 @@ public class GridMapUserList extends ArrayList<String>
 	{
 		this.addAll(Arrays.asList(names));
 	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder toReturn = new StringBuilder();
+		for (String s : this) {
+			if (toReturn.length() > 0) {
+				toReturn.append(",");
+			}
+			toReturn.append("'");
+			toReturn.append(s);
+			toReturn.append("'");
+		}		
+		return toReturn.toString();
+	}
 }

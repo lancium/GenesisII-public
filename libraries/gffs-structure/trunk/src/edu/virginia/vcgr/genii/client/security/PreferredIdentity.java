@@ -75,6 +75,9 @@ public class PreferredIdentity implements Serializable
 		return _identityString;
 	}
 
+	/**
+	 * return the current preferred identity in openssl one-line RDN format.
+	 */
 	public String getIdentityString()
 	{
 		return _identityString;
@@ -309,7 +312,7 @@ public class PreferredIdentity implements Serializable
 	 * giving a credential wallet's contents is not enough, since those never include the
 	 * connection.
 	 */
-	static public String resolveIdentityPatternInCredentials(String pattern, List<NuCredential> creds)
+	static public X509Certificate findIdentityPatternInCredentials(String pattern, List<NuCredential> creds)
 	{
 		if ((pattern == null) || (creds == null))
 			return null;
@@ -329,8 +332,17 @@ public class PreferredIdentity implements Serializable
 			X509Certificate[] x509 = nc.getOriginalAsserter();
 
 			if (PreferredIdentity.getDnString(x509[0]).contains(pattern)) {
-				return PreferredIdentity.getDnString(x509[0]);
+				return x509[0];
 			}
+		}
+		return null;
+	}
+	
+	static public String resolveIdentityPatternInCredentials(String pattern, List<NuCredential> creds)
+	{
+		X509Certificate cert = findIdentityPatternInCredentials(pattern, creds);
+		if (cert != null) {
+			return PreferredIdentity.getDnString(cert);
 		}
 		return null;
 	}

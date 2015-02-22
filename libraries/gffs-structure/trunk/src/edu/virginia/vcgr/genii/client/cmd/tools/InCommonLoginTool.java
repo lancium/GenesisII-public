@@ -170,11 +170,6 @@ public class InCommonLoginTool extends BaseLoginTool
 			callContext.setActiveKeyAndCertMaterial(clientKeyMaterial);
 			ContextManager.storeCurrentContext(callContext);
 
-			/*
-			 * hmmm: adding a preferred identity for the incommon TLS cert seems like the right
-			 * idea, similar to myproxy login before xsede login. may need to discuss if this is
-			 * generally the 'right' user to associate with.
-			 */
 			// handle establishing a preferred identity, if that's not set as fixated.
 			if (!PreferredIdentity.fixatedInCurrent()) {
 				// the identity wasn't fixated, or it doesn't exist, so we can set preferred

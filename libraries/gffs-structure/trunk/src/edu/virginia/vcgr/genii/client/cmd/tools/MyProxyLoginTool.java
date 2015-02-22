@@ -82,8 +82,10 @@ public class MyProxyLoginTool extends BaseLoginTool
 	@Override
 	protected void verify() throws ToolException
 	{
+/*cannot check this here, since verify is called before runCommand, which gathers this argument.
 		if ((_username == null) || (_username.length() == 0))
 			throw new InvalidToolUsageException("The username cannot be blank.");
+*/
 
 		if (_durationString != null) {
 			try {

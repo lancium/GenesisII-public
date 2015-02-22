@@ -30,6 +30,7 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.MessageElementUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
@@ -506,7 +507,7 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 		if (!dir.isDirectory())
 			throw new ResourceException("Local path for exported dir is not a directory.");
 
-		/* Get listting */
+		/* Get listing */
 		File[] localEntries = dir.listFiles();
 		ArrayList<File> ret = new ArrayList<File>();
 
@@ -607,11 +608,13 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 						/* moved code to check if _dirServiceEPR set to constructor */
 						serviceEPR = _dirServiceEPR;
 						entryType = ExportedDirEntry._DIR_TYPE;
-						// hmmm: add in export owner here!!!
-						ArrayList<String> owners = null;
+						PreferredIdentity current = PreferredIdentity.getCurrent();
+						String owner = current != null? current.getIdentityString() : null;
+						if (_logger.isDebugEnabled())
+							_logger.debug("got preferred identity for new export: '" + owner + "'");
 						creationProperties =
 							ExportedDirUtils.createCreationProperties(null, newPath, null, null, null, childrenParentIds,
-								getReplicationState(), owners);
+								getReplicationState(), owner);
 					} catch (RemoteException re) {
 						throw new ResourceException("Unable to create construction parameters.", re);
 					}

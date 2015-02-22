@@ -82,8 +82,10 @@ public class XSEDELoginTool extends BaseLoginTool
 		BaseLoginTool.copyCreds(mpTool, lTool);
 		retVal = lTool.run(stdout, stderr, stdin);
 
-//hmmm: this seems to be the crucial fix for the grid shell logging in to work and be kept in context.
-		// reload current context.
+		/*
+		 * reload current context. this seems to be the crucial fix for the grid shell logging in to
+		 * work and be kept in context.
+		 */
 		callContext = ContextManager.getCurrentContext();
 
 		// reset any pass-through credential that had been established during login, since it's no longer needed.

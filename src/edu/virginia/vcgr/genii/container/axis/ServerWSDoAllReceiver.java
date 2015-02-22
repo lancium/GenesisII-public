@@ -647,27 +647,20 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		}
 	}
 
-	/*
-	 * As the name suggests, this method stores the client's SAML credentials in the calling
-	 * context.
+	/**
+	 * We retrieve delegated SAML credentials from the working context and store them in the calling
+	 * context. This is done because we traditionally use the calling context, not the working
+	 * context, for all security related purposes. Furthermore, this usage matches the client-side
+	 * credentials handling logic.
 	 */
 	private void populateSAMLPropertiesInContext(WorkingContext workingContext, ICallingContext callContext)
 	{
-
-		// We retrieve delegated SAML credentials from the working context and
-		// store them in the
-		// calling context. This is done because we traditionally use the
-		// calling context, not the
-		// working context, for all security related purposes. Furthermore, this
-		// usage matches the
-		// client-side credentials handling logic.
+		// migrate the credentials from working context to the calling context.
 		CredentialWallet credentialsWallet =
 			(CredentialWallet) workingContext.getProperty(SAMLConstants.SAML_CREDENTIALS_WORKING_CONTEXT_CREDS_PROPERTY_NAME);
 		callContext.setTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME, credentialsWallet);
 
-		// Like the credential wallet, we copy client's SSL certificate from the
-		// working context to
-		// the calling context.
+		// also copy the client's SSL certificate from the working context to the calling context.
 		X509Certificate[] clientSSLCertificate =
 			(X509Certificate[]) workingContext.getProperty(SAMLConstants.SAML_CLIENT_SSL_CERTIFICATE_PROPERTY_NAME);
 		callContext.setTransientProperty(SAMLConstants.SAML_CLIENT_SSL_CERTIFICATE_PROPERTY_NAME, clientSSLCertificate);
@@ -683,11 +676,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	 *         during CertPathValidation)
 	 * @throws WSSecurityException
 	 */
+	@Override
 	protected boolean verifyTrust(X509Certificate cert, RequestData reqData) throws WSSecurityException
 	{
-		// Return true for now. performAuthz() will grab the creds retrieved
-		// via message signature (and elsewhere) and make the actual trust/authz
-		// decision.
+		/*
+		 * Return true for now. performAuthz() will grab the creds retrieved via message signature
+		 * (and elsewhere) and make the actual trust/authz decision.
+		 */
 		return true;
 	}
 
@@ -699,7 +694,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	 */
 	static public class ServerPWCallback implements CallbackHandler
 	{
-
 		/**
 		 * 
 		 * @see javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])
@@ -715,19 +709,18 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 					switch (pc.getUsage()) {
 						case WSPasswordCallback.USERNAME_TOKEN:
-							// broken, but WSS4J seems to call
-							// USERNAME_TOKEN_UNKNOWN
-							// case below anyway
+							/*
+							 * broken, but WSS4J seems to call USERNAME_TOKEN_UNKNOWN case below
+							 * anyway.
+							 */
 							break;
 
 						case WSPasswordCallback.USERNAME_TOKEN_UNKNOWN:
-
 							// Grab the supplied username token
 							UsernamePasswordIdentity identity =
 								new UsernamePasswordIdentity(pc.getIdentifer(), pc.getPassword());
 
-							// Extract our calling context (any decryption
-							// should be over with)
+							// Extract our calling context (any decryption should be finished).
 							ICallingContext callContext = null;
 							try {
 								callContext = ContextManager.getExistingContext();

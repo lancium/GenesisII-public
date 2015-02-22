@@ -1,0 +1,12 @@
+mst [-e | -c] [--existance | --compare] [Resource-propertyname] [><=<>] [value-of-the-property]
+
+** If you are trying to compare a resource property whose value is a time (i.e- modificationTime, currentTime etc.), 
+the compared value-of-the-property must also be in a valid time format(yyyy-mm-dd hh:mm:ss[.f])    
+
+example:
+
+mds -c modificationTime > 2014-01-01 
+
+-- This will find all the files or directories which have been modified after the 1st Jan of 2014.
+
+-- Resource property name can be any XPath expression  

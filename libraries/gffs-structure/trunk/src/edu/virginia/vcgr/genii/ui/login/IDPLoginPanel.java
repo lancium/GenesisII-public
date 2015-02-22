@@ -116,8 +116,6 @@ final class IDPLoginPanel extends LoginPanel
 		// 0 is none, 1 is xsede, 2 is lrz, index must match setting above!
 		_comboBox.setSelectedIndex(1);
 		
-		// hmmm: also need to record the type in user prefs!!!
-		
 		_comboBox.addActionListener(new InternalActionListener());		
 		
 		add(new JLabel("Username"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
@@ -256,6 +254,10 @@ final class IDPLoginPanel extends LoginPanel
 	
 	public void setupAccordingToType(ProxyTypes newType)
 	{
+		
+		// hmmm: also need to record the current type in user prefs when it changes!!!
+		
+
 		if (newType != null) {
 			// patch the paths to be the expected locations for xsede or gffs.eu.
 			_type = newType;
@@ -288,11 +290,11 @@ final class IDPLoginPanel extends LoginPanel
 		{
 			@SuppressWarnings("unchecked")
 			JComboBox<String> cb = (JComboBox<String>)e.getSource();
-	        String proxy = (String)cb.getSelectedItem();
-	        //updateLabel(proxy);
-			
-			ProxyTypes newType = ProxyTypes.parseString(proxy);
-			setupAccordingToType(newType);
+			if (cb != null) {
+				String proxy = (String)cb.getSelectedItem();			
+				ProxyTypes newType = ProxyTypes.parseString(proxy);
+				setupAccordingToType(newType);
+			}
 		}		
 	}
 }

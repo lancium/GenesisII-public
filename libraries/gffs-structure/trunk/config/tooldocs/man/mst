@@ -1,0 +1,20 @@
+Description:
+
+The grid mst tool allows the user to find files or directories with a given resource property.
+
+The following options are available:
+
+-e | --existence
+
+Checks for existence of any given resource property.
+
+-c | --compare
+
+filter out the files and directories using a comparison
+operation on the resource property/properties.
+** In case of comparing the time the right side of the comparison must be a valid time.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.LsTool 

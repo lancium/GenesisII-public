@@ -212,17 +212,18 @@ public class CredentialWallet implements Externalizable, Describable
 		return null;
 	}
 
-	public String getFirstUserName()
+	/**
+	 * pulls out the CN as a user name from the X509Certificate.
+	 */
+	static public String extractUsername(X509Certificate cert)
 	{
-		TrustCredential assertion = getFirstUserCredential();
-		if (assertion != null) {
-			// This is a USER assertion of the form A->B->... where A is a USER.
-			String userName =
-				X500PrincipalUtilities.getCN(assertion.getRootOfTrust().getOriginalAsserter()[0].getSubjectX500Principal());
-			_logger.debug("calculated user name for byteio storage: '" + userName + "'");
-			return userName;
-		}
-		return null;
+		if (cert == null)
+			return null;
+		// This is a USER assertion of the form A->B->... where A is a USER.
+		String userName = X500PrincipalUtilities.getCN(cert.getSubjectX500Principal());
+		if (_logger.isDebugEnabled())
+			_logger.debug("calculated user name: '" + userName + "'");
+		return userName;
 	}
 
 	public static boolean chainsAreIntact(TrustCredential credential)

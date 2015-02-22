@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
-import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,6 +20,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 
 public class ExportManipulator
@@ -74,12 +74,16 @@ public class ExportManipulator
 			throw new ResourceException("exception during export checking.", r);
 		}
 		// Now we have both the container path and the target path.
-		// hmmm: need to add in the owners of the export!
-		ArrayList<String> owners = null;
+		
+		// find out the owner of the export from the preferred id.
+		PreferredIdentity current = PreferredIdentity.getCurrent();
+		String owner = current != null? current.getIdentityString() : null;
+		if (_logger.isDebugEnabled())
+			_logger.debug("got preferred identity for new export: '" + owner + "'");
 		try {
 			EndpointReferenceType exEPR =
 				ExportTool.createExportedRoot(targetpath.toString(), servicepath.getEndpoint(), localPath, "", "", 0L,
-					targetpath.toString(), false, owners);
+					targetpath.toString(), false, owner);
 			if (exEPR == null)
 				_logger.debug("created null EPR with createExportedRoot");
 		} catch (Exception r) {

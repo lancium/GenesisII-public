@@ -895,8 +895,6 @@ public class RNSPath implements Serializable, Cloneable
 				try {
 					context = ContextManager.getCurrentContext();
 					context.setSingleValueProperty("RNSShortForm", true);
-					// hmmm: also have taken out context storing here in applyContents.
-					// ContextManager.storeCurrentContext(context);
 					_logger.trace("Short RNS form requested from Grid Client.");
 				} catch (Exception e) {
 					_logger.trace("could not set the short form");
@@ -926,12 +924,8 @@ public class RNSPath implements Serializable, Cloneable
 			}
 
 			if (getShortForm) {
-				// remove the calling context property for short form
-				// ICallingContext context;
 				try {
-					// context = ContextManager.getCurrentContext();
 					context.removeProperty("RNSShortForm");
-					// ContextManager.storeCurrentContext(context);
 				} catch (Exception e) {
 					_logger.error("Could not remove the short form request from the calling context", e);
 				}

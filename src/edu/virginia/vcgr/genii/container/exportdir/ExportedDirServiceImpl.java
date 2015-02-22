@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.container.exportdir;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -37,6 +36,7 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.ResourceLock;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.utils.StatsLogger;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -232,12 +232,17 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			String fullPath = ExportedFileUtils.createFullPath(_resource.getLocalPath(), name);
 			String parentIds = ExportedDirUtils.createParentIdsString(_resource.getParentIds(), _resource.getId());
 			String isReplicated = _resource.getReplicationState();
-			// hmmm: add in export owner here!!!
-			ArrayList<String> owners = null;
+
+			// find out the owner of the export from the preferred id.
+			PreferredIdentity current = PreferredIdentity.getCurrent();
+			String owner = current != null? current.getIdentityString() : null;
+			if (_logger.isDebugEnabled())
+				_logger.debug("got preferred identity for new export: '" + owner + "'");
+
 			newRef =
 				vcgrCreate(
 					new VcgrCreate(ExportedDirUtils.createCreationProperties(null, fullPath, null, null, null, parentIds,
-						isReplicated, owners))).getEndpoint();
+						isReplicated, owner))).getEndpoint();
 
 			String newEntryId = (new GUID()).toString();
 			ExportedDirEntry newEntry =

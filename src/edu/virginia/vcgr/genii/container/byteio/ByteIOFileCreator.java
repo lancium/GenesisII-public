@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.byteio;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.Random;
 
 import org.apache.commons.logging.Log;
@@ -10,8 +11,9 @@ import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
+import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoExportUtils;
-import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 
 public class ByteIOFileCreator
@@ -33,24 +35,22 @@ public class ByteIOFileCreator
 
 		// First get the calling context.
 		ICallingContext callContext = ContextManager.getExistingContext();
-		// Then get the credential wallet.
-		CredentialWallet Wallet =
-			(CredentialWallet) callContext.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);
-		// Then, get the list of USER names from the credential wallet.
-		if (!Wallet.isEmpty()) {
-			/*
-			 * Then pick the first one, but be careful - usernames may not always be unique - they are these days, but maybe not
-			 * in future.
-			 */
-			String userName = Wallet.getFirstUserName();
+		
+		String prefId = (PreferredIdentity.getCurrent() != null? PreferredIdentity.getCurrent().getIdentityString() : null); 
+		X509Certificate owner = GffsExportConfiguration.findPreferredIdentityServerSide(callContext, prefId);
+		String userName = CredentialWallet.extractUsername(owner); 
+		if (_logger.isDebugEnabled())
 			_logger.debug("username chosen for byteio file is: " + userName);
-			if (userName != null) {
-				baseDir = new GuaranteedDirectory(uroot, userName);
-			} else {
-				String msg = "failed attempting to create a byteio file without any user credentials.";
-				_logger.error(msg);
-				throw new IOException(msg);
-			}
+		if (userName != null) {
+			/*
+			 * hmmm: we need to interact with proxyio server here to guarantee a directory in user
+			 * location, if the byteio.InUserHome option is true.
+			 */
+			baseDir = new GuaranteedDirectory(uroot, userName);
+		} else {
+			String msg = "failed attempting to create a byteio file without any user credentials.";
+			_logger.error(msg);
+			throw new IOException(msg);
 		}
 
 		String filePrefix = "rbyteio";

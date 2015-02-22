@@ -22,7 +22,8 @@ public class RequestHandler implements Runnable
 
 	RequestHandler(Socket sock, byte[] nonce)
 	{
-		_logger.info("request handler created on socket with port " + sock.getLocalPort());
+		if (_logger.isDebugEnabled())
+			_logger.debug("request handler created on socket with port " + sock.getLocalPort());
 		this.socket = sock;
 		System.arraycopy(nonce, 0, this.nonce, 0, nonce.length);
 	}
@@ -43,7 +44,7 @@ public class RequestHandler implements Runnable
 			if (bytes_read == -1) {
 				DefaultResponse.send(socket, ErrorCode.NW_READ_ERROR_CODE,
 					ErrorCode.getErrorMsgFromErrorCode(ErrorCode.NW_READ_ERROR_CODE));
-				_logger.info("failed to read any bytes from client");
+				_logger.warn("failed to read any bytes from client.");
 				return;
 			}
 
@@ -51,10 +52,11 @@ public class RequestHandler implements Runnable
 			if (request == null) {
 				DefaultResponse.send(socket, ErrorCode.INVALID_REQ_ERROR_CODE,
 					ErrorCode.getErrorMsgFromErrorCode(ErrorCode.INVALID_REQ_ERROR_CODE));
-				_logger.info("Bad request, could not unmarshal!");
+				_logger.error("Bad request from client, could not unmarshal!");
 				return;
 			}
-			_logger.info("request received: " + request.toString());
+			if (_logger.isDebugEnabled())
+				_logger.debug("request received: " + request.toString());
 
 			request.handle(socket);
 
@@ -62,7 +64,7 @@ public class RequestHandler implements Runnable
 		} catch (IOException e) {
 			DefaultResponse.send(socket, ErrorCode.NW_READ_ERROR_CODE,
 				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.NW_READ_ERROR_CODE));
-			_logger.info("io exception caught in run", e);
+			_logger.error("io exception caught in run", e);
 		} finally {
 			try {
 				bin.close();
@@ -147,10 +149,8 @@ public class RequestHandler implements Runnable
 				return null;
 			}
 		}
-
-		_logger.info("num bytes read = " + request.getNumBytesRead());
-		// System.out.println(new String(request.getWriteBuf()));
-
+		if (_logger.isDebugEnabled())	
+			_logger.debug("num bytes read = " + request.getNumBytesRead());
 		return request;
 	}
 

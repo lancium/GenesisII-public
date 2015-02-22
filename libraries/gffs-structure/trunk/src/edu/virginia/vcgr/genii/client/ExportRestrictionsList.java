@@ -14,7 +14,6 @@ public class ExportRestrictionsList
 	public ExportRestrictionsList()
 	{
 		_restrictions = InstallationProperties.getInstallationProperties().getExportCreationRestrictionsFile();
-
 	}
 
 	/**
@@ -31,6 +30,13 @@ public class ExportRestrictionsList
 
 	// hmmm: implement the rest of this class.
 
-	// needs like: checkCreation(path, mode)
-	// verified against the file.
+	/**
+	 * tests a path to see whether exports are allowed on it or not.
+	 */
+	boolean checkCreationOkay(String path, String mode)
+	{
+		///hmmm: implement parsing of the restrictions file.
+		
+		return true;
+	}
 }

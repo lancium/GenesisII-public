@@ -167,10 +167,10 @@ public class ApplicationBase
 			_logger.error("did not find the grid connection command line in the proper format.  bailing out.");
 			return GridStates.CONNECTION_MEANS_UNKNOWN;
 		}
-		parameters[0] = parameters[0].substring(1); // take off initial quote on first parm.
-		parameters[1] = parameters[1].substring(0, parameters[1].length() - 1); // take off last
-																				// quote on second
-																				// parm.
+		// take off initial quote on first parm.
+		parameters[0] = parameters[0].substring(1);
+		// take off last quote on second parm.
+		parameters[1] = parameters[1].substring(0, parameters[1].length() - 1);
 		if (_logger.isDebugEnabled())
 			_logger.debug("got arguments: [0]=" + parameters[0] + " [1]=" + parameters[1]);
 

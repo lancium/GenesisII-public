@@ -1,0 +1,4 @@
+The Metadata search tool (mst) is designed to filter out files and directories
+with a given (set of) resource properties. The tool does that by using a
+recursive decent search starting from the current directory. It uses XPath
+expressions to search through the metadata of resources.

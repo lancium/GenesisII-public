@@ -28,26 +28,25 @@ public class Driver
 
 	public static void main(String[] args)
 	{
-		_logger.info("starting proxy io driver program...");
-
+		if (_logger.isDebugEnabled())
+			_logger.debug("Proxy server: request to start");
+		
 		BufferedInputStream bis = new BufferedInputStream(System.in);
-		_logger.info("Proxy server: request to start");
 
-		// int nonce = -1;
 		byte[] nonce = new byte[Constants.NONCE_SIZE];
 		try {
 			int nonce_size = bis.read(nonce);
 			// We ensure we get 16 bytes from client!
 			if (nonce_size != Constants.NONCE_SIZE) {
 				System.out.println("0");
-				_logger.info("ProxyServer: Did not get 16 byte nonce. Exitting");
+				_logger.error("ProxyServer: Did not get 16 byte nonce. Exiting!");
 				System.exit(-1);
 			}
 			bis.close();
 
 		} catch (Exception e) {
 			System.out.println("0");
-			_logger.info("ProxyServer: Error reading nonce. Exiting!");
+			_logger.error("ProxyServer: Problem reading nonce. Exiting!");
 			System.exit(-1);
 		}
 
@@ -58,7 +57,7 @@ public class Driver
 		} catch (IOException ioe) {
 			StreamUtils.close(socket);
 			System.out.println("0");
-			_logger.info("ProxyServer: Error creating server socket. Exiting!!");
+			_logger.error("ProxyServer: Error creating server socket.  Exiting!!");
 			System.exit(-1);
 		}
 
@@ -66,26 +65,28 @@ public class Driver
 
 		System.out.println(socket.getLocalPort());
 		
-		_logger.info("communicated port to client.");
+		if (_logger.isDebugEnabled())
+			_logger.debug("communicated port to client.");
 		
 		// start the monitoring thread!
 		Monitor monitor = new Monitor(System.currentTimeMillis());
 		Thread monitor_thread = new Thread(monitor);
 		monitor_thread.start();
+		if (_logger.isDebugEnabled())
+			_logger.debug("started monitoring thread.");
 		
-		_logger.info("started monitoring thread.");
-
-		_logger.info("before starting accept loop.");
+		if (_logger.isDebugEnabled())
+			_logger.debug("before starting accept loop.");
 		
 		// Starting select-accept loop!
 		while (true) {
 			try {
 				// wait for request
 				Socket connxn = socket.accept();
-				//hmmm: this should only accept on loopback, and then we don't need a check.
+				//hmmm: this should only accept on loopback, and then we don't need a check below.
 				
-				//hmmm: too noisy.
-				_logger.info("accept gives us a client socket on port " + connxn.getPort());				
+				if (_logger.isDebugEnabled())
+					_logger.debug("accept gives us a client socket on port " + connxn.getPort());				
 
 				// Only localhost requests are entertained!
 				if (!connxn.getInetAddress().isLoopbackAddress()) {
