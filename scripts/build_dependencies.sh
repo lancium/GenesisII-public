@@ -10,6 +10,11 @@ export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's work
 export TOPDIR="$WORKDIR/.."
 pushd "$TOPDIR"
 
+# set the install dir variable if not already.
+if [ -z "$GENII_INSTALL_DIR" ]; then
+  export GENII_INSTALL_DIR="$TOPDIR"
+fi
+
 # set up some important variables for the success of the build.
 export ANT_OPTS='-Xms512m -Xmx768m -XX:MaxPermSize=768m'
 
