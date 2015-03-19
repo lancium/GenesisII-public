@@ -31,6 +31,7 @@ function validate_configuration()
     echo installation before running this script.
     exit 1
   fi
+#below should be unnecessary with new JAVA_HOME guessing code in prepare_tools.
 #  if [ -z "$JAVA_HOME" -o ! -d "$JAVA_HOME" -o ! -d "$JAVA_HOME/bin" ]; then
 #    echo The JAVA_HOME variable must be set to point at Java for this computer.
 #    echo The standard is for there to be a bin folder under that location.

@@ -246,6 +246,21 @@ function bootstrap_grid()
 
   grid_chk script "local:'${bootstrap_file}'"
 
+  # now put the context file into standard location for bootstrapping.
+  cp "$GENII_INSTALL_DIR/context.xml" "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/context.xml"
+  check_if_failed "copying context file into deployment '$DEPLOYMENT_NAME'"
+
+  # also put a simple generated container.properties file into place.
+  cp "$GENII_INSTALL_DIR/container.properties.example" "$GENII_INSTALL_DIR/container.properties"
+  check_if_failed "generating a container.properties file"
+
+  # drop in the reconnection line so our mini grid canhaz simple reconnect.
+  echo "edu.virginia.vcgr.genii.gridInitCommand=\"local:$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/context.xml\" \"$DEPLOYMENT_NAME\"" >>"$GENII_INSTALL_DIR/container.properties"
+  check_if_failed "adding grid connection information to container.properties"
+
+  # copy up a bogus deployment information file to have a placeholder that makes sense.
+  cp "$GENII_INSTALL_DIR/installer/bootstrap-build.config" "$GENII_INSTALL_DIR/current.deployment"
+  check_if_failed "copying current.deployment for bootstrapped grid"
   # jump back out of the install directory.  the deployment behaves
   # oddly if we aren't in there, but nothing else should require being in the install dir.
   popd &>/dev/null
