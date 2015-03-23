@@ -47,6 +47,7 @@ public class FileDisplayWidget extends JTextPane
 		try {
 			StyledDocument doc = getStyledDocument();
 			doc.remove(0, doc.getLength());
+			repaint();
 		} catch (Throwable cause) {
 			_logger.warn("Unable to clear Text area.", cause);
 		}

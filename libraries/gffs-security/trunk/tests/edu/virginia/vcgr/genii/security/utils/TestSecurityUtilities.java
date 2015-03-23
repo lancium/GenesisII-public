@@ -19,7 +19,11 @@ public class TestSecurityUtilities
 {
 	static private Log _logger = LogFactory.getLog(TestSecurityUtilities.class);
 
-	// hmmm: test is currently tied to the xsede official certs dir.
+	/*
+	 * future: test is currently tied to the xsede official certs dir. this needs to be fixed for
+	 * generality.
+	 */
+	// future: make this into a junit based unit test.
 
 	boolean skipTest = false; // skips all tests if set to true.
 	List<X509CRL> foundCrls = null;
@@ -124,9 +128,8 @@ public class TestSecurityUtilities
 				isRevoked = true;
 			}
 			assertFalse(isRevoked);
-			
-			InputStream is =
-				TestSecurityUtilities.class.getResourceAsStream("revoked_gw135_iu_xsede_org.cer");
+
+			InputStream is = TestSecurityUtilities.class.getResourceAsStream("revoked_gw135_iu_xsede_org.cer");
 			if (is == null) {
 				_logger.warn("test does not run in ant build properly right now; depends on eclipse class path.");
 				skipTest = true;
@@ -135,7 +138,7 @@ public class TestSecurityUtilities
 			X509Certificate[] revCerts = SecurityUtilities.loadCertificateChainFromStream(is);
 			assertNotEquals(revCerts.length, 0);
 
-			isRevoked = false;  // reset value.
+			isRevoked = false; // reset value.
 			try {
 				SecurityUtilities.isCertChainRevoked(foundCertStore, revCerts);
 			} catch (Throwable t) {

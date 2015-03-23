@@ -2259,7 +2259,7 @@ public class JobManager implements Closeable
 
 				SecurityUpdateResults checkResults = new SecurityUpdateResults();
 				/*
-				 * hmmm: where does this 10 hour time limit come from? why block it like that with a
+				 * future: where does this 10 hour time limit come from? why block it like that with a
 				 * constant? instead, we should grab the current credentials deadline and use that
 				 * directly.
 				 */

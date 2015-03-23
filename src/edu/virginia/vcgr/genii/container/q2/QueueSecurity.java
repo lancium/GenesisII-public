@@ -154,9 +154,10 @@ public class QueueSecurity
 		return ret;
 	}
 
-	// Determines if caller is admin of this queue
-	// User is a queue admin if they are admin of container
-	// Or in the write acl of the queue
+	/*
+	 * Determines if caller is admin of this queue. User is a queue admin if they are admin of
+	 * container Or in the write acl of the queue.
+	 */
 	public static boolean isQueueAdmin() throws AuthZSecurityException
 	{
 		if (Security.isAdministrator())
@@ -170,10 +171,15 @@ public class QueueSecurity
 			if (authZHandler != null) {
 				config = authZHandler.getAuthZConfig(rKey.dereference(), false);
 				Acl resourceAcls = AxisAcl.decodeAcl(config);
-				for (AclEntry entry : resourceAcls.writeAcl) {
+				for (AclEntry entry : resourceAcls.writeAcl) {					
+					if (entry == null) {
+						// null entry indicates all access.
+						return true;
+					}
 					for (Identity caller : callers) {
-						if (entry.isPermitted(caller))
+						if (entry.isPermitted(caller)) {
 							return true;
+						}
 					}
 				}
 			}

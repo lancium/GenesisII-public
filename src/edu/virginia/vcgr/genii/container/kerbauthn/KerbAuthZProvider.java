@@ -205,7 +205,8 @@ public class KerbAuthZProvider extends AclAuthZProvider
 						File fullKeytabPath =
 							Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keypr._keytab);
 						if (!(new File(fullKeytabPath.getAbsolutePath())).exists()) {
-							_logger.error("Failing authentication on kerberos because keytab file does not exist: " + fullKeytabPath.getAbsolutePath());
+							_logger.error("Failing authentication on kerberos because keytab file does not exist: "
+								+ fullKeytabPath.getAbsolutePath());
 							return false;
 						}
 						if (_logger.isDebugEnabled())
@@ -240,7 +241,8 @@ public class KerbAuthZProvider extends AclAuthZProvider
 					userOptions.put("useTicketCache", "false");
 					userOptions.put("refreshKrb5Config", "true");
 
-					// must always attempt to login as the user, regardless of existence of service principal.
+					// must always attempt to login as the user, regardless of existence of service
+					// principal.
 					_logger.info("authenticating user '" + username + "' against realm '" + realm + "'");
 					Krb5LoginModule userLoginCtx = new Krb5LoginModule();
 					Subject userSubject = new Subject();

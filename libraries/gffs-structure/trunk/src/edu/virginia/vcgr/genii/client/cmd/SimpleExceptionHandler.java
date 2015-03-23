@@ -14,7 +14,7 @@ import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
 public class SimpleExceptionHandler implements IExceptionHandler
 {
 	static private Log _logger = LogFactory.getLog(SimpleExceptionHandler.class);
-	
+
 	public static int performBaseExceptionHandling(Throwable cause, Writer eStream)
 	{
 		PrintWriter errorStream = new PrintWriter(eStream);
@@ -24,7 +24,14 @@ public class SimpleExceptionHandler implements IExceptionHandler
 
 		int toReturn = 0; // assume we can recover by default.
 
+		/*
+		 * remembers the last message we printed so we don't echo duplicates (which can happen when
+		 * exceptions are wrapped repeatedly at different levels).
+		 */
+		String lastMessage = null;
+
 		while (cause != null) {
+			String nextToAdd = null;
 			if (cause instanceof java.lang.OutOfMemoryError) {
 				builder.append(tab + "The client has run out of memory.  This could be fixed by increasing\n"
 					+ "the maximum memory allowed for the JVM.  On Linux, try changing -Xmx512M\n"
@@ -36,11 +43,11 @@ public class SimpleExceptionHandler implements IExceptionHandler
 				// re-throw to cause the grid client to exit.
 				throw new java.lang.OutOfMemoryError();
 			} else if (cause instanceof NullPointerException) {
-				builder.append(tab + "Internal Genesis II Error -- Null Pointer Exception\n");
+				nextToAdd = "Internal Genesis II Error -- Null Pointer Exception\n";
 			} else if (cause instanceof FileNotFoundException) {
-				builder.append(tab + "File Not Found:  " + cause.getLocalizedMessage() + "\n");
+				nextToAdd = "File Not Found:  " + cause.getLocalizedMessage() + "\n";
 			} else if (cause instanceof BaseFaultType) {
-				builder.append(tab + ((BaseFaultType) cause).getDescription(0).get_value() + "\n");
+				nextToAdd = ((BaseFaultType) cause).getDescription(0).get_value() + "\n";
 			} else if (cause instanceof AxisFault) {
 				String message = cause.getLocalizedMessage();
 
@@ -50,15 +57,21 @@ public class SimpleExceptionHandler implements IExceptionHandler
 				operation = PermissionDeniedException.extractMethodName(cause.getMessage());
 				failedAsset = PermissionDeniedException.extractAssetDenied(cause.getMessage());
 				if ((operation != null) && (failedAsset != null)) {
-					builder.append(tab + "Permission denied on \"" + failedAsset + "\" (in method \"" + operation + "\").\n");
+					nextToAdd = "Permission denied on \"" + failedAsset + "\" (in method \"" + operation + "\").\n";
 				} else {
-					builder.append(tab + "fault: " + message + "\n");
+					nextToAdd = message + "\n";
 				}
 			} else {
-				builder.append(tab + cause.getLocalizedMessage() + "\n");
+				nextToAdd = cause.getLocalizedMessage() + "\n";
 			}
-
-			tab = tab + "    ";
+			if ((lastMessage == null) || !lastMessage.equals(nextToAdd)) {
+				// we won't be repeating ourselves, so add that line.
+				builder.append(tab + nextToAdd);
+				// remember what we just added.
+				lastMessage = nextToAdd;
+				// increase the indentation level.
+				tab = tab + "    ";
+			}
 			cause = cause.getCause();
 		}
 

@@ -1,0 +1,4 @@
+Description:
+
+The reconnect tool allows a user to fix their grid connection if it is erroneous.  This can occur if a different grid's client was in use, but one later installs a different grid.  When problems occur with the grid connection, it is often because the old grid is still connected rather than the expected grid from the installer.  The reconnect tool can fix this without requiring the user to have knowledge of the proper grid context.
+

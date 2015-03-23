@@ -47,8 +47,8 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 
 	@XmlAttribute(name = "current-stage-protocol")
 	private StageProtocol _current = StageProtocol.undefined;
-	
-	private boolean _stageIn=false;
+
+	private boolean _stageIn = false;
 
 	public DataStage()
 	{
@@ -61,7 +61,7 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 
 		_pBroker = pBroker;
 		_mBroker = mBroker;
-		_stageIn=stageIn;
+		_stageIn = stageIn;
 
 		addParameterizableListener(pBroker);
 		addModificationListener(mBroker);
@@ -119,7 +119,8 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 				editor.setInitialData(current);
 				editor.pack();
 				editor.setModalityType(ModalityType.DOCUMENT_MODAL);
-				if (_stageIn) editor.setStageIn();
+				if (_stageIn)
+					editor.setStageIn();
 				GUIUtils.centerComponent(editor);
 				editor.setVisible(true);
 				current = editor.getStageData();
@@ -147,7 +148,8 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 			editor.setModalityType(ModalityType.DOCUMENT_MODAL);
 			editor.pack();
 			GUIUtils.centerComponent(editor);
-			if (_stageIn) editor.setStageIn();
+			if (_stageIn)
+				editor.setStageIn();
 			editor.setVisible(true);
 			data = editor.getStageData();
 			if (data != null) {

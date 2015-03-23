@@ -15,7 +15,7 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
-// hmmm: fix non-sensical members at base. divide into different derived bases using taxonomy.
+// future: fix non-sensical members at base. divide into different derived bases using taxonomy.
 
 public abstract class BaseLoginTool extends BaseGridTool
 {

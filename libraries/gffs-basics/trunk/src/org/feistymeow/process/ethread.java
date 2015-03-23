@@ -102,7 +102,8 @@ public abstract class ethread implements Runnable
 	}
 
 	/**
-	 * Returns true if the thread object is still alive.  this does not necessarily mean it is currently active.
+	 * Returns true if the thread object is still alive. this does not necessarily mean it is
+	 * currently active.
 	 */
 	public boolean threadAlive()
 	{

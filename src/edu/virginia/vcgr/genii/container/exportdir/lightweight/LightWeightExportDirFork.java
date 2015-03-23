@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -14,6 +16,8 @@ import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryDoesNotExistFaultType;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSMetadataType;
@@ -22,6 +26,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.ExportProperties.ExportMechanisms;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -52,8 +57,9 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 public class LightWeightExportDirFork extends AbstractRNSResourceFork implements RNSResourceFork, InMemoryIterableFork
-// , GeniiNoOutCalls
 {
+	static private Log _logger = LogFactory.getLog(LightWeightExportDirFork.class);
+
 	final private VExportDir getTarget() throws IOException
 	{
 		return LightWeightExportUtils.getDirectory(getForkPath());
@@ -79,7 +85,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		VExportDir dir = getTarget();
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("LightWeightExport: File Create \"" + newFileName +  "\" in \"" + dir.getName() + "\" from "+caller);
+		StatsLogger.logStats("LightWeightExport: File Create \"" + newFileName + "\" in \"" + dir.getName() + "\" from "
+			+ caller);
 		// End logging
 
 		if (dir.createFile(newFileName)) {
@@ -99,7 +106,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		VExportDir dir = getTarget();
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("LightWeightExport: Dir List \"" + dir.getName() + "/"+ entryName + "\" from "+caller);
+		StatsLogger.logStats("LightWeightExport: Dir List \"" + dir.getName() + "/" + entryName + "\" from " + caller);
 		// End logging
 		for (VExportEntry dirEntry : dir.list(entryName)) {
 			String dName = dirEntry.getName();
@@ -128,7 +135,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		VExportDir dir = getTarget();
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("LightWeightExport: Dir Create \"" + dir.getName() +  "/" + newDirectoryName + "\" from "+caller);
+		StatsLogger.logStats("LightWeightExport: Dir Create \"" + dir.getName() + "/" + newDirectoryName + "\" from " + caller);
 		// End logging
 		if (dir.mkdir(newDirectoryName)) {
 			String forkPath = formForkPath(newDirectoryName);
@@ -147,7 +154,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		VExportDir dir = getTarget();
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("LightWeightExport: Dir Delete " + dir.getName() + "/"+ entryName + " from "+caller);
+		StatsLogger.logStats("LightWeightExport: Dir Delete " + dir.getName() + "/" + entryName + " from " + caller);
 		// End logging
 		return dir.remove(entryName);
 	}
@@ -188,6 +195,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		String dirPath = null;
 		if (dir instanceof DiskExportEntry) {
 			DiskExportEntry f = (DiskExportEntry) dir;
+			dirPath = f.getFileTarget().getAbsolutePath();
+		} else if (dir instanceof SudoDiskExportEntry) {
+			SudoDiskExportEntry f = (SudoDiskExportEntry) dir;
 			dirPath = f.getFileTarget().getAbsolutePath();
 		}
 
@@ -234,10 +244,29 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 	static final private Pattern EPI_PATTERN = Pattern.compile("^(.+):fork-path:.+$");
 
+	// move this to a more general location, since we use rns entry responses in several places.
+	static public Comparator<RNSEntryResponseType> getComparator()
+	{
+		return new Comparator<RNSEntryResponseType>()
+		{
+			@Override
+			public int compare(RNSEntryResponseType c1, RNSEntryResponseType c2)
+			{
+				if ((c1 == null) && (c2 == null))
+					return 0;
+				if (c1 == null)
+					return -1;
+				if (c2 == null)
+					return 1;
+				return c1.getEntryName().compareTo(c2.getEntryName());
+			}
+		};
+	}
+
 	public static Collection<RNSEntryResponseType> getEntries(Iterable<InternalEntry> entries, ResourceKey rKey,
 		boolean requestedShortForm, String dirPath) throws ResourceException
 	{
-		Collection<RNSEntryResponseType> resultEntries = new LinkedList<RNSEntryResponseType>();
+		LinkedList<RNSEntryResponseType> resultEntries = new LinkedList<RNSEntryResponseType>();
 		RNSEntryResponseType lastF = null;
 		RNSEntryResponseType lastD = null;
 		QName MODTIME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
@@ -264,7 +293,6 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				// Now the code where we hoist out and reuse the values from the first time around
 				// We also want to do this the old way if shortForm==false
 				if ((!isDir && lastF == null) || (isDir && lastD == null) || requestedShortForm == false) {
-
 					AttributesPreFetcherFactory factory = new LightWeightExportAttributePrefetcherFactoryImpl();
 					RNSEntryResponseType entry =
 						new RNSEntryResponseType(requestedShortForm ? null : epr, RNSUtilities.createMetadata(epr,
@@ -301,6 +329,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 					// What we replace depends on the type
 					if (!isDir) {
+						if (_logger.isTraceEnabled())
+							_logger.debug("handling as file: " + internalEntry.getName());
+
 						MessageElement sz = new MessageElement(SIZE, forkFile.length());
 						Calendar c = Calendar.getInstance();
 						c.setTimeInMillis(forkFile.lastModified());
@@ -346,7 +377,33 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						resultEntries.add(next);
 
 					} else if (isDir) {
-						int elements = forkFile.list().length;
+						if (_logger.isTraceEnabled())
+							_logger.debug("handling as dir: " + internalEntry.getName());
+
+						int elements = -1;
+						ExportMechanisms expMech =
+							ExportMechanisms.parse((String) rKey.dereference().getProperty(
+								LightWeightExportConstants.EXPORT_MECHANISM));
+						if ((expMech == null) || expMech.equals(ExportMechanisms.EXPORT_MECH_ACL)
+							|| expMech.equals(ExportMechanisms.EXPORT_MECH_ACLANDCHOWN)) {
+							// normal exports just go directly to a File.
+							elements = forkFile.list().length;
+						} else if (expMech.equals(ExportMechanisms.EXPORT_MECH_PROXYIO)) {
+							// this export is in proxyio mode which uses sudo and a co-process.
+							String user =
+								(String) rKey.dereference().getProperty(LightWeightExportConstants.EXPORT_OWNER_UNIX_NAME);
+							if (_logger.isTraceEnabled())
+								_logger.debug("trying short-circuit to proxyio, user=" + user + " path='" + forkFile + "'");
+							SudoDiskExportEntry sdee;
+							try {
+								sdee = new SudoDiskExportEntry(forkFile, user);
+								elements = sdee.list().size();
+							} catch (IOException e) {
+								throw new ResourceException("could not translate proxyio export info to get element count", e);
+							}
+						} else {
+							throw new ResourceException("unknown or unimplemented type of export mechanism: " + expMech);
+						}
 
 						// Now replace the message elements
 						for (int pos = 0; pos < me.length; pos++) {
@@ -377,22 +434,24 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				}
 			}
 		}
+
+		Collections.sort(resultEntries, getComparator());
+
 		return resultEntries;
 	}
 
 	public static Collection<Pair<Long, MessageElement>> getEntries(List<InMemoryIteratorEntry> imieList, int firstElement,
 		int numElements, Object[] EprAndService, boolean shortForm) throws IOException
 	{
-		// ASG May, 2014. New code to hoist common operations out of getIndexedContent and ws
-		// iterator iterate. We will exploit the fact
-		// that this is a light weight export ... in other words that the only things that change
-		// from one RNSEntryResponse to another is the
-		// entry name, the size, and the times. Most importantly, the permissions do not change, and
-		// those take 50% of the time required to build
-		// an iterate response.
-		// The other major factor is CreateForkEPR that takes 7% of the 80% used by iterate. Since
-		// only one field of the EPR changes, we will
-		// change only that field.
+		/*
+		 * ASG May, 2014. New code to hoist common operations out of getIndexedContent and ws
+		 * iterator iterate. We will exploit the fact that this is a light weight export ... in
+		 * other words that the only things that change from one RNSEntryResponse to another is the
+		 * entry name, the size, and the times. Most importantly, the permissions do not change, and
+		 * those take 50% of the time required to build an iterate response. The other major factor
+		 * is CreateForkEPR that takes 7% of the 80% used by iterate. Since only one field of the
+		 * EPR changes, we will change only that field.
+		 */
 
 		Collection<Pair<Long, MessageElement>> ret = new ArrayList<Pair<Long, MessageElement>>(numElements);
 		firstElement = Math.max(firstElement, 0);

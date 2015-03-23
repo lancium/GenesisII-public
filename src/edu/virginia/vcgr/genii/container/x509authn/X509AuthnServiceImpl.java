@@ -458,8 +458,9 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 	}
 
-	/** 
-	 * builds the initial credential that the STS trusts the TLS cert that we were told to delegate to.
+	/**
+	 * builds the initial credential that the STS trusts the TLS cert that we were told to delegate
+	 * to.
 	 */
 	public static RequestSecurityTokenResponseType delegateCredential(BaseAuthenticationServiceImpl theThis,
 		IRNSResource resource, X509Certificate[] delegateToChain, Date created, Date expiry) throws AuthZSecurityException,

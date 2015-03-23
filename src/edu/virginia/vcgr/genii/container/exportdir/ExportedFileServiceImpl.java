@@ -30,7 +30,6 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = ExportedFileDBResourceProvider.class)
 public class ExportedFileServiceImpl extends RandomByteIOServiceImpl implements ExportedFilePortType
-// , GeniiNoOutCalls
 {
 	static private Log _logger = LogFactory.getLog(ExportedFileServiceImpl.class);
 

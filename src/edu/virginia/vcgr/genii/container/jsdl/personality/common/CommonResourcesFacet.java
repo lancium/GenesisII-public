@@ -65,6 +65,7 @@ public class CommonResourcesFacet extends DefaultResourcesFacet
 	@Override
 	public void consumeIndividualCPUCount(Object currentUnderstanding, RangeExpression individualCPUCount) throws JSDLException
 	{
-		((CommonExecutionUnderstanding) currentUnderstanding).setIndividualCPUCount(individualCPUCount.describe().getUpperBound());
+		((CommonExecutionUnderstanding) currentUnderstanding).setIndividualCPUCount(individualCPUCount.describe()
+			.getUpperBound());
 	}
 }

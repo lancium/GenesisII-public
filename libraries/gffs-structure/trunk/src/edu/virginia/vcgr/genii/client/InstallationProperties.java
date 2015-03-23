@@ -19,6 +19,7 @@ import edu.virginia.vcgr.appmgr.launcher.ApplicationDescription;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.configuration.UserConfigurationFile;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.security.axis.AclAuthZClientTool;
 import edu.virginia.vcgr.genii.security.identity.Identity;
@@ -120,7 +121,7 @@ public class InstallationProperties extends Properties
 		}
 		return propsFile;
 	}
-	
+
 	/**
 	 * returns the file that controls where exports may be created.
 	 */
@@ -168,10 +169,9 @@ public class InstallationProperties extends Properties
 		return HierarchicalDirectory.openRootHierarchicalDirectory(new File(prop + "/"
 			+ InstallationConstants.OWNER_CERTS_DIRECTORY_NAME));
 	}
-	
+
 	public File getOwnerCertFile()
 	{
-		// hmmm: cache the owner certificate here, since it doesn't change at runtime.
 		HierarchicalDirectory dir = getLocalCertsDirectory();
 		if (dir == null) {
 			_logger.warn("failure: in get owner cert, the default owners dir is null.");
@@ -193,18 +193,32 @@ public class InstallationProperties extends Properties
 		return found[0];
 	}
 
+	// cache the owner certificate here, since it doesn't change at runtime.
+	private static Identity _containerOwnerCertificate = null;
+
+	/**
+	 * returns the container's owner certificate which we cache upon first read.
+	 */
 	public Identity getOwnerCertificate()
 	{
-		File found = getOwnerCertFile();
-		if (found == null) return null;
-		if (_logger.isTraceEnabled())
-			_logger.trace("found owner cert at " + found.getAbsolutePath());
-		if (found.exists()) {
-			try {
-				GeniiPath filePath = new GeniiPath("local:" + found.getAbsolutePath());
-				return AclAuthZClientTool.downloadIdentity(filePath);
-			} catch (Throwable cause) {
-				_logger.warn("Unable to get administrator certificate.", cause);
+		synchronized (InstallationProperties.class) {
+			if (_containerOwnerCertificate != null) {
+				// we already looked this up, so hand it out.
+				return _containerOwnerCertificate;
+			}
+			File found = getOwnerCertFile();
+			if (found == null)
+				return null;
+			if (_logger.isTraceEnabled())
+				_logger.trace("found owner cert at " + found.getAbsolutePath());
+			if (found.exists()) {
+				try {
+					GeniiPath filePath = new GeniiPath("local:" + found.getAbsolutePath());
+					_containerOwnerCertificate = AclAuthZClientTool.downloadIdentity(filePath);
+					return _containerOwnerCertificate;
+				} catch (Throwable cause) {
+					_logger.warn("Unable to get administrator certificate.", cause);
+				}
 			}
 		}
 		return null;
@@ -245,4 +259,18 @@ public class InstallationProperties extends Properties
 			throw new RuntimeException("Unable to access or create state directory.", cause);
 		}
 	}
+
+	/*
+	 * returns the simple grid name from the current deployment properties file. only really
+	 * meaningful for a real installation, rather than a code build.
+	 */
+	public static String getSimpleGridName()
+	{
+		UserConfigurationFile depProps =
+			new UserConfigurationFile(new File(ApplicationDescription.getInstallationDirectory(),
+				InstallationConstants.DEPLOYMENT_PROPERTIES_FILE).getAbsolutePath());
+		String gridName = depProps.getProperty(InstallationConstants.GRID_NAME_SETTING);
+		return gridName;
+	}
+
 }

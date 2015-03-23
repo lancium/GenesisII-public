@@ -201,11 +201,15 @@ public class ScriptTool extends BaseGridTool
 			for (Object property : initialProperties.keySet())
 				b.put((String) property, initialProperties.get(property));
 
+			Object retval = null;
 			if (reader != null)
-				engine.eval(reader);
+				retval = engine.eval(reader);
 			else
-				engine.eval(stdin);
-
+				retval = engine.eval(stdin);
+			
+			if ((retval != null) && (retval instanceof Integer)) {
+				return (Integer) retval;
+			}
 			return 0;
 		} catch (ScriptException se) {
 			Throwable cause = se.getCause();

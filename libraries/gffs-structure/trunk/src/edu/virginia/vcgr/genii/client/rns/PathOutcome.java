@@ -67,10 +67,11 @@ public class PathOutcome
 		return (outcome != null) && (this.getOutcome() != outcome.getOutcome());
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		return outcomeText(this);
 	}
-	
+
 	/**
 	 * returns a textual representation of the outcomes that are known about by this class.
 	 */

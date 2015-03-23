@@ -517,7 +517,7 @@ public class SecurityUtilities implements CertificateValidator
 	{
 		if (directory == null || !directory.isDirectory())
 			return Collections.emptyList();
-		
+
 		List<X509CRL> crlList = new ArrayList<X509CRL>();
 		File[] crlFiles = directory.listFiles(crlFilter);
 
@@ -543,24 +543,27 @@ public class SecurityUtilities implements CertificateValidator
 				}
 
 				{
-					// we zap this to false if we find a problem with any crl we loaded from that file.
+					// we zap this to false if we find a problem with any crl we loaded from that
+					// file.
 					boolean okayToAdd = true;
-					
+
 					// verify crl is not stale.
 					for (X509CRL crl : intermediate) {
 						Date thisUpdate = crl.getThisUpdate();
-						if ( (thisUpdate != null) && (thisUpdate.after(new Date()))) {
+						if ((thisUpdate != null) && (thisUpdate.after(new Date()))) {
 							_logger.warn("CRL last update date is in the future; ignoring " + crlFile);
 							okayToAdd = false;
 						}
 						Date nextUpdate = crl.getNextUpdate();
-						if ( (nextUpdate != null) && (nextUpdate.before(new Date()))) {
+						if ((nextUpdate != null) && (nextUpdate.before(new Date()))) {
 							_logger.warn("CRL next update date is in the past; needs new CRL " + crlFile);
-							// we keep this for now, since we don't want to be unprotected: okayToAdd = false;
+							// we keep this for now, since we don't want to be unprotected:
+							// okayToAdd = false;
 						}
 					}
-					if (!okayToAdd) continue;  // ignore remainder of checks.
-					
+					if (!okayToAdd)
+						continue; // ignore remainder of checks.
+
 					// load the CA for this CRL file.
 					int indexExtension = crlFile.getAbsolutePath().lastIndexOf(".r0");
 					String caFilename = crlFile.getAbsolutePath().substring(0, indexExtension) + ".0";
@@ -589,7 +592,7 @@ public class SecurityUtilities implements CertificateValidator
 								okayToAdd = false;
 								break;
 							}
-					
+
 						}
 					}
 					if (okayToAdd) {

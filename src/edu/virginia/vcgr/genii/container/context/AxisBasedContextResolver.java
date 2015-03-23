@@ -145,7 +145,8 @@ public class AxisBasedContextResolver implements IContextResolver
 		if (privateKey != null) {
 			if (_logger.isDebugEnabled()) {
 				_logger.debug("Using resource's own private key " + ResourceManager.getCurrentResource().getServiceName());
-				_logger.debug("...epi for that resource is " + resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME));
+				_logger.debug("...epi for that resource is "
+					+ resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME));
 			}
 		}
 		Certificate[] targetCertChain = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);

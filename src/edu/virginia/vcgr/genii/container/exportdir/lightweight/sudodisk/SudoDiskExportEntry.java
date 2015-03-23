@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
@@ -17,6 +18,7 @@ import edu.virginia.vcgr.genii.client.io.fslock.FSLockManager;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.AbstractVExportEntry;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportDir;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportEntry;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportEntryComparator;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportFile;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.FileServerClient;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.FileServerID;
@@ -45,6 +47,11 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 
 		if (!doesExist(_target, _uname))
 			throw new FileNotFoundException(String.format("Unable to locate file system entry \"%s\".", _target));
+	}
+
+	public File getFileTarget()
+	{
+		return _target;
 	}
 
 	/**
@@ -150,7 +157,7 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 			throw new IOException("Unable to start i/o proxy");
 		}
 
-		Collection<VExportEntry> entries = new LinkedList<VExportEntry>();
+		LinkedList<VExportEntry> entries = new LinkedList<VExportEntry>();
 		try {
 			DirListResponse dlr = FileServerClient.listlong(_target.getAbsolutePath(), fsid.getNonce(), fsid.getPort());
 
@@ -176,6 +183,8 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 		} catch (Exception e) {
 			throw new IOException(e.toString());
 		}
+
+		Collections.sort(entries, VExportEntryComparator.getComparator());
 
 		return entries;
 	}

@@ -1,14 +1,15 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
- * language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package edu.virginia.vcgr.genii.client.comm.axis.security;
@@ -55,8 +56,8 @@ import edu.virginia.vcgr.genii.security.x509.SingleSSLX509KeyManager;
 /**
  * Wrapper for the generic SSLSocketFactory.
  * 
- * Selects the identity in the current calling context's client cert/key for use during SSL handshake. For containers, the TLS
- * certificate is chosen instead of resource certificates.
+ * Selects the identity in the current calling context's client cert/key for use during SSL
+ * handshake. For containers, the TLS certificate is chosen instead of resource certificates.
  * 
  * Allows us to re-read trust-stores when we detect changes in the client/server configuration.
  * 
@@ -74,13 +75,13 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 	static final private int SESSION_CACHE_SIZE_MAX = 256; // cak: reduced from 1000.
 
 	static {
-		// initializations to restrict types of TLS we will use.		
+		// initializations to restrict types of TLS we will use.
 		// this one is for https-client:
 		java.lang.System.setProperty("https.protocols", "TLSv1");
 		// evidence says this does not help for our case of the gffs client, but
 		// this does at least protect our normal web browsing from using SSLv3.
 	}
-	
+
 	// holds the maximum elements for the socket cache, rather than reading it from file every time.
 	static private Integer _maxCacheElements = -1;
 
@@ -98,13 +99,13 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		notifyUnloaded();
 		loadTrustManager();
 	}
-	
+
 	@Override
 	public void notifyUnloaded()
 	{
 		synchronized (_sslSessionCache) {
 			_sslSessionCache.clear();
-		}	
+		}
 	}
 
 	public void loadTrustManager()
@@ -172,7 +173,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 					new SecurityUpdateResults());
 
 			/*
-			 * use only the container TLS cert rather than resource cert, unless we are acting as a client.
+			 * use only the container TLS cert rather than resource cert, unless we are acting as a
+			 * client.
 			 */
 			if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
 				CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
@@ -217,7 +219,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			}
 			sslcontext.init(kms, mgrs, null);
 
-			// show which trust managers we have loaded. we want at least one of these to be our crl handling replacement.
+			// show which trust managers we have loaded. we want at least one of these to be our crl
+			// handling replacement.
 			if (_logger.isDebugEnabled()) {
 				for (TrustManager m : mgrs) {
 					_logger.debug("trust manager: " + m.toString() + " type: " + m.getClass().getCanonicalName());

@@ -54,7 +54,7 @@ public class Driver extends ApplicationBase
 			System.exit(1);
 		}
 
-		if ((args.length > 1) && (args[0].equals("connect"))) {
+		if ((args.length > 1) && (args[0].equals("connect") || args[0].equals("reconnect"))) {
 			_logger.info("adjusting deployment loading process since this is a connect command.");
 			String stateDir = InstallationProperties.getUserDir();
 			try {

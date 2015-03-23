@@ -226,7 +226,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 
 					switch (pc.getUsage()) {
 						case WSPasswordCallback.USERNAME_TOKEN:
-							System.err.println("Hmmm, probably bad -- need to lookup a password");
+							System.err.println("This is probably bad -- need to lookup a password");
 						case WSPasswordCallback.USERNAME_TOKEN_UNKNOWN:
 							// don't care
 							return;

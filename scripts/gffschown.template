@@ -1,20 +1,68 @@
-#!/bin/sh
+#!/bin/bash
 
-# this script provides chown support for the GFFS container.
-# it can be modified as necessary by system admins.
-# the first parameter is expected to be the unix user who will inherit file
-# ownership.  the second paramter is the path to the file.
+# this script provides chown support for the GFFS container.  it can be
+# modified as necessary by system admins.  the first parameter is expected
+# to be the unix user who will be given file ownership.  the second parameter
+# is the path to the file.
 
 #DEBUG NOISE
-outfile=$(mktemp /tmp/gffschown-out-${USER}.XXXXXX)
-echo >>$outfile
-echo "hello, got to chowner script.  cmdline is:" >>$outfile
-echo $* >>$outfile
-echo "and user is $USER and home is $HOME" >>$outfile
+#outfile=$(mktemp /tmp/gffschown-out-${USER}.XXXXXX)
+#echo >>$outfile
+#echo "hello, got to chowner script.  cmdline is:" >>$outfile
+#echo $* >>$outfile
+#echo "and user is $USER and home is $HOME" >>$outfile
+#END DEBUG NOISE
+
+user="$1"; shift
+path="$1"; shift
+
+####>>>  detaint user name and file name here somehow.
+
+# echoes the "detainted" version of the single input parameter.
+# this string will not retain any characters which are problematic for
+# shell expansion.
+function detaint()
+{
+  local maybe_tainted="$1"; shift
+  # replace dollar signs in the string.
+  local to_return="${maybe_tainted//\$/}"
+  # replace back ticks.
+  to_return="${to_return//\`/}"
+  # replace newlines.
+  to_return="${to_return//$'\n'/}"
+  # replace carriage returns.
+  to_return="${to_return//$'\r'/}"
+#...more?
+
+  echo "$to_return"
+}
+
+# now replace the two input variables with the detainted version.
+user="$(detaint "$user")"
+path="$(detaint "$path")"
+
+
+echo "untainted user is now '$user'"
+echo "untainted path is now '$path'"
+echo bailing
+exit 1
+
+
+
+if [ ! -f "$path" ]; then
+  echo "The file provided does not exist: $path"
+  exit 1
+fi
 
 # ensure that the container can still access the file as needed.
-/bin/chmod g+rw "$2"
+/bin/chmod g+rw "$path"
+if [ $? -ne 0 ]; then
+  echo "Failure to chmod the file: $path"
+fi
 
 # actually perform the chown operation.
-/bin/chown "$1" "$2"
+/bin/chown "$1" "$path"
+if [ $? -ne 0 ]; then
+  echo "Failure to chown the file: $path"
+fi
 

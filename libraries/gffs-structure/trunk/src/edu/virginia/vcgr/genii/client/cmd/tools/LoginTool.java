@@ -246,10 +246,11 @@ public class LoginTool extends BaseLoginTool
 		if (numArgs > 1)
 			throw new InvalidToolUsageException("This tool takes at most one argument.");
 
-/*cannot check this here, since verify is called before runCommand, which gathers this argument.
-		if ((_username == null) || (_username.length() == 0))
-			throw new InvalidToolUsageException("The username cannot be blank.");
-*/
+		/*
+		 * cannot check this here, since verify is called before runCommand, which gathers this
+		 * argument. if ((_username == null) || (_username.length() == 0)) throw new
+		 * InvalidToolUsageException("The username cannot be blank.");
+		 */
 
 		if (_bogusPassword) {
 			if (_password != null) {

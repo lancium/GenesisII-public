@@ -4,14 +4,14 @@ public class EarlyExitException extends Exception
 {
 	static final long serialVersionUID = 0L;
 
-	private int _exitCode;
+	private Integer _exitCode;
 
 	public EarlyExitException(int exitCode)
 	{
 		_exitCode = exitCode;
 	}
 
-	public int getExitCode()
+	public Integer getExitCode()
 	{
 		return _exitCode;
 	}

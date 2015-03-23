@@ -49,7 +49,7 @@ public class X509PatternAclEntry implements AclEntry
 
 	// cache an X509 pattern upon first use.
 	transient protected X509Principal _bcPattern;
-	
+
 	public X509PatternAclEntry(X509Identity trustRoot, X500Principal userPattern)
 	{
 		_userPattern = userPattern;
@@ -78,7 +78,8 @@ public class X509PatternAclEntry implements AclEntry
 			X509Certificate trustedCert = _trustRoot.getOriginalAsserter()[0];
 			ks.setCertificateEntry(trustedCert.getSubjectX500Principal().getName(), trustedCert);
 
-			_trustManagerJdk = new RevocationAwareTrustManager(CertificateValidatorFactory.getValidator().getTrustStoreProvider());
+			_trustManagerJdk =
+				new RevocationAwareTrustManager(CertificateValidatorFactory.getValidator().getTrustStoreProvider());
 		}
 	}
 
@@ -102,10 +103,12 @@ public class X509PatternAclEntry implements AclEntry
 
 		if (!trustOkay) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("client not trusted by pattern acl, user[1 of " + userCertChain.length + "] for " + userCertChain[0].getSubjectDN());
+				_logger.debug("client not trusted by pattern acl, user[1 of " + userCertChain.length + "] for "
+					+ userCertChain[0].getSubjectDN());
 		} else {
 			if (_logger.isDebugEnabled())
-				_logger.debug("trust established by pattern acl for user[1 of " + userCertChain.length + "] for " + userCertChain[0].getSubjectDN());
+				_logger.debug("trust established by pattern acl for user[1 of " + userCertChain.length + "] for "
+					+ userCertChain[0].getSubjectDN());
 		}
 		return trustOkay;
 	}

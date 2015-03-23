@@ -29,66 +29,79 @@ class GridStageEditor extends StageEditor<GridStageData>
 	{
 		GridStageData ret = new GridStageData();
 		ret.path(_path.getText());
-		// ASG 9-06-2014. Now check if the indicated path exists, or how much of the path does anyway
-		String pathString=_path.getText();
-		boolean exists=true;
-		boolean isByteIO=false;
+		// ASG 9-06-2014. Now check if the indicated path exists, or how much of the path does
+		// anyway
+		String pathString = _path.getText();
+		boolean exists = true;
+		boolean isByteIO = false;
 		RNSPath path = RNSPath.getCurrent();
 		// Let's see if we can work out the prefix
-		String goodPath=path.getValidPrefix(pathString);
-		/*		System.out.println("Starting stage out processing ");
-		System.out.println("pathString = " + pathString);
-		System.out.println("valid prefix is " + goodPath);*/
+		String goodPath = path.getValidPrefix(pathString);
+		/*
+		 * System.out.println("Starting stage out processing "); System.out.println("pathString = "
+		 * + pathString); System.out.println("valid prefix is " + goodPath);
+		 */
 		try {
 			path = path.lookup(pathString, RNSPathQueryFlags.MUST_EXIST);
 		} catch (RNSPathDoesNotExistException r) {
-			exists=false;
+			exists = false;
 		} catch (RNSPathAlreadyExistsException er) {
-			exists=true;
+			exists = true;
 		}
 
-		if (exists) isByteIO=path.isByteIO();
+		if (exists)
+			isByteIO = path.isByteIO();
 		// We've now got the prefix and know if it exists or not. If it exists path refers to it.
 		if (_stageIn) {
-			if (exists && isByteIO) return ret;
+			if (exists && isByteIO)
+				return ret;
 			// Need to warn them and print out prefix
-			String errString= "";
-			if (!exists) 
-				errString= "WARNING!!\n Path " + pathString + " does not exist OR you do not have permission.\n The prefix [" + goodPath + "] exists.\nThis will likely cause your job to fail!";			
-			else if (!isByteIO) 
-				errString= "WARNING!!\n Path " + pathString + " is NOT a ByteIO file\nThis will likely cause your job to fail!";			
+			String errString = "";
+			if (!exists)
+				errString =
+					"WARNING!!\n Path " + pathString + " does not exist OR you do not have permission.\n The prefix ["
+						+ goodPath + "] exists.\nThis will likely cause your job to fail!";
+			else if (!isByteIO)
+				errString =
+					"WARNING!!\n Path " + pathString + " is NOT a ByteIO file\nThis will likely cause your job to fail!";
 			// Note it cannot be a byteio and not exists
-			JOptionPane.showMessageDialog(null,errString, "Click to continue",
-					JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, errString, "Click to continue", JOptionPane.WARNING_MESSAGE);
 		} else {
 			// This is a stage out. Need to make sure the target directory exists and is a directory
-			String errString="Generic Error";
+			String errString = "Generic Error";
 			if (exists) {
-				if (!path.isByteIO()) {						 
-					errString= "WARNING!!\n Path " + pathString + " exists and is not a file.\nIf it exists it should be a file.\n" 
-							+ "This will likely cause your job to fail!";			
-				}
-				else
-					errString= "WARNING!!\n Path " + pathString + " already exists and will be overwritten.\n" 
-							+ "Make sure this is what you intend!";	
+				if (!path.isByteIO()) {
+					errString =
+						"WARNING!!\n Path " + pathString + " exists and is not a file.\nIf it exists it should be a file.\n"
+							+ "This will likely cause your job to fail!";
+				} else
+					errString =
+						"WARNING!!\n Path " + pathString + " already exists and will be overwritten.\n"
+							+ "Make sure this is what you intend!";
 				if (path.isRNS()) {
-					errString= "WARNING!!\n Path " + pathString + " is a DIRECTORY. Directories should not be targets.\nThis will likely cause your job to fail!";			
+					errString =
+						"WARNING!!\n Path " + pathString
+							+ " is a DIRECTORY. Directories should not be targets.\nThis will likely cause your job to fail!";
 				}
-				JOptionPane.showMessageDialog(null,errString, "Click to continue",
-						JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null, errString, "Click to continue", JOptionPane.WARNING_MESSAGE);
 			} else {
 				// The file does not exists ... that is ok as long as its parent is an RNS
-				// The file does not exist, or some part of the path does not exist. This is more complicated
-				int baseOffset=pathString.lastIndexOf("/");
-				if (baseOffset >=0){
+				// The file does not exist, or some part of the path does not exist. This is more
+				// complicated
+				int baseOffset = pathString.lastIndexOf("/");
+				if (baseOffset >= 0) {
 					// Everything to the left is the path
 					String parentPath = pathString.substring(0, baseOffset);
-					/*					System.out.println("parent path = " + parentPath);
-					System.out.println("valid prefix is " + goodPath);*/
-					if (parentPath.compareToIgnoreCase(goodPath)!=0) {
-						errString= "WARNING!!\n Path " + pathString + " does not exist, its parent does not exist, OR you do not have permission.\n The prefix [" + goodPath + "] exists.\nThis will likely cause your job to fail!";			
-						JOptionPane.showMessageDialog(null,errString, "Click to continue",
-								JOptionPane.WARNING_MESSAGE);
+					/*
+					 * System.out.println("parent path = " + parentPath);
+					 * System.out.println("valid prefix is " + goodPath);
+					 */
+					if (parentPath.compareToIgnoreCase(goodPath) != 0) {
+						errString =
+							"WARNING!!\n Path " + pathString
+								+ " does not exist, its parent does not exist, OR you do not have permission.\n The prefix ["
+								+ goodPath + "] exists.\nThis will likely cause your job to fail!";
+						JOptionPane.showMessageDialog(null, errString, "Click to continue", JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			}

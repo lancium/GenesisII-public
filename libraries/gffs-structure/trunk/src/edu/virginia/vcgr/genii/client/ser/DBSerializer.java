@@ -67,19 +67,22 @@ public class DBSerializer
 			Object toReturn = oin.readObject();
 			if (toReturn instanceof CredentialWallet) {
 				if (_logger.isTraceEnabled())
-					_logger.debug("fromBlob: loaded credential wallet successfully: " + ((CredentialWallet)toReturn).describe(VerbosityLevel.HIGH));				
+					_logger.debug("fromBlob: loaded credential wallet successfully: "
+						+ ((CredentialWallet) toReturn).describe(VerbosityLevel.HIGH));
 			}
 			return toReturn;
 		} catch (IOException e) {
 			if ((e.getMessage() != null) && e.getMessage().contains("serialVersionUID = 2694770099055262044, local class")) {
 				// 2694770099055262044 is the old version of the unicore assertion class.
 				_logger.warn("caught serialization issue; older format unicore TrustDelegation detected: " + e.getMessage());
-				
-				// so far we have seen things be happiest by being given a calling context implementation here.
+
+				// so far we have seen things be happiest by being given a calling context
+				// implementation here.
 				CallingContextImpl substituteContext = new CallingContextImpl((CallingContextImpl) null);
 				// see if we can just use the container resource.
-				//SecurityUtilities secu = (SecurityUtilities)CertificateValidatorFactory.getValidator();
-				TrustStoreLinkage tsl = (TrustStoreLinkage)CertificateValidatorFactory.getValidator().getTrustStoreProvider();  
+				// SecurityUtilities secu =
+				// (SecurityUtilities)CertificateValidatorFactory.getValidator();
+				TrustStoreLinkage tsl = (TrustStoreLinkage) CertificateValidatorFactory.getValidator().getTrustStoreProvider();
 				if (tsl != null) {
 					try {
 						substituteContext.setActiveKeyAndCertMaterial(tsl.getContainerKey());
@@ -88,7 +91,7 @@ public class DBSerializer
 					}
 				}
 				return substituteContext;
-			}			
+			}
 			String msg = "unable to deserialize from blob (io exception): " + e.getMessage();
 			_logger.error(msg);
 			throw new SQLException(msg, e);

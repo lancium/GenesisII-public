@@ -62,8 +62,6 @@ public class ExportProperties
 	public static final String EXPORT_MECHANISM_PROPERTY = "export.Mechanism";
 	// can export configuration be overridden in construction properties of exported resource?
 	public static final String EXPORT_ALLOW_OVERRIDE_PROPERTY = "export.AllowOverride";
-	// will random byteio files be stored in user's home dir?
-	public static final String BYTEIO_IN_USERHOME_PROPERTY = "byteio.InUserHome";
 	// who will own the byteio files, the gffs container or the creating user?
 	public static final String BYTEIO_STORAGE_PROPERTY = "byteio.Storage";
 	// the location where the gffschown application (or script) is stored.
@@ -113,8 +111,7 @@ public class ExportProperties
 				return EXPORT_MECH_PROXYIO;
 			if (fromString.equalsIgnoreCase(EXPORT_MECH_ARCHIVE.toString()))
 				return EXPORT_MECH_ARCHIVE;
-			_logger.debug("returning default export mechanism.");
-			return EXPORT_MECH_ACL;
+			return null;
 		}
 	};
 
@@ -163,16 +160,6 @@ public class ExportProperties
 		}
 		String r = _exportProps.getProperty(EXPORT_MECHANISM_PROPERTY);
 		return ExportMechanisms.parse(r);
-	}
-
-	public boolean getByteIOInUserHome()
-	{
-		if (_exportProps == null) {
-			_logger.error("export property configuration is not defined.");
-			return false;
-		}
-		String r = _exportProps.getProperty(BYTEIO_IN_USERHOME_PROPERTY);
-		return r.equalsIgnoreCase("true");
 	}
 
 	public OwnershipForByteIO getByteIOStorage()

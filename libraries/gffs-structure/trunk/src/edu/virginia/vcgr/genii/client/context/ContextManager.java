@@ -66,16 +66,17 @@ public class ContextManager
 	static public ICallingContext getCurrentContext() throws FileNotFoundException, IOException
 	{
 		IContextResolver res = getResolver();
-		//_logger.debug("type of resolver here is: " + res.getClass().getCanonicalName());
+		// _logger.debug("type of resolver here is: " + res.getClass().getCanonicalName());
 		return res.load();
 	}
 
 	static public void storeCurrentContext(ICallingContext context) throws FileNotFoundException, IOException
 	{
 		if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
-			_logger.error("saving calling context on server side; do we really want to???  backtrace:\n" + ProgramTools.showLastFewOnStack(15));
+			_logger.error("saving calling context on server side; do we really want to???  backtrace:\n"
+				+ ProgramTools.showLastFewOnStack(15));
 		}
-		
+
 		getResolver().store(context);
 	}
 

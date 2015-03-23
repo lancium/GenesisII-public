@@ -86,8 +86,7 @@ public class TrustAllSslSocketConnector extends SslSocketConnector
 		_logger.debug("original ssl protocol is: " + protocol);
 		protocol = "TLSv1.1";
 		SSLContext context =
-			getProvider() == null ? SSLContext.getInstance(protocol) : SSLContext
-				.getInstance(protocol, getProvider());
+			getProvider() == null ? SSLContext.getInstance(protocol) : SSLContext.getInstance(protocol, getProvider());
 		SSLContext sslcontext = context;
 
 		SSLSessionContext sessionContext = sslcontext.getServerSessionContext();
@@ -101,14 +100,14 @@ public class TrustAllSslSocketConnector extends SslSocketConnector
 				sessionContext.setSessionCacheSize(1000);
 			}
 		}
-		
+
 		context.init(keyManagers, trustManagers, secureRandom);
 
 		sessionContext = sslcontext.getServerSessionContext();
 		if (sessionContext == null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Couldn't get a session context on which to set the cache size.");
-		} else {			
+		} else {
 			if (sessionContext.getSessionCacheSize() > 1000) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("Setting server ssl session context cache size to 1000.");

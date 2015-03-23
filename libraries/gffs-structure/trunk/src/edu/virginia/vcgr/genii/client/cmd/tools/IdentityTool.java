@@ -86,7 +86,7 @@ public class IdentityTool extends BaseGridTool
 	{
 		_patternString = pat;
 	}
-	
+
 	@Option({ "resolve" })
 	public void setResolve()
 	{
@@ -171,7 +171,7 @@ public class IdentityTool extends BaseGridTool
 				}
 			}
 		}
-		
+
 		if (_resolveIdentity) {
 			PreferredIdentity curr = PreferredIdentity.getFromContext(context);
 			if (curr == null) {
@@ -185,7 +185,7 @@ public class IdentityTool extends BaseGridTool
 					stdout.println("The preferred identity cannot currently be resolved to an existing credential.");
 				}
 			}
-			
+
 		}
 
 		// if listing all, show anything the user has currently.
@@ -206,11 +206,16 @@ public class IdentityTool extends BaseGridTool
 	@Override
 	protected void verify() throws ToolException
 	{
-		if (!_resetting && !_settingId && !_showIdentity && !_listAllIdentities && !_resolveIdentity) {
-			throw new ToolException("This tool requires at least one action on the command line.");
-		}
 		if ((_exactString != null) && (_patternString != null)) {
 			throw new ToolException("This tool cannot accept both an exact string and a pattern.");
+		}
+		if (!_resetting && !_settingId && !_showIdentity && !_listAllIdentities && !_resolveIdentity) {
+			// we don't want to goof if they provided _some_ info but forgot the main tag...
+			if ( (_patternString != null ) || (_exactString != null) ) {
+				throw new ToolException("This tool cannot accept DN strings without a --set operation.");
+			}
+			// if they didn't pick an action, then we just show the current identity.
+			_showIdentity = true;
 		}
 	}
 }

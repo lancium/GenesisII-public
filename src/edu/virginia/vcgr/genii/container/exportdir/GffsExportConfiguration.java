@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileChangeTracker;
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.ExportProperties;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -28,15 +29,16 @@ public class GffsExportConfiguration
 
 	// how long gridmap entries can be kept in the cache.
 	public static final long GRIDMAP_CACHE_LIFETIME = 1000 * 60 * 30;
-	
+
 	// how many cached gridmap elements we keep around.
 	public static final int MAX_GRIDMAP_CACHE_ELEMENTS = 200;
-	
+
 	// the cache for mapping between DN and grid map users.
-	private static TimedOutLRUCache<String, GridMapUserList> _dnCache = new TimedOutLRUCache<String, GridMapUserList>(MAX_GRIDMAP_CACHE_ELEMENTS, GRIDMAP_CACHE_LIFETIME);
-	
-	// last timestamp we saw on the gridmap file.
-	private static long _lastGridmapTimestamp = -1; 
+	private static TimedOutLRUCache<String, GridMapUserList> _dnCache = new TimedOutLRUCache<String, GridMapUserList>(
+		MAX_GRIDMAP_CACHE_ELEMENTS, GRIDMAP_CACHE_LIFETIME);
+
+	// tracks last timestamp we saw on the gridmap file.
+	private static FileChangeTracker _GridmapChangeTracker = null;
 
 	/**
 	 * consumes a line of text from a grid-mapfile and breaks it down into the DN specified and the
@@ -102,45 +104,23 @@ public class GffsExportConfiguration
 		return DN;
 	}
 
-	/*
-	 * hmmm: add a cache! this really should not read the file each and every time. so cache the
-	 * values without time-out, and we won't have to read it every time. however, if the grid
-	 * map file changes, we should throw out all cached entries.
-	 */
-
 	/**
-	 * returns true if the time stamp for the grid-mapfile has changed since the last time we checked.
+	 * returns true if the time stamp for the grid-mapfile has changed since the last time we
+	 * checked.
 	 */
-	private static boolean gridmapFileChanged()
+	private static synchronized boolean gridmapFileChanged()
 	{
-		if (_lastGridmapTimestamp < 0) {
-			recordLastGridmapTimestamp();
+		if (_GridmapChangeTracker == null) {
+			_GridmapChangeTracker = new FileChangeTracker(new File(ExportProperties.getExportProperties().getGridMapFile()));
 		}
-		return (_lastGridmapTimestamp != getGridmapChangeTime());		
+		return _GridmapChangeTracker.hasFileChanged();
 	}
-	
-	private static long getGridmapChangeTime()
-	{
-		String mapfile = ExportProperties.getExportProperties().getGridMapFile();
-		File f = new File(mapfile);
-		if (f.exists())
-			return f.lastModified();
-		return -1;
-	}
-	
-	private static void recordLastGridmapTimestamp()
-	{
-		long lastChange = getGridmapChangeTime();
-		if (lastChange > 0) {
-			_lastGridmapTimestamp = lastChange;
-		}
-	}
-	
+
 	private static void cacheDnMapping(String dn, GridMapUserList users)
 	{
 		_dnCache.put(dn, users);
 	}
-	
+
 	private static GridMapUserList lookupDnInCache(String dn)
 	{
 		if (gridmapFileChanged()) {
@@ -152,7 +132,7 @@ public class GffsExportConfiguration
 		}
 		return _dnCache.get(dn);
 	}
-	
+
 	/**
 	 * reads the grid-mapfile to locate a particular DN.
 	 * 
@@ -167,7 +147,7 @@ public class GffsExportConfiguration
 				_logger.debug("found user DN in cache: " + cached);
 			return cached;
 		}
-		
+
 		// nothing was cached, so we have to do a lookup.
 		File mapFile = ExportProperties.getExportProperties().openGridMapFile();
 		if (mapFile == null) {
@@ -200,7 +180,7 @@ public class GffsExportConfiguration
 		}
 		return usersFound;
 	}
-	
+
 	/**
 	 * a helpful method for the server side (container) that finds the preferred identity in the
 	 * user's credentials, if possible. if not possible, then this just falls back to the first USER
@@ -211,16 +191,18 @@ public class GffsExportConfiguration
 	{
 		ArrayList<NuCredential> credSet = new ArrayList<NuCredential>();
 		credSet.addAll(TransientCredentials.getTransientCredentials(context).getCredentials());
-		
-		X509Certificate clientCert = (X509Certificate) context.getSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
+
+		X509Certificate clientCert =
+			(X509Certificate) context.getSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
 		if (clientCert != null) {
-			credSet.add(new X509Identity(new X509Certificate[] {clientCert}, IdentityType.CONNECTION));
+			credSet.add(new X509Identity(new X509Certificate[] { clientCert }, IdentityType.CONNECTION));
 		} else {
 			_logger.error("failed to determine the calling client's TLS certificate");
 		}
-		
+
 		if (_logger.isDebugEnabled()) {
-			_logger.debug("got a credential set to search of:\n" + TrustCredential.showCredentialList(credSet, VerbosityLevel.HIGH));
+			_logger.debug("got a credential set to search of:\n"
+				+ TrustCredential.showCredentialList(credSet, VerbosityLevel.HIGH));
 			_logger.debug("searching for owner as: " + ownerDN);
 		}
 
@@ -236,45 +218,21 @@ public class GffsExportConfiguration
 			CredentialWallet tempWallet = new CredentialWallet(credSet);
 			owner = tempWallet.getFirstUserCredential().getOriginalAsserter()[0];
 		}
-		
+
 		if (_logger.isDebugEnabled())
 			_logger.debug("ownerDN resolved to: '" + owner.getSubjectDN() + "'");
-		
+
 		return owner;
 	}
 
-	private static void dumpInfo(String info, String dn, GridMapUserList users)
+	/**
+	 * logs the information from a line of a grid mapfile.
+	 */
+	public static void dumpInfo(Log logger, String info, String dn, GridMapUserList users)
 	{
-		_logger.info(info + ": DN= " + dn + ", users list: ");
+		logger.info(info + ": DN= " + dn + ", users list: ");
 		for (int i = 0; i < users.size(); i++) {
-			_logger.info("#" + i + ": " + users.get(i));
-		}
-	}
-
-	static public void main(String[] args) throws Throwable
-	{
-		//hmmm: move this to a unit test.
-		{
-			// tests a basic line from the grid-mapfile.
-			String example = "\"/C=US/O=NPACI/OU=SDSC/CN=Nancy Wilkins-Diehr/UID=wilkinsn\" wilkinsn";
-			GridMapUserList usersSeen = new GridMapUserList();
-			String dnfound = parseGridMapLine(example, usersSeen);
-			dumpInfo("first test", dnfound, usersSeen);
-		}
-		{
-			// tests multiple users listed (one to many, which we don't need but want to not barf
-			// on).
-			String example = "\"/C=US/O=NPACI/OU=SDSC/CN=Feng Wang/UID=ux454763\" ux454763,jortnips";
-			GridMapUserList usersSeen = new GridMapUserList();
-			String dnfound = parseGridMapLine(example, usersSeen);
-			dumpInfo("second test (has two users)", dnfound, usersSeen);
-		}
-		{
-			// tests pernicious extra spaces.
-			String example = "\"/C=US/O=NPACI/OU=SDSC/CN=Christopher T. Jordan/UID=ctjordan\"    ctjordan";
-			GridMapUserList usersSeen = new GridMapUserList();
-			String dnfound = parseGridMapLine(example, usersSeen);
-			dumpInfo("third test", dnfound, usersSeen);
+			logger.info("#" + i + ": " + users.get(i));
 		}
 	}
 }

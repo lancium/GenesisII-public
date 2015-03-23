@@ -96,7 +96,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 {
 	private static final String STUB_CONFIGURED = "edu.virginia.vcgr.genii.client.security.stub-configured";
 
-	// hmmm: this really needs to be stored in a config file so users can change it!!!
+	// future: this really needs to be stored in a config file so users can change it!!!
 	/*
 	 * the amount of time that any particular client request is allowed to take before time expires.
 	 * default was raised from 2 minutes to 6.
@@ -310,7 +310,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext)
 		throws ResourceException, GenesisIISecurityException
 	{
-		// hmmm: this would be a good place to use a shorter timeout on containers.
+		// future: this would be a good place to use a shorter timeout on containers.
 
 		try {
 

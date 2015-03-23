@@ -446,28 +446,22 @@ public class FileServerClient
 			}
 		}
 
-		/*
-		 * String install_dir_sys_prop = "edu.virginia.vcgr.genii.install-base-dir";
-		 */
-
-		
-		//hmmm: this should use the sudo pwrapper?
-		
+		// prepare a command line for launching the proxyio server.
 		List<String> cmds = new ArrayList<String>();
 		cmds.add("sudo");
-		cmds.add("-n");  // non-interactive, don't break out for a password prompt.
+		cmds.add("-n"); // non-interactive, don't break out for a password prompt.
 		cmds.add("-u");
 		cmds.add(uname);
 		cmds.add(ExportProperties.getExportProperties().getProxyIOLauncherFilePath());
 
 		if (_logger.isDebugEnabled()) {
-			_logger.debug("sudo export file server command line about to issue is:");
+			_logger.debug("proxyio client about to issue command line:");
 			int line = 0;
-			for (String cmd: cmds) {
+			for (String cmd : cmds) {
 				_logger.debug(line++ + "  " + cmd);
 			}
 		}
-		
+
 		Process p = null;
 		ProcessBuilder pb = new ProcessBuilder(cmds);
 
@@ -487,7 +481,7 @@ public class FileServerClient
 		} catch (InterruptedException e1) {
 			// ignored.
 		}
-		
+
 		BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 		BufferedOutputStream stdin = new BufferedOutputStream(p.getOutputStream());
@@ -510,7 +504,7 @@ public class FileServerClient
 
 			if (_logger.isDebugEnabled())
 				_logger.debug("port received from proxyio server is: " + port);
-			
+
 			if (port == 0) {
 				p.destroy();
 				return null;

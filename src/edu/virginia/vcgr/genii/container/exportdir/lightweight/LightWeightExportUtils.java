@@ -6,13 +6,14 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.client.ExportProperties;
 import edu.virginia.vcgr.genii.client.ExportProperties.ExportMechanisms;
 import edu.virginia.vcgr.genii.client.resource.IResource;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.disk.DiskExportRoot;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoDiskExportEntry;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoDiskExportRoot;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoExportUtils;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.svn.SVNExportRoot;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.zipjar.ZipJarExportRoot;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -43,25 +44,35 @@ public class LightWeightExportUtils
 
 				VExportRoot vroot = null;
 
-				// Temporarily disabled
-				// if (rootDirString.matches("^.+:.*$")) {
-				// // Handle SVN
-				// Long revision = (Long)
-				// resource.getProperty(LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME);
-				//
-				// vroot =
-				// new SVNExportRoot(rootDirString,
-				// (String) resource.getProperty(LightWeightExportConstants.SVN_USER_PROPERTY_NAME),
-				// (String) resource.getProperty(LightWeightExportConstants.SVN_PASS_PROPERTY_NAME),
-				// revision);
-				// if (revision == null)
-				// return vroot;
-				// } else
-
-				{
+				// future: Temporarily disabled code for svn exports.  why was it disabled?  -cak
+				boolean svnEnabled = false;
+				if (svnEnabled && (rootDirString.matches("^.+:.*$"))) {
+					// Handle SVN export types.
+					Long revision = (Long) resource.getProperty(LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME);
+					vroot =
+						new SVNExportRoot(rootDirString,
+							(String) resource.getProperty(LightWeightExportConstants.SVN_USER_PROPERTY_NAME),
+							(String) resource.getProperty(LightWeightExportConstants.SVN_PASS_PROPERTY_NAME), revision);
+					if (revision == null)
+						return vroot;
+				} else {
 					File root = new File(rootDirString);
-					ExportMechanisms exportType = ExportProperties.getExportProperties().getExportMechanism();
-					if (exportType == ExportMechanisms.EXPORT_MECH_PROXYIO) {
+
+					ExportMechanisms exportType =
+						ExportMechanisms.parse((String) rKey.dereference().getProperty(
+							LightWeightExportConstants.EXPORT_MECHANISM));
+
+					if (exportType == null) {
+						/*
+						 * if we couldn't retrieve the original mode used for creating the export,
+						 * we fall back to the original mode since this is probably an older export.
+						 */
+						exportType = ExportMechanisms.EXPORT_MECH_ACL;
+						if (_logger.isDebugEnabled())
+							_logger.debug("did not find stored export mode; falling back to older export creation mode of: "
+								+ exportType.toString());
+					}
+					if (exportType.equals(ExportMechanisms.EXPORT_MECH_PROXYIO)) {
 						String unixUsername = SudoExportUtils.getExportOwnerUser(rKey);
 						if (unixUsername == null) {
 							String msg = "failure to determine the export owner name for a sudo-based export!";
@@ -69,14 +80,18 @@ public class LightWeightExportUtils
 							throw new IOException(msg);
 
 						}
+
 						if (SudoDiskExportEntry.isDir(root, unixUsername)) {
 							return new SudoDiskExportRoot(root, unixUsername);
 						}
-					} else {
+					} else if ((exportType.equals(ExportMechanisms.EXPORT_MECH_ACL))
+						|| (exportType.equals(ExportMechanisms.EXPORT_MECH_ACLANDCHOWN))) {
 						if (root.isDirectory())
 							return new DiskExportRoot(root);
 						else if (root.getName().endsWith(".jar") || root.getName().endsWith(".zip"))
 							vroot = new ZipJarExportRoot(root);
+					} else {
+						throw new ResourceException("unknown or unimplemented type of export mechanism: " + exportType);
 					}
 				}
 

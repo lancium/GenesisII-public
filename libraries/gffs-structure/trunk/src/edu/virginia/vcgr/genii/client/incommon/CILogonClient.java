@@ -300,11 +300,11 @@ public class CILogonClient
 		context.setCredentialsProvider(provider);
 
 		String stars = "";
-		for (int i = 1; i < password.length(); ++i) {
+		for (int i = 0; i < password.length(); ++i) {
 			stars += "*";
 		}
 		debug("Calling " + request.getMethod() + " on " + request.getURI().toString() + " with username=" + username
-			+ " and password=" + password.charAt(0) + stars);
+			+ " and password=" + stars);
 		return makeCall(request, context);
 	}
 

@@ -9,11 +9,14 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 
 public class FSClientTest
 {
-	/* these need to be changed to the local users that can run the test and to the right home root folder. */
-	static final String HOME_ROOT = "/home/";  // where home folders live.
-	static final String MY_USER_NAME = "fred";  // my user name that runs test.
-	static final String OTHER_USER_NAME = "drake";  // second user i can sudo as.
-	
+	/*
+	 * these need to be changed to the local users that can run the test and to the right home root
+	 * folder.
+	 */
+	static final String HOME_ROOT = "/home/"; // where home folders live.
+	static final String MY_USER_NAME = "fred"; // my user name that runs test.
+	static final String OTHER_USER_NAME = "drake"; // second user i can sudo as.
+
 	public static void main(String[] args) throws Exception
 	{
 		DefaultResponse retVal;

@@ -72,11 +72,12 @@ public class ResolverUtils
 			try {
 				// First lookup the particular EPI in this resolver
 				GeniiResolverPortType proxy = ClientUtils.createProxy(GeniiResolverPortType.class, resolver.getEPR());
-				String []EPItoLookup={targetEPI.toString()};	
+				String[] EPItoLookup = { targetEPI.toString() };
 				LookupResponseType targetList = proxy.lookup(EPItoLookup);
-				// Now we have the EPR that represents the directory of instances of this EPI, lets look them up
-				proxy=ClientUtils.createProxy(GeniiResolverPortType.class, targetList.getEntryResponse(0).getEndpoint());
-				String [] pattern={};
+				// Now we have the EPR that represents the directory of instances of this EPI, lets
+				// look them up
+				proxy = ClientUtils.createProxy(GeniiResolverPortType.class, targetList.getEntryResponse(0).getEndpoint());
+				String[] pattern = {};
 				targetList = proxy.lookup(pattern);
 				return targetList;
 			} catch (Exception exception) {
@@ -86,8 +87,9 @@ public class ResolverUtils
 		}
 		return null;
 	}
-	
-	static public int [] getEndpoints(EndpointReferenceType originalEPR) {
+
+	static public int[] getEndpoints(EndpointReferenceType originalEPR)
+	{
 		WSName wsname = new WSName(originalEPR);
 		URI targetEPI = wsname.getEndpointIdentifier();
 		List<ResolverDescription> resolvers = wsname.getResolvers();
@@ -102,10 +104,10 @@ public class ResolverUtils
 			}
 		}
 		return null;
-	}	
-	
+	}
+
 	static public int getEndpointCount(EndpointReferenceType originalEPR)
-	
+
 	{
 		WSName wsname = new WSName(originalEPR);
 		URI targetEPI = wsname.getEndpointIdentifier();

@@ -2,23 +2,34 @@ export
 
 export --create { <export-service-path> | --url <export-service-url> } 
 	[--svn-user=<svn-username>] [--svn-pass=<svn-pass>] [--svn-revision=<svn-revision>]
-	[--creator="<DN-filter-pattern>"]  [--force]
+	[--creator="<DN-filter-pattern>"]  [--force]  [--heavy]
 	<local-path> [new-rns-path]
 
 export --quit { <export-root-rns-path> | --url <export-root-url> }
 
 Example:
 
-export --create --creator="/CN=Dill Pickle" /containers/khandroma_jurgis/Services/LightWeightExportPortType local:/home/jurgis/xsede/code/trunk /src/GenesisII.trunk
+export --create --creator="/CN=Dill Pickle" /containers/khandroma_jurgis local:/home/jurgis/xsede/code/trunk /src/GenesisII.trunk
 
-This creates an export of the source code "trunk" from the local file system,
-where the local files are owned by a unix user named "jurgis".  Jurgis has a
-grid container running on the machine which is linked into the grid at
-'/containers/khandroma_jurgis'.  The source code export will reside inside the
-grid at '/src/GenesisII.trunk', which will offer a view into jurgis's local
-folder where the source code actually resides.
-The creator flag is used because this grid user currently has multiple
+  This creates a light-weight export of the source code "trunk" from the local
+file system, where the local files are owned by a unix user named "jurgis".
+Jurgis has a grid container running on the machine which is linked into the
+grid at '/containers/khandroma_jurgis'.  The exported source code will reside
+inside the grid at '/src/GenesisII.trunk', which will offer a view into
+jurgis's local folder where the source code actually resides.
+  The creator flag is used because this grid user currently has multiple
 identities in their credential wallet and has specified that the true creator
 of the export (in the grid) should be the user known as 'Dill Pickle'.  If
-that user is not found in the credentials, then the export attempt will fail.
+that user is not found in the credentials, then the export will fall back to
+using whatever credentials are actually available for the user.
+
+export --create --force --creator="/CN=Dill Pickle" /containers/khandroma_jurgis local:/home/jurgis/xsede/code/trunk /src/GenesisII.trunk
+
+  Identical to the first example, but the user added the '--force' flag on the
+command line.  The force flag permits administrators to create exports at the
+behest of other users.  When using the force flag, the creator specified does
+not have to exist in the user's current credentials _as_long_as_ the current
+user is an administrator of the export port type (i.e. the user has WRITE
+permission on the port type).  If the user is not an admin but tries to use
+--force, then the export attempt is rejected.  
 

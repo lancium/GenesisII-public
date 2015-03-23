@@ -1,1 +1,2 @@
 client-ui [--shell]
+ui [--shell]

@@ -170,9 +170,9 @@ public class PluginManager
 							+ "\" does not appear to implement the IMenuPlugin interface.");
 
 					MainMenuDescriptor descriptor =
-						new MainMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtilities.getRequiredAttribute(child, MENU_NAME_ATTR,
-							null), XMLUtilities.getRequiredAttribute(child, MENU_LABEL_ATTR, null), XMLUtilities.getRequiredAttribute(
-							child, MENU_GROUP_ATTR, null));
+						new MainMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtilities.getRequiredAttribute(child,
+							MENU_NAME_ATTR, null), XMLUtilities.getRequiredAttribute(child, MENU_LABEL_ATTR, null),
+							XMLUtilities.getRequiredAttribute(child, MENU_GROUP_ATTR, null));
 
 					/*
 					 * Let's see if the menu already exists (i.e., another plugin is also in the
@@ -225,7 +225,8 @@ public class PluginManager
 
 					/* Just go ahead and add the tab plugin descriptor to the collection */
 					tabs.add(new TabPluginDescriptor(name, (ITabPlugin) plugin, XMLUtilities.getRequiredAttribute(child,
-						TAB_NAME_ATTR, null), Integer.parseInt(XMLUtilities.getRequiredAttribute(child, TAB_PRIORITY_ATTR, "0"))));
+						TAB_NAME_ATTR, null),
+						Integer.parseInt(XMLUtilities.getRequiredAttribute(child, TAB_PRIORITY_ATTR, "0"))));
 				} else
 					throw new PluginException("Unrecognized element \"" + nodeName + " in plugin configuration.");
 			}

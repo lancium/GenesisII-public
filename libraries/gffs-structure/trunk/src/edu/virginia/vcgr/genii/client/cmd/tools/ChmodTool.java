@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -88,6 +89,29 @@ public class ChmodTool extends BaseGridTool
 	public void setRecursive()
 	{
 		_recursive = true;
+	}
+	
+	// the following three methods assist our command line parsing, which hoses up the chmod -rwx style of removing rights.
+
+	@Option({"r"})
+	public void setReadRemove()
+	{
+		List<String> args = getArguments();
+		args.add("-r");
+	}
+
+	@Option({"w"})
+	public void setWriteRemove()
+	{
+		List<String> args = getArguments();
+		args.add("-w");
+	}
+	
+	@Option({"x"})
+	public void setExecRemove()
+	{
+		List<String> args = getArguments();
+		args.add("-x");
 	}
 
 	@Override

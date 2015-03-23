@@ -82,10 +82,11 @@ public class MyProxyLoginTool extends BaseLoginTool
 	@Override
 	protected void verify() throws ToolException
 	{
-/*cannot check this here, since verify is called before runCommand, which gathers this argument.
-		if ((_username == null) || (_username.length() == 0))
-			throw new InvalidToolUsageException("The username cannot be blank.");
-*/
+		/*
+		 * cannot check this here, since verify is called before runCommand, which gathers this
+		 * argument. if ((_username == null) || (_username.length() == 0)) throw new
+		 * InvalidToolUsageException("The username cannot be blank.");
+		 */
 
 		if (_durationString != null) {
 			try {
@@ -100,14 +101,14 @@ public class MyProxyLoginTool extends BaseLoginTool
 	{
 		return Installation.getDeployment(new DeploymentName()).security();
 	}
-	
+
 	/**
 	 * assumes that the username and password have already been set.
 	 */
-	public int doMyproxyLogin(ICallingContext callContext) throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
-	{		
+	public int doMyproxyLogin(ICallingContext callContext) throws ReloadShellException, ToolException, UserCancelException,
+		RNSException, AuthZSecurityException, IOException, ResourcePropertyException, CreationException,
+		InvalidToolUsageException, ClassNotFoundException, DialogException
+	{
 		String pass = new String(_password);
 
 		Logger jdkLogger = Logger.getLogger(this.getClass().getName());
@@ -122,8 +123,8 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 		Properties myProxyProperties = loadMyProxyProperties();
 		int lifetime = Integer.parseInt(myProxyProperties.getProperty(MYPROXY_LIFETIME_PROP));
-		
-		if ((_host != null) && (_port != 0)) {			
+
+		if ((_host != null) && (_port != 0)) {
 			mp.setPort(_port);
 			mp.setHost(_host);
 			_logger.debug("plugging in chosen parameters for host and port: host=" + _host + " port=" + _port);
@@ -133,7 +134,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 			String host = myProxyProperties.getProperty(MYPROXY_HOST_PROP);
 
 			mp.setPort(port);
-			mp.setHost(host);			
+			mp.setHost(host);
 		}
 
 		mp.setLifetime(lifetime);
@@ -141,8 +142,9 @@ public class MyProxyLoginTool extends BaseLoginTool
 		mp.setPassphrase(pass);
 
 		/*
-		 * Myproxy trust root can be overriden with either environment variable GLOBUS_LOCATION or X509_CERT_DIR,
-		 * although at our level we are defining the location in the security property file.
+		 * Myproxy trust root can be overriden with either environment variable GLOBUS_LOCATION or
+		 * X509_CERT_DIR, although at our level we are defining the location in the security
+		 * property file.
 		 */
 		String myProxyDirectory =
 			getSecurityProperties().getProperty(KeystoreSecurityConstants.Client.MYPROXY_CERTIFICATES_LOCATION_PROP);
@@ -157,7 +159,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 
 		if (_logger.isDebugEnabled())
 			_logger.debug("myproxy login using host " + mp.getHost() + " and port " + mp.getPort());
-		
+
 		try {
 			mp.connect();
 		} catch (Exception e) {
@@ -194,27 +196,28 @@ public class MyProxyLoginTool extends BaseLoginTool
 		// store the new myproxy session cert.
 		KeyAndCertMaterial clientKeyMaterial = new KeyAndCertMaterial(keyMat, mp.getPrivateKey());
 		callContext.setActiveKeyAndCertMaterial(clientKeyMaterial);
-		
+
 		// add the pass through identity to the calling context.
 		callContext.setSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY, keyMat[0]);
 		if (_logger.isDebugEnabled())
 			_logger.debug("issuer for the new cert is: " + keyMat[0].getIssuerDN());
 		if (_logger.isTraceEnabled())
-			_logger.trace("adding myproxy TLS cert: " + keyMat[0]);		
-		
+			_logger.trace("adding myproxy TLS cert: " + keyMat[0]);
+
 		// handle establishing a preferred identity, if that's not set as fixated.
 		if (!PreferredIdentity.fixatedInCurrent()) {
-			// the identity wasn't fixated, or it doesn't exist, so we can set preferred identity here.
+			// the identity wasn't fixated, or it doesn't exist, so we can set preferred identity
+			// here.
 			PreferredIdentity newIdentity = new PreferredIdentity(PreferredIdentity.getDnString(keyMat[0]), false);
 			PreferredIdentity.setInContext(callContext, newIdentity);
 			_logger.debug("preferred identity set in myproxy login: " + newIdentity.toString());
-		}				
-		
+		}
+
 		// update the saved context before we leave.
 		ContextManager.storeCurrentContext(callContext);
 		return 0;
 	}
-	
+
 	@Override
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
 		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,

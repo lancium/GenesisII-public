@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -26,11 +27,13 @@ public class Driver
 {
 	static private Log _logger = LogFactory.getLog(Driver.class);
 
+	static final int SOCKET_BACKLOG = 50;
+
 	public static void main(String[] args)
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Proxy server: request to start");
-		
+
 		BufferedInputStream bis = new BufferedInputStream(System.in);
 
 		byte[] nonce = new byte[Constants.NONCE_SIZE];
@@ -53,44 +56,47 @@ public class Driver
 		// open server socket
 		ServerSocket socket = null;
 		try {
-			socket = new ServerSocket(0);
+			InetAddress addr = InetAddress.getByName("127.0.0.1");
+			socket = new ServerSocket(0, SOCKET_BACKLOG, addr);
 		} catch (IOException ioe) {
 			StreamUtils.close(socket);
 			System.out.println("0");
-			_logger.error("ProxyServer: Error creating server socket.  Exiting!!");
+			_logger.error("ProxyServer: Error creating server socket.  Exiting!", ioe);
 			System.exit(-1);
 		}
 
 		_logger.info("ProxyServer: Proxy started on port: " + socket.getLocalPort());
 
 		System.out.println(socket.getLocalPort());
-		
+
 		if (_logger.isDebugEnabled())
 			_logger.debug("communicated port to client.");
-		
-		// start the monitoring thread!
+
+		// start the monitoring thread.
 		Monitor monitor = new Monitor(System.currentTimeMillis());
 		Thread monitor_thread = new Thread(monitor);
 		monitor_thread.start();
 		if (_logger.isDebugEnabled())
 			_logger.debug("started monitoring thread.");
-		
+
 		if (_logger.isDebugEnabled())
 			_logger.debug("before starting accept loop.");
-		
-		// Starting select-accept loop!
+
+		// Starting select-accept loop.
 		while (true) {
 			try {
 				// wait for request
 				Socket connxn = socket.accept();
-				//hmmm: this should only accept on loopback, and then we don't need a check below.
-				
 				if (_logger.isDebugEnabled())
-					_logger.debug("accept gives us a client socket on port " + connxn.getPort());				
+					_logger.debug("accept gives us a client socket on port " + connxn.getPort());
 
-				// Only localhost requests are entertained!
+				/*
+				 * only localhost requests are supported. this should be ensured by construction of
+				 * server socket above, but we're still checking just to make sure we never see a
+				 * connection from elsewhere.
+				 */
 				if (!connxn.getInetAddress().isLoopbackAddress()) {
-					_logger.warn("Not loopback request - ignoring!!  address is: " + connxn.getInetAddress().getHostAddress());
+					_logger.error("Not loopback request - ignoring!  (how did this happen?)  address is: " + connxn.getInetAddress().getHostAddress());
 					continue;
 				} else {
 					Monitor.setLastReqTime(System.currentTimeMillis());
@@ -99,7 +105,7 @@ public class Driver
 				RequestHandler reqHandler = new RequestHandler(connxn, nonce);
 				Thread t = new Thread(reqHandler);
 				t.start();
-			} catch (Exception e) {				
+			} catch (Exception e) {
 				_logger.warn("exception in main loop of proxy io server.", e);
 			}
 		}

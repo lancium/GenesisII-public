@@ -88,10 +88,11 @@ public class XSEDELoginTool extends BaseLoginTool
 		 */
 		callContext = ContextManager.getCurrentContext();
 
-		// reset any pass-through credential that had been established during login, since it's no longer needed.
+		// reset any pass-through credential that had been established during login, since it's no
+		// longer needed.
 		callContext.removeProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 		ContextManager.storeCurrentContext(callContext);
-		
+
 		// drop any notification brokers or other cached info after credential change.
 		CacheManager.resetCachingSystem();
 

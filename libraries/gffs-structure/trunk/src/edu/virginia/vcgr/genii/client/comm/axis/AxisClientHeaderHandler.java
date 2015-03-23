@@ -246,8 +246,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 					if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
 						/*
-						 * in the server role, we first delegate from the source resource to our container tls
-						 * cert and thence to the target resource.
+						 * in the server role, we first delegate from the source resource to our
+						 * container tls cert and thence to the target resource.
 						 */
 						CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
 						if (tlsKey != null) {
@@ -282,9 +282,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 								+ clientKeyAndCertificate._clientCertChain[0].getSubjectDN());
 
 						// in the client role here, so just delegate to the resource.
-						TrustCredential newTC = walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
-							clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
-							accessCategories, trustDelegation);
+						TrustCredential newTC =
+							walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
+								clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
+								restrictions, accessCategories, trustDelegation);
 
 						if (newTC != null) {
 							if (_logger.isDebugEnabled())

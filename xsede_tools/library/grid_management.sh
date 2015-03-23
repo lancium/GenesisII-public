@@ -230,6 +230,9 @@ function bootstrap_grid()
   # perform the basic setup of the grid, already canned for us.
   echo "Bootstrapping default grid configuration..."
 
+  # clear out any container properties that could interfere with our new grid.
+  \rm -f "$GENII_INSTALL_DIR/container.properties"
+
   bootstrap_file="$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/bootstrap.xml"
   cp "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/template-bootstrap.xml" "$bootstrap_file"
 
@@ -261,6 +264,7 @@ function bootstrap_grid()
   # copy up a bogus deployment information file to have a placeholder that makes sense.
   cp "$GENII_INSTALL_DIR/installer/bootstrap-build.config" "$GENII_INSTALL_DIR/current.deployment"
   check_if_failed "copying current.deployment for bootstrapped grid"
+
   # jump back out of the install directory.  the deployment behaves
   # oddly if we aren't in there, but nothing else should require being in the install dir.
   popd &>/dev/null

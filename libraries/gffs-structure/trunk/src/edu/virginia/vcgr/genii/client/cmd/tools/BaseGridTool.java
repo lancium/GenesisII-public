@@ -89,10 +89,10 @@ public abstract class BaseGridTool implements ITool
 
 	protected abstract void verify() throws ToolException;
 
-	// hmmm: ugly, but true. the set returned here should be reduced.
+	// future: ugly, but true. the set of exceptions returned here should be reduced.
 	protected abstract int runCommand() throws ReloadShellException /* necessary */, ToolException /* necessary */,
 		UserCancelException /* necessary */, RNSException /* necessary */, GenesisIISecurityException,
-		IOException/* necessary */, ResourcePropertyException, CreationException, ClassNotFoundException/* necessary */,
+		IOException /* necessary */, ResourcePropertyException, CreationException, ClassNotFoundException /* necessary */,
 		DialogException;
 
 	protected boolean useGui()
@@ -147,18 +147,21 @@ public abstract class BaseGridTool implements ITool
 	{
 		_lastExit = newExitValue;
 	}
-	
+
 	public void establishStandardIO(Writer out, Writer err, Reader in)
 	{
-		if (out == null) out = new PrintWriter(new StringWriter());
-		if (err == null) err = new PrintWriter(new StringWriter());
-		if (in == null) in = new BufferedReader(new StringReader(""));
-		
+		if (out == null)
+			out = new PrintWriter(new StringWriter());
+		if (err == null)
+			err = new PrintWriter(new StringWriter());
+		if (in == null)
+			in = new BufferedReader(new StringReader(""));
+
 		stdout = (out instanceof PrintWriter) ? (PrintWriter) out : new PrintWriter(out, true);
 		stderr = (err instanceof PrintWriter) ? (PrintWriter) err : new PrintWriter(err, true);
 		stdin = (in instanceof BufferedReader) ? (BufferedReader) in : new BufferedReader(in);
 	}
-	
+
 	@Override
 	public final int run(Writer out, Writer err, Reader in) throws ReloadShellException, ToolException
 	{

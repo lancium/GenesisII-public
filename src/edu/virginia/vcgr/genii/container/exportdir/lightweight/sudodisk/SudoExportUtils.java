@@ -11,11 +11,14 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.ExportProperties;
 import edu.virginia.vcgr.genii.client.ExportProperties.ExportMechanisms;
 import edu.virginia.vcgr.genii.client.ExportProperties.OwnershipForByteIO;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.security.WalletUtilities;
 import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
 import edu.virginia.vcgr.genii.container.exportdir.GridMapUserList;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.LightWeightExportConstants;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.exportdir.lightweight.LightWeightExportPortType;
 
 public class SudoExportUtils
 {
@@ -142,10 +145,31 @@ public class SudoExportUtils
 	 */
 	public static void chownFileToDeducedUser(File localPath) throws IOException
 	{
-//hmmm: this case needs to be re-examined!  use preferred id?
-		
-		ArrayList<String> users = WalletUtilities.extractOwnersFromCredentials(null, true);
-		String unixUser = SudoExportUtils.doGridMapping(users);
+
+		ResourceKey rkey = ResourceManager.getCurrentResource();
+
+		String unixUser = null;
+		if (rkey.dereference() instanceof LightWeightExportPortType) {
+			unixUser = (String) rkey.dereference().getProperty(LightWeightExportConstants.EXPORT_OWNER_UNIX_NAME);
+			if (_logger.isDebugEnabled())
+				_logger.debug("found stored unix user owning export as: " + unixUser);
+		} else {
+			PreferredIdentity prefId = PreferredIdentity.getCurrent();
+			String ownerDN = null;
+			if (prefId != null) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("found a preferred id for the chown as: " + prefId);
+				ownerDN = prefId.getIdentityString();
+				unixUser = SudoExportUtils.doGridMapping(ownerDN);
+			} else {
+				// well, we got nothing. the owner dn stays null.
+				if (_logger.isDebugEnabled())
+					_logger.debug("did not find any preferred id in the context; cannot exactly determine owner!");
+				ArrayList<String> users = WalletUtilities.extractOwnersFromCredentials(null, true);
+				unixUser = SudoExportUtils.doGridMapping(users);
+			}
+		}
+
 		if (unixUser != null) {
 			chownFileToUser(localPath, unixUser);
 		} else {
@@ -175,8 +199,21 @@ public class SudoExportUtils
 	 */
 	public static void chownIfACLandChownEnabled(File localPath) throws IOException
 	{
-		if (ExportProperties.getExportProperties().getExportMechanism() == ExportMechanisms.EXPORT_MECH_ACLANDCHOWN) {
-			_logger.debug("chown for export on path: '" + localPath + "'");
+		// look up the export mechanism setting for the export resource.
+		ExportMechanisms expMech =
+			ExportMechanisms.parse((String) ResourceManager.getCurrentResource().dereference()
+				.getProperty(LightWeightExportConstants.EXPORT_MECHANISM));
+		if (expMech == null) {
+			// if we have no record of the type of export, then we fall back to the old style.
+			expMech = ExportMechanisms.EXPORT_MECH_ACL;
+		}
+		/*
+		 * if we're in the right export mode, we'll chown the file to the user we have recorded as
+		 * export owner.
+		 */
+		if (expMech.equals(ExportMechanisms.EXPORT_MECH_ACLANDCHOWN)) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("ACL and CHOWN mode calling chown for export on path: '" + localPath + "'");
 			chownFileToDeducedUser(localPath);
 		}
 	}

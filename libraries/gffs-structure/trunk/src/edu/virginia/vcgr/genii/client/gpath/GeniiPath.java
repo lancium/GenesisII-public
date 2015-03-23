@@ -50,6 +50,9 @@ public class GeniiPath implements Serializable
 		if (path == null)
 			path = "";
 
+		// drop any backslashes in the path in favor of forward slashes.
+		path = path.replace("\\", "/");
+
 		int index = path.indexOf(':');
 		if (index > 0) {
 			String protocol = path.substring(0, index);
@@ -189,13 +192,6 @@ public class GeniiPath implements Serializable
 	{
 		String basename = path();
 		int slash_posn = basename.lastIndexOf('/');
-		// ASG September 28, 2013. The code only checked for '/', not '\' as we see in Windows
-		if (slash_posn < 0) // there was no '/'
-			slash_posn = basename.lastIndexOf('\\');
-/*hmmm: we actually just want to turn backslash into forward slash to avoid
-needing to compare everywhere in the code.  what about any GeniiPath creation / returning method
-does the replacement to be sure we never see it.  path() method could also validate this.
-*/
 		if (slash_posn >= 0)
 			basename = basename.substring(slash_posn + 1);
 		return basename;
@@ -322,7 +318,13 @@ does the replacement to be sure we never see it.  path() method could also valid
 	 * returns a list of paths of either local java File or RNSPath objects.
 	 */
 	public static Collection<PathMixIn> pathExpander(String path)
-	{
+	{		
+		if (path == null)
+			path = "";
+
+		// drop any backslashes in the path in favor of forward slashes.
+		path = path.replace("\\", "/");
+
 		Collection<PathMixIn> toReturn = null;
 
 		GeniiPath gp = new GeniiPath(path);

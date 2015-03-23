@@ -108,7 +108,7 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 			boolean okay = CertificateValidatorFactory.getValidator().validateCertificateConsistency(_identity);
 			if (!okay)
 				throw new AttributeInvalidException("failed to validate cert path: " + _identity.toString());
-			
+
 			for (X509Certificate cert : getOriginalAsserter()) {
 				cert.checkValidity(date);
 			}
@@ -116,8 +116,7 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 			throw new AttributeInvalidException("Security attribute asserting identity contains an invalid certificate: "
 				+ e.getMessage(), e);
 		} catch (Exception e) {
-			throw new AttributeInvalidException("Failure during certificate validation: "
-				+ e.getMessage(), e);
+			throw new AttributeInvalidException("Failure during certificate validation: " + e.getMessage(), e);
 		}
 	}
 

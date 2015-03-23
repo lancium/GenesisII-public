@@ -58,7 +58,6 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = ExportedDirDBResourceProvider.class)
 public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDirPortType
-// , GeniiNoOutCalls
 {
 	static private Log _logger = LogFactory.getLog(ExportedDirServiceImpl.class);
 
@@ -138,11 +137,11 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 
 			String fullPath = ExportedFileUtils.createFullPath(_resource.getLocalPath(), filename);
 			String parentIds = ExportedDirUtils.createParentIdsString(_resource.getParentIds(), _resource.getId());
-			
+
 			// 2014-11-05 ASG - adding logging
 
 			String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-			StatsLogger.logStats("LightWeightExport: Create file from "+caller);
+			StatsLogger.logStats("LightWeightExport: Create file from " + caller);
 			// End logging
 
 			try {
@@ -235,7 +234,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 
 			// find out the owner of the export from the preferred id.
 			PreferredIdentity current = PreferredIdentity.getCurrent();
-			String owner = current != null? current.getIdentityString() : null;
+			String owner = current != null ? current.getIdentityString() : null;
 			if (_logger.isDebugEnabled())
 				_logger.debug("got preferred identity for new export: '" + owner + "'");
 

@@ -35,17 +35,13 @@ public class ByteIOFileCreator
 
 		// First get the calling context.
 		ICallingContext callContext = ContextManager.getExistingContext();
-		
-		String prefId = (PreferredIdentity.getCurrent() != null? PreferredIdentity.getCurrent().getIdentityString() : null); 
+
+		String prefId = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
 		X509Certificate owner = GffsExportConfiguration.findPreferredIdentityServerSide(callContext, prefId);
-		String userName = CredentialWallet.extractUsername(owner); 
+		String userName = CredentialWallet.extractUsername(owner);
 		if (_logger.isDebugEnabled())
 			_logger.debug("username chosen for byteio file is: " + userName);
 		if (userName != null) {
-			/*
-			 * hmmm: we need to interact with proxyio server here to guarantee a directory in user
-			 * location, if the byteio.InUserHome option is true.
-			 */
 			baseDir = new GuaranteedDirectory(uroot, userName);
 		} else {
 			String msg = "failed attempting to create a byteio file without any user credentials.";

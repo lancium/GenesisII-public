@@ -108,16 +108,17 @@ public class UpdateGridCertsTool
 			props.setProperty(CertUpdateHelpers.LAST_UPDATE_PACKAGE_PROPNAME, certPackFile.getName());
 
 			justWriteProps(props, true);
-//			// reschedule updates for next interval.
-//			Long interval = Long.parseLong(props.getProperty(CertUpdateHelpers.UPDATE_INTERVAL_PROPNAME));
-//			if (interval <= 60 * 1000) {
-//				// reset the interval since checking every minute or less is insane. we could be
-//				// more stringent here, but want to allow testing at small intervals.
-//				interval = CertUpdateHelpers.DEFAULT_CERT_UPDATE_INTERVAL;
-//			}
-//			long timeNow = new Date().getTime();
-//			props.setProperty(CertUpdateHelpers.NEXT_UPDATE_PROPNAME, "" + (interval + timeNow));
-//			CertUpdateHelpers.putCertUpdateProperties(props);
+			// // reschedule updates for next interval.
+			// Long interval =
+			// Long.parseLong(props.getProperty(CertUpdateHelpers.UPDATE_INTERVAL_PROPNAME));
+			// if (interval <= 60 * 1000) {
+			// // reset the interval since checking every minute or less is insane. we could be
+			// // more stringent here, but want to allow testing at small intervals.
+			// interval = CertUpdateHelpers.DEFAULT_CERT_UPDATE_INTERVAL;
+			// }
+			// long timeNow = new Date().getTime();
+			// props.setProperty(CertUpdateHelpers.NEXT_UPDATE_PROPNAME, "" + (interval + timeNow));
+			// CertUpdateHelpers.putCertUpdateProperties(props);
 
 		} catch (Throwable t) {
 			_logger.error("cert update process croaked with exception", t);

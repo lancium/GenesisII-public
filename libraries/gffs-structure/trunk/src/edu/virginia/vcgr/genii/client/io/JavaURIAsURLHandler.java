@@ -22,6 +22,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,13 +36,16 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 	static private final String[] _HANDLED_PROTOCOLS = new String[] { "http", "https", "ftp" };
 
 	// tracks http and https connections to allow proper closure on stage-out.
-	// hmmm: public member=not good; make this supported by a couple functions, maybe even move to
-	// own class.
-	public static HashMap<URI, HttpURLConnection> activeConns = new HashMap<URI, HttpURLConnection>();
+	private static HashMap<URI, HttpURLConnection> _activeConns = new HashMap<URI, HttpURLConnection>();
 
 	public String[] getHandledProtocols()
 	{
 		return _HANDLED_PROTOCOLS;
+	}
+	
+	public static Map<URI, HttpURLConnection> getActiveConns()
+	{
+		return _activeConns;
 	}
 
 	public boolean canRead(String protocol)
@@ -93,7 +97,7 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 				HttpURLConnection hconn = (HttpURLConnection) conn;
 				hconn.setDoOutput(true);
 				hconn.setRequestMethod("PUT");
-				activeConns.put(uri, hconn);
+				_activeConns.put(uri, hconn);
 			} else {
 				conn.setDoOutput(true);
 			}

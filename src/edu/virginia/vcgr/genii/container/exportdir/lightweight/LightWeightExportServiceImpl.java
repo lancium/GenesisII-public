@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.exportdir.lightweight;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,6 +11,8 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
+import edu.virginia.vcgr.genii.client.ExportControl.ModeAllowance;
+import edu.virginia.vcgr.genii.client.ExportControlsList;
 import edu.virginia.vcgr.genii.client.ExportProperties;
 import edu.virginia.vcgr.genii.client.ExportProperties.ExportMechanisms;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
@@ -43,9 +46,9 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 
 	/**
 	 * checks whether the user's current credentials from the calling context is sufficient to make
-	 * them an admin on the current resource port type. this can be checked during export creation on
-	 * the parent resource, *before* we create a new resource, so we can decide whether to let the
-	 * user force a particular credential as the export owner.
+	 * them an admin on the current resource port type. this can be checked during export creation
+	 * on the parent resource, *before* we create a new resource, so we can decide whether to let
+	 * the user force a particular credential as the export owner.
 	 */
 	private boolean testForAdministrativeRights()
 	{
@@ -103,6 +106,15 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 			}
 		}
 
+		ICallingContext context;
+		try {
+			context = ContextManager.getCurrentContext();
+		} catch (Exception e) {
+			String msg = "could not load calling context to inspect credentials during export.";
+			_logger.error(msg);
+			throw new ResourceException(msg);
+		}
+
 		if (forcing) {
 			hasAdminAccess = testForAdministrativeRights();
 			if (hasAdminAccess) {
@@ -112,35 +124,68 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 				 */
 				_logger.debug("ownerDN set by 'force' to: '" + ownerDN + "'");
 			} else {
-				// no go, hoser.  you don't have the rights to force the owner.
+				// no go, hoser. you don't have the rights to force the owner.
 				throw new ResourceException(
 					"permission was denied for WRITE access as admin on export port type; cannot force ownership.");
 			}
 		} else {
 			// need to look the supposed creator up.
-			ICallingContext context;
-			try {
-				context = ContextManager.getCurrentContext();
-			} catch (Exception e) {
-				String msg = "could not load calling context to inspect credentials during export.";
-				_logger.error(msg);
-				throw new ResourceException(msg);
-			}
-			
 			X509Certificate owner = GffsExportConfiguration.findPreferredIdentityServerSide(context, ownerDN);
 			if (owner != null) {
-				ownerDN = PreferredIdentity.getDnString(owner); 
+				ownerDN = PreferredIdentity.getDnString(owner);
 			}
 			if (_logger.isDebugEnabled())
 				_logger.debug("export ownerDN resolved to: '" + ownerDN + "'");
 		}
 
+		// retrieve the owner as a unix user if possible.
+		String owningUnixUser = SudoExportUtils.doGridMapping(ownerDN);
+
+		// make sure the user is set properly if we need to know it.
+		if (ExportProperties.getExportProperties().getExportMechanism().equals(ExportMechanisms.EXPORT_MECH_PROXYIO)
+			|| ExportProperties.getExportProperties().getExportMechanism().equals(ExportMechanisms.EXPORT_MECH_ACLANDCHOWN)) {
+			if (owningUnixUser == null) {
+				// not having a unix user is fatal for these types of export creations.
+				String msg = "Failed to discover Unix user in the grid-mapfile for this export, owner DN was: " + ownerDN;
+				_logger.error(msg);
+				throw new ResourceException(msg);
+			}
+
+			// additionally we need to check the path for proxyio type exports.
+			if (ExportProperties.getExportProperties().getExportMechanism().equals(ExportMechanisms.EXPORT_MECH_PROXYIO)) {
+				// check that the path is allowed by our current set of restrictions.
+				ExportControlsList ecl = ExportControlsList.getExportControlsList();
+				Set<ModeAllowance> modes;
+				/*
+				 * future: how to pick the right modes for the export based on the export's
+				 * read-only or read-write nature? currently impossible since exports are just
+				 * exports without a sense of read-only. need to add this feature in future.
+				 */
+				modes = ModeAllowance.getReadWriteMode();
+				if (!ecl.checkCreationOkay(initInfo.getPath(), owningUnixUser, modes)) {
+					String msg =
+						"cannot create export; this path is blocked for user '" + owningUnixUser + "' by export controls: "
+							+ initInfo.getPath();
+					_logger.error(msg);
+					throw new ResourceException(msg);
+				}
+			}
+		}
+
 		// finally, after all the checks above, create the resource.
 		ResourceKey key = super.createResource(creationParameters);
+		// save the starting path for the export.
 		key.dereference().setProperty(LightWeightExportConstants.ROOT_DIRECTORY_PROPERTY_NAME, initInfo.getPath());
 
-		// now use the fruits of our efforts, if there were any.
-		String owningUnixUser = SudoExportUtils.doGridMapping(ownerDN);
+		// record the type of export that this is based on, to avoid hosing ourselves if container
+		// mode changes later.
+		key.dereference().setProperty(LightWeightExportConstants.EXPORT_MECHANISM,
+			ExportProperties.getExportProperties().getExportMechanism().toString());
+		if (_logger.isDebugEnabled())
+			_logger.debug("setting export's creation mode to: "
+				+ key.dereference().getProperty(LightWeightExportConstants.EXPORT_MECHANISM));
+
+		// now use the fruits of our efforts on calculating the user name, if there were any.
 		if (owningUnixUser != null) {
 			key.dereference().setProperty(LightWeightExportConstants.EXPORT_OWNER_UNIX_NAME, owningUnixUser);
 			_logger.info("export owner unix user resolved as: '" + owningUnixUser + "'");
@@ -153,25 +198,15 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 			// check if directory exists.
 			ExportMechanisms exportType = ExportProperties.getExportProperties().getExportMechanism();
 			if (exportType == ExportMechanisms.EXPORT_MECH_PROXYIO) {
-				// first complain if we didn't figure out the owner.
-				if (owningUnixUser == null) {
-					String msg =
-						"Export is in proxy IO mode, but could not determine Unix user that owns the export from grid-mapfile."
-							+ "  Perhaps the export creator was not logged in or the grid user is not listed in the grid-mapfile."
-							+ "  This will not work properly.";
-					_logger.warn(msg);
-					throw new ResourceException(msg);
-				}
-
+				// test whether this is an OS where we support proxyio exports.
 				String osName = System.getProperty("os.name");
-				boolean isCompatibleOS = true;
+				boolean isCompatibleOS = false;
+				_logger.debug("property says OS name is: " + osName);
 				if (osName.contains("Windows")) {
 					isCompatibleOS = false;
 				} else if (osName.contains("OS X") || osName.contains("")) {
 					// linux and mac
 					isCompatibleOS = true;
-				} else {
-					isCompatibleOS = false;
 				}
 
 				if (!isCompatibleOS) {
@@ -186,12 +221,16 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
 							+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
 				}
-			} else {
+			} else if ((exportType == null) || exportType.equals(ExportMechanisms.EXPORT_MECH_ACL)
+				|| exportType.equals(ExportMechanisms.EXPORT_MECH_ACLANDCHOWN)) {
+				// handle ACL and ACLANDCHOWN type exports.
 				if (!ExportedDirUtils.dirReadable(initInfo.getPath())) {
 					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
 						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
 							+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
 				}
+			} else {
+				throw new ResourceException("unknown or unimplemented type of export mechanism: " + exportType);
 			}
 
 		} catch (IOException ioe) {

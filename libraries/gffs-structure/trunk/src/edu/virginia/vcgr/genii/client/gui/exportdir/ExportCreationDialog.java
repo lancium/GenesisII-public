@@ -154,37 +154,4 @@ public class ExportCreationDialog extends JDialog
 			setVisible(false);
 		}
 	}
-
-	// hmmm: this class does not seem to be used at all; ask andrew.
-
-	// private class HelpAction extends AbstractAction
-	// {
-	// static final long serialVersionUID = 0L;
-	// private String _url;
-	//
-	// public HelpAction(String helpUrl)
-	// {
-	// super("Help");
-	// _url = helpUrl;
-	// }
-	//
-	// @Override
-	// public void actionPerformed(ActionEvent e)
-	// {
-	// _information = null;
-	// setVisible(false);
-	// if (Desktop.isDesktopSupported()) {
-	// Desktop desktop = Desktop.getDesktop();
-	// if (desktop.isSupported(Desktop.Action.OPEN))
-	// try {
-	// desktop.browse(new URI(_url));
-	// } catch (IOException e1) {
-	// _logger.error("caught unexpected exception", e1);
-	// } catch (URISyntaxException e1) {
-	// _logger.error("caught unexpected exception", e1);
-	// }
-	// }
-	// }
-	// }
-
 }

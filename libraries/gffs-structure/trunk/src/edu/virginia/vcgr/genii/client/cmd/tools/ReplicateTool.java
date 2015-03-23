@@ -69,12 +69,12 @@ public class ReplicateTool extends BaseGridTool
 		_destroy = true;
 	}
 
-	@Option({ "list" , "l"})
+	@Option({ "list", "l" })
 	public void setList()
 	{
 		_list = true;
 	}
-	
+
 	@Override
 	protected void verify() throws ToolException
 	{
@@ -103,7 +103,8 @@ public class ReplicateTool extends BaseGridTool
 		if (_destroy) {
 			return destroyReplica();
 		}
-		if (_list) return listReplicas();
+		if (_list)
+			return listReplicas();
 		String sourcePath = getArgument(0);
 		String containerPath = getArgument(1);
 		String linkPath = (numArguments() < 3 ? null : getArgument(2));
@@ -185,7 +186,6 @@ public class ReplicateTool extends BaseGridTool
 		}
 	}
 
-	
 	/*
 	 * Print the list of replicas to the console.
 	 */
@@ -195,28 +195,27 @@ public class ReplicateTool extends BaseGridTool
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath replicaRNS = current.lookup(replicaPath, RNSPathQueryFlags.MUST_EXIST);
 		EndpointReferenceType replicaEPR = replicaRNS.getEndpoint();
-		int []list=null;
+		int[] list = null;
 		// First get the vector or replica numbers
-		list=ResolverUtils.getEndpoints(replicaEPR);
+		list = ResolverUtils.getEndpoints(replicaEPR);
 		// Now look them all up and get their EPRs
-		LookupResponseType dir=ResolverUtils.getEndpointEntries(replicaEPR);
-		if (dir!=null  && list!=null) {
-			RNSEntryResponseType []response=dir.getEntryResponse();
-			for (int j=0;j<response.length ; j++) {
+		LookupResponseType dir = ResolverUtils.getEndpointEntries(replicaEPR);
+		if (dir != null && list != null) {
+			RNSEntryResponseType[] response = dir.getEntryResponse();
+			for (int j = 0; j < response.length; j++) {
 				String temp = response[j].getEndpoint().getAddress().toString();
 				int axisIndex = temp.indexOf("/axis");
-				int containerID=temp.indexOf("container-id");
-				if (axisIndex>=0 && containerID>=0)
-					stdout.println("Replica " + list[j] + ": " + temp.substring(0, axisIndex) +": " + temp.substring(containerID));
+				int containerID = temp.indexOf("container-id");
+				if (axisIndex >= 0 && containerID >= 0)
+					stdout.println("Replica " + list[j] + ": " + temp.substring(0, axisIndex) + ": "
+						+ temp.substring(containerID));
 			}
-		}
-		else {
-			stdout.println("There are no replicas of resource "+ replicaPath);
+		} else {
+			stdout.println("There are no replicas of resource " + replicaPath);
 		}
 		return 0;
 	}
 
-	
 	/**
 	 * Destroy a single replica without destroying the entire virtual resource. (Note -- "rm file"
 	 * destroys all replicas.)
@@ -234,75 +233,88 @@ public class ReplicateTool extends BaseGridTool
 	private int destroyReplica() throws RNSException, AuthZSecurityException, ResourceException, ToolException
 	{
 		String replicaPath = getArgument(0);
-		int replicaNum= Integer.parseInt(getArgument(1));
-		Boolean sameEPR=false;
+		int replicaNum = Integer.parseInt(getArgument(1));
+		Boolean sameEPR = false;
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath replicaRNS = current.lookup(replicaPath, RNSPathQueryFlags.MUST_EXIST);
 		EndpointReferenceType replicaEPR = replicaRNS.getEndpoint();
 		// Now get the replica vector of replica numbers
-		int []list=null;
+		int[] list = null;
 		// First get the vector or replica numbers
-		list=ResolverUtils.getEndpoints(replicaEPR);
+		list = ResolverUtils.getEndpoints(replicaEPR);
 		// If there is only one copy, don't allow replica remove
-		if (list.length==1) {
+		if (list.length == 1) {
 			stdout.println("Only one copy of " + replicaPath + ". Use rm to delete it.");
 			return 1;
 		}
 		// Now look them all up and get their EPRs
-		LookupResponseType dir=ResolverUtils.getEndpointEntries(replicaEPR);
-		if (dir!=null  && list!=null) {
+		LookupResponseType dir = ResolverUtils.getEndpointEntries(replicaEPR);
+		if (dir != null && list != null) {
 			// Now find the replica
-			int index=-1;
-			for (int j=0;j<list.length;j++) {
-				if (list[j]==replicaNum) {
-					index=j;
+			int index = -1;
+			for (int j = 0; j < list.length; j++) {
+				if (list[j] == replicaNum) {
+					index = j;
 					break;
 				}
 			}
-			if (index>=0) {
-/*				
-				stdout.println(":replicaEPR data:\n" + replicaEPR.getAddress().toString()+"\n" + 
-						replicaEPR.getReferenceParameters().get_any()[0].toString());
-				stdout.println(":selected entry data:\n" + dir.getEntryResponse(index).getEndpoint().getAddress().toString()+"\n" + 
-						dir.getEntryResponse(index).getEndpoint().getReferenceParameters().get_any()[0].toString());
-*/
-				// To determine if the two replica instances are the same we check if their container address and resource key are the same.
+			if (index >= 0) {
+				/*
+				 * stdout.println(":replicaEPR data:\n" + replicaEPR.getAddress().toString()+"\n" +
+				 * replicaEPR.getReferenceParameters().get_any()[0].toString());
+				 * stdout.println(":selected entry data:\n" +
+				 * dir.getEntryResponse(index).getEndpoint().getAddress().toString()+"\n" +
+				 * dir.getEntryResponse
+				 * (index).getEndpoint().getReferenceParameters().get_any()[0].toString());
+				 */
+				// To determine if the two replica instances are the same we check if their
+				// container address and resource key are the same.
 				// The EPR equals operator does not do it correctly.
-				sameEPR = replicaEPR.getAddress().toString().compareTo(dir.getEntryResponse(index).getEndpoint().getAddress().toString())==0 &&
-						replicaEPR.getReferenceParameters().get_any()[0].toString().compareTo(dir.getEntryResponse(index).getEndpoint().getReferenceParameters().get_any()[0].toString())==0;
-				
+				sameEPR =
+					replicaEPR.getAddress().toString()
+						.compareTo(dir.getEntryResponse(index).getEndpoint().getAddress().toString()) == 0
+						&& replicaEPR.getReferenceParameters().get_any()[0].toString().compareTo(
+							dir.getEntryResponse(index).getEndpoint().getReferenceParameters().get_any()[0].toString()) == 0;
+
 				if (sameEPR) {
-				// 2014-10-04 ASG. I had code to pick a different EPR, but the list of EPR's I got back did not have resolvers embedded in them.
-				// So instead i am going to call ResolverUtils.resolve(EPR) and let the server pick one for me because it will properly embed
-				// the resolver info in the EPR. I could alternatively, construct my own using some notion of closeness, but i will not.		
-					// We must consider what might happen if the operation fails in the middle. If we simply unlink the old and link in the new,
-					// if a failure occurs after unlinking, and before linking, we could loose the reference to the resource. Soooo, instead we
-					// fist create a new link with the old, soon-to-be-removed-epr, then unlink, link the new, unlink the old.						
-					RNSPath tempLink = current.lookup(replicaPath + "-warning-removal-replica-failed", RNSPathQueryFlags.MUST_NOT_EXIST);
+					// 2014-10-04 ASG. I had code to pick a different EPR, but the list of EPR's I
+					// got back did not have resolvers embedded in them.
+					// So instead i am going to call ResolverUtils.resolve(EPR) and let the server
+					// pick one for me because it will properly embed
+					// the resolver info in the EPR. I could alternatively, construct my own using
+					// some notion of closeness, but i will not.
+					// We must consider what might happen if the operation fails in the middle. If
+					// we simply unlink the old and link in the new,
+					// if a failure occurs after unlinking, and before linking, we could loose the
+					// reference to the resource. Soooo, instead we
+					// fist create a new link with the old, soon-to-be-removed-epr, then unlink,
+					// link the new, unlink the old.
+					RNSPath tempLink =
+						current.lookup(replicaPath + "-warning-removal-replica-failed", RNSPathQueryFlags.MUST_NOT_EXIST);
 					try {
 						EndpointReferenceType replacementEPR = ResolverUtils.resolve(replicaEPR);
-						tempLink.link(replicaEPR);	// We will unlink this in just a moment, just don't want to loose it.
-						replicaRNS.unlink();		// unlink the old entry
-						replicaRNS.link(replacementEPR);//link in the new
-						// now when we destroy the replicaEPR we will not be removing the copy pointed to by the directory entry					
+						tempLink.link(replicaEPR); // We will unlink this in just a moment, just
+													// don't want to loose it.
+						replicaRNS.unlink(); // unlink the old entry
+						replicaRNS.link(replacementEPR);// link in the new
+						// now when we destroy the replicaEPR we will not be removing the copy
+						// pointed to by the directory entry
 						// Next we unlink the temporary link
 						tempLink.unlink();
 					} catch (Throwable e) {
-						stdout.println("Failed to get a new resolution EPR, this should NEVER happen.");						
+						stdout.println("Failed to get a new resolution EPR, this should NEVER happen.");
 						throw new ToolException("Failure removing replicant: " + e.getLocalizedMessage(), e);
 					}
-				}	
-				else replicaEPR=dir.getEntryResponse(index).getEndpoint();
-			}
-			else {
+				} else
+					replicaEPR = dir.getEntryResponse(index).getEndpoint();
+			} else {
 				stdout.println(replicaNum + " is out of range");
 				return 1;
 			}
-		}
-		else {
+		} else {
 			stdout.println("There are no replicas of " + replicaPath);
 			return 1;
-		}		
+		}
 		// Now destroy the replicant
 		MessageElement[] elementArr = new MessageElement[1];
 		elementArr[0] = new MessageElement(SyncProperty.UNLINKED_REPLICA_QNAME, "true");

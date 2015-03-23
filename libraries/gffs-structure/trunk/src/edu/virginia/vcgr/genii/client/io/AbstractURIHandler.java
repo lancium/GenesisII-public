@@ -113,14 +113,14 @@ public abstract class AbstractURIHandler implements IURIHandler
 			out = openOutputStream(target, credential);
 
 			DataTransferStatistics toReturn = StreamUtils.copyStream(fin, out);
-			HttpURLConnection conn = JavaURIAsURLHandler.activeConns.get(target);
+			HttpURLConnection conn = JavaURIAsURLHandler.getActiveConns().get(target);
 			if (conn != null) {
 				String msg = conn.getResponseMessage();
 				_logger.debug("web server response: " + msg);
 				// disconnect so everything is flushed and completed.
 				conn.disconnect();
 				// clean out the connection info.
-				JavaURIAsURLHandler.activeConns.remove(target);
+				JavaURIAsURLHandler.getActiveConns().remove(target);
 			}
 			return toReturn;
 		} finally {

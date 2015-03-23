@@ -196,11 +196,13 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		String filename = createFile.getFilename();
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("EnhancedRNSPortType: File Create \"" + filename + "\" from "+caller);
+		StatsLogger.logStats("EnhancedRNSPortType: File Create \"" + filename + "\" from " + caller);
 		// End logging
 		try {
-			// TODO - rather than building a list of all the files in the directory and seeing if
-			// this one is there - just check if is there
+			/*
+			 * TODO - rather than building a list of all the files in the directory and seeing if
+			 * this one is there - just check if is there.
+			 */
 			_resourceLock.lock();
 			Collection<String> entries = _resource.listEntries(filename);
 			_resource.commit();
@@ -267,7 +269,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		for (int lcv = 0; lcv < ret.length; lcv++) {
 			// 2014-11-05 ASG - adding logging
 			String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-			StatsLogger.logStats("EnhancedRNSPortType: Dir link \"" + addRequest[lcv].getEntryName() + "\" from "+caller);
+			StatsLogger.logStats("EnhancedRNSPortType: Dir link \"" + addRequest[lcv].getEntryName() + "\" from " + caller);
 			// End logging
 			try {
 				ret[lcv] = add(addRequest[lcv]);
@@ -289,7 +291,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		EndpointReferenceType entryReference;
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("EnhancedRNSPortType: Create link " + "\"" + entry.getEntryName() + "\"" + " from "+caller);
+		StatsLogger.logStats("EnhancedRNSPortType: Create link " + "\"" + entry.getEntryName() + "\"" + " from " + caller);
 		// End logging
 		if (entry == null || entry.getEntryName() == null) {
 			// Pure factory operation
@@ -366,7 +368,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("EnhancedRNSPortType: Dir List from "+caller);
+		StatsLogger.logStats("EnhancedRNSPortType: Dir List from " + caller);
 		// End logging
 		// ASG 2014-03-25 Here is where we will put the code to check if an implicit
 		// parameter has been passed in the SOAP header, and if so, not include the EPR
@@ -516,10 +518,10 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		VersionVector vvr;
 		try {
 			_resourceLock.lock();
-			
+
 			for (String request : removeRequest) {
 				// 2014-11-05 ASG - adding logging
-				StatsLogger.logStats("EnhancedRNSPortType: Dir Remove  " + "\"" + request + "\"" + "  from "+caller);
+				StatsLogger.logStats("EnhancedRNSPortType: Dir Remove  " + "\"" + request + "\"" + "  from " + caller);
 				// End logging
 				tmp = _resource.removeEntries(request);
 				if (tmp != null)

@@ -24,9 +24,6 @@ export.GridMapFile=/etc/grid-security/grid-mapfile
 # Can the export have overrides in the construction properties?
 export.AllowOverride=false
 
-# should the random byteio files be stored in the user's own home directory?
-byteio.InUserHome=false
-
 # controls how the byteio files are owned.  if this is set to ChownToUser, then
 # the gffs runs a script after the file is created to change its ownership.
 byteio.Storage=OwnedByGFFS

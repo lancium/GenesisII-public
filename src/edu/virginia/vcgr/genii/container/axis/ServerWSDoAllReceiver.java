@@ -176,7 +176,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				 * headers, don't do any crypto processing.
 				 */
 				resource.commit();
-				// hmmm: why commit before doing anything?
 
 				Message sm = msgContext.getCurrentMessage();
 				if (sm == null) {
@@ -539,8 +538,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					}
 					if (ips.contains(clientIP) == true) {
 						/*
-						 * hmmm: do we ever see this logging happen? outcalls from self might still
-						 * have non-localhost IP.
+						 * future: do we ever see this logging happen? outcalls from self might
+						 * still have non-localhost IP. or we skip making an outcall at all, which
+						 * supposedly exists in the codebase somewhere.
 						 */
 						if (_logger.isDebugEnabled())
 							_logger.debug("startup: allowing client on local address: " + clientIP);

@@ -35,6 +35,9 @@ creator
 force
     This flag specifies that the creator value specified should be used without vetting against the local credential wallet.  This can be necessary when an administrator is creating an export for another uer.  The container will still require that the user creating the export has full administrative permissions on the lightweight export port type specified, or the export creation will fail.
 
+heavy
+    This flag specifies using a full-blown recursive export rather than the default of a lightweight export.  Lightweight exports perform significantly faster, but heavy exports support setting permissions on any file or directory in the export.  Lightweight exports instead share permissions from the top-level of the export for all files and directories under the export.
+
 Description:
 
 The export tool gives users the ability to create and terminate grid exports of existing data (please reference exporting for more information on exports in the grid). If no command line values are given, then export launches a graphical dialog to help maintain local exports. Note that the dialog only allows users to manipulate exports created through the dialog (in other words, one cannot create an export on the command line, and then terminate it through the dialog) and only works in environments where a container has been started (i.e., you cannot use the export dialog to create exports on a remote machine).

@@ -145,6 +145,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateRNSRootTool</mconf:class>
 		<mconf:class name="connect"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ConnectTool</mconf:class>
+		<mconf:class name="reconnect"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ReconnectTool</mconf:class>
 		<mconf:class name="ls"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LsTool</mconf:class>
 		<mconf:class name="pwd"
@@ -265,6 +267,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.BESManager</mconf:class>
 		<mconf:class name="client-ui"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ClientApplicationUITool</mconf:class>
+		<mconf:class name="ui"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ClientApplicationUITool</mconf:class>
 		<mconf:class name="accounting"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.gui.AccountingTool</mconf:class>
 		<mconf:class name="env"
@@ -319,6 +323,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LogReaderTool</mconf:class>
 		<mconf:class name="identity"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.IdentityTool</mconf:class>
+		<mconf:class name="mst"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MetadataSearchTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

@@ -28,16 +28,15 @@ public class ApplicationDescription
 
 	static final private String PATCH_SIGNER_CERTIFICATE_PROPERTY_BASE = BASE_PROP_NAME + "patch-signer-certificate";
 	static final private String APPLICATION_NAME_PROPERTY = BASE_PROP_NAME + "application-name";
-	// hmmm: this might should be used.
-	// static final private String APPLICATION_DIRECTORY_PROPERTY = BASE_PROP_NAME +
-	// "application-directory";
 	static final private String APPLICATION_URL_PROPERTY_BASE = BASE_PROP_NAME + "application-url";
 	static final private String JAR_DESCRIPTION_FILE_PROPERTY = BASE_PROP_NAME + "jar-description-file";
 	static final private String APPLICATION_CLASS_PROPERTY = BASE_PROP_NAME + "application-class";
 	static final private String FAKE_UPDATER_CLASS_VALUE = "edu.virginia.vcgr.appmgr.update.UpdaterClass";
 
-	// the optional environment variable that points at the installation location.
-	// this becomes required if one is running the software under eclipse.
+	/*
+	 * the optional environment variable that points at the installation location. this becomes
+	 * required if one is running the software under eclipse.
+	 */
 	static public final String INSTALLATION_DIR_ENVIRONMENT_VARIABLE = "GENII_INSTALL_DIR";
 
 	private VersionManager _versionManager;

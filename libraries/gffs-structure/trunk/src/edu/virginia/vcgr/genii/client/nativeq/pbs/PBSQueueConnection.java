@@ -225,28 +225,24 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 		generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
-		/* VANA commented the whole section
-		URI variation = application.getSPMDVariation();
-		if (variation != null) {
-			// temporarily set std redirects to null; these are written as pbs directives
-			File stdoutRedirect = application.getStdoutRedirect(workingDirectory);
-			File stderrRedirect = application.getStderrRedirect(workingDirectory);
-
-			application.setStdoutRedirect(null);
-			application.setStderrRedirect(null);
-
-			// proceed as usual
-			List<String> finalCmdLine = super.generateApplicationBody(script, workingDirectory, application);
-
-			// reset std redirects in application description
-			if (stdoutRedirect != null)
-				application.setStdoutRedirect(stdoutRedirect.toString());
-			if (stderrRedirect != null)
-				application.setStderrRedirect(stderrRedirect.toString());
-
-			return finalCmdLine;
-		} else */
-			return super.generateApplicationBody(script, workingDirectory, application);
+		/*
+		 * VANA commented the whole section URI variation = application.getSPMDVariation(); if
+		 * (variation != null) { // temporarily set std redirects to null; these are written as pbs
+		 * directives File stdoutRedirect = application.getStdoutRedirect(workingDirectory); File
+		 * stderrRedirect = application.getStderrRedirect(workingDirectory);
+		 * 
+		 * application.setStdoutRedirect(null); application.setStderrRedirect(null);
+		 * 
+		 * // proceed as usual List<String> finalCmdLine = super.generateApplicationBody(script,
+		 * workingDirectory, application);
+		 * 
+		 * // reset std redirects in application description if (stdoutRedirect != null)
+		 * application.setStdoutRedirect(stdoutRedirect.toString()); if (stderrRedirect != null)
+		 * application.setStderrRedirect(stderrRedirect.toString());
+		 * 
+		 * return finalCmdLine; } else
+		 */
+		return super.generateApplicationBody(script, workingDirectory, application);
 	}
 
 	@Override

@@ -785,11 +785,6 @@ public class RNSPath implements Serializable, Cloneable
 		try {
 			context = ContextManager.getCurrentContext();
 			context.setSingleValueProperty("RNSShortForm", shortForm);
-
-			// hmmm: this seems safer, since it will not interfere with other calling contexts about
-			// to be deserialized.
-			// ContextManager.storeCurrentContext(context);
-
 			_logger.trace("RNS Short form set to true for listContents");
 		} catch (Exception e) {
 		}
@@ -824,11 +819,6 @@ public class RNSPath implements Serializable, Cloneable
 			if (shortForm) {
 				try {
 					context.removeProperty("RNSShortForm");
-					/*
-					 * hmmm: this seems safer, since it will not interfere with other calling
-					 * contexts about to be deserialized.
-					 */
-					// ContextManager.storeCurrentContext(context);
 				} catch (Exception e) {
 					_logger.error("Could not remove the short form request from the calling context", e);
 				}

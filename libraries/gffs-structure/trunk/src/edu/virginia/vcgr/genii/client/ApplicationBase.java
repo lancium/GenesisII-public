@@ -45,7 +45,7 @@ public class ApplicationBase
 	static public final String USER_DIR_PROPERTY_VALUE = "env-GENII_USER_DIR";
 
 	static TrustStoreLinkage _containerLinkage = null;
-	
+
 	/**
 	 * a simple search for the deployment directory in the environment variables. this does not have
 	 * a default value implemented here, and must fall-back to a default elsewhere.
@@ -68,7 +68,7 @@ public class ApplicationBase
 			}
 		}
 	}
-	
+
 	/**
 	 * Prepares the static configuration manager.
 	 */
@@ -81,7 +81,7 @@ public class ApplicationBase
 			System.exit(1);
 		}
 		SecurityUtilities.initializeSecurity();
-		
+
 		_containerLinkage = new TrustStoreLinkage();
 
 		CertificateValidatorFactory.setValidator(new SecurityUtilities(_containerLinkage));
@@ -127,6 +127,29 @@ public class ApplicationBase
 		CONNECTION_GOOD_NOW
 	}
 
+	static public void dropGridConnection(Writer output, Writer error, Reader input)
+	{
+		ICallingContext callContext = null;
+		try {
+			callContext = ContextManager.getCurrentContext();
+			if (callContext == null)
+				callContext = new CallingContextImpl(new ContextType());
+		} catch (Throwable e) {
+			_logger.error("could not load or create calling context.");
+		}
+		if (callContext == null) {
+			_logger.error("failed to build calling context, so cannot drop grid connection.");
+			return;
+		}
+		// set the current path to null to force a redo.
+		callContext.setCurrentPath(null);
+		try {
+			ContextManager.storeCurrentContext(callContext);
+		} catch (Exception e) {
+			_logger.error("failure while storing current context", e);
+		}
+	}
+	
 	static public GridStates establishGridConnection(Writer output, Writer error, Reader input)
 	{
 		ICallingContext callContext = null;
@@ -141,9 +164,9 @@ public class ApplicationBase
 			_logger.error("failed to build calling context.");
 			return GridStates.CONNECTION_MEANS_UNKNOWN;
 		}
-		
-		//_logger.debug("in establish grid conn, context is: " + callContext.dumpContext());		
-		
+
+		// _logger.debug("in establish grid conn, context is: " + callContext.dumpContext());
+
 		RNSPath currdir = callContext.getCurrentPath();
 		if (currdir != null) {
 			return GridStates.CONNECTION_ALREADY_GOOD;

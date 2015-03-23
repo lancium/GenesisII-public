@@ -182,15 +182,15 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 				// This shouldn't fail, but I can't test it now and it's just
 				// for a print statement.
 			}
-			
+
 			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners,
 				ContextManager.getExistingContext(), workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
 
-			//hmmm: set this back to trace level.
-			if (_logger.isDebugEnabled()) {				
-				_logger.debug("after creating job, context has these creds:\n" + TransientCredentials.getTransientCredentials(ContextManager.getExistingContext()).toString());
+			if (_logger.isTraceEnabled()) {
+				_logger.debug("after creating job, context has these creds:\n"
+					+ TransientCredentials.getTransientCredentials(ContextManager.getExistingContext()).toString());
 			}
-			
+
 			Calendar future = Calendar.getInstance();
 			future.setTimeInMillis(System.currentTimeMillis() + BES_ACTIVITY_LIFETIME);
 			_logger

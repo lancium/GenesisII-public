@@ -1,3 +1,4 @@
-
-# no directories listed, so wide open to export what users can reach.
+# Path UserID [Options]
+# Default exports file allows any user to export on any path.
+/ * rw
 

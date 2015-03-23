@@ -42,7 +42,7 @@ public class TellConfigTool extends BaseGridTool
 		AuthZSecurityException, IOException, ResourcePropertyException
 	{
 		int toReturn = 0;
-		
+
 		if (numArguments() == 0) {
 			stdout.println("No configuration item requested; try 'grid man tell-config'");
 		}
@@ -98,8 +98,8 @@ public class TellConfigTool extends BaseGridTool
 					stdout.println("Owner Certificate stored in: '" + certFile + "'");
 					if (certFile != null) {
 						stdout.println("Owner Certificate Subject: '"
-							+ InstallationProperties.getInstallationProperties().getOwnerCertificate().describe(VerbosityLevel.LOW)
-							+ "'");
+							+ InstallationProperties.getInstallationProperties().getOwnerCertificate()
+								.describe(VerbosityLevel.LOW) + "'");
 					}
 					break;
 				}

@@ -10,13 +10,12 @@ import org.junit.Test;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.db.NotTheServerDatabaseConnectionPool;
-
-// hmmm: this test class needs to move into gffs-structure to follow database connection pool.
+// future: this test class needs to move into gffs-structure to follow database connection pool.
+// future: test should also be restructured to be a unit test in junit style.
 public class TestingDBConnectionPool
 {
 	static private final int _NUM_ROWS = 1000;
-	static private ServerDatabaseConnectionPool _pool;
+	static private DatabaseConnectionPool _pool;
 
 	@Test
 	public void testNothing()
@@ -80,7 +79,8 @@ public class TestingDBConnectionPool
 		props.setProperty("edu.virginia.vcgr.genii.client.db.db-password", "");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.pool-size", "8");
 
-		_pool = new ServerDatabaseConnectionPool(props);
+		// TODO: parameters not right; need to copy server db conn pool?
+		_pool = new DatabaseConnectionPool(null, props, null);
 	}
 
 	static public void createTables() throws Throwable

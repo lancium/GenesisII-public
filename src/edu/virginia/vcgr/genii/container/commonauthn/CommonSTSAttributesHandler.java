@@ -59,7 +59,8 @@ public class CommonSTSAttributesHandler extends GeniiDirAttributeHandlers
 		addHandler(SecurityConstants.CERTIFICATE_CHAIN_QNAME, "getResourceCertificate");
 		addHandler(SecurityConstants.STORED_CALLING_CONTEXT_QNAME, "getStoredCallingContext");
 		addHandler(SecurityConstants.IDP_PRIVATE_KEY_QNAME, "getPrivateKey");
-//		addHandler(GeniiDirPolicy.REPLICATION_POLICY_QNAME, "getReplicationPolicyAttr", "setReplicationPolicyAttr");
+		// addHandler(GeniiDirPolicy.REPLICATION_POLICY_QNAME, "getReplicationPolicyAttr",
+		// "setReplicationPolicyAttr");
 		super.registerHandlers();
 	}
 
