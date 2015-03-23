@@ -15,6 +15,8 @@ import edu.virginia.vcgr.genii.client.nativeq.pbs.PBSQueue;
 import edu.virginia.vcgr.genii.client.nativeq.pbs.PBSQueueConfiguration;
 import edu.virginia.vcgr.genii.client.nativeq.sge.SGEQueue;
 import edu.virginia.vcgr.genii.client.nativeq.sge.SGEQueueConfiguration;
+import edu.virginia.vcgr.genii.client.nativeq.slurm.SLURMQueue;
+import edu.virginia.vcgr.genii.client.nativeq.slurm.SLURMQueueConfiguration;
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeed;
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeedUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
@@ -183,6 +185,10 @@ class Version1Upgrader
 				SGEQueueConfiguration conf = new SGEQueueConfiguration();
 				upgrade(conf, props);
 				nativeQueueConf.providerConfiguration(conf);
+			} else if (provName.equals(SLURMQueue.PROVIDER_NAME)) {
+				SLURMQueueConfiguration conf = new SLURMQueueConfiguration();
+				upgrade(conf, props);
+				nativeQueueConf.providerConfiguration(conf);
 			}
 		}
 
@@ -210,6 +216,12 @@ class Version1Upgrader
 		conf.qsub(getAppConf(props, APPPATH_FMT, APPARG_FMT, provName, "qsub"));
 		conf.qstat(getAppConf(props, APPPATH_FMT, APPARG_FMT, provName, "qstat"));
 		conf.qdel(getAppConf(props, APPPATH_FMT, APPARG_FMT, provName, "qdel"));
+
+		if (provName == "slurm") {
+			conf.sbatch(getAppConf(props, APPPATH_FMT, APPARG_FMT, provName, "sbatch"));
+			conf.squeue(getAppConf(props, APPPATH_FMT, APPARG_FMT, provName, "squeue"));
+			conf.scancel(getAppConf(props, APPPATH_FMT, APPARG_FMT, provName, "scancel"));
+		}	
 
 		conf.bashBinary(props.getProperty(BASHBIN));
 		conf.submitScriptName(props.getProperty(SCRIPTNAME));
@@ -241,6 +253,11 @@ class Version1Upgrader
 	static private void upgrade(SGEQueueConfiguration conf, Properties props)
 	{
 		upgradeScriptBasedConf(conf, props, "sge");
+	}
+
+	static private void upgrade(SLURMQueueConfiguration conf, Properties props)
+	{
+		upgradeScriptBasedConf(conf, props, "slurm");
 	}
 
 	static boolean upgrade(BESConstructionParameters params, Properties props) throws IOException

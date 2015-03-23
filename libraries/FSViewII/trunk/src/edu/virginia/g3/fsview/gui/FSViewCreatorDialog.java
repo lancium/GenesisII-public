@@ -75,10 +75,8 @@ final public class FSViewCreatorDialog extends JDialog
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(new JButton(new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		/* VANA added 'Help' button */
 		content.add(new JButton(new HelpAction()), new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		/* VANA added 'Help' button */
 
 		JPanel errorPanel = new JPanel(new GridBagLayout());
 		errorPanel.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -166,7 +164,6 @@ final public class FSViewCreatorDialog extends JDialog
 		}
 	}
 
-	/* VANA Help button functionality */
 	private class HelpAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
@@ -205,7 +202,6 @@ final public class FSViewCreatorDialog extends JDialog
 		}
 	}
 
-	/* VANA Help button functionality */
 
 	static public void main(String[] args)
 	{

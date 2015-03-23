@@ -17,6 +17,9 @@ public class CommonScriptBasedQueueConfiguration extends ScriptBasedQueueConfigu
 	static final private String DEFAULT_QSUB_BINARY = "qsub";
 	static final private String DEFAULT_QSTAT_BINARY = "qstat";
 	static final private String DEFAULT_QDEL_BINARY = "qdel";
+	static final private String DEFAULT_SBATCH_BINARY = "sbatch";
+	static final private String DEFAULT_SQUEUE_BINARY = "squeue";
+	static final private String DEFAULT_SCANCEL_BINARY = "scancel";
 
 	@XmlAttribute(name = "queue-name", required = false)
 	private String _queueName = null;
@@ -32,6 +35,15 @@ public class CommonScriptBasedQueueConfiguration extends ScriptBasedQueueConfigu
 
 	@XmlElement(namespace = NS, name = "qdel", required = false, nillable = true)
 	private ExecutableApplicationConfiguration _qdel = new ExecutableApplicationConfiguration();
+	
+	@XmlElement(namespace = NS, name = "sbatch", required = false, nillable = true)
+	private ExecutableApplicationConfiguration _sbatch = new ExecutableApplicationConfiguration();
+
+	@XmlElement(namespace = NS, name = "squeue", required = false, nillable = true)
+	private ExecutableApplicationConfiguration _squeue = new ExecutableApplicationConfiguration();
+
+	@XmlElement(namespace = NS, name = "scancel", required = false, nillable = true)
+	private ExecutableApplicationConfiguration _scancel = new ExecutableApplicationConfiguration();
 
 	private File binDirectory()
 	{
@@ -82,4 +94,34 @@ public class CommonScriptBasedQueueConfiguration extends ScriptBasedQueueConfigu
 	{
 		_qdel = conf;
 	}
+
+	final public List<String> startSBatch() throws FileNotFoundException
+        {
+                return _sbatch.startCommandLine(binDirectory(), DEFAULT_SBATCH_BINARY);
+        }
+
+        final public void sbatch(ExecutableApplicationConfiguration conf)
+        {
+                _sbatch = conf;
+        }
+
+        final public List<String> startSQueue() throws FileNotFoundException
+        {
+                return _squeue.startCommandLine(binDirectory(), DEFAULT_SQUEUE_BINARY);
+        }
+
+        final public void squeue(ExecutableApplicationConfiguration conf)
+        {
+                _squeue = conf;
+        }
+
+        final public List<String> startSCancel() throws FileNotFoundException
+        {
+                return _scancel.startCommandLine(binDirectory(), DEFAULT_SCANCEL_BINARY);
+        }
+
+        final public void scancel(ExecutableApplicationConfiguration conf)
+        {
+                _scancel = conf;
+        }
 }

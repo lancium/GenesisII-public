@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.client.nativeq;
 
-import java.net.URI;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -8,22 +7,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.Collection;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.io.StreamUtils;
 import org.morgan.util.Pair;
+import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
+import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
@@ -61,15 +61,15 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		checkBinary(bashBinary);
 	}
 
-	final protected File getSubmitScript(File workingDirectory) throws IOException
-	{
-		String submitScriptName = providerConfiguration().submitScriptName();
+        final protected File getSubmitScript(File workingDirectory) throws IOException
+        {
+                String submitScriptName = providerConfiguration().submitScriptName();
 
-		if (submitScriptName == null)
-			return File.createTempFile("qsub", ".sh", workingDirectory);
+                if (submitScriptName == null)
+                        return File.createTempFile("qsub", ".sh", workingDirectory);
 
-		return new File(workingDirectory, submitScriptName);
-	}
+                return new File(workingDirectory, submitScriptName);
+        }
 
 	final protected File getBashBinary()
 	{
@@ -189,15 +189,11 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 				stderrRedirect = new File(PATH_TO_DEV_NULL);
 			}
 
-			//VANA
-
 			URI variation = application.getSPMDVariation();
 			if (variation != null) {
 				stdoutRedirect = null;
 				stderrRedirect = null;
 			}
-
-			//VANA
 
 			CmdLineManipulatorUtils.addEnvProperties(jobProperties, application.getFuseMountPoint(),
 				application.getEnvironment(), workingDirectory, application.getStdinRedirect(workingDirectory), stdoutRedirect,
@@ -253,7 +249,6 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		try {
 			Collection<String> commandLine = builder.command();
 			logProcess(commandLine);
-
 			Process proc = builder.start();
 			proc.getOutputStream().close();
 			StreamCopier stdoutCopy = new StreamCopier(proc.getInputStream());
@@ -264,7 +259,6 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 
 			if (result == 0)
 				return stdoutCopy.getResult();
-
 			throw new ScriptExecutionException(commandLine, result, stderrCopy.getResult());
 		} catch (InterruptedException ie) {
 			throw new NativeQueueException("Unable to execute command.", ie);

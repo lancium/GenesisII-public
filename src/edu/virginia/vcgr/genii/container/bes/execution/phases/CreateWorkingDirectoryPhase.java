@@ -46,10 +46,8 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 			if (OperatingSystemType.getCurrent().isWindows())
 				cwd.setWritable(true, false);
 
-			else
-				FileSystemUtils.chmod(cwd.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
-					| FileSystemUtils.MODE_USER_EXECUTE | FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE
-					| FileSystemUtils.MODE_GROUP_EXECUTE);
+			else{
+				FileSystemUtils.chmod(cwd.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE | FileSystemUtils.MODE_USER_EXECUTE | FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE | FileSystemUtils.MODE_GROUP_EXECUTE); }
 
 		} catch (Throwable cause) {
 			history.createErrorWriter(cause, "Unable to create directory.")
