@@ -77,9 +77,12 @@ INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/xsede_tools.jenkins-xs
 # give the build an input file it can use.  this one relies on our having set
 # the crucial variables beforehand in the code above; they will percolate down
 # to the bootstrapping scripts and test scripts.
-sed -e "s/GENII_INSTALL_DIR=.*/GENII_INSTALL_DIR=\$GENII_INSTALL_DIR/" \
-  -e "s/GENII_USER_DIR=.*/GENII_USER_DIR=\$GENII_USER_DIR/" \
-  -e "s/BACKUP_USER_DIR=.*/BACKUP_USER_DIR=\$BACKUP_USER_DIR/" \
+
+#these are old replacements:
+#-e "s/GENII_INSTALL_DIR=.*/GENII_INSTALL_DIR=\$GENII_INSTALL_DIR/" \
+#-e "s/GENII_USER_DIR=.*/GENII_USER_DIR=\$GENII_USER_DIR/" \
+
+sed -e "s/BACKUP_USER_DIR=.*/BACKUP_USER_DIR=\$BACKUP_USER_DIR/" \
   < $INPUTFILE_FOR_JENKINS \
   > "$GRITTY_TESTING_TOP_LEVEL/xsede_tools.cfg"
 bail_on_fail
@@ -159,7 +162,7 @@ echo "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
 # location of ${user.home}/.GenesisII.
 for i in $GENII_INSTALL_DIR/lib/genesisII*log4j.properties; do
   sed -i \
-    -e "s/log4j.rootCategory=.*, *VCONSOLE, *LOGFILE/log4j.rootCategory=DEBUG, VCONSOLE, LOGFILE/" \
+    -e "s/log4j.rootCategory=.*LOGFILE/log4j.rootCategory=DEBUG, VCONSOLE, LOGFILE/" \
     -e "s%\${user.home}\/.GenesisII%$GRITTY_TESTING_TOP_LEVEL\/logs%" \
       "$i" &>/dev/null
 done

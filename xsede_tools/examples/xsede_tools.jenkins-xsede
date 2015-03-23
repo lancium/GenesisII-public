@@ -15,14 +15,14 @@
 # This setting is not needed if the environment defines GENII_INSTALL_DIR.
 # Update this if Genesis is installed elsewhere, e.g. the installation path on
 # Mac OSX is instead "/Applications/GenesisII".
-GENII_INSTALL_DIR=replace
+#old: GENII_INSTALL_DIR=replace
 
 # The user state directory for Genesis.  If not set, the default will be used.
 # This setting is not needed if the environment defines GENII_USER_DIR.
 # This directory should never be stored on an NFS or other mounted location,
 # as that imposes significant performance issues and may cause problems for
 # the Derby embedded database.
-GENII_USER_DIR=replace
+#old: GENII_USER_DIR=replace
 
 # The name of the deployment to use.  The modern XSEDE and XCG installers use
 # the name "current_grid" for this.  Other installers may provide a different
