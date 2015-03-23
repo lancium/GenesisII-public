@@ -304,14 +304,14 @@ file="$OLD_DEPLOYMENT_DIR/$old_dep/configuration/server-config.xml"
 CONTAINER_HOSTNAME_PROPERTY="$(seek_variable_in_xml "$var" "$file")"
 if [ -z "$CONTAINER_HOSTNAME_PROPERTY" ]; then
   # try again with the newest installation.
-  echo "hmmm: $var was missing in $file, trying alternate."
+  echo "info: $var was missing in $file, trying alternate."
   file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/server-config.xml"
   CONTAINER_HOSTNAME_PROPERTY="$(seek_variable_in_xml "$var" "$file")"
 echo got value = $CONTAINER_HOSTNAME_PROPERTY
   if [[ -z "$CONTAINER_HOSTNAME_PROPERTY" \
       || "$CONTAINER_HOSTNAME_PROPERTY" =~ .*installer:.* ]]; then
     # try again with the hostname command.
-    echo "hmmm: $var also missing in $file, falling back to hostname command."
+    echo "info: $var also missing in $file, falling back to hostname command."
     CONTAINER_HOSTNAME_PROPERTY="$(hostname -f)"
     echo "Moving forward with intuited hostname of '$CONTAINER_HOSTNAME_PROPERTY'."
   fi
