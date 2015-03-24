@@ -11,6 +11,8 @@
 # get into the real directory for this test.
 script_lib_dir="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 export SCRIPT_TOP="$( \cd "$script_lib_dir/.." && \pwd )"  # go to top of hierarchy.
+# canonicalize path to avoid using links.
+SCRIPT_TOP="$(readlink -f "$SCRIPT_TOP")"
 cd $SCRIPT_TOP
 
 # stuff important values into the environment.
