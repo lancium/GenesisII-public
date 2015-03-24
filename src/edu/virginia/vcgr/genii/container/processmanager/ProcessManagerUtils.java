@@ -1,18 +1,19 @@
 package edu.virginia.vcgr.genii.container.processmanager;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 public class ProcessManagerUtils
 {
 	static private IProcessManagerProvider _provider;
 
 	static {
-		OperatingSystemType os = OperatingSystemType.getCurrent();
+		OperatingSystemTypes os = OperatingSystemType.getCurrent();
 
-		if (os == OperatingSystemType.LINUX) {
+		if (os == OperatingSystemTypes.LINUX) {
 			// Currently undefined Linux behavior for process management
 			_provider = new LinuxProvider();
-		} else if (os.isWindows()) {
+		} else if (OperatingSystemType.isWindows()) {
 			_provider = new WindowsProvider();
 		} else {
 			throw new RuntimeException("Don't know an IProcessManagerProvider for OS type \"" + os + "\".");

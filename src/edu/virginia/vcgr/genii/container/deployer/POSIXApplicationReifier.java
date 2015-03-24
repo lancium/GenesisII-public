@@ -11,6 +11,7 @@ import org.ggf.jsdl.posix.FileName_Type;
 import org.ggf.jsdl.posix.POSIXApplication_Type;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 public class POSIXApplicationReifier
 {
@@ -85,7 +86,7 @@ public class POSIXApplicationReifier
 
 	static private boolean isWindows()
 	{
-		return OperatingSystemType.getCurrent() == OperatingSystemType.Windows_XP;
+		return OperatingSystemType.getCurrent() == OperatingSystemTypes.Windows_XP;
 	}
 
 	static private String modifyPath(String original, String[] newPaths)

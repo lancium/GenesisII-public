@@ -217,7 +217,7 @@ public class ProcessWrapper
 				_done = true;
 				if (_process != null) {
 					try {
-						if (OperatingSystemType.getCurrent().isWindows())
+						if (OperatingSystemType.isWindows())
 							ProcessManager.kill(_process);
 					} catch (Throwable cause) {
 						_logger.warn("There was a problem killing a windows process.");

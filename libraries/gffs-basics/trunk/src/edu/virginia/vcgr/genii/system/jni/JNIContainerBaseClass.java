@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 public class JNIContainerBaseClass
 {
@@ -30,8 +31,8 @@ public class JNIContainerBaseClass
 			System.loadLibrary(VCGR_CONTAINER_LIB_NAME);
 			_logger.debug("loaded shared library: " + VCGR_CONTAINER_LIB_NAME);
 		} catch (UnsatisfiedLinkError e) {
-			OperatingSystemType os = OperatingSystemType.getCurrent();
-			if (os == OperatingSystemType.LINUX) {
+			OperatingSystemTypes os = OperatingSystemType.getCurrent();
+			if (os == OperatingSystemTypes.LINUX) {
 				if (_logger.isTraceEnabled())
 					_logger.trace("saw expected failure to load library " + VCGR_CONTAINER_LIB_NAME + " on linux OS.");
 			} else {

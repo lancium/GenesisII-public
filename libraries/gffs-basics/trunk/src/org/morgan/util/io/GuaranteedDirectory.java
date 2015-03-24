@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 /**
  * A utility class which acts like a file, but upon successful creation guarantees that the names
@@ -55,9 +56,9 @@ public class GuaranteedDirectory extends File
 				 * CAK: note, we no longer support java 6. this could be updated if there were
 				 * better ways in java 7.
 				 */
-				OperatingSystemType osType = OperatingSystemType.getCurrent();
-				if (!((osType == OperatingSystemType.Windows_XP) || (osType == OperatingSystemType.Windows_VISTA)
-					|| (osType == OperatingSystemType.Windows_7) || (osType == OperatingSystemType.Windows_8))) {
+				OperatingSystemTypes osType = OperatingSystemType.getCurrent();
+				if (!((osType == OperatingSystemTypes.Windows_XP) || (osType == OperatingSystemTypes.Windows_VISTA)
+					|| (osType == OperatingSystemTypes.Windows_7) || (osType == OperatingSystemTypes.Windows_8))) {
 					// we think we're good to try this; this doesn't seem to be a windows variant.
 					Runtime r = Runtime.getRuntime();
 					String[] cmds = { "chmod", "u+rwx,g-rwx,o-rwx", getAbsolutePath() };

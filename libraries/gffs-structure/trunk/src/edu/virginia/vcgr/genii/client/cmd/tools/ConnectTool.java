@@ -63,7 +63,7 @@ public class ConnectTool extends BaseGridTool
 
 	static public void connect(String connectURL) throws ResourceException, MalformedURLException, IOException
 	{
-		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
+		boolean isWindows = OperatingSystemType.isWindows();
 
 		URL url = URLUtilities.formURL(connectURL, isWindows);
 		connect(ContextStreamUtils.load(url), null);
@@ -87,7 +87,7 @@ public class ConnectTool extends BaseGridTool
 	static public void connect(String connectURL, DeploymentName deploymentName) throws ResourceException,
 		MalformedURLException, IOException
 	{
-		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
+		boolean isWindows = OperatingSystemType.isWindows();
 
 		URL url = URLUtilities.formURL(connectURL, isWindows);
 		connect(ContextStreamUtils.load(url), deploymentName);

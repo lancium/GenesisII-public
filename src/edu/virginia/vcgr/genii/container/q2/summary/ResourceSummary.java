@@ -7,14 +7,14 @@ import java.util.Set;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 
-import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 import edu.virginia.vcgr.appmgr.os.ProcessorArchitecture;
 
 public class ResourceSummary
 {
-	static public OperatingSystemType translate(OperatingSystemTypeEnumeration osTypeEnum)
+	static public OperatingSystemTypes translate(OperatingSystemTypeEnumeration osTypeEnum)
 	{
-		return OperatingSystemType.valueOf(osTypeEnum.getValue());
+		return OperatingSystemTypes.valueOf(osTypeEnum.getValue());
 	}
 
 	static public ProcessorArchitecture translate(ProcessorArchitectureEnumeration archEnum)

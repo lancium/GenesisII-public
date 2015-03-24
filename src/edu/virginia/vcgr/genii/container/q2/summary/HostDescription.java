@@ -5,7 +5,7 @@ import java.util.Comparator;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 
-import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 import edu.virginia.vcgr.appmgr.os.ProcessorArchitecture;
 
 public class HostDescription implements Comparable<HostDescription>
@@ -20,9 +20,9 @@ public class HostDescription implements Comparable<HostDescription>
 	};
 
 	private ProcessorArchitecture _arch;
-	private OperatingSystemType _osType;
+	private OperatingSystemTypes _osType;
 
-	public HostDescription(ProcessorArchitecture arch, OperatingSystemType osType)
+	public HostDescription(ProcessorArchitecture arch, OperatingSystemTypes osType)
 	{
 		_arch = arch;
 		_osType = osType;
@@ -30,7 +30,7 @@ public class HostDescription implements Comparable<HostDescription>
 
 	public HostDescription(ProcessorArchitectureEnumeration archEnum, OperatingSystemTypeEnumeration osEnum)
 	{
-		this(ProcessorArchitecture.valueOf(archEnum.getValue()), OperatingSystemType.valueOf(osEnum.getValue()));
+		this(ProcessorArchitecture.valueOf(archEnum.getValue()), OperatingSystemTypes.valueOf(osEnum.getValue()));
 	}
 
 	public boolean equals(HostDescription other)

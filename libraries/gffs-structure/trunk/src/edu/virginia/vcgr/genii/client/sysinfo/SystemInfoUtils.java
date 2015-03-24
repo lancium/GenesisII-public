@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 public class SystemInfoUtils
 {
@@ -24,14 +25,14 @@ public class SystemInfoUtils
 
 	static private ISystemInfoProvider _provider;
 	static {
-		OperatingSystemType osType = OperatingSystemType.getCurrent();
+		OperatingSystemTypes osType = OperatingSystemType.getCurrent();
 
-		if (osType == OperatingSystemType.LINUX)
+		if (osType == OperatingSystemTypes.LINUX)
 			_provider = new ProcFilesystemProvider();
-		else if ((osType == OperatingSystemType.Windows_XP) || (osType == OperatingSystemType.Windows_VISTA)
-			|| (osType == OperatingSystemType.Windows_7) || (osType == OperatingSystemType.Windows_8))
+		else if ((osType == OperatingSystemTypes.Windows_XP) || (osType == OperatingSystemTypes.Windows_VISTA)
+			|| (osType == OperatingSystemTypes.Windows_7) || (osType == OperatingSystemTypes.Windows_8))
 			_provider = new WindowsProvider();
-		else if (osType == OperatingSystemType.MACOS)
+		else if (osType == OperatingSystemTypes.MACOS)
 			_provider = new MacOSXProvider();
 		else
 			throw new RuntimeException("Don't know an ISystemInfoProvider for OS type \"" + osType + "\".");

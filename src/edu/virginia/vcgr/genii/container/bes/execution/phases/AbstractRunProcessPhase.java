@@ -81,9 +81,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		if (overload == null || overload.size() == 0)
 			return ret;
 
-		OperatingSystemType os = OperatingSystemType.getCurrent();
-
-		if (os.isWindows())
+		if (OperatingSystemType.isWindows())
 			overloadWindowsEnvironment(ret, overload);
 		else
 			overloadLinuxEnvironment(ret, overload);
@@ -164,7 +162,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		if (command.contains(File.separator))
 			return command;
 
-		if (OperatingSystemType.getCurrent().isWindows()) {
+		if (OperatingSystemType.isWindows()) {
 			String key = findWindowsVariable(env, "PATH");
 			path = env.get(key);
 		} else {

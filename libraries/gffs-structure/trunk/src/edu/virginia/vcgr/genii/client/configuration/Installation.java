@@ -78,7 +78,7 @@ public class Installation
 	{
 		return _installationDirectory;
 	}
-	
+
 	static public File getDeploymentsDirectory()
 	{
 		return _deploymentsDirectory;
@@ -114,7 +114,7 @@ public class Installation
 	static public File getGridCommand()
 	{
 		File ret;
-		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
+		boolean isWindows = OperatingSystemType.isWindows();
 
 		if (isWindows)
 			ret = new File(_installationDirectory, "grid.bat");

@@ -11,6 +11,7 @@ import org.ggf.jsdl.hpcp.Environment_Type;
 import org.ggf.jsdl.hpcp.FileName_Type;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 public class HPCApplicationReifier
 {
@@ -81,7 +82,7 @@ public class HPCApplicationReifier
 
 	static private boolean isWindows()
 	{
-		return OperatingSystemType.getCurrent() == OperatingSystemType.Windows_XP;
+		return OperatingSystemType.getCurrent() == OperatingSystemTypes.Windows_XP;
 	}
 
 	static private String modifyPath(String original, String[] newPaths)

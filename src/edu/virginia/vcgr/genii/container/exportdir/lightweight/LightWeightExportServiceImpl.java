@@ -11,6 +11,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.ExportControl.ModeAllowance;
 import edu.virginia.vcgr.genii.client.ExportControlsList;
 import edu.virginia.vcgr.genii.client.ExportProperties;
@@ -199,14 +200,21 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 			ExportMechanisms exportType = ExportProperties.getExportProperties().getExportMechanism();
 			if (exportType == ExportMechanisms.EXPORT_MECH_PROXYIO) {
 				// test whether this is an OS where we support proxyio exports.
-				String osName = System.getProperty("os.name");
+				// String osName = System.getProperty("os.name");
 				boolean isCompatibleOS = false;
-				_logger.debug("property says OS name is: " + osName);
-				if (osName.contains("Windows")) {
-					isCompatibleOS = false;
-				} else if (osName.contains("OS X") || osName.contains("")) {
-					// linux and mac
+				// _logger.debug("property says OS name is: " + osName);
+				if (!OperatingSystemType.isWindows()) {
+					// osName.contains("Windows")) {
 					isCompatibleOS = true;
+
+					/*
+					 * this is a very simple decision currently. if we had another OS that didn't
+					 * support sudo, we would want to exclude it here.
+					 */
+
+					// } else if (osName.contains("OS X") || osName.contains("")) {
+					// linux and mac
+					// isCompatibleOS = true;
 				}
 
 				if (!isCompatibleOS) {

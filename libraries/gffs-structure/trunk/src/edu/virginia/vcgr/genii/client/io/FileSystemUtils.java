@@ -83,7 +83,7 @@ public class FileSystemUtils extends JNIClientBaseClass
 		if (!filepath.exists())
 			throw new FileNotFoundException("Couldn't find file \"" + filepath.getAbsolutePath() + "\".");
 
-		if (OperatingSystemType.getCurrent().isWindows())
+		if (OperatingSystemType.isWindows())
 			return makeWindowsExecutable(filepath);
 		else {
 			if (!filepath.canExecute()) {
@@ -97,7 +97,7 @@ public class FileSystemUtils extends JNIClientBaseClass
 
 	static public boolean isSoftLink(File file) throws IOException
 	{
-		if (OperatingSystemType.getCurrent().isWindows())
+		if (OperatingSystemType.isWindows())
 			return false;
 
 		if (file == null)

@@ -7,6 +7,7 @@ import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 import edu.virginia.vcgr.genii.client.container.ContainerIDFile;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 
@@ -127,7 +128,7 @@ public class ApplicationContext
 
 	public boolean isMacOS()
 	{
-		return OperatingSystemType.getCurrent() == OperatingSystemType.MACOS;
+		return OperatingSystemTypes.MACOS.equals(OperatingSystemType.getCurrent());
 	}
 
 	public boolean isLocal(EndpointReferenceType epr)

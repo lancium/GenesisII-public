@@ -180,7 +180,7 @@ public class CreateUserDelegateTool extends CreateUserTool
 	{
 		ComboBoxDialog menu;
 
-		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
+		boolean isWindows = OperatingSystemType.isWindows();
 
 		MenuItem pkcs12 = new SimpleMenuItem("P", "PKCS12");
 		MenuItem jks = new SimpleMenuItem("J", "JKS");

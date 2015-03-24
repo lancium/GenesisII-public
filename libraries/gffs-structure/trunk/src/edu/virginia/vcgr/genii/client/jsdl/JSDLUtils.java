@@ -34,6 +34,7 @@ import org.ggf.jsdl.Range_Type;
 import org.w3c.dom.Element;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
@@ -75,15 +76,15 @@ public class JSDLUtils extends JNIContainerBaseClass
 
 	static public OperatingSystemType_Type getLocalOperatingSystemType()
 	{
-		OperatingSystemType os = OperatingSystemType.getCurrent();
+		OperatingSystemTypes os = OperatingSystemType.getCurrent();
 
 		if (_logger.isDebugEnabled())
 			_logger.debug("Determined that the local OS Type is \"" + os + "\".");
-		if (os.equals(OperatingSystemType.Windows_7) || os.equals(OperatingSystemType.Windows_VISTA)
-			|| os.equals(OperatingSystemType.Windows_8)) {
+		if (os.equals(OperatingSystemTypes.Windows_7) || os.equals(OperatingSystemTypes.Windows_VISTA)
+			|| os.equals(OperatingSystemTypes.Windows_8)) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Considering " + os + " as roughly equivalent to XP.");
-			os = OperatingSystemType.Windows_XP;
+			os = OperatingSystemTypes.Windows_XP;
 		}
 		return new OperatingSystemType_Type(OperatingSystemTypeEnumeration.fromString(os.name()), null);
 	}

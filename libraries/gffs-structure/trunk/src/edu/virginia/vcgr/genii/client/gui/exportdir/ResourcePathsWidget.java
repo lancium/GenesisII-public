@@ -36,7 +36,7 @@ public class ResourcePathsWidget extends JComponent
 
 	private JButton createLocalBrowseButton()
 	{
-		if (OperatingSystemType.getCurrent().isWindows()) {
+		if (OperatingSystemType.isWindows()) {
 			// A persistent bug in Microsoft Windows JFileChooser
 			// implementation can cause this widget to hang
 			// indefinitely and so we can't safely use it.

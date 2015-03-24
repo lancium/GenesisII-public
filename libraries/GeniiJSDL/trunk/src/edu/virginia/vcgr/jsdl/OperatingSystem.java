@@ -29,7 +29,7 @@ public class OperatingSystem extends CommonJSDLElement
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "OperatingSystemType")
-	private OperatingSystemType _osType = null;
+	private OperatingSystemTypeElement _osType = null;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "OperatingSystemVersion")
 	private String _osVersion = null;
@@ -37,7 +37,7 @@ public class OperatingSystem extends CommonJSDLElement
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "Description")
 	private String _description;
 
-	public OperatingSystem(OperatingSystemType osType)
+	public OperatingSystem(OperatingSystemTypeElement osType)
 	{
 		_osType = osType;
 	}
@@ -47,12 +47,12 @@ public class OperatingSystem extends CommonJSDLElement
 		this(null);
 	}
 
-	final public void osType(OperatingSystemType osType)
+	final public void osType(OperatingSystemTypeElement osType)
 	{
 		_osType = osType;
 	}
 
-	final public OperatingSystemType osType()
+	final public OperatingSystemTypeElement osType()
 	{
 		return _osType;
 	}

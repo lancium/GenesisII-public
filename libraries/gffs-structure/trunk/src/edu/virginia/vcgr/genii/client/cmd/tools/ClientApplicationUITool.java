@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.IOException;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -47,7 +48,7 @@ public class ClientApplicationUITool extends BaseGridTool
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
 		AuthZSecurityException, IOException, ResourcePropertyException
 	{
-		if (OperatingSystemType.getCurrent() == OperatingSystemType.MACOS)
+		if (OperatingSystemTypes.MACOS.equals(OperatingSystemType.getCurrent()))
 			setupMacOSProperties();
 
 		ClientApplication ca = new ClientApplication(_launchShell);

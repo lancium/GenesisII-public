@@ -35,7 +35,7 @@ import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.JobDescription;
 import edu.virginia.vcgr.jsdl.JobIdentification;
 import edu.virginia.vcgr.jsdl.OperatingSystem;
-import edu.virginia.vcgr.jsdl.OperatingSystemType;
+import edu.virginia.vcgr.jsdl.OperatingSystemTypeElement;
 import edu.virginia.vcgr.jsdl.Resources;
 import edu.virginia.vcgr.jsdl.SourceTarget;
 import edu.virginia.vcgr.jsdl.hpc.HPCConstants;
@@ -132,7 +132,7 @@ public class JSDLEventGenerator
 			receiver.startOperatingSystem(path, operatingSystem.osVersion(), operatingSystem.description());
 			handleAnys(path, operatingSystem.any(), operatingSystem.anyAttributes(), receiver);
 
-			OperatingSystemType osType = operatingSystem.osType();
+			OperatingSystemTypeElement osType = operatingSystem.osType();
 			if (osType != null) {
 				path.push(path.formQNameFromPrevious("OperatingSystemType"));
 				receiver.startOperatingSystemType(path, osType.osName());

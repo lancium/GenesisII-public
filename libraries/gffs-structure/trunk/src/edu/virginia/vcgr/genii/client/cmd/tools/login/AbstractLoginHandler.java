@@ -88,7 +88,7 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 
 	private void addEntriesFromWindows(Collection<CertEntry> entries)
 	{
-		if (OperatingSystemType.getCurrent().isWindows()) {
+		if (OperatingSystemType.isWindows()) {
 			WinX509KeyManager km = new WinX509KeyManager();
 			String[] aliases = km.getClientAliases(null, null);
 			for (String alias : aliases) {

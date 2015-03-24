@@ -56,7 +56,7 @@ import edu.virginia.vcgr.jsdl.JobIdentification;
 import edu.virginia.vcgr.jsdl.MatchingParameter;
 import edu.virginia.vcgr.jsdl.OperatingSystem;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
-import edu.virginia.vcgr.jsdl.OperatingSystemType;
+import edu.virginia.vcgr.jsdl.OperatingSystemTypeElement;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 import edu.virginia.vcgr.jsdl.Resources;
 import edu.virginia.vcgr.jsdl.SourceTarget;
@@ -250,7 +250,7 @@ public class JobDocument implements PostUnmarshallListener
 			if (_operatingSystem != null) {
 				builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "OperatingSystemType"));
 				builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "OperatingSystemName"));
-				os.osType(new OperatingSystemType(_operatingSystem));
+				os.osType(new OperatingSystemTypeElement(_operatingSystem));
 				builder.pop();
 				builder.pop();
 			}

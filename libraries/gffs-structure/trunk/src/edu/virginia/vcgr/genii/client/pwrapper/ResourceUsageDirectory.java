@@ -29,7 +29,7 @@ public class ResourceUsageDirectory
 		try {
 			File tempFile = File.createTempFile("rusage-", ".xml", _directory);
 
-			if (OperatingSystemType.getCurrent().isWindows())
+			if (OperatingSystemType.isWindows())
 				tempFile.setWritable(true, false);
 			else
 				FileSystemUtils.chmod(tempFile.getAbsolutePath(), FileSystemUtils.MODE_USER_READ

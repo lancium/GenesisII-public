@@ -43,7 +43,7 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 		try {
 			File cwd = new GuaranteedDirectory(_workingDirectory);
 
-			if (OperatingSystemType.getCurrent().isWindows())
+			if (OperatingSystemType.isWindows())
 				cwd.setWritable(true, false);
 
 			else{
