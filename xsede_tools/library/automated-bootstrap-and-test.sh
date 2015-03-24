@@ -10,10 +10,13 @@
 
 # get into the real directory for this test.
 script_lib_dir="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+script_lib_dir="$(readlink -f "$script_lib_dir")"
 export SCRIPT_TOP="$( \cd "$script_lib_dir/.." && \pwd )"  # go to top of hierarchy.
 # canonicalize path to avoid using links.
 SCRIPT_TOP="$(readlink -f "$SCRIPT_TOP")"
 cd $SCRIPT_TOP
+echo "canonicalized script_lib_dir to: $script_lib_dir"
+echo "canonicalized SCRIPT_TOP to: $SCRIPT_TOP"
 
 # stuff important values into the environment.
 #
@@ -22,8 +25,8 @@ cd $SCRIPT_TOP
 export AUTOBUILD_RUNNING=true
 
 # get required parameters...
-export BUILDS_FOLDER="$1"; shift
-export WORKSPACE_DIR="$1"; shift
+export BUILDS_FOLDER="$(readlink -f "$1")"; shift
+export WORKSPACE_DIR="$(readlink -f "$1")"; shift
 # optional parameters...
 # using a different port for the container is an option...
 export DIFFERENT_PORT="$1"; shift
@@ -142,7 +145,8 @@ if [ $? -ne 0 ]; then
 fi
 popd &>/dev/null
 
-# patch all the paths so they point to the current genesis 2 location.
+# patch all the paths so they point to the current genesis 2 location, rather
+# than at the location where the code was built.
 bash "$GRITTY_TESTING_TOP_LEVEL/library/genesis2_path_fixer.sh" "$GENII_INSTALL_DIR" "$WORKSPACE_DIR"
 
 ##############
