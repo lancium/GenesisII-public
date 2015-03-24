@@ -168,10 +168,12 @@ echo "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
 # location of ${user.home}/.GenesisII.
 for i in $GENII_INSTALL_DIR/lib/genesisII*log4j.properties; do
   sed -i \
-    -e "s/log4j.rootCategory=.*LOGFILE/log4j.rootCategory=DEBUG, VCONSOLE, LOGFILE/" \
+    -e "s/log4j.rootCategory=.*LOGFILE/log4j.rootCategory=DEBUG, LOGFILE/" \
     -e "s%\${user.home}\/.GenesisII%$GRITTY_TESTING_TOP_LEVEL\/logs%" \
       "$i" &>/dev/null
 done
+#old: VCONSOLE, 
+# don't want vconsole echoes any more.
 
 ################
 
